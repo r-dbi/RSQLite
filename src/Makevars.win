@@ -1,0 +1,2 @@
+PKG_CPPFLAGS=
+PKG_LIBS=-Lwindows -lsqlite3

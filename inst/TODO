@@ -1,0 +1,22 @@
+* Need to do a lot more testing.  In particular the actual SQL
+  engine needs vigorous testing -- I've done very simple things
+  with it.
+
+* The actual R SQLite package shares an enormous amount of code
+  with both the RMySQL and ROracle drivers, so that piece should
+  be somewhat stable (he says!).  On the other hand, currently
+  we cannot use both drivers simultaneously (this should be an
+  easy fix).
+
+* Need to add the dbApply(), as in RMySQL.  This is very easy to do
+  here (see RS_SQLite_stdCallback), but shouldn't this be better
+  implemented in the RS-DBI.c to provide this service for all drivers
+  that sit on top of RS-DBI.c?
+
+* It would be nice to hook R as regular SQL functions and aggregations
+  (e.g., select group1, group2, median(x) from FOO group by group1, group2;)
+  Given the modularity in the SQLite C API, this is definitely not hard.
+  How to hook more interesting R function that return objects is not clear
+  at all, though.
+
+* It would be interesting to play with the in-memory db version.

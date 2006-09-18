@@ -1,5 +1,5 @@
 Package: RSQLite
-Version: 0.4-1
+Version: 0.4-2
 Date: 2006-01-18
 Title: SQLite interface for R
 Author: David A. James <dj@bell-labs.com>
@@ -13,3 +13,4 @@ Depends: R (>= 2.0.0), methods, DBI (>= 0.1-8)
 License: LGPL version 2 or newer
 URL: http://stat.bell-labs.com/RS-DBI 
      http://www.sqlite.org
+Collate: zzz.R S4R.R dbObjectId.R SQLite.R SQLiteSupport.R

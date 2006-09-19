@@ -81,37 +81,16 @@ m4trace:configure.in:49: -1- AC_SUBST([ac_ct_CC])
 m4trace:configure.in:49: -1- AC_SUBST([CC])
 m4trace:configure.in:49: -1- AC_SUBST([CC])
 m4trace:configure.in:49: -1- AC_SUBST([ac_ct_CC])
-m4trace:configure.in:73: -1- AC_CHECK_LIB([sqlite3], [sqlite3_open], [HAVE_SQLITE="yes"], [HAVE_SQLITE=""])
-m4trace:configure.in:76: -1- AC_CHECK_HEADERS([sqlite3.h], [HAVE_SQLITE_H="yes"], [HAVE_SQLITE_H=""])
-m4trace:configure.in:76: -1- AH_OUTPUT([HAVE_SQLITE3_H], [/* Define to 1 if you have the <sqlite3.h> header file. */
-#undef HAVE_SQLITE3_H])
-m4trace:configure.in:76: -1- AC_HEADER_STDC
-m4trace:configure.in:76: -1- AC_SUBST([EGREP])
-m4trace:configure.in:76: -1- AC_DEFINE_TRACE_LITERAL([STDC_HEADERS])
-m4trace:configure.in:76: -1- AH_OUTPUT([STDC_HEADERS], [/* Define to 1 if you have the ANSI C header files. */
-#undef STDC_HEADERS])
-m4trace:configure.in:76: -1- AC_CHECK_HEADERS([sys/types.h sys/stat.h stdlib.h string.h memory.h strings.h \
-                  inttypes.h stdint.h unistd.h], [], [], [$ac_includes_default])
-m4trace:configure.in:76: -1- AH_OUTPUT([HAVE_SYS_TYPES_H], [/* Define to 1 if you have the <sys/types.h> header file. */
-#undef HAVE_SYS_TYPES_H])
-m4trace:configure.in:76: -1- AH_OUTPUT([HAVE_SYS_STAT_H], [/* Define to 1 if you have the <sys/stat.h> header file. */
-#undef HAVE_SYS_STAT_H])
-m4trace:configure.in:76: -1- AH_OUTPUT([HAVE_STDLIB_H], [/* Define to 1 if you have the <stdlib.h> header file. */
-#undef HAVE_STDLIB_H])
-m4trace:configure.in:76: -1- AH_OUTPUT([HAVE_STRING_H], [/* Define to 1 if you have the <string.h> header file. */
-#undef HAVE_STRING_H])
-m4trace:configure.in:76: -1- AH_OUTPUT([HAVE_MEMORY_H], [/* Define to 1 if you have the <memory.h> header file. */
-#undef HAVE_MEMORY_H])
-m4trace:configure.in:76: -1- AH_OUTPUT([HAVE_STRINGS_H], [/* Define to 1 if you have the <strings.h> header file. */
-#undef HAVE_STRINGS_H])
-m4trace:configure.in:76: -1- AH_OUTPUT([HAVE_INTTYPES_H], [/* Define to 1 if you have the <inttypes.h> header file. */
-#undef HAVE_INTTYPES_H])
-m4trace:configure.in:76: -1- AH_OUTPUT([HAVE_STDINT_H], [/* Define to 1 if you have the <stdint.h> header file. */
-#undef HAVE_STDINT_H])
-m4trace:configure.in:76: -1- AH_OUTPUT([HAVE_UNISTD_H], [/* Define to 1 if you have the <unistd.h> header file. */
-#undef HAVE_UNISTD_H])
-m4trace:configure.in:317: -1- AC_SUBST([PKG_CPPFLAGS])
-m4trace:configure.in:318: -1- AC_SUBST([PKG_LIBS])
-m4trace:configure.in:320: -1- AC_CONFIG_FILES([src/Makevars])
-m4trace:configure.in:320: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
-m4trace:configure.in:320: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])
+m4trace:configure.in:96: -1- _m4_warn([obsolete], [The macro `AC_WARN' is obsolete.
+You should run autoupdate.], [autoconf/oldnames.m4:54: AC_WARN is expanded from...
+configure.in:96: the top level])
+m4trace:configure.in:98: -1- _m4_warn([obsolete], [The macro `AC_WARN' is obsolete.
+You should run autoupdate.], [autoconf/oldnames.m4:54: AC_WARN is expanded from...
+configure.in:98: the top level])
+m4trace:configure.in:295: -1- AC_SUBST([PKG_CPPFLAGS])
+m4trace:configure.in:296: -1- AC_SUBST([PKG_LIBS])
+m4trace:configure.in:298: -1- AC_CONFIG_FILES([src/Makevars])
+m4trace:configure.in:298: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
+You should run autoupdate.], [])
+m4trace:configure.in:298: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
+m4trace:configure.in:298: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])

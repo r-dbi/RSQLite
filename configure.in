@@ -3,8 +3,9 @@ dnl $Id$
 dnl
 dnl R embedding of the SQLite engine.
 dnl
-dnl Generate a "configure" script that will install the RSQLite packge,
-dnl possibly also installing the SQLite engine itself.
+dnl Generate a "configure" script that will install the RSQLite packge.
+dnl By default, we install our own statically linked version of the 
+dnl SQLite engine to avoid version mismatches.
 dnl
 dnl    USAGE:  autoconf
 dnl
@@ -16,11 +17,7 @@ dnl The resulting configure script implements the following logic:
 dnl
 dnl 1. If both PKG_CPPFLAGS and PKG_LIBS are defined, use them and exit.
 dnl
-dnl 2. We check for sqlite3.h and -lsqlite3 in system directories, and if
-dnl    found, we use these (provide the user does not specifically request 
-dnl    another version, 3. and 4. see below).
-dnl
-dnl 3. Alternatively, if the user specifies explicitly a particular SQLite
+dnl 2. If the user specifies explicitly a particular SQLite
 dnl    installation we use that version. This can be requested through 
 dnl         --with-sqlite-dir=DIR 
 dnl         --with-sqlite-inc=<include-DIR>
@@ -31,7 +28,7 @@ dnl    subdirectories;  individual locations of these two may be
 dnl    specified independently through <include-dir> and <library-dir>,
 dnl    respectively.  If we found these, we exit.
 dnl
-dnl 4. If we haven't found the SQLite installation yet, or if the user 
+dnl 3. If the user did not specify a SQLite installation, or if the user 
 dnl    explicitly requests to install the SQLite version we provide,
 dnl    we run configure/make/make install on the SQLite tarball.
 dnl    By default we install it in ${R_PACKAGE_DIR}/sqlite, but users
@@ -65,16 +62,6 @@ FOUND_ALL="no"
 #
 test -n "${PKG_CPPFLAGS}" -a -n "${PKG_LIBS}"  && FOUND_ALL="yes"
 
-# can we find SQLite in the system directories? (users may still want/need
-# to use another version/installation)
-#
-AC_CHECK_LIB(sqlite3, sqlite3_open, 
-             HAVE_SQLITE="yes", 
-             HAVE_SQLITE="")
-AC_CHECK_HEADERS(sqlite3.h, 
-             HAVE_SQLITE_H="yes", 
-             HAVE_SQLITE_H="")
-
 #
 # does user want a particular SQLite installation/version (possibly
 # overriding system directories)?
@@ -94,57 +81,45 @@ AC_ARG_WITH(sqlite-inc,
 #
 # Use SQLITE_DIR (if specified) to initialize SQLITE_{INC,LIB}
 # (handle the uniformative cases --with-no-sqlite or w.o. DIR values,
-# and make sure the various directories actually exist)
+# and make sure the various directories actually exist).  Ignore
+# with-sqlite-inc and with-sqlite-lib if with-sqlite-dir is present,
+# but issue a warning.
 #
-test "${SQLITE_DIR}" = "yes" -o "${SQLITE_DIR}" = "no"  &&  SQLITE_DIR=""
-test "${SQLITE_LIB}" = "yes" -o "${SQLITE_LIB}" = "no"  &&  SQLITE_LIB=""
-test "${SQLITE_INC}" = "yes" -o "${SQLITE_INC}" = "no"  &&  SQLITE_INC=""
-
-if test -n "${SQLITE_DIR}" ; then
-   test ! -d "${SQLITE_DIR}" && \
-              AC_MSG_ERROR([dir ${SQLITE_DIR} does not exist])
-   test -z "${SQLITE_INC}" -a -d "${SQLITE_DIR}/include" && \
-              SQLITE_INC="${SQLITE_DIR}/include"
-   test -z "${SQLITE_LIB}" -a -d "${SQLITE_DIR}/lib" && \
-              SQLITE_LIB="${SQLITE_DIR}/lib"
+if test "${FOUND_ALL}" = "no"; then
+    if test -n "${SQLITE_DIR}" ; then
+       test ! -d "${SQLITE_DIR}" && \
+                  AC_MSG_ERROR([dir ${SQLITE_DIR} does not exist])
+       test -n "${SQLITE_INC}" && \
+                  AC_WARN([Using sqlite-dir and ignoring sqlite-inc])
+       test -n "${SQLITE_LIB}" && \
+                  AC_WARN([Using sqlite-dir and ignoring sqlite-lib])
+       SQLITE_INC="${SQLITE_DIR}/include"
+       SQLITE_LIB="${SQLITE_DIR}/lib"
+       test ! -d "${SQLITE_INC}" && \
+                  AC_MSG_ERROR([dir ${SQLITE_INC} does not exist])
+       test ! -d "${SQLITE_LIB}" && \
+                  AC_MSG_ERROR([dir ${SQLITE_LIB} does not exist])
+       PKG_LIBS="-L${SQLITE_LIB} -lsqlite3"
+       PKG_CPPFLAGS="-I${SQLITE_INC}" 
+       FOUND_ALL="yes"
+    else
+       if test -n "${SQLITE_INC}" || test -n "${SQLITE_LIB}"; then
+          ## must have both
+          test -n "${SQLITE_INC}" && test -n "${SQLITE_LIB}" || \
+               AC_MSG_ERROR([must specify sqlite-inc and sqlite-lib])
+          ## must be dirs
+          test ! -d "${SQLITE_INC}" && \
+               AC_MSG_ERROR([sqlite-inc dir ${SQLITE_INC} does not exist])
+          test ! -d "${SQLITE_LIB}" && \
+               AC_MSG_ERROR([sqlite-lib dir ${SQLITE_LIB} does not exist])
+          PKG_LIBS="-L${SQLITE_LIB} -lsqlite3"
+          PKG_CPPFLAGS="-I${SQLITE_INC}" 
+          FOUND_ALL="yes"
+       fi
+    fi
 fi
 
-# 
-# We now determine whether we found the lib and header files (we still
-# need to check PKG_*, in case the user only defined one of them)
-#
-if test -z "${PKG_LIBS}" ; then
-   if test -n "${SQLITE_LIB}" ;  then
-      # use the one specified in --with-sqlite-*
-      PKG_LIBS="-L${SQLITE_LIB} -lsqlite3"
-   else
-      # use the one in the system dirs (if there's one)
-      test -n "${HAVE_SQLITE}" && PKG_LIBS="-lsqlite3"
-   fi
-fi
 
-if test -z "${PKG_CPPFLAGS}" ; then
-   if test -n "${SQLITE_INC}" ; then
-      # use the one specified in --with-sqlite-*
-      PKG_CPPFLAGS="-I${SQLITE_INC}" 
-      FOUND_INC="yes"
-   else
-      if test -n "${HAVE_SQLITE_H}" ; then
-         # use the one in the system dirs 
-         PKG_CPPFLAGS="" 
-         FOUND_INC="yes"
-      else
-         PKG_CPPFLAGS=""  
-         FOUND_INC="no"   
-      fi
-   fi
-fi
-
-if test "${FOUND_ALL}" = "no" ; then
-   test "${FOUND_INC}" = "yes" -a -n "${PKG_LIBS}"  && FOUND_ALL="yes"
-fi
-
-# 
 # do users want/need to install our own copy SQLite (taken from
 # http://www.sqlite.org)? If provided, force installation regardless
 # whether there's one already or not.
@@ -164,8 +139,8 @@ AC_ARG_ENABLE(sqlite,
                 fi
               ])
 
-if test "${FOUND_ALL}" = "no" -a "${SQLITE_TDIR}" != "no" ; then
 
+if test "${FOUND_ALL}" = "no" -a "${SQLITE_TDIR}" != "no" ; then
    # We need to install SQLite. Note that SQLite's configure will run
    # before the actual $R_PACKAGE_DIR is fully created -- so we'll install 
    # it under inst/sqlite so that when R copies rescursevely "inst" into 

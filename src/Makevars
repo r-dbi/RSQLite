@@ -1,2 +1,0 @@
-PKG_CPPFLAGS=
-PKG_LIBS=-lsqlite3

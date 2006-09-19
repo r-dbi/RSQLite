@@ -1,6 +1,6 @@
 Package: RSQLite
 Version: 0.4-2
-Date: 2006-01-18
+Date: 2006-09-18
 Title: SQLite interface for R
 Author: David A. James <dj@bell-labs.com>
 Maintainer: David A. James <dj@bell-labs.com>

@@ -91,6 +91,8 @@ function(obj, what="", ...)
 "sqliteNewConnection"<- 
 function(drv, dbname = "", mode=0, cache_size=NULL, synchronous=0)
 {
+  if (!is.null(dbname)) 
+    dbname <- path.expand(dbname)
   con.params <- as.character(c(dbname, mode))
   drvId <- as(drv, "integer")
   conId <- .Call("RS_SQLite_newConnection", drvId, con.params, 

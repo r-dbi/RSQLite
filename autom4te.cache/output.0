@@ -3241,12 +3241,12 @@ echo "$as_me: error: must specify sqlite-inc and sqlite-lib" >&2;}
    { (exit 1); exit 1; }; }
           ## must be dirs
           test ! -d "${SQLITE_INC}" && \
-               { { echo "$as_me:$LINENO: error: dir ${SQLITE_INC} does not exist" >&5
-echo "$as_me: error: dir ${SQLITE_INC} does not exist" >&2;}
+               { { echo "$as_me:$LINENO: error: sqlite-inc dir ${SQLITE_INC} does not exist" >&5
+echo "$as_me: error: sqlite-inc dir ${SQLITE_INC} does not exist" >&2;}
    { (exit 1); exit 1; }; }
           test ! -d "${SQLITE_LIB}" && \
-               { { echo "$as_me:$LINENO: error: dir ${SQLITE_LIB} does not exist" >&5
-echo "$as_me: error: dir ${SQLITE_LIB} does not exist" >&2;}
+               { { echo "$as_me:$LINENO: error: sqlite-lib dir ${SQLITE_LIB} does not exist" >&5
+echo "$as_me: error: sqlite-lib dir ${SQLITE_LIB} does not exist" >&2;}
    { (exit 1); exit 1; }; }
           PKG_LIBS="-L${SQLITE_LIB} -lsqlite3"
           PKG_CPPFLAGS="-I${SQLITE_INC}" 
@@ -3361,7 +3361,7 @@ if test "${FOUND_ALL}" = "no" -a "${SQLITE_TDIR}" != "no" ; then
   
    # Since we installed successfully, now we set PKG_* vars and exit
    PKG_CPPFLAGS="-I${SQLITE_TDIR}/include"
-   PKG_LIBS="-L${SQLITE_TDIR}/lib -lsqlite3"
+   PKG_LIBS="${SQLITE_TDIR}/lib/libsqlite3.a"
    FOUND_ALL="yes"
 
    echo ""

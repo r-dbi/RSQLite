@@ -1029,7 +1029,7 @@ RS_sqlite_import(
     zSql = sqlite3_mprintf("SELECT * FROM '%q'", zTable);
     if( zSql==0 ) return 0;
     nByte = strlen(zSql);
-    rc = sqlite3_prepare(db, zSql, 0, &pStmt, 0);
+    rc = sqlite3_prepare(db, zSql, -1, &pStmt, 0);
     sqlite3_free(zSql);
     if( rc ){
       char errMsg[512];
@@ -1051,7 +1051,7 @@ RS_sqlite_import(
     }
     zSql[j++] = ')';
     zSql[j] = 0;
-    rc = sqlite3_prepare(db, zSql, 0, &pStmt, 0);
+    rc = sqlite3_prepare(db, zSql, -1, &pStmt, 0);
     free(zSql);
     if( rc ){
       char errMsg[512];

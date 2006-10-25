@@ -14,3 +14,4 @@ src\/tags$
 src\/.*\.o$
 src\/.*\.so$
 help\/
+inst\/sqlite

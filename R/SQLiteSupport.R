@@ -18,21 +18,23 @@
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ##
 
-"sqliteInitDriver" <- 
-function(max.con = 16, fetch.default.rec = 500, force.reload=FALSE)
+"sqliteInitDriver" <-
+function(max.con = 16, fetch.default.rec = 500, force.reload=FALSE,
+         shared.cache=FALSE)
 ## return a manager id
 {
   config.params <- as.integer(c(max.con, fetch.default.rec))
   force <- as.logical(force.reload)
-  id <- .Call("RS_SQLite_init", config.params, force, PACKAGE = "RSQLite")
+  cache <- as.logical(shared.cache)
+  id <- .Call("RS_SQLite_init", config.params, force, cache, PACKAGE = .SQLitePkgName)
   new("SQLiteDriver", Id = id)
 }
 
-"sqliteCloseDriver" <- 
+"sqliteCloseDriver" <-
 function(drv, ...)
 {
   drvId <- as(drv, "integer")
-  .Call("RS_SQLite_closeManager", drvId, PACKAGE = "RSQLite")
+  .Call("RS_SQLite_closeManager", drvId, PACKAGE = .SQLitePkgName)
 }
 
 "sqliteDescribeDriver" <-
@@ -60,16 +62,17 @@ function(obj, verbose = FALSE, ...)
       show(info$connectionIds[[i]])
     }
   }
+  cat("  Shared Cache:", info$"shared_cache", "\n")
   invisible(NULL)
 }
 
-"sqliteDriverInfo" <- 
+"sqliteDriverInfo" <-
 function(obj, what="", ...)
 {
   if(!isIdCurrent(obj))
     stop(paste("expired", class(obj)))
   drvId <- as(obj, "integer")[1]
-  info <- .Call("RS_SQLite_managerInfo", drvId, PACKAGE = "RSQLite")  
+  info <- .Call("RS_SQLite_managerInfo", drvId, PACKAGE = .SQLitePkgName)
   drvId <- info$managerId
   ## replace drv/connection id w. actual drv/connection objects
   conObjs <- vector("list", length = info$"num_con")
@@ -85,17 +88,17 @@ function(obj, what="", ...)
 }
 
 ## note that dbname may be a database name, an empty string "", or NULL.
-## The distinction between "" and NULL is that "" is interpreted by 
+## The distinction between "" and NULL is that "" is interpreted by
 ## the SQLite API as the default database (SQLite config specific)
 ## while NULL means "no database".
-"sqliteNewConnection"<- 
-function(drv, dbname = "", mode=0, cache_size=NULL, synchronous=0)
+"sqliteNewConnection"<-
+function(drv, dbname = "", loadable.extensions=FALSE, cache_size=NULL, synchronous=0)
 {
-  if (!is.null(dbname)) 
+  if (!is.null(dbname))
     dbname <- path.expand(dbname)
-  con.params <- as.character(c(dbname, mode))
+  con.params <- as.character(c(dbname, as.integer(loadable.extensions)))
   drvId <- as(drv, "integer")
-  conId <- .Call("RS_SQLite_newConnection", drvId, con.params, 
+  conId <- .Call("RS_SQLite_newConnection", drvId, con.params,
                  PACKAGE ="RSQLite")
   con <- new("SQLiteConnection", Id = conId)
 
@@ -106,7 +109,7 @@ function(drv, dbname = "", mode=0, cache_size=NULL, synchronous=0)
     if(is.numeric(synchronous))
       nsync <- as.integer(synchronous)
     else if(is.character(synchronous))
-      nsync <- 
+      nsync <-
         pmatch(tolower(synchronous), c("off", "normal", "full"), nomatch = 1) - 1
     else nsync <- 0
     dbGetQuery(con, sprintf("PRAGMA synchronous=%d", as.integer(nsync)))
@@ -115,7 +118,7 @@ function(drv, dbname = "", mode=0, cache_size=NULL, synchronous=0)
   con
 }
 
-"sqliteDescribeConnection" <- 
+"sqliteDescribeConnection" <-
 function(obj, verbose = FALSE, ...)
 {
   if(!isIdCurrent(obj)){
@@ -128,6 +131,7 @@ function(obj, verbose = FALSE, ...)
   cat("  Host:", info$host, "\n")
   cat("  Dbname:", info$dbname, "\n")
   cat("  Connection type:", info$conType, "\n")
+  cat("  Loadable extensions:", info$loadableExtensions, "\n")
   if(verbose){
     cat("  SQLite engine version: ", info$serverVersion, "\n")
     cat("  SQLite engine thread id: ", info$threadId, "\n")
@@ -137,12 +141,12 @@ function(obj, verbose = FALSE, ...)
       cat("   ", i, " ")
       show(info$rsId[[i]])
     }
-  } else 
+  } else
     cat("  No resultSet available\n")
   invisible(NULL)
 }
 
-"sqliteCloseConnection" <- 
+"sqliteCloseConnection" <-
 function(con, ...)
 {
   if(!isIdCurrent(con)){
@@ -150,7 +154,7 @@ function(con, ...)
      return(TRUE)
   }
   conId <- as(con, "integer")
-  .Call("RS_SQLite_closeConnection", conId, PACKAGE = "RSQLite")
+  .Call("RS_SQLite_closeConnection", conId, PACKAGE = .SQLitePkgName)
 }
 
 "sqliteConnectionInfo" <-
@@ -159,7 +163,7 @@ function(obj, what="", ...)
   if(!isIdCurrent(obj))
     stop(paste("expired", class(obj)))
   id <- as(obj, "integer")
-  info <- .Call("RS_SQLite_connectionInfo", id, PACKAGE = "RSQLite")
+  info <- .Call("RS_SQLite_connectionInfo", id, PACKAGE = .SQLitePkgName)
   if(length(info$rsId)){
     rsId <- vector("list", length = length(info$rsId))
     for(i in seq(along = info$rsId))
@@ -172,21 +176,37 @@ function(obj, what="", ...)
     info
 }
 
-"sqliteExecStatement" <- 
-function(con, statement, limit = -1)
+sqliteTransactionStatement <-
+function(con, statement)
+## checks for any open resultsets, and closes them if completed.
+## the statement is then executed on the connection, and returns
+## whether it executed without an error or not.
+{
+  ## are there resultSets pending on con?
+  if(length(dbListResults(con)) > 0){
+    res <- dbListResults(con)[[1]]
+    if(!dbHasCompleted(res)){
+      stop("connection with pending rows, close resultSet before continuing")
+    }
+    dbClearResult(res)
+  }
+
+  rc <- try(dbGetQuery(con, statement))
+  !inherits(rc, ErrorClass)
+}
+
+"sqliteExecStatement" <-
+function(con, statement, bind.data=NULL)
 ## submits the sql statement to SQLite and creates a
 ## dbResult object if the SQL operation does not produce
 ## output, otherwise it produces a resultSet that can
 ## be used for fetching rows.
-## limit specifies how many rows we actually put in the
-## resultSet
 {
   conId <- as(con, "integer")
   statement <- as(statement, "character")
-  limit <- as(limit, "integer")
-  rsId <- .Call("RS_SQLite_exec", 
-                conId, statement, limit, 
-                PACKAGE = "RSQLite")
+  rsId <- .Call("RS_SQLite_exec",
+                conId, statement, as.data.frame(bind.data),
+                PACKAGE = .SQLitePkgName)
 #  out <- new("SQLitedbResult", Id = rsId)
 #  if(dbGetInfo(out, what="isSelect")
 #    out <- new("SQLiteResultSet", Id = rsId)
@@ -196,16 +216,16 @@ function(con, statement, limit = -1)
 }
 
 ## helper function: it exec's *and* retrieves a statement. It should
-## be named somehting else.
-"sqliteQuickSQL" <- 
-function(con, statement, ...)
+## be named something else.
+"sqliteQuickSQL" <-
+function(con, statement, bind.data=NULL, ...)
 {
    nr <- length(dbListResults(con))
    if(nr>0){                     ## are there resultSets pending on con?
       new.con <- dbConnect(con)   ## yep, create a clone connection
       on.exit(dbDisconnect(new.con))
-      rs <- sqliteExecStatement(new.con, statement)
-   } else rs <- sqliteExecStatement(con, statement)
+      rs <- sqliteExecStatement(new.con, statement, bind.data)
+   } else rs <- sqliteExecStatement(con, statement, bind.data)
    if(dbHasCompleted(rs)){
       dbClearResult(rs)            ## no records to fetch, we're done
       invisible()
@@ -214,24 +234,24 @@ function(con, statement, ...)
    res <- sqliteFetch(rs, n = -1, ...)
    if(dbHasCompleted(rs))
       dbClearResult(rs)
-   else 
+   else
       warning("pending rows")
    res
 }
 
-"sqliteFetch" <- 
-function(res, n=0, ...)   
+"sqliteFetch" <-
+function(res, n=0, ...)
 ## Fetch at most n records from the opened resultSet (n = -1 meanSQLite
 ## all records, n=0 means extract as many as "default_fetch_rec",
 ## as defined by SQLiteDriver (see summary(drv, TRUE)).
-## The returned object is a data.frame. 
+## The returned object is a data.frame.
 ## Note: The method dbHasCompleted() on the resultSet tells you whether
-## or not there are pending records to be fetched. 
+## or not there are pending records to be fetched.
 ##
 ## TODO: Make sure we don't exhaust all the memory, or generate
 ## an object whose size exceeds option("object.size").  Also,
 ## are we sure we want to return a data.frame?
-{    
+{
 
   if(!isIdCurrent(res))
      stop("invalid result handle")
@@ -240,8 +260,8 @@ function(res, n=0, ...)
   }
   n <- as(n, "integer")
   rsId <- as(res, "integer")
-  rel <- .Call("RS_SQLite_fetch", rsId, nrec = n, PACKAGE = "RSQLite")
-  if(length(rel)==0 || length(rel[[1]])==0) 
+  rel <- .Call("RS_SQLite_fetch", rsId, nrec = n, PACKAGE = .SQLitePkgName)
+  if(length(rel)==0 || length(rel[[1]])==0)
     return(data.frame(NULL))
   for(j in seq(along = rel))
       rel[[j]] <- type.convert(rel[[j]], ...)
@@ -254,21 +274,21 @@ function(res, n=0, ...)
   rel
 }
 
-"sqliteResultInfo" <- 
+"sqliteResultInfo" <-
 function(obj, what = "", ...)
 {
   if(!isIdCurrent(obj))
     stop(paste("expired", class(obj)))
    id <- as(obj, "integer")
-   info <- .Call("RS_SQLite_resultSetInfo", id, PACKAGE = "RSQLite")
+   info <- .Call("RS_SQLite_resultSetInfo", id, PACKAGE = .SQLitePkgName)
    flds <- info$fieldDescription[[1]]
    if(!is.null(flds)){
-       flds$Sclass <- .Call("RS_DBI_SclassNames", flds$Sclass, 
-                            PACKAGE = "RSQLite")
-       flds$type <- .Call("RS_SQLite_typeNames", flds$type, 
-                            PACKAGE = "RSQLite")
+       flds$Sclass <- .Call("RS_DBI_SclassNames", flds$Sclass,
+                            PACKAGE = .SQLitePkgName)
+       flds$type <- .Call("RS_SQLite_typeNames", flds$type,
+                            PACKAGE = .SQLitePkgName)
        ## no factors
-       info$fields <- structure(flds, row.names = paste(seq(along=flds$type)), 
+       info$fields <- structure(flds, row.names = paste(seq(along=flds$type)),
                                 class="data.frame")
    }
    if(!missing(what))
@@ -277,7 +297,7 @@ function(obj, what = "", ...)
      info
 }
 
-"sqliteDescribeResult" <- 
+"sqliteDescribeResult" <-
 function(obj, verbose = FALSE, ...)
 {
   if(!isIdCurrent(obj)){
@@ -293,14 +313,14 @@ function(obj, verbose = FALSE, ...)
   if(hasOutput){
     cat("  Output fields:", nrow(flds), "\n")
     if(verbose && length(flds)>0){
-       cat("  Fields:\n")  
+       cat("  Fields:\n")
        out <- print(flds)
     }
   }
   invisible(NULL)
 }
 
-"sqliteCloseResult" <- 
+"sqliteCloseResult" <-
 function(res, ...)
 {
   if(!isIdCurrent(res)){
@@ -308,17 +328,17 @@ function(res, ...)
      return(TRUE)
   }
   rsId <- as(res, "integer")
-  .Call("RS_SQLite_closeResultSet", rsId, PACKAGE = "RSQLite")
+  .Call("RS_SQLite_closeResultSet", rsId, PACKAGE = .SQLitePkgName)
 }
 
-"sqliteTableFields" <- 
+"sqliteTableFields" <-
 function(con, name, ...)
 {
    if(length(dbListResults(con))>0){
       con2 <- dbConnect(con)
       on.exit(dbDisconnect(con2))
    }
-   else 
+   else
       con2 <- con
    rs <- dbSendQuery(con2, paste("select * from ", name))
    dummy <- fetch(rs, n = 1)
@@ -330,7 +350,7 @@ function(con, name, ...)
       nms
 }
 ## this is exactly the same as ROracle's oraReadTable
-"sqliteReadTable" <-  
+"sqliteReadTable" <-
 function(con, name, row.names = "row_names", check.names = TRUE, ...)
 ## Should we also allow row.names to be a character vector (as in read.table)?
 ## is it "correct" to set the row.names of output data.frame?
@@ -345,15 +365,15 @@ function(con, name, row.names = "row_names", check.names = TRUE, ...)
    nms <- names(out)
    j <- switch(mode(row.names),
            character = if(row.names=="") 0 else
-               match(tolower(row.names), tolower(nms), 
+               match(tolower(row.names), tolower(nms),
                      nomatch = if(missing(row.names)) 0 else -1),
            numeric=, logical = row.names,
            NULL = 0,
            0)
-   if(as.numeric(j)==0) 
+   if(as.numeric(j)==0)
       return(out)
    if(is.logical(j)) ## Must be TRUE
-      j <- match(row.names, tolower(nms), nomatch=0) 
+      j <- match(row.names, tolower(nms), nomatch=0)
    if(j<1 || j>ncol(out)){
       warning("row.names not set on output data.frame (non-existing field)")
       return(out)
@@ -373,17 +393,17 @@ function(dbObj, name, value, field.types = NULL, row.names = TRUE, ...)
     value <- as.data.frame(value)
   if(!is.null(row.names) && row.names){
     value  <- cbind(row.names(value), value)  ## can't use row.names= here
-    names(value)[1] <- "row.names" 
+    names(value)[1] <- "row.names"
   }
   if(is.null(field.types)){
     ## the following mapping should be coming from some kind of table
     ## also, need to use converter functions (for dates, etc.)
     field.types <- sapply(value, dbDataType, dbObj = dbObj)
-  } 
+  }
   i <- match("row.names", names(field.types), nomatch=0)
   if(i>0) ## did we add a row.names value?  If so, it's a text field.
     field.types[i] <- dbDataType(dbObj, field.types$row.names)
-  names(field.types) <- 
+  names(field.types) <-
     make.db.names(dbObj, names(field.types), allow.keywords = FALSE)
 
   ## need to create a new (empty) table
@@ -392,19 +412,19 @@ function(dbObj, name, value, field.types = NULL, row.names = TRUE, ...)
 }
 
 "sqliteImportFile" <-
-function(con, name, value, field.types = NULL, overwrite = FALSE, 
-  append = FALSE, header, row.names, nrows = 50, sep = ",", 
+function(con, name, value, field.types = NULL, overwrite = FALSE,
+  append = FALSE, header, row.names, nrows = 50, sep = ",",
   eol="\n", skip = 0, ...)
 {
   if(overwrite && append)
     stop("overwrite and append cannot both be TRUE")
 
   ## Do we need to clone the connection (ie., if it is in use)?
-  if(length(dbListResults(con))!=0){ 
+  if(length(dbListResults(con))!=0){
     new.con <- dbConnect(con)              ## there's pending work, so clone
     on.exit(dbDisconnect(new.con))
-  } 
-  else 
+  }
+  else
     new.con <- con
 
   if(dbExistsTable(con,name)){
@@ -424,7 +444,7 @@ function(con, name, value, field.types = NULL, overwrite = FALSE,
   fn <- file.path(dirname(value), basename(value))
   if(missing(header) || missing(row.names)){
     f <- file(fn, open="r")
-    if(skip>0) 
+    if(skip>0)
       readLines(f, n=skip)
     txtcon <- textConnection(readLines(f, n=2))
     flds <- count.fields(txtcon, sep)
@@ -446,26 +466,26 @@ function(con, name, value, field.types = NULL, overwrite = FALSE,
   if(new.table){
     ## need to init table, say, with the first nrows lines
     d <- read.table(fn, sep=sep, header=header, skip=skip, nrows=nrows, ...)
-    sql <- 
+    sql <-
       dbBuildTableDefinition(new.con, name, d, field.types = field.types,
         row.names = row.names)
     rs <- try(dbSendQuery(new.con, sql))
     if(inherits(rs, ErrorClass)){
       warning("could not create table: aborting sqliteImportFile")
       return(FALSE)
-    } 
-    else 
+    }
+    else
       dbClearResult(rs)
   }
   else if(!append){
     warning(sprintf("table %s already exists -- use append=TRUE?", name))
   }
-  rc <- 
+  rc <-
       try({
          skip <- skip + as.integer(header)
          conId <- as(con, "integer")
          .Call("RS_SQLite_importFile", conId, name, fn, sep, eol,
-            as(skip, "integer"), PACKAGE = "RSQLite")
+            as(skip, "integer"), PACKAGE = .SQLitePkgName)
       })
   if(inherits(rc, ErrorClass)){
     if(new.table) dbRemoveTable(new.con, name)
@@ -484,14 +504,14 @@ function(con, name, value, row.names = TRUE, ...)
   a <- list(con = con, name = name, value = fn, header = TRUE)
   do.call("sqliteImportFile", c(a, dots))
 }
- 
+
 ## from ROracle, except we don't quote strings here.
-"safe.write" <- 
-function(value, file, batch, row.names = TRUE, ..., 
+"safe.write" <-
+function(value, file, batch, row.names = TRUE, ...,
   sep = ',', eol = '\n', quote.string = FALSE)
 ## safe.write makes sure write.table don't exceed available memory by batching
 ## at most batch rows (but it is still slowww)
-{  
+{
    N <- nrow(value)
    if(N<1){
       warning("no rows in data.frame")
@@ -499,14 +519,14 @@ function(value, file, batch, row.names = TRUE, ...,
    }
    if(missing(batch) || is.null(batch))
       batch <- 10000
-   else if(batch<=0) 
+   else if(batch<=0)
       batch <- N
-   from <- 1 
+   from <- 1
    to <- min(batch, N)
    while(from<=N){
-     write.table(value[from:to,, drop=FALSE], file = file, 
+     write.table(value[from:to,, drop=FALSE], file = file,
         append = from>1,
-        quote = quote.string, sep=sep, na = .SQLite.NA.string, 
+        quote = quote.string, sep=sep, na = .SQLite.NA.string,
         row.names=row.names, col.names=(from==1), eol = eol, ...)
       from <- to+1
       to <- min(to+batch, N)
@@ -523,7 +543,7 @@ function(value, file, batch, row.names = TRUE, ...,
   rs.mode <- storage.mode(obj)
   if(rs.class=="numeric"){
     sql.type <- if(rs.mode=="integer") "int" else  "double"
-  } 
+  }
   else {
     sql.type <- switch(rs.class,
                   character = "text",

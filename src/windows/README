@@ -1,7 +1,7 @@
 Building RSQLite on Windows.
 
-Currently we include SQLite Version =3.2.1, dated 2005/03/29 
-(the <version> tag is "3_2_1")
+Currently we include SQLite Version =3.3.8, dated 2006/10/09
+(the <version> tag is "3_3_8")
 
 Steps:
 

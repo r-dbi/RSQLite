@@ -261,8 +261,8 @@ setMethod("dbDataType", "SQLiteObject",
 
 setMethod("make.db.names", 
    signature(dbObj="SQLiteObject", snames = "character"),
-   def = function(dbObj, snames, ...){
-      make.db.names.default(snames, ...)
+   def = function(dbObj, snames, keywords, unique, allow.keywords, ...){
+      make.db.names.default(snames, keywords, unique, allow.keywords)
    },
    valueClass = "character"
 )
@@ -274,8 +274,8 @@ setMethod("SQLKeywords", "SQLiteObject",
 
 setMethod("isSQLKeyword",
    signature(dbObj="SQLiteObject", name="character"),
-   def = function(dbObj, name, ...){
-        isSQLKeyword.default(name, keywords = .SQL92Keywords)
+   def = function(dbObj, name, keywords, case, ...){
+        isSQLKeyword.default(name, keywords = .SQL92Keywords, case)
    },
    valueClass = "character"
 )

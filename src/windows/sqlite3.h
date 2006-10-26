@@ -12,7 +12,7 @@
 ** This header file defines the interface that the SQLite library
 ** presents to client programs.
 **
-** @(#) $Id: sqlite.h.in,v 1.187 2006/07/08 18:09:15 drh Exp $
+** @(#) $Id: sqlite.h.in,v 1.194 2006/09/16 21:45:14 drh Exp $
 */
 #ifndef _SQLITE3_H_
 #define _SQLITE3_H_
@@ -31,7 +31,7 @@ extern "C" {
 #ifdef SQLITE_VERSION
 # undef SQLITE_VERSION
 #endif
-#define SQLITE_VERSION         "3.3.7"
+#define SQLITE_VERSION         "3.3.8"
 
 /*
 ** The format of the version string is "X.Y.Z<trailing string>", where
@@ -48,7 +48,7 @@ extern "C" {
 #ifdef SQLITE_VERSION_NUMBER
 # undef SQLITE_VERSION_NUMBER
 #endif
-#define SQLITE_VERSION_NUMBER 3003007
+#define SQLITE_VERSION_NUMBER 3003008
 
 /*
 ** The version string is also compiled into the library so that a program
@@ -197,6 +197,44 @@ int sqlite3_exec(
 #define SQLITE_ROW         100  /* sqlite3_step() has another row ready */
 #define SQLITE_DONE        101  /* sqlite3_step() has finished executing */
 /* end-of-error-codes */
+
+/*
+** Using the sqlite3_extended_result_codes() API, you can cause
+** SQLite to return result codes with additional information in
+** their upper bits.  The lower 8 bits will be the same as the
+** primary result codes above.  But the upper bits might contain
+** more specific error information.
+**
+** To extract the primary result code from an extended result code,
+** simply mask off the lower 8 bits.
+**
+**        primary = extended & 0xff;
+**
+** New result error codes may be added from time to time.  Software
+** that uses the extended result codes should plan accordingly and be
+** sure to always handle new unknown codes gracefully.
+**
+** The SQLITE_OK result code will never be extended.  It will always
+** be exactly zero.
+**
+** The extended result codes always have the primary result code
+** as a prefix.  Primary result codes only contain a single "_"
+** character.  Extended result codes contain two or more "_" characters.
+*/
+#define SQLITE_IOERR_READ          (SQLITE_IOERR | (1<<8))
+#define SQLITE_IOERR_SHORT_READ    (SQLITE_IOERR | (2<<8))
+#define SQLITE_IOERR_WRITE         (SQLITE_IOERR | (3<<8))
+#define SQLITE_IOERR_FSYNC         (SQLITE_IOERR | (4<<8))
+#define SQLITE_IOERR_DIR_FSYNC     (SQLITE_IOERR | (5<<8))
+#define SQLITE_IOERR_TRUNCATE      (SQLITE_IOERR | (6<<8))
+#define SQLITE_IOERR_FSTAT         (SQLITE_IOERR | (7<<8))
+#define SQLITE_IOERR_UNLOCK        (SQLITE_IOERR | (8<<8))
+#define SQLITE_IOERR_RDLOCK        (SQLITE_IOERR | (9<<8))
+
+/*
+** Enable or disable the extended result codes.
+*/
+int sqlite3_extended_result_codes(sqlite3*, int onoff);
 
 /*
 ** Each entry in an SQLite table has a unique integer key.  (The key is
@@ -478,6 +516,7 @@ int sqlite3_set_authorizer(
 #define SQLITE_ANALYZE              28   /* Table Name      NULL            */
 #define SQLITE_CREATE_VTABLE        29   /* Table Name      Module Name     */
 #define SQLITE_DROP_VTABLE          30   /* Table Name      Module Name     */
+#define SQLITE_FUNCTION             31   /* Function Name   NULL            */
 
 /*
 ** The return value of the authorization function should be one of the
@@ -1520,6 +1559,42 @@ int sqlite3_enable_load_extension(sqlite3 *db, int onoff);
 /*
 ****** EXPERIMENTAL - subject to change without notice **************
 **
+** Register an extension entry point that is automatically invoked
+** whenever a new database connection is opened.
+**
+** This API can be invoked at program startup in order to register
+** one or more statically linked extensions that will be available
+** to all new database connections.
+**
+** Duplicate extensions are detected so calling this routine multiple
+** times with the same extension is harmless.
+**
+** This routine stores a pointer to the extension in an array
+** that is obtained from malloc().  If you run a memory leak
+** checker on your program and it reports a leak because of this
+** array, then invoke sqlite3_automatic_extension_reset() prior
+** to shutdown to free the memory.
+**
+** Automatic extensions apply across all threads.
+*/
+int sqlite3_auto_extension(void *xEntryPoint);
+
+
+/*
+****** EXPERIMENTAL - subject to change without notice **************
+**
+** Disable all previously registered automatic extensions.  This
+** routine undoes the effect of all prior sqlite3_automatic_extension()
+** calls.
+**
+** This call disabled automatic extensions in all threads.
+*/
+void sqlite3_reset_auto_extension(void);
+
+
+/*
+****** EXPERIMENTAL - subject to change without notice **************
+**
 ** The interface to the virtual-table mechanism is currently considered
 ** to be experimental.  The interface might change in incompatible ways.
 ** If this is a problem for you, do not use the interface at this time.
@@ -1544,11 +1619,11 @@ typedef struct sqlite3_module sqlite3_module;
 struct sqlite3_module {
   int iVersion;
   int (*xCreate)(sqlite3*, void *pAux,
-               int argc, char **argv,
-               sqlite3_vtab **ppVTab);
+               int argc, const char *const*argv,
+               sqlite3_vtab **ppVTab, char**);
   int (*xConnect)(sqlite3*, void *pAux,
-               int argc, char **argv,
-               sqlite3_vtab **ppVTab);
+               int argc, const char *const*argv,
+               sqlite3_vtab **ppVTab, char**);
   int (*xBestIndex)(sqlite3_vtab *pVTab, sqlite3_index_info*);
   int (*xDisconnect)(sqlite3_vtab *pVTab);
   int (*xDestroy)(sqlite3_vtab *pVTab);
@@ -1668,10 +1743,21 @@ int sqlite3_create_module(
 ** be taylored to the specific needs of the module implementation.   The
 ** purpose of this superclass is to define certain fields that are common
 ** to all module implementations.
+**
+** Virtual tables methods can set an error message by assigning a
+** string obtained from sqlite3_mprintf() to zErrMsg.  The method should
+** take care that any prior string is freed by a call to sqlite3_free()
+** prior to assigning a new string to zErrMsg.  After the error message
+** is delivered up to the client application, the string will be automatically
+** freed by sqlite3_free() and the zErrMsg field will be zeroed.  Note
+** that sqlite3_mprintf() and sqlite3_free() are used on the zErrMsg field
+** since virtual tables are commonly implemented in loadable extensions which
+** do not have access to sqlite3MPrintf() or sqlite3Free().
 */
 struct sqlite3_vtab {
   const sqlite3_module *pModule;  /* The module for this virtual table */
   int nRef;                       /* Used internally */
+  char *zErrMsg;                  /* Error message from sqlite3_mprintf() */
   /* Virtual table implementations will typically add additional fields */
 };
 
@@ -1695,6 +1781,24 @@ struct sqlite3_vtab_cursor {
 ** the virtual tables they implement.
 */
 int sqlite3_declare_vtab(sqlite3*, const char *zCreateTable);
+
+/*
+** Virtual tables can provide alternative implementations of functions
+** using the xFindFunction method.  But global versions of those functions
+** must exist in order to be overloaded.
+**
+** This API makes sure a global version of a function with a particular
+** name and number of parameters exists.  If no such function exists
+** before this API is called, a new function is created.  The implementation
+** of the new function always causes an exception to be thrown.  So
+** the new function is not good for anything by itself.  Its only
+** purpose is to be a place-holder function that can be overloaded
+** by virtual tables.
+**
+** This API should be considered part of the virtual table interface,
+** which is experimental and subject to change.
+*/
+int sqlite3_overload_function(sqlite3*, const char *zFuncName, int nArg);
 
 /*
 ** The interface to the virtual-table mechanism defined above (back up

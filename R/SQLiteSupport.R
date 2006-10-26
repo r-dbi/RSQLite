@@ -340,7 +340,7 @@ function(con, name, ...)
    }
    else
       con2 <- con
-   rs <- dbSendQuery(con2, paste("select * from ", name))
+   rs <- dbSendQuery(con2, paste("select * from ", name, "limit 1"))
    dummy <- fetch(rs, n = 1)
    dbClearResult(rs)
    nms <- names(dummy)

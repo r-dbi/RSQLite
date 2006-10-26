@@ -34,7 +34,7 @@ setOldClass("data.frame")   ## to avoid warnings in setMethod's valueClass arg
 setClass("SQLiteObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
 setClass("SQLiteDriver", representation("DBIDriver", "SQLiteObject"))
 
-"SQLite" <- 
+"SQLite" <-
 function(max.con=16, fetch.default.rec = 500, force.reload=FALSE)
 {
    sqliteInitDriver(max.con, fetch.default.rec, force.reload)
@@ -65,10 +65,10 @@ setMethod("summary", "SQLiteDriver",
 
 setClass("SQLiteConnection", representation("DBIConnection", "SQLiteObject"))
 
-setAs("SQLiteConnection", "SQLiteDriver", 
+setAs("SQLiteConnection", "SQLiteDriver",
    def = function(from) new("SQLiteDriver", Id = as(from,"integer")[1])
 )
-setMethod("dbConnect", "SQLiteDriver", 
+setMethod("dbConnect", "SQLiteDriver",
    def = function(drv, ...) sqliteNewConnection(drv, ...),
    valueClass = "SQLiteConnection"
 )
@@ -102,14 +102,14 @@ setMethod("dbGetException", "SQLiteConnection",
    },
    valueClass = "list"    ## TODO: should return a SQLiteException
 )
-setMethod("dbSendQuery", 
+setMethod("dbSendQuery",
    sig = signature(conn = "SQLiteConnection", statement = "character"),
    def = function(conn, statement, ...){
       sqliteExecStatement(conn, statement, ...)
    },
    valueClass = "SQLiteResult"
 )
-setMethod("dbGetQuery", 
+setMethod("dbGetQuery",
    sig = signature(conn = "SQLiteConnection", statement = "character"),
    def = function(conn, statement, ...){
       sqliteQuickSQL(conn, statement, ...)
@@ -127,7 +127,7 @@ setMethod("dbCallProc", "SQLiteConnection",
 ## Convenience methods
 ##
 
-setMethod("dbExistsTable", 
+setMethod("dbExistsTable",
    sig = signature(conn = "SQLiteConnection", name = "character"),
    def = function(conn, name, ...){
       lst <- dbListTables(conn)
@@ -135,12 +135,12 @@ setMethod("dbExistsTable",
    },
    valueClass = "logical"
 )
-setMethod("dbReadTable", 
+setMethod("dbReadTable",
    sig = signature(conn = "SQLiteConnection", name = "character"),
    def = function(conn, name, ...) sqliteReadTable(conn, name, ...),
    valueClass = "data.frame"
 )
-setMethod("dbWriteTable", 
+setMethod("dbWriteTable",
    sig = signature(conn = "SQLiteConnection", name = "character",
                    value="data.frame"),
    def = function(conn, name, value, ...)
@@ -150,14 +150,14 @@ setMethod("dbWriteTable",
 
 ## create/load table from a file via dbWriteTable (the argument
 ## value specifies a file name).  TODO, value a connection.
-setMethod("dbWriteTable", 
+setMethod("dbWriteTable",
    sig = signature(conn = "SQLiteConnection", name = "character",
                    value="character"),
    def = function(conn, name, value, ...)
       sqliteImportFile(conn, name, value, ...),
    valueClass = "logical"
 )
-setMethod("dbRemoveTable", 
+setMethod("dbRemoveTable",
    sig = signature(conn = "SQLiteConnection", name = "character"),
    def = function(conn, name, ...){
       rc <- try(dbGetQuery(conn, paste("drop table", name)))
@@ -179,7 +179,7 @@ setMethod("dbListResults", "SQLiteConnection",
 
 setClass("SQLiteResult", representation("DBIResult", "SQLiteObject"))
 
-setAs("SQLiteResult", "SQLiteConnection", 
+setAs("SQLiteResult", "SQLiteConnection",
    def = function(from) new("SQLiteConnection", Id = as(from,"integer")[1:2])
 )
 setMethod("fetch", "SQLiteResult",
@@ -216,7 +216,7 @@ setMethod("dbGetRowCount", "SQLiteResult",
 setMethod("dbHasCompleted", "SQLiteResult",
    def = function(res, ...){
       out <- dbGetInfo(res, "completed")[[1]]
-      if(out<0) 
+      if(out<0)
          NA
       else ifelse(out==0, FALSE, TRUE)
    },
@@ -230,16 +230,16 @@ setMethod("dbGetException", "SQLiteConnection",
    valueClass = "list"
 )
 
-setMethod("dbListTables", "SQLiteConnection", 
+setMethod("dbListTables", "SQLiteConnection",
    def = function(conn, ...){
-      out <- dbGetQuery(conn, 
+      out <- dbGetQuery(conn,
          "select name from sqlite_master where type='table' or type='view' order by name",
          ...)[,1]
       if(!is.null(out)) out else character()
    },
    valueClass = "character"
 )
-setMethod("dbListFields", 
+setMethod("dbListFields",
    sig = signature(conn = "SQLiteConnection", name = "character"),
    def = function(conn, name, ...) sqliteTableFields(conn, name, ...),
    valueClass = "character"
@@ -259,14 +259,14 @@ setMethod("dbDataType", "SQLiteObject",
 )
 
 
-setMethod("make.db.names", 
+setMethod("make.db.names",
    signature(dbObj="SQLiteObject", snames = "character"),
    def = function(dbObj, snames, keywords, unique, allow.keywords, ...){
       make.db.names.default(snames, keywords, unique, allow.keywords)
    },
    valueClass = "character"
 )
-      
+
 setMethod("SQLKeywords", "SQLiteObject",
    def = function(dbObj, ...) .SQL92Keywords,
    valueClass = "character"

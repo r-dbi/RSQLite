@@ -11,7 +11,7 @@ It returns an object that allows you to connect to the SQLite engine
 embedded in R.
 }
 \usage{
-SQLite(max.con = 16, fetch.default.rec = 500, force.reload = FALSE, shared.cache = FALSE)
+SQLite(max.con = 16, fetch.default.rec = 500, force.reload = FALSE)
 }
 \arguments{
 \item{max.con }{
@@ -30,10 +30,6 @@ SQLite(max.con = 16, fetch.default.rec = 500, force.reload = FALSE, shared.cache
   Setting this to \code{TRUE} allows you to change
   default settings.  Notice that all connections should be closed
   before re-loading.
-  }
-\item{shared.cache}{should SQLite's shared cache mode be activated.
-  The default is \code{FALSE}.
-  See \url{http://www.sqlite.org/sharedcache.html} for details.
   }
 }
 \value{

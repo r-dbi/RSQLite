@@ -172,6 +172,13 @@ function(obj, what="", ...)
     info
 }
 
+"sqliteQuickColumn" <- function(con, table, column)
+{
+    conId <- as(con, "integer")
+    .Call("RS_SQLite_quick_column", conId, as.character(table),
+          as.character(column), PACKAGE="RSQLite")
+}
+    
 "sqliteExecStatement" <-
 function(con, statement, limit = -1)
 ## submits the sql statement to SQLite and creates a

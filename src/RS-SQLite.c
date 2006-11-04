@@ -315,6 +315,72 @@ RS_SQLite_closeConnection(Con_Handle *conHandle)
   return status;
 }
 
+
+int RS_SQLite_get_row_count(sqlite3* db, const char* tname) {
+    char* sqlQuery;
+    const char* sqlFmt = "select rowid from %s order by rowid desc limit 1";
+    int qrylen = strlen(sqlFmt);
+    int rc = 0;
+    int i, ans;
+    sqlite3_stmt* stmt;
+    const char* tail;
+    
+    qrylen += strlen(tname) + 1;
+    sqlQuery = (char*)  R_alloc(qrylen, sizeof(char));
+    snprintf(sqlQuery, qrylen, sqlFmt, tname);
+    rc = sqlite3_prepare(db, sqlQuery, -1, &stmt, &tail);
+    if (rc != SQLITE_OK) {
+        error("SQL error: %s\n", sqlite3_errmsg(db));
+    }
+    rc = sqlite3_step(stmt);
+    ans = sqlite3_column_int(stmt, 0);
+    sqlite3_finalize(stmt);
+    return ans;
+}
+
+
+SEXP RS_SQLite_quick_column(Con_Handle *conHandle, SEXP table, SEXP column)
+{
+    SEXP ans;
+    RS_DBI_connection *con;
+    sqlite3           *db_connection;
+    int               numrows;
+    char              sqlQuery[500];
+    char              *table_name;
+    char              *column_name;
+    int               rc;
+    sqlite3_stmt      *stmt;
+    const char        *tail;
+    int               i = 0;
+
+    con = RS_DBI_getConnection(conHandle);
+    db_connection = (sqlite3 *) con->drvConnection;
+    table_name = CHAR(STRING_ELT(table, 0));
+    column_name = CHAR(STRING_ELT(column, 0));
+    numrows = RS_SQLite_get_row_count(db_connection, table_name);
+    snprintf(sqlQuery, sizeof(sqlQuery), "select %s from %s", 
+             column_name, table_name);
+    
+    rc = sqlite3_prepare(db_connection, sqlQuery, strlen(sqlQuery), &stmt, &tail);
+    /* FIXME: handle error properly for DBI */
+    if(rc != SQLITE_OK) {
+        error("SQL error: %s\n", sqlite3_errmsg(db_connection));
+    }
+    /* FIXME: just int right now */
+    PROTECT(ans = allocVector(INTSXP, numrows));
+    i = 0;
+    rc = sqlite3_step(stmt);
+    while (rc == SQLITE_ROW && i < numrows) {
+        INTEGER(ans)[i] = sqlite3_column_int(stmt, 0);
+        i++;
+        rc = sqlite3_step(stmt);
+    }
+    sqlite3_finalize(stmt);
+    UNPROTECT(1);
+    return ans;
+}
+
+
 Res_Handle *
 RS_SQLite_exec(Con_Handle *conHandle, s_object *statement, s_object *s_limit)
 {

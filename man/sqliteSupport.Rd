@@ -11,6 +11,7 @@
 \alias{sqliteExecStatement}         % result-related
 \alias{sqliteFetch}
 \alias{sqliteQuickSQL}
+\alias{sqliteTransactionStatement}
 \alias{sqliteResultInfo}
 \alias{sqliteDescribeResult}
 \alias{sqliteCloseResult}
@@ -49,6 +50,7 @@
 
    ## SQLiteResult-related
    sqliteExecStatement(con, statement, bind.data=NULL)
+   sqliteTransactionStatement(con, statement)
    sqliteFetch(res, n=0, ...)
    sqliteQuickSQL(con, statement, bind.data=NULL, ...)
    sqliteResultInfo(obj, what, ...)
@@ -144,10 +146,6 @@
 }
 \item{statement}{
    character string holding SQL statements.
-}
-\item{limit}{
-   integer specifying maximum number or rows to fetch.  The default
-   is -1 (fetch all rows).
 }
 \item{n}{
    number of rows to fetch from the given result set. A value of -1

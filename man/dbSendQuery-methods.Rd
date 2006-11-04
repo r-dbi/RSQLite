@@ -3,10 +3,16 @@
 \docType{methods}
 \alias{dbSendQuery-methods}
 \alias{dbGetQuery-methods}
+\alias{dbSendPreparedQuery}
+\alias{dbGetPreparedQuery}
+\alias{dbSendPreparedQuery-methods}
+\alias{dbGetPreparedQuery-methods}
 \alias{dbClearResult-methods}
 \alias{dbGetException-methods}
 \alias{dbSendQuery,SQLiteConnection,character-method}
 \alias{dbGetQuery,SQLiteConnection,character-method}
+\alias{dbSendPreparedQuery,SQLiteConnection,character,data.frame-method}
+\alias{dbGetPreparedQuery,SQLiteConnection,character,data.frame-method}
 \alias{dbClearResult,SQLiteResult-method}
 \alias{dbGetException,SQLiteConnection-method}
 \title{
@@ -15,6 +21,9 @@
 \description{
    These methods are straight-forward implementations of the corresponding
    generic functions.
+   
+   The prepared variants take an extra data.frame, which performs parameter
+   binding.
 }
 \section{Methods}{\describe{
 \item{conn}{

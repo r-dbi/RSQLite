@@ -1,15 +1,21 @@
 % $Id$
 \name{dbCommit-methods}
 \docType{methods}
+\alias{dbBeginTransaction}
+\alias{dbBeginTransaction-methods}
 \alias{dbCommit-methods}
 \alias{dbRollback-methods}
+\alias{dbBeginTransaction,SQLiteConnection-method}
 \alias{dbCommit,SQLiteConnection-method}
 \alias{dbRollback,SQLiteConnection-method}
 \title{
   DBMS Transaction Management
 }
 \description{
-   Not yet implemented.
+   By default, SQLite is in auto-commit mode. dbBeginTransaction starts an 
+   SQLite transaction and turn auto-commit off. dbCommit and dbRollback 
+   commit and rollback the transaction, respectively and turn auto-commit
+   on.
 }
 \section{Methods}{\describe{
 \item{conn}{
@@ -40,6 +46,7 @@
 \examples{\dontrun{
 drv <- dbDriver("SQLite")
 con <- dbConnect(drv, dbname = "mySQLite.db")
+dbBeginTransaction(con)
 rs <- dbSendQuery(con, 
       "delete * from PURGE as p where p.wavelength<0.03")
 if(dbGetInfo(rs, what = "rowsAffected") > 250){

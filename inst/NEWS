@@ -15,6 +15,10 @@ Version 0.4-7
   Extensions documentation:
   http://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions
 
+* Implemented dbCommit() and dbRollback(). There is also a new
+  generic method dbBeginTransaction(), which begins a transaction.
+  Note that this is an extension to the DBI interface.
+
 (more changes will be added here)
 
 Version 0.4-4

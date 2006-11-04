@@ -60,6 +60,17 @@ setMethod("summary", "SQLiteDriver",
    def = function(object, ...) sqliteDescribeDriver(object, ...)
 )
 
+## ------------------------------------------------------------------
+## Begin DBI extensions: 
+##
+## generic dbBeginTransaction
+##
+setGeneric("dbBeginTransaction", 
+   def = function(conn, ...) standardGeneric("dbBeginTransaction"),
+   valueClass = "logical"
+)
+
+
 ##
 ## Class: SQLiteConnection
 ##
@@ -122,6 +133,18 @@ setMethod("summary", "SQLiteConnection",
 
 setMethod("dbCallProc", "SQLiteConnection",
    def = function(conn, ...) .NotYetImplemented()
+)
+
+setMethod("dbCommit", "SQLiteConnection",
+   def = function(conn, ...) sqliteTransactionStatement(conn, "COMMIT")
+)
+
+setMethod("dbRollback", "SQLiteConnection",
+   def = function(conn, ...) sqliteTransactionStatement(conn, "ROLLBACK")
+)
+
+setMethod("dbBeginTransaction", "SQLiteConnection",
+   def = function(conn, ...) sqliteTransactionStatement(conn, "BEGIN")
 )
 
 ##

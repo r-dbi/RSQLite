@@ -24,6 +24,7 @@
 char *compiledVarsion = SQLITE_VERSION;
 int RS_sqlite_import(sqlite3 *db, const char *zTable,
        const char *zFile, const char *separator, const char *eol, int skip);
+int corrected_sqlite3_step(sqlite3_stmt *pStatement);
 
 /* The macro NA_STRING is a CHRSXP in R but a char * in Splus */
 #ifdef USING_R

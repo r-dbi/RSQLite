@@ -352,6 +352,9 @@ SEXP RS_SQLite_quick_column(Con_Handle *conHandle, SEXP table, SEXP column)
     sqlite3_stmt      *stmt;
     const char        *tail;
     int               i = 0;
+    int               col_type;
+    int              *intans;
+    double           *doubleans;
 
     con = RS_DBI_getConnection(conHandle);
     db_connection = (sqlite3 *) con->drvConnection;
@@ -362,16 +365,50 @@ SEXP RS_SQLite_quick_column(Con_Handle *conHandle, SEXP table, SEXP column)
              column_name, table_name);
     
     rc = sqlite3_prepare(db_connection, sqlQuery, strlen(sqlQuery), &stmt, &tail);
-    /* FIXME: handle error properly for DBI */
+    /* FIXME: how should we be handling errors?
+       Could either follow the pattern in the rest of the package or
+       start to use the condition system and raise specific conditions.
+     */
     if(rc != SQLITE_OK) {
         error("SQL error: %s\n", sqlite3_errmsg(db_connection));
     }
-    /* FIXME: just int right now */
-    PROTECT(ans = allocVector(INTSXP, numrows));
-    i = 0;
+
     rc = sqlite3_step(stmt);
+    col_type = sqlite3_column_type(stmt, 0);
+    switch(col_type) {
+    case SQLITE_INTEGER:
+        PROTECT(ans = allocVector(INTSXP, numrows));
+        intans = INTEGER(ans);
+        break;
+    case SQLITE_FLOAT:
+        PROTECT(ans = allocVector(REALSXP, numrows));
+        doubleans = REAL(ans);
+        break;
+    case SQLITE_TEXT:
+        PROTECT(ans = allocVector(STRSXP, numrows));
+        break;
+    case SQLITE_NULL:
+        error("RS_SQLite_quick_column: encountered NULL column");
+        break;
+    case SQLITE_BLOB: 
+        error("RS_SQLite_quick_column: BLOB column handling not implementing");
+        break;
+    default:
+        error("RS_SQLite_quick_column: unknown column type %d", col_type);
+    }
+
+    i = 0;
     while (rc == SQLITE_ROW && i < numrows) {
-        INTEGER(ans)[i] = sqlite3_column_int(stmt, 0);
+        switch (col_type) {
+        case SQLITE_INTEGER:
+            intans[i] = sqlite3_column_int(stmt, 0);
+            break;
+        case SQLITE_FLOAT:
+            doubleans[i] = sqlite3_column_double(stmt, 0);
+            break;
+        case SQLITE_TEXT:
+            SET_STRING_ELT(ans, i, mkChar(sqlite3_column_text(stmt, 0)));
+        }
         i++;
         rc = sqlite3_step(stmt);
     }

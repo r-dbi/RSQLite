@@ -214,8 +214,15 @@ function(con, statement, bind.data=NULL)
 {
   conId <- as(con, "integer")
   statement <- as(statement, "character")
+  if (!is.null(bind.data)) {
+      bind.data <- as.data.frame(bind.data)
+      if (nrow(bind.data) == 0) {
+          warning("ignoring zero-row bind.data")
+          bind.data <- NULL
+      }
+  }
   rsId <- .Call("RS_SQLite_exec",
-                conId, statement, as.data.frame(bind.data),
+                conId, statement, bind.data,
                 PACKAGE = .SQLitePkgName)
 #  out <- new("SQLitedbResult", Id = rsId)
 #  if(dbGetInfo(out, what="isSelect")

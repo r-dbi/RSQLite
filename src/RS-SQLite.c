@@ -457,7 +457,7 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
   sqlite3           *db_connection;
   sqlite3_stmt      *db_statement;
   int      state, bind_count;
-  int      i, j, rows, cols;
+  int      i, j, rows = 0, cols = 0;
   char     *dyn_statement;
 
   con = RS_DBI_getConnection(conHandle);
@@ -512,8 +512,10 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
   res->drvResultSet = (void *) db_statement;
 
   bind_count = sqlite3_bind_parameter_count(db_statement);
-  rows = GET_LENGTH(GET_ROWNAMES(bind_data));
-  cols = GET_LENGTH(bind_data);
+  if (bind_count > 0 && bind_data != R_NilValue) {
+      rows = GET_LENGTH(GET_ROWNAMES(bind_data));
+      cols = GET_LENGTH(bind_data);
+  }
 
   /* this will return 0 if the statement is not a SELECT */
   if(sqlite3_column_count(db_statement) > 0){

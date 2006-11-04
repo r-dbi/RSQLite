@@ -27,6 +27,31 @@
 
 setOldClass("data.frame")   ## to avoid warnings in setMethod's valueClass arg
 
+## ------------------------------------------------------------------
+## Begin DBI extensions: 
+##
+## generics dbSendPreparedQuery, dbGetPreparedQuery 
+## and dbBeginTransaction
+##
+setGeneric("dbSendPreparedQuery", 
+   def = function(conn, statement, bind.data, ...) 
+           standardGeneric("dbSendPreparedQuery"),
+   valueClass = "DBIResult"
+)
+setGeneric("dbGetPreparedQuery", 
+   def = function(conn, statement, bind.data, ...) 
+           standardGeneric("dbGetPreparedQuery")
+)
+setGeneric("dbBeginTransaction", 
+   def = function(conn, ...)
+           standardGeneric("dbBeginTransaction"),
+   valueClass = "logical"
+)
+##
+## End DBI extensions
+## ------------------------------------------------------------------
+
+
 ##
 ## Class: SQLiteDriver
 ##
@@ -59,17 +84,6 @@ setMethod("dbListConnections", "SQLiteDriver",
 setMethod("summary", "SQLiteDriver",
    def = function(object, ...) sqliteDescribeDriver(object, ...)
 )
-
-## ------------------------------------------------------------------
-## Begin DBI extensions: 
-##
-## generic dbBeginTransaction
-##
-setGeneric("dbBeginTransaction", 
-   def = function(conn, ...) standardGeneric("dbBeginTransaction"),
-   valueClass = "logical"
-)
-
 
 ##
 ## Class: SQLiteConnection
@@ -121,11 +135,27 @@ setMethod("dbSendQuery",
    },
    valueClass = "SQLiteResult"
 )
+setMethod("dbSendPreparedQuery", 
+   sig = signature(conn = "SQLiteConnection", statement = "character",
+                   bind.data = "data.frame"),
+   def = function(conn, statement, bind.data, ...){
+      sqliteExecStatement(conn, statement, bind.data, ...)
+   },
+   valueClass = "SQLiteResult"
+)
 setMethod("dbGetQuery",
    sig = signature(conn = "SQLiteConnection", statement = "character"),
    def = function(conn, statement, ...){
       sqliteQuickSQL(conn, statement, ...)
    },
+)
+setMethod("dbGetPreparedQuery", 
+   sig = signature(conn = "SQLiteConnection", statement = "character",
+                   bind.data = "data.frame"),
+   def = function(conn, statement, bind.data, ...){
+      sqliteQuickSQL(conn, statement, bind.data, ...)
+   },
+   valueClass = "SQLiteResult"
 )
 setMethod("summary", "SQLiteConnection",
    def = function(object, ...) sqliteDescribeConnection(object, ...)

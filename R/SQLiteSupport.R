@@ -206,19 +206,16 @@ function(con, statement)
 
 
 "sqliteExecStatement" <-
-function(con, statement, limit = -1)
+function(con, statement, bind.data=NULL)
 ## submits the sql statement to SQLite and creates a
 ## dbResult object if the SQL operation does not produce
 ## output, otherwise it produces a resultSet that can
 ## be used for fetching rows.
-## limit specifies how many rows we actually put in the
-## resultSet
 {
   conId <- as(con, "integer")
   statement <- as(statement, "character")
-  limit <- as(limit, "integer")
   rsId <- .Call("RS_SQLite_exec",
-                conId, statement, limit,
+                conId, statement, as.data.frame(bind.data),
                 PACKAGE = .SQLitePkgName)
 #  out <- new("SQLitedbResult", Id = rsId)
 #  if(dbGetInfo(out, what="isSelect")
@@ -229,16 +226,16 @@ function(con, statement, limit = -1)
 }
 
 ## helper function: it exec's *and* retrieves a statement. It should
-## be named somehting else.
+## be named something else.
 "sqliteQuickSQL" <-
-function(con, statement, ...)
+function(con, statement, bind.data=NULL, ...)
 {
    nr <- length(dbListResults(con))
    if(nr>0){                     ## are there resultSets pending on con?
       new.con <- dbConnect(con)   ## yep, create a clone connection
       on.exit(dbDisconnect(new.con))
-      rs <- sqliteExecStatement(new.con, statement)
-   } else rs <- sqliteExecStatement(con, statement)
+      rs <- sqliteExecStatement(new.con, statement, bind.data)
+   } else rs <- sqliteExecStatement(con, statement, bind.data)
    if(dbHasCompleted(rs)){
       dbClearResult(rs)            ## no records to fetch, we're done
       invisible()

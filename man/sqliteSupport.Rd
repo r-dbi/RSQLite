@@ -3,7 +3,7 @@
 \alias{sqliteInitDriver}            % driver-related function
 \alias{sqliteDriverInfo}
 \alias{sqliteDescribeDriver}
-\alias{sqliteCloseDriver}           % connection-related 
+\alias{sqliteCloseDriver}           % connection-related
 \alias{sqliteNewConnection}
 \alias{sqliteConnectionInfo}
 \alias{sqliteDescribeConnection}
@@ -16,7 +16,7 @@
 \alias{sqliteCloseResult}
 \alias{sqliteReadTable}
 \alias{sqliteWriteTable}            % convenience functions
-\alias{sqliteImportFile}            
+\alias{sqliteImportFile}
 \alias{sqliteTableFields}
 \alias{sqliteDataType}
 \alias{.SQLitePkgName}              % constants
@@ -48,9 +48,9 @@
    sqliteCloseConnection(con, ...)
 
    ## SQLiteResult-related
-   sqliteExecStatement(con, statement, limit)
+   sqliteExecStatement(con, statement, bind.data=NULL)
    sqliteFetch(res, n=0, ...)
-   sqliteQuickSQL(con, statement, ...)
+   sqliteQuickSQL(con, statement, bind.data=NULL, ...)
    sqliteResultInfo(obj, what, ...)
    sqliteDescribeResult(obj, verbose = FALSE, ...)
    sqliteCloseResult(res, ...)
@@ -58,8 +58,8 @@
    ## data mappings and convenience functions
    sqliteDataType(obj, ...)
    sqliteReadTable(con, name, row.names = "row_names", check.names = TRUE, ...)
-   sqliteImportFile(con, name, value, field.types, overwrite=FALSE, 
-      append=FALSE, header, row.names, nrows=50, sep=",", eol="\n", 
+   sqliteImportFile(con, name, value, field.types, overwrite=FALSE,
+      append=FALSE, header, row.names, nrows=50, sep=",", eol="\n",
       skip = 0, ...)
    sqliteWriteTable(con, name, value, row.names = TRUE, ...)
    sqliteTableFields(con, name, ...)
@@ -72,7 +72,7 @@
 }
 \item{fetch.default.rec}{
    default number of rows to fetch (move to R/S-Plus).  This default is
-   used in \code{sqliteFetch}. 
+   used in \code{sqliteFetch}.
    The default is 500.
 }
 \item{force.reload}{
@@ -114,25 +114,28 @@
    logical describing whether shared-cache mode should be enabled on the SQLite
    driver. The default is FALSE.
 }
+\item{bind.data}{
+   a data frame which will be used to bind variables in the statement.
+}
 \item{cache_size}{
    positive integer to pass to the \code{PRAGMA cache_size};  this
    changes the maximum number of disk pages that SQLite will hold in
-   memory (SQLite's default is 2000 pages). 
+   memory (SQLite's default is 2000 pages).
 }
 \item{synchronous}{
   values the \code{PRAGMA synchronous} flag, possible values are
   0, 1, or 2 or the corresponding strings "OFF", "NORMAL", or "FULL".
   The \code{RSQLite} package uses a default of 0 (OFF), although
-  SQLite's default is 2 (FULL) as of version 3.2.8. 
+  SQLite's default is 2 (FULL) as of version 3.2.8.
   Users have reported significant speed ups using \code{sychronous="OFF"},
   and the SQLite documentation itself implies considerably improved
   performance at the very modest risk of database corruption in the
-  unlikely case of the operating system (\emph{not} the R application) 
+  unlikely case of the operating system (\emph{not} the R application)
   crashing.
 }
 %\item{max.results}{
 %   positive integer indicating the maximum number of results that
-%   SQLite connections will hold open.  The current default of 1 
+%   SQLite connections will hold open.  The current default of 1
 %   is hardcoded in the C code.
 %}
 \item{force}{
@@ -164,7 +167,7 @@
    \code{sapply(value,SQLDataType)}, see \code{SQLiteSQLType}.
 }
 \item{row.names}{
-   a logical specifying whether to prepend the \code{value} data.frame 
+   a logical specifying whether to prepend the \code{value} data.frame
    row names or not.  The default is \code{TRUE}.
 }
 \item{check.names}{
@@ -203,20 +206,20 @@
 
    \code{sqliteDriverInfo} returns a list of name-value metadata pairs.
 
-   \code{sqliteDescribeDriver} returns \code{NULL} (displays the object's 
+   \code{sqliteDescribeDriver} returns \code{NULL} (displays the object's
    metadata).
 
-   \code{sqliteCloseDriver} returns a logical indicating whether the 
+   \code{sqliteCloseDriver} returns a logical indicating whether the
    operation succeeded or not.
 
    \code{sqliteNewConnection} returns an \code{SQLiteConnection} object.
 
    \code{sqliteConnectionInfo}returns a list of name-value metadata pairs.
 
-   \code{sqliteDescribeConnection} returns \code{NULL} (displays the 
+   \code{sqliteDescribeConnection} returns \code{NULL} (displays the
    object's metadata).
 
-   \code{sqliteCloseConnection} returns a logical indicating whether the 
+   \code{sqliteCloseConnection} returns a logical indicating whether the
    operation succeeded or not.
 
    \code{sqliteExecStatement} returns an \code{SQLiteResult} object.
@@ -226,35 +229,35 @@
    \code{sqliteQuickSQL} returns either a data.frame if the \code{statement} is
    a \code{select}-like or NULL otherwise.
 
-   \code{sqliteDescribeResult} returns \code{NULL} (displays the object's 
+   \code{sqliteDescribeResult} returns \code{NULL} (displays the object's
    metadata).
-   
-   \code{sqliteCloseResult} returns a logical indicating whether the 
+
+   \code{sqliteCloseResult} returns a logical indicating whether the
    operation succeeded or not.
-   
+
    \code{sqliteReadTable}  returns a data.frame with the contents of the
    DBMS table.
-   
-   \code{sqliteWriteTable}  returns a logical indicating whether the 
+
+   \code{sqliteWriteTable}  returns a logical indicating whether the
    operation succeeded or not.
-   
-   \code{sqliteImportFile}  returns a logical indicating whether the 
+
+   \code{sqliteImportFile}  returns a logical indicating whether the
    operation succeeded or not.
-   
-   \code{sqliteTableFields} returns a character vector with the 
+
+   \code{sqliteTableFields} returns a character vector with the
    table \code{name} field names.
-   
+
    \code{sqliteDataType} retuns a character string with the closest
    SQL data type.  Note that SQLite is typeless, so this is mostly for
    creating table that are compatible across RDBMS.
-   
+
    \code{sqliteResultInfo} returns a list of name-value metadata pairs.
 }
 \section{Constants}{
 \code{.SQLitePkgName} (currently \code{"RSQLite"}),
 \code{.SQLitePkgVersion} (the R package version),
 \code{.SQLitePkgRCS} (the RCS revision),
-\code{.SQLitecle.NA.string} (character that SQLite uses to 
+\code{.SQLitecle.NA.string} (character that SQLite uses to
 denote \code{NULL} on input),
 %\code{.SQLiteSQLKeywords}    % TODO: should we add these?
 \code{.conflicts.OK}.

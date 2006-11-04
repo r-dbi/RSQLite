@@ -52,7 +52,13 @@ typedef struct st_sqlite_err {
    char *errorMsg;
 } RS_SQLite_exception;
 
-RS_SQLite_conParams *RS_SQLite_allocConParams(const char *dbname, int mode);
+typedef struct st_sqlite_bindparam {
+  SEXPTYPE  type;
+  s_object *data;
+  int      is_protected;
+} RS_SQLite_bindParam;
+
+RS_SQLite_conParams *RS_SQLite_allocConParams(const char *dbname, int loadable_extensions);
 void                RS_SQLite_freeConParams(RS_SQLite_conParams *conParams);
 
 /* The following functions are the S/R entry into the C implementation (i.e.,
@@ -66,7 +72,7 @@ void                RS_SQLite_freeConParams(RS_SQLite_conParams *conParams);
  */
 
 /* dbManager */
-Mgr_Handle *RS_SQLite_init(s_object *config_params, s_object *reload, 
+Mgr_Handle *RS_SQLite_init(s_object *config_params, s_object *reload,
                            s_object *cache);
 s_object   *RS_SQLite_close(Mgr_Handle *mgrHandle);
 
@@ -91,7 +97,7 @@ int       RS_SQLite_stdCallback(void *resHandle, int ncol, char **row,
 
 /* dbResultSet */
 Res_Handle *RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
-                           s_object *s_limit);
+                           s_object *bind_data);
 s_object   *RS_SQLite_fetch(Res_Handle *rsHandle, s_object *max_rec);
 s_object   *RS_SQLite_closeResultSet(Res_Handle *rsHandle);
 void        RS_SQLite_initFields(RS_DBI_resultSet *res, int ncol,
@@ -100,6 +106,7 @@ void        RS_SQLite_initFields(RS_DBI_resultSet *res, int ncol,
 s_object   *RS_SQLite_validHandle(Db_Handle *handle);      /* boolean */
 
 RS_DBI_fields *RS_SQLite_createDataMappings(Res_Handle *resHandle);
+
 /* the following funs return named lists with meta-data for
  * the manager, connections, and  result sets, respectively.
  */

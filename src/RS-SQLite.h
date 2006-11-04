@@ -44,7 +44,7 @@ extern  "C" {
  */
 typedef struct st_sdbi_conParams {
   char *dbname;
-  int  mode;                     /* unused by SQLite as of 2.0.5 used */
+  int  loadable_extensions;
 } RS_SQLite_conParams;
 
 typedef struct st_sqlite_err {
@@ -66,7 +66,8 @@ void                RS_SQLite_freeConParams(RS_SQLite_conParams *conParams);
  */
 
 /* dbManager */
-Mgr_Handle *RS_SQLite_init(s_object *config_params, s_object *reload);
+Mgr_Handle *RS_SQLite_init(s_object *config_params, s_object *reload, 
+                           s_object *cache);
 s_object   *RS_SQLite_close(Mgr_Handle *mgrHandle);
 
 /* dbConnection */

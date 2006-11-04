@@ -66,15 +66,17 @@ int RS_sqlite_import(sqlite3 *db, const char *zTable,
 
 
 Mgr_Handle *
-RS_SQLite_init(s_object *config_params, s_object *reload)
+RS_SQLite_init(s_object *config_params, s_object *reload, s_object *cache)
 {
   S_EVALUATOR
 
   /* Currently we can specify the 2 defaults max conns and records per
    * fetch (this last one can be over-ridden explicitly in the S call to fetch).
    */
+  RS_DBI_manager *mgr;
   Mgr_Handle *mgrHandle;
   Sint  fetch_default_rec, force_reload, max_con;
+  Sint  *shared_cache;
   const char *drvName = "SQLite";
   const char *clientVersion = sqlite3_libversion();
 
@@ -97,6 +99,21 @@ RS_SQLite_init(s_object *config_params, s_object *reload)
 
   mgrHandle = RS_DBI_allocManager(drvName, max_con, fetch_default_rec,
            force_reload);
+
+  mgr = RS_DBI_getManager(mgrHandle);
+
+  shared_cache = (Sint *)malloc(sizeof(Sint));
+  if(!shared_cache){
+    RS_DBI_errorMessage(
+        "could not malloc space for driver data", RS_DBI_ERROR);
+  }
+
+  *shared_cache = LGL_EL(cache,0);
+  mgr->drvData = (void *)shared_cache;
+
+  if(*shared_cache)
+      sqlite3_enable_shared_cache(1);
+
   return mgrHandle;
 }
 
@@ -107,11 +124,18 @@ RS_SQLite_closeManager(Mgr_Handle *mgrHandle)
 
   RS_DBI_manager *mgr;
   s_object *status;
+  Sint *shared_cache;
 
   mgr = RS_DBI_getManager(mgrHandle);
   if(mgr->num_con)
     RS_DBI_errorMessage("there are opened connections -- close them first",
       RS_DBI_ERROR);
+
+  sqlite3_enable_shared_cache(0);
+  shared_cache = (Sint *)mgr->drvData;
+  if(shared_cache){
+    free(shared_cache);
+  }
 
   RS_DBI_freeManager(mgrHandle);
 
@@ -139,12 +163,12 @@ RS_SQLite_cloneConnection(Con_Handle *conHandle)
 
   mgrHandle = RS_DBI_asMgrHandle(MGR_ID(conHandle));
 
-  /* copy dbname and mode into a 2-element character
+  /* copy dbname and loadable_extensions into a 2-element character
    * vector to be passed to the RS_SQLite_newConnection() function.
    */
   MEM_PROTECT(con_params = NEW_CHARACTER((Sint) 2));
   SET_CHR_EL(con_params, 0, C_S_CPY(conParams->dbname));
-  sprintf(buf1, "%d", (int) conParams->mode);
+  sprintf(buf1, "%d", (int) conParams->loadable_extensions);
   SET_CHR_EL(con_params, 1, C_S_CPY(buf1));
   MEM_UNPROTECT(1);
 
@@ -152,7 +176,7 @@ RS_SQLite_cloneConnection(Con_Handle *conHandle)
 }
 
 RS_SQLite_conParams *
-RS_SQLite_allocConParams(const char *dbname, int mode)
+RS_SQLite_allocConParams(const char *dbname, int loadable_extensions)
 {
   RS_SQLite_conParams *conParams;
 
@@ -162,7 +186,7 @@ RS_SQLite_allocConParams(const char *dbname, int mode)
                        RS_DBI_ERROR);
   }
   conParams->dbname = RS_DBI_copyString(dbname);
-  conParams->mode = mode;
+  conParams->loadable_extensions = loadable_extensions;
   return conParams;
 }
 
@@ -171,7 +195,7 @@ RS_SQLite_freeConParams(RS_SQLite_conParams *conParams)
 {
   if(conParams->dbname)
      free(conParams->dbname);
-  /* conParams->mode is an int, thus needs no free */
+  /* conParams->loadable_extensions is an int, thus needs no free */
   free(conParams);
   conParams = (RS_SQLite_conParams *)NULL;
   return;
@@ -224,14 +248,14 @@ RS_SQLite_newConnection(Mgr_Handle *mgrHandle, s_object *s_con_params)
   Con_Handle  *conHandle;
   sqlite3     *db_connection, **pDb;
   char        *dbname = NULL;
-  int         rc, mode;
+  int         rc, loadable_extensions;
 
   if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
     RS_DBI_errorMessage("invalid SQLiteManager", RS_DBI_ERROR);
 
   /* unpack connection parameters from S object */
   dbname = CHR_EL(s_con_params, 0);
-  mode = (Sint) atol(CHR_EL(s_con_params,1));
+  loadable_extensions = (Sint) atol(CHR_EL(s_con_params,1));
   pDb = (sqlite3 **) calloc((size_t) 1, sizeof(sqlite3 *));
 
   rc = sqlite3_open(dbname, pDb);
@@ -252,10 +276,14 @@ RS_SQLite_newConnection(Mgr_Handle *mgrHandle, s_object *s_con_params)
                         RS_DBI_ERROR);
   }
   /* save connection parameters in the connection object */
-  conParams = RS_SQLite_allocConParams(dbname, mode);
+  conParams = RS_SQLite_allocConParams(dbname, loadable_extensions);
   con->drvConnection = (void *) db_connection;
   con->conParams = (void *) conParams;
   RS_SQLite_setException(con, SQLITE_OK, "OK");
+
+  /* enable loadable extensions if required */
+  if(loadable_extensions != 0)
+    sqlite3_enable_load_extension(db_connection, 1);
 
   return conHandle;
 }
@@ -875,21 +903,22 @@ RS_SQLite_managerInfo(Mgr_Handle *mgrHandle)
 
   RS_DBI_manager *mgr;
   s_object *output;
-  Sint i, num_con, max_con, *cons, ncon;
-  Sint j, n = 8;
+  Sint i, num_con, max_con, *cons, ncon, *shared_cache;
+  Sint j, n = 9;
   char *mgrDesc[] = {"drvName",   "connectionIds", "fetch_default_rec",
                      "managerId", "length",        "num_con",
-                     "counter",   "clientVersion"};
+                     "counter",   "clientVersion", "shared_cache"};
   Stype mgrType[] = {CHARACTER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
                      INTEGER_TYPE,   INTEGER_TYPE, INTEGER_TYPE,
-                     INTEGER_TYPE,   CHARACTER_TYPE};
-  Sint  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1, 1};
+                     INTEGER_TYPE,   CHARACTER_TYPE, CHARACTER_TYPE };
+  Sint  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 
   mgr = RS_DBI_getManager(mgrHandle);
   if(!mgr)
     RS_DBI_errorMessage("driver not loaded yet", RS_DBI_ERROR);
   num_con = (Sint) mgr->num_con;
   max_con = (Sint) mgr->length;
+  shared_cache = (Sint *) mgr->drvData;
   mgrLen[1] = num_con;
 
   output = RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, n);
@@ -920,6 +949,10 @@ RS_SQLite_managerInfo(Mgr_Handle *mgrHandle)
   LST_INT_EL(output,j++,0) = mgr->num_con;
   LST_INT_EL(output,j++,0) = mgr->counter;
   SET_LST_CHR_EL(output,j++,0,C_S_CPY(SQLITE_VERSION));
+  if(*shared_cache)
+    SET_LST_CHR_EL(output,j++,0,C_S_CPY("on"));
+  else
+    SET_LST_CHR_EL(output,j++,0,C_S_CPY("off"));
 
   return output;
 }
@@ -932,13 +965,13 @@ RS_SQLite_connectionInfo(Con_Handle *conHandle)
   RS_SQLite_conParams *conParams;
   RS_DBI_connection  *con;
   s_object   *output;
-  Sint       i, n = 7, *res, nres;
+  Sint       i, n = 8, *res, nres;
   char *conDesc[] = {"host", "user", "dbname", "conType",
-         "serverVersion", "threadId", "rsId"};
+             "serverVersion", "threadId", "rsId", "loadableExtensions"};
   Stype conType[] = {CHARACTER_TYPE, CHARACTER_TYPE, CHARACTER_TYPE,
           CHARACTER_TYPE, CHARACTER_TYPE,
-          INTEGER_TYPE, INTEGER_TYPE};
-  Sint  conLen[]  = {1, 1, 1, 1, 1, 1, 1};
+              INTEGER_TYPE, INTEGER_TYPE, CHARACTER_TYPE};
+  Sint  conLen[]  = {1, 1, 1, 1, 1, 1, 1, 1};
 
   con = RS_DBI_getConnection(conHandle);
   conLen[6] = con->num_res;         /* num of open resultSets */
@@ -970,8 +1003,12 @@ RS_SQLite_connectionInfo(Con_Handle *conHandle)
     LST_INT_EL(output,6,i) = (Sint) res[i];
   }
 
-  return output;
+  if(conParams->loadable_extensions)
+    SET_LST_CHR_EL(output,7,0,C_S_CPY("on"));
+  else
+    SET_LST_CHR_EL(output,7,0,C_S_CPY("off"));
 
+  return output;
 }
 s_object *
 RS_SQLite_resultSetInfo(Res_Handle *rsHandle)
@@ -1209,7 +1246,7 @@ RS_sqlite_import(
         }
       }
 
-      if(sqlite3_step(pStmt)!=SQLITE_DONE){
+      if(corrected_sqlite3_step(pStmt)!=SQLITE_DONE){
         char errMsg[512];
         (void) sprintf(errMsg,
                  "RS_sqlite_import: internal error: sqlite3_step() filed");
@@ -1278,4 +1315,14 @@ RS_sqlite_getline(FILE *in, const char *eol)
     }
 
     return buf;
+}
+
+/* from http://www.sqlite.org/capi3ref.html#sqlite3_step */
+int corrected_sqlite3_step(sqlite3_stmt *pStatement){
+  int rc;
+  rc = sqlite3_step(pStatement);
+  if( rc==SQLITE_ERROR ){
+    rc = sqlite3_reset(pStatement);
+  }
+  return rc;
 }

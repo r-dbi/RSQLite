@@ -35,9 +35,10 @@ setClass("SQLiteObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
 setClass("SQLiteDriver", representation("DBIDriver", "SQLiteObject"))
 
 "SQLite" <-
-function(max.con=16, fetch.default.rec = 500, force.reload=FALSE)
+function(max.con=16, fetch.default.rec = 500, force.reload=FALSE,
+         shared.cache=FALSE)
 {
-   sqliteInitDriver(max.con, fetch.default.rec, force.reload)
+   sqliteInitDriver(max.con, fetch.default.rec, force.reload, shared.cache)
 }
 
 setMethod("dbUnloadDriver", "SQLiteDriver",
@@ -82,7 +83,7 @@ setMethod("dbConnect", "character",
 setMethod("dbConnect", "SQLiteConnection",
    def = function(drv, ...){
       con.id <- as(drv, "integer")
-      new.id <- .Call("RS_SQLite_cloneConnection", con.id, PACKAGE = "RSQLite")
+      new.id <- .Call("RS_SQLite_cloneConnection", con.id, PACKAGE = .SQLitePkgName)
       new("SQLiteConnection", Id = new.id)
    },
    valueClass = "SQLiteConnection"
@@ -98,7 +99,7 @@ setMethod("dbGetInfo", "SQLiteConnection",
 setMethod("dbGetException", "SQLiteConnection",
    def = function(conn, ...){
       id <- as(conn, "integer")
-      .Call("RS_SQLite_getException", id, PACKAGE = "RSQLite")
+      .Call("RS_SQLite_getException", id, PACKAGE = .SQLitePkgName)
    },
    valueClass = "list"    ## TODO: should return a SQLiteException
 )
@@ -225,7 +226,7 @@ setMethod("dbHasCompleted", "SQLiteResult",
 setMethod("dbGetException", "SQLiteConnection",
    def = function(conn, ...){
      id <- as.integer(conn)
-     .Call("RS_SQLite_getException", id[1:2], PACKAGE = "RSQLite")
+     .Call("RS_SQLite_getException", id[1:2], PACKAGE = .SQLitePkgName)
    },
    valueClass = "list"
 )

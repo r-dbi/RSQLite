@@ -1,3 +1,31 @@
+Version 0.4-7
+
+* Upgraded to SQLite 3.3.8
+
+* Use .SQLitePkgName instead of hard-coding the package name when
+  using .Call
+
+* The SQLite driver has a new logical parameter "shared.cache" to
+  enable the shared-cache mode, which allows multiple connections
+  to share a single data and schema cache. See
+  http://www.sqlite.org/sharedcache.html
+
+* dbConnect() now has a logical parameter "loadable.extensions" 
+  which will allow loading of extensions. See the Loadable 
+  Extensions documentation:
+  http://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions
+
+(more changes will be added here)
+
+Version 0.4-4
+
+* Upgraded to SQLite 3.3.7
+
+* Default when building from source is now to compile the included
+  version of SQLite and link to it statically
+
+* Fixed unclosed textConnections
+
 Version 0.4-1
 
 * Added a method for dbWriteTable to write table from a text file, e.g.,

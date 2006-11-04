@@ -34,13 +34,15 @@
 }
 \usage{
    ## SQLiteDriver-related
-   sqliteInitDriver(max.con=16, fetch.default.rec = 500, force.reload=FALSE)
+   sqliteInitDriver(max.con=16, fetch.default.rec = 500, force.reload=FALSE,
+                    shared.cache=FALSE)
    sqliteDriverInfo(obj, what, ...)
    sqliteDescribeDriver(obj, verbose = FALSE, ...)
    sqliteCloseDriver(drv, ...)
 
    ## SQLiteConnection-related
-   sqliteNewConnection(drv, dbname, mode = 0, cache_size=NULL, synchronous=0)
+   sqliteNewConnection(drv, dbname, loadable.extensions=FALSE, cache_size=NULL,
+                       synchronous=0)
    sqliteConnectionInfo(obj, what, ...)
    sqliteDescribeConnection(obj, verbose = FALSE, ...)
    sqliteCloseConnection(con, ...)
@@ -104,10 +106,13 @@
    character string with the SQLite database file name (SQLite, like
    Microsoft's Access, stores an entire database in one file).
 }
-\item{mode}{
-   positive integer describing the mode for opening the database
-   (SQLite's underlying API currently does not yet use it, but
-   it is reserved for future functionality).  The default is 0.
+\item{loadable.extensions}{
+   logical describing whether loadable extensions will be enabled for this
+   connection. The default is FALSE.
+}
+\item{shared.cache}{
+   logical describing whether shared-cache mode should be enabled on the SQLite
+   driver. The default is FALSE.
 }
 \item{cache_size}{
    positive integer to pass to the \code{PRAGMA cache_size};  this

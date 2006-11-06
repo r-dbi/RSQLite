@@ -288,8 +288,12 @@ setMethod("dbListTables", "SQLiteConnection",
    def = function(conn, ...){
       out <- dbGetQuery(conn,
          "select name from sqlite_master where type='table' or type='view' order by name",
-         ...)[,1]
-      if(!is.null(out)) out else character()
+         ...)
+      if (is.null(out) || nrow(out) == 0)
+        out <- character(0)
+      else
+        out <- out[, 1]
+      out
    },
    valueClass = "character"
 )

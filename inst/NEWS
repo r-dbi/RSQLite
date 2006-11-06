@@ -1,3 +1,7 @@
+Version 0.4-12
+
+* Fix bug in dbListTables for empty databases
+
 Version 0.4-11
 
 * Implemented dbCommit() and dbRollback(). There is also a new

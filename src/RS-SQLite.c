@@ -1170,16 +1170,11 @@ RS_SQLite_resultSetInfo(Res_Handle *rsHandle)
 
   result = RS_DBI_getResultSet(rsHandle);
   if(result->fields)
-    flds = RS_DBI_getFieldDescriptions(result->fields);
+      PROTECT(flds = RS_DBI_getFieldDescriptions(result->fields));
   else
-    flds = S_NULL_ENTRY;
+      PROTECT(flds = S_NULL_ENTRY);
 
-  output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
-  if(IS_LIST(output))
-    output = AS_LIST(output);
-  else
-    RS_DBI_errorMessage("internal error: could not alloc named list",
-      RS_DBI_ERROR);
+  PROTECT(output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n));
   SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
   LST_INT_EL(output,1,0) = result->isSelect;
   LST_INT_EL(output,2,0) = result->rowsAffected;
@@ -1188,6 +1183,7 @@ RS_SQLite_resultSetInfo(Res_Handle *rsHandle)
   if(flds != S_NULL_ENTRY)
      SET_ELEMENT(LST_EL(output, 5), (Sint) 0, flds);
 
+  UNPROTECT(2);
   return output;
 }
 

@@ -272,21 +272,16 @@ function(res, n=0, ...)
 
   if(!isIdCurrent(res))
      stop("invalid result handle")
-  type.convert <- function(x, na.strings="NA", as.is=TRUE, dec="."){
-     .Internal(type.convert(x, na.strings, as.is, dec))
-  }
   n <- as(n, "integer")
   rsId <- as(res, "integer")
   rel <- .Call("RS_SQLite_fetch", rsId, nrec = n, PACKAGE = .SQLitePkgName)
   if(length(rel)==0 || length(rel[[1]])==0)
     return(data.frame(NULL))
-  for(j in seq(along = rel))
-      rel[[j]] <- type.convert(rel[[j]], ...)
   ## create running row index as of previous fetch (if any)
   cnt <- dbGetRowCount(res)
   nrec <- length(rel[[1]])
-  indx <- seq(from = cnt - nrec + 1, length = nrec)
-  attr(rel, "row.names") <- as.character(indx)
+  indx <- seq.int(from = cnt - nrec + 1, length = nrec)
+  attr(rel, "row.names") <- indx
   class(rel) <- "data.frame"
   rel
 }

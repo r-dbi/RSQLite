@@ -1018,24 +1018,24 @@ s_object* RS_SQLite_mget(s_object *rsHandle, s_object *max_rec)
     }
 
     PROTECT(output = R_NewHashedEnv(R_NilValue));
-    expand = 0; /* just for now */
-    for(i = 0; ; i++){
-        if(i==num_rec){  /* exhausted the allocated space */
-            if(expand){    /* do we extend or return the records fetched so far*/
+    for (i = 0; ; i++) {
+        if (i == num_rec) {  /* exhausted the allocated space */
+            if (expand) {    /* do we extend or return the records fetched so far*/
                 num_rec = 2 * num_rec;
-                RS_DBI_allocOutput(output, flds, num_rec, expand);
+                UNPROTECT(1);
+                PROTECT(SET_LENGTH(cur_vect, num_rec));
             }
             else
                 break;       /* okay, no more fetching for now */
         }
         state = corrected_sqlite3_step(db_statement);
-        if(state!=SQLITE_ROW && state!=SQLITE_DONE){
+        if (state != SQLITE_ROW && state != SQLITE_DONE) {
             char errMsg[2048];
             (void)sprintf(errMsg, "RS_SQLite_fetch: failed: %s",
                           sqlite3_errmsg(sqlite3_db_handle(db_statement)));
             RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
         }
-        if(state==SQLITE_DONE){
+        if (state == SQLITE_DONE) {
             res->completed = (Sint) 1;
             break;
         }
@@ -1044,9 +1044,7 @@ s_object* RS_SQLite_mget(s_object *rsHandle, s_object *max_rec)
         if (prev_key == NULL || strcmp(prev_key, cur_key) != 0) {
             if (cur_vect != R_NilValue) {
                 UNPROTECT(1);
-                Rprintf("Setting len of '%s' to %d\n", prev_key,vec_i);
                 PROTECT(SET_LENGTH(cur_vect, vec_i));
-                Rprintf("len is %d\n", length(cur_vect));
                 defineVar(install(prev_key), cur_vect, output);                
                 UNPROTECT(1);
             }

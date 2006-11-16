@@ -1042,13 +1042,11 @@ s_object* RS_SQLite_mget(s_object *rsHandle, s_object *max_rec)
 
         cur_key = sqlite3_column_text(db_statement, 0);
         if (prev_key == NULL || strcmp(prev_key, cur_key) != 0) {
-            if (prev_key != NULL)
-                free(prev_key);
-            prev_key = (char *)malloc(sizeof(char)*strlen(cur_key) + 1);
-            strcpy(prev_key, cur_key);
             if (cur_vect != R_NilValue) {
                 UNPROTECT(1);
-                PROTECT(SET_LENGTH(cur_vect, vec_i-1));
+                Rprintf("Setting len of '%s' to %d\n", prev_key,vec_i);
+                PROTECT(SET_LENGTH(cur_vect, vec_i));
+                Rprintf("len is %d\n", length(cur_vect));
                 defineVar(install(prev_key), cur_vect, output);                
                 UNPROTECT(1);
             }
@@ -1064,6 +1062,10 @@ s_object* RS_SQLite_mget(s_object *rsHandle, s_object *max_rec)
                 cur_vect = PROTECT(allocVector(STRSXP, num_rec));
                 break;
             }
+            if (prev_key != NULL)
+                free(prev_key);
+            prev_key = (char *)malloc(sizeof(char)*strlen(cur_key) + 1);
+            strcpy(prev_key, cur_key);
             defineVar(install(cur_key), cur_vect, output);
             vec_i = 0;
         }

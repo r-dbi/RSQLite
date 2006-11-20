@@ -533,7 +533,6 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
     res->isSelect = (Sint) 1;           /* statement is a select  */
     res->rowCount = 0;                  /* fake's cursor's row count */
     res->rowsAffected = (Sint) -1;     /* no rows affected */
-    res->fields = RS_SQLite_createDataMappings(rsHandle);
 
     RS_SQLite_setException(con, state, "OK");
   }
@@ -825,9 +824,7 @@ RS_SQLite_createDataMappings(Res_Handle *rsHandle)
 
    for(j=0; j<ncol; j++){
     flds->name[j] = RS_DBI_copyString(sqlite3_column_name(db_statement, j));
-
-    /* interpret everything as a string */
-    col_type = sqlite3_column_type(db_statement, 0);
+    col_type = sqlite3_column_type(db_statement, j);
     switch(col_type) {
     case SQLITE_INTEGER:
         flds->type[j] = SQL92_TYPE_INTEGER;
@@ -901,6 +898,14 @@ RS_SQLite_fetch(s_object *rsHandle, s_object *max_rec)
       RS_DBI_ERROR);
   }
 
+  state = corrected_sqlite3_step(db_statement);
+  if(state!=SQLITE_ROW && state!=SQLITE_DONE){
+      char errMsg[2048];
+      (void)sprintf(errMsg, "RS_SQLite_fetch: failed first step: %s",
+                    sqlite3_errmsg(sqlite3_db_handle(db_statement)));
+      RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+  }
+  res->fields = RS_SQLite_createDataMappings(rsHandle);
   flds = res->fields;
   if(!flds){
      RS_DBI_errorMessage("corrupt SQLite resultSet, missing fieldDescription",
@@ -925,6 +930,10 @@ RS_SQLite_fetch(s_object *rsHandle, s_object *max_rec)
 #endif
 
   for(i = 0; ; i++){
+    if(state==SQLITE_DONE){
+      res->completed = (Sint) 1;
+      break;
+    }
     if(i==num_rec){  /* exhausted the allocated space */
       if(expand){    /* do we extend or return the records fetched so far*/
         num_rec = 2 * num_rec;
@@ -939,19 +948,6 @@ RS_SQLite_fetch(s_object *rsHandle, s_object *max_rec)
       }
       else
         break;       /* okay, no more fetching for now */
-    }
-
-    state = corrected_sqlite3_step(db_statement);
-    if(state!=SQLITE_ROW && state!=SQLITE_DONE){
-      char errMsg[2048];
-      (void)sprintf(errMsg, "RS_SQLite_fetch: failed: %s",
-                     sqlite3_errmsg(sqlite3_db_handle(db_statement)));
-      RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
-    }
-
-    if(state==SQLITE_DONE){
-      res->completed = (Sint) 1;
-      break;
     }
 
     for(j = 0; j < num_fields; j++){
@@ -983,6 +979,13 @@ RS_SQLite_fetch(s_object *rsHandle, s_object *max_rec)
           break;
       }
     } /* end column loop */
+    state = corrected_sqlite3_step(db_statement);
+    if(state!=SQLITE_ROW && state!=SQLITE_DONE){
+      char errMsg[2048];
+      (void)sprintf(errMsg, "RS_SQLite_fetch: failed: %s",
+                     sqlite3_errmsg(sqlite3_db_handle(db_statement)));
+      RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+    }
   } /* end row loop */
 
   /* size to actual number of records fetched */

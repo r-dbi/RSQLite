@@ -490,7 +490,9 @@ function(con, name, value, field.types = NULL, overwrite = FALSE,
   new.table <- !dbExistsTable(con, name)
   if(new.table){
     ## need to init table, say, with the first nrows lines
-    d <- read.table(fn, sep=sep, header=header, skip=skip, nrows=nrows, ...)
+    d <- read.table(fn, sep=sep, header=header, skip=skip, nrows=nrows,
+                    na.strings=.SQLite.NA.string,
+                    stringsAsFactors=FALSE, ...)
     sql <-
       dbBuildTableDefinition(new.con, name, d, field.types = field.types,
         row.names = row.names)
@@ -567,15 +569,15 @@ function(value, file, batch, row.names = TRUE, ...,
   rs.class <- data.class(obj)
   rs.mode <- storage.mode(obj)
   if(rs.class=="numeric"){
-    sql.type <- if(rs.mode=="integer") "int" else  "double"
+    sql.type <- if(rs.mode=="integer") "INTEGER" else  "REAL"
   }
   else {
     sql.type <- switch(rs.class,
-                  character = "text",
-                  logical = "tinyint",
-                  factor = "text",	## up to 65535 characters
-                  ordered = "text",
-                  "text")
+                  character = "TEXT",
+                  logical = "INTEGER",
+                  factor = "TEXT",	## up to 65535 characters
+                  ordered = "TEXT",
+                  "TEXT")
   }
   sql.type
 }

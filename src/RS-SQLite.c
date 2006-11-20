@@ -351,7 +351,7 @@ int RS_SQLite_get_row_count(sqlite3* db, const char* tname) {
     int i, ans;
     sqlite3_stmt* stmt;
     const char* tail;
-    
+
     qrylen += strlen(tname) + 1;
     sqlQuery = (char*)  R_alloc(qrylen, sizeof(char));
     snprintf(sqlQuery, qrylen, sqlFmt, tname);
@@ -388,9 +388,9 @@ SEXP RS_SQLite_quick_column(Con_Handle *conHandle, SEXP table, SEXP column)
     table_name = CHAR(STRING_ELT(table, 0));
     column_name = CHAR(STRING_ELT(column, 0));
     numrows = RS_SQLite_get_row_count(db_connection, table_name);
-    snprintf(sqlQuery, sizeof(sqlQuery), "select %s from %s", 
+    snprintf(sqlQuery, sizeof(sqlQuery), "select %s from %s",
              column_name, table_name);
-    
+
     rc = sqlite3_prepare(db_connection, sqlQuery, strlen(sqlQuery), &stmt, &tail);
     /* FIXME: how should we be handling errors?
        Could either follow the pattern in the rest of the package or
@@ -417,7 +417,7 @@ SEXP RS_SQLite_quick_column(Con_Handle *conHandle, SEXP table, SEXP column)
     case SQLITE_NULL:
         error("RS_SQLite_quick_column: encountered NULL column");
         break;
-    case SQLITE_BLOB: 
+    case SQLITE_BLOB:
         error("RS_SQLite_quick_column: BLOB column handling not implementing");
         break;
     default:
@@ -814,7 +814,7 @@ RS_SQLite_createDataMappings(Res_Handle *rsHandle)
   sqlite3_stmt  *db_statement;
   RS_DBI_resultSet   *result;
   RS_DBI_fields      *flds;
-  int     j, ncol;
+  int     j, ncol, col_type;
 
   result = RS_DBI_getResultSet(rsHandle);
   db_statement = (sqlite3_stmt *) result->drvResultSet;
@@ -827,16 +827,45 @@ RS_SQLite_createDataMappings(Res_Handle *rsHandle)
     flds->name[j] = RS_DBI_copyString(sqlite3_column_name(db_statement, j));
 
     /* interpret everything as a string */
-    flds->type[j] = SQL92_TYPE_CHAR_VAR;
-    flds->Sclass[j] = CHARACTER_TYPE;
-    flds->length[j] = (Sint) -1;   /* unknown */
+    col_type = sqlite3_column_type(db_statement, 0);
+    switch(col_type) {
+    case SQLITE_INTEGER:
+        flds->type[j] = SQL92_TYPE_INTEGER;
+        flds->Sclass[j] = INTEGER_TYPE;
+        flds->length[j] = (Sint) sizeof(int);
+        flds->isVarLength[j] = (Sint) 0;
+        break;
+    case SQLITE_FLOAT:
+        flds->type[j] = SQL92_TYPE_DOUBLE;
+        flds->Sclass[j] = REAL_TYPE;
+        flds->length[j] = (Sint) sizeof(double);
+        flds->isVarLength[j] = (Sint) 0;
+        break;
+    case SQLITE_TEXT:
+        flds->type[j] = SQL92_TYPE_CHAR_VAR;
+        flds->Sclass[j] = CHARACTER_TYPE;
+        flds->length[j] = (Sint) -1;   /* unknown */
+        flds->isVarLength[j] = (Sint) 1;
+        break;
+    case SQLITE_NULL:
+        error("NULL column handling not implemented");
+        break;
+    case SQLITE_BLOB:
+        error("BLOB column handling not implemented");
+        break;
+    default:
+        error("unknown column type %d", col_type);
+    }
     flds->precision[j] = (Sint) -1;
     flds->scale[j] = (Sint) -1;
-    flds->nullOk[j] = (Sint) -1;   /* actually we may be able to get(?) */
-    flds->isVarLength[j] = (Sint) -1;
-  }
-
-  return flds;
+    /* For nullOk, could use sqlite3_column_origin_name and
+       sqlite3_table_column_metadata to determine this.  It
+       won't always be possible as the query column may not
+       refer to a table column.
+    */
+    flds->nullOk[j] = (Sint) -1;
+   }
+   return flds;
 }
 
 /* we will return a data.frame with character data and then invoke
@@ -1045,7 +1074,7 @@ s_object* RS_SQLite_mget(s_object *rsHandle, s_object *max_rec)
             if (cur_vect != R_NilValue) {
                 UNPROTECT(1);
                 PROTECT(SET_LENGTH(cur_vect, vec_i));
-                defineVar(install(prev_key), cur_vect, output);                
+                defineVar(install(prev_key), cur_vect, output);
                 UNPROTECT(1);
             }
             switch (flds->Sclass[1]) {
@@ -1087,7 +1116,7 @@ s_object* RS_SQLite_mget(s_object *rsHandle, s_object *max_rec)
             if(null_item)
                 SET_STRING_ELT(cur_vect, vec_i++, NA_STRING);
             else
-                SET_STRING_ELT(cur_vect, vec_i++, 
+                SET_STRING_ELT(cur_vect, vec_i++,
                                mkChar(sqlite3_column_text(db_statement, 1)));
             break;
         }

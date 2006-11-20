@@ -286,6 +286,19 @@ function(res, n=0, ...)
   rel
 }
 
+"sqliteFetchOneColumn" <-
+function(con, statement, n=0, ...)
+{
+    rs <- dbSendQuery(con, statement)
+    on.exit(dbClearResult(rs))
+    n <- as(n, "integer")
+    rsId <- as(rs, "integer")
+    rel <- .Call("RS_SQLite_fetch", rsId, nrec = n, PACKAGE = .SQLitePkgName)
+    if (length(rel) == 0 || length(rel[[1]]) == 0)
+      return(NULL)
+    rel[[1]]
+}
+
 "sqliteResultInfo" <-
 function(obj, what = "", ...)
 {

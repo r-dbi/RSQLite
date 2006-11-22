@@ -573,7 +573,7 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
       for(i=0; i<rows; i++){
 
         /* bind each parameter to the statement */
-        for(j=0; j<cols; j++){
+        for (j = 0; j < bind_count; j++) {
           RS_SQLite_bindParam param = params[j];
           int integer;
           double number;
@@ -616,7 +616,7 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
             RS_SQLite_setException(con, sqlite3_errcode(db_connection),
                                    errMsg);
 
-            RS_SQLite_freeParameterBinding(cols, params);
+            RS_SQLite_freeParameterBinding(bind_count, params);
 
             sqlite3_finalize(db_statement);
             res->drvResultSet = (void *)NULL;
@@ -634,7 +634,7 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
           RS_SQLite_setException(con, sqlite3_errcode(db_connection),
                                  errMsg);
 
-          RS_SQLite_freeParameterBinding(cols, params);
+          RS_SQLite_freeParameterBinding(bind_count, params);
 
           sqlite3_finalize(db_statement);
           res->drvResultSet = (void *)NULL;
@@ -651,7 +651,7 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
           RS_SQLite_setException(con, sqlite3_errcode(db_connection),
                                  errMsg);
 
-          RS_SQLite_freeParameterBinding(cols, params);
+          RS_SQLite_freeParameterBinding(bind_count, params);
 
           sqlite3_finalize(db_statement);
           res->drvResultSet = (void *)NULL;
@@ -661,7 +661,7 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
       }
 
       /* free the binding parameter information */
-      RS_SQLite_freeParameterBinding(cols, params);
+      RS_SQLite_freeParameterBinding(bind_count, params);
     }
 
     res->isSelect  = (Sint) 0;          /* statement is not a select  */
@@ -680,15 +680,16 @@ RS_SQLite_createParameterBinding(int n, s_object *bind_data,
   S_EVALUATOR
 
   RS_SQLite_bindParam *params;
-  int i, j, *used_index, current;
+  int i, j, *used_index, current, num_cols;
   s_object *colNames, *data, *levels;
 
   /* check that we have enough columns in the data frame */
   colNames = GET_NAMES(bind_data);
-  if(GET_LENGTH(colNames) < n){
+  num_cols = length(colNames);
+  if(num_cols < n){
     sprintf(errorMsg,
             "incomplete data binding: expected %d parameters, got %d",
-            n, GET_LENGTH(colNames));
+            n, num_cols);
     return NULL;
   }
 
@@ -699,17 +700,22 @@ RS_SQLite_createParameterBinding(int n, s_object *bind_data,
     return NULL;
   }
 
-  used_index = (int *)malloc(sizeof(int)*n);
+  /* If too many columns are provided in the bind data, need to
+     allocate enough space for the used_index
+  */
+  used_index = (int *)malloc(sizeof(int)*num_cols);
   if(used_index==NULL){
     free(params);
     sprintf(errorMsg, "could not allocate memory");
     return NULL;
   }
 
-  for(i=0; i<n; i++){
+  for(i=0; i<num_cols; i++){
     used_index[i] = -1;
-    params[i].is_protected = 0;
-    params[i].data = NULL;
+    if (i < n) {
+        params[i].is_protected = 0;
+        params[i].data = NULL;
+    }
   }
 
   for(i=0; i<n; i++){
@@ -727,7 +733,7 @@ RS_SQLite_createParameterBinding(int n, s_object *bind_data,
       }
     }
     else{
-      for(j=0; j<LENGTH(colNames); j++){
+      for(j=0; j<num_cols; j++){
         /* skip past initial bind identifier */
         if(strcmp(paramName+1, CHR_EL(colNames, j)) == 0){
           if(used_index[j] == -1){

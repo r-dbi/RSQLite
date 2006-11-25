@@ -72,8 +72,38 @@ testUnitFetch <- function() {
         checkEquals(1L, nrow(gotdf))
         checkEquals(ncol(basicDf), ncol(gotdf))
         checkEquals(expected_types, sapply(gotdf, typeof))
+        checkEquals(basicDf[i, ], gotdf)
     }
-    checkTRUE(dbHasCompleted(rs))
+    ## In this case, you can't know there are no more records:
+    checkTrue(!dbHasCompleted(rs))
+    checkEquals(0, nrow(fetch(rs, n=1)))
+    checkTrue(dbHasCompleted(rs))
+}
+
+testFetchByTwo <- function() {
+    db <- DATA$db
+    ## Create table by hand
+    schema = "create table t1 (name text, fldInt integer, fldDbl float)"
+    dbGetQuery(db, schema)
+    dbBeginTransaction(db)
+    dbGetPreparedQuery(db, "insert into t1 values (?, ?, ?)", bind.data=basicDf)
+    dbCommit(db)
+    expected_types <- c(name="character", fldInt="integer", fldDbl="double")
+    rs <- dbSendQuery(db, "select * from t1")
+    on.exit(dbClearResult(rs))
+    N <- nrow(basicDf)
+    if (N %% 2 != 0)
+      N <- N + 1
+    N <- N / 2
+    for (i in seq(1, N)) {
+        gotdf <- fetch(rs, n=2)
+        checkEquals(ncol(basicDf), ncol(gotdf))
+        checkEquals(expected_types, sapply(gotdf, typeof))
+        if (i < 3) {
+            checkEquals(2, nrow(gotdf))
+        }
+    }
+    checkTrue(dbHasCompleted(rs))
 }
 
 

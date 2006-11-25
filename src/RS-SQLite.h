@@ -61,6 +61,12 @@ typedef struct st_sqlite_bindparam {
 RS_SQLite_conParams *RS_SQLite_allocConParams(const char *dbname, int loadable_extensions);
 void                RS_SQLite_freeConParams(RS_SQLite_conParams *conParams);
 
+/* Convert declared column type string to SQLite column type.
+ * For example, "varchar" => SQLITE_TEXT
+ *
+ */
+int                 SQLite_decltype_to_type(const char *decltype);
+
 /* The following functions are the S/R entry into the C implementation (i.e.,
  * these are the only ones visible from R/S) we use the prefix "RS_SQLite" in
  * function names to denote this.  These functions are  built on top of the

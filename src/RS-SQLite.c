@@ -343,6 +343,46 @@ RS_SQLite_closeConnection(Con_Handle *conHandle)
 }
 
 
+int SQLite_decltype_to_type(const char* decltype)
+{
+    unsigned int h = 0;
+    int len = strlen(decltype);
+    const unsigned char *zIn = decltype;
+    const unsigned char *zEnd = &(decltype[len]);
+    int col_type = SQLITE_FLOAT;
+
+    while( zIn!=zEnd ){
+        h = (h<<8) + tolower(*zIn);
+        zIn++;
+        if( h==(('c'<<24)+('h'<<16)+('a'<<8)+'r') ){             /* CHAR */
+            col_type = SQLITE_TEXT;
+        }else if( h==(('c'<<24)+('l'<<16)+('o'<<8)+'b') ){       /* CLOB */
+            col_type = SQLITE_TEXT;
+        }else if( h==(('t'<<24)+('e'<<16)+('x'<<8)+'t') ){       /* TEXT */
+            col_type = SQLITE_TEXT;
+        }else if( h==(('b'<<24)+('l'<<16)+('o'<<8)+'b')          /* BLOB */
+                  && col_type==SQLITE_FLOAT ){
+            col_type = SQLITE_BLOB;
+#ifndef SQLITE_OMIT_FLOATING_POINT
+        }else if( h==(('r'<<24)+('e'<<16)+('a'<<8)+'l')          /* REAL */
+                  && col_type==SQLITE_FLOAT ){
+            col_type = SQLITE_FLOAT;
+        }else if( h==(('f'<<24)+('l'<<16)+('o'<<8)+'a')          /* FLOA */
+                  && col_type==SQLITE_FLOAT ){
+            col_type = SQLITE_FLOAT;
+        }else if( h==(('d'<<24)+('o'<<16)+('u'<<8)+'b')          /* DOUB */
+                  && col_type==SQLITE_FLOAT ){
+            col_type = SQLITE_FLOAT;
+#endif
+        }else if( (h&0x00FFFFFF)==(('i'<<16)+('n'<<8)+'t') ){    /* INT */
+            col_type = SQLITE_INTEGER;
+            break;
+        }
+    }
+    return col_type;
+}
+
+
 int RS_SQLite_get_row_count(sqlite3* db, const char* tname) {
     char* sqlQuery;
     const char* sqlFmt = "select rowid from %s order by rowid desc limit 1";
@@ -820,6 +860,7 @@ RS_SQLite_createDataMappings(Res_Handle *rsHandle)
   RS_DBI_resultSet   *result;
   RS_DBI_fields      *flds;
   int     j, ncol, col_type;
+  const char *col_decltype = NULL;
 
   result = RS_DBI_getResultSet(rsHandle);
   db_statement = (sqlite3_stmt *) result->drvResultSet;
@@ -830,7 +871,16 @@ RS_SQLite_createDataMappings(Res_Handle *rsHandle)
 
    for(j=0; j<ncol; j++){
     flds->name[j] = RS_DBI_copyString(sqlite3_column_name(db_statement, j));
+    /* XXX: We do our best to determine the type of the column.  When
+       the first row retrieved contains a NULL and does not reference
+       a table column, we give up.
+     */
     col_type = sqlite3_column_type(db_statement, j);
+    if (col_type == SQLITE_NULL) {
+        /* try to get type from origin column */
+        col_decltype = sqlite3_column_decltype(db_statement, j);
+        col_type = SQLite_decltype_to_type(col_decltype);
+    }
     switch(col_type) {
     case SQLITE_INTEGER:
         flds->type[j] = SQL92_TYPE_INTEGER;

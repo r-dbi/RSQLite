@@ -961,7 +961,9 @@ RS_SQLite_fetch(s_object *rsHandle, s_object *max_rec)
                     sqlite3_errmsg(sqlite3_db_handle(db_statement)));
       RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
   }
-  res->fields = RS_SQLite_createDataMappings(rsHandle);
+  if (!(res->fields)) {
+      res->fields = RS_SQLite_createDataMappings(rsHandle);
+  }
   flds = res->fields;
   if(!flds){
      RS_DBI_errorMessage("corrupt SQLite resultSet, missing fieldDescription",

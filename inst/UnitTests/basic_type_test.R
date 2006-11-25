@@ -13,23 +13,23 @@ DATA <- new.env(parent=emptyenv(), hash=TRUE)
     file.remove(DATA$dbfile)
 }
 
+basicDf <- data.frame(name=c("Alice", "Bob", "Carl", "Diane", NA),
+                      fldInt=as.integer(c(as.integer(1:4), NA)),
+                      fldDbl=as.double(c(1.1, 2.2, 3.3, 4.4, NA)),
+                      stringsAsFactors=FALSE)
+
+
 testBasicTypeConversion <- function() {
     db <- DATA$db
-    df <- data.frame(name=c("Alice", "Bob", "Carl", "Diane", NA),
-                     fldInt=as.integer(c(as.integer(1:4), NA)),
-                     fldDbl=as.double(c(1.1, 2.2, 3.3, 4.4, NA)),
-                     stringsAsFactors=FALSE)
-
-    ## Create table by hand
     schema = "create table t1 (name text, fldInt integer, fldDbl float)"
     dbGetQuery(db, schema)
     dbBeginTransaction(db)
-    dbGetPreparedQuery(db, "insert into t1 values (?, ?, ?)", bind.data=df)
+    dbGetPreparedQuery(db, "insert into t1 values (?, ?, ?)", bind.data=basicDf)
     dbCommit(db)
     expected_types <- c(name="character", fldInt="integer", fldDbl="double")
     gotdf <- dbGetQuery(db, "select * from t1")
 
-    checkEquals(dim(df), dim(gotdf))
+    checkEquals(dim(basicDf), dim(gotdf))
     checkEquals(expected_types, sapply(gotdf, typeof))
     checkTrue(all(is.na(gotdf[5, ])))
 }
@@ -56,19 +56,35 @@ testNAInFirstRow <- function() {
     checkEquals(basicDf, got)
 }
 
+testUnitFetch <- function() {
+    db <- DATA$db
+    ## Create table by hand
+    schema = "create table t1 (name text, fldInt integer, fldDbl float)"
+    dbGetQuery(db, schema)
+    dbBeginTransaction(db)
+    dbGetPreparedQuery(db, "insert into t1 values (?, ?, ?)", bind.data=basicDf)
+    dbCommit(db)
+    expected_types <- c(name="character", fldInt="integer", fldDbl="double")
+    rs <- dbSendQuery(db, "select * from t1")
+    on.exit(dbClearResult(rs))
+    for (i in seq(length=nrow(basicDf))) {
+        gotdf <- fetch(rs, n=1)
+        checkEquals(1L, nrow(gotdf))
+        checkEquals(ncol(basicDf), ncol(gotdf))
+        checkEquals(expected_types, sapply(gotdf, typeof))
+    }
+    checkTRUE(dbHasCompleted(rs))
+}
+
+
 testWriteTableBasicTypeConversion <- function() {
     db <- DATA$db
-    df <- data.frame(name=c("Alice", "Bob", "Carl", "Diane", NA),
-                     fldInt=as.integer(c(as.integer(1:4), NA)),
-                     fldDbl=as.double(c(1.1, 2.2, 3.3, 4.4, NA)),
-                     stringsAsFactors=FALSE)
-
-    dbWriteTable(db, "t1", df, row.names=FALSE)
+    dbWriteTable(db, "t1", basicDf, row.names=FALSE)
 
     expected_types <- c(name="character", fldInt="integer", fldDbl="double")
     gotdf <- dbGetQuery(db, "select * from t1")
 
-    checkEquals(dim(df), dim(gotdf))
+    checkEquals(dim(basicDf), dim(gotdf))
     checkEquals(expected_types, sapply(gotdf, typeof))
     checkTrue(all(is.na(gotdf[5, ])))
 }

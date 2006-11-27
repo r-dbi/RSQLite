@@ -1059,145 +1059,178 @@ RS_SQLite_fetch(s_object *rsHandle, s_object *max_rec)
   return output;
 }
 
-s_object* RS_SQLite_mget(s_object *rsHandle, s_object *max_rec)
+/* declare function that needs to be added to R API */
+SEXP R_NewHashedEnv(SEXP);
+
+s_object *      /* data.frame */
+RS_SQLite_mget(s_object *rsHandle, s_object *max_rec)
 {
-    RS_DBI_resultSet *res;
-    RS_DBI_fields    *flds;
-    sqlite3_stmt     *db_statement;
-    s_object  *s_tmp;
-    SEXP output, v_tmp;
-    int    i, j, state, expand, vec_i;
-    Sint   num_rec;
-    int    num_fields, null_item;
-    const char *cur_key = NULL;
-    char *prev_key = NULL;
-    s_object *cur_vect = R_NilValue;
+  RS_DBI_resultSet *res;
+  RS_DBI_fields    *flds;
+  sqlite3_stmt     *db_statement;
+  s_object  *output, *s_tmp;
+  int    i, j, state, expand, vlen;
+  Sint   num_rec;
+  int    num_fields, row_idx;
+  int *key_breaks;
+  int breaks_idx;
+  const char *cur_key = NULL;
+  char *prev_key = NULL;
+  SEXP env, vect;
 
-    res = RS_DBI_getResultSet(rsHandle);
-    if(res->isSelect != 1){
-        RS_DBI_errorMessage("resultSet does not correspond to a SELECT statement",
-                            RS_DBI_WARNING);
-        return S_NULL_ENTRY;
-    }
 
-    if(res->completed == 1)
-        return S_NULL_ENTRY;
+  res = RS_DBI_getResultSet(rsHandle);
+  if(res->isSelect != 1){
+    RS_DBI_errorMessage("resultSet does not correspond to a SELECT statement",
+    RS_DBI_WARNING);
+    return S_NULL_ENTRY;
+  }
 
-    db_statement = (sqlite3_stmt *)res->drvResultSet;
-    if(db_statement == NULL){
-        RS_DBI_errorMessage("corrupt SQLite resultSet, missing statement handle",
-                            RS_DBI_ERROR);
-    }
+  if(res->completed == 1)
+    return R_NilValue;
 
-    flds = res->fields;
-    if(!flds){
-        RS_DBI_errorMessage("corrupt SQLite resultSet, missing fieldDescription",
-                            RS_DBI_ERROR);
-    }
+  db_statement = (sqlite3_stmt *)res->drvResultSet;
+  if(db_statement == NULL){
+    RS_DBI_errorMessage("corrupt SQLite resultSet, missing statement handle",
+      RS_DBI_ERROR);
+  }
 
-    num_fields = flds->num_fields;
-    num_rec = INT_EL(max_rec,0);
-    expand = (num_rec < 0);   /* dyn expand output to accommodate all rows*/
-    if(expand || num_rec == 0){
-        num_rec = RS_DBI_getManager(rsHandle)->fetch_default_rec;
-    }
+  state = corrected_sqlite3_step(db_statement);
+  row_idx = 0;
+  if(state!=SQLITE_ROW && state!=SQLITE_DONE){
+      char errMsg[2048];
+      (void)sprintf(errMsg, "RS_SQLite_fetch: failed first step: %s",
+                    sqlite3_errmsg(sqlite3_db_handle(db_statement)));
+      RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+  }
+  if (!res->fields) {
+      if (!(res->fields = RS_SQLite_createDataMappings(rsHandle))) {
+          RS_DBI_errorMessage("corrupt SQLite resultSet, missing fieldDescription",
+                              RS_DBI_ERROR);
+      }
+  }
+  flds = res->fields;
+  /* force first column to character */
+  flds->Sclass[0] = CHARACTER_TYPE;
 
-    PROTECT(output = R_NewHashedEnv(R_NilValue));
-    for (i = 0; ; i++) {
-        if (i == num_rec) {  /* exhausted the allocated space */
-            if (expand) {    /* do we extend or return the records fetched so far*/
-                num_rec = 2 * num_rec;
-                UNPROTECT(1);
-                PROTECT(SET_LENGTH(cur_vect, num_rec));
-            }
-            else
-                break;       /* okay, no more fetching for now */
-        }
-        state = corrected_sqlite3_step(db_statement);
-        if (state != SQLITE_ROW && state != SQLITE_DONE) {
-            char errMsg[2048];
-            (void)sprintf(errMsg, "RS_SQLite_fetch: failed: %s",
-                          sqlite3_errmsg(sqlite3_db_handle(db_statement)));
-            RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
-        }
-        if (state == SQLITE_DONE) {
-            res->completed = (Sint) 1;
-            break;
-        }
+  num_fields = flds->num_fields;
+  num_rec = INT_EL(max_rec,0);
+  expand = (num_rec < 0);   /* dyn expand output to accommodate all rows*/
+  if(expand || num_rec == 0){
+    num_rec = RS_DBI_getManager(rsHandle)->fetch_default_rec;
+  }
 
-        cur_key = sqlite3_column_text(db_statement, 0);
-        if (prev_key == NULL || strcmp(prev_key, cur_key) != 0) {
-            if (cur_vect != R_NilValue) {
-                UNPROTECT(1);
-                PROTECT(SET_LENGTH(cur_vect, vec_i));
-                defineVar(install(prev_key), cur_vect, output);
-                UNPROTECT(1);
-            }
-            switch (flds->Sclass[1]) {
-            case INTEGER_TYPE:
-                cur_vect = PROTECT(allocVector(INTSXP, num_rec));
-                break;
-            case NUMERIC_TYPE:
-                cur_vect = PROTECT(allocVector(REALSXP, num_rec));
-                break;
-            case CHARACTER_TYPE: /* falls through */
-            default:
-                cur_vect = PROTECT(allocVector(STRSXP, num_rec));
-                break;
-            }
-            if (prev_key != NULL)
-                free(prev_key);
-            prev_key = (char *)malloc(sizeof(char)*strlen(cur_key) + 1);
-            strcpy(prev_key, cur_key);
-            defineVar(install(cur_key), cur_vect, output);
-            vec_i = 0;
-        }
-        null_item = (sqlite3_column_type(db_statement, 1) == SQLITE_NULL);
-        switch (flds->Sclass[1]) {
+  MEM_PROTECT(output = NEW_LIST((Sint) num_fields));
+  RS_DBI_allocOutput(output, flds, num_rec, 0);
+  key_breaks = (int *)R_alloc(num_rec, sizeof(int));
+  key_breaks[0] = 0;
+  breaks_idx++;
+  while (state != SQLITE_DONE) {
+      if (sqlite3_column_type(db_statement, 0) == SQLITE_NULL)
+          error("RS_SQLite_mget: encounted NULL key");
+      cur_key = sqlite3_column_text(db_statement, 0);
+      if (prev_key == NULL || strcmp(prev_key, cur_key) != 0) {
+          if (prev_key != NULL) {
+              Free(prev_key);
+              key_breaks[breaks_idx++] = row_idx;
+          }
+          prev_key = Calloc(strlen(cur_key) + 1, char);
+          strcpy(prev_key, cur_key);
+      }
+
+    for (j = 0; j < num_fields; j++) {
+      int null_item = (sqlite3_column_type(db_statement, j) == SQLITE_NULL);
+      switch(flds->Sclass[j]){
         case INTEGER_TYPE:
-            if(null_item)
-                INTEGER(cur_vect)[vec_i++] = NA_INTEGER;
-            else
-                INTEGER(cur_vect)[vec_i++] = sqlite3_column_int(db_statement, 1);
-            break;
+          if(null_item)
+            NA_SET(&(LST_INT_EL(output,j,row_idx)), INTEGER_TYPE);
+          else
+            LST_INT_EL(output,j,row_idx) =
+                      sqlite3_column_int(db_statement, j);
+          break;
         case NUMERIC_TYPE:
-            if(null_item)
-                REAL(cur_vect)[vec_i++] = NA_REAL;
-            else
-                REAL(cur_vect)[vec_i++] = sqlite3_column_double(db_statement, 1);
-            break;
+          if(null_item)
+            NA_SET(&(LST_NUM_EL(output,j,row_idx)), NUMERIC_TYPE);
+          else
+            LST_NUM_EL(output,j,row_idx) =
+                      sqlite3_column_double(db_statement, j);
+          break;
         case CHARACTER_TYPE:
-            /* falls through */
+          /* falls through */
         default:
-            if(null_item)
-                SET_STRING_ELT(cur_vect, vec_i++, NA_STRING);
-            else
-                SET_STRING_ELT(cur_vect, vec_i++,
-                               mkChar(sqlite3_column_text(db_statement, 1)));
-            break;
-        }
-    } /* end row loop */
-
-#if 0
-    /* size to actual number of records fetched */
-    if(i < num_rec){
-        num_rec = i;
-        /* adjust the length of each of the members in the output_list */
-        for(j = 0; j<num_fields; j++){
-            s_tmp = LST_EL(output,j);
-            MEM_PROTECT(SET_LENGTH(s_tmp, num_rec));
-            SET_ELEMENT(output, j, s_tmp);
-            MEM_UNPROTECT(1);
-        }
+          if(null_item)
+            SET_LST_CHR_EL(output,j,row_idx, NA_STRING);
+          else
+            SET_LST_CHR_EL(output,j,row_idx,
+                           C_S_CPY(sqlite3_column_text(db_statement, j)));
+          break;
+      }
+    } /* end column loop */
+    row_idx++;
+    if (row_idx == num_rec) {  /* request satisfied or exhausted allocated space */
+      if (expand) {    /* do we extend or return the records fetched so far*/
+          key_breaks = (int *)S_realloc((char *)key_breaks, 2 * num_rec, num_rec,
+                                        sizeof(int));
+          num_rec = 2 * num_rec;
+          RS_DBI_allocOutput(output, flds, num_rec, expand);
+      }
+      else
+        break;       /* okay, no more fetching for now */
     }
-#endif
-    res->rowCount += num_rec;
+    state = corrected_sqlite3_step(db_statement);
+    if (state != SQLITE_ROW && state != SQLITE_DONE) {
+      char errMsg[2048];
+      (void)sprintf(errMsg, "RS_SQLite_fetch: failed: %s",
+                    sqlite3_errmsg(sqlite3_db_handle(db_statement)));
+      RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+    }
+  } /* end row loop */
+  if (state == SQLITE_DONE) {
+      res->completed = (Sint) 1;
+  }
+  /* size to actual number of records fetched */
+  if(row_idx < num_rec){
+    num_rec = row_idx;
+    /* adjust the length of each of the members in the output_list */
+    for(j = 0; j<num_fields; j++){
+      s_tmp = LST_EL(output,j);
+      MEM_PROTECT(SET_LENGTH(s_tmp, num_rec));
+      SET_ELEMENT(output, j, s_tmp);
+      MEM_UNPROTECT(1);
+    }
+  }
+  res->rowCount += num_rec;
+  key_breaks[breaks_idx++] = num_rec;
+  PROTECT(env = R_NewHashedEnv(R_NilValue));
+  for (j = 1; j < breaks_idx; j++) {
+      vlen = key_breaks[j] - key_breaks[j - 1];
+      s_tmp = LST_EL(output, 1);
+      PROTECT(vect = allocVector(TYPEOF(s_tmp), vlen));
+      for (i = 0; i < vlen; i++) {
+          switch (TYPEOF(vect)) {
+          case INTSXP:
+              INTEGER(vect)[i] = INTEGER(s_tmp)[key_breaks[j-1]+i];
+              break;
+          case REALSXP:
+              REAL(vect)[i] = REAL(s_tmp)[key_breaks[j-1]+i];
+              break;
+          case STRSXP:
+              SET_STRING_ELT(vect, i, STRING_ELT(s_tmp, key_breaks[j-1]+i));
+              break;
+          default:
+              error("unknown type");
+              break;
+          }
+      }
+      s_tmp = STRING_ELT(LST_EL(output, 0), key_breaks[j]-1);
+      defineVar(install(CHAR(s_tmp)), vect, env);
+      UNPROTECT(1);
+  }
 
-    if (prev_key != NULL)
-        free(prev_key);
-
-    MEM_UNPROTECT(2);
-    return output;
+  if (prev_key)
+      Free(prev_key);
+  MEM_UNPROTECT(2);
+  return env;
 }
 
 /* return a 2-elem list with the last exception number and exception message on a given connection.

@@ -1059,6 +1059,14 @@ RS_SQLite_fetch(s_object *rsHandle, s_object *max_rec)
   return output;
 }
 
+/* The following mget-like function is EXPERIMENTAL
+
+   The purpose is to return a compact list structure directly instead
+   of, for example, pulling across a two-column table and calling
+   split.
+
+*/
+#if 0
 /* declare function that needs to be added to R API */
 SEXP R_NewHashedEnv(SEXP);
 
@@ -1232,6 +1240,7 @@ RS_SQLite_mget(s_object *rsHandle, s_object *max_rec)
   MEM_UNPROTECT(2);
   return env;
 }
+#endif
 
 /* return a 2-elem list with the last exception number and exception message on a given connection.
  * NOTE: RS_SQLite_getException() is meant to be used mostly directory R.

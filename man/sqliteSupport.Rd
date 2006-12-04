@@ -20,6 +20,7 @@
 \alias{sqliteImportFile}
 \alias{sqliteTableFields}
 \alias{sqliteDataType}
+\alias{sqliteQuickColumn}
 \alias{.SQLitePkgName}              % constants
 \alias{.SQLitePkgVersion}
 \alias{.SQLitePkgRCS}

@@ -530,8 +530,10 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
   res->statement = dyn_statement;
   res->drvResultSet = NULL;
 
-  state = sqlite3_prepare(db_connection, dyn_statement, -1,
-                          &db_statement, NULL);
+  do {
+      state = sqlite3_prepare(db_connection, dyn_statement, -1,
+                              &db_statement, NULL);
+  } while (state == SQLITE_SCHEMA);
 
   if(state!=SQLITE_OK){
     char buf[2048];

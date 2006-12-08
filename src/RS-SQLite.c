@@ -531,11 +531,12 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
   res->drvResultSet = NULL;
 
   do {
-      state = sqlite3_prepare(db_connection, dyn_statement, -1,
-                              &db_statement, NULL);
-  } while (state == SQLITE_SCHEMA);
+      if (db_statement)
+          sqlite3_finalize(db_statement);
+  state = sqlite3_prepare(db_connection, dyn_statement, -1,
+                          &db_statement, NULL);
 
-  if(state!=SQLITE_OK){
+  if (state != SQLITE_OK && state != SQLITE_SCHEMA) {
     char buf[2048];
     (void) sprintf(buf, "error in statement: %s",
                      sqlite3_errmsg(db_connection));
@@ -545,7 +546,7 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
     RS_DBI_errorMessage(buf, RS_DBI_ERROR);
   }
 
-  if(db_statement == NULL){
+  if(db_statement == NULL && state != SQLITE_SCHEMA){
     char *message = "nothing to execute";
     RS_SQLite_setException(con, 0, message);
     RS_DBI_freeResultSet(rsHandle);
@@ -581,10 +582,11 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
   else {
     /* if no bind parameters exist, we directly execute the query */
     if(bind_count == 0){
+        if (state != SQLITE_SCHEMA) {
       state = corrected_sqlite3_step(db_statement);
-      if(state!=SQLITE_DONE){
+      if (state != SQLITE_DONE && state != SQLITE_SCHEMA) {
         char errMsg[2048];
-        sprintf(errMsg, "RS_SQLite_exec: could not execute: %s",
+        sprintf(errMsg, "RS_SQLite_exec: could not execute1: %s",
                         sqlite3_errmsg(db_connection));
 
         RS_SQLite_setException(con, sqlite3_errcode(db_connection),
@@ -595,6 +597,7 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
         RS_DBI_freeResultSet(rsHandle);
         RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
       }
+        }
     }
     else {
       char bindingErrorMsg[2048];
@@ -650,7 +653,7 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
                                           string, -1, SQLITE_TRANSIENT);
               break;
           }
-          if(state!=SQLITE_OK){
+          if (state != SQLITE_OK && state != SQLITE_SCHEMA) {
             char errMsg[2048];
             sprintf(errMsg, "RS_SQLite_exec: could not bind data: %s",
                             sqlite3_errmsg(db_connection));
@@ -669,7 +672,7 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
 
         /* execute the statement */
         state = corrected_sqlite3_step(db_statement);
-        if(state!=SQLITE_DONE){
+        if (state != SQLITE_DONE && state != SQLITE_SCHEMA) {
           char errMsg[2048];
           sprintf(errMsg, "RS_SQLite_exec: could not execute: %s",
                           sqlite3_errmsg(db_connection));
@@ -686,7 +689,7 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
 
         /* reset the bind parameters */
         state = sqlite3_reset(db_statement);
-        if(state!=SQLITE_OK){
+        if (state != SQLITE_OK && state != SQLITE_SCHEMA) {
           char errMsg[2048];
           sprintf(errMsg, "RS_SQLite_exec: could not reset statement: %s",
                           sqlite3_errmsg(db_connection));
@@ -706,11 +709,13 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
       RS_SQLite_freeParameterBinding(bind_count, params);
     }
 
+
     res->isSelect  = (Sint) 0;          /* statement is not a select  */
     res->completed = (Sint) 1;          /* BUG: what if query is async?*/
     res->rowsAffected = (Sint) sqlite3_changes(db_connection);
     RS_SQLite_setException(con, state, "OK");
   }
+  } while (state == SQLITE_SCHEMA);
 
   return rsHandle;
 }
@@ -932,13 +937,16 @@ RS_SQLite_fetch(s_object *rsHandle, s_object *max_rec)
 {
   S_EVALUATOR
 
+  RS_DBI_connection *con;
   RS_DBI_resultSet *res;
   RS_DBI_fields    *flds;
   sqlite3_stmt     *db_statement;
+  sqlite3          *db_connection;
   s_object  *output, *s_tmp;
   int    j, state, expand;
   Sint   num_rec;
   int    num_fields, row_idx;
+  int    done = 0, reprepare = 0;
 
   res = RS_DBI_getResultSet(rsHandle);
   if(res->isSelect != 1){
@@ -956,13 +964,28 @@ RS_SQLite_fetch(s_object *rsHandle, s_object *max_rec)
       RS_DBI_ERROR);
   }
 
+  while (!done) {
+      if (reprepare) {
+          con = RS_DBI_getConnection(rsHandle);
+          db_connection = (sqlite3 *) con->drvConnection;
+          sqlite3_finalize(db_statement);
+          state = sqlite3_prepare(db_connection, res->statement, -1, &db_statement,
+                                  NULL);
+      }
   state = corrected_sqlite3_step(db_statement);
   row_idx = 0;
-  if(state!=SQLITE_ROW && state!=SQLITE_DONE){
+  if (state != SQLITE_ROW && state != SQLITE_DONE && state != SQLITE_SCHEMA) {
       char errMsg[2048];
       (void)sprintf(errMsg, "RS_SQLite_fetch: failed first step: %s",
                     sqlite3_errmsg(sqlite3_db_handle(db_statement)));
       RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+  }
+  if (state == SQLITE_SCHEMA)
+      reprepare = 1;
+  else {
+      reprepare = 0;
+      done = 1;
+  }
   }
   if (!res->fields) {
       if (!(res->fields = RS_SQLite_createDataMappings(rsHandle))) {

@@ -2,7 +2,7 @@ library("RSQLite")
 
 DATA <- new.env(parent=emptyenv(), hash=TRUE)
 
-MysetUp <- function() {
+.setUp <- function() {
     DATA$dbfile <- tempfile()
     DATA$db1 <- dbConnect(dbDriver("SQLite"), DATA$dbfile)
     DATA$db2 <- dbConnect(dbDriver("SQLite"), DATA$dbfile)
@@ -15,12 +15,30 @@ MysetUp <- function() {
     dbClearResult(rs)
 }
 
-MytearDown <- function() {
+.tearDown <- function() {
     lapply(dbListResults(DATA$db1), dbClearResult)
     lapply(dbListResults(DATA$db2), dbClearResult)
     dbDisconnect(DATA$db1)
     dbDisconnect(DATA$db2)
     file.remove(DATA$dbfile)
+}
+
+testSchemaChangeDuringQuery <- function() {
+    rs1 <- dbSendQuery(DATA$db1, "select * from t1")
+    junk <- fetch(rs1, n=1)
+    checkEquals("a", junk[["a"]])
+    ## This should cause an error because the DB is locked
+    ## by the active select.
+    checkException(dbGetQuery(DATA$db2,
+                              "create table t2 (x text, y integer)"),
+                   silent=TRUE)
+    dbClearResult(rs1)
+    rs1 <- dbSendQuery(DATA$db1, "select * from t1")
+    ## if we haven't started fetching, it is ok
+    dbGetQuery(DATA$db2,
+               "create table t2 (x text, y integer)")
+    junk <- fetch(rs1, n=2)
+    checkEquals(c("a", "b"), junk[["a"]])
 }
 
 testSimultaneousSelects <- function() {

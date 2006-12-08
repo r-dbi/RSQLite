@@ -399,7 +399,7 @@ int RS_SQLite_get_row_count(sqlite3* db, const char* tname) {
     if (rc != SQLITE_OK) {
         error("SQL error: %s\n", sqlite3_errmsg(db));
     }
-    rc = sqlite3_step(stmt);
+    rc = corrected_sqlite3_step(stmt);
     ans = sqlite3_column_int(stmt, 0);
     sqlite3_finalize(stmt);
     return ans;
@@ -440,7 +440,7 @@ SEXP RS_SQLite_quick_column(Con_Handle *conHandle, SEXP table, SEXP column)
         error("SQL error: %s\n", sqlite3_errmsg(db_connection));
     }
 
-    rc = sqlite3_step(stmt);
+    rc = corrected_sqlite3_step(stmt);
     col_type = sqlite3_column_type(stmt, 0);
     switch(col_type) {
     case SQLITE_INTEGER:
@@ -477,7 +477,7 @@ SEXP RS_SQLite_quick_column(Con_Handle *conHandle, SEXP table, SEXP column)
             SET_STRING_ELT(ans, i, mkChar(sqlite3_column_text(stmt, 0)));
         }
         i++;
-        rc = sqlite3_step(stmt);
+        rc = corrected_sqlite3_step(stmt);
     }
     sqlite3_finalize(stmt);
     UNPROTECT(1);

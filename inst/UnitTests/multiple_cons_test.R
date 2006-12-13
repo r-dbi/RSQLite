@@ -83,3 +83,19 @@ testSimultaneousSelects2 <- function() {
     dbDisconnect(db1)
     dbDisconnect(db2)
 }
+
+testSchemaChangeDuringWriteTable <- function() {
+    rs1 <- dbSendQuery(DATA$db1, "select * from t1")
+    junk <- fetch(rs1, n=1)
+    checkEquals("a", junk[["a"]])
+    x <- data.frame(col1=1:10, col2=letters[1:10])
+    ## This fails because the active select locks the DB
+    checkEquals(FALSE, dbWriteTable(DATA$db2, "tablex", x))
+    dbClearResult(rs1)
+    checkEquals(TRUE, dbWriteTable(DATA$db2, "tablex", x))
+    checkTrue("tablex" %in% dbListTables(DATA$db2))
+
+    dbGetQuery(DATA$db1, "create table foobar (a text)")
+    dbWriteTable(DATA$db2, "tabley", x)
+    checkTrue("tabley" %in% dbListTables(DATA$db2))
+}

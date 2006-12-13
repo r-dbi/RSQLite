@@ -537,6 +537,9 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
                           &db_statement, NULL);
 
   if (state != SQLITE_OK && state != SQLITE_SCHEMA) {
+    sqlite3_finalize(db_statement);
+    res->drvResultSet = (void *)NULL;
+
     char buf[2048];
     (void) sprintf(buf, "error in statement: %s",
                      sqlite3_errmsg(db_connection));

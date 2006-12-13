@@ -1593,7 +1593,7 @@ RS_sqlite_import(
     char *zCommit;              /* How to commit changes */
     FILE *in;                   /* The input file */
     int lineno = 0;             /* Line number of input file */
-
+    char errMsg[512];
     char *z;
 
     nSep = strlen(separator);
@@ -1609,7 +1609,6 @@ RS_sqlite_import(
     sqlite3_free(zSql);
     if (rc != SQLITE_OK && rc != SQLITE_SCHEMA) {
       sqlite3_finalize(pStmt);
-      char errMsg[512];
       (void) sprintf(errMsg, "RS_sqlite_import: %s", sqlite3_errmsg(db));
       RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
       nCol = 0;
@@ -1632,13 +1631,11 @@ RS_sqlite_import(
     free(zSql);
     if (rc != SQLITE_OK && rc != SQLITE_SCHEMA) {
       sqlite3_finalize(pStmt);
-      char errMsg[512];
       (void) sprintf(errMsg, "RS_sqlite_import: %s", sqlite3_errmsg(db));
       RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
     }
     in = fopen(zFile, "rb");
     if( in==0 ){
-      char errMsg[512];
       (void) sprintf(errMsg, "RS_sqlite_import: cannot open file %s", zFile);
       sqlite3_finalize(pStmt);
       RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
@@ -1663,12 +1660,9 @@ RS_sqlite_import(
         }
       }
       if( i+1!=nCol ){
-        char errMsg[512];
         (void) sprintf(errMsg,
                "RS_sqlite_import: %s line %d expected %d columns of data but found %d",
                zFile, lineno, nCol, i+1);
-        RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
-        /* XXX XXX XXX: we never get here, _errorMessage exits!!!!! */
         zCommit = "ROLLBACK";
         break;
       }
@@ -1685,9 +1679,7 @@ RS_sqlite_import(
       rc = corrected_sqlite3_step(pStmt);
       if (rc != SQLITE_DONE && rc != SQLITE_SCHEMA) {
         sqlite3_finalize(pStmt);
-        char errMsg[512];
-        (void) sprintf(errMsg,
-                 "RS_sqlite_import: internal error: sqlite3_step() filed");
+        (void) sprintf(errMsg, "RS_sqlite_import: %s", sqlite3_errmsg(db));
         RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
       }
       rc = sqlite3_reset(pStmt);
@@ -1695,10 +1687,7 @@ RS_sqlite_import(
       zLine = NULL;
       if (rc != SQLITE_OK && rc != SQLITE_SCHEMA) {
         sqlite3_finalize(pStmt);
-        char errMsg[512];
         (void) sprintf(errMsg,"RS_sqlite_import: %s", sqlite3_errmsg(db));
-        RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
-        /* FIXME XXX XXX XXX we never get here, errorMessage exits!!! */
         zCommit = "ROLLBACK";
         break;
       }
@@ -1707,6 +1696,9 @@ RS_sqlite_import(
     fclose(in);
     sqlite3_finalize(pStmt);
     sqlite3_exec(db, zCommit, 0, 0, 0);
+    if (strcmp(zCommit, "ROLLBACK") == 0) {
+        RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+    }
     return 1;
 }
 

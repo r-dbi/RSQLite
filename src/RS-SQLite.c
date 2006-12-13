@@ -495,7 +495,7 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
   Res_Handle        *rsHandle;
   RS_DBI_resultSet  *res;
   sqlite3           *db_connection;
-  sqlite3_stmt      *db_statement;
+  sqlite3_stmt      *db_statement = NULL;
   int      state, bind_count;
   int      i, j, rows = 0, cols = 0;
   char     *dyn_statement;

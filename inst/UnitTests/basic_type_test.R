@@ -69,7 +69,7 @@ testUnitFetch <- function() {
     on.exit(dbClearResult(rs))
     for (i in seq(length=nrow(basicDf))) {
         gotdf <- fetch(rs, n=1)
-        checkEquals(1L, nrow(gotdf))
+        checkEquals(1:1, nrow(gotdf))
         checkEquals(ncol(basicDf), ncol(gotdf))
         checkEquals(expected_types, sapply(gotdf, typeof))
         checkEquals(basicDf[i, ], gotdf)

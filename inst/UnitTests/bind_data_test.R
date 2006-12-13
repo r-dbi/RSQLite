@@ -64,8 +64,8 @@ testBindNamedReorderExtraCols <- function() {
     dbGetQuery(db, basicTableSql)
     values <- "(:name, :id, :rate)"
     sql <- paste("insert into t1 values", values)
-    basicDf$foo <- 1L
-    basicDf$bar <- 0L
+    basicDf$foo <- 1:1
+    basicDf$bar <- 0:0
     basicDf$baz <- "a"
     newOrd <- c("foo", "id", "bar", "rate", "name", "baz")
     basicDf <- basicDf[ , newOrd]

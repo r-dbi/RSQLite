@@ -522,13 +522,14 @@ function(con, name, value, field.types = NULL, overwrite = FALSE,
 }
 
 "sqliteWriteTable" <-
-function(con, name, value, row.names = TRUE, ...)
+function(con, name, value, row.names = TRUE, sep=",", ...)
 {
   fn <- tempfile("rsdbi")
   on.exit(unlink(fn), add = TRUE)
   dots <- list(...)
-  safe.write(value, file = fn, batch = dots$batch, row.names = row.names)
-  a <- list(con = con, name = name, value = fn, header = TRUE)
+  safe.write(value, file = fn, batch = dots$batch, row.names = row.names,
+             sep = sep)
+  a <- list(con = con, name = name, value = fn, header = TRUE, sep=sep)
   do.call("sqliteImportFile", c(a, dots))
 }
 

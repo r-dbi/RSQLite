@@ -540,9 +540,11 @@ sqliteWriteTable <- function(con, name, value, row.names=TRUE,
       new.table <- !foundTable
       createTable <- (new.table || foundTable && overwrite)
       removeTable <- (foundTable && overwrite)
-      dbBeginTransaction(con)
-      success <- TRUE
-
+      success <- dbBeginTransaction(con)
+      if (!success) {
+          warning("unable to begin transaction")
+          return(FALSE)
+      }
       ## sanity check
       if (foundTable && !removeTable && !append) {
           warning(paste("table", name,
@@ -551,10 +553,15 @@ sqliteWriteTable <- function(con, name, value, row.names=TRUE,
       }
 
       if (removeTable) {
-          if (!dbRemoveTable(con, name)) {
-              warning(paste("table", name, "couldn't be overwritten"))
-              success <- FALSE
-          }
+          success <- tryCatch({
+              if (!dbRemoveTable(con, name)) {
+                  warning(paste("table", name, "couldn't be overwritten"))
+                  FALSE
+              }
+          }, error=function(e) {
+              warning(conditionMessage(e))
+              FALSE
+          })
       }
 
       if (!success) {
@@ -610,8 +617,11 @@ sqliteWriteTable <- function(con, name, value, row.names=TRUE,
       })
       if (!success)
         dbRollback(con)
-      else
-        dbCommit(con)
+      else {
+          success <- dbCommit(con)
+          if (!success)
+            dbRollback(con)
+      }
       success
 }
 

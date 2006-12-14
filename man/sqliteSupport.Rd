@@ -64,7 +64,9 @@
    sqliteImportFile(con, name, value, field.types, overwrite=FALSE,
       append=FALSE, header, row.names, nrows=50, sep=",", eol="\n",
       skip = 0, ...)
-   sqliteWriteTable(con, name, value, row.names = TRUE, ...)
+   sqliteWriteTable(con, name, value, row.names = TRUE,
+                    overwrite = FALSE, append = FALSE,
+                    field.types = NULL, ...)
    sqliteTableFields(con, name, ...)
 }
 \arguments{

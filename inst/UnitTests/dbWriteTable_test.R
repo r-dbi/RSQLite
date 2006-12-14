@@ -13,6 +13,27 @@ DATA <- new.env(parent=emptyenv(), hash=TRUE)
     file.remove(DATA$dbfile)
 }
 
+
+testWithRowNames <- function() {
+    df <- data.frame(a=1:10, b=pi*1:10, c=LETTERS[1:10],
+                     stringsAsFactors=FALSE)
+    rn <- paste(letters[1:10], 1:10, sep="")
+    row.names(df) <- rn
+    dbWriteTable(DATA$db, "t1rn", df)
+
+    expect <- df
+    row.names(expect) <- 1:nrow(df)
+    expect <- cbind(rn, expect, stringsAsFactors=FALSE)
+    names(expect)[1] <- "row_names"
+    got <- dbGetQuery(DATA$db, "select * from t1rn")
+    colTypes <- c("character", "integer", "double", "character")
+    names(colTypes) <- names(expect)
+    checkEquals(colTypes, sapply(expect, typeof))
+    checkEquals(colTypes, sapply(got, typeof))
+    checkEquals(dim(expect), dim(got))
+    checkEquals(expect, got)
+}
+
 testCanCloseAfterFailedWriteTable <- function() {
     ## handle DB connection manually since we want
     ## to explicitly check dbDisconnect is error free.
@@ -28,7 +49,7 @@ testCanCloseAfterFailedWriteTable <- function() {
     checkEquals(FALSE, dbWriteTable(con,"t1", x, append=T))
 
     ## this used to cause an error
-    dbDisconnect(con)
+    checkEquals(TRUE, dbDisconnect(con))
     file.remove(tf)
 }
 
@@ -48,9 +69,11 @@ testCommasInDataFrame <- function() {
 
     df <- data.frame(company=c("ABC, Inc.","DEF Holdings"),
                      layoffs=c(1000,2000),
-                     country=c("JP","HK"))
-    ## Our fix is not automagic, but we now allow sep as an argument.
-    dbWriteTable(DATA$db, "t1", df, sep="\t")
+                     country=c("JP","HK"),
+                     stringsAsFactors=FALSE)
+    dbWriteTable(DATA$db, "t1", df, row.names=FALSE)
+    got <- dbGetQuery(DATA$db, "select * from t1")
+    checkEquals(df, got)
 }
 
 

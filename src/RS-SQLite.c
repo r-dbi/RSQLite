@@ -872,6 +872,7 @@ RS_SQLite_createDataMappings(Res_Handle *rsHandle)
   RS_DBI_fields      *flds;
   int     j, ncol, col_type;
   const char *col_decltype = NULL;
+  char *col_name;
 
   result = RS_DBI_getResultSet(rsHandle);
   db_statement = (sqlite3_stmt *) result->drvResultSet;
@@ -881,7 +882,14 @@ RS_SQLite_createDataMappings(Res_Handle *rsHandle)
   flds->num_fields = (Sint) ncol;
 
    for(j=0; j<ncol; j++){
-    flds->name[j] = RS_DBI_copyString(sqlite3_column_name(db_statement, j));
+       col_name = (char*)sqlite3_column_name(db_statement, j); /* -Wall */
+       if (col_name)
+           flds->name[j] = RS_DBI_copyString(col_name);
+       else {                   /* weird failure */
+           RS_DBI_freeFields(flds);
+           flds = NULL;
+           return NULL;
+       }
     /* XXX: We do our best to determine the type of the column.  When
        the first row retrieved contains a NULL and does not reference
        a table column, we give up.
@@ -973,8 +981,10 @@ RS_SQLite_fetch(s_object *rsHandle, s_object *max_rec)
           con = RS_DBI_getConnection(rsHandle);
           db_connection = (sqlite3 *) con->drvConnection;
           sqlite3_finalize(db_statement);
+          res->drvResultSet = (void*)NULL;
           state = sqlite3_prepare(db_connection, res->statement, -1, &db_statement,
                                   NULL);
+          res->drvResultSet = db_statement;
       }
   state = corrected_sqlite3_step(db_statement);
   row_idx = 0;

@@ -347,8 +347,8 @@ int SQLite_decltype_to_type(const char* decltype)
 {
     unsigned int h = 0;
     int len = strlen(decltype);
-    const unsigned char *zIn = decltype;
-    const unsigned char *zEnd = &(decltype[len]);
+    const unsigned char *zIn = (unsigned char*)decltype;
+    const unsigned char *zEnd = (unsigned char*)&(decltype[len]);
     int col_type = SQLITE_FLOAT;
 
     while( zIn!=zEnd ){
@@ -388,7 +388,7 @@ int RS_SQLite_get_row_count(sqlite3* db, const char* tname) {
     const char* sqlFmt = "select rowid from %s order by rowid desc limit 1";
     int qrylen = strlen(sqlFmt);
     int rc = 0;
-    int i, ans;
+    int ans;
     sqlite3_stmt* stmt;
     const char* tail;
 
@@ -408,20 +408,20 @@ int RS_SQLite_get_row_count(sqlite3* db, const char* tname) {
 
 SEXP RS_SQLite_quick_column(Con_Handle *conHandle, SEXP table, SEXP column)
 {
-    SEXP ans;
-    RS_DBI_connection *con;
-    sqlite3           *db_connection;
+    SEXP ans = R_NilValue;
+    RS_DBI_connection *con = NULL;
+    sqlite3           *db_connection = NULL;
     int               numrows;
     char              sqlQuery[500];
-    char              *table_name;
-    char              *column_name;
+    char              *table_name = NULL;
+    char              *column_name = NULL;
     int               rc;
-    sqlite3_stmt      *stmt;
-    const char        *tail;
+    sqlite3_stmt      *stmt = NULL;
+    const char        *tail = NULL;
     int               i = 0;
     int               col_type;
-    int              *intans;
-    double           *doubleans;
+    int              *intans = NULL;
+    double           *doubleans = NULL;
 
     con = RS_DBI_getConnection(conHandle);
     db_connection = (sqlite3 *) con->drvConnection;
@@ -474,7 +474,8 @@ SEXP RS_SQLite_quick_column(Con_Handle *conHandle, SEXP table, SEXP column)
             doubleans[i] = sqlite3_column_double(stmt, 0);
             break;
         case SQLITE_TEXT:
-            SET_STRING_ELT(ans, i, mkChar(sqlite3_column_text(stmt, 0)));
+            SET_STRING_ELT(ans, i, /* cast for -Wall */
+                           mkChar((char*)sqlite3_column_text(stmt, 0)));
         }
         i++;
         rc = corrected_sqlite3_step(stmt);
@@ -1039,8 +1040,8 @@ RS_SQLite_fetch(s_object *rsHandle, s_object *max_rec)
           if(null_item)
             SET_LST_CHR_EL(output,j,row_idx, NA_STRING);
           else
-            SET_LST_CHR_EL(output,j,row_idx,
-                           C_S_CPY(sqlite3_column_text(db_statement, j)));
+            SET_LST_CHR_EL(output,j,row_idx, /* cast for -Wall */
+                           C_S_CPY((char*)sqlite3_column_text(db_statement, j)));
           break;
       }
     } /* end column loop */

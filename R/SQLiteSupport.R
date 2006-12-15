@@ -554,7 +554,9 @@ sqliteWriteTable <- function(con, name, value, row.names=TRUE,
 
       if (removeTable) {
           success <- tryCatch({
-              if (!dbRemoveTable(con, name)) {
+              if (dbRemoveTable(con, name)) {
+                  TRUE
+              } else {
                   warning(paste("table", name, "couldn't be overwritten"))
                   FALSE
               }

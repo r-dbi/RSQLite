@@ -34,6 +34,22 @@ testWithRowNames <- function() {
     checkEquals(expect, got)
 }
 
+testOverwriteAndAppend <- function() {
+    df <- data.frame(a=1:10, b=pi*1:10, c=LETTERS[1:10],
+                     stringsAsFactors=FALSE)
+    dbWriteTable(DATA$db, "t1", df, row.names=FALSE)
+    ## The default is overwrite=FALSE, append
+    checkTrue(!dbWriteTable(DATA$db, "t1", df, row.names=FALSE))
+    checkTrue(dbWriteTable(DATA$db, "t1", df, row.names=FALSE,
+                           append=TRUE))
+    checkTrue(dbWriteTable(DATA$db, "t1", df, row.names=FALSE,
+                           overwrite=TRUE))
+    ## you can't overwrite and append
+    checkException(dbWriteTable(DATA$db, "t1", df, row.names=FALSE,
+                                overwrite=TRUE, append=TRUE))
+}
+
+
 testCanCloseAfterFailedWriteTable <- function() {
     ## handle DB connection manually since we want
     ## to explicitly check dbDisconnect is error free.

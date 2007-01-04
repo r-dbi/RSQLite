@@ -107,3 +107,30 @@ testCommasInDataFrame <- function() {
 ## dbWriteTable call fixes this problem:
 
 ## dbWriteTable(con,"blah",blah,eol="\r\n")
+
+## tests for importing a file using dbWriteTable
+
+testImportViaWriteTable <- function() {
+    expect <- data.frame(a=1:3, b=c("x", "y", "z"),
+                         stringsAsFactors=FALSE)
+    checkTrue(dbWriteTable(DATA$db, "dat", "dat1.txt", sep="|", eol="\n",
+                           head=TRUE, over=TRUE))
+    got <- dbGetQuery(DATA$db, "select * from dat")
+    checkEquals(expect, got)
+
+    checkTrue(dbWriteTable(DATA$db, "dat", "dat2.txt", sep="|", eol="\n",
+                           head=TRUE, over=TRUE))
+    got <- dbGetQuery(DATA$db, "select * from dat")
+    checkEquals(expect, got)
+
+    checkTrue(dbWriteTable(DATA$db, "dat", "dat3.txt", sep="|", eol="\r\n",
+                           head=TRUE, over=TRUE))
+    got <- dbGetQuery(DATA$db, "select * from dat")
+    checkEquals(expect, got)
+
+    checkTrue(dbWriteTable(DATA$db, "dat", "dat4.txt", sep="|", eol="\r\n",
+                           head=TRUE, over=TRUE))
+    got <- dbGetQuery(DATA$db, "select * from dat")
+    checkEquals(expect, got)
+
+}

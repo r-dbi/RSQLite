@@ -1723,9 +1723,10 @@ char *
 RS_sqlite_getline(FILE *in, const char *eol)
 {
    /* caller must free memory */
-   char   *buf, ceol;
-   size_t nc, i, neol;
-   int    c;
+   char *buf, ceol;
+   size_t nc, i;
+   int c, j, neol;
+   int found_eol = 0;
 
    nc = 1024; i = 0;
    buf = (char *) malloc(nc);
@@ -1746,16 +1747,26 @@ RS_sqlite_getline(FILE *in, const char *eol)
       if(c==EOF)
         break;
       buf[i++] = c;
-      if(c==ceol){           /* '\n'){ */
-        buf[i-neol] = '\0';   /* drop the newline char(s) */
-        break;
+      if (c == ceol) {
+          /* see if we've got eol */
+          found_eol = 1;
+          for (j = neol - 1; j > 0; j--) {
+              if (buf[(i - 1) - j] != eol[neol - 1 - j]) {
+                  found_eol = 0;
+                  break;
+              }
+          }
+          if (found_eol) {
+              buf[i-neol] = '\0';   /* drop the newline char(s) */
+              break;
+          }
       }
     }
 
-    if(i==0){              /* empty line */
-      free(buf);
-      buf = (char *) NULL;
-    }
+   if (i == 0 || strlen(buf) == 0) {    /* empty line */
+       free(buf);
+       buf = (char *) NULL;
+   }
 
     return buf;
 }

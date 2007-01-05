@@ -111,7 +111,7 @@ testCommasInDataFrame <- function() {
 ## tests for importing a file using dbWriteTable
 
 testImportViaWriteTable <- function() {
-    expect <- data.frame(a=1:3, b=c("x", "y", "z"),
+    expect <- data.frame(a=c(1:3, NA), b=c("x", "y", "z", "E"),
                          stringsAsFactors=FALSE)
     checkTrue(dbWriteTable(DATA$db, "dat", "dat1.txt", sep="|", eol="\n",
                            head=TRUE, over=TRUE))

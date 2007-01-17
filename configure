@@ -1261,6 +1261,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+# As suggested by BDR, I may need to use CFLAGS to compile under 64-bit
+# (I can't test this), but see "Writing R Extensions"
+: ${R_HOME=`R RHOME`}
+if test -z "${R_HOME}"; then
+   echo "could not determine R_HOME"
+   exit 1
+fi
+CC=`"${R_HOME}/bin/R" CMD config CC`
+CFLAGS=`"${R_HOME}/bin/R" CMD config CFLAGS`
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -3155,16 +3164,6 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-# As suggested by BDR, I may need to use CFLAGS to compile under 64-bit
-# (I can't test this), but see "Writing R Extensions"
-: ${R_HOME=`R RHOME`}
-if test -z "${R_HOME}"; then
-   echo "could not determine R_HOME"
-   exit 1
-fi
-CC=`"${R_HOME}/bin/R" CMD config CC`
-CFLAGS=`"${R_HOME}/bin/R" CMD config CFLAGS`
-
 FOUND_ALL="no"
 
 #
@@ -3331,6 +3330,7 @@ if test "${FOUND_ALL}" = "no" -a "${SQLITE_TDIR}" != "no" ; then
    echo "(the file /tmp/sqlite$$ stores compiler messages)"
    echo ""
    export SQLITE_TDIR
+   export CC
    ( ./configure --silent --prefix=${SQLITE_TDIR}    \
                  --disable-tcl \
                  --enable-shared=${SQLITE_SHARED} --with-pic && \

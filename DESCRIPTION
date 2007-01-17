@@ -1,15 +1,13 @@
 Package: RSQLite
-Version: 0.4-18
+Version: 0.4-19
 Title: SQLite interface for R
 Author: David A. James
-Maintainer: David A. James <daj025@gmail.com>
-Description: Database Interface R driver for SQLite
+Maintainer: Seth Falcon <sfalcon@fhcrc.org>
+Description: Database Interface R driver for SQLite.
    This package embeds the SQLite database engine in R and
-   provides an interface compliant with the DBI version 0.1-8.
+   provides an interface compliant with the DBI package.
    The source for the SQLite engine (version 3.3.8) is included. 
 SaveImage: yes
 Depends: R (>= 2.3.0), methods, DBI (>= 0.1-11)
 License: LGPL version 2 or newer
-URL: http://stat.bell-labs.com/RS-DBI 
-     http://www.sqlite.org
 Collate: zzz.R S4R.R dbObjectId.R SQLite.R SQLiteSupport.R

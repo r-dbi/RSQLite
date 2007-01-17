@@ -42,9 +42,6 @@ dnl
 
 AC_INIT(src/RS-SQLite.c)
 
-AC_PROG_CPP
-AC_PROG_CC
-
 # As suggested by BDR, I may need to use CFLAGS to compile under 64-bit
 # (I can't test this), but see "Writing R Extensions"
 : ${R_HOME=`R RHOME`}
@@ -54,6 +51,8 @@ if test -z "${R_HOME}"; then
 fi
 CC=`"${R_HOME}/bin/R" CMD config CC`
 CFLAGS=`"${R_HOME}/bin/R" CMD config CFLAGS`
+AC_PROG_CPP
+AC_PROG_CC
 
 FOUND_ALL="no"
 
@@ -193,6 +192,7 @@ if test "${FOUND_ALL}" = "no" -a "${SQLITE_TDIR}" != "no" ; then
    echo "(the file /tmp/sqlite$$ stores compiler messages)"
    echo ""
    export SQLITE_TDIR
+   export CC
    ( ./configure --silent --prefix=${SQLITE_TDIR}    \
                  --disable-tcl \
                  --enable-shared=${SQLITE_SHARED} --with-pic && \

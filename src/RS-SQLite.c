@@ -134,6 +134,7 @@ RS_SQLite_closeManager(Mgr_Handle *mgrHandle)
   shared_cache = (Sint *)mgr->drvData;
   if(shared_cache){
     free(shared_cache);
+    mgr->drvData = NULL;
   }
 
   RS_DBI_freeManager(mgrHandle);

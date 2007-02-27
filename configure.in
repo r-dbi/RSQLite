@@ -224,6 +224,8 @@ if test "${FOUND_ALL}" = "no" -a "${SQLITE_TDIR}" != "no" ; then
    # Since we installed successfully, now we set PKG_* vars and exit
    PKG_CPPFLAGS="-I${SQLITE_TDIR}/include"
    PKG_LIBS="${SQLITE_TDIR}/lib/libsqlite3.a"
+   AC_SEARCH_LIBS(fdatasync, [rt])
+   PKG_LIBS="${PKG_LIBS} $LIBS"
    FOUND_ALL="yes"
 
    echo ""

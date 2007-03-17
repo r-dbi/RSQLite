@@ -25,7 +25,6 @@ exportClasses(
 ## Methods/Generics
 exportMethods(
    show,
-   print,
    dbUnloadDriver,
    dbGetInfo,
    dbListConnections,

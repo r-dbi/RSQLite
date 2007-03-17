@@ -4,17 +4,17 @@
 ## vim: syntax=R
 
 import(methods)   ## needed as of 2003-09-05
+import(DBI)       ## presumably this imports classes, methods, funs, etc.?
+
 exportMethods(
    coerce,
    initialize    ## needed as of 2003-09-05?
 )
 
-import(DBI)       ## presumably this imports classes, methods, funs, etc.?
 useDynLib(RSQLite)
 
 ## Classes
 exportClasses(
-   DBIObject, DBIDriver, DBIConnection, DBIResult,    ## re-export??
    dbObjectId,
    SQLiteObject,
    SQLiteDriver,
@@ -29,6 +29,7 @@ exportMethods(
    dbUnloadDriver,
    dbGetInfo,
    dbListConnections,
+   dbCommit,
    dbConnect,
    dbDisconnect,
    dbGetException,
@@ -67,7 +68,6 @@ export(
   sqliteExecStatement,
   sqliteQuickSQL,
   sqliteFetch,
-  type.convert,
   sqliteResultInfo,
   sqliteDescribeResult,
   sqliteCloseResult,

@@ -7,7 +7,6 @@
 \alias{dbGetPreparedQuery}
 \alias{dbSendPreparedQuery-methods}
 \alias{dbGetPreparedQuery-methods}
-\alias{dbClearResult-methods}
 \alias{dbGetException-methods}
 \alias{dbSendQuery,SQLiteConnection,character-method}
 \alias{dbGetQuery,SQLiteConnection,character-method}

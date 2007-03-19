@@ -427,7 +427,7 @@ function(dbObj, name, value, field.types = NULL, row.names = TRUE, ...)
   }
   i <- match("row.names", names(field.types), nomatch=0)
   if(i>0) ## did we add a row.names value?  If so, it's a text field.
-    field.types[i] <- dbDataType(dbObj, field.types$row.names)
+    field.types[i] <- dbDataType(dbObj, field.types[["row.names"]])
   names(field.types) <-
     make.db.names(dbObj, names(field.types), allow.keywords = FALSE)
 

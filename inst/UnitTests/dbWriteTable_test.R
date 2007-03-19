@@ -134,3 +134,16 @@ testImportViaWriteTable <- function() {
     checkEquals(expect, got)
 
 }
+
+
+testFactorWithNA <- function() {
+    df <- data.frame(x=1:10,y=factor(LETTERS[1:10]))
+    df$y[4] <- NA
+
+    dbWriteTable(DATA$db, "bad_table", df)
+
+    got <- dbGetQuery(DATA$db, "select * from bad_table")
+
+    checkEquals(df$x, got$x)
+    checkEquals(as.character(df$y), got$y)
+}

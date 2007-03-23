@@ -47,23 +47,28 @@
   \code{\link[DBI]{dbGetInfo}},
   \code{\link[DBI]{dbReadTable}}.
 }
-\examples{\dontrun{
+\examples{
 drv <- dbDriver("SQLite")
-con <- dbConnect(drv, dbname = "sqlite.db")
+tfile <- tempfile()
+con <- dbConnect(drv, dbname = tfile)
+data(USJudgeRatings)
+dbWriteTable(con, "jratings", USJudgeRatings)
+
 res <- dbSendQuery(con, statement = paste(
-                      "SELECT w.laser_id, w.wavelength, p.cut_off",
-                      "FROM WL w, PURGE P", 
-                      "WHERE w.laser_id = p.laser_id",
-                      "ORDER BY w.laser_id"))
-# we now fetch the first 100 records from the resultSet into a data.frame
-data1 <- fetch(res, n = 100)   
+                      "SELECT row_names, ORAL, DILG, FAMI",
+                      "FROM jratings"))
+
+# we now fetch the first 10 records from the resultSet into a data.frame
+data1 <- fetch(res, n = 10)   
 dim(data1)
 
 dbHasCompleted(res)
 
 # let's get all remaining records
 data2 <- fetch(res, n = -1)
-}
+
+dbClearResult(res)
+dbDisconnect(con)
 }
 \keyword{methods}
 \keyword{interface}

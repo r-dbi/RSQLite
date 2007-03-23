@@ -113,16 +113,16 @@ On meta-data:
 \code{\link[DBI]{dbGetRowCount}},
 \code{\link[DBI]{dbGetAffectedRows}}.
 }
-\examples{\dontrun{
+\examples{
    # create a SQLite instance and create one connection.
    m <- dbDriver("SQLite")
    
-   # initialize a new database "base.dbms" in the current directory
-   # and copy some data.frame from the base package into it
-   
-   con <- dbConnect(m, dbname = "base.dbms")
+   # initialize a new database to a tempfile and copy some data.frame
+   # from the base package into it
+   tfile <- tempfile()
+   con <- dbConnect(m, dbname = tfile)
    data(USArrests)
-   dbWriteTable(con, "USArrests", USArrests, overwrite = T)
+   dbWriteTable(con, "USArrests", USArrests)
    
    # query
    rs <- dbSendQuery(con, "select * from USArrests")
@@ -131,8 +131,12 @@ On meta-data:
    d2 <- fetch(rs, n = -1)      # extract all remaining data
    dbHasCompleted(rs)
    dbClearResult(rs)
-   dbListTables(con)    
-   }
+   dbListTables(con)
+
+   # clean up
+   dbDisconnect(con)
+   file.info(tfile)
+   file.remove(tfile)
 }
 \keyword{interface}
 \keyword{database}

@@ -43,7 +43,7 @@ Class \code{"dbObjectId"}, by class "SQLiteObject".
 
 \examples{\dontrun{
 drv <- dbDriver("SQLite")
-con <- dbConnect(drv, "user/password@dbname")
+con <- dbConnect(drv, dbname="path/to/dbfile")
 }
 }
 \keyword{database}

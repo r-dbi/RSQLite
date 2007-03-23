@@ -31,16 +31,14 @@
 \note{A cleaner mechanism would use external references, but
 historically this class has existed mainly for R/S-Plus portability.}
 
-\examples{\dontrun{
-  pg <- dbDriver("PostgreSQL")
-  con <- dbConnect(pg, "user", "password")
-  is(pg, "dbObjectId")   ## True
+\examples{
+  sqlite <- dbDriver("SQLite")
+  con <- dbConnect(sqlite, ":memory")
+  is(sqlite, "dbObjectId")   ## True
   is(con, "dbObjectId")  ## True
   isIdCurrent(con)       ## True
-  q("yes")
-  \$ R 
+  dbDisconnect(con)
   isIdCurrent(con)       ## False
-}
 }
 \keyword{classes}
 % vim: syntax=tex

@@ -50,10 +50,12 @@ Class \code{"dbObjectId"}, by class "SQLiteObject".
  \code{\link{SQLiteResult-class}}
 }
 
-\examples{\dontrun{
+\examples{
 drv <- dbDriver("SQLite")
-con <- dbConnect(drv, dbname = "rsdbi.db")
-}
+tfile <- tempfile()
+con <- dbConnect(drv, dbname = tfile)
+dbDisconnect(con)
+dbUnloadDriver(drv)
 }
 \keyword{database}
 \keyword{interface}

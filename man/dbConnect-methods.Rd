@@ -67,24 +67,7 @@
   \code{\link[DBI]{dbGetInfo}},
   \code{\link[DBI]{dbReadTable}}.
 }
-\examples{\dontrun{
-# create an SQLite instance and create one connection.
-drv <- dbDriver("SQLite")
 
-# open the connection using user, passsword, etc., as
-con <- dbConnect(drv, dbname = "sqlite.db")
-
-# Run an SQL statement by creating first a resultSet object
-rs <- dbSendQuery(con, statement = paste(
-                      "SELECT w.laser_id, w.wavelength, p.cut_off",
-                      "FROM WL w, PURGE P", 
-                      "WHERE w.laser_id = p.laser_id", 
-                      "SORT BY w.laser_id")
-# we now fetch records from the resultSet into a data.frame
-data <- fetch(rs, n = -1)   # extract all rows
-dim(data)
-}
-}
 \keyword{methods}
 \keyword{interface}
 \keyword{database}

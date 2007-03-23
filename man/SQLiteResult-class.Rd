@@ -48,11 +48,6 @@ Class \code{"dbObjectId"}, by class "SQLiteObject".
  \code{\link{SQLiteResult-class}}
 }
 
-\examples{\dontrun{
-drv <- dbDriver("SQLite")
-con <- dbConnect(drv, dbname = "rsdbi.db")
-}
-}
 \keyword{database}
 \keyword{interface}
 \keyword{classes}

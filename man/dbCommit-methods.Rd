@@ -12,10 +12,11 @@
   DBMS Transaction Management
 }
 \description{
-   By default, SQLite is in auto-commit mode. dbBeginTransaction starts an 
-   SQLite transaction and turn auto-commit off. dbCommit and dbRollback 
-   commit and rollback the transaction, respectively and turn auto-commit
-   on.
+  By default, SQLite is in auto-commit mode. \code{dbBeginTransaction}
+  starts a SQLite transaction and turns auto-commit
+  off. \code{dbCommit} and \code{dbRollback} commit and rollback the
+  transaction, respectively and turn auto-commit on.
+
 }
 \section{Methods}{\describe{
 \item{conn}{
@@ -43,17 +44,28 @@
    \code{\link[DBI]{dbGetInfo}},
    \code{\link[DBI]{dbReadTable}}.
 }
-\examples{\dontrun{
+\examples{
 drv <- dbDriver("SQLite")
-con <- dbConnect(drv, dbname = "mySQLite.db")
+tfile <- tempfile()
+con <- dbConnect(drv, dbname = tfile)
+data(USArrests)
+dbWriteTable(con, "arrests", USArrests)
+dbGetQuery(con, "select count(*) from arrests")[1, ]
+
 dbBeginTransaction(con)
-rs <- dbSendQuery(con, 
-      "delete * from PURGE as p where p.wavelength<0.03")
-if(dbGetInfo(rs, what = "rowsAffected") > 250){
-  warning("dubious deletion -- rolling back transaction")
+rs <- dbSendQuery(con, "DELETE from arrests WHERE Murder > 1")
+dbGetQuery(con, "select count(*) from arrests")[1, ]
+if (dbGetInfo(rs)[["rowsAffected"]] > 40)
   dbRollback(con)
-}
-}
+dbGetQuery(con, "select count(*) from arrests")[1, ]
+
+dbBeginTransaction(con)
+rs <- dbSendQuery(con, "DELETE from arrests WHERE Murder > 5")
+dbCommit(con)
+dbGetQuery(con, "select count(*) from arrests")[1, ]
+
+
+dbDisconnect(con)
 }
 \keyword{methods}
 \keyword{interface}

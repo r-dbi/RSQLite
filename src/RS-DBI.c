@@ -1,7 +1,4 @@
 /* 
- * $Id$ 
- *
- *
  * Copyright (C) 1999-2002 The Omega Project for Statistical Computing
  *
  * This library is free software; you can redistribute it and/or
@@ -21,6 +18,7 @@
 
 #include "RS-DBI.h"
 
+#include <R_ext/RS.h>
 /* TODO: monitor memory/object size consumption against S limits 
  *       in $SHOME/include/options.h we find "max_memory". We then
  *       mem_size to make sure we're not bumping into problems.
@@ -1165,14 +1163,19 @@ RS_DBI_makeSQLNames(s_object *snames)
 {
    S_EVALUATOR
    long     nstrings;
-   char     *name, c;
+   char *name;
+   SEXP schar;
+   char c;
    char     errMsg[128];
    size_t   len;
    Sint     i;
 
    nstrings = (Sint) GET_LENGTH(snames);
    for(i = 0; i<nstrings; i++){
-      name = CHR_EL(snames, i);
+       schar = STRING_ELT(snames, i);
+       name = CallocCharBuf(length(schar));
+       strncpy(name, CHAR(schar), length(schar));
+
       if(strlen(name)> RS_DBI_MAX_IDENTIFIER_LENGTH){
 	 (void) sprintf(errMsg,"SQL identifier %s longer than %d chars", 
 			name, RS_DBI_MAX_IDENTIFIER_LENGTH);
@@ -1193,6 +1196,8 @@ RS_DBI_makeSQLNames(s_object *snames)
 	 if(c=='.') *name='_';
 	 name++;
       }
+      SET_STRING_ELT(snames, i, mkChar(name));
+      Free(name);
    }
 
    return snames;
@@ -1207,7 +1212,7 @@ RS_na_set(void *ptr, Stype type)
 {
   double *d;
   Sint   *i;
-  char   *c;
+  const char   *c;
   switch(type){
   case INTEGER_TYPE:
     i = (Sint *) ptr;
@@ -1222,8 +1227,8 @@ RS_na_set(void *ptr, Stype type)
     *d = NA_REAL;
     break;
   case STRING_TYPE:
-    c = (char *) ptr;
-    c = CHR_EL(NA_STRING, 0);
+    c = (const char *) ptr;
+    c = CHAR(NA_STRING);
     break;
   }
 }
@@ -1231,7 +1236,7 @@ int
 RS_is_na(void *ptr, Stype type)
 {
    int *i, out = -2;
-   char *c;
+   const char *c;
    double *d;
 
    switch(type){
@@ -1245,8 +1250,8 @@ RS_is_na(void *ptr, Stype type)
       out = ISNA(*d);
       break;
    case STRING_TYPE:
-      c = (char *) ptr;
-      out = (int) (strcmp(c, CHR_EL(NA_STRING, 0))==0);
+      c = (const char *) ptr;
+      out = (int) (strcmp(c, CHAR(NA_STRING))==0);
       break;
    }
    return out;

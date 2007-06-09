@@ -247,7 +247,7 @@ RS_SQLite_newConnection(Mgr_Handle *mgrHandle, s_object *s_con_params)
   RS_SQLite_conParams *conParams;
   Con_Handle  *conHandle;
   sqlite3     *db_connection, **pDb;
-  char        *dbname = NULL;
+  const char  *dbname = NULL;
   int         rc, loadable_extensions;
 
   if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
@@ -262,7 +262,9 @@ RS_SQLite_newConnection(Mgr_Handle *mgrHandle, s_object *s_con_params)
   db_connection = *pDb;           /* available, even if open fails! See API */
   if(rc != SQLITE_OK){
      char buf[256];
-     sprintf(buf, "could not connect to dbname \"%s\"\n", dbname);
+     sprintf(buf, "could not connect to dbname:\n%s\n",
+             sqlite3_errmsg(db_connection));
+
      RS_DBI_errorMessage(buf, RS_DBI_ERROR);
   }
 
@@ -414,8 +416,8 @@ SEXP RS_SQLite_quick_column(Con_Handle *conHandle, SEXP table, SEXP column)
     sqlite3           *db_connection = NULL;
     int               numrows;
     char              sqlQuery[500];
-    char              *table_name = NULL;
-    char              *column_name = NULL;
+    const char        *table_name = NULL;
+    const char        *column_name = NULL;
     int               rc;
     sqlite3_stmt      *stmt = NULL;
     const char        *tail = NULL;
@@ -627,7 +629,7 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
           RS_SQLite_bindParam param = params[j];
           int integer;
           double number;
-          char *string;
+          const char *string;
 
           switch(param.type){
             case INTEGER_TYPE:
@@ -1534,7 +1536,8 @@ RS_SQLite_importFile(
 
   RS_DBI_connection *con;
   sqlite3           *db_connection;
-  char              *zFile, *zTable, *zSep, *s, *s1, *zEol;
+  char              *zFile, *zTable, *zSep, *zEol;
+  const char *s, *s1;
   Sint              rc, skip;
   s_object          *output;
 

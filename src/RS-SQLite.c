@@ -349,6 +349,8 @@ RS_SQLite_closeConnection(Con_Handle *conHandle)
 int SQLite_decltype_to_type(const char* decltype)
 {
     unsigned int h = 0;
+    if (!decltype)
+        return SQLITE_TEXT;
     int len = strlen(decltype);
     const unsigned char *zIn = (unsigned char*)decltype;
     const unsigned char *zEnd = (unsigned char*)&(decltype[len]);

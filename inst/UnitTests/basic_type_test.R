@@ -118,3 +118,16 @@ testWriteTableBasicTypeConversion <- function() {
     checkEquals(expected_types, sapply(gotdf, typeof))
     checkTrue(all(is.na(gotdf[5, ])))
 }
+
+testFirstResultRowIsNull <- function() {
+    db <- DATA$db
+    data(USArrests)
+    dbWriteTable(db, "t1", USArrests)
+    a1 <- dbGetQuery(db, "select Murder/(Murder - 8.1) from t1 limit 10")
+    checkEquals("double", typeof(a1[[1]]))
+    ## This isn't ideal, but for now, if the first row of a result set
+    ## contains a NULL, then that column is forced to be character.
+    a2 <- dbGetQuery(db,
+                     "select Murder/(Murder - 8.1) from t1 limit 10 offset 2")
+    checkEquals("character", typeof(a2[[1]]))
+}

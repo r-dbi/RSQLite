@@ -83,7 +83,8 @@ Mgr_Handle *RS_SQLite_init(s_object *config_params, s_object *reload,
 s_object   *RS_SQLite_close(Mgr_Handle *mgrHandle);
 
 /* dbConnection */
-Con_Handle *RS_SQLite_newConnection(Mgr_Handle *mgrHandle, s_object *con_params);
+Con_Handle *RS_SQLite_newConnection(Mgr_Handle *mgrHandle, SEXP dbfile,
+                                    SEXP allow_ext);
 Con_Handle *RS_SQLite_cloneConnection(Con_Handle *conHandle);
 s_object   *RS_SQLite_closeConnection(Con_Handle *conHandle);
 /* we simulate db exceptions ourselves */

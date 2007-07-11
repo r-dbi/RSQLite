@@ -94,12 +94,13 @@ function(obj, what="", ...)
 "sqliteNewConnection"<-
 function(drv, dbname = "", loadable.extensions=FALSE, cache_size=NULL, synchronous=0)
 {
-  if (!is.null(dbname))
-    dbname <- path.expand(dbname)
-  con.params <- as.character(c(dbname, as.integer(loadable.extensions)))
+  if (is.null(dbname))
+    dbname <- ""
+  dbname <- path.expand(dbname)
+  loadable.extensions <- as.logical(loadable.extensions)
   drvId <- as(drv, "integer")
-  conId <- .Call("RS_SQLite_newConnection", drvId, con.params,
-                 PACKAGE ="RSQLite")
+  conId <- .Call("RS_SQLite_newConnection", drvId,
+                 dbname, loadable.extensions, PACKAGE ="RSQLite")
   con <- new("SQLiteConnection", Id = conId)
 
   ## experimental PRAGMAs

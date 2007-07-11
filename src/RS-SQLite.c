@@ -154,8 +154,10 @@ RS_SQLite_cloneConnection(Con_Handle *conHandle)
   Mgr_Handle  *mgrHandle;
   RS_DBI_connection  *con;
   RS_SQLite_conParams *conParams;
+  SEXP dbname, allow_ext;
   s_object    *con_params;
   char   buf1[256];
+  Con_Handle *ans;
 
   /* get connection params used to open existing connection */
   con = RS_DBI_getConnection(conHandle);
@@ -166,13 +168,11 @@ RS_SQLite_cloneConnection(Con_Handle *conHandle)
   /* copy dbname and loadable_extensions into a 2-element character
    * vector to be passed to the RS_SQLite_newConnection() function.
    */
-  MEM_PROTECT(con_params = NEW_CHARACTER((Sint) 2));
-  SET_CHR_EL(con_params, 0, C_S_CPY(conParams->dbname));
-  sprintf(buf1, "%d", (int) conParams->loadable_extensions);
-  SET_CHR_EL(con_params, 1, C_S_CPY(buf1));
-  MEM_UNPROTECT(1);
-
-  return RS_SQLite_newConnection(mgrHandle, con_params);
+  PROTECT(dbname = mkString(conParams->dbname));
+  PROTECT(allow_ext = ScalarLogical(conParams->loadable_extensions));
+  ans = RS_SQLite_newConnection(mgrHandle, dbname, allow_ext);
+  UNPROTECT(2);
+  return ans;
 }
 
 RS_SQLite_conParams *
@@ -239,10 +239,8 @@ RS_SQLite_freeException(RS_DBI_connection *con)
 }
 
 Con_Handle *
-RS_SQLite_newConnection(Mgr_Handle *mgrHandle, s_object *s_con_params)
+RS_SQLite_newConnection(Mgr_Handle *mgrHandle, SEXP dbfile, SEXP allow_ext)
 {
-  S_EVALUATOR
-
   RS_DBI_connection   *con;
   RS_SQLite_conParams *conParams;
   Con_Handle  *conHandle;
@@ -253,9 +251,16 @@ RS_SQLite_newConnection(Mgr_Handle *mgrHandle, s_object *s_con_params)
   if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
     RS_DBI_errorMessage("invalid SQLiteManager", RS_DBI_ERROR);
 
-  /* unpack connection parameters from S object */
-  dbname = CHR_EL(s_con_params, 0);
-  loadable_extensions = (Sint) atol(CHR_EL(s_con_params,1));
+  if (TYPEOF(dbfile) != STRSXP || length(dbfile) != 1)
+      error("'dbname' must be a length one character vector");
+  dbname = CHAR(STRING_ELT(dbfile, 0));
+
+  if (!isLogical(allow_ext))
+      error("'allow_ext' must be TRUE or FALSE");
+  loadable_extensions = LOGICAL(allow_ext)[0];
+  if (loadable_extensions == NA_LOGICAL)
+      error("'allow_ext' must be TRUE or FALSE, not NA");
+
   pDb = (sqlite3 **) calloc((size_t) 1, sizeof(sqlite3 *));
 
   rc = sqlite3_open(dbname, pDb);

@@ -387,8 +387,6 @@ RS_DBI_freeFields(RS_DBI_fields *flds)
 void
 RS_DBI_makeDataFrame(SEXP data)
 {
-   S_EVALUATOR
-
    SEXP row_names, df_class_name; 
    Sint   i, n;
    char   buf[1024];
@@ -469,7 +467,6 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
 SEXP  		/* boolean */
 RS_DBI_validHandle(Db_Handle handle)
 { 
-   S_EVALUATOR
    SEXP valid;
    int  handleType = 0;
 
@@ -592,8 +589,6 @@ RS_DBI_nCopyString(const char *str, size_t len, int del_blanks)
 SEXP 
 RS_DBI_copyfields(RS_DBI_fields *flds)
 {
-  S_EVALUATOR
-
   SEXP S_fields;
   Sint  n = (Sint) 8;
   char  *desc[]={"name", "Sclass", "type", "len", "precision",
@@ -626,7 +621,6 @@ RS_DBI_copyfields(RS_DBI_fields *flds)
 SEXP 
 RS_DBI_createNamedList(char **names, Stype *types, Sint *lengths, Sint  n)
 {
-  S_EVALUATOR
   SEXP output, output_names, obj = S_NULL_ENTRY;
   Sint  num_elem;
   int   j;
@@ -893,8 +887,6 @@ is_validHandle(Db_Handle handle, HANDLE_TYPE handleType)
 SEXP          /* named list */
 RS_DBI_managerInfo(Mgr_Handle mgrHandle)
 {
-  S_EVALUATOR
-
   RS_DBI_manager *mgr;
   SEXP output;
   Sint  i, num_con;
@@ -931,8 +923,6 @@ RS_DBI_managerInfo(Mgr_Handle mgrHandle)
 SEXP         /* return a named list */
 RS_DBI_connectionInfo(Con_Handle conHandle)
 {
-  S_EVALUATOR
-  
   RS_DBI_connection  *con;
   SEXP output;
   Sint     i;
@@ -968,8 +958,6 @@ RS_DBI_connectionInfo(Con_Handle conHandle)
 SEXP        /* return a named list */
 RS_DBI_resultSetInfo(Res_Handle rsHandle)
 {
-  S_EVALUATOR
-
   RS_DBI_resultSet       *result;
   SEXP output, flds;
   Sint  n = (Sint) 6;
@@ -999,8 +987,6 @@ RS_DBI_resultSetInfo(Res_Handle rsHandle)
 SEXP     /* named list */
 RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
 {
-  S_EVALUATOR
-
   SEXP S_fields;
   Sint  n = (Sint) 7;
   Sint  lengths[7];
@@ -1067,7 +1053,6 @@ RS_DBI_getTypeName(Sint t, const struct data_types table[])
 SEXP 
 RS_DBI_makeSQLNames(SEXP snames)
 {
-   S_EVALUATOR
    long     nstrings;
    char *name;
    SEXP schar;

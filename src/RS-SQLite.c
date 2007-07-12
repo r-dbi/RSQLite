@@ -62,8 +62,6 @@ int corrected_sqlite3_step(sqlite3_stmt *pStatement);
 Mgr_Handle
 RS_SQLite_init(SEXP config_params, SEXP reload, SEXP cache)
 {
-  S_EVALUATOR
-
   /* Currently we can specify the 2 defaults max conns and records per
    * fetch (this last one can be over-ridden explicitly in the S call to fetch).
    */
@@ -114,8 +112,6 @@ RS_SQLite_init(SEXP config_params, SEXP reload, SEXP cache)
 SEXP 
 RS_SQLite_closeManager(Mgr_Handle mgrHandle)
 {
-  S_EVALUATOR
-
   RS_DBI_manager *mgr;
   SEXP status;
   Sint *shared_cache;
@@ -144,8 +140,6 @@ RS_SQLite_closeManager(Mgr_Handle mgrHandle)
 Con_Handle
 RS_SQLite_cloneConnection(Con_Handle conHandle)
 {
-  S_EVALUATOR
-
   Mgr_Handle mgrHandle;
   RS_DBI_connection  *con;
   RS_SQLite_conParams *conParams;
@@ -293,8 +287,6 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext)
 SEXP 
 RS_SQLite_closeConnection(Con_Handle conHandle)
 {
-  S_EVALUATOR
-
   RS_DBI_connection *con;
   sqlite3 *db_connection;
   SEXP status;
@@ -495,8 +487,6 @@ Res_Handle
 RS_SQLite_exec(Con_Handle conHandle, SEXP statement,
                SEXP bind_data)
 {
-  S_EVALUATOR
-
   RS_DBI_connection *con;
   Res_Handle rsHandle;
   RS_DBI_resultSet  *res;
@@ -733,8 +723,6 @@ RS_SQLite_bindParam *
 RS_SQLite_createParameterBinding(int n, SEXP bind_data,
                                  sqlite3_stmt *stmt, char *errorMsg)
 {
-  S_EVALUATOR
-
   RS_SQLite_bindParam *params;
   int i, j, *used_index, current, num_cols;
   SEXP colNames, data, levels;
@@ -861,7 +849,6 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
 void
 RS_SQLite_freeParameterBinding(int n, RS_SQLite_bindParam *params)
 {
-  S_EVALUATOR
   int i;
 
   for(i=0; i<n; i++){
@@ -875,8 +862,6 @@ RS_SQLite_freeParameterBinding(int n, RS_SQLite_bindParam *params)
 RS_DBI_fields *
 RS_SQLite_createDataMappings(Res_Handle rsHandle)
 {
-  S_EVALUATOR
-
   sqlite3_stmt  *db_statement;
   RS_DBI_resultSet   *result;
   RS_DBI_fields      *flds;
@@ -957,8 +942,6 @@ RS_SQLite_createDataMappings(Res_Handle rsHandle)
 SEXP       /* data.frame */
 RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
 {
-  S_EVALUATOR
-
   RS_DBI_connection *con;
   RS_DBI_resultSet *res;
   RS_DBI_fields    *flds;
@@ -1283,8 +1266,6 @@ RS_SQLite_mget(SEXP rsHandle, SEXP max_rec)
 SEXP 
 RS_SQLite_getException(SEXP conHandle)
 {
-  S_EVALUATOR
-
   SEXP output;
   RS_DBI_connection   *con;
   RS_SQLite_exception *err;
@@ -1308,8 +1289,6 @@ RS_SQLite_getException(SEXP conHandle)
 SEXP 
 RS_SQLite_closeResultSet(SEXP resHandle)
 {
-  S_EVALUATOR
-
   sqlite3_stmt     *db_statement;
   RS_DBI_resultSet *result;
   SEXP status;
@@ -1339,8 +1318,6 @@ RS_SQLite_closeResultSet(SEXP resHandle)
 SEXP 
 RS_SQLite_managerInfo(Mgr_Handle mgrHandle)
 {
-  S_EVALUATOR
-
   RS_DBI_manager *mgr;
   SEXP output;
   Sint i, num_con, max_con, *cons, ncon, *shared_cache;
@@ -1400,8 +1377,6 @@ RS_SQLite_managerInfo(Mgr_Handle mgrHandle)
 SEXP 
 RS_SQLite_connectionInfo(Con_Handle conHandle)
 {
-  S_EVALUATOR
-
   RS_SQLite_conParams *conParams;
   RS_DBI_connection  *con;
   SEXP output;
@@ -1446,8 +1421,6 @@ RS_SQLite_connectionInfo(Con_Handle conHandle)
 SEXP 
 RS_SQLite_resultSetInfo(Res_Handle rsHandle)
 {
-  S_EVALUATOR
-
   RS_DBI_resultSet   *result;
   SEXP output, flds;
   Sint  n = 6;
@@ -1506,8 +1479,6 @@ RS_SQLite_importFile(
   SEXP s_skip
 )
 {
-  S_EVALUATOR
-
   RS_DBI_connection *con;
   sqlite3           *db_connection;
   char              *zFile, *zTable, *zSep, *zEol;

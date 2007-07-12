@@ -390,22 +390,9 @@ RS_DBI_makeDataFrame(SEXP data)
    S_EVALUATOR
 
    SEXP row_names, df_class_name; 
-#ifndef USING_R
-   SEXP S_RowNamesSymbol;       /* mimic Rinternal.h R_RowNamesSymbol */
-   SEXP S_ClassSymbol;
-#endif
    Sint   i, n;
    char   buf[1024];
    
-#ifndef USING_R
-   if(IS_LIST(data))
-      data = AS_LIST(data);
-   else
-      RS_DBI_errorMessage(
-            "internal error in RS_DBI_makeDataFrame: could not corce named-list into data.frame",
-            RS_DBI_ERROR);
-#endif
-
    PROTECT(data);
    PROTECT(df_class_name = NEW_CHARACTER((Sint) 1));
    SET_CHR_EL(df_class_name, 0, C_S_CPY("data.frame"));
@@ -417,22 +404,8 @@ RS_DBI_makeDataFrame(SEXP data)
       (void) sprintf(buf, "%d", i+1);
       SET_CHR_EL(row_names, i, C_S_CPY(buf));
    }
-#ifdef USING_R
    SET_ROWNAMES(data, row_names);
    SET_CLASS_NAME(data, df_class_name);
-#else
-   /* untested S4/Splus code */
-   PROTECT(S_RowNamesSymbol = NEW_CHARACTER((Sint) 1));
-   SET_CHR_EL(S_RowNamesSymbol, 0, C_S_CPY("row.names"));
-
-   PROTECT(S_ClassSymbol = NEW_CHARACTER((Sint) 1));
-   SET_CHR_EL(S_ClassSymbol, 0, C_S_CPY("class"));
-   /* Note: the fun attribute() is just an educated guess as to 
-    * which function to use for setting attributes (see S.h) 
-    */
-   (void) attribute(data, S_ClassSymbol, df_class_name); 
-   UNPROTECT(2);
-#endif
    UNPROTECT(3);
    return;
 }
@@ -457,9 +430,6 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
       SET_VECTOR_ELT(output, j, s_tmp);
       UNPROTECT(1);
     }
-#ifndef USING_R
-    output = AS_LIST(output);    /* this is only for S4's sake */
-#endif
     UNPROTECT(1);
     return;
   }
@@ -482,11 +452,6 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
     case LIST_TYPE:
       SET_VECTOR_ELT(output, j, NEW_LIST(num_rec));
       break;
-#ifndef USING_R
-    case RAW:  /* we use a list as a container for raw objects */
-      SET_VECTOR_ELT(output, j, NEW_LIST(num_rec));
-      break;
-#endif
     default:
       RS_DBI_errorMessage("unsupported data type", RS_DBI_ERROR);
     }
@@ -497,12 +462,7 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
     SET_CHR_EL(names,j, C_S_CPY(flds->name[j]));
   }
   SET_NAMES(output, names);
-#ifndef USING_R
-  output = AS_LIST(output);   /* again this is required only for S4 */
-#endif
-
   UNPROTECT(2);
-  
   return;
 }
 
@@ -648,14 +608,6 @@ RS_DBI_copyfields(RS_DBI_fields *flds)
   for(j = 0; j < n; j++) 
     lengths[j] = (Sint) num_fields;
   S_fields =  RS_DBI_createNamedList(desc, types, lengths, n);
-#ifndef USING_R
-  if(IS_LIST(S_fields))
-    S_fields = AS_LIST(S_fields);
-  else
-    RS_DBI_errorMessage(
-          "internal error in RS_DBI_copyfields: could not alloc named list",
-          RS_DBI_ERROR);
-#endif
   /* copy contentes from flds into an R/S list */
   for(i = 0; i < num_fields; i++){
     SET_LST_CHR_EL(S_fields,0,i, C_S_CPY(flds->name[i]));
@@ -699,11 +651,6 @@ RS_DBI_createNamedList(char **names, Stype *types, Sint *lengths, Sint  n)
     case LIST_TYPE:
       PROTECT(obj = NEW_LIST(num_elem));
       break;
-#ifndef USING_R
-    case RAW_TYPE:
-      PROTECT(obj = NEW_RAW(num_elem));
-      break;
-#endif
     default:
       RS_DBI_errorMessage("unsupported data type", RS_DBI_ERROR);
     }
@@ -964,14 +911,6 @@ RS_DBI_managerInfo(Mgr_Handle mgrHandle)
   mgrLen[0] = num_con;
 
   output = RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, n);
-#ifndef USING_R
-  if(IS_LIST(output))
-    output = AS_LIST(output);
-  else
-    RS_DBI_errorMessage(
-          "internal error: could not alloc named list", 
-    	  RS_DBI_ERROR);
-#endif
   for(i = 0; i < num_con; i++)
     LST_INT_EL(output,0,i) = (Sint) mgr->connectionIds[i];
 
@@ -1010,14 +949,6 @@ RS_DBI_connectionInfo(Con_Handle conHandle)
   conLen[7] = con->num_res;   /* number of resultSets opened */
 
   output = RS_DBI_createNamedList(conDesc, conType, conLen, n);
-#ifndef USING_R
-  if(IS_LIST(output))
-    output = AS_LIST(output);
-  else
-    RS_DBI_errorMessage(
-          "internal error in RS_DBI_connectionInfo: could not alloc named list",
-	  RS_DBI_ERROR);
-#endif
   /* dummy */
   SET_LST_CHR_EL(output,0,0,C_S_CPY("NA"));        /* host */
   SET_LST_CHR_EL(output,1,0,C_S_CPY("NA"));        /* dbname */
@@ -1055,14 +986,6 @@ RS_DBI_resultSetInfo(Res_Handle rsHandle)
     flds = S_NULL_ENTRY;
 
   output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
-#ifndef USING_R
-  if(IS_LIST(output))
-    output = AS_LIST(output);
-  else
-    RS_DBI_errorMessage(
-          "internal error in RS_DBI_resultSetInfo: could not alloc named list",
-	  RS_DBI_ERROR);
-#endif
   SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
   LST_INT_EL(output,1,0) = result->isSelect;
   LST_INT_EL(output,2,0) = result->rowsAffected;
@@ -1093,14 +1016,6 @@ RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
   for(j = 0; j < n; j++) 
     lengths[j] = (Sint) num_fields;
   PROTECT(S_fields =  RS_DBI_createNamedList(desc, types, lengths, n));
-#ifndef USING_R
-  if(IS_LIST(S_fields))
-    S_fields = AS_LIST(S_fields);
-  else
-    RS_DBI_errorMessage(
-          "internal error in RS_DBI_getFieldDescription: could not alloc named list",
-          RS_DBI_ERROR);
-#endif
   /* copy contentes from flds into an R/S list */
   for(i = 0; i < (Sint) num_fields; i++){
     SET_LST_CHR_EL(S_fields,0,i,C_S_CPY(flds->name[i]));
@@ -1193,13 +1108,12 @@ RS_DBI_makeSQLNames(SEXP snames)
 
    return snames;
 }
-#ifdef USING_R
+
 /*  These 2 R-specific functions are used by the C macros IS_NA(p,t) 
  *  and NA_SET(p,t) (in this way one simply use macros to test and set
  *  NA's regardless whether we're using R or S.
  */
-void
-RS_na_set(void *ptr, Stype type)
+void RS_na_set(void *ptr, Stype type)
 {
   double *d;
   Sint   *i;
@@ -1223,8 +1137,8 @@ RS_na_set(void *ptr, Stype type)
     break;
   }
 }
-int
-RS_is_na(void *ptr, Stype type)
+
+int RS_is_na(void *ptr, Stype type)
 {
    int *i, out = -2;
    const char *c;
@@ -1247,7 +1161,7 @@ RS_is_na(void *ptr, Stype type)
    }
    return out;
 }
-#endif
+
 /* the codes come from from R/src/main/util.c */
 const struct data_types RS_dataTypeTable[] = {
     { "NULL",		NILSXP	   },  /* real types */

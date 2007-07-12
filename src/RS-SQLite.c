@@ -34,12 +34,7 @@ int RS_sqlite_import(sqlite3 *db, const char *zTable,
 int corrected_sqlite3_step(sqlite3_stmt *pStatement);
 
 /* The macro NA_STRING is a CHRSXP in R but a char * in Splus */
-#ifdef USING_R
-/*#  define RS_NA_STRING "<NA>" */           /* CHR_EL(NA_STRING,0)  */
-#  define RS_NA_STRING CHAR(NA_STRING)
-#else
-#  define RS_NA_STRING NA_STRING
-#endif
+#define RS_NA_STRING CHAR(NA_STRING)
 
 /* R and S Database Interface to the SQLite embedded SQL engine
  *
@@ -1033,13 +1028,6 @@ RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
 
   PROTECT(output = NEW_LIST((Sint) num_fields));
   RS_DBI_allocOutput(output, flds, num_rec, 0);
-#ifndef USING_R
-  if(IS_LIST(output))
-    output = AS_LIST(output);
-  else
-    RS_DBI_errorMessage("internal error: could not alloc output list",
-      RS_DBI_ERROR);
-#endif
 
   while (state != SQLITE_DONE) {
     for (j = 0; j < num_fields; j++) {
@@ -1075,13 +1063,6 @@ RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
       if (expand) {    /* do we extend or return the records fetched so far*/
         num_rec = 2 * num_rec;
         RS_DBI_allocOutput(output, flds, num_rec, expand);
-#ifndef USING_R
-        if(IS_LIST(output))
-          output = AS_LIST(output);
-        else
-          RS_DBI_errorMessage("internal error: could not alloc output list",
-            RS_DBI_ERROR);
-#endif
       }
       else
         break;       /* okay, no more fetching for now */
@@ -1317,13 +1298,6 @@ RS_SQLite_getException(SEXP conHandle)
     RS_DBI_errorMessage("internal error: corrupt connection handle",
       RS_DBI_ERROR);
   output = RS_DBI_createNamedList(exDesc, exType, exLen, n);
-#ifndef USING_R
-  if(IS_LIST(output))
-    output = AS_LIST(output);
-  else
-    RS_DBI_errorMessage("internal error: could not allocate named list",
-      RS_DBI_ERROR);
-#endif
   err = (RS_SQLite_exception *) con->drvData;
   LST_INT_EL(output,0,0) = (Sint) err->errorNum;
   SET_LST_CHR_EL(output,1,0,C_S_CPY(err->errorMsg));
@@ -1442,13 +1416,6 @@ RS_SQLite_connectionInfo(Con_Handle conHandle)
   con = RS_DBI_getConnection(conHandle);
   conLen[6] = con->num_res;         /* num of open resultSets */
   output = RS_DBI_createNamedList(conDesc, conType, conLen, n);
-#ifndef USING_R
-  if(IS_LIST(output))
-    output = AS_LIST(output);
-  else
-    RS_DBI_errorMessage("internal error: could not alloc named list",
-      RS_DBI_ERROR);
-#endif
   conParams = (RS_SQLite_conParams *) con->conParams;
   SET_LST_CHR_EL(output,0,0,C_S_CPY("localhost"));
   SET_LST_CHR_EL(output,1,0,C_S_CPY(RS_NA_STRING));

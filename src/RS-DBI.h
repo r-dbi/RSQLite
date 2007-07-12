@@ -29,7 +29,7 @@
 extern "C" {
 #endif
 
-#include "S4R.h"
+#include "Rhelpers.h"
 
 /* Microsoft Visual C++ uses int _getpid()  */
 #ifdef MSVC

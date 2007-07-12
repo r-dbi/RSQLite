@@ -1,19 +1,9 @@
-/* S4 (Splus5+) and R portability macros.
+/* Convenience macros for R programming
  *
- * This file provides additional macros to the ones in Rdefines.h (in R)
- * and S4/Splus5 S.h (see Appendix A of the green book) to 
- * allow portability between R > 1.0.0, S4, and Splus5+ at the C source
- * level.  In addition to the macros in Rdefines.h and Appendix A,
- * we have macros to do x[[i][j] and x[[i]][j] <- val inside C functions,
- * macros to test for primitive data types, plus macros to test and 
- * set NA's portably.
- * TODO: Macros to build and eval functions portably?
  */
 
-#ifndef S4R_H
-#define S4R_H
-
-
+#ifndef RHELPERS_H
+#define RHELPERS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -127,4 +117,4 @@ extern "C" {
 }
 #endif
 
-#endif /* S4R_H */
+#endif /* RHELPERS_H */

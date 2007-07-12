@@ -406,13 +406,13 @@ RS_DBI_makeDataFrame(SEXP data)
             RS_DBI_ERROR);
 #endif
 
-   MEM_PROTECT(data);
-   MEM_PROTECT(df_class_name = NEW_CHARACTER((Sint) 1));
+   PROTECT(data);
+   PROTECT(df_class_name = NEW_CHARACTER((Sint) 1));
    SET_CHR_EL(df_class_name, 0, C_S_CPY("data.frame"));
 
    /* row.names */
    n = GET_LENGTH(LST_EL(data,0));            /* length(data[[1]]) */
-   MEM_PROTECT(row_names = NEW_CHARACTER(n));
+   PROTECT(row_names = NEW_CHARACTER(n));
    for(i=0; i<n; i++){
       (void) sprintf(buf, "%d", i+1);
       SET_CHR_EL(row_names, i, C_S_CPY(buf));
@@ -422,18 +422,18 @@ RS_DBI_makeDataFrame(SEXP data)
    SET_CLASS_NAME(data, df_class_name);
 #else
    /* untested S4/Splus code */
-   MEM_PROTECT(S_RowNamesSymbol = NEW_CHARACTER((Sint) 1));
+   PROTECT(S_RowNamesSymbol = NEW_CHARACTER((Sint) 1));
    SET_CHR_EL(S_RowNamesSymbol, 0, C_S_CPY("row.names"));
 
-   MEM_PROTECT(S_ClassSymbol = NEW_CHARACTER((Sint) 1));
+   PROTECT(S_ClassSymbol = NEW_CHARACTER((Sint) 1));
    SET_CHR_EL(S_ClassSymbol, 0, C_S_CPY("class"));
    /* Note: the fun attribute() is just an educated guess as to 
     * which function to use for setting attributes (see S.h) 
     */
    (void) attribute(data, S_ClassSymbol, df_class_name); 
-   MEM_UNPROTECT(2);
+   UNPROTECT(2);
 #endif
-   MEM_UNPROTECT(3);
+   UNPROTECT(3);
    return;
 }
 
@@ -446,37 +446,37 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
   int    num_fields;
   Stype  *fld_Sclass;
 
-  MEM_PROTECT(output);
+  PROTECT(output);
 
   num_fields = flds->num_fields;
   if(expand){
     for(j = 0; j < (Sint) num_fields; j++){
       /* Note that in R-1.2.3 (at least) we need to protect SET_LENGTH */
       s_tmp = LST_EL(output,j);
-      MEM_PROTECT(SET_LENGTH(s_tmp, num_rec));  
+      PROTECT(SET_LENGTH(s_tmp, num_rec));  
       SET_VECTOR_ELT(output, j, s_tmp);
-      MEM_UNPROTECT(1);
+      UNPROTECT(1);
     }
 #ifndef USING_R
     output = AS_LIST(output);    /* this is only for S4's sake */
 #endif
-    MEM_UNPROTECT(1);
+    UNPROTECT(1);
     return;
   }
 
   fld_Sclass = flds->Sclass;
   for(j = 0; j < (Sint) num_fields; j++){
     switch((int)fld_Sclass[j]){
-    case LOGICAL_TYPE:    
+    case LGLSXP:    
       SET_VECTOR_ELT(output, j, NEW_LOGICAL(num_rec));
       break;
-    case CHARACTER_TYPE:
+    case STRSXP:
       SET_VECTOR_ELT(output, j, NEW_CHARACTER(num_rec));
       break;
-    case INTEGER_TYPE:
+    case INTSXP:
       SET_VECTOR_ELT(output, j, NEW_INTEGER(num_rec));
       break;
-    case NUMERIC_TYPE:
+    case REALSXP:
       SET_VECTOR_ELT(output, j, NEW_NUMERIC(num_rec));
       break;
     case LIST_TYPE:
@@ -492,7 +492,7 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
     }
   }
 
-  MEM_PROTECT(names = NEW_CHARACTER((Sint) num_fields));
+  PROTECT(names = NEW_CHARACTER((Sint) num_fields));
   for(j = 0; j< (Sint) num_fields; j++){
     SET_CHR_EL(names,j, C_S_CPY(flds->name[j]));
   }
@@ -501,7 +501,7 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
   output = AS_LIST(output);   /* again this is required only for S4 */
 #endif
 
-  MEM_UNPROTECT(2);
+  UNPROTECT(2);
   
   return;
 }
@@ -524,9 +524,9 @@ RS_DBI_validHandle(Db_Handle handle)
      handleType = RES_HANDLE_TYPE;
      break;
    }
-   MEM_PROTECT(valid = NEW_LOGICAL((Sint) 1));
+   PROTECT(valid = NEW_LOGICAL((Sint) 1));
    LGL_EL(valid,0) = (Sint) is_validHandle(handle, handleType);
-   MEM_UNPROTECT(1);
+   UNPROTECT(1);
    return valid;
 }
     
@@ -638,9 +638,9 @@ RS_DBI_copyfields(RS_DBI_fields *flds)
   Sint  n = (Sint) 8;
   char  *desc[]={"name", "Sclass", "type", "len", "precision",
  		 "scale","isVarLength", "nullOK"};
-  Stype types[] = {CHARACTER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
-		   INTEGER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
-		   LOGICAL_TYPE, LOGICAL_TYPE};
+  Stype types[] = {STRSXP, INTSXP, INTSXP,
+		   INTSXP, INTSXP, INTSXP,
+		   LGLSXP, LGLSXP};
   Sint  lengths[8];
   int   i, j, num_fields;
 
@@ -679,29 +679,29 @@ RS_DBI_createNamedList(char **names, Stype *types, Sint *lengths, Sint  n)
   Sint  num_elem;
   int   j;
 
-  MEM_PROTECT(output = NEW_LIST(n));
-  MEM_PROTECT(output_names = NEW_CHARACTER(n));
+  PROTECT(output = NEW_LIST(n));
+  PROTECT(output_names = NEW_CHARACTER(n));
   for(j = 0; j < n; j++){
     num_elem = lengths[j];
     switch((int)types[j]){
-    case LOGICAL_TYPE: 
-      MEM_PROTECT(obj = NEW_LOGICAL(num_elem));
+    case LGLSXP: 
+      PROTECT(obj = NEW_LOGICAL(num_elem));
       break;
-    case INTEGER_TYPE:
-      MEM_PROTECT(obj = NEW_INTEGER(num_elem));
+    case INTSXP:
+      PROTECT(obj = NEW_INTEGER(num_elem));
       break;
-    case NUMERIC_TYPE:
-      MEM_PROTECT(obj = NEW_NUMERIC(num_elem));
+    case REALSXP:
+      PROTECT(obj = NEW_NUMERIC(num_elem));
       break;
-    case CHARACTER_TYPE:
-      MEM_PROTECT(obj = NEW_CHARACTER(num_elem));
+    case STRSXP:
+      PROTECT(obj = NEW_CHARACTER(num_elem));
       break;
     case LIST_TYPE:
-      MEM_PROTECT(obj = NEW_LIST(num_elem));
+      PROTECT(obj = NEW_LIST(num_elem));
       break;
 #ifndef USING_R
     case RAW_TYPE:
-      MEM_PROTECT(obj = NEW_RAW(num_elem));
+      PROTECT(obj = NEW_RAW(num_elem));
       break;
 #endif
     default:
@@ -711,7 +711,7 @@ RS_DBI_createNamedList(char **names, Stype *types, Sint *lengths, Sint  n)
     SET_CHR_EL(output_names, j, C_S_CPY(names[j]));
   }
   SET_NAMES(output, output_names);
-  MEM_UNPROTECT(n+2);
+  UNPROTECT(n+2);
   return(output);
 }
 
@@ -730,7 +730,7 @@ RS_DBI_SclassNames(SEXP type)
            RS_DBI_ERROR);
   n = LENGTH(type);
   typeCodes = INTEGER_DATA(type);
-  MEM_PROTECT(typeNames = NEW_CHARACTER(n));
+  PROTECT(typeNames = NEW_CHARACTER(n));
   for(i = 0; i < n; i++) {
     s = RS_DBI_getTypeName(typeCodes[i], RS_dataTypeTable);
     if(!s)
@@ -739,7 +739,7 @@ RS_DBI_SclassNames(SEXP type)
             RS_DBI_ERROR);
     SET_CHR_EL(typeNames, i, C_S_CPY(s));
   }
-  MEM_UNPROTECT(1);
+  UNPROTECT(1);
   return typeNames;
 }
 
@@ -752,9 +752,9 @@ RS_DBI_asMgrHandle(Sint mgrId)
 {
   Mgr_Handle mgrHandle;
 
-  MEM_PROTECT(mgrHandle = NEW_INTEGER((Sint) 1));
+  PROTECT(mgrHandle = NEW_INTEGER((Sint) 1));
   MGR_ID(mgrHandle) = mgrId;
-  MEM_UNPROTECT(1);
+  UNPROTECT(1);
   return mgrHandle;
 }
 
@@ -763,10 +763,10 @@ RS_DBI_asConHandle(Sint mgrId, Sint conId)
 {
   Con_Handle conHandle;
 
-  MEM_PROTECT(conHandle = NEW_INTEGER((Sint) 2));
+  PROTECT(conHandle = NEW_INTEGER((Sint) 2));
   MGR_ID(conHandle) = mgrId;
   CON_ID(conHandle) = conId;
-  MEM_UNPROTECT(1);
+  UNPROTECT(1);
   return conHandle;
 }
 
@@ -775,11 +775,11 @@ RS_DBI_asResHandle(Sint mgrId, Sint conId, Sint resId)
 {
   Res_Handle resHandle;
 
-  MEM_PROTECT(resHandle = NEW_INTEGER((Sint) 3));
+  PROTECT(resHandle = NEW_INTEGER((Sint) 3));
   MGR_ID(resHandle) = mgrId;
   CON_ID(resHandle) = conId;
   RES_ID(resHandle) = resId;
-  MEM_UNPROTECT(1);
+  UNPROTECT(1);
   return resHandle;
 }
 
@@ -954,9 +954,9 @@ RS_DBI_managerInfo(Mgr_Handle mgrHandle)
   Sint n = (Sint) 7;
   char *mgrDesc[] = {"connectionIds", "fetch_default_rec","managerId",
 		     "length", "num_con", "counter", "clientVersion"};
-  Stype mgrType[] = {INTEGER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
-		     INTEGER_TYPE, INTEGER_TYPE, INTEGER_TYPE, 
-                     CHARACTER_TYPE};
+  Stype mgrType[] = {INTSXP, INTSXP, INTSXP,
+		     INTSXP, INTSXP, INTSXP, 
+                     STRSXP};
   Sint  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1};
   
   mgr = RS_DBI_getManager(mgrHandle);
@@ -1001,9 +1001,9 @@ RS_DBI_connectionInfo(Con_Handle conHandle)
   char *conDesc[] = {"host", "user", "dbname", "conType",
 		     "serverVersion", "protocolVersion",
 		     "threadId", "rsHandle"};
-  Stype conType[] = {CHARACTER_TYPE, CHARACTER_TYPE, CHARACTER_TYPE,
-		      CHARACTER_TYPE, CHARACTER_TYPE, INTEGER_TYPE,
-		      INTEGER_TYPE, INTEGER_TYPE};
+  Stype conType[] = {STRSXP, STRSXP, STRSXP,
+		      STRSXP, STRSXP, INTSXP,
+		      INTSXP, INTSXP};
   Sint  conLen[]  = {1, 1, 1, 1, 1, 1, 1, -1};
 
   con = RS_DBI_getConnection(conHandle);
@@ -1044,8 +1044,8 @@ RS_DBI_resultSetInfo(Res_Handle rsHandle)
   Sint  n = (Sint) 6;
   char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
 		     "rowCount", "completed", "fields"};
-  Stype rsType[]  = {CHARACTER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
-		     INTEGER_TYPE,   INTEGER_TYPE, LIST_TYPE};
+  Stype rsType[]  = {STRSXP, INTSXP, INTSXP,
+		     INTSXP,   INTSXP, LIST_TYPE};
   Sint  rsLen[]   = {1, 1, 1, 1, 1, 1};
 
   result = RS_DBI_getResultSet(rsHandle);
@@ -1083,9 +1083,9 @@ RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
   Sint  lengths[7];
   char  *desc[]={"name", "Sclass", "type", "len", "precision",
 		"scale","nullOK"};
-  Stype types[] = {CHARACTER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
-		   INTEGER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
-		   LOGICAL_TYPE};
+  Stype types[] = {STRSXP, INTSXP, INTSXP,
+		   INTSXP, INTSXP, INTSXP,
+		   LGLSXP};
   Sint   i, j;
   int    num_fields;
 
@@ -1205,19 +1205,19 @@ RS_na_set(void *ptr, Stype type)
   Sint   *i;
   const char   *c;
   switch(type){
-  case INTEGER_TYPE:
+  case INTSXP:
     i = (Sint *) ptr;
     *i = NA_INTEGER;
     break;
-  case LOGICAL_TYPE:
+  case LGLSXP:
     i = (Sint *) ptr;
     *i = NA_LOGICAL;
     break;
-  case NUMERIC_TYPE:
+  case REALSXP:
     d = (double *) ptr;
     *d = NA_REAL;
     break;
-  case STRING_TYPE:
+  case CHARSXP:
     c = (const char *) ptr;
     c = CHAR(NA_STRING);
     break;
@@ -1231,16 +1231,16 @@ RS_is_na(void *ptr, Stype type)
    double *d;
 
    switch(type){
-   case INTEGER_TYPE:
-   case LOGICAL_TYPE:
+   case INTSXP:
+   case LGLSXP:
       i = (int *) ptr;
       out = (int) ((*i) == NA_INTEGER);
       break;
-   case NUMERIC_TYPE:
+   case REALSXP:
       d = (double *) ptr;
       out = ISNA(*d);
       break;
-   case STRING_TYPE:
+   case CHARSXP:
       c = (const char *) ptr;
       out = (int) (strcmp(c, CHAR(NA_STRING))==0);
       break;
@@ -1250,7 +1250,6 @@ RS_is_na(void *ptr, Stype type)
 #endif
 /* the codes come from from R/src/main/util.c */
 const struct data_types RS_dataTypeTable[] = {
-#ifdef USING_R
     { "NULL",		NILSXP	   },  /* real types */
     { "symbol",		SYMSXP	   },
     { "pairlist",	LISTSXP	   },
@@ -1274,17 +1273,4 @@ const struct data_types RS_dataTypeTable[] = {
     { "numeric",	REALSXP	   },
     { "name",		SYMSXP	   },
     { (char *)0,	-1	   }
-#else
-    { "logical",	LGL	  },
-    { "integer",	INT	  },
-    { "single",		REAL	  },
-    { "numeric",	DOUBLE	  },
-    { "character",	CHAR	  },
-    { "list",		LIST	  },
-    { "complex",	COMPLEX	  },
-    { "raw",		RAW	  },
-    { "any",		ANY	  },
-    { "structure",	STRUCTURE },
-    { (char *)0,	-1	  }
-#endif
 };

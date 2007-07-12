@@ -36,7 +36,7 @@ int corrected_sqlite3_step(sqlite3_stmt *pStatement);
 /* The macro NA_STRING is a CHRSXP in R but a char * in Splus */
 #ifdef USING_R
 /*#  define RS_NA_STRING "<NA>" */           /* CHR_EL(NA_STRING,0)  */
-#  define RS_NA_STRING CHAR_DEREF(NA_STRING)
+#  define RS_NA_STRING CHAR(NA_STRING)
 #else
 #  define RS_NA_STRING NA_STRING
 #endif
@@ -139,9 +139,9 @@ RS_SQLite_closeManager(Mgr_Handle mgrHandle)
 
   RS_DBI_freeManager(mgrHandle);
 
-  MEM_PROTECT(status = NEW_LOGICAL((Sint) 1));
+  PROTECT(status = NEW_LOGICAL((Sint) 1));
   LGL_EL(status,0) = TRUE;
-  MEM_UNPROTECT(1);
+  UNPROTECT(1);
   return status;
 }
 
@@ -343,9 +343,9 @@ RS_SQLite_closeConnection(Con_Handle conHandle)
   con->drvData = (void *) NULL;
   RS_DBI_freeConnection(conHandle);
 
-  MEM_PROTECT(status = NEW_LOGICAL((Sint) 1));
+  PROTECT(status = NEW_LOGICAL((Sint) 1));
   LGL_EL(status, 0) = TRUE;
-  MEM_UNPROTECT(1);
+  UNPROTECT(1);
 
   return status;
 }
@@ -639,23 +639,23 @@ RS_SQLite_exec(Con_Handle conHandle, SEXP statement,
           const char *string;
 
           switch(param.type){
-            case INTEGER_TYPE:
+            case INTSXP:
               integer = INT_EL(param.data, i);
-              if(IS_NA( &integer, INTEGER_TYPE ))
+              if(IS_NA( &integer, INTSXP ))
                 state = sqlite3_bind_null(db_statement, j+1);
               else
                 state = sqlite3_bind_int(db_statement, j+1, integer);
               break;
 
-            case NUMERIC_TYPE:
+            case REALSXP:
               number = NUM_EL(param.data, i);
-              if(IS_NA( &number, NUMERIC_TYPE ))
+              if(IS_NA( &number, REALSXP ))
                 state = sqlite3_bind_null(db_statement, j+1);
               else
                 state = sqlite3_bind_double(db_statement, j+1, number);
               break;
 
-            case CHARACTER_TYPE:
+            case STRSXP:
               /* falls through */
             default:
               string = CHR_EL(param.data, i);
@@ -826,23 +826,23 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
     params[i].is_protected = 0;
 
     if(isInteger(data)){
-      params[i].type = INTEGER_TYPE;
+      params[i].type = INTSXP;
       params[i].data = data;
     }
     else if(isNumeric(data)){
-      params[i].type = NUMERIC_TYPE;
+      params[i].type = REALSXP;
       params[i].data = data;
     }
     else if(isString(data)){
-      params[i].type = STRING_TYPE;
+      params[i].type = STRSXP;
       params[i].data = data;
     }
     else if(isFactor(data)){
       /* need to convert to a string vector */
-      params[i].type = STRING_TYPE;
+      params[i].type = STRSXP;
       levels = GET_LEVELS(data);
 
-      PROTECT( params[i].data = allocVector(STRING_TYPE, LENGTH(data)) );
+      PROTECT( params[i].data = allocVector(STRSXP, LENGTH(data)) );
       for(j=0; j<LENGTH(data); j++) {
           int factor_code = INT_EL(data, j);
           if (factor_code == NA_INTEGER)
@@ -854,7 +854,7 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
       }
     }
     else{
-      params[i].type = STRING_TYPE;
+      params[i].type = STRSXP;
       PROTECT( params[i].data = AS_CHARACTER(data) );
       params[i].is_protected = 1;
     }
@@ -918,19 +918,19 @@ RS_SQLite_createDataMappings(Res_Handle rsHandle)
     switch(col_type) {
     case SQLITE_INTEGER:
         flds->type[j] = SQL92_TYPE_INTEGER;
-        flds->Sclass[j] = INTEGER_TYPE;
+        flds->Sclass[j] = INTSXP;
         flds->length[j] = (Sint) sizeof(int);
         flds->isVarLength[j] = (Sint) 0;
         break;
     case SQLITE_FLOAT:
         flds->type[j] = SQL92_TYPE_DOUBLE;
-        flds->Sclass[j] = REAL_TYPE;
+        flds->Sclass[j] = REALSXP;
         flds->length[j] = (Sint) sizeof(double);
         flds->isVarLength[j] = (Sint) 0;
         break;
     case SQLITE_TEXT:
         flds->type[j] = SQL92_TYPE_CHAR_VAR;
-        flds->Sclass[j] = CHARACTER_TYPE;
+        flds->Sclass[j] = STRSXP;
         flds->length[j] = (Sint) -1;   /* unknown */
         flds->isVarLength[j] = (Sint) 1;
         break;
@@ -1031,7 +1031,7 @@ RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
     num_rec = RS_DBI_getManager(rsHandle)->fetch_default_rec;
   }
 
-  MEM_PROTECT(output = NEW_LIST((Sint) num_fields));
+  PROTECT(output = NEW_LIST((Sint) num_fields));
   RS_DBI_allocOutput(output, flds, num_rec, 0);
 #ifndef USING_R
   if(IS_LIST(output))
@@ -1045,21 +1045,21 @@ RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
     for (j = 0; j < num_fields; j++) {
       int null_item = (sqlite3_column_type(db_statement, j) == SQLITE_NULL);
       switch(flds->Sclass[j]){
-        case INTEGER_TYPE:
+        case INTSXP:
           if(null_item)
-            NA_SET(&(LST_INT_EL(output,j,row_idx)), INTEGER_TYPE);
+            NA_SET(&(LST_INT_EL(output,j,row_idx)), INTSXP);
           else
             LST_INT_EL(output,j,row_idx) =
                       sqlite3_column_int(db_statement, j);
           break;
-        case NUMERIC_TYPE:
+        case REALSXP:
           if(null_item)
-            NA_SET(&(LST_NUM_EL(output,j,row_idx)), NUMERIC_TYPE);
+            NA_SET(&(LST_NUM_EL(output,j,row_idx)), REALSXP);
           else
             LST_NUM_EL(output,j,row_idx) =
                       sqlite3_column_double(db_statement, j);
           break;
-        case CHARACTER_TYPE:
+        case STRSXP:
           /* falls through */
         default:
           if(null_item)
@@ -1103,13 +1103,13 @@ RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
     /* adjust the length of each of the members in the output_list */
     for(j = 0; j<num_fields; j++){
       s_tmp = LST_EL(output,j);
-      MEM_PROTECT(SET_LENGTH(s_tmp, num_rec));
+      PROTECT(SET_LENGTH(s_tmp, num_rec));
       SET_VECTOR_ELT(output, j, s_tmp);
-      MEM_UNPROTECT(1);
+      UNPROTECT(1);
     }
   }
   res->rowCount += num_rec;
-  MEM_UNPROTECT(1);
+  UNPROTECT(1);
   return output;
 }
 
@@ -1173,7 +1173,7 @@ RS_SQLite_mget(SEXP rsHandle, SEXP max_rec)
   }
   flds = res->fields;
   /* force first column to character */
-  flds->Sclass[0] = CHARACTER_TYPE;
+  flds->Sclass[0] = STRSXP;
 
   num_fields = flds->num_fields;
   num_rec = INT_EL(max_rec,0);
@@ -1182,7 +1182,7 @@ RS_SQLite_mget(SEXP rsHandle, SEXP max_rec)
     num_rec = RS_DBI_getManager(rsHandle)->fetch_default_rec;
   }
 
-  MEM_PROTECT(output = NEW_LIST((Sint) num_fields));
+  PROTECT(output = NEW_LIST((Sint) num_fields));
   RS_DBI_allocOutput(output, flds, num_rec, 0);
   key_breaks = (int *)R_alloc(num_rec, sizeof(int));
   key_breaks[0] = 0;
@@ -1203,21 +1203,21 @@ RS_SQLite_mget(SEXP rsHandle, SEXP max_rec)
     for (j = 0; j < num_fields; j++) {
       int null_item = (sqlite3_column_type(db_statement, j) == SQLITE_NULL);
       switch(flds->Sclass[j]){
-        case INTEGER_TYPE:
+        case INTSXP:
           if(null_item)
-            NA_SET(&(LST_INT_EL(output,j,row_idx)), INTEGER_TYPE);
+            NA_SET(&(LST_INT_EL(output,j,row_idx)), INTSXP);
           else
             LST_INT_EL(output,j,row_idx) =
                       sqlite3_column_int(db_statement, j);
           break;
-        case NUMERIC_TYPE:
+        case REALSXP:
           if(null_item)
-            NA_SET(&(LST_NUM_EL(output,j,row_idx)), NUMERIC_TYPE);
+            NA_SET(&(LST_NUM_EL(output,j,row_idx)), REALSXP);
           else
             LST_NUM_EL(output,j,row_idx) =
                       sqlite3_column_double(db_statement, j);
           break;
-        case CHARACTER_TYPE:
+        case STRSXP:
           /* falls through */
         default:
           if(null_item)
@@ -1256,9 +1256,9 @@ RS_SQLite_mget(SEXP rsHandle, SEXP max_rec)
     /* adjust the length of each of the members in the output_list */
     for(j = 0; j<num_fields; j++){
       s_tmp = LST_EL(output,j);
-      MEM_PROTECT(SET_LENGTH(s_tmp, num_rec));
+      PROTECT(SET_LENGTH(s_tmp, num_rec));
       SET_VECTOR_ELT(output, j, s_tmp);
-      MEM_UNPROTECT(1);
+      UNPROTECT(1);
     }
   }
   res->rowCount += num_rec;
@@ -1291,7 +1291,7 @@ RS_SQLite_mget(SEXP rsHandle, SEXP max_rec)
 
   if (prev_key)
       Free(prev_key);
-  MEM_UNPROTECT(2);
+  UNPROTECT(2);
   return env;
 }
 #endif
@@ -1309,7 +1309,7 @@ RS_SQLite_getException(SEXP conHandle)
   RS_SQLite_exception *err;
   Sint  n = 2;
   char *exDesc[] = {"errorNum", "errorMsg"};
-  Stype exType[] = {INTEGER_TYPE, CHARACTER_TYPE};
+  Stype exType[] = {INTSXP, STRSXP};
   Sint  exLen[]  = {1, 1};
 
   con = RS_DBI_getConnection(conHandle);
@@ -1355,9 +1355,9 @@ RS_SQLite_closeResultSet(SEXP resHandle)
   result->drvData = (void *) NULL;
   RS_DBI_freeResultSet(resHandle);
 
-  MEM_PROTECT(status = NEW_LOGICAL((Sint) 1));
+  PROTECT(status = NEW_LOGICAL((Sint) 1));
   LGL_EL(status, 0) = TRUE;
-  MEM_UNPROTECT(1);
+  UNPROTECT(1);
 
   return status;
 }
@@ -1374,9 +1374,9 @@ RS_SQLite_managerInfo(Mgr_Handle mgrHandle)
   char *mgrDesc[] = {"drvName",   "connectionIds", "fetch_default_rec",
                      "managerId", "length",        "num_con",
                      "counter",   "clientVersion", "shared_cache"};
-  Stype mgrType[] = {CHARACTER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
-                     INTEGER_TYPE,   INTEGER_TYPE, INTEGER_TYPE,
-                     INTEGER_TYPE,   CHARACTER_TYPE, CHARACTER_TYPE };
+  Stype mgrType[] = {STRSXP, INTSXP, INTSXP,
+                     INTSXP,   INTSXP, INTSXP,
+                     INTSXP,   STRSXP, STRSXP };
   Sint  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 
   mgr = RS_DBI_getManager(mgrHandle);
@@ -1434,9 +1434,9 @@ RS_SQLite_connectionInfo(Con_Handle conHandle)
   Sint       i, n = 8, *res, nres;
   char *conDesc[] = {"host", "user", "dbname", "conType",
              "serverVersion", "threadId", "rsId", "loadableExtensions"};
-  Stype conType[] = {CHARACTER_TYPE, CHARACTER_TYPE, CHARACTER_TYPE,
-          CHARACTER_TYPE, CHARACTER_TYPE,
-              INTEGER_TYPE, INTEGER_TYPE, CHARACTER_TYPE};
+  Stype conType[] = {STRSXP, STRSXP, STRSXP,
+          STRSXP, STRSXP,
+              INTSXP, INTSXP, STRSXP};
   Sint  conLen[]  = {1, 1, 1, 1, 1, 1, 1, 1};
 
   con = RS_DBI_getConnection(conHandle);
@@ -1486,8 +1486,8 @@ RS_SQLite_resultSetInfo(Res_Handle rsHandle)
   Sint  n = 6;
   char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
          "rowCount", "completed", "fieldDescription"};
-  Stype rsType[]  = {CHARACTER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
-         INTEGER_TYPE,   INTEGER_TYPE, LIST_TYPE};
+  Stype rsType[]  = {STRSXP, INTSXP, INTSXP,
+         INTSXP,   INTSXP, LIST_TYPE};
   Sint  rsLen[]   = {1, 1, 1, 1, 1, 1};
 
   result = RS_DBI_getResultSet(rsHandle);
@@ -1520,12 +1520,12 @@ RS_SQLite_typeNames(SEXP typeIds)
 
   n = LENGTH(typeIds);
   typeCodes = INTEGER_DATA(typeIds);
-  MEM_PROTECT(typeNames = NEW_CHARACTER(n));
+  PROTECT(typeNames = NEW_CHARACTER(n));
   for(i = 0; i < n; i++) {
     s = RS_DBI_getTypeName(typeCodes[i], RS_SQLite_fieldTypes);
     SET_CHR_EL(typeNames, i, C_S_CPY(s));
   }
-  MEM_UNPROTECT(1);
+  UNPROTECT(1);
   return typeNames;
 }
 
@@ -1589,9 +1589,9 @@ RS_SQLite_importFile(
   free(zFile);
   free(zSep);
 
-  MEM_PROTECT(output = NEW_LOGICAL((Sint) 1));
+  PROTECT(output = NEW_LOGICAL((Sint) 1));
   LOGICAL_POINTER(output)[0] = rc;
-  MEM_UNPROTECT(1);
+  UNPROTECT(1);
   return output;
 }
 

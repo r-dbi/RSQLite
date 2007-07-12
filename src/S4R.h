@@ -30,11 +30,7 @@ extern "C" {
 #  define singl double
 #  define Sint  int
 #  define charPtr SEXP *
-#  define CHAR_DEREF(x) CHAR(x)
 #  define C_S_CPY(p)    COPY_TO_USER_STRING(p)    /* cpy C string to R */
-#  define MEM_PROTECT(x) PROTECT(x)
-#  define MEM_UNPROTECT(n) UNPROTECT(n)
-#  define MEM_UNPROTECT_PTR(x) UNPROTECT_PTR(x)
 
 /* The following are macros defined in the Green Book, but missing
  * in Rdefines.h.  The semantics are as close to S4's as possible (?).
@@ -88,7 +84,7 @@ extern "C" {
 #define RAW_EL(x,i) RAW_POINTER((x))[(i)]
 #if defined(R_VERSION) && R_VERSION >= R_Version(1,2,0) 
 #  define LST_EL(x,i) VECTOR_ELT((x),(i))
-#  define CHR_EL(x,i) CHAR_DEREF(STRING_ELT((x),(i)))
+#  define CHR_EL(x,i) CHAR(STRING_ELT((x),(i)))
 #  define SET_CHR_EL(x,i,val)  SET_STRING_ELT((x),(i), (val))
 #endif
 

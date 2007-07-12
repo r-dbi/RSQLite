@@ -54,7 +54,7 @@ typedef struct st_sqlite_err {
 
 typedef struct st_sqlite_bindparam {
   SEXPTYPE  type;
-  s_object *data;
+  SEXP data;
   int      is_protected;
 } RS_SQLite_bindParam;
 
@@ -78,19 +78,19 @@ int                 SQLite_decltype_to_type(const char *decltype);
  */
 
 /* dbManager */
-Mgr_Handle *RS_SQLite_init(s_object *config_params, s_object *reload,
-                           s_object *cache);
-s_object   *RS_SQLite_close(Mgr_Handle *mgrHandle);
+Mgr_Handle RS_SQLite_init(SEXP config_params, SEXP reload,
+                           SEXP cache);
+SEXP RS_SQLite_close(Mgr_Handle mgrHandle);
 
 /* dbConnection */
-Con_Handle *RS_SQLite_newConnection(Mgr_Handle *mgrHandle, SEXP dbfile,
+Con_Handle RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile,
                                     SEXP allow_ext);
-Con_Handle *RS_SQLite_cloneConnection(Con_Handle *conHandle);
-s_object   *RS_SQLite_closeConnection(Con_Handle *conHandle);
+Con_Handle RS_SQLite_cloneConnection(Con_Handle conHandle);
+SEXP RS_SQLite_closeConnection(Con_Handle conHandle);
 /* we simulate db exceptions ourselves */
 void        RS_SQLite_setException(RS_DBI_connection *con, int errorNum,
                                    const char *errorMsg);
-s_object   *RS_SQLite_getException(Con_Handle *conHandle);
+SEXP RS_SQLite_getException(Con_Handle conHandle);
 /* err No, Msg */
 
 /* currently we only provide a "standard" callback to sqlite_exec() -- this
@@ -103,28 +103,28 @@ int       RS_SQLite_stdCallback(void *resHandle, int ncol, char **row,
                                 char **colNames);
 
 /* dbResultSet */
-Res_Handle *RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
-                           s_object *bind_data);
-s_object   *RS_SQLite_fetch(Res_Handle *rsHandle, s_object *max_rec);
-s_object   *RS_SQLite_closeResultSet(Res_Handle *rsHandle);
+Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement,
+                           SEXP bind_data);
+SEXP RS_SQLite_fetch(Res_Handle rsHandle, SEXP max_rec);
+SEXP RS_SQLite_closeResultSet(Res_Handle rsHandle);
 void        RS_SQLite_initFields(RS_DBI_resultSet *res, int ncol,
                                  char **colNames);
 
-s_object   *RS_SQLite_validHandle(Db_Handle *handle);      /* boolean */
+SEXP RS_SQLite_validHandle(Db_Handle handle);      /* boolean */
 
-RS_DBI_fields *RS_SQLite_createDataMappings(Res_Handle *resHandle);
+RS_DBI_fields *RS_SQLite_createDataMappings(Res_Handle resHandle);
 
 /* the following funs return named lists with meta-data for
  * the manager, connections, and  result sets, respectively.
  */
-s_object *RS_SQLite_managerInfo(Mgr_Handle *mgrHandle);
-s_object *RS_SQLite_connectionInfo(Con_Handle *conHandle);
-s_object *RS_SQLite_resultSetInfo(Res_Handle *rsHandle);
+SEXP RS_SQLite_managerInfo(Mgr_Handle mgrHandle);
+SEXP RS_SQLite_connectionInfo(Con_Handle conHandle);
+SEXP RS_SQLite_resultSetInfo(Res_Handle rsHandle);
 
 /*  The following imports the delim-fields of a file into an existing table*/
-s_object *RS_SQLite_importFile(Con_Handle *conHandle, s_object *s_tablename,
-             s_object *s_filename, s_object *s_separator, s_object *s_obj,
-             s_object *s_skip);
+SEXP RS_SQLite_importFile(Con_Handle conHandle, SEXP s_tablename,
+             SEXP s_filename, SEXP s_separator, SEXP s_obj,
+             SEXP s_skip);
 
 /* TODO: general connection */
 char * RS_sqlite_getline(FILE *in, const char *eol);
@@ -173,7 +173,7 @@ const struct data_types RS_SQLite_fieldTypes[] = {
      { (char *) 0,              -1                  }
 };
 
-s_object *RS_SQLite_typeNames(s_object *typeIds);
+SEXP RS_SQLite_typeNames(SEXP typeIds);
 
 #ifdef _cplusplus
 }

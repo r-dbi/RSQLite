@@ -25,7 +25,7 @@ char *compiledVarsion = SQLITE_VERSION;
 
 /* the following are for parameter binding */
 RS_SQLite_bindParam *RS_SQLite_createParameterBinding(int n,
-                        s_object *bind_data, sqlite3_stmt *stmt,
+                        SEXP bind_data, sqlite3_stmt *stmt,
                         char *errorMsg);
 void RS_SQLite_freeParameterBinding(int n,
                                      RS_SQLite_bindParam *param);
@@ -64,8 +64,8 @@ int corrected_sqlite3_step(sqlite3_stmt *pStatement);
  */
 
 
-Mgr_Handle *
-RS_SQLite_init(s_object *config_params, s_object *reload, s_object *cache)
+Mgr_Handle
+RS_SQLite_init(SEXP config_params, SEXP reload, SEXP cache)
 {
   S_EVALUATOR
 
@@ -73,7 +73,7 @@ RS_SQLite_init(s_object *config_params, s_object *reload, s_object *cache)
    * fetch (this last one can be over-ridden explicitly in the S call to fetch).
    */
   RS_DBI_manager *mgr;
-  Mgr_Handle *mgrHandle;
+  Mgr_Handle mgrHandle;
   Sint  fetch_default_rec, force_reload, max_con;
   Sint  *shared_cache;
   const char *drvName = "SQLite";
@@ -116,13 +116,13 @@ RS_SQLite_init(s_object *config_params, s_object *reload, s_object *cache)
   return mgrHandle;
 }
 
-s_object *
-RS_SQLite_closeManager(Mgr_Handle *mgrHandle)
+SEXP 
+RS_SQLite_closeManager(Mgr_Handle mgrHandle)
 {
   S_EVALUATOR
 
   RS_DBI_manager *mgr;
-  s_object *status;
+  SEXP status;
   Sint *shared_cache;
 
   mgr = RS_DBI_getManager(mgrHandle);
@@ -146,18 +146,18 @@ RS_SQLite_closeManager(Mgr_Handle *mgrHandle)
 }
 
 /* open a connection with the same parameters used for in conHandle */
-Con_Handle *
-RS_SQLite_cloneConnection(Con_Handle *conHandle)
+Con_Handle
+RS_SQLite_cloneConnection(Con_Handle conHandle)
 {
   S_EVALUATOR
 
-  Mgr_Handle  *mgrHandle;
+  Mgr_Handle mgrHandle;
   RS_DBI_connection  *con;
   RS_SQLite_conParams *conParams;
   SEXP dbname, allow_ext;
-  s_object    *con_params;
+  SEXP con_params;
   char   buf1[256];
-  Con_Handle *ans;
+  Con_Handle ans;
 
   /* get connection params used to open existing connection */
   con = RS_DBI_getConnection(conHandle);
@@ -238,12 +238,12 @@ RS_SQLite_freeException(RS_DBI_connection *con)
    return;
 }
 
-Con_Handle *
-RS_SQLite_newConnection(Mgr_Handle *mgrHandle, SEXP dbfile, SEXP allow_ext)
+Con_Handle
+RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext)
 {
   RS_DBI_connection   *con;
   RS_SQLite_conParams *conParams;
-  Con_Handle  *conHandle;
+  Con_Handle conHandle;
   sqlite3     *db_connection, **pDb;
   const char  *dbname = NULL;
   int         rc, loadable_extensions;
@@ -295,14 +295,14 @@ RS_SQLite_newConnection(Mgr_Handle *mgrHandle, SEXP dbfile, SEXP allow_ext)
   return conHandle;
 }
 
-s_object *
-RS_SQLite_closeConnection(Con_Handle *conHandle)
+SEXP 
+RS_SQLite_closeConnection(Con_Handle conHandle)
 {
   S_EVALUATOR
 
   RS_DBI_connection *con;
   sqlite3 *db_connection;
-  s_object *status;
+  SEXP status;
   int      rc;
 
   con = RS_DBI_getConnection(conHandle);
@@ -416,7 +416,7 @@ int RS_SQLite_get_row_count(sqlite3* db, const char* tname) {
 }
 
 
-SEXP RS_SQLite_quick_column(Con_Handle *conHandle, SEXP table, SEXP column)
+SEXP RS_SQLite_quick_column(Con_Handle conHandle, SEXP table, SEXP column)
 {
     SEXP ans = R_NilValue;
     RS_DBI_connection *con = NULL;
@@ -496,14 +496,14 @@ SEXP RS_SQLite_quick_column(Con_Handle *conHandle, SEXP table, SEXP column)
 }
 
 
-Res_Handle *
-RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
-               s_object *bind_data)
+Res_Handle
+RS_SQLite_exec(Con_Handle conHandle, SEXP statement,
+               SEXP bind_data)
 {
   S_EVALUATOR
 
   RS_DBI_connection *con;
-  Res_Handle        *rsHandle;
+  Res_Handle rsHandle;
   RS_DBI_resultSet  *res;
   sqlite3           *db_connection;
   sqlite3_stmt      *db_statement = NULL;
@@ -735,14 +735,14 @@ RS_SQLite_exec(Con_Handle *conHandle, s_object *statement,
 }
 
 RS_SQLite_bindParam *
-RS_SQLite_createParameterBinding(int n, s_object *bind_data,
+RS_SQLite_createParameterBinding(int n, SEXP bind_data,
                                  sqlite3_stmt *stmt, char *errorMsg)
 {
   S_EVALUATOR
 
   RS_SQLite_bindParam *params;
   int i, j, *used_index, current, num_cols;
-  s_object *colNames, *data, *levels;
+  SEXP colNames, data, levels;
 
   /* check that we have enough columns in the data frame */
   colNames = GET_NAMES(bind_data);
@@ -878,7 +878,7 @@ RS_SQLite_freeParameterBinding(int n, RS_SQLite_bindParam *params)
 }
 
 RS_DBI_fields *
-RS_SQLite_createDataMappings(Res_Handle *rsHandle)
+RS_SQLite_createDataMappings(Res_Handle rsHandle)
 {
   S_EVALUATOR
 
@@ -959,8 +959,8 @@ RS_SQLite_createDataMappings(Res_Handle *rsHandle)
  * the .Internal(type.convert(...)) as in read.table in the
  * calling R/S function.  Grrr!
  */
-s_object *      /* data.frame */
-RS_SQLite_fetch(s_object *rsHandle, s_object *max_rec)
+SEXP       /* data.frame */
+RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
 {
   S_EVALUATOR
 
@@ -969,7 +969,7 @@ RS_SQLite_fetch(s_object *rsHandle, s_object *max_rec)
   RS_DBI_fields    *flds;
   sqlite3_stmt     *db_statement;
   sqlite3          *db_connection;
-  s_object  *output, *s_tmp;
+  SEXP output, s_tmp;
   int    j, state, expand;
   Sint   num_rec;
   int    num_fields, row_idx;
@@ -1104,7 +1104,7 @@ RS_SQLite_fetch(s_object *rsHandle, s_object *max_rec)
     for(j = 0; j<num_fields; j++){
       s_tmp = LST_EL(output,j);
       MEM_PROTECT(SET_LENGTH(s_tmp, num_rec));
-      SET_ELEMENT(output, j, s_tmp);
+      SET_VECTOR_ELT(output, j, s_tmp);
       MEM_UNPROTECT(1);
     }
   }
@@ -1124,13 +1124,13 @@ RS_SQLite_fetch(s_object *rsHandle, s_object *max_rec)
 /* declare function that needs to be added to R API */
 SEXP R_NewHashedEnv(SEXP);
 
-s_object *      /* data.frame */
-RS_SQLite_mget(s_object *rsHandle, s_object *max_rec)
+SEXP       /* data.frame */
+RS_SQLite_mget(SEXP rsHandle, SEXP max_rec)
 {
   RS_DBI_resultSet *res;
   RS_DBI_fields    *flds;
   sqlite3_stmt     *db_statement;
-  s_object  *output, *s_tmp;
+  SEXP output, *s_tmp;
   int    i, j, state, expand, vlen;
   Sint   num_rec;
   int    num_fields, row_idx;
@@ -1257,7 +1257,7 @@ RS_SQLite_mget(s_object *rsHandle, s_object *max_rec)
     for(j = 0; j<num_fields; j++){
       s_tmp = LST_EL(output,j);
       MEM_PROTECT(SET_LENGTH(s_tmp, num_rec));
-      SET_ELEMENT(output, j, s_tmp);
+      SET_VECTOR_ELT(output, j, s_tmp);
       MEM_UNPROTECT(1);
     }
   }
@@ -1299,12 +1299,12 @@ RS_SQLite_mget(s_object *rsHandle, s_object *max_rec)
 /* return a 2-elem list with the last exception number and exception message on a given connection.
  * NOTE: RS_SQLite_getException() is meant to be used mostly directory R.
  */
-s_object *
-RS_SQLite_getException(s_object *conHandle)
+SEXP 
+RS_SQLite_getException(SEXP conHandle)
 {
   S_EVALUATOR
 
-  s_object  *output;
+  SEXP output;
   RS_DBI_connection   *con;
   RS_SQLite_exception *err;
   Sint  n = 2;
@@ -1331,14 +1331,14 @@ RS_SQLite_getException(s_object *conHandle)
   return output;
 }
 
-s_object *
-RS_SQLite_closeResultSet(s_object *resHandle)
+SEXP 
+RS_SQLite_closeResultSet(SEXP resHandle)
 {
   S_EVALUATOR
 
   sqlite3_stmt     *db_statement;
   RS_DBI_resultSet *result;
-  s_object *status;
+  SEXP status;
 
   result = RS_DBI_getResultSet(resHandle);
   db_statement = (sqlite3_stmt *)result->drvResultSet;
@@ -1362,13 +1362,13 @@ RS_SQLite_closeResultSet(s_object *resHandle)
   return status;
 }
 
-s_object *
-RS_SQLite_managerInfo(Mgr_Handle *mgrHandle)
+SEXP 
+RS_SQLite_managerInfo(Mgr_Handle mgrHandle)
 {
   S_EVALUATOR
 
   RS_DBI_manager *mgr;
-  s_object *output;
+  SEXP output;
   Sint i, num_con, max_con, *cons, ncon, *shared_cache;
   Sint j, n = 9;
   char *mgrDesc[] = {"drvName",   "connectionIds", "fetch_default_rec",
@@ -1423,14 +1423,14 @@ RS_SQLite_managerInfo(Mgr_Handle *mgrHandle)
   return output;
 }
 
-s_object *
-RS_SQLite_connectionInfo(Con_Handle *conHandle)
+SEXP 
+RS_SQLite_connectionInfo(Con_Handle conHandle)
 {
   S_EVALUATOR
 
   RS_SQLite_conParams *conParams;
   RS_DBI_connection  *con;
-  s_object   *output;
+  SEXP output;
   Sint       i, n = 8, *res, nres;
   char *conDesc[] = {"host", "user", "dbname", "conType",
              "serverVersion", "threadId", "rsId", "loadableExtensions"};
@@ -1476,13 +1476,13 @@ RS_SQLite_connectionInfo(Con_Handle *conHandle)
 
   return output;
 }
-s_object *
-RS_SQLite_resultSetInfo(Res_Handle *rsHandle)
+SEXP 
+RS_SQLite_resultSetInfo(Res_Handle rsHandle)
 {
   S_EVALUATOR
 
   RS_DBI_resultSet   *result;
-  s_object  *output, *flds;
+  SEXP output, flds;
   Sint  n = 6;
   char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
          "rowCount", "completed", "fieldDescription"};
@@ -1503,16 +1503,16 @@ RS_SQLite_resultSetInfo(Res_Handle *rsHandle)
   LST_INT_EL(output,3,0) = result->rowCount;
   LST_INT_EL(output,4,0) = result->completed;
   if(flds != S_NULL_ENTRY)
-     SET_ELEMENT(LST_EL(output, 5), (Sint) 0, flds);
+     SET_VECTOR_ELT(LST_EL(output, 5), (Sint) 0, flds);
 
   UNPROTECT(2);
   return output;
 }
 
-s_object *
-RS_SQLite_typeNames(s_object *typeIds)
+SEXP 
+RS_SQLite_typeNames(SEXP typeIds)
 {
-  s_object *typeNames;
+  SEXP typeNames;
   Sint n;
   Sint *typeCodes;
   int i;
@@ -1529,14 +1529,14 @@ RS_SQLite_typeNames(s_object *typeIds)
   return typeNames;
 }
 
-s_object *    /* returns TRUE/FALSE */
+SEXP     /* returns TRUE/FALSE */
 RS_SQLite_importFile(
-  Con_Handle *conHandle,
-  s_object *s_tablename,
-  s_object *s_filename,
-  s_object *s_separator,
-  s_object *s_eol,
-  s_object *s_skip
+  Con_Handle conHandle,
+  SEXP s_tablename,
+  SEXP s_filename,
+  SEXP s_separator,
+  SEXP s_eol,
+  SEXP s_skip
 )
 {
   S_EVALUATOR
@@ -1546,7 +1546,7 @@ RS_SQLite_importFile(
   char              *zFile, *zTable, *zSep, *zEol;
   const char *s, *s1;
   Sint              rc, skip;
-  s_object          *output;
+  SEXP output;
 
 
   s = CHR_EL(s_tablename, 0);

@@ -538,6 +538,25 @@ RS_DBI_errorMessage(char *msg, DBI_EXCEPTION exception_type)
   return;
 }
 
+void DBI_MSG(char *msg, DBI_EXCEPTION exception_type, char *driver)
+{
+  switch (exception_type) {
+  case RS_DBI_MESSAGE:
+    PROBLEM "%s driver message: (%s)", driver, msg WARN;
+    break;
+  case RS_DBI_WARNING:
+    PROBLEM "%s driver warning: (%s)", driver, msg WARN;
+    break;
+  case RS_DBI_ERROR:
+    PROBLEM  "%s driver: (%s)", driver, msg ERROR;
+    break;
+  case RS_DBI_TERMINATE:        /* is this used? */
+    PROBLEM "%s driver fatal: (%s)", driver, msg ERROR;
+    break;
+  }
+  return;
+}
+
 /* wrapper to strcpy */
 char *
 RS_DBI_copyString(const char *str)

@@ -58,6 +58,8 @@ typedef struct st_sqlite_bindparam {
   int      is_protected;
 } RS_SQLite_bindParam;
 
+#define RSQLITE_MSG(msg, err_type) DBI_MSG(msg, err_type, "RSQLite")
+
 RS_SQLite_conParams *RS_SQLite_allocConParams(const char *dbname, int loadable_extensions);
 void                RS_SQLite_freeConParams(RS_SQLite_conParams *conParams);
 

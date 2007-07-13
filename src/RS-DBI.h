@@ -232,6 +232,8 @@ void  RS_DBI_setException(Db_Handle handle,
 			  DBI_EXCEPTION exceptionType,
 			  int errorNum, 
 			  const char *errorMsg);
+void DBI_MSG(char *msg, DBI_EXCEPTION exception_type, char *driver);
+
 /* utility funs (copy strings, convert from R/S types to string, etc.*/
 char     *RS_DBI_copyString(const char *str);
 char     *RS_DBI_nCopyString(const char *str, size_t len, int del_blanks);

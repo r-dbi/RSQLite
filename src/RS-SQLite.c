@@ -933,52 +933,35 @@ RS_SQLite_createDataMappings(Res_Handle rsHandle)
    return flds;
 }
 
-/* we will return a data.frame with character data and then invoke
- * the .Internal(type.convert(...)) as in read.table in the
- * calling R/S function.  Grrr!
- */
-SEXP       /* data.frame */
-RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
+/* Given a DBI resultset handle, call corrected_sqlite3_step once
+   handling the SQLITE_SCHEMA state indicating that the query needs to
+   be prepared again.  This will occur when the DB schema has
+   changed. */
+static int single_step_with_reprepare(SEXP rsHandle)
 {
+    int state, done = 0, reprepare = 0;
     RS_DBI_connection *con;
     RS_DBI_resultSet *res;
-    RS_DBI_fields *flds;
-    sqlite3_stmt *db_statement;
     sqlite3 *db_connection;
-    SEXP output, s_tmp;
-    int j, state, expand;
-    Sint num_rec;
-    int num_fields, row_idx;
-    int done = 0, reprepare = 0;
-    
+    sqlite3_stmt *db_statement;
+
     res = RS_DBI_getResultSet(rsHandle);
-    if (res->isSelect != 1) {
-        RSQLITE_MSG("resultSet does not correspond to a SELECT statement",
-                    RS_DBI_WARNING);
-        return R_NilValue;
-    }
-
-    if (res->completed == 1)
-        return R_NilValue;
-
     db_statement = (sqlite3_stmt *)res->drvResultSet;
     if (db_statement == NULL) {
         RSQLITE_MSG("corrupt SQLite resultSet, missing statement handle",
                     RS_DBI_ERROR);
     }
-    
     while (!done) {
         if (reprepare) {
             con = RS_DBI_getConnection(rsHandle);
             db_connection = (sqlite3 *) con->drvConnection;
             sqlite3_finalize(db_statement);
-            res->drvResultSet = (void*)NULL;
+            res->drvResultSet = (void *)NULL;
             state = sqlite3_prepare(db_connection, res->statement, -1,
                                     &db_statement, NULL);
             res->drvResultSet = db_statement;
         }
         state = corrected_sqlite3_step(db_statement);
-        row_idx = 0;
         if (state != SQLITE_ROW && state != SQLITE_DONE 
             && state != SQLITE_SCHEMA) {
             char errMsg[2048];
@@ -993,6 +976,51 @@ RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
             done = 1;
         }
     }
+    return state;
+}
+
+/* Return a data.frame containing the requested number of rows from
+   the resultset.
+
+   We try to determine the correct R type for each column in the
+   result.  Currently, type detection happens only for the first fetch
+   on a given resultset and the first row of the resultset is used for
+   type interpolation.  If a NULL value appears in the first row of
+   the resultset and the column corresponds to a DB table column, we
+   guess the type based on the DB schema definition for the column.
+   If the NULL value does not correspond to a table column, then we
+   force character.
+
+   TODO: consider making this smarter by keeping track of unknown
+   columns and setting the type based on the first non-NULL.
+
+   TODO: consider adding ability for users to specify desired types
+   for result columns.  This could happen either via coercion in R or
+   at the SQLite level (which would be more efficient, but less
+   flexible).
+
+ */
+SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
+{
+    RS_DBI_resultSet *res;
+    RS_DBI_fields *flds;
+    sqlite3_stmt *db_statement;
+    SEXP output, s_tmp;
+    int j, state, expand;
+    Sint num_rec;
+    int num_fields, row_idx = 0;
+
+    res = RS_DBI_getResultSet(rsHandle);
+    if (res->isSelect != 1) {
+        RSQLITE_MSG("resultSet does not correspond to a SELECT statement",
+                    RS_DBI_WARNING);
+        return R_NilValue;
+    }
+    if (res->completed == 1)
+        return R_NilValue;
+
+    state = single_step_with_reprepare(rsHandle);
+
     if (!res->fields) {
         if (!(res->fields = RS_SQLite_createDataMappings(rsHandle))) {
             RSQLITE_MSG("corrupt SQLite resultSet, missing fieldDescription",
@@ -1000,9 +1028,8 @@ RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
         }
     }
     flds = res->fields;
-
     num_fields = flds->num_fields;
-    num_rec = INT_EL(max_rec,0);
+    num_rec = INT_EL(max_rec, 0);
     expand = (num_rec < 0);   /* dyn expand output to accommodate all rows*/
     if (expand || num_rec == 0) {
         num_rec = RS_DBI_getManager(rsHandle)->fetch_default_rec;
@@ -1011,6 +1038,7 @@ RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
     PROTECT(output = NEW_LIST((Sint) num_fields));
     RS_DBI_allocOutput(output, flds, num_rec, 0);
 
+    db_statement = (sqlite3_stmt *)res->drvResultSet;
     while (state != SQLITE_DONE) {
         for (j = 0; j < num_fields; j++) {
             int null_item;

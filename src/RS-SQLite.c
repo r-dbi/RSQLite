@@ -979,6 +979,44 @@ static int single_step_with_reprepare(SEXP rsHandle)
     return state;
 }
 
+/* Fills the output VECSXP with one row of data from the resultset
+ */
+static void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
+                        RS_DBI_fields *flds)
+{
+    int j;
+    int null_item;
+
+    for (j = 0; j < flds->num_fields; j++) {
+        null_item = (sqlite3_column_type(db_statement, j) == SQLITE_NULL);
+        switch (flds->Sclass[j]) {
+        case INTSXP:
+            if (null_item)
+                NA_SET(&(LST_INT_EL(output, j, row_idx)), INTSXP);
+            else
+                LST_INT_EL(output, j, row_idx) =
+                    sqlite3_column_int(db_statement, j);
+            break;
+        case REALSXP:
+            if (null_item)
+                NA_SET(&(LST_NUM_EL(output,j,row_idx)), REALSXP);
+            else
+                LST_NUM_EL(output,j,row_idx) =
+                    sqlite3_column_double(db_statement, j);
+            break;
+        case STRSXP:
+            /* falls through */
+        default:
+            if (null_item)
+                SET_LST_CHR_EL(output,j,row_idx, NA_STRING);
+            else
+                SET_LST_CHR_EL(output,j,row_idx, /* cast for -Wall */
+                               C_S_CPY((char*)sqlite3_column_text(db_statement, j)));
+            break;
+        }
+    }
+}
+
 /* Return a data.frame containing the requested number of rows from
    the resultset.
 
@@ -1040,35 +1078,7 @@ SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
 
     db_statement = (sqlite3_stmt *)res->drvResultSet;
     while (state != SQLITE_DONE) {
-        for (j = 0; j < num_fields; j++) {
-            int null_item;
-            null_item = (sqlite3_column_type(db_statement, j) == SQLITE_NULL);
-            switch (flds->Sclass[j]) {
-            case INTSXP:
-                if (null_item)
-                    NA_SET(&(LST_INT_EL(output,j,row_idx)), INTSXP);
-                else
-                    LST_INT_EL(output,j,row_idx) =
-                        sqlite3_column_int(db_statement, j);
-                break;
-            case REALSXP:
-                if (null_item)
-                    NA_SET(&(LST_NUM_EL(output,j,row_idx)), REALSXP);
-                else
-                    LST_NUM_EL(output,j,row_idx) =
-                        sqlite3_column_double(db_statement, j);
-                break;
-            case STRSXP:
-                /* falls through */
-            default:
-                if (null_item)
-                    SET_LST_CHR_EL(output,j,row_idx, NA_STRING);
-                else
-                    SET_LST_CHR_EL(output,j,row_idx, /* cast for -Wall */
-                                   C_S_CPY((char*)sqlite3_column_text(db_statement, j)));
-                break;
-            }
-        } /* end column loop */
+        fill_one_row(db_statement, output, row_idx, flds);
         row_idx++;
         if (row_idx == num_rec) {  /* request satisfied or exhausted allocated space */
             if (expand) {    /* do we extend or return the records fetched so far*/

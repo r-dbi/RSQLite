@@ -955,18 +955,18 @@ RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
     
     res = RS_DBI_getResultSet(rsHandle);
     if (res->isSelect != 1) {
-        RS_DBI_errorMessage("resultSet does not correspond to a SELECT statement",
-                            RS_DBI_WARNING);
-        return S_NULL_ENTRY;
+        RSQLITE_MSG("resultSet does not correspond to a SELECT statement",
+                    RS_DBI_WARNING);
+        return R_NilValue;
     }
 
-    if(res->completed == 1)
-        return S_NULL_ENTRY;
+    if (res->completed == 1)
+        return R_NilValue;
 
     db_statement = (sqlite3_stmt *)res->drvResultSet;
-    if(db_statement == NULL){
-        RS_DBI_errorMessage("corrupt SQLite resultSet, missing statement handle",
-                            RS_DBI_ERROR);
+    if (db_statement == NULL) {
+        RSQLITE_MSG("corrupt SQLite resultSet, missing statement handle",
+                    RS_DBI_ERROR);
     }
     
     while (!done) {
@@ -975,17 +975,18 @@ RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
             db_connection = (sqlite3 *) con->drvConnection;
             sqlite3_finalize(db_statement);
             res->drvResultSet = (void*)NULL;
-            state = sqlite3_prepare(db_connection, res->statement, -1, &db_statement,
-                                    NULL);
+            state = sqlite3_prepare(db_connection, res->statement, -1,
+                                    &db_statement, NULL);
             res->drvResultSet = db_statement;
         }
         state = corrected_sqlite3_step(db_statement);
         row_idx = 0;
-        if (state != SQLITE_ROW && state != SQLITE_DONE && state != SQLITE_SCHEMA) {
+        if (state != SQLITE_ROW && state != SQLITE_DONE 
+            && state != SQLITE_SCHEMA) {
             char errMsg[2048];
             (void)sprintf(errMsg, "RS_SQLite_fetch: failed first step: %s",
                           sqlite3_errmsg(sqlite3_db_handle(db_statement)));
-            RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+            RSQLITE_MSG(errMsg, RS_DBI_ERROR);
         }
         if (state == SQLITE_SCHEMA)
             reprepare = 1;
@@ -996,8 +997,8 @@ RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
     }
     if (!res->fields) {
         if (!(res->fields = RS_SQLite_createDataMappings(rsHandle))) {
-            RS_DBI_errorMessage("corrupt SQLite resultSet, missing fieldDescription",
-                                RS_DBI_ERROR);
+            RSQLITE_MSG("corrupt SQLite resultSet, missing fieldDescription",
+                        RS_DBI_ERROR);
         }
     }
     flds = res->fields;
@@ -1014,7 +1015,8 @@ RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
 
     while (state != SQLITE_DONE) {
         for (j = 0; j < num_fields; j++) {
-            int null_item = (sqlite3_column_type(db_statement, j) == SQLITE_NULL);
+            int null_item;
+            null_item = (sqlite3_column_type(db_statement, j) == SQLITE_NULL);
             switch (flds->Sclass[j]) {
             case INTSXP:
                 if (null_item)
@@ -1055,7 +1057,7 @@ RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
             char errMsg[2048];
             (void)sprintf(errMsg, "RS_SQLite_fetch: failed: %s",
                           sqlite3_errmsg(sqlite3_db_handle(db_statement)));
-            RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+            RSQLITE_MSG(errMsg, RS_DBI_ERROR);
         }
     } /* end row loop */
     if (state == SQLITE_DONE) {

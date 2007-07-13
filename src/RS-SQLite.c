@@ -144,8 +144,6 @@ RS_SQLite_cloneConnection(Con_Handle conHandle)
   RS_DBI_connection  *con;
   RS_SQLite_conParams *conParams;
   SEXP dbname, allow_ext;
-  SEXP con_params;
-  char   buf1[256];
   Con_Handle ans;
 
   /* get connection params used to open existing connection */

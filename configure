@@ -800,12 +800,6 @@ if test -n "$ac_init_help"; then
 
   cat <<\_ACEOF
 
-Optional Features:
-  --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
-  --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
---enable-sqlite=DIR      install SQLite software into DIR
-                         (by default into \${R_PACKAGE_DIR}/sqlite)
-
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
@@ -3169,7 +3163,7 @@ FOUND_ALL="no"
 #
 # if users provide both PKG_CPPFLAGS *and* PKG_LIBS, then we're done!
 #
-test -n "${PKG_CPPFLAGS}" -a -n "${PKG_LIBS}"  && FOUND_ALL="yes"
+test -n "${PKG_CPPFLAGS}" -a -n "${PKG_LIBS}" && FOUND_ALL="yes"
 
 #
 # does user want a particular SQLite installation/version (possibly
@@ -3255,113 +3249,10 @@ echo "$as_me: error: sqlite-lib dir ${SQLITE_LIB} does not exist" >&2;}
 fi
 
 
-# do users want/need to install our own copy SQLite (taken from
-# http://www.sqlite.org)? If provided, force installation regardless
-# whether there's one already or not.
-#
-# SQLITE_TDIR will store the target SQLite installation directory.
-#
-# Check whether --enable-sqlite or --disable-sqlite was given.
-if test "${enable_sqlite+set}" = set; then
-  enableval="$enable_sqlite"
-   SQLITE_TDIR="${enable_sqlite}"
-                FOUND_ALL="no"
-
-else
-   if test "${FOUND_ALL}" = "yes" ; then
-                   SQLITE_TDIR="no"
-                else
-                   SQLITE_TDIR="yes"
-                fi
-
-fi;
-
-
-if test "${FOUND_ALL}" = "no" -a "${SQLITE_TDIR}" != "no" ; then
-   # We need to install SQLite. Note that SQLite's configure will run
-   # before the actual $R_PACKAGE_DIR is fully created -- so we'll install
-   # it under inst/sqlite so that when R copies rescursevely "inst" into
-   # $R_PACKAGE_DIR the actual SQLite directoy will be $R_PACKGE_DIR/sqlite
-   # If the user doesn't specify a directory, we only build static libraries
-   # (to avoid the LD_LIBRARY_PATH dance).
-
-   base_dir=`pwd`
-   if test "${SQLITE_TDIR}" = "yes" ; then
-      SQLITE_TDIR="${base_dir}/inst/sqlite"
-      SQLITE_FINAL="${R_PACKAGE_DIR}/sqlite"
-      SQLITE_SHARED="no"
-   else
-      SQLITE_FINAL="${SQLITE_TDIR}"
-      SQLITE_SHARED="yes"
-   fi
-   test ! -d "${SQLITE_TDIR}"         && mkdir "${SQLITE_TDIR}"
-   test ! -d "${SQLITE_TDIR}/bin"     && mkdir "${SQLITE_TDIR}/bin"
-   test ! -d "${SQLITE_TDIR}/lib"     && mkdir "${SQLITE_TDIR}/lib"
-   test ! -d "${SQLITE_TDIR}/include" && mkdir "${SQLITE_TDIR}/include"
-
-   # Are tar and gzip available?  One would hope!  Is basename portable?
-   : ${TAR=tar}
-   : ${GZIP=gzip}
-   : ${MAKE=make}
-   : ${SQLITE_TAR="${base_dir}/src/sqlite-3.*.*.tar.gz"}
-
-   if test -r "${SQLITE_TAR}" ; then
-      echo "Could not read sqlite source tar file (${SQLITE_TAR})."
-      echo "Set and export the shell variable SQLITE_TAR to the appropriate"
-      echo "pathname, e.g., 'export SQLITE_TAR=$HOME/sqlite-3.2.1.tar.gz'"
-      exit 1
-   fi
-
-   tmp_dir=/tmp/bld_sqlite$$
-   mkdir "${tmp_dir}" && cd "${tmp_dir}"
-
-   ${GZIP} -c -d ${SQLITE_TAR} | ${TAR} xf -
-
-   # compute name of source directory (as of 2.8.6, SQLite doesn't follow
-   # the GNU naming standard, and it untars into "sqlite")
-   SQLITE_SRC=`basename ${SQLITE_TAR} | \
-               sed 's/\.tar\.gz//' | sed 's/\.tgz//' | sed 's/\.tar//' `
-   test ! -d "${SQLITE_SRC}" && SQLITE_SRC=sqlite
-
-   cd ./"${SQLITE_SRC}"
-   echo ""
-   echo "building the SQLite engine ... slowly ...."
-   echo ""
-   echo "(the file /tmp/sqlite$$ stores compiler messages)"
-   echo ""
-   export SQLITE_TDIR
-   export CC
-   ( ./configure --silent --prefix=${SQLITE_TDIR}    \
-                 --disable-tcl \
-                 --enable-shared=${SQLITE_SHARED} --with-pic && \
-       ${MAKE} && ${MAKE} install && ${MAKE} clean ) >/tmp/sqlite$$ 2>&1
-
-   if test $? -ne 0 ; then
-      echo ""
-      echo "SQLite installation failed."
-      echo ""
-      echo "INSTRUCTIONS:"
-      echo ""
-      echo "  1. You need to install SQLite manually.   For details,"
-      echo "     consult the web site http://www.sqlite.org"
-      echo ""
-      echo "  2. After installing SQLite, re-run R CMD INSTALL, specifying"
-      echo "     the location of the SQLite directories, e.g.,"
-      echo ""
-      echo "     R CMD INSTALL --configure-args=--with-sqlite-dir=<DIR> ..."
-      echo ""
-      echo "     or set PKG_LIBS and PKG_CPPFLAGS, as described in"
-      echo "     R help(INSTALL)."
-      echo ""
-      exit 1
-   fi
-
-   cd ..  && rm -rf "${SQLITE_SRC}"
-   cd "${base_dir}"
-
+if test "${FOUND_ALL}" = "no" ; then
    # Since we installed successfully, now we set PKG_* vars and exit
-   PKG_CPPFLAGS="-I${SQLITE_TDIR}/include"
-   PKG_LIBS="${SQLITE_TDIR}/lib/libsqlite3.a"
+   PKG_CPPFLAGS="-DRSQLITE_USE_BUNDLED_SQLITE"
+   PKG_LIBS=""
 
 echo "$as_me:$LINENO: checking for library containing fdatasync" >&5
 echo $ECHO_N "checking for library containing fdatasync... $ECHO_C" >&6
@@ -3491,68 +3382,6 @@ fi
 
    PKG_LIBS="${PKG_LIBS} $LIBS"
    FOUND_ALL="yes"
-
-   echo ""
-   echo "-------------------------------------------------------------------"
-   echo ""
-   echo "SQLite installed successfully:"
-   echo ""
-   if test "${SQLITE_SHARED}" = yes ; then
-      echo "  Do not forget to verify whether you need to include the dir"
-      echo "  ${SQLITE_FINAL}/lib in your LD_LIBRARY_PATH, e.g., "
-      echo ""
-      echo "    LD_LIBRARY_PATH=${SQLITE_FINAL}/lib:\$LD_LIBRARY_PATH"
-      echo "    export LD_LIBRARY_PATH"
-      echo ""
-      echo "  prior to invoking R."
-      echo ""
-   fi
-   echo "-------------------------------------------------------------------"
-   echo ""
-   rm -rf "${tmp_dir}"
-fi
-
-if test "${FOUND_ALL}" = "no" ; then
-
-   ## we failed -- print instructions accordingly
-
-   if test -n "${SQLITE_LIB}" -o -n "${SQLITE_INC}"; then
-      echo ""
-      echo "Configuration error:"
-      echo "  could not find either sqlite.h or lib sqlite."
-      echo ""
-      echo "INSTRUCTIONS:"
-      echo ""
-      echo '  Re-run "configure" specifying the SQLite base directory '
-      echo '  (with subdirectories "include" and "lib") using the argument'
-      echo "     --with-sqlite-dir=<sqlite-base-dir>"
-      echo ""
-      echo "  Alternatively you may specify individually the header and "
-      echo "  lib directories with the arguments"
-      echo "     --with-sqlite-inc=<sqlite-include-dir>"
-      echo "     --with-sqlite-lib=<sqlite-lib-dir>"
-      echo ""
-   else
-      echo ""
-      echo "Configuration error:"
-      echo '  could not find the SQLite "sqlite.h" header or the'
-      echo "  library -lsqlite3"
-      echo ""
-      echo "INSTRUCTIONS:"
-      echo ""
-      echo "1. Define and export the 2 shell variables PKG_CPPFLAGS and"
-      echo "   PKG_LIBS to include the directory for header files (*.h)"
-      echo "   and libraries, for example (using Bourne shell syntax):"
-      echo ""
-      echo '      export PKG_CPPFLAGS="-I<SQLite-include>"'
-      echo '      export PKG_LIBS="-L<SQLite-libs> -lsqliteclient3"'
-      echo ""
-      echo "2. Re-run the R INSTALL command:"
-      echo ""
-      echo "      R CMD INSTALL RSQLite<version>.tar.gz"
-      echo ""
-   fi
-   exit 1
 fi
 
 

@@ -1,6 +1,6 @@
 /******************************************************************************
 ** This file is an amalgamation of many separate C source files from SQLite
-** version 3.4.0.  By combining all the individual C code files into this 
+** version 3.4.1.  By combining all the individual C code files into this 
 ** single large file, the entire code can be compiled as a one translation
 ** unit.  This allows many compilers to do optimizations that would not be
 ** possible if the files were compiled separately.  Performance improvements
@@ -11,15 +11,21 @@
 ** programs, you need this file and the "sqlite3.h" header file that defines
 ** the programming interface to the SQLite library.  (If you do not have 
 ** the "sqlite3.h" header file at hand, you will find a copy in the first
-** 2679 lines past this header comment.)  Additional code files may be
+** 2702 lines past this header comment.)  Additional code files may be
 ** needed if you want a wrapper to interface SQLite with your choice of
 ** programming language.  The code for the "sqlite3" command-line shell
 ** is also in a separate file.  This file contains only code for the core
 ** SQLite library.
 **
-** This amalgamation was generated on 2007-06-18 17:44:42 UTC.
+** This amalgamation was generated on 2007-07-20 11:05:39 UTC.
 */
 #define SQLITE_AMALGAMATION 1
+#ifndef SQLITE_PRIVATE
+# define SQLITE_PRIVATE static
+#endif
+#ifndef SQLITE_API
+# define SQLITE_API
+#endif
 /************** Begin file sqlite3.h *****************************************/
 /*
 ** 2001 September 15
@@ -53,7 +59,7 @@
 ** the version number) and changes its name to "sqlite3.h" as
 ** part of the build process.
 **
-** @(#) $Id: sqlite.h.in,v 1.212 2007/06/14 20:57:19 drh Exp $
+** @(#) $Id: sqlite.h.in,v 1.218 2007/07/19 12:41:40 drh Exp $
 */
 #ifndef _SQLITE3_H_
 #define _SQLITE3_H_
@@ -104,8 +110,8 @@ extern "C" {
 **
 ** See also: [sqlite3_libversion()] and [sqlite3_libversion_number()].
 */
-#define SQLITE_VERSION         "3.4.0"
-#define SQLITE_VERSION_NUMBER 3004000
+#define SQLITE_VERSION         "3.4.1"
+#define SQLITE_VERSION_NUMBER 3004001
 
 /*
 ** CAPI3REF: Run-Time Library Version Numbers
@@ -124,7 +130,7 @@ extern "C" {
 ** constants within the DLL.
 */
 extern const char sqlite3_version[];
-const char *sqlite3_libversion(void);
+SQLITE_API const char *sqlite3_libversion(void);
 int sqlite3_libversion_number(void);
 
 /*
@@ -181,7 +187,7 @@ typedef struct sqlite3 sqlite3;
 ** before this routine is called. Otherwise, SQLITE_BUSY is returned and the
 ** database connection remains open.
 */
-int sqlite3_close(sqlite3 *);
+SQLITE_API int sqlite3_close(sqlite3 *);
 
 /*
 ** The type for a callback function.
@@ -234,7 +240,7 @@ typedef int (*sqlite3_callback)(void*,int,char**, char**);
 ** The particular return value depends on the type of error. 
 **
 */
-int sqlite3_exec(
+SQLITE_API int sqlite3_exec(
   sqlite3*,                                  /* An open database */
   const char *sql,                           /* SQL to be evaluted */
   int (*callback)(void*,int,char**,char**),  /* Callback function */
@@ -392,13 +398,13 @@ sqlite_int64 sqlite3_last_insert_rowid(sqlite3*);
 **
 ** SQLite implements the command "DELETE FROM table" without a WHERE clause
 ** by dropping and recreating the table.  (This is much faster than going
-** through and deleting individual elements form the table.)  Because of
+** through and deleting individual elements from the table.)  Because of
 ** this optimization, the change count for "DELETE FROM table" will be
 ** zero regardless of the number of elements that were originally in the
 ** table. To get an accurate count of the number of rows deleted, use
 ** "DELETE FROM table WHERE 1" instead.
 */
-int sqlite3_changes(sqlite3*);
+SQLITE_API int sqlite3_changes(sqlite3*);
 
 /*
 ** CAPI3REF: Total Number Of Rows Modified
@@ -439,7 +445,7 @@ int sqlite3_total_changes(sqlite3*);
 ** explicit transaction, then the entire transaction will be rolled
 ** back automatically.
 */
-void sqlite3_interrupt(sqlite3*);
+SQLITE_API void sqlite3_interrupt(sqlite3*);
 
 /*
 ** CAPI3REF: Determine If An SQL Statement Is Complete
@@ -459,8 +465,8 @@ void sqlite3_interrupt(sqlite3*);
 ** in order to deal with triggers, but the basic idea is the same:  the
 ** statement is not complete unless it ends in a semicolon.
 */
-int sqlite3_complete(const char *sql);
-int sqlite3_complete16(const void *sql);
+SQLITE_API int sqlite3_complete(const char *sql);
+SQLITE_API int sqlite3_complete16(const void *sql);
 
 /*
 ** CAPI3REF: Register A Callback To Handle SQLITE_BUSY Errors
@@ -693,9 +699,9 @@ void sqlite3_free_table(char **result);
 ** The code above will render a correct SQL statement in the zSQL
 ** variable even if the zText variable is a NULL pointer.
 */
-char *sqlite3_mprintf(const char*,...);
-char *sqlite3_vmprintf(const char*, va_list);
-char *sqlite3_snprintf(int,char*,const char*, ...);
+SQLITE_API char *sqlite3_mprintf(const char*,...);
+SQLITE_API char *sqlite3_vmprintf(const char*, va_list);
+SQLITE_API char *sqlite3_snprintf(int,char*,const char*, ...);
 
 /*
 ** CAPI3REF: Memory Allocation Functions
@@ -706,9 +712,9 @@ char *sqlite3_snprintf(int,char*,const char*, ...);
 ** different.  For maximum portability, it is best not to mix calls
 ** to the standard malloc/realloc/free with the sqlite versions.
 */
-void *sqlite3_malloc(int);
-void *sqlite3_realloc(void*, int);
-void sqlite3_free(void*);
+SQLITE_API void *sqlite3_malloc(int);
+SQLITE_API void *sqlite3_realloc(void*, int);
+SQLITE_API void sqlite3_free(void*);
 
 /*
 ** CAPI3REF: Compile-Time Authorization Callbacks
@@ -848,8 +854,8 @@ int sqlite3_set_authorizer(
 ** The sqlite3_profile() API is currently considered experimental and
 ** is subject to change.
 */
-void *sqlite3_trace(sqlite3*, void(*xTrace)(void*,const char*), void*);
-void *sqlite3_profile(sqlite3*,
+SQLITE_API void *sqlite3_trace(sqlite3*, void(*xTrace)(void*,const char*), void*);
+SQLITE_API void *sqlite3_profile(sqlite3*,
    void(*xProfile)(void*,const char*,sqlite_uint64), void*);
 
 /*
@@ -909,11 +915,11 @@ void sqlite3_progress_handler(sqlite3*, int, int(*)(void*), void*);
 ** defined.  Filenames containing international characters must be converted
 ** to UTF-8 prior to passing them into sqlite3_open().
 */
-int sqlite3_open(
+SQLITE_API int sqlite3_open(
   const char *filename,   /* Database filename (UTF-8) */
   sqlite3 **ppDb          /* OUT: SQLite db handle */
 );
-int sqlite3_open16(
+SQLITE_API int sqlite3_open16(
   const void *filename,   /* Database filename (UTF-16) */
   sqlite3 **ppDb          /* OUT: SQLite db handle */
 );
@@ -946,9 +952,9 @@ int sqlite3_open16(
 ** code returned by this function is associated with the same error as
 ** the strings returned by [sqlite3_errmsg()] and [sqlite3_errmsg16()].
 */
-int sqlite3_errcode(sqlite3 *db);
-const char *sqlite3_errmsg(sqlite3*);
-const void *sqlite3_errmsg16(sqlite3*);
+SQLITE_API int sqlite3_errcode(sqlite3 *db);
+SQLITE_API const char *sqlite3_errmsg(sqlite3*);
+SQLITE_API const void *sqlite3_errmsg16(sqlite3*);
 
 /*
 ** CAPI3REF: SQL Statement Object
@@ -986,10 +992,14 @@ typedef struct sqlite3_stmt sqlite3_stmt;
 ** The second argument "zSql" is the statement to be compiled, encoded
 ** as either UTF-8 or UTF-16.  The sqlite3_prepare() and sqlite3_prepare_v2()
 ** interfaces uses UTF-8 and sqlite3_prepare16() and sqlite3_prepare16_v2()
-** use UTF-16. If the next argument, "nBytes", is less
+** use UTF-16.
+**
+** If the nByte argument is less
 ** than zero, then zSql is read up to the first zero terminator.  If
-** "nBytes" is not less than zero, then it is the length of the string zSql
-** in bytes (not characters).
+** nByte is non-negative, then it is the maximum number of 
+** bytes read from zSql.  When nByte is non-negative, the
+** zSql string ends at either the first '\000' character or 
+** until the nByte-th byte, whichever comes first.
 **
 ** *pzTail is made to point to the first byte past the end of the first
 ** SQL statement in zSql.  This routine only compiles the first statement
@@ -1039,31 +1049,31 @@ typedef struct sqlite3_stmt sqlite3_stmt;
 ** </li>
 ** </ol>
 */
-int sqlite3_prepare(
+SQLITE_API int sqlite3_prepare(
   sqlite3 *db,            /* Database handle */
   const char *zSql,       /* SQL statement, UTF-8 encoded */
-  int nBytes,             /* Length of zSql in bytes. */
+  int nByte,              /* Maximum length of zSql in bytes. */
   sqlite3_stmt **ppStmt,  /* OUT: Statement handle */
   const char **pzTail     /* OUT: Pointer to unused portion of zSql */
 );
 int sqlite3_prepare_v2(
   sqlite3 *db,            /* Database handle */
   const char *zSql,       /* SQL statement, UTF-8 encoded */
-  int nBytes,             /* Length of zSql in bytes. */
+  int nByte,              /* Maximum length of zSql in bytes. */
   sqlite3_stmt **ppStmt,  /* OUT: Statement handle */
   const char **pzTail     /* OUT: Pointer to unused portion of zSql */
 );
-int sqlite3_prepare16(
+SQLITE_API int sqlite3_prepare16(
   sqlite3 *db,            /* Database handle */
   const void *zSql,       /* SQL statement, UTF-16 encoded */
-  int nBytes,             /* Length of zSql in bytes. */
+  int nByte,              /* Maximum length of zSql in bytes. */
   sqlite3_stmt **ppStmt,  /* OUT: Statement handle */
   const void **pzTail     /* OUT: Pointer to unused portion of zSql */
 );
 int sqlite3_prepare16_v2(
   sqlite3 *db,            /* Database handle */
   const void *zSql,       /* SQL statement, UTF-16 encoded */
-  int nBytes,             /* Length of zSql in bytes. */
+  int nByte,              /* Maximum length of zSql in bytes. */
   sqlite3_stmt **ppStmt,  /* OUT: Statement handle */
   const void **pzTail     /* OUT: Pointer to unused portion of zSql */
 );
@@ -1260,10 +1270,16 @@ const void *sqlite3_column_name16(sqlite3_stmt*, int N);
 ** These routines provide a means to determine what column of what
 ** table in which database a result of a SELECT statement comes from.
 ** The name of the database or table or column can be returned as
-** either a UTF8 or UTF16 string.  The returned string is valid until
+** either a UTF8 or UTF16 string.  The _database_ routines return
+** the database name, the _table_ routines return the table name, and
+** the origin_ routines return the column name.
+** The returned string is valid until
 ** the [sqlite3_stmt | prepared statement] is destroyed using
 ** [sqlite3_finalize()] or until the same information is requested
-** again about the same column.
+** again in a different encoding.
+**
+** The names returned are the original un-aliased names of the
+** database, table, and column.
 **
 ** The first argument to the following calls is a 
 ** [sqlite3_stmt | compiled SQL statement].
@@ -1391,7 +1407,7 @@ const void *sqlite3_column_decltype16(sqlite3_stmt*,int);
 ** more specific [SQLITE_ERROR | result codes] are returned directly
 ** by sqlite3_step().  The use of the "v2" interface is recommended.
 */
-int sqlite3_step(sqlite3_stmt*);
+SQLITE_API int sqlite3_step(sqlite3_stmt*);
 
 /*
 ** CAPI3REF:
@@ -1462,8 +1478,6 @@ int sqlite3_data_count(sqlite3_stmt *pStmt);
 ** the value returned by sqlite3_column_type() is undefined.  Future
 ** versions of SQLite may change the behavior of sqlite3_column_type()
 ** following a type conversion.
-**
-*** The sqlite3_column_nm
 **
 ** If the result is a BLOB or UTF-8 string then the sqlite3_column_bytes() 
 ** routine returns the number of bytes in that BLOB or string.
@@ -1587,7 +1601,7 @@ sqlite3_value *sqlite3_column_value(sqlite3_stmt*, int iCol);
 ** depending on the circumstances, and the 
 ** [SQLITE_ERROR | result code] returned will be [SQLITE_ABORT].
 */
-int sqlite3_finalize(sqlite3_stmt *pStmt);
+SQLITE_API int sqlite3_finalize(sqlite3_stmt *pStmt);
 
 /*
 ** CAPI3REF: Reset A Prepared Statement Object
@@ -1599,7 +1613,7 @@ int sqlite3_finalize(sqlite3_stmt *pStmt);
 ** the [sqlite3_bind_blob | sqlite3_bind_*() API] retain their values.
 ** Use [sqlite3_clear_bindings()] to reset the bindings.
 */
-int sqlite3_reset(sqlite3_stmt *pStmt);
+SQLITE_API int sqlite3_reset(sqlite3_stmt *pStmt);
 
 /*
 ** CAPI3REF: Create Or Redefine SQL Functions
@@ -1703,7 +1717,7 @@ int sqlite3_create_function16(
 ** using these functions, we are not going to tell you want they do.
 */
 int sqlite3_aggregate_count(sqlite3_context*);
-int sqlite3_expired(sqlite3_stmt*);
+SQLITE_API int sqlite3_expired(sqlite3_stmt*);
 int sqlite3_transfer_bindings(sqlite3_stmt*, sqlite3_stmt*);
 int sqlite3_global_recover(void);
 
@@ -1990,7 +2004,7 @@ int sqlite3_collation_needed16(
 ** The code to implement this API is not available in the public release
 ** of SQLite.
 */
-int sqlite3_key(
+SQLITE_API int sqlite3_key(
   sqlite3 *db,                   /* Database to be rekeyed */
   const void *pKey, int nKey     /* The key */
 );
@@ -2003,7 +2017,7 @@ int sqlite3_key(
 ** The code to implement this API is not available in the public release
 ** of SQLite.
 */
-int sqlite3_rekey(
+SQLITE_API int sqlite3_rekey(
   sqlite3 *db,                   /* Database to be rekeyed */
   const void *pKey, int nKey     /* The new key */
 );
@@ -2011,7 +2025,7 @@ int sqlite3_rekey(
 /*
 ** CAPI3REF:  Suspend Execution For A Short Time
 **
-** This function causes the current thread to suspect execution
+** This function causes the current thread to suspend execution
 ** a number of milliseconds specified in its parameter.
 **
 ** If the operating system does not support sleep requests with 
@@ -2019,7 +2033,7 @@ int sqlite3_rekey(
 ** the nearest second. The number of milliseconds of sleep actually 
 ** requested from the operating system is returned.
 */
-int sqlite3_sleep(int);
+SQLITE_API int sqlite3_sleep(int);
 
 /*
 ** CAPI3REF:  Name Of The Folder Holding Temporary Files
@@ -2422,6 +2436,8 @@ struct sqlite3_module {
   int (*xFindFunction)(sqlite3_vtab *pVtab, int nArg, const char *zName,
                        void (**pxFunc)(sqlite3_context*,int,sqlite3_value**),
                        void **ppArg);
+
+  int (*xRename)(sqlite3_vtab *pVtab, const char *zNew);
 };
 
 /*
@@ -2514,6 +2530,19 @@ int sqlite3_create_module(
   const char *zName,         /* Name of the module */
   const sqlite3_module *,    /* Methods for the module */
   void *                     /* Client data for xCreate/xConnect */
+);
+
+/*
+** This routine is identical to the sqlite3_create_module() method above,
+** except that it allows a destructor function to be specified. It is
+** even more experimental than the rest of the virtual tables API.
+*/
+int sqlite3_create_module_v2(
+  sqlite3 *db,               /* SQLite connection to register module with */
+  const char *zName,         /* Name of the module */
+  const sqlite3_module *,    /* Methods for the module */
+  void *,                    /* Client data for xCreate/xConnect */
+  void(*xDestroy)(void*)     /* Module destructor function */
 );
 
 /*
@@ -2765,12 +2794,12 @@ int sqlite3_blob_write(sqlite3_blob *, const void *z, int n, int iOffset);
 *************************************************************************
 ** Internal interface definitions for SQLite.
 **
-** @(#) $Id: sqliteInt.h,v 1.572 2007/06/10 22:57:33 drh Exp $
+** @(#) $Id: sqliteInt.h,v 1.578 2007/06/26 10:38:55 danielk1977 Exp $
 */
 #ifndef _SQLITEINT_H_
 #define _SQLITEINT_H_
-/************** Include limits.h in the middle of sqliteInt.h ****************/
-/************** Begin file limits.h ******************************************/
+/************** Include sqliteLimit.h in the middle of sqliteInt.h ***********/
+/************** Begin file sqliteLimit.h *************************************/
 /*
 ** 2007 May 7
 **
@@ -2785,7 +2814,7 @@ int sqlite3_blob_write(sqlite3_blob *, const void *z, int n, int iOffset);
 ** 
 ** This file defines various limits of what SQLite can process.
 **
-** @(#) $Id: limits.h,v 1.9 2007/06/09 09:53:51 drh Exp $
+** @(#) $Id: sqliteLimit.h,v 1.1 2007/06/19 15:23:48 drh Exp $
 */
 
 /*
@@ -2930,7 +2959,7 @@ int sqlite3_blob_write(sqlite3_blob *, const void *z, int n, int iOffset);
 # define SQLITE_MAX_LIKE_PATTERN_LENGTH 50000
 #endif
 
-/************** End of limits.h **********************************************/
+/************** End of sqliteLimit.h *****************************************/
 /************** Continuing where we left off in sqliteInt.h ******************/
 
 
@@ -3056,10 +3085,10 @@ struct HashElem {
 /*
 ** Access routines.  To delete, insert a NULL pointer.
 */
-static void sqlite3HashInit(Hash*, int keytype, int copyKey);
-static void *sqlite3HashInsert(Hash*, const void *pKey, int nKey, void *pData);
-static void *sqlite3HashFind(const Hash*, const void *pKey, int nKey);
-static void sqlite3HashClear(Hash*);
+SQLITE_PRIVATE void sqlite3HashInit(Hash*, int keytype, int copyKey);
+SQLITE_PRIVATE void *sqlite3HashInsert(Hash*, const void *pKey, int nKey, void *pData);
+SQLITE_PRIVATE void *sqlite3HashFind(const Hash*, const void *pKey, int nKey);
+SQLITE_PRIVATE void sqlite3HashClear(Hash*);
 
 /*
 ** Macros for looping over all elements of a hash table.  The idiom is
@@ -3251,9 +3280,7 @@ static void sqlite3HashClear(Hash*);
 #include <assert.h>
 #include <stddef.h>
 
-#if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
-# define isnan(X)  ((X)!=(X))
-#endif
+#define sqlite3_isnan(X)  ((X)!=(X))
 
 /*
 ** If compiling for a processor that lacks floating point support,
@@ -3553,125 +3580,125 @@ typedef struct VdbeOpList VdbeOpList;
 #define OP_Variable                            25
 #define OP_String                              26
 #define OP_RealAffinity                        27
-#define OP_ParseSchema                         28
-#define OP_VOpen                               29
-#define OP_Close                               30
-#define OP_CreateIndex                         31
-#define OP_IsUnique                            32
-#define OP_NotFound                            33
-#define OP_Int64                               34
-#define OP_MustBeInt                           35
-#define OP_Halt                                36
-#define OP_Rowid                               37
-#define OP_IdxLT                               38
-#define OP_AddImm                              39
-#define OP_Statement                           40
-#define OP_RowData                             41
-#define OP_MemMax                              42
-#define OP_Push                                43
+#define OP_VRename                             28
+#define OP_ParseSchema                         29
+#define OP_VOpen                               30
+#define OP_Close                               31
+#define OP_CreateIndex                         32
+#define OP_IsUnique                            33
+#define OP_NotFound                            34
+#define OP_Int64                               35
+#define OP_MustBeInt                           36
+#define OP_Halt                                37
+#define OP_Rowid                               38
+#define OP_IdxLT                               39
+#define OP_AddImm                              40
+#define OP_Statement                           41
+#define OP_RowData                             42
+#define OP_MemMax                              43
+#define OP_Push                                44
 #define OP_Or                                  60   /* same as TK_OR       */
-#define OP_NotExists                           44
-#define OP_MemIncr                             45
-#define OP_Gosub                               46
+#define OP_NotExists                           45
+#define OP_MemIncr                             46
+#define OP_Gosub                               47
 #define OP_Divide                              81   /* same as TK_SLASH    */
-#define OP_Integer                             47
+#define OP_Integer                             48
 #define OP_ToNumeric                          140   /* same as TK_TO_NUMERIC*/
-#define OP_MemInt                              48
-#define OP_Prev                                49
+#define OP_MemInt                              49
+#define OP_Prev                                50
 #define OP_Concat                              83   /* same as TK_CONCAT   */
 #define OP_BitAnd                              74   /* same as TK_BITAND   */
-#define OP_VColumn                             50
-#define OP_CreateTable                         51
-#define OP_Last                                52
+#define OP_VColumn                             51
+#define OP_CreateTable                         52
+#define OP_Last                                53
 #define OP_IsNull                              65   /* same as TK_ISNULL   */
-#define OP_IncrVacuum                          53
-#define OP_IdxRowid                            54
-#define OP_MakeIdxRec                          55
+#define OP_IncrVacuum                          54
+#define OP_IdxRowid                            55
+#define OP_MakeIdxRec                          56
 #define OP_ShiftRight                          77   /* same as TK_RSHIFT   */
-#define OP_ResetCount                          56
-#define OP_FifoWrite                           57
-#define OP_Callback                            58
-#define OP_ContextPush                         59
-#define OP_DropTrigger                         62
-#define OP_DropIndex                           63
-#define OP_IdxGE                               64
-#define OP_IdxDelete                           73
-#define OP_Vacuum                              84
-#define OP_MoveLe                              86
-#define OP_IfNot                               89
-#define OP_DropTable                           90
-#define OP_MakeRecord                          91
+#define OP_ResetCount                          57
+#define OP_FifoWrite                           58
+#define OP_Callback                            59
+#define OP_ContextPush                         62
+#define OP_DropTrigger                         63
+#define OP_DropIndex                           64
+#define OP_IdxGE                               73
+#define OP_IdxDelete                           84
+#define OP_Vacuum                              86
+#define OP_MoveLe                              89
+#define OP_IfNot                               90
+#define OP_DropTable                           91
+#define OP_MakeRecord                          92
 #define OP_ToBlob                             139   /* same as TK_TO_BLOB  */
-#define OP_Delete                              92
-#define OP_AggFinal                            93
+#define OP_Delete                              93
+#define OP_AggFinal                            94
 #define OP_ShiftLeft                           76   /* same as TK_LSHIFT   */
-#define OP_Dup                                 94
-#define OP_Goto                                95
-#define OP_TableLock                           96
-#define OP_FifoRead                            97
-#define OP_Clear                               98
-#define OP_IdxGT                               99
-#define OP_MoveLt                             100
+#define OP_Dup                                 95
+#define OP_Goto                                96
+#define OP_TableLock                           97
+#define OP_FifoRead                            98
+#define OP_Clear                               99
+#define OP_IdxGT                              100
+#define OP_MoveLt                             101
 #define OP_Le                                  70   /* same as TK_LE       */
-#define OP_VerifyCookie                       101
-#define OP_AggStep                            102
-#define OP_Pull                               103
+#define OP_VerifyCookie                       102
+#define OP_AggStep                            103
+#define OP_Pull                               104
 #define OP_ToText                             138   /* same as TK_TO_TEXT  */
 #define OP_Not                                 16   /* same as TK_NOT      */
 #define OP_ToReal                             142   /* same as TK_TO_REAL  */
-#define OP_SetNumColumns                      104
-#define OP_AbsValue                           105
-#define OP_Transaction                        106
-#define OP_VFilter                            107
+#define OP_SetNumColumns                      105
+#define OP_AbsValue                           106
+#define OP_Transaction                        107
+#define OP_VFilter                            108
 #define OP_Negative                            85   /* same as TK_UMINUS   */
 #define OP_Ne                                  67   /* same as TK_NE       */
-#define OP_VDestroy                           108
-#define OP_ContextPop                         109
+#define OP_VDestroy                           109
+#define OP_ContextPop                         110
 #define OP_BitOr                               75   /* same as TK_BITOR    */
-#define OP_Next                               110
-#define OP_IdxInsert                          111
-#define OP_Distinct                           112
+#define OP_Next                               111
+#define OP_IdxInsert                          112
+#define OP_Distinct                           113
 #define OP_Lt                                  71   /* same as TK_LT       */
-#define OP_Insert                             113
-#define OP_Destroy                            114
-#define OP_ReadCookie                         115
-#define OP_ForceInt                           116
-#define OP_LoadAnalysis                       117
-#define OP_Explain                            118
-#define OP_IfMemZero                          119
-#define OP_OpenPseudo                         120
-#define OP_OpenEphemeral                      121
-#define OP_Null                               122
-#define OP_Blob                               123
+#define OP_Insert                             114
+#define OP_Destroy                            115
+#define OP_ReadCookie                         116
+#define OP_ForceInt                           117
+#define OP_LoadAnalysis                       118
+#define OP_Explain                            119
+#define OP_IfMemZero                          120
+#define OP_OpenPseudo                         121
+#define OP_OpenEphemeral                      122
+#define OP_Null                               123
+#define OP_Blob                               124
 #define OP_Add                                 78   /* same as TK_PLUS     */
-#define OP_MemStore                           124
-#define OP_Rewind                             127
-#define OP_MoveGe                             128
-#define OP_VBegin                             129
-#define OP_VUpdate                            130
+#define OP_MemStore                           127
+#define OP_Rewind                             128
+#define OP_MoveGe                             129
+#define OP_VBegin                             130
+#define OP_VUpdate                            131
 #define OP_BitNot                              87   /* same as TK_BITNOT   */
-#define OP_VCreate                            131
-#define OP_MemMove                            132
-#define OP_MemNull                            133
-#define OP_Found                              134
-#define OP_NullRow                            135
+#define OP_VCreate                            132
+#define OP_MemMove                            133
+#define OP_MemNull                            134
+#define OP_Found                              135
+#define OP_NullRow                            136
 
 /* The following opcode values are never used */
-#define OP_NotUsed_136                        136
 #define OP_NotUsed_137                        137
 
 /* Opcodes that are guaranteed to never push a value onto the stack
 ** contain a 1 their corresponding position of the following mask
 ** set.  See the opcodeNoPush() function in vdbeaux.c  */
 #define NOPUSH_MASK_0 0xeeb4
-#define NOPUSH_MASK_1 0x796b
-#define NOPUSH_MASK_2 0x7ddb
-#define NOPUSH_MASK_3 0xff32
+#define NOPUSH_MASK_1 0xf96b
+#define NOPUSH_MASK_2 0xfbb6
+#define NOPUSH_MASK_3 0xfe64
 #define NOPUSH_MASK_4 0xffff
-#define NOPUSH_MASK_5 0xb6f7
-#define NOPUSH_MASK_6 0xfdfd
-#define NOPUSH_MASK_7 0x93b3
-#define NOPUSH_MASK_8 0x7ccf
+#define NOPUSH_MASK_5 0x6ef7
+#define NOPUSH_MASK_6 0xfbfb
+#define NOPUSH_MASK_7 0x8767
+#define NOPUSH_MASK_8 0x7d9f
 #define NOPUSH_MASK_9 0x0000
 
 /************** End of opcodes.h *********************************************/
@@ -3681,37 +3708,37 @@ typedef struct VdbeOpList VdbeOpList;
 ** Prototypes for the VDBE interface.  See comments on the implementation
 ** for a description of what each of these routines does.
 */
-static Vdbe *sqlite3VdbeCreate(sqlite3*);
-static int sqlite3VdbeAddOp(Vdbe*,int,int,int);
-static int sqlite3VdbeOp3(Vdbe*,int,int,int,const char *zP3,int);
-static int sqlite3VdbeAddOpList(Vdbe*, int nOp, VdbeOpList const *aOp);
-static void sqlite3VdbeChangeP1(Vdbe*, int addr, int P1);
-static void sqlite3VdbeChangeP2(Vdbe*, int addr, int P2);
-static void sqlite3VdbeJumpHere(Vdbe*, int addr);
-static void sqlite3VdbeChangeToNoop(Vdbe*, int addr, int N);
-static void sqlite3VdbeChangeP3(Vdbe*, int addr, const char *zP1, int N);
-static VdbeOp *sqlite3VdbeGetOp(Vdbe*, int);
-static int sqlite3VdbeMakeLabel(Vdbe*);
-static void sqlite3VdbeDelete(Vdbe*);
-static void sqlite3VdbeMakeReady(Vdbe*,int,int,int,int);
-static int sqlite3VdbeFinalize(Vdbe*);
-static void sqlite3VdbeResolveLabel(Vdbe*, int);
-static int sqlite3VdbeCurrentAddr(Vdbe*);
+SQLITE_PRIVATE Vdbe *sqlite3VdbeCreate(sqlite3*);
+SQLITE_PRIVATE int sqlite3VdbeAddOp(Vdbe*,int,int,int);
+SQLITE_PRIVATE int sqlite3VdbeOp3(Vdbe*,int,int,int,const char *zP3,int);
+SQLITE_PRIVATE int sqlite3VdbeAddOpList(Vdbe*, int nOp, VdbeOpList const *aOp);
+SQLITE_PRIVATE void sqlite3VdbeChangeP1(Vdbe*, int addr, int P1);
+SQLITE_PRIVATE void sqlite3VdbeChangeP2(Vdbe*, int addr, int P2);
+SQLITE_PRIVATE void sqlite3VdbeJumpHere(Vdbe*, int addr);
+SQLITE_PRIVATE void sqlite3VdbeChangeToNoop(Vdbe*, int addr, int N);
+SQLITE_PRIVATE void sqlite3VdbeChangeP3(Vdbe*, int addr, const char *zP1, int N);
+SQLITE_PRIVATE VdbeOp *sqlite3VdbeGetOp(Vdbe*, int);
+SQLITE_PRIVATE int sqlite3VdbeMakeLabel(Vdbe*);
+SQLITE_PRIVATE void sqlite3VdbeDelete(Vdbe*);
+SQLITE_PRIVATE void sqlite3VdbeMakeReady(Vdbe*,int,int,int,int);
+SQLITE_PRIVATE int sqlite3VdbeFinalize(Vdbe*);
+SQLITE_PRIVATE void sqlite3VdbeResolveLabel(Vdbe*, int);
+SQLITE_PRIVATE int sqlite3VdbeCurrentAddr(Vdbe*);
 #ifdef SQLITE_DEBUG
-static   void sqlite3VdbeTrace(Vdbe*,FILE*);
+SQLITE_PRIVATE   void sqlite3VdbeTrace(Vdbe*,FILE*);
 #endif
-static void sqlite3VdbeResetStepResult(Vdbe*);
-static int sqlite3VdbeReset(Vdbe*);
-static void sqlite3VdbeSetNumCols(Vdbe*,int);
-static int sqlite3VdbeSetColName(Vdbe*, int, int, const char *, int);
-static void sqlite3VdbeCountChanges(Vdbe*);
-static sqlite3 *sqlite3VdbeDb(Vdbe*);
-static void sqlite3VdbeSetSql(Vdbe*, const char *z, int n);
-static const char *sqlite3VdbeGetSql(Vdbe*);
-static void sqlite3VdbeSwap(Vdbe*,Vdbe*);
+SQLITE_PRIVATE void sqlite3VdbeResetStepResult(Vdbe*);
+SQLITE_PRIVATE int sqlite3VdbeReset(Vdbe*);
+SQLITE_PRIVATE void sqlite3VdbeSetNumCols(Vdbe*,int);
+SQLITE_PRIVATE int sqlite3VdbeSetColName(Vdbe*, int, int, const char *, int);
+SQLITE_PRIVATE void sqlite3VdbeCountChanges(Vdbe*);
+SQLITE_PRIVATE sqlite3 *sqlite3VdbeDb(Vdbe*);
+SQLITE_PRIVATE void sqlite3VdbeSetSql(Vdbe*, const char *z, int n);
+SQLITE_PRIVATE const char *sqlite3VdbeGetSql(Vdbe*);
+SQLITE_PRIVATE void sqlite3VdbeSwap(Vdbe*,Vdbe*);
 
 #ifndef NDEBUG
-static   void sqlite3VdbeComment(Vdbe*, const char*, ...);
+SQLITE_PRIVATE   void sqlite3VdbeComment(Vdbe*, const char*, ...);
 # define VdbeComment(X)  sqlite3VdbeComment X
 #else
 # define VdbeComment(X)
@@ -3768,7 +3795,7 @@ typedef struct BtCursor BtCursor;
 typedef struct BtShared BtShared;
 
 
-static int sqlite3BtreeOpen(
+SQLITE_PRIVATE int sqlite3BtreeOpen(
   const char *zFilename,   /* Name of database file to open */
   sqlite3 *db,             /* Associated database connection */
   Btree **,                /* Return open Btree* here */
@@ -3785,39 +3812,39 @@ static int sqlite3BtreeOpen(
 #define BTREE_NO_READLOCK   2  /* Omit readlocks on readonly files */
 #define BTREE_MEMORY        4  /* In-memory DB.  No argument */
 
-static int sqlite3BtreeClose(Btree*);
-static int sqlite3BtreeSetBusyHandler(Btree*,BusyHandler*);
-static int sqlite3BtreeSetCacheSize(Btree*,int);
-static int sqlite3BtreeSetSafetyLevel(Btree*,int,int);
-static int sqlite3BtreeSyncDisabled(Btree*);
-static int sqlite3BtreeSetPageSize(Btree*,int,int);
-static int sqlite3BtreeGetPageSize(Btree*);
-static int sqlite3BtreeMaxPageCount(Btree*,int);
-static int sqlite3BtreeGetReserve(Btree*);
-static int sqlite3BtreeSetAutoVacuum(Btree *, int);
-static int sqlite3BtreeGetAutoVacuum(Btree *);
-static int sqlite3BtreeBeginTrans(Btree*,int);
-static int sqlite3BtreeCommitPhaseOne(Btree*, const char *zMaster);
-static int sqlite3BtreeCommitPhaseTwo(Btree*);
-static int sqlite3BtreeCommit(Btree*);
-static int sqlite3BtreeRollback(Btree*);
-static int sqlite3BtreeBeginStmt(Btree*);
-static int sqlite3BtreeCommitStmt(Btree*);
-static int sqlite3BtreeRollbackStmt(Btree*);
-static int sqlite3BtreeCreateTable(Btree*, int*, int flags);
-static int sqlite3BtreeIsInTrans(Btree*);
-static int sqlite3BtreeIsInStmt(Btree*);
-static int sqlite3BtreeIsInReadTrans(Btree*);
-static void *sqlite3BtreeSchema(Btree *, int, void(*)(void *));
-static int sqlite3BtreeSchemaLocked(Btree *);
-static int sqlite3BtreeLockTable(Btree *, int, u8);
+SQLITE_PRIVATE int sqlite3BtreeClose(Btree*);
+SQLITE_PRIVATE int sqlite3BtreeSetBusyHandler(Btree*,BusyHandler*);
+SQLITE_PRIVATE int sqlite3BtreeSetCacheSize(Btree*,int);
+SQLITE_PRIVATE int sqlite3BtreeSetSafetyLevel(Btree*,int,int);
+SQLITE_PRIVATE int sqlite3BtreeSyncDisabled(Btree*);
+SQLITE_PRIVATE int sqlite3BtreeSetPageSize(Btree*,int,int);
+SQLITE_PRIVATE int sqlite3BtreeGetPageSize(Btree*);
+SQLITE_PRIVATE int sqlite3BtreeMaxPageCount(Btree*,int);
+SQLITE_PRIVATE int sqlite3BtreeGetReserve(Btree*);
+SQLITE_PRIVATE int sqlite3BtreeSetAutoVacuum(Btree *, int);
+SQLITE_PRIVATE int sqlite3BtreeGetAutoVacuum(Btree *);
+SQLITE_PRIVATE int sqlite3BtreeBeginTrans(Btree*,int);
+SQLITE_PRIVATE int sqlite3BtreeCommitPhaseOne(Btree*, const char *zMaster);
+SQLITE_PRIVATE int sqlite3BtreeCommitPhaseTwo(Btree*);
+SQLITE_PRIVATE int sqlite3BtreeCommit(Btree*);
+SQLITE_PRIVATE int sqlite3BtreeRollback(Btree*);
+SQLITE_PRIVATE int sqlite3BtreeBeginStmt(Btree*);
+SQLITE_PRIVATE int sqlite3BtreeCommitStmt(Btree*);
+SQLITE_PRIVATE int sqlite3BtreeRollbackStmt(Btree*);
+SQLITE_PRIVATE int sqlite3BtreeCreateTable(Btree*, int*, int flags);
+SQLITE_PRIVATE int sqlite3BtreeIsInTrans(Btree*);
+SQLITE_PRIVATE int sqlite3BtreeIsInStmt(Btree*);
+SQLITE_PRIVATE int sqlite3BtreeIsInReadTrans(Btree*);
+SQLITE_PRIVATE void *sqlite3BtreeSchema(Btree *, int, void(*)(void *));
+SQLITE_PRIVATE int sqlite3BtreeSchemaLocked(Btree *);
+SQLITE_PRIVATE int sqlite3BtreeLockTable(Btree *, int, u8);
 
-static const char *sqlite3BtreeGetFilename(Btree *);
-static const char *sqlite3BtreeGetDirname(Btree *);
-static const char *sqlite3BtreeGetJournalname(Btree *);
-static int sqlite3BtreeCopyFile(Btree *, Btree *);
+SQLITE_PRIVATE const char *sqlite3BtreeGetFilename(Btree *);
+SQLITE_PRIVATE const char *sqlite3BtreeGetDirname(Btree *);
+SQLITE_PRIVATE const char *sqlite3BtreeGetJournalname(Btree *);
+SQLITE_PRIVATE int sqlite3BtreeCopyFile(Btree *, Btree *);
 
-static int sqlite3BtreeIncrVacuum(Btree *);
+SQLITE_PRIVATE int sqlite3BtreeIncrVacuum(Btree *);
 
 /* The flags parameter to sqlite3BtreeCreateTable can be the bitwise OR
 ** of the following flags:
@@ -3826,12 +3853,12 @@ static int sqlite3BtreeIncrVacuum(Btree *);
 #define BTREE_ZERODATA   2    /* Table has keys only - no data */
 #define BTREE_LEAFDATA   4    /* Data stored in leaves only.  Implies INTKEY */
 
-static int sqlite3BtreeDropTable(Btree*, int, int*);
-static int sqlite3BtreeClearTable(Btree*, int);
-static int sqlite3BtreeGetMeta(Btree*, int idx, u32 *pValue);
-static int sqlite3BtreeUpdateMeta(Btree*, int idx, u32 value);
+SQLITE_PRIVATE int sqlite3BtreeDropTable(Btree*, int, int*);
+SQLITE_PRIVATE int sqlite3BtreeClearTable(Btree*, int);
+SQLITE_PRIVATE int sqlite3BtreeGetMeta(Btree*, int idx, u32 *pValue);
+SQLITE_PRIVATE int sqlite3BtreeUpdateMeta(Btree*, int idx, u32 value);
 
-static int sqlite3BtreeCursor(
+SQLITE_PRIVATE int sqlite3BtreeCursor(
   Btree*,                              /* BTree containing table to open */
   int iTable,                          /* Index of root page */
   int wrFlag,                          /* 1 for writing.  0 for read-only */
@@ -3840,35 +3867,35 @@ static int sqlite3BtreeCursor(
   BtCursor **ppCursor                  /* Returned cursor */
 );
 
-static int sqlite3BtreeCloseCursor(BtCursor*);
-static int sqlite3BtreeMoveto(BtCursor*,const void *pKey,i64 nKey,int bias,int *pRes);
-static int sqlite3BtreeDelete(BtCursor*);
-static int sqlite3BtreeInsert(BtCursor*, const void *pKey, i64 nKey,
+SQLITE_PRIVATE int sqlite3BtreeCloseCursor(BtCursor*);
+SQLITE_PRIVATE int sqlite3BtreeMoveto(BtCursor*,const void *pKey,i64 nKey,int bias,int *pRes);
+SQLITE_PRIVATE int sqlite3BtreeDelete(BtCursor*);
+SQLITE_PRIVATE int sqlite3BtreeInsert(BtCursor*, const void *pKey, i64 nKey,
                                   const void *pData, int nData,
                                   int nZero, int bias);
-static int sqlite3BtreeFirst(BtCursor*, int *pRes);
-static int sqlite3BtreeLast(BtCursor*, int *pRes);
-static int sqlite3BtreeNext(BtCursor*, int *pRes);
-static int sqlite3BtreeEof(BtCursor*);
-static int sqlite3BtreeFlags(BtCursor*);
-static int sqlite3BtreePrevious(BtCursor*, int *pRes);
-static int sqlite3BtreeKeySize(BtCursor*, i64 *pSize);
-static int sqlite3BtreeKey(BtCursor*, u32 offset, u32 amt, void*);
-static const void *sqlite3BtreeKeyFetch(BtCursor*, int *pAmt);
-static const void *sqlite3BtreeDataFetch(BtCursor*, int *pAmt);
-static int sqlite3BtreeDataSize(BtCursor*, u32 *pSize);
-static int sqlite3BtreeData(BtCursor*, u32 offset, u32 amt, void*);
+SQLITE_PRIVATE int sqlite3BtreeFirst(BtCursor*, int *pRes);
+SQLITE_PRIVATE int sqlite3BtreeLast(BtCursor*, int *pRes);
+SQLITE_PRIVATE int sqlite3BtreeNext(BtCursor*, int *pRes);
+SQLITE_PRIVATE int sqlite3BtreeEof(BtCursor*);
+SQLITE_PRIVATE int sqlite3BtreeFlags(BtCursor*);
+SQLITE_PRIVATE int sqlite3BtreePrevious(BtCursor*, int *pRes);
+SQLITE_PRIVATE int sqlite3BtreeKeySize(BtCursor*, i64 *pSize);
+SQLITE_PRIVATE int sqlite3BtreeKey(BtCursor*, u32 offset, u32 amt, void*);
+SQLITE_PRIVATE const void *sqlite3BtreeKeyFetch(BtCursor*, int *pAmt);
+SQLITE_PRIVATE const void *sqlite3BtreeDataFetch(BtCursor*, int *pAmt);
+SQLITE_PRIVATE int sqlite3BtreeDataSize(BtCursor*, u32 *pSize);
+SQLITE_PRIVATE int sqlite3BtreeData(BtCursor*, u32 offset, u32 amt, void*);
 
-static char *sqlite3BtreeIntegrityCheck(Btree*, int *aRoot, int nRoot, int, int*);
-static struct Pager *sqlite3BtreePager(Btree*);
+SQLITE_PRIVATE char *sqlite3BtreeIntegrityCheck(Btree*, int *aRoot, int nRoot, int, int*);
+SQLITE_PRIVATE struct Pager *sqlite3BtreePager(Btree*);
 
-static int sqlite3BtreePutData(BtCursor*, u32 offset, u32 amt, void*);
-static void sqlite3BtreeCacheOverflow(BtCursor *);
+SQLITE_PRIVATE int sqlite3BtreePutData(BtCursor*, u32 offset, u32 amt, void*);
+SQLITE_PRIVATE void sqlite3BtreeCacheOverflow(BtCursor *);
 
 #ifdef SQLITE_TEST
-static int sqlite3BtreeCursorInfo(BtCursor*, int*, int);
-static void sqlite3BtreeCursorList(Btree*);
-static int sqlite3BtreePageDump(Btree*, int, int recursive);
+SQLITE_PRIVATE int sqlite3BtreeCursorInfo(BtCursor*, int*, int);
+SQLITE_PRIVATE void sqlite3BtreeCursorList(Btree*);
+SQLITE_PRIVATE int sqlite3BtreePageDump(Btree*, int, int recursive);
 #endif
 
 #endif /* _BTREE_H_ */
@@ -3933,66 +3960,66 @@ typedef struct PgHdr DbPage;
 ** See source code comments for a detailed description of the following
 ** routines:
 */
-static int sqlite3PagerOpen(Pager **ppPager, const char *zFilename,
+SQLITE_PRIVATE int sqlite3PagerOpen(Pager **ppPager, const char *zFilename,
                      int nExtra, int flags);
-static void sqlite3PagerSetBusyhandler(Pager*, BusyHandler *pBusyHandler);
-static void sqlite3PagerSetDestructor(Pager*, void(*)(DbPage*,int));
-static void sqlite3PagerSetReiniter(Pager*, void(*)(DbPage*,int));
-static int sqlite3PagerSetPagesize(Pager*, int);
-static int sqlite3PagerMaxPageCount(Pager*, int);
-static int sqlite3PagerReadFileheader(Pager*, int, unsigned char*);
-static void sqlite3PagerSetCachesize(Pager*, int);
-static int sqlite3PagerClose(Pager *pPager);
-static int sqlite3PagerAcquire(Pager *pPager, Pgno pgno, DbPage **ppPage, int clrFlag);
+SQLITE_PRIVATE void sqlite3PagerSetBusyhandler(Pager*, BusyHandler *pBusyHandler);
+SQLITE_PRIVATE void sqlite3PagerSetDestructor(Pager*, void(*)(DbPage*,int));
+SQLITE_PRIVATE void sqlite3PagerSetReiniter(Pager*, void(*)(DbPage*,int));
+SQLITE_PRIVATE int sqlite3PagerSetPagesize(Pager*, int);
+SQLITE_PRIVATE int sqlite3PagerMaxPageCount(Pager*, int);
+SQLITE_PRIVATE int sqlite3PagerReadFileheader(Pager*, int, unsigned char*);
+SQLITE_PRIVATE void sqlite3PagerSetCachesize(Pager*, int);
+SQLITE_PRIVATE int sqlite3PagerClose(Pager *pPager);
+SQLITE_PRIVATE int sqlite3PagerAcquire(Pager *pPager, Pgno pgno, DbPage **ppPage, int clrFlag);
 #define sqlite3PagerGet(A,B,C) sqlite3PagerAcquire(A,B,C,0)
-static DbPage *sqlite3PagerLookup(Pager *pPager, Pgno pgno);
-static int sqlite3PagerRef(DbPage*);
-static int sqlite3PagerUnref(DbPage*);
-static int sqlite3PagerWrite(DbPage*);
-static int sqlite3PagerOverwrite(Pager *pPager, Pgno pgno, void*);
-static int sqlite3PagerPagecount(Pager*);
-static int sqlite3PagerTruncate(Pager*,Pgno);
-static int sqlite3PagerBegin(DbPage*, int exFlag);
-static int sqlite3PagerCommitPhaseOne(Pager*,const char *zMaster, Pgno);
-static int sqlite3PagerCommitPhaseTwo(Pager*);
-static int sqlite3PagerRollback(Pager*);
-static int sqlite3PagerIsreadonly(Pager*);
-static int sqlite3PagerStmtBegin(Pager*);
-static int sqlite3PagerStmtCommit(Pager*);
-static int sqlite3PagerStmtRollback(Pager*);
-static void sqlite3PagerDontRollback(DbPage*);
-static void sqlite3PagerDontWrite(DbPage*);
-static int sqlite3PagerRefcount(Pager*);
-static void sqlite3PagerSetSafetyLevel(Pager*,int,int);
-static const char *sqlite3PagerFilename(Pager*);
-static const char *sqlite3PagerDirname(Pager*);
-static const char *sqlite3PagerJournalname(Pager*);
-static int sqlite3PagerNosync(Pager*);
-static int sqlite3PagerMovepage(Pager*,DbPage*,Pgno);
-static void *sqlite3PagerGetData(DbPage *); 
-static void *sqlite3PagerGetExtra(DbPage *); 
-static int sqlite3PagerLockingMode(Pager *, int);
+SQLITE_PRIVATE DbPage *sqlite3PagerLookup(Pager *pPager, Pgno pgno);
+SQLITE_PRIVATE int sqlite3PagerRef(DbPage*);
+SQLITE_PRIVATE int sqlite3PagerUnref(DbPage*);
+SQLITE_PRIVATE int sqlite3PagerWrite(DbPage*);
+SQLITE_PRIVATE int sqlite3PagerOverwrite(Pager *pPager, Pgno pgno, void*);
+SQLITE_PRIVATE int sqlite3PagerPagecount(Pager*);
+SQLITE_PRIVATE int sqlite3PagerTruncate(Pager*,Pgno);
+SQLITE_PRIVATE int sqlite3PagerBegin(DbPage*, int exFlag);
+SQLITE_PRIVATE int sqlite3PagerCommitPhaseOne(Pager*,const char *zMaster, Pgno);
+SQLITE_PRIVATE int sqlite3PagerCommitPhaseTwo(Pager*);
+SQLITE_PRIVATE int sqlite3PagerRollback(Pager*);
+SQLITE_PRIVATE int sqlite3PagerIsreadonly(Pager*);
+SQLITE_PRIVATE int sqlite3PagerStmtBegin(Pager*);
+SQLITE_PRIVATE int sqlite3PagerStmtCommit(Pager*);
+SQLITE_PRIVATE int sqlite3PagerStmtRollback(Pager*);
+SQLITE_PRIVATE void sqlite3PagerDontRollback(DbPage*);
+SQLITE_PRIVATE void sqlite3PagerDontWrite(DbPage*);
+SQLITE_PRIVATE int sqlite3PagerRefcount(Pager*);
+SQLITE_PRIVATE void sqlite3PagerSetSafetyLevel(Pager*,int,int);
+SQLITE_PRIVATE const char *sqlite3PagerFilename(Pager*);
+SQLITE_PRIVATE const char *sqlite3PagerDirname(Pager*);
+SQLITE_PRIVATE const char *sqlite3PagerJournalname(Pager*);
+SQLITE_PRIVATE int sqlite3PagerNosync(Pager*);
+SQLITE_PRIVATE int sqlite3PagerMovepage(Pager*,DbPage*,Pgno);
+SQLITE_PRIVATE void *sqlite3PagerGetData(DbPage *); 
+SQLITE_PRIVATE void *sqlite3PagerGetExtra(DbPage *); 
+SQLITE_PRIVATE int sqlite3PagerLockingMode(Pager *, int);
 
 #if defined(SQLITE_ENABLE_MEMORY_MANAGEMENT) && !defined(SQLITE_OMIT_DISKIO)
-static   int sqlite3PagerReleaseMemory(int);
+SQLITE_PRIVATE   int sqlite3PagerReleaseMemory(int);
 #endif
 
 #ifdef SQLITE_HAS_CODEC
-static   void sqlite3PagerSetCodec(Pager*,void*(*)(void*,void*,Pgno,int),void*);
+SQLITE_PRIVATE   void sqlite3PagerSetCodec(Pager*,void*(*)(void*,void*,Pgno,int),void*);
 #endif
 
 #if !defined(NDEBUG) || defined(SQLITE_TEST)
-static   Pgno sqlite3PagerPagenumber(DbPage*);
-static   int sqlite3PagerIswriteable(DbPage*);
+SQLITE_PRIVATE   Pgno sqlite3PagerPagenumber(DbPage*);
+SQLITE_PRIVATE   int sqlite3PagerIswriteable(DbPage*);
 #endif
 
 #if defined(SQLITE_DEBUG) || defined(SQLITE_TEST)
-static   int sqlite3PagerLockstate(Pager*);
+SQLITE_PRIVATE   int sqlite3PagerLockstate(Pager*);
 #endif
 
 #ifdef SQLITE_TEST
-static   int *sqlite3PagerStats(Pager*);
-static   void sqlite3PagerRefdump(Pager*);
+SQLITE_PRIVATE   int *sqlite3PagerStats(Pager*);
+SQLITE_PRIVATE   void sqlite3PagerRefdump(Pager*);
   int pager3_refinfo_enable;
 #endif
 
@@ -4178,7 +4205,7 @@ typedef struct WhereLevel WhereLevel;
 #     define OS_WIN 1
 #     define OS_UNIX 0
 #     define OS_OS2 0
-#   elif defined(_EMX_) || defined(_OS2) || defined(OS2) || defined(_OS2_) || defined(__OS2__)
+#   elif defined(__EMX__) || defined(_OS2) || defined(OS2) || defined(_OS2_) || defined(__OS2__)
 #     define OS_WIN 0
 #     define OS_UNIX 0
 #     define OS_OS2 1
@@ -4205,11 +4232,15 @@ typedef struct WhereLevel WhereLevel;
 # include <windows.h>
 # define SQLITE_TEMPNAME_SIZE (MAX_PATH+50)
 #elif OS_OS2
+# if (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ >= 3) && defined(OS2_HIGH_MEMORY)
+#  include <os2safe.h> /* has to be included before os2.h for linking to work */
+# endif
 # define INCL_DOSDATETIME
 # define INCL_DOSFILEMGR
 # define INCL_DOSERRORS
 # define INCL_DOSMISC
 # define INCL_DOSPROCESS
+# define INCL_DOSMODULEMGR
 # include <os2.h>
 # define SQLITE_TEMPNAME_SIZE (CCHMAXPATHCOMP)
 #else
@@ -4482,46 +4513,46 @@ extern unsigned int sqlite3_pending_byte;
 /*
 ** Prototypes for operating system interface routines.
 */
-static int sqlite3OsClose(OsFile**);
-static int sqlite3OsOpenDirectory(OsFile*, const char*);
-static int sqlite3OsRead(OsFile*, void*, int amt);
-static int sqlite3OsWrite(OsFile*, const void*, int amt);
-static int sqlite3OsSeek(OsFile*, i64 offset);
-static int sqlite3OsTruncate(OsFile*, i64 size);
-static int sqlite3OsSync(OsFile*, int);
-static void sqlite3OsSetFullSync(OsFile *id, int setting);
-static int sqlite3OsFileSize(OsFile*, i64 *pSize);
-static int sqlite3OsLock(OsFile*, int);
-static int sqlite3OsUnlock(OsFile*, int);
-static int sqlite3OsCheckReservedLock(OsFile *id);
-static int sqlite3OsOpenReadWrite(const char*, OsFile**, int*);
-static int sqlite3OsOpenExclusive(const char*, OsFile**, int);
-static int sqlite3OsOpenReadOnly(const char*, OsFile**);
-static int sqlite3OsDelete(const char*);
-static int sqlite3OsFileExists(const char*);
-static char *sqlite3OsFullPathname(const char*);
-static int sqlite3OsIsDirWritable(char*);
-static int sqlite3OsSyncDirectory(const char*);
-static int sqlite3OsSectorSize(OsFile *id);
-static int sqlite3OsTempFileName(char*);
-static int sqlite3OsRandomSeed(char*);
-static int sqlite3OsSleep(int ms);
-static int sqlite3OsCurrentTime(double*);
-static void sqlite3OsEnterMutex(void);
-static void sqlite3OsLeaveMutex(void);
-static int sqlite3OsInMutex(int);
-static ThreadData *sqlite3OsThreadSpecificData(int);
-static void *sqlite3OsMalloc(int);
-static void *sqlite3OsRealloc(void *, int);
-static void sqlite3OsFree(void *);
-static int sqlite3OsAllocationSize(void *);
-static void *sqlite3OsDlopen(const char*);
-static void *sqlite3OsDlsym(void*, const char*);
-static int sqlite3OsDlclose(void*);
+SQLITE_PRIVATE int sqlite3OsClose(OsFile**);
+SQLITE_PRIVATE int sqlite3OsOpenDirectory(OsFile*, const char*);
+SQLITE_PRIVATE int sqlite3OsRead(OsFile*, void*, int amt);
+SQLITE_PRIVATE int sqlite3OsWrite(OsFile*, const void*, int amt);
+SQLITE_PRIVATE int sqlite3OsSeek(OsFile*, i64 offset);
+SQLITE_PRIVATE int sqlite3OsTruncate(OsFile*, i64 size);
+SQLITE_PRIVATE int sqlite3OsSync(OsFile*, int);
+SQLITE_PRIVATE void sqlite3OsSetFullSync(OsFile *id, int setting);
+SQLITE_PRIVATE int sqlite3OsFileSize(OsFile*, i64 *pSize);
+SQLITE_PRIVATE int sqlite3OsLock(OsFile*, int);
+SQLITE_PRIVATE int sqlite3OsUnlock(OsFile*, int);
+SQLITE_PRIVATE int sqlite3OsCheckReservedLock(OsFile *id);
+SQLITE_PRIVATE int sqlite3OsOpenReadWrite(const char*, OsFile**, int*);
+SQLITE_PRIVATE int sqlite3OsOpenExclusive(const char*, OsFile**, int);
+SQLITE_PRIVATE int sqlite3OsOpenReadOnly(const char*, OsFile**);
+SQLITE_PRIVATE int sqlite3OsDelete(const char*);
+SQLITE_PRIVATE int sqlite3OsFileExists(const char*);
+SQLITE_PRIVATE char *sqlite3OsFullPathname(const char*);
+SQLITE_PRIVATE int sqlite3OsIsDirWritable(char*);
+SQLITE_PRIVATE int sqlite3OsSyncDirectory(const char*);
+SQLITE_PRIVATE int sqlite3OsSectorSize(OsFile *id);
+SQLITE_PRIVATE int sqlite3OsTempFileName(char*);
+SQLITE_PRIVATE int sqlite3OsRandomSeed(char*);
+SQLITE_PRIVATE int sqlite3OsSleep(int ms);
+SQLITE_PRIVATE int sqlite3OsCurrentTime(double*);
+SQLITE_PRIVATE void sqlite3OsEnterMutex(void);
+SQLITE_PRIVATE void sqlite3OsLeaveMutex(void);
+SQLITE_PRIVATE int sqlite3OsInMutex(int);
+SQLITE_PRIVATE ThreadData *sqlite3OsThreadSpecificData(int);
+SQLITE_PRIVATE void *sqlite3OsMalloc(int);
+SQLITE_PRIVATE void *sqlite3OsRealloc(void *, int);
+SQLITE_PRIVATE void sqlite3OsFree(void *);
+SQLITE_PRIVATE int sqlite3OsAllocationSize(void *);
+SQLITE_PRIVATE void *sqlite3OsDlopen(const char*);
+SQLITE_PRIVATE void *sqlite3OsDlsym(void*, const char*);
+SQLITE_PRIVATE int sqlite3OsDlclose(void*);
 
 #if defined(SQLITE_TEST) || defined(SQLITE_DEBUG)
-static   int sqlite3OsFileHandle(OsFile *id);
-static   int sqlite3OsLockState(OsFile *id);
+SQLITE_PRIVATE   int sqlite3OsFileHandle(OsFile *id);
+SQLITE_PRIVATE   int sqlite3OsLockState(OsFile *id);
 #endif
 
 /*
@@ -4922,6 +4953,7 @@ struct Module {
   const sqlite3_module *pModule;       /* Callback pointers */
   const char *zName;                   /* Name passed to create_module() */
   void *pAux;                          /* pAux passed to create_module() */
+  void (*xDestroy)(void *);            /* Module destructor function */
 };
 
 /*
@@ -4943,6 +4975,9 @@ struct Column {
   u8 notNull;      /* True if there is a NOT NULL constraint */
   u8 isPrimKey;    /* True if this column is part of the PRIMARY KEY */
   char affinity;   /* One of the SQLITE_AFF_... values */
+#ifndef SQLITE_OMIT_VIRTUALTABLE
+  u8 isHidden;     /* True if this column is 'hidden' */
+#endif
 };
 
 /*
@@ -5081,9 +5116,11 @@ struct Table {
 ** table support is omitted from the build.
 */
 #ifndef SQLITE_OMIT_VIRTUALTABLE
-#  define IsVirtual(X) ((X)->isVirtual)
+#  define IsVirtual(X)      ((X)->isVirtual)
+#  define IsHiddenColumn(X) ((X)->isHidden)
 #else
-#  define IsVirtual(X) 0
+#  define IsVirtual(X)      0
+#  define IsHiddenColumn(X) 0
 #endif
 
 /*
@@ -5951,7 +5988,7 @@ extern const unsigned char sqlite3UtfTrans1[];
 ** corruption is first detected.
 */
 #ifdef SQLITE_DEBUG
-static   int sqlite3Corrupt(void);
+SQLITE_PRIVATE   int sqlite3Corrupt(void);
 # define SQLITE_CORRUPT_BKPT sqlite3Corrupt()
 #else
 # define SQLITE_CORRUPT_BKPT SQLITE_CORRUPT
@@ -5960,170 +5997,170 @@ static   int sqlite3Corrupt(void);
 /*
 ** Internal function prototypes
 */
-static int sqlite3StrICmp(const char *, const char *);
-static int sqlite3StrNICmp(const char *, const char *, int);
-static int sqlite3IsNumber(const char*, int*, u8);
+SQLITE_PRIVATE int sqlite3StrICmp(const char *, const char *);
+SQLITE_PRIVATE int sqlite3StrNICmp(const char *, const char *, int);
+SQLITE_PRIVATE int sqlite3IsNumber(const char*, int*, u8);
 
-static void *sqlite3Malloc(int,int);
-static void *sqlite3MallocRaw(int,int);
-static void *sqlite3Realloc(void*,int);
-static char *sqlite3StrDup(const char*);
-static char *sqlite3StrNDup(const char*, int);
+SQLITE_PRIVATE void *sqlite3Malloc(int,int);
+SQLITE_PRIVATE void *sqlite3MallocRaw(int,int);
+SQLITE_PRIVATE void *sqlite3Realloc(void*,int);
+SQLITE_PRIVATE char *sqlite3StrDup(const char*);
+SQLITE_PRIVATE char *sqlite3StrNDup(const char*, int);
 # define sqlite3CheckMemory(a,b)
-static void *sqlite3ReallocOrFree(void*,int);
-static void sqlite3FreeX(void*);
-static void *sqlite3MallocX(int);
+SQLITE_PRIVATE void *sqlite3ReallocOrFree(void*,int);
+SQLITE_PRIVATE void sqlite3FreeX(void*);
+SQLITE_PRIVATE void *sqlite3MallocX(int);
 #ifdef SQLITE_ENABLE_MEMORY_MANAGEMENT
-static   int sqlite3AllocSize(void *);
+SQLITE_PRIVATE   int sqlite3AllocSize(void *);
 #endif
 
-static char *sqlite3MPrintf(const char*, ...);
-static char *sqlite3VMPrintf(const char*, va_list);
+SQLITE_PRIVATE char *sqlite3MPrintf(const char*, ...);
+SQLITE_PRIVATE char *sqlite3VMPrintf(const char*, va_list);
 #if defined(SQLITE_TEST) || defined(SQLITE_DEBUG)
-static   void sqlite3DebugPrintf(const char*, ...);
-static   void *sqlite3TextToPtr(const char*);
+SQLITE_PRIVATE   void sqlite3DebugPrintf(const char*, ...);
+SQLITE_PRIVATE   void *sqlite3TextToPtr(const char*);
 #endif
-static void sqlite3SetString(char **, ...);
-static void sqlite3ErrorMsg(Parse*, const char*, ...);
-static void sqlite3ErrorClear(Parse*);
-static void sqlite3Dequote(char*);
-static void sqlite3DequoteExpr(Expr*);
-static int sqlite3KeywordCode(const unsigned char*, int);
-static int sqlite3RunParser(Parse*, const char*, char **);
-static void sqlite3FinishCoding(Parse*);
-static Expr *sqlite3Expr(int, Expr*, Expr*, const Token*);
-static Expr *sqlite3ExprOrFree(int, Expr*, Expr*, const Token*);
-static Expr *sqlite3RegisterExpr(Parse*,Token*);
-static Expr *sqlite3ExprAnd(Expr*, Expr*);
-static void sqlite3ExprSpan(Expr*,Token*,Token*);
-static Expr *sqlite3ExprFunction(ExprList*, Token*);
-static void sqlite3ExprAssignVarNumber(Parse*, Expr*);
-static void sqlite3ExprDelete(Expr*);
-static ExprList *sqlite3ExprListAppend(ExprList*,Expr*,Token*);
-static void sqlite3ExprListDelete(ExprList*);
-static int sqlite3Init(sqlite3*, char**);
-static int sqlite3InitCallback(void*, int, char**, char**);
-static void sqlite3Pragma(Parse*,Token*,Token*,Token*,int);
-static void sqlite3ResetInternalSchema(sqlite3*, int);
-static void sqlite3BeginParse(Parse*,int);
-static void sqlite3CommitInternalChanges(sqlite3*);
-static Table *sqlite3ResultSetOfSelect(Parse*,char*,Select*);
-static void sqlite3OpenMasterTable(Parse *, int);
-static void sqlite3StartTable(Parse*,Token*,Token*,int,int,int,int);
-static void sqlite3AddColumn(Parse*,Token*);
-static void sqlite3AddNotNull(Parse*, int);
-static void sqlite3AddPrimaryKey(Parse*, ExprList*, int, int, int);
-static void sqlite3AddCheckConstraint(Parse*, Expr*);
-static void sqlite3AddColumnType(Parse*,Token*);
-static void sqlite3AddDefaultValue(Parse*,Expr*);
-static void sqlite3AddCollateType(Parse*, const char*, int);
-static void sqlite3EndTable(Parse*,Token*,Token*,Select*);
+SQLITE_PRIVATE void sqlite3SetString(char **, ...);
+SQLITE_PRIVATE void sqlite3ErrorMsg(Parse*, const char*, ...);
+SQLITE_PRIVATE void sqlite3ErrorClear(Parse*);
+SQLITE_PRIVATE void sqlite3Dequote(char*);
+SQLITE_PRIVATE void sqlite3DequoteExpr(Expr*);
+SQLITE_PRIVATE int sqlite3KeywordCode(const unsigned char*, int);
+SQLITE_PRIVATE int sqlite3RunParser(Parse*, const char*, char **);
+SQLITE_PRIVATE void sqlite3FinishCoding(Parse*);
+SQLITE_PRIVATE Expr *sqlite3Expr(int, Expr*, Expr*, const Token*);
+SQLITE_PRIVATE Expr *sqlite3ExprOrFree(int, Expr*, Expr*, const Token*);
+SQLITE_PRIVATE Expr *sqlite3RegisterExpr(Parse*,Token*);
+SQLITE_PRIVATE Expr *sqlite3ExprAnd(Expr*, Expr*);
+SQLITE_PRIVATE void sqlite3ExprSpan(Expr*,Token*,Token*);
+SQLITE_PRIVATE Expr *sqlite3ExprFunction(ExprList*, Token*);
+SQLITE_PRIVATE void sqlite3ExprAssignVarNumber(Parse*, Expr*);
+SQLITE_PRIVATE void sqlite3ExprDelete(Expr*);
+SQLITE_PRIVATE ExprList *sqlite3ExprListAppend(ExprList*,Expr*,Token*);
+SQLITE_PRIVATE void sqlite3ExprListDelete(ExprList*);
+SQLITE_PRIVATE int sqlite3Init(sqlite3*, char**);
+SQLITE_PRIVATE int sqlite3InitCallback(void*, int, char**, char**);
+SQLITE_PRIVATE void sqlite3Pragma(Parse*,Token*,Token*,Token*,int);
+SQLITE_PRIVATE void sqlite3ResetInternalSchema(sqlite3*, int);
+SQLITE_PRIVATE void sqlite3BeginParse(Parse*,int);
+SQLITE_PRIVATE void sqlite3CommitInternalChanges(sqlite3*);
+SQLITE_PRIVATE Table *sqlite3ResultSetOfSelect(Parse*,char*,Select*);
+SQLITE_PRIVATE void sqlite3OpenMasterTable(Parse *, int);
+SQLITE_PRIVATE void sqlite3StartTable(Parse*,Token*,Token*,int,int,int,int);
+SQLITE_PRIVATE void sqlite3AddColumn(Parse*,Token*);
+SQLITE_PRIVATE void sqlite3AddNotNull(Parse*, int);
+SQLITE_PRIVATE void sqlite3AddPrimaryKey(Parse*, ExprList*, int, int, int);
+SQLITE_PRIVATE void sqlite3AddCheckConstraint(Parse*, Expr*);
+SQLITE_PRIVATE void sqlite3AddColumnType(Parse*,Token*);
+SQLITE_PRIVATE void sqlite3AddDefaultValue(Parse*,Expr*);
+SQLITE_PRIVATE void sqlite3AddCollateType(Parse*, const char*, int);
+SQLITE_PRIVATE void sqlite3EndTable(Parse*,Token*,Token*,Select*);
 
-static void sqlite3CreateView(Parse*,Token*,Token*,Token*,Select*,int,int);
+SQLITE_PRIVATE void sqlite3CreateView(Parse*,Token*,Token*,Token*,Select*,int,int);
 
 #if !defined(SQLITE_OMIT_VIEW) || !defined(SQLITE_OMIT_VIRTUALTABLE)
-static   int sqlite3ViewGetColumnNames(Parse*,Table*);
+SQLITE_PRIVATE   int sqlite3ViewGetColumnNames(Parse*,Table*);
 #else
 # define sqlite3ViewGetColumnNames(A,B) 0
 #endif
 
-static void sqlite3DropTable(Parse*, SrcList*, int, int);
-static void sqlite3DeleteTable(Table*);
-static void sqlite3Insert(Parse*, SrcList*, ExprList*, Select*, IdList*, int);
-static void *sqlite3ArrayAllocate(void*,int,int,int*,int*,int*);
-static IdList *sqlite3IdListAppend(IdList*, Token*);
-static int sqlite3IdListIndex(IdList*,const char*);
-static SrcList *sqlite3SrcListAppend(SrcList*, Token*, Token*);
-static SrcList *sqlite3SrcListAppendFromTerm(SrcList*, Token*, Token*, Token*,
+SQLITE_PRIVATE void sqlite3DropTable(Parse*, SrcList*, int, int);
+SQLITE_PRIVATE void sqlite3DeleteTable(Table*);
+SQLITE_PRIVATE void sqlite3Insert(Parse*, SrcList*, ExprList*, Select*, IdList*, int);
+SQLITE_PRIVATE void *sqlite3ArrayAllocate(void*,int,int,int*,int*,int*);
+SQLITE_PRIVATE IdList *sqlite3IdListAppend(IdList*, Token*);
+SQLITE_PRIVATE int sqlite3IdListIndex(IdList*,const char*);
+SQLITE_PRIVATE SrcList *sqlite3SrcListAppend(SrcList*, Token*, Token*);
+SQLITE_PRIVATE SrcList *sqlite3SrcListAppendFromTerm(SrcList*, Token*, Token*, Token*,
                                       Select*, Expr*, IdList*);
-static void sqlite3SrcListShiftJoinType(SrcList*);
-static void sqlite3SrcListAssignCursors(Parse*, SrcList*);
-static void sqlite3IdListDelete(IdList*);
-static void sqlite3SrcListDelete(SrcList*);
-static void sqlite3CreateIndex(Parse*,Token*,Token*,SrcList*,ExprList*,int,Token*,
+SQLITE_PRIVATE void sqlite3SrcListShiftJoinType(SrcList*);
+SQLITE_PRIVATE void sqlite3SrcListAssignCursors(Parse*, SrcList*);
+SQLITE_PRIVATE void sqlite3IdListDelete(IdList*);
+SQLITE_PRIVATE void sqlite3SrcListDelete(SrcList*);
+SQLITE_PRIVATE void sqlite3CreateIndex(Parse*,Token*,Token*,SrcList*,ExprList*,int,Token*,
                         Token*, int, int);
-static void sqlite3DropIndex(Parse*, SrcList*, int);
-static int sqlite3Select(Parse*, Select*, int, int, Select*, int, int*, char *aff);
-static Select *sqlite3SelectNew(ExprList*,SrcList*,Expr*,ExprList*,Expr*,ExprList*,
+SQLITE_PRIVATE void sqlite3DropIndex(Parse*, SrcList*, int);
+SQLITE_PRIVATE int sqlite3Select(Parse*, Select*, int, int, Select*, int, int*, char *aff);
+SQLITE_PRIVATE Select *sqlite3SelectNew(ExprList*,SrcList*,Expr*,ExprList*,Expr*,ExprList*,
                         int,Expr*,Expr*);
-static void sqlite3SelectDelete(Select*);
-static Table *sqlite3SrcListLookup(Parse*, SrcList*);
-static int sqlite3IsReadOnly(Parse*, Table*, int);
-static void sqlite3OpenTable(Parse*, int iCur, int iDb, Table*, int);
-static void sqlite3DeleteFrom(Parse*, SrcList*, Expr*);
-static void sqlite3Update(Parse*, SrcList*, ExprList*, Expr*, int);
-static WhereInfo *sqlite3WhereBegin(Parse*, SrcList*, Expr*, ExprList**);
-static void sqlite3WhereEnd(WhereInfo*);
-static void sqlite3ExprCodeGetColumn(Vdbe*, Table*, int, int);
-static void sqlite3ExprCode(Parse*, Expr*);
-static void sqlite3ExprCodeAndCache(Parse*, Expr*);
-static int sqlite3ExprCodeExprList(Parse*, ExprList*);
-static void sqlite3ExprIfTrue(Parse*, Expr*, int, int);
-static void sqlite3ExprIfFalse(Parse*, Expr*, int, int);
-static Table *sqlite3FindTable(sqlite3*,const char*, const char*);
-static Table *sqlite3LocateTable(Parse*,const char*, const char*);
-static Index *sqlite3FindIndex(sqlite3*,const char*, const char*);
-static void sqlite3UnlinkAndDeleteTable(sqlite3*,int,const char*);
-static void sqlite3UnlinkAndDeleteIndex(sqlite3*,int,const char*);
-static void sqlite3Vacuum(Parse*);
-static int sqlite3RunVacuum(char**, sqlite3*);
-static char *sqlite3NameFromToken(Token*);
-static int sqlite3ExprCompare(Expr*, Expr*);
+SQLITE_PRIVATE void sqlite3SelectDelete(Select*);
+SQLITE_PRIVATE Table *sqlite3SrcListLookup(Parse*, SrcList*);
+SQLITE_PRIVATE int sqlite3IsReadOnly(Parse*, Table*, int);
+SQLITE_PRIVATE void sqlite3OpenTable(Parse*, int iCur, int iDb, Table*, int);
+SQLITE_PRIVATE void sqlite3DeleteFrom(Parse*, SrcList*, Expr*);
+SQLITE_PRIVATE void sqlite3Update(Parse*, SrcList*, ExprList*, Expr*, int);
+SQLITE_PRIVATE WhereInfo *sqlite3WhereBegin(Parse*, SrcList*, Expr*, ExprList**);
+SQLITE_PRIVATE void sqlite3WhereEnd(WhereInfo*);
+SQLITE_PRIVATE void sqlite3ExprCodeGetColumn(Vdbe*, Table*, int, int);
+SQLITE_PRIVATE void sqlite3ExprCode(Parse*, Expr*);
+SQLITE_PRIVATE void sqlite3ExprCodeAndCache(Parse*, Expr*);
+SQLITE_PRIVATE int sqlite3ExprCodeExprList(Parse*, ExprList*);
+SQLITE_PRIVATE void sqlite3ExprIfTrue(Parse*, Expr*, int, int);
+SQLITE_PRIVATE void sqlite3ExprIfFalse(Parse*, Expr*, int, int);
+SQLITE_PRIVATE Table *sqlite3FindTable(sqlite3*,const char*, const char*);
+SQLITE_PRIVATE Table *sqlite3LocateTable(Parse*,const char*, const char*);
+SQLITE_PRIVATE Index *sqlite3FindIndex(sqlite3*,const char*, const char*);
+SQLITE_PRIVATE void sqlite3UnlinkAndDeleteTable(sqlite3*,int,const char*);
+SQLITE_PRIVATE void sqlite3UnlinkAndDeleteIndex(sqlite3*,int,const char*);
+SQLITE_PRIVATE void sqlite3Vacuum(Parse*);
+SQLITE_PRIVATE int sqlite3RunVacuum(char**, sqlite3*);
+SQLITE_PRIVATE char *sqlite3NameFromToken(Token*);
+SQLITE_PRIVATE int sqlite3ExprCompare(Expr*, Expr*);
 int sqliteFuncId(Token*);
-static int sqlite3ExprResolveNames(NameContext *, Expr *);
-static int sqlite3ExprAnalyzeAggregates(NameContext*, Expr*);
-static int sqlite3ExprAnalyzeAggList(NameContext*,ExprList*);
-static Vdbe *sqlite3GetVdbe(Parse*);
-static Expr *sqlite3CreateIdExpr(const char*);
-static void sqlite3Randomness(int, void*);
-static void sqlite3RollbackAll(sqlite3*);
-static void sqlite3CodeVerifySchema(Parse*, int);
-static void sqlite3BeginTransaction(Parse*, int);
-static void sqlite3CommitTransaction(Parse*);
-static void sqlite3RollbackTransaction(Parse*);
-static int sqlite3ExprIsConstant(Expr*);
-static int sqlite3ExprIsConstantNotJoin(Expr*);
-static int sqlite3ExprIsConstantOrFunction(Expr*);
-static int sqlite3ExprIsInteger(Expr*, int*);
-static int sqlite3IsRowid(const char*);
-static void sqlite3GenerateRowDelete(sqlite3*, Vdbe*, Table*, int, int);
-static void sqlite3GenerateRowIndexDelete(Vdbe*, Table*, int, char*);
-static void sqlite3GenerateIndexKey(Vdbe*, Index*, int);
-static void sqlite3GenerateConstraintChecks(Parse*,Table*,int,char*,int,int,int,int);
-static void sqlite3CompleteInsertion(Parse*, Table*, int, char*, int, int, int, int);
-static void sqlite3OpenTableAndIndices(Parse*, Table*, int, int);
-static void sqlite3BeginWriteOperation(Parse*, int, int);
-static Expr *sqlite3ExprDup(Expr*);
-static void sqlite3TokenCopy(Token*, Token*);
-static ExprList *sqlite3ExprListDup(ExprList*);
-static SrcList *sqlite3SrcListDup(SrcList*);
-static IdList *sqlite3IdListDup(IdList*);
-static Select *sqlite3SelectDup(Select*);
-static FuncDef *sqlite3FindFunction(sqlite3*,const char*,int,int,u8,int);
-static void sqlite3RegisterBuiltinFunctions(sqlite3*);
-static void sqlite3RegisterDateTimeFunctions(sqlite3*);
-static int sqlite3SafetyOn(sqlite3*);
-static int sqlite3SafetyOff(sqlite3*);
-static int sqlite3SafetyCheck(sqlite3*);
-static void sqlite3ChangeCookie(sqlite3*, Vdbe*, int);
+SQLITE_PRIVATE int sqlite3ExprResolveNames(NameContext *, Expr *);
+SQLITE_PRIVATE int sqlite3ExprAnalyzeAggregates(NameContext*, Expr*);
+SQLITE_PRIVATE int sqlite3ExprAnalyzeAggList(NameContext*,ExprList*);
+SQLITE_PRIVATE Vdbe *sqlite3GetVdbe(Parse*);
+SQLITE_PRIVATE Expr *sqlite3CreateIdExpr(const char*);
+SQLITE_PRIVATE void sqlite3Randomness(int, void*);
+SQLITE_PRIVATE void sqlite3RollbackAll(sqlite3*);
+SQLITE_PRIVATE void sqlite3CodeVerifySchema(Parse*, int);
+SQLITE_PRIVATE void sqlite3BeginTransaction(Parse*, int);
+SQLITE_PRIVATE void sqlite3CommitTransaction(Parse*);
+SQLITE_PRIVATE void sqlite3RollbackTransaction(Parse*);
+SQLITE_PRIVATE int sqlite3ExprIsConstant(Expr*);
+SQLITE_PRIVATE int sqlite3ExprIsConstantNotJoin(Expr*);
+SQLITE_PRIVATE int sqlite3ExprIsConstantOrFunction(Expr*);
+SQLITE_PRIVATE int sqlite3ExprIsInteger(Expr*, int*);
+SQLITE_PRIVATE int sqlite3IsRowid(const char*);
+SQLITE_PRIVATE void sqlite3GenerateRowDelete(sqlite3*, Vdbe*, Table*, int, int);
+SQLITE_PRIVATE void sqlite3GenerateRowIndexDelete(Vdbe*, Table*, int, char*);
+SQLITE_PRIVATE void sqlite3GenerateIndexKey(Vdbe*, Index*, int);
+SQLITE_PRIVATE void sqlite3GenerateConstraintChecks(Parse*,Table*,int,char*,int,int,int,int);
+SQLITE_PRIVATE void sqlite3CompleteInsertion(Parse*, Table*, int, char*, int, int, int, int);
+SQLITE_PRIVATE void sqlite3OpenTableAndIndices(Parse*, Table*, int, int);
+SQLITE_PRIVATE void sqlite3BeginWriteOperation(Parse*, int, int);
+SQLITE_PRIVATE Expr *sqlite3ExprDup(Expr*);
+SQLITE_PRIVATE void sqlite3TokenCopy(Token*, Token*);
+SQLITE_PRIVATE ExprList *sqlite3ExprListDup(ExprList*);
+SQLITE_PRIVATE SrcList *sqlite3SrcListDup(SrcList*);
+SQLITE_PRIVATE IdList *sqlite3IdListDup(IdList*);
+SQLITE_PRIVATE Select *sqlite3SelectDup(Select*);
+SQLITE_PRIVATE FuncDef *sqlite3FindFunction(sqlite3*,const char*,int,int,u8,int);
+SQLITE_PRIVATE void sqlite3RegisterBuiltinFunctions(sqlite3*);
+SQLITE_PRIVATE void sqlite3RegisterDateTimeFunctions(sqlite3*);
+SQLITE_PRIVATE int sqlite3SafetyOn(sqlite3*);
+SQLITE_PRIVATE int sqlite3SafetyOff(sqlite3*);
+SQLITE_PRIVATE int sqlite3SafetyCheck(sqlite3*);
+SQLITE_PRIVATE void sqlite3ChangeCookie(sqlite3*, Vdbe*, int);
 
 #ifndef SQLITE_OMIT_TRIGGER
-static   void sqlite3BeginTrigger(Parse*, Token*,Token*,int,int,IdList*,SrcList*,
+SQLITE_PRIVATE   void sqlite3BeginTrigger(Parse*, Token*,Token*,int,int,IdList*,SrcList*,
                            Expr*,int, int);
-static   void sqlite3FinishTrigger(Parse*, TriggerStep*, Token*);
-static   void sqlite3DropTrigger(Parse*, SrcList*, int);
-static   void sqlite3DropTriggerPtr(Parse*, Trigger*);
-static   int sqlite3TriggersExist(Parse*, Table*, int, ExprList*);
-static   int sqlite3CodeRowTrigger(Parse*, int, ExprList*, int, Table *, int, int, 
+SQLITE_PRIVATE   void sqlite3FinishTrigger(Parse*, TriggerStep*, Token*);
+SQLITE_PRIVATE   void sqlite3DropTrigger(Parse*, SrcList*, int);
+SQLITE_PRIVATE   void sqlite3DropTriggerPtr(Parse*, Trigger*);
+SQLITE_PRIVATE   int sqlite3TriggersExist(Parse*, Table*, int, ExprList*);
+SQLITE_PRIVATE   int sqlite3CodeRowTrigger(Parse*, int, ExprList*, int, Table *, int, int, 
                            int, int);
   void sqliteViewTriggers(Parse*, Table*, Expr*, int, ExprList*);
-static   void sqlite3DeleteTriggerStep(TriggerStep*);
-static   TriggerStep *sqlite3TriggerSelectStep(Select*);
-static   TriggerStep *sqlite3TriggerInsertStep(Token*, IdList*, ExprList*,Select*,int);
-static   TriggerStep *sqlite3TriggerUpdateStep(Token*, ExprList*, Expr*, int);
-static   TriggerStep *sqlite3TriggerDeleteStep(Token*, Expr*);
-static   void sqlite3DeleteTrigger(Trigger*);
-static   void sqlite3UnlinkAndDeleteTrigger(sqlite3*,int,const char*);
+SQLITE_PRIVATE   void sqlite3DeleteTriggerStep(TriggerStep*);
+SQLITE_PRIVATE   TriggerStep *sqlite3TriggerSelectStep(Select*);
+SQLITE_PRIVATE   TriggerStep *sqlite3TriggerInsertStep(Token*, IdList*, ExprList*,Select*,int);
+SQLITE_PRIVATE   TriggerStep *sqlite3TriggerUpdateStep(Token*, ExprList*, Expr*, int);
+SQLITE_PRIVATE   TriggerStep *sqlite3TriggerDeleteStep(Token*, Expr*);
+SQLITE_PRIVATE   void sqlite3DeleteTrigger(Trigger*);
+SQLITE_PRIVATE   void sqlite3UnlinkAndDeleteTrigger(sqlite3*,int,const char*);
 #else
 # define sqlite3TriggersExist(A,B,C,D,E,F) 0
 # define sqlite3DeleteTrigger(A)
@@ -6132,130 +6169,130 @@ static   void sqlite3UnlinkAndDeleteTrigger(sqlite3*,int,const char*);
 # define sqlite3CodeRowTrigger(A,B,C,D,E,F,G,H,I) 0
 #endif
 
-static int sqlite3JoinType(Parse*, Token*, Token*, Token*);
-static void sqlite3CreateForeignKey(Parse*, ExprList*, Token*, ExprList*, int);
-static void sqlite3DeferForeignKey(Parse*, int);
+SQLITE_PRIVATE int sqlite3JoinType(Parse*, Token*, Token*, Token*);
+SQLITE_PRIVATE void sqlite3CreateForeignKey(Parse*, ExprList*, Token*, ExprList*, int);
+SQLITE_PRIVATE void sqlite3DeferForeignKey(Parse*, int);
 #ifndef SQLITE_OMIT_AUTHORIZATION
-static   void sqlite3AuthRead(Parse*,Expr*,SrcList*);
-static   int sqlite3AuthCheck(Parse*,int, const char*, const char*, const char*);
-static   void sqlite3AuthContextPush(Parse*, AuthContext*, const char*);
-static   void sqlite3AuthContextPop(AuthContext*);
+SQLITE_PRIVATE   void sqlite3AuthRead(Parse*,Expr*,SrcList*);
+SQLITE_PRIVATE   int sqlite3AuthCheck(Parse*,int, const char*, const char*, const char*);
+SQLITE_PRIVATE   void sqlite3AuthContextPush(Parse*, AuthContext*, const char*);
+SQLITE_PRIVATE   void sqlite3AuthContextPop(AuthContext*);
 #else
 # define sqlite3AuthRead(a,b,c)
 # define sqlite3AuthCheck(a,b,c,d,e)    SQLITE_OK
 # define sqlite3AuthContextPush(a,b,c)
 # define sqlite3AuthContextPop(a)  ((void)(a))
 #endif
-static void sqlite3Attach(Parse*, Expr*, Expr*, Expr*);
-static void sqlite3Detach(Parse*, Expr*);
-static int sqlite3BtreeFactory(const sqlite3 *db, const char *zFilename,
+SQLITE_PRIVATE void sqlite3Attach(Parse*, Expr*, Expr*, Expr*);
+SQLITE_PRIVATE void sqlite3Detach(Parse*, Expr*);
+SQLITE_PRIVATE int sqlite3BtreeFactory(const sqlite3 *db, const char *zFilename,
                        int omitJournal, int nCache, Btree **ppBtree);
-static int sqlite3FixInit(DbFixer*, Parse*, int, const char*, const Token*);
-static int sqlite3FixSrcList(DbFixer*, SrcList*);
-static int sqlite3FixSelect(DbFixer*, Select*);
-static int sqlite3FixExpr(DbFixer*, Expr*);
-static int sqlite3FixExprList(DbFixer*, ExprList*);
-static int sqlite3FixTriggerStep(DbFixer*, TriggerStep*);
-static int sqlite3AtoF(const char *z, double*);
-char *sqlite3_snprintf(int,char*,const char*,...);
-static int sqlite3GetInt32(const char *, int*);
-static int sqlite3FitsIn64Bits(const char *);
-static int sqlite3Utf16ByteLen(const void *pData, int nChar);
-static int sqlite3Utf8CharLen(const char *pData, int nByte);
-static u32 sqlite3ReadUtf8(const unsigned char *);
-static int sqlite3PutVarint(unsigned char *, u64);
-static int sqlite3GetVarint(const unsigned char *, u64 *);
-static int sqlite3GetVarint32(const unsigned char *, u32 *);
-static int sqlite3VarintLen(u64 v);
-static void sqlite3IndexAffinityStr(Vdbe *, Index *);
-static void sqlite3TableAffinityStr(Vdbe *, Table *);
-static char sqlite3CompareAffinity(Expr *pExpr, char aff2);
-static int sqlite3IndexAffinityOk(Expr *pExpr, char idx_affinity);
-static char sqlite3ExprAffinity(Expr *pExpr);
-static int sqlite3Atoi64(const char*, i64*);
-static void sqlite3Error(sqlite3*, int, const char*,...);
-static void *sqlite3HexToBlob(const char *z);
-static int sqlite3TwoPartName(Parse *, Token *, Token *, Token **);
-static const char *sqlite3ErrStr(int);
-static int sqlite3ReadSchema(Parse *pParse);
-static CollSeq *sqlite3FindCollSeq(sqlite3*,u8 enc, const char *,int,int);
-static CollSeq *sqlite3LocateCollSeq(Parse *pParse, const char *zName, int nName);
-static CollSeq *sqlite3ExprCollSeq(Parse *pParse, Expr *pExpr);
-static Expr *sqlite3ExprSetColl(Parse *pParse, Expr *, Token *);
-static int sqlite3CheckCollSeq(Parse *, CollSeq *);
-static int sqlite3CheckObjectName(Parse *, const char *);
-static void sqlite3VdbeSetChanges(sqlite3 *, int);
-static void sqlite3Utf16Substr(sqlite3_context *,int,sqlite3_value **);
+SQLITE_PRIVATE int sqlite3FixInit(DbFixer*, Parse*, int, const char*, const Token*);
+SQLITE_PRIVATE int sqlite3FixSrcList(DbFixer*, SrcList*);
+SQLITE_PRIVATE int sqlite3FixSelect(DbFixer*, Select*);
+SQLITE_PRIVATE int sqlite3FixExpr(DbFixer*, Expr*);
+SQLITE_PRIVATE int sqlite3FixExprList(DbFixer*, ExprList*);
+SQLITE_PRIVATE int sqlite3FixTriggerStep(DbFixer*, TriggerStep*);
+SQLITE_PRIVATE int sqlite3AtoF(const char *z, double*);
+SQLITE_API char *sqlite3_snprintf(int,char*,const char*,...);
+SQLITE_PRIVATE int sqlite3GetInt32(const char *, int*);
+SQLITE_PRIVATE int sqlite3FitsIn64Bits(const char *);
+SQLITE_PRIVATE int sqlite3Utf16ByteLen(const void *pData, int nChar);
+SQLITE_PRIVATE int sqlite3Utf8CharLen(const char *pData, int nByte);
+SQLITE_PRIVATE u32 sqlite3ReadUtf8(const unsigned char *);
+SQLITE_PRIVATE int sqlite3PutVarint(unsigned char *, u64);
+SQLITE_PRIVATE int sqlite3GetVarint(const unsigned char *, u64 *);
+SQLITE_PRIVATE int sqlite3GetVarint32(const unsigned char *, u32 *);
+SQLITE_PRIVATE int sqlite3VarintLen(u64 v);
+SQLITE_PRIVATE void sqlite3IndexAffinityStr(Vdbe *, Index *);
+SQLITE_PRIVATE void sqlite3TableAffinityStr(Vdbe *, Table *);
+SQLITE_PRIVATE char sqlite3CompareAffinity(Expr *pExpr, char aff2);
+SQLITE_PRIVATE int sqlite3IndexAffinityOk(Expr *pExpr, char idx_affinity);
+SQLITE_PRIVATE char sqlite3ExprAffinity(Expr *pExpr);
+SQLITE_PRIVATE int sqlite3Atoi64(const char*, i64*);
+SQLITE_PRIVATE void sqlite3Error(sqlite3*, int, const char*,...);
+SQLITE_PRIVATE void *sqlite3HexToBlob(const char *z);
+SQLITE_PRIVATE int sqlite3TwoPartName(Parse *, Token *, Token *, Token **);
+SQLITE_PRIVATE const char *sqlite3ErrStr(int);
+SQLITE_PRIVATE int sqlite3ReadSchema(Parse *pParse);
+SQLITE_PRIVATE CollSeq *sqlite3FindCollSeq(sqlite3*,u8 enc, const char *,int,int);
+SQLITE_PRIVATE CollSeq *sqlite3LocateCollSeq(Parse *pParse, const char *zName, int nName);
+SQLITE_PRIVATE CollSeq *sqlite3ExprCollSeq(Parse *pParse, Expr *pExpr);
+SQLITE_PRIVATE Expr *sqlite3ExprSetColl(Parse *pParse, Expr *, Token *);
+SQLITE_PRIVATE int sqlite3CheckCollSeq(Parse *, CollSeq *);
+SQLITE_PRIVATE int sqlite3CheckObjectName(Parse *, const char *);
+SQLITE_PRIVATE void sqlite3VdbeSetChanges(sqlite3 *, int);
+SQLITE_PRIVATE void sqlite3Utf16Substr(sqlite3_context *,int,sqlite3_value **);
 
-static const void *sqlite3ValueText(sqlite3_value*, u8);
-static int sqlite3ValueBytes(sqlite3_value*, u8);
-static void sqlite3ValueSetStr(sqlite3_value*, int, const void *,u8, void(*)(void*));
-static void sqlite3ValueFree(sqlite3_value*);
-static sqlite3_value *sqlite3ValueNew(void);
-static char *sqlite3Utf16to8(const void*, int);
-static int sqlite3ValueFromExpr(Expr *, u8, u8, sqlite3_value **);
-static void sqlite3ValueApplyAffinity(sqlite3_value *, u8, u8);
+SQLITE_PRIVATE const void *sqlite3ValueText(sqlite3_value*, u8);
+SQLITE_PRIVATE int sqlite3ValueBytes(sqlite3_value*, u8);
+SQLITE_PRIVATE void sqlite3ValueSetStr(sqlite3_value*, int, const void *,u8, void(*)(void*));
+SQLITE_PRIVATE void sqlite3ValueFree(sqlite3_value*);
+SQLITE_PRIVATE sqlite3_value *sqlite3ValueNew(void);
+SQLITE_PRIVATE char *sqlite3Utf16to8(const void*, int);
+SQLITE_PRIVATE int sqlite3ValueFromExpr(Expr *, u8, u8, sqlite3_value **);
+SQLITE_PRIVATE void sqlite3ValueApplyAffinity(sqlite3_value *, u8, u8);
 extern const unsigned char sqlite3UpperToLower[];
-static void sqlite3RootPageMoved(Db*, int, int);
-static void sqlite3Reindex(Parse*, Token*, Token*);
-static void sqlite3AlterFunctions(sqlite3*);
-static void sqlite3AlterRenameTable(Parse*, SrcList*, Token*);
-static int sqlite3GetToken(const unsigned char *, int *);
-static void sqlite3NestedParse(Parse*, const char*, ...);
-static void sqlite3ExpirePreparedStatements(sqlite3*);
-static void sqlite3CodeSubselect(Parse *, Expr *);
-static int sqlite3SelectResolve(Parse *, Select *, NameContext *);
-static void sqlite3ColumnDefault(Vdbe *, Table *, int);
-static void sqlite3AlterFinishAddColumn(Parse *, Token *);
-static void sqlite3AlterBeginAddColumn(Parse *, SrcList *);
-static CollSeq *sqlite3GetCollSeq(sqlite3*, CollSeq *, const char *, int);
-static char sqlite3AffinityType(const Token*);
-static void sqlite3Analyze(Parse*, Token*, Token*);
-static int sqlite3InvokeBusyHandler(BusyHandler*);
-static int sqlite3FindDb(sqlite3*, Token*);
-static int sqlite3AnalysisLoad(sqlite3*,int iDB);
-static void sqlite3DefaultRowEst(Index*);
-static void sqlite3RegisterLikeFunctions(sqlite3*, int);
-static int sqlite3IsLikeFunction(sqlite3*,Expr*,int*,char*);
-static ThreadData *sqlite3ThreadData(void);
-static const ThreadData *sqlite3ThreadDataReadOnly(void);
-static void sqlite3ReleaseThreadData(void);
-static void sqlite3AttachFunctions(sqlite3 *);
-static void sqlite3MinimumFileFormat(Parse*, int, int);
-static void sqlite3SchemaFree(void *);
-static Schema *sqlite3SchemaGet(Btree *);
-static int sqlite3SchemaToIndex(sqlite3 *db, Schema *);
-static KeyInfo *sqlite3IndexKeyinfo(Parse *, Index *);
-static int sqlite3CreateFunc(sqlite3 *, const char *, int, int, void *, 
+SQLITE_PRIVATE void sqlite3RootPageMoved(Db*, int, int);
+SQLITE_PRIVATE void sqlite3Reindex(Parse*, Token*, Token*);
+SQLITE_PRIVATE void sqlite3AlterFunctions(sqlite3*);
+SQLITE_PRIVATE void sqlite3AlterRenameTable(Parse*, SrcList*, Token*);
+SQLITE_PRIVATE int sqlite3GetToken(const unsigned char *, int *);
+SQLITE_PRIVATE void sqlite3NestedParse(Parse*, const char*, ...);
+SQLITE_PRIVATE void sqlite3ExpirePreparedStatements(sqlite3*);
+SQLITE_PRIVATE void sqlite3CodeSubselect(Parse *, Expr *);
+SQLITE_PRIVATE int sqlite3SelectResolve(Parse *, Select *, NameContext *);
+SQLITE_PRIVATE void sqlite3ColumnDefault(Vdbe *, Table *, int);
+SQLITE_PRIVATE void sqlite3AlterFinishAddColumn(Parse *, Token *);
+SQLITE_PRIVATE void sqlite3AlterBeginAddColumn(Parse *, SrcList *);
+SQLITE_PRIVATE CollSeq *sqlite3GetCollSeq(sqlite3*, CollSeq *, const char *, int);
+SQLITE_PRIVATE char sqlite3AffinityType(const Token*);
+SQLITE_PRIVATE void sqlite3Analyze(Parse*, Token*, Token*);
+SQLITE_PRIVATE int sqlite3InvokeBusyHandler(BusyHandler*);
+SQLITE_PRIVATE int sqlite3FindDb(sqlite3*, Token*);
+SQLITE_PRIVATE int sqlite3AnalysisLoad(sqlite3*,int iDB);
+SQLITE_PRIVATE void sqlite3DefaultRowEst(Index*);
+SQLITE_PRIVATE void sqlite3RegisterLikeFunctions(sqlite3*, int);
+SQLITE_PRIVATE int sqlite3IsLikeFunction(sqlite3*,Expr*,int*,char*);
+SQLITE_PRIVATE ThreadData *sqlite3ThreadData(void);
+SQLITE_PRIVATE const ThreadData *sqlite3ThreadDataReadOnly(void);
+SQLITE_PRIVATE void sqlite3ReleaseThreadData(void);
+SQLITE_PRIVATE void sqlite3AttachFunctions(sqlite3 *);
+SQLITE_PRIVATE void sqlite3MinimumFileFormat(Parse*, int, int);
+SQLITE_PRIVATE void sqlite3SchemaFree(void *);
+SQLITE_PRIVATE Schema *sqlite3SchemaGet(Btree *);
+SQLITE_PRIVATE int sqlite3SchemaToIndex(sqlite3 *db, Schema *);
+SQLITE_PRIVATE KeyInfo *sqlite3IndexKeyinfo(Parse *, Index *);
+SQLITE_PRIVATE int sqlite3CreateFunc(sqlite3 *, const char *, int, int, void *, 
   void (*)(sqlite3_context*,int,sqlite3_value **),
   void (*)(sqlite3_context*,int,sqlite3_value **), void (*)(sqlite3_context*));
-static int sqlite3ApiExit(sqlite3 *db, int);
-static void sqlite3FailedMalloc(void);
-static void sqlite3AbortOtherActiveVdbes(sqlite3 *, Vdbe *);
-static int sqlite3OpenTempDatabase(Parse *);
+SQLITE_PRIVATE int sqlite3ApiExit(sqlite3 *db, int);
+SQLITE_PRIVATE void sqlite3FailedMalloc(void);
+SQLITE_PRIVATE void sqlite3AbortOtherActiveVdbes(sqlite3 *, Vdbe *);
+SQLITE_PRIVATE int sqlite3OpenTempDatabase(Parse *);
 
 #ifndef SQLITE_OMIT_LOAD_EXTENSION
-static   void sqlite3CloseExtensions(sqlite3*);
-static   int sqlite3AutoLoadExtensions(sqlite3*);
+SQLITE_PRIVATE   void sqlite3CloseExtensions(sqlite3*);
+SQLITE_PRIVATE   int sqlite3AutoLoadExtensions(sqlite3*);
 #else
 # define sqlite3CloseExtensions(X)
 # define sqlite3AutoLoadExtensions(X)  SQLITE_OK
 #endif
 
 #ifndef SQLITE_OMIT_SHARED_CACHE
-static   void sqlite3TableLock(Parse *, int, int, u8, const char *);
+SQLITE_PRIVATE   void sqlite3TableLock(Parse *, int, int, u8, const char *);
 #else
   #define sqlite3TableLock(v,w,x,y,z)
 #endif
 
 #ifdef SQLITE_TEST
-static   int sqlite3Utf8To8(unsigned char*);
+SQLITE_PRIVATE   int sqlite3Utf8To8(unsigned char*);
 #endif
 
 #ifdef SQLITE_MEMDEBUG
-static   void sqlite3MallocDisallow(void);
-static   void sqlite3MallocAllow(void);
-static   int sqlite3TestMallocFail(void);
+SQLITE_PRIVATE   void sqlite3MallocDisallow(void);
+SQLITE_PRIVATE   void sqlite3MallocAllow(void);
+SQLITE_PRIVATE   int sqlite3TestMallocFail(void);
 #else
   #define sqlite3TestMallocFail() 0
   #define sqlite3MallocDisallow()
@@ -6263,8 +6300,8 @@ static   int sqlite3TestMallocFail(void);
 #endif
 
 #ifdef SQLITE_ENABLE_MEMORY_MANAGEMENT
-static   void *sqlite3ThreadSafeMalloc(int);
-static   void sqlite3ThreadSafeFree(void *);
+SQLITE_PRIVATE   void *sqlite3ThreadSafeMalloc(int);
+SQLITE_PRIVATE   void sqlite3ThreadSafeFree(void *);
 #else
   #define sqlite3ThreadSafeMalloc sqlite3MallocX
   #define sqlite3ThreadSafeFree sqlite3FreeX
@@ -6276,45 +6313,45 @@ static   void sqlite3ThreadSafeFree(void *);
 #  define sqlite3VtabRollback(X)
 #  define sqlite3VtabCommit(X)
 #else
-static    void sqlite3VtabClear(Table*);
-static    int sqlite3VtabSync(sqlite3 *db, int rc);
-static    int sqlite3VtabRollback(sqlite3 *db);
-static    int sqlite3VtabCommit(sqlite3 *db);
+SQLITE_PRIVATE    void sqlite3VtabClear(Table*);
+SQLITE_PRIVATE    int sqlite3VtabSync(sqlite3 *db, int rc);
+SQLITE_PRIVATE    int sqlite3VtabRollback(sqlite3 *db);
+SQLITE_PRIVATE    int sqlite3VtabCommit(sqlite3 *db);
 #endif
-static void sqlite3VtabLock(sqlite3_vtab*);
-static void sqlite3VtabUnlock(sqlite3*, sqlite3_vtab*);
-static void sqlite3VtabBeginParse(Parse*, Token*, Token*, Token*);
-static void sqlite3VtabFinishParse(Parse*, Token*);
-static void sqlite3VtabArgInit(Parse*);
-static void sqlite3VtabArgExtend(Parse*, Token*);
-static int sqlite3VtabCallCreate(sqlite3*, int, const char *, char **);
-static int sqlite3VtabCallConnect(Parse*, Table*);
-static int sqlite3VtabCallDestroy(sqlite3*, int, const char *);
-static int sqlite3VtabBegin(sqlite3 *, sqlite3_vtab *);
-static FuncDef *sqlite3VtabOverloadFunction(FuncDef*, int nArg, Expr*);
-static void sqlite3InvalidFunction(sqlite3_context*,int,sqlite3_value**);
-static int sqlite3Reprepare(Vdbe*);
-static void sqlite3ExprListCheckLength(Parse*, ExprList*, int, const char*);
+SQLITE_PRIVATE void sqlite3VtabLock(sqlite3_vtab*);
+SQLITE_PRIVATE void sqlite3VtabUnlock(sqlite3*, sqlite3_vtab*);
+SQLITE_PRIVATE void sqlite3VtabBeginParse(Parse*, Token*, Token*, Token*);
+SQLITE_PRIVATE void sqlite3VtabFinishParse(Parse*, Token*);
+SQLITE_PRIVATE void sqlite3VtabArgInit(Parse*);
+SQLITE_PRIVATE void sqlite3VtabArgExtend(Parse*, Token*);
+SQLITE_PRIVATE int sqlite3VtabCallCreate(sqlite3*, int, const char *, char **);
+SQLITE_PRIVATE int sqlite3VtabCallConnect(Parse*, Table*);
+SQLITE_PRIVATE int sqlite3VtabCallDestroy(sqlite3*, int, const char *);
+SQLITE_PRIVATE int sqlite3VtabBegin(sqlite3 *, sqlite3_vtab *);
+SQLITE_PRIVATE FuncDef *sqlite3VtabOverloadFunction(FuncDef*, int nArg, Expr*);
+SQLITE_PRIVATE void sqlite3InvalidFunction(sqlite3_context*,int,sqlite3_value**);
+SQLITE_PRIVATE int sqlite3Reprepare(Vdbe*);
+SQLITE_PRIVATE void sqlite3ExprListCheckLength(Parse*, ExprList*, int, const char*);
 CollSeq* sqlite3BinaryCompareCollSeq(Parse *, Expr *, Expr *);
 
 #if SQLITE_MAX_EXPR_DEPTH>0
-static   void sqlite3ExprSetHeight(Expr *);
-static   int sqlite3SelectExprHeight(Select *);
+SQLITE_PRIVATE   void sqlite3ExprSetHeight(Expr *);
+SQLITE_PRIVATE   int sqlite3SelectExprHeight(Select *);
 #else
   #define sqlite3ExprSetHeight(x)
 #endif
 
-static u32 sqlite3Get2byte(const u8*);
-static u32 sqlite3Get4byte(const u8*);
-static void sqlite3Put2byte(u8*, u32);
-static void sqlite3Put4byte(u8*, u32);
+SQLITE_PRIVATE u32 sqlite3Get2byte(const u8*);
+SQLITE_PRIVATE u32 sqlite3Get4byte(const u8*);
+SQLITE_PRIVATE void sqlite3Put2byte(u8*, u32);
+SQLITE_PRIVATE void sqlite3Put4byte(u8*, u32);
 
 #ifdef SQLITE_SSE
 #include "sseInt.h"
 #endif
 
 #ifdef SQLITE_DEBUG
-static   void sqlite3ParserTrace(FILE*, char *);
+SQLITE_PRIVATE   void sqlite3ParserTrace(FILE*, char *);
 #endif
 
 /*
@@ -6324,7 +6361,7 @@ static   void sqlite3ParserTrace(FILE*, char *);
 */
 #ifdef SQLITE_ENABLE_IOTRACE
 # define IOTRACE(A)  if( sqlite3_io_trace ){ sqlite3_io_trace A; }
-static   void sqlite3VdbeIOTraceSql(Vdbe*);
+SQLITE_PRIVATE   void sqlite3VdbeIOTraceSql(Vdbe*);
 #else
 # define IOTRACE(A)
 # define sqlite3VdbeIOTraceSql(X)
@@ -7281,7 +7318,7 @@ static void currentTimeFunc(
 ** functions.  This should be the only routine in this file with
 ** external linkage.
 */
-static void sqlite3RegisterDateTimeFunctions(sqlite3 *db){
+SQLITE_PRIVATE void sqlite3RegisterDateTimeFunctions(sqlite3 *db){
 #ifndef SQLITE_OMIT_DATETIME_FUNCS
   static const struct {
      char *zName;
@@ -7347,7 +7384,7 @@ static void sqlite3RegisterDateTimeFunctions(sqlite3 *db){
 ** of this would be completely automatic if SQLite were coded using
 ** C++ instead of plain old C.
 */
-static int sqlite3OsClose(OsFile **pId){
+SQLITE_PRIVATE int sqlite3OsClose(OsFile **pId){
   OsFile *id;
   if( pId!=0 && (id = *pId)!=0 ){
     return id->pMethod->xClose(pId);
@@ -7355,40 +7392,40 @@ static int sqlite3OsClose(OsFile **pId){
     return SQLITE_OK;
   }
 }
-static int sqlite3OsOpenDirectory(OsFile *id, const char *zName){
+SQLITE_PRIVATE int sqlite3OsOpenDirectory(OsFile *id, const char *zName){
   return id->pMethod->xOpenDirectory(id, zName);
 }
-static int sqlite3OsRead(OsFile *id, void *pBuf, int amt){
+SQLITE_PRIVATE int sqlite3OsRead(OsFile *id, void *pBuf, int amt){
   return id->pMethod->xRead(id, pBuf, amt);
 }
-static int sqlite3OsWrite(OsFile *id, const void *pBuf, int amt){
+SQLITE_PRIVATE int sqlite3OsWrite(OsFile *id, const void *pBuf, int amt){
   return id->pMethod->xWrite(id, pBuf, amt);
 }
-static int sqlite3OsSeek(OsFile *id, i64 offset){
+SQLITE_PRIVATE int sqlite3OsSeek(OsFile *id, i64 offset){
   return id->pMethod->xSeek(id, offset);
 }
-static int sqlite3OsTruncate(OsFile *id, i64 size){
+SQLITE_PRIVATE int sqlite3OsTruncate(OsFile *id, i64 size){
   return id->pMethod->xTruncate(id, size);
 }
-static int sqlite3OsSync(OsFile *id, int fullsync){
+SQLITE_PRIVATE int sqlite3OsSync(OsFile *id, int fullsync){
   return id->pMethod->xSync(id, fullsync);
 }
-static void sqlite3OsSetFullSync(OsFile *id, int value){
+SQLITE_PRIVATE void sqlite3OsSetFullSync(OsFile *id, int value){
   id->pMethod->xSetFullSync(id, value);
 }
-static int sqlite3OsFileSize(OsFile *id, i64 *pSize){
+SQLITE_PRIVATE int sqlite3OsFileSize(OsFile *id, i64 *pSize){
   return id->pMethod->xFileSize(id, pSize);
 }
-static int sqlite3OsLock(OsFile *id, int lockType){
+SQLITE_PRIVATE int sqlite3OsLock(OsFile *id, int lockType){
   return id->pMethod->xLock(id, lockType);
 }
-static int sqlite3OsUnlock(OsFile *id, int lockType){
+SQLITE_PRIVATE int sqlite3OsUnlock(OsFile *id, int lockType){
   return id->pMethod->xUnlock(id, lockType);
 }
-static int sqlite3OsCheckReservedLock(OsFile *id){
+SQLITE_PRIVATE int sqlite3OsCheckReservedLock(OsFile *id){
   return id->pMethod->xCheckReservedLock(id);
 }
-static int sqlite3OsSectorSize(OsFile *id){
+SQLITE_PRIVATE int sqlite3OsSectorSize(OsFile *id){
   int (*xSectorSize)(OsFile*) = id->pMethod->xSectorSize;
   return xSectorSize ? xSectorSize(id) : SQLITE_DEFAULT_SECTOR_SIZE;
 }
@@ -7627,7 +7664,7 @@ int sqlite3_mallocfail_trace = 0; /* Print a msg on malloc fail if true */
 ** Check for a simulated memory allocation failure.  Return true if
 ** the failure should be simulated.  Return false to proceed as normal.
 */
-static int sqlite3TestMallocFail(){
+SQLITE_PRIVATE int sqlite3TestMallocFail(){
   if( sqlite3_isFail ){
     return 1;
   }
@@ -7813,7 +7850,7 @@ static void relinkAlloc(void *p)
 ** to debug memory leaks when Tcl is not available.
 */
 #if defined(TCLSH) && defined(SQLITE_DEBUG) && SQLITE_MEMDEBUG>1
-static int sqlite3OutstandingMallocs(Tcl_Interp *interp){
+SQLITE_PRIVATE int sqlite3OutstandingMallocs(Tcl_Interp *interp){
   void *p;
   Tcl_Obj *pRes = Tcl_NewObj();
   Tcl_IncrRefCount(pRes);
@@ -8003,7 +8040,7 @@ static void updateMemoryUsedCount(int n){
 ** sqlite3OsMalloc(). If the Malloc() call fails, attempt to free memory 
 ** by calling sqlite3_release_memory().
 */
-static void *sqlite3MallocRaw(int n, int doMemManage){
+SQLITE_PRIVATE void *sqlite3MallocRaw(int n, int doMemManage){
   void *p = 0;
   if( n>0 && !sqlite3MallocFailed() && (!doMemManage || enforceSoftLimit(n)) ){
     while( (p = OSMALLOC(n))==0 && sqlite3_release_memory(n) ){}
@@ -8022,7 +8059,7 @@ static void *sqlite3MallocRaw(int n, int doMemManage){
 ** pointer to the new allocation is returned.  If the Realloc() call fails,
 ** attempt to free memory by calling sqlite3_release_memory().
 */
-static void *sqlite3Realloc(void *p, int n){
+SQLITE_PRIVATE void *sqlite3Realloc(void *p, int n){
   if( sqlite3MallocFailed() ){
     return 0;
   }
@@ -8051,7 +8088,7 @@ static void *sqlite3Realloc(void *p, int n){
 ** Free the memory pointed to by p. p must be either a NULL pointer or a 
 ** value returned by a previous call to sqlite3Malloc() or sqlite3Realloc().
 */
-static void sqlite3FreeX(void *p){
+SQLITE_PRIVATE void sqlite3FreeX(void *p){
   if( p ){
     updateMemoryUsedCount(0 - OSSIZEOF(p));
     OSFREE(p);
@@ -8062,7 +8099,7 @@ static void sqlite3FreeX(void *p){
 ** A version of sqliteMalloc() that is always a function, not a macro.
 ** Currently, this is used only to alloc to allocate the parser engine.
 */
-static void *sqlite3MallocX(int n){
+SQLITE_PRIVATE void *sqlite3MallocX(int n){
   return sqliteMalloc(n);
 }
 
@@ -8073,14 +8110,14 @@ static void *sqlite3MallocX(int n){
 ** These two are implemented as wrappers around sqlite3MallocRaw(), 
 ** sqlite3Realloc() and sqlite3Free().
 */ 
-static void *sqlite3Malloc(int n, int doMemManage){
+SQLITE_PRIVATE void *sqlite3Malloc(int n, int doMemManage){
   void *p = sqlite3MallocRaw(n, doMemManage);
   if( p ){
     memset(p, 0, n);
   }
   return p;
 }
-static void *sqlite3ReallocOrFree(void *p, int n){
+SQLITE_PRIVATE void *sqlite3ReallocOrFree(void *p, int n){
   void *pNew;
   pNew = sqlite3Realloc(p, n);
   if( !pNew ){
@@ -8103,11 +8140,11 @@ static void *sqlite3ReallocOrFree(void *p, int n){
 **     ThreadSafeMalloc() will cause an error somewhere down the line.
 */
 #ifdef SQLITE_ENABLE_MEMORY_MANAGEMENT
-static void *sqlite3ThreadSafeMalloc(int n){
+SQLITE_PRIVATE void *sqlite3ThreadSafeMalloc(int n){
   (void)ENTER_MALLOC;
   return sqlite3Malloc(n, 0);
 }
-static void sqlite3ThreadSafeFree(void *p){
+SQLITE_PRIVATE void sqlite3ThreadSafeFree(void *p){
   (void)ENTER_MALLOC;
   if( p ){
     OSFREE(p);
@@ -8127,7 +8164,7 @@ static void sqlite3ThreadSafeFree(void *p){
 ** regardless of how much memory was actually allocated.
 */
 #ifdef SQLITE_ENABLE_MEMORY_MANAGEMENT
-static int sqlite3AllocSize(void *p){
+SQLITE_PRIVATE int sqlite3AllocSize(void *p){
   return OSSIZEOF(p);
 }
 #endif
@@ -8139,7 +8176,7 @@ static int sqlite3AllocSize(void *p){
 ** called via macros that record the current file and line number in the
 ** ThreadData structure.
 */
-static char *sqlite3StrDup(const char *z){
+SQLITE_PRIVATE char *sqlite3StrDup(const char *z){
   char *zNew;
   int n;
   if( z==0 ) return 0;
@@ -8148,7 +8185,7 @@ static char *sqlite3StrDup(const char *z){
   if( zNew ) memcpy(zNew, z, n);
   return zNew;
 }
-static char *sqlite3StrNDup(const char *z, int n){
+SQLITE_PRIVATE char *sqlite3StrNDup(const char *z, int n){
   char *zNew;
   if( z==0 ) return 0;
   zNew = sqlite3MallocRaw(n+1, 1);
@@ -8166,7 +8203,7 @@ static char *sqlite3StrNDup(const char *z, int n){
 ** point to that string.  The 1st argument must either be NULL or 
 ** point to memory obtained from sqliteMalloc().
 */
-static void sqlite3SetString(char **pz, ...){
+SQLITE_PRIVATE void sqlite3SetString(char **pz, ...){
   va_list ap;
   int nByte;
   const char *z;
@@ -8210,7 +8247,7 @@ static void sqlite3SetString(char **pz, ...){
 ** is set to SQLITE_NOMEM.
 */
 int sqlite3_mallocHasFailed = 0;
-static int sqlite3ApiExit(sqlite3* db, int rc){
+SQLITE_PRIVATE int sqlite3ApiExit(sqlite3* db, int rc){
   if( sqlite3MallocFailed() ){
     sqlite3_mallocHasFailed = 0;
     sqlite3OsLeaveMutex();
@@ -8223,7 +8260,7 @@ static int sqlite3ApiExit(sqlite3* db, int rc){
 /* 
 ** Set the "malloc has failed" condition to true for this thread.
 */
-static void sqlite3FailedMalloc(){
+SQLITE_PRIVATE void sqlite3FailedMalloc(){
   if( !sqlite3MallocFailed() ){
     sqlite3OsEnterMutex();
     assert( sqlite3_mallocHasFailed==0 );
@@ -8236,7 +8273,7 @@ static void sqlite3FailedMalloc(){
 ** This function sets a flag in the thread-specific-data structure that will
 ** cause an assert to fail if sqliteMalloc() or sqliteRealloc() is called.
 */
-static void sqlite3MallocDisallow(){
+SQLITE_PRIVATE void sqlite3MallocDisallow(){
   assert( sqlite3_mallocDisallowed>=0 );
   sqlite3_mallocDisallowed++;
 }
@@ -8245,7 +8282,7 @@ static void sqlite3MallocDisallow(){
 ** This function clears the flag set in the thread-specific-data structure set
 ** by sqlite3MallocDisallow().
 */
-static void sqlite3MallocAllow(){
+SQLITE_PRIVATE void sqlite3MallocAllow(){
   assert( sqlite3_mallocDisallowed>0 );
   sqlite3_mallocDisallowed--;
 }
@@ -8328,6 +8365,7 @@ static void sqlite3MallocAllow(){
 #define etTOKEN      13 /* a pointer to a Token structure */
 #define etSRCLIST    14 /* a pointer to a SrcList */
 #define etPOINTER    15 /* The %p conversion */
+#define etSQLESCAPE3 16 /* %w -> Strings with '\"' doubled */
 
 
 /*
@@ -8369,6 +8407,7 @@ static const et_info fmtinfo[] = {
   {  'z',  0, 6, etDYNSTRING,  0,  0 },
   {  'q',  0, 4, etSQLESCAPE,  0,  0 },
   {  'Q',  0, 4, etSQLESCAPE2, 0,  0 },
+  {  'w',  0, 4, etSQLESCAPE3, 0,  0 },
   {  'c',  0, 0, etCHARX,      0,  0 },
   {  'o',  8, 0, etRADIX,      0,  2 },
   {  'u', 10, 0, etRADIX,      0,  0 },
@@ -8708,7 +8747,7 @@ static int vxprintf(
         if( xtype==etFLOAT ) realvalue += rounder;
         /* Normalize realvalue to within 10.0 > realvalue >= 1.0 */
         exp = 0;
-        if( isnan(realvalue) ){
+        if( sqlite3_isnan(realvalue) ){
           bufpt = "NaN";
           length = 3;
           break;
@@ -8865,14 +8904,16 @@ static int vxprintf(
         if( precision>=0 && precision<length ) length = precision;
         break;
       case etSQLESCAPE:
-      case etSQLESCAPE2: {
+      case etSQLESCAPE2:
+      case etSQLESCAPE3: {
         int i, j, n, ch, isnull;
         int needQuote;
+        char q = ((xtype==etSQLESCAPE3)?'"':'\'');   /* Quote character */
         char *escarg = va_arg(ap,char*);
         isnull = escarg==0;
         if( isnull ) escarg = (xtype==etSQLESCAPE2 ? "NULL" : "(NULL)");
         for(i=n=0; (ch=escarg[i])!=0; i++){
-          if( ch=='\'' )  n++;
+          if( ch==q )  n++;
         }
         needQuote = !isnull && xtype==etSQLESCAPE2;
         n += i + 1 + needQuote*2;
@@ -8883,12 +8924,12 @@ static int vxprintf(
           bufpt = buf;
         }
         j = 0;
-        if( needQuote ) bufpt[j++] = '\'';
+        if( needQuote ) bufpt[j++] = q;
         for(i=0; (ch=escarg[i])!=0; i++){
           bufpt[j++] = ch;
-          if( ch=='\'' ) bufpt[j++] = ch;
+          if( ch==q ) bufpt[j++] = ch;
         }
-        if( needQuote ) bufpt[j++] = '\'';
+        if( needQuote ) bufpt[j++] = q;
         bufpt[j] = 0;
         length = j;
         /* The precision is ignored on %q and %Q */
@@ -9055,7 +9096,7 @@ static void *printf_realloc(void *old, int size){
 ** Print into memory obtained from sqliteMalloc().  Use the internal
 ** %-conversion extensions.
 */
-static char *sqlite3VMPrintf(const char *zFormat, va_list ap){
+SQLITE_PRIVATE char *sqlite3VMPrintf(const char *zFormat, va_list ap){
   char zBase[SQLITE_PRINT_BUF_SIZE];
   return base_vprintf(printf_realloc, 1, zBase, sizeof(zBase), zFormat, ap);
 }
@@ -9064,7 +9105,7 @@ static char *sqlite3VMPrintf(const char *zFormat, va_list ap){
 ** Print into memory obtained from sqliteMalloc().  Use the internal
 ** %-conversion extensions.
 */
-static char *sqlite3MPrintf(const char *zFormat, ...){
+SQLITE_PRIVATE char *sqlite3MPrintf(const char *zFormat, ...){
   va_list ap;
   char *z;
   char zBase[SQLITE_PRINT_BUF_SIZE];
@@ -9078,7 +9119,7 @@ static char *sqlite3MPrintf(const char *zFormat, ...){
 ** Print into memory obtained from sqlite3_malloc().  Omit the internal
 ** %-conversion extensions.
 */
-char *sqlite3_vmprintf(const char *zFormat, va_list ap){
+SQLITE_API char *sqlite3_vmprintf(const char *zFormat, va_list ap){
   char zBase[SQLITE_PRINT_BUF_SIZE];
   return base_vprintf(sqlite3_realloc, 0, zBase, sizeof(zBase), zFormat, ap);
 }
@@ -9087,7 +9128,7 @@ char *sqlite3_vmprintf(const char *zFormat, va_list ap){
 ** Print into memory obtained from sqlite3_malloc()().  Omit the internal
 ** %-conversion extensions.
 */
-char *sqlite3_mprintf(const char *zFormat, ...){
+SQLITE_API char *sqlite3_mprintf(const char *zFormat, ...){
   va_list ap;
   char *z;
   va_start(ap, zFormat);
@@ -9102,7 +9143,7 @@ char *sqlite3_mprintf(const char *zFormat, ...){
 ** are not able to use a "," as the decimal point in place of "." as
 ** specified by some locales.
 */
-char *sqlite3_snprintf(int n, char *zBuf, const char *zFormat, ...){
+SQLITE_API char *sqlite3_snprintf(int n, char *zBuf, const char *zFormat, ...){
   char *z;
   va_list ap;
 
@@ -9122,7 +9163,7 @@ char *sqlite3_snprintf(int n, char *zBuf, const char *zFormat, ...){
 ** The printf() built into some versions of windows does not understand %lld
 ** and segfaults if you give it a long long int.
 */
-static void sqlite3DebugPrintf(const char *zFormat, ...){
+SQLITE_PRIVATE void sqlite3DebugPrintf(const char *zFormat, ...){
   extern int getpid(void);
   va_list ap;
   char zBuf[500];
@@ -9226,7 +9267,7 @@ static int randomByte(void){
 /*
 ** Return N random bytes.
 */
-static void sqlite3Randomness(int N, void *pBuf){
+SQLITE_PRIVATE void sqlite3Randomness(int N, void *pBuf){
   unsigned char *zBuf = pBuf;
   sqlite3OsEnterMutex();
   while( N-- ){
@@ -9621,6 +9662,7 @@ struct Vdbe {
 #ifdef SQLITE_DEBUG
   FILE *trace;        /* Write an execution trace here, if not NULL */
 #endif
+  int openedStatement;  /* True if this VM has opened a statement journal */
 #ifdef SQLITE_SSE
   int fetchId;          /* Statement number used by sqlite3_fetch_statement */
   int lru;              /* Counter used for LRU cache replacement */
@@ -9638,67 +9680,67 @@ struct Vdbe {
 /*
 ** Function prototypes
 */
-static void sqlite3VdbeFreeCursor(Vdbe *, Cursor*);
+SQLITE_PRIVATE void sqlite3VdbeFreeCursor(Vdbe *, Cursor*);
 void sqliteVdbePopStack(Vdbe*,int);
-static int sqlite3VdbeCursorMoveto(Cursor*);
+SQLITE_PRIVATE int sqlite3VdbeCursorMoveto(Cursor*);
 #if defined(SQLITE_DEBUG) || defined(VDBE_PROFILE)
-static void sqlite3VdbePrintOp(FILE*, int, Op*);
+SQLITE_PRIVATE void sqlite3VdbePrintOp(FILE*, int, Op*);
 #endif
-static int sqlite3VdbeSerialTypeLen(u32);
-static u32 sqlite3VdbeSerialType(Mem*, int);
-static int sqlite3VdbeSerialPut(unsigned char*, int, Mem*, int);
-static int sqlite3VdbeSerialGet(const unsigned char*, u32, Mem*);
-static void sqlite3VdbeDeleteAuxData(VdbeFunc*, int);
+SQLITE_PRIVATE int sqlite3VdbeSerialTypeLen(u32);
+SQLITE_PRIVATE u32 sqlite3VdbeSerialType(Mem*, int);
+SQLITE_PRIVATE int sqlite3VdbeSerialPut(unsigned char*, int, Mem*, int);
+SQLITE_PRIVATE int sqlite3VdbeSerialGet(const unsigned char*, u32, Mem*);
+SQLITE_PRIVATE void sqlite3VdbeDeleteAuxData(VdbeFunc*, int);
 
 int sqlite2BtreeKeyCompare(BtCursor *, const void *, int, int, int *);
-static int sqlite3VdbeIdxKeyCompare(Cursor*, int , const unsigned char*, int*);
-static int sqlite3VdbeIdxRowid(BtCursor *, i64 *);
-static int sqlite3MemCompare(const Mem*, const Mem*, const CollSeq*);
-static int sqlite3VdbeRecordCompare(void*,int,const void*,int, const void*);
-static int sqlite3VdbeIdxRowidLen(const u8*);
-static int sqlite3VdbeExec(Vdbe*);
-static int sqlite3VdbeList(Vdbe*);
-static int sqlite3VdbeHalt(Vdbe*);
-static int sqlite3VdbeChangeEncoding(Mem *, int);
-static int sqlite3VdbeMemTooBig(Mem*);
-static int sqlite3VdbeMemCopy(Mem*, const Mem*);
-static void sqlite3VdbeMemShallowCopy(Mem*, const Mem*, int);
-static int sqlite3VdbeMemMove(Mem*, Mem*);
-static int sqlite3VdbeMemNulTerminate(Mem*);
-static int sqlite3VdbeMemSetStr(Mem*, const char*, int, u8, void(*)(void*));
-static void sqlite3VdbeMemSetInt64(Mem*, i64);
-static void sqlite3VdbeMemSetDouble(Mem*, double);
-static void sqlite3VdbeMemSetNull(Mem*);
-static void sqlite3VdbeMemSetZeroBlob(Mem*,int);
-static int sqlite3VdbeMemMakeWriteable(Mem*);
-static int sqlite3VdbeMemDynamicify(Mem*);
-static int sqlite3VdbeMemStringify(Mem*, int);
-static i64 sqlite3VdbeIntValue(Mem*);
-static int sqlite3VdbeMemIntegerify(Mem*);
-static double sqlite3VdbeRealValue(Mem*);
-static void sqlite3VdbeIntegerAffinity(Mem*);
-static int sqlite3VdbeMemRealify(Mem*);
-static int sqlite3VdbeMemNumerify(Mem*);
-static int sqlite3VdbeMemFromBtree(BtCursor*,int,int,int,Mem*);
-static void sqlite3VdbeMemRelease(Mem *p);
-static int sqlite3VdbeMemFinalize(Mem*, FuncDef*);
+SQLITE_PRIVATE int sqlite3VdbeIdxKeyCompare(Cursor*, int , const unsigned char*, int*);
+SQLITE_PRIVATE int sqlite3VdbeIdxRowid(BtCursor *, i64 *);
+SQLITE_PRIVATE int sqlite3MemCompare(const Mem*, const Mem*, const CollSeq*);
+SQLITE_PRIVATE int sqlite3VdbeRecordCompare(void*,int,const void*,int, const void*);
+SQLITE_PRIVATE int sqlite3VdbeIdxRowidLen(const u8*);
+SQLITE_PRIVATE int sqlite3VdbeExec(Vdbe*);
+SQLITE_PRIVATE int sqlite3VdbeList(Vdbe*);
+SQLITE_PRIVATE int sqlite3VdbeHalt(Vdbe*);
+SQLITE_PRIVATE int sqlite3VdbeChangeEncoding(Mem *, int);
+SQLITE_PRIVATE int sqlite3VdbeMemTooBig(Mem*);
+SQLITE_PRIVATE int sqlite3VdbeMemCopy(Mem*, const Mem*);
+SQLITE_PRIVATE void sqlite3VdbeMemShallowCopy(Mem*, const Mem*, int);
+SQLITE_PRIVATE int sqlite3VdbeMemMove(Mem*, Mem*);
+SQLITE_PRIVATE int sqlite3VdbeMemNulTerminate(Mem*);
+SQLITE_PRIVATE int sqlite3VdbeMemSetStr(Mem*, const char*, int, u8, void(*)(void*));
+SQLITE_PRIVATE void sqlite3VdbeMemSetInt64(Mem*, i64);
+SQLITE_PRIVATE void sqlite3VdbeMemSetDouble(Mem*, double);
+SQLITE_PRIVATE void sqlite3VdbeMemSetNull(Mem*);
+SQLITE_PRIVATE void sqlite3VdbeMemSetZeroBlob(Mem*,int);
+SQLITE_PRIVATE int sqlite3VdbeMemMakeWriteable(Mem*);
+SQLITE_PRIVATE int sqlite3VdbeMemDynamicify(Mem*);
+SQLITE_PRIVATE int sqlite3VdbeMemStringify(Mem*, int);
+SQLITE_PRIVATE i64 sqlite3VdbeIntValue(Mem*);
+SQLITE_PRIVATE int sqlite3VdbeMemIntegerify(Mem*);
+SQLITE_PRIVATE double sqlite3VdbeRealValue(Mem*);
+SQLITE_PRIVATE void sqlite3VdbeIntegerAffinity(Mem*);
+SQLITE_PRIVATE int sqlite3VdbeMemRealify(Mem*);
+SQLITE_PRIVATE int sqlite3VdbeMemNumerify(Mem*);
+SQLITE_PRIVATE int sqlite3VdbeMemFromBtree(BtCursor*,int,int,int,Mem*);
+SQLITE_PRIVATE void sqlite3VdbeMemRelease(Mem *p);
+SQLITE_PRIVATE int sqlite3VdbeMemFinalize(Mem*, FuncDef*);
 #ifndef NDEBUG
-static   void sqlite3VdbeMemSanity(Mem*);
-static   int sqlite3VdbeOpcodeNoPush(u8);
+SQLITE_PRIVATE   void sqlite3VdbeMemSanity(Mem*);
+SQLITE_PRIVATE   int sqlite3VdbeOpcodeNoPush(u8);
 #endif
-static int sqlite3VdbeMemTranslate(Mem*, u8);
+SQLITE_PRIVATE int sqlite3VdbeMemTranslate(Mem*, u8);
 #ifdef SQLITE_DEBUG
-static   void sqlite3VdbePrintSql(Vdbe*);
-static   void sqlite3VdbeMemPrettyPrint(Mem *pMem, char *zBuf);
+SQLITE_PRIVATE   void sqlite3VdbePrintSql(Vdbe*);
+SQLITE_PRIVATE   void sqlite3VdbeMemPrettyPrint(Mem *pMem, char *zBuf);
 #endif
-static int sqlite3VdbeMemHandleBom(Mem *pMem);
-static void sqlite3VdbeFifoInit(Fifo*);
-static int sqlite3VdbeFifoPush(Fifo*, i64);
-static int sqlite3VdbeFifoPop(Fifo*, i64*);
-static void sqlite3VdbeFifoClear(Fifo*);
+SQLITE_PRIVATE int sqlite3VdbeMemHandleBom(Mem *pMem);
+SQLITE_PRIVATE void sqlite3VdbeFifoInit(Fifo*);
+SQLITE_PRIVATE int sqlite3VdbeFifoPush(Fifo*, i64);
+SQLITE_PRIVATE int sqlite3VdbeFifoPop(Fifo*, i64*);
+SQLITE_PRIVATE void sqlite3VdbeFifoClear(Fifo*);
 
 #ifndef SQLITE_OMIT_INCRBLOB
-static   int sqlite3VdbeMemExpandBlob(Mem *);
+SQLITE_PRIVATE   int sqlite3VdbeMemExpandBlob(Mem *);
 #else
   #define sqlite3VdbeMemExpandBlob(x) SQLITE_OK
 #endif
@@ -9807,7 +9849,7 @@ const unsigned char sqlite3UtfTrans1[] = {
 ** desiredEnc. It is an error if the string is already of the desired
 ** encoding, or if *pMem does not contain a string value.
 */
-static int sqlite3VdbeMemTranslate(Mem *pMem, u8 desiredEnc){
+SQLITE_PRIVATE int sqlite3VdbeMemTranslate(Mem *pMem, u8 desiredEnc){
   unsigned char zShort[NBFS]; /* Temporary short output buffer */
   int len;                    /* Maximum length of output string in bytes */
   unsigned char *zOut;                  /* Output buffer */
@@ -10018,7 +10060,7 @@ translate_out:
 ** The allocation (static, dynamic etc.) and encoding of the Mem may be
 ** changed by this function.
 */
-static int sqlite3VdbeMemHandleBom(Mem *pMem){
+SQLITE_PRIVATE int sqlite3VdbeMemHandleBom(Mem *pMem){
   int rc = SQLITE_OK;
   u8 bom = 0;
 
@@ -10064,7 +10106,7 @@ static int sqlite3VdbeMemHandleBom(Mem *pMem){
 ** number of unicode characters in the first nByte of pZ (or up to 
 ** the first 0x00, whichever comes first).
 */
-static int sqlite3Utf8CharLen(const char *zIn, int nByte){
+SQLITE_PRIVATE int sqlite3Utf8CharLen(const char *zIn, int nByte){
   int r = 0;
   const u8 *z = (const u8*)zIn;
   const u8 *zTerm;
@@ -10089,7 +10131,7 @@ static int sqlite3Utf8CharLen(const char *zIn, int nByte){
 **
 ** NULL is returned if there is an allocation error.
 */
-static char *sqlite3Utf16to8(const void *z, int nByte){
+SQLITE_PRIVATE char *sqlite3Utf16to8(const void *z, int nByte){
   Mem m;
   memset(&m, 0, sizeof(m));
   sqlite3VdbeMemSetStr(&m, z, nByte, SQLITE_UTF16NATIVE, SQLITE_STATIC);
@@ -10106,7 +10148,7 @@ static char *sqlite3Utf16to8(const void *z, int nByte){
 ** then return the number of bytes in the first nChar unicode characters
 ** in pZ (or up until the first pair of 0x00 bytes, whichever comes first).
 */
-static int sqlite3Utf16ByteLen(const void *zIn, int nChar){
+SQLITE_PRIVATE int sqlite3Utf16ByteLen(const void *zIn, int nChar){
   unsigned int c = 1;
   char const *z = zIn;
   int n = 0;
@@ -10143,7 +10185,7 @@ static int sqlite3Utf16ByteLen(const void *zIn, int nChar){
 ** The translation is done in-place (since it is impossible for the
 ** correct UTF-8 encoding to be longer than a malformed encoding).
 */
-static int sqlite3Utf8To8(unsigned char *zIn){
+SQLITE_PRIVATE int sqlite3Utf8To8(unsigned char *zIn){
   unsigned char *zOut = zIn;
   unsigned char *zStart = zIn;
   int c;
@@ -10166,7 +10208,7 @@ static int sqlite3Utf8To8(unsigned char *zIn){
 ** It checks that the primitives for serializing and deserializing
 ** characters in each encoding are inverses of each other.
 */
-static void sqlite3UtfSelfTest(){
+SQLITE_PRIVATE void sqlite3UtfSelfTest(){
   unsigned int i, t;
   unsigned char zBuf[20];
   unsigned char *z;
@@ -10230,7 +10272,7 @@ static void sqlite3UtfSelfTest(){
 ** This file contains functions for allocating memory, comparing
 ** strings, and stuff like that.
 **
-** $Id: util.c,v 1.205 2007/05/16 17:50:46 danielk1977 Exp $
+** $Id: util.c,v 1.207 2007/06/26 00:37:28 drh Exp $
 */
 
 
@@ -10255,7 +10297,7 @@ static void sqlite3UtfSelfTest(){
 ** should be called with err_code set to SQLITE_OK and zFormat set
 ** to NULL.
 */
-static void sqlite3Error(sqlite3 *db, int err_code, const char *zFormat, ...){
+SQLITE_PRIVATE void sqlite3Error(sqlite3 *db, int err_code, const char *zFormat, ...){
   if( db && (db->pErr || (db->pErr = sqlite3ValueNew())!=0) ){
     db->errCode = err_code;
     if( zFormat ){
@@ -10288,7 +10330,7 @@ static void sqlite3Error(sqlite3 *db, int err_code, const char *zFormat, ...){
 ** Function sqlite3Error() should be used during statement execution
 ** (sqlite3_step() etc.).
 */
-static void sqlite3ErrorMsg(Parse *pParse, const char *zFormat, ...){
+SQLITE_PRIVATE void sqlite3ErrorMsg(Parse *pParse, const char *zFormat, ...){
   va_list ap;
   pParse->nErr++;
   sqliteFree(pParse->zErrMsg);
@@ -10303,7 +10345,7 @@ static void sqlite3ErrorMsg(Parse *pParse, const char *zFormat, ...){
 /*
 ** Clear the error message in pParse, if any
 */
-static void sqlite3ErrorClear(Parse *pParse){
+SQLITE_PRIVATE void sqlite3ErrorClear(Parse *pParse){
   sqliteFree(pParse->zErrMsg);
   pParse->zErrMsg = 0;
   pParse->nErr = 0;
@@ -10319,7 +10361,7 @@ static void sqlite3ErrorClear(Parse *pParse){
 ** brackets from around identifers.  For example:  "[a-b-c]" becomes
 ** "a-b-c".
 */
-static void sqlite3Dequote(char *z){
+SQLITE_PRIVATE void sqlite3Dequote(char *z){
   int quote;
   int i, j;
   if( z==0 ) return;
@@ -10392,14 +10434,14 @@ const unsigned char sqlite3UpperToLower[] = {
 ** Some systems have stricmp().  Others have strcasecmp().  Because
 ** there is no consistency, we will define our own.
 */
-static int sqlite3StrICmp(const char *zLeft, const char *zRight){
+SQLITE_PRIVATE int sqlite3StrICmp(const char *zLeft, const char *zRight){
   register unsigned char *a, *b;
   a = (unsigned char *)zLeft;
   b = (unsigned char *)zRight;
   while( *a!=0 && UpperToLower[*a]==UpperToLower[*b]){ a++; b++; }
   return UpperToLower[*a] - UpperToLower[*b];
 }
-static int sqlite3StrNICmp(const char *zLeft, const char *zRight, int N){
+SQLITE_PRIVATE int sqlite3StrNICmp(const char *zLeft, const char *zRight, int N){
   register unsigned char *a, *b;
   a = (unsigned char *)zLeft;
   b = (unsigned char *)zRight;
@@ -10415,7 +10457,7 @@ static int sqlite3StrNICmp(const char *zLeft, const char *zRight, int N){
 **
 ** An empty string is considered non-numeric.
 */
-static int sqlite3IsNumber(const char *z, int *realnum, u8 enc){
+SQLITE_PRIVATE int sqlite3IsNumber(const char *z, int *realnum, u8 enc){
   int incr = (enc==SQLITE_UTF8?1:2);
   if( enc==SQLITE_UTF16BE ) z++;
   if( *z=='-' || *z=='+' ) z += incr;
@@ -10453,7 +10495,7 @@ static int sqlite3IsNumber(const char *z, int *realnum, u8 enc){
 ** of "." depending on how locale is set.  But that would cause problems
 ** for SQL.  So this routine always uses "." regardless of locale.
 */
-static int sqlite3AtoF(const char *z, double *pResult){
+SQLITE_PRIVATE int sqlite3AtoF(const char *z, double *pResult){
 #ifndef SQLITE_OMIT_FLOATING_POINT
   int sign = 1;
   const char *zBegin = z;
@@ -10512,17 +10554,39 @@ static int sqlite3AtoF(const char *z, double *pResult){
 }
 
 /*
+** Compare the 19-character string zNum against the text representation
+** value 2^63:  9223372036854775808.  Return negative, zero, or positive
+** if zNum is less than, equal to, or greater than the string.
+**
+** Unlike memcmp() this routine is guaranteed to return the difference
+** in the values of the last digit if the only difference is in the
+** last digit.  So, for example,
+**
+**      compare2pow63("9223372036854775800")
+**
+** will return -8.
+*/
+static int compare2pow63(const char *zNum){
+  int c;
+  c = memcmp(zNum,"922337203685477580",18);
+  if( c==0 ){
+    c = zNum[18] - '8';
+  }
+  return c;
+}
+
+
+/*
 ** Return TRUE if zNum is a 64-bit signed integer and write
 ** the value of the integer into *pNum.  If zNum is not an integer
 ** or is an integer that is too large to be expressed with 64 bits,
-** then return false.  If n>0 and the integer is string is not
-** exactly n bytes long, return false.
+** then return false.
 **
 ** When this routine was originally written it dealt with only
 ** 32-bit numbers.  At that time, it was much faster than the
 ** atoi() library routine in RedHat 7.2.
 */
-static int sqlite3Atoi64(const char *zNum, i64 *pNum){
+SQLITE_PRIVATE int sqlite3Atoi64(const char *zNum, i64 *pNum){
   i64 v = 0;
   int neg;
   int i, c;
@@ -10536,42 +10600,24 @@ static int sqlite3Atoi64(const char *zNum, i64 *pNum){
   }else{
     neg = 0;
   }
+  while( zNum[0]=='0' ){ zNum++; } /* Skip over leading zeros. Ticket #2454 */
   for(i=0; (c=zNum[i])>='0' && c<='9'; i++){
     v = v*10 + c - '0';
   }
   *pNum = neg ? -v : v;
-  return c==0 && i>0 && 
-      (i<19 || (i==19 && memcmp(zNum,"9223372036854775807",19)<=0));
-}
-
-/*
-** The string zNum represents an integer.  There might be some other
-** information following the integer too, but that part is ignored.
-** If the integer that the prefix of zNum represents will fit in a
-** 32-bit signed integer, return TRUE.  Otherwise return FALSE.
-**
-** This routine returns FALSE for the string -2147483648 even that
-** that number will in fact fit in a 32-bit integer.  But positive
-** 2147483648 will not fit in 32 bits.  So it seems safer to return
-** false.
-*/
-static int sqlite3FitsIn32Bits(const char *zNum){
-  int i, c;
-  if( *zNum=='-' || *zNum=='+' ) zNum++;
-  for(i=0; (c=zNum[i])>='0' && c<='9'; i++){}
-  return i<10 || (i==10 && memcmp(zNum,"2147483647",10)<=0);
-}
-
-/*
-** If zNum represents an integer that will fit in 32-bits, then set
-** *pValue to that integer and return true.  Otherwise return false.
-*/
-static int sqlite3GetInt32(const char *zNum, int *pValue){
-  if( sqlite3FitsIn32Bits(zNum) ){
-    *pValue = atoi(zNum);
+  if( c!=0 || i==0 || i>19 ){
+    /* zNum is empty or contains non-numeric text or is longer
+    ** than 19 digits (thus guaranting that it is too large) */
+    return 0;
+  }else if( i<19 ){
+    /* Less than 19 digits, so we know that it fits in 64 bits */
     return 1;
+  }else{
+    /* 19-digit numbers must be no larger than 9223372036854775807 if positive
+    ** or 9223372036854775808 if negative.  Note that 9223372036854665808
+    ** is 2^63. */
+    return compare2pow63(zNum)<neg;
   }
-  return 0;
 }
 
 /*
@@ -10585,13 +10631,65 @@ static int sqlite3GetInt32(const char *zNum, int *pValue){
 ** 9223373036854775808 will not fit in 64 bits.  So it seems safer to return
 ** false.
 */
-static int sqlite3FitsIn64Bits(const char *zNum){
+SQLITE_PRIVATE int sqlite3FitsIn64Bits(const char *zNum){
   int i, c;
-  if( *zNum=='-' || *zNum=='+' ) zNum++;
+  int neg = 0;
+  if( *zNum=='-' ){
+    neg = 1;
+    zNum++;
+  }else if( *zNum=='+' ){
+    zNum++;
+  }
+  while( *zNum=='0' ){
+    zNum++;   /* Skip leading zeros.  Ticket #2454 */
+  }
   for(i=0; (c=zNum[i])>='0' && c<='9'; i++){}
-  return i<19 || (i==19 && memcmp(zNum,"9223372036854775807",19)<=0);
+  if( i<19 ){
+    /* Guaranteed to fit if less than 19 digits */
+    return 1;
+  }else if( i>19 ){
+    /* Guaranteed to be too big if greater than 19 digits */
+    return 0;
+  }else{
+    /* Compare against 2^63. */
+    return compare2pow63(zNum)<neg;
+  }
 }
 
+/*
+** If zNum represents an integer that will fit in 32-bits, then set
+** *pValue to that integer and return true.  Otherwise return false.
+**
+** Any non-numeric characters that following zNum are ignored.
+** This is different from sqlite3Atoi64() which requires the
+** input number to be zero-terminated.
+*/
+SQLITE_PRIVATE int sqlite3GetInt32(const char *zNum, int *pValue){
+  sqlite_int64 v = 0;
+  int i, c;
+  int neg = 0;
+  if( zNum[0]=='-' ){
+    neg = 1;
+    zNum++;
+  }else if( zNum[0]=='+' ){
+    zNum++;
+  }
+  while( zNum[0]=='0' ) zNum++;
+  for(i=0; i<10 && (c = zNum[i] - '0')>=0 && c<=9; i++){
+    v = v*10 + c;
+  }
+  if( i>9 ){
+    return 0;
+  }
+  if( v-neg>2147483647 ){
+    return 0;
+  }
+  if( neg ){
+    v = -v;
+  }
+  *pValue = (int)v;
+  return 1;
+}
 
 /*
 ** Check to make sure we have a valid db pointer.  This test is not
@@ -10602,7 +10700,7 @@ static int sqlite3FitsIn64Bits(const char *zNum){
 ** dereferenced for any reason.  The calling function should invoke
 ** SQLITE_MISUSE immediately.
 */
-static int sqlite3SafetyCheck(sqlite3 *db){
+SQLITE_PRIVATE int sqlite3SafetyCheck(sqlite3 *db){
   int magic;
   if( db==0 ) return 1;
   magic = db->magic;
@@ -10641,7 +10739,7 @@ static int sqlite3SafetyCheck(sqlite3 *db){
 ** bit clear.  Except, if we get to the 9th byte, it stores the full
 ** 8 bits and is the last byte.
 */
-static int sqlite3PutVarint(unsigned char *p, u64 v){
+SQLITE_PRIVATE int sqlite3PutVarint(unsigned char *p, u64 v){
   int i, j, n;
   u8 buf[10];
   if( v & (((u64)0xff000000)<<32) ){
@@ -10670,7 +10768,7 @@ static int sqlite3PutVarint(unsigned char *p, u64 v){
 ** Read a 64-bit variable-length integer from memory starting at p[0].
 ** Return the number of bytes read.  The value is stored in *v.
 */
-static int sqlite3GetVarint(const unsigned char *p, u64 *v){
+SQLITE_PRIVATE int sqlite3GetVarint(const unsigned char *p, u64 *v){
   u32 x;
   u64 x64;
   int n;
@@ -10712,7 +10810,7 @@ static int sqlite3GetVarint(const unsigned char *p, u64 *v){
 ** Read a 32-bit variable-length integer from memory starting at p[0].
 ** Return the number of bytes read.  The value is stored in *v.
 */
-static int sqlite3GetVarint32(const unsigned char *p, u32 *v){
+SQLITE_PRIVATE int sqlite3GetVarint32(const unsigned char *p, u32 *v){
   u32 x;
   int n;
   unsigned char c;
@@ -10738,7 +10836,7 @@ static int sqlite3GetVarint32(const unsigned char *p, u32 *v){
 ** Return the number of bytes that will be needed to store the given
 ** 64-bit integer.
 */
-static int sqlite3VarintLen(u64 v){
+SQLITE_PRIVATE int sqlite3VarintLen(u64 v){
   int i = 0;
   do{
     i++;
@@ -10751,10 +10849,10 @@ static int sqlite3VarintLen(u64 v){
 /*
 ** Read or write a four-byte big-endian integer value.
 */
-static u32 sqlite3Get4byte(const u8 *p){
+SQLITE_PRIVATE u32 sqlite3Get4byte(const u8 *p){
   return (p[0]<<24) | (p[1]<<16) | (p[2]<<8) | p[3];
 }
-static void sqlite3Put4byte(unsigned char *p, u32 v){
+SQLITE_PRIVATE void sqlite3Put4byte(unsigned char *p, u32 v){
   p[0] = v>>24;
   p[1] = v>>16;
   p[2] = v>>8;
@@ -10787,7 +10885,7 @@ static int hexToInt(int h){
 ** binary value has been obtained from malloc and must be freed by
 ** the calling routine.
 */
-static void *sqlite3HexToBlob(const char *z){
+SQLITE_PRIVATE void *sqlite3HexToBlob(const char *z){
   char *zBlob;
   int i;
   int n = strlen(z);
@@ -10829,7 +10927,7 @@ static void *sqlite3HexToBlob(const char *z){
 ** call to sqlite3_close(db) and db has been deallocated.  And we do
 ** not want to write into deallocated memory.
 */
-static int sqlite3SafetyOn(sqlite3 *db){
+SQLITE_PRIVATE int sqlite3SafetyOn(sqlite3 *db){
   if( db->magic==SQLITE_MAGIC_OPEN ){
     db->magic = SQLITE_MAGIC_BUSY;
     return 0;
@@ -10845,7 +10943,7 @@ static int sqlite3SafetyOn(sqlite3 *db){
 ** Return an error (non-zero) if the magic was not SQLITE_MAGIC_BUSY
 ** when this routine is called.
 */
-static int sqlite3SafetyOff(sqlite3 *db){
+SQLITE_PRIVATE int sqlite3SafetyOff(sqlite3 *db){
   if( db->magic==SQLITE_MAGIC_BUSY ){
     db->magic = SQLITE_MAGIC_OPEN;
     return 0;
@@ -10859,7 +10957,7 @@ static int sqlite3SafetyOff(sqlite3 *db){
 /*
 ** Return a pointer to the ThreadData associated with the calling thread.
 */
-static ThreadData *sqlite3ThreadData(){
+SQLITE_PRIVATE ThreadData *sqlite3ThreadData(){
   ThreadData *p = (ThreadData*)sqlite3OsThreadSpecificData(1);
   if( !p ){
     sqlite3FailedMalloc();
@@ -10872,7 +10970,7 @@ static ThreadData *sqlite3ThreadData(){
 ** If no ThreadData has been allocated to this thread yet, return a pointer
 ** to a substitute ThreadData structure that is all zeros. 
 */
-static const ThreadData *sqlite3ThreadDataReadOnly(){
+SQLITE_PRIVATE const ThreadData *sqlite3ThreadDataReadOnly(){
   static const ThreadData zeroData = {0};  /* Initializer to silence warnings
                                            ** from broken compilers */
   const ThreadData *pTd = sqlite3OsThreadSpecificData(0);
@@ -10883,7 +10981,7 @@ static const ThreadData *sqlite3ThreadDataReadOnly(){
 ** Check to see if the ThreadData for this thread is all zero.  If it
 ** is, then deallocate it. 
 */
-static void sqlite3ReleaseThreadData(){
+SQLITE_PRIVATE void sqlite3ReleaseThreadData(){
   sqlite3OsThreadSpecificData(-1);
 }
 
@@ -10918,7 +11016,7 @@ static void sqlite3ReleaseThreadData(){
 ** sense for SQLITE_HASH_STRING and SQLITE_HASH_BINARY and is ignored
 ** for other key classes.
 */
-static void sqlite3HashInit(Hash *pNew, int keyClass, int copyKey){
+SQLITE_PRIVATE void sqlite3HashInit(Hash *pNew, int keyClass, int copyKey){
   assert( pNew!=0 );
   assert( keyClass>=SQLITE_HASH_STRING && keyClass<=SQLITE_HASH_BINARY );
   pNew->keyClass = keyClass;
@@ -10938,7 +11036,7 @@ static void sqlite3HashInit(Hash *pNew, int keyClass, int copyKey){
 ** Call this routine to delete a hash table or to reset a hash table
 ** to the empty state.
 */
-static void sqlite3HashClear(Hash *pH){
+SQLITE_PRIVATE void sqlite3HashClear(Hash *pH){
   HashElem *elem;         /* For looping over all elements of the table */
 
   assert( pH!=0 );
@@ -11196,7 +11294,7 @@ static void removeElementGivenHash(
 ** that matches pKey,nKey.  Return the data for this element if it is
 ** found, or NULL if there is no match.
 */
-static void *sqlite3HashFind(const Hash *pH, const void *pKey, int nKey){
+SQLITE_PRIVATE void *sqlite3HashFind(const Hash *pH, const void *pKey, int nKey){
   int h;             /* A hash on key */
   HashElem *elem;    /* The element that matches key */
   int (*xHash)(const void*,int);  /* The hash function */
@@ -11225,7 +11323,7 @@ static void *sqlite3HashFind(const Hash *pH, const void *pKey, int nKey){
 ** If the "data" parameter to this function is NULL, then the
 ** element corresponding to "key" is removed from the hash table.
 */
-static void *sqlite3HashInsert(Hash *pH, const void *pKey, int nKey, void *data){
+SQLITE_PRIVATE void *sqlite3HashInsert(Hash *pH, const void *pKey, int nKey, void *data){
   int hraw;             /* Raw hash value of the key */
   int h;                /* the hash of the key modulo hash table size */
   HashElem *elem;       /* Used to loop thru the element list */
@@ -11318,43 +11416,43 @@ const char *const sqlite3OpcodeNames[] = { "?",
  /*  25 */ "Variable",
  /*  26 */ "String",
  /*  27 */ "RealAffinity",
- /*  28 */ "ParseSchema",
- /*  29 */ "VOpen",
- /*  30 */ "Close",
- /*  31 */ "CreateIndex",
- /*  32 */ "IsUnique",
- /*  33 */ "NotFound",
- /*  34 */ "Int64",
- /*  35 */ "MustBeInt",
- /*  36 */ "Halt",
- /*  37 */ "Rowid",
- /*  38 */ "IdxLT",
- /*  39 */ "AddImm",
- /*  40 */ "Statement",
- /*  41 */ "RowData",
- /*  42 */ "MemMax",
- /*  43 */ "Push",
- /*  44 */ "NotExists",
- /*  45 */ "MemIncr",
- /*  46 */ "Gosub",
- /*  47 */ "Integer",
- /*  48 */ "MemInt",
- /*  49 */ "Prev",
- /*  50 */ "VColumn",
- /*  51 */ "CreateTable",
- /*  52 */ "Last",
- /*  53 */ "IncrVacuum",
- /*  54 */ "IdxRowid",
- /*  55 */ "MakeIdxRec",
- /*  56 */ "ResetCount",
- /*  57 */ "FifoWrite",
- /*  58 */ "Callback",
- /*  59 */ "ContextPush",
+ /*  28 */ "VRename",
+ /*  29 */ "ParseSchema",
+ /*  30 */ "VOpen",
+ /*  31 */ "Close",
+ /*  32 */ "CreateIndex",
+ /*  33 */ "IsUnique",
+ /*  34 */ "NotFound",
+ /*  35 */ "Int64",
+ /*  36 */ "MustBeInt",
+ /*  37 */ "Halt",
+ /*  38 */ "Rowid",
+ /*  39 */ "IdxLT",
+ /*  40 */ "AddImm",
+ /*  41 */ "Statement",
+ /*  42 */ "RowData",
+ /*  43 */ "MemMax",
+ /*  44 */ "Push",
+ /*  45 */ "NotExists",
+ /*  46 */ "MemIncr",
+ /*  47 */ "Gosub",
+ /*  48 */ "Integer",
+ /*  49 */ "MemInt",
+ /*  50 */ "Prev",
+ /*  51 */ "VColumn",
+ /*  52 */ "CreateTable",
+ /*  53 */ "Last",
+ /*  54 */ "IncrVacuum",
+ /*  55 */ "IdxRowid",
+ /*  56 */ "MakeIdxRec",
+ /*  57 */ "ResetCount",
+ /*  58 */ "FifoWrite",
+ /*  59 */ "Callback",
  /*  60 */ "Or",
  /*  61 */ "And",
- /*  62 */ "DropTrigger",
- /*  63 */ "DropIndex",
- /*  64 */ "IdxGE",
+ /*  62 */ "ContextPush",
+ /*  63 */ "DropTrigger",
+ /*  64 */ "DropIndex",
  /*  65 */ "IsNull",
  /*  66 */ "NotNull",
  /*  67 */ "Ne",
@@ -11363,7 +11461,7 @@ const char *const sqlite3OpcodeNames[] = { "?",
  /*  70 */ "Le",
  /*  71 */ "Lt",
  /*  72 */ "Ge",
- /*  73 */ "IdxDelete",
+ /*  73 */ "IdxGE",
  /*  74 */ "BitAnd",
  /*  75 */ "BitOr",
  /*  76 */ "ShiftLeft",
@@ -11374,59 +11472,59 @@ const char *const sqlite3OpcodeNames[] = { "?",
  /*  81 */ "Divide",
  /*  82 */ "Remainder",
  /*  83 */ "Concat",
- /*  84 */ "Vacuum",
+ /*  84 */ "IdxDelete",
  /*  85 */ "Negative",
- /*  86 */ "MoveLe",
+ /*  86 */ "Vacuum",
  /*  87 */ "BitNot",
  /*  88 */ "String8",
- /*  89 */ "IfNot",
- /*  90 */ "DropTable",
- /*  91 */ "MakeRecord",
- /*  92 */ "Delete",
- /*  93 */ "AggFinal",
- /*  94 */ "Dup",
- /*  95 */ "Goto",
- /*  96 */ "TableLock",
- /*  97 */ "FifoRead",
- /*  98 */ "Clear",
- /*  99 */ "IdxGT",
- /* 100 */ "MoveLt",
- /* 101 */ "VerifyCookie",
- /* 102 */ "AggStep",
- /* 103 */ "Pull",
- /* 104 */ "SetNumColumns",
- /* 105 */ "AbsValue",
- /* 106 */ "Transaction",
- /* 107 */ "VFilter",
- /* 108 */ "VDestroy",
- /* 109 */ "ContextPop",
- /* 110 */ "Next",
- /* 111 */ "IdxInsert",
- /* 112 */ "Distinct",
- /* 113 */ "Insert",
- /* 114 */ "Destroy",
- /* 115 */ "ReadCookie",
- /* 116 */ "ForceInt",
- /* 117 */ "LoadAnalysis",
- /* 118 */ "Explain",
- /* 119 */ "IfMemZero",
- /* 120 */ "OpenPseudo",
- /* 121 */ "OpenEphemeral",
- /* 122 */ "Null",
- /* 123 */ "Blob",
- /* 124 */ "MemStore",
+ /*  89 */ "MoveLe",
+ /*  90 */ "IfNot",
+ /*  91 */ "DropTable",
+ /*  92 */ "MakeRecord",
+ /*  93 */ "Delete",
+ /*  94 */ "AggFinal",
+ /*  95 */ "Dup",
+ /*  96 */ "Goto",
+ /*  97 */ "TableLock",
+ /*  98 */ "FifoRead",
+ /*  99 */ "Clear",
+ /* 100 */ "IdxGT",
+ /* 101 */ "MoveLt",
+ /* 102 */ "VerifyCookie",
+ /* 103 */ "AggStep",
+ /* 104 */ "Pull",
+ /* 105 */ "SetNumColumns",
+ /* 106 */ "AbsValue",
+ /* 107 */ "Transaction",
+ /* 108 */ "VFilter",
+ /* 109 */ "VDestroy",
+ /* 110 */ "ContextPop",
+ /* 111 */ "Next",
+ /* 112 */ "IdxInsert",
+ /* 113 */ "Distinct",
+ /* 114 */ "Insert",
+ /* 115 */ "Destroy",
+ /* 116 */ "ReadCookie",
+ /* 117 */ "ForceInt",
+ /* 118 */ "LoadAnalysis",
+ /* 119 */ "Explain",
+ /* 120 */ "IfMemZero",
+ /* 121 */ "OpenPseudo",
+ /* 122 */ "OpenEphemeral",
+ /* 123 */ "Null",
+ /* 124 */ "Blob",
  /* 125 */ "Real",
  /* 126 */ "HexBlob",
- /* 127 */ "Rewind",
- /* 128 */ "MoveGe",
- /* 129 */ "VBegin",
- /* 130 */ "VUpdate",
- /* 131 */ "VCreate",
- /* 132 */ "MemMove",
- /* 133 */ "MemNull",
- /* 134 */ "Found",
- /* 135 */ "NullRow",
- /* 136 */ "NotUsed_136",
+ /* 127 */ "MemStore",
+ /* 128 */ "Rewind",
+ /* 129 */ "MoveGe",
+ /* 130 */ "VBegin",
+ /* 131 */ "VUpdate",
+ /* 132 */ "VCreate",
+ /* 133 */ "MemMove",
+ /* 134 */ "MemNull",
+ /* 135 */ "Found",
+ /* 136 */ "NullRow",
  /* 137 */ "NotUsed_137",
  /* 138 */ "ToText",
  /* 139 */ "ToBlob",
@@ -11452,11 +11550,6 @@ const char *const sqlite3OpcodeNames[] = { "?",
 **
 ** This file contains code that is specific to OS/2.
 */
-
-#if (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ >= 3) && defined(OS2_HIGH_MEMORY)
-/* os2safe.h has to be included before os2.h, needed for high mem */
-#include <os2safe.h>
-#endif
 
 
 #if OS_OS2
@@ -11620,7 +11713,7 @@ int sqlite3_open_file_count = 0;
 ** set of implementations is used instead.
 */
 #if defined(SQLITE_ENABLE_MEMORY_MANAGEMENT) || defined (SQLITE_MEMDEBUG)
-static void *sqlite3GenericMalloc(int n){
+SQLITE_PRIVATE void *sqlite3GenericMalloc(int n){
   char *p = (char *)malloc(n+8);
   assert(n>0);
   assert(sizeof(int)<=8);
@@ -11630,7 +11723,7 @@ static void *sqlite3GenericMalloc(int n){
   }
   return (void *)p;
 }
-static void *sqlite3GenericRealloc(void *p, int n){
+SQLITE_PRIVATE void *sqlite3GenericRealloc(void *p, int n){
   char *p2 = ((char *)p - 8);
   assert(n>0);
   p2 = (char*)realloc(p2, n+8);
@@ -11640,29 +11733,29 @@ static void *sqlite3GenericRealloc(void *p, int n){
   }
   return (void *)p2;
 }
-static void sqlite3GenericFree(void *p){
+SQLITE_PRIVATE void sqlite3GenericFree(void *p){
   assert(p);
   free((void *)((char *)p - 8));
 }
-static int sqlite3GenericAllocationSize(void *p){
+SQLITE_PRIVATE int sqlite3GenericAllocationSize(void *p){
   return p ? *(int *)((char *)p - 8) : 0;
 }
 #else
-static void *sqlite3GenericMalloc(int n){
+SQLITE_PRIVATE void *sqlite3GenericMalloc(int n){
   char *p = (char *)malloc(n);
   return (void *)p;
 }
-static void *sqlite3GenericRealloc(void *p, int n){
+SQLITE_PRIVATE void *sqlite3GenericRealloc(void *p, int n){
   assert(n>0);
   p = realloc(p, n);
   return p;
 }
-static void sqlite3GenericFree(void *p){
+SQLITE_PRIVATE void sqlite3GenericFree(void *p){
   assert(p);
   free(p);
 }
 /* Never actually used, but needed for the linker */
-static int sqlite3GenericAllocationSize(void *p){ return 0; }
+SQLITE_PRIVATE int sqlite3GenericAllocationSize(void *p){ return 0; }
 #endif
 
 /*
@@ -11698,7 +11791,7 @@ struct os2File {
 /*
 ** Delete the named file
 */
-static int sqlite3Os2Delete( const char *zFilename ){
+SQLITE_PRIVATE int sqlite3Os2Delete( const char *zFilename ){
   APIRET rc = NO_ERROR;
 
   rc = DosDelete( (PSZ)zFilename );
@@ -11709,7 +11802,7 @@ static int sqlite3Os2Delete( const char *zFilename ){
 /*
 ** Return TRUE if the named file exists.
 */
-static int sqlite3Os2FileExists( const char *zFilename ){
+SQLITE_PRIVATE int sqlite3Os2FileExists( const char *zFilename ){
   FILESTATUS3 fsts3ConfigInfo;
   memset(&fsts3ConfigInfo, 0, sizeof(fsts3ConfigInfo));
   return DosQueryPathInfo( (PSZ)zFilename, FIL_STANDARD,
@@ -11732,7 +11825,7 @@ int allocateOs2File( os2File *pInit, OsFile **pld );
 ** On failure, the function returns SQLITE_CANTOPEN and leaves
 ** *id and *pReadonly unchanged.
 */
-static int sqlite3Os2OpenReadWrite(
+SQLITE_PRIVATE int sqlite3Os2OpenReadWrite(
   const char *zFilename,
   OsFile **pld,
   int *pReadonly
@@ -11786,7 +11879,7 @@ static int sqlite3Os2OpenReadWrite(
 **
 ** On failure, return SQLITE_CANTOPEN.
 */
-static int sqlite3Os2OpenExclusive( const char *zFilename, OsFile **pld, int delFlag ){
+SQLITE_PRIVATE int sqlite3Os2OpenExclusive( const char *zFilename, OsFile **pld, int delFlag ){
   os2File  f;
   HFILE    hf;
   ULONG    ulAction;
@@ -11806,7 +11899,7 @@ static int sqlite3Os2OpenExclusive( const char *zFilename, OsFile **pld, int del
   f.delOnClose = delFlag ? 1 : 0;
   f.pathToDel = delFlag ? sqlite3OsFullPathname( zFilename ) : NULL;
   OpenCounter( +1 );
-  if( delFlag ) DosForceDelete( sqlite3OsFullPathname( zFilename ) );
+  if( delFlag ) DosForceDelete( (PSZ)sqlite3OsFullPathname( zFilename ) );
   OSTRACE3( "OPEN EX %d \"%s\"\n", hf, sqlite3OsFullPathname ( zFilename ) );
   return allocateOs2File( &f, pld );
 }
@@ -11818,7 +11911,7 @@ static int sqlite3Os2OpenExclusive( const char *zFilename, OsFile **pld, int del
 **
 ** On failure, return SQLITE_CANTOPEN.
 */
-static int sqlite3Os2OpenReadOnly( const char *zFilename, OsFile **pld ){
+SQLITE_PRIVATE int sqlite3Os2OpenReadOnly( const char *zFilename, OsFile **pld ){
   os2File  f;
   HFILE    hf;
   ULONG    ulAction;
@@ -11868,19 +11961,19 @@ int os2OpenDirectory(
 ** Create a temporary file name in zBuf.  zBuf must be big enough to
 ** hold at least SQLITE_TEMPNAME_SIZE characters.
 */
-static int sqlite3Os2TempFileName( char *zBuf ){
+SQLITE_PRIVATE int sqlite3Os2TempFileName( char *zBuf ){
   static const unsigned char zChars[] =
     "abcdefghijklmnopqrstuvwxyz"
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     "0123456789";
   int i, j;
   PSZ zTempPath = 0;
-  if( DosScanEnv( "TEMP", &zTempPath ) ){
-    if( DosScanEnv( "TMP", &zTempPath ) ){
-      if( DosScanEnv( "TMPDIR", &zTempPath ) ){
+  if( DosScanEnv( (PSZ)"TEMP", &zTempPath ) ){
+    if( DosScanEnv( (PSZ)"TMP", &zTempPath ) ){
+      if( DosScanEnv( (PSZ)"TMPDIR", &zTempPath ) ){
            ULONG ulDriveNum = 0, ulDriveMap = 0;
            DosQueryCurrentDisk( &ulDriveNum, &ulDriveMap );
-           sprintf( zTempPath, "%c:", (char)( 'A' + ulDriveNum - 1 ) );
+           sprintf( (char*)zTempPath, "%c:", (char)( 'A' + ulDriveNum - 1 ) );
       }
     }
   }
@@ -11909,7 +12002,7 @@ int os2Close( OsFile **pld ){
     rc = DosClose( pFile->h );
     pFile->locktype = NO_LOCK;
     if( pFile->delOnClose != 0 ){
-        rc = DosForceDelete( pFile->pathToDel );
+        rc = DosForceDelete( (PSZ)pFile->pathToDel );
     }
     *pld = 0;
     OpenCounter( -1 );
@@ -11931,7 +12024,7 @@ int os2Read( OsFile *id, void *pBuf, int amt ){
   DosRead( ((os2File*)id)->h, pBuf, amt, &got );
   if (got == (ULONG)amt)
     return SQLITE_OK;
-  else if (got < 0)
+  else if (got == 0)
     return SQLITE_IOERR_READ;
   else {
     memset(&((char*)pBuf)[got], 0, amt-got);
@@ -11984,7 +12077,7 @@ int os2Sync( OsFile *id, int dataOnly ){
 ** Sync the directory zDirname. This is a no-op on operating systems other
 ** than UNIX.
 */
-static int sqlite3Os2SyncDirectory( const char *zDirname ){
+SQLITE_PRIVATE int sqlite3Os2SyncDirectory( const char *zDirname ){
   SimulateIOError( return SQLITE_IOERR );
   return SQLITE_OK;
 }
@@ -12060,7 +12153,7 @@ static int unlockReadLock( os2File *id ){
 ** Check that a given pathname is a directory and is writable
 **
 */
-static int sqlite3Os2IsDirWritable( char *zDirname ){
+SQLITE_PRIVATE int sqlite3Os2IsDirWritable( char *zDirname ){
   FILESTATUS3 fsts3ConfigInfo;
   APIRET rc = NO_ERROR;
   memset(&fsts3ConfigInfo, 0, sizeof(fsts3ConfigInfo));
@@ -12322,21 +12415,27 @@ int os2Unlock( OsFile *id, int locktype ){
 ** The calling function is responsible for freeing this space once it
 ** is no longer needed.
 */
-static char *sqlite3Os2FullPathname( const char *zRelative ){
+SQLITE_PRIVATE char *sqlite3Os2FullPathname( const char *zRelative ){
   char *zFull = 0;
   if( strchr(zRelative, ':') ){
     sqlite3SetString( &zFull, zRelative, (char*)0 );
   }else{
-    char zBuff[SQLITE_TEMPNAME_SIZE - 2] = {0};
-    char zDrive[1] = {0};
-    ULONG cbzFullLen = SQLITE_TEMPNAME_SIZE;
     ULONG ulDriveNum = 0;
     ULONG ulDriveMap = 0;
-    DosQueryCurrentDisk( &ulDriveNum, &ulDriveMap );
-    DosQueryCurrentDir( 0L, zBuff, &cbzFullLen );
-    zFull = sqliteMalloc( cbzFullLen );
-    sprintf( zDrive, "%c", (char)('A' + ulDriveNum - 1) );
-    sqlite3SetString( &zFull, zDrive, ":\\", zBuff, "\\", zRelative, (char*)0 );
+    ULONG cbzBufLen = SQLITE_TEMPNAME_SIZE;
+    char zDrive[2];
+    char *zBuff;
+
+    zBuff = sqliteMalloc( cbzBufLen );
+    if( zBuff != 0 ){
+      DosQueryCurrentDisk( &ulDriveNum, &ulDriveMap );
+      if( DosQueryCurrentDir( ulDriveNum, (PBYTE)zBuff, &cbzBufLen ) == NO_ERROR ){
+        sprintf( zDrive, "%c", (char)('A' + ulDriveNum - 1) );
+        sqlite3SetString( &zFull, zDrive, ":\\", zBuff,
+                          "\\", zRelative, (char*)0 );
+      }
+      sqliteFree( zBuff );
+    }
   }
   return zFull;
 }
@@ -12434,15 +12533,15 @@ int allocateOs2File( os2File *pInit, OsFile **pld ){
 ** Interfaces for opening a shared library, finding entry points
 ** within the shared library, and closing the shared library.
 */
-static void *sqlite3Os2Dlopen(const char *zFilename){
+SQLITE_PRIVATE void *sqlite3Os2Dlopen(const char *zFilename){
   UCHAR loadErr[256];
   HMODULE hmod;
   APIRET rc;
-  rc = DosLoadModule(loadErr, sizeof(loadErr), zFilename, &hmod);
+  rc = DosLoadModule((PSZ)loadErr, sizeof(loadErr), zFilename, &hmod);
   if (rc != NO_ERROR) return 0;
   return (void*)hmod;
 }
-static void *sqlite3Os2Dlsym(void *pHandle, const char *zSymbol){
+SQLITE_PRIVATE void *sqlite3Os2Dlsym(void *pHandle, const char *zSymbol){
   PFN pfn;
   APIRET rc;
   rc = DosQueryProcAddr((HMODULE)pHandle, 0L, zSymbol, &pfn);
@@ -12455,9 +12554,9 @@ static void *sqlite3Os2Dlsym(void *pHandle, const char *zSymbol){
     rc = DosQueryProcAddr((HMODULE)pHandle, 0L, _zSymbol, &pfn);
   }
   if (rc != NO_ERROR) return 0;
-  return pfn;
+  return (void *)pfn;
 }
-static int sqlite3Os2Dlclose(void *pHandle){
+SQLITE_PRIVATE int sqlite3Os2Dlclose(void *pHandle){
   return DosFreeModule((HMODULE)pHandle);
 }
 #endif /* SQLITE_OMIT_LOAD_EXTENSION */
@@ -12468,7 +12567,7 @@ static int sqlite3Os2Dlclose(void *pHandle){
 ** is written into the buffer zBuf[256].  The calling function must
 ** supply a sufficiently large buffer.
 */
-static int sqlite3Os2RandomSeed( char *zBuf ){
+SQLITE_PRIVATE int sqlite3Os2RandomSeed( char *zBuf ){
   /* We have to initialize zBuf to prevent valgrind from reporting
   ** errors.  The reports issued by valgrind are incorrect - we would
   ** prefer that the randomness be increased by making use of the
@@ -12489,7 +12588,7 @@ static int sqlite3Os2RandomSeed( char *zBuf ){
 /*
 ** Sleep for a little while.  Return the amount of time slept.
 */
-static int sqlite3Os2Sleep( int ms ){
+SQLITE_PRIVATE int sqlite3Os2Sleep( int ms ){
   DosSleep( ms );
   return ms;
 }
@@ -12510,9 +12609,9 @@ static ULONG mutexOwner;
 ** SQLite uses only a single Mutex.  There is not much critical
 ** code and what little there is executes quickly and without blocking.
 */
-static void sqlite3Os2EnterMutex(){
-  PTIB ptib;
+SQLITE_PRIVATE void sqlite3Os2EnterMutex(){
 #ifdef SQLITE_OS2_THREADS
+  PTIB ptib;
   DosEnterCritSec();
   DosGetInfoBlocks( &ptib, NULL );
   mutexOwner = ptib->tib_ptib2->tib2_ultid;
@@ -12520,8 +12619,10 @@ static void sqlite3Os2EnterMutex(){
   assert( !inMutex );
   inMutex = 1;
 }
-static void sqlite3Os2LeaveMutex(){
+SQLITE_PRIVATE void sqlite3Os2LeaveMutex(){
+#ifdef SQLITE_OS2_THREADS
   PTIB ptib;
+#endif
   assert( inMutex );
   inMutex = 0;
 #ifdef SQLITE_OS2_THREADS
@@ -12538,7 +12639,7 @@ static void sqlite3Os2LeaveMutex(){
 ** calling thread holds the mutex.  If the parameter is false, return
 ** true if any thread holds the mutex.
 */
-static int sqlite3Os2InMutex( int thisThreadOnly ){
+SQLITE_PRIVATE int sqlite3Os2InMutex( int thisThreadOnly ){
 #ifdef SQLITE_OS2_THREADS
   PTIB ptib;
   DosGetInfoBlocks( &ptib, NULL );
@@ -12561,7 +12662,7 @@ int sqlite3_current_time = 0;
 ** current time and date as a Julian Day number into *prNow and
 ** return 0.  Return 1 if the time and date cannot be found.
 */
-static int sqlite3Os2CurrentTime( double *prNow ){
+SQLITE_PRIVATE int sqlite3Os2CurrentTime( double *prNow ){
   double now;
   USHORT second, minute, hour,
          day, month, year;
@@ -12623,7 +12724,7 @@ int sqlite3_tsd_count = 0;
 ** Return a pointer to the thread specific data or NULL if it is
 ** unallocated or gets deallocated.
 */
-static ThreadData *sqlite3Os2ThreadSpecificData( int allocateFlag ){
+SQLITE_PRIVATE ThreadData *sqlite3Os2ThreadSpecificData( int allocateFlag ){
   static ThreadData **s_ppTsd = NULL;
   static const ThreadData zeroData = {0, 0, 0};
   ThreadData *pTsd;
@@ -12931,7 +13032,7 @@ int sqlite3_open_file_count = 0;
 ** set of implementations is used instead.
 */
 #if defined(SQLITE_ENABLE_MEMORY_MANAGEMENT) || defined (SQLITE_MEMDEBUG)
-static void *sqlite3GenericMalloc(int n){
+SQLITE_PRIVATE void *sqlite3GenericMalloc(int n){
   char *p = (char *)malloc(n+8);
   assert(n>0);
   assert(sizeof(int)<=8);
@@ -12941,7 +13042,7 @@ static void *sqlite3GenericMalloc(int n){
   }
   return (void *)p;
 }
-static void *sqlite3GenericRealloc(void *p, int n){
+SQLITE_PRIVATE void *sqlite3GenericRealloc(void *p, int n){
   char *p2 = ((char *)p - 8);
   assert(n>0);
   p2 = (char*)realloc(p2, n+8);
@@ -12951,29 +13052,29 @@ static void *sqlite3GenericRealloc(void *p, int n){
   }
   return (void *)p2;
 }
-static void sqlite3GenericFree(void *p){
+SQLITE_PRIVATE void sqlite3GenericFree(void *p){
   assert(p);
   free((void *)((char *)p - 8));
 }
-static int sqlite3GenericAllocationSize(void *p){
+SQLITE_PRIVATE int sqlite3GenericAllocationSize(void *p){
   return p ? *(int *)((char *)p - 8) : 0;
 }
 #else
-static void *sqlite3GenericMalloc(int n){
+SQLITE_PRIVATE void *sqlite3GenericMalloc(int n){
   char *p = (char *)malloc(n);
   return (void *)p;
 }
-static void *sqlite3GenericRealloc(void *p, int n){
+SQLITE_PRIVATE void *sqlite3GenericRealloc(void *p, int n){
   assert(n>0);
   p = realloc(p, n);
   return p;
 }
-static void sqlite3GenericFree(void *p){
+SQLITE_PRIVATE void sqlite3GenericFree(void *p){
   assert(p);
   free(p);
 }
 /* Never actually used, but needed for the linker */
-static int sqlite3GenericAllocationSize(void *p){ return 0; }
+SQLITE_PRIVATE int sqlite3GenericAllocationSize(void *p){ return 0; }
 #endif
 
 /*
@@ -13650,7 +13751,7 @@ static int transferOwnership(unixFile *pFile){
 /*
 ** Delete the named file
 */
-static int sqlite3UnixDelete(const char *zFilename){
+SQLITE_PRIVATE int sqlite3UnixDelete(const char *zFilename){
   SimulateIOError(return SQLITE_IOERR_DELETE);
   unlink(zFilename);
   return SQLITE_OK;
@@ -13659,7 +13760,7 @@ static int sqlite3UnixDelete(const char *zFilename){
 /*
 ** Return TRUE if the named file exists.
 */
-static int sqlite3UnixFileExists(const char *zFilename){
+SQLITE_PRIVATE int sqlite3UnixFileExists(const char *zFilename){
   return access(zFilename, 0)==0;
 }
 
@@ -13684,7 +13785,7 @@ static int allocateUnixFile(
 ** On failure, the function returns SQLITE_CANTOPEN and leaves
 ** *id and *pReadonly unchanged.
 */
-static int sqlite3UnixOpenReadWrite(
+SQLITE_PRIVATE int sqlite3UnixOpenReadWrite(
   const char *zFilename,
   OsFile **pId,
   int *pReadonly
@@ -13727,7 +13828,7 @@ static int sqlite3UnixOpenReadWrite(
 **
 ** On failure, return SQLITE_CANTOPEN.
 */
-static int sqlite3UnixOpenExclusive(const char *zFilename, OsFile **pId, int delFlag){
+SQLITE_PRIVATE int sqlite3UnixOpenExclusive(const char *zFilename, OsFile **pId, int delFlag){
   int h;
 
   CRASH_TEST_OVERRIDE(sqlite3CrashOpenExclusive, zFilename, pId, delFlag);
@@ -13748,7 +13849,7 @@ static int sqlite3UnixOpenExclusive(const char *zFilename, OsFile **pId, int del
 **
 ** On failure, return SQLITE_CANTOPEN.
 */
-static int sqlite3UnixOpenReadOnly(const char *zFilename, OsFile **pId){
+SQLITE_PRIVATE int sqlite3UnixOpenReadOnly(const char *zFilename, OsFile **pId){
   int h;
   
   CRASH_TEST_OVERRIDE(sqlite3CrashOpenReadOnly, zFilename, pId, 0);
@@ -13783,15 +13884,19 @@ static int unixOpenDirectory(
   OsFile *id,
   const char *zDirname
 ){
+  int h;
   unixFile *pFile = (unixFile*)id;
   assert( pFile!=0 );
   SET_THREADID(pFile);
   assert( pFile->dirfd<0 );
-  pFile->dirfd = open(zDirname, O_RDONLY|O_BINARY, 0);
-  if( pFile->dirfd<0 ){
+  pFile->dirfd = h = open(zDirname, O_RDONLY|O_BINARY, 0);
+  if( h<0 ){
     return SQLITE_CANTOPEN; 
   }
-  OSTRACE3("OPENDIR %-3d %s\n", pFile->dirfd, zDirname);
+#ifdef FD_CLOEXEC
+  fcntl(h, F_SETFD, fcntl(h, F_GETFD, 0) | FD_CLOEXEC);
+#endif
+  OSTRACE3("OPENDIR %-3d %s\n", h, zDirname);
   return SQLITE_OK;
 }
 
@@ -13799,7 +13904,7 @@ static int unixOpenDirectory(
 ** Create a temporary file name in zBuf.  zBuf must be big enough to
 ** hold at least SQLITE_TEMPNAME_SIZE characters.
 */
-static int sqlite3UnixTempFileName(char *zBuf){
+SQLITE_PRIVATE int sqlite3UnixTempFileName(char *zBuf){
   static const char *azDirs[] = {
      0,
      "/var/tmp",
@@ -13839,7 +13944,7 @@ static int sqlite3UnixTempFileName(char *zBuf){
 ** Check that a given pathname is a directory and is writable 
 **
 */
-static int sqlite3UnixIsDirWritable(char *zBuf){
+SQLITE_PRIVATE int sqlite3UnixIsDirWritable(char *zBuf){
 #ifndef SQLITE_OMIT_PAGER_PRAGMAS
   struct stat buf;
   if( zBuf==0 ) return 0;
@@ -14108,7 +14213,7 @@ static int unixSync(OsFile *id, int dataOnly){
 ** before making changes to individual journals on a multi-database commit.
 ** The F_FULLFSYNC option is not needed here.
 */
-static int sqlite3UnixSyncDirectory(const char *zDirname){
+SQLITE_PRIVATE int sqlite3UnixSyncDirectory(const char *zDirname){
 #ifdef SQLITE_DISABLE_DIRSYNC
   return SQLITE_OK;
 #else
@@ -14136,7 +14241,7 @@ static int sqlite3UnixSyncDirectory(const char *zDirname){
 static int unixTruncate(OsFile *id, i64 nByte){
   int rc;
   assert( id );
-  rc = ftruncate(((unixFile*)id)->h, nByte);
+  rc = ftruncate(((unixFile*)id)->h, (off_t)nByte);
   SimulateIOError( rc=1 );
   if( rc ){
     return SQLITE_IOERR_TRUNCATE;
@@ -15133,7 +15238,7 @@ static int nolockUnixClose(OsFile **pId) {
 ** The calling function is responsible for freeing this space once it
 ** is no longer needed.
 */
-static char *sqlite3UnixFullPathname(const char *zRelative){
+SQLITE_PRIVATE char *sqlite3UnixFullPathname(const char *zRelative){
   char *zFull = 0;
   if( zRelative[0]=='/' ){
     sqlite3SetString(&zFull, zRelative, (char*)0);
@@ -15442,6 +15547,9 @@ static int allocateUnixFile(
   unixFile f;
   int rc;
 
+#ifdef FD_CLOEXEC
+  fcntl(h, F_SETFD, fcntl(h, F_GETFD, 0) | FD_CLOEXEC);
+#endif
   memset(&f, 0, sizeof(f));
   sqlite3OsEnterMutex();
   rc = findLockInfo(h, &f.pLock, &f.pOpen);
@@ -15489,13 +15597,13 @@ static int allocateUnixFile(
 ** within the shared library, and closing the shared library.
 */
 #include <dlfcn.h>
-static void *sqlite3UnixDlopen(const char *zFilename){
+SQLITE_PRIVATE void *sqlite3UnixDlopen(const char *zFilename){
   return dlopen(zFilename, RTLD_NOW | RTLD_GLOBAL);
 }
-static void *sqlite3UnixDlsym(void *pHandle, const char *zSymbol){
+SQLITE_PRIVATE void *sqlite3UnixDlsym(void *pHandle, const char *zSymbol){
   return dlsym(pHandle, zSymbol);
 }
-static int sqlite3UnixDlclose(void *pHandle){
+SQLITE_PRIVATE int sqlite3UnixDlclose(void *pHandle){
   return dlclose(pHandle);
 }
 #endif /* SQLITE_OMIT_LOAD_EXTENSION */
@@ -15505,7 +15613,7 @@ static int sqlite3UnixDlclose(void *pHandle){
 ** is written into the buffer zBuf[256].  The calling function must
 ** supply a sufficiently large buffer.
 */
-static int sqlite3UnixRandomSeed(char *zBuf){
+SQLITE_PRIVATE int sqlite3UnixRandomSeed(char *zBuf){
   /* We have to initialize zBuf to prevent valgrind from reporting
   ** errors.  The reports issued by valgrind are incorrect - we would
   ** prefer that the randomness be increased by making use of the
@@ -15542,7 +15650,7 @@ static int sqlite3UnixRandomSeed(char *zBuf){
 ** Sleep for a little while.  Return the amount of time slept.
 ** The argument is the number of milliseconds we want to sleep.
 */
-static int sqlite3UnixSleep(int ms){
+SQLITE_PRIVATE int sqlite3UnixSleep(int ms){
 #if defined(HAVE_USLEEP) && HAVE_USLEEP
   usleep(ms*1000);
   return ms;
@@ -15601,7 +15709,7 @@ static pthread_mutex_t mutexAux = PTHREAD_MUTEX_INITIALIZER;  /* Aux mutex */
 **
 ** As of version 3.3.2, this mutex must be recursive.
 */
-static void sqlite3UnixEnterMutex(){
+SQLITE_PRIVATE void sqlite3UnixEnterMutex(){
 #ifdef SQLITE_UNIX_THREADS
   pthread_mutex_lock(&mutexAux);
   if( !mutexOwnerValid || !pthread_equal(mutexOwner, pthread_self()) ){
@@ -15619,7 +15727,7 @@ static void sqlite3UnixEnterMutex(){
   inMutex++;
 #endif
 }
-static void sqlite3UnixLeaveMutex(){
+SQLITE_PRIVATE void sqlite3UnixLeaveMutex(){
   assert( inMutex>0 );
 #ifdef SQLITE_UNIX_THREADS
   pthread_mutex_lock(&mutexAux);
@@ -15643,7 +15751,7 @@ static void sqlite3UnixLeaveMutex(){
 ** calling thread holds the mutex.  If the parameter is false, return
 ** true if any thread holds the mutex.
 */
-static int sqlite3UnixInMutex(int thisThrd){
+SQLITE_PRIVATE int sqlite3UnixInMutex(int thisThrd){
 #ifdef SQLITE_UNIX_THREADS
   int rc;
   pthread_mutex_lock(&mutexAux);
@@ -15689,7 +15797,7 @@ int sqlite3_tsd_count = 0;
 ** Return a pointer to the thread specific data or NULL if it is
 ** unallocated or gets deallocated.
 */
-static ThreadData *sqlite3UnixThreadSpecificData(int allocateFlag){
+SQLITE_PRIVATE ThreadData *sqlite3UnixThreadSpecificData(int allocateFlag){
   static const ThreadData zeroData = {0};  /* Initializer to silence warnings
                                            ** from broken compilers */
 #ifdef SQLITE_UNIX_THREADS
@@ -15772,7 +15880,7 @@ int sqlite3_current_time = 0;
 ** current time and date as a Julian Day number into *prNow and
 ** return 0.  Return 1 if the time and date cannot be found.
 */
-static int sqlite3UnixCurrentTime(double *prNow){
+SQLITE_PRIVATE int sqlite3UnixCurrentTime(double *prNow){
 #ifdef NO_GETTOD
   time_t t;
   time(&t);
@@ -15975,7 +16083,7 @@ int sqlite3_open_file_count = 0;
 ** set of implementations is used instead.
 */
 #if defined(SQLITE_ENABLE_MEMORY_MANAGEMENT) || defined (SQLITE_MEMDEBUG)
-static void *sqlite3GenericMalloc(int n){
+SQLITE_PRIVATE void *sqlite3GenericMalloc(int n){
   char *p = (char *)malloc(n+8);
   assert(n>0);
   assert(sizeof(int)<=8);
@@ -15985,7 +16093,7 @@ static void *sqlite3GenericMalloc(int n){
   }
   return (void *)p;
 }
-static void *sqlite3GenericRealloc(void *p, int n){
+SQLITE_PRIVATE void *sqlite3GenericRealloc(void *p, int n){
   char *p2 = ((char *)p - 8);
   assert(n>0);
   p2 = (char*)realloc(p2, n+8);
@@ -15995,29 +16103,29 @@ static void *sqlite3GenericRealloc(void *p, int n){
   }
   return (void *)p2;
 }
-static void sqlite3GenericFree(void *p){
+SQLITE_PRIVATE void sqlite3GenericFree(void *p){
   assert(p);
   free((void *)((char *)p - 8));
 }
-static int sqlite3GenericAllocationSize(void *p){
+SQLITE_PRIVATE int sqlite3GenericAllocationSize(void *p){
   return p ? *(int *)((char *)p - 8) : 0;
 }
 #else
-static void *sqlite3GenericMalloc(int n){
+SQLITE_PRIVATE void *sqlite3GenericMalloc(int n){
   char *p = (char *)malloc(n);
   return (void *)p;
 }
-static void *sqlite3GenericRealloc(void *p, int n){
+SQLITE_PRIVATE void *sqlite3GenericRealloc(void *p, int n){
   assert(n>0);
   p = realloc(p, n);
   return p;
 }
-static void sqlite3GenericFree(void *p){
+SQLITE_PRIVATE void sqlite3GenericFree(void *p){
   assert(p);
   free(p);
 }
 /* Never actually used, but needed for the linker */
-static int sqlite3GenericAllocationSize(void *p){ return 0; }
+SQLITE_PRIVATE int sqlite3GenericAllocationSize(void *p){ return 0; }
 #endif
 
 /*
@@ -16590,7 +16698,7 @@ static void *convertUtf8Filename(const char *zFilename){
 ** up and returning an error.
 */
 #define MX_DELETION_ATTEMPTS 3
-static int sqlite3WinDelete(const char *zFilename){
+SQLITE_PRIVATE int sqlite3WinDelete(const char *zFilename){
   int cnt = 0;
   int rc;
   void *zConverted = convertUtf8Filename(zFilename);
@@ -16621,7 +16729,7 @@ static int sqlite3WinDelete(const char *zFilename){
 /*
 ** Return TRUE if the named file exists.
 */
-static int sqlite3WinFileExists(const char *zFilename){
+SQLITE_PRIVATE int sqlite3WinFileExists(const char *zFilename){
   int exists = 0;
   void *zConverted = convertUtf8Filename(zFilename);
   if( zConverted==0 ){
@@ -16656,7 +16764,7 @@ static int allocateWinFile(winFile *pInit, OsFile **pId);
 ** On failure, the function returns SQLITE_CANTOPEN and leaves
 ** *id and *pReadonly unchanged.
 */
-static int sqlite3WinOpenReadWrite(
+SQLITE_PRIVATE int sqlite3WinOpenReadWrite(
   const char *zFilename,
   OsFile **pId,
   int *pReadonly
@@ -16765,7 +16873,7 @@ static int sqlite3WinOpenReadWrite(
 ** a second open after the first one fails.  The whole operation only
 ** fails if both open attempts are unsuccessful.
 */
-static int sqlite3WinOpenExclusive(const char *zFilename, OsFile **pId, int delFlag){
+SQLITE_PRIVATE int sqlite3WinOpenExclusive(const char *zFilename, OsFile **pId, int delFlag){
   winFile f;
   HANDLE h;
   DWORD fileflags;
@@ -16832,7 +16940,7 @@ static int sqlite3WinOpenExclusive(const char *zFilename, OsFile **pId, int delF
 **
 ** On failure, return SQLITE_CANTOPEN.
 */
-static int sqlite3WinOpenReadOnly(const char *zFilename, OsFile **pId){
+SQLITE_PRIVATE int sqlite3WinOpenReadOnly(const char *zFilename, OsFile **pId){
   winFile f;
   HANDLE h;
   void *zConverted = convertUtf8Filename(zFilename);
@@ -16903,7 +17011,7 @@ static int winOpenDirectory(
 ** Create a temporary file name in zBuf.  zBuf must be big enough to
 ** hold at least SQLITE_TEMPNAME_SIZE characters.
 */
-static int sqlite3WinTempFileName(char *zBuf){
+SQLITE_PRIVATE int sqlite3WinTempFileName(char *zBuf){
   static char zChars[] =
     "abcdefghijklmnopqrstuvwxyz"
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -17072,7 +17180,7 @@ static int winSync(OsFile *id, int dataOnly){
 ** Sync the directory zDirname. This is a no-op on operating systems other
 ** than UNIX.
 */
-static int sqlite3WinSyncDirectory(const char *zDirname){
+SQLITE_PRIVATE int sqlite3WinSyncDirectory(const char *zDirname){
   SimulateIOError(return SQLITE_IOERR_READ);
   return SQLITE_OK;
 }
@@ -17149,7 +17257,7 @@ static int unlockReadLock(winFile *pFile){
 ** Check that a given pathname is a directory and is writable 
 **
 */
-static int sqlite3WinIsDirWritable(char *zDirname){
+SQLITE_PRIVATE int sqlite3WinIsDirWritable(char *zDirname){
   int fileAttr;
   void *zConverted;
   if( zDirname==0 ) return 0;
@@ -17380,7 +17488,7 @@ static int winUnlock(OsFile *id, int locktype){
 ** The calling function is responsible for freeing this space once it
 ** is no longer needed.
 */
-static char *sqlite3WinFullPathname(const char *zRelative){
+SQLITE_PRIVATE char *sqlite3WinFullPathname(const char *zRelative){
   char *zFull;
 #if defined(__CYGWIN__)
   int nByte;
@@ -17520,7 +17628,7 @@ static int allocateWinFile(winFile *pInit, OsFile **pId){
 ** Interfaces for opening a shared library, finding entry points
 ** within the shared library, and closing the shared library.
 */
-static void *sqlite3WinDlopen(const char *zFilename){
+SQLITE_PRIVATE void *sqlite3WinDlopen(const char *zFilename){
   HANDLE h;
   void *zConverted = convertUtf8Filename(zFilename);
   if( zConverted==0 ){
@@ -17539,7 +17647,7 @@ static void *sqlite3WinDlopen(const char *zFilename){
   return (void*)h;
   
 }
-static void *sqlite3WinDlsym(void *pHandle, const char *zSymbol){
+SQLITE_PRIVATE void *sqlite3WinDlsym(void *pHandle, const char *zSymbol){
 #if OS_WINCE
   /* The GetProcAddressA() routine is only available on wince. */
   return GetProcAddressA((HANDLE)pHandle, zSymbol);
@@ -17549,7 +17657,7 @@ static void *sqlite3WinDlsym(void *pHandle, const char *zSymbol){
   return GetProcAddress((HANDLE)pHandle, zSymbol);
 #endif
 }
-static int sqlite3WinDlclose(void *pHandle){
+SQLITE_PRIVATE int sqlite3WinDlclose(void *pHandle){
   return FreeLibrary((HANDLE)pHandle);
 }
 #endif /* !SQLITE_OMIT_LOAD_EXTENSION */
@@ -17559,7 +17667,7 @@ static int sqlite3WinDlclose(void *pHandle){
 ** is written into the buffer zBuf[256].  The calling function must
 ** supply a sufficiently large buffer.
 */
-static int sqlite3WinRandomSeed(char *zBuf){
+SQLITE_PRIVATE int sqlite3WinRandomSeed(char *zBuf){
   /* We have to initialize zBuf to prevent valgrind from reporting
   ** errors.  The reports issued by valgrind are incorrect - we would
   ** prefer that the randomness be increased by making use of the
@@ -17580,7 +17688,7 @@ static int sqlite3WinRandomSeed(char *zBuf){
 /*
 ** Sleep for a little while.  Return the amount of time slept.
 */
-static int sqlite3WinSleep(int ms){
+SQLITE_PRIVATE int sqlite3WinSleep(int ms){
   Sleep(ms);
   return ms;
 }
@@ -17605,7 +17713,7 @@ static int inMutex = 0;
 ** Version 3.3.1 and earlier used a simple mutex.  Beginning with
 ** version 3.3.2, a recursive mutex is required.
 */
-static void sqlite3WinEnterMutex(){
+SQLITE_PRIVATE void sqlite3WinEnterMutex(){
 #ifdef SQLITE_W32_THREADS
   static int isInit = 0;
   while( !isInit ){
@@ -17622,7 +17730,7 @@ static void sqlite3WinEnterMutex(){
 #endif
   inMutex++;
 }
-static void sqlite3WinLeaveMutex(){
+SQLITE_PRIVATE void sqlite3WinLeaveMutex(){
   assert( inMutex );
   inMutex--;
 #ifdef SQLITE_W32_THREADS
@@ -17638,7 +17746,7 @@ static void sqlite3WinLeaveMutex(){
 ** calling thread holds the mutex.  If the parameter is false, return
 ** true if any thread holds the mutex.
 */
-static int sqlite3WinInMutex(int thisThreadOnly){
+SQLITE_PRIVATE int sqlite3WinInMutex(int thisThreadOnly){
 #ifdef SQLITE_W32_THREADS
   return inMutex>0 && (thisThreadOnly==0 || mutexOwner==GetCurrentThreadId());
 #else
@@ -17660,7 +17768,7 @@ int sqlite3_current_time = 0;
 ** current time and date as a Julian Day number into *prNow and
 ** return 0.  Return 1 if the time and date cannot be found.
 */
-static int sqlite3WinCurrentTime(double *prNow){
+SQLITE_PRIVATE int sqlite3WinCurrentTime(double *prNow){
   FILETIME ft;
   /* FILETIME structure is a 64-bit value representing the number of 
      100-nanosecond intervals since January 1, 1601 (= JD 2305813.5). 
@@ -17713,7 +17821,7 @@ int sqlite3_tsd_count = 0;
 ** Return a pointer to the thread specific data or NULL if it is
 ** unallocated or gets deallocated.
 */
-static ThreadData *sqlite3WinThreadSpecificData(int allocateFlag){
+SQLITE_PRIVATE ThreadData *sqlite3WinThreadSpecificData(int allocateFlag){
   static int key;
   static int keyInit = 0;
   static const ThreadData zeroData = {0};
@@ -17774,7 +17882,7 @@ static ThreadData *sqlite3WinThreadSpecificData(int allocateFlag){
 ** file simultaneously, or one process from reading the database while
 ** another is writing.
 **
-** @(#) $Id: pager.c,v 1.348 2007/06/18 17:25:18 drh Exp $
+** @(#) $Id: pager.c,v 1.351 2007/07/20 00:33:36 drh Exp $
 */
 #ifndef SQLITE_OMIT_DISKIO
 
@@ -18300,17 +18408,6 @@ static int write32bits(OsFile *fd, u32 val){
   put32bits(ac, val);
   return sqlite3OsWrite(fd, ac, 4);
 }
-
-/*
-** Read a 32-bit integer at offset 'offset' from the page identified by
-** page header 'p'.
-*/
-static u32 retrieve32bits(PgHdr *p, int offset){
-  unsigned char *ac;
-  ac = &((unsigned char*)PGHDR_TO_DATA(p))[offset];
-  return sqlite3Get4byte(ac);
-}
-
 
 /*
 ** This function should be called when an error occurs within the pager
@@ -19385,7 +19482,7 @@ end_stmt_playback:
 /*
 ** Change the maximum number of in-memory pages that are allowed.
 */
-static void sqlite3PagerSetCachesize(Pager *pPager, int mxPage){
+SQLITE_PRIVATE void sqlite3PagerSetCachesize(Pager *pPager, int mxPage){
   if( mxPage>10 ){
     pPager->mxPage = mxPage;
   }else{
@@ -19420,7 +19517,7 @@ static void sqlite3PagerSetCachesize(Pager *pPager, int mxPage){
 ** and FULL=3.
 */
 #ifndef SQLITE_OMIT_PAGER_PRAGMAS
-static void sqlite3PagerSetSafetyLevel(Pager *pPager, int level, int full_fsync){
+SQLITE_PRIVATE void sqlite3PagerSetSafetyLevel(Pager *pPager, int level, int full_fsync){
   pPager->noSync =  level==1 || pPager->tempFile;
   pPager->fullSync = level==3 && !pPager->tempFile;
   pPager->full_fsync = full_fsync;
@@ -19477,7 +19574,7 @@ static int sqlite3PagerOpentemp(OsFile **pFd){
 ** It is never written to disk.  This can be used to implement an
 ** in-memory database.
 */
-static int sqlite3PagerOpen(
+SQLITE_PRIVATE int sqlite3PagerOpen(
   Pager **ppPager,         /* Return the Pager structure here */
   const char *zFilename,   /* Name of the database file to open */
   int nExtra,              /* Extra bytes append to each in-memory page */
@@ -19628,7 +19725,7 @@ static int sqlite3PagerOpen(
 /*
 ** Set the busy handler function.
 */
-static void sqlite3PagerSetBusyhandler(Pager *pPager, BusyHandler *pBusyHandler){
+SQLITE_PRIVATE void sqlite3PagerSetBusyhandler(Pager *pPager, BusyHandler *pBusyHandler){
   pPager->pBusyHandler = pBusyHandler;
 }
 
@@ -19640,7 +19737,7 @@ static void sqlite3PagerSetBusyhandler(Pager *pPager, BusyHandler *pBusyHandler)
 ** The destructor is not called as a result sqlite3PagerClose().  
 ** Destructors are only called by sqlite3PagerUnref().
 */
-static void sqlite3PagerSetDestructor(Pager *pPager, void (*xDesc)(DbPage*,int)){
+SQLITE_PRIVATE void sqlite3PagerSetDestructor(Pager *pPager, void (*xDesc)(DbPage*,int)){
   pPager->xDestructor = xDesc;
 }
 
@@ -19651,7 +19748,7 @@ static void sqlite3PagerSetDestructor(Pager *pPager, void (*xDesc)(DbPage*,int))
 ** an opportunity to restore the EXTRA section to agree with the restored
 ** page data.
 */
-static void sqlite3PagerSetReiniter(Pager *pPager, void (*xReinit)(DbPage*,int)){
+SQLITE_PRIVATE void sqlite3PagerSetReiniter(Pager *pPager, void (*xReinit)(DbPage*,int)){
   pPager->xReiniter = xReinit;
 }
 
@@ -19660,7 +19757,7 @@ static void sqlite3PagerSetReiniter(Pager *pPager, void (*xReinit)(DbPage*,int))
 ** size is inappropriate, then an alternative page size is selected
 ** and returned.
 */
-static int sqlite3PagerSetPagesize(Pager *pPager, int pageSize){
+SQLITE_PRIVATE int sqlite3PagerSetPagesize(Pager *pPager, int pageSize){
   assert( pageSize>=512 && pageSize<=SQLITE_MAX_PAGE_SIZE );
   if( !pPager->memDb && pPager->nRef==0 ){
     pager_reset(pPager);
@@ -19677,7 +19774,7 @@ static int sqlite3PagerSetPagesize(Pager *pPager, int pageSize){
 **
 ** Regardless of mxPage, return the current maximum page count.
 */
-static int sqlite3PagerMaxPageCount(Pager *pPager, int mxPage){
+SQLITE_PRIVATE int sqlite3PagerMaxPageCount(Pager *pPager, int mxPage){
   if( mxPage>0 ){
     pPager->mxPgno = mxPage;
   }
@@ -19719,7 +19816,7 @@ void enable_simulated_io_errors(void){
 ** response is to zero the memory at pDest and continue.  A real IO error 
 ** will presumably recur and be picked up later (Todo: Think about this).
 */
-static int sqlite3PagerReadFileheader(Pager *pPager, int N, unsigned char *pDest){
+SQLITE_PRIVATE int sqlite3PagerReadFileheader(Pager *pPager, int N, unsigned char *pDest){
   int rc = SQLITE_OK;
   memset(pDest, 0, N);
   if( MEMDB==0 ){
@@ -19744,7 +19841,7 @@ static int sqlite3PagerReadFileheader(Pager *pPager, int N, unsigned char *pDest
 ** PENDING_BYTE is byte 4096 (the first byte of page 5) and the size of the
 ** file is 4096 bytes, 5 is returned instead of 4.
 */
-static int sqlite3PagerPagecount(Pager *pPager){
+SQLITE_PRIVATE int sqlite3PagerPagecount(Pager *pPager){
   i64 n;
   int rc;
   assert( pPager!=0 );
@@ -19929,7 +20026,7 @@ static int pager_wait_on_lock(Pager *pPager, int locktype){
 /*
 ** Truncate the file to the number of pages specified.
 */
-static int sqlite3PagerTruncate(Pager *pPager, Pgno nPage){
+SQLITE_PRIVATE int sqlite3PagerTruncate(Pager *pPager, Pgno nPage){
   int rc;
   assert( pPager->state>=PAGER_SHARED || MEMDB );
   sqlite3PagerPagecount(pPager);
@@ -19974,7 +20071,7 @@ static int sqlite3PagerTruncate(Pager *pPager, Pgno nPage){
 ** a hot journal may be left in the filesystem but no error is returned
 ** to the caller.
 */
-static int sqlite3PagerClose(Pager *pPager){
+SQLITE_PRIVATE int sqlite3PagerClose(Pager *pPager){
 #ifdef SQLITE_ENABLE_MEMORY_MANAGEMENT
   /* A malloc() cannot fail in sqlite3ThreadData() as one or more calls to 
   ** malloc() must have already been made by this thread before it gets
@@ -20031,7 +20128,7 @@ static int sqlite3PagerClose(Pager *pPager){
 /*
 ** Return the page number for the given page data.
 */
-static Pgno sqlite3PagerPagenumber(DbPage *p){
+SQLITE_PRIVATE Pgno sqlite3PagerPagenumber(DbPage *p){
   return p->pgno;
 }
 #endif
@@ -20085,7 +20182,7 @@ static void _page_ref(PgHdr *pPg){
 ** Increment the reference count for a page.  The input pointer is
 ** a reference to the page data.
 */
-static int sqlite3PagerRef(DbPage *pPg){
+SQLITE_PRIVATE int sqlite3PagerRef(DbPage *pPg){
   page_ref(pPg);
   return SQLITE_OK;
 }
@@ -20463,7 +20560,7 @@ static int pager_recycle(Pager *pPager, int syncOk, PgHdr **ppPg){
 ** of bytes of memory released.
 */
 #if defined(SQLITE_ENABLE_MEMORY_MANAGEMENT) && !defined(SQLITE_OMIT_DISKIO)
-static int sqlite3PagerReleaseMemory(int nReq){
+SQLITE_PRIVATE int sqlite3PagerReleaseMemory(int nReq){
   const ThreadData *pTsdro = sqlite3ThreadDataReadOnly();
   int nReleased = 0;
   int i;
@@ -20844,7 +20941,7 @@ static int pager_get_content(PgHdr *pPg){
 ** called again with noContent==0, that means that the content is needed
 ** and the disk read should occur at that point.
 */
-static int sqlite3PagerAcquire(
+SQLITE_PRIVATE int sqlite3PagerAcquire(
   Pager *pPager,      /* The pager open on the database file */
   Pgno pgno,          /* Page number to fetch */
   DbPage **ppPage,    /* Write a pointer to the page here */
@@ -20979,7 +21076,7 @@ static int sqlite3PagerAcquire(
 ** returns NULL if the page is not in cache or if a disk I/O error 
 ** has ever happened.
 */
-static DbPage *sqlite3PagerLookup(Pager *pPager, Pgno pgno){
+SQLITE_PRIVATE DbPage *sqlite3PagerLookup(Pager *pPager, Pgno pgno){
   PgHdr *pPg;
 
   assert( pPager!=0 );
@@ -21006,7 +21103,7 @@ static DbPage *sqlite3PagerLookup(Pager *pPager, Pgno pgno){
 ** are released, a rollback occurs and the lock on the database is
 ** removed.
 */
-static int sqlite3PagerUnref(DbPage *pPg){
+SQLITE_PRIVATE int sqlite3PagerUnref(DbPage *pPg){
 
   /* Decrement the reference count for this page
   */
@@ -21141,7 +21238,7 @@ failed_to_open_journal:
 ** immediately instead of waiting until we try to flush the cache.  The
 ** exFlag is ignored if a transaction is already active.
 */
-static int sqlite3PagerBegin(DbPage *pPg, int exFlag){
+SQLITE_PRIVATE int sqlite3PagerBegin(DbPage *pPg, int exFlag){
   Pager *pPager = pPg->pPager;
   int rc = SQLITE_OK;
   assert( pPg->nRef>0 );
@@ -21423,7 +21520,7 @@ static int pager_write(PgHdr *pPg){
 ** fit on a single disk sector. In this case all co-resident pages
 ** must have been written to the journal file before returning.
 */
-static int sqlite3PagerWrite(DbPage *pDbPage){
+SQLITE_PRIVATE int sqlite3PagerWrite(DbPage *pDbPage){
   int rc = SQLITE_OK;
 
   PgHdr *pPg = pDbPage;
@@ -21490,7 +21587,7 @@ static int sqlite3PagerWrite(DbPage *pDbPage){
 ** to change the content of the page.
 */
 #ifndef NDEBUG
-static int sqlite3PagerIswriteable(DbPage *pPg){
+SQLITE_PRIVATE int sqlite3PagerIswriteable(DbPage *pPg){
   return pPg->dirty;
 }
 #endif
@@ -21500,7 +21597,7 @@ static int sqlite3PagerIswriteable(DbPage *pPg){
 ** Replace the content of a single page with the information in the third
 ** argument.
 */
-static int sqlite3PagerOverwrite(Pager *pPager, Pgno pgno, void *pData){
+SQLITE_PRIVATE int sqlite3PagerOverwrite(Pager *pPager, Pgno pgno, void *pData){
   PgHdr *pPg;
   int rc;
 
@@ -21540,7 +21637,7 @@ static int sqlite3PagerOverwrite(Pager *pPager, Pgno pgno, void *pData){
 ** page contains critical data, we still need to be sure it gets
 ** rolled back in spite of the sqlite3PagerDontRollback() call.
 */
-static void sqlite3PagerDontWrite(DbPage *pDbPage){
+SQLITE_PRIVATE void sqlite3PagerDontWrite(DbPage *pDbPage){
   PgHdr *pPg = pDbPage;
   Pager *pPager = pPg->pPager;
 
@@ -21579,7 +21676,7 @@ static void sqlite3PagerDontWrite(DbPage *pDbPage){
 ** that we will never need to read the page content in the future.
 ** so the needRead flag can be cleared at this point.
 */
-static void sqlite3PagerDontRollback(DbPage *pPg){
+SQLITE_PRIVATE void sqlite3PagerDontRollback(DbPage *pPg){
   Pager *pPager = pPg->pPager;
 
   assert( pPager->state>=PAGER_RESERVED );
@@ -21623,13 +21720,10 @@ static int pager_incr_changecounter(Pager *pPager){
     rc = sqlite3PagerWrite(pPgHdr);
     if( rc!=SQLITE_OK ) return rc;
   
-    /* Read the current value at byte 24. */
-    change_counter = retrieve32bits(pPgHdr, 24);
-  
     /* Increment the value just read and write it back to byte 24. */
+    change_counter = sqlite3Get4byte((u8*)pPager->dbFileVers);
     change_counter++;
     put32bits(((char*)PGHDR_TO_DATA(pPgHdr))+24, change_counter);
-  
     /* Release the page reference. */
     sqlite3PagerUnref(pPgHdr);
     pPager->changeCountDone = 1;
@@ -21654,7 +21748,7 @@ static int pager_incr_changecounter(Pager *pPager){
 ** If parameter nTrunc is non-zero, then the pager file is truncated to
 ** nTrunc pages (this is used by auto-vacuum databases).
 */
-static int sqlite3PagerCommitPhaseOne(Pager *pPager, const char *zMaster, Pgno nTrunc){
+SQLITE_PRIVATE int sqlite3PagerCommitPhaseOne(Pager *pPager, const char *zMaster, Pgno nTrunc){
   int rc = SQLITE_OK;
 
   PAGERTRACE4("DATABASE SYNC: File=%s zMaster=%s nTrunc=%d\n", 
@@ -21745,7 +21839,7 @@ sync_exit:
 ** and an error code is returned.  If the commit worked, SQLITE_OK
 ** is returned.
 */
-static int sqlite3PagerCommitPhaseTwo(Pager *pPager){
+SQLITE_PRIVATE int sqlite3PagerCommitPhaseTwo(Pager *pPager){
   int rc;
   PgHdr *pPg;
 
@@ -21799,7 +21893,7 @@ static int sqlite3PagerCommitPhaseTwo(Pager *pPager){
 ** codes are returned for all these occasions.  Otherwise,
 ** SQLITE_OK is returned.
 */
-static int sqlite3PagerRollback(Pager *pPager){
+SQLITE_PRIVATE int sqlite3PagerRollback(Pager *pPager){
   int rc;
   PAGERTRACE2("ROLLBACK %d\n", PAGERID(pPager));
   if( MEMDB ){
@@ -21873,14 +21967,14 @@ static int sqlite3PagerRollback(Pager *pPager){
 ** Return TRUE if the database file is opened read-only.  Return FALSE
 ** if the database is (in theory) writable.
 */
-static int sqlite3PagerIsreadonly(Pager *pPager){
+SQLITE_PRIVATE int sqlite3PagerIsreadonly(Pager *pPager){
   return pPager->readOnly;
 }
 
 /*
 ** Return the number of references to the pager.
 */
-static int sqlite3PagerRefcount(Pager *pPager){
+SQLITE_PRIVATE int sqlite3PagerRefcount(Pager *pPager){
   return pPager->nRef;
 }
 
@@ -21888,7 +21982,7 @@ static int sqlite3PagerRefcount(Pager *pPager){
 /*
 ** This routine is used for testing and analysis only.
 */
-static int *sqlite3PagerStats(Pager *pPager){
+SQLITE_PRIVATE int *sqlite3PagerStats(Pager *pPager){
   static int a[11];
   a[0] = pPager->nRef;
   a[1] = pPager->nPage;
@@ -21912,7 +22006,7 @@ static int *sqlite3PagerStats(Pager *pPager){
 ** open.  A new statement journal is created that can be used to rollback
 ** changes of a single SQL command within a larger transaction.
 */
-static int sqlite3PagerStmtBegin(Pager *pPager){
+SQLITE_PRIVATE int sqlite3PagerStmtBegin(Pager *pPager){
   int rc;
   assert( !pPager->stmtInUse );
   assert( pPager->state>=PAGER_SHARED );
@@ -21962,7 +22056,7 @@ stmt_begin_failed:
 /*
 ** Commit a statement.
 */
-static int sqlite3PagerStmtCommit(Pager *pPager){
+SQLITE_PRIVATE int sqlite3PagerStmtCommit(Pager *pPager){
   if( pPager->stmtInUse ){
     PgHdr *pPg, *pNext;
     PAGERTRACE2("STMT-COMMIT %d\n", PAGERID(pPager));
@@ -21993,7 +22087,7 @@ static int sqlite3PagerStmtCommit(Pager *pPager){
 /*
 ** Rollback a statement.
 */
-static int sqlite3PagerStmtRollback(Pager *pPager){
+SQLITE_PRIVATE int sqlite3PagerStmtRollback(Pager *pPager){
   int rc;
   if( pPager->stmtInUse ){
     PAGERTRACE2("STMT-ROLLBACK %d\n", PAGERID(pPager));
@@ -22025,21 +22119,21 @@ static int sqlite3PagerStmtRollback(Pager *pPager){
 /*
 ** Return the full pathname of the database file.
 */
-static const char *sqlite3PagerFilename(Pager *pPager){
+SQLITE_PRIVATE const char *sqlite3PagerFilename(Pager *pPager){
   return pPager->zFilename;
 }
 
 /*
 ** Return the directory of the database file.
 */
-static const char *sqlite3PagerDirname(Pager *pPager){
+SQLITE_PRIVATE const char *sqlite3PagerDirname(Pager *pPager){
   return pPager->zDirectory;
 }
 
 /*
 ** Return the full pathname of the journal file.
 */
-static const char *sqlite3PagerJournalname(Pager *pPager){
+SQLITE_PRIVATE const char *sqlite3PagerJournalname(Pager *pPager){
   return pPager->zJournal;
 }
 
@@ -22047,7 +22141,7 @@ static const char *sqlite3PagerJournalname(Pager *pPager){
 ** Return true if fsync() calls are disabled for this pager.  Return FALSE
 ** if fsync()s are executed normally.
 */
-static int sqlite3PagerNosync(Pager *pPager){
+SQLITE_PRIVATE int sqlite3PagerNosync(Pager *pPager){
   return pPager->noSync;
 }
 
@@ -22055,7 +22149,7 @@ static int sqlite3PagerNosync(Pager *pPager){
 /*
 ** Set the codec for this pager
 */
-static void sqlite3PagerSetCodec(
+SQLITE_PRIVATE void sqlite3PagerSetCodec(
   Pager *pPager,
   void *(*xCodec)(void*,void*,Pgno,int),
   void *pCodecArg
@@ -22083,7 +22177,7 @@ static void sqlite3PagerSetCodec(
 ** has been removed (CREATE INDEX needs to move a page when a statement
 ** transaction is active).
 */
-static int sqlite3PagerMovepage(Pager *pPager, DbPage *pPg, Pgno pgno){
+SQLITE_PRIVATE int sqlite3PagerMovepage(Pager *pPager, DbPage *pPg, Pgno pgno){
   PgHdr *pPgOld;  /* The page being overwritten. */
   int h;
   Pgno needSyncPgno = 0;
@@ -22171,7 +22265,7 @@ static int sqlite3PagerMovepage(Pager *pPager, DbPage *pPg, Pgno pgno){
 /*
 ** Return a pointer to the data for the specified page.
 */
-static void *sqlite3PagerGetData(DbPage *pPg){
+SQLITE_PRIVATE void *sqlite3PagerGetData(DbPage *pPg){
   return PGHDR_TO_DATA(pPg);
 }
 
@@ -22179,7 +22273,7 @@ static void *sqlite3PagerGetData(DbPage *pPg){
 ** Return a pointer to the Pager.nExtra bytes of "extra" space 
 ** allocated along with the specified page.
 */
-static void *sqlite3PagerGetExtra(DbPage *pPg){
+SQLITE_PRIVATE void *sqlite3PagerGetExtra(DbPage *pPg){
   Pager *pPager = pPg->pPager;
   return (pPager?PGHDR_TO_EXTRA(pPg, pPager):0);
 }
@@ -22194,7 +22288,7 @@ static void *sqlite3PagerGetExtra(DbPage *pPg){
 ** PAGER_LOCKINGMODE_EXCLUSIVE, indicating the current (possibly updated)
 ** locking-mode.
 */
-static int sqlite3PagerLockingMode(Pager *pPager, int eMode){
+SQLITE_PRIVATE int sqlite3PagerLockingMode(Pager *pPager, int eMode){
   assert( eMode==PAGER_LOCKINGMODE_QUERY
             || eMode==PAGER_LOCKINGMODE_NORMAL
             || eMode==PAGER_LOCKINGMODE_EXCLUSIVE );
@@ -22212,7 +22306,7 @@ static int sqlite3PagerLockingMode(Pager *pPager, int eMode){
 ** The return value is one of NO_LOCK, SHARED_LOCK, RESERVED_LOCK,
 ** PENDING_LOCK, or EXCLUSIVE_LOCK.
 */
-static int sqlite3PagerLockstate(Pager *pPager){
+SQLITE_PRIVATE int sqlite3PagerLockstate(Pager *pPager){
   return sqlite3OsLockState(pPager->fd);
 }
 #endif
@@ -22221,7 +22315,7 @@ static int sqlite3PagerLockstate(Pager *pPager){
 /*
 ** Print a listing of all referenced pages and their ref count.
 */
-static void sqlite3PagerRefdump(Pager *pPager){
+SQLITE_PRIVATE void sqlite3PagerRefdump(Pager *pPager){
   PgHdr *pPg;
   for(pPg=pPager->pAll; pPg; pPg=pPg->pNextAll){
     if( pPg->nRef<=0 ) continue;
@@ -22246,7 +22340,7 @@ static void sqlite3PagerRefdump(Pager *pPager){
 **    May you share freely, never taking more than you give.
 **
 *************************************************************************
-** $Id: btree.c,v 1.388 2007/05/24 09:20:16 danielk1977 Exp $
+** $Id: btree.c,v 1.392 2007/06/26 01:04:49 drh Exp $
 **
 ** This file implements a external (disk-based) database using BTrees.
 ** See the header comment on "btreeInt.h" for additional information.
@@ -22827,16 +22921,16 @@ struct IntegrityCk {
 /*
 ** Internal routines that should be accessed by the btree layer only.
 */
-static int sqlite3BtreeGetPage(BtShared*, Pgno, MemPage**, int);
-static int sqlite3BtreeInitPage(MemPage *pPage, MemPage *pParent);
-static void sqlite3BtreeParseCellPtr(MemPage*, u8*, CellInfo*);
-static void sqlite3BtreeParseCell(MemPage*, int, CellInfo*);
-static u8 *sqlite3BtreeFindCell(MemPage *pPage, int iCell);
-static int sqlite3BtreeRestoreOrClearCursorPosition(BtCursor *pCur);
-static void sqlite3BtreeGetTempCursor(BtCursor *pCur, BtCursor *pTempCur);
-static void sqlite3BtreeReleaseTempCursor(BtCursor *pCur);
-static int sqlite3BtreeIsRootPage(MemPage *pPage);
-static void sqlite3BtreeMoveToParent(BtCursor *pCur);
+SQLITE_PRIVATE int sqlite3BtreeGetPage(BtShared*, Pgno, MemPage**, int);
+SQLITE_PRIVATE int sqlite3BtreeInitPage(MemPage *pPage, MemPage *pParent);
+SQLITE_PRIVATE void sqlite3BtreeParseCellPtr(MemPage*, u8*, CellInfo*);
+SQLITE_PRIVATE void sqlite3BtreeParseCell(MemPage*, int, CellInfo*);
+SQLITE_PRIVATE u8 *sqlite3BtreeFindCell(MemPage *pPage, int iCell);
+SQLITE_PRIVATE int sqlite3BtreeRestoreOrClearCursorPosition(BtCursor *pCur);
+SQLITE_PRIVATE void sqlite3BtreeGetTempCursor(BtCursor *pCur, BtCursor *pTempCur);
+SQLITE_PRIVATE void sqlite3BtreeReleaseTempCursor(BtCursor *pCur);
+SQLITE_PRIVATE int sqlite3BtreeIsRootPage(MemPage *pPage);
+SQLITE_PRIVATE void sqlite3BtreeMoveToParent(BtCursor *pCur);
 
 /************** End of btreeInt.h ********************************************/
 /************** Continuing where we left off in btree.c **********************/
@@ -23122,7 +23216,7 @@ static void clearCursorPosition(BtCursor *pCur){
 ** returning the cursor to it's saved position, any saved position is deleted
 ** and the cursor state set to CURSOR_INVALID.
 */
-static int sqlite3BtreeRestoreOrClearCursorPosition(BtCursor *pCur){
+SQLITE_PRIVATE int sqlite3BtreeRestoreOrClearCursorPosition(BtCursor *pCur){
   int rc;
   assert( pCur->eState==CURSOR_REQUIRESEEK );
 #ifndef SQLITE_OMIT_INCRBLOB
@@ -23245,10 +23339,9 @@ static int ptrmapGet(BtShared *pBt, Pgno key, u8 *pEType, Pgno *pPgno){
 */
 #define findCell(pPage, iCell) \
   ((pPage)->aData + get2byte(&(pPage)->aData[(pPage)->cellOffset+2*(iCell)]))
-static u8 *sqlite3BtreeFindCell(MemPage *pPage, int iCell){
-  u8 *data = pPage->aData;
+SQLITE_PRIVATE u8 *sqlite3BtreeFindCell(MemPage *pPage, int iCell){
   assert( iCell>=0 );
-  assert( iCell<get2byte(&data[pPage->hdrOffset+3]) );
+  assert( iCell<get2byte(&pPage->aData[pPage->hdrOffset+3]) );
   return findCell(pPage, iCell);
 }
 
@@ -23282,7 +23375,7 @@ static u8 *findOverflowCell(MemPage *pPage, int iCell){
 ** Within this file, the parseCell() macro can be called instead of
 ** sqlite3BtreeParseCellPtr(). Using some compilers, this will be faster.
 */
-static void sqlite3BtreeParseCellPtr(
+SQLITE_PRIVATE void sqlite3BtreeParseCellPtr(
   MemPage *pPage,         /* Page containing the cell */
   u8 *pCell,              /* Pointer to the cell text. */
   CellInfo *pInfo         /* Fill in this structure */
@@ -23350,7 +23443,7 @@ static void sqlite3BtreeParseCellPtr(
 }
 #define parseCell(pPage, iCell, pInfo) \
   sqlite3BtreeParseCellPtr((pPage), findCell((pPage), (iCell)), (pInfo))
-static void sqlite3BtreeParseCell(
+SQLITE_PRIVATE void sqlite3BtreeParseCell(
   MemPage *pPage,         /* Page containing the cell */
   int iCell,              /* The cell index.  First cell is 0 */
   CellInfo *pInfo         /* Fill in this structure */
@@ -23635,7 +23728,7 @@ static void decodeFlags(MemPage *pPage, int flagByte){
 ** guarantee that the page is well-formed.  It only shows that
 ** we failed to detect any corruption.
 */
-static int sqlite3BtreeInitPage(
+SQLITE_PRIVATE int sqlite3BtreeInitPage(
   MemPage *pPage,        /* The page to be initialized */
   MemPage *pParent       /* The parent.  Might be NULL */
 ){
@@ -23748,7 +23841,7 @@ static void zeroPage(MemPage *pPage, int flags){
 ** means we have started to be concerned about content and the disk
 ** read should occur at that point.
 */
-static int sqlite3BtreeGetPage(
+SQLITE_PRIVATE int sqlite3BtreeGetPage(
   BtShared *pBt,       /* The btree */
   Pgno pgno,           /* Number of the page to fetch */
   MemPage **ppPage,    /* Return the page in this parameter */
@@ -23847,7 +23940,7 @@ static void pageReinit(DbPage *pData, int pageSize){
 ** a new database with a random name is created.  This randomly named
 ** database file will be deleted when sqlite3BtreeClose() is called.
 */
-static int sqlite3BtreeOpen(
+SQLITE_PRIVATE int sqlite3BtreeOpen(
   const char *zFilename,  /* Name of the file containing the BTree database */
   sqlite3 *pSqlite,       /* Associated database handle */
   Btree **ppBtree,        /* Pointer to new Btree object written here */
@@ -23963,6 +24056,7 @@ static int sqlite3BtreeOpen(
     pBt->pageSizeFixed = 1;
 #ifndef SQLITE_OMIT_AUTOVACUUM
     pBt->autoVacuum = (get4byte(&zDbHeader[36 + 4*4])?1:0);
+    pBt->incrVacuum = (get4byte(&zDbHeader[36 + 7*4])?1:0);
 #endif
   }
   pBt->usableSize = pBt->pageSize - nReserve;
@@ -23998,7 +24092,7 @@ btree_open_out:
 /*
 ** Close an open database and invalidate all cursors.
 */
-static int sqlite3BtreeClose(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeClose(Btree *p){
   BtShared *pBt = p->pBt;
   BtCursor *pCur;
 
@@ -24066,7 +24160,7 @@ static int sqlite3BtreeClose(Btree *p){
 /*
 ** Change the busy handler callback function.
 */
-static int sqlite3BtreeSetBusyHandler(Btree *p, BusyHandler *pHandler){
+SQLITE_PRIVATE int sqlite3BtreeSetBusyHandler(Btree *p, BusyHandler *pHandler){
   BtShared *pBt = p->pBt;
   pBt->pBusyHandler = pHandler;
   sqlite3PagerSetBusyhandler(pBt->pPager, pHandler);
@@ -24088,7 +24182,7 @@ static int sqlite3BtreeSetBusyHandler(Btree *p, BusyHandler *pHandler){
 ** Synchronous is on by default so database corruption is not
 ** normally a worry.
 */
-static int sqlite3BtreeSetCacheSize(Btree *p, int mxPage){
+SQLITE_PRIVATE int sqlite3BtreeSetCacheSize(Btree *p, int mxPage){
   BtShared *pBt = p->pBt;
   sqlite3PagerSetCachesize(pBt->pPager, mxPage);
   return SQLITE_OK;
@@ -24103,7 +24197,7 @@ static int sqlite3BtreeSetCacheSize(Btree *p, int mxPage){
 ** probability of damage to near zero but with a write performance reduction.
 */
 #ifndef SQLITE_OMIT_PAGER_PRAGMAS
-static int sqlite3BtreeSetSafetyLevel(Btree *p, int level, int fullSync){
+SQLITE_PRIVATE int sqlite3BtreeSetSafetyLevel(Btree *p, int level, int fullSync){
   BtShared *pBt = p->pBt;
   sqlite3PagerSetSafetyLevel(pBt->pPager, level, fullSync);
   return SQLITE_OK;
@@ -24114,7 +24208,7 @@ static int sqlite3BtreeSetSafetyLevel(Btree *p, int level, int fullSync){
 ** Return TRUE if the given btree is set to safety level 1.  In other
 ** words, return TRUE if no sync() occurs on the disk files.
 */
-static int sqlite3BtreeSyncDisabled(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeSyncDisabled(Btree *p){
   BtShared *pBt = p->pBt;
   assert( pBt && pBt->pPager );
   return sqlite3PagerNosync(pBt->pPager);
@@ -24136,7 +24230,7 @@ static int sqlite3BtreeSyncDisabled(Btree *p){
 ** If parameter nReserve is less than zero, then the number of reserved
 ** bytes per page is left unchanged.
 */
-static int sqlite3BtreeSetPageSize(Btree *p, int pageSize, int nReserve){
+SQLITE_PRIVATE int sqlite3BtreeSetPageSize(Btree *p, int pageSize, int nReserve){
   BtShared *pBt = p->pBt;
   if( pBt->pageSizeFixed ){
     return SQLITE_READONLY;
@@ -24157,10 +24251,10 @@ static int sqlite3BtreeSetPageSize(Btree *p, int pageSize, int nReserve){
 /*
 ** Return the currently defined page size
 */
-static int sqlite3BtreeGetPageSize(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeGetPageSize(Btree *p){
   return p->pBt->pageSize;
 }
-static int sqlite3BtreeGetReserve(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeGetReserve(Btree *p){
   return p->pBt->pageSize - p->pBt->usableSize;
 }
 
@@ -24169,7 +24263,7 @@ static int sqlite3BtreeGetReserve(Btree *p){
 ** No changes are made if mxPage is 0 or negative.
 ** Regardless of the value of mxPage, return the maximum page count.
 */
-static int sqlite3BtreeMaxPageCount(Btree *p, int mxPage){
+SQLITE_PRIVATE int sqlite3BtreeMaxPageCount(Btree *p, int mxPage){
   return sqlite3PagerMaxPageCount(p->pBt->pPager, mxPage);
 }
 #endif /* !defined(SQLITE_OMIT_PAGER_PRAGMAS) || !defined(SQLITE_OMIT_VACUUM) */
@@ -24180,18 +24274,16 @@ static int sqlite3BtreeMaxPageCount(Btree *p, int mxPage){
 ** is disabled. The default value for the auto-vacuum property is 
 ** determined by the SQLITE_DEFAULT_AUTOVACUUM macro.
 */
-static int sqlite3BtreeSetAutoVacuum(Btree *p, int autoVacuum){
+SQLITE_PRIVATE int sqlite3BtreeSetAutoVacuum(Btree *p, int autoVacuum){
 #ifdef SQLITE_OMIT_AUTOVACUUM
   return SQLITE_READONLY;
 #else
   BtShared *pBt = p->pBt;
   int av = (autoVacuum?1:0);
-  int iv = (autoVacuum==BTREE_AUTOVACUUM_INCR?1:0);
   if( pBt->pageSizeFixed && av!=pBt->autoVacuum ){
     return SQLITE_READONLY;
   }
   pBt->autoVacuum = av;
-  pBt->incrVacuum = iv;
   return SQLITE_OK;
 #endif
 }
@@ -24200,7 +24292,7 @@ static int sqlite3BtreeSetAutoVacuum(Btree *p, int autoVacuum){
 ** Return the value of the 'auto-vacuum' property. If auto-vacuum is 
 ** enabled 1 is returned. Otherwise 0.
 */
-static int sqlite3BtreeGetAutoVacuum(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeGetAutoVacuum(Btree *p){
 #ifdef SQLITE_OMIT_AUTOVACUUM
   return BTREE_AUTOVACUUM_NONE;
 #else
@@ -24260,6 +24352,7 @@ static int lockBtree(BtShared *pBt){
     pBt->minLeafFrac = page1[23];
 #ifndef SQLITE_OMIT_AUTOVACUUM
     pBt->autoVacuum = (get4byte(&page1[36 + 4*4])?1:0);
+    pBt->incrVacuum = (get4byte(&page1[36 + 7*4])?1:0);
 #endif
   }
 
@@ -24368,7 +24461,9 @@ static int newDatabase(BtShared *pBt){
   pBt->pageSizeFixed = 1;
 #ifndef SQLITE_OMIT_AUTOVACUUM
   assert( pBt->autoVacuum==1 || pBt->autoVacuum==0 );
+  assert( pBt->incrVacuum==1 || pBt->incrVacuum==0 );
   put4byte(&data[36 + 4*4], pBt->autoVacuum);
+  put4byte(&data[36 + 7*4], pBt->incrVacuum);
 #endif
   return SQLITE_OK;
 }
@@ -24408,7 +24503,7 @@ static int newDatabase(BtShared *pBt){
 ** when A already has a read lock, we encourage A to give up and let B
 ** proceed.
 */
-static int sqlite3BtreeBeginTrans(Btree *p, int wrflag){
+SQLITE_PRIVATE int sqlite3BtreeBeginTrans(Btree *p, int wrflag){
   BtShared *pBt = p->pBt;
   int rc = SQLITE_OK;
 
@@ -24771,7 +24866,7 @@ static int incrVacuumStep(BtShared *pBt, Pgno nFin){
 ** SQLITE_DONE is returned. If it is not finished, but no error occured,
 ** SQLITE_OK is returned. Otherwise an SQLite error code. 
 */
-static int sqlite3BtreeIncrVacuum(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeIncrVacuum(Btree *p){
   BtShared *pBt = p->pBt;
   assert( pBt->inTransaction==TRANS_WRITE && p->inTrans==TRANS_WRITE );
   if( !pBt->autoVacuum ){
@@ -24879,7 +24974,7 @@ static int autoVacuumCommit(BtShared *pBt, Pgno *pnTrunc){
 ** Once this is routine has returned, the only thing required to commit
 ** the write-transaction for this database file is to delete the journal.
 */
-static int sqlite3BtreeCommitPhaseOne(Btree *p, const char *zMaster){
+SQLITE_PRIVATE int sqlite3BtreeCommitPhaseOne(Btree *p, const char *zMaster){
   int rc = SQLITE_OK;
   if( p->inTrans==TRANS_WRITE ){
     BtShared *pBt = p->pBt;
@@ -24911,7 +25006,7 @@ static int sqlite3BtreeCommitPhaseOne(Btree *p, const char *zMaster){
 ** This will release the write lock on the database file.  If there
 ** are no active cursors, it also releases the read lock.
 */
-static int sqlite3BtreeCommitPhaseTwo(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeCommitPhaseTwo(Btree *p){
   BtShared *pBt = p->pBt;
 
   btreeIntegrity(p);
@@ -24957,7 +25052,7 @@ static int sqlite3BtreeCommitPhaseTwo(Btree *p){
 /*
 ** Do both phases of a commit.
 */
-static int sqlite3BtreeCommit(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeCommit(Btree *p){
   int rc;
   rc = sqlite3BtreeCommitPhaseOne(p, 0);
   if( rc==SQLITE_OK ){
@@ -24991,7 +25086,7 @@ static int countWriteCursors(BtShared *pBt){
 ** This will release the write lock on the database file.  If there
 ** are no active cursors, it also releases the read lock.
 */
-static int sqlite3BtreeRollback(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeRollback(Btree *p){
   int rc;
   BtShared *pBt = p->pBt;
   MemPage *pPage1;
@@ -25071,7 +25166,7 @@ static int sqlite3BtreeRollback(Btree *p){
 ** error occurs within the statement, the effect of that one statement
 ** can be rolled back without having to rollback the entire transaction.
 */
-static int sqlite3BtreeBeginStmt(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeBeginStmt(Btree *p){
   int rc;
   BtShared *pBt = p->pBt;
   if( (p->inTrans!=TRANS_WRITE) || pBt->inStmt ){
@@ -25088,7 +25183,7 @@ static int sqlite3BtreeBeginStmt(Btree *p){
 ** Commit the statment subtransaction currently in progress.  If no
 ** subtransaction is active, this is a no-op.
 */
-static int sqlite3BtreeCommitStmt(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeCommitStmt(Btree *p){
   int rc;
   BtShared *pBt = p->pBt;
   if( pBt->inStmt && !pBt->readOnly ){
@@ -25108,7 +25203,7 @@ static int sqlite3BtreeCommitStmt(Btree *p){
 ** to use a cursor that was open at the beginning of this operation
 ** will result in an error.
 */
-static int sqlite3BtreeRollbackStmt(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeRollbackStmt(Btree *p){
   int rc = SQLITE_OK;
   BtShared *pBt = p->pBt;
   sqlite3MallocDisallow();
@@ -25171,7 +25266,7 @@ static int dfltCompare(
 ** default comparison function is used.  The comparison function is
 ** always ignored for INTKEY tables.
 */
-static int sqlite3BtreeCursor(
+SQLITE_PRIVATE int sqlite3BtreeCursor(
   Btree *p,                                   /* The btree */
   int iTable,                                 /* Root page of table to open */
   int wrFlag,                                 /* 1 to write. 0 read-only */
@@ -25247,7 +25342,7 @@ create_cursor_exception:
 ** Close a cursor.  The read lock on the database file is released
 ** when the last cursor is closed.
 */
-static int sqlite3BtreeCloseCursor(BtCursor *pCur){
+SQLITE_PRIVATE int sqlite3BtreeCloseCursor(BtCursor *pCur){
   BtShared *pBt = pCur->pBtree->pBt;
   clearCursorPosition(pCur);
   if( pCur->pPrev ){
@@ -25269,7 +25364,7 @@ static int sqlite3BtreeCloseCursor(BtCursor *pCur){
 ** Make a temporary cursor by filling in the fields of pTempCur.
 ** The temporary cursor is not on the cursor list for the Btree.
 */
-static void sqlite3BtreeGetTempCursor(BtCursor *pCur, BtCursor *pTempCur){
+SQLITE_PRIVATE void sqlite3BtreeGetTempCursor(BtCursor *pCur, BtCursor *pTempCur){
   memcpy(pTempCur, pCur, sizeof(*pCur));
   pTempCur->pNext = 0;
   pTempCur->pPrev = 0;
@@ -25282,20 +25377,26 @@ static void sqlite3BtreeGetTempCursor(BtCursor *pCur, BtCursor *pTempCur){
 ** Delete a temporary cursor such as was made by the CreateTemporaryCursor()
 ** function above.
 */
-static void sqlite3BtreeReleaseTempCursor(BtCursor *pCur){
+SQLITE_PRIVATE void sqlite3BtreeReleaseTempCursor(BtCursor *pCur){
   if( pCur->pPage ){
     sqlite3PagerUnref(pCur->pPage->pDbPage);
   }
 }
 
 /*
-** The GET_CELL_INFO() macro. Takes one argument, a pointer to a valid
-** btree cursor (type BtCursor*).  This macro makes sure the BtCursor.info
-** field of the given cursor is valid.  If it is not already valid, call
+** Make sure the BtCursor* given in the argument has a valid
+** BtCursor.info structure.  If it is not already valid, call
 ** sqlite3BtreeParseCell() to fill it in.
 **
 ** BtCursor.info is a cache of the information in the current cell.
 ** Using this cache reduces the number of calls to sqlite3BtreeParseCell().
+**
+** 2007-06-25:  There is a bug in some versions of MSVC that cause the
+** compiler to crash when getCellInfo() is implemented as a macro.
+** But there is a measureable speed advantage to using the macro on gcc
+** (when less compiler optimizations like -Os or -O0 are used and the
+** compiler is not doing agressive inlining.)  So we use a real function
+** for MSVC and a macro for everything else.  Ticket #2457.
 */
 #ifndef NDEBUG
   static void assertCellInfo(BtCursor *pCur){
@@ -25307,13 +25408,24 @@ static void sqlite3BtreeReleaseTempCursor(BtCursor *pCur){
 #else
   #define assertCellInfo(x)
 #endif
-
-#define GET_CELL_INFO(pCur)                                             \
-  if( pCur->info.nSize==0 )                                             \
+#ifdef _MSC_VER
+  /* Use a real function in MSVC to work around bugs in that compiler. */
+  static void getCellInfo(BtCursor *pCur){
+    if( pCur->info.nSize==0 ){
+      sqlite3BtreeParseCell(pCur->pPage, pCur->idx, &pCur->info);
+    }else{
+      assertCellInfo(pCur);
+    }
+  }
+#else /* if not _MSC_VER */
+  /* Use a macro in all other compilers so that the function is inlined */
+#define getCellInfo(pCur)                                               \
+  if( pCur->info.nSize==0 ){                                            \
     sqlite3BtreeParseCell(pCur->pPage, pCur->idx, &pCur->info);         \
-  else                                                                  \
-    assertCellInfo(pCur);
-   
+  }else{                                                                \
+    assertCellInfo(pCur);                                               \
+  }
+#endif /* _MSC_VER */
 
 /*
 ** Set *pSize to the size of the buffer needed to hold the value of
@@ -25323,14 +25435,14 @@ static void sqlite3BtreeReleaseTempCursor(BtCursor *pCur){
 ** For a table with the INTKEY flag set, this routine returns the key
 ** itself, not the number of bytes in the key.
 */
-static int sqlite3BtreeKeySize(BtCursor *pCur, i64 *pSize){
+SQLITE_PRIVATE int sqlite3BtreeKeySize(BtCursor *pCur, i64 *pSize){
   int rc = restoreOrClearCursorPosition(pCur);
   if( rc==SQLITE_OK ){
     assert( pCur->eState==CURSOR_INVALID || pCur->eState==CURSOR_VALID );
     if( pCur->eState==CURSOR_INVALID ){
       *pSize = 0;
     }else{
-      GET_CELL_INFO(pCur);
+      getCellInfo(pCur);
       *pSize = pCur->info.nKey;
     }
   }
@@ -25344,7 +25456,7 @@ static int sqlite3BtreeKeySize(BtCursor *pCur, i64 *pSize){
 ** pointing to an entry (which can happen, for example, if
 ** the database is empty) then *pSize is set to 0.
 */
-static int sqlite3BtreeDataSize(BtCursor *pCur, u32 *pSize){
+SQLITE_PRIVATE int sqlite3BtreeDataSize(BtCursor *pCur, u32 *pSize){
   int rc = restoreOrClearCursorPosition(pCur);
   if( rc==SQLITE_OK ){
     assert( pCur->eState==CURSOR_INVALID || pCur->eState==CURSOR_VALID );
@@ -25352,7 +25464,7 @@ static int sqlite3BtreeDataSize(BtCursor *pCur, u32 *pSize){
       /* Not pointing at a valid entry - set *pSize to 0. */
       *pSize = 0;
     }else{
-      GET_CELL_INFO(pCur);
+      getCellInfo(pCur);
       *pSize = pCur->info.nData;
     }
   }
@@ -25525,7 +25637,7 @@ static int accessPayload(
   assert( pCur->idx>=0 && pCur->idx<pPage->nCell );
   assert( offset>=0 );
 
-  GET_CELL_INFO(pCur);
+  getCellInfo(pCur);
   aPayload = pCur->info.pCell + pCur->info.nHeader;
   nKey = (pPage->intKey ? 0 : pCur->info.nKey);
 
@@ -25646,7 +25758,7 @@ static int accessPayload(
 ** wrong.  An error is returned if "offset+amt" is larger than
 ** the available payload.
 */
-static int sqlite3BtreeKey(BtCursor *pCur, u32 offset, u32 amt, void *pBuf){
+SQLITE_PRIVATE int sqlite3BtreeKey(BtCursor *pCur, u32 offset, u32 amt, void *pBuf){
   int rc = restoreOrClearCursorPosition(pCur);
   if( rc==SQLITE_OK ){
     assert( pCur->eState==CURSOR_VALID );
@@ -25670,7 +25782,7 @@ static int sqlite3BtreeKey(BtCursor *pCur, u32 offset, u32 amt, void *pBuf){
 ** wrong.  An error is returned if "offset+amt" is larger than
 ** the available payload.
 */
-static int sqlite3BtreeData(BtCursor *pCur, u32 offset, u32 amt, void *pBuf){
+SQLITE_PRIVATE int sqlite3BtreeData(BtCursor *pCur, u32 offset, u32 amt, void *pBuf){
   int rc = restoreOrClearCursorPosition(pCur);
   if( rc==SQLITE_OK ){
     assert( pCur->eState==CURSOR_VALID );
@@ -25714,7 +25826,7 @@ static const unsigned char *fetchPayload(
   assert( pCur->eState==CURSOR_VALID );
   pPage = pCur->pPage;
   assert( pCur->idx>=0 && pCur->idx<pPage->nCell );
-  GET_CELL_INFO(pCur);
+  getCellInfo(pCur);
   aPayload = pCur->info.pCell;
   aPayload += pCur->info.nHeader;
   if( pPage->intKey ){
@@ -25747,13 +25859,13 @@ static const unsigned char *fetchPayload(
 ** These routines is used to get quick access to key and data
 ** in the common case where no overflow pages are used.
 */
-static const void *sqlite3BtreeKeyFetch(BtCursor *pCur, int *pAmt){
+SQLITE_PRIVATE const void *sqlite3BtreeKeyFetch(BtCursor *pCur, int *pAmt){
   if( pCur->eState==CURSOR_VALID ){
     return (const void*)fetchPayload(pCur, pAmt, 0);
   }
   return 0;
 }
-static const void *sqlite3BtreeDataFetch(BtCursor *pCur, int *pAmt){
+SQLITE_PRIVATE const void *sqlite3BtreeDataFetch(BtCursor *pCur, int *pAmt){
   if( pCur->eState==CURSOR_VALID ){
     return (const void*)fetchPayload(pCur, pAmt, 1);
   }
@@ -25796,7 +25908,7 @@ static int moveToChild(BtCursor *pCur, u32 newPgno){
 ** virtual root page is the page that the right-pointer of page
 ** 1 is pointing to.
 */
-static int sqlite3BtreeIsRootPage(MemPage *pPage){
+SQLITE_PRIVATE int sqlite3BtreeIsRootPage(MemPage *pPage){
   MemPage *pParent = pPage->pParent;
   if( pParent==0 ) return 1;
   if( pParent->pgno>1 ) return 0;
@@ -25812,7 +25924,7 @@ static int sqlite3BtreeIsRootPage(MemPage *pPage){
 ** right-most child page then pCur->idx is set to one more than
 ** the largest cell index.
 */
-static void sqlite3BtreeMoveToParent(BtCursor *pCur){
+SQLITE_PRIVATE void sqlite3BtreeMoveToParent(BtCursor *pCur){
   MemPage *pParent;
   MemPage *pPage;
   int idxParent;
@@ -25923,7 +26035,7 @@ static int moveToRightmost(BtCursor *pCur){
 ** on success.  Set *pRes to 0 if the cursor actually points to something
 ** or set *pRes to 1 if the table is empty.
 */
-static int sqlite3BtreeFirst(BtCursor *pCur, int *pRes){
+SQLITE_PRIVATE int sqlite3BtreeFirst(BtCursor *pCur, int *pRes){
   int rc;
   rc = moveToRoot(pCur);
   if( rc ) return rc;
@@ -25942,7 +26054,7 @@ static int sqlite3BtreeFirst(BtCursor *pCur, int *pRes){
 ** on success.  Set *pRes to 0 if the cursor actually points to something
 ** or set *pRes to 1 if the table is empty.
 */
-static int sqlite3BtreeLast(BtCursor *pCur, int *pRes){
+SQLITE_PRIVATE int sqlite3BtreeLast(BtCursor *pCur, int *pRes){
   int rc;
   rc = moveToRoot(pCur);
   if( rc ) return rc;
@@ -25984,7 +26096,7 @@ static int sqlite3BtreeLast(BtCursor *pCur, int *pRes){
 **     *pRes>0      The cursor is left pointing at an entry that
 **                  is larger than pKey.
 */
-static int sqlite3BtreeMoveto(
+SQLITE_PRIVATE int sqlite3BtreeMoveto(
   BtCursor *pCur,        /* The cursor to be moved */
   const void *pKey,      /* The key content for indices.  Not used by tables */
   i64 nKey,              /* Size of pKey.  Or the key for tables */
@@ -26101,7 +26213,7 @@ static int sqlite3BtreeMoveto(
 ** past the last entry in the table or sqlite3BtreePrev() moves past
 ** the first entry.  TRUE is also returned if the table is empty.
 */
-static int sqlite3BtreeEof(BtCursor *pCur){
+SQLITE_PRIVATE int sqlite3BtreeEof(BtCursor *pCur){
   /* TODO: What if the cursor is in CURSOR_REQUIRESEEK but all table entries
   ** have been deleted? This API will need to change to return an error code
   ** as well as the boolean result value.
@@ -26115,7 +26227,7 @@ static int sqlite3BtreeEof(BtCursor *pCur){
 ** was already pointing to the last entry in the database before
 ** this routine was called, then set *pRes=1.
 */
-static int sqlite3BtreeNext(BtCursor *pCur, int *pRes){
+SQLITE_PRIVATE int sqlite3BtreeNext(BtCursor *pCur, int *pRes){
   int rc;
   MemPage *pPage;
 
@@ -26180,7 +26292,7 @@ static int sqlite3BtreeNext(BtCursor *pCur, int *pRes){
 ** was already pointing to the first entry in the database before
 ** this routine was called, then set *pRes=1.
 */
-static int sqlite3BtreePrevious(BtCursor *pCur, int *pRes){
+SQLITE_PRIVATE int sqlite3BtreePrevious(BtCursor *pCur, int *pRes){
   int rc;
   Pgno pgno;
   MemPage *pPage;
@@ -27911,7 +28023,7 @@ static int checkReadLocks(Btree *pBtree, Pgno pgnoRoot, BtCursor *pExclude){
 ** For an INTKEY table, only the nKey value of the key is used.  pKey is
 ** ignored.  For a ZERODATA table, the pData and nData are both ignored.
 */
-static int sqlite3BtreeInsert(
+SQLITE_PRIVATE int sqlite3BtreeInsert(
   BtCursor *pCur,                /* Insert data into the table of this cursor */
   const void *pKey, i64 nKey,    /* The key of the new record */
   const void *pData, int nData,  /* The data of the new record */
@@ -27997,7 +28109,7 @@ end_insert:
 ** Delete the entry that the cursor is pointing to.  The cursor
 ** is left pointing at a random location.
 */
-static int sqlite3BtreeDelete(BtCursor *pCur){
+SQLITE_PRIVATE int sqlite3BtreeDelete(BtCursor *pCur){
   MemPage *pPage = pCur->pPage;
   unsigned char *pCell;
   int rc;
@@ -28113,7 +28225,7 @@ static int sqlite3BtreeDelete(BtCursor *pCur){
 **     BTREE_INTKEY|BTREE_LEAFDATA     Used for SQL tables with rowid keys
 **     BTREE_ZERODATA                  Used for SQL indices
 */
-static int sqlite3BtreeCreateTable(Btree *p, int *piTable, int flags){
+SQLITE_PRIVATE int sqlite3BtreeCreateTable(Btree *p, int *piTable, int flags){
   BtShared *pBt = p->pBt;
   MemPage *pRoot;
   Pgno pgnoRoot;
@@ -28292,7 +28404,7 @@ cleardatabasepage_out:
 ** read cursors on the table.  Open write cursors are moved to the
 ** root of the table.
 */
-static int sqlite3BtreeClearTable(Btree *p, int iTable){
+SQLITE_PRIVATE int sqlite3BtreeClearTable(Btree *p, int iTable){
   int rc;
   BtShared *pBt = p->pBt;
   if( p->inTrans!=TRANS_WRITE ){
@@ -28331,7 +28443,7 @@ static int sqlite3BtreeClearTable(Btree *p, int iTable){
 ** The last root page is recorded in meta[3] and the value of
 ** meta[3] is updated by this procedure.
 */
-static int sqlite3BtreeDropTable(Btree *p, int iTable, int *piMoved){
+SQLITE_PRIVATE int sqlite3BtreeDropTable(Btree *p, int iTable, int *piMoved){
   int rc;
   MemPage *pPage = 0;
   BtShared *pBt = p->pBt;
@@ -28449,7 +28561,7 @@ static int sqlite3BtreeDropTable(Btree *p, int iTable, int *piMoved){
 ** layer (and the SetCookie and ReadCookie opcodes) the number of
 ** free pages is not visible.  So Cookie[0] is the same as Meta[1].
 */
-static int sqlite3BtreeGetMeta(Btree *p, int idx, u32 *pMeta){
+SQLITE_PRIVATE int sqlite3BtreeGetMeta(Btree *p, int idx, u32 *pMeta){
   DbPage *pDbPage;
   int rc;
   unsigned char *pP1;
@@ -28488,7 +28600,7 @@ static int sqlite3BtreeGetMeta(Btree *p, int idx, u32 *pMeta){
 ** Write meta-information back into the database.  Meta[0] is
 ** read-only and may not be written.
 */
-static int sqlite3BtreeUpdateMeta(Btree *p, int idx, u32 iMeta){
+SQLITE_PRIVATE int sqlite3BtreeUpdateMeta(Btree *p, int idx, u32 iMeta){
   BtShared *pBt = p->pBt;
   unsigned char *pP1;
   int rc;
@@ -28501,6 +28613,11 @@ static int sqlite3BtreeUpdateMeta(Btree *p, int idx, u32 iMeta){
   rc = sqlite3PagerWrite(pBt->pPage1->pDbPage);
   if( rc ) return rc;
   put4byte(&pP1[36 + idx*4], iMeta);
+  if( idx==7 ){
+    assert( pBt->autoVacuum || iMeta==0 );
+    assert( iMeta==0 || iMeta==1 );
+    pBt->incrVacuum = iMeta;
+  }
   return SQLITE_OK;
 }
 
@@ -28508,7 +28625,7 @@ static int sqlite3BtreeUpdateMeta(Btree *p, int idx, u32 iMeta){
 ** Return the flag byte at the beginning of the page that the cursor
 ** is currently pointing to.
 */
-static int sqlite3BtreeFlags(BtCursor *pCur){
+SQLITE_PRIVATE int sqlite3BtreeFlags(BtCursor *pCur){
   /* TODO: What about CURSOR_REQUIRESEEK state? Probably need to call
   ** restoreOrClearCursorPosition() here.
   */
@@ -28521,7 +28638,7 @@ static int sqlite3BtreeFlags(BtCursor *pCur){
 ** Return the pager associated with a BTree.  This routine is used for
 ** testing and debugging only.
 */
-static Pager *sqlite3BtreePager(Btree *p){
+SQLITE_PRIVATE Pager *sqlite3BtreePager(Btree *p){
   return p->pBt->pPager;
 }
 
@@ -28856,7 +28973,7 @@ static int checkTreePage(
 ** and a pointer to that error message is returned.  The calling function
 ** is responsible for freeing the error message when it is done.
 */
-static char *sqlite3BtreeIntegrityCheck(
+SQLITE_PRIVATE char *sqlite3BtreeIntegrityCheck(
   Btree *p,     /* The btree to be checked */
   int *aRoot,   /* An array of root pages numbers for individual trees */
   int nRoot,    /* Number of entries in aRoot[] */
@@ -28961,7 +29078,7 @@ static char *sqlite3BtreeIntegrityCheck(
 /*
 ** Return the full pathname of the underlying database file.
 */
-static const char *sqlite3BtreeGetFilename(Btree *p){
+SQLITE_PRIVATE const char *sqlite3BtreeGetFilename(Btree *p){
   assert( p->pBt->pPager!=0 );
   return sqlite3PagerFilename(p->pBt->pPager);
 }
@@ -28969,7 +29086,7 @@ static const char *sqlite3BtreeGetFilename(Btree *p){
 /*
 ** Return the pathname of the directory that contains the database file.
 */
-static const char *sqlite3BtreeGetDirname(Btree *p){
+SQLITE_PRIVATE const char *sqlite3BtreeGetDirname(Btree *p){
   assert( p->pBt->pPager!=0 );
   return sqlite3PagerDirname(p->pBt->pPager);
 }
@@ -28979,7 +29096,7 @@ static const char *sqlite3BtreeGetDirname(Btree *p){
 ** value of this routine is the same regardless of whether the journal file
 ** has been created or not.
 */
-static const char *sqlite3BtreeGetJournalname(Btree *p){
+SQLITE_PRIVATE const char *sqlite3BtreeGetJournalname(Btree *p){
   assert( p->pBt->pPager!=0 );
   return sqlite3PagerJournalname(p->pBt->pPager);
 }
@@ -28992,7 +29109,7 @@ static const char *sqlite3BtreeGetJournalname(Btree *p){
 ** The size of file pBtFrom may be reduced by this operation.
 ** If anything goes wrong, the transaction on pBtFrom is rolled back.
 */
-static int sqlite3BtreeCopyFile(Btree *pTo, Btree *pFrom){
+SQLITE_PRIVATE int sqlite3BtreeCopyFile(Btree *pTo, Btree *pFrom){
   int rc = SQLITE_OK;
   Pgno i, nPage, nToPage, iSkip;
 
@@ -29049,21 +29166,21 @@ static int sqlite3BtreeCopyFile(Btree *pTo, Btree *pFrom){
 /*
 ** Return non-zero if a transaction is active.
 */
-static int sqlite3BtreeIsInTrans(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeIsInTrans(Btree *p){
   return (p && (p->inTrans==TRANS_WRITE));
 }
 
 /*
 ** Return non-zero if a statement transaction is active.
 */
-static int sqlite3BtreeIsInStmt(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeIsInStmt(Btree *p){
   return (p->pBt && p->pBt->inStmt);
 }
 
 /*
 ** Return non-zero if a read (or write) transaction is active.
 */
-static int sqlite3BtreeIsInReadTrans(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeIsInReadTrans(Btree *p){
   return (p && (p->inTrans!=TRANS_NONE));
 }
 
@@ -29083,7 +29200,7 @@ static int sqlite3BtreeIsInReadTrans(Btree *p){
 ** blob of allocated memory. This function should not call sqliteFree()
 ** on the memory, the btree layer does that.
 */
-static void *sqlite3BtreeSchema(Btree *p, int nBytes, void(*xFree)(void *)){
+SQLITE_PRIVATE void *sqlite3BtreeSchema(Btree *p, int nBytes, void(*xFree)(void *)){
   BtShared *pBt = p->pBt;
   if( !pBt->pSchema ){
     pBt->pSchema = sqliteMalloc(nBytes);
@@ -29096,7 +29213,7 @@ static void *sqlite3BtreeSchema(Btree *p, int nBytes, void(*xFree)(void *)){
 ** Return true if another user of the same shared btree as the argument
 ** handle holds an exclusive lock on the sqlite_master table.
 */
-static int sqlite3BtreeSchemaLocked(Btree *p){
+SQLITE_PRIVATE int sqlite3BtreeSchemaLocked(Btree *p){
   return (queryTableLock(p, MASTER_ROOT, READ_LOCK)!=SQLITE_OK);
 }
 
@@ -29107,7 +29224,7 @@ static int sqlite3BtreeSchemaLocked(Btree *p){
 ** lock is a write lock if isWritelock is true or a read lock
 ** if it is false.
 */
-static int sqlite3BtreeLockTable(Btree *p, int iTab, u8 isWriteLock){
+SQLITE_PRIVATE int sqlite3BtreeLockTable(Btree *p, int iTab, u8 isWriteLock){
   int rc = SQLITE_OK;
   u8 lockType = (isWriteLock?WRITE_LOCK:READ_LOCK);
   rc = queryTableLock(p, iTab, lockType);
@@ -29126,7 +29243,7 @@ static int sqlite3BtreeLockTable(Btree *p, int iTab, u8 isWriteLock){
 ** Only the data content may only be modified, it is not possible
 ** to change the length of the data stored.
 */
-static int sqlite3BtreePutData(BtCursor *pCsr, u32 offset, u32 amt, void *z){
+SQLITE_PRIVATE int sqlite3BtreePutData(BtCursor *pCsr, u32 offset, u32 amt, void *z){
 
   assert(pCsr->isIncrblobHandle);
   if( pCsr->eState==CURSOR_REQUIRESEEK ){
@@ -29163,7 +29280,7 @@ static int sqlite3BtreePutData(BtCursor *pCsr, u32 offset, u32 amt, void *z){
 ** accessPayload() (the worker function for sqlite3BtreeData() and
 ** sqlite3BtreePutData()).
 */
-static void sqlite3BtreeCacheOverflow(BtCursor *pCur){
+SQLITE_PRIVATE void sqlite3BtreeCacheOverflow(BtCursor *pCur){
   assert(!pCur->isIncrblobHandle);
   assert(!pCur->aOverflow);
   pCur->isIncrblobHandle = 1;
@@ -29209,7 +29326,7 @@ static FifoPage *allocateFifoPage(int nEntry){
 /*
 ** Initialize a Fifo structure.
 */
-static void sqlite3VdbeFifoInit(Fifo *pFifo){
+SQLITE_PRIVATE void sqlite3VdbeFifoInit(Fifo *pFifo){
   memset(pFifo, 0, sizeof(*pFifo));
 }
 
@@ -29218,7 +29335,7 @@ static void sqlite3VdbeFifoInit(Fifo *pFifo){
 ** normally.   SQLITE_NOMEM is returned if we are unable to allocate
 ** memory.
 */
-static int sqlite3VdbeFifoPush(Fifo *pFifo, i64 val){
+SQLITE_PRIVATE int sqlite3VdbeFifoPush(Fifo *pFifo, i64 val){
   FifoPage *pPage;
   pPage = pFifo->pLast;
   if( pPage==0 ){
@@ -29243,7 +29360,7 @@ static int sqlite3VdbeFifoPush(Fifo *pFifo, i64 val){
 ** extracted is the one least recently inserted.  If the Fifo is empty
 ** return SQLITE_DONE.
 */
-static int sqlite3VdbeFifoPop(Fifo *pFifo, i64 *pVal){
+SQLITE_PRIVATE int sqlite3VdbeFifoPop(Fifo *pFifo, i64 *pVal){
   FifoPage *pPage;
   if( pFifo->nEntry==0 ){
     return SQLITE_DONE;
@@ -29276,7 +29393,7 @@ static int sqlite3VdbeFifoPop(Fifo *pFifo, i64 *pVal){
 ** Delete all information from a Fifo object.   Free all memory held
 ** by the Fifo.
 */
-static void sqlite3VdbeFifoClear(Fifo *pFifo){
+SQLITE_PRIVATE void sqlite3VdbeFifoClear(Fifo *pFifo){
   FifoPage *pPage, *pNextPage;
   for(pPage=pFifo->pFirst; pPage; pPage=pNextPage){
     pNextPage = pPage->pNext;
@@ -29324,7 +29441,7 @@ static void sqlite3VdbeFifoClear(Fifo *pFifo){
 ** SQLITE_NOMEM may be returned if a malloc() fails during conversion
 ** between formats.
 */
-static int sqlite3VdbeChangeEncoding(Mem *pMem, int desiredEnc){
+SQLITE_PRIVATE int sqlite3VdbeChangeEncoding(Mem *pMem, int desiredEnc){
   int rc;
   if( !(pMem->flags&MEM_Str) || pMem->enc==desiredEnc ){
     return SQLITE_OK;
@@ -29350,7 +29467,7 @@ static int sqlite3VdbeChangeEncoding(Mem *pMem, int desiredEnc){
 **
 ** Return SQLITE_OK on success or SQLITE_NOMEM if malloc fails.
 */
-static int sqlite3VdbeMemDynamicify(Mem *pMem){
+SQLITE_PRIVATE int sqlite3VdbeMemDynamicify(Mem *pMem){
   int n;
   u8 *z;
   expandBlob(pMem);
@@ -29379,7 +29496,7 @@ static int sqlite3VdbeMemDynamicify(Mem *pMem){
 ** blob stored in dynamically allocated space.
 */
 #ifndef SQLITE_OMIT_INCRBLOB
-static int sqlite3VdbeMemExpandBlob(Mem *pMem){
+SQLITE_PRIVATE int sqlite3VdbeMemExpandBlob(Mem *pMem){
   if( pMem->flags & MEM_Zero ){
     char *pNew;
     int nByte;
@@ -29410,7 +29527,7 @@ static int sqlite3VdbeMemExpandBlob(Mem *pMem){
 **
 ** Return SQLITE_OK on success or SQLITE_NOMEM if malloc fails.
 */
-static int sqlite3VdbeMemMakeWriteable(Mem *pMem){
+SQLITE_PRIVATE int sqlite3VdbeMemMakeWriteable(Mem *pMem){
   int n;
   u8 *z;
   expandBlob(pMem);
@@ -29442,7 +29559,7 @@ static int sqlite3VdbeMemMakeWriteable(Mem *pMem){
 /*
 ** Make sure the given Mem is \u0000 terminated.
 */
-static int sqlite3VdbeMemNulTerminate(Mem *pMem){
+SQLITE_PRIVATE int sqlite3VdbeMemNulTerminate(Mem *pMem){
   if( (pMem->flags & MEM_Term)!=0 || (pMem->flags & MEM_Str)==0 ){
     return SQLITE_OK;   /* Nothing to do */
   }
@@ -29482,7 +29599,7 @@ static int sqlite3VdbeMemNulTerminate(Mem *pMem){
 ** keys are strings. In the former case a NULL pointer is returned the
 ** user and the later is an internal programming error.
 */
-static int sqlite3VdbeMemStringify(Mem *pMem, int enc){
+SQLITE_PRIVATE int sqlite3VdbeMemStringify(Mem *pMem, int enc){
   int rc = SQLITE_OK;
   int fg = pMem->flags;
   char *z = pMem->zShort;
@@ -29519,7 +29636,7 @@ static int sqlite3VdbeMemStringify(Mem *pMem, int enc){
 ** Return SQLITE_ERROR if the finalizer reports an error.  SQLITE_OK
 ** otherwise.
 */
-static int sqlite3VdbeMemFinalize(Mem *pMem, FuncDef *pFunc){
+SQLITE_PRIVATE int sqlite3VdbeMemFinalize(Mem *pMem, FuncDef *pFunc){
   int rc = SQLITE_OK;
   if( pFunc && pFunc->xFinalize ){
     sqlite3_context ctx;
@@ -29549,7 +29666,7 @@ static int sqlite3VdbeMemFinalize(Mem *pMem, FuncDef *pFunc){
 ** inconsistent state, for example with (Mem.z==0) and
 ** (Mem.type==SQLITE_TEXT).
 */
-static void sqlite3VdbeMemRelease(Mem *p){
+SQLITE_PRIVATE void sqlite3VdbeMemRelease(Mem *p){
   if( p->flags & (MEM_Dyn|MEM_Agg) ){
     if( p->xDel ){
       if( p->flags & MEM_Agg ){
@@ -29577,7 +29694,7 @@ static void sqlite3VdbeMemRelease(Mem *p){
 **
 ** If pMem is a string, its encoding might be changed.
 */
-static i64 sqlite3VdbeIntValue(Mem *pMem){
+SQLITE_PRIVATE i64 sqlite3VdbeIntValue(Mem *pMem){
   int flags = pMem->flags;
   if( flags & MEM_Int ){
     return pMem->u.i;
@@ -29604,7 +29721,7 @@ static i64 sqlite3VdbeIntValue(Mem *pMem){
 ** value.  If it is a string or blob, try to convert it to a double.
 ** If it is a NULL, return 0.0.
 */
-static double sqlite3VdbeRealValue(Mem *pMem){
+SQLITE_PRIVATE double sqlite3VdbeRealValue(Mem *pMem){
   if( pMem->flags & MEM_Real ){
     return pMem->r;
   }else if( pMem->flags & MEM_Int ){
@@ -29628,7 +29745,7 @@ static double sqlite3VdbeRealValue(Mem *pMem){
 ** The MEM structure is already a MEM_Real.  Try to also make it a
 ** MEM_Int if we can.
 */
-static void sqlite3VdbeIntegerAffinity(Mem *pMem){
+SQLITE_PRIVATE void sqlite3VdbeIntegerAffinity(Mem *pMem){
   assert( pMem->flags & MEM_Real );
   pMem->u.i = pMem->r;
   if( ((double)pMem->u.i)==pMem->r ){
@@ -29639,7 +29756,7 @@ static void sqlite3VdbeIntegerAffinity(Mem *pMem){
 /*
 ** Convert pMem to type integer.  Invalidate any prior representations.
 */
-static int sqlite3VdbeMemIntegerify(Mem *pMem){
+SQLITE_PRIVATE int sqlite3VdbeMemIntegerify(Mem *pMem){
   pMem->u.i = sqlite3VdbeIntValue(pMem);
   sqlite3VdbeMemRelease(pMem);
   pMem->flags = MEM_Int;
@@ -29650,7 +29767,7 @@ static int sqlite3VdbeMemIntegerify(Mem *pMem){
 ** Convert pMem so that it is of type MEM_Real.
 ** Invalidate any prior representations.
 */
-static int sqlite3VdbeMemRealify(Mem *pMem){
+SQLITE_PRIVATE int sqlite3VdbeMemRealify(Mem *pMem){
   pMem->r = sqlite3VdbeRealValue(pMem);
   sqlite3VdbeMemRelease(pMem);
   pMem->flags = MEM_Real;
@@ -29661,7 +29778,7 @@ static int sqlite3VdbeMemRealify(Mem *pMem){
 ** Convert pMem so that it has types MEM_Real or MEM_Int or both.
 ** Invalidate any prior representations.
 */
-static int sqlite3VdbeMemNumerify(Mem *pMem){
+SQLITE_PRIVATE int sqlite3VdbeMemNumerify(Mem *pMem){
   double r1, r2;
   i64 i;
   assert( (pMem->flags & (MEM_Int|MEM_Real|MEM_Null))==0 );
@@ -29682,7 +29799,7 @@ static int sqlite3VdbeMemNumerify(Mem *pMem){
 /*
 ** Delete any previous value and set the value stored in *pMem to NULL.
 */
-static void sqlite3VdbeMemSetNull(Mem *pMem){
+SQLITE_PRIVATE void sqlite3VdbeMemSetNull(Mem *pMem){
   sqlite3VdbeMemRelease(pMem);
   pMem->flags = MEM_Null;
   pMem->type = SQLITE_NULL;
@@ -29693,7 +29810,7 @@ static void sqlite3VdbeMemSetNull(Mem *pMem){
 ** Delete any previous value and set the value to be a BLOB of length
 ** n containing all zeros.
 */
-static void sqlite3VdbeMemSetZeroBlob(Mem *pMem, int n){
+SQLITE_PRIVATE void sqlite3VdbeMemSetZeroBlob(Mem *pMem, int n){
   sqlite3VdbeMemRelease(pMem);
   pMem->flags = MEM_Blob|MEM_Zero|MEM_Short;
   pMem->type = SQLITE_BLOB;
@@ -29708,7 +29825,7 @@ static void sqlite3VdbeMemSetZeroBlob(Mem *pMem, int n){
 ** Delete any previous value and set the value stored in *pMem to val,
 ** manifest type INTEGER.
 */
-static void sqlite3VdbeMemSetInt64(Mem *pMem, i64 val){
+SQLITE_PRIVATE void sqlite3VdbeMemSetInt64(Mem *pMem, i64 val){
   sqlite3VdbeMemRelease(pMem);
   pMem->u.i = val;
   pMem->flags = MEM_Int;
@@ -29719,8 +29836,8 @@ static void sqlite3VdbeMemSetInt64(Mem *pMem, i64 val){
 ** Delete any previous value and set the value stored in *pMem to val,
 ** manifest type REAL.
 */
-static void sqlite3VdbeMemSetDouble(Mem *pMem, double val){
-  if( isnan(val) ){
+SQLITE_PRIVATE void sqlite3VdbeMemSetDouble(Mem *pMem, double val){
+  if( sqlite3_isnan(val) ){
     sqlite3VdbeMemSetNull(pMem);
   }else{
     sqlite3VdbeMemRelease(pMem);
@@ -29734,7 +29851,7 @@ static void sqlite3VdbeMemSetDouble(Mem *pMem, double val){
 ** Return true if the Mem object contains a TEXT or BLOB that is
 ** too large - whose size exceeds SQLITE_MAX_LENGTH.
 */
-static int sqlite3VdbeMemTooBig(Mem *p){
+SQLITE_PRIVATE int sqlite3VdbeMemTooBig(Mem *p){
   if( p->flags & (MEM_Str|MEM_Blob) ){
     int n = p->n;
     if( p->flags & MEM_Zero ){
@@ -29751,7 +29868,7 @@ static int sqlite3VdbeMemTooBig(Mem *p){
 ** pFrom->z is used, then pTo->z points to the same thing as pFrom->z
 ** and flags gets srcType (either MEM_Ephem or MEM_Static).
 */
-static void sqlite3VdbeMemShallowCopy(Mem *pTo, const Mem *pFrom, int srcType){
+SQLITE_PRIVATE void sqlite3VdbeMemShallowCopy(Mem *pTo, const Mem *pFrom, int srcType){
   memcpy(pTo, pFrom, sizeof(*pFrom)-sizeof(pFrom->zShort));
   pTo->xDel = 0;
   if( pTo->flags & (MEM_Str|MEM_Blob) ){
@@ -29765,7 +29882,7 @@ static void sqlite3VdbeMemShallowCopy(Mem *pTo, const Mem *pFrom, int srcType){
 ** Make a full copy of pFrom into pTo.  Prior contents of pTo are
 ** freed before the copy is made.
 */
-static int sqlite3VdbeMemCopy(Mem *pTo, const Mem *pFrom){
+SQLITE_PRIVATE int sqlite3VdbeMemCopy(Mem *pTo, const Mem *pFrom){
   int rc;
   if( pTo->flags & MEM_Dyn ){
     sqlite3VdbeMemRelease(pTo);
@@ -29787,7 +29904,7 @@ static int sqlite3VdbeMemCopy(Mem *pTo, const Mem *pFrom){
 ** might be returned if pFrom held ephemeral data and we were unable
 ** to allocate enough space to make a copy.
 */
-static int sqlite3VdbeMemMove(Mem *pTo, Mem *pFrom){
+SQLITE_PRIVATE int sqlite3VdbeMemMove(Mem *pTo, Mem *pFrom){
   int rc;
   if( pTo->flags & MEM_Dyn ){
     sqlite3VdbeMemRelease(pTo);
@@ -29809,7 +29926,7 @@ static int sqlite3VdbeMemMove(Mem *pTo, Mem *pFrom){
 /*
 ** Change the value of a Mem to be a string or a BLOB.
 */
-static int sqlite3VdbeMemSetStr(
+SQLITE_PRIVATE int sqlite3VdbeMemSetStr(
   Mem *pMem,          /* Memory cell to set to string value */
   const char *z,      /* String pointer */
   int n,              /* Bytes in string, or negative */
@@ -29881,7 +29998,7 @@ static int sqlite3VdbeMemSetStr(
 **
 ** Two NULL values are considered equal by this function.
 */
-static int sqlite3MemCompare(const Mem *pMem1, const Mem *pMem2, const CollSeq *pColl){
+SQLITE_PRIVATE int sqlite3MemCompare(const Mem *pMem1, const Mem *pMem2, const CollSeq *pColl){
   int rc;
   int f1, f2;
   int combined_flags;
@@ -30006,7 +30123,7 @@ static int sqlite3MemCompare(const Mem *pMem1, const Mem *pMem2, const CollSeq *
 ** If this routine fails for any reason (malloc returns NULL or unable
 ** to read from the disk) then the pMem is left in an inconsistent state.
 */
-static int sqlite3VdbeMemFromBtree(
+SQLITE_PRIVATE int sqlite3VdbeMemFromBtree(
   BtCursor *pCur,   /* Cursor pointing at record to retrieve. */
   int offset,       /* Offset from the start of data to return bytes from. */
   int amt,          /* Number of bytes to return. */
@@ -30072,7 +30189,7 @@ static int sqlite3VdbeMemFromBtree(
 ** Perform various checks on the memory cell pMem. An assert() will
 ** fail if pMem is internally inconsistent.
 */
-static void sqlite3VdbeMemSanity(Mem *pMem){
+SQLITE_PRIVATE void sqlite3VdbeMemSanity(Mem *pMem){
   int flags = pMem->flags;
   assert( flags!=0 );  /* Must define some type */
   if( flags & (MEM_Str|MEM_Blob) ){
@@ -30126,7 +30243,7 @@ static void sqlite3VdbeMemSanity(Mem *pMem){
 ** If that is the case, then the result must be aligned on an even byte
 ** boundary.
 */
-static const void *sqlite3ValueText(sqlite3_value* pVal, u8 enc){
+SQLITE_PRIVATE const void *sqlite3ValueText(sqlite3_value* pVal, u8 enc){
   if( !pVal ) return 0;
   assert( (enc&3)==(enc&~SQLITE_UTF16_ALIGNED) );
 
@@ -30161,7 +30278,7 @@ static const void *sqlite3ValueText(sqlite3_value* pVal, u8 enc){
 /*
 ** Create a new sqlite3_value object.
 */
-static sqlite3_value *sqlite3ValueNew(void){
+SQLITE_PRIVATE sqlite3_value *sqlite3ValueNew(void){
   Mem *p = sqliteMalloc(sizeof(*p));
   if( p ){
     p->flags = MEM_Null;
@@ -30180,7 +30297,7 @@ static sqlite3_value *sqlite3ValueNew(void){
 ** the value by passing it to sqlite3ValueFree() later on. If the expression
 ** cannot be converted to a value, then *ppVal is set to NULL.
 */
-static int sqlite3ValueFromExpr(
+SQLITE_PRIVATE int sqlite3ValueFromExpr(
   Expr *pExpr, 
   u8 enc, 
   u8 affinity,
@@ -30239,7 +30356,7 @@ no_mem:
 /*
 ** Change the string value of an sqlite3_value object
 */
-static void sqlite3ValueSetStr(
+SQLITE_PRIVATE void sqlite3ValueSetStr(
   sqlite3_value *v, 
   int n, 
   const void *z, 
@@ -30252,7 +30369,7 @@ static void sqlite3ValueSetStr(
 /*
 ** Free an sqlite3_value object
 */
-static void sqlite3ValueFree(sqlite3_value *v){
+SQLITE_PRIVATE void sqlite3ValueFree(sqlite3_value *v){
   if( !v ) return;
   sqlite3ValueSetStr(v, 0, 0, SQLITE_UTF8, SQLITE_STATIC);
   sqliteFree(v);
@@ -30262,7 +30379,7 @@ static void sqlite3ValueFree(sqlite3_value *v){
 ** Return the number of bytes in the sqlite3_value object assuming
 ** that it uses the encoding "enc"
 */
-static int sqlite3ValueBytes(sqlite3_value *pVal, u8 enc){
+SQLITE_PRIVATE int sqlite3ValueBytes(sqlite3_value *pVal, u8 enc){
   Mem *p = (Mem*)pVal;
   if( (p->flags & MEM_Blob)!=0 || sqlite3ValueText(pVal, enc) ){
     if( p->flags & MEM_Zero ){
@@ -30307,7 +30424,7 @@ int sqlite3_vdbe_addop_trace = 0;
 /*
 ** Create a new virtual database engine.
 */
-static Vdbe *sqlite3VdbeCreate(sqlite3 *db){
+SQLITE_PRIVATE Vdbe *sqlite3VdbeCreate(sqlite3 *db){
   Vdbe *p;
   p = sqliteMalloc( sizeof(Vdbe) );
   if( p==0 ) return 0;
@@ -30325,7 +30442,7 @@ static Vdbe *sqlite3VdbeCreate(sqlite3 *db){
 /*
 ** Remember the SQL string for a prepared statement.
 */
-static void sqlite3VdbeSetSql(Vdbe *p, const char *z, int n){
+SQLITE_PRIVATE void sqlite3VdbeSetSql(Vdbe *p, const char *z, int n){
   if( p==0 ) return;
   assert( p->zSql==0 );
   p->zSql = sqlite3StrNDup(z, n);
@@ -30334,14 +30451,14 @@ static void sqlite3VdbeSetSql(Vdbe *p, const char *z, int n){
 /*
 ** Return the SQL associated with a prepared statement
 */
-static const char *sqlite3VdbeGetSql(Vdbe *p){
+SQLITE_PRIVATE const char *sqlite3VdbeGetSql(Vdbe *p){
   return p->zSql;
 }
 
 /*
 ** Swap all content between two VDBE structures.
 */
-static void sqlite3VdbeSwap(Vdbe *pA, Vdbe *pB){
+SQLITE_PRIVATE void sqlite3VdbeSwap(Vdbe *pA, Vdbe *pB){
   Vdbe tmp, *pTmp;
   char *zTmp;
   int nTmp;
@@ -30366,7 +30483,7 @@ static void sqlite3VdbeSwap(Vdbe *pA, Vdbe *pB){
 /*
 ** Turn tracing on or off
 */
-static void sqlite3VdbeTrace(Vdbe *p, FILE *trace){
+SQLITE_PRIVATE void sqlite3VdbeTrace(Vdbe *p, FILE *trace){
   p->trace = trace;
 }
 #endif
@@ -30416,7 +30533,7 @@ static void resizeOpArray(Vdbe *p, int N){
 ** the sqlite3VdbeChangeP3() function to change the value of the P3
 ** operand.
 */
-static int sqlite3VdbeAddOp(Vdbe *p, int op, int p1, int p2){
+SQLITE_PRIVATE int sqlite3VdbeAddOp(Vdbe *p, int op, int p1, int p2){
   int i;
   VdbeOp *pOp;
 
@@ -30445,7 +30562,7 @@ static int sqlite3VdbeAddOp(Vdbe *p, int op, int p1, int p2){
 /*
 ** Add an opcode that includes the p3 value.
 */
-static int sqlite3VdbeOp3(Vdbe *p, int op, int p1, int p2, const char *zP3,int p3type){
+SQLITE_PRIVATE int sqlite3VdbeOp3(Vdbe *p, int op, int p1, int p2, const char *zP3,int p3type){
   int addr = sqlite3VdbeAddOp(p, op, p1, p2);
   sqlite3VdbeChangeP3(p, addr, zP3, p3type);
   return addr;
@@ -30465,7 +30582,7 @@ static int sqlite3VdbeOp3(Vdbe *p, int op, int p1, int p2, const char *zP3,int p
 **
 ** Zero is returned if a malloc() fails.
 */
-static int sqlite3VdbeMakeLabel(Vdbe *p){
+SQLITE_PRIVATE int sqlite3VdbeMakeLabel(Vdbe *p){
   int i;
   i = p->nLabel++;
   assert( p->magic==VDBE_MAGIC_INIT );
@@ -30485,7 +30602,7 @@ static int sqlite3VdbeMakeLabel(Vdbe *p){
 ** be inserted.  The parameter "x" must have been obtained from
 ** a prior call to sqlite3VdbeMakeLabel().
 */
-static void sqlite3VdbeResolveLabel(Vdbe *p, int x){
+SQLITE_PRIVATE void sqlite3VdbeResolveLabel(Vdbe *p, int x){
   int j = -1-x;
   assert( p->magic==VDBE_MAGIC_INIT );
   assert( j>=0 && j<p->nLabel );
@@ -30531,7 +30648,7 @@ static int opcodeNoPush(u8 op){
 }
 
 #ifndef NDEBUG
-static int sqlite3VdbeOpcodeNoPush(u8 op){
+SQLITE_PRIVATE int sqlite3VdbeOpcodeNoPush(u8 op){
   return opcodeNoPush(op);
 }
 #endif
@@ -30573,18 +30690,23 @@ static void resolveP2Values(Vdbe *p, int *pMaxFuncArgs, int *pMaxStack){
 #endif
     ){
       if( pOp->p2>nMaxArgs ) nMaxArgs = pOp->p2;
-    }else if( opcode==OP_Halt ){
+    }
+    if( opcode==OP_Halt ){
       if( pOp->p1==SQLITE_CONSTRAINT && pOp->p2==OE_Abort ){
         doesStatementRollback = 1;
       }
     }else if( opcode==OP_Statement ){
       hasStatementBegin = 1;
+#ifndef SQLITE_OMIT_VIRTUALTABLE
+    }else if( opcode==OP_VUpdate || opcode==OP_VRename ){
+      doesStatementRollback = 1;
     }else if( opcode==OP_VFilter ){
       int n;
       assert( p->nOp - i >= 3 );
       assert( pOp[-2].opcode==OP_Integer );
       n = pOp[-2].p1;
       if( n>nMaxArgs ) nMaxArgs = n;
+#endif
     }
     if( opcodeNoPush(opcode) ){
       nMaxStack--;
@@ -30617,7 +30739,7 @@ static void resolveP2Values(Vdbe *p, int *pMaxFuncArgs, int *pMaxStack){
 /*
 ** Return the address of the next instruction to be inserted.
 */
-static int sqlite3VdbeCurrentAddr(Vdbe *p){
+SQLITE_PRIVATE int sqlite3VdbeCurrentAddr(Vdbe *p){
   assert( p->magic==VDBE_MAGIC_INIT );
   return p->nOp;
 }
@@ -30626,7 +30748,7 @@ static int sqlite3VdbeCurrentAddr(Vdbe *p){
 ** Add a whole list of operations to the operation stack.  Return the
 ** address of the first operation added.
 */
-static int sqlite3VdbeAddOpList(Vdbe *p, int nOp, VdbeOpList const *aOp){
+SQLITE_PRIVATE int sqlite3VdbeAddOpList(Vdbe *p, int nOp, VdbeOpList const *aOp){
   int addr;
   assert( p->magic==VDBE_MAGIC_INIT );
   resizeOpArray(p, p->nOp + nOp);
@@ -30662,7 +30784,7 @@ static int sqlite3VdbeAddOpList(Vdbe *p, int nOp, VdbeOpList const *aOp){
 ** static array using sqlite3VdbeAddOpList but we want to make a
 ** few minor changes to the program.
 */
-static void sqlite3VdbeChangeP1(Vdbe *p, int addr, int val){
+SQLITE_PRIVATE void sqlite3VdbeChangeP1(Vdbe *p, int addr, int val){
   assert( p==0 || p->magic==VDBE_MAGIC_INIT );
   if( p && addr>=0 && p->nOp>addr && p->aOp ){
     p->aOp[addr].p1 = val;
@@ -30673,7 +30795,7 @@ static void sqlite3VdbeChangeP1(Vdbe *p, int addr, int val){
 ** Change the value of the P2 operand for a specific instruction.
 ** This routine is useful for setting a jump destination.
 */
-static void sqlite3VdbeChangeP2(Vdbe *p, int addr, int val){
+SQLITE_PRIVATE void sqlite3VdbeChangeP2(Vdbe *p, int addr, int val){
   assert( val>=0 );
   assert( p==0 || p->magic==VDBE_MAGIC_INIT );
   if( p && addr>=0 && p->nOp>addr && p->aOp ){
@@ -30685,7 +30807,7 @@ static void sqlite3VdbeChangeP2(Vdbe *p, int addr, int val){
 ** Change the P2 operand of instruction addr so that it points to
 ** the address of the next instruction to be coded.
 */
-static void sqlite3VdbeJumpHere(Vdbe *p, int addr){
+SQLITE_PRIVATE void sqlite3VdbeJumpHere(Vdbe *p, int addr){
   sqlite3VdbeChangeP2(p, addr, p->nOp);
 }
 
@@ -30739,7 +30861,7 @@ static void freeP3(int p3type, void *p3){
 /*
 ** Change N opcodes starting at addr to No-ops.
 */
-static void sqlite3VdbeChangeToNoop(Vdbe *p, int addr, int N){
+SQLITE_PRIVATE void sqlite3VdbeChangeToNoop(Vdbe *p, int addr, int N){
   if( p && p->aOp ){
     VdbeOp *pOp = &p->aOp[addr];
     while( N-- ){
@@ -30776,7 +30898,7 @@ static void sqlite3VdbeChangeToNoop(Vdbe *p, int addr, int N){
 **
 ** If addr<0 then change P3 on the most recently inserted instruction.
 */
-static void sqlite3VdbeChangeP3(Vdbe *p, int addr, const char *zP3, int n){
+SQLITE_PRIVATE void sqlite3VdbeChangeP3(Vdbe *p, int addr, const char *zP3, int n){
   Op *pOp;
   assert( p==0 || p->magic==VDBE_MAGIC_INIT );
   if( p==0 || p->aOp==0 || sqlite3MallocFailed() ){
@@ -30833,7 +30955,7 @@ static void sqlite3VdbeChangeP3(Vdbe *p, int addr, const char *zP3, int n){
 ** Replace the P3 field of the most recently coded instruction with
 ** comment text.
 */
-static void sqlite3VdbeComment(Vdbe *p, const char *zFormat, ...){
+SQLITE_PRIVATE void sqlite3VdbeComment(Vdbe *p, const char *zFormat, ...){
   va_list ap;
   assert( p->nOp>0 || p->aOp==0 );
   assert( p->aOp==0 || p->aOp[p->nOp-1].p3==0 || sqlite3MallocFailed() );
@@ -30846,7 +30968,7 @@ static void sqlite3VdbeComment(Vdbe *p, const char *zFormat, ...){
 /*
 ** Return the opcode for a given address.
 */
-static VdbeOp *sqlite3VdbeGetOp(Vdbe *p, int addr){
+SQLITE_PRIVATE VdbeOp *sqlite3VdbeGetOp(Vdbe *p, int addr){
   assert( p->magic==VDBE_MAGIC_INIT );
   assert( (addr>=0 && addr<p->nOp) || sqlite3MallocFailed() );
   return ((addr>=0 && addr<p->nOp)?(&p->aOp[addr]):0);
@@ -30929,7 +31051,7 @@ static char *displayP3(Op *pOp, char *zTemp, int nTemp){
 /*
 ** Print a single opcode.  This routine is used for debugging only.
 */
-static void sqlite3VdbePrintOp(FILE *pOut, int pc, Op *pOp){
+SQLITE_PRIVATE void sqlite3VdbePrintOp(FILE *pOut, int pc, Op *pOp){
   char *zP3;
   char zPtr[50];
   static const char *zFormat1 = "%4d %-13s %4d %4d %s\n";
@@ -30960,7 +31082,7 @@ static void releaseMemArray(Mem *p, int N){
 ** running the code, it invokes the callback once for each instruction.
 ** This feature is used to implement "EXPLAIN".
 */
-static int sqlite3VdbeList(
+SQLITE_PRIVATE int sqlite3VdbeList(
   Vdbe *p                   /* The VDBE */
 ){
   sqlite3 *db = p->db;
@@ -31038,7 +31160,7 @@ static int sqlite3VdbeList(
 /*
 ** Print the SQL that was used to generate a VDBE program.
 */
-static void sqlite3VdbePrintSql(Vdbe *p){
+SQLITE_PRIVATE void sqlite3VdbePrintSql(Vdbe *p){
   int nOp = p->nOp;
   VdbeOp *pOp;
   if( nOp<1 ) return;
@@ -31055,7 +31177,7 @@ static void sqlite3VdbePrintSql(Vdbe *p){
 /*
 ** Print an IOTRACE message showing SQL content.
 */
-static void sqlite3VdbeIOTraceSql(Vdbe *p){
+SQLITE_PRIVATE void sqlite3VdbeIOTraceSql(Vdbe *p){
   int nOp = p->nOp;
   VdbeOp *pOp;
   if( sqlite3_io_trace==0 ) return;
@@ -31091,7 +31213,7 @@ static void sqlite3VdbeIOTraceSql(Vdbe *p){
 ** This is the only way to move a VDBE from VDBE_MAGIC_INIT to
 ** VDBE_MAGIC_RUN.
 */
-static void sqlite3VdbeMakeReady(
+SQLITE_PRIVATE void sqlite3VdbeMakeReady(
   Vdbe *p,                       /* The VDBE */
   int nVar,                      /* Number of '?' see in the SQL statement */
   int nMem,                      /* Number of memory cells to allocate */
@@ -31172,6 +31294,7 @@ static void sqlite3VdbeMakeReady(
   p->nChange = 0;
   p->cacheCtr = 1;
   p->minWriteFileFormat = 255;
+  p->openedStatement = 0;
 #ifdef VDBE_PROFILE
   {
     int i;
@@ -31187,7 +31310,7 @@ static void sqlite3VdbeMakeReady(
 ** Close a cursor and release all the resources that cursor happens
 ** to hold.
 */
-static void sqlite3VdbeFreeCursor(Vdbe *p, Cursor *pCx){
+SQLITE_PRIVATE void sqlite3VdbeFreeCursor(Vdbe *p, Cursor *pCx){
   if( pCx==0 ){
     return;
   }
@@ -31254,6 +31377,7 @@ static void Cleanup(Vdbe *p){
   p->contextStackTop = 0;
   sqliteFree(p->zErrMsg);
   p->zErrMsg = 0;
+  p->resOnStack = 0;
 }
 
 /*
@@ -31262,7 +31386,7 @@ static void Cleanup(Vdbe *p){
 ** execution of the vdbe program so that sqlite3_column_count() can
 ** be called on an SQL statement before sqlite3_step().
 */
-static void sqlite3VdbeSetNumCols(Vdbe *p, int nResColumn){
+SQLITE_PRIVATE void sqlite3VdbeSetNumCols(Vdbe *p, int nResColumn){
   Mem *pColName;
   int n;
   releaseMemArray(p->aColName, p->nResColumn*COLNAME_N);
@@ -31287,7 +31411,7 @@ static void sqlite3VdbeSetNumCols(Vdbe *p, int nResColumn){
 ** the string is freed using sqliteFree() when the vdbe is finished with
 ** it. Otherwise, N bytes of zName are copied.
 */
-static int sqlite3VdbeSetColName(Vdbe *p, int idx, int var, const char *zName, int N){
+SQLITE_PRIVATE int sqlite3VdbeSetColName(Vdbe *p, int idx, int var, const char *zName, int N){
   int rc;
   Mem *pColName;
   assert( idx<p->nResColumn );
@@ -31555,7 +31679,7 @@ static void checkActiveVdbeCnt(sqlite3 *db){
 ** aborted so that they do not have data rolled out from underneath
 ** them leading to a segfault.
 */
-static void sqlite3AbortOtherActiveVdbes(sqlite3 *db, Vdbe *pExcept){
+SQLITE_PRIVATE void sqlite3AbortOtherActiveVdbes(sqlite3 *db, Vdbe *pExcept){
   Vdbe *pOther;
   for(pOther=db->pVdbe; pOther; pOther=pOther->pNext){
     if( pOther==pExcept ) continue;
@@ -31579,7 +31703,7 @@ static void sqlite3AbortOtherActiveVdbes(sqlite3 *db, Vdbe *pExcept){
 ** lock contention, return SQLITE_BUSY.  If SQLITE_BUSY is returned, it
 ** means the close did not happen and needs to be repeated.
 */
-static int sqlite3VdbeHalt(Vdbe *p){
+SQLITE_PRIVATE int sqlite3VdbeHalt(Vdbe *p){
   sqlite3 *db = p->db;
   int i;
   int (*xFunc)(Btree *pBt) = 0;  /* Function to call on each btree backend */
@@ -31720,7 +31844,9 @@ static int sqlite3VdbeHalt(Vdbe *p){
       }
     }else if( !xFunc ){
       if( p->rc==SQLITE_OK || p->errorAction==OE_Fail ){
-        xFunc = sqlite3BtreeCommitStmt;
+        if( p->openedStatement ){
+          xFunc = sqlite3BtreeCommitStmt;
+        } 
       }else if( p->errorAction==OE_Abort ){
         xFunc = sqlite3BtreeRollbackStmt;
       }else{
@@ -31784,7 +31910,7 @@ static int sqlite3VdbeHalt(Vdbe *p){
 ** Each VDBE holds the result of the most recent sqlite3_step() call
 ** in p->rc.  This routine sets that result back to SQLITE_OK.
 */
-static void sqlite3VdbeResetStepResult(Vdbe *p){
+SQLITE_PRIVATE void sqlite3VdbeResetStepResult(Vdbe *p){
   p->rc = SQLITE_OK;
 }
 
@@ -31799,7 +31925,7 @@ static void sqlite3VdbeResetStepResult(Vdbe *p){
 ** virtual machine from VDBE_MAGIC_RUN or VDBE_MAGIC_HALT back to
 ** VDBE_MAGIC_INIT.
 */
-static int sqlite3VdbeReset(Vdbe *p){
+SQLITE_PRIVATE int sqlite3VdbeReset(Vdbe *p){
   sqlite3 *db;
   db = p->db;
 
@@ -31875,7 +32001,7 @@ static int sqlite3VdbeReset(Vdbe *p){
 ** Clean up and delete a VDBE after execution.  Return an integer which is
 ** the result code.  Write any error message text into *pzErrMsg.
 */
-static int sqlite3VdbeFinalize(Vdbe *p){
+SQLITE_PRIVATE int sqlite3VdbeFinalize(Vdbe *p){
   int rc = SQLITE_OK;
   if( p->magic==VDBE_MAGIC_RUN || p->magic==VDBE_MAGIC_HALT ){
     rc = sqlite3VdbeReset(p);
@@ -31893,7 +32019,7 @@ static int sqlite3VdbeFinalize(Vdbe *p){
 ** are always destroyed.  To destroy all auxdata entries, call this
 ** routine with mask==0.
 */
-static void sqlite3VdbeDeleteAuxData(VdbeFunc *pVdbeFunc, int mask){
+SQLITE_PRIVATE void sqlite3VdbeDeleteAuxData(VdbeFunc *pVdbeFunc, int mask){
   int i;
   for(i=0; i<pVdbeFunc->nAux; i++){
     struct AuxData *pAux = &pVdbeFunc->apAux[i];
@@ -31909,7 +32035,7 @@ static void sqlite3VdbeDeleteAuxData(VdbeFunc *pVdbeFunc, int mask){
 /*
 ** Delete an entire VDBE.
 */
-static void sqlite3VdbeDelete(Vdbe *p){
+SQLITE_PRIVATE void sqlite3VdbeDelete(Vdbe *p){
   int i;
   if( p==0 ) return;
   Cleanup(p);
@@ -31944,7 +32070,7 @@ static void sqlite3VdbeDelete(Vdbe *p){
 ** MoveTo now.  Return an error code.  If no MoveTo is pending, this
 ** routine does nothing and returns SQLITE_OK.
 */
-static int sqlite3VdbeCursorMoveto(Cursor *p){
+SQLITE_PRIVATE int sqlite3VdbeCursorMoveto(Cursor *p){
   if( p->deferredMoveto ){
     int res, rc;
 #ifdef SQLITE_TEST
@@ -32014,7 +32140,7 @@ static int sqlite3VdbeCursorMoveto(Cursor *p){
 /*
 ** Return the serial-type for the value stored in pMem.
 */
-static u32 sqlite3VdbeSerialType(Mem *pMem, int file_format){
+SQLITE_PRIVATE u32 sqlite3VdbeSerialType(Mem *pMem, int file_format){
   int flags = pMem->flags;
   int n;
 
@@ -32052,7 +32178,7 @@ static u32 sqlite3VdbeSerialType(Mem *pMem, int file_format){
 /*
 ** Return the length of the data corresponding to the supplied serial-type.
 */
-static int sqlite3VdbeSerialTypeLen(u32 serial_type){
+SQLITE_PRIVATE int sqlite3VdbeSerialTypeLen(u32 serial_type){
   if( serial_type>=12 ){
     return (serial_type-12)/2;
   }else{
@@ -32119,7 +32245,7 @@ static double floatSwap(double in){
 ** of bytes in the zero-filled tail is included in the return value only
 ** if those bytes were zeroed in buf[].
 */ 
-static int sqlite3VdbeSerialPut(u8 *buf, int nBuf, Mem *pMem, int file_format){
+SQLITE_PRIVATE int sqlite3VdbeSerialPut(u8 *buf, int nBuf, Mem *pMem, int file_format){
   u32 serial_type = sqlite3VdbeSerialType(pMem, file_format);
   int len;
 
@@ -32168,7 +32294,7 @@ static int sqlite3VdbeSerialPut(u8 *buf, int nBuf, Mem *pMem, int file_format){
 ** Deserialize the data blob pointed to by buf as serial type serial_type
 ** and store the result in pMem.  Return the number of bytes read.
 */ 
-static int sqlite3VdbeSerialGet(
+SQLITE_PRIVATE int sqlite3VdbeSerialGet(
   const unsigned char *buf,     /* Buffer to deserialize from */
   u32 serial_type,              /* Serial type to deserialize */
   Mem *pMem                     /* Memory cell to write value into */
@@ -32285,7 +32411,7 @@ static int sqlite3VdbeSerialGet(
 ** greater than {nKey2, pKey2}.  Both Key1 and Key2 must be byte strings
 ** composed by the OP_MakeRecord opcode of the VDBE.
 */
-static int sqlite3VdbeRecordCompare(
+SQLITE_PRIVATE int sqlite3VdbeRecordCompare(
   void *userData,
   int nKey1, const void *pKey1, 
   int nKey2, const void *pKey2
@@ -32362,7 +32488,7 @@ static int sqlite3VdbeRecordCompare(
 ** an integer rowid).  This routine returns the number of bytes in
 ** that integer.
 */
-static int sqlite3VdbeIdxRowidLen(const u8 *aKey){
+SQLITE_PRIVATE int sqlite3VdbeIdxRowidLen(const u8 *aKey){
   u32 szHdr;        /* Size of the header */
   u32 typeRowid;    /* Serial type of the rowid */
 
@@ -32377,7 +32503,7 @@ static int sqlite3VdbeIdxRowidLen(const u8 *aKey){
 ** Read the rowid (the last field in the record) and store it in *rowid.
 ** Return SQLITE_OK if everything works, or an error code otherwise.
 */
-static int sqlite3VdbeIdxRowid(BtCursor *pCur, i64 *rowid){
+SQLITE_PRIVATE int sqlite3VdbeIdxRowid(BtCursor *pCur, i64 *rowid){
   i64 nCellKey = 0;
   int rc;
   u32 szHdr;        /* Size of the header */
@@ -32412,7 +32538,7 @@ static int sqlite3VdbeIdxRowid(BtCursor *pCur, i64 *rowid){
 ** omits the rowid at the end.  The rowid at the end of the index entry
 ** is ignored as well.
 */
-static int sqlite3VdbeIdxKeyCompare(
+SQLITE_PRIVATE int sqlite3VdbeIdxKeyCompare(
   Cursor *pC,                 /* The cursor to compare against */
   int nKey, const u8 *pKey,   /* The key to compare */
   int *res                    /* Write the comparison result here */
@@ -32442,7 +32568,7 @@ static int sqlite3VdbeIdxKeyCompare(
 ** This routine sets the value to be returned by subsequent calls to
 ** sqlite3_changes() on the database handle 'db'. 
 */
-static void sqlite3VdbeSetChanges(sqlite3 *db, int nChange){
+SQLITE_PRIVATE void sqlite3VdbeSetChanges(sqlite3 *db, int nChange){
   db->nChange = nChange;
   db->nTotalChange += nChange;
 }
@@ -32451,7 +32577,7 @@ static void sqlite3VdbeSetChanges(sqlite3 *db, int nChange){
 ** Set a flag in the vdbe to update the change counter when it is finalised
 ** or reset.
 */
-static void sqlite3VdbeCountChanges(Vdbe *v){
+SQLITE_PRIVATE void sqlite3VdbeCountChanges(Vdbe *v){
   v->changeCntOn = 1;
 }
 
@@ -32465,7 +32591,7 @@ static void sqlite3VdbeCountChanges(Vdbe *v){
 ** sequences, or changing an authorization function are the types of
 ** things that make prepared statements obsolete.
 */
-static void sqlite3ExpirePreparedStatements(sqlite3 *db){
+SQLITE_PRIVATE void sqlite3ExpirePreparedStatements(sqlite3 *db){
   Vdbe *p;
   for(p = db->pVdbe; p; p=p->pNext){
     p->expired = 1;
@@ -32475,7 +32601,7 @@ static void sqlite3ExpirePreparedStatements(sqlite3 *db){
 /*
 ** Return the database associated with the Vdbe.
 */
-static sqlite3 *sqlite3VdbeDb(Vdbe *v){
+SQLITE_PRIVATE sqlite3 *sqlite3VdbeDb(Vdbe *v){
   return v->db;
 }
 
@@ -32505,7 +32631,7 @@ static sqlite3 *sqlite3VdbeDb(Vdbe *v){
 ** collating sequences are registered or if an authorizer function is
 ** added or changed.
 */
-int sqlite3_expired(sqlite3_stmt *pStmt){
+SQLITE_API int sqlite3_expired(sqlite3_stmt *pStmt){
   Vdbe *p = (Vdbe*)pStmt;
   return p==0 || p->expired;
 }
@@ -32755,6 +32881,7 @@ end_of_step:
   if( p->zSql && (rc&0xff)<SQLITE_ROW ){
     /* This behavior occurs if sqlite3_prepare_v2() was used to build
     ** the prepared statement.  Return error codes directly */
+    sqlite3Error(p->db, p->rc, 0);
     return p->rc;
   }else{
     /* This is for legacy sqlite3_prepare() builds and when the code
@@ -32769,11 +32896,11 @@ end_of_step:
 ** call sqlite3Reprepare() and try again.
 */
 #ifdef SQLITE_OMIT_PARSER
-int sqlite3_step(sqlite3_stmt *pStmt){
+SQLITE_API int sqlite3_step(sqlite3_stmt *pStmt){
   return sqlite3Step((Vdbe*)pStmt);
 }
 #else
-int sqlite3_step(sqlite3_stmt *pStmt){
+SQLITE_API int sqlite3_step(sqlite3_stmt *pStmt){
   int cnt = 0;
   int rc;
   Vdbe *v = (Vdbe*)pStmt;
@@ -32804,7 +32931,7 @@ void *sqlite3_user_data(sqlite3_context *p){
 ** for name resolution but are actually overloaded by the xFindFunction
 ** method of virtual tables.
 */
-static void sqlite3InvalidFunction(
+SQLITE_PRIVATE void sqlite3InvalidFunction(
   sqlite3_context *context,  /* The function calling context */
   int argc,                  /* Number of arguments to the function */
   sqlite3_value **argv       /* Value of each argument */
@@ -32933,7 +33060,7 @@ int sqlite3_data_count(sqlite3_stmt *pStmt){
 static Mem *columnMem(sqlite3_stmt *pStmt, int i){
   Vdbe *pVm = (Vdbe *)pStmt;
   int vals = sqlite3_data_count(pStmt);
-  if( i>=vals || i<0 ){
+  if( pVm==0 || pVm->resOnStack==0 || i>=pVm->nResColumn || i<0 ){
     static const Mem nullMem = {{0}, 0.0, "", 0, MEM_Null, SQLITE_NULL };
     sqlite3Error(pVm->db, SQLITE_RANGE, 0);
     return (Mem*)&nullMem;
@@ -33439,7 +33566,7 @@ sqlite3 *sqlite3_db_handle(sqlite3_stmt *pStmt){
 ** in this file for details.  If in doubt, do not deviate from existing
 ** commenting and indentation practices when changing or adding code.
 **
-** $Id: vdbe.c,v 1.626 2007/06/15 14:53:53 danielk1977 Exp $
+** $Id: vdbe.c,v 1.636 2007/07/01 21:18:40 drh Exp $
 */
 
 /*
@@ -33686,7 +33813,7 @@ int sqlite3_value_numeric_type(sqlite3_value *pVal){
 ** Exported version of applyAffinity(). This one works on sqlite3_value*, 
 ** not the internal Mem* type.
 */
-static void sqlite3ValueApplyAffinity(sqlite3_value *pVal, u8 affinity, u8 enc){
+SQLITE_PRIVATE void sqlite3ValueApplyAffinity(sqlite3_value *pVal, u8 affinity, u8 enc){
   applyAffinity((Mem *)pVal, affinity, enc);
 }
 
@@ -33695,7 +33822,7 @@ static void sqlite3ValueApplyAffinity(sqlite3_value *pVal, u8 affinity, u8 enc){
 ** Write a nice string representation of the contents of cell pMem
 ** into buffer zBuf, length nBuf.
 */
-static void sqlite3VdbeMemPrettyPrint(Mem *pMem, char *zBuf){
+SQLITE_PRIVATE void sqlite3VdbeMemPrettyPrint(Mem *pMem, char *zBuf){
   char *zCsr = zBuf;
   int f = pMem->flags;
 
@@ -33835,7 +33962,7 @@ __inline__ unsigned long long int hwtime(void){
 ** After this routine has finished, sqlite3VdbeFinalize() should be
 ** used to clean up the mess that was left behind.
 */
-static int sqlite3VdbeExec(
+SQLITE_PRIVATE int sqlite3VdbeExec(
   Vdbe *p                    /* The VDBE */
 ){
   int pc;                    /* The program counter */
@@ -34544,11 +34671,20 @@ case OP_Remainder: {           /* same as TK_REM, no-push */
       case OP_Multiply:    b *= a;       break;
       case OP_Divide: {
         if( a==0 ) goto divide_by_zero;
+        /* Dividing the largest possible negative 64-bit integer (1<<63) by 
+        ** -1 returns an integer to large to store in a 64-bit data-type. On
+        ** some architectures, the value overflows to (1<<63). On others,
+        ** a SIGFPE is issued. The following statement normalizes this
+        ** behaviour so that all architectures behave as if integer 
+        ** overflow occured.
+        */
+        if( a==-1 && b==(((i64)1)<<63) ) a = 1;
         b /= a;
         break;
       }
       default: {
         if( a==0 ) goto divide_by_zero;
+        if( a==-1 ) a = 1;
         b %= a;
         break;
       }
@@ -34575,11 +34711,12 @@ case OP_Remainder: {           /* same as TK_REM, no-push */
         i64 ia = (i64)a;
         i64 ib = (i64)b;
         if( ia==0 ) goto divide_by_zero;
+        if( ia==-1 ) ia = 1;
         b = ib % ia;
         break;
       }
     }
-    if( isnan(b) ){
+    if( sqlite3_isnan(b) ){
       goto divide_by_zero;
     }
     Release(pTos);
@@ -35789,6 +35926,7 @@ case OP_Statement: {       /* no-push */
     assert( sqlite3BtreeIsInTrans(pBt) );
     if( !sqlite3BtreeIsInStmt(pBt) ){
       rc = sqlite3BtreeBeginStmt(pBt);
+      p->openedStatement = 1;
     }
   }
   break;
@@ -35900,15 +36038,27 @@ case OP_Transaction: {       /* no-push */
 ** the main database file and P1==1 is the database file used to store
 ** temporary tables.
 **
+** If P1 is negative, then this is a request to read the size of a
+** databases free-list. P2 must be set to 1 in this case. The actual
+** database accessed is ((P1+1)*-1). For example, a P1 parameter of -1
+** corresponds to database 0 ("main"), a P1 of -2 is database 1 ("temp").
+**
 ** There must be a read-lock on the database (either a transaction
 ** must be started or there must be an open cursor) before
 ** executing this instruction.
 */
 case OP_ReadCookie: {
   int iMeta;
+  int iDb = pOp->p1;
+  int iCookie = pOp->p2;
+
   assert( pOp->p2<SQLITE_N_BTREE_META );
-  assert( pOp->p1>=0 && pOp->p1<db->nDb );
-  assert( db->aDb[pOp->p1].pBt!=0 );
+  if( iDb<0 ){
+    iDb = (-1*(iDb+1));
+    iCookie *= -1;
+  }
+  assert( iDb>=0 && iDb<db->nDb );
+  assert( db->aDb[iDb].pBt!=0 );
   /* The indexing of meta values at the schema layer is off by one from
   ** the indexing in the btree layer.  The btree considers meta[0] to
   ** be the number of free pages in the database (a read-only value)
@@ -35916,7 +36066,7 @@ case OP_ReadCookie: {
   ** meta[1] to be the schema cookie.  So we have to shift the index
   ** by one in the following statement.
   */
-  rc = sqlite3BtreeGetMeta(db->aDb[pOp->p1].pBt, 1 + pOp->p2, (u32 *)&iMeta);
+  rc = sqlite3BtreeGetMeta(db->aDb[iDb].pBt, 1 + iCookie, (u32 *)&iMeta);
   pTos++;
   pTos->u.i = iMeta;
   pTos->flags = MEM_Int;
@@ -37674,8 +37824,7 @@ case OP_IntegrityCk: {
   pnErr = &p->aMem[j];
   assert( (pnErr->flags & MEM_Int)!=0 );
   for(j=0; j<nRoot; j++){
-    Mem *pMem = &pTos[-j];
-    aRoot[j] = pMem->u.i;
+    aRoot[j] = pTos[-j].u.i;
   }
   aRoot[j] = 0;
   popStack(&pTos, nRoot);
@@ -38368,6 +38517,30 @@ case OP_VNext: {   /* no-push */
 }
 #endif /* SQLITE_OMIT_VIRTUALTABLE */
 
+#ifndef SQLITE_OMIT_VIRTUALTABLE
+/* Opcode: VRename * * P3
+**
+** P3 is a pointer to a virtual table object, an sqlite3_vtab structure.
+** This opcode invokes the corresponding xRename method. The value
+** on the top of the stack is popped and passed as the zName argument
+** to the xRename method.
+*/
+case OP_VRename: {   /* no-push */
+  sqlite3_vtab *pVtab = (sqlite3_vtab *)(pOp->p3);
+  assert( pVtab->pModule->xRename );
+
+  Stringify(pTos, encoding);
+
+  if( sqlite3SafetyOff(db) ) goto abort_due_to_misuse;
+  sqlite3VtabLock(pVtab);
+  rc = pVtab->pModule->xRename(pVtab, pTos->z);
+  sqlite3VtabUnlock(db, pVtab);
+  if( sqlite3SafetyOn(db) ) goto abort_due_to_misuse;
+
+  popStack(&pTos, 1);
+  break;
+}
+#endif
 
 #ifndef SQLITE_OMIT_VIRTUALTABLE
 /* Opcode: VUpdate P1 P2 P3
@@ -38585,7 +38758,7 @@ abort_due_to_interrupt:
 **
 ** This file contains code used to implement incremental BLOB I/O.
 **
-** $Id: vdbeblob.c,v 1.10 2007/05/08 20:37:40 drh Exp $
+** $Id: vdbeblob.c,v 1.11 2007/06/27 00:36:14 drh Exp $
 */
 
 
@@ -38849,6 +39022,7 @@ static int blobReadWrite(
     sqlite3VdbeFinalize(v);
     p->pStmt = 0;
   }else{
+    db->errCode = rc;
     v->rc = rc;
   }
 
@@ -38895,7 +39069,7 @@ int sqlite3_blob_bytes(sqlite3_blob *pBlob){
 ** This file contains routines used for analyzing expressions and
 ** for generating VDBE code that evaluates expressions in SQLite.
 **
-** $Id: expr.c,v 1.298 2007/06/15 16:37:29 danielk1977 Exp $
+** $Id: expr.c,v 1.300 2007/06/25 16:29:34 danielk1977 Exp $
 */
 
 /*
@@ -38914,7 +39088,7 @@ int sqlite3_blob_bytes(sqlite3_blob *pBlob){
 ** SELECT a AS b FROM t1 WHERE b;
 ** SELECT * FROM t1 WHERE (select a from t1);
 */
-static char sqlite3ExprAffinity(Expr *pExpr){
+SQLITE_PRIVATE char sqlite3ExprAffinity(Expr *pExpr){
   int op = pExpr->op;
   if( op==TK_SELECT ){
     return sqlite3ExprAffinity(pExpr->pSelect->pEList->a[0].pExpr);
@@ -38934,7 +39108,7 @@ static char sqlite3ExprAffinity(Expr *pExpr){
 ** flag.  An explicit collating sequence will override implicit
 ** collating sequences.
 */
-static Expr *sqlite3ExprSetColl(Parse *pParse, Expr *pExpr, Token *pName){
+SQLITE_PRIVATE Expr *sqlite3ExprSetColl(Parse *pParse, Expr *pExpr, Token *pName){
   CollSeq *pColl;
   if( pExpr==0 ) return 0;
   pColl = sqlite3LocateCollSeq(pParse, (char*)pName->z, pName->n);
@@ -38949,11 +39123,13 @@ static Expr *sqlite3ExprSetColl(Parse *pParse, Expr *pExpr, Token *pName){
 ** Return the default collation sequence for the expression pExpr. If
 ** there is no default collation type, return 0.
 */
-static CollSeq *sqlite3ExprCollSeq(Parse *pParse, Expr *pExpr){
+SQLITE_PRIVATE CollSeq *sqlite3ExprCollSeq(Parse *pParse, Expr *pExpr){
   CollSeq *pColl = 0;
   if( pExpr ){
+    int op;
     pColl = pExpr->pColl;
-    if( pExpr->op==TK_CAST && !pColl ){
+    op = pExpr->op;
+    if( (op==TK_CAST || op==TK_UPLUS) && !pColl ){
       return sqlite3ExprCollSeq(pParse, pExpr->pLeft);
     }
   }
@@ -38968,7 +39144,7 @@ static CollSeq *sqlite3ExprCollSeq(Parse *pParse, Expr *pExpr){
 ** type affinity of the other operand.  This routine returns the
 ** type affinity that should be used for the comparison operator.
 */
-static char sqlite3CompareAffinity(Expr *pExpr, char aff2){
+SQLITE_PRIVATE char sqlite3CompareAffinity(Expr *pExpr, char aff2){
   char aff1 = sqlite3ExprAffinity(pExpr);
   if( aff1 && aff2 ){
     /* Both sides of the comparison are columns. If one has numeric
@@ -39020,7 +39196,7 @@ static char comparisonAffinity(Expr *pExpr){
 ** if the index with affinity idx_affinity may be used to implement
 ** the comparison in pExpr.
 */
-static int sqlite3IndexAffinityOk(Expr *pExpr, char idx_affinity){
+SQLITE_PRIVATE int sqlite3IndexAffinityOk(Expr *pExpr, char idx_affinity){
   char aff = comparisonAffinity(pExpr);
   switch( aff ){
     case SQLITE_AFF_NONE:
@@ -39099,7 +39275,7 @@ static int codeCompare(
 ** for this node is obtained from sqliteMalloc().  The calling function
 ** is responsible for making sure the node eventually gets freed.
 */
-static Expr *sqlite3Expr(int op, Expr *pLeft, Expr *pRight, const Token *pToken){
+SQLITE_PRIVATE Expr *sqlite3Expr(int op, Expr *pLeft, Expr *pRight, const Token *pToken){
   Expr *pNew;
   pNew = sqliteMalloc( sizeof(Expr) );
   if( pNew==0 ){
@@ -39140,7 +39316,7 @@ static Expr *sqlite3Expr(int op, Expr *pLeft, Expr *pRight, const Token *pToken)
 ** Works like sqlite3Expr() but frees its pLeft and pRight arguments
 ** if it fails due to a malloc problem.
 */
-static Expr *sqlite3ExprOrFree(int op, Expr *pLeft, Expr *pRight, const Token *pToken){
+SQLITE_PRIVATE Expr *sqlite3ExprOrFree(int op, Expr *pLeft, Expr *pRight, const Token *pToken){
   Expr *pNew = sqlite3Expr(op, pLeft, pRight, pToken);
   if( pNew==0 ){
     sqlite3ExprDelete(pLeft);
@@ -39160,7 +39336,7 @@ static Expr *sqlite3ExprOrFree(int op, Expr *pLeft, Expr *pRight, const Token *p
 ** The returns an expression that will code to extract the value from
 ** that memory location as needed.
 */
-static Expr *sqlite3RegisterExpr(Parse *pParse, Token *pToken){
+SQLITE_PRIVATE Expr *sqlite3RegisterExpr(Parse *pParse, Token *pToken){
   Vdbe *v = pParse->pVdbe;
   Expr *p;
   int depth;
@@ -39184,7 +39360,7 @@ static Expr *sqlite3RegisterExpr(Parse *pParse, Token *pToken){
 ** Join two expressions using an AND operator.  If either expression is
 ** NULL, then just return the other expression.
 */
-static Expr *sqlite3ExprAnd(Expr *pLeft, Expr *pRight){
+SQLITE_PRIVATE Expr *sqlite3ExprAnd(Expr *pLeft, Expr *pRight){
   if( pLeft==0 ){
     return pRight;
   }else if( pRight==0 ){
@@ -39198,7 +39374,7 @@ static Expr *sqlite3ExprAnd(Expr *pLeft, Expr *pRight){
 ** Set the Expr.span field of the given expression to span all
 ** text between the two given tokens.
 */
-static void sqlite3ExprSpan(Expr *pExpr, Token *pLeft, Token *pRight){
+SQLITE_PRIVATE void sqlite3ExprSpan(Expr *pExpr, Token *pLeft, Token *pRight){
   assert( pRight!=0 );
   assert( pLeft!=0 );
   if( !sqlite3MallocFailed() && pRight->z && pLeft->z ){
@@ -39216,7 +39392,7 @@ static void sqlite3ExprSpan(Expr *pExpr, Token *pLeft, Token *pRight){
 ** Construct a new expression node for a function with multiple
 ** arguments.
 */
-static Expr *sqlite3ExprFunction(ExprList *pList, Token *pToken){
+SQLITE_PRIVATE Expr *sqlite3ExprFunction(ExprList *pList, Token *pToken){
   Expr *pNew;
   assert( pToken );
   pNew = sqliteMalloc( sizeof(Expr) );
@@ -39250,7 +39426,7 @@ static Expr *sqlite3ExprFunction(ExprList *pList, Token *pToken){
 ** instance of the wildcard, the next sequenial variable number is
 ** assigned.
 */
-static void sqlite3ExprAssignVarNumber(Parse *pParse, Expr *pExpr){
+SQLITE_PRIVATE void sqlite3ExprAssignVarNumber(Parse *pParse, Expr *pExpr){
   Token *pToken;
   if( pExpr==0 ) return;
   pToken = &pExpr->token;
@@ -39309,7 +39485,7 @@ static void sqlite3ExprAssignVarNumber(Parse *pParse, Expr *pExpr){
 /*
 ** Recursively delete an expression tree.
 */
-static void sqlite3ExprDelete(Expr *p){
+SQLITE_PRIVATE void sqlite3ExprDelete(Expr *p){
   if( p==0 ) return;
   if( p->span.dyn ) sqliteFree((char*)p->span.z);
   if( p->token.dyn ) sqliteFree((char*)p->token.z);
@@ -39324,7 +39500,7 @@ static void sqlite3ExprDelete(Expr *p){
 ** The Expr.token field might be a string literal that is quoted.
 ** If so, remove the quotation marks.
 */
-static void sqlite3DequoteExpr(Expr *p){
+SQLITE_PRIVATE void sqlite3DequoteExpr(Expr *p){
   if( ExprHasAnyProperty(p, EP_Dequoted) ){
     return;
   }
@@ -39348,7 +39524,7 @@ static void sqlite3DequoteExpr(Expr *p){
 **
 ** Any tables that the SrcList might point to are not duplicated.
 */
-static Expr *sqlite3ExprDup(Expr *p){
+SQLITE_PRIVATE Expr *sqlite3ExprDup(Expr *p){
   Expr *pNew;
   if( p==0 ) return 0;
   pNew = sqliteMallocRaw( sizeof(*p) );
@@ -39367,7 +39543,7 @@ static Expr *sqlite3ExprDup(Expr *p){
   pNew->pSelect = sqlite3SelectDup(p->pSelect);
   return pNew;
 }
-static void sqlite3TokenCopy(Token *pTo, Token *pFrom){
+SQLITE_PRIVATE void sqlite3TokenCopy(Token *pTo, Token *pFrom){
   if( pTo->dyn ) sqliteFree((char*)pTo->z);
   if( pFrom->z ){
     pTo->n = pFrom->n;
@@ -39377,7 +39553,7 @@ static void sqlite3TokenCopy(Token *pTo, Token *pFrom){
     pTo->z = 0;
   }
 }
-static ExprList *sqlite3ExprListDup(ExprList *p){
+SQLITE_PRIVATE ExprList *sqlite3ExprListDup(ExprList *p){
   ExprList *pNew;
   struct ExprList_item *pItem, *pOldItem;
   int i;
@@ -39419,7 +39595,7 @@ static ExprList *sqlite3ExprListDup(ExprList *p){
 */
 #if !defined(SQLITE_OMIT_VIEW) || !defined(SQLITE_OMIT_TRIGGER) \
  || !defined(SQLITE_OMIT_SUBQUERY)
-static SrcList *sqlite3SrcListDup(SrcList *p){
+SQLITE_PRIVATE SrcList *sqlite3SrcListDup(SrcList *p){
   SrcList *pNew;
   int i;
   int nByte;
@@ -39449,7 +39625,7 @@ static SrcList *sqlite3SrcListDup(SrcList *p){
   }
   return pNew;
 }
-static IdList *sqlite3IdListDup(IdList *p){
+SQLITE_PRIVATE IdList *sqlite3IdListDup(IdList *p){
   IdList *pNew;
   int i;
   if( p==0 ) return 0;
@@ -39469,7 +39645,7 @@ static IdList *sqlite3IdListDup(IdList *p){
   }
   return pNew;
 }
-static Select *sqlite3SelectDup(Select *p){
+SQLITE_PRIVATE Select *sqlite3SelectDup(Select *p){
   Select *pNew;
   if( p==0 ) return 0;
   pNew = sqliteMallocRaw( sizeof(*p) );
@@ -39498,7 +39674,7 @@ static Select *sqlite3SelectDup(Select *p){
   return pNew;
 }
 #else
-static Select *sqlite3SelectDup(Select *p){
+SQLITE_PRIVATE Select *sqlite3SelectDup(Select *p){
   assert( p==0 );
   return 0;
 }
@@ -39509,7 +39685,7 @@ static Select *sqlite3SelectDup(Select *p){
 ** Add a new element to the end of an expression list.  If pList is
 ** initially NULL, then create a new expression list.
 */
-static ExprList *sqlite3ExprListAppend(ExprList *pList, Expr *pExpr, Token *pName){
+SQLITE_PRIVATE ExprList *sqlite3ExprListAppend(ExprList *pList, Expr *pExpr, Token *pName){
   if( pList==0 ){
     pList = sqliteMalloc( sizeof(ExprList) );
     if( pList==0 ){
@@ -39547,7 +39723,7 @@ no_mem:
 ** If the expression list pEList contains more than iLimit elements,
 ** leave an error message in pParse.
 */
-static void sqlite3ExprListCheckLength(
+SQLITE_PRIVATE void sqlite3ExprListCheckLength(
   Parse *pParse,
   ExprList *pEList,
   int iLimit,
@@ -39604,7 +39780,7 @@ static void heightOfSelect(Select *p, int *pnHeight){
 ** has a height equal to the maximum height of any other 
 ** referenced Expr plus one.
 */
-static void sqlite3ExprSetHeight(Expr *p){
+SQLITE_PRIVATE void sqlite3ExprSetHeight(Expr *p){
   int nHeight = 0;
   heightOfExpr(p->pLeft, &nHeight);
   heightOfExpr(p->pRight, &nHeight);
@@ -39617,7 +39793,7 @@ static void sqlite3ExprSetHeight(Expr *p){
 ** Return the maximum height of any expression tree referenced
 ** by the select statement passed as an argument.
 */
-static int sqlite3SelectExprHeight(Select *p){
+SQLITE_PRIVATE int sqlite3SelectExprHeight(Select *p){
   int nHeight = 0;
   heightOfSelect(p, &nHeight);
   return nHeight;
@@ -39627,7 +39803,7 @@ static int sqlite3SelectExprHeight(Select *p){
 /*
 ** Delete an entire expression list.
 */
-static void sqlite3ExprListDelete(ExprList *pList){
+SQLITE_PRIVATE void sqlite3ExprListDelete(ExprList *pList){
   int i;
   struct ExprList_item *pItem;
   if( pList==0 ) return;
@@ -39757,7 +39933,7 @@ static int exprNodeIsConstant(void *pArg, Expr *pExpr){
 ** is considered a variable but a single-quoted string (ex: 'abc') is
 ** a constant.
 */
-static int sqlite3ExprIsConstant(Expr *p){
+SQLITE_PRIVATE int sqlite3ExprIsConstant(Expr *p){
   int isConst = 1;
   walkExprTree(p, exprNodeIsConstant, &isConst);
   return isConst;
@@ -39769,7 +39945,7 @@ static int sqlite3ExprIsConstant(Expr *p){
 ** Return 0 if it involves variables or function calls or terms from
 ** an ON or USING clause.
 */
-static int sqlite3ExprIsConstantNotJoin(Expr *p){
+SQLITE_PRIVATE int sqlite3ExprIsConstantNotJoin(Expr *p){
   int isConst = 3;
   walkExprTree(p, exprNodeIsConstant, &isConst);
   return isConst!=0;
@@ -39784,7 +39960,7 @@ static int sqlite3ExprIsConstantNotJoin(Expr *p){
 ** is considered a variable but a single-quoted string (ex: 'abc') is
 ** a constant.
 */
-static int sqlite3ExprIsConstantOrFunction(Expr *p){
+SQLITE_PRIVATE int sqlite3ExprIsConstantOrFunction(Expr *p){
   int isConst = 2;
   walkExprTree(p, exprNodeIsConstant, &isConst);
   return isConst!=0;
@@ -39796,7 +39972,7 @@ static int sqlite3ExprIsConstantOrFunction(Expr *p){
 ** in *pValue.  If the expression is not an integer or if it is too big
 ** to fit in a signed 32-bit integer, return 0 and leave *pValue unchanged.
 */
-static int sqlite3ExprIsInteger(Expr *p, int *pValue){
+SQLITE_PRIVATE int sqlite3ExprIsInteger(Expr *p, int *pValue){
   switch( p->op ){
     case TK_INTEGER: {
       if( sqlite3GetInt32((char*)p->token.z, pValue) ){
@@ -39823,7 +39999,7 @@ static int sqlite3ExprIsInteger(Expr *p, int *pValue){
 /*
 ** Return TRUE if the given string is a row-id column name.
 */
-static int sqlite3IsRowid(const char *z){
+SQLITE_PRIVATE int sqlite3IsRowid(const char *z){
   if( sqlite3StrICmp(z, "_ROWID_")==0 ) return 1;
   if( sqlite3StrICmp(z, "ROWID")==0 ) return 1;
   if( sqlite3StrICmp(z, "OID")==0 ) return 1;
@@ -40033,6 +40209,7 @@ static int lookupName(
           memcpy(pExpr, pDup, sizeof(*pExpr));
           sqliteFree(pDup);
           cnt = 1;
+          pMatch = 0;
           assert( zTab==0 && zDb==0 );
           goto lookupname_end_2;
         }
@@ -40322,7 +40499,7 @@ static int nameResolverStep(void *pArg, Expr *pExpr){
 ** If the expression contains aggregate functions then set the EP_Agg
 ** property on the expression.
 */
-static int sqlite3ExprResolveNames( 
+SQLITE_PRIVATE int sqlite3ExprResolveNames( 
   NameContext *pNC,       /* Namespace to resolve expressions in. */
   Expr *pExpr             /* The expression to be analyzed. */
 ){
@@ -40379,7 +40556,7 @@ struct QueryCoder {
 ** operator or subquery.
 */
 #ifndef SQLITE_OMIT_SUBQUERY
-static void sqlite3CodeSubselect(Parse *pParse, Expr *pExpr){
+SQLITE_PRIVATE void sqlite3CodeSubselect(Parse *pParse, Expr *pExpr){
   int testAddr = 0;                       /* One-time test address */
   Vdbe *v = sqlite3GetVdbe(pParse);
   if( v==0 ) return;
@@ -40552,7 +40729,7 @@ static void codeInteger(Vdbe *v, const char *z, int n){
 ** is an open cursor to pTab in iTable.  If iColumn<0 then
 ** code is generated that extracts the rowid.
 */
-static void sqlite3ExprCodeGetColumn(Vdbe *v, Table *pTab, int iColumn, int iTable){
+SQLITE_PRIVATE void sqlite3ExprCodeGetColumn(Vdbe *v, Table *pTab, int iColumn, int iTable){
   if( iColumn<0 ){
     int op = (pTab && IsVirtual(pTab)) ? OP_VRowid : OP_Rowid;
     sqlite3VdbeAddOp(v, op, iTable, 0);
@@ -40580,7 +40757,7 @@ static void sqlite3ExprCodeGetColumn(Vdbe *v, Table *pTab, int iColumn, int iTab
 ** the make process cause these values to align.  Assert()s in the code
 ** below verify that the numbers are aligned correctly.
 */
-static void sqlite3ExprCode(Parse *pParse, Expr *pExpr){
+SQLITE_PRIVATE void sqlite3ExprCode(Parse *pParse, Expr *pExpr){
   Vdbe *v = pParse->pVdbe;
   int op;
   int stackChng = 1;    /* Amount of change to stack depth */
@@ -40968,7 +41145,7 @@ static void sqlite3ExprCode(Parse *pParse, Expr *pExpr){
 ** not cached.  If the expression is cached, its result is stored in a 
 ** memory location.
 */
-static void sqlite3ExprCodeAndCache(Parse *pParse, Expr *pExpr){
+SQLITE_PRIVATE void sqlite3ExprCodeAndCache(Parse *pParse, Expr *pExpr){
   Vdbe *v = pParse->pVdbe;
   int iMem;
   int addr1, addr2;
@@ -40990,7 +41167,7 @@ static void sqlite3ExprCodeAndCache(Parse *pParse, Expr *pExpr){
 **
 ** Return the number of elements pushed onto the stack.
 */
-static int sqlite3ExprCodeExprList(
+SQLITE_PRIVATE int sqlite3ExprCodeExprList(
   Parse *pParse,     /* Parsing context */
   ExprList *pList    /* The expression list to be coded */
 ){
@@ -41018,7 +41195,7 @@ static int sqlite3ExprCodeExprList(
 ** the make process cause these values to align.  Assert()s in the code
 ** below verify that the numbers are aligned correctly.
 */
-static void sqlite3ExprIfTrue(Parse *pParse, Expr *pExpr, int dest, int jumpIfNull){
+SQLITE_PRIVATE void sqlite3ExprIfTrue(Parse *pParse, Expr *pExpr, int dest, int jumpIfNull){
   Vdbe *v = pParse->pVdbe;
   int op = 0;
   int ckOffset = pParse->ckOffset;
@@ -41107,7 +41284,7 @@ static void sqlite3ExprIfTrue(Parse *pParse, Expr *pExpr, int dest, int jumpIfNu
 ** If the expression evaluates to NULL (neither true nor false) then
 ** jump if jumpIfNull is true or fall through if jumpIfNull is false.
 */
-static void sqlite3ExprIfFalse(Parse *pParse, Expr *pExpr, int dest, int jumpIfNull){
+SQLITE_PRIVATE void sqlite3ExprIfFalse(Parse *pParse, Expr *pExpr, int dest, int jumpIfNull){
   Vdbe *v = pParse->pVdbe;
   int op = 0;
   int ckOffset = pParse->ckOffset;
@@ -41224,7 +41401,7 @@ static void sqlite3ExprIfFalse(Parse *pParse, Expr *pExpr, int dest, int jumpIfN
 ** just might result in some slightly slower code.  But returning
 ** an incorrect TRUE could lead to a malfunction.
 */
-static int sqlite3ExprCompare(Expr *pA, Expr *pB){
+SQLITE_PRIVATE int sqlite3ExprCompare(Expr *pA, Expr *pB){
   int i;
   if( pA==0||pB==0 ){
     return pB==pA;
@@ -41434,7 +41611,7 @@ static int analyzeAggregate(void *pArg, Expr *pExpr){
 ** If errors are seen, leave an error message in zErrMsg and return
 ** the number of errors.
 */
-static int sqlite3ExprAnalyzeAggregates(NameContext *pNC, Expr *pExpr){
+SQLITE_PRIVATE int sqlite3ExprAnalyzeAggregates(NameContext *pNC, Expr *pExpr){
   int nErr = pNC->pParse->nErr;
   walkExprTree(pExpr, analyzeAggregate, pNC);
   return pNC->pParse->nErr - nErr;
@@ -41446,7 +41623,7 @@ static int sqlite3ExprAnalyzeAggregates(NameContext *pNC, Expr *pExpr){
 **
 ** If an error is found, the analysis is cut short.
 */
-static int sqlite3ExprAnalyzeAggList(NameContext *pNC, ExprList *pList){
+SQLITE_PRIVATE int sqlite3ExprAnalyzeAggList(NameContext *pNC, ExprList *pList){
   struct ExprList_item *pItem;
   int i;
   int nErr = 0;
@@ -41474,7 +41651,7 @@ static int sqlite3ExprAnalyzeAggList(NameContext *pNC, ExprList *pList){
 ** This file contains C code routines that used to generate VDBE code
 ** that implements the ALTER TABLE command.
 **
-** $Id: alter.c,v 1.25 2007/05/15 14:34:32 drh Exp $
+** $Id: alter.c,v 1.27 2007/06/27 17:09:24 danielk1977 Exp $
 */
 
 /*
@@ -41513,7 +41690,7 @@ static void renameTableFunc(
 
   /* The principle used to locate the table name in the CREATE TABLE 
   ** statement is that the table name is the first token that is immediatedly
-  ** followed by a left parenthesis - TK_LP.
+  ** followed by a left parenthesis - TK_LP - or "USING" TK_USING.
   */
   if( zSql ){
     do {
@@ -41534,7 +41711,7 @@ static void renameTableFunc(
         len = sqlite3GetToken(zCsr, &token);
       } while( token==TK_SPACE );
       assert( len>0 );
-    } while( token!=TK_LP );
+    } while( token!=TK_LP && token!=TK_USING );
 
     zRet = sqlite3MPrintf("%.*s%Q%s", tname.z - zSql, zSql, 
        zTableName, tname.z+tname.n);
@@ -41619,7 +41796,7 @@ static void renameTriggerFunc(
 /*
 ** Register built-in functions used to help implement ALTER TABLE
 */
-static void sqlite3AlterFunctions(sqlite3 *db){
+SQLITE_PRIVATE void sqlite3AlterFunctions(sqlite3 *db){
   static const struct {
      char *zName;
      signed char nArg;
@@ -41723,7 +41900,7 @@ static void reloadTableSchema(Parse *pParse, Table *pTab, const char *zName){
 ** Generate code to implement the "ALTER TABLE xxx RENAME TO yyy" 
 ** command. 
 */
-static void sqlite3AlterRenameTable(
+SQLITE_PRIVATE void sqlite3AlterRenameTable(
   Parse *pParse,            /* Parser context. */
   SrcList *pSrc,            /* The table to rename. */
   Token *pName              /* The new table name. */
@@ -41739,18 +41916,13 @@ static void sqlite3AlterRenameTable(
 #ifndef SQLITE_OMIT_TRIGGER
   char *zWhere = 0;         /* Where clause to locate temp triggers */
 #endif
+  int isVirtualRename = 0;  /* True if this is a v-table with an xRename() */
   
   if( sqlite3MallocFailed() ) goto exit_rename_table;
   assert( pSrc->nSrc==1 );
 
   pTab = sqlite3LocateTable(pParse, pSrc->a[0].zName, pSrc->a[0].zDatabase);
   if( !pTab ) goto exit_rename_table;
-#ifndef SQLITE_OMIT_VIRTUALTABLE
-  if( IsVirtual(pTab) ){
-    sqlite3ErrorMsg(pParse, "virtual tables may not be altered");
-    goto exit_rename_table;
-  }
-#endif
   iDb = sqlite3SchemaToIndex(pParse->db, pTab->pSchema);
   zDb = db->aDb[iDb].zName;
 
@@ -41785,16 +41957,38 @@ static void sqlite3AlterRenameTable(
   }
 #endif
 
+#ifndef SQLITE_OMIT_VIRTUALTABLE
+  if( sqlite3ViewGetColumnNames(pParse, pTab) ){
+    goto exit_rename_table;
+  }
+  if( IsVirtual(pTab) && pTab->pMod->pModule->xRename ){
+    isVirtualRename = 1;
+  }
+#endif
+
   /* Begin a transaction and code the VerifyCookie for database iDb. 
   ** Then modify the schema cookie (since the ALTER TABLE modifies the
-  ** schema).
+  ** schema). Open a statement transaction if the table is a virtual
+  ** table.
   */
   v = sqlite3GetVdbe(pParse);
   if( v==0 ){
     goto exit_rename_table;
   }
-  sqlite3BeginWriteOperation(pParse, 0, iDb);
+  sqlite3BeginWriteOperation(pParse, isVirtualRename, iDb);
   sqlite3ChangeCookie(db, v, iDb);
+
+  /* If this is a virtual table, invoke the xRename() function if
+  ** one is defined. The xRename() callback will modify the names
+  ** of any resources used by the v-table implementation (including other
+  ** SQLite tables) that are identified by the name of the virtual table.
+  */
+#ifndef SQLITE_OMIT_VIRTUALTABLE
+  if( isVirtualRename ){
+    sqlite3VdbeOp3(v, OP_String8, 0, 0, zName, 0);
+    sqlite3VdbeOp3(v, OP_VRename, 0, 0, (const char*)pTab->pVtab, P3_VTAB);
+  }
+#endif
 
   /* figure out how many UTF-8 characters are in zName */
   zTabName = pTab->zName;
@@ -41868,7 +42062,7 @@ exit_rename_table:
 ** The Table structure pParse->pNewTable was extended to include
 ** the new column during parsing.
 */
-static void sqlite3AlterFinishAddColumn(Parse *pParse, Token *pColDef){
+SQLITE_PRIVATE void sqlite3AlterFinishAddColumn(Parse *pParse, Token *pColDef){
   Table *pNew;              /* Copy of pParse->pNewTable */
   Table *pTab;              /* Table being altered */
   int iDb;                  /* Database number */
@@ -41981,7 +42175,7 @@ static void sqlite3AlterFinishAddColumn(Parse *pParse, Token *pColDef){
 ** Routine sqlite3AlterFinishAddColumn() will be called to complete
 ** coding the "ALTER TABLE ... ADD" statement.
 */
-static void sqlite3AlterBeginAddColumn(Parse *pParse, SrcList *pSrc){
+SQLITE_PRIVATE void sqlite3AlterBeginAddColumn(Parse *pParse, SrcList *pSrc){
   Table *pNew;
   Table *pTab;
   Vdbe *v;
@@ -42066,7 +42260,7 @@ exit_begin_add_column:
 *************************************************************************
 ** This file contains code associated with the ANALYZE command.
 **
-** @(#) $Id: analyze.c,v 1.18 2007/05/12 12:08:51 drh Exp $
+** @(#) $Id: analyze.c,v 1.19 2007/06/20 13:37:31 drh Exp $
 */
 #ifndef SQLITE_OMIT_ANALYZE
 
@@ -42228,7 +42422,7 @@ static void analyzeOneTable(
 
     /* Store the results.  
     **
-    ** The result is a single row of the sqlite_stmt1 table.  The first
+    ** The result is a single row of the sqlite_stat1 table.  The first
     ** two columns are the names of the table and index.  The third column
     ** is a string composed of a list of integer statistics about the
     ** index.  The first integer in the list is the total number of entires
@@ -42332,7 +42526,7 @@ static void analyzeTable(Parse *pParse, Table *pTab){
 ** Form 2 analyzes all indices the single database named.
 ** Form 3 analyzes all indices associated with the named table.
 */
-static void sqlite3Analyze(Parse *pParse, Token *pName1, Token *pName2){
+SQLITE_PRIVATE void sqlite3Analyze(Parse *pParse, Token *pName1, Token *pName2){
   sqlite3 *db = pParse->db;
   int iDb;
   int i;
@@ -42430,7 +42624,7 @@ static int analysisLoader(void *pData, int argc, char **argv, char **azNotUsed){
 /*
 ** Load the content of the sqlite_stat1 table into the index hash tables.
 */
-static int sqlite3AnalysisLoad(sqlite3 *db, int iDb){
+SQLITE_PRIVATE int sqlite3AnalysisLoad(sqlite3 *db, int iDb){
   analysisInfo sInfo;
   HashElem *i;
   char *zSql;
@@ -42813,7 +43007,7 @@ attach_end:
 **
 **     DETACH pDbname
 */
-static void sqlite3Detach(Parse *pParse, Expr *pDbname){
+SQLITE_PRIVATE void sqlite3Detach(Parse *pParse, Expr *pDbname){
   codeAttach(pParse, SQLITE_DETACH, "sqlite_detach", 1, pDbname, 0, 0, pDbname);
 }
 
@@ -42822,7 +43016,7 @@ static void sqlite3Detach(Parse *pParse, Expr *pDbname){
 **
 **     ATTACH p AS pDbname KEY pKey
 */
-static void sqlite3Attach(Parse *pParse, Expr *p, Expr *pDbname, Expr *pKey){
+SQLITE_PRIVATE void sqlite3Attach(Parse *pParse, Expr *p, Expr *pDbname, Expr *pKey){
   codeAttach(pParse, SQLITE_ATTACH, "sqlite_attach", 3, p, p, pDbname, pKey);
 }
 #endif /* SQLITE_OMIT_ATTACH */
@@ -42830,7 +43024,7 @@ static void sqlite3Attach(Parse *pParse, Expr *p, Expr *pDbname, Expr *pKey){
 /*
 ** Register the functions sqlite_attach and sqlite_detach.
 */
-static void sqlite3AttachFunctions(sqlite3 *db){
+SQLITE_PRIVATE void sqlite3AttachFunctions(sqlite3 *db){
 #ifndef SQLITE_OMIT_ATTACH
   static const int enc = SQLITE_UTF8;
   sqlite3CreateFunc(db, "sqlite_attach", 3, enc, db, attachFunc, 0, 0);
@@ -42845,7 +43039,7 @@ static void sqlite3AttachFunctions(sqlite3 *db){
 ** The return value indicates whether or not fixation is required.  TRUE
 ** means we do need to fix the database references, FALSE means we do not.
 */
-static int sqlite3FixInit(
+SQLITE_PRIVATE int sqlite3FixInit(
   DbFixer *pFix,      /* The fixer to be initialized */
   Parse *pParse,      /* Error messages will be written here */
   int iDb,            /* This is the database that must be used */
@@ -42878,7 +43072,7 @@ static int sqlite3FixInit(
 ** pParse->zErrMsg and these routines return non-zero.  If everything
 ** checks out, these routines return 0.
 */
-static int sqlite3FixSrcList(
+SQLITE_PRIVATE int sqlite3FixSrcList(
   DbFixer *pFix,       /* Context of the fixation */
   SrcList *pList       /* The Source list to check and modify */
 ){
@@ -42905,7 +43099,7 @@ static int sqlite3FixSrcList(
   return 0;
 }
 #if !defined(SQLITE_OMIT_VIEW) || !defined(SQLITE_OMIT_TRIGGER)
-static int sqlite3FixSelect(
+SQLITE_PRIVATE int sqlite3FixSelect(
   DbFixer *pFix,       /* Context of the fixation */
   Select *pSelect      /* The SELECT statement to be fixed to one database */
 ){
@@ -42926,7 +43120,7 @@ static int sqlite3FixSelect(
   }
   return 0;
 }
-static int sqlite3FixExpr(
+SQLITE_PRIVATE int sqlite3FixExpr(
   DbFixer *pFix,     /* Context of the fixation */
   Expr *pExpr        /* The expression to be fixed to one database */
 ){
@@ -42944,7 +43138,7 @@ static int sqlite3FixExpr(
   }
   return 0;
 }
-static int sqlite3FixExprList(
+SQLITE_PRIVATE int sqlite3FixExprList(
   DbFixer *pFix,     /* Context of the fixation */
   ExprList *pList    /* The expression to be fixed to one database */
 ){
@@ -42961,7 +43155,7 @@ static int sqlite3FixExprList(
 #endif
 
 #ifndef SQLITE_OMIT_TRIGGER
-static int sqlite3FixTriggerStep(
+SQLITE_PRIVATE int sqlite3FixTriggerStep(
   DbFixer *pFix,     /* Context of the fixation */
   TriggerStep *pStep /* The trigger step be fixed to one database */
 ){
@@ -43084,7 +43278,7 @@ static void sqliteAuthBadReturnCode(Parse *pParse, int rc){
 ** instruction into a TK_NULL.  If the auth function returns SQLITE_DENY,
 ** then generate an error.
 */
-static void sqlite3AuthRead(
+SQLITE_PRIVATE void sqlite3AuthRead(
   Parse *pParse,        /* The parser context */
   Expr *pExpr,          /* The expression to check authorization on */
   SrcList *pTabList     /* All table that pExpr might refer to */
@@ -43155,7 +43349,7 @@ static void sqlite3AuthRead(
 ** is returned, then the error count and error message in pParse are
 ** modified appropriately.
 */
-static int sqlite3AuthCheck(
+SQLITE_PRIVATE int sqlite3AuthCheck(
   Parse *pParse,
   int code,
   const char *zArg1,
@@ -43191,7 +43385,7 @@ static int sqlite3AuthCheck(
 ** zArg3 argument to authorization callbacks will be zContext until
 ** popped.  Or if pParse==0, this routine is a no-op.
 */
-static void sqlite3AuthContextPush(
+SQLITE_PRIVATE void sqlite3AuthContextPush(
   Parse *pParse,
   AuthContext *pContext, 
   const char *zContext
@@ -43207,7 +43401,7 @@ static void sqlite3AuthContextPush(
 ** Pop an authorization context that was previously pushed
 ** by sqlite3AuthContextPush
 */
-static void sqlite3AuthContextPop(AuthContext *pContext){
+SQLITE_PRIVATE void sqlite3AuthContextPop(AuthContext *pContext){
   if( pContext->pParse ){
     pContext->pParse->zAuthContext = pContext->zAuthContext;
     pContext->pParse = 0;
@@ -43242,14 +43436,14 @@ static void sqlite3AuthContextPop(AuthContext *pContext){
 **     COMMIT
 **     ROLLBACK
 **
-** $Id: build.c,v 1.432 2007/05/15 14:34:32 drh Exp $
+** $Id: build.c,v 1.433 2007/07/02 19:31:27 drh Exp $
 */
 
 /*
 ** This routine is called when a new SQL statement is beginning to
 ** be parsed.  Initialize the pParse structure as needed.
 */
-static void sqlite3BeginParse(Parse *pParse, int explainFlag){
+SQLITE_PRIVATE void sqlite3BeginParse(Parse *pParse, int explainFlag){
   pParse->explain = explainFlag;
   pParse->nVar = 0;
 }
@@ -43276,7 +43470,7 @@ struct TableLock {
 ** code to make the lock occur is generated by a later call to
 ** codeTableLocks() which occurs during sqlite3FinishCoding().
 */
-static void sqlite3TableLock(
+SQLITE_PRIVATE void sqlite3TableLock(
   Parse *pParse,     /* Parsing context */
   int iDb,           /* Index of the database containing the table to lock */
   int iTab,          /* Root page number of the table to be locked */
@@ -43346,7 +43540,7 @@ static void codeTableLocks(Parse *pParse){
 ** Note that if an error occurred, it might be the case that
 ** no VDBE code was generated.
 */
-static void sqlite3FinishCoding(Parse *pParse){
+SQLITE_PRIVATE void sqlite3FinishCoding(Parse *pParse){
   sqlite3 *db;
   Vdbe *v;
 
@@ -43443,7 +43637,7 @@ static void sqlite3FinishCoding(Parse *pParse){
 ** INSERT, UPDATE, and DELETE operations against SQLITE_MASTER.  Use
 ** care if you decide to try to use this routine for some other purposes.
 */
-static void sqlite3NestedParse(Parse *pParse, const char *zFormat, ...){
+SQLITE_PRIVATE void sqlite3NestedParse(Parse *pParse, const char *zFormat, ...){
   va_list ap;
   char *zSql;
 # define SAVE_SZ  (sizeof(Parse) - offsetof(Parse,nVar))
@@ -43478,7 +43672,7 @@ static void sqlite3NestedParse(Parse *pParse, const char *zFormat, ...){
 **
 ** See also sqlite3LocateTable().
 */
-static Table *sqlite3FindTable(sqlite3 *db, const char *zName, const char *zDatabase){
+SQLITE_PRIVATE Table *sqlite3FindTable(sqlite3 *db, const char *zName, const char *zDatabase){
   Table *p = 0;
   int i;
   assert( zName!=0 );
@@ -43501,7 +43695,7 @@ static Table *sqlite3FindTable(sqlite3 *db, const char *zName, const char *zData
 ** routine leaves an error message in pParse->zErrMsg where
 ** sqlite3FindTable() does not.
 */
-static Table *sqlite3LocateTable(Parse *pParse, const char *zName, const char *zDbase){
+SQLITE_PRIVATE Table *sqlite3LocateTable(Parse *pParse, const char *zName, const char *zDbase){
   Table *p;
 
   /* Read the database schema. If an error occurs, leave an error message
@@ -43534,7 +43728,7 @@ static Table *sqlite3LocateTable(Parse *pParse, const char *zName, const char *z
 ** TEMP first, then MAIN, then any auxiliary databases added
 ** using the ATTACH command.
 */
-static Index *sqlite3FindIndex(sqlite3 *db, const char *zName, const char *zDb){
+SQLITE_PRIVATE Index *sqlite3FindIndex(sqlite3 *db, const char *zName, const char *zDb){
   Index *p = 0;
   int i;
   for(i=OMIT_TEMPDB; i<db->nDb; i++){
@@ -43581,7 +43775,7 @@ static void sqliteDeleteIndex(Index *p){
 ** the index hash table and free all memory structures associated
 ** with the index.
 */
-static void sqlite3UnlinkAndDeleteIndex(sqlite3 *db, int iDb, const char *zIdxName){
+SQLITE_PRIVATE void sqlite3UnlinkAndDeleteIndex(sqlite3 *db, int iDb, const char *zIdxName){
   Index *pIndex;
   int len;
   Hash *pHash = &db->aDb[iDb].pSchema->idxHash;
@@ -43614,7 +43808,7 @@ static void sqlite3UnlinkAndDeleteIndex(sqlite3 *db, int iDb, const char *zIdxNa
 ** files.  If iDb>=2 then reset the internal schema for only the
 ** single file indicated.
 */
-static void sqlite3ResetInternalSchema(sqlite3 *db, int iDb){
+SQLITE_PRIVATE void sqlite3ResetInternalSchema(sqlite3 *db, int iDb){
   int i, j;
 
   assert( iDb>=0 && iDb<db->nDb );
@@ -43665,7 +43859,7 @@ static void sqlite3ResetInternalSchema(sqlite3 *db, int iDb){
 /*
 ** This routine is called when a commit occurs.
 */
-static void sqlite3CommitInternalChanges(sqlite3 *db){
+SQLITE_PRIVATE void sqlite3CommitInternalChanges(sqlite3 *db){
   db->flags &= ~SQLITE_InternChanges;
 }
 
@@ -43699,7 +43893,7 @@ static void sqliteResetColumnNames(Table *pTable){
 ** memory structures of the indices and foreign keys associated with 
 ** the table.
 */
-static void sqlite3DeleteTable(Table *pTable){
+SQLITE_PRIVATE void sqlite3DeleteTable(Table *pTable){
   Index *pIndex, *pNext;
   FKey *pFKey, *pNextFKey;
 
@@ -43749,7 +43943,7 @@ static void sqlite3DeleteTable(Table *pTable){
 ** Unlink the given table from the hash tables and the delete the
 ** table structure with all its indices and foreign keys.
 */
-static void sqlite3UnlinkAndDeleteTable(sqlite3 *db, int iDb, const char *zTabName){
+SQLITE_PRIVATE void sqlite3UnlinkAndDeleteTable(sqlite3 *db, int iDb, const char *zTabName){
   Table *p;
   FKey *pF1, *pF2;
   Db *pDb;
@@ -43789,7 +43983,7 @@ static void sqlite3UnlinkAndDeleteTable(sqlite3 *db, int iDb, const char *zTabNa
 ** are not \000 terminated and are not persistent.  The returned string
 ** is \000 terminated and is persistent.
 */
-static char *sqlite3NameFromToken(Token *pName){
+SQLITE_PRIVATE char *sqlite3NameFromToken(Token *pName){
   char *zName;
   if( pName ){
     zName = sqliteStrNDup((char*)pName->z, pName->n);
@@ -43804,7 +43998,7 @@ static char *sqlite3NameFromToken(Token *pName){
 ** Open the sqlite_master table stored in database number iDb for
 ** writing. The table is opened using cursor 0.
 */
-static void sqlite3OpenMasterTable(Parse *p, int iDb){
+SQLITE_PRIVATE void sqlite3OpenMasterTable(Parse *p, int iDb){
   Vdbe *v = sqlite3GetVdbe(p);
   sqlite3TableLock(p, iDb, MASTER_ROOT, 1, SCHEMA_TABLE(iDb));
   sqlite3VdbeAddOp(v, OP_Integer, iDb, 0);
@@ -43818,7 +44012,7 @@ static void sqlite3OpenMasterTable(Parse *p, int iDb){
 ** index of the named database in db->aDb[], or -1 if the named db 
 ** does not exist.
 */
-static int sqlite3FindDb(sqlite3 *db, Token *pName){
+SQLITE_PRIVATE int sqlite3FindDb(sqlite3 *db, Token *pName){
   int i = -1;    /* Database number */
   int n;         /* Number of characters in the name */
   Db *pDb;       /* A database whose name space is being searched */
@@ -43854,7 +44048,7 @@ static int sqlite3FindDb(sqlite3 *db, Token *pName){
 ** pName2) that stores the unqualified table name.  The index of the
 ** database "xxx" is returned.
 */
-static int sqlite3TwoPartName(
+SQLITE_PRIVATE int sqlite3TwoPartName(
   Parse *pParse,      /* Parsing and code generating context */
   Token *pName1,      /* The "xxx" in the name "xxx.yyy" or "xxx" */
   Token *pName2,      /* The "yyy" in the name "xxx.yyy" */
@@ -43887,7 +44081,7 @@ static int sqlite3TwoPartName(
 ** "sqlite_" (in upper, lower or mixed case). This portion of the namespace
 ** is reserved for internal use.
 */
-static int sqlite3CheckObjectName(Parse *pParse, const char *zName){
+SQLITE_PRIVATE int sqlite3CheckObjectName(Parse *pParse, const char *zName){
   if( !pParse->db->init.busy && pParse->nested==0 
           && (pParse->db->flags & SQLITE_WriteSchema)==0
           && 0==sqlite3StrNICmp(zName, "sqlite_", 7) ){
@@ -43913,7 +44107,7 @@ static int sqlite3CheckObjectName(Parse *pParse, const char *zName){
 ** At the end of the CREATE TABLE statement, the sqlite3EndTable() routine
 ** is called to complete the construction of the new table record.
 */
-static void sqlite3StartTable(
+SQLITE_PRIVATE void sqlite3StartTable(
   Parse *pParse,   /* Parser context */
   Token *pName1,   /* First part of the name of the table or view */
   Token *pName2,   /* Second part of the name of the table or view */
@@ -44124,7 +44318,7 @@ sqlite3UpperToLower[*(unsigned char *)(y)]     \
 ** first to get things going.  Then this routine is called for each
 ** column.
 */
-static void sqlite3AddColumn(Parse *pParse, Token *pName){
+SQLITE_PRIVATE void sqlite3AddColumn(Parse *pParse, Token *pName){
   Table *p;
   int i;
   char *z;
@@ -44170,7 +44364,7 @@ static void sqlite3AddColumn(Parse *pParse, Token *pName){
 ** been seen on a column.  This routine sets the notNull flag on
 ** the column currently under construction.
 */
-static void sqlite3AddNotNull(Parse *pParse, int onError){
+SQLITE_PRIVATE void sqlite3AddNotNull(Parse *pParse, int onError){
   Table *p;
   int i;
   if( (p = pParse->pNewTable)==0 ) return;
@@ -44203,7 +44397,7 @@ static void sqlite3AddNotNull(Parse *pParse, int onError){
 ** If none of the substrings in the above table are found,
 ** SQLITE_AFF_NUMERIC is returned.
 */
-static char sqlite3AffinityType(const Token *pType){
+SQLITE_PRIVATE char sqlite3AffinityType(const Token *pType){
   u32 h = 0;
   char aff = SQLITE_AFF_NUMERIC;
   const unsigned char *zIn = pType->z;
@@ -44250,7 +44444,7 @@ static char sqlite3AffinityType(const Token *pType){
 ** that contains the typename of the column and store that string
 ** in zType.
 */ 
-static void sqlite3AddColumnType(Parse *pParse, Token *pType){
+SQLITE_PRIVATE void sqlite3AddColumnType(Parse *pParse, Token *pType){
   Table *p;
   int i;
   Column *pCol;
@@ -44274,7 +44468,7 @@ static void sqlite3AddColumnType(Parse *pParse, Token *pType){
 ** This routine is called by the parser while in the middle of
 ** parsing a CREATE TABLE statement.
 */
-static void sqlite3AddDefaultValue(Parse *pParse, Expr *pExpr){
+SQLITE_PRIVATE void sqlite3AddDefaultValue(Parse *pParse, Expr *pExpr){
   Table *p;
   Column *pCol;
   if( (p = pParse->pNewTable)!=0 ){
@@ -44312,7 +44506,7 @@ static void sqlite3AddDefaultValue(Parse *pParse, Expr *pExpr){
 ** If the key is not an INTEGER PRIMARY KEY, then create a unique
 ** index for the key.  No index is created for INTEGER PRIMARY KEYs.
 */
-static void sqlite3AddPrimaryKey(
+SQLITE_PRIVATE void sqlite3AddPrimaryKey(
   Parse *pParse,    /* Parsing context */
   ExprList *pList,  /* List of field names to be indexed */
   int onError,      /* What to do with a uniqueness conflict */
@@ -44371,7 +44565,7 @@ primary_key_exit:
 /*
 ** Add a new CHECK constraint to the table currently under construction.
 */
-static void sqlite3AddCheckConstraint(
+SQLITE_PRIVATE void sqlite3AddCheckConstraint(
   Parse *pParse,    /* Parsing context */
   Expr *pCheckExpr  /* The check expression */
 ){
@@ -44391,7 +44585,7 @@ static void sqlite3AddCheckConstraint(
 ** Set the collation function of the most recently parsed table column
 ** to the CollSeq given.
 */
-static void sqlite3AddCollateType(Parse *pParse, const char *zType, int nType){
+SQLITE_PRIVATE void sqlite3AddCollateType(Parse *pParse, const char *zType, int nType){
   Table *p;
   int i;
 
@@ -44433,7 +44627,7 @@ static void sqlite3AddCollateType(Parse *pParse, const char *zType, int nType){
 ** invokes the collation factory if the named collation cannot be found
 ** and generates an error message.
 */
-static CollSeq *sqlite3LocateCollSeq(Parse *pParse, const char *zName, int nName){
+SQLITE_PRIVATE CollSeq *sqlite3LocateCollSeq(Parse *pParse, const char *zName, int nName){
   sqlite3 *db = pParse->db;
   u8 enc = ENC(db);
   u8 initbusy = db->init.busy;
@@ -44471,7 +44665,7 @@ static CollSeq *sqlite3LocateCollSeq(Parse *pParse, const char *zName, int nName
 ** and the probability of hitting the same cookie value is only
 ** 1 chance in 2^32.  So we're safe enough.
 */
-static void sqlite3ChangeCookie(sqlite3 *db, Vdbe *v, int iDb){
+SQLITE_PRIVATE void sqlite3ChangeCookie(sqlite3 *db, Vdbe *v, int iDb){
   sqlite3VdbeAddOp(v, OP_Integer, db->aDb[iDb].pSchema->schema_cookie+1, 0);
   sqlite3VdbeAddOp(v, OP_SetCookie, iDb, 0);
 }
@@ -44587,7 +44781,7 @@ static char *createTableStmt(Table *p, int isTemp){
 ** "CREATE TABLE ... AS SELECT ..." statement.  The column names of
 ** the new table will match the result set of the SELECT.
 */
-static void sqlite3EndTable(
+SQLITE_PRIVATE void sqlite3EndTable(
   Parse *pParse,          /* Parse context */
   Token *pCons,           /* The ',' token after the last column defn. */
   Token *pEnd,            /* The final ')' token in the CREATE TABLE */
@@ -44796,7 +44990,7 @@ static void sqlite3EndTable(
 /*
 ** The parser calls this routine in order to create a new VIEW
 */
-static void sqlite3CreateView(
+SQLITE_PRIVATE void sqlite3CreateView(
   Parse *pParse,     /* The parsing context */
   Token *pBegin,     /* The CREATE token that begins the statement */
   Token *pName1,     /* The token that holds the name of the view */
@@ -44873,7 +45067,7 @@ static void sqlite3CreateView(
 ** the columns of the view in the pTable structure.  Return the number
 ** of errors.  If an error is seen leave an error message in pParse->zErrMsg.
 */
-static int sqlite3ViewGetColumnNames(Parse *pParse, Table *pTable){
+SQLITE_PRIVATE int sqlite3ViewGetColumnNames(Parse *pParse, Table *pTable){
   Table *pSelTab;   /* A fake table from which we get the result set */
   Select *pSel;     /* Copy of the SELECT that implements the view */
   int nErr = 0;     /* Number of errors encountered */
@@ -44983,7 +45177,7 @@ static void sqliteViewResetAll(sqlite3 *db, int idx){
 ** in order to be certain that we got the right one.
 */
 #ifndef SQLITE_OMIT_AUTOVACUUM
-static void sqlite3RootPageMoved(Db *pDb, int iFrom, int iTo){
+SQLITE_PRIVATE void sqlite3RootPageMoved(Db *pDb, int iFrom, int iTo){
   HashElem *pElem;
   Hash *pHash;
 
@@ -45091,7 +45285,7 @@ static void destroyTable(Parse *pParse, Table *pTab){
 ** This routine is called to do the work of a DROP TABLE statement.
 ** pName is the name of the table to be dropped.
 */
-static void sqlite3DropTable(Parse *pParse, SrcList *pName, int isView, int noErr){
+SQLITE_PRIVATE void sqlite3DropTable(Parse *pParse, SrcList *pName, int isView, int noErr){
   Table *pTab;
   Vdbe *v;
   sqlite3 *db = pParse->db;
@@ -45259,7 +45453,7 @@ exit_drop_table:
 ** The foreign key is set for IMMEDIATE processing.  A subsequent call
 ** to sqlite3DeferForeignKey() might change this to DEFERRED.
 */
-static void sqlite3CreateForeignKey(
+SQLITE_PRIVATE void sqlite3CreateForeignKey(
   Parse *pParse,       /* Parsing context */
   ExprList *pFromCol,  /* Columns in this table that point to other table */
   Token *pTo,          /* Name of the other table */
@@ -45365,7 +45559,7 @@ fk_end:
 ** The behavior of the most recently created foreign key is adjusted
 ** accordingly.
 */
-static void sqlite3DeferForeignKey(Parse *pParse, int isDeferred){
+SQLITE_PRIVATE void sqlite3DeferForeignKey(Parse *pParse, int isDeferred){
 #ifndef SQLITE_OMIT_FOREIGN_KEY
   Table *pTab;
   FKey *pFKey;
@@ -45450,14 +45644,14 @@ static void sqlite3RefillIndex(Parse *pParse, Index *pIndex, int memRootPage){
 ** is a primary key or unique-constraint on the most recent column added
 ** to the table currently under construction.  
 */
-static void sqlite3CreateIndex(
+SQLITE_PRIVATE void sqlite3CreateIndex(
   Parse *pParse,     /* All information about this parse */
   Token *pName1,     /* First part of index name. May be NULL */
   Token *pName2,     /* Second part of index name. May be NULL */
   SrcList *pTblName, /* Table to index. Use pParse->pNewTable if 0 */
   ExprList *pList,   /* A list of columns to be indexed */
   int onError,       /* OE_Abort, OE_Ignore, OE_Replace, or OE_None */
-  Token *pStart,     /* The CREATE token that begins a CREATE TABLE statement */
+  Token *pStart,     /* The CREATE token that begins this statement */
   Token *pEnd,       /* The ")" that closes the CREATE INDEX statement */
   int sortOrder,     /* Sort order of primary key when pList==NULL */
   int ifNotExist     /* Omit error if index already exists */
@@ -45879,7 +46073,7 @@ exit_create_index:
 ** Generate code to make sure the file format number is at least minFormat.
 ** The generated code will increase the file format number if necessary.
 */
-static void sqlite3MinimumFileFormat(Parse *pParse, int iDb, int minFormat){
+SQLITE_PRIVATE void sqlite3MinimumFileFormat(Parse *pParse, int iDb, int minFormat){
   Vdbe *v;
   v = sqlite3GetVdbe(pParse);
   if( v ){
@@ -45909,7 +46103,7 @@ static void sqlite3MinimumFileFormat(Parse *pParse, int iDb, int minFormat){
 ** how aiRowEst[] should be initialized.  The numbers generated here
 ** are based on typical values found in actual indices.
 */
-static void sqlite3DefaultRowEst(Index *pIdx){
+SQLITE_PRIVATE void sqlite3DefaultRowEst(Index *pIdx){
   unsigned *a = pIdx->aiRowEst;
   int i;
   assert( a!=0 );
@@ -45930,7 +46124,7 @@ static void sqlite3DefaultRowEst(Index *pIdx){
 ** This routine will drop an existing named index.  This routine
 ** implements the DROP INDEX statement.
 */
-static void sqlite3DropIndex(Parse *pParse, SrcList *pName, int ifExists){
+SQLITE_PRIVATE void sqlite3DropIndex(Parse *pParse, SrcList *pName, int ifExists){
   Index *pIndex;
   Vdbe *v;
   sqlite3 *db = pParse->db;
@@ -46005,7 +46199,7 @@ exit_drop_index:
 ** might be the same as the pArray parameter or it might be a different
 ** pointer if the array was resized.
 */
-static void *sqlite3ArrayAllocate(
+SQLITE_PRIVATE void *sqlite3ArrayAllocate(
   void *pArray,     /* Array of objects.  Might be reallocated */
   int szEntry,      /* Size of each object in the array */
   int initSize,     /* Suggested initial allocation, in elements */
@@ -46039,7 +46233,7 @@ static void *sqlite3ArrayAllocate(
 **
 ** A new IdList is returned, or NULL if malloc() fails.
 */
-static IdList *sqlite3IdListAppend(IdList *pList, Token *pToken){
+SQLITE_PRIVATE IdList *sqlite3IdListAppend(IdList *pList, Token *pToken){
   int i;
   if( pList==0 ){
     pList = sqliteMalloc( sizeof(IdList) );
@@ -46065,7 +46259,7 @@ static IdList *sqlite3IdListAppend(IdList *pList, Token *pToken){
 /*
 ** Delete an IdList.
 */
-static void sqlite3IdListDelete(IdList *pList){
+SQLITE_PRIVATE void sqlite3IdListDelete(IdList *pList){
   int i;
   if( pList==0 ) return;
   for(i=0; i<pList->nId; i++){
@@ -46079,7 +46273,7 @@ static void sqlite3IdListDelete(IdList *pList){
 ** Return the index in pList of the identifier named zId.  Return -1
 ** if not found.
 */
-static int sqlite3IdListIndex(IdList *pList, const char *zName){
+SQLITE_PRIVATE int sqlite3IdListIndex(IdList *pList, const char *zName){
   int i;
   if( pList==0 ) return -1;
   for(i=0; i<pList->nId; i++){
@@ -46113,7 +46307,7 @@ static int sqlite3IdListIndex(IdList *pList, const char *zName){
 **
 ** Then C is the table name and B is the database name.
 */
-static SrcList *sqlite3SrcListAppend(SrcList *pList, Token *pTable, Token *pDatabase){
+SQLITE_PRIVATE SrcList *sqlite3SrcListAppend(SrcList *pList, Token *pTable, Token *pDatabase){
   struct SrcList_item *pItem;
   if( pList==0 ){
     pList = sqliteMalloc( sizeof(SrcList) );
@@ -46152,7 +46346,7 @@ static SrcList *sqlite3SrcListAppend(SrcList *pList, Token *pTable, Token *pData
 /*
 ** Assign cursors to all tables in a SrcList
 */
-static void sqlite3SrcListAssignCursors(Parse *pParse, SrcList *pList){
+SQLITE_PRIVATE void sqlite3SrcListAssignCursors(Parse *pParse, SrcList *pList){
   int i;
   struct SrcList_item *pItem;
   assert(pList || sqlite3MallocFailed() );
@@ -46170,7 +46364,7 @@ static void sqlite3SrcListAssignCursors(Parse *pParse, SrcList *pList){
 /*
 ** Delete an entire SrcList including all its substructure.
 */
-static void sqlite3SrcListDelete(SrcList *pList){
+SQLITE_PRIVATE void sqlite3SrcListDelete(SrcList *pList){
   int i;
   struct SrcList_item *pItem;
   if( pList==0 ) return;
@@ -46202,7 +46396,7 @@ static void sqlite3SrcListDelete(SrcList *pList){
 ** Return a new SrcList which encodes is the FROM with the new
 ** term added.
 */
-static SrcList *sqlite3SrcListAppendFromTerm(
+SQLITE_PRIVATE SrcList *sqlite3SrcListAppendFromTerm(
   SrcList *p,             /* The left part of the FROM clause already seen */
   Token *pTable,          /* Name of the table to add to the FROM clause */
   Token *pDatabase,       /* Name of the database containing pTable */
@@ -46244,7 +46438,7 @@ static SrcList *sqlite3SrcListAppendFromTerm(
 ** in p->a[0] and p->a[1], respectively.  The parser initially stores the
 ** operator with A.  This routine shifts that operator over to B.
 */
-static void sqlite3SrcListShiftJoinType(SrcList *p){
+SQLITE_PRIVATE void sqlite3SrcListShiftJoinType(SrcList *p){
   if( p && p->a ){
     int i;
     for(i=p->nSrc-1; i>0; i--){
@@ -46257,7 +46451,7 @@ static void sqlite3SrcListShiftJoinType(SrcList *p){
 /*
 ** Begin a transaction
 */
-static void sqlite3BeginTransaction(Parse *pParse, int type){
+SQLITE_PRIVATE void sqlite3BeginTransaction(Parse *pParse, int type){
   sqlite3 *db;
   Vdbe *v;
   int i;
@@ -46279,7 +46473,7 @@ static void sqlite3BeginTransaction(Parse *pParse, int type){
 /*
 ** Commit a transaction
 */
-static void sqlite3CommitTransaction(Parse *pParse){
+SQLITE_PRIVATE void sqlite3CommitTransaction(Parse *pParse){
   sqlite3 *db;
   Vdbe *v;
 
@@ -46296,7 +46490,7 @@ static void sqlite3CommitTransaction(Parse *pParse){
 /*
 ** Rollback a transaction
 */
-static void sqlite3RollbackTransaction(Parse *pParse){
+SQLITE_PRIVATE void sqlite3RollbackTransaction(Parse *pParse){
   sqlite3 *db;
   Vdbe *v;
 
@@ -46314,7 +46508,7 @@ static void sqlite3RollbackTransaction(Parse *pParse){
 ** Make sure the TEMP database is open and available for use.  Return
 ** the number of errors.  Leave any error messages in the pParse structure.
 */
-static int sqlite3OpenTempDatabase(Parse *pParse){
+SQLITE_PRIVATE int sqlite3OpenTempDatabase(Parse *pParse){
   sqlite3 *db = pParse->db;
   if( db->aDb[1].pBt==0 && !pParse->explain ){
     int rc = sqlite3BtreeFactory(db, 0, 0, SQLITE_DEFAULT_CACHE_SIZE,
@@ -46361,7 +46555,7 @@ static int sqlite3OpenTempDatabase(Parse *pParse){
 ** schema on any databases.  This can be used to position the OP_Goto
 ** early in the code, before we know if any database tables will be used.
 */
-static void sqlite3CodeVerifySchema(Parse *pParse, int iDb){
+SQLITE_PRIVATE void sqlite3CodeVerifySchema(Parse *pParse, int iDb){
   sqlite3 *db;
   Vdbe *v;
   int mask;
@@ -46405,7 +46599,7 @@ static void sqlite3CodeVerifySchema(Parse *pParse, int iDb){
 ** iDb==1 then only the temp database is made writable.  If iDb>1 then the
 ** specified auxiliary database and the temp database are made writable.
 */
-static void sqlite3BeginWriteOperation(Parse *pParse, int setStatement, int iDb){
+SQLITE_PRIVATE void sqlite3BeginWriteOperation(Parse *pParse, int setStatement, int iDb){
   Vdbe *v = sqlite3GetVdbe(pParse);
   if( v==0 ) return;
   sqlite3CodeVerifySchema(pParse, iDb);
@@ -46490,7 +46684,7 @@ static void reindexDatabases(Parse *pParse, char const *zColl){
 ** indices associated with the named table.
 */
 #ifndef SQLITE_OMIT_REINDEX
-static void sqlite3Reindex(Parse *pParse, Token *pName1, Token *pName2){
+SQLITE_PRIVATE void sqlite3Reindex(Parse *pParse, Token *pName1, Token *pName2){
   CollSeq *pColl;             /* Collating sequence to be reindexed, or NULL */
   char *z;                    /* Name of a table or index */
   const char *zDb;            /* Name of the database */
@@ -46553,7 +46747,7 @@ static void sqlite3Reindex(Parse *pParse, Token *pName1, Token *pName2){
 ** sequence), NULL is returned and the state of pParse updated to reflect
 ** the error.
 */
-static KeyInfo *sqlite3IndexKeyinfo(Parse *pParse, Index *pIdx){
+SQLITE_PRIVATE KeyInfo *sqlite3IndexKeyinfo(Parse *pParse, Index *pIdx){
   int i;
   int nCol = pIdx->nColumn;
   int nBytes = sizeof(KeyInfo) + (nCol-1)*sizeof(CollSeq*) + nCol;
@@ -46664,7 +46858,7 @@ static int synthCollSeq(sqlite3 *db, CollSeq *pColl){
 ** db for collation type name zName, length nName, or NULL, if no collation
 ** sequence can be found.
 */
-static CollSeq *sqlite3GetCollSeq(
+SQLITE_PRIVATE CollSeq *sqlite3GetCollSeq(
   sqlite3* db, 
   CollSeq *pColl, 
   const char *zName, 
@@ -46701,7 +46895,7 @@ static CollSeq *sqlite3GetCollSeq(
 ** an equivalent collating sequence that uses a text encoding different
 ** from the main database is substituted, if one is available.
 */
-static int sqlite3CheckCollSeq(Parse *pParse, CollSeq *pColl){
+SQLITE_PRIVATE int sqlite3CheckCollSeq(Parse *pParse, CollSeq *pColl){
   if( pColl ){
     const char *zName = pColl->zName;
     CollSeq *p = sqlite3GetCollSeq(pParse->db, pColl, zName, -1);
@@ -46783,7 +46977,7 @@ static CollSeq *findCollSeqEntry(
 ** if necessary and generates an error message if the collating sequence
 ** cannot be found.
 */
-static CollSeq *sqlite3FindCollSeq(
+SQLITE_PRIVATE CollSeq *sqlite3FindCollSeq(
   sqlite3 *db,
   u8 enc,
   const char *zName,
@@ -46822,7 +47016,7 @@ static CollSeq *sqlite3FindCollSeq(
 ** number of arguments may be returned even if the eTextRep flag does not
 ** match that requested.
 */
-static FuncDef *sqlite3FindFunction(
+SQLITE_PRIVATE FuncDef *sqlite3FindFunction(
   sqlite3 *db,       /* An open database */
   const char *zName, /* Name of the function.  Not null-terminated */
   int nName,         /* Number of characters in the name */
@@ -46908,7 +47102,7 @@ static FuncDef *sqlite3FindFunction(
 ** pointer itself, it just cleans up subsiduary resources (i.e. the contents
 ** of the schema hash tables).
 */
-static void sqlite3SchemaFree(void *p){
+SQLITE_PRIVATE void sqlite3SchemaFree(void *p){
   Hash temp1;
   Hash temp2;
   HashElem *pElem;
@@ -46937,7 +47131,7 @@ static void sqlite3SchemaFree(void *p){
 ** Find and return the schema associated with a BTree.  Create
 ** a new one if necessary.
 */
-static Schema *sqlite3SchemaGet(Btree *pBt){
+SQLITE_PRIVATE Schema *sqlite3SchemaGet(Btree *pBt){
   Schema * p;
   if( pBt ){
     p = (Schema *)sqlite3BtreeSchema(pBt,sizeof(Schema),sqlite3SchemaFree);
@@ -47048,7 +47242,7 @@ extern const char sqlite3IsIdChar[];
 ** to recognize the end of a trigger can be omitted.  All we have to do
 ** is look for a semicolon that is not part of an string or comment.
 */
-int sqlite3_complete(const char *zSql){
+SQLITE_API int sqlite3_complete(const char *zSql){
   u8 state = 0;   /* Current state, using numbers defined in header comment */
   u8 token;       /* Value of the next token */
 
@@ -47202,7 +47396,7 @@ int sqlite3_complete(const char *zSql){
 ** above, except that the parameter is required to be UTF-16 encoded, not
 ** UTF-8.
 */
-int sqlite3_complete16(const void *zSql){
+SQLITE_API int sqlite3_complete16(const void *zSql){
   sqlite3_value *pVal;
   char const *zSql8;
   int rc = 0;
@@ -47243,7 +47437,7 @@ int sqlite3_complete16(const void *zSql){
 ** add an error message to pParse->zErrMsg and return NULL.  If all tables
 ** are found, return a pointer to the last table.
 */
-static Table *sqlite3SrcListLookup(Parse *pParse, SrcList *pSrc){
+SQLITE_PRIVATE Table *sqlite3SrcListLookup(Parse *pParse, SrcList *pSrc){
   Table *pTab = 0;
   int i;
   struct SrcList_item *pItem;
@@ -47263,7 +47457,7 @@ static Table *sqlite3SrcListLookup(Parse *pParse, SrcList *pSrc){
 ** writable, generate an error message and return 1.  If it is
 ** writable return 0;
 */
-static int sqlite3IsReadOnly(Parse *pParse, Table *pTab, int viewOk){
+SQLITE_PRIVATE int sqlite3IsReadOnly(Parse *pParse, Table *pTab, int viewOk){
   if( (pTab->readOnly && (pParse->db->flags & SQLITE_WriteSchema)==0
         && pParse->nested==0) 
 #ifndef SQLITE_OMIT_VIRTUALTABLE
@@ -47285,7 +47479,7 @@ static int sqlite3IsReadOnly(Parse *pParse, Table *pTab, int viewOk){
 /*
 ** Generate code that will open a table for reading.
 */
-static void sqlite3OpenTable(
+SQLITE_PRIVATE void sqlite3OpenTable(
   Parse *p,       /* Generate code into this VDBE */
   int iCur,       /* The cursor number of the table */
   int iDb,        /* The database index in sqlite3.aDb[] */
@@ -47311,7 +47505,7 @@ static void sqlite3OpenTable(
 **                 \________/       \________________/
 **                  pTabList              pWhere
 */
-static void sqlite3DeleteFrom(
+SQLITE_PRIVATE void sqlite3DeleteFrom(
   Parse *pParse,         /* The parser context */
   SrcList *pTabList,     /* The table from which we should delete things */
   Expr *pWhere           /* The WHERE clause.  May be null */
@@ -47611,7 +47805,7 @@ delete_from_cleanup:
 ** and then generates code to remove both the table record and all index
 ** entries that point to that record.
 */
-static void sqlite3GenerateRowDelete(
+SQLITE_PRIVATE void sqlite3GenerateRowDelete(
   sqlite3 *db,       /* The database containing the index */
   Vdbe *v,           /* Generate code into this VDBE */
   Table *pTab,       /* Table containing the row to be deleted */
@@ -47644,7 +47838,7 @@ static void sqlite3GenerateRowDelete(
 **   3.  The "iCur" cursor must be pointing to the row that is to be
 **       deleted.
 */
-static void sqlite3GenerateRowIndexDelete(
+SQLITE_PRIVATE void sqlite3GenerateRowIndexDelete(
   Vdbe *v,           /* Generate code into this VDBE */
   Table *pTab,       /* Table containing the row to be deleted */
   int iCur,          /* Cursor number for the table */
@@ -47666,7 +47860,7 @@ static void sqlite3GenerateRowIndexDelete(
 ** iCur is the index of a cursor open on the pTab table and pointing to
 ** the entry that needs indexing.
 */
-static void sqlite3GenerateIndexKey(
+SQLITE_PRIVATE void sqlite3GenerateIndexKey(
   Vdbe *v,           /* Generate code into this VDBE */
   Index *pIdx,       /* The index for which to generate a key */
   int iCur           /* Cursor number for the pIdx->pTable table */
@@ -47708,7 +47902,7 @@ static void sqlite3GenerateIndexKey(
 ** sqliteRegisterBuildinFunctions() found at the bottom of the file.
 ** All other code has file scope.
 **
-** $Id: func.c,v 1.160 2007/06/07 19:08:33 drh Exp $
+** $Id: func.c,v 1.161 2007/06/22 15:21:16 danielk1977 Exp $
 */
 /* #include <math.h> */
 
@@ -48086,7 +48280,7 @@ static const struct compareInfo likeInfoAlt = { '%', '_',   0, 0 };
 /*
 ** Read a single UTF-8 character and return its value.
 */
-static u32 sqlite3ReadUtf8(const unsigned char *z){
+SQLITE_PRIVATE u32 sqlite3ReadUtf8(const unsigned char *z){
   u32 c;
   SQLITE_READ_UTF8(z, c);
   return c;
@@ -48984,7 +49178,7 @@ static void minMaxFinalize(sqlite3_context *context){
 ** functions.  This should be the only routine in this file with
 ** external linkage.
 */
-static void sqlite3RegisterBuiltinFunctions(sqlite3 *db){
+SQLITE_PRIVATE void sqlite3RegisterBuiltinFunctions(sqlite3 *db){
   static const struct {
      char *zName;
      signed char nArg;
@@ -49096,7 +49290,13 @@ static void sqlite3RegisterBuiltinFunctions(sqlite3 *db){
     }
   }
   sqlite3RegisterDateTimeFunctions(db);
-  sqlite3_overload_function(db, "MATCH", 2);
+  if( !sqlite3MallocFailed() ){
+    int rc = sqlite3_overload_function(db, "MATCH", 2);
+    assert( rc==SQLITE_NOMEM || rc==SQLITE_OK );
+    if( rc==SQLITE_NOMEM ){
+      sqlite3FailedMalloc();
+    }
+  }
 #ifdef SQLITE_SSE
   (void)sqlite3SseFunctions(db);
 #endif
@@ -49123,7 +49323,7 @@ static void setLikeOptFlag(sqlite3 *db, const char *zName, int flagVal){
 ** parameter determines whether or not the LIKE operator is case
 ** sensitive.  GLOB is always case sensitive.
 */
-static void sqlite3RegisterLikeFunctions(sqlite3 *db, int caseSensitive){
+SQLITE_PRIVATE void sqlite3RegisterLikeFunctions(sqlite3 *db, int caseSensitive){
   struct compareInfo *pInfo;
   if( caseSensitive ){
     pInfo = (struct compareInfo*)&likeInfoAlt;
@@ -49146,7 +49346,7 @@ static void sqlite3RegisterLikeFunctions(sqlite3 *db, int caseSensitive){
 ** return TRUE.  If the function is not a LIKE-style function then
 ** return FALSE.
 */
-static int sqlite3IsLikeFunction(sqlite3 *db, Expr *pExpr, int *pIsNocase, char *aWc){
+SQLITE_PRIVATE int sqlite3IsLikeFunction(sqlite3 *db, Expr *pExpr, int *pIsNocase, char *aWc){
   FuncDef *pDef;
   if( pExpr->op!=TK_FUNCTION || !pExpr->pList ){
     return 0;
@@ -49188,7 +49388,7 @@ static int sqlite3IsLikeFunction(sqlite3 *db, Expr *pExpr, int *pIsNocase, char 
 ** This file contains C code routines that are called by the parser
 ** to handle INSERT statements in SQLite.
 **
-** $Id: insert.c,v 1.186 2007/05/04 13:15:56 drh Exp $
+** $Id: insert.c,v 1.187 2007/06/26 10:38:55 danielk1977 Exp $
 */
 
 /*
@@ -49204,7 +49404,7 @@ static int sqlite3IsLikeFunction(sqlite3 *db, Expr *pExpr, int *pIsNocase, char 
 **  'd'            INTEGER
 **  'e'            REAL
 */
-static void sqlite3IndexAffinityStr(Vdbe *v, Index *pIdx){
+SQLITE_PRIVATE void sqlite3IndexAffinityStr(Vdbe *v, Index *pIdx){
   if( !pIdx->zColAff ){
     /* The first time a column affinity string for a particular index is
     ** required, it is allocated and populated here. It is then stored as
@@ -49243,7 +49443,7 @@ static void sqlite3IndexAffinityStr(Vdbe *v, Index *pIdx){
 **  'd'            INTEGER
 **  'e'            REAL
 */
-static void sqlite3TableAffinityStr(Vdbe *v, Table *pTab){
+SQLITE_PRIVATE void sqlite3TableAffinityStr(Vdbe *v, Table *pTab){
   /* The first time a column affinity string for a particular table
   ** is required, it is allocated and populated here. It is then 
   ** stored as a member of the Table structure for subsequent use.
@@ -49492,7 +49692,7 @@ static int xferOptimization(
 **         end the loop
 **         cleanup
 */
-static void sqlite3Insert(
+SQLITE_PRIVATE void sqlite3Insert(
   Parse *pParse,        /* Parser context */
   SrcList *pTabList,    /* Name of table into which we are inserting */
   ExprList *pList,      /* List of values to be inserted */
@@ -49523,6 +49723,8 @@ static void sqlite3Insert(
   int counterMem = 0;   /* Memory cell holding AUTOINCREMENT counter */
   int appendFlag = 0;   /* True if the insert is likely to be an append */
   int iDb;
+
+  int nHidden = 0;
 
 #ifndef SQLITE_OMIT_TRIGGER
   int isView;                 /* True if attempting to insert into a view */
@@ -49700,7 +49902,12 @@ static void sqlite3Insert(
   /* Make sure the number of columns in the source data matches the number
   ** of columns to be inserted into the table.
   */
-  if( pColumn==0 && nColumn && nColumn!=pTab->nCol ){
+  if( IsVirtual(pTab) ){
+    for(i=0; i<pTab->nCol; i++){
+      nHidden += (IsHiddenColumn(&pTab->aCol[i]) ? 1 : 0);
+    }
+  }
+  if( pColumn==0 && nColumn && nColumn!=(pTab->nCol-nHidden) ){
     sqlite3ErrorMsg(pParse, 
        "table %S has %d columns but %d values were supplied",
        pTabList, 0, pTab->nCol, nColumn);
@@ -49815,6 +50022,11 @@ static void sqlite3Insert(
       sqlite3VdbeAddOp(v, OP_MustBeInt, 0, 0);
     }
 
+    /* Cannot have triggers on a virtual table. If it were possible,
+    ** this block would have to account for hidden column.
+    */
+    assert(!IsVirtual(pTab));
+
     /* Create the new column data
     */
     for(i=0; i<pTab->nCol; i++){
@@ -49907,6 +50119,7 @@ static void sqlite3Insert(
     /* Push onto the stack, data for all columns of the new entry, beginning
     ** with the first column.
     */
+    nHidden = 0;
     for(i=0; i<pTab->nCol; i++){
       if( i==pTab->iPKey ){
         /* The value of the INTEGER PRIMARY KEY column is always a NULL.
@@ -49917,13 +50130,19 @@ static void sqlite3Insert(
         continue;
       }
       if( pColumn==0 ){
-        j = i;
+        if( IsHiddenColumn(&pTab->aCol[i]) ){
+          assert( IsVirtual(pTab) );
+          j = -1;
+          nHidden++;
+        }else{
+          j = i - nHidden;
+        }
       }else{
         for(j=0; j<pColumn->nId; j++){
           if( pColumn->a[j].idx==i ) break;
         }
       }
-      if( nColumn==0 || (pColumn && j>=pColumn->nId) ){
+      if( j<0 || nColumn==0 || (pColumn && j>=pColumn->nId) ){
         sqlite3ExprCode(pParse, pTab->aCol[i].pDflt);
       }else if( useTempTable ){
         sqlite3VdbeAddOp(v, OP_Column, srcTab, j); 
@@ -50100,7 +50319,7 @@ insert_cleanup:
 ** is still pointing at the same entry after the routine returns.
 ** Without the isUpdate flag, the "base" cursor might be moved.
 */
-static void sqlite3GenerateConstraintChecks(
+SQLITE_PRIVATE void sqlite3GenerateConstraintChecks(
   Parse *pParse,      /* The parser context */
   Table *pTab,        /* the table into which we are inserting */
   int base,           /* Index of a read/write cursor pointing at pTab */
@@ -50354,7 +50573,7 @@ static void sqlite3GenerateConstraintChecks(
 ** The arguments to this routine should be the same as the first six
 ** arguments to sqlite3GenerateConstraintChecks.
 */
-static void sqlite3CompleteInsertion(
+SQLITE_PRIVATE void sqlite3CompleteInsertion(
   Parse *pParse,      /* The parser context */
   Table *pTab,        /* the table into which we are inserting */
   int base,           /* Index of a read/write cursor pointing at pTab */
@@ -50411,7 +50630,7 @@ static void sqlite3CompleteInsertion(
 ** indices of that table.  The "base" parameter is the cursor number used
 ** for the table.  Indices are opened on subsequent cursors.
 */
-static void sqlite3OpenTableAndIndices(
+SQLITE_PRIVATE void sqlite3OpenTableAndIndices(
   Parse *pParse,   /* Parsing context */
   Table *pTab,     /* Table to be opened */
   int base,        /* Cursor number assigned to the table */
@@ -50791,7 +51010,7 @@ static int xferOptimization(
 ** argument to xCallback().  If xCallback=NULL then no callback
 ** is invoked, even for queries.
 */
-int sqlite3_exec(
+SQLITE_API int sqlite3_exec(
   sqlite3 *db,                /* The database on which the SQL executes */
   const char *zSql,           /* The SQL to be executed */
   sqlite3_callback xCallback, /* Invoke this callback routine */
@@ -50929,7 +51148,7 @@ exec_out:
 ** as extensions by SQLite should #include this file instead of 
 ** sqlite3.h.
 **
-** @(#) $Id: sqlite3ext.h,v 1.10 2007/03/29 18:46:01 drh Exp $
+** @(#) $Id: sqlite3ext.h,v 1.12 2007/07/20 10:48:36 drh Exp $
 */
 #ifndef _SQLITE3EXT_H_
 #define _SQLITE3EXT_H_
@@ -50939,6 +51158,12 @@ typedef struct sqlite3_api_routines sqlite3_api_routines;
 /*
 ** The following structure hold pointers to all of the SQLite API
 ** routines.
+**
+** WARNING:  In order to maintain backwards compatibility, add new
+** interfaces to the end of this structure only.  If you insert new
+** interfaces in the middle of this structure, then older different
+** versions of SQLite will not be able to load each others shared
+** libraries!
 */
 struct sqlite3_api_routines {
   void * (*aggregate_context)(sqlite3_context*,int nBytes);
@@ -51060,6 +51285,7 @@ struct sqlite3_api_routines {
   int (*prepare_v2)(sqlite3*,const char*,int,sqlite3_stmt**,const char**);
   int (*prepare16_v2)(sqlite3*,const void*,int,sqlite3_stmt**,const void**);
   int (*clear_bindings)(sqlite3_stmt*);
+  int (*create_module_v2)(sqlite3*,const char*,const sqlite3_module*,void*,void (*xDestroy)(void *));
 };
 
 /*
@@ -51122,6 +51348,7 @@ struct sqlite3_api_routines {
 #define sqlite3_create_function        sqlite3_api->create_function
 #define sqlite3_create_function16      sqlite3_api->create_function16
 #define sqlite3_create_module          sqlite3_api->create_module
+#define sqlite3_create_module_v2       sqlite3_api->create_module_v2
 #define sqlite3_data_count             sqlite3_api->data_count
 #define sqlite3_db_handle              sqlite3_api->db_handle
 #define sqlite3_declare_vtab           sqlite3_api->declare_vtab
@@ -51260,6 +51487,7 @@ struct sqlite3_api_routines {
 
 #ifdef SQLITE_OMIT_VIRTUALTABLE
 # define sqlite3_create_module 0
+# define sqlite3_create_module_v2 0
 # define sqlite3_declare_vtab 0
 #endif
 
@@ -51424,6 +51652,12 @@ const sqlite3_api_routines sqlite3_apis = {
   sqlite3_prepare_v2,
   sqlite3_prepare16_v2,
   sqlite3_clear_bindings,
+
+  /*
+  ** Added for 3.4.1
+  */
+  sqlite3_create_module_v2,
+
 };
 
 /*
@@ -51511,7 +51745,7 @@ int sqlite3_load_extension(
 ** Call this routine when the database connection is closing in order
 ** to clean up loaded extensions
 */
-static void sqlite3CloseExtensions(sqlite3 *db){
+SQLITE_PRIVATE void sqlite3CloseExtensions(sqlite3 *db){
   int i;
   for(i=0; i<db->nExtension; i++){
     sqlite3OsDlclose(db->aExtension[i]);
@@ -51583,7 +51817,7 @@ void sqlite3_reset_auto_extension(void){
 /*
 ** Load all automatic extensions.
 */
-static int sqlite3AutoLoadExtensions(sqlite3 *db){
+SQLITE_PRIVATE int sqlite3AutoLoadExtensions(sqlite3 *db){
   int i;
   int go = 1;
   int rc = SQLITE_OK;
@@ -51631,7 +51865,7 @@ static int sqlite3AutoLoadExtensions(sqlite3 *db){
 *************************************************************************
 ** This file contains code used to implement the PRAGMA command.
 **
-** $Id: pragma.c,v 1.139 2007/05/23 13:50:24 danielk1977 Exp $
+** $Id: pragma.c,v 1.142 2007/06/26 10:38:55 danielk1977 Exp $
 */
 
 /* Ignore this whole file if pragmas are disabled
@@ -51849,7 +52083,7 @@ static int flagPragma(Parse *pParse, const char *zLeft, const char *zRight){
 ** and pId2 is the id.  If the left side is just "id" then pId1 is the
 ** id and pId2 is any empty string.
 */
-static void sqlite3Pragma(
+SQLITE_PRIVATE void sqlite3Pragma(
   Parse *pParse, 
   Token *pId1,        /* First part of [database.]id field */
   Token *pId2,        /* Second part of [database.]id field, or NULL */
@@ -52039,6 +52273,9 @@ static void sqlite3Pragma(
 #ifndef SQLITE_OMIT_AUTOVACUUM
   if( sqlite3StrICmp(zLeft,"auto_vacuum")==0 ){
     Btree *pBt = pDb->pBt;
+    if( sqlite3ReadSchema(pParse) ){
+      goto pragma_out;
+    }
     if( !zRight ){
       int auto_vacuum = 
           pBt ? sqlite3BtreeGetAutoVacuum(pBt) : SQLITE_DEFAULT_AUTOVACUUM;
@@ -52046,7 +52283,34 @@ static void sqlite3Pragma(
     }else{
       int eAuto = getAutoVacuum(zRight);
       if( eAuto>=0 ){
-        sqlite3BtreeSetAutoVacuum(pBt, eAuto);
+        /* Call SetAutoVacuum() to set initialize the internal auto and
+        ** incr-vacuum flags. This is required in case this connection
+        ** creates the database file. It is important that it is created
+        ** as an auto-vacuum capable db.
+        */
+        int rc = sqlite3BtreeSetAutoVacuum(pBt, eAuto);
+        if( rc==SQLITE_OK && (eAuto==1 || eAuto==2) ){
+          /* When setting the auto_vacuum mode to either "full" or 
+          ** "incremental", write the value of meta[6] in the database
+          ** file. Before writing to meta[6], check that meta[3] indicates
+          ** that this really is an auto-vacuum capable database.
+          */
+          static const VdbeOpList setMeta6[] = {
+            { OP_Transaction,    0,               1,        0},    /* 0 */
+            { OP_ReadCookie,     0,               3,        0},    /* 1 */
+            { OP_If,             0,               0,        0},    /* 2 */
+            { OP_Halt,           SQLITE_OK,       OE_Abort, 0},    /* 3 */
+            { OP_Integer,        0,               0,        0},    /* 4 */
+            { OP_SetCookie,      0,               6,        0},    /* 5 */
+          };
+          int iAddr;
+          iAddr = sqlite3VdbeAddOpList(v, ArraySize(setMeta6), setMeta6);
+          sqlite3VdbeChangeP1(v, iAddr, iDb);
+          sqlite3VdbeChangeP1(v, iAddr+1, iDb);
+          sqlite3VdbeChangeP2(v, iAddr+2, iAddr+4);
+          sqlite3VdbeChangeP1(v, iAddr+4, eAuto-1);
+          sqlite3VdbeChangeP1(v, iAddr+5, iDb);
+        }
       }
     }
   }else
@@ -52212,6 +52476,7 @@ static void sqlite3Pragma(
     pTab = sqlite3FindTable(db, zRight, zDb);
     if( pTab ){
       int i;
+      int nHidden = 0;
       Column *pCol;
       sqlite3VdbeSetNumCols(v, 6);
       sqlite3VdbeSetColName(v, 0, COLNAME_NAME, "cid", P3_STATIC);
@@ -52223,7 +52488,11 @@ static void sqlite3Pragma(
       sqlite3ViewGetColumnNames(pParse, pTab);
       for(i=0, pCol=pTab->aCol; i<pTab->nCol; i++, pCol++){
         const Token *pDflt;
-        sqlite3VdbeAddOp(v, OP_Integer, i, 0);
+        if( IsHiddenColumn(pCol) ){
+          nHidden++;
+          continue;
+        }
+        sqlite3VdbeAddOp(v, OP_Integer, i-nHidden, 0);
         sqlite3VdbeOp3(v, OP_String8, 0, 0, pCol->zName, 0);
         sqlite3VdbeOp3(v, OP_String8, 0, 0,
            pCol->zType ? pCol->zType : "", 0);
@@ -52621,17 +52890,27 @@ static void sqlite3Pragma(
   ** The user-version is not used internally by SQLite. It may be used by
   ** applications for any purpose.
   */
-  if( sqlite3StrICmp(zLeft, "schema_version")==0 ||
-      sqlite3StrICmp(zLeft, "user_version")==0 ){
+  if( sqlite3StrICmp(zLeft, "schema_version")==0 
+   || sqlite3StrICmp(zLeft, "user_version")==0 
+   || sqlite3StrICmp(zLeft, "freelist_count")==0 
+  ){
 
     int iCookie;   /* Cookie index. 0 for schema-cookie, 6 for user-cookie. */
-    if( zLeft[0]=='s' || zLeft[0]=='S' ){
-      iCookie = 0;
-    }else{
-      iCookie = 5;
+    switch( zLeft[0] ){
+      case 's': case 'S':
+        iCookie = 0;
+        break;
+      case 'f': case 'F':
+        iCookie = 1;
+        iDb = (-1*(iDb+1));
+        assert(iDb<=0);
+        break;
+      default:
+        iCookie = 5;
+        break;
     }
 
-    if( zRight ){
+    if( zRight && iDb>=0 ){
       /* Write the specified cookie value */
       static const VdbeOpList setCookie[] = {
         { OP_Transaction,    0,  1,  0},    /* 0 */
@@ -52766,7 +53045,7 @@ pragma_out:
 ** interface, and routines that contribute to loading the database schema
 ** from disk.
 **
-** $Id: prepare.c,v 1.50 2007/05/08 20:37:39 drh Exp $
+** $Id: prepare.c,v 1.51 2007/06/24 10:14:00 danielk1977 Exp $
 */
 
 /*
@@ -52793,7 +53072,7 @@ static void corruptSchema(InitData *pData, const char *zExtra){
 **     argv[2] = SQL text for the CREATE statement.
 **
 */
-static int sqlite3InitCallback(void *pInit, int argc, char **argv, char **azColName){
+SQLITE_PRIVATE int sqlite3InitCallback(void *pInit, int argc, char **argv, char **azColName){
   InitData *pData = (InitData*)pInit;
   sqlite3 *db = pData->db;
   int iDb = pData->iDb;
@@ -52963,7 +53242,7 @@ static int sqlite3InitOne(sqlite3 *db, int iDb, char **pzErrMsg){
   **    meta[3]   Use freelist if 0.  Autovacuum if greater than zero.
   **    meta[4]   Db text encoding. 1:UTF-8 2:UTF-16LE 3:UTF-16BE
   **    meta[5]   The user cookie. Used by the application.
-  **    meta[6]   
+  **    meta[6]   Incremental-vacuum flag.
   **    meta[7]
   **    meta[8]
   **    meta[9]
@@ -53085,7 +53364,7 @@ static int sqlite3InitOne(sqlite3 *db, int iDb, char **pzErrMsg){
 ** bit is set in the flags field of the Db structure. If the database
 ** file was of zero-length, then the DB_Empty flag is also set.
 */
-static int sqlite3Init(sqlite3 *db, char **pzErrMsg){
+SQLITE_PRIVATE int sqlite3Init(sqlite3 *db, char **pzErrMsg){
   int i, rc;
   int called_initone = 0;
   
@@ -53127,7 +53406,7 @@ static int sqlite3Init(sqlite3 *db, char **pzErrMsg){
 ** This routine is a no-op if the database schema is already initialised.
 ** Otherwise, the schema is loaded. An error code is returned.
 */
-static int sqlite3ReadSchema(Parse *pParse){
+SQLITE_PRIVATE int sqlite3ReadSchema(Parse *pParse){
   int rc = SQLITE_OK;
   sqlite3 *db = pParse->db;
   if( !db->init.busy ){
@@ -53175,7 +53454,7 @@ static int schemaIsValid(sqlite3 *db){
 ** If the same database is attached more than once, the first
 ** attached database is returned.
 */
-static int sqlite3SchemaToIndex(sqlite3 *db, Schema *pSchema){
+SQLITE_PRIVATE int sqlite3SchemaToIndex(sqlite3 *db, Schema *pSchema){
   int i = -1000000;
 
   /* If pSchema is NULL, then return -1000000. This happens when code in 
@@ -53202,7 +53481,7 @@ static int sqlite3SchemaToIndex(sqlite3 *db, Schema *pSchema){
 /*
 ** Compile the UTF-8 encoded SQL statement zSql into a statement handle.
 */
-static int sqlite3Prepare(
+SQLITE_PRIVATE int sqlite3Prepare(
   sqlite3 *db,              /* Database handle. */
   const char *zSql,         /* UTF-8 encoded SQL statement. */
   int nBytes,               /* Length of zSql in bytes. */
@@ -53322,7 +53601,7 @@ static int sqlite3Prepare(
 ** Return true if the statement was recompiled successfully.
 ** Return false if there is an error of some kind.
 */
-static int sqlite3Reprepare(Vdbe *p){
+SQLITE_PRIVATE int sqlite3Reprepare(Vdbe *p){
   int rc;
   sqlite3_stmt *pNew;
   const char *zSql;
@@ -53356,7 +53635,7 @@ static int sqlite3Reprepare(Vdbe *p){
 ** and the statement is automatically recompiled if an schema change
 ** occurs.
 */
-int sqlite3_prepare(
+SQLITE_API int sqlite3_prepare(
   sqlite3 *db,              /* Database handle. */
   const char *zSql,         /* UTF-8 encoded SQL statement. */
   int nBytes,               /* Length of zSql in bytes. */
@@ -53425,7 +53704,7 @@ static int sqlite3Prepare16(
 ** and the statement is automatically recompiled if an schema change
 ** occurs.
 */
-int sqlite3_prepare16(
+SQLITE_API int sqlite3_prepare16(
   sqlite3 *db,              /* Database handle. */ 
   const void *zSql,         /* UTF-8 encoded SQL statement. */
   int nBytes,               /* Length of zSql in bytes. */
@@ -53462,7 +53741,7 @@ int sqlite3_prepare16_v2(
 ** This file contains C code routines that are called by the parser
 ** to handle SELECT statements in SQLite.
 **
-** $Id: select.c,v 1.351 2007/06/15 15:31:50 drh Exp $
+** $Id: select.c,v 1.354 2007/07/18 18:17:12 drh Exp $
 */
 
 
@@ -53487,7 +53766,7 @@ static void clearSelect(Select *p){
 ** Allocate a new Select structure and return a pointer to that
 ** structure.
 */
-static Select *sqlite3SelectNew(
+SQLITE_PRIVATE Select *sqlite3SelectNew(
   ExprList *pEList,     /* which columns to include in the result */
   SrcList *pSrc,        /* the FROM clause -- which tables to scan */
   Expr *pWhere,         /* the WHERE clause */
@@ -53535,7 +53814,7 @@ static Select *sqlite3SelectNew(
 /*
 ** Delete the given Select structure and all of its substructures.
 */
-static void sqlite3SelectDelete(Select *p){
+SQLITE_PRIVATE void sqlite3SelectDelete(Select *p){
   if( p ){
     clearSelect(p);
     sqliteFree(p);
@@ -53559,7 +53838,7 @@ static void sqlite3SelectDelete(Select *p){
 ** If an illegal or unsupported join type is seen, then still return
 ** a join type, but put an error in the pParse structure.
 */
-static int sqlite3JoinType(Parse *pParse, Token *pA, Token *pB, Token *pC){
+SQLITE_PRIVATE int sqlite3JoinType(Parse *pParse, Token *pA, Token *pB, Token *pC){
   int jointype = 0;
   Token *apAll[3];
   Token *p;
@@ -53635,9 +53914,23 @@ static void setToken(Token *p, const char *z){
 }
 
 /*
+** Set the token to the double-quoted and escaped version of the string pointed
+** to by z. For example;
+**
+**    {a"bc}  ->  {"a""bc"}
+*/
+static void setQuotedToken(Token *p, const char *z){
+  p->z = (u8 *)sqlite3MPrintf("\"%w\"", z);
+  p->dyn = 1;
+  if( p->z ){
+    p->n = strlen((char *)p->z);
+  }
+}
+
+/*
 ** Create an expression node for an identifier with the name of zName
 */
-static Expr *sqlite3CreateIdExpr(const char *zName){
+SQLITE_PRIVATE Expr *sqlite3CreateIdExpr(const char *zName){
   Token dummy;
   setToken(&dummy, zName);
   return sqlite3Expr(TK_ID, 0, 0, &dummy);
@@ -54506,7 +54799,7 @@ static int prepSelectStmt(Parse*, Select*);
 ** Given a SELECT statement, generate a Table structure that describes
 ** the result set of that SELECT.
 */
-static Table *sqlite3ResultSetOfSelect(Parse *pParse, char *zTabName, Select *pSelect){
+SQLITE_PRIVATE Table *sqlite3ResultSetOfSelect(Parse *pParse, char *zTabName, Select *pSelect){
   Table *pTab;
   int i, j;
   ExprList *pEList;
@@ -54769,6 +55062,15 @@ static int prepSelectStmt(Parse *pParse, Select *p){
             Expr *pExpr, *pRight;
             char *zName = pTab->aCol[j].zName;
 
+            /* If a column is marked as 'hidden' (currently only possible
+            ** for virtual tables), do not include it in the expanded
+            ** result-set list.
+            */
+            if( IsHiddenColumn(&pTab->aCol[j]) ){
+              assert(IsVirtual(pTab));
+              continue;
+            }
+
             if( i>0 ){
               struct SrcList_item *pLeft = &pTabList->a[i-1];
               if( (pLeft[1].jointype & JT_NATURAL)!=0 &&
@@ -54785,12 +55087,12 @@ static int prepSelectStmt(Parse *pParse, Select *p){
             }
             pRight = sqlite3Expr(TK_ID, 0, 0, 0);
             if( pRight==0 ) break;
-            setToken(&pRight->token, zName);
+            setQuotedToken(&pRight->token, zName);
             if( zTabName && (longNames || pTabList->nSrc>1) ){
               Expr *pLeft = sqlite3Expr(TK_ID, 0, 0, 0);
               pExpr = sqlite3Expr(TK_DOT, pLeft, pRight, 0);
               if( pExpr==0 ) break;
-              setToken(&pLeft->token, zTabName);
+              setQuotedToken(&pLeft->token, zTabName);
               setToken(&pExpr->span, sqlite3MPrintf("%s.%s", zTabName, zName));
               pExpr->span.dyn = 1;
               pExpr->token.z = 0;
@@ -54799,6 +55101,7 @@ static int prepSelectStmt(Parse *pParse, Select *p){
             }else{
               pExpr = pRight;
               pExpr->span = pExpr->token;
+              pExpr->span.dyn = 0;
             }
             if( longNames ){
               pNew = sqlite3ExprListAppend(pNew, pExpr, &pExpr->span);
@@ -54824,6 +55127,9 @@ static int prepSelectStmt(Parse *pParse, Select *p){
   if( p->pEList && p->pEList->nExpr>SQLITE_MAX_COLUMN ){
     sqlite3ErrorMsg(pParse, "too many columns in result set");
     rc = SQLITE_ERROR;
+  }
+  if( sqlite3MallocFailed() ){
+    rc = SQLITE_NOMEM;
   }
   return rc;
 }
@@ -54923,7 +55229,7 @@ static int matchOrderbyToColumn(
 ** Get a VDBE for the given parser context.  Create a new one if necessary.
 ** If an error occurs, return NULL and leave a message in pParse.
 */
-static Vdbe *sqlite3GetVdbe(Parse *pParse){
+SQLITE_PRIVATE Vdbe *sqlite3GetVdbe(Parse *pParse){
   Vdbe *v = pParse->pVdbe;
   if( v==0 ){
     v = pParse->pVdbe = sqlite3VdbeCreate(pParse->db);
@@ -55936,6 +56242,16 @@ static int simpleMinMaxQuery(Parse *pParse, Select *p, int eDest, int iParm){
       sqlite3VdbeAddOp(v, OP_MakeRecord, 1, 0);
       seekOp = OP_MoveGt;
     }
+    if( pIdx->aSortOrder[0]==SQLITE_SO_DESC ){
+      /* Ticket #2514: invert the seek operator if we are using
+      ** a descending index. */
+      if( seekOp==OP_Last ){
+        seekOp = OP_Rewind;
+      }else{
+        assert( seekOp==OP_MoveGt );
+        seekOp = OP_MoveLt;
+      }
+    }
     sqlite3VdbeAddOp(v, seekOp, iIdx, 0);
     sqlite3VdbeAddOp(v, OP_IdxRowid, iIdx, 0);
     sqlite3VdbeAddOp(v, OP_Close, iIdx, 0);
@@ -56008,7 +56324,7 @@ static int processOrderGroupBy(
 ** is a sub-select, then pOuterNC is a pointer to the NameContext 
 ** of the parent SELECT.
 */
-static int sqlite3SelectResolve(
+SQLITE_PRIVATE int sqlite3SelectResolve(
   Parse *pParse,         /* The parser context */
   Select *p,             /* The SELECT statement being coded. */
   NameContext *pOuterNC  /* The outer name context. May be NULL. */
@@ -56283,7 +56599,7 @@ static void updateAccumulator(Parse *pParse, AggInfo *pAggInfo){
 ** the second element in a three-way join, the parentTab parameter will
 ** be 1 (the 2nd value of a 0-indexed array.)
 */
-static int sqlite3Select(
+SQLITE_PRIVATE int sqlite3Select(
   Parse *pParse,         /* The parser context */
   Select *p,             /* The SELECT statement being coded. */
   int eDest,             /* How to dispose of the results */
@@ -56835,7 +57151,7 @@ select_end:
 ** code base.  Then are intended to be called from within the debugger
 ** or from temporary "printf" statements inserted for debugging.
 */
-static void sqlite3PrintExpr(Expr *p){
+SQLITE_PRIVATE void sqlite3PrintExpr(Expr *p){
   if( p->token.z && p->token.n>0 ){
     sqlite3DebugPrintf("(%.*s", p->token.n, p->token.z);
   }else{
@@ -56851,7 +57167,7 @@ static void sqlite3PrintExpr(Expr *p){
   }
   sqlite3DebugPrintf(")");
 }
-static void sqlite3PrintExprList(ExprList *pList){
+SQLITE_PRIVATE void sqlite3PrintExprList(ExprList *pList){
   int i;
   for(i=0; i<pList->nExpr; i++){
     sqlite3PrintExpr(pList->a[i].pExpr);
@@ -56860,7 +57176,7 @@ static void sqlite3PrintExprList(ExprList *pList){
     }
   }
 }
-static void sqlite3PrintSelect(Select *p, int indent){
+SQLITE_PRIVATE void sqlite3PrintSelect(Select *p, int indent){
   sqlite3DebugPrintf("%*sSELECT(%p) ", indent, "", p);
   sqlite3PrintExprList(p->pEList);
   sqlite3DebugPrintf("\n");
@@ -57134,7 +57450,7 @@ void sqlite3_free_table(
 /*
 ** Delete a linked list of TriggerStep structures.
 */
-static void sqlite3DeleteTriggerStep(TriggerStep *pTriggerStep){
+SQLITE_PRIVATE void sqlite3DeleteTriggerStep(TriggerStep *pTriggerStep){
   while( pTriggerStep ){
     TriggerStep * pTmp = pTriggerStep;
     pTriggerStep = pTriggerStep->pNext;
@@ -57157,7 +57473,7 @@ static void sqlite3DeleteTriggerStep(TriggerStep *pTriggerStep){
 ** sqlite3FinishTrigger() function is called to complete the trigger
 ** construction process.
 */
-static void sqlite3BeginTrigger(
+SQLITE_PRIVATE void sqlite3BeginTrigger(
   Parse *pParse,      /* The parse context of the CREATE TRIGGER statement */
   Token *pName1,      /* The name of the trigger */
   Token *pName2,      /* The name of the trigger */
@@ -57317,7 +57633,7 @@ trigger_cleanup:
 ** This routine is called after all of the trigger actions have been parsed
 ** in order to complete the process of building the trigger.
 */
-static void sqlite3FinishTrigger(
+SQLITE_PRIVATE void sqlite3FinishTrigger(
   Parse *pParse,          /* Parser context */
   TriggerStep *pStepList, /* The triggered program */
   Token *pAll             /* Token that describes the complete CREATE TRIGGER */
@@ -57443,7 +57759,7 @@ static void sqlitePersistTriggerStep(TriggerStep *p){
 ** The parser calls this routine when it finds a SELECT statement in
 ** body of a TRIGGER.  
 */
-static TriggerStep *sqlite3TriggerSelectStep(Select *pSelect){
+SQLITE_PRIVATE TriggerStep *sqlite3TriggerSelectStep(Select *pSelect){
   TriggerStep *pTriggerStep = sqliteMalloc(sizeof(TriggerStep));
   if( pTriggerStep==0 ) {
     sqlite3SelectDelete(pSelect);
@@ -57465,7 +57781,7 @@ static TriggerStep *sqlite3TriggerSelectStep(Select *pSelect){
 ** The parser calls this routine when it sees an INSERT inside the
 ** body of a trigger.
 */
-static TriggerStep *sqlite3TriggerInsertStep(
+SQLITE_PRIVATE TriggerStep *sqlite3TriggerInsertStep(
   Token *pTableName,  /* Name of the table into which we insert */
   IdList *pColumn,    /* List of columns in pTableName to insert into */
   ExprList *pEList,   /* The VALUE clause: a list of values to be inserted */
@@ -57499,7 +57815,7 @@ static TriggerStep *sqlite3TriggerInsertStep(
 ** a pointer to that trigger step.  The parser calls this routine when it
 ** sees an UPDATE statement inside the body of a CREATE TRIGGER.
 */
-static TriggerStep *sqlite3TriggerUpdateStep(
+SQLITE_PRIVATE TriggerStep *sqlite3TriggerUpdateStep(
   Token *pTableName,   /* Name of the table to be updated */
   ExprList *pEList,    /* The SET clause: list of column and new values */
   Expr *pWhere,        /* The WHERE clause */
@@ -57527,7 +57843,7 @@ static TriggerStep *sqlite3TriggerUpdateStep(
 ** a pointer to that trigger step.  The parser calls this routine when it
 ** sees a DELETE statement inside the body of a CREATE TRIGGER.
 */
-static TriggerStep *sqlite3TriggerDeleteStep(Token *pTableName, Expr *pWhere){
+SQLITE_PRIVATE TriggerStep *sqlite3TriggerDeleteStep(Token *pTableName, Expr *pWhere){
   TriggerStep *pTriggerStep = sqliteMalloc(sizeof(TriggerStep));
   if( pTriggerStep==0 ){
     sqlite3ExprDelete(pWhere);
@@ -57546,7 +57862,7 @@ static TriggerStep *sqlite3TriggerDeleteStep(Token *pTableName, Expr *pWhere){
 /* 
 ** Recursively delete a Trigger structure
 */
-static void sqlite3DeleteTrigger(Trigger *pTrigger){
+SQLITE_PRIVATE void sqlite3DeleteTrigger(Trigger *pTrigger){
   if( pTrigger==0 ) return;
   sqlite3DeleteTriggerStep(pTrigger->step_list);
   sqliteFree(pTrigger->name);
@@ -57565,7 +57881,7 @@ static void sqlite3DeleteTrigger(Trigger *pTrigger){
 ** same job as this routine except it takes a pointer to the trigger
 ** instead of the trigger name.
 **/
-static void sqlite3DropTrigger(Parse *pParse, SrcList *pName, int noErr){
+SQLITE_PRIVATE void sqlite3DropTrigger(Parse *pParse, SrcList *pName, int noErr){
   Trigger *pTrigger = 0;
   int i;
   const char *zDb;
@@ -57613,7 +57929,7 @@ static Table *tableOfTrigger(Trigger *pTrigger){
 /*
 ** Drop a trigger given a pointer to that trigger. 
 */
-static void sqlite3DropTriggerPtr(Parse *pParse, Trigger *pTrigger){
+SQLITE_PRIVATE void sqlite3DropTriggerPtr(Parse *pParse, Trigger *pTrigger){
   Table   *pTable;
   Vdbe *v;
   sqlite3 *db = pParse->db;
@@ -57667,7 +57983,7 @@ static void sqlite3DropTriggerPtr(Parse *pParse, Trigger *pTrigger){
 /*
 ** Remove a trigger from the hash tables of the sqlite* pointer.
 */
-static void sqlite3UnlinkAndDeleteTrigger(sqlite3 *db, int iDb, const char *zName){
+SQLITE_PRIVATE void sqlite3UnlinkAndDeleteTrigger(sqlite3 *db, int iDb, const char *zName){
   Trigger *pTrigger;
   int nName = strlen(zName);
   pTrigger = sqlite3HashInsert(&(db->aDb[iDb].pSchema->trigHash),
@@ -57720,7 +58036,7 @@ static int checkColumnOverLap(IdList *pIdList, ExprList *pEList){
 ** The returned bit vector is some combination of TRIGGER_BEFORE and
 ** TRIGGER_AFTER.
 */
-static int sqlite3TriggersExist(
+SQLITE_PRIVATE int sqlite3TriggersExist(
   Parse *pParse,          /* Used to check for recursive triggers */
   Table *pTab,            /* The table the contains the triggers */
   int op,                 /* one of TK_DELETE, TK_INSERT, TK_UPDATE */
@@ -57859,7 +58175,7 @@ static int codeTriggerProgram(
 **    trigger program(s).
 **
 */
-static int sqlite3CodeRowTrigger(
+SQLITE_PRIVATE int sqlite3CodeRowTrigger(
   Parse *pParse,       /* Parse context */
   int op,              /* One of TK_UPDATE, TK_INSERT, TK_DELETE */
   ExprList *pChanges,  /* Changes list for any UPDATE OF triggers */
@@ -57961,7 +58277,7 @@ static int sqlite3CodeRowTrigger(
 ** This file contains C code routines that are called by the parser
 ** to handle UPDATE statements.
 **
-** $Id: update.c,v 1.137 2007/03/29 05:51:49 drh Exp $
+** $Id: update.c,v 1.138 2007/06/25 16:29:34 danielk1977 Exp $
 */
 
 #ifndef SQLITE_OMIT_VIRTUALTABLE
@@ -58002,11 +58318,12 @@ static void updateVirtualTable(
 ** function is capable of transforming these types of expressions into
 ** sqlite3_value objects.
 */
-static void sqlite3ColumnDefault(Vdbe *v, Table *pTab, int i){
+SQLITE_PRIVATE void sqlite3ColumnDefault(Vdbe *v, Table *pTab, int i){
   if( pTab && !pTab->pSelect ){
     sqlite3_value *pValue;
     u8 enc = ENC(sqlite3VdbeDb(v));
     Column *pCol = &pTab->aCol[i];
+    assert( i<pTab->nCol );
     sqlite3ValueFromExpr(pCol->pDflt, enc, pCol->affinity, &pValue);
     if( pValue ){
       sqlite3VdbeChangeP3(v, -1, (const char *)pValue, P3_MEM);
@@ -58023,7 +58340,7 @@ static void sqlite3ColumnDefault(Vdbe *v, Table *pTab, int i){
 **          \_______/ \________/     \______/       \________________/
 *            onError   pTabList      pChanges             pWhere
 */
-static void sqlite3Update(
+SQLITE_PRIVATE void sqlite3Update(
   Parse *pParse,         /* The parser context */
   SrcList *pTabList,     /* The table in which we should change things */
   ExprList *pChanges,    /* Things to be changed */
@@ -58639,7 +58956,7 @@ static int execExecSql(sqlite3 *db, const char *zSql){
 ** with 2.0.0, SQLite no longer uses GDBM so this command has
 ** become a no-op.
 */
-static void sqlite3Vacuum(Parse *pParse){
+SQLITE_PRIVATE void sqlite3Vacuum(Parse *pParse){
   Vdbe *v = sqlite3GetVdbe(pParse);
   if( v ){
     sqlite3VdbeAddOp(v, OP_Vacuum, 0, 0);
@@ -58650,7 +58967,7 @@ static void sqlite3Vacuum(Parse *pParse){
 /*
 ** This routine implements the OP_Vacuum opcode of the VDBE.
 */
-static int sqlite3RunVacuum(char **pzErrMsg, sqlite3 *db){
+SQLITE_PRIVATE int sqlite3RunVacuum(char **pzErrMsg, sqlite3 *db){
   int rc = SQLITE_OK;     /* Return code from service routines */
   Btree *pMain;           /* The database being vacuumed */
   Btree *pTemp;           /* The temporary database we vacuum into */
@@ -58850,9 +59167,36 @@ end_of_vacuum:
 *************************************************************************
 ** This file contains code used to help implement virtual tables.
 **
-** $Id: vtab.c,v 1.46 2007/05/04 13:15:57 drh Exp $
+** $Id: vtab.c,v 1.48 2007/06/26 10:38:55 danielk1977 Exp $
 */
 #ifndef SQLITE_OMIT_VIRTUALTABLE
+
+static int createModule(
+  sqlite3 *db,                    /* Database in which module is registered */
+  const char *zName,              /* Name assigned to this module */
+  const sqlite3_module *pModule,  /* The definition of the module */
+  void *pAux,                     /* Context pointer for xCreate/xConnect */
+  void (*xDestroy)(void *)        /* Module destructor function */
+) {
+  int nName = strlen(zName);
+  Module *pMod = (Module *)sqliteMallocRaw(sizeof(Module) + nName + 1);
+  if( pMod ){
+    char *zCopy = (char *)(&pMod[1]);
+    memcpy(zCopy, zName, nName+1);
+    pMod->zName = zCopy;
+    pMod->pModule = pModule;
+    pMod->pAux = pAux;
+    pMod->xDestroy = xDestroy;
+    pMod = (Module *)sqlite3HashInsert(&db->aModule, zCopy, nName, (void*)pMod);
+    if( pMod && pMod->xDestroy ){
+      pMod->xDestroy(pMod->pAux);
+    }
+    sqliteFree(pMod);
+    sqlite3ResetInternalSchema(db, 0);
+  }
+  return sqlite3ApiExit(db, SQLITE_OK);
+}
+
 
 /*
 ** External API function used to create a new virtual-table module.
@@ -58863,19 +59207,20 @@ int sqlite3_create_module(
   const sqlite3_module *pModule,  /* The definition of the module */
   void *pAux                      /* Context pointer for xCreate/xConnect */
 ){
-  int nName = strlen(zName);
-  Module *pMod = (Module *)sqliteMallocRaw(sizeof(Module) + nName + 1);
-  if( pMod ){
-    char *zCopy = (char *)(&pMod[1]);
-    memcpy(zCopy, zName, nName+1);
-    pMod->zName = zCopy;
-    pMod->pModule = pModule;
-    pMod->pAux = pAux;
-    pMod = (Module *)sqlite3HashInsert(&db->aModule, zCopy, nName, (void*)pMod);
-    sqliteFree(pMod);
-    sqlite3ResetInternalSchema(db, 0);
-  }
-  return sqlite3ApiExit(db, SQLITE_OK);
+  return createModule(db, zName, pModule, pAux, 0);
+}
+
+/*
+** External API function used to create a new virtual-table module.
+*/
+int sqlite3_create_module_v2(
+  sqlite3 *db,                    /* Database in which module is registered */
+  const char *zName,              /* Name assigned to this module */
+  const sqlite3_module *pModule,  /* The definition of the module */
+  void *pAux,                     /* Context pointer for xCreate/xConnect */
+  void (*xDestroy)(void *)        /* Module destructor function */
+){
+  return createModule(db, zName, pModule, pAux, xDestroy);
 }
 
 /*
@@ -58886,7 +59231,7 @@ int sqlite3_create_module(
 ** If a disconnect is attempted while a virtual table is locked,
 ** the disconnect is deferred until all locks have been removed.
 */
-static void sqlite3VtabLock(sqlite3_vtab *pVtab){
+SQLITE_PRIVATE void sqlite3VtabLock(sqlite3_vtab *pVtab){
   pVtab->nRef++;
 }
 
@@ -58894,7 +59239,7 @@ static void sqlite3VtabLock(sqlite3_vtab *pVtab){
 ** Unlock a virtual table.  When the last lock is removed,
 ** disconnect the virtual table.
 */
-static void sqlite3VtabUnlock(sqlite3 *db, sqlite3_vtab *pVtab){
+SQLITE_PRIVATE void sqlite3VtabUnlock(sqlite3 *db, sqlite3_vtab *pVtab){
   pVtab->nRef--;
   assert(db);
   assert(!sqlite3SafetyCheck(db));
@@ -58914,7 +59259,7 @@ static void sqlite3VtabUnlock(sqlite3 *db, sqlite3_vtab *pVtab){
 ** This routine is called, for example, just before deleting the Table
 ** record.
 */
-static void sqlite3VtabClear(Table *p){
+SQLITE_PRIVATE void sqlite3VtabClear(Table *p){
   sqlite3_vtab *pVtab = p->pVtab;
   if( pVtab ){
     assert( p->pMod && p->pMod->pModule );
@@ -58961,7 +59306,7 @@ static void addModuleArgument(Table *pTable, char *zArg){
 ** statement.  The module name has been parsed, but the optional list
 ** of parameters that follow the module name are still pending.
 */
-static void sqlite3VtabBeginParse(
+SQLITE_PRIVATE void sqlite3VtabBeginParse(
   Parse *pParse,        /* Parsing context */
   Token *pName1,        /* Name of new table, or database name */
   Token *pName2,        /* Name of new table or NULL */
@@ -59022,7 +59367,7 @@ static void addArgumentToVtab(Parse *pParse){
 ** The parser calls this routine after the CREATE VIRTUAL TABLE statement
 ** has been completely parsed.
 */
-static void sqlite3VtabFinishParse(Parse *pParse, Token *pEnd){
+SQLITE_PRIVATE void sqlite3VtabFinishParse(Parse *pParse, Token *pEnd){
   Table *pTab;        /* The table being constructed */
   sqlite3 *db;        /* The database connection */
   char *zModule;      /* The module name of the table: USING modulename */
@@ -59110,7 +59455,7 @@ static void sqlite3VtabFinishParse(Parse *pParse, Token *pEnd){
 ** The parser calls this routine when it sees the first token
 ** of an argument to the module name in a CREATE VIRTUAL TABLE statement.
 */
-static void sqlite3VtabArgInit(Parse *pParse){
+SQLITE_PRIVATE void sqlite3VtabArgInit(Parse *pParse){
   addArgumentToVtab(pParse);
   pParse->sArg.z = 0;
   pParse->sArg.n = 0;
@@ -59120,7 +59465,7 @@ static void sqlite3VtabArgInit(Parse *pParse){
 ** The parser calls this routine for each token after the first token
 ** in an argument to the module name in a CREATE VIRTUAL TABLE statement.
 */
-static void sqlite3VtabArgExtend(Parse *pParse, Token *p){
+SQLITE_PRIVATE void sqlite3VtabArgExtend(Parse *pParse, Token *p){
   Token *pArg = &pParse->sArg;
   if( pArg->z==0 ){
     pArg->z = p->z;
@@ -59186,6 +59531,44 @@ static int vtabCallConstructor(
   }
   db->pVTab = 0;
   sqliteFree(zModuleName);
+
+  /* If everything went according to plan, loop through the columns
+  ** of the table to see if any of them contain the token "hidden".
+  ** If so, set the Column.isHidden flag and remove the token from
+  ** the type string.
+  */
+  if( rc==SQLITE_OK ){
+    int iCol;
+    for(iCol=0; iCol<pTab->nCol; iCol++){
+      char *zType = pTab->aCol[iCol].zType;
+      int nType;
+      int i = 0;
+      if( !zType ) continue;
+      nType = strlen(zType);
+      if( sqlite3StrNICmp("hidden", zType, 6) || (zType[6] && zType[6]!=' ') ){
+        for(i=0; i<nType; i++){
+          if( (0==sqlite3StrNICmp(" hidden", &zType[i], 7))
+           && (zType[i+7]=='\0' || zType[i+7]==' ')
+          ){
+            i++;
+            break;
+          }
+        }
+      }
+      if( i<nType ){
+        int j;
+        int nDel = 6 + (zType[i+6] ? 1 : 0);
+        for(j=i; (j+nDel)<=nType; j++){
+          zType[j] = zType[j+nDel];
+        }
+        if( zType[i]=='\0' && i>0 ){
+          assert(zType[i-1]==' ');
+          zType[i-1] = '\0';
+        }
+        pTab->aCol[iCol].isHidden = 1;
+      }
+    }
+  }
   return rc;
 }
 
@@ -59196,7 +59579,7 @@ static int vtabCallConstructor(
 **
 ** This call is a no-op if table pTab is not a virtual table.
 */
-static int sqlite3VtabCallConnect(Parse *pParse, Table *pTab){
+SQLITE_PRIVATE int sqlite3VtabCallConnect(Parse *pParse, Table *pTab){
   Module *pMod;
   int rc = SQLITE_OK;
 
@@ -59254,7 +59637,7 @@ static int addToVTrans(sqlite3 *db, sqlite3_vtab *pVtab){
 ** description of the error and an SQLITE_XXX error code is returned.
 ** In this case the caller must call sqliteFree() on *pzErr.
 */
-static int sqlite3VtabCallCreate(sqlite3 *db, int iDb, const char *zTab, char **pzErr){
+SQLITE_PRIVATE int sqlite3VtabCallCreate(sqlite3 *db, int iDb, const char *zTab, char **pzErr){
   int rc = SQLITE_OK;
   Table *pTab;
   Module *pMod;
@@ -59338,7 +59721,7 @@ int sqlite3_declare_vtab(sqlite3 *db, const char *zCreateTable){
 **
 ** This call is a no-op if zTab is not a virtual table.
 */
-static int sqlite3VtabCallDestroy(sqlite3 *db, int iDb, const char *zTab)
+SQLITE_PRIVATE int sqlite3VtabCallDestroy(sqlite3 *db, int iDb, const char *zTab)
 {
   int rc = SQLITE_OK;
   Table *pTab;
@@ -59391,7 +59774,7 @@ static void callFinaliser(sqlite3 *db, int offset){
 ** sqlite3.aVTrans array. Return the error code for the first error 
 ** that occurs, or SQLITE_OK if all xSync operations are successful.
 */
-static int sqlite3VtabSync(sqlite3 *db, int rc2){
+SQLITE_PRIVATE int sqlite3VtabSync(sqlite3 *db, int rc2){
   int i;
   int rc = SQLITE_OK;
   int rcsafety;
@@ -59421,7 +59804,7 @@ static int sqlite3VtabSync(sqlite3 *db, int rc2){
 ** Invoke the xRollback method of all virtual tables in the 
 ** sqlite3.aVTrans array. Then clear the array itself.
 */
-static int sqlite3VtabRollback(sqlite3 *db){
+SQLITE_PRIVATE int sqlite3VtabRollback(sqlite3 *db){
   callFinaliser(db, (int)(&((sqlite3_module *)0)->xRollback));
   return SQLITE_OK;
 }
@@ -59430,7 +59813,7 @@ static int sqlite3VtabRollback(sqlite3 *db){
 ** Invoke the xCommit method of all virtual tables in the 
 ** sqlite3.aVTrans array. Then clear the array itself.
 */
-static int sqlite3VtabCommit(sqlite3 *db){
+SQLITE_PRIVATE int sqlite3VtabCommit(sqlite3 *db){
   callFinaliser(db, (int)(&((sqlite3_module *)0)->xCommit));
   return SQLITE_OK;
 }
@@ -59443,7 +59826,7 @@ static int sqlite3VtabCommit(sqlite3 *db){
 ** If the xBegin call is successful, place the sqlite3_vtab pointer
 ** in the sqlite3.aVTrans array.
 */
-static int sqlite3VtabBegin(sqlite3 *db, sqlite3_vtab *pVtab){
+SQLITE_PRIVATE int sqlite3VtabBegin(sqlite3 *db, sqlite3_vtab *pVtab){
   int rc = SQLITE_OK;
   const sqlite3_module *pModule;
 
@@ -59495,7 +59878,7 @@ static int sqlite3VtabBegin(sqlite3 *db, sqlite3_vtab *pVtab){
 ** new FuncDef structure that is marked as ephemeral using the
 ** SQLITE_FUNC_EPHEM flag.
 */
-static FuncDef *sqlite3VtabOverloadFunction(
+SQLITE_PRIVATE FuncDef *sqlite3VtabOverloadFunction(
   FuncDef *pDef,  /* Function to possibly overload */
   int nArg,       /* Number of arguments to the function */
   Expr *pExpr     /* First argument to the function */
@@ -61494,7 +61877,7 @@ static void whereInfoFree(WhereInfo *pWInfo){
 ** If the where clause loops cannot be arranged to provide the correct
 ** output order, then the *ppOrderBy is unchanged.
 */
-static WhereInfo *sqlite3WhereBegin(
+SQLITE_PRIVATE WhereInfo *sqlite3WhereBegin(
   Parse *pParse,        /* The parser context */
   SrcList *pTabList,    /* A list of all tables to be scanned */
   Expr *pWhere,         /* The WHERE clause */
@@ -62211,7 +62594,7 @@ whereBeginNoMem:
 ** Generate the end of the WHERE loop.  See comments on 
 ** sqlite3WhereBegin() for additional information.
 */
-static void sqlite3WhereEnd(WhereInfo *pWInfo){
+SQLITE_PRIVATE void sqlite3WhereEnd(WhereInfo *pWInfo){
   Vdbe *v = pWInfo->pParse->pVdbe;
   int i;
   WhereLevel *pLevel;
@@ -62489,402 +62872,402 @@ typedef union {
 **  yy_default[]       Default action for each state.
 */
 static const YYACTIONTYPE yy_action[] = {
- /*     0 */   289,  898,  121,  585,  405,  169,    2,  435,   61,   61,
+ /*     0 */   290,  898,  122,  585,  407,  170,    2,  437,   61,   61,
  /*    10 */    61,   61,  517,   63,   63,   63,   63,   64,   64,   65,
- /*    20 */    65,   65,   66,  230,  387,  384,  420,  426,   68,   63,
- /*    30 */    63,   63,   63,   64,   64,   65,   65,   65,   66,  230,
- /*    40 */   443,  208,  392,  447,   60,   59,  294,  430,  431,  427,
- /*    50 */   427,   62,   62,   61,   61,   61,   61,  205,   63,   63,
- /*    60 */    63,   63,   64,   64,   65,   65,   65,   66,  230,  289,
- /*    70 */   368,  316,  435,  487,  205,   80,   67,  415,   69,  151,
+ /*    20 */    65,   65,   66,  231,  445,  209,  422,  428,   68,   63,
+ /*    30 */    63,   63,   63,   64,   64,   65,   65,   65,   66,  231,
+ /*    40 */   389,  386,  394,  449,   60,   59,  295,  432,  433,  429,
+ /*    50 */   429,   62,   62,   61,   61,   61,   61,  261,   63,   63,
+ /*    60 */    63,   63,   64,   64,   65,   65,   65,   66,  231,  290,
+ /*    70 */   491,  492,  437,  487,  206,   81,   67,  417,   69,  152,
  /*    80 */    63,   63,   63,   63,   64,   64,   65,   65,   65,   66,
- /*    90 */   230,  515,  162,  410,   35,  420,  426,  443,  571,   58,
- /*   100 */    64,   64,   65,   65,   65,   66,  230,  393,  394,  417,
- /*   110 */   417,  417,  289,   60,   59,  294,  430,  431,  427,  427,
- /*   120 */    62,   62,   61,   61,   61,   61,  302,   63,   63,   63,
- /*   130 */    63,   64,   64,   65,   65,   65,   66,  230,  420,  426,
- /*   140 */    92,   65,   65,   65,   66,  230,  392,  456,  472,   67,
- /*   150 */    56,   69,  151,  169,  406,  435,   60,   59,  294,  430,
- /*   160 */   431,  427,  427,   62,   62,   61,   61,   61,   61,  247,
+ /*    90 */   231,   67,  460,   69,  152,  422,  428,  571,  262,   58,
+ /*   100 */    64,   64,   65,   65,   65,   66,  231,  395,  396,  419,
+ /*   110 */   419,  419,  290,   60,   59,  295,  432,  433,  429,  429,
+ /*   120 */    62,   62,   61,   61,   61,   61,  315,   63,   63,   63,
+ /*   130 */    63,   64,   64,   65,   65,   65,   66,  231,  422,  428,
+ /*   140 */    93,   65,   65,   65,   66,  231,  394,  231,  412,   34,
+ /*   150 */    56,  296,  440,  441,  408,  486,   60,   59,  295,  432,
+ /*   160 */   433,  429,  429,   62,   62,   61,   61,   61,   61,  488,
  /*   170 */    63,   63,   63,   63,   64,   64,   65,   65,   65,   66,
- /*   180 */   230,  289,  569,  522,  292,  620,  111,  478,  515,  447,
- /*   190 */   230,  316,  403,   21,   67,  460,   69,  151,   66,  230,
- /*   200 */   568,  443,  208,   67,  224,   69,  151,  420,  426,  146,
- /*   210 */   147,  393,  394,  410,   41,  386,  148,  531,    2,  487,
- /*   220 */   435,  566,  232,  415,  289,   60,   59,  294,  430,  431,
- /*   230 */   427,  427,   62,   62,   61,   61,   61,   61,  316,   63,
- /*   240 */    63,   63,   63,   64,   64,   65,   65,   65,   66,  230,
- /*   250 */   420,  426,  486,  330,  211,  417,  417,  417,  359,  270,
- /*   260 */   410,   41,  378,  207,  362,  542,  245,  289,   60,   59,
- /*   270 */   294,  430,  431,  427,  427,   62,   62,   61,   61,   61,
- /*   280 */    61,  392,   63,   63,   63,   63,   64,   64,   65,   65,
- /*   290 */    65,   66,  230,  420,  426,  260,  299,  273,  522,  271,
- /*   300 */   522,  210,  370,  319,  223,  433,  433,  532,   21,  576,
- /*   310 */    21,   60,   59,  294,  430,  431,  427,  427,   62,   62,
- /*   320 */    61,   61,   61,   61,  191,   63,   63,   63,   63,   64,
- /*   330 */    64,   65,   65,   65,   66,  230,  261,  316,  239,   76,
- /*   340 */   289,  544,  299,  149,  482,  150,  393,  394,  178,  240,
- /*   350 */   569,  341,  344,  345,  404,  520,  445,  322,  165,  410,
- /*   360 */    28,  540,  346,  517,  248,  539,  420,  426,  568,  567,
- /*   370 */   161,  115,  238,  339,  243,  340,  173,  358,  272,  411,
- /*   380 */   821,  488,   79,  249,   60,   59,  294,  430,  431,  427,
- /*   390 */   427,   62,   62,   61,   61,   61,   61,  530,   63,   63,
- /*   400 */    63,   63,   64,   64,   65,   65,   65,   66,  230,  289,
- /*   410 */   248,  178,  465,  485,  341,  344,  345,  115,  238,  339,
- /*   420 */   243,  340,  173,   82,  316,  346,  316,  491,  492,  249,
- /*   430 */   565,  207,  152,  523,  489,  420,  426,  178,  529,  503,
- /*   440 */   341,  344,  345,  407,  472,  528,  410,   35,  410,   35,
- /*   450 */   171,  346,  198,   60,   59,  294,  430,  431,  427,  427,
- /*   460 */    62,   62,   61,   61,   61,   61,  411,   63,   63,   63,
- /*   470 */    63,   64,   64,   65,   65,   65,   66,  230,  289,  548,
- /*   480 */   579,  288,  502,  234,  411,  316,  411,  316,  296,  283,
- /*   490 */   298,  316,  445,  521,  165,  476,  172,  157,  421,  422,
- /*   500 */   457,  335,  457,  144,  420,  426,  366,  410,   35,  410,
- /*   510 */    36,  435,    1,  410,   49,  327,  392,  547,  193,  424,
- /*   520 */   425,  156,   60,   59,  294,  430,  431,  427,  427,   62,
- /*   530 */    62,   61,   61,   61,   61,  333,   63,   63,   63,   63,
- /*   540 */    64,   64,   65,   65,   65,   66,  230,  289,  423,  332,
- /*   550 */   452,  252,  411,  295,  438,  439,  297,  316,  349,  307,
- /*   560 */   231,  457,  453,  321,  438,  439,  392,  369,  266,  265,
- /*   570 */   189,  217,  392,  420,  426,  454,  435,  493,  205,  410,
- /*   580 */    49,  393,  394,  583,  889,  174,  889,  494,  545,  492,
- /*   590 */   392,   60,   59,  294,  430,  431,  427,  427,   62,   62,
- /*   600 */    61,   61,   61,   61,  411,   63,   63,   63,   63,   64,
- /*   610 */    64,   65,   65,   65,   66,  230,  289,  207,  586,  387,
- /*   620 */   384,   91,   10,  580,  336,  308,  392,  207,  367,  480,
- /*   630 */   316,  393,  394,  583,  888,  219,  888,  393,  394,  476,
- /*   640 */   291,  233,  420,  426,  481,  249,  410,    3,  434,  260,
- /*   650 */   317,  363,  410,   29,  448,  393,  394,  468,  260,  289,
- /*   660 */    60,   59,  294,  430,  431,  427,  427,   62,   62,   61,
- /*   670 */    61,   61,   61,  580,   63,   63,   63,   63,   64,   64,
- /*   680 */    65,   65,   65,   66,  230,  420,  426,  391,  312,  388,
- /*   690 */   555,  393,  394,   75,  204,   77,  395,  396,  397,  557,
- /*   700 */   357,  197,  289,   60,   59,  294,  430,  431,  427,  427,
- /*   710 */    62,   62,   61,   61,   61,   61,  316,   63,   63,   63,
- /*   720 */    63,   64,   64,   65,   65,   65,   66,  230,  420,  426,
- /*   730 */   319,  116,  433,  433,  319,  411,  433,  433,  410,   24,
- /*   740 */   319,  515,  433,  433,  515,  289,   60,   70,  294,  430,
- /*   750 */   431,  427,  427,   62,   62,   61,   61,   61,   61,  375,
+ /*   180 */   231,  290,  255,  522,  293,  569,  112,  406,  520,  449,
+ /*   190 */   329,  315,  405,   20,  437,  338,  517,  394,  530,  529,
+ /*   200 */   503,  445,  209,  568,  567,  206,  528,  422,  428,  147,
+ /*   210 */   148,  395,  396,  412,   41,  208,  149,  531,  370,  487,
+ /*   220 */   259,  566,  257,  417,  290,   60,   59,  295,  432,  433,
+ /*   230 */   429,  429,   62,   62,   61,   61,   61,   61,  315,   63,
+ /*   240 */    63,   63,   63,   64,   64,   65,   65,   65,   66,  231,
+ /*   250 */   422,  428,  445,  331,  212,  419,  419,  419,  361,  437,
+ /*   260 */   412,   41,  395,  396,  364,  565,  208,  290,   60,   59,
+ /*   270 */   295,  432,  433,  429,  429,   62,   62,   61,   61,   61,
+ /*   280 */    61,  394,   63,   63,   63,   63,   64,   64,   65,   65,
+ /*   290 */    65,   66,  231,  422,  428,  489,  298,  522,  472,   66,
+ /*   300 */   231,  211,  472,  224,  409,  284,  532,   20,  447,  521,
+ /*   310 */   166,   60,   59,  295,  432,  433,  429,  429,   62,   62,
+ /*   320 */    61,   61,   61,   61,  472,   63,   63,   63,   63,   64,
+ /*   330 */    64,   65,   65,   65,   66,  231,  207,  478,  315,   76,
+ /*   340 */   290,  235,  298,   55,  482,  225,  395,  396,  179,  545,
+ /*   350 */   492,  343,  346,  347,   67,  150,   69,  152,  337,  522,
+ /*   360 */   412,   35,  348,  237,  249,  368,  422,  428,  576,   20,
+ /*   370 */   162,  116,  239,  341,  244,  342,  174,  320,  440,  441,
+ /*   380 */   412,    3,   79,  250,   60,   59,  295,  432,  433,  429,
+ /*   390 */   429,   62,   62,   61,   61,   61,   61,  172,   63,   63,
+ /*   400 */    63,   63,   64,   64,   65,   65,   65,   66,  231,  290,
+ /*   410 */   249,  548,  232,  485,  508,  351,  315,  116,  239,  341,
+ /*   420 */   244,  342,  174,  179,  315,  523,  343,  346,  347,  250,
+ /*   430 */   218,  413,  153,  462,  509,  422,  428,  348,  412,   34,
+ /*   440 */   463,  208,  175,  173,  158,  233,  412,   34,  336,  547,
+ /*   450 */   447,  321,  166,   60,   59,  295,  432,  433,  429,  429,
+ /*   460 */    62,   62,   61,   61,   61,   61,  413,   63,   63,   63,
+ /*   470 */    63,   64,   64,   65,   65,   65,   66,  231,  290,  540,
+ /*   480 */   333,  515,  502,  539,  454,  569,  300,   19,  329,  142,
+ /*   490 */   315,  388,  315,  328,    2,  360,  455,  292,  481,  371,
+ /*   500 */   267,  266,  250,  568,  422,  428,  586,  389,  386,  456,
+ /*   510 */   206,  493,  412,   49,  412,   49,  301,  583,  889,  157,
+ /*   520 */   889,  494,   60,   59,  295,  432,  433,  429,  429,   62,
+ /*   530 */    62,   61,   61,   61,   61,  199,   63,   63,   63,   63,
+ /*   540 */    64,   64,   65,   65,   65,   66,  231,  290,  315,  179,
+ /*   550 */   436,  253,  343,  346,  347,  368,  151,  580,  306,  248,
+ /*   560 */   307,  450,   75,  348,   77,  380,  208,  423,  424,  413,
+ /*   570 */   412,   27,  317,  422,  428,  438,    1,   22,  583,  888,
+ /*   580 */   394,  888,  542,  476,  318,  261,  435,  435,  426,  427,
+ /*   590 */   413,   60,   59,  295,  432,  433,  429,  429,   62,   62,
+ /*   600 */    61,   61,   61,   61,  326,   63,   63,   63,   63,   64,
+ /*   610 */    64,   65,   65,   65,   66,  231,  290,  425,  580,  372,
+ /*   620 */   219,   92,  515,    9,  334,  394,  555,  394,  454,   67,
+ /*   630 */   394,   69,  152,  397,  398,  399,  318,  234,  435,  435,
+ /*   640 */   455,  316,  422,  428,  297,  395,  396,  318,  430,  435,
+ /*   650 */   435,  579,  289,  456,  220,  325,    5,  217,  544,  290,
+ /*   660 */    60,   59,  295,  432,  433,  429,  429,   62,   62,   61,
+ /*   670 */    61,   61,   61,  393,   63,   63,   63,   63,   64,   64,
+ /*   680 */    65,   65,   65,   66,  231,  422,  428,  480,  311,  390,
+ /*   690 */   395,  396,  395,  396,  205,  395,  396,  821,  271,  515,
+ /*   700 */   248,  198,  290,   60,   59,  295,  432,  433,  429,  429,
+ /*   710 */    62,   62,   61,   61,   61,   61,  468,   63,   63,   63,
+ /*   720 */    63,   64,   64,   65,   65,   65,   66,  231,  422,  428,
+ /*   730 */   169,  158,  261,  261,  302,  413,  274,  117,  272,  261,
+ /*   740 */   515,  515,  261,  515,  190,  290,   60,   70,  295,  432,
+ /*   750 */   433,  429,  429,   62,   62,   61,   61,   61,   61,  377,
  /*   760 */    63,   63,   63,   63,   64,   64,   65,   65,   65,   66,
- /*   770 */   230,  420,  426,  538,  356,  538,  216,  260,  472,  303,
- /*   780 */   175,  176,  177,  254,  476,  515,  260,  383,  289,    5,
- /*   790 */    59,  294,  430,  431,  427,  427,   62,   62,   61,   61,
- /*   800 */    61,   61,  316,   63,   63,   63,   63,   64,   64,   65,
- /*   810 */    65,   65,   66,  230,  420,  426,  392,  236,  380,  247,
- /*   820 */   304,  258,  247,  256,  410,   33,  260,  558,  125,  467,
- /*   830 */   515,  416,  168,  157,  294,  430,  431,  427,  427,   62,
- /*   840 */    62,   61,   61,   61,   61,  306,   63,   63,   63,   63,
- /*   850 */    64,   64,   65,   65,   65,   66,  230,   72,  323,  452,
- /*   860 */     4,  153,   22,  247,  293,  305,  435,  559,  316,  382,
- /*   870 */   316,  453,  320,   72,  323,  316,    4,  366,  316,  180,
- /*   880 */   293,  393,  394,   20,  454,  141,  326,  316,  320,  325,
- /*   890 */   410,   53,  410,   52,  316,  411,  155,  410,   96,  447,
- /*   900 */   410,   94,  316,  500,  316,  325,  328,  469,  247,  410,
- /*   910 */    99,  444,  260,  411,  318,  447,  410,  100,  316,   74,
- /*   920 */    73,  467,  183,  260,  410,  110,  410,  112,   72,  314,
- /*   930 */   315,  435,  337,  415,  458,   74,   73,  479,  316,  377,
- /*   940 */   410,   17,  218,   19,   72,  314,  315,   72,  323,  415,
- /*   950 */     4,  205,  316,  274,  293,  316,  411,  466,  205,  409,
- /*   960 */   410,   97,  320,  408,  374,  417,  417,  417,  418,  419,
- /*   970 */    12,  376,  316,  206,  410,   34,  174,  410,   95,  325,
- /*   980 */    55,  417,  417,  417,  418,  419,   12,  310,  120,  447,
- /*   990 */   428,  159,    9,  260,  410,   25,  220,  221,  222,  102,
- /*  1000 */   441,  441,  316,  471,  409,  316,  475,  316,  408,   74,
- /*  1010 */    73,  436,  202,   23,  278,  455,  244,   13,   72,  314,
- /*  1020 */   315,  279,  316,  415,  410,   54,  316,  410,  113,  410,
- /*  1030 */   114,  291,  581,  200,  276,  547,  462,  497,  498,  199,
- /*  1040 */   316,  504,  201,  463,  410,   26,  316,  524,  410,   37,
- /*  1050 */   316,  474,  316,  170,  253,  417,  417,  417,  418,  419,
- /*  1060 */    12,  505,  410,   38,  510,  483,  316,   13,  410,   27,
- /*  1070 */   508,  582,  410,   39,  410,   40,  316,  255,  507,  506,
- /*  1080 */   512,  316,  125,  316,  511,  373,  275,  265,  410,   42,
- /*  1090 */   509,  290,  316,  251,  316,  125,  205,  257,  410,   43,
- /*  1100 */   316,  259,  316,  410,   44,  410,   30,  348,  316,  125,
- /*  1110 */   316,  353,  186,  316,  410,   31,  410,   45,  316,  543,
- /*  1120 */   379,  125,  410,   46,  410,   47,  316,  551,  264,  170,
- /*  1130 */   410,   48,  410,   32,  401,  410,   11,  552,  440,   89,
- /*  1140 */   410,   50,  301,  562,  578,   89,  287,  361,  410,   51,
- /*  1150 */   364,  365,  267,  268,  269,  554,  143,  564,  277,  324,
- /*  1160 */   280,  281,  575,  225,  442,  461,  464,  503,  241,  513,
- /*  1170 */   516,  550,  343,  160,  561,  390,    8,  313,  398,  399,
- /*  1180 */   400,  412,   82,  226,  331,  329,   81,  406,   57,   78,
- /*  1190 */   209,  167,   83,  459,  122,  414,  227,  334,  228,  338,
- /*  1200 */   300,  500,  103,  496,  246,  519,  514,  490,  495,  242,
- /*  1210 */   214,  518,  499,  229,  501,  413,  350,  533,  284,  525,
- /*  1220 */   526,  527,  235,  181,  473,  237,  285,  477,  182,  354,
- /*  1230 */   352,  184,   86,  185,  118,  535,  187,  546,  360,  190,
- /*  1240 */   129,  553,  139,  371,  372,  130,  215,  309,  560,  131,
- /*  1250 */   132,  133,  572,  577,  135,  573,   98,  574,  389,  262,
- /*  1260 */   402,  621,  536,  213,  101,  622,  432,  163,  164,  429,
- /*  1270 */   138,   71,  449,  437,  446,  140,  470,  154,    6,  450,
- /*  1280 */     7,  158,  166,  451,   14,  123,   13,  124,  484,  212,
- /*  1290 */    84,  342,  104,  105,   90,  250,   85,  117,  106,  347,
- /*  1300 */   179,  240,  351,  142,  534,  126,   18,  170,   93,  263,
- /*  1310 */   188,  107,  355,  286,  109,  127,  549,  541,  128,  119,
- /*  1320 */   537,  192,   15,  194,  195,  136,  196,  134,  556,  563,
- /*  1330 */   311,  137,   16,  108,  570,  203,  145,  385,  381,  282,
- /*  1340 */   584,  899,  899,  899,  899,  899,   87,  899,   88,
+ /*   770 */   231,  422,  428,  382,  557,  303,  304,  248,  413,  318,
+ /*   780 */   558,  435,  435,  559,  538,  358,  538,  385,  290,  194,
+ /*   790 */    59,  295,  432,  433,  429,  429,   62,   62,   61,   61,
+ /*   800 */    61,   61,  369,   63,   63,   63,   63,   64,   64,   65,
+ /*   810 */    65,   65,   66,  231,  422,  428,  394,  273,  248,  248,
+ /*   820 */   170,  246,  437,  413,  384,  365,  176,  177,  178,  467,
+ /*   830 */   309,  121,  154,  126,  295,  432,  433,  429,  429,   62,
+ /*   840 */    62,   61,   61,   61,   61,  315,   63,   63,   63,   63,
+ /*   850 */    64,   64,   65,   65,   65,   66,  231,   72,  322,  175,
+ /*   860 */     4,  315,  261,  315,  294,  261,  413,  412,   28,  315,
+ /*   870 */   261,  315,  319,   72,  322,  315,    4,  418,  443,  443,
+ /*   880 */   294,  395,  396,  412,   23,  412,   32,  437,  319,  324,
+ /*   890 */   327,  412,   53,  412,   52,  315,  156,  412,   97,  449,
+ /*   900 */   315,  192,  315,  275,  315,  324,  376,  469,  500,  315,
+ /*   910 */   476,  277,  476,  163,  292,  449,  315,  412,   95,   74,
+ /*   920 */    73,  467,  412,  100,  412,  101,  412,  111,   72,  313,
+ /*   930 */   314,  412,  113,  417,  446,   74,   73,  479,  412,   16,
+ /*   940 */   379,  315,  181,  465,   72,  313,  314,   72,  322,  417,
+ /*   950 */     4,  206,  315,  184,  294,  315,  497,  498,  474,  206,
+ /*   960 */   171,  339,  319,  412,   98,  419,  419,  419,  420,  421,
+ /*   970 */    11,  359,  378,  305,  412,   33,  413,  412,   96,  324,
+ /*   980 */   458,  419,  419,  419,  420,  421,   11,  413,  411,  449,
+ /*   990 */   411,  160,  410,  315,  410,  466,  221,  222,  223,  103,
+ /*  1000 */    83,  471,  315,  507,  506,  315,  620,  475,  315,   74,
+ /*  1010 */    73,  245,  203,   21,  279,  412,   24,  437,   72,  313,
+ /*  1020 */   314,  280,  315,  417,  412,   54,  505,  412,  114,  315,
+ /*  1030 */   412,  115,  504,  201,  145,  547,  240,  510,  524,  200,
+ /*  1040 */   315,  511,  202,  315,  412,   25,  315,  241,  315,   18,
+ /*  1050 */   315,  412,   36,  315,  254,  419,  419,  419,  420,  421,
+ /*  1060 */    11,  256,  412,   37,  258,  412,   26,  315,  412,   38,
+ /*  1070 */   412,   39,  412,   40,  260,  412,   42,  315,  512,  315,
+ /*  1080 */   126,  315,  437,  315,  187,  375,  276,  266,  265,  412,
+ /*  1090 */    43,  291,  315,  252,  315,  126,  206,  581,    8,  412,
+ /*  1100 */    44,  412,   29,  412,   30,  412,   45,  350,  363,  126,
+ /*  1110 */   315,  543,  315,  126,  412,   46,  412,   47,  315,  355,
+ /*  1120 */   381,  551,  315,  171,  552,  315,   90,  562,  578,   90,
+ /*  1130 */   288,  366,  412,   48,  412,   31,  582,  367,  268,  269,
+ /*  1140 */   412,   10,  270,  554,  412,   50,  564,  412,   51,  278,
+ /*  1150 */   281,  282,  575,  144,  442,  403,  323,  226,  444,  461,
+ /*  1160 */   464,  242,  503,  550,  561,  513,  161,  392,  400,  516,
+ /*  1170 */   401,  345,  402,    7,  312,   83,  227,  332,  228,   82,
+ /*  1180 */   330,   57,  408,  416,  168,   78,  459,  123,  210,  414,
+ /*  1190 */    84,  335,  340,  299,  496,  500,  490,  229,  495,  243,
+ /*  1200 */   104,  247,  499,  501,  230,  285,  415,  215,  514,  518,
+ /*  1210 */   525,  526,  519,  236,  527,  473,  238,  352,  477,  286,
+ /*  1220 */   182,  356,  533,  354,  119,  183,  185,   87,  546,  130,
+ /*  1230 */   186,  535,  188,  140,  362,  191,  553,  216,  373,  374,
+ /*  1240 */   131,  560,  308,  132,  133,  572,  577,  136,  263,  134,
+ /*  1250 */   139,  536,  573,  391,   91,   94,  404,  574,   99,  214,
+ /*  1260 */   102,  621,  622,  431,  164,  434,  165,   71,  141,   17,
+ /*  1270 */   439,  448,  451,  155,    6,  452,  470,  110,  167,  453,
+ /*  1280 */   457,  124,   13,  213,  120,   80,   12,  125,  159,  483,
+ /*  1290 */   484,   85,  310,  105,  180,  251,  106,  118,   86,  107,
+ /*  1300 */   241,  344,  349,  353,  143,  534,  127,  357,  171,  189,
+ /*  1310 */   264,  108,  287,  128,  549,  129,  193,  537,  541,   14,
+ /*  1320 */   195,   88,  196,  556,  197,  137,  138,  135,   15,  563,
+ /*  1330 */   570,  109,  283,  146,  204,  383,  387,  899,  584,  899,
+ /*  1340 */   899,  899,  899,  899,   89,
 };
 static const YYCODETYPE yy_lookahead[] = {
  /*     0 */    16,  139,  140,  141,  168,   21,  144,   23,   69,   70,
  /*    10 */    71,   72,  176,   74,   75,   76,   77,   78,   79,   80,
- /*    20 */    81,   82,   83,   84,    1,    2,   42,   43,   73,   74,
+ /*    20 */    81,   82,   83,   84,   78,   79,   42,   43,   73,   74,
  /*    30 */    75,   76,   77,   78,   79,   80,   81,   82,   83,   84,
- /*    40 */    78,   79,   23,   58,   60,   61,   62,   63,   64,   65,
- /*    50 */    66,   67,   68,   69,   70,   71,   72,  110,   74,   75,
+ /*    40 */     1,    2,   23,   58,   60,   61,   62,   63,   64,   65,
+ /*    50 */    66,   67,   68,   69,   70,   71,   72,  147,   74,   75,
  /*    60 */    76,   77,   78,   79,   80,   81,   82,   83,   84,   16,
- /*    70 */   123,  147,   88,   88,  110,   22,  216,   92,  218,  219,
+ /*    70 */   185,  186,   88,   88,  110,   22,  217,   92,  219,  220,
  /*    80 */    74,   75,   76,   77,   78,   79,   80,   81,   82,   83,
- /*    90 */    84,  147,   19,  169,  170,   42,   43,   78,  238,   46,
+ /*    90 */    84,  217,  218,  219,  220,   42,   43,  238,  188,   46,
  /*   100 */    78,   79,   80,   81,   82,   83,   84,   88,   89,  124,
  /*   110 */   125,  126,   16,   60,   61,   62,   63,   64,   65,   66,
- /*   120 */    67,   68,   69,   70,   71,   72,  182,   74,   75,   76,
+ /*   120 */    67,   68,   69,   70,   71,   72,  147,   74,   75,   76,
  /*   130 */    77,   78,   79,   80,   81,   82,   83,   84,   42,   43,
- /*   140 */    44,   80,   81,   82,   83,   84,   23,  223,  161,  216,
- /*   150 */    19,  218,  219,   21,   23,   23,   60,   61,   62,   63,
- /*   160 */    64,   65,   66,   67,   68,   69,   70,   71,   72,  225,
+ /*   140 */    44,   80,   81,   82,   83,   84,   23,   84,  169,  170,
+ /*   150 */    19,  164,  165,  166,   23,  169,   60,   61,   62,   63,
+ /*   160 */    64,   65,   66,   67,   68,   69,   70,   71,   72,  169,
  /*   170 */    74,   75,   76,   77,   78,   79,   80,   81,   82,   83,
- /*   180 */    84,   16,  147,  147,  150,  112,   21,  200,  147,   58,
- /*   190 */    84,  147,  156,  157,  216,  217,  218,  219,   83,   84,
- /*   200 */   165,   78,   79,  216,  190,  218,  219,   42,   43,   78,
- /*   210 */    79,   88,   89,  169,  170,  141,  180,  181,  144,   88,
- /*   220 */    88,   98,  147,   92,   16,   60,   61,   62,   63,   64,
+ /*   180 */    84,   16,   14,  147,  150,  147,   21,  167,  168,   58,
+ /*   190 */   211,  147,  156,  157,   23,  216,  176,   23,  181,  176,
+ /*   200 */   177,   78,   79,  165,  166,  110,  183,   42,   43,   78,
+ /*   210 */    79,   88,   89,  169,  170,  228,  180,  181,  123,   88,
+ /*   220 */    52,   98,   54,   92,   16,   60,   61,   62,   63,   64,
  /*   230 */    65,   66,   67,   68,   69,   70,   71,   72,  147,   74,
  /*   240 */    75,   76,   77,   78,   79,   80,   81,   82,   83,   84,
- /*   250 */    42,   43,  169,  209,  210,  124,  125,  126,  224,   14,
- /*   260 */   169,  170,  227,  228,  230,   18,  225,   16,   60,   61,
+ /*   250 */    42,   43,   78,  209,  210,  124,  125,  126,  224,   88,
+ /*   260 */   169,  170,   88,   89,  230,  227,  228,   16,   60,   61,
  /*   270 */    62,   63,   64,   65,   66,   67,   68,   69,   70,   71,
  /*   280 */    72,   23,   74,   75,   76,   77,   78,   79,   80,   81,
- /*   290 */    82,   83,   84,   42,   43,  147,   16,   52,  147,   54,
- /*   300 */   147,  210,   55,  106,  153,  108,  109,  156,  157,  156,
- /*   310 */   157,   60,   61,   62,   63,   64,   65,   66,   67,   68,
- /*   320 */    69,   70,   71,   72,   22,   74,   75,   76,   77,   78,
- /*   330 */    79,   80,   81,   82,   83,   84,  188,  147,   92,  131,
- /*   340 */    16,   94,   16,   22,   20,  155,   88,   89,   90,  103,
- /*   350 */   147,   93,   94,   95,  167,  168,  161,  162,  163,  169,
- /*   360 */   170,   25,  104,  176,   84,   29,   42,   43,  165,  166,
- /*   370 */    90,   91,   92,   93,   94,   95,   96,   41,  133,  189,
- /*   380 */   133,  169,  131,  103,   60,   61,   62,   63,   64,   65,
- /*   390 */    66,   67,   68,   69,   70,   71,   72,  181,   74,   75,
+ /*   290 */    82,   83,   84,   42,   43,  160,   16,  147,  161,   83,
+ /*   300 */    84,  210,  161,  153,  169,  158,  156,  157,  161,  162,
+ /*   310 */   163,   60,   61,   62,   63,   64,   65,   66,   67,   68,
+ /*   320 */    69,   70,   71,   72,  161,   74,   75,   76,   77,   78,
+ /*   330 */    79,   80,   81,   82,   83,   84,  192,  200,  147,  131,
+ /*   340 */    16,  200,   16,  199,   20,  190,   88,   89,   90,  185,
+ /*   350 */   186,   93,   94,   95,  217,   22,  219,  220,  147,  147,
+ /*   360 */   169,  170,  104,  200,   84,  147,   42,   43,  156,  157,
+ /*   370 */    90,   91,   92,   93,   94,   95,   96,  164,  165,  166,
+ /*   380 */   169,  170,  131,  103,   60,   61,   62,   63,   64,   65,
+ /*   390 */    66,   67,   68,   69,   70,   71,   72,  155,   74,   75,
  /*   400 */    76,   77,   78,   79,   80,   81,   82,   83,   84,   16,
- /*   410 */    84,   90,   22,   20,   93,   94,   95,   91,   92,   93,
- /*   420 */    94,   95,   96,  121,  147,  104,  147,  185,  186,  103,
- /*   430 */   227,  228,  155,  181,  160,   42,   43,   90,  176,  177,
- /*   440 */    93,   94,   95,  169,  161,  183,  169,  170,  169,  170,
- /*   450 */   155,  104,  155,   60,   61,   62,   63,   64,   65,   66,
+ /*   410 */    84,   11,  221,   20,   30,   16,  147,   91,   92,   93,
+ /*   420 */    94,   95,   96,   90,  147,  181,   93,   94,   95,  103,
+ /*   430 */   212,  189,  155,   27,   50,   42,   43,  104,  169,  170,
+ /*   440 */    34,  228,   43,  201,  202,  147,  169,  170,  206,   49,
+ /*   450 */   161,  162,  163,   60,   61,   62,   63,   64,   65,   66,
  /*   460 */    67,   68,   69,   70,   71,   72,  189,   74,   75,   76,
- /*   470 */    77,   78,   79,   80,   81,   82,   83,   84,   16,   11,
- /*   480 */   244,  245,   20,  200,  189,  147,  189,  147,  211,  158,
- /*   490 */   211,  147,  161,  162,  163,  147,  201,  202,   42,   43,
- /*   500 */   223,  206,  223,  113,   42,   43,  147,  169,  170,  169,
- /*   510 */   170,   23,   19,  169,  170,  186,   23,   49,  155,   63,
- /*   520 */    64,  147,   60,   61,   62,   63,   64,   65,   66,   67,
- /*   530 */    68,   69,   70,   71,   72,  147,   74,   75,   76,   77,
- /*   540 */    78,   79,   80,   81,   82,   83,   84,   16,   92,  211,
- /*   550 */    12,   20,  189,  164,  165,  166,  208,  147,   16,  215,
- /*   560 */   220,  223,   24,  164,  165,  166,   23,   99,  100,  101,
- /*   570 */   155,  212,   23,   42,   43,   37,   88,   39,  110,  169,
- /*   580 */   170,   88,   89,   19,   20,   43,   22,   49,  185,  186,
- /*   590 */    23,   60,   61,   62,   63,   64,   65,   66,   67,   68,
- /*   600 */    69,   70,   71,   72,  189,   74,   75,   76,   77,   78,
- /*   610 */    79,   80,   81,   82,   83,   84,   16,  228,    0,    1,
- /*   620 */     2,   21,   19,   59,  147,  215,   23,  228,  213,   80,
- /*   630 */   147,   88,   89,   19,   20,  145,   22,   88,   89,  147,
- /*   640 */    98,  147,   42,   43,   20,  103,  169,  170,   20,  147,
- /*   650 */   147,  236,  169,  170,   20,   88,   89,  114,  147,   16,
+ /*   470 */    77,   78,   79,   80,   81,   82,   83,   84,   16,   25,
+ /*   480 */   211,  147,   20,   29,   12,  147,  102,   19,  211,   21,
+ /*   490 */   147,  141,  147,  216,  144,   41,   24,   98,   20,   99,
+ /*   500 */   100,  101,  103,  165,   42,   43,    0,    1,    2,   37,
+ /*   510 */   110,   39,  169,  170,  169,  170,  182,   19,   20,  147,
+ /*   520 */    22,   49,   60,   61,   62,   63,   64,   65,   66,   67,
+ /*   530 */    68,   69,   70,   71,   72,  155,   74,   75,   76,   77,
+ /*   540 */    78,   79,   80,   81,   82,   83,   84,   16,  147,   90,
+ /*   550 */    20,   20,   93,   94,   95,  147,  155,   59,  215,  225,
+ /*   560 */   215,   20,  130,  104,  132,  227,  228,   42,   43,  189,
+ /*   570 */   169,  170,   16,   42,   43,   20,   19,   22,   19,   20,
+ /*   580 */    23,   22,   18,  147,  106,  147,  108,  109,   63,   64,
+ /*   590 */   189,   60,   61,   62,   63,   64,   65,   66,   67,   68,
+ /*   600 */    69,   70,   71,   72,  186,   74,   75,   76,   77,   78,
+ /*   610 */    79,   80,   81,   82,   83,   84,   16,   92,   59,   55,
+ /*   620 */   212,   21,  147,   19,  147,   23,  188,   23,   12,  217,
+ /*   630 */    23,  219,  220,    7,    8,    9,  106,  147,  108,  109,
+ /*   640 */    24,  147,   42,   43,  208,   88,   89,  106,   92,  108,
+ /*   650 */   109,  244,  245,   37,  145,   39,  191,  182,   94,   16,
  /*   660 */    60,   61,   62,   63,   64,   65,   66,   67,   68,   69,
- /*   670 */    70,   71,   72,   59,   74,   75,   76,   77,   78,   79,
- /*   680 */    80,   81,   82,   83,   84,   42,   43,  147,  142,  143,
- /*   690 */   188,   88,   89,  130,  148,  132,    7,    8,    9,  188,
- /*   700 */   208,  155,   16,   60,   61,   62,   63,   64,   65,   66,
- /*   710 */    67,   68,   69,   70,   71,   72,  147,   74,   75,   76,
+ /*   670 */    70,   71,   72,  147,   74,   75,   76,   77,   78,   79,
+ /*   680 */    80,   81,   82,   83,   84,   42,   43,   80,  142,  143,
+ /*   690 */    88,   89,   88,   89,  148,   88,   89,  133,   14,  147,
+ /*   700 */   225,  155,   16,   60,   61,   62,   63,   64,   65,   66,
+ /*   710 */    67,   68,   69,   70,   71,   72,  114,   74,   75,   76,
  /*   720 */    77,   78,   79,   80,   81,   82,   83,   84,   42,   43,
- /*   730 */   106,  147,  108,  109,  106,  189,  108,  109,  169,  170,
- /*   740 */   106,  147,  108,  109,  147,   16,   60,   61,   62,   63,
+ /*   730 */   201,  202,  147,  147,  182,  189,   52,  147,   54,  147,
+ /*   740 */   147,  147,  147,  147,  155,   16,   60,   61,   62,   63,
  /*   750 */    64,   65,   66,   67,   68,   69,   70,   71,   72,  213,
  /*   760 */    74,   75,   76,   77,   78,   79,   80,   81,   82,   83,
- /*   770 */    84,   42,   43,   99,  100,  101,  182,  147,  161,  182,
- /*   780 */    99,  100,  101,   14,  147,  147,  147,  241,   16,  191,
+ /*   770 */    84,   42,   43,  188,  188,  182,  182,  225,  189,  106,
+ /*   780 */   188,  108,  109,  188,   99,  100,  101,  241,   16,  155,
  /*   790 */    61,   62,   63,   64,   65,   66,   67,   68,   69,   70,
- /*   800 */    71,   72,  147,   74,   75,   76,   77,   78,   79,   80,
- /*   810 */    81,   82,   83,   84,   42,   43,   23,  200,  188,  225,
- /*   820 */   182,   52,  225,   54,  169,  170,  147,  188,   22,   22,
- /*   830 */   147,  147,  201,  202,   62,   63,   64,   65,   66,   67,
- /*   840 */    68,   69,   70,   71,   72,  208,   74,   75,   76,   77,
- /*   850 */    78,   79,   80,   81,   82,   83,   84,   16,   17,   12,
- /*   860 */    19,  155,   19,  225,   23,  182,   23,  188,  147,  239,
- /*   870 */   147,   24,   31,   16,   17,  147,   19,  147,  147,  155,
- /*   880 */    23,   88,   89,   19,   37,   21,   39,  147,   31,   48,
- /*   890 */   169,  170,  169,  170,  147,  189,   89,  169,  170,   58,
- /*   900 */   169,  170,  147,   97,  147,   48,  147,  114,  225,  169,
- /*   910 */   170,  161,  147,  189,   16,   58,  169,  170,  147,   78,
- /*   920 */    79,  114,  155,  147,  169,  170,  169,  170,   87,   88,
- /*   930 */    89,   88,   80,   92,  147,   78,   79,   80,  147,   91,
- /*   940 */   169,  170,  212,   19,   87,   88,   89,   16,   17,   92,
- /*   950 */    19,  110,  147,  188,   23,  147,  189,  203,  110,  107,
- /*   960 */   169,  170,   31,  111,  188,  124,  125,  126,  127,  128,
- /*   970 */   129,  123,  147,  192,  169,  170,   43,  169,  170,   48,
- /*   980 */   199,  124,  125,  126,  127,  128,  129,  242,  243,   58,
- /*   990 */    92,    5,   68,  147,  169,  170,   10,   11,   12,   13,
- /*  1000 */   124,  125,  147,  147,  107,  147,  147,  147,  111,   78,
- /*  1010 */    79,   20,   26,   22,   28,   20,  147,   22,   87,   88,
- /*  1020 */    89,   35,  147,   92,  169,  170,  147,  169,  170,  169,
- /*  1030 */   170,   98,   20,   47,  188,   49,   27,    7,    8,   53,
- /*  1040 */   147,  147,   56,   34,  169,  170,  147,  147,  169,  170,
- /*  1050 */   147,   20,  147,   22,  147,  124,  125,  126,  127,  128,
- /*  1060 */   129,  178,  169,  170,  178,   20,  147,   22,  169,  170,
- /*  1070 */    30,   59,  169,  170,  169,  170,  147,  147,   91,   92,
- /*  1080 */    20,  147,   22,  147,  178,   99,  100,  101,  169,  170,
- /*  1090 */    50,  105,  147,   20,  147,   22,  110,  147,  169,  170,
- /*  1100 */   147,  147,  147,  169,  170,  169,  170,   20,  147,   22,
- /*  1110 */   147,  233,  232,  147,  169,  170,  169,  170,  147,   20,
- /*  1120 */   134,   22,  169,  170,  169,  170,  147,   20,  147,   22,
- /*  1130 */   169,  170,  169,  170,  149,  169,  170,   20,  229,   22,
- /*  1140 */   169,  170,  102,   20,   20,   22,   22,  147,  169,  170,
- /*  1150 */   147,  147,  147,  147,  147,  147,  191,  147,  147,  222,
- /*  1160 */   147,  147,  147,  193,  229,  172,  172,  177,  172,  172,
- /*  1170 */   172,  194,  173,    6,  194,  146,   22,  154,  146,  146,
- /*  1180 */   146,  189,  121,  194,  118,  116,  119,   23,  120,  130,
- /*  1190 */   221,  112,   98,  152,  152,  160,  195,  115,  196,   98,
- /*  1200 */    40,   97,   19,  179,   84,  179,  160,  171,  171,  171,
- /*  1210 */   226,  160,  173,  197,  171,  198,   15,  152,  174,  171,
- /*  1220 */   171,  171,  204,  151,  205,  204,  174,  205,  151,   38,
- /*  1230 */   152,  151,  130,  152,   60,  152,  151,  184,  152,  184,
- /*  1240 */    19,  194,  214,  152,   15,  187,  226,  152,  194,  187,
- /*  1250 */   187,  187,   33,  137,  184,  152,  159,  152,    1,  234,
- /*  1260 */    20,  112,  235,  175,  175,  112,  107,  112,  112,   92,
- /*  1270 */   214,   19,   11,   20,   20,   19,  114,   19,  117,   20,
- /*  1280 */   117,  112,   22,   20,   22,   19,   22,   20,   20,   44,
- /*  1290 */    19,   44,   19,   19,  237,   20,   19,   32,   19,   44,
- /*  1300 */    96,  103,   16,   21,   17,   98,  231,   22,  237,  133,
- /*  1310 */    98,   19,   36,    5,  240,   45,    1,   45,  102,  243,
- /*  1320 */    51,  122,   19,  113,   14,  102,  115,  113,   17,  123,
- /*  1330 */   246,  122,   19,   14,   20,  135,   19,    3,   57,  136,
- /*  1340 */     4,  247,  247,  247,  247,  247,   68,  247,   68,
+ /*   800 */    71,   72,  213,   74,   75,   76,   77,   78,   79,   80,
+ /*   810 */    81,   82,   83,   84,   42,   43,   23,  133,  225,  225,
+ /*   820 */    21,  225,   23,  189,  239,  236,   99,  100,  101,   22,
+ /*   830 */   242,  243,  155,   22,   62,   63,   64,   65,   66,   67,
+ /*   840 */    68,   69,   70,   71,   72,  147,   74,   75,   76,   77,
+ /*   850 */    78,   79,   80,   81,   82,   83,   84,   16,   17,   43,
+ /*   860 */    19,  147,  147,  147,   23,  147,  189,  169,  170,  147,
+ /*   870 */   147,  147,   31,   16,   17,  147,   19,  147,  124,  125,
+ /*   880 */    23,   88,   89,  169,  170,  169,  170,   88,   31,   48,
+ /*   890 */   147,  169,  170,  169,  170,  147,   89,  169,  170,   58,
+ /*   900 */   147,   22,  147,  188,  147,   48,  188,  114,   97,  147,
+ /*   910 */   147,  188,  147,   19,   98,   58,  147,  169,  170,   78,
+ /*   920 */    79,  114,  169,  170,  169,  170,  169,  170,   87,   88,
+ /*   930 */    89,  169,  170,   92,  161,   78,   79,   80,  169,  170,
+ /*   940 */    91,  147,  155,   22,   87,   88,   89,   16,   17,   92,
+ /*   950 */    19,  110,  147,  155,   23,  147,    7,    8,   20,  110,
+ /*   960 */    22,   80,   31,  169,  170,  124,  125,  126,  127,  128,
+ /*   970 */   129,  208,  123,  208,  169,  170,  189,  169,  170,   48,
+ /*   980 */   147,  124,  125,  126,  127,  128,  129,  189,  107,   58,
+ /*   990 */   107,    5,  111,  147,  111,  203,   10,   11,   12,   13,
+ /*  1000 */   121,  147,  147,   91,   92,  147,  112,  147,  147,   78,
+ /*  1010 */    79,  147,   26,   19,   28,  169,  170,   23,   87,   88,
+ /*  1020 */    89,   35,  147,   92,  169,  170,  178,  169,  170,  147,
+ /*  1030 */   169,  170,  147,   47,  113,   49,   92,  178,  147,   53,
+ /*  1040 */   147,  178,   56,  147,  169,  170,  147,  103,  147,   19,
+ /*  1050 */   147,  169,  170,  147,  147,  124,  125,  126,  127,  128,
+ /*  1060 */   129,  147,  169,  170,  147,  169,  170,  147,  169,  170,
+ /*  1070 */   169,  170,  169,  170,  147,  169,  170,  147,   20,  147,
+ /*  1080 */    22,  147,   88,  147,  232,   99,  100,  101,  147,  169,
+ /*  1090 */   170,  105,  147,   20,  147,   22,  110,   20,   68,  169,
+ /*  1100 */   170,  169,  170,  169,  170,  169,  170,   20,  147,   22,
+ /*  1110 */   147,   20,  147,   22,  169,  170,  169,  170,  147,  233,
+ /*  1120 */   134,   20,  147,   22,   20,  147,   22,   20,   20,   22,
+ /*  1130 */    22,  147,  169,  170,  169,  170,   59,  147,  147,  147,
+ /*  1140 */   169,  170,  147,  147,  169,  170,  147,  169,  170,  147,
+ /*  1150 */   147,  147,  147,  191,  229,  149,  223,  193,  229,  172,
+ /*  1160 */   172,  172,  177,  194,  194,  172,    6,  146,  146,  172,
+ /*  1170 */   146,  173,  146,   22,  154,  121,  194,  118,  195,  119,
+ /*  1180 */   116,  120,   23,  160,  112,  130,  152,  152,  222,  189,
+ /*  1190 */    98,  115,   98,   40,  179,   97,  171,  196,  171,  171,
+ /*  1200 */    19,   84,  173,  171,  197,  174,  198,  226,  160,  160,
+ /*  1210 */   171,  171,  179,  204,  171,  205,  204,   15,  205,  174,
+ /*  1220 */   151,   38,  152,  152,   60,  151,  151,  130,  184,   19,
+ /*  1230 */   152,  152,  151,  214,  152,  184,  194,  226,  152,   15,
+ /*  1240 */   187,  194,  152,  187,  187,   33,  137,  184,  234,  187,
+ /*  1250 */   214,  235,  152,    1,  237,  237,   20,  152,  159,  175,
+ /*  1260 */   175,  112,  112,   92,  112,  107,  112,   19,   19,  231,
+ /*  1270 */    20,   20,   11,   19,  117,   20,  114,  240,   22,   20,
+ /*  1280 */    20,   19,  117,   44,  243,   22,   22,   20,  112,   20,
+ /*  1290 */    20,   19,  246,   19,   96,   20,   19,   32,   19,   19,
+ /*  1300 */   103,   44,   44,   16,   21,   17,   98,   36,   22,   98,
+ /*  1310 */   133,   19,    5,   45,    1,  102,  122,   51,   45,   19,
+ /*  1320 */   113,   68,   14,   17,  115,  102,  122,  113,   19,  123,
+ /*  1330 */    20,   14,  136,   19,  135,   57,    3,  247,    4,  247,
+ /*  1340 */   247,  247,  247,  247,   68,
 };
 #define YY_SHIFT_USE_DFLT (-62)
-#define YY_SHIFT_MAX 385
+#define YY_SHIFT_MAX 387
 static const short yy_shift_ofst[] = {
- /*     0 */    23,  841,  986,  -16,  841,  931,  931,  931,  258,  123,
- /*    10 */   -36,   96,  931,  931,  931,  931,  931,  -45,  468,   19,
- /*    20 */   567,  488,  -38,  -38,   53,  165,  208,  251,  324,  393,
- /*    30 */   462,  531,  600,  643,  686,  643,  643,  643,  643,  643,
+ /*     0 */    39,  841,  986,  -16,  841,  931,  931,  258,  123,  -36,
+ /*    10 */    96,  931,  931,  931,  931,  931,  -45,  400,  174,   19,
+ /*    20 */   171,  -54,  -54,   53,  165,  208,  251,  324,  393,  462,
+ /*    30 */   531,  600,  643,  686,  643,  643,  643,  643,  643,  643,
  /*    40 */   643,  643,  643,  643,  643,  643,  643,  643,  643,  643,
  /*    50 */   643,  643,  729,  772,  772,  857,  931,  931,  931,  931,
  /*    60 */   931,  931,  931,  931,  931,  931,  931,  931,  931,  931,
  /*    70 */   931,  931,  931,  931,  931,  931,  931,  931,  931,  931,
  /*    80 */   931,  931,  931,  931,  931,  931,  931,  931,  931,  931,
- /*    90 */   931,  931,  931,  931,  -61,  -61,    6,    6,  280,   22,
- /*   100 */    61,  542,  247,  567,  567,  567,  567,  567,  567,  567,
- /*   110 */   115,  488,  106,  -62,  -62,  131,  326,  538,  538,  564,
- /*   120 */   614,  618,  132,  567,  132,  567,  567,  567,  567,  567,
- /*   130 */   567,  567,  567,  567,  567,  567,  567,  567,  848,  -53,
- /*   140 */   -36,  -36,  -36,  -62,  -62,  -62,  -15,  -15,  321,  347,
- /*   150 */   624,  493,  628,  634,  847,  543,  793,  603,  549,  689,
- /*   160 */   567,  567,  852,  567,  567,  843,  567,  567,  807,  567,
- /*   170 */   567,  197,  807,  567,  567, 1040, 1040, 1040,  567,  567,
- /*   180 */   197,  567,  567,  197,  567,  336,  674,  567,  567,  197,
- /*   190 */   567,  567,  567,  197,  567,  567,  567,  197,  197,  567,
- /*   200 */   567,  567,  567,  567,  864,  897,  390,  876,  876,  563,
- /*   210 */  1009, 1009, 1009,  933, 1009, 1009,  806,  302,  302, 1167,
- /*   220 */  1167, 1167, 1167, 1154,  -36, 1061, 1066, 1067, 1069, 1068,
- /*   230 */  1164, 1059, 1079, 1079, 1094, 1082, 1094, 1082, 1101, 1101,
- /*   240 */  1160, 1101, 1104, 1101, 1183, 1120, 1164, 1120, 1164, 1160,
- /*   250 */  1101, 1101, 1101, 1183, 1201, 1079, 1201, 1079, 1201, 1079,
- /*   260 */  1079, 1191, 1102, 1201, 1079, 1174, 1174, 1221, 1061, 1079,
- /*   270 */  1229, 1229, 1229, 1229, 1061, 1174, 1221, 1079, 1219, 1219,
- /*   280 */  1079, 1079, 1116,  -62,  -62,  -62,  -62,  -62,  -62,  456,
- /*   290 */   245,  681,  769,   73,  898,  991,  995, 1031, 1045,  246,
- /*   300 */  1030,  987, 1060, 1073, 1087, 1099, 1107, 1117, 1123,  924,
- /*   310 */  1124, 1012, 1257, 1240, 1149, 1153, 1155, 1156, 1177, 1159,
- /*   320 */  1252, 1253, 1254, 1256, 1261, 1258, 1259, 1260, 1263, 1161,
- /*   330 */  1262, 1163, 1264, 1162, 1266, 1267, 1169, 1268, 1265, 1245,
- /*   340 */  1271, 1247, 1273, 1275, 1274, 1277, 1255, 1279, 1204, 1198,
- /*   350 */  1286, 1287, 1282, 1207, 1276, 1269, 1270, 1285, 1272, 1176,
- /*   360 */  1212, 1292, 1308, 1315, 1216, 1278, 1280, 1199, 1303, 1210,
- /*   370 */  1310, 1211, 1311, 1214, 1223, 1209, 1313, 1206, 1314, 1319,
- /*   380 */  1281, 1200, 1203, 1317, 1334, 1336,
+ /*    90 */   931,  931,  931,  931,  931,  -61,  -61,    6,    6,  280,
+ /*   100 */    22,   61,  399,  564,   19,   19,   19,   19,   19,   19,
+ /*   110 */    19,  216,  171,   63,  -62,  -62,  131,  326,  472,  472,
+ /*   120 */   498,  559,  506,  799,   19,  799,   19,   19,   19,   19,
+ /*   130 */    19,   19,   19,   19,   19,   19,   19,   19,   19,  849,
+ /*   140 */    95,  -36,  -36,  -36,  -62,  -62,  -62,  -15,  -15,  333,
+ /*   150 */   459,  478,  557,  530,  541,  616,  602,  793,  604,  607,
+ /*   160 */   626,   19,   19,  881,   19,   19,  994,   19,   19,  807,
+ /*   170 */    19,   19,  673,  807,   19,   19,  384,  384,  384,   19,
+ /*   180 */    19,  673,   19,   19,  673,   19,  454,  685,   19,   19,
+ /*   190 */   673,   19,   19,   19,  673,   19,   19,   19,  673,  673,
+ /*   200 */    19,   19,   19,   19,   19,  468,  883,  921,  754,  754,
+ /*   210 */   432,  406,  406,  406,  816,  406,  406,  811,  879,  879,
+ /*   220 */  1160, 1160, 1160, 1160, 1151,  -36, 1054, 1059, 1060, 1064,
+ /*   230 */  1061, 1159, 1055, 1072, 1072, 1092, 1076, 1092, 1076, 1094,
+ /*   240 */  1094, 1153, 1094, 1098, 1094, 1181, 1117, 1159, 1117, 1159,
+ /*   250 */  1153, 1094, 1094, 1094, 1181, 1202, 1072, 1202, 1072, 1202,
+ /*   260 */  1072, 1072, 1183, 1097, 1202, 1072, 1164, 1164, 1210, 1054,
+ /*   270 */  1072, 1224, 1224, 1224, 1224, 1054, 1164, 1210, 1072, 1212,
+ /*   280 */  1212, 1072, 1072, 1109,  -62,  -62,  -62,  -62,  -62,  -62,
+ /*   290 */   525,  684,  727,  168,  894,  556,  555,  938,  944,  949,
+ /*   300 */   912, 1058, 1073, 1087, 1091, 1101, 1104, 1107, 1030, 1108,
+ /*   310 */  1077, 1252, 1236, 1149, 1150, 1152, 1154, 1171, 1158, 1248,
+ /*   320 */  1250, 1251, 1249, 1261, 1254, 1255, 1256, 1259, 1260, 1263,
+ /*   330 */  1157, 1264, 1165, 1263, 1162, 1262, 1267, 1176, 1269, 1270,
+ /*   340 */  1265, 1239, 1272, 1257, 1274, 1275, 1277, 1279, 1258, 1280,
+ /*   350 */  1198, 1197, 1287, 1288, 1283, 1208, 1271, 1266, 1268, 1286,
+ /*   360 */  1273, 1177, 1211, 1292, 1307, 1313, 1213, 1253, 1276, 1194,
+ /*   370 */  1300, 1207, 1308, 1209, 1306, 1214, 1223, 1204, 1309, 1206,
+ /*   380 */  1310, 1317, 1278, 1199, 1196, 1314, 1333, 1334,
 };
 #define YY_REDUCE_USE_DFLT (-165)
-#define YY_REDUCE_MAX 288
+#define YY_REDUCE_MAX 289
 static const short yy_reduce_ofst[] = {
- /*     0 */  -138,  277,  546,  -13,  190,  279,   44,  338,   36,  203,
- /*    10 */   295, -140,  340,  -76,   91,  344,  410,  -22,  415,   35,
- /*    20 */   151,  331,  389,  399,  -67,  -67,  -67,  -67,  -67,  -67,
- /*    30 */   -67,  -67,  -67,  -67,  -67,  -67,  -67,  -67,  -67,  -67,
- /*    40 */   -67,  -67,  -67,  -67,  -67,  -67,  -67,  -67,  -67,  -67,
- /*    50 */   -67,  -67,  -67,  -67,  -67,  477,  483,  569,  655,  721,
- /*    60 */   723,  728,  731,  740,  747,  755,  757,  771,  791,  805,
- /*    70 */   808,  825,  855,  858,  860,  875,  879,  893,  899,  903,
- /*    80 */   905,  919,  929,  934,  936,  945,  947,  953,  955,  961,
- /*    90 */   963,  966,  971,  979,  -67,  -67,  -67,  -67,  187,  -67,
- /*   100 */   -67,  262,   34,  -56,  594,  597,  638,  683,  630,  153,
- /*   110 */   -67,  195,  -67,  -67,  -67,  274, -164,  242,  403,  236,
- /*   120 */   236,   74,  283,  348,  617,   41,  148,  492,  359,  637,
- /*   130 */   502,  511,  639,  679,  765,  776,  730,  846,  297,  363,
- /*   140 */   706,  724,  767,  781,  631,  745,   83,  212,  216,  252,
- /*   150 */    14,   75,   14,   14,  329,  374,  388,  494,  503,  490,
- /*   160 */   540,  584,  598,  503,  684,  750,  759,  787,  754,  856,
- /*   170 */   859,   14,  754,  869,  894,  883,  886,  906,  900,  907,
- /*   180 */    14,  930,  950,   14,  954,  880,  878,  981, 1000,   14,
- /*   190 */  1003, 1004, 1005,   14, 1006, 1007, 1008,   14,   14, 1010,
- /*   200 */  1011, 1013, 1014, 1015,  985,  965,  970,  909,  935,  937,
- /*   210 */   993,  994,  996,  990,  997,  998,  999,  977,  980, 1029,
- /*   220 */  1032, 1033, 1034, 1023,  992,  989, 1001, 1002, 1016, 1017,
- /*   230 */  1035,  969, 1041, 1042, 1018, 1019, 1021, 1022, 1036, 1037,
- /*   240 */  1024, 1038, 1039, 1043, 1044,  984, 1046, 1020, 1051, 1026,
- /*   250 */  1048, 1049, 1050, 1052, 1072, 1065, 1077, 1078, 1080, 1081,
- /*   260 */  1083, 1025, 1027, 1085, 1086, 1053, 1055, 1028, 1047, 1091,
- /*   270 */  1058, 1062, 1063, 1064, 1054, 1070, 1056, 1095, 1057, 1071,
- /*   280 */  1103, 1105, 1074, 1097, 1088, 1089, 1075, 1076, 1084,
+ /*     0 */  -138,  277,  546,  137,  401,  -21,   44,   36,   38,  242,
+ /*    10 */  -141,  191,   91,  269,  343,  345, -126,  589,  338,  150,
+ /*    20 */   147,  -13,  213,  412,  412,  412,  412,  412,  412,  412,
+ /*    30 */   412,  412,  412,  412,  412,  412,  412,  412,  412,  412,
+ /*    40 */   412,  412,  412,  412,  412,  412,  412,  412,  412,  412,
+ /*    50 */   412,  412,  412,  412,  412,  211,  698,  714,  716,  722,
+ /*    60 */   724,  728,  748,  753,  755,  757,  762,  769,  794,  805,
+ /*    70 */   808,  846,  855,  858,  861,  875,  882,  893,  896,  899,
+ /*    80 */   901,  903,  906,  920,  930,  932,  934,  936,  945,  947,
+ /*    90 */   963,  965,  971,  975,  978,  412,  412,  412,  412,   20,
+ /*   100 */   412,  412,   23,   34,  334,  475,  552,  593,  594,  585,
+ /*   110 */   212,  412,  289,  412,  412,  412,  135, -164, -115,  164,
+ /*   120 */   407,  407,  350,  141,  436,  163,  596,  -90,  763,  218,
+ /*   130 */   765,  438,  586,  592,  595,  715,  718,  408,  723,  380,
+ /*   140 */   634,  677,  787,  798,  144,  529,  588,  -14,    0,   17,
+ /*   150 */   244,  155,  298,  155,  155,  418,  372,  477,  490,  494,
+ /*   160 */   509,  526,  590,  465,  494,  730,  773,  743,  833,  792,
+ /*   170 */   854,  860,  155,  792,  864,  885,  848,  859,  863,  891,
+ /*   180 */   907,  155,  914,  917,  155,  927,  852,  886,  941,  961,
+ /*   190 */   155,  984,  990,  991,  155,  992,  995,  996,  155,  155,
+ /*   200 */   999, 1002, 1003, 1004, 1005, 1006,  962,  964,  925,  929,
+ /*   210 */   933,  987,  988,  989,  985,  993,  997,  998,  969,  970,
+ /*   220 */  1021, 1022, 1024, 1026, 1020, 1000,  982,  983, 1001, 1007,
+ /*   230 */  1008, 1023,  966, 1034, 1035, 1009, 1010, 1012, 1013, 1025,
+ /*   240 */  1027, 1015, 1028, 1029, 1032, 1031,  981, 1048, 1011, 1049,
+ /*   250 */  1033, 1039, 1040, 1043, 1045, 1069, 1070, 1074, 1071, 1075,
+ /*   260 */  1078, 1079, 1014, 1016, 1081, 1082, 1044, 1051, 1019, 1042,
+ /*   270 */  1086, 1053, 1056, 1057, 1062, 1047, 1063, 1036, 1090, 1017,
+ /*   280 */  1018, 1100, 1105, 1037, 1099, 1084, 1085, 1038, 1041, 1046,
 };
 static const YYACTIONTYPE yy_default[] = {
- /*     0 */   592,  818,  897,  707,  897,  818,  897,  818,  897,  843,
- /*    10 */   711,  872,  814,  818,  897,  897,  897,  789,  897,  843,
- /*    20 */   897,  623,  843,  843,  740,  897,  897,  897,  897,  897,
- /*    30 */   897,  897,  897,  741,  897,  817,  813,  809,  811,  810,
+ /*     0 */   592,  816,  897,  707,  897,  816,  897,  897,  843,  711,
+ /*    10 */   872,  814,  897,  897,  897,  897,  789,  897,  843,  897,
+ /*    20 */   623,  843,  843,  740,  897,  897,  897,  897,  897,  897,
+ /*    30 */   897,  897,  741,  897,  818,  813,  809,  811,  810,  817,
  /*    40 */   742,  731,  738,  745,  723,  856,  747,  748,  754,  755,
  /*    50 */   873,  871,  777,  776,  795,  897,  897,  897,  897,  897,
  /*    60 */   897,  897,  897,  897,  897,  897,  897,  897,  897,  897,
  /*    70 */   897,  897,  897,  897,  897,  897,  897,  897,  897,  897,
  /*    80 */   897,  897,  897,  897,  897,  897,  897,  897,  897,  897,
- /*    90 */   897,  897,  897,  897,  779,  800,  778,  788,  616,  780,
- /*   100 */   781,  676,  611,  897,  897,  897,  897,  897,  897,  897,
- /*   110 */   782,  897,  783,  796,  797,  897,  897,  897,  897,  897,
- /*   120 */   897,  592,  707,  897,  707,  897,  897,  897,  897,  897,
+ /*    90 */   897,  897,  897,  897,  897,  779,  800,  778,  788,  616,
+ /*   100 */   780,  781,  676,  611,  897,  897,  897,  897,  897,  897,
+ /*   110 */   897,  782,  897,  783,  796,  797,  897,  897,  897,  897,
+ /*   120 */   897,  897,  592,  707,  897,  707,  897,  897,  897,  897,
  /*   130 */   897,  897,  897,  897,  897,  897,  897,  897,  897,  897,
- /*   140 */   897,  897,  897,  701,  711,  890,  897,  897,  667,  897,
- /*   150 */   897,  897,  897,  897,  897,  897,  897,  897,  897,  599,
- /*   160 */   597,  897,  699,  897,  897,  625,  897,  897,  709,  897,
- /*   170 */   897,  714,  715,  897,  897,  897,  897,  897,  897,  897,
- /*   180 */   613,  897,  897,  688,  897,  849,  897,  897,  897,  863,
- /*   190 */   897,  897,  897,  861,  897,  897,  897,  690,  750,  830,
- /*   200 */   897,  876,  878,  897,  897,  699,  708,  897,  897,  812,
- /*   210 */   734,  734,  734,  646,  734,  734,  649,  744,  744,  596,
- /*   220 */   596,  596,  596,  666,  897,  744,  735,  737,  727,  739,
- /*   230 */   897,  897,  716,  716,  724,  726,  724,  726,  678,  678,
- /*   240 */   663,  678,  649,  678,  822,  827,  897,  827,  897,  663,
- /*   250 */   678,  678,  678,  822,  608,  716,  608,  716,  608,  716,
- /*   260 */   716,  853,  855,  608,  716,  680,  680,  756,  744,  716,
- /*   270 */   687,  687,  687,  687,  744,  680,  756,  716,  875,  875,
- /*   280 */   716,  716,  883,  633,  651,  651,  858,  890,  895,  897,
- /*   290 */   897,  897,  897,  763,  897,  897,  897,  897,  897,  897,
- /*   300 */   897,  897,  897,  897,  897,  897,  897,  897,  897,  836,
- /*   310 */   897,  897,  897,  897,  768,  764,  897,  765,  897,  693,
- /*   320 */   897,  897,  897,  897,  897,  897,  897,  897,  897,  897,
- /*   330 */   728,  897,  736,  897,  897,  897,  897,  897,  897,  897,
+ /*   140 */   897,  897,  897,  897,  701,  711,  890,  897,  897,  667,
+ /*   150 */   897,  897,  897,  897,  897,  897,  897,  897,  897,  897,
+ /*   160 */   599,  597,  897,  699,  897,  897,  625,  897,  897,  709,
+ /*   170 */   897,  897,  714,  715,  897,  897,  897,  897,  897,  897,
+ /*   180 */   897,  613,  897,  897,  688,  897,  849,  897,  897,  897,
+ /*   190 */   863,  897,  897,  897,  861,  897,  897,  897,  690,  750,
+ /*   200 */   830,  897,  876,  878,  897,  897,  699,  708,  897,  897,
+ /*   210 */   812,  734,  734,  734,  646,  734,  734,  649,  744,  744,
+ /*   220 */   596,  596,  596,  596,  666,  897,  744,  735,  737,  727,
+ /*   230 */   739,  897,  897,  716,  716,  724,  726,  724,  726,  678,
+ /*   240 */   678,  663,  678,  649,  678,  822,  827,  897,  827,  897,
+ /*   250 */   663,  678,  678,  678,  822,  608,  716,  608,  716,  608,
+ /*   260 */   716,  716,  853,  855,  608,  716,  680,  680,  756,  744,
+ /*   270 */   716,  687,  687,  687,  687,  744,  680,  756,  716,  875,
+ /*   280 */   875,  716,  716,  883,  633,  651,  651,  858,  890,  895,
+ /*   290 */   897,  897,  897,  897,  763,  897,  897,  897,  897,  897,
+ /*   300 */   897,  897,  897,  897,  897,  897,  897,  897,  836,  897,
+ /*   310 */   897,  897,  897,  768,  764,  897,  765,  897,  693,  897,
+ /*   320 */   897,  897,  897,  897,  897,  897,  897,  897,  897,  815,
+ /*   330 */   897,  728,  897,  736,  897,  897,  897,  897,  897,  897,
  /*   340 */   897,  897,  897,  897,  897,  897,  897,  897,  897,  897,
- /*   350 */   897,  897,  897,  897,  897,  897,  851,  852,  897,  897,
+ /*   350 */   897,  897,  897,  897,  897,  897,  897,  897,  851,  852,
  /*   360 */   897,  897,  897,  897,  897,  897,  897,  897,  897,  897,
  /*   370 */   897,  897,  897,  897,  897,  897,  897,  897,  897,  897,
- /*   380 */   882,  897,  897,  885,  593,  897,  587,  590,  589,  591,
- /*   390 */   595,  598,  620,  621,  622,  600,  601,  602,  603,  604,
- /*   400 */   605,  606,  612,  614,  632,  634,  618,  636,  697,  698,
- /*   410 */   760,  691,  692,  696,  771,  762,  766,  767,  769,  770,
- /*   420 */   784,  785,  787,  793,  799,  802,  786,  791,  792,  794,
- /*   430 */   798,  801,  694,  695,  805,  619,  626,  627,  630,  631,
- /*   440 */   839,  841,  840,  842,  629,  628,  772,  775,  807,  808,
- /*   450 */   864,  865,  866,  867,  868,  803,  815,  816,  717,  806,
+ /*   380 */   897,  897,  882,  897,  897,  885,  593,  897,  587,  590,
+ /*   390 */   589,  591,  595,  598,  620,  621,  622,  600,  601,  602,
+ /*   400 */   603,  604,  605,  606,  612,  614,  632,  634,  618,  636,
+ /*   410 */   697,  698,  760,  691,  692,  696,  771,  762,  766,  767,
+ /*   420 */   769,  770,  784,  785,  787,  793,  799,  802,  786,  791,
+ /*   430 */   792,  794,  798,  801,  694,  695,  805,  619,  626,  627,
+ /*   440 */   630,  631,  839,  841,  840,  842,  629,  628,  772,  775,
+ /*   450 */   807,  808,  864,  865,  866,  867,  868,  803,  717,  806,
  /*   460 */   790,  729,  732,  733,  730,  700,  710,  719,  720,  721,
  /*   470 */   722,  705,  706,  712,  725,  758,  759,  713,  702,  703,
  /*   480 */   704,  804,  761,  773,  774,  637,  638,  768,  639,  640,
@@ -63113,7 +63496,7 @@ static char *yyTracePrompt = 0;
 ** Outputs:
 ** None.
 */
-static void sqlite3ParserTrace(FILE *TraceFILE, char *zTracePrompt){
+SQLITE_PRIVATE void sqlite3ParserTrace(FILE *TraceFILE, char *zTracePrompt){
   yyTraceFILE = TraceFILE;
   yyTracePrompt = zTracePrompt;
   if( yyTraceFILE==0 ) yyTracePrompt = 0;
@@ -63177,10 +63560,10 @@ static const char *const yyTokenName[] = {
   "having_opt",    "orderby_opt",   "limit_opt",     "sclp",        
   "as",            "seltablist",    "stl_prefix",    "joinop",      
   "on_opt",        "using_opt",     "seltablist_paren",  "joinop2",     
-  "inscollist",    "sortlist",      "sortitem",      "exprlist",    
+  "inscollist",    "sortlist",      "sortitem",      "nexprlist",   
   "setlist",       "insert_cmd",    "inscollist_opt",  "itemlist",    
-  "likeop",        "escape",        "between_op",    "in_op",       
-  "case_operand",  "case_exprlist",  "case_else",     "expritem",    
+  "exprlist",      "likeop",        "escape",        "between_op",  
+  "in_op",         "case_operand",  "case_exprlist",  "case_else",   
   "uniqueflag",    "idxitem",       "collate",       "nmnum",       
   "plus_opt",      "number",        "trigger_decl",  "trigger_cmd_list",
   "trigger_time",  "trigger_event",  "foreach_clause",  "when_clause", 
@@ -63344,7 +63727,7 @@ static const char *const yyRuleName[] = {
  /* 147 */ "sortorder ::= DESC",
  /* 148 */ "sortorder ::=",
  /* 149 */ "groupby_opt ::=",
- /* 150 */ "groupby_opt ::= GROUP BY exprlist",
+ /* 150 */ "groupby_opt ::= GROUP BY nexprlist",
  /* 151 */ "having_opt ::=",
  /* 152 */ "having_opt ::= HAVING expr",
  /* 153 */ "limit_opt ::=",
@@ -63423,10 +63806,10 @@ static const char *const yyRuleName[] = {
  /* 226 */ "case_else ::=",
  /* 227 */ "case_operand ::= expr",
  /* 228 */ "case_operand ::=",
- /* 229 */ "exprlist ::= exprlist COMMA expritem",
- /* 230 */ "exprlist ::= expritem",
- /* 231 */ "expritem ::= expr",
- /* 232 */ "expritem ::=",
+ /* 229 */ "exprlist ::= nexprlist",
+ /* 230 */ "exprlist ::=",
+ /* 231 */ "nexprlist ::= nexprlist COMMA expr",
+ /* 232 */ "nexprlist ::= expr",
  /* 233 */ "cmd ::= CREATE uniqueflag INDEX ifnotexists nm dbnm ON nm LP idxlist RP",
  /* 234 */ "uniqueflag ::= UNIQUE",
  /* 235 */ "uniqueflag ::=",
@@ -63544,7 +63927,7 @@ static void yyGrowStack(yyParser *p){
 ** A pointer to a parser.  This pointer is used in subsequent calls
 ** to sqlite3Parser and sqlite3ParserFree.
 */
-static void *sqlite3ParserAlloc(void *(*mallocProc)(size_t)){
+SQLITE_PRIVATE void *sqlite3ParserAlloc(void *(*mallocProc)(size_t)){
   yyParser *pParser;
   pParser = (yyParser*)(*mallocProc)( (size_t)sizeof(yyParser) );
   if( pParser ){
@@ -63584,9 +63967,8 @@ static void yy_destructor(YYCODETYPE yymajor, YYMINORTYPE *yypminor){
     case 196:
     case 204:
     case 210:
-    case 217:
-    case 220:
-    case 222:
+    case 218:
+    case 221:
     case 223:
     case 235:
 {sqlite3ExprDelete((yypminor->yy172));}
@@ -63601,7 +63983,8 @@ static void yy_destructor(YYCODETYPE yymajor, YYMINORTYPE *yypminor){
     case 211:
     case 212:
     case 215:
-    case 221:
+    case 216:
+    case 222:
 {sqlite3ExprListDelete((yypminor->yy174));}
       break;
     case 188:
@@ -63667,7 +64050,7 @@ static int yy_pop_parser_stack(yyParser *pParser){
 **       from malloc.
 ** </ul>
 */
-static void sqlite3ParserFree(
+SQLITE_PRIVATE void sqlite3ParserFree(
   void *p,                    /* The parser to be deleted */
   void (*freeProc)(void*)     /* Function used to reclaim memory */
 ){
@@ -64034,41 +64417,41 @@ static const struct {
   { 170, 3 },
   { 170, 3 },
   { 170, 3 },
-  { 216, 1 },
-  { 216, 2 },
-  { 216, 1 },
-  { 216, 2 },
+  { 217, 1 },
   { 217, 2 },
-  { 217, 0 },
-  { 170, 4 },
-  { 170, 2 },
-  { 170, 3 },
-  { 170, 3 },
-  { 170, 4 },
-  { 170, 2 },
-  { 170, 2 },
-  { 170, 2 },
-  { 218, 1 },
+  { 217, 1 },
+  { 217, 2 },
   { 218, 2 },
-  { 170, 5 },
+  { 218, 0 },
+  { 170, 4 },
+  { 170, 2 },
+  { 170, 3 },
+  { 170, 3 },
+  { 170, 4 },
+  { 170, 2 },
+  { 170, 2 },
+  { 170, 2 },
   { 219, 1 },
   { 219, 2 },
   { 170, 5 },
+  { 220, 1 },
+  { 220, 2 },
+  { 170, 5 },
   { 170, 3 },
   { 170, 5 },
   { 170, 4 },
   { 170, 4 },
   { 170, 5 },
-  { 221, 5 },
-  { 221, 4 },
-  { 222, 2 },
-  { 222, 0 },
-  { 220, 1 },
-  { 220, 0 },
+  { 222, 5 },
+  { 222, 4 },
+  { 223, 2 },
+  { 223, 0 },
+  { 221, 1 },
+  { 221, 0 },
+  { 216, 1 },
+  { 216, 0 },
   { 211, 3 },
   { 211, 1 },
-  { 223, 1 },
-  { 223, 0 },
   { 143, 11 },
   { 224, 1 },
   { 224, 0 },
@@ -64522,6 +64905,7 @@ static void yy_reduce(
       case 115:
       case 141:
       case 149:
+      case 230:
       case 236:
 {yygotominor.yy174 = 0;}
         break;
@@ -64605,7 +64989,6 @@ static void yy_reduce(
       case 202:
       case 225:
       case 227:
-      case 231:
 {yygotominor.yy172 = yymsp[0].minor.yy172;}
         break;
       case 138:
@@ -64614,7 +64997,6 @@ static void yy_reduce(
       case 203:
       case 226:
       case 228:
-      case 232:
 {yygotominor.yy172 = 0;}
         break;
       case 139:
@@ -64627,6 +65009,7 @@ static void yy_reduce(
         break;
       case 142:
       case 150:
+      case 229:
 {yygotominor.yy174 = yymsp[0].minor.yy174;}
         break;
       case 143:
@@ -64685,11 +65068,11 @@ static void yy_reduce(
 {sqlite3Insert(pParse, yymsp[-3].minor.yy373, 0, 0, yymsp[-2].minor.yy432, yymsp[-5].minor.yy46);}
         break;
       case 168:
-      case 229:
+      case 231:
 {yygotominor.yy174 = sqlite3ExprListAppend(yymsp[-2].minor.yy174,yymsp[0].minor.yy172,0);}
         break;
       case 169:
-      case 230:
+      case 232:
 {yygotominor.yy174 = sqlite3ExprListAppend(0,yymsp[0].minor.yy172,0);}
         break;
       case 172:
@@ -65278,7 +65661,7 @@ static void yy_accept(
 ** Outputs:
 ** None.
 */
-static void sqlite3Parser(
+SQLITE_PRIVATE void sqlite3Parser(
   void *yyp,                   /* The parser */
   int yymajor,                 /* The major token code number */
   sqlite3ParserTOKENTYPE yyminor       /* The value for the token */
@@ -65436,7 +65819,7 @@ static void sqlite3Parser(
 ** individual tokens and sends those tokens one-by-one over to the
 ** parser for analysis.
 **
-** $Id: tokenize.c,v 1.129 2007/05/15 14:34:32 drh Exp $
+** $Id: tokenize.c,v 1.130 2007/07/13 10:26:08 drh Exp $
 */
 
 /*
@@ -65594,7 +65977,7 @@ static int keywordCode(const char *z, int n){
   }
   return TK_ID;
 }
-static int sqlite3KeywordCode(const unsigned char *z, int n){
+SQLITE_PRIVATE int sqlite3KeywordCode(const unsigned char *z, int n){
   return keywordCode((char*)z, n);
 }
 
@@ -65909,9 +66292,16 @@ static int getToken(const unsigned char *z, int *tokenType){
   *tokenType = TK_ILLEGAL;
   return 1;
 }
-static int sqlite3GetToken(const unsigned char *z, int *tokenType){
+SQLITE_PRIVATE int sqlite3GetToken(const unsigned char *z, int *tokenType){
   return getToken(z, tokenType);
 }
+
+/*
+** The interface to the LEMON-generated parser
+*/
+SQLITE_PRIVATE void *sqlite3ParserAlloc(void*(*)(size_t));
+SQLITE_PRIVATE void sqlite3ParserFree(void*, void(*)(void*));
+SQLITE_PRIVATE void sqlite3Parser(void*, int, Token, Parse*);
 
 /*
 ** Run the parser on the given SQL string.  The parser structure is
@@ -65920,16 +66310,13 @@ static int sqlite3GetToken(const unsigned char *z, int *tokenType){
 ** memory obtained from malloc() and *pzErrMsg made to point to that
 ** error message.  Or maybe not.
 */
-static int sqlite3RunParser(Parse *pParse, const char *zSql, char **pzErrMsg){
+SQLITE_PRIVATE int sqlite3RunParser(Parse *pParse, const char *zSql, char **pzErrMsg){
   int nErr = 0;
   int i;
   void *pEngine;
   int tokenType;
   int lastTokenParsed = -1;
   sqlite3 *db = pParse->db;
-  extern void *sqlite3ParserAlloc(void*(*)(size_t));
-  extern void sqlite3ParserFree(void*, void(*)(void*));
-  extern void sqlite3Parser(void*, int, Token, Parse*);
 
   if( db->activeVdbeCnt==0 ){
     db->u1.isInterrupted = 0;
@@ -66061,14 +66448,14 @@ abort_parse:
 ** other files are for internal use by SQLite and should not be
 ** accessed by users of the library.
 **
-** $Id: main.c,v 1.376 2007/05/08 20:37:39 drh Exp $
+** $Id: main.c,v 1.377 2007/06/22 15:21:16 danielk1977 Exp $
 */
 
 /*
 ** The version of the library
 */
 const char sqlite3_version[] = SQLITE_VERSION;
-const char *sqlite3_libversion(void){ return sqlite3_version; }
+SQLITE_API const char *sqlite3_libversion(void){ return sqlite3_version; }
 int sqlite3_libversion_number(void){ return SQLITE_VERSION_NUMBER; }
 
 /*
@@ -66139,7 +66526,7 @@ sqlite_int64 sqlite3_last_insert_rowid(sqlite3 *db){
 /*
 ** Return the number of changes in the most recent call to sqlite3_exec().
 */
-int sqlite3_changes(sqlite3 *db){
+SQLITE_API int sqlite3_changes(sqlite3 *db){
   return db->nChange;
 }
 
@@ -66153,7 +66540,7 @@ int sqlite3_total_changes(sqlite3 *db){
 /*
 ** Close an existing SQLite database
 */
-int sqlite3_close(sqlite3 *db){
+SQLITE_API int sqlite3_close(sqlite3 *db){
   HashElem *i;
   int j;
 
@@ -66238,6 +66625,9 @@ int sqlite3_close(sqlite3 *db){
 #ifndef SQLITE_OMIT_VIRTUALTABLE
   for(i=sqliteHashFirst(&db->aModule); i; i=sqliteHashNext(i)){
     Module *pMod = (Module *)sqliteHashData(i);
+    if( pMod->xDestroy ){
+      pMod->xDestroy(pMod->pAux);
+    }
     sqliteFree(pMod);
   }
   sqlite3HashClear(&db->aModule);
@@ -66267,7 +66657,7 @@ int sqlite3_close(sqlite3 *db){
 /*
 ** Rollback all database files.
 */
-static void sqlite3RollbackAll(sqlite3 *db){
+SQLITE_PRIVATE void sqlite3RollbackAll(sqlite3 *db){
   int i;
   int inTrans = 0;
   for(i=0; i<db->nDb; i++){
@@ -66294,7 +66684,7 @@ static void sqlite3RollbackAll(sqlite3 *db){
 ** Return a static string that describes the kind of error specified in the
 ** argument.
 */
-static const char *sqlite3ErrStr(int rc){
+SQLITE_PRIVATE const char *sqlite3ErrStr(int rc){
   const char *z;
   switch( rc & 0xff ){
     case SQLITE_ROW:
@@ -66378,7 +66768,7 @@ static int sqliteDefaultBusyCallback(
 ** If this routine returns non-zero, the lock is retried.  If it
 ** returns 0, the operation aborts with an SQLITE_BUSY error.
 */
-static int sqlite3InvokeBusyHandler(BusyHandler *p){
+SQLITE_PRIVATE int sqlite3InvokeBusyHandler(BusyHandler *p){
   int rc;
   if( p==0 || p->xFunc==0 || p->nBusy<0 ) return 0;
   rc = p->xFunc(p->pArg, p->nBusy);
@@ -66455,7 +66845,7 @@ int sqlite3_busy_timeout(sqlite3 *db, int ms){
 /*
 ** Cause any pending operation to stop at its earliest opportunity.
 */
-void sqlite3_interrupt(sqlite3 *db){
+SQLITE_API void sqlite3_interrupt(sqlite3 *db){
   if( db && (db->magic==SQLITE_MAGIC_OPEN || db->magic==SQLITE_MAGIC_BUSY) ){
     db->u1.isInterrupted = 1;
   }
@@ -66471,9 +66861,9 @@ void sqlite3_interrupt(sqlite3 *db){
 **
 ** Use sqlite3_free() to free memory returned by sqlite3_mprintf().
 */
-void sqlite3_free(void *p){ if( p ) sqlite3OsFree(p); }
-void *sqlite3_malloc(int nByte){ return nByte>0 ? sqlite3OsMalloc(nByte) : 0; }
-void *sqlite3_realloc(void *pOld, int nByte){ 
+SQLITE_API void sqlite3_free(void *p){ if( p ) sqlite3OsFree(p); }
+SQLITE_API void *sqlite3_malloc(int nByte){ return nByte>0 ? sqlite3OsMalloc(nByte) : 0; }
+SQLITE_API void *sqlite3_realloc(void *pOld, int nByte){ 
   if( pOld ){
     if( nByte>0 ){
       return sqlite3OsRealloc(pOld, nByte);
@@ -66492,7 +66882,7 @@ void *sqlite3_realloc(void *pOld, int nByte){
 ** that if a malloc() fails in sqlite3_create_function(), an error code
 ** is returned and the mallocFailed flag cleared. 
 */
-static int sqlite3CreateFunc(
+SQLITE_PRIVATE int sqlite3CreateFunc(
   sqlite3 *db,
   const char *zFunctionName,
   int nArg,
@@ -66649,7 +67039,7 @@ int sqlite3_overload_function(
 ** trace is a pointer to a function that is invoked at the start of each
 ** SQL statement.
 */
-void *sqlite3_trace(sqlite3 *db, void (*xTrace)(void*,const char*), void *pArg){
+SQLITE_API void *sqlite3_trace(sqlite3 *db, void (*xTrace)(void*,const char*), void *pArg){
   void *pOld = db->pTraceArg;
   db->xTrace = xTrace;
   db->pTraceArg = pArg;
@@ -66663,7 +67053,7 @@ void *sqlite3_trace(sqlite3 *db, void (*xTrace)(void*,const char*), void *pArg){
 ** profile is a pointer to a function that is invoked at the conclusion of
 ** each SQL statement that is run.
 */
-void *sqlite3_profile(
+SQLITE_API void *sqlite3_profile(
   sqlite3 *db,
   void (*xProfile)(void*,const char*,sqlite_uint64),
   void *pArg
@@ -66747,7 +67137,7 @@ void *sqlite3_rollback_hook(
 **           2                0              memory
 **           3               any             memory
 */
-static int sqlite3BtreeFactory(
+SQLITE_PRIVATE int sqlite3BtreeFactory(
   const sqlite3 *db,        /* Main database when opening aux otherwise 0 */
   const char *zFilename,    /* Name of the file containing the BTree database */
   int omitJournal,          /* if TRUE then do not journal this file */
@@ -66793,7 +67183,7 @@ static int sqlite3BtreeFactory(
 ** Return UTF-8 encoded English language explanation of the most recent
 ** error.
 */
-const char *sqlite3_errmsg(sqlite3 *db){
+SQLITE_API const char *sqlite3_errmsg(sqlite3 *db){
   const char *z;
   assert( !sqlite3MallocFailed() );
   if( !db ){
@@ -66814,7 +67204,7 @@ const char *sqlite3_errmsg(sqlite3 *db){
 ** Return UTF-16 encoded English language explanation of the most recent
 ** error.
 */
-const void *sqlite3_errmsg16(sqlite3 *db){
+SQLITE_API const void *sqlite3_errmsg16(sqlite3 *db){
   /* Because all the characters in the string are in the unicode
   ** range 0x00-0xFF, if we pad the big-endian string with a 
   ** zero byte, we can obtain the little-endian string with
@@ -66857,7 +67247,7 @@ const void *sqlite3_errmsg16(sqlite3 *db){
 ** Return the most recent error code generated by an SQLite routine. If NULL is
 ** passed to this function, we assume a malloc() failed during sqlite3_open().
 */
-int sqlite3_errcode(sqlite3 *db){
+SQLITE_API int sqlite3_errcode(sqlite3 *db){
   if( !db || sqlite3MallocFailed() ){
     return SQLITE_NOMEM;
   }
@@ -67030,41 +67420,47 @@ static int openDatabase(
   db->aDb[1].safety_level = 1;
 #endif
 
+  db->magic = SQLITE_MAGIC_OPEN;
+  if( sqlite3MallocFailed() ){
+    goto opendb_out;
+  }
+
   /* Register all built-in functions, but do not attempt to read the
   ** database schema yet. This is delayed until the first time the database
   ** is accessed.
   */
-  if( !sqlite3MallocFailed() ){
-    sqlite3Error(db, SQLITE_OK, 0);
-    sqlite3RegisterBuiltinFunctions(db);
-  }
-  db->magic = SQLITE_MAGIC_OPEN;
+  sqlite3Error(db, SQLITE_OK, 0);
+  sqlite3RegisterBuiltinFunctions(db);
 
   /* Load automatic extensions - extensions that have been registered
   ** using the sqlite3_automatic_extension() API.
   */
   (void)sqlite3AutoLoadExtensions(db);
+  if( sqlite3_errcode(db)!=SQLITE_OK ){
+    goto opendb_out;
+  }
 
 #ifdef SQLITE_ENABLE_FTS1
-  {
+  if( !sqlite3MallocFailed() ){
     extern int sqlite3Fts1Init(sqlite3*);
-    sqlite3Fts1Init(db);
+    rc = sqlite3Fts1Init(db);
   }
 #endif
 
 #ifdef SQLITE_ENABLE_FTS2
-  {
+  if( !sqlite3MallocFailed() && rc==SQLITE_OK ){
     extern int sqlite3Fts2Init(sqlite3*);
-    sqlite3Fts2Init(db);
+    rc = sqlite3Fts2Init(db);
   }
 #endif
 
 #ifdef SQLITE_ENABLE_ICU
-  if( !sqlite3MallocFailed() ){
+  if( !sqlite3MallocFailed() && rc==SQLITE_OK ){
     extern int sqlite3IcuInit(sqlite3*);
-    sqlite3IcuInit(db);
+    rc = sqlite3IcuInit(db);
   }
 #endif
+  sqlite3Error(db, rc, 0);
 
   /* -DSQLITE_DEFAULT_LOCKING_MODE=1 makes EXCLUSIVE the default locking
   ** mode.  -DSQLITE_DEFAULT_LOCKING_MODE=0 make NORMAL the default locking
@@ -67088,7 +67484,7 @@ opendb_out:
 /*
 ** Open a new database handle.
 */
-int sqlite3_open(
+SQLITE_API int sqlite3_open(
   const char *zFilename, 
   sqlite3 **ppDb 
 ){
@@ -67099,7 +67495,7 @@ int sqlite3_open(
 /*
 ** Open a new database handle.
 */
-int sqlite3_open16(
+SQLITE_API int sqlite3_open16(
   const void *zFilename, 
   sqlite3 **ppDb
 ){
@@ -67138,7 +67534,7 @@ int sqlite3_open16(
 ** This routine sets the error code and string returned by
 ** sqlite3_errcode(), sqlite3_errmsg() and sqlite3_errmsg16().
 */
-int sqlite3_finalize(sqlite3_stmt *pStmt){
+SQLITE_API int sqlite3_finalize(sqlite3_stmt *pStmt){
   int rc;
   if( pStmt==0 ){
     rc = SQLITE_OK;
@@ -67156,7 +67552,7 @@ int sqlite3_finalize(sqlite3_stmt *pStmt){
 ** This routine sets the error code and string returned by
 ** sqlite3_errcode(), sqlite3_errmsg() and sqlite3_errmsg16().
 */
-int sqlite3_reset(sqlite3_stmt *pStmt){
+SQLITE_API int sqlite3_reset(sqlite3_stmt *pStmt){
   int rc;
   if( pStmt==0 ){
     rc = SQLITE_OK;
@@ -67290,7 +67686,7 @@ int sqlite3_get_autocommit(sqlite3 *db){
 ** debugging builds.  This provides a way to set a breakpoint for when
 ** corruption is first detected.
 */
-static int sqlite3Corrupt(void){
+SQLITE_PRIVATE int sqlite3Corrupt(void){
   return SQLITE_CORRUPT;
 }
 #endif
@@ -67464,7 +67860,7 @@ int sqlite3_clear_bindings(sqlite3_stmt *pStmt){
 /*
 ** Sleep for a little while.  Return the amount of time slept.
 */
-int sqlite3_sleep(int ms){
+SQLITE_API int sqlite3_sleep(int ms){
   return sqlite3OsSleep(ms);
 }
 

@@ -170,7 +170,12 @@ setMethod("dbCommit", "SQLiteConnection",
 )
 
 setMethod("dbRollback", "SQLiteConnection",
-   def = function(conn, ...) sqliteTransactionStatement(conn, "ROLLBACK")
+   def = function(conn, ...) {
+       rsList <- dbListResults(conn)
+       if (length(rsList))
+         dbClearResult(rsList[[1]])
+       sqliteTransactionStatement(conn, "ROLLBACK")
+   }
 )
 
 setMethod("dbBeginTransaction", "SQLiteConnection",

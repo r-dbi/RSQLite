@@ -30,6 +30,7 @@ extern "C" {
 #endif
 
 #include "Rhelpers.h"
+#include <ctype.h>
 
 /* Microsoft Visual C++ uses int _getpid()  */
 #ifdef MSVC

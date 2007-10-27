@@ -147,3 +147,16 @@ testFactorWithNA <- function() {
     checkEquals(df$x, got$x)
     checkEquals(as.character(df$y), got$y)
 }
+
+testLogicalTreatedAsInt <- function() {
+    df <- data.frame(x=1:3, y=c(NA, TRUE, FALSE))
+
+    dbWriteTable(DATA$db, "t1", df)
+
+    got <- dbGetQuery(DATA$db, "select * from t1")
+
+    checkEquals("integer", typeof(got$y))
+    checkEquals(as.integer(NA), got$y[1])
+    checkEquals(1L, got$y[2])
+    checkEquals(0L, got$y[3])
+}

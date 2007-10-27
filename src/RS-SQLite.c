@@ -783,11 +783,11 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
 
     params[i].is_protected = 0;
 
-    if(isInteger(data)){
+    if(isInteger(data) || isLogical(data)){
       params[i].type = INTSXP;
       params[i].data = data;
     }
-    else if(isNumeric(data)){
+    else if(isReal(data)){
       params[i].type = REALSXP;
       params[i].data = data;
     }

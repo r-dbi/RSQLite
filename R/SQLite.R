@@ -281,13 +281,14 @@ setMethod("dbHasCompleted", "SQLiteResult",
    },
    valueClass = "logical"
 )
-setMethod("dbGetException", "SQLiteConnection",
-   def = function(conn, ...){
-     id <- as.integer(conn)
-     .Call("RS_SQLite_getException", id[1:2], PACKAGE = .SQLitePkgName)
-   },
-   valueClass = "list"
-)
+##RG comments this definition out - not sure why there are two
+##setMethod("dbGetException", "SQLiteConnection",
+##   def = function(conn, ...){
+##     id <- as.integer(conn)
+##     .Call("RS_SQLite_getException", id[1:2], PACKAGE = .SQLitePkgName)
+##   },
+##   valueClass = "list"
+##)
 
 setMethod("dbListTables", "SQLiteConnection",
    def = function(conn, ...){

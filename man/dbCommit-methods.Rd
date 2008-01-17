@@ -64,7 +64,6 @@ rs <- dbSendQuery(con, "DELETE from arrests WHERE Murder > 5")
 dbCommit(con)
 dbGetQuery(con, "select count(*) from arrests")[1, ]
 
-
 dbDisconnect(con)
 }
 \keyword{methods}

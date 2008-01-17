@@ -47,12 +47,22 @@
   \code{\link[DBI]{dbGetInfo}},
   \code{\link[DBI]{dbReadTable}}.
 }
-\examples{\dontrun{
-drv <- dbDriver("MySQL")
-con <- dbConnect(drv)
-res <- dbSendQuery(con, "SELECT * from liv25")
-data <- fetch(res, n = -1)
-}
+\examples{
+con <- dbConnect(SQLite(), ":memory:")
+data(USArrests)
+dbWriteTable(con, "arrests", USArrests)
+
+res <- dbSendQuery(con, "SELECT * from arrests")
+data <- fetch(res, n = 2)
+data
+dbClearResult(res)
+
+dbGetQuery(con, "SELECT * from arrests limit 3")
+
+tryCatch(dbGetQuery(con, "SELECT * FROM tableDoesNotExist"),
+         error=function(e) { print("caught") })
+dbGetException(con)
+
 }
 \keyword{methods}
 \keyword{interface}

@@ -1,4 +1,3 @@
-% $Id$
 \name{dbSendQuery-methods}
 \docType{methods}
 \alias{dbSendQuery-methods}
@@ -15,21 +14,18 @@
 \alias{dbClearResult,SQLiteResult-method}
 \alias{dbGetException,SQLiteConnection-method}
 \title{
-  Execute a statement on a given database connection
+  Execute a SQL statement on a database connection
 }
 \description{
-   These methods are straight-forward implementations of the corresponding
-   generic functions.
-   
-   The prepared variants take an extra data.frame, which performs parameter
-   binding.
+   These are the primary methods for interacting with a database via SQL
+   queries.
 }
 \section{Methods}{\describe{
-\item{conn}{
-  an \code{SQLiteConnection} object.
-  }
-\item{statement}{a character vector of length 1 with the SQL statement.}
-\item{res}{an \code{SQLiteResult} object.}
+\item{conn}{a \code{SQLiteConnection} object.}
+\item{statement}{a character vector of length one specifying the SQL
+statement that should be executed.  Only a single SQL statment should be
+provided.}
+\item{res}{a \code{SQLiteResult} object.}
 \item{\dots }{additional parameters.}
 }
 }

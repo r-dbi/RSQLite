@@ -54,13 +54,16 @@ dbGetQuery(con, "select count(*) from arrests")[1, ]
 
 dbBeginTransaction(con)
 rs <- dbSendQuery(con, "DELETE from arrests WHERE Murder > 1")
+do_commit <- if (dbGetInfo(rs)[["rowsAffected"]] > 40) FALSE else TRUE
+dbClearResult(rs)
 dbGetQuery(con, "select count(*) from arrests")[1, ]
-if (dbGetInfo(rs)[["rowsAffected"]] > 40)
-  dbRollback(con)
+if (!do_commit)
+    dbRollback(con)
 dbGetQuery(con, "select count(*) from arrests")[1, ]
 
 dbBeginTransaction(con)
 rs <- dbSendQuery(con, "DELETE from arrests WHERE Murder > 5")
+dbClearResult(rs)
 dbCommit(con)
 dbGetQuery(con, "select count(*) from arrests")[1, ]
 

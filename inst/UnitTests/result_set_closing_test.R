@@ -28,7 +28,7 @@ test_dbGetQuery_auto_close <- function() {
     dbDisconnect(db)
 }
 
-test_dbGetQuery_warn_on_new_connection <- function() {
+test_dbGetQuery_error_on_incomplete_open_result_set <- function() {
     db <- dbConnect(SQLite(), DATA$p2)
     res <- dbSendQuery(db, "CREATE TABLE t1 (b integer, bb text)")
     dbClearResult(res)
@@ -37,7 +37,7 @@ test_dbGetQuery_warn_on_new_connection <- function() {
     ans <- tryCatch({
         dbGetQuery(db, "CREATE TABLE t2 (foo text)")
         FALSE
-        }, warning=function(w) {
+        }, error=function(w) {
                  TRUE
              })
     checkEquals(TRUE, ans)

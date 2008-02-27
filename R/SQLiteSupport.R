@@ -238,17 +238,7 @@ function(con, statement, bind.data=NULL)
 "sqliteQuickSQL" <-
 function(con, statement, bind.data=NULL, ...)
 {
-   ## first close any complete result sets
-   lapply(dbListResults(con),
-          function(rs) if (dbHasCompleted(rs)) dbClearResult(rs))
-   nr <- length(dbListResults(con))
-   if(nr>0){                     ## are there resultSets pending on con?
-       warning(paste("There is an open, incomplete result set;",
-                     "executing query on a temporary connection"))
-      new.con <- dbConnect(con)   ## yep, create a clone connection
-      on.exit(dbDisconnect(new.con))
-      rs <- sqliteExecStatement(new.con, statement, bind.data)
-   } else rs <- sqliteExecStatement(con, statement, bind.data)
+   rs <- sqliteExecStatement(con, statement, bind.data)
    if(dbHasCompleted(rs)){
       dbClearResult(rs)            ## no records to fetch, we're done
       invisible()

@@ -113,7 +113,7 @@ fi
 
 if test "${FOUND_ALL}" = "no" ; then
    # Since we installed successfully, now we set PKG_* vars and exit
-   PKG_CPPFLAGS="-DRSQLITE_USE_BUNDLED_SQLITE"
+   PKG_CPPFLAGS="-DRSQLITE_USE_BUNDLED_SQLITE -DSQLITE_MAX_SQL_LENGTH=2000000"
    PKG_LIBS=""
    AC_SEARCH_LIBS(fdatasync, [rt])
    PKG_LIBS="${PKG_LIBS} $LIBS"

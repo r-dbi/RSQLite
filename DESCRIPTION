@@ -1,5 +1,5 @@
 Package: RSQLite
-Version: 0.6-8
+Version: 0.6-9
 Title: SQLite interface for R
 Author: David A. James
 Maintainer: Seth Falcon <seth@userprimary.net>

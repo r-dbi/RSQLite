@@ -1,0 +1,168 @@
+Version 0.4-12
+
+* Fix bug in dbListTables for empty databases
+
+Version 0.4-11
+
+* Implemented dbCommit() and dbRollback(). There is also a new
+  generic method dbBeginTransaction(), which begins a transaction.
+  Note that this is an extension to the DBI interface.
+
+* Update to the SQLite 3 API for fetching records. This means that
+  the records are pulled from the database as required, and not
+  cached in memory as was previously done.
+
+* Added generic methods dbSendPreparedQuery() and dbGetPreparedQuery()
+  which are similiar to dbSendQuery() and dbGetQuery(), but take an
+  extra "bind.data" parameter, which is a data frame. The statement
+  is assumed to contain bind variables. Bind variables are either
+  for a column name (":name" or "@name") or for a column index ("?")
+  in the data frame. See http://sqlite.org/capi3ref.html for more details.
+
+  dbGetPreparedQuery(con, "INSERT INTO table1 VALUES (:col1)",
+                           data.frame(col1=c(1, 2)) )
+
+  Each bind variable in the query has to be bound only once, either via
+  named or positional parameters. If it is not bound or is bound more
+  than once (due to a mix or positional/named parameters) an error is
+  thrown. Any extra columns in the data frame are ignored.
+
+  If you are having a lot of string parameters, use stringsAsFactors=FALSE
+  when creating the bind.data data.frame instance.  You can also use I().
+
+* Added experimental sqliteQuickColumn function that retrieves an entire 
+  column from a specified table as quickly as possible.
+
+* The SQLite driver has a new logical parameter "shared.cache" to
+  enable the shared-cache mode, which allows multiple connections
+  to share a single data and schema cache. See
+  http://www.sqlite.org/sharedcache.html
+
+Version 0.4-9
+
+* Upgraded to SQLite 3.3.8
+
+* Use .SQLitePkgName instead of hard-coding the package name when
+  using .Call
+
+* dbConnect() now has a logical parameter "loadable.extensions"
+  which will allow loading of extensions. See the Loadable
+  Extensions documentation:
+  http://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions
+
+Version 0.4-4
+
+* Upgraded to SQLite 3.3.7
+
+* Default when building from source is now to compile the included
+  version of SQLite and link to it statically
+
+* Fixed unclosed textConnections
+
+Version 0.4-1
+
+* Added a method for dbWriteTable to write table from a text file, e.g.,
+  dbWriteTable(con, "tablename", "filename")
+
+* Fixed problems exporting/importing NA's (thanks to Ronngui Huang for
+  a very clear bug report).
+
+* Fixed double free() in the C code, a tiny memory leak, and configure now
+  builds sqlite properly on 64-bit linux (thanks to Seth Falcon for these).
+
+* dbConnect() now accepts values for the "cache_size" and "sychnronous"
+  PRAGMAs ("synchronous" defaults to 0 or "off") to improve
+  performance (thanks to Charles Loboz for pointing these out, see the
+  file "rsqlitePerf.txt").
+
+Version 0.4-0
+
+* First attempt at using the new SQLite Version 3 API.  This version
+  is a bridge to the new API, but it does not make available the new
+  capabilities (e.g., prepared statements, data bindings, etc.) but
+  prepares us for those new features.
+
+* Clean up some installation code (mainly to make it easy to automatically
+  build on Windows, as per Kurt Hornik and Uwe Ligges suggestions).
+
+* Fixed bug that ignored "fetch.default.rec" in SQLite()/dbDriver()
+  (as reported by Duncan Murdoch)
+
+* Fixed bug in dbReadTable() that was not recognizing "row.names" in its
+  default, thus it now re-creates a data.frame that has been exported
+  with dbWriteTable().
+
+* Fixed bug where dbListTables was not listing views (as reported by
+  Doug Bates).
+
+* Added code in "configure.in" to determine CC/CFLAGS used in compiling R
+  (as suggested by Brian D. Ripley to get it to compile on 64-bit machines).
+  As of today, I can't test this myself.
+
+Version 0.3-5
+
+* Documentation typos, trivial packaging changes, as per CRAN maintainer
+  request.
+
+Version 0.3-4
+
+* Fixed documentation typos.
+
+Version 0.3-3
+
+* Minor fixes to accommadate R 1.8.0 changes to data.frame subsetting.
+
+* Updated the documentation to use 1.8.0 new S4-style method documentation.
+
+* Updated to SQLite to the latest 2.8.6 (included with RSQLite).
+
+* Added file NAMESPACE.future to prepare for namespace implementation
+  at some future release.
+
+Version 0.3-2
+
+* Ported to Windows.  It now installs fine under Windows with
+
+    Rcmd INSTALL RSQLite_0.3-2.tar.gz
+
+  (there's also a binary RSQLite_0.3-2.zip)
+
+* Added code to verify that the SQLite library versions used for
+  compilation and at runtime agree.
+
+* Added source sqlite-2.8.3.
+
+* Fixed minor documentation errors and removed the DBI.pdf documentation
+  file, which is included in the required DBI package.
+
+* The package now installs as a binary image by default (use the --no-save
+  argument to R CMD INSTALL to override this).
+
+Version 0.3-1
+
+* Moved the implementation to version 4 style classes, and it now
+  it is fully compliant with the DBI 0.1-3.
+
+* Simplified the core helper R/SQLite functions (w. prefix "sqlite")
+  following the ROracle model.
+
+* Updated to sqlite version 2.7.1 (note that if you have an sqlite
+  database file from a version prior to 2.6 you'll need to update
+  it -- for details see http://www.hwaic.com/sw/sqlite).
+
+Version 0.2-1
+
+* Worked mostly in the configuration;  added the --enable-sqlite and
+  --with-sqlite arguments to have the RSQLite configuration also install
+  SQLite or locate it, respectively.
+
+Version 0.1-1
+
+* First implementation -- used the RS-DBI.[ch] code (which is the core
+  connection/cursor manager) "as is" and modified the RS-MySQL.[hc],
+  (which sits directly on top of the MySQL C API) and replace the
+  MySQL API calls with SQLite API calls.  This was pretty easy, except
+  for the fact that the SQLite API is so minimal (3, yes, 3 C functions)
+  with no support for connections, result set (cursors), data types,
+  meta-data -- nothing.  So I had to simulate all this. (Actually it
+  wasn't too bad).

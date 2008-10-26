@@ -1,4 +1,3 @@
-
 RSQLite -- An embedded database engine in R
 
 SQLite (http://www.sqlite.org) is a public-domain,
@@ -7,16 +6,12 @@ a decent subset of the SQL 92 standard, including the core
 table creation, updating, insertion, and selection operations,
 plus transaction management.
 
-RSQLite requires SQLite version 2.8.6, and it's included
-as part of this package.
-
 For those interested, the actual implementation of SQLite
 relies on a simple virtual database machine for dynamically
 translating SQL into executable code, for details see
 www.hwaci.com/sw/sqlite/vdbe.html
 
-RSQLite complies with the R/S database interface being defined
-by the R-SIG-DB group.
+RSQLite complies with DBI database interface.
 
 See the file "INSTALL" for details on how to install the package on
 Linux/Unix-like systems.  See INSTALL.windows for instructions on

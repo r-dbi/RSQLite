@@ -1,0 +1,7 @@
+* Updating the included SQLite version
+
+1. Download the sqlite-amalgamatation from
+   http://www.sqlite.org/download.html.  Unzip files to
+   RSQLite/src/sqlite.
+
+2. Change the version in the DESCRIPTION file.

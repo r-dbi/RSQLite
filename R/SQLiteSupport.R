@@ -57,7 +57,7 @@ function(obj, verbose = FALSE, ...)
   }
   cat("  Open connections:", info$"num_con", "\n")
   if(verbose && !is.null(info$connectionIds)){
-    for(i in seq(along = info$connectionIds)){
+    for(i in seq(along.with = info$connectionIds)){
       cat("   ", i, " ")
       show(info$connectionIds[[i]])
     }
@@ -77,7 +77,7 @@ function(obj, what="", ...)
   ## replace drv/connection id w. actual drv/connection objects
   conObjs <- vector("list", length = info$"num_con")
   ids <- info$connectionIds
-  for(i in seq(along = ids))
+  for(i in seq(along.with = ids))
     conObjs[[i]] <- new("SQLiteConnection", Id = c(drvId, ids[i]))
   info$connectionIds <- conObjs
   info$managerId <- new("SQLiteDriver", Id = drvId)
@@ -138,7 +138,7 @@ function(obj, verbose = FALSE, ...)
     cat("  SQLite engine thread id: ", info$threadId, "\n")
   }
   if(length(info$rsId)>0){
-    for(i in seq(along = info$rsId)){
+    for(i in seq(along.with = info$rsId)){
       cat("   ", i, " ")
       show(info$rsId[[i]])
     }
@@ -167,7 +167,7 @@ function(obj, what="", ...)
   info <- .Call("RS_SQLite_connectionInfo", id, PACKAGE = .SQLitePkgName)
   if(length(info$rsId)){
     rsId <- vector("list", length = length(info$rsId))
-    for(i in seq(along = info$rsId))
+    for(i in seq(along.with = info$rsId))
       rsId[[i]] <- new("SQLiteResult", Id = c(id, info$rsId[i]))
     info$rsId <- rsId
   }
@@ -276,7 +276,7 @@ function(res, n=0, ...)
   ## create running row index as of previous fetch (if any)
   cnt <- dbGetRowCount(res)
   nrec <- length(rel[[1]])
-  indx <- seq(from = cnt - nrec + as.integer(1), length = nrec)
+  indx <- seq(from = cnt - nrec + as.integer(1), length.out = nrec)
   attr(rel, "row.names") <- as.integer(indx)
   class(rel) <- "data.frame"
   rel
@@ -309,7 +309,7 @@ function(obj, what = "", ...)
        flds$type <- .Call("RS_SQLite_typeNames", flds$type,
                             PACKAGE = .SQLitePkgName)
        ## no factors
-       info$fields <- structure(flds, row.names = paste(seq(along=flds$type)),
+       info$fields <- structure(flds, row.names = paste(seq(along.with=flds$type)),
                                 class="data.frame")
    }
    if(!missing(what))

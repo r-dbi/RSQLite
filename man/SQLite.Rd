@@ -111,7 +111,7 @@ On meta-data:
 \code{\link[DBI]{dbGetStatement}},
 \code{\link[DBI]{dbHasCompleted}},
 \code{\link[DBI]{dbGetRowCount}},
-\code{\link[DBI]{dbGetAffectedRows}}.
+\code{\link[DBI]{dbGetRowsAffected}}.
 }
 \examples{
    # create a SQLite instance and create one connection.

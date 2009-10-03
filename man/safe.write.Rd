@@ -20,7 +20,7 @@ safe.write(value, file, batch, row.names = TRUE, ..., sep = ',',
   \item{quote.string}{logical value passed to \code{write.table}.}
 }
 \details{
-   The function has a while loop invoking \code{\link[base]{write.table}}
+   The function has a while loop invoking \code{\link{write.table}}
    for subsets of \code{batch} rows of \code{value}.  Since this is
    a helper function for \code{\link[RMySQL]{mysqlWriteTable}} has hardcoded
    other arguments to \code{write.table}.
@@ -30,7 +30,7 @@ safe.write(value, file, batch, row.names = TRUE, ..., sep = ',',
 }
 \note{No error checking whatsoever is done.}
 
-\seealso{\code{\link[base]{write.table}}} 
+\seealso{\code{\link{write.table}}}
 
 \examples{\dontrun{
    ctr.file <- file("dump.sqloader", "w")

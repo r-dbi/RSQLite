@@ -106,7 +106,7 @@ On meta-data:
 \code{\link[DBI]{dbGetInfo}},
 \code{\link[DBI]{dbListTables}},
 \code{\link[DBI]{dbListFields}},
-\code{\link[DBI]{dbColumnsInfo}},
+\code{\link[DBI]{dbColumnInfo}},
 \code{\link[DBI]{dbGetException}},
 \code{\link[DBI]{dbGetStatement}},
 \code{\link[DBI]{dbHasCompleted}},

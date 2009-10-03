@@ -67,13 +67,13 @@
 
   \code{header} is a logical indicating whether the first data line
   (but see \code{skip}) has a header or not.  If missing, it value
-  is determined following \code{\link[base]{read.table}} convention,
+  is determined following \code{\link{read.table}} convention,
   namely, it is set to TRUE if and only if the first row has one
   fewer field that the number of columns.
 
   \code{row.names} is a logical to specify whether the first column
   is a set of row names.  If missing its defualt follows the 
-  \code{\link[base]{read.table}} convention.
+  \code{\link{read.table}} convention.
   
   \code{col.names} a character vector with column names (these names
   will be filtered with \code{\link[DBI]{make.db.names}} to 

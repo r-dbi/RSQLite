@@ -1,3 +1,11 @@
+Version 0.7-3
+
+- Use the default value for SQLITE_MAX_SQL_LENGTH which has now been
+  significantly increased over the value of 2 million that we had set
+  in 2008.
+
+- Fix some Rd cross references in the documentation.
+
 Version 0.7-2
 
 - Fixed some partial argument matching warnings.  Thanks to Matthias

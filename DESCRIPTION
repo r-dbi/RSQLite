@@ -1,12 +1,12 @@
 Package: RSQLite
-Version: 0.7-3
+Version: 0.8-0
 Title: SQLite interface for R
 Author: David A. James
 Maintainer: Seth Falcon <seth@userprimary.net>
 Description: Database Interface R driver for SQLite.
    This package embeds the SQLite database engine in R and
    provides an interface compliant with the DBI package.
-   The source for the SQLite engine (version 3.6.4) is included.
+   The source for the SQLite engine (version 3.6.19) is included.
 LazyLoad: yes
 Depends: R (>= 2.6.0), methods, DBI (>= 0.2-3)
 Imports: methods, DBI (>= 0.2-3)

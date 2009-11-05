@@ -67,7 +67,7 @@ testUnitFetch <- function() {
     expected_types <- c(name="character", fldInt="integer", fldDbl="double")
     rs <- dbSendQuery(db, "select * from t1")
     on.exit(dbClearResult(rs))
-    for (i in seq(length=nrow(basicDf))) {
+    for (i in seq_len(nrow(basicDf))) {
         gotdf <- fetch(rs, n=1)
         checkEquals(1:1, nrow(gotdf))
         checkEquals(ncol(basicDf), ncol(gotdf))

@@ -47,14 +47,14 @@ setAs("dbObjectId", "character",
 
 ## formating, showing, printing,...
 setMethod("format", "dbObjectId", 
-   def = function(x, ...) {
+   definition = function(x, ...) {
       paste("(", paste(as(x, "integer"), collapse=","), ")", sep="")
    },
    valueClass = "character"
 )
 
 setMethod("show", "dbObjectId",
-   def = function(object) {
+   definition = function(object) {
       expired <- if(isIdCurrent(object)) "" else "Expired "
       str <- paste("<", expired, class(object), ":", format(object), ">", sep="")
       cat(str, "\n")

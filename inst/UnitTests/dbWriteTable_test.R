@@ -62,7 +62,7 @@ testCanCloseAfterFailedWriteTable <- function() {
     dbGetQuery(con, "create unique index t1_c1_c2_idx on t1(col1, col2)")
 
     ## uniqueness constraint error/failure
-    checkEquals(FALSE, dbWriteTable(con,"t1", x, append=T))
+    checkEquals(FALSE, dbWriteTable(con,"t1", x, append=TRUE))
 
     ## this used to cause an error
     checkEquals(TRUE, dbDisconnect(con))
@@ -114,22 +114,22 @@ testImportViaWriteTable <- function() {
     expect <- data.frame(a=c(1:3, NA), b=c("x", "y", "z", "E"),
                          stringsAsFactors=FALSE)
     checkTrue(dbWriteTable(DATA$db, "dat", "dat1.txt", sep="|", eol="\n",
-                           head=TRUE, over=TRUE))
+                           header=TRUE, overwrite=TRUE))
     got <- dbGetQuery(DATA$db, "select * from dat")
     checkEquals(expect, got)
 
     checkTrue(dbWriteTable(DATA$db, "dat", "dat2.txt", sep="|", eol="\n",
-                           head=TRUE, over=TRUE))
+                           header=TRUE, overwrite=TRUE))
     got <- dbGetQuery(DATA$db, "select * from dat")
     checkEquals(expect, got)
 
     checkTrue(dbWriteTable(DATA$db, "dat", "dat3.txt", sep="|", eol="\r\n",
-                           head=TRUE, over=TRUE))
+                           header=TRUE, overwrite=TRUE))
     got <- dbGetQuery(DATA$db, "select * from dat")
     checkEquals(expect, got)
 
     checkTrue(dbWriteTable(DATA$db, "dat", "dat4.txt", sep="|", eol="\r\n",
-                           head=TRUE, over=TRUE))
+                           header=TRUE, overwrite=TRUE))
     got <- dbGetQuery(DATA$db, "select * from dat")
     checkEquals(expect, got)
 

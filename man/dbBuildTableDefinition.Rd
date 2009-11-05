@@ -16,7 +16,7 @@ dbBuildTableDefinition(dbObj, name, value, field.types = NULL, row.names = TRUE,
   \item{field.types}{optional named list of the types for each field 
     in \code{value}} 
   \item{row.names}{logical, should row.name of \code{value} be exported
-    as a \code{row\_names} field? Default is TRUE}
+    as a \code{row\_names} field? Default is \code{TRUE}}
   \item{\dots}{reserved for future use}
 }
 \details{

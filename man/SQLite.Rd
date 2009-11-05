@@ -34,7 +34,7 @@ SQLite(max.con = 16, fetch.default.rec = 500, force.reload = FALSE,
   }
 \item{shared.cache}{
   logical describing whether shared-cache mode should be enabled on the SQLite
-  driver. The default is FALSE.
+  driver. The default is \code{FALSE}.
   }
 }
 \value{

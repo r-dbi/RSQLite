@@ -75,9 +75,9 @@
 con <- dbConnect("SQLite", dbname = "sqlite.db")
 
 export <- c("trantime.email", "trantime.print", "round.trip.time.email")
-tabs <- make.db.names(export, unique = T, allow.keywords = T)
+tabs <- make.db.names(con, export, unique = TRUE, allow.keywords = TRUE)
 
-for(i in seq(along = export) )
+for(i in seq_along(export) )
    dbWriteTable(con, name = tabs[i],  get(export[i]))
 }
 }

@@ -20,7 +20,7 @@
   an object that inherits from \code{SQLiteDriver} as created by
   \code{dbDriver}.
 }
-\item{...}{
+\item{\dots}{
   any other arguments are passed to the driver \code{drvName}.
   }
 }

@@ -135,7 +135,7 @@ if(dbExistsTable(con, "fuel_frame")){
    dbWriteTable(conn, "fuel_frame", fuel.frame)
 }
 if(dbExistsTable(conn, "RESULTS")){
-   dbWriteTable(conn, "RESULTS", results2000, append = T)
+   dbWriteTable(conn, "RESULTS", results2000, append = TRUE)
 else
    dbWriteTable(conn, "RESULTS", results2000)
 }

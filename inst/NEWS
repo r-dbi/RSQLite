@@ -6,6 +6,8 @@ Version 0.8-0
   Avoid partial argument name matching, use TRUE/FALSE not T/F and
   improve Rd markup.
 
+- Integrate RUnit unit tests so that they run during R CMD check.
+
 Version 0.7-3
 
 - Use the default value for SQLITE_MAX_SQL_LENGTH which has now been

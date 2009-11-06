@@ -672,3 +672,28 @@ function(value, file, batch, row.names = TRUE, ...,
   }
   sql.type
 }
+
+## RSQLite RUnit unit test support
+.test_RSQLite <- function(dir) {
+    require("RUnit", quietly=TRUE) || stop("RUnit not found")
+
+    .any_errors <- function(res) any(sapply(res, function(r) r[["nErr"]] > 0))
+    .any_fail <- function(res) any(sapply(res, function(r) r[["nFail"]] > 0))
+
+    if (missing(dir)) {
+        dir <- system.file("UnitTests", package="RSQLite")
+    }
+    cwd <- getwd()
+    on.exit(setwd(cwd))
+    setwd(dir)
+    suite <- defineTestSuite(name="RSQLite RUnit Tests", dirs=".",
+                             testFileRegexp=".*_test\\.R$",
+                             rngKind="default",
+                             rngNormalKind="default")
+    result <- runTestSuite(suite)
+    printTextProtocol(result, showDetails=FALSE)
+    if (.any_errors(result) || .any_fail(result)) {
+        stop("RSQLite unit tests FAILED")
+    }
+    result
+}

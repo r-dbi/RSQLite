@@ -3,28 +3,28 @@
 \alias{SQLite}
 \alias{SQLiteDriver}
 \title{
-  Instantiate the SQLite engine from the current R session.
+  Initialize the SQLite engine for the current R session.
 }
 \description{
-This function creates and initializes the SQLite engine.
+This function initializes the SQLite engine.
 It returns an object that allows you to connect to the SQLite engine
 embedded in R.
 }
 \usage{
-SQLite(max.con = 16, fetch.default.rec = 500, force.reload = FALSE, 
+SQLite(max.con = 200, fetch.default.rec = 500, force.reload = FALSE, 
        shared.cache=FALSE)
 }
 \arguments{
-\item{max.con }{
+\item{max.con}{
   maximum number of connections that may be open at one time.
-  This can be up to 100, a limit defined at compilation time.
   Note that since the SQLite engine is embedded (i.e., a set of C 
   functions within the R process) connections consume very
   little resources.
   }
 \item{fetch.default.rec}{
-  number of records to fetch at one time from the database.
-  (The \code{fetch} method uses this number as a default.)
+  default number of records to fetch at one time from the database.
+  The \code{fetch} method will use this number as a default, but
+  individual calls can override it.
   }
 \item{force.reload}{
   should the package code be reloaded (reinitialized)?
@@ -40,7 +40,7 @@ SQLite(max.con = 16, fetch.default.rec = 500, force.reload = FALSE,
 \value{
 An object of class \code{SQLiteDriver} which extends 
 \code{dbDriver} and \code{dbObjectId}.
-This object is required to create connections
+This object is needed to create connections
 to the embedded SQLite database.
 There can be many SQLite database instances running
 simultaneously.

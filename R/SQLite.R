@@ -60,7 +60,7 @@ setClass("SQLiteObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
 setClass("SQLiteDriver", representation("DBIDriver", "SQLiteObject"))
 
 "SQLite" <-
-function(max.con=16, fetch.default.rec = 500, force.reload=FALSE,
+function(max.con = 200L, fetch.default.rec = 500, force.reload = FALSE,
          shared.cache=FALSE)
 {
    sqliteInitDriver(max.con, fetch.default.rec, force.reload, shared.cache)

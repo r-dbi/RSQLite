@@ -35,9 +35,6 @@ extern  "C" {
 
 #include "RS-DBI.h"
 
-#define RS_SQLITE_MAX_CON 100    /* arbitrary, since  SQLite is an SQL engine*/
-#define RS_SQLITE_FETCH   500    /* records per fetch */
-
 /* SQLite connection parameters struct, allocating and freeing
  * methods.  This is pretty simple, since SQLite does not recognise users
  * TODO: SQLite 3.0 api allows for key/value strings.

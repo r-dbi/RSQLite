@@ -201,7 +201,7 @@ function(con, statement)
     dbClearResult(res)
   }
 
-  rc <- try(dbGetQuery(con, statement))
+  rc <- try(dbGetQuery(con, statement), silent = TRUE)
   !inherits(rc, ErrorClass)
 }
 

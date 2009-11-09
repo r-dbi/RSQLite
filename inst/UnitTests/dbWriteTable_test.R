@@ -39,14 +39,16 @@ testOverwriteAndAppend <- function() {
                      stringsAsFactors=FALSE)
     dbWriteTable(DATA$db, "t1", df, row.names=FALSE)
     ## The default is overwrite=FALSE, append
-    checkTrue(!dbWriteTable(DATA$db, "t1", df, row.names=FALSE))
+    checkTrue(!suppressWarnings(dbWriteTable(DATA$db, "t1",
+                                             df, row.names=FALSE)))
     checkTrue(dbWriteTable(DATA$db, "t1", df, row.names=FALSE,
                            append=TRUE))
     checkTrue(dbWriteTable(DATA$db, "t1", df, row.names=FALSE,
                            overwrite=TRUE))
     ## you can't overwrite and append
     checkException(dbWriteTable(DATA$db, "t1", df, row.names=FALSE,
-                                overwrite=TRUE, append=TRUE))
+                                overwrite=TRUE, append=TRUE),
+                   silent=TRUE)
 }
 
 
@@ -62,7 +64,8 @@ testCanCloseAfterFailedWriteTable <- function() {
     dbGetQuery(con, "create unique index t1_c1_c2_idx on t1(col1, col2)")
 
     ## uniqueness constraint error/failure
-    checkEquals(FALSE, dbWriteTable(con,"t1", x, append=TRUE))
+    checkEquals(FALSE,
+                suppressWarnings(dbWriteTable(con,"t1", x, append=TRUE)))
 
     ## this used to cause an error
     checkEquals(TRUE, dbDisconnect(con))

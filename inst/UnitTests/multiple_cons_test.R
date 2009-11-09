@@ -90,7 +90,8 @@ testSchemaChangeDuringWriteTable <- function() {
     checkEquals("a", junk[["a"]])
     x <- data.frame(col1=1:10, col2=letters[1:10])
     ## This fails because the active select locks the DB
-    checkEquals(FALSE, dbWriteTable(DATA$db2, "tablex", x))
+    checkEquals(FALSE,
+                suppressWarnings(dbWriteTable(DATA$db2, "tablex", x)))
     dbClearResult(rs1)
     checkEquals(TRUE, dbWriteTable(DATA$db2, "tablex", x))
     checkTrue("tablex" %in% dbListTables(DATA$db2))

@@ -7,10 +7,28 @@ Version 0.8-0
   improve Rd markup.
 
 - Integrate RUnit unit tests so that they run during R CMD check.
+  Small improvements to make the tests run more quietly.  You can run
+  the unit tests by calling RSQLite:::.test_RSQLite() (require latest
+  version of the RUnit package).
 
 - Add sqliteCopyDatabase, a function that uses SQLite's online backup
   API to allow a specified database to be copied to a file.  This can
   be used to create a file copy of an in memory database.
+
+- Increase the default max connections from 16 to 200 in SQLite().
+  Connections to SQLite are inexpensive and there is no longer any
+  hard-coded limit to the number of connections you can have.
+  However, memory is allocated at driver initialization time based on
+  the maximum, so it is best not to use very large values unless you
+  really need the connections.
+
+- sqliteTransactionStatement, which is used by dbCommit, dbRollback,
+  and dbBeginTransaction, now passes silent=TRUE to try() to suppress
+  error messages.  Without this, code that could otherwise handle a
+  failed commit gracefully had no way to suppress the error message.
+  You can use dbGetException to see the error when
+  sqliteTransactionStatement returns FALSE.
+
 
 Version 0.7-3
 

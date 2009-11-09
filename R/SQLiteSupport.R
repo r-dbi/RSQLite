@@ -617,8 +617,10 @@ sqliteWriteTable <- function(con, name, value, row.names=TRUE,
         dbRollback(con)
       else {
           success <- dbCommit(con)
-          if (!success)
+          if (!success) {
+            warning(dbGetException(con)[["errorMsg"]])
             dbRollback(con)
+          }
       }
       success
 }

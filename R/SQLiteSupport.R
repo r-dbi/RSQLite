@@ -673,6 +673,12 @@ function(value, file, batch, row.names = TRUE, ...,
   sql.type
 }
 
+sqliteCopyDatabase <- function(db, filename)
+{
+    conId <- as(db, "integer")
+    .Call("RS_SQLite_copy_database", conId, filename, PACKAGE = .SQLitePkgName)
+}
+
 ## RSQLite RUnit unit test support
 .test_RSQLite <- function(dir) {
     require("RUnit", quietly=TRUE) || stop("RUnit not found")

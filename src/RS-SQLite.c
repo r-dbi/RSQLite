@@ -1749,3 +1749,35 @@ int corrected_sqlite3_step(sqlite3_stmt *pStatement){
   }
   return rc;
 }
+
+SEXP RS_SQLite_copy_database(Con_Handle conHandle, SEXP s)
+{
+    if (!isString(s) || length(s) != 1) {
+        error("filename must be a length one character vector, "
+              "got a %s with length %d",
+              type2char(TYPEOF(s)), length(s));
+    }
+    SEXP elt = STRING_ELT(s, 0);
+    if (elt == NA_STRING || length(elt) == 0) {
+        error("invalid filename: '%s'", CHAR(elt));
+    }
+    /* TODO: should we verify that the filename is different from the
+       one associated with the source database?
+    */
+    const char *fname = CHAR(elt);
+    RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
+    sqlite3 *dbTo, *dbFrom = (sqlite3 *)con->drvConnection;
+    int rc = sqlite3_open(fname, &dbTo);
+    if (rc == SQLITE_OK) {
+        sqlite3_backup *backup = sqlite3_backup_init(dbTo, "main",
+                                                     dbFrom, "main");
+        if (backup) {
+            sqlite3_backup_step(backup, -1);
+            sqlite3_backup_finish(backup);
+        }
+        rc = sqlite3_errcode(dbTo);
+    }
+    sqlite3_close(dbTo);
+    return rc == 0 ? ScalarLogical(1) : ScalarLogical(0);
+}
+

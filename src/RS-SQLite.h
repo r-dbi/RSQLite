@@ -128,6 +128,8 @@ SEXP RS_SQLite_importFile(Con_Handle conHandle, SEXP s_tablename,
              SEXP s_filename, SEXP s_separator, SEXP s_obj,
              SEXP s_skip);
 
+SEXP RS_SQLite_copy_database(Con_Handle conHandle, SEXP s);
+
 /* TODO: general connection */
 char * RS_sqlite_getline(FILE *in, const char *eol);
 

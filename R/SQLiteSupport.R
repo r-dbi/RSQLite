@@ -96,6 +96,9 @@ function(drv, dbname = "", loadable.extensions=FALSE, cache_size=NULL, synchrono
 {
   if (is.null(dbname))
     dbname <- ""
+  ## path.expand converts as.character(NA) => "NA"
+  if (any(is.na(dbname)))
+      stop("'dbname' must not be NA")
   dbname <- path.expand(dbname)
   loadable.extensions <- as.logical(loadable.extensions)
   drvId <- as(drv, "integer")
@@ -696,7 +699,8 @@ sqliteCopyDatabase <- function(db, filename)
     setwd(dir)
 
     ro <- getOption("RUnit")
-    ro$silent <- TRUE
+    ro[["silent"]] <- TRUE
+    ro[["verbose"]] <- as.integer(verbose)
     orig.options = options("RUnit"=ro)
     on.exit(options(orig.options), add = TRUE)
 
@@ -704,7 +708,7 @@ sqliteCopyDatabase <- function(db, filename)
                              testFileRegexp=".*_test\\.R$",
                              rngKind="default",
                              rngNormalKind="default")
-    result <- runTestSuite(suite, verbose = as.integer(verbose))
+    result <- runTestSuite(suite)
     printTextProtocol(result, showDetails=FALSE)
     if (.any_errors(result) || .any_fail(result)) {
         stop("RSQLite unit tests FAILED")

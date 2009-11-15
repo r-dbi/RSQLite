@@ -29,6 +29,10 @@ Version 0.8-0
   You can use dbGetException to see the error when
   sqliteTransactionStatement returns FALSE.
 
+- dbConnect/sqliteNewConnection now throws an error if dbname argument
+  is NA.  Previously, if as.character(NA) was provided, a database
+  with filename "NA" was created.
+
 
 Version 0.7-3
 

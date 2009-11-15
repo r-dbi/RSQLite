@@ -238,8 +238,9 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext)
   if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
     RS_DBI_errorMessage("invalid SQLiteManager", RS_DBI_ERROR);
 
-  if (TYPEOF(dbfile) != STRSXP || length(dbfile) != 1)
-      error("'dbname' must be a length one character vector");
+  if (TYPEOF(dbfile) != STRSXP || length(dbfile) != 1
+      || STRING_ELT(dbfile, 0) == NA_STRING)
+      error("'dbname' must be a length one character vector and not NA");
   dbname = CHAR(STRING_ELT(dbfile, 0));
 
   if (!isLogical(allow_ext))

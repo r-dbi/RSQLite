@@ -92,7 +92,8 @@ function(obj, what="", ...)
 ## the SQLite API as the default database (SQLite config specific)
 ## while NULL means "no database".
 "sqliteNewConnection"<-
-function(drv, dbname = "", loadable.extensions=FALSE, cache_size=NULL, synchronous=0)
+function(drv, dbname = "", loadable.extensions = FALSE, cache_size = NULL,
+         synchronous = 0, vfs = NULL)
 {
   if (is.null(dbname))
     dbname <- ""
@@ -101,9 +102,20 @@ function(drv, dbname = "", loadable.extensions=FALSE, cache_size=NULL, synchrono
       stop("'dbname' must not be NA")
   dbname <- path.expand(dbname)
   loadable.extensions <- as.logical(loadable.extensions)
+  if (!is.null(vfs)) {
+      if (length(vfs) != 1L)
+          stop("'vfs' must be NULL or a character vector of length one")
+      allowed <- c("unix-posix", "unix-afp", "unix-flock", "unix-dotfile",
+                   "unix-none")
+      if (!(vfs %in% allowed)) {
+          stop("'vfs' must be one of ",
+               paste(allowed, collapse=", "),
+               ". See http://www.sqlite.org/compile.html")
+      }
+  }
   drvId <- as(drv, "integer")
   conId <- .Call("RS_SQLite_newConnection", drvId,
-                 dbname, loadable.extensions, PACKAGE ="RSQLite")
+                 dbname, loadable.extensions, vfs, PACKAGE ="RSQLite")
   con <- new("SQLiteConnection", Id = conId)
 
   ## experimental PRAGMAs
@@ -131,22 +143,18 @@ function(obj, verbose = FALSE, ...)
   }
   info <- dbGetInfo(obj)
   show(obj)
-  cat("  User:", info$user, "\n")
-  cat("  Host:", info$host, "\n")
-  cat("  Dbname:", info$dbname, "\n")
-  cat("  Connection type:", info$conType, "\n")
+  cat("  Database name:", info$dbname, "\n")
   cat("  Loadable extensions:", info$loadableExtensions, "\n")
-  if(verbose){
-    cat("  SQLite engine version: ", info$serverVersion, "\n")
-    cat("  SQLite engine thread id: ", info$threadId, "\n")
-  }
+  cat("  Virtual File System:", info$vfs, "\n")
+  cat("  SQLite engine version: ", info$serverVersion, "\n")
+  cat("  Results Sets:\n")
   if(length(info$rsId)>0){
     for(i in seq(along.with = info$rsId)){
       cat("   ", i, " ")
       show(info$rsId[[i]])
     }
   } else
-    cat("  No resultSet available\n")
+    cat("   No open result sets\n")
   invisible(NULL)
 }
 
@@ -167,7 +175,7 @@ function(obj, what="", ...)
   if(!isIdCurrent(obj))
     stop(paste("expired", class(obj)))
   id <- as(obj, "integer")
-  info <- .Call("RS_SQLite_connectionInfo", id, PACKAGE = .SQLitePkgName)
+  info <- .Call("RSQLite_connectionInfo", id, PACKAGE = .SQLitePkgName)
   if(length(info$rsId)){
     rsId <- vector("list", length = length(info$rsId))
     for(i in seq(along.with = info$rsId))

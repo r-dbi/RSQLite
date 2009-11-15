@@ -33,6 +33,13 @@ Version 0.8-0
   is NA.  Previously, if as.character(NA) was provided, a database
   with filename "NA" was created.
 
+- dbConnect/sqliteNewConnection now accepts an argument 'vfs' to
+  control the virtual filesystem used by SQLite.  The default, NULL,
+  lets SQLite select the appropriate vfs for the system.  You can
+  specify one of "unix-posix", "unix-afp", "unix-flock",
+  "unix-dotfile", or "unix-none".  For details, see
+  http://www.sqlite.org/compile.html.
+
 
 Version 0.7-3
 

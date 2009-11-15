@@ -25,7 +25,7 @@
 \item{\dots }{
   As of RSQLite 0.4-1 you may specify values for the two \code{PRAGMAs}
   \code{cache\_size} and \code{synchronous} when initializing a new
-  connection (this does not applies, obviously, to cloning an existing
+  connection (this does not apply when cloning an existing
   connection).
 
   RSQLite defaults \code{synchronous} to 0 (or "OFF"),

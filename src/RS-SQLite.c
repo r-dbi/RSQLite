@@ -143,7 +143,7 @@ RS_SQLite_cloneConnection(Con_Handle conHandle)
   Mgr_Handle mgrHandle;
   RS_DBI_connection  *con;
   RS_SQLite_conParams *conParams;
-  SEXP dbname, allow_ext;
+  SEXP dbname, allow_ext, vfs;
   Con_Handle ans;
 
   /* get connection params used to open existing connection */
@@ -157,13 +157,15 @@ RS_SQLite_cloneConnection(Con_Handle conHandle)
    */
   PROTECT(dbname = mkString(conParams->dbname));
   PROTECT(allow_ext = ScalarLogical(conParams->loadable_extensions));
-  ans = RS_SQLite_newConnection(mgrHandle, dbname, allow_ext);
-  UNPROTECT(2);
+  PROTECT(vfs = mkString(conParams->vfs));
+  ans = RS_SQLite_newConnection(mgrHandle, dbname, allow_ext, vfs);
+  UNPROTECT(3);
   return ans;
 }
 
 RS_SQLite_conParams *
-RS_SQLite_allocConParams(const char *dbname, int loadable_extensions)
+RS_SQLite_allocConParams(const char *dbname, int loadable_extensions,
+                         const char *vfs)
 {
   RS_SQLite_conParams *conParams;
 
@@ -173,15 +175,20 @@ RS_SQLite_allocConParams(const char *dbname, int loadable_extensions)
                        RS_DBI_ERROR);
   }
   conParams->dbname = RS_DBI_copyString(dbname);
+  if (vfs)
+      conParams->vfs = RS_DBI_copyString(vfs);
+  else
+      conParams->vfs = RS_DBI_copyString("");
   conParams->loadable_extensions = loadable_extensions;
+  conParams->flags = 0;
   return conParams;
 }
 
 void
 RS_SQLite_freeConParams(RS_SQLite_conParams *conParams)
 {
-  if(conParams->dbname)
-     free(conParams->dbname);
+  if (conParams->dbname) free(conParams->dbname);
+  if (conParams->vfs) free(conParams->vfs);
   /* conParams->loadable_extensions is an int, thus needs no free */
   free(conParams);
   conParams = (RS_SQLite_conParams *)NULL;
@@ -226,7 +233,8 @@ RS_SQLite_freeException(RS_DBI_connection *con)
 }
 
 Con_Handle
-RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext)
+RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
+                        SEXP s_vfs)
 {
   RS_DBI_connection   *con;
   RS_SQLite_conParams *conParams;
@@ -234,6 +242,7 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext)
   sqlite3     *db_connection, **pDb;
   const char  *dbname = NULL;
   int         rc, loadable_extensions;
+  const char *vfs = NULL;
 
   if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
     RS_DBI_errorMessage("invalid SQLiteManager", RS_DBI_ERROR);
@@ -249,9 +258,21 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext)
   if (loadable_extensions == NA_LOGICAL)
       error("'allow_ext' must be TRUE or FALSE, not NA");
 
+  if (!isNull(s_vfs)) {
+      if (!isString(s_vfs) || length(s_vfs) != 1
+          || STRING_ELT(s_vfs, 0) == NA_STRING) {
+          error("invalid argument 'vfs'");
+      }
+      vfs = CHAR(STRING_ELT(s_vfs, 0));
+      /* "" is not valid, NULL gives default value */
+      if (strlen(vfs) == 0) vfs = NULL;
+  }
+
   pDb = (sqlite3 **) calloc((size_t) 1, sizeof(sqlite3 *));
 
-  rc = sqlite3_open(dbname, pDb);
+  rc = sqlite3_open_v2(dbname, pDb,
+                       SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
+                       vfs);
   db_connection = *pDb;           /* available, even if open fails! See API */
   if(rc != SQLITE_OK){
      char buf[256];
@@ -271,7 +292,8 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext)
                         RS_DBI_ERROR);
   }
   /* save connection parameters in the connection object */
-  conParams = RS_SQLite_allocConParams(dbname, loadable_extensions);
+  conParams = RS_SQLite_allocConParams(dbname, loadable_extensions,
+                                       vfs);
   con->drvConnection = (void *) db_connection;
   con->conParams = (void *) conParams;
   RS_SQLite_setException(con, SQLITE_OK, "OK");
@@ -1391,49 +1413,42 @@ RS_SQLite_managerInfo(Mgr_Handle mgrHandle)
 }
 
 SEXP 
-RS_SQLite_connectionInfo(Con_Handle conHandle)
+RSQLite_connectionInfo(Con_Handle conHandle)
 {
-  RS_SQLite_conParams *conParams;
-  RS_DBI_connection  *con;
-  SEXP output;
-  Sint       i, n = 8, *res, nres;
-  char *conDesc[] = {"host", "user", "dbname", "conType",
-             "serverVersion", "threadId", "rsId", "loadableExtensions"};
-  Stype conType[] = {STRSXP, STRSXP, STRSXP,
-          STRSXP, STRSXP,
-              INTSXP, INTSXP, STRSXP};
-  Sint  conLen[]  = {1, 1, 1, 1, 1, 1, 1, 1};
+    int info_count = 5, i = 0, nres;
+    RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
+    RS_SQLite_conParams *params = (RS_SQLite_conParams *) con->conParams;
+    SEXP rsIds;
 
-  con = RS_DBI_getConnection(conHandle);
-  conLen[6] = con->num_res;         /* num of open resultSets */
-  output = RS_DBI_createNamedList(conDesc, conType, conLen, n);
-  conParams = (RS_SQLite_conParams *) con->conParams;
-  SET_LST_CHR_EL(output,0,0,C_S_CPY("localhost"));
-  SET_LST_CHR_EL(output,1,0,C_S_CPY(RS_NA_STRING));
-  SET_LST_CHR_EL(output,2,0,C_S_CPY(conParams->dbname));
-  SET_LST_CHR_EL(output,3,0,C_S_CPY("direct"));
-  SET_LST_CHR_EL(output,4,0,C_S_CPY(SQLITE_VERSION));
+    SEXP info = PROTECT(NEW_LIST(info_count));
+    SEXP info_nms = PROTECT(NEW_CHARACTER(info_count));
+    SET_NAMES(info, info_nms);
+    UNPROTECT(1);
 
-  LST_INT_EL(output,5,0) = (Sint) -1;
+    SET_STRING_ELT(info_nms, i, mkChar("dbname"));
+    SET_VECTOR_ELT(info, i++, mkString(params->dbname));
 
-  res = (Sint *) S_alloc( (long) con->length, (int) sizeof(Sint));
-  nres = RS_DBI_listEntries(con->resultSetIds, con->length, res);
-  if(nres != con->num_res){
-    RS_DBI_errorMessage(
-    "internal error: corrupt RS_DBI resultSet table",
-    RS_DBI_ERROR);
-  }
-  for( i = 0; i < con->num_res; i++){
-    LST_INT_EL(output,6,i) = (Sint) res[i];
-  }
+    SET_STRING_ELT(info_nms, i, mkChar("serverVersion"));
+    SET_VECTOR_ELT(info, i++, mkString(params->dbname));
 
-  if(conParams->loadable_extensions)
-    SET_LST_CHR_EL(output,7,0,C_S_CPY("on"));
-  else
-    SET_LST_CHR_EL(output,7,0,C_S_CPY("off"));
+    SET_STRING_ELT(info_nms, i, mkChar("rsId"));
+    rsIds = PROTECT(NEW_INTEGER(con->length));
+    nres = RS_DBI_listEntries(con->resultSetIds, con->length, INTEGER(rsIds));
+    SET_LENGTH(rsIds, nres);
+    SET_VECTOR_ELT(info, i++, rsIds);
+    UNPROTECT(1);
 
-  return output;
+    SET_STRING_ELT(info_nms, i, mkChar("loadableExtensions"));
+    SET_VECTOR_ELT(info, i++,
+                   mkString(params->loadable_extensions ? "on" : "off"));
+
+    SET_STRING_ELT(info_nms, i, mkChar("vfs"));
+    SET_VECTOR_ELT(info, i++, mkString(params->vfs));
+
+    UNPROTECT(1);
+    return info;
 }
+
 SEXP 
 RS_SQLite_resultSetInfo(Res_Handle rsHandle)
 {

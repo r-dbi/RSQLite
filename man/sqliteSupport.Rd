@@ -44,7 +44,7 @@
 
    ## SQLiteConnection-related
    sqliteNewConnection(drv, dbname, loadable.extensions=FALSE, cache_size=NULL,
-                       synchronous=0)
+                       synchronous=0, vfs = NULL)
    sqliteConnectionInfo(obj, what, ...)
    sqliteDescribeConnection(obj, verbose = FALSE, ...)
    sqliteCloseConnection(con, ...)
@@ -138,6 +138,16 @@
   unlikely case of the operating system (\emph{not} the R application)
   crashing.
 }
+
+\item{vfs}{
+  The name of the SQLite virtual filesystem module to use.  If
+\code{NULL}, the default module will be used.  Otherwise, one of
+\code{"unix-posix"}, \code{"unix-afp"}, \code{"unix-flock"},
+\code{"unix-dotfile"}, or \code{"unix-none"}.  See
+\url{http://www.sqlite.org/compile.html} for details.
+}
+
+
 %\item{max.results}{
 %   positive integer indicating the maximum number of results that
 %   SQLite connections will hold open.  The current default of 1

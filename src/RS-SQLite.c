@@ -1429,7 +1429,7 @@ RSQLite_connectionInfo(Con_Handle conHandle)
     SET_VECTOR_ELT(info, i++, mkString(params->dbname));
 
     SET_STRING_ELT(info_nms, i, mkChar("serverVersion"));
-    SET_VECTOR_ELT(info, i++, mkString(params->dbname));
+    SET_VECTOR_ELT(info, i++, mkString(SQLITE_VERSION));
 
     SET_STRING_ELT(info_nms, i, mkChar("rsId"));
     rsIds = PROTECT(NEW_INTEGER(con->length));

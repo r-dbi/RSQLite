@@ -33,12 +33,20 @@ Version 0.8-0
   is NA.  Previously, if as.character(NA) was provided, a database
   with filename "NA" was created.
 
-- dbConnect/sqliteNewConnection now accepts an argument 'vfs' to
-  control the virtual filesystem used by SQLite.  The default, NULL,
-  lets SQLite select the appropriate vfs for the system.  You can
-  specify one of "unix-posix", "unix-afp", "unix-flock",
-  "unix-dotfile", or "unix-none".  For details, see
-  http://www.sqlite.org/compile.html.
+- dbConnect/sqliteNewConnection now accepts two new arguments:
+
+  flags:
+      provides additional control over connetion details.  For
+      convenience, you can specify one of SQLITE_RWC (default),
+      SQLITE_RW, or SQLITE_RO to obtain a connection in
+      read/write/create, read/write, or read only mode, respectively.
+      See http://sqlite.org/c3ref/open.html for details.
+  vfs:
+      controls the virtual filesystem used by SQLite.  The default,
+      NULL, lets SQLite select the appropriate vfs for the system.
+      You can specify one of "unix-posix", "unix-afp", "unix-flock",
+      "unix-dotfile", or "unix-none".  For details, see
+      http://www.sqlite.org/compile.html.
 
 
 Version 0.7-3

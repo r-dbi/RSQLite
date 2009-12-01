@@ -80,4 +80,5 @@ export(
   safe.write
 )
 
-
+## constants
+export(SQLITE_RWC, SQLITE_RW, SQLITE_RO)

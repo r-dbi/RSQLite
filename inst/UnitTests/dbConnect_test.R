@@ -39,3 +39,28 @@ test_valid_vfs <- function()
     }
     for (v in allowed) checkVfs(v)
 }
+
+test_open_flags <- function()
+{
+    drv <- SQLite()
+    tmpFile <- tempfile()
+    on.exit(file.remove(tmpFile))
+
+    ## error if file does not exist
+    checkException(dbConnect(drv, dbname = tmpFile, flags = SQLITE_RO))
+    checkException(dbConnect(drv, dbname = tmpFile, flags = SQLITE_RW))
+
+    dbrw <- dbConnect(drv, dbname = tmpFile, flags = SQLITE_RWC)
+    df <- data.frame(a=letters, b=runif(26L), stringsAsFactors=FALSE)
+    checkTrue(dbWriteTable(dbrw, "t1", df))
+
+    dbro <- dbConnect(drv, dbname = tmpFile, flags = SQLITE_RO)
+    checkTrue(!dbWriteTable(dbro, "t2", df))
+
+    dbrw2 <- dbConnect(drv, dbname = tmpFile, flags = SQLITE_RW)
+    checkTrue(dbWriteTable(dbrw2, "t2", df))
+
+    dbDisconnect(dbrw)
+    dbDisconnect(dbro)
+    dbDisconnect(dbrw2)
+}

@@ -1,4 +1,3 @@
-% $Id$
 \name{sqliteSupport}                % adapted from ROracle
 \alias{sqliteInitDriver}            % driver-related function
 \alias{sqliteDriverInfo}
@@ -25,6 +24,9 @@
 \alias{.SQLitePkgVersion}
 \alias{.SQLitePkgRCS}
 \alias{.SQLite.NA.string}
+\alias{SQLITE_RWC}
+\alias{SQLITE_RW}
+\alias{SQLITE_RO}
 \alias{last.warning}
 %\alias{.SQLiteSQLKeywords}
 \alias{.conflicts.OK}
@@ -44,7 +46,7 @@
 
    ## SQLiteConnection-related
    sqliteNewConnection(drv, dbname, loadable.extensions=FALSE, cache_size=NULL,
-                       synchronous=0, vfs = NULL)
+                       synchronous=0, flags = NULL, vfs = NULL)
    sqliteConnectionInfo(obj, what, ...)
    sqliteDescribeConnection(obj, verbose = FALSE, ...)
    sqliteCloseConnection(con, ...)
@@ -114,7 +116,17 @@
 \item{loadable.extensions}{
    logical describing whether loadable extensions will be enabled for this
    connection. The default is FALSE.
-}
+ }
+\item{flags}{
+   An integer that will be interpretted as a collection of flags by the
+   SQLite API.  If \code{NULL}, the flags will default to
+   \code{SQLITE_RWC} which will open the file in read/write mode and
+   create the file if it does not exist.  You can use \code{SQLITE_RW}
+   to open in read/write mode and \code{SQLITE_RO} to open in read only
+   mode.  In both cases, an error is raised if the database file does
+   not already exist.  See \url{http://sqlite.org/c3ref/open.html} for
+   more details.
+ }
 \item{shared.cache}{
    logical describing whether shared-cache mode should be enabled on the SQLite
    driver. The default is FALSE.
@@ -264,16 +276,32 @@
 
    \code{sqliteResultInfo} returns a list of name-value metadata pairs.
 }
+
 \section{Constants}{
-\code{.SQLitePkgName} (currently \code{"RSQLite"}),
-\code{.SQLitePkgVersion} (the R package version),
-\code{.SQLitePkgRCS} (the RCS revision),
-\code{.SQLitecle.NA.string} (character that SQLite uses to
-denote \code{NULL} on input),
-%\code{.SQLiteSQLKeywords}    % TODO: should we add these?
-\code{.conflicts.OK}.
-%\non_function{}
+  \code{.SQLitePkgName} (currently \code{"RSQLite"}),
+  \code{.SQLitePkgVersion} (the R package version),
+  \code{.SQLitePkgRCS} (the RCS revision),
+  \code{.SQLitecle.NA.string} (character that SQLite uses to
+  denote \code{NULL} on input),
+  \code{.conflicts.OK}.
+  
+  The following constants can be used as the value of the \code{flags}
+  argument to \code{sqliteNewConnection} to control the mode of the
+  databse connection:
+  
+  \describe{
+    \item{\code{SQLITE_RWC}}{
+      open the database in read/write mode and create the database file if
+      it does not already exist}
+    
+    \item{\code{SQLITE_RW}}{open the database in read/write mode.
+      Raise an error if the file does not already exist}
+    
+    \item{\code{SQLITE_RO}}{open the database in read only mode.
+      Raise an error if the file does not already exist}
+  }
 }
+
 \keyword{datasets}
 \keyword{interface}
 \keyword{database}

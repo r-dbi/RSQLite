@@ -143,7 +143,7 @@ RS_SQLite_cloneConnection(Con_Handle conHandle)
   Mgr_Handle mgrHandle;
   RS_DBI_connection  *con;
   RS_SQLite_conParams *conParams;
-  SEXP dbname, allow_ext, vfs;
+  SEXP dbname, allow_ext, vfs, flags;
   Con_Handle ans;
 
   /* get connection params used to open existing connection */
@@ -158,14 +158,15 @@ RS_SQLite_cloneConnection(Con_Handle conHandle)
   PROTECT(dbname = mkString(conParams->dbname));
   PROTECT(allow_ext = ScalarLogical(conParams->loadable_extensions));
   PROTECT(vfs = mkString(conParams->vfs));
-  ans = RS_SQLite_newConnection(mgrHandle, dbname, allow_ext, vfs);
-  UNPROTECT(3);
+  PROTECT(flags = ScalarInteger(conParams->flags));
+  ans = RS_SQLite_newConnection(mgrHandle, dbname, allow_ext, flags, vfs);
+  UNPROTECT(4);
   return ans;
 }
 
 RS_SQLite_conParams *
 RS_SQLite_allocConParams(const char *dbname, int loadable_extensions,
-                         const char *vfs)
+                         int flags, const char *vfs)
 {
   RS_SQLite_conParams *conParams;
 
@@ -180,7 +181,7 @@ RS_SQLite_allocConParams(const char *dbname, int loadable_extensions,
   else
       conParams->vfs = RS_DBI_copyString("");
   conParams->loadable_extensions = loadable_extensions;
-  conParams->flags = 0;
+  conParams->flags = flags;
   return conParams;
 }
 
@@ -234,7 +235,7 @@ RS_SQLite_freeException(RS_DBI_connection *con)
 
 Con_Handle
 RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
-                        SEXP s_vfs)
+                        SEXP s_flags, SEXP s_vfs)
 {
   RS_DBI_connection   *con;
   RS_SQLite_conParams *conParams;
@@ -243,6 +244,8 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
   const char  *dbname = NULL;
   int         rc, loadable_extensions;
   const char *vfs = NULL;
+  int mode = 0;
+  int open_flags = 0;
 
   if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
     RS_DBI_errorMessage("invalid SQLiteManager", RS_DBI_ERROR);
@@ -267,12 +270,15 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
       /* "" is not valid, NULL gives default value */
       if (strlen(vfs) == 0) vfs = NULL;
   }
-
+  
+  if (!isInteger(s_flags) || length(s_flags) != 1)
+      error("argument 'mode' must be length 1 integer, got %s, length: %d",
+            type2char(TYPEOF(s_flags)), length(s_flags));
+  open_flags = INTEGER(s_flags)[0];
+  
   pDb = (sqlite3 **) calloc((size_t) 1, sizeof(sqlite3 *));
 
-  rc = sqlite3_open_v2(dbname, pDb,
-                       SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
-                       vfs);
+  rc = sqlite3_open_v2(dbname, pDb, open_flags, vfs);
   db_connection = *pDb;           /* available, even if open fails! See API */
   if(rc != SQLITE_OK){
      char buf[256];
@@ -293,7 +299,7 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
   }
   /* save connection parameters in the connection object */
   conParams = RS_SQLite_allocConParams(dbname, loadable_extensions,
-                                       vfs);
+                                       open_flags, vfs);
   con->drvConnection = (void *) db_connection;
   con->conParams = (void *) conParams;
   RS_SQLite_setException(con, SQLITE_OK, "OK");
@@ -1415,7 +1421,7 @@ RS_SQLite_managerInfo(Mgr_Handle mgrHandle)
 SEXP 
 RSQLite_connectionInfo(Con_Handle conHandle)
 {
-    int info_count = 5, i = 0, nres;
+    int info_count = 6, i = 0, nres;
     RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
     RS_SQLite_conParams *params = (RS_SQLite_conParams *) con->conParams;
     SEXP rsIds;
@@ -1441,6 +1447,9 @@ RSQLite_connectionInfo(Con_Handle conHandle)
     SET_STRING_ELT(info_nms, i, mkChar("loadableExtensions"));
     SET_VECTOR_ELT(info, i++,
                    mkString(params->loadable_extensions ? "on" : "off"));
+
+    SET_STRING_ELT(info_nms, i, mkChar("flags"));
+    SET_VECTOR_ELT(info, i++, ScalarInteger(params->flags));
 
     SET_STRING_ELT(info_nms, i, mkChar("vfs"));
     SET_VECTOR_ELT(info, i++, mkString(params->vfs));

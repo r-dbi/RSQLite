@@ -35,6 +35,13 @@ extern  "C" {
 
 #include "RS-DBI.h"
 
+/* These control the open mode for new connections and
+   are mapped to the appropriate SQLite flag.
+ */
+#define RSQLITE_RWC 0
+#define RSQLITE_RW  1
+#define RSQLITE_RO  2
+
 /* SQLite connection parameters struct, allocating and freeing
  * methods.  This is pretty simple, since SQLite does not recognise users
  * TODO: SQLite 3.0 api allows for key/value strings.
@@ -61,7 +68,7 @@ typedef struct st_sqlite_bindparam {
 
 RS_SQLite_conParams *RS_SQLite_allocConParams(const char *dbname,
                                               int loadable_extensions,
-                                              const char *vfs);
+                                              int flags, const char *vfs);
 
 void                RS_SQLite_freeConParams(RS_SQLite_conParams *conParams);
 
@@ -88,7 +95,7 @@ SEXP RS_SQLite_close(Mgr_Handle mgrHandle);
 
 /* dbConnection */
 Con_Handle RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile,
-                                   SEXP allow_ext, SEXP s_vfs);
+                                   SEXP allow_ext, SEXP s_flags, SEXP s_vfs);
 Con_Handle RS_SQLite_cloneConnection(Con_Handle conHandle);
 SEXP RS_SQLite_closeConnection(Con_Handle conHandle);
 /* we simulate db exceptions ourselves */

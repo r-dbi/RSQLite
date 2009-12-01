@@ -21,6 +21,11 @@
 ## Constants
 ##
 
+## these are used to control the mode of new connections
+SQLITE_RWC <- 6L
+SQLITE_RW <- 2L
+SQLITE_RO <- 1L
+
 .SQLitePkgName <- "RSQLite"
 .SQLitePkgRCS <- "$Id$"
 .SQLite.NA.string <- "\\N"  ## on input SQLite interprets \N as NULL (NA)

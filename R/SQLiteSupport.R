@@ -93,7 +93,7 @@ function(obj, what="", ...)
 ## while NULL means "no database".
 "sqliteNewConnection"<-
 function(drv, dbname = "", loadable.extensions = FALSE, cache_size = NULL,
-         synchronous = 0, vfs = NULL)
+         synchronous = 0, flags = NULL, vfs = NULL)
 {
   if (is.null(dbname))
     dbname <- ""
@@ -113,9 +113,10 @@ function(drv, dbname = "", loadable.extensions = FALSE, cache_size = NULL,
                ". See http://www.sqlite.org/compile.html")
       }
   }
+  flags <- if (is.null(flags)) SQLITE_RWC else flags
   drvId <- as(drv, "integer")
   conId <- .Call("RS_SQLite_newConnection", drvId,
-                 dbname, loadable.extensions, vfs, PACKAGE ="RSQLite")
+                 dbname, loadable.extensions, flags, vfs, PACKAGE ="RSQLite")
   con <- new("SQLiteConnection", Id = conId)
 
   ## experimental PRAGMAs
@@ -145,6 +146,7 @@ function(obj, verbose = FALSE, ...)
   show(obj)
   cat("  Database name:", info$dbname, "\n")
   cat("  Loadable extensions:", info$loadableExtensions, "\n")
+  cat("  File open flags:", info$falgs, "\n")
   cat("  Virtual File System:", info$vfs, "\n")
   cat("  SQLite engine version: ", info$serverVersion, "\n")
   cat("  Results Sets:\n")

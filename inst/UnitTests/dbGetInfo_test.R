@@ -4,11 +4,12 @@ test_dbGetInfo_connection <- function()
     on.exit(dbDisconnect(db))
 
     info <- dbGetInfo(db)
-    checkEquals(5, length(info))
+    checkEquals(6L, length(info))
     checkEquals(":memory:", info[["dbname"]])
     checkEquals("3.6.19", info[["serverVersion"]])
     checkEquals(integer(0), info[["rsId"]])
     checkEquals("off", info[["loadableExtensions"]])
+    checkEquals(SQLITE_RWC, info[["flags"]])
     checkEquals("", info[["vfs"]])
 }
 

@@ -15,6 +15,10 @@ test_dbGetInfo_connection <- function()
 
 test_dbGetInfo_connection_vfs <- function()
 {
+    if (.Platform[["OS.type"]] == "windows") {
+        cat("Skipping test: vfs customization not available on Windows\n")
+        return(TRUE)
+    }
     db <- dbConnect(SQLite(), dbname = "", vfs = "unix-none")
     on.exit(dbDisconnect(db))
     info <- dbGetInfo(db)

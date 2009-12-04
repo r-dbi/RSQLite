@@ -103,14 +103,19 @@ function(drv, dbname = "", loadable.extensions = FALSE, cache_size = NULL,
   dbname <- path.expand(dbname)
   loadable.extensions <- as.logical(loadable.extensions)
   if (!is.null(vfs)) {
-      if (length(vfs) != 1L)
-          stop("'vfs' must be NULL or a character vector of length one")
-      allowed <- c("unix-posix", "unix-afp", "unix-flock", "unix-dotfile",
-                   "unix-none")
-      if (!(vfs %in% allowed)) {
-          stop("'vfs' must be one of ",
-               paste(allowed, collapse=", "),
-               ". See http://www.sqlite.org/compile.html")
+      if (.Platform[["OS.type"]] == "windows") {
+          warning("vfs customization not available on this platform.",
+                  " Ignoring value: vfs = ", vfs)
+      } else {
+          if (length(vfs) != 1L)
+              stop("'vfs' must be NULL or a character vector of length one")
+          allowed <- c("unix-posix", "unix-afp", "unix-flock", "unix-dotfile",
+                       "unix-none")
+          if (!(vfs %in% allowed)) {
+              stop("'vfs' must be one of ",
+                   paste(allowed, collapse=", "),
+                   ". See http://www.sqlite.org/compile.html")
+          }
       }
   }
   flags <- if (is.null(flags)) SQLITE_RWC else flags

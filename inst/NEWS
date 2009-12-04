@@ -9,7 +9,8 @@ Version 0.8-0
 - Integrate RUnit unit tests so that they run during R CMD check.
   Small improvements to make the tests run more quietly.  You can run
   the unit tests by calling RSQLite:::.test_RSQLite() (require latest
-  version of the RUnit package).
+  version of the RUnit package).  Also had to disable some unit tests
+  on Windows.  Investigation of details is on the TODO list.
 
 - Add sqliteCopyDatabase, a function that uses SQLite's online backup
   API to allow a specified database to be copied to a file.  This can
@@ -46,7 +47,9 @@ Version 0.8-0
       NULL, lets SQLite select the appropriate vfs for the system.
       You can specify one of "unix-posix", "unix-afp", "unix-flock",
       "unix-dotfile", or "unix-none".  For details, see
-      http://www.sqlite.org/compile.html.
+      http://www.sqlite.org/compile.html.  This functionality is not
+      available on Windows and non-NULL values of the vfs argument
+      will be ignored with a warning.
 
 
 Version 0.7-3

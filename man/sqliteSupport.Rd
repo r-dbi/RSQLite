@@ -156,7 +156,8 @@
 \code{NULL}, the default module will be used.  Otherwise, one of
 \code{"unix-posix"}, \code{"unix-afp"}, \code{"unix-flock"},
 \code{"unix-dotfile"}, or \code{"unix-none"}.  See
-\url{http://www.sqlite.org/compile.html} for details.
+\url{http://www.sqlite.org/compile.html} for details.  This argument is
+ignored on Windows as the "unix-*" vfs modules are not available there.
 }
 
 

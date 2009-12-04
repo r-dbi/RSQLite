@@ -16,6 +16,10 @@ test_invalid_dbname_is_caught <- function()
 
 test_invalid_vfs_is_caught <- function()
 {
+    if (.Platform[["OS.type"]] == "windows") {
+        cat("Skipping test: vfs customization not available on Windows\n")
+        return(TRUE)
+    }
     drv <- SQLite()
     checkException(dbConnect(drv, dbname = "", vfs = ""))
     checkException(dbConnect(drv, dbname = "", vfs = "notvfs"))
@@ -28,6 +32,10 @@ test_invalid_vfs_is_caught <- function()
 
 test_valid_vfs <- function()
 {
+    if (.Platform[["OS.type"]] == "windows") {
+        cat("Skipping test: vfs customization not available on Windows\n")
+        return(TRUE)
+    }
     drv <- SQLite()
     allowed <- c("unix-posix", "unix-afp", "unix-flock", "unix-dotfile",
                  "unix-none")

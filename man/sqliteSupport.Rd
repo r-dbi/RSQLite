@@ -153,11 +153,18 @@
 
 \item{vfs}{
   The name of the SQLite virtual filesystem module to use.  If
-\code{NULL}, the default module will be used.  Otherwise, one of
-\code{"unix-posix"}, \code{"unix-afp"}, \code{"unix-flock"},
-\code{"unix-dotfile"}, or \code{"unix-none"}.  See
-\url{http://www.sqlite.org/compile.html} for details.  This argument is
-ignored on Windows as the "unix-*" vfs modules are not available there.
+  \code{NULL}, the default module will be used.  Module availability
+  depends on your operating as summarized by the following table:
+
+\tabular{rlll}{
+  module          \tab OSX \tab Unix (not OSX) \tab Windows\cr
+  "unix-none"     \tab Y   \tab Y              \tab N\cr
+  "unix-dotfile"  \tab Y   \tab Y              \tab N\cr
+  "unix-flock"    \tab Y   \tab N              \tab N\cr
+  "unix-afp"      \tab Y   \tab N              \tab N\cr
+  "unix-posix"    \tab Y   \tab N              \tab N\cr
+}
+See \url{http://www.sqlite.org/compile.html} for details.
 }
 
 

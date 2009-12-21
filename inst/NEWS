@@ -47,9 +47,11 @@ Version 0.8-0
       NULL, lets SQLite select the appropriate vfs for the system.
       You can specify one of "unix-posix", "unix-afp", "unix-flock",
       "unix-dotfile", or "unix-none".  For details, see
-      http://www.sqlite.org/compile.html.  This functionality is not
-      available on Windows and non-NULL values of the vfs argument
-      will be ignored with a warning.
+      http://www.sqlite.org/compile.html.  This functionality is only
+      fully available on OSX.  On non-OSX Unix, you can use
+      unix-dotfile and unix-none.  None of these modules are available
+      on Windows where a non-NULL values of the vfs argument will be
+      ignored with a warning.
 
 
 Version 0.7-3

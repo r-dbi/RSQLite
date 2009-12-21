@@ -1,3 +1,11 @@
+.getOS <- function()
+{
+    ostype <- .Platform[["OS.type"]]
+    if (ostype == "windows") return("windows")
+    if (grepl("darwin", R.Version()$os)) return("osx")
+    ostype
+}
+
 test_NULL_dbname <- function() {
     for (i in 1:20) {
         db <- dbConnect(SQLite(), dbname=NULL)
@@ -16,7 +24,7 @@ test_invalid_dbname_is_caught <- function()
 
 test_invalid_vfs_is_caught <- function()
 {
-    if (.Platform[["OS.type"]] == "windows") {
+    if (.getOS() == "windows") {
         cat("Skipping test: vfs customization not available on Windows\n")
         return(TRUE)
     }
@@ -32,13 +40,13 @@ test_invalid_vfs_is_caught <- function()
 
 test_valid_vfs <- function()
 {
-    if (.Platform[["OS.type"]] == "windows") {
-        cat("Skipping test: vfs customization not available on Windows\n")
-        return(TRUE)
-    }
+    allowed <- switch(.getOS(),
+                      osx = c("unix-posix", "unix-afp", "unix-flock",
+                              "unix-dotfile", "unix-none"),
+                      unix = c("unix-dotfile", "unix-none"),
+                      windows = character(0),
+                      character(0))
     drv <- SQLite()
-    allowed <- c("unix-posix", "unix-afp", "unix-flock", "unix-dotfile",
-                 "unix-none")
     checkVfs <- function(v)
     {
         db <- dbConnect(drv, dbname = "", vfs = v)

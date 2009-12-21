@@ -1,6 +1,6 @@
 Version 0.8-0
 
-- Upgrade to SQLite 3.6.19
+- Upgrade to SQLite 3.6.21
 
 - Apply some code and Rd cleanups contributed by Mattias Burger.
   Avoid partial argument name matching, use TRUE/FALSE not T/F and

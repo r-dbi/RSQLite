@@ -517,7 +517,7 @@ RS_DBI_setException(Db_Handle handle, DBI_EXCEPTION exceptionType,
 }
 
 void 
-RS_DBI_errorMessage(char *msg, DBI_EXCEPTION exception_type)
+RS_DBI_errorMessage(const char *msg, DBI_EXCEPTION exception_type)
 {
   char *driver = "RS-DBI";   /* TODO: use the actual driver name */
   

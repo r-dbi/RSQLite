@@ -229,7 +229,7 @@ void RS_DBI_makeDataFrame(SEXP data);
  * dbManager and/or dbConnection methods.  I still need to 
  * go back and re-code the error-handling throughout, darn!
  */
-void  RS_DBI_errorMessage(char *msg, DBI_EXCEPTION exceptionType);
+void  RS_DBI_errorMessage(const char *msg, DBI_EXCEPTION exceptionType);
 void  RS_DBI_setException(Db_Handle handle, 
 			  DBI_EXCEPTION exceptionType,
 			  int errorNum, 

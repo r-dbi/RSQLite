@@ -1,3 +1,12 @@
+Version 0.8-1
+
+- sqliteFetch now returns a data.frame with the expected number of
+  columns when a query returns zero rows.  Before, a 0 x 0 data.frame
+  was returned regardless of the number of columns in the original
+  query.  The change will be seen in calls to fetch and dbGetQuery for
+  queries that return no result rows.
+
+
 Version 0.8-0
 
 - Upgrade to SQLite 3.6.21

@@ -289,12 +289,10 @@ function(res, n=0, ...)
   n <- as(n, "integer")
   rsId <- as(res, "integer")
   rel <- .Call("RS_SQLite_fetch", rsId, nrec = n, PACKAGE = .SQLitePkgName)
-  if(length(rel)==0 || length(rel[[1]])==0)
-    return(data.frame(NULL))
   ## create running row index as of previous fetch (if any)
   cnt <- dbGetRowCount(res)
-  nrec <- length(rel[[1]])
-  indx <- seq(from = cnt - nrec + as.integer(1), length.out = nrec)
+  nrec <- if (length(rel) > 0L) length(rel[[1L]]) else 0L
+  indx <- seq(from = cnt - nrec + 1L, length.out = nrec)
   attr(rel, "row.names") <- as.integer(indx)
   class(rel) <- "data.frame"
   rel

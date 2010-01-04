@@ -131,3 +131,15 @@ testFirstResultRowIsNull <- function() {
                      "select Murder/(Murder - 8.1) from t1 limit 10 offset 2")
     checkEquals("character", typeof(a2[[1]]))
 }
+
+test_no_rows_preserves_column_count <- function()
+{
+    db <- DATA$db
+    want_dim <- c(1L, 2L)
+    ans <- dbGetQuery(db, "select 1 as a, 2 as b where 1")
+    checkEquals(want_dim, dim(ans))
+
+    want_dim <- c(0L, 2L)
+    ans <- dbGetQuery(db, "select 1 as a, 2 as b where 0")
+    checkEquals(want_dim, dim(ans))
+}

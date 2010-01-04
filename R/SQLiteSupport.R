@@ -691,10 +691,24 @@ function(value, file, batch, row.names = TRUE, ...,
   sql.type
 }
 
-sqliteCopyDatabase <- function(db, filename)
+sqliteCopyDatabase <- function(from, to)
 {
-    conId <- as(db, "integer")
-    .Call("RS_SQLite_copy_database", conId, filename, PACKAGE = .SQLitePkgName)
+    if (!is(from, "SQLiteConnection"))
+        stop("'from' must be a SQLiteConnection instance")
+    destdb <- to
+    if (!is(to, "SQLiteConnection")) {
+        if (is.character(to) && length(to) == 1L && !is.na(to) && nzchar(to)) {
+            if (":memory:" == to)
+                stop("invalid file name for 'to'.  Use a SQLiteConnection",
+                     " to copy to an in-memory database")
+            destdb <- dbConnect(SQLite(), dbname = path.expand(to))
+            on.exit(dbDisconnect(destdb))
+        } else {
+            stop("'to' must be SQLiteConnection or string")
+        }
+    }
+    .Call("RS_SQLite_copy_database", from@Id, destdb@Id, PACKAGE = .SQLitePkgName)
+    invisible(NULL)
 }
 
 ## RSQLite RUnit unit test support

@@ -1775,34 +1775,25 @@ int corrected_sqlite3_step(sqlite3_stmt *pStatement){
   return rc;
 }
 
-SEXP RS_SQLite_copy_database(Con_Handle conHandle, SEXP s)
+SEXP RS_SQLite_copy_database(Con_Handle fromConHandle, Con_Handle toConHandle)
 {
-    if (!isString(s) || length(s) != 1) {
-        error("filename must be a length one character vector, "
-              "got a %s with length %d",
-              type2char(TYPEOF(s)), length(s));
+    sqlite3_backup *backup = NULL;
+    RS_DBI_connection *fromCon = RS_DBI_getConnection(fromConHandle);
+    RS_DBI_connection *toCon = RS_DBI_getConnection(toConHandle);
+    sqlite3 *dbFrom = (sqlite3 *)fromCon->drvConnection;
+    sqlite3 *dbTo = (sqlite3 *)toCon->drvConnection;
+    int rc = 0;
+
+    backup = sqlite3_backup_init(dbTo, "main", dbFrom, "main");
+    if (backup) {
+        sqlite3_backup_step(backup, -1);
+        sqlite3_backup_finish(backup);
     }
-    SEXP elt = STRING_ELT(s, 0);
-    if (elt == NA_STRING || length(elt) == 0) {
-        error("invalid filename: '%s'", CHAR(elt));
+    rc = sqlite3_errcode(dbTo);
+    if (rc != SQLITE_OK) {
+        RS_SQLite_setException(toCon, rc, sqlite3_errmsg(dbTo));
+        RS_DBI_errorMessage(sqlite3_errmsg(dbTo), RS_DBI_ERROR);
     }
-    /* TODO: should we verify that the filename is different from the
-       one associated with the source database?
-    */
-    const char *fname = CHAR(elt);
-    RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
-    sqlite3 *dbTo, *dbFrom = (sqlite3 *)con->drvConnection;
-    int rc = sqlite3_open(fname, &dbTo);
-    if (rc == SQLITE_OK) {
-        sqlite3_backup *backup = sqlite3_backup_init(dbTo, "main",
-                                                     dbFrom, "main");
-        if (backup) {
-            sqlite3_backup_step(backup, -1);
-            sqlite3_backup_finish(backup);
-        }
-        rc = sqlite3_errcode(dbTo);
-    }
-    sqlite3_close(dbTo);
-    return rc == 0 ? ScalarLogical(1) : ScalarLogical(0);
+    return R_NilValue;
 }
 

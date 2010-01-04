@@ -6,6 +6,15 @@ Version 0.8-1
   query.  The change will be seen in calls to fetch and dbGetQuery for
   queries that return no result rows.
 
+- sqliteCopyDatabase has been refactored to support copying to either
+  a file or an open and empty database connection.  This makes it
+  possible to transfer a disk based database to an in-memory based
+  database.  The changes to sqliteCopyDatabase are NOT BACKWARDS
+  COMPATIBLE: the return value is now NULL (an error is raised if the
+  copying fails) and the argument names have been changed to 'from'
+  and 'to'.  As this was a newly added feature that uses an
+  experimental SQLite API, I decided to disregards compatibility.
+
 
 Version 0.8-0
 

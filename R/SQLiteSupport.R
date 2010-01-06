@@ -694,17 +694,17 @@ function(value, file, batch, row.names = TRUE, ...,
 sqliteCopyDatabase <- function(from, to)
 {
     if (!is(from, "SQLiteConnection"))
-        stop("'from' must be a SQLiteConnection instance")
+        stop("'from' must be a SQLiteConnection object")
     destdb <- to
     if (!is(to, "SQLiteConnection")) {
         if (is.character(to) && length(to) == 1L && !is.na(to) && nzchar(to)) {
             if (":memory:" == to)
                 stop("invalid file name for 'to'.  Use a SQLiteConnection",
-                     " to copy to an in-memory database")
+                     " object to copy to an in-memory database")
             destdb <- dbConnect(SQLite(), dbname = path.expand(to))
             on.exit(dbDisconnect(destdb))
         } else {
-            stop("'to' must be SQLiteConnection or string")
+            stop("'to' must be SQLiteConnection object or a non-empty string")
         }
     }
     .Call("RS_SQLite_copy_database", from@Id, destdb@Id, PACKAGE = .SQLitePkgName)

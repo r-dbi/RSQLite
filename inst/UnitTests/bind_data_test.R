@@ -82,3 +82,12 @@ testBindNamedReorderExtraCols <- function() {
     checkEquals(basicDf[ , c("name", "id", "rate")], got)
 }
 
+test_bind_data_has_zero_dim <- function()
+{
+    db <- DATA$db
+    dbGetQuery(db, basicTableSql)
+    values <- "(:name, :id, :rate)"
+    sql <- paste("insert into t1 values", values)
+    df <- basicDf[0, ]
+    checkException(dbSendPreparedQuery(db, sql, bind.data = df))
+}

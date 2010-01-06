@@ -15,6 +15,9 @@ Version 0.8-1
   and 'to'.  As this was a newly added feature that uses an
   experimental SQLite API, I decided to disregards compatibility.
 
+- Calling dbSendPreparedQuery with a non-NULL bind.data that has zero
+  rows or zero columns is now an error.
+
 
 Version 0.8-0
 

@@ -25,12 +25,12 @@ char *compiledVarsion = SQLITE_VERSION;
 
 /* the following are for parameter binding */
 RS_SQLite_bindParam *RS_SQLite_createParameterBinding(int n,
-                        SEXP bind_data, sqlite3_stmt *stmt,
-                        char *errorMsg);
+                                                      SEXP bind_data, sqlite3_stmt *stmt,
+                                                      char *errorMsg);
 void RS_SQLite_freeParameterBinding(int n,
-                                     RS_SQLite_bindParam *param);
+                                    RS_SQLite_bindParam *param);
 int RS_sqlite_import(sqlite3 *db, const char *zTable,
-       const char *zFile, const char *separator, const char *eol, int skip);
+                     const char *zFile, const char *separator, const char *eol, int skip);
 int corrected_sqlite3_step(sqlite3_stmt *pStatement);
 
 /* The macro NA_STRING is a CHRSXP in R but a char * in Splus */
@@ -62,306 +62,306 @@ int corrected_sqlite3_step(sqlite3_stmt *pStatement);
 Mgr_Handle
 RS_SQLite_init(SEXP config_params, SEXP reload, SEXP cache)
 {
-  /* Currently we can specify the 2 defaults max conns and records per
-   * fetch (this last one can be over-ridden explicitly in the S call to fetch).
-   */
-  RS_DBI_manager *mgr;
-  Mgr_Handle mgrHandle;
-  Sint  fetch_default_rec, force_reload, max_con;
-  Sint  *shared_cache;
-  const char *drvName = "SQLite";
-  const char *clientVersion = sqlite3_libversion();
+    /* Currently we can specify the 2 defaults max conns and records per
+     * fetch (this last one can be over-ridden explicitly in the S call to fetch).
+     */
+    RS_DBI_manager *mgr;
+    Mgr_Handle mgrHandle;
+    Sint  fetch_default_rec, force_reload, max_con;
+    Sint  *shared_cache;
+    const char *drvName = "SQLite";
+    const char *clientVersion = sqlite3_libversion();
 
-  /* make sure we're running with the "right" version of the SQLite library */
-  if(strcmp(clientVersion, compiledVarsion)){
-     char  buf[256];
-     (void) sprintf(buf,
-                    "%s mismatch between compiled version %s and runtime version %s",
-                    drvName, compiledVarsion, clientVersion);
-     RS_DBI_errorMessage(buf, RS_DBI_WARNING);
-  }
-  if(GET_LENGTH(config_params)!=2){
-     RS_DBI_errorMessage(
-        "initialization error: must specify max num of conenctions and default number of rows per fetch",
-        RS_DBI_ERROR);
-  }
-  max_con = INT_EL(config_params, 0);
-  fetch_default_rec = INT_EL(config_params,1);
-  force_reload = LGL_EL(reload,0);
+    /* make sure we're running with the "right" version of the SQLite library */
+    if(strcmp(clientVersion, compiledVarsion)){
+        char  buf[256];
+        (void) sprintf(buf,
+                       "%s mismatch between compiled version %s and runtime version %s",
+                       drvName, compiledVarsion, clientVersion);
+        RS_DBI_errorMessage(buf, RS_DBI_WARNING);
+    }
+    if(GET_LENGTH(config_params)!=2){
+        RS_DBI_errorMessage(
+            "initialization error: must specify max num of conenctions and default number of rows per fetch",
+            RS_DBI_ERROR);
+    }
+    max_con = INT_EL(config_params, 0);
+    fetch_default_rec = INT_EL(config_params,1);
+    force_reload = LGL_EL(reload,0);
 
-  mgrHandle = RS_DBI_allocManager(drvName, max_con, fetch_default_rec,
-           force_reload);
+    mgrHandle = RS_DBI_allocManager(drvName, max_con, fetch_default_rec,
+                                    force_reload);
 
-  mgr = RS_DBI_getManager(mgrHandle);
+    mgr = RS_DBI_getManager(mgrHandle);
 
-  shared_cache = (Sint *)malloc(sizeof(Sint));
-  if(!shared_cache){
-    RS_DBI_errorMessage(
-        "could not malloc space for driver data", RS_DBI_ERROR);
-  }
+    shared_cache = (Sint *)malloc(sizeof(Sint));
+    if(!shared_cache){
+        RS_DBI_errorMessage(
+            "could not malloc space for driver data", RS_DBI_ERROR);
+    }
 
-  *shared_cache = LGL_EL(cache,0);
-  mgr->drvData = (void *)shared_cache;
+    *shared_cache = LGL_EL(cache,0);
+    mgr->drvData = (void *)shared_cache;
 
-  if(*shared_cache)
-      sqlite3_enable_shared_cache(1);
+    if(*shared_cache)
+        sqlite3_enable_shared_cache(1);
 
-  return mgrHandle;
+    return mgrHandle;
 }
 
 SEXP 
 RS_SQLite_closeManager(Mgr_Handle mgrHandle)
 {
-  RS_DBI_manager *mgr;
-  SEXP status;
-  Sint *shared_cache;
+    RS_DBI_manager *mgr;
+    SEXP status;
+    Sint *shared_cache;
 
-  mgr = RS_DBI_getManager(mgrHandle);
-  if(mgr->num_con)
-    RS_DBI_errorMessage("there are opened connections -- close them first",
-      RS_DBI_ERROR);
+    mgr = RS_DBI_getManager(mgrHandle);
+    if(mgr->num_con)
+        RS_DBI_errorMessage("there are opened connections -- close them first",
+                            RS_DBI_ERROR);
 
-  sqlite3_enable_shared_cache(0);
-  shared_cache = (Sint *)mgr->drvData;
-  if(shared_cache){
-    free(shared_cache);
-    mgr->drvData = NULL;
-  }
+    sqlite3_enable_shared_cache(0);
+    shared_cache = (Sint *)mgr->drvData;
+    if(shared_cache){
+        free(shared_cache);
+        mgr->drvData = NULL;
+    }
 
-  RS_DBI_freeManager(mgrHandle);
+    RS_DBI_freeManager(mgrHandle);
 
-  PROTECT(status = NEW_LOGICAL((Sint) 1));
-  LGL_EL(status,0) = TRUE;
-  UNPROTECT(1);
-  return status;
+    PROTECT(status = NEW_LOGICAL((Sint) 1));
+    LGL_EL(status,0) = TRUE;
+    UNPROTECT(1);
+    return status;
 }
 
 /* open a connection with the same parameters used for in conHandle */
 Con_Handle
 RS_SQLite_cloneConnection(Con_Handle conHandle)
 {
-  Mgr_Handle mgrHandle;
-  RS_DBI_connection  *con;
-  RS_SQLite_conParams *conParams;
-  SEXP dbname, allow_ext, vfs, flags;
-  Con_Handle ans;
+    Mgr_Handle mgrHandle;
+    RS_DBI_connection  *con;
+    RS_SQLite_conParams *conParams;
+    SEXP dbname, allow_ext, vfs, flags;
+    Con_Handle ans;
 
-  /* get connection params used to open existing connection */
-  con = RS_DBI_getConnection(conHandle);
-  conParams = (RS_SQLite_conParams *) con->conParams;
+    /* get connection params used to open existing connection */
+    con = RS_DBI_getConnection(conHandle);
+    conParams = (RS_SQLite_conParams *) con->conParams;
 
-  mgrHandle = RS_DBI_asMgrHandle(MGR_ID(conHandle));
+    mgrHandle = RS_DBI_asMgrHandle(MGR_ID(conHandle));
 
-  /* copy dbname and loadable_extensions into a 2-element character
-   * vector to be passed to the RS_SQLite_newConnection() function.
-   */
-  PROTECT(dbname = mkString(conParams->dbname));
-  PROTECT(allow_ext = ScalarLogical(conParams->loadable_extensions));
-  PROTECT(vfs = mkString(conParams->vfs));
-  PROTECT(flags = ScalarInteger(conParams->flags));
-  ans = RS_SQLite_newConnection(mgrHandle, dbname, allow_ext, flags, vfs);
-  UNPROTECT(4);
-  return ans;
+    /* copy dbname and loadable_extensions into a 2-element character
+     * vector to be passed to the RS_SQLite_newConnection() function.
+     */
+    PROTECT(dbname = mkString(conParams->dbname));
+    PROTECT(allow_ext = ScalarLogical(conParams->loadable_extensions));
+    PROTECT(vfs = mkString(conParams->vfs));
+    PROTECT(flags = ScalarInteger(conParams->flags));
+    ans = RS_SQLite_newConnection(mgrHandle, dbname, allow_ext, flags, vfs);
+    UNPROTECT(4);
+    return ans;
 }
 
 RS_SQLite_conParams *
 RS_SQLite_allocConParams(const char *dbname, int loadable_extensions,
                          int flags, const char *vfs)
 {
-  RS_SQLite_conParams *conParams;
+    RS_SQLite_conParams *conParams;
 
-  conParams = (RS_SQLite_conParams *) malloc(sizeof(RS_SQLite_conParams));
-  if(!conParams){
-    RS_DBI_errorMessage("could not malloc space for connection params",
-                       RS_DBI_ERROR);
-  }
-  conParams->dbname = RS_DBI_copyString(dbname);
-  if (vfs)
-      conParams->vfs = RS_DBI_copyString(vfs);
-  else
-      conParams->vfs = RS_DBI_copyString("");
-  conParams->loadable_extensions = loadable_extensions;
-  conParams->flags = flags;
-  return conParams;
+    conParams = (RS_SQLite_conParams *) malloc(sizeof(RS_SQLite_conParams));
+    if(!conParams){
+        RS_DBI_errorMessage("could not malloc space for connection params",
+                            RS_DBI_ERROR);
+    }
+    conParams->dbname = RS_DBI_copyString(dbname);
+    if (vfs)
+        conParams->vfs = RS_DBI_copyString(vfs);
+    else
+        conParams->vfs = RS_DBI_copyString("");
+    conParams->loadable_extensions = loadable_extensions;
+    conParams->flags = flags;
+    return conParams;
 }
 
 void
 RS_SQLite_freeConParams(RS_SQLite_conParams *conParams)
 {
-  if (conParams->dbname) free(conParams->dbname);
-  if (conParams->vfs) free(conParams->vfs);
-  /* conParams->loadable_extensions is an int, thus needs no free */
-  free(conParams);
-  conParams = (RS_SQLite_conParams *)NULL;
-  return;
+    if (conParams->dbname) free(conParams->dbname);
+    if (conParams->vfs) free(conParams->vfs);
+    /* conParams->loadable_extensions is an int, thus needs no free */
+    free(conParams);
+    conParams = (RS_SQLite_conParams *)NULL;
+    return;
 }
 
 /* set exception object (allocate memory if needed) */
 void
 RS_SQLite_setException(RS_DBI_connection *con, int err_no, const char *err_msg)
 {
-   RS_SQLite_exception *ex;
+    RS_SQLite_exception *ex;
 
-   ex = (RS_SQLite_exception *) con->drvData;
-   if(!ex){    /* brand new exception object */
-      ex = (RS_SQLite_exception *) malloc(sizeof(RS_SQLite_exception));
-      if(!ex)
-         RS_DBI_errorMessage("could not allocate SQLite exception object",
-                RS_DBI_ERROR);
-   }
-   else
-      free(ex->errorMsg);      /* re-use existing object */
+    ex = (RS_SQLite_exception *) con->drvData;
+    if(!ex){    /* brand new exception object */
+        ex = (RS_SQLite_exception *) malloc(sizeof(RS_SQLite_exception));
+        if(!ex)
+            RS_DBI_errorMessage("could not allocate SQLite exception object",
+                                RS_DBI_ERROR);
+    }
+    else
+        free(ex->errorMsg);      /* re-use existing object */
 
-   ex->errorNum = err_no;
-   if(err_msg)
-      ex->errorMsg = RS_DBI_copyString(err_msg);
-   else
-      ex->errorMsg = (char *) NULL;
+    ex->errorNum = err_no;
+    if(err_msg)
+        ex->errorMsg = RS_DBI_copyString(err_msg);
+    else
+        ex->errorMsg = (char *) NULL;
 
-   con->drvData = (void *) ex;
-   return;
+    con->drvData = (void *) ex;
+    return;
 }
 
 void
 RS_SQLite_freeException(RS_DBI_connection *con)
 {
-   RS_SQLite_exception *ex = (RS_SQLite_exception *) con->drvData;
+    RS_SQLite_exception *ex = (RS_SQLite_exception *) con->drvData;
 
-   if(!ex) return;
-   if(ex->errorMsg) free(ex->errorMsg);
-   free(ex);
-   return;
+    if(!ex) return;
+    if(ex->errorMsg) free(ex->errorMsg);
+    free(ex);
+    return;
 }
 
 Con_Handle
 RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
                         SEXP s_flags, SEXP s_vfs)
 {
-  RS_DBI_connection   *con;
-  RS_SQLite_conParams *conParams;
-  Con_Handle conHandle;
-  sqlite3     *db_connection, **pDb;
-  const char  *dbname = NULL;
-  int         rc, loadable_extensions;
-  const char *vfs = NULL;
-  int mode = 0;
-  int open_flags = 0;
+    RS_DBI_connection   *con;
+    RS_SQLite_conParams *conParams;
+    Con_Handle conHandle;
+    sqlite3     *db_connection, **pDb;
+    const char  *dbname = NULL;
+    int         rc, loadable_extensions;
+    const char *vfs = NULL;
+    int mode = 0;
+    int open_flags = 0;
 
-  if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
-    RS_DBI_errorMessage("invalid SQLiteManager", RS_DBI_ERROR);
+    if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
+        RS_DBI_errorMessage("invalid SQLiteManager", RS_DBI_ERROR);
 
-  if (TYPEOF(dbfile) != STRSXP || length(dbfile) != 1
-      || STRING_ELT(dbfile, 0) == NA_STRING)
-      error("'dbname' must be a length one character vector and not NA");
-  dbname = CHAR(STRING_ELT(dbfile, 0));
+    if (TYPEOF(dbfile) != STRSXP || length(dbfile) != 1
+        || STRING_ELT(dbfile, 0) == NA_STRING)
+        error("'dbname' must be a length one character vector and not NA");
+    dbname = CHAR(STRING_ELT(dbfile, 0));
 
-  if (!isLogical(allow_ext))
-      error("'allow_ext' must be TRUE or FALSE");
-  loadable_extensions = LOGICAL(allow_ext)[0];
-  if (loadable_extensions == NA_LOGICAL)
-      error("'allow_ext' must be TRUE or FALSE, not NA");
+    if (!isLogical(allow_ext))
+        error("'allow_ext' must be TRUE or FALSE");
+    loadable_extensions = LOGICAL(allow_ext)[0];
+    if (loadable_extensions == NA_LOGICAL)
+        error("'allow_ext' must be TRUE or FALSE, not NA");
 
-  if (!isNull(s_vfs)) {
-      if (!isString(s_vfs) || length(s_vfs) != 1
-          || STRING_ELT(s_vfs, 0) == NA_STRING) {
-          error("invalid argument 'vfs'");
-      }
-      vfs = CHAR(STRING_ELT(s_vfs, 0));
-      /* "" is not valid, NULL gives default value */
-      if (strlen(vfs) == 0) vfs = NULL;
-  }
+    if (!isNull(s_vfs)) {
+        if (!isString(s_vfs) || length(s_vfs) != 1
+            || STRING_ELT(s_vfs, 0) == NA_STRING) {
+            error("invalid argument 'vfs'");
+        }
+        vfs = CHAR(STRING_ELT(s_vfs, 0));
+        /* "" is not valid, NULL gives default value */
+        if (strlen(vfs) == 0) vfs = NULL;
+    }
   
-  if (!isInteger(s_flags) || length(s_flags) != 1)
-      error("argument 'mode' must be length 1 integer, got %s, length: %d",
-            type2char(TYPEOF(s_flags)), length(s_flags));
-  open_flags = INTEGER(s_flags)[0];
+    if (!isInteger(s_flags) || length(s_flags) != 1)
+        error("argument 'mode' must be length 1 integer, got %s, length: %d",
+              type2char(TYPEOF(s_flags)), length(s_flags));
+    open_flags = INTEGER(s_flags)[0];
   
-  pDb = (sqlite3 **) calloc((size_t) 1, sizeof(sqlite3 *));
+    pDb = (sqlite3 **) calloc((size_t) 1, sizeof(sqlite3 *));
 
-  rc = sqlite3_open_v2(dbname, pDb, open_flags, vfs);
-  db_connection = *pDb;           /* available, even if open fails! See API */
-  if(rc != SQLITE_OK){
-     char buf[256];
-     sprintf(buf, "could not connect to dbname:\n%s\n",
-             sqlite3_errmsg(db_connection));
+    rc = sqlite3_open_v2(dbname, pDb, open_flags, vfs);
+    db_connection = *pDb;           /* available, even if open fails! See API */
+    if(rc != SQLITE_OK){
+        char buf[256];
+        sprintf(buf, "could not connect to dbname:\n%s\n",
+                sqlite3_errmsg(db_connection));
 
-     RS_DBI_errorMessage(buf, RS_DBI_ERROR);
-  }
+        RS_DBI_errorMessage(buf, RS_DBI_ERROR);
+    }
 
-  /* SQLite connections can only have 1 result set open at a time */
-  conHandle = RS_DBI_allocConnection(mgrHandle, (Sint) 1);
-  con = RS_DBI_getConnection(conHandle);
-  if(!con){
-    (void) sqlite3_close(db_connection);
-    RS_DBI_freeConnection(conHandle);
-    RS_DBI_errorMessage("could not alloc space for connection object",
-                        RS_DBI_ERROR);
-  }
-  /* save connection parameters in the connection object */
-  conParams = RS_SQLite_allocConParams(dbname, loadable_extensions,
-                                       open_flags, vfs);
-  con->drvConnection = (void *) db_connection;
-  con->conParams = (void *) conParams;
-  RS_SQLite_setException(con, SQLITE_OK, "OK");
+    /* SQLite connections can only have 1 result set open at a time */
+    conHandle = RS_DBI_allocConnection(mgrHandle, (Sint) 1);
+    con = RS_DBI_getConnection(conHandle);
+    if(!con){
+        (void) sqlite3_close(db_connection);
+        RS_DBI_freeConnection(conHandle);
+        RS_DBI_errorMessage("could not alloc space for connection object",
+                            RS_DBI_ERROR);
+    }
+    /* save connection parameters in the connection object */
+    conParams = RS_SQLite_allocConParams(dbname, loadable_extensions,
+                                         open_flags, vfs);
+    con->drvConnection = (void *) db_connection;
+    con->conParams = (void *) conParams;
+    RS_SQLite_setException(con, SQLITE_OK, "OK");
 
-  /* enable loadable extensions if required */
-  if(loadable_extensions != 0)
-    sqlite3_enable_load_extension(db_connection, 1);
+    /* enable loadable extensions if required */
+    if(loadable_extensions != 0)
+        sqlite3_enable_load_extension(db_connection, 1);
 
-  return conHandle;
+    return conHandle;
 }
 
 SEXP 
 RS_SQLite_closeConnection(Con_Handle conHandle)
 {
-  RS_DBI_connection *con;
-  sqlite3 *db_connection;
-  SEXP status;
-  int      rc;
+    RS_DBI_connection *con;
+    sqlite3 *db_connection;
+    SEXP status;
+    int      rc;
 
-  con = RS_DBI_getConnection(conHandle);
-  if(con->num_res>0){
-    RS_DBI_errorMessage(
-     "close the pending result sets before closing this connection",
-     RS_DBI_ERROR);
-  }
+    con = RS_DBI_getConnection(conHandle);
+    if(con->num_res>0){
+        RS_DBI_errorMessage(
+            "close the pending result sets before closing this connection",
+            RS_DBI_ERROR);
+    }
 
-  db_connection = (sqlite3 *) con->drvConnection;
-  rc = sqlite3_close(db_connection);  /* it also frees db_connection */
-  if(rc==SQLITE_BUSY){
-    RS_DBI_errorMessage(
-     "finalize the pending prepared statements before closing this connection",
-     RS_DBI_ERROR);
-  }
-  else if(rc!=SQLITE_OK){
-    RS_DBI_errorMessage(
-     "internal error: SQLite could not close the connection",
-     RS_DBI_ERROR);
-  }
+    db_connection = (sqlite3 *) con->drvConnection;
+    rc = sqlite3_close(db_connection);  /* it also frees db_connection */
+    if(rc==SQLITE_BUSY){
+        RS_DBI_errorMessage(
+            "finalize the pending prepared statements before closing this connection",
+            RS_DBI_ERROR);
+    }
+    else if(rc!=SQLITE_OK){
+        RS_DBI_errorMessage(
+            "internal error: SQLite could not close the connection",
+            RS_DBI_ERROR);
+    }
 
-  /* make sure we first free the conParams and SQLite connection from
-   * the RS-RBI connection object.
-   */
+    /* make sure we first free the conParams and SQLite connection from
+     * the RS-RBI connection object.
+     */
 
-  if(con->conParams){
-     RS_SQLite_freeConParams(con->conParams);
-     /* we must set con->conParms to NULL (not just free it) to signal
-      * RS_DBI_freeConnection that it is okay to free the connection itself.
-      */
-     con->conParams = (RS_SQLite_conParams *) NULL;
-  }
-  /* free(db_connection); */    /* freed by sqlite3_close? */
-  con->drvConnection = (void *) NULL;
+    if(con->conParams){
+        RS_SQLite_freeConParams(con->conParams);
+        /* we must set con->conParms to NULL (not just free it) to signal
+         * RS_DBI_freeConnection that it is okay to free the connection itself.
+         */
+        con->conParams = (RS_SQLite_conParams *) NULL;
+    }
+    /* free(db_connection); */    /* freed by sqlite3_close? */
+    con->drvConnection = (void *) NULL;
 
-  RS_SQLite_freeException(con);
-  con->drvData = (void *) NULL;
-  RS_DBI_freeConnection(conHandle);
+    RS_SQLite_freeException(con);
+    con->drvData = (void *) NULL;
+    RS_DBI_freeConnection(conHandle);
 
-  PROTECT(status = NEW_LOGICAL((Sint) 1));
-  LGL_EL(status, 0) = TRUE;
-  UNPROTECT(1);
+    PROTECT(status = NEW_LOGICAL((Sint) 1));
+    LGL_EL(status, 0) = TRUE;
+    UNPROTECT(1);
 
-  return status;
+    return status;
 }
 
 
@@ -459,7 +459,7 @@ SEXP RS_SQLite_quick_column(Con_Handle conHandle, SEXP table, SEXP column)
     /* FIXME: how should we be handling errors?
        Could either follow the pattern in the rest of the package or
        start to use the condition system and raise specific conditions.
-     */
+    */
     if(rc != SQLITE_OK) {
         error("SQL error: %s\n", sqlite3_errmsg(db_connection));
     }
@@ -536,8 +536,8 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
         if (res->completed != 1) {
             free(dyn_statement);
             RS_DBI_errorMessage(
-                                "connection with pending rows, close resultSet before continuing",
-                                RS_DBI_ERROR);
+                "connection with pending rows, close resultSet before continuing",
+                RS_DBI_ERROR);
         } else
             RS_SQLite_closeResultSet(rsHandle);
     }
@@ -727,216 +727,217 @@ RS_SQLite_bindParam *
 RS_SQLite_createParameterBinding(int n, SEXP bind_data,
                                  sqlite3_stmt *stmt, char *errorMsg)
 {
-  RS_SQLite_bindParam *params;
-  int i, j, *used_index, current, num_cols;
-  SEXP colNames, data, levels;
+    RS_SQLite_bindParam *params;
+    int i, j, *used_index, current, num_cols;
+    SEXP colNames, data, levels;
 
-  /* check that we have enough columns in the data frame */
-  colNames = GET_NAMES(bind_data);
-  num_cols = length(colNames);
-  if(num_cols < n){
-    sprintf(errorMsg,
-            "incomplete data binding: expected %d parameters, got %d",
-            n, num_cols);
-    return NULL;
-  }
+    /* check that we have enough columns in the data frame */
+    colNames = GET_NAMES(bind_data);
+    num_cols = length(colNames);
+    if(num_cols < n){
+        sprintf(errorMsg,
+                "incomplete data binding: expected %d parameters, got %d",
+                n, num_cols);
+        return NULL;
+    }
 
-  /* allocate and initalize the structures*/
-  params = (RS_SQLite_bindParam *)malloc(sizeof(RS_SQLite_bindParam) * n);
-  if(params==NULL){
-    sprintf(errorMsg, "could not allocate memory");
-    return NULL;
-  }
+    /* allocate and initalize the structures*/
+    params = (RS_SQLite_bindParam *)malloc(sizeof(RS_SQLite_bindParam) * n);
+    if(params==NULL){
+        sprintf(errorMsg, "could not allocate memory");
+        return NULL;
+    }
 
-  /* If too many columns are provided in the bind data, need to
-     allocate enough space for the used_index
-  */
-  used_index = (int *)malloc(sizeof(int)*num_cols);
-  if(used_index==NULL){
-    free(params);
-    sprintf(errorMsg, "could not allocate memory");
-    return NULL;
-  }
+    /* If too many columns are provided in the bind data, need to
+       allocate enough space for the used_index
+    */
+    used_index = (int *)malloc(sizeof(int)*num_cols);
+    if(used_index==NULL){
+        free(params);
+        sprintf(errorMsg, "could not allocate memory");
+        return NULL;
+    }
 
-  for(i=0; i<num_cols; i++){
-    used_index[i] = -1;
-    if (i < n) {
+    for(i=0; i<num_cols; i++){
+        used_index[i] = -1;
+        if (i < n) {
+            params[i].is_protected = 0;
+            params[i].data = NULL;
+        }
+    }
+
+    for(i=0; i<n; i++){
+        const char *paramName = sqlite3_bind_parameter_name(stmt, i+1);
+
+        current = -1;
+        if(paramName == NULL){
+            /* assume the first non-used column is the one we want */
+            for(j=0; j<n; j++){
+                if(used_index[j] == -1){
+                    current = j;
+                    used_index[j] = 1;
+                    break;
+                }
+            }
+        }
+        else {
+            for(j=0; j<num_cols; j++){
+                /* skip past initial bind identifier */
+                if(strcmp(paramName+1, CHR_EL(colNames, j)) == 0){
+                    if(used_index[j] == -1){
+                        current = j;
+                        used_index[j] = 1;
+                        break;
+                    }
+                    /* it's already in use! throw an error */
+                    sprintf(errorMsg,
+                            "attempted to re-bind column [%s] to positional "
+                            "parameter %d",
+                            CHR_EL(colNames, j), i+1);
+                    free(params);
+                    free(used_index);
+                    return NULL;
+                }
+            }
+        }
+
+        if(current == -1){
+            sprintf(errorMsg,
+                    "unable to bind data for positional parameter %d", i+1);
+            free(params);
+            free(used_index);
+            return NULL;
+        }
+
+        data = LST_EL(bind_data, current);
+
         params[i].is_protected = 0;
-        params[i].data = NULL;
-    }
-  }
 
-  for(i=0; i<n; i++){
-    const char *paramName = sqlite3_bind_parameter_name(stmt, i+1);
-
-    current = -1;
-    if(paramName == NULL){
-      /* assume the first non-used column is the one we want */
-      for(j=0; j<n; j++){
-        if(used_index[j] == -1){
-          current = j;
-          used_index[j] = 1;
-          break;
+        if(isInteger(data) || isLogical(data)){
+            params[i].type = INTSXP;
+            params[i].data = data;
         }
-      }
-    }
-    else{
-      for(j=0; j<num_cols; j++){
-        /* skip past initial bind identifier */
-        if(strcmp(paramName+1, CHR_EL(colNames, j)) == 0){
-          if(used_index[j] == -1){
-            current = j;
-            used_index[j] = 1;
-            break;
-          }
-          /* it's already in use! throw an error */
-          sprintf(errorMsg,
-            "attempted to re-bind column [%s] to positional parameter %d",
-            CHR_EL(colNames, j), i+1);
-          free(params);
-          free(used_index);
-          return NULL;
+        else if(isReal(data)){
+            params[i].type = REALSXP;
+            params[i].data = data;
         }
-      }
+        else if(isString(data)){
+            params[i].type = STRSXP;
+            params[i].data = data;
+        }
+        else if(isFactor(data)){
+            /* need to convert to a string vector */
+            params[i].type = STRSXP;
+            levels = GET_LEVELS(data);
+
+            PROTECT( params[i].data = allocVector(STRSXP, LENGTH(data)) );
+            for(j=0; j<LENGTH(data); j++) {
+                int factor_code = INT_EL(data, j);
+                if (factor_code == NA_INTEGER)
+                    SET_CHR_EL(params[i].data, j, NA_STRING);
+                else
+                    SET_CHR_EL(params[i].data, j,
+                               STRING_ELT(levels, factor_code - 1));
+                params[i].is_protected = 1;
+            }
+        }
+        else{
+            params[i].type = STRSXP;
+            PROTECT( params[i].data = AS_CHARACTER(data) );
+            params[i].is_protected = 1;
+        }
     }
 
-    if(current == -1){
-      sprintf(errorMsg,
-        "unable to bind data for positional parameter %d", i+1);
-      free(params);
-      free(used_index);
-      return NULL;
-    }
-
-    data = LST_EL(bind_data, current);
-
-    params[i].is_protected = 0;
-
-    if(isInteger(data) || isLogical(data)){
-      params[i].type = INTSXP;
-      params[i].data = data;
-    }
-    else if(isReal(data)){
-      params[i].type = REALSXP;
-      params[i].data = data;
-    }
-    else if(isString(data)){
-      params[i].type = STRSXP;
-      params[i].data = data;
-    }
-    else if(isFactor(data)){
-      /* need to convert to a string vector */
-      params[i].type = STRSXP;
-      levels = GET_LEVELS(data);
-
-      PROTECT( params[i].data = allocVector(STRSXP, LENGTH(data)) );
-      for(j=0; j<LENGTH(data); j++) {
-          int factor_code = INT_EL(data, j);
-          if (factor_code == NA_INTEGER)
-              SET_CHR_EL(params[i].data, j, NA_STRING);
-          else
-              SET_CHR_EL(params[i].data, j,
-                         STRING_ELT(levels, factor_code - 1));
-          params[i].is_protected = 1;
-      }
-    }
-    else{
-      params[i].type = STRSXP;
-      PROTECT( params[i].data = AS_CHARACTER(data) );
-      params[i].is_protected = 1;
-    }
-  }
-
-  return params;
+    return params;
 }
 
 void
 RS_SQLite_freeParameterBinding(int n, RS_SQLite_bindParam *params)
 {
-  int i;
+    int i;
 
-  for(i=0; i<n; i++){
-    if(params[i].is_protected)
-      UNPROTECT(1);
-  }
+    for(i=0; i<n; i++){
+        if(params[i].is_protected)
+            UNPROTECT(1);
+    }
 
-  free(params);
+    free(params);
 }
 
 RS_DBI_fields *
 RS_SQLite_createDataMappings(Res_Handle rsHandle)
 {
-  sqlite3_stmt  *db_statement;
-  RS_DBI_resultSet   *result;
-  RS_DBI_fields      *flds;
-  int     j, ncol, col_type;
-  const char *col_decltype = NULL;
-  char *col_name;
+    sqlite3_stmt  *db_statement;
+    RS_DBI_resultSet   *result;
+    RS_DBI_fields      *flds;
+    int     j, ncol, col_type;
+    const char *col_decltype = NULL;
+    char *col_name;
 
-  result = RS_DBI_getResultSet(rsHandle);
-  db_statement = (sqlite3_stmt *) result->drvResultSet;
+    result = RS_DBI_getResultSet(rsHandle);
+    db_statement = (sqlite3_stmt *) result->drvResultSet;
 
-  ncol = sqlite3_column_count(db_statement);
-  flds = RS_DBI_allocFields(ncol); /* BUG: mem leak if this fails? */
-  flds->num_fields = (Sint) ncol;
+    ncol = sqlite3_column_count(db_statement);
+    flds = RS_DBI_allocFields(ncol); /* BUG: mem leak if this fails? */
+    flds->num_fields = (Sint) ncol;
 
-   for(j=0; j<ncol; j++){
-       col_name = (char*)sqlite3_column_name(db_statement, j); /* -Wall */
-       if (col_name)
-           flds->name[j] = RS_DBI_copyString(col_name);
-       else {                   /* weird failure */
-           RS_DBI_freeFields(flds);
-           flds = NULL;
-           return NULL;
-       }
-    /* XXX: We do our best to determine the type of the column.  When
-       the first row retrieved contains a NULL and does not reference
-       a table column, we give up.
-     */
-    col_type = sqlite3_column_type(db_statement, j);
-    if (col_type == SQLITE_NULL) {
-        /* try to get type from origin column */
-        col_decltype = sqlite3_column_decltype(db_statement, j);
-        col_type = SQLite_decltype_to_type(col_decltype);
+    for(j=0; j<ncol; j++){
+        col_name = (char*)sqlite3_column_name(db_statement, j); /* -Wall */
+        if (col_name)
+            flds->name[j] = RS_DBI_copyString(col_name);
+        else {                   /* weird failure */
+            RS_DBI_freeFields(flds);
+            flds = NULL;
+            return NULL;
+        }
+        /* XXX: We do our best to determine the type of the column.  When
+           the first row retrieved contains a NULL and does not reference
+           a table column, we give up.
+        */
+        col_type = sqlite3_column_type(db_statement, j);
+        if (col_type == SQLITE_NULL) {
+            /* try to get type from origin column */
+            col_decltype = sqlite3_column_decltype(db_statement, j);
+            col_type = SQLite_decltype_to_type(col_decltype);
+        }
+        switch(col_type) {
+        case SQLITE_INTEGER:
+            flds->type[j] = SQL92_TYPE_INTEGER;
+            flds->Sclass[j] = INTSXP;
+            flds->length[j] = (Sint) sizeof(int);
+            flds->isVarLength[j] = (Sint) 0;
+            break;
+        case SQLITE_FLOAT:
+            flds->type[j] = SQL92_TYPE_DOUBLE;
+            flds->Sclass[j] = REALSXP;
+            flds->length[j] = (Sint) sizeof(double);
+            flds->isVarLength[j] = (Sint) 0;
+            break;
+        case SQLITE_TEXT:
+            flds->type[j] = SQL92_TYPE_CHAR_VAR;
+            flds->Sclass[j] = STRSXP;
+            flds->length[j] = (Sint) -1;   /* unknown */
+            flds->isVarLength[j] = (Sint) 1;
+            break;
+        case SQLITE_NULL:
+            error("NULL column handling not implemented");
+            break;
+        case SQLITE_BLOB:
+            error("BLOB column handling not implemented");
+            break;
+        default:
+            error("unknown column type %d", col_type);
+        }
+        flds->precision[j] = (Sint) -1;
+        flds->scale[j] = (Sint) -1;
+        /* For nullOk, could use sqlite3_column_origin_name and
+           sqlite3_table_column_metadata to determine this.  It
+           won't always be possible as the query column may not
+           refer to a table column.
+        */
+        flds->nullOk[j] = (Sint) -1;
     }
-    switch(col_type) {
-    case SQLITE_INTEGER:
-        flds->type[j] = SQL92_TYPE_INTEGER;
-        flds->Sclass[j] = INTSXP;
-        flds->length[j] = (Sint) sizeof(int);
-        flds->isVarLength[j] = (Sint) 0;
-        break;
-    case SQLITE_FLOAT:
-        flds->type[j] = SQL92_TYPE_DOUBLE;
-        flds->Sclass[j] = REALSXP;
-        flds->length[j] = (Sint) sizeof(double);
-        flds->isVarLength[j] = (Sint) 0;
-        break;
-    case SQLITE_TEXT:
-        flds->type[j] = SQL92_TYPE_CHAR_VAR;
-        flds->Sclass[j] = STRSXP;
-        flds->length[j] = (Sint) -1;   /* unknown */
-        flds->isVarLength[j] = (Sint) 1;
-        break;
-    case SQLITE_NULL:
-        error("NULL column handling not implemented");
-        break;
-    case SQLITE_BLOB:
-        error("BLOB column handling not implemented");
-        break;
-    default:
-        error("unknown column type %d", col_type);
-    }
-    flds->precision[j] = (Sint) -1;
-    flds->scale[j] = (Sint) -1;
-    /* For nullOk, could use sqlite3_column_origin_name and
-       sqlite3_table_column_metadata to determine this.  It
-       won't always be possible as the query column may not
-       refer to a table column.
-    */
-    flds->nullOk[j] = (Sint) -1;
-   }
-   return flds;
+    return flds;
 }
 
 /* Given a DBI resultset handle, call corrected_sqlite3_step once
@@ -988,7 +989,7 @@ static int single_step_with_reprepare(SEXP rsHandle)
 /* Fills the output VECSXP with one row of data from the resultset
  */
 static void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
-                        RS_DBI_fields *flds)
+                         RS_DBI_fields *flds)
 {
     int j;
     int null_item;
@@ -1043,7 +1044,7 @@ static void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
    at the SQLite level (which would be more efficient, but less
    flexible).
 
- */
+*/
 SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
 {
     RS_DBI_resultSet *res;
@@ -1135,172 +1136,172 @@ SEXP R_NewHashedEnv(SEXP);
 SEXP       /* data.frame */
 RS_SQLite_mget(SEXP rsHandle, SEXP max_rec)
 {
-  RS_DBI_resultSet *res;
-  RS_DBI_fields    *flds;
-  sqlite3_stmt     *db_statement;
-  SEXP output, *s_tmp;
-  int    i, j, state, expand, vlen;
-  Sint   num_rec;
-  int    num_fields, row_idx;
-  int *key_breaks;
-  int breaks_idx;
-  const char *cur_key = NULL;
-  char *prev_key = NULL;
-  SEXP env, vect;
+    RS_DBI_resultSet *res;
+    RS_DBI_fields    *flds;
+    sqlite3_stmt     *db_statement;
+    SEXP output, *s_tmp;
+    int    i, j, state, expand, vlen;
+    Sint   num_rec;
+    int    num_fields, row_idx;
+    int *key_breaks;
+    int breaks_idx;
+    const char *cur_key = NULL;
+    char *prev_key = NULL;
+    SEXP env, vect;
 
 
-  res = RS_DBI_getResultSet(rsHandle);
-  if(res->isSelect != 1){
-    RS_DBI_errorMessage("resultSet does not correspond to a SELECT statement",
-    RS_DBI_WARNING);
-    return S_NULL_ENTRY;
-  }
-
-  if(res->completed == 1)
-    return R_NilValue;
-
-  db_statement = (sqlite3_stmt *)res->drvResultSet;
-  if(db_statement == NULL){
-    RS_DBI_errorMessage("corrupt SQLite resultSet, missing statement handle",
-      RS_DBI_ERROR);
-  }
-
-  state = corrected_sqlite3_step(db_statement);
-  row_idx = 0;
-  if(state!=SQLITE_ROW && state!=SQLITE_DONE){
-      char errMsg[2048];
-      (void)sprintf(errMsg, "RS_SQLite_fetch: failed first step: %s",
-                    sqlite3_errmsg(sqlite3_db_handle(db_statement)));
-      RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
-  }
-  if (!res->fields) {
-      if (!(res->fields = RS_SQLite_createDataMappings(rsHandle))) {
-          RS_DBI_errorMessage("corrupt SQLite resultSet, missing fieldDescription",
-                              RS_DBI_ERROR);
-      }
-  }
-  flds = res->fields;
-  /* force first column to character */
-  flds->Sclass[0] = STRSXP;
-
-  num_fields = flds->num_fields;
-  num_rec = INT_EL(max_rec,0);
-  expand = (num_rec < 0);   /* dyn expand output to accommodate all rows*/
-  if(expand || num_rec == 0){
-    num_rec = RS_DBI_getManager(rsHandle)->fetch_default_rec;
-  }
-
-  PROTECT(output = NEW_LIST((Sint) num_fields));
-  RS_DBI_allocOutput(output, flds, num_rec, 0);
-  key_breaks = (int *)R_alloc(num_rec, sizeof(int));
-  key_breaks[0] = 0;
-  breaks_idx++;
-  while (state != SQLITE_DONE) {
-      if (sqlite3_column_type(db_statement, 0) == SQLITE_NULL)
-          error("RS_SQLite_mget: encounted NULL key");
-      cur_key = sqlite3_column_text(db_statement, 0);
-      if (prev_key == NULL || strcmp(prev_key, cur_key) != 0) {
-          if (prev_key != NULL) {
-              Free(prev_key);
-              key_breaks[breaks_idx++] = row_idx;
-          }
-          prev_key = Calloc(strlen(cur_key) + 1, char);
-          strcpy(prev_key, cur_key);
-      }
-
-    for (j = 0; j < num_fields; j++) {
-      int null_item = (sqlite3_column_type(db_statement, j) == SQLITE_NULL);
-      switch(flds->Sclass[j]){
-        case INTSXP:
-          if(null_item)
-            NA_SET(&(LST_INT_EL(output,j,row_idx)), INTSXP);
-          else
-            LST_INT_EL(output,j,row_idx) =
-                      sqlite3_column_int(db_statement, j);
-          break;
-        case REALSXP:
-          if(null_item)
-            NA_SET(&(LST_NUM_EL(output,j,row_idx)), REALSXP);
-          else
-            LST_NUM_EL(output,j,row_idx) =
-                      sqlite3_column_double(db_statement, j);
-          break;
-        case STRSXP:
-          /* falls through */
-        default:
-          if(null_item)
-            SET_LST_CHR_EL(output,j,row_idx, NA_STRING);
-          else
-            SET_LST_CHR_EL(output,j,row_idx,
-                           C_S_CPY(sqlite3_column_text(db_statement, j)));
-          break;
-      }
-    } /* end column loop */
-    row_idx++;
-    if (row_idx == num_rec) {  /* request satisfied or exhausted allocated space */
-      if (expand) {    /* do we extend or return the records fetched so far*/
-          key_breaks = (int *)S_realloc((char *)key_breaks, 2 * num_rec, num_rec,
-                                        sizeof(int));
-          num_rec = 2 * num_rec;
-          RS_DBI_allocOutput(output, flds, num_rec, expand);
-      }
-      else
-        break;       /* okay, no more fetching for now */
+    res = RS_DBI_getResultSet(rsHandle);
+    if(res->isSelect != 1){
+        RS_DBI_errorMessage("resultSet does not correspond to a SELECT statement",
+                            RS_DBI_WARNING);
+        return S_NULL_ENTRY;
     }
+
+    if(res->completed == 1)
+        return R_NilValue;
+
+    db_statement = (sqlite3_stmt *)res->drvResultSet;
+    if(db_statement == NULL){
+        RS_DBI_errorMessage("corrupt SQLite resultSet, missing statement handle",
+                            RS_DBI_ERROR);
+    }
+
     state = corrected_sqlite3_step(db_statement);
-    if (state != SQLITE_ROW && state != SQLITE_DONE) {
-      char errMsg[2048];
-      (void)sprintf(errMsg, "RS_SQLite_fetch: failed: %s",
-                    sqlite3_errmsg(sqlite3_db_handle(db_statement)));
-      RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+    row_idx = 0;
+    if(state!=SQLITE_ROW && state!=SQLITE_DONE){
+        char errMsg[2048];
+        (void)sprintf(errMsg, "RS_SQLite_fetch: failed first step: %s",
+                      sqlite3_errmsg(sqlite3_db_handle(db_statement)));
+        RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
     }
-  } /* end row loop */
-  if (state == SQLITE_DONE) {
-      res->completed = (Sint) 1;
-  }
-  /* size to actual number of records fetched */
-  if(row_idx < num_rec){
-    num_rec = row_idx;
-    /* adjust the length of each of the members in the output_list */
-    for(j = 0; j<num_fields; j++){
-      s_tmp = LST_EL(output,j);
-      PROTECT(SET_LENGTH(s_tmp, num_rec));
-      SET_VECTOR_ELT(output, j, s_tmp);
-      UNPROTECT(1);
+    if (!res->fields) {
+        if (!(res->fields = RS_SQLite_createDataMappings(rsHandle))) {
+            RS_DBI_errorMessage("corrupt SQLite resultSet, missing fieldDescription",
+                                RS_DBI_ERROR);
+        }
     }
-  }
-  res->rowCount += num_rec;
-  key_breaks[breaks_idx++] = num_rec;
-  PROTECT(env = R_NewHashedEnv(R_NilValue));
-  for (j = 1; j < breaks_idx; j++) {
-      vlen = key_breaks[j] - key_breaks[j - 1];
-      s_tmp = LST_EL(output, 1);
-      PROTECT(vect = allocVector(TYPEOF(s_tmp), vlen));
-      for (i = 0; i < vlen; i++) {
-          switch (TYPEOF(vect)) {
-          case INTSXP:
-              INTEGER(vect)[i] = INTEGER(s_tmp)[key_breaks[j-1]+i];
-              break;
-          case REALSXP:
-              REAL(vect)[i] = REAL(s_tmp)[key_breaks[j-1]+i];
-              break;
-          case STRSXP:
-              SET_STRING_ELT(vect, i, STRING_ELT(s_tmp, key_breaks[j-1]+i));
-              break;
-          default:
-              error("unknown type");
-              break;
-          }
-      }
-      s_tmp = STRING_ELT(LST_EL(output, 0), key_breaks[j]-1);
-      defineVar(install(CHAR(s_tmp)), vect, env);
-      UNPROTECT(1);
-  }
+    flds = res->fields;
+    /* force first column to character */
+    flds->Sclass[0] = STRSXP;
 
-  if (prev_key)
-      Free(prev_key);
-  UNPROTECT(2);
-  return env;
+    num_fields = flds->num_fields;
+    num_rec = INT_EL(max_rec,0);
+    expand = (num_rec < 0);   /* dyn expand output to accommodate all rows*/
+    if(expand || num_rec == 0){
+        num_rec = RS_DBI_getManager(rsHandle)->fetch_default_rec;
+    }
+
+    PROTECT(output = NEW_LIST((Sint) num_fields));
+    RS_DBI_allocOutput(output, flds, num_rec, 0);
+    key_breaks = (int *)R_alloc(num_rec, sizeof(int));
+    key_breaks[0] = 0;
+    breaks_idx++;
+    while (state != SQLITE_DONE) {
+        if (sqlite3_column_type(db_statement, 0) == SQLITE_NULL)
+            error("RS_SQLite_mget: encounted NULL key");
+        cur_key = sqlite3_column_text(db_statement, 0);
+        if (prev_key == NULL || strcmp(prev_key, cur_key) != 0) {
+            if (prev_key != NULL) {
+                Free(prev_key);
+                key_breaks[breaks_idx++] = row_idx;
+            }
+            prev_key = Calloc(strlen(cur_key) + 1, char);
+            strcpy(prev_key, cur_key);
+        }
+
+        for (j = 0; j < num_fields; j++) {
+            int null_item = (sqlite3_column_type(db_statement, j) == SQLITE_NULL);
+            switch(flds->Sclass[j]){
+            case INTSXP:
+                if(null_item)
+                    NA_SET(&(LST_INT_EL(output,j,row_idx)), INTSXP);
+                else
+                    LST_INT_EL(output,j,row_idx) =
+                        sqlite3_column_int(db_statement, j);
+                break;
+            case REALSXP:
+                if(null_item)
+                    NA_SET(&(LST_NUM_EL(output,j,row_idx)), REALSXP);
+                else
+                    LST_NUM_EL(output,j,row_idx) =
+                        sqlite3_column_double(db_statement, j);
+                break;
+            case STRSXP:
+                /* falls through */
+            default:
+                if(null_item)
+                    SET_LST_CHR_EL(output,j,row_idx, NA_STRING);
+                else
+                    SET_LST_CHR_EL(output,j,row_idx,
+                                   C_S_CPY(sqlite3_column_text(db_statement, j)));
+                break;
+            }
+        } /* end column loop */
+        row_idx++;
+        if (row_idx == num_rec) {  /* request satisfied or exhausted allocated space */
+            if (expand) {    /* do we extend or return the records fetched so far*/
+                key_breaks = (int *)S_realloc((char *)key_breaks, 2 * num_rec, num_rec,
+                                              sizeof(int));
+                num_rec = 2 * num_rec;
+                RS_DBI_allocOutput(output, flds, num_rec, expand);
+            }
+            else
+                break;       /* okay, no more fetching for now */
+        }
+        state = corrected_sqlite3_step(db_statement);
+        if (state != SQLITE_ROW && state != SQLITE_DONE) {
+            char errMsg[2048];
+            (void)sprintf(errMsg, "RS_SQLite_fetch: failed: %s",
+                          sqlite3_errmsg(sqlite3_db_handle(db_statement)));
+            RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+        }
+    } /* end row loop */
+    if (state == SQLITE_DONE) {
+        res->completed = (Sint) 1;
+    }
+    /* size to actual number of records fetched */
+    if(row_idx < num_rec){
+        num_rec = row_idx;
+        /* adjust the length of each of the members in the output_list */
+        for(j = 0; j<num_fields; j++){
+            s_tmp = LST_EL(output,j);
+            PROTECT(SET_LENGTH(s_tmp, num_rec));
+            SET_VECTOR_ELT(output, j, s_tmp);
+            UNPROTECT(1);
+        }
+    }
+    res->rowCount += num_rec;
+    key_breaks[breaks_idx++] = num_rec;
+    PROTECT(env = R_NewHashedEnv(R_NilValue));
+    for (j = 1; j < breaks_idx; j++) {
+        vlen = key_breaks[j] - key_breaks[j - 1];
+        s_tmp = LST_EL(output, 1);
+        PROTECT(vect = allocVector(TYPEOF(s_tmp), vlen));
+        for (i = 0; i < vlen; i++) {
+            switch (TYPEOF(vect)) {
+            case INTSXP:
+                INTEGER(vect)[i] = INTEGER(s_tmp)[key_breaks[j-1]+i];
+                break;
+            case REALSXP:
+                REAL(vect)[i] = REAL(s_tmp)[key_breaks[j-1]+i];
+                break;
+            case STRSXP:
+                SET_STRING_ELT(vect, i, STRING_ELT(s_tmp, key_breaks[j-1]+i));
+                break;
+            default:
+                error("unknown type");
+                break;
+            }
+        }
+        s_tmp = STRING_ELT(LST_EL(output, 0), key_breaks[j]-1);
+        defineVar(install(CHAR(s_tmp)), vect, env);
+        UNPROTECT(1);
+    }
+
+    if (prev_key)
+        Free(prev_key);
+    UNPROTECT(2);
+    return env;
 }
 #endif
 
@@ -1310,112 +1311,112 @@ RS_SQLite_mget(SEXP rsHandle, SEXP max_rec)
 SEXP 
 RS_SQLite_getException(SEXP conHandle)
 {
-  SEXP output;
-  RS_DBI_connection   *con;
-  RS_SQLite_exception *err;
-  Sint  n = 2;
-  char *exDesc[] = {"errorNum", "errorMsg"};
-  Stype exType[] = {INTSXP, STRSXP};
-  Sint  exLen[]  = {1, 1};
+    SEXP output;
+    RS_DBI_connection   *con;
+    RS_SQLite_exception *err;
+    Sint  n = 2;
+    char *exDesc[] = {"errorNum", "errorMsg"};
+    Stype exType[] = {INTSXP, STRSXP};
+    Sint  exLen[]  = {1, 1};
 
-  con = RS_DBI_getConnection(conHandle);
-  if(!con->drvConnection)
-    RS_DBI_errorMessage("internal error: corrupt connection handle",
-      RS_DBI_ERROR);
-  output = RS_DBI_createNamedList(exDesc, exType, exLen, n);
-  err = (RS_SQLite_exception *) con->drvData;
-  LST_INT_EL(output,0,0) = (Sint) err->errorNum;
-  SET_LST_CHR_EL(output,1,0,C_S_CPY(err->errorMsg));
+    con = RS_DBI_getConnection(conHandle);
+    if(!con->drvConnection)
+        RS_DBI_errorMessage("internal error: corrupt connection handle",
+                            RS_DBI_ERROR);
+    output = RS_DBI_createNamedList(exDesc, exType, exLen, n);
+    err = (RS_SQLite_exception *) con->drvData;
+    LST_INT_EL(output,0,0) = (Sint) err->errorNum;
+    SET_LST_CHR_EL(output,1,0,C_S_CPY(err->errorMsg));
 
-  return output;
+    return output;
 }
 
 SEXP 
 RS_SQLite_closeResultSet(SEXP resHandle)
 {
-  sqlite3_stmt     *db_statement;
-  RS_DBI_resultSet *result;
-  SEXP status;
+    sqlite3_stmt     *db_statement;
+    RS_DBI_resultSet *result;
+    SEXP status;
 
-  result = RS_DBI_getResultSet(resHandle);
-  db_statement = (sqlite3_stmt *)result->drvResultSet;
-  if(db_statement == NULL)
-    RS_DBI_errorMessage("corrupt SQLite resultSet, missing statement handle",
-      RS_DBI_ERROR);
+    result = RS_DBI_getResultSet(resHandle);
+    db_statement = (sqlite3_stmt *)result->drvResultSet;
+    if(db_statement == NULL)
+        RS_DBI_errorMessage("corrupt SQLite resultSet, missing statement handle",
+                            RS_DBI_ERROR);
 
-  sqlite3_finalize(db_statement);
+    sqlite3_finalize(db_statement);
 
-  result->drvResultSet = (void *) NULL;
-  /* need to NULL drvResultSet, otherwise can't free the rsHandle */
-  if(result->drvData)
-     free(result->drvData);
-  result->drvData = (void *) NULL;
-  RS_DBI_freeResultSet(resHandle);
+    result->drvResultSet = (void *) NULL;
+    /* need to NULL drvResultSet, otherwise can't free the rsHandle */
+    if(result->drvData)
+        free(result->drvData);
+    result->drvData = (void *) NULL;
+    RS_DBI_freeResultSet(resHandle);
 
-  PROTECT(status = NEW_LOGICAL((Sint) 1));
-  LGL_EL(status, 0) = TRUE;
-  UNPROTECT(1);
+    PROTECT(status = NEW_LOGICAL((Sint) 1));
+    LGL_EL(status, 0) = TRUE;
+    UNPROTECT(1);
 
-  return status;
+    return status;
 }
 
 SEXP 
 RS_SQLite_managerInfo(Mgr_Handle mgrHandle)
 {
-  RS_DBI_manager *mgr;
-  SEXP output;
-  Sint i, num_con, max_con, *cons, ncon, *shared_cache;
-  Sint j, n = 9;
-  char *mgrDesc[] = {"drvName",   "connectionIds", "fetch_default_rec",
-                     "managerId", "length",        "num_con",
-                     "counter",   "clientVersion", "shared_cache"};
-  Stype mgrType[] = {STRSXP, INTSXP, INTSXP,
-                     INTSXP,   INTSXP, INTSXP,
-                     INTSXP,   STRSXP, STRSXP };
-  Sint  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+    RS_DBI_manager *mgr;
+    SEXP output;
+    Sint i, num_con, max_con, *cons, ncon, *shared_cache;
+    Sint j, n = 9;
+    char *mgrDesc[] = {"drvName",   "connectionIds", "fetch_default_rec",
+                       "managerId", "length",        "num_con",
+                       "counter",   "clientVersion", "shared_cache"};
+    Stype mgrType[] = {STRSXP, INTSXP, INTSXP,
+                       INTSXP,   INTSXP, INTSXP,
+                       INTSXP,   STRSXP, STRSXP };
+    Sint  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 
-  mgr = RS_DBI_getManager(mgrHandle);
-  if(!mgr)
-    RS_DBI_errorMessage("driver not loaded yet", RS_DBI_ERROR);
-  num_con = (Sint) mgr->num_con;
-  max_con = (Sint) mgr->length;
-  shared_cache = (Sint *) mgr->drvData;
-  mgrLen[1] = num_con;
+    mgr = RS_DBI_getManager(mgrHandle);
+    if(!mgr)
+        RS_DBI_errorMessage("driver not loaded yet", RS_DBI_ERROR);
+    num_con = (Sint) mgr->num_con;
+    max_con = (Sint) mgr->length;
+    shared_cache = (Sint *) mgr->drvData;
+    mgrLen[1] = num_con;
 
-  output = RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, n);
-  if(IS_LIST(output))
-    output = AS_LIST(output);
-  else
-    RS_DBI_errorMessage("internal error: could not alloc named list",
-      RS_DBI_ERROR);
-  j = (Sint) 0;
-  if(mgr->drvName)
-    SET_LST_CHR_EL(output,j++,0,C_S_CPY(mgr->drvName));
-  else
-    SET_LST_CHR_EL(output,j++,0,C_S_CPY(""));
+    output = RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, n);
+    if(IS_LIST(output))
+        output = AS_LIST(output);
+    else
+        RS_DBI_errorMessage("internal error: could not alloc named list",
+                            RS_DBI_ERROR);
+    j = (Sint) 0;
+    if(mgr->drvName)
+        SET_LST_CHR_EL(output,j++,0,C_S_CPY(mgr->drvName));
+    else
+        SET_LST_CHR_EL(output,j++,0,C_S_CPY(""));
 
-  cons = (Sint *) S_alloc((long)max_con, (int)sizeof(Sint));
-  ncon = RS_DBI_listEntries(mgr->connectionIds, mgr->length, cons);
-  if(ncon != num_con){
-    RS_DBI_errorMessage(
-    "internal error: corrupt RS_DBI connection table",
-    RS_DBI_ERROR);
-  }
-  for(i = 0; i < num_con; i++)
-    LST_INT_EL(output, j, i) = cons[i];
-  j++;
-  LST_INT_EL(output,j++,0) = mgr->fetch_default_rec;
-  LST_INT_EL(output,j++,0) = mgr->managerId;
-  LST_INT_EL(output,j++,0) = mgr->length;
-  LST_INT_EL(output,j++,0) = mgr->num_con;
-  LST_INT_EL(output,j++,0) = mgr->counter;
-  SET_LST_CHR_EL(output,j++,0,C_S_CPY(SQLITE_VERSION));
-  if(*shared_cache)
-    SET_LST_CHR_EL(output,j++,0,C_S_CPY("on"));
-  else
-    SET_LST_CHR_EL(output,j++,0,C_S_CPY("off"));
+    cons = (Sint *) S_alloc((long)max_con, (int)sizeof(Sint));
+    ncon = RS_DBI_listEntries(mgr->connectionIds, mgr->length, cons);
+    if(ncon != num_con){
+        RS_DBI_errorMessage(
+            "internal error: corrupt RS_DBI connection table",
+            RS_DBI_ERROR);
+    }
+    for(i = 0; i < num_con; i++)
+        LST_INT_EL(output, j, i) = cons[i];
+    j++;
+    LST_INT_EL(output,j++,0) = mgr->fetch_default_rec;
+    LST_INT_EL(output,j++,0) = mgr->managerId;
+    LST_INT_EL(output,j++,0) = mgr->length;
+    LST_INT_EL(output,j++,0) = mgr->num_con;
+    LST_INT_EL(output,j++,0) = mgr->counter;
+    SET_LST_CHR_EL(output,j++,0,C_S_CPY(SQLITE_VERSION));
+    if(*shared_cache)
+        SET_LST_CHR_EL(output,j++,0,C_S_CPY("on"));
+    else
+        SET_LST_CHR_EL(output,j++,0,C_S_CPY("off"));
 
-  return output;
+    return output;
 }
 
 SEXP 
@@ -1461,116 +1462,116 @@ RSQLite_connectionInfo(Con_Handle conHandle)
 SEXP 
 RS_SQLite_resultSetInfo(Res_Handle rsHandle)
 {
-  RS_DBI_resultSet   *result;
-  SEXP output, flds;
-  Sint  n = 6;
-  char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
-         "rowCount", "completed", "fieldDescription"};
-  Stype rsType[]  = {STRSXP, INTSXP, INTSXP,
-         INTSXP,   INTSXP, LIST_TYPE};
-  Sint  rsLen[]   = {1, 1, 1, 1, 1, 1};
+    RS_DBI_resultSet   *result;
+    SEXP output, flds;
+    Sint  n = 6;
+    char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
+                       "rowCount", "completed", "fieldDescription"};
+    Stype rsType[]  = {STRSXP, INTSXP, INTSXP,
+                       INTSXP,   INTSXP, LIST_TYPE};
+    Sint  rsLen[]   = {1, 1, 1, 1, 1, 1};
 
-  result = RS_DBI_getResultSet(rsHandle);
-  if(result->fields)
-      PROTECT(flds = RS_DBI_getFieldDescriptions(result->fields));
-  else
-      PROTECT(flds = S_NULL_ENTRY);
+    result = RS_DBI_getResultSet(rsHandle);
+    if(result->fields)
+        PROTECT(flds = RS_DBI_getFieldDescriptions(result->fields));
+    else
+        PROTECT(flds = S_NULL_ENTRY);
 
-  PROTECT(output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n));
-  SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
-  LST_INT_EL(output,1,0) = result->isSelect;
-  LST_INT_EL(output,2,0) = result->rowsAffected;
-  LST_INT_EL(output,3,0) = result->rowCount;
-  LST_INT_EL(output,4,0) = result->completed;
-  if(flds != S_NULL_ENTRY)
-     SET_VECTOR_ELT(LST_EL(output, 5), (Sint) 0, flds);
+    PROTECT(output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n));
+    SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
+    LST_INT_EL(output,1,0) = result->isSelect;
+    LST_INT_EL(output,2,0) = result->rowsAffected;
+    LST_INT_EL(output,3,0) = result->rowCount;
+    LST_INT_EL(output,4,0) = result->completed;
+    if(flds != S_NULL_ENTRY)
+        SET_VECTOR_ELT(LST_EL(output, 5), (Sint) 0, flds);
 
-  UNPROTECT(2);
-  return output;
+    UNPROTECT(2);
+    return output;
 }
 
 SEXP 
 RS_SQLite_typeNames(SEXP typeIds)
 {
-  SEXP typeNames;
-  Sint n;
-  Sint *typeCodes;
-  int i;
-  char *s;
+    SEXP typeNames;
+    Sint n;
+    Sint *typeCodes;
+    int i;
+    char *s;
 
-  n = LENGTH(typeIds);
-  typeCodes = INTEGER_DATA(typeIds);
-  PROTECT(typeNames = NEW_CHARACTER(n));
-  for(i = 0; i < n; i++) {
-    s = RS_DBI_getTypeName(typeCodes[i], RS_SQLite_fieldTypes);
-    SET_CHR_EL(typeNames, i, C_S_CPY(s));
-  }
-  UNPROTECT(1);
-  return typeNames;
+    n = LENGTH(typeIds);
+    typeCodes = INTEGER_DATA(typeIds);
+    PROTECT(typeNames = NEW_CHARACTER(n));
+    for(i = 0; i < n; i++) {
+        s = RS_DBI_getTypeName(typeCodes[i], RS_SQLite_fieldTypes);
+        SET_CHR_EL(typeNames, i, C_S_CPY(s));
+    }
+    UNPROTECT(1);
+    return typeNames;
 }
 
 SEXP     /* returns TRUE/FALSE */
 RS_SQLite_importFile(
-  Con_Handle conHandle,
-  SEXP s_tablename,
-  SEXP s_filename,
-  SEXP s_separator,
-  SEXP s_eol,
-  SEXP s_skip
-)
+    Con_Handle conHandle,
+    SEXP s_tablename,
+    SEXP s_filename,
+    SEXP s_separator,
+    SEXP s_eol,
+    SEXP s_skip
+    )
 {
-  RS_DBI_connection *con;
-  sqlite3           *db_connection;
-  char              *zFile, *zTable, *zSep, *zEol;
-  const char *s, *s1;
-  Sint              rc, skip;
-  SEXP output;
+    RS_DBI_connection *con;
+    sqlite3           *db_connection;
+    char              *zFile, *zTable, *zSep, *zEol;
+    const char *s, *s1;
+    Sint              rc, skip;
+    SEXP output;
 
 
-  s = CHR_EL(s_tablename, 0);
-  zTable = (char *) malloc( strlen(s)+1);
-  if(!zTable){
-    RS_DBI_errorMessage("could not allocate memory", RS_DBI_ERROR);
-  }
-  (void) strcpy(zTable, s);
+    s = CHR_EL(s_tablename, 0);
+    zTable = (char *) malloc( strlen(s)+1);
+    if(!zTable){
+        RS_DBI_errorMessage("could not allocate memory", RS_DBI_ERROR);
+    }
+    (void) strcpy(zTable, s);
 
-  s = CHR_EL(s_filename, 0);
-  zFile = (char *) malloc( strlen(s)+1);
-  if(!zFile){
-    free(zTable);
-    RS_DBI_errorMessage("could not allocate memory", RS_DBI_ERROR);
-  }
-  (void) strcpy(zFile, s);
+    s = CHR_EL(s_filename, 0);
+    zFile = (char *) malloc( strlen(s)+1);
+    if(!zFile){
+        free(zTable);
+        RS_DBI_errorMessage("could not allocate memory", RS_DBI_ERROR);
+    }
+    (void) strcpy(zFile, s);
 
-  s = CHR_EL(s_separator, 0);
-  s1 = CHR_EL(s_eol, 0);
-  zSep = (char *) malloc( strlen(s)+1);
-  zEol = (char *) malloc(strlen(s1)+1);
-  if(!zSep || !zEol){
+    s = CHR_EL(s_separator, 0);
+    s1 = CHR_EL(s_eol, 0);
+    zSep = (char *) malloc( strlen(s)+1);
+    zEol = (char *) malloc(strlen(s1)+1);
+    if(!zSep || !zEol){
+        free(zTable);
+        free(zFile);
+        if(zSep) free(zSep);
+        if(zEol) free(zEol);
+        RS_DBI_errorMessage("could not allocate memory", RS_DBI_ERROR);
+    }
+    (void) strcpy(zSep, s);
+    (void) strcpy(zEol, s1);
+
+    skip = (Sint) INT_EL(s_skip, 0);
+
+    con = RS_DBI_getConnection(conHandle);
+    db_connection = (sqlite3 *) con->drvConnection;
+
+    rc = RS_sqlite_import(db_connection, zTable, zFile, zSep, zEol, skip);
+
     free(zTable);
     free(zFile);
-    if(zSep) free(zSep);
-    if(zEol) free(zEol);
-    RS_DBI_errorMessage("could not allocate memory", RS_DBI_ERROR);
-  }
-  (void) strcpy(zSep, s);
-  (void) strcpy(zEol, s1);
+    free(zSep);
 
-  skip = (Sint) INT_EL(s_skip, 0);
-
-  con = RS_DBI_getConnection(conHandle);
-  db_connection = (sqlite3 *) con->drvConnection;
-
-  rc = RS_sqlite_import(db_connection, zTable, zFile, zSep, zEol, skip);
-
-  free(zTable);
-  free(zFile);
-  free(zSep);
-
-  PROTECT(output = NEW_LOGICAL((Sint) 1));
-  LOGICAL_POINTER(output)[0] = rc;
-  UNPROTECT(1);
-  return output;
+    PROTECT(output = NEW_LOGICAL((Sint) 1));
+    LOGICAL_POINTER(output)[0] = rc;
+    UNPROTECT(1);
+    return output;
 }
 
 /* The following code comes directly from SQLite's shell.c, with
@@ -1578,13 +1579,13 @@ RS_SQLite_importFile(
  */
 int
 RS_sqlite_import(
-   sqlite3 *db,
-   const char *zTable,          /* table must already exist */
-   const char *zFile,
-   const char *separator,
-   const char *eol,
-   Sint skip
-)
+    sqlite3 *db,
+    const char *zTable,          /* table must already exist */
+    const char *zFile,
+    const char *separator,
+    const char *eol,
+    Sint skip
+    )
 {
     sqlite3_stmt *pStmt;        /* A statement */
     int rc;                     /* Result code */
@@ -1603,9 +1604,9 @@ RS_sqlite_import(
 
     nSep = strlen(separator);
     if( nSep==0 ){
-      RS_DBI_errorMessage(
-         "RS_sqlite_import: non-null separator required for import",
-         RS_DBI_ERROR);
+        RS_DBI_errorMessage(
+            "RS_sqlite_import: non-null separator required for import",
+            RS_DBI_ERROR);
     }
     zSql = sqlite3_mprintf("SELECT * FROM '%q'", zTable);
     if( zSql==0 ) return 0;
@@ -1613,12 +1614,12 @@ RS_sqlite_import(
     rc = sqlite3_prepare(db, zSql, -1, &pStmt, 0);
     sqlite3_free(zSql);
     if (rc != SQLITE_OK && rc != SQLITE_SCHEMA) {
-      sqlite3_finalize(pStmt);
-      (void) sprintf(errMsg, "RS_sqlite_import: %s", sqlite3_errmsg(db));
-      RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
-      nCol = 0;
+        sqlite3_finalize(pStmt);
+        (void) sprintf(errMsg, "RS_sqlite_import: %s", sqlite3_errmsg(db));
+        RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+        nCol = 0;
     }else{
-      nCol = sqlite3_column_count(pStmt);
+        nCol = sqlite3_column_count(pStmt);
     }
     sqlite3_finalize(pStmt);
     if( nCol==0 ) return 0;
@@ -1627,75 +1628,75 @@ RS_sqlite_import(
     sqlite3_snprintf(nByte+20, zSql, "INSERT INTO '%q' VALUES(?", zTable);
     j = strlen(zSql);
     for(i=1; i<nCol; i++){
-      zSql[j++] = ',';
-      zSql[j++] = '?';
+        zSql[j++] = ',';
+        zSql[j++] = '?';
     }
     zSql[j++] = ')';
     zSql[j] = 0;
     rc = sqlite3_prepare(db, zSql, -1, &pStmt, 0);
     free(zSql);
     if (rc != SQLITE_OK && rc != SQLITE_SCHEMA) {
-      sqlite3_finalize(pStmt);
-      (void) sprintf(errMsg, "RS_sqlite_import: %s", sqlite3_errmsg(db));
-      RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+        sqlite3_finalize(pStmt);
+        (void) sprintf(errMsg, "RS_sqlite_import: %s", sqlite3_errmsg(db));
+        RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
     }
     in = fopen(zFile, "rb");
     if( in==0 ){
-      (void) sprintf(errMsg, "RS_sqlite_import: cannot open file %s", zFile);
-      sqlite3_finalize(pStmt);
-      RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+        (void) sprintf(errMsg, "RS_sqlite_import: cannot open file %s", zFile);
+        sqlite3_finalize(pStmt);
+        RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
     }
     azCol = malloc( sizeof(azCol[0])*(nCol+1) );
     if( azCol==0 ) return 0;
     sqlite3_exec(db, "BEGIN", 0, 0, 0);
     zCommit = "COMMIT";
     while( (zLine = RS_sqlite_getline(in, eol)) != NULL){
-      lineno++;
-      if(lineno <= skip) continue;
-      i = 0;
-      azCol[0] = zLine;
-      for(i=0, z=zLine; *z && *z!='\n' && *z!='\r'; z++){
-        if( *z==separator[0] && strncmp(z, separator, nSep)==0 ){
-          *z = 0;
-          i++;
-          if( i<nCol ){
-            azCol[i] = &z[nSep];
-            z += nSep-1;
-          }
+        lineno++;
+        if(lineno <= skip) continue;
+        i = 0;
+        azCol[0] = zLine;
+        for(i=0, z=zLine; *z && *z!='\n' && *z!='\r'; z++){
+            if( *z==separator[0] && strncmp(z, separator, nSep)==0 ){
+                *z = 0;
+                i++;
+                if( i<nCol ){
+                    azCol[i] = &z[nSep];
+                    z += nSep-1;
+                }
+            }
         }
-      }
-      if( i+1!=nCol ){
-        (void) sprintf(errMsg,
-               "RS_sqlite_import: %s line %d expected %d columns of data but found %d",
-               zFile, lineno, nCol, i+1);
-        zCommit = "ROLLBACK";
-        break;
-      }
+        if( i+1!=nCol ){
+            (void) sprintf(errMsg,
+                           "RS_sqlite_import: %s line %d expected %d columns of data but found %d",
+                           zFile, lineno, nCol, i+1);
+            zCommit = "ROLLBACK";
+            break;
+        }
 
-      for(i=0; i<nCol; i++){
-        if(azCol[i][0]=='\\' && azCol[i][1]=='N'){   /* insert NULL for NA */
-          sqlite3_bind_null(pStmt, i+1);
+        for(i=0; i<nCol; i++){
+            if(azCol[i][0]=='\\' && azCol[i][1]=='N'){   /* insert NULL for NA */
+                sqlite3_bind_null(pStmt, i+1);
+            }
+            else {
+                sqlite3_bind_text(pStmt, i+1, azCol[i], -1, SQLITE_STATIC);
+            }
         }
-        else {
-          sqlite3_bind_text(pStmt, i+1, azCol[i], -1, SQLITE_STATIC);
-        }
-      }
 
-      rc = corrected_sqlite3_step(pStmt);
-      if (rc != SQLITE_DONE && rc != SQLITE_SCHEMA) {
-        sqlite3_finalize(pStmt);
-        (void) sprintf(errMsg, "RS_sqlite_import: %s", sqlite3_errmsg(db));
-        RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
-      }
-      rc = sqlite3_reset(pStmt);
-      free(zLine);
-      zLine = NULL;
-      if (rc != SQLITE_OK && rc != SQLITE_SCHEMA) {
-        sqlite3_finalize(pStmt);
-        (void) sprintf(errMsg,"RS_sqlite_import: %s", sqlite3_errmsg(db));
-        zCommit = "ROLLBACK";
-        break;
-      }
+        rc = corrected_sqlite3_step(pStmt);
+        if (rc != SQLITE_DONE && rc != SQLITE_SCHEMA) {
+            sqlite3_finalize(pStmt);
+            (void) sprintf(errMsg, "RS_sqlite_import: %s", sqlite3_errmsg(db));
+            RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+        }
+        rc = sqlite3_reset(pStmt);
+        free(zLine);
+        zLine = NULL;
+        if (rc != SQLITE_OK && rc != SQLITE_SCHEMA) {
+            sqlite3_finalize(pStmt);
+            (void) sprintf(errMsg,"RS_sqlite_import: %s", sqlite3_errmsg(db));
+            zCommit = "ROLLBACK";
+            break;
+        }
     }
     free(azCol);
     fclose(in);
@@ -1716,63 +1717,63 @@ RS_sqlite_import(
 char *
 RS_sqlite_getline(FILE *in, const char *eol)
 {
-   /* caller must free memory */
-   char *buf, ceol;
-   size_t nc, i;
-   int c, j, neol;
-   int found_eol = 0;
+    /* caller must free memory */
+    char *buf, ceol;
+    size_t nc, i;
+    int c, j, neol;
+    int found_eol = 0;
 
-   nc = 1024; i = 0;
-   buf = (char *) malloc(nc);
-   if(!buf)
-      RS_DBI_errorMessage("RS_sqlite_getline could not malloc", RS_DBI_ERROR);
+    nc = 1024; i = 0;
+    buf = (char *) malloc(nc);
+    if(!buf)
+        RS_DBI_errorMessage("RS_sqlite_getline could not malloc", RS_DBI_ERROR);
 
-   neol = strlen(eol);  /* num of eol chars */
-   ceol = eol[neol-1];  /* last char in eol */
-   while(TRUE){
-      c=fgetc(in);
-      if(i==nc){
-        nc = 2 * nc;
-        buf = (char *) realloc((void *) buf, nc);
-        if(!buf)
-          RS_DBI_errorMessage(
-             "RS_sqlite_getline could not realloc", RS_DBI_ERROR);
-      }
-      if(c==EOF)
-        break;
-      buf[i++] = c;
-      if (c == ceol) {
-          /* see if we've got eol */
-          found_eol = 1;
-          for (j = neol - 1; j > 0; j--) {
-              if (buf[(i - 1) - j] != eol[neol - 1 - j]) {
-                  found_eol = 0;
-                  break;
-              }
-          }
-          if (found_eol) {
-              buf[i-neol] = '\0';   /* drop the newline char(s) */
-              break;
-          }
-      }
+    neol = strlen(eol);  /* num of eol chars */
+    ceol = eol[neol-1];  /* last char in eol */
+    while(TRUE){
+        c=fgetc(in);
+        if(i==nc){
+            nc = 2 * nc;
+            buf = (char *) realloc((void *) buf, nc);
+            if(!buf)
+                RS_DBI_errorMessage(
+                    "RS_sqlite_getline could not realloc", RS_DBI_ERROR);
+        }
+        if(c==EOF)
+            break;
+        buf[i++] = c;
+        if (c == ceol) {
+            /* see if we've got eol */
+            found_eol = 1;
+            for (j = neol - 1; j > 0; j--) {
+                if (buf[(i - 1) - j] != eol[neol - 1 - j]) {
+                    found_eol = 0;
+                    break;
+                }
+            }
+            if (found_eol) {
+                buf[i-neol] = '\0';   /* drop the newline char(s) */
+                break;
+            }
+        }
     }
 
-   if (i == 0 || strlen(buf) == 0) {    /* empty line */
-       free(buf);
-       buf = (char *) NULL;
-   }
+    if (i == 0 || strlen(buf) == 0) {    /* empty line */
+        free(buf);
+        buf = (char *) NULL;
+    }
 
     return buf;
 }
 
 /* from http://www.sqlite.org/capi3ref.html#sqlite3_step */
 int corrected_sqlite3_step(sqlite3_stmt *pStatement){
-  int rc;
-  rc = sqlite3_step(pStatement);
-  if( rc==SQLITE_ERROR ){
-    rc = sqlite3_reset(pStatement);
-  }
-  return rc;
+    int rc;
+    rc = sqlite3_step(pStatement);
+    if( rc==SQLITE_ERROR ){
+        rc = sqlite3_reset(pStatement);
+    }
+    return rc;
 }
 
 SEXP RS_SQLite_copy_database(Con_Handle fromConHandle, Con_Handle toConHandle)

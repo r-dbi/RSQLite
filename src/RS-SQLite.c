@@ -605,7 +605,7 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
                 }
             } else {
                 char bindingErrorMsg[2048];
-
+                bindingErrorMsg[0] = '\0';
                 /* get the binding parameter information */
                 RS_SQLite_bindParam *params =
                     RS_SQLite_createParameterBinding(bind_count, bind_data,

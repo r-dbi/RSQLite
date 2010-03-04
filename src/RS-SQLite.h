@@ -24,11 +24,7 @@
 extern  "C" {
 #endif
 
-#ifdef RSQLITE_USE_BUNDLED_SQLITE
-#  include "sqlite/sqlite3.h"
-#else
-#  include <sqlite3.h>
-#endif
+#include "sqlite.h"
 
 #include <string.h>
 #include <unistd.h>   /* needed by getlogin() -- is this portable??? */
@@ -58,11 +54,6 @@ typedef struct st_sqlite_err {
    char *errorMsg;
 } RS_SQLite_exception;
 
-typedef struct st_sqlite_bindparam {
-  SEXPTYPE  type;
-  SEXP data;
-  int      is_protected;
-} RS_SQLite_bindParam;
 
 #define RSQLITE_MSG(msg, err_type) DBI_MSG(msg, err_type, "RSQLite")
 

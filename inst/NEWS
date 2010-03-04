@@ -13,6 +13,8 @@ Version 0.8-4
 - There is now a fairly comprehensive example of using prepared
   queries in the man page for dbSendQuery-methods.
 
+- Upgrade to SQLite 3.6.21 => 3.6.22 (minor bug fixes).
+
 Version 0.8-3
 
 - Enable RTree module for the Windows build.  The configure script is

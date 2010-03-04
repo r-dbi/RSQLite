@@ -10,6 +10,9 @@ Version 0.8-4
 
 - RSQLite now requires DBI >= 0.2-5
 
+- There is now a fairly comprehensive example of using prepared
+  queries in the man page for dbSendQuery-methods.
+
 Version 0.8-3
 
 - Enable RTree module for the Windows build.  The configure script is

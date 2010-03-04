@@ -59,6 +59,63 @@ tryCatch(dbGetQuery(con, "SELECT * FROM tableDoesNotExist"),
          error=function(e) { print("caught") })
 dbGetException(con)
 
+## The following example demonstrates the use of
+## transactions and bound parameters in prepared
+## statements.
+
+make_data <- function(n)
+{
+    alpha <- c(letters, as.character(0:9))
+    make_key <- function(n)
+    {
+        paste(sample(alpha, n, replace = TRUE), collapse = "")
+    }
+    keys <- sapply(sample(1:5, replace=TRUE), function(x) make_key(x))
+    counts <- sample(seq_len(1e4), n, replace = TRUE)
+    data.frame(key = keys, count = counts, stringsAsFactors = FALSE)
+}
+
+key_counts <- make_data(100)
+
+
+db <- dbConnect(SQLite(), dbname = ":memory:")
+
+sql <- "
+create table keys (key text, count integer)
+"
+
+dbGetQuery(db, sql)
+
+bulk_insert <- function(sql, key_counts)
+{
+    dbBeginTransaction(db)
+    dbGetPreparedQuery(db, sql, bind.data = key_counts)
+    dbCommit(db)
+    dbGetQuery(db, "select count(*) from keys")[[1]]
+}
+
+##  for all styles, you can have up to 999 parameters
+
+## anonymous
+sql <- "insert into keys values (?, ?)"
+bulk_insert(sql, key_counts)
+
+
+## named w/ :, $, @
+## names are matched against column names of bind.data
+
+sql <- "insert into keys values (:key, :count)"
+bulk_insert(sql, key_counts[ , 2:1])
+
+sql <- "insert into keys values ($key, $count)"
+bulk_insert(sql, key_counts)
+
+sql <- "insert into keys values (@key, @count)"
+bulk_insert(sql, key_counts)
+
+## indexed (NOT CURRENTLY SUPPORTED)
+## sql <- "insert into keys values (?1, ?2)"
+## bulk_insert(sql)
 }
 \keyword{methods}
 \keyword{interface}

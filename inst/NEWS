@@ -1,10 +1,14 @@
 Version 0.8-4
 
-- Fix a memory leak in bound parameter binding management.
+- Fix a memory leak in bound parameter management.
 
-- Improve internal memory handling four prepared queries.  Use
+- Improve internal memory handling for prepared queries.  Use
   R_PreserveObject/R_ReleaseObject instead of the protection stack to
-  manage parameter binding.
+  manage parameter binding.  Logical vectors are now properly coerced
+  to integer vectors and Rf_asCharacterFactor is used to convert
+  factors in bind data.
+
+- RSQLite now requires DBI >= 0.2-5
 
 Version 0.8-3
 

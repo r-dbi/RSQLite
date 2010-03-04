@@ -1,3 +1,11 @@
+Version 0.8-4
+
+- Fix a memory leak in bound parameter binding management.
+
+- Improve internal memory handling four prepared queries.  Use
+  R_PreserveObject/R_ReleaseObject instead of the protection stack to
+  manage parameter binding.
+
 Version 0.8-3
 
 - Enable RTree module for the Windows build.  The configure script is

@@ -240,11 +240,10 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
     RS_DBI_connection   *con;
     RS_SQLite_conParams *conParams;
     Con_Handle conHandle;
-    sqlite3     *db_connection, **pDb;
+    sqlite3     *db_connection;
     const char  *dbname = NULL;
     int         rc, loadable_extensions;
     const char *vfs = NULL;
-    int mode = 0;
     int open_flags = 0;
 
     if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
@@ -276,10 +275,7 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
               type2char(TYPEOF(s_flags)), length(s_flags));
     open_flags = INTEGER(s_flags)[0];
   
-    pDb = (sqlite3 **) calloc((size_t) 1, sizeof(sqlite3 *));
-
-    rc = sqlite3_open_v2(dbname, pDb, open_flags, vfs);
-    db_connection = *pDb;           /* available, even if open fails! See API */
+    rc = sqlite3_open_v2(dbname, &db_connection, open_flags, vfs);
     if(rc != SQLITE_OK){
         char buf[256];
         sprintf(buf, "could not connect to dbname:\n%s\n",
@@ -732,7 +728,7 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
     SEXP colNames, data, levels;
 
     /* check that we have enough columns in the data frame */
-    colNames = GET_NAMES(bind_data);
+    colNames = Rf_getAttrib(bind_data, R_NamesSymbol);
     num_cols = length(colNames);
     if(num_cols < n){
         sprintf(errorMsg,
@@ -826,28 +822,29 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
             params[i].data = data;
         }
         else if(isFactor(data)){
+            int factor_code, data_len = length(data);
             /* need to convert to a string vector */
             params[i].type = STRSXP;
-            levels = GET_LEVELS(data);
+            levels = Rf_getAttrib(data, R_LevelsSymbol);
 
-            PROTECT( params[i].data = allocVector(STRSXP, LENGTH(data)) );
-            for(j=0; j<LENGTH(data); j++) {
-                int factor_code = INT_EL(data, j);
+            R_PreserveObject(params[i].data = Rf_allocVector(STRSXP, data_len));
+            params[i].is_protected = 1;
+            for (j = 0; j < data_len; j++) {
+                factor_code = INT_EL(data, j);
                 if (factor_code == NA_INTEGER)
                     SET_CHR_EL(params[i].data, j, NA_STRING);
                 else
                     SET_CHR_EL(params[i].data, j,
                                STRING_ELT(levels, factor_code - 1));
-                params[i].is_protected = 1;
             }
         }
         else{
             params[i].type = STRSXP;
-            PROTECT( params[i].data = AS_CHARACTER(data) );
+            R_PreserveObject(params[i].data = Rf_coerceVector(data, STRSXP));
             params[i].is_protected = 1;
         }
     }
-
+    free(used_index);
     return params;
 }
 
@@ -858,9 +855,8 @@ RS_SQLite_freeParameterBinding(int n, RS_SQLite_bindParam *params)
 
     for(i=0; i<n; i++){
         if(params[i].is_protected)
-            UNPROTECT(1);
+            R_ReleaseObject(params[i].data);
     }
-
     free(params);
 }
 

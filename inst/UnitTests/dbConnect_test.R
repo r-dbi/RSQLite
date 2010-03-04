@@ -71,7 +71,7 @@ test_open_flags <- function()
     checkTrue(dbWriteTable(dbrw, "t1", df))
 
     dbro <- dbConnect(drv, dbname = tmpFile, flags = SQLITE_RO)
-    checkTrue(!dbWriteTable(dbro, "t2", df))
+    checkTrue(!suppressWarnings(dbWriteTable(dbro, "t2", df)))
 
     dbrw2 <- dbConnect(drv, dbname = tmpFile, flags = SQLITE_RW)
     checkTrue(dbWriteTable(dbrw2, "t2", df))

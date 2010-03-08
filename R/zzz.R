@@ -1,4 +1,4 @@
-".First.lib" <- 
+".First.lib" <-
 function(libname, pkgname)
 {
     require("methods")
@@ -13,3 +13,7 @@ function(libname, pkgname)
 }
 
 .onLoad <- .First.lib
+
+.onUnload <- function(libpath) {
+    library.dynam.unload("RSQLite", libpath)
+}

@@ -516,7 +516,9 @@ static void RSQLite_freeResultSet(Res_Handle rsHandle)
         result->drvResultSet = NULL;
     }
     if (result->drvData) {
-        free(result->drvData);
+        RS_SQLite_bindParams *params = (RS_SQLite_bindParams *)result->drvData;
+        R_ReleaseObject(params->data);
+        RS_SQLite_freeParameterBinding(params);
         result->drvData = NULL;
     }
     RS_DBI_freeResultSet(rsHandle);
@@ -528,7 +530,7 @@ static void
 exec_error(const char *msg,
            RS_DBI_connection *con,
            int bind_count,
-           RS_SQLite_bindParam *params,
+           RS_SQLite_bindParams *params,
            Res_Handle rsHandle)
 {
     sqlite3 *db = (sqlite3 *) con->drvConnection;
@@ -542,11 +544,124 @@ exec_error(const char *msg,
         rsHandle = NULL;
     }
     if (params) {
-        RS_SQLite_freeParameterBinding(bind_count, params);
+        RS_SQLite_freeParameterBinding(params);
         params = NULL;
     }
     RS_DBI_errorMessage(buf, RS_DBI_ERROR);
 }
+
+static void
+select_prepared_query(sqlite3_stmt *db_statement,
+                      SEXP bind_data,
+                      int bind_count,
+                      int rows,
+                      RS_DBI_connection *con,
+                      SEXP rsHandle)
+{
+    RS_DBI_resultSet *res;
+    int state, i, j;
+    char bindingErrorMsg[2048]; bindingErrorMsg[0] = '\0';
+    RS_SQLite_bindParams *params =
+        RS_SQLite_createParameterBinding(bind_count, bind_data,
+                                         db_statement, bindingErrorMsg);
+    if (params == NULL) {
+        /* FIXME: this UNPROTECT is ugly, paired to caller */
+        UNPROTECT(1);
+        exec_error(bindingErrorMsg, con, 0, NULL, rsHandle);
+    }
+    res = RS_DBI_getResultSet(rsHandle);
+    res->drvData = params;
+}
+
+static int
+bind_params_to_stmt(RS_SQLite_bindParams *params,
+                    sqlite3_stmt *db_statement, int row)
+{
+    int state, j;
+    for (j = 0; j < params->count; j++) {
+        SEXP pdata = VECTOR_ELT(params->data, j);
+        int integer;
+        double number;
+        const char *string;
+
+        switch(TYPEOF(pdata)){
+        case INTSXP:
+            integer = INTEGER(pdata)[row];
+            if (IS_NA(&integer, INTSXP))
+                state = sqlite3_bind_null(db_statement, j+1);
+            else
+                state = sqlite3_bind_int(db_statement, j+1, integer);
+            break;
+        case REALSXP:
+            number = NUM_EL(pdata, row);
+            if (IS_NA(&number, REALSXP))
+                state = sqlite3_bind_null(db_statement, j+1);
+            else
+                state = sqlite3_bind_double(db_statement, j+1, number);
+            break;
+        case STRSXP:
+            /* falls through */
+        default:
+            string = CHR_EL(pdata, row);
+            /* why does IS_NA for character crash? */
+            if(strcmp(string, RS_NA_STRING) == 0)
+                state = sqlite3_bind_null(db_statement, j+1);
+            else
+                state = sqlite3_bind_text(db_statement, j+1,
+                                          string, -1, SQLITE_STATIC);
+            break;
+        }
+        if (state != SQLITE_OK) break;
+    }
+    return state;
+}
+
+static void
+non_select_prepared_query(sqlite3_stmt *db_statement,
+                          SEXP bind_data,
+                          int bind_count,
+                          int rows,
+                          RS_DBI_connection *con,
+                          SEXP rsHandle)
+{
+    int state, i, j;
+    char bindingErrorMsg[2048]; bindingErrorMsg[0] = '\0';
+    RS_SQLite_bindParams *params =
+        RS_SQLite_createParameterBinding(bind_count, bind_data,
+                                         db_statement, bindingErrorMsg);
+    if (params == NULL) {
+        /* FIXME: this UNPROTECT is ugly, paired to caller */
+        UNPROTECT(1);
+        exec_error(bindingErrorMsg, con, 0, NULL, rsHandle);
+    }
+
+    /* we need to step through the query for each row */
+    for (i=0; i<rows; i++) {
+        state = bind_params_to_stmt(params, db_statement, i);
+        if (state != SQLITE_OK) {
+            UNPROTECT(1);
+            /* FIXME: add errmsg from sqlite */
+            exec_error("RS_SQLite_exec: could not bind data",
+                       con, 0, NULL, rsHandle);
+        }
+        state = sqlite3_step(db_statement);
+        if (state != SQLITE_DONE) {
+            UNPROTECT(1);
+            /* FIXME: add errmsg from sqlite */
+            exec_error("RS_SQLite_exec: could not execute",
+                       con, 0, NULL, rsHandle);
+        }
+        state = sqlite3_reset(db_statement);
+        sqlite3_clear_bindings(db_statement);
+        if (state != SQLITE_OK) {
+            UNPROTECT(1);
+            exec_error("RS_SQLite_exec: could not reset statement",
+                       con, 0, NULL, rsHandle);
+        }
+    }
+    RS_SQLite_freeParameterBinding(params);
+}
+
 
 Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
 {
@@ -603,106 +718,33 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
         rows = GET_LENGTH(GET_ROWNAMES(bind_data));
         cols = GET_LENGTH(bind_data);
     }
-    /* this will return 0 if the statement is not a SELECT */
-    if (sqlite3_column_count(db_statement) > 0) {
+
+
+    res->isSelect = sqlite3_column_count(db_statement) > 0;
+    res->rowCount = 0;      /* fake's cursor's row count */
+    res->rowsAffected = -1; /* no rows affected */
+    RS_SQLite_setException(con, state, "OK");
+
+    if (res->isSelect) {
         if (bind_count > 0) {
-            UNPROTECT(1);
-            exec_error("cannot have bound parameters on a SELECT statement",
-                       con, 0, NULL, rsHandle);
+            select_prepared_query(db_statement, bind_data, bind_count,
+                                  rows, con, rsHandle);
         }
-        res->isSelect = (Sint) 1;      /* statement is a select  */
-        res->rowCount = 0;             /* fake's cursor's row count */
-        res->rowsAffected = (Sint) -1; /* no rows affected */
-        RS_SQLite_setException(con, state, "OK");
     } else {
-        /* if no bind parameters exist, we directly execute the query */
-        if (bind_count == 0) {
+        if (bind_count > 0) {
+            non_select_prepared_query(db_statement, bind_data, bind_count,
+                                      rows, con, rsHandle);
+        }
+        else {
             state = sqlite3_step(db_statement);
             if (state != SQLITE_DONE) {
                 UNPROTECT(1);
                 exec_error("RS_SQLite_exec: could not execute1",
                            con, 0, NULL, rsHandle);
             }
-        } else {
-            char bindingErrorMsg[2048]; bindingErrorMsg[0] = '\0';
-            RS_SQLite_bindParam *params =
-                RS_SQLite_createParameterBinding(bind_count, bind_data,
-                                                 db_statement, bindingErrorMsg);
-            if (params == NULL) {
-                UNPROTECT(1);
-                exec_error("RS_SQLite_exec: could not execute1",
-                           con, 0, NULL, rsHandle);
-            }
-
-            /* we need to step through the query for each row */
-            for (i=0; i<rows; i++) {
-                /* bind each parameter to the statement */
-                for (j = 0; j < bind_count; j++) {
-                    RS_SQLite_bindParam param = params[j];
-                    int integer;
-                    double number;
-                    const char *string;
-
-                    switch(param.type){
-                    case INTSXP:
-                        integer = INT_EL(param.data, i);
-                        if(IS_NA( &integer, INTSXP ))
-                            state = sqlite3_bind_null(db_statement, j+1);
-                        else
-                            state = sqlite3_bind_int(db_statement, j+1, integer);
-                        break;
-                    case REALSXP:
-                        number = NUM_EL(param.data, i);
-                        if(IS_NA( &number, REALSXP ))
-                            state = sqlite3_bind_null(db_statement, j+1);
-                        else
-                            state = sqlite3_bind_double(db_statement, j+1, number);
-                        break;
-                    case STRSXP:
-                        /* falls through */
-                    default:
-                        string = CHR_EL(param.data, i);
-                        /* why does IS_NA for character crash? */
-                        if(strcmp(string, RS_NA_STRING) == 0)
-                            state = sqlite3_bind_null(db_statement, j+1);
-                        else    /* FIXME: should we use SQLITE_STATIC? */
-                            state = sqlite3_bind_text(db_statement, j+1,
-                                                      string, -1, SQLITE_TRANSIENT);
-                        break;
-                    }
-                    if (state != SQLITE_OK && state != SQLITE_SCHEMA) {
-                        UNPROTECT(1);
-                        exec_error("RS_SQLite_exec: could not bind data",
-                                   con, 0, NULL, rsHandle);
-                    }
-                }
-
-                /* execute the statement */
-                state = sqlite3_step(db_statement);
-                if (state != SQLITE_DONE) {
-                    UNPROTECT(1);
-                    exec_error("RS_SQLite_exec: could not execute",
-                               con, 0, NULL, rsHandle);
-                }
-
-                /* reset the bind parameters */
-                state = sqlite3_reset(db_statement);
-                sqlite3_clear_bindings(db_statement);
-                if (state != SQLITE_OK) {
-                    UNPROTECT(1);
-                    exec_error("RS_SQLite_exec: could not reset statement",
-                               con, 0, NULL, rsHandle);
-                }
-            }
-
-            /* free the binding parameter information */
-            RS_SQLite_freeParameterBinding(bind_count, params);
         }
-
-        res->isSelect  = (Sint) 0;          /* statement is not a select  */
         res->completed = (Sint) 1;          /* BUG: what if query is async?*/
         res->rowsAffected = (Sint) sqlite3_changes(db_connection);
-        RS_SQLite_setException(con, state, "OK");
     }
     UNPROTECT(1);
     return rsHandle;

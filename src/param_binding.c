@@ -5,9 +5,7 @@
 
 
 static int *
-init_bindParams(RS_SQLite_bindParam *params,
-                int num_params,
-                int num_cols)
+init_bindParams(int num_cols)
 {
     int i;
     /* FIXME: this could probably move to R_alloc */
@@ -16,10 +14,6 @@ init_bindParams(RS_SQLite_bindParam *params,
 
     for (i = 0; i < num_cols; i++){
         used_index[i] = -1;
-        if (i < num_params) {
-            params[i].is_protected = 0;
-            params[i].data = NULL;
-        }
     }
     return used_index;
 }
@@ -36,32 +30,34 @@ static int first_not_used(const int *used_index, int len)
     return current;
 }
 
-void add_data_to_param_binding(RS_SQLite_bindParam *param, SEXP data)
+void add_data_to_param_binding(RS_SQLite_bindParams *params, int i, SEXP data)
 {
+    int did_alloc = 1;
+    SEXP col_data;
     if (isFactor(data)) {
-        param->type = STRSXP;
-        param->data = Rf_asCharacterFactor(data);
-        R_PreserveObject(param->data);
-        param->is_protected = 1;
+        col_data = Rf_asCharacterFactor(data);
     }
     else {
         switch (TYPEOF(data)) {
         case LGLSXP:
-            param->type = INTSXP;
-            param->data = Rf_coerceVector(data, INTSXP);
-            R_PreserveObject(param->data);
-            param->is_protected = 1;
+            col_data = Rf_coerceVector(data, INTSXP);
             break;
         case INTSXP: case REALSXP: case STRSXP:
-            param->type = TYPEOF(data);
-            param->data = data;
+            did_alloc = 0;
+            col_data = data;
             break;
         default:
-            param->type = STRSXP;
-            param->data = Rf_coerceVector(data, STRSXP);
-            R_PreserveObject(param->data);
-            param->is_protected = 1;
+            col_data = Rf_coerceVector(data, STRSXP);
         }
+    }
+    /* Since params->data is preserved, this provides protection from
+       GC */
+    SET_VECTOR_ELT(params->data, i, col_data);
+    if (!did_alloc) {
+        /* we want to hold on to the data columns and make sure that
+           they are duplicated on modification so our copy is
+           preserved. */
+        SET_NAMED(data, 2);
     }
 }
 
@@ -79,13 +75,13 @@ static int find_by_name(const char *paramName, SEXP colNames)
     return ans;
 }
 
-RS_SQLite_bindParam *
+RS_SQLite_bindParams *
 RS_SQLite_createParameterBinding(int n, SEXP bind_data,
                                  sqlite3_stmt *stmt, char *errorMsg)
 {
-    RS_SQLite_bindParam *params;
+    RS_SQLite_bindParams *params;
     int i, *used_index, current, num_cols, err = 0;
-    SEXP colNames, data;
+    SEXP colNames, col_data;
 
     colNames = Rf_getAttrib(bind_data, R_NamesSymbol);
     num_cols = length(colNames);
@@ -97,15 +93,19 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
     }
 
     /* could this move to R_alloc? */
-    params = (RS_SQLite_bindParam *)malloc(sizeof(RS_SQLite_bindParam) * n);
+    params = (RS_SQLite_bindParams *)malloc(sizeof(RS_SQLite_bindParams));
     if (!params) {
         sprintf(errorMsg, "could not allocate memory");
         return NULL;
     }
+    params->count = n;
+    /* XXX: if the R allocation fails, we leak memory */
+    params->data = Rf_allocVector(VECSXP, n);
+    R_PreserveObject(params->data);
 
-    used_index = init_bindParams(params, n, num_cols);
+    used_index = init_bindParams(num_cols);
     if (!used_index) {
-        free(params);
+        RS_SQLite_freeParameterBinding(params);
         sprintf(errorMsg, "could not allocate memory");
         return NULL;
     }
@@ -129,6 +129,7 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
                             "parameter %d",
                             CHAR(STRING_ELT(colNames, current)), i+1);
                     err = 1;
+                    break;
                 }
             }
         }
@@ -137,30 +138,27 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
             sprintf(errorMsg,
                     "unable to bind data for positional parameter %d", i+1);
             err = 1;
+            break;
         }
 
         if (!err) {
-            data = VECTOR_ELT(bind_data, current);
-            add_data_to_param_binding(&(params[i]), data);
+            col_data = VECTOR_ELT(bind_data, current);
+            add_data_to_param_binding(params, i, col_data);
         }
     }
     free(used_index);
     used_index = NULL;
     if (err) {
-        free(params);
-        params = NULL;
+        RS_SQLite_freeParameterBinding(params);
     }
     return params;
 }
 
 void
-RS_SQLite_freeParameterBinding(int n, RS_SQLite_bindParam *params)
+RS_SQLite_freeParameterBinding(RS_SQLite_bindParams *params)
 {
     int i;
-
-    for(i=0; i<n; i++){
-        if(params[i].is_protected)
-            R_ReleaseObject(params[i].data);
-    }
+    if (params->data) R_ReleaseObject(params->data);
     free(params);
+    params = NULL;
 }

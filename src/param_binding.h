@@ -4,17 +4,17 @@
 #include <Rinternals.h>
 #include "sqlite.h"
 
-typedef struct st_sqlite_bindparam {
-    SEXPTYPE type;
+typedef struct st_sqlite_bindparams {
+    int count;
     SEXP data;
-    int is_protected;
-} RS_SQLite_bindParam;
+} RS_SQLite_bindParams;
 
 
-RS_SQLite_bindParam *RS_SQLite_createParameterBinding(int n,
-                                                      SEXP bind_data, sqlite3_stmt *stmt,
-                                                      char *errorMsg);
-void RS_SQLite_freeParameterBinding(int n,
-                                    RS_SQLite_bindParam *param);
+RS_SQLite_bindParams *
+RS_SQLite_createParameterBinding(int n,
+                                 SEXP bind_data, sqlite3_stmt *stmt,
+                                 char *errorMsg);
+
+void RS_SQLite_freeParameterBinding(RS_SQLite_bindParams *);
 
 #endif  /* PARAM_BINDING_H_ */

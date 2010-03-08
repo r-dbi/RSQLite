@@ -234,7 +234,8 @@ function(con, statement, bind.data=NULL)
   conId <- as(con, "integer")
   statement <- as(statement, "character")
   if (!is.null(bind.data)) {
-      bind.data <- as.data.frame(bind.data)
+      if (class(bind.data)[1] != "data.frame")
+          bind.data <- as.data.frame(bind.data)
       if (min(dim(bind.data)) <= 0) {
           stop("bind.data must have non-zero dimensions")
       }

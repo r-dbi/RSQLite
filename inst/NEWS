@@ -1,6 +1,8 @@
 Version 0.8-4
 
-- Fix a memory leak in bound parameter management.
+- Fix a memory leak in bound parameter management and resolve a
+  missing PROTECT bug that caused spurious crashes when performing
+  many prepared queries.
 
 - Improve internal memory handling for prepared queries.  Use
   R_PreserveObject/R_ReleaseObject instead of the protection stack to
@@ -17,6 +19,18 @@ Version 0.8-4
 
 - Use sqlite3_prepare_v2 throughout, remove workaround code needed for
   legacy sqlite3_prepare behavior.
+
+- Add name space unload hook to unload RSQLite.so.
+
+- Enable full-text search module by default.  See
+  http://www.sqlite.org/fts3.html for details on this SQLite
+  module.
+
+- Add EXPERIMENTAL support for prepared queries that involve a SELECT.
+  This was previously unsupported.  SELECT queries can now be used
+  with dbSendPreparedQuery.  The return value is the same as rbind'ing
+  the results of the individual queries.  This means that parameters
+  that return no results are ignored in the result.
 
 Version 0.8-3
 

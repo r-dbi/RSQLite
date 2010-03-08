@@ -289,6 +289,7 @@ function(res, n=0, ...)
   n <- as(n, "integer")
   rsId <- as(res, "integer")
   rel <- .Call("RS_SQLite_fetch", rsId, nrec = n, PACKAGE = .SQLitePkgName)
+  if (is.null(rel)) rel <- list()       # result set is completed
   ## create running row index as of previous fetch (if any)
   cnt <- dbGetRowCount(res)
   nrec <- if (length(rel) > 0L) length(rel[[1L]]) else 0L

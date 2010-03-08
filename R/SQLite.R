@@ -282,7 +282,7 @@ setMethod("dbHasCompleted", "SQLiteResult",
       out <- dbGetInfo(res, "completed")[[1]]
       if(out<0)
          NA
-      else ifelse(out==0, FALSE, TRUE)
+      else out == 1L
    },
    valueClass = "logical"
 )

@@ -581,7 +581,7 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
     }
 
     /* allocate and init a new result set */
-    rsHandle = RS_DBI_allocResultSet(conHandle);
+    PROTECT(rsHandle = RS_DBI_allocResultSet(conHandle));
     res = RS_DBI_getResultSet(rsHandle);
     res->completed = (Sint) 0;
     res->statement = dyn_statement;
@@ -589,10 +589,12 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
     state = sqlite3_prepare_v2(db_connection, dyn_statement, -1,
                                &db_statement, NULL);
     if (state != SQLITE_OK) {
+        UNPROTECT(1);
         exec_error("error in statement", con, 0, NULL, rsHandle);
     }
 
     if (db_statement == NULL) {
+        UNPROTECT(1);
         exec_error("nothing to execute", con, 0, NULL, rsHandle);
     }
     res->drvResultSet = (void *) db_statement;
@@ -604,6 +606,7 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
     /* this will return 0 if the statement is not a SELECT */
     if (sqlite3_column_count(db_statement) > 0) {
         if (bind_count > 0) {
+            UNPROTECT(1);
             exec_error("cannot have bound parameters on a SELECT statement",
                        con, 0, NULL, rsHandle);
         }
@@ -616,6 +619,7 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
         if (bind_count == 0) {
             state = sqlite3_step(db_statement);
             if (state != SQLITE_DONE) {
+                UNPROTECT(1);
                 exec_error("RS_SQLite_exec: could not execute1",
                            con, 0, NULL, rsHandle);
             }
@@ -625,6 +629,7 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
                 RS_SQLite_createParameterBinding(bind_count, bind_data,
                                                  db_statement, bindingErrorMsg);
             if (params == NULL) {
+                UNPROTECT(1);
                 exec_error("RS_SQLite_exec: could not execute1",
                            con, 0, NULL, rsHandle);
             }
@@ -660,12 +665,13 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
                         /* why does IS_NA for character crash? */
                         if(strcmp(string, RS_NA_STRING) == 0)
                             state = sqlite3_bind_null(db_statement, j+1);
-                        else
+                        else    /* FIXME: should we use SQLITE_STATIC? */
                             state = sqlite3_bind_text(db_statement, j+1,
                                                       string, -1, SQLITE_TRANSIENT);
                         break;
                     }
                     if (state != SQLITE_OK && state != SQLITE_SCHEMA) {
+                        UNPROTECT(1);
                         exec_error("RS_SQLite_exec: could not bind data",
                                    con, 0, NULL, rsHandle);
                     }
@@ -674,13 +680,16 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
                 /* execute the statement */
                 state = sqlite3_step(db_statement);
                 if (state != SQLITE_DONE) {
+                    UNPROTECT(1);
                     exec_error("RS_SQLite_exec: could not execute",
                                con, 0, NULL, rsHandle);
                 }
 
                 /* reset the bind parameters */
                 state = sqlite3_reset(db_statement);
+                sqlite3_clear_bindings(db_statement);
                 if (state != SQLITE_OK) {
+                    UNPROTECT(1);
                     exec_error("RS_SQLite_exec: could not reset statement",
                                con, 0, NULL, rsHandle);
                 }
@@ -695,6 +704,7 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
         res->rowsAffected = (Sint) sqlite3_changes(db_connection);
         RS_SQLite_setException(con, state, "OK");
     }
+    UNPROTECT(1);
     return rsHandle;
 }
 

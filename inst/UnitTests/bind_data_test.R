@@ -71,13 +71,13 @@ testBindNamedReorderExtraCols <- function() {
     basicDf <- basicDf[ , newOrd]
 
     ## This raises the following error:
-##     Error in sqliteExecStatement(conn, statement, bind.data, ...) : 
+##     Error in sqliteExecStatement(conn, statement, bind.data, ...) :
 ## 	RS-DBI driver: (attempted to re-bind column [name] to positional
 ## 	parameter 1)
 
     rs <- dbSendPreparedQuery(db, sql, bind.data=basicDf)
     dbClearResult(rs)
-    
+
     got <- dbGetQuery(db, "select * from t1")
     checkEquals(basicDf[ , c("name", "id", "rate")], got)
 }
@@ -90,4 +90,79 @@ test_bind_data_has_zero_dim <- function()
     sql <- paste("insert into t1 values", values)
     df <- basicDf[0, ]
     checkException(dbSendPreparedQuery(db, sql, bind.data = df))
+}
+
+bind_select_setup <- function(db) {
+    df <- data.frame(id = letters[1:5],
+                     score = 1:5,
+                     size = c(1L, 1L, 2L, 2L, 3L),
+                     stringsAsFactors = FALSE)
+
+    dbWriteTable(db, "t1", df, row.names = FALSE)
+    df
+}
+
+test_bind_select_one_per <- function()
+{
+    db <- DATA$db
+    df <- bind_select_setup(db)
+    q <- "select * from t1 where id = ?"
+    got <- dbGetPreparedQuery(db, q, data.frame(id = c("e", "a", "c")))
+    checkEquals(c("e", "a", "c"), got$id)
+    checkEquals(c(5L, 1L, 3L), got$score)
+
+    res <- dbSendPreparedQuery(db, q, data.frame(id = c("e", "a", "c")))
+    checkEquals("e", fetch(res, n = 1)[["id"]])
+    checkEquals("a", fetch(res, n = 1)[["id"]])
+    checkEquals("c", fetch(res, n = 1)[["id"]])
+    checkEquals(0L, nrow(fetch(res, n = 1)))
+    checkTrue(dbGetInfo(res)$completed == 1L)
+    dbClearResult(res)
+}
+
+test_bind_select_no_matches <- function()
+{
+    db <- DATA$db
+    df <- bind_select_setup(db)
+    q <- "select * from t1 where id = ?"
+
+    ## no result 1
+    got <- dbGetPreparedQuery(db, q, data.frame(id = "X"))
+    checkEquals(c(0L, 3L), dim(got))
+    checkEquals(names(df), names(got))
+
+    ## no result many
+    got <- dbGetPreparedQuery(db, q, data.frame(id = c("X", "Y", "Z")))
+    checkEquals(c(0L, 3L), dim(got))
+    checkEquals(names(df), names(got))
+
+    # no results when mixed in
+    got <- dbGetPreparedQuery(db, q,
+                              data.frame(id = c("X", "b", "e", "Y", "a")))
+    checkEquals(c("b", "e", "a"), got$id)
+}
+
+test_bind_select_multi_match <- function()
+{
+    db <- DATA$db
+    df <- bind_select_setup(db)
+    q <- "select * from t1 where size = ?"
+
+    got <- dbGetPreparedQuery(db, q,
+                              data.frame(size=c(1L, 2L, 3L)))
+    checkEquals(df, got)
+
+    ## with non-match
+    got <- dbGetPreparedQuery(db, q,
+                              data.frame(size=c(1L, -100L, 2L, 3L)))
+    checkEquals(df, got)
+
+    ## as result set using incremental fetch
+    res <- dbSendPreparedQuery(db, q,
+                               data.frame(size=c(3L, 2L)))
+    checkEquals("e", fetch(res, n = 1L)[["id"]])
+    checkEquals("c", fetch(res, n = 1L)[["id"]])
+    checkEquals("d", fetch(res, n = 1L)[["id"]])
+    checkEquals(c(0L, 3L), dim(fetch(res, n = 1L)))
+    checkTrue(dbGetInfo(res)$completed == 1L)
 }

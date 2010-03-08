@@ -99,6 +99,9 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
         return NULL;
     }
     params->count = n;
+    params->row_count = length(VECTOR_ELT(bind_data, 0));
+    params->rows_used = 0;
+    params->row_complete = 1;
     /* XXX: if the R allocation fails, we leak memory */
     params->data = Rf_allocVector(VECSXP, n);
     R_PreserveObject(params->data);
@@ -157,7 +160,6 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
 void
 RS_SQLite_freeParameterBinding(RS_SQLite_bindParams *params)
 {
-    int i;
     if (params->data) R_ReleaseObject(params->data);
     free(params);
     params = NULL;

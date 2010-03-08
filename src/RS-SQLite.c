@@ -559,7 +559,7 @@ select_prepared_query(sqlite3_stmt *db_statement,
                       SEXP rsHandle)
 {
     RS_DBI_resultSet *res;
-    int state, i, j;
+    int state;
     char bindingErrorMsg[2048]; bindingErrorMsg[0] = '\0';
     RS_SQLite_bindParams *params =
         RS_SQLite_createParameterBinding(bind_count, bind_data,
@@ -624,7 +624,7 @@ non_select_prepared_query(sqlite3_stmt *db_statement,
                           RS_DBI_connection *con,
                           SEXP rsHandle)
 {
-    int state, i, j;
+    int state, i;
     char bindingErrorMsg[2048]; bindingErrorMsg[0] = '\0';
     RS_SQLite_bindParams *params =
         RS_SQLite_createParameterBinding(bind_count, bind_data,
@@ -671,7 +671,7 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
     sqlite3 *db_connection;
     sqlite3_stmt *db_statement = NULL;
     int state, bind_count;
-    int i, j, rows = 0, cols = 0;
+    int rows = 0, cols = 0;
     char *dyn_statement;
 
     con = RS_DBI_getConnection(conHandle);
@@ -826,31 +826,6 @@ RS_SQLite_createDataMappings(Res_Handle rsHandle)
     return flds;
 }
 
-/* Given a DBI resultset handle, call corrected_sqlite3_step once
-   handling the SQLITE_SCHEMA state indicating that the query needs to
-   be prepared again.  This will occur when the DB schema has
-   changed. */
-static int single_step_with_reprepare(SEXP rsHandle)
-{
-    int state;
-    RS_DBI_resultSet *res;
-    sqlite3_stmt *db_statement;
-
-    res = RS_DBI_getResultSet(rsHandle);
-    db_statement = (sqlite3_stmt *)res->drvResultSet;
-    if (db_statement == NULL) {
-        RSQLITE_MSG("corrupt SQLite resultSet, missing statement handle",
-                    RS_DBI_ERROR);
-    }
-    state = sqlite3_step(db_statement);
-    if (state != SQLITE_ROW && state != SQLITE_DONE) {
-        char errMsg[2048];
-        (void)sprintf(errMsg, "RS_SQLite_fetch: failed first step: %s",
-                      sqlite3_errmsg(sqlite3_db_handle(db_statement)));
-        RSQLITE_MSG(errMsg, RS_DBI_ERROR);
-    }
-    return state;
-}
 
 /* Fills the output VECSXP with one row of data from the resultset
  */
@@ -888,6 +863,35 @@ static void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
             break;
         }
     }
+}
+
+static int do_select_step(RS_DBI_resultSet *res, int row_idx)
+{
+    int state;
+    RS_SQLite_bindParams * params = NULL;
+    sqlite3_stmt *stmt = (sqlite3_stmt *)res->drvResultSet;
+    if (res->drvData) {         /* we have parameters to bind */
+        params = (RS_SQLite_bindParams *)res->drvData;
+        if (params->row_complete) {
+            params->row_complete = 0;
+            sqlite3_clear_bindings(stmt);
+            state = bind_params_to_stmt(params,
+                                        stmt,
+                                        params->rows_used);
+            if (state != SQLITE_OK) return state;
+            params->rows_used++;
+        }
+    }
+    state = sqlite3_step(stmt);
+    if (params && state == SQLITE_DONE) {
+        params->row_complete = 1;
+        if (params->rows_used < params->row_count) {
+            state = sqlite3_reset(stmt);
+            if (state != SQLITE_OK) return state;
+            return do_select_step(res, row_idx);
+        }
+    }
+    return state;
 }
 
 /* Return a data.frame containing the requested number of rows from
@@ -930,8 +934,14 @@ SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
     if (res->completed == 1)
         return R_NilValue;
 
-    state = single_step_with_reprepare(rsHandle);
-
+    /* We need to step once to be able to create the data mappings */
+    state = do_select_step(res, row_idx);
+    if (state != SQLITE_ROW && state != SQLITE_DONE) {
+        char errMsg[2048];
+        (void)sprintf(errMsg, "RS_SQLite_fetch: failed first step: %s",
+                      sqlite3_errmsg(sqlite3_db_handle(db_statement)));
+        RSQLITE_MSG(errMsg, RS_DBI_ERROR);
+    }
     if (!res->fields) {
         if (!(res->fields = RS_SQLite_createDataMappings(rsHandle))) {
             RSQLITE_MSG("corrupt SQLite resultSet, missing fieldDescription",
@@ -961,7 +971,7 @@ SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
             else
                 break;       /* okay, no more fetching for now */
         }
-        state = sqlite3_step(db_statement);
+        state = do_select_step(res, row_idx);
         if (state != SQLITE_ROW && state != SQLITE_DONE) {
             char errMsg[2048];
             (void)sprintf(errMsg, "RS_SQLite_fetch: failed: %s",

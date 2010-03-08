@@ -6,6 +6,9 @@
 
 typedef struct st_sqlite_bindparams {
     int count;
+    int row_count;
+    int rows_used;
+    int row_complete;
     SEXP data;
 } RS_SQLite_bindParams;
 

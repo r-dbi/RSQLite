@@ -559,7 +559,6 @@ select_prepared_query(sqlite3_stmt *db_statement,
                       SEXP rsHandle)
 {
     RS_DBI_resultSet *res;
-    int state;
     char bindingErrorMsg[2048]; bindingErrorMsg[0] = '\0';
     RS_SQLite_bindParams *params =
         RS_SQLite_createParameterBinding(bind_count, bind_data,

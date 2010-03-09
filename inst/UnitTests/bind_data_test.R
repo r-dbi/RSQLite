@@ -166,3 +166,15 @@ test_bind_select_multi_match <- function()
     checkEquals(c(0L, 3L), dim(fetch(res, n = 1L)))
     checkTrue(dbGetInfo(res)$completed == 1L)
 }
+
+test_bind_select_NA <- function()
+{
+    db <- DATA$db
+    df <- bind_select_setup(db)
+    dbGetQuery(db, "insert into t1 values ('x', NULL, NULL)")
+
+    got <- dbGetPreparedQuery(db, "select id from t1 where score is :v",
+                              data.frame(v=as.integer(NA)))
+    checkEquals(c(1L, 1L), dim(got))
+    checkEquals("x", got$id)
+}

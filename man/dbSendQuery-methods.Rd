@@ -63,6 +63,8 @@ dbGetException(con)
 ## transactions and bound parameters in prepared
 ## statements.
 
+set.seed(0x4554)
+
 make_data <- function(n)
 {
     alpha <- c(letters, as.character(0:9))
@@ -116,6 +118,10 @@ bulk_insert(sql, key_counts)
 ## indexed (NOT CURRENTLY SUPPORTED)
 ## sql <- "insert into keys values (?1, ?2)"
 ## bulk_insert(sql)
+
+sql <- "select * from keys where count = :cc"
+dbGetPreparedQuery(db, sql, data.frame(cc = c(95, 403)))
+
 }
 \keyword{methods}
 \keyword{interface}

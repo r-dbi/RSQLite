@@ -26,11 +26,11 @@ Version 0.8-4
   http://www.sqlite.org/fts3.html for details on this SQLite
   module.
 
-- Add EXPERIMENTAL support for prepared queries that involve a SELECT.
-  This was previously unsupported.  SELECT queries can now be used
-  with dbSendPreparedQuery.  The return value is the same as rbind'ing
-  the results of the individual queries.  This means that parameters
-  that return no results are ignored in the result.
+- Add support for prepared queries that involve a SELECT.  This was
+  previously unsupported.  SELECT queries can now be used with
+  dbSendPreparedQuery.  The return value is the same as rbind'ing the
+  results of the individual queries.  This means that parameters that
+  return no results are ignored in the result.
 
 Version 0.8-3
 

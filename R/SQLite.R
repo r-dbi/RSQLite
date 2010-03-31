@@ -97,7 +97,7 @@ setMethod("summary", "SQLiteDriver",
 setClass("SQLiteConnection", representation("DBIConnection", "SQLiteObject"))
 
 setAs("SQLiteConnection", "SQLiteDriver",
-   def = function(from) new("SQLiteDriver", Id = as(from,"integer")[1])
+   def = function(from) new("SQLiteDriver", Id = from@Id)
 )
 setMethod("dbConnect", "SQLiteDriver",
    definition = function(drv, ...) sqliteNewConnection(drv, ...),
@@ -112,8 +112,7 @@ setMethod("dbConnect", "character",
 )
 setMethod("dbConnect", "SQLiteConnection",
    definition = function(drv, ...){
-      con.id <- as(drv, "integer")
-      new.id <- .Call("RS_SQLite_cloneConnection", con.id, PACKAGE = .SQLitePkgName)
+      new.id <- .Call("RS_SQLite_cloneConnection", drv@Id, PACKAGE = .SQLitePkgName)
       new("SQLiteConnection", Id = new.id)
    },
    valueClass = "SQLiteConnection"
@@ -128,8 +127,7 @@ setMethod("dbGetInfo", "SQLiteConnection",
 )
 setMethod("dbGetException", "SQLiteConnection",
    definition = function(conn, ...){
-      id <- as(conn, "integer")
-      .Call("RS_SQLite_getException", id, PACKAGE = .SQLitePkgName)
+       .Call("RS_SQLite_getException", conn@Id, PACKAGE = .SQLitePkgName)
    },
    valueClass = "list"    ## TODO: should return a SQLiteException
 )
@@ -244,7 +242,7 @@ setMethod("dbListResults", "SQLiteConnection",
 setClass("SQLiteResult", representation("DBIResult", "SQLiteObject"))
 
 setAs("SQLiteResult", "SQLiteConnection",
-   def = function(from) new("SQLiteConnection", Id = as(from,"integer")[1:2])
+   def = function(from) new("SQLiteConnection", Id = from@Id)
 )
 setMethod("fetch", "SQLiteResult",
    definition = function(res, n = 0, ...) sqliteFetch(res, n = n, ...),

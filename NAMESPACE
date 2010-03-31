@@ -44,7 +44,6 @@ exportMethods(
    dbUnloadDriver,
    dbWriteTable,
    fetch,
-   format,
    initialize,
    isSQLKeyword,
    make.db.names,

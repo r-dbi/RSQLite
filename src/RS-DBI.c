@@ -868,8 +868,7 @@ is_validHandle(Db_Handle handle, HANDLE_TYPE handleType)
   if(len<handleType || handleType<1 || handleType>3) 
     return 0;
   mgr_id = MGR_ID(handle);
-  if( ((Sint) getpid()) != mgr_id)
-    return 0;
+  if(mgr_id <= 0) return 0;
 
   /* at least we have a potential valid dbManager */
   mgr = dbManager;

@@ -1,3 +1,13 @@
+Version 0.9-0
+
+- The SQLite driver handle validation code, is_ValidHandle, no longer
+  requires the driver ID to be equal to the current process ID.
+  SQLite supports multiple processes accessing the same SQLite file
+  via locking (however, results are known to be unreliable on NFS).
+  This change should make using RSQLite with the multicore package
+  easier.  For an example of the issue that the PID check causes see:
+  https://stat.ethz.ch/pipermail/r-sig-hpc/2009-August/000335.html
+
 Version 0.8-4
 
 - Fix a memory leak in bound parameter management and resolve a

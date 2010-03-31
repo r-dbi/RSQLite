@@ -72,14 +72,15 @@ function(obj, what="", ...)
     stop(paste("expired", class(obj)))
   drvId <- obj@Id
   info <- .Call("RS_SQLite_managerInfo", drvId, PACKAGE = .SQLitePkgName)
-  drvId <- info$managerId
   ## replace drv/connection id w. actual drv/connection objects
   conObjs <- vector("list", length = info$"num_con")
   ids <- info$connectionIds
   for(i in seq(along.with = ids))
-    conObjs[[i]] <- new("SQLiteConnection", Id = c(drvId, ids[i]))
+    conObjs[[i]] <- new("SQLiteConnection",
+                        Id = .Call("DBI_newConnectionHandle", drvId, ids[i],
+                                   PACKAGE = .SQLitePkgName))
   info$connectionIds <- conObjs
-  info$managerId <- new("SQLiteDriver", Id = drvId)
+  info$managerId <- obj
   if(!missing(what))
     info[what]
   else
@@ -184,7 +185,9 @@ function(obj, what="", ...)
   if(length(info$rsId)){
     rsId <- vector("list", length = length(info$rsId))
     for(i in seq(along.with = info$rsId))
-      rsId[[i]] <- new("SQLiteResult", Id = c(id, info$rsId[i]))
+      rsId[[i]] <- new("SQLiteResult",
+                       Id = .Call("DBI_newResultHandle",
+                       id, info$rsId[i], PACKAGE = .SQLitePkgName))
     info$rsId <- rsId
   }
   if(!missing(what))

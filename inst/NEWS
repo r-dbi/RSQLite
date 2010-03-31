@@ -8,8 +8,13 @@ Version 0.9-0
   easier.  For an example of the issue that the PID check causes see:
   https://stat.ethz.ch/pipermail/r-sig-hpc/2009-August/000335.html
 
-- Treat handle ID as opaque pointers; remove handle ID coerce code and
-  use obj@Id.
+- Refactor to use external pointers to wrap handle IDs; remove handle
+  ID coerce code (e.g. as(obj@Id, "integer")).  For now, the old
+  scheme of storing handle IDs in an integer vector is mostly
+  maintained only these integer vectors are stored in the protection
+  slot of an external pointer.  Using external pointers will allow the
+  use of finalizer code so that, for example, unreferenced result sets
+  can be cleaned up.
 
 Version 0.8-4
 

@@ -79,9 +79,10 @@ typedef enum enum_handle_type {
   RES_HANDLE_TYPE = 3      /* dbResult handle */
 } HANDLE_TYPE; 
 
-#define MGR_ID(handle) INT_EL((handle),0)  /* the actual scalar mgr id */
-#define CON_ID(handle) INT_EL((handle),1)  
-#define RES_ID(handle) INT_EL((handle),2)
+#define MGR_ID(handle) INTEGER((R_ExternalPtrProtected(handle)))[0]
+#define CON_ID(handle) INTEGER((R_ExternalPtrProtected(handle)))[1]
+#define RES_ID(handle) INTEGER((R_ExternalPtrProtected(handle)))[2]
+#define HANDLE_LENGTH(handle) Rf_length(R_ExternalPtrProtected(handle));
 
 /* First, the following fully describes the field output by a select
  * (or select-like) statement, and the mappings from the internal
@@ -265,6 +266,10 @@ SEXP RS_DBI_copyFields(RS_DBI_fields *flds);
 void RS_na_set(void *ptr, Stype type);
 int  RS_is_na(void *ptr, Stype type);
 extern const struct data_types RS_dataTypeTable[];
+
+SEXP DBI_handle_to_string(SEXP xp);
+SEXP DBI_newResultHandle(SEXP xp, SEXP resId);
+SEXP DBI_newConnectionHandle(SEXP xp, SEXP conId);
 
 #ifdef __cplusplus 
 }

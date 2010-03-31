@@ -1644,4 +1644,3 @@ SEXP RS_SQLite_copy_database(Con_Handle fromConHandle, Con_Handle toConHandle)
     }
     return R_NilValue;
 }
-

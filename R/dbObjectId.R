@@ -32,12 +32,13 @@
 ## TODO: Convert the Id slot to be an external object (as per Luke Tierney's
 ## implementation), even at the expense of S-plus compatibility?
 
-setClass("dbObjectId", representation(Id = "integer", "VIRTUAL"))
+setClass("dbObjectId", representation(Id = "externalptr", "VIRTUAL"))
 
 setMethod("show", "dbObjectId",
    definition = function(object) {
       expired <- if(isIdCurrent(object)) "" else "Expired "
-      str <- paste("<", expired, class(object), ":", object@Id, ">", sep="")
+      id <- .Call("DBI_handle_to_string", object@Id, PACKAGE = .SQLitePkgName)
+      str <- paste("<", expired, class(object), ": ", id, ">", sep="")
       cat(str, "\n")
       invisible(NULL)
    }

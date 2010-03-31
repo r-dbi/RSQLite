@@ -256,12 +256,11 @@ RS_DBI_freeConnection(Con_Handle conHandle)
   return;
 }
 
-Res_Handle
-RS_DBI_allocResultSet(Con_Handle conHandle)
+SEXP
+RS_DBI_allocResultSet(SEXP conHandle)
 {
   RS_DBI_connection *con = NULL;
   RS_DBI_resultSet  *result = NULL;
-  Res_Handle rsHandle;
   Sint indx, res_id;
 
   con = RS_DBI_getConnection(conHandle);
@@ -299,8 +298,7 @@ RS_DBI_allocResultSet(Con_Handle conHandle)
   con->resultSets[indx] = result;
   con->resultSetIds[indx] = res_id;
 
-  rsHandle = RS_DBI_asResHandle(MGR_ID(conHandle),CON_ID(conHandle),res_id);
-  return rsHandle;
+  return RS_DBI_asResHandle(MGR_ID(conHandle), CON_ID(conHandle), res_id);
 }
 
 void
@@ -707,44 +705,68 @@ RS_DBI_SclassNames(SEXP type)
  * database. 
  */
 
-Mgr_Handle
-RS_DBI_asMgrHandle(Sint mgrId)
+SEXP
+RS_DBI_asMgrHandle(int mgrId)
 {
-  Mgr_Handle mgrHandle;
-
-  PROTECT(mgrHandle = NEW_INTEGER((Sint) 1));
-  MGR_ID(mgrHandle) = mgrId;
-  UNPROTECT(1);
-  return mgrHandle;
+    SEXP mgrHandle, label, ids;
+    PROTECT(ids = allocVector(INTSXP, 1));
+    INTEGER(ids)[0] = mgrId;
+    PROTECT(label = mkString("DBI MGR"));
+    mgrHandle = R_MakeExternalPtr(NULL, label, ids);
+    UNPROTECT(2);
+    /* FIXME: add finalizer code */
+    return mgrHandle;
 }
 
-Con_Handle
-RS_DBI_asConHandle(Sint mgrId, Sint conId)
+SEXP
+DBI_newConnectionHandle(SEXP xp, SEXP conId)
 {
-  Con_Handle conHandle;
-
-  PROTECT(conHandle = NEW_INTEGER((Sint) 2));
-  MGR_ID(conHandle) = mgrId;
-  CON_ID(conHandle) = conId;
-  UNPROTECT(1);
-  return conHandle;
+    int mid = INTEGER(R_ExternalPtrProtected(xp))[0];
+    return RS_DBI_asConHandle(mid, INTEGER(conId)[0]);
 }
 
-Res_Handle
-RS_DBI_asResHandle(Sint mgrId, Sint conId, Sint resId)
+SEXP
+RS_DBI_asConHandle(int mgrId, int conId)
 {
-  Res_Handle resHandle;
+    SEXP conHandle, s_ids, label;
+    int *ids;
+    PROTECT(s_ids = allocVector(INTSXP, 2));
+    ids = INTEGER(s_ids);
+    ids[0] = mgrId;
+    ids[1] = conId;
+    PROTECT(label = mkString("DBI CON"));
+    conHandle = R_MakeExternalPtr(NULL, label, s_ids);
+    UNPROTECT(2);
+    /* FIXME: add finalizer code */
+    return conHandle;
+}
 
-  PROTECT(resHandle = NEW_INTEGER((Sint) 3));
-  MGR_ID(resHandle) = mgrId;
-  CON_ID(resHandle) = conId;
-  RES_ID(resHandle) = resId;
-  UNPROTECT(1);
-  return resHandle;
+SEXP
+DBI_newResultHandle(SEXP xp, SEXP resId)
+{
+    int *ids = INTEGER(R_ExternalPtrProtected(xp));
+    return RS_DBI_asResHandle(ids[0], ids[1], INTEGER(resId)[0]);
+}
+
+SEXP
+RS_DBI_asResHandle(int mgrId, int conId, int resId)
+{
+    SEXP resHandle, s_ids, label;
+    int *ids;
+    PROTECT(s_ids = allocVector(INTSXP, 3));
+    ids = INTEGER(s_ids);
+    ids[0] = mgrId;
+    ids[1] = conId;
+    ids[2] = resId;
+    PROTECT(label = mkString("DBI RES"));
+    resHandle = R_MakeExternalPtr(NULL, label, s_ids);
+    UNPROTECT(2);
+    /* FIXME: add finalizer code */
+    return resHandle;
 }
 
 RS_DBI_manager *
-RS_DBI_getManager(Mgr_Handle handle)
+RS_DBI_getManager(SEXP handle)
 {
   RS_DBI_manager  *mgr;
 
@@ -759,11 +781,10 @@ RS_DBI_getManager(Mgr_Handle handle)
 }
 
 RS_DBI_connection *
-RS_DBI_getConnection(Con_Handle conHandle)
+RS_DBI_getConnection(SEXP conHandle)
 {
   RS_DBI_manager  *mgr;
   Sint indx;
-
   mgr = RS_DBI_getManager(conHandle);
   indx = RS_DBI_lookup(mgr->connectionIds, mgr->length, CON_ID(conHandle));
   if(indx < 0)
@@ -778,11 +799,10 @@ RS_DBI_getConnection(Con_Handle conHandle)
 }
 
 RS_DBI_resultSet *
-RS_DBI_getResultSet(Res_Handle rsHandle)
+RS_DBI_getResultSet(SEXP rsHandle)
 {
   RS_DBI_connection *con;
   Sint indx;
-  
   con = RS_DBI_getConnection(rsHandle);
   indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(rsHandle));
   if(indx<0)
@@ -853,18 +873,14 @@ RS_DBI_freeEntry(Sint *table, Sint indx)
   return;
 }
 int 
-is_validHandle(Db_Handle handle, HANDLE_TYPE handleType)
+is_validHandle(SEXP handle, HANDLE_TYPE handleType)
 {
-  Sint  mgr_id, len, indx;
-  RS_DBI_manager    *mgr;
-  RS_DBI_connection *con;
+    int mgr_id, len, indx;
+    RS_DBI_manager *mgr;
+    RS_DBI_connection *con;
 
-  if(IS_INTEGER(handle))
-    handle = AS_INTEGER(handle);
-  else
-    return 0;       /* non handle object */
-
-  len = (int) GET_LENGTH(handle);
+  if (TYPEOF(handle) != EXTPTRSXP) return 0;
+  len = HANDLE_LENGTH(handle);
   if(len<handleType || handleType<1 || handleType>3) 
     return 0;
   mgr_id = MGR_ID(handle);
@@ -1191,3 +1207,34 @@ const struct data_types RS_dataTypeTable[] = {
     { "name",		SYMSXP	   },
     { (char *)0,	-1	   }
 };
+
+SEXP DBI_handle_to_string(SEXP xp)
+{
+    char *buf, *fmt;
+    SEXP ans, tag, ids;
+    int len, *v;
+    if (TYPEOF(xp) != EXTPTRSXP)
+        RS_DBI_errorMessage("DBI_handle_to_string: invalid handle",
+                            RS_DBI_ERROR);
+    tag = STRING_ELT(R_ExternalPtrTag(xp), 0);
+    ids = R_ExternalPtrProtected(xp);
+    len = strlen(CHAR(tag)) + 20;
+    buf = CallocCharBuf(len);
+    v = INTEGER(ids);
+    switch (length(ids)) {
+    case 1:
+        snprintf(buf, len, "%s (%d)", CHAR(tag), v[0]);
+        break;
+    case 2:
+        snprintf(buf, len, "%s (%d, %d)", CHAR(tag), v[0], v[1]);
+        break;
+    case 3:
+        snprintf(buf, len, "%s (%d, %d, %d)", CHAR(tag), v[0], v[1], v[2]);
+        break;
+    default:
+        snprintf(buf, len, "%s", "BAD LENGTH");
+    }
+    ans = mkString(buf);
+    Free(buf);
+    return ans;
+}

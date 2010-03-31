@@ -707,35 +707,3 @@ sqliteCopyDatabase <- function(from, to)
     .Call("RS_SQLite_copy_database", from@Id, destdb@Id, PACKAGE = .SQLitePkgName)
     invisible(NULL)
 }
-
-## RSQLite RUnit unit test support
-.test_RSQLite <- function(dir, verbose = FALSE) {
-    require("RUnit", quietly=TRUE) || stop("RUnit not found")
-
-    .any_errors <- function(res) any(sapply(res, function(r) r[["nErr"]] > 0))
-    .any_fail <- function(res) any(sapply(res, function(r) r[["nFail"]] > 0))
-
-    if (missing(dir)) {
-        dir <- system.file("UnitTests", package="RSQLite")
-    }
-    cwd <- getwd()
-    on.exit(setwd(cwd))
-    setwd(dir)
-
-    ro <- getOption("RUnit")
-    ro[["silent"]] <- TRUE
-    ro[["verbose"]] <- as.integer(verbose)
-    orig.options = options("RUnit"=ro)
-    on.exit(options(orig.options), add = TRUE)
-
-    suite <- defineTestSuite(name="RSQLite RUnit Tests", dirs=".",
-                             testFileRegexp=".*_test\\.R$",
-                             rngKind="default",
-                             rngNormalKind="default")
-    result <- runTestSuite(suite)
-    printTextProtocol(result, showDetails=FALSE)
-    if (.any_errors(result) || .any_fail(result)) {
-        stop("RSQLite unit tests FAILED")
-    }
-    result
-}

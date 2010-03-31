@@ -16,6 +16,8 @@ Version 0.9-0
   use of finalizer code so that, for example, unreferenced result sets
   can be cleaned up.
 
+- Upgrade to SQLite 3.6.23.1.
+
 Version 0.8-4
 
 - Fix a memory leak in bound parameter management and resolve a

@@ -72,15 +72,9 @@ function(obj, what="", ...)
     stop(paste("expired", class(obj)))
   drvId <- obj@Id
   info <- .Call("RS_SQLite_managerInfo", drvId, PACKAGE = .SQLitePkgName)
-  ## replace drv/connection id w. actual drv/connection objects
-  conObjs <- vector("list", length = info$"num_con")
-  ids <- info$connectionIds
-  for(i in seq(along.with = ids))
-    conObjs[[i]] <- new("SQLiteConnection",
-                        Id = .Call("DBI_newConnectionHandle", drvId, ids[i],
-                                   PACKAGE = .SQLitePkgName))
-  info$connectionIds <- conObjs
   info$managerId <- obj
+  ## connection IDs are no longer tracked by the manager.
+  info$connectionIds <- list()
   if(!missing(what))
     info[what]
   else

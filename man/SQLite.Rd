@@ -16,10 +16,9 @@ SQLite(max.con = 200, fetch.default.rec = 500, force.reload = FALSE,
 }
 \arguments{
 \item{max.con}{
-  maximum number of connections that may be open at one time.
-  Note that since the SQLite engine is embedded (i.e., a set of C 
-  functions within the R process) connections consume very
-  little resources.
+  IGNORED.  As of RSQLite 0.9.0, connections are managed dynamically and
+  there is no predefined limit to the number of connections you can have
+  in a given R session.
   }
 \item{fetch.default.rec}{
   default number of records to fetch at one time from the database.

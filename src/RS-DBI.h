@@ -79,10 +79,22 @@ typedef enum enum_handle_type {
   RES_HANDLE_TYPE = 3      /* dbResult handle */
 } HANDLE_TYPE; 
 
-#define MGR_ID(handle) INTEGER((R_ExternalPtrProtected(handle)))[0]
-#define CON_ID(handle) INTEGER((R_ExternalPtrProtected(handle)))[1]
-#define RES_ID(handle) INTEGER((R_ExternalPtrProtected(handle)))[2]
-#define HANDLE_LENGTH(handle) Rf_length(R_ExternalPtrProtected(handle));
+static int MGR_ID(SEXP handle)
+{
+    SEXP h = R_ExternalPtrProtected(handle);
+    if (TYPEOF(h) == VECSXP) h = VECTOR_ELT(h, 0);
+    return INTEGER(h)[0];
+}
+
+static int CON_ID(SEXP handle)
+{
+    SEXP h = R_ExternalPtrProtected(handle);
+    if (TYPEOF(h) == VECSXP) h = VECTOR_ELT(h, 0);
+    return INTEGER(h)[1];
+}
+
+#define RES_ID(handle) INTEGER(VECTOR_ELT(R_ExternalPtrProtected(handle), 0))[2]
+
 
 /* First, the following fully describes the field output by a select
  * (or select-like) statement, and the mappings from the internal
@@ -185,14 +197,15 @@ Con_Handle RS_DBI_allocConnection(Mgr_Handle mgrHandle,
 					  Sint max_res);
 void               RS_DBI_freeConnection(Con_Handle conHandle);
 RS_DBI_connection *RS_DBI_getConnection(Db_Handle handle);
-Con_Handle RS_DBI_asConHandle(Sint mgrId, Sint conId);
+Con_Handle RS_DBI_asConHandle(Sint mgrId, Sint conId, RS_DBI_connection *con);
 SEXP RS_DBI_connectionInfo(Con_Handle con_Handle);
 
 /* dbResultSet */
 Res_Handle RS_DBI_allocResultSet(Con_Handle conHandle);
 void               RS_DBI_freeResultSet(Res_Handle rsHandle);
+void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
 RS_DBI_resultSet  *RS_DBI_getResultSet(Res_Handle rsHandle);
-Res_Handle RS_DBI_asResHandle(Sint pid, Sint conId, Sint resId);
+Res_Handle RS_DBI_asResHandle(Sint pid, Sint conId, Sint resId, SEXP conxp);
 SEXP RS_DBI_resultSetInfo(Res_Handle rsHandle);
 
 /* utility funs */

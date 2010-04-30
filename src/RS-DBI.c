@@ -31,6 +31,13 @@
 
 static RS_DBI_manager *dbManager = NULL;
 
+static int HANDLE_LENGTH(SEXP handle)
+{
+    SEXP h = R_ExternalPtrProtected(handle);
+    if (TYPEOF(h) == VECSXP) h = VECTOR_ELT(h, 0);
+    return Rf_length(h);
+}
+
 Mgr_Handle
 RS_DBI_allocManager(const char *drvName, Sint max_con,
 		    Sint fetch_default_rec, Sint force_realloc)
@@ -138,22 +145,12 @@ RS_DBI_allocConnection(Mgr_Handle mgrHandle, Sint max_res)
   RS_DBI_manager    *mgr;
   RS_DBI_connection *con;
   Con_Handle conHandle;
-  Sint  i, indx, con_id;
+  Sint  i, con_id;
   
   mgr = RS_DBI_getManager(mgrHandle);
-  indx = RS_DBI_newEntry(mgr->connectionIds, mgr->length);
-  if(indx < 0){
-    char buf[128], msg[128];
-    (void) strcat(msg, "cannot allocate a new connection -- maximum of ");
-    (void) strcat(msg, "%d connections already opened");
-    (void) sprintf(buf, msg, (int) mgr->length);
-    RS_DBI_errorMessage(buf, RS_DBI_ERROR);
-  }
   con = (RS_DBI_connection *) malloc(sizeof(RS_DBI_connection));
   if(!con){
-    char *errMsg = "could not malloc dbConnection";
-    RS_DBI_freeEntry(mgr->connectionIds, indx);
-    RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+    RS_DBI_errorMessage("could not malloc dbConnection", RS_DBI_ERROR);
   }
   con->managerId = MGR_ID(mgrHandle);
   con_id = mgr->counter;
@@ -168,19 +165,17 @@ RS_DBI_allocConnection(Mgr_Handle mgrHandle, Sint max_res)
   con->resultSets = (RS_DBI_resultSet **)
     calloc((size_t) max_res, sizeof(RS_DBI_resultSet));
   if(!con->resultSets){
-    char  *errMsg = "could not calloc resultSets for the dbConnection";
-    RS_DBI_freeEntry(mgr->connectionIds, indx);
     free(con);
-    RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+    RS_DBI_errorMessage("could not calloc resultSets for the dbConnection",
+                        RS_DBI_ERROR);
   }
   con->num_res = (Sint) 0;
   con->resultSetIds = (Sint *) calloc((size_t) max_res, sizeof(Sint));
   if(!con->resultSetIds) {
-    char *errMsg = "could not calloc vector of resultSet Ids";
     free(con->resultSets);
     free(con);
-    RS_DBI_freeEntry(mgr->connectionIds, indx);
-    RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+    RS_DBI_errorMessage("could not calloc vector of resultSet Ids",
+                        RS_DBI_ERROR);
   }
   for(i=0; i<max_res; i++){
     con->resultSets[i] = (RS_DBI_resultSet *) NULL;
@@ -190,9 +185,7 @@ RS_DBI_allocConnection(Mgr_Handle mgrHandle, Sint max_res)
   /* Finally, update connection table in mgr */
   mgr->num_con += (Sint) 1;
   mgr->counter += (Sint) 1;
-  mgr->connections[indx] = con;
-  mgr->connectionIds[indx] = con_id;
-  conHandle = RS_DBI_asConHandle(MGR_ID(mgrHandle), con_id);
+  conHandle = RS_DBI_asConHandle(MGR_ID(mgrHandle), con_id, con);
   return conHandle;
 }
 
@@ -202,11 +195,10 @@ RS_DBI_allocConnection(Mgr_Handle mgrHandle, Sint max_res)
  */
 
 void 
-RS_DBI_freeConnection(Con_Handle conHandle)
+RS_DBI_freeConnection(SEXP conHandle)
 {
   RS_DBI_connection *con;
   RS_DBI_manager    *mgr;
-  Sint indx;
 
   con = RS_DBI_getConnection(conHandle);
   mgr = RS_DBI_getManager(conHandle);
@@ -215,13 +207,8 @@ RS_DBI_freeConnection(Con_Handle conHandle)
   if(con->num_res > 0) {
     char *errMsg = "opened resultSet(s) forcebly closed";
     int  i;
-    Res_Handle rsHandle;
-
     for(i=0; i < con->num_res; i++){
-      rsHandle = RS_DBI_asResHandle(con->managerId,
-				    con->connectionId,
-				    (Sint) con->resultSetIds[i]);
-      RS_DBI_freeResultSet(rsHandle);
+        RS_DBI_freeResultSet0(con->resultSets[i], con);
     }
     RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
   }
@@ -245,15 +232,11 @@ RS_DBI_freeConnection(Con_Handle conHandle)
   if(con->resultSetIds) free(con->resultSetIds);
 
   /* update the manager's connection table */
-  indx = RS_DBI_lookup(mgr->connectionIds, mgr->length, con->connectionId);
-  RS_DBI_freeEntry(mgr->connectionIds, indx);
-  mgr->connections[indx] = (RS_DBI_connection *) NULL;
   mgr->num_con -= (Sint) 1;
 
   free(con);
   con = (RS_DBI_connection *) NULL;
-
-  return;
+  R_ClearExternalPtr(conHandle);
 }
 
 SEXP
@@ -298,43 +281,44 @@ RS_DBI_allocResultSet(SEXP conHandle)
   con->resultSets[indx] = result;
   con->resultSetIds[indx] = res_id;
 
-  return RS_DBI_asResHandle(MGR_ID(conHandle), CON_ID(conHandle), res_id);
+  return RS_DBI_asResHandle(MGR_ID(conHandle), CON_ID(conHandle), res_id,
+                            conHandle);
+}
+
+void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
+{
+    if(result->drvResultSet) {
+        char *errMsg =
+            "internal error in RS_DBI_freeResultSet: "
+            "non-freed result->drvResultSet (some memory leaked)";
+        RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+    }
+    if (result->drvData) {
+        char *errMsg =
+            "internal error in RS_DBI_freeResultSet: "
+            "non-freed result->drvData (some memory leaked)";
+        RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
+    }
+    if (result->statement)
+        free(result->statement);
+    if (result->fields)
+        RS_DBI_freeFields(result->fields);
+    free(result);
+    result = (RS_DBI_resultSet *) NULL;
+
+    /* update connection's resultSet table */
+    /* indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(rsHandle)); */
+    /* SQLite connections only ever have one result set */
+    RS_DBI_freeEntry(con->resultSetIds, 0);
+    con->resultSets[0] = NULL;
+    con->num_res -= 1;
 }
 
 void
 RS_DBI_freeResultSet(Res_Handle rsHandle)
 {
-  RS_DBI_resultSet  *result;
-  RS_DBI_connection *con;
-  Sint indx;
-
-  con = RS_DBI_getConnection(rsHandle);
-  result = RS_DBI_getResultSet(rsHandle);
-
-  if(result->drvResultSet) {
-    char *errMsg = 
-      "internal error in RS_DBI_freeResultSet: non-freed result->drvResultSet (some memory leaked)";
-    RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
-  }
-  if(result->drvData){
-    char *errMsg =
-      "internal error in RS_DBI_freeResultSet: non-freed result->drvData (some memory leaked)";
-    RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
-  }
-  if(result->statement)
-    free(result->statement);
-  if(result->fields)
-    RS_DBI_freeFields(result->fields);
-  free(result);
-  result = (RS_DBI_resultSet *) NULL;
-
-  /* update connection's resultSet table */
-  indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(rsHandle));
-  RS_DBI_freeEntry(con->resultSetIds, indx);
-  con->resultSets[indx] = (RS_DBI_resultSet *) NULL;
-  con->num_res -= (Sint) 1;
-
-  return;
+  RS_DBI_freeResultSet0(RS_DBI_getResultSet(rsHandle),
+                        RS_DBI_getConnection(rsHandle));
 }
 
 RS_DBI_fields *
@@ -465,24 +449,29 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
 SEXP  		/* boolean */
 RS_DBI_validHandle(Db_Handle handle)
 { 
-   SEXP valid;
-   int  handleType = 0;
-
-   switch( (int) GET_LENGTH(handle)){
-   case MGR_HANDLE_TYPE:
-     handleType = MGR_HANDLE_TYPE;
-     break;
-   case CON_HANDLE_TYPE:
-     handleType = CON_HANDLE_TYPE;
-     break;
-   case RES_HANDLE_TYPE:
-     handleType = RES_HANDLE_TYPE;
-     break;
-   }
-   PROTECT(valid = NEW_LOGICAL((Sint) 1));
-   LGL_EL(valid,0) = (Sint) is_validHandle(handle, handleType);
-   UNPROTECT(1);
-   return valid;
+    SEXP valid, contents;
+    int  handleType = 0;
+    if (TYPEOF(handle) != EXTPTRSXP) return 0;
+    contents = R_ExternalPtrProtected(handle);
+    if (TYPEOF(contents) == VECSXP) {
+        handleType = RES_HANDLE_TYPE;
+    } else {
+        switch(length(contents)) {
+        case MGR_HANDLE_TYPE:
+            handleType = MGR_HANDLE_TYPE;
+            break;
+        case CON_HANDLE_TYPE:
+            handleType = CON_HANDLE_TYPE;
+            break;
+        case RES_HANDLE_TYPE:
+            handleType = RES_HANDLE_TYPE;
+            break;
+        }
+    }
+    PROTECT(valid = NEW_LOGICAL((Sint) 1));
+    LGL_EL(valid,0) = (Sint) is_validHandle(handle, handleType);
+    UNPROTECT(1);
+    return valid;
 }
     
 void 
@@ -722,11 +711,23 @@ SEXP
 DBI_newConnectionHandle(SEXP xp, SEXP conId)
 {
     int mid = INTEGER(R_ExternalPtrProtected(xp))[0];
-    return RS_DBI_asConHandle(mid, INTEGER(conId)[0]);
+    return RS_DBI_asConHandle(mid, INTEGER(conId)[0], NULL);
+}
+
+/* FIXME: need to address this fwd declaration */
+SEXP
+RS_SQLite_closeConnection(Con_Handle conHandle);
+
+static void _finalize_con_handle(SEXP xp)
+{
+    if (R_ExternalPtrAddr(xp)) {
+        RS_SQLite_closeConnection(xp);
+        R_ClearExternalPtr(xp);
+    }
 }
 
 SEXP
-RS_DBI_asConHandle(int mgrId, int conId)
+RS_DBI_asConHandle(int mgrId, int conId, RS_DBI_connection *con)
 {
     SEXP conHandle, s_ids, label;
     int *ids;
@@ -735,9 +736,9 @@ RS_DBI_asConHandle(int mgrId, int conId)
     ids[0] = mgrId;
     ids[1] = conId;
     PROTECT(label = mkString("DBI CON"));
-    conHandle = R_MakeExternalPtr(NULL, label, s_ids);
+    conHandle = R_MakeExternalPtr(con, label, s_ids);
     UNPROTECT(2);
-    /* FIXME: add finalizer code */
+    R_RegisterCFinalizerEx(conHandle, _finalize_con_handle, 1);
     return conHandle;
 }
 
@@ -745,22 +746,28 @@ SEXP
 DBI_newResultHandle(SEXP xp, SEXP resId)
 {
     int *ids = INTEGER(R_ExternalPtrProtected(xp));
-    return RS_DBI_asResHandle(ids[0], ids[1], INTEGER(resId)[0]);
+    return RS_DBI_asResHandle(ids[0], ids[1], INTEGER(resId)[0], xp);
 }
 
 SEXP
-RS_DBI_asResHandle(int mgrId, int conId, int resId)
+RS_DBI_asResHandle(int mgrId, int conId, int resId, SEXP conxp)
 {
-    SEXP resHandle, s_ids, label;
+    SEXP resHandle, s_ids, label, v;
     int *ids;
     PROTECT(s_ids = allocVector(INTSXP, 3));
     ids = INTEGER(s_ids);
     ids[0] = mgrId;
     ids[1] = conId;
     ids[2] = resId;
+    PROTECT(v = allocVector(VECSXP, 2));
+    SET_VECTOR_ELT(v, 0, s_ids);
+    /* this ensures the connection is preserved as long as
+       there is a reference to a result set
+     */
+    SET_VECTOR_ELT(v, 1, conxp);
     PROTECT(label = mkString("DBI RES"));
-    resHandle = R_MakeExternalPtr(NULL, label, s_ids);
-    UNPROTECT(2);
+    resHandle = R_MakeExternalPtr(R_ExternalPtrAddr(conxp), label, v);
+    UNPROTECT(3);
     /* FIXME: add finalizer code */
     return resHandle;
 }
@@ -783,37 +790,19 @@ RS_DBI_getManager(SEXP handle)
 RS_DBI_connection *
 RS_DBI_getConnection(SEXP conHandle)
 {
-  RS_DBI_manager  *mgr;
-  Sint indx;
-  mgr = RS_DBI_getManager(conHandle);
-  indx = RS_DBI_lookup(mgr->connectionIds, mgr->length, CON_ID(conHandle));
-  if(indx < 0)
-    RS_DBI_errorMessage(
-          "internal error in RS_DBI_getConnection: corrupt connection handle",
-	  RS_DBI_ERROR);
-  if(!mgr->connections[indx])
-    RS_DBI_errorMessage(
-          "internal error in RS_DBI_getConnection: corrupt connection  object",
-	  RS_DBI_ERROR);
-  return mgr->connections[indx];
+    return (RS_DBI_connection *)R_ExternalPtrAddr(conHandle);
 }
 
 RS_DBI_resultSet *
 RS_DBI_getResultSet(SEXP rsHandle)
 {
   RS_DBI_connection *con;
-  Sint indx;
   con = RS_DBI_getConnection(rsHandle);
-  indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(rsHandle));
-  if(indx<0)
+  if(!con)
     RS_DBI_errorMessage(
-      "internal error in RS_DBI_getResultSet: could not find resultSet in connection",
-      RS_DBI_ERROR);
-  if(!con->resultSets[indx])
-    RS_DBI_errorMessage(
-          "internal error in RS_DBI_getResultSet: missing resultSet",
+          "internal error in RS_DBI_getResultSet: bad connection",
           RS_DBI_ERROR);
-  return con->resultSets[indx];
+  return con->resultSets[0];
 }
 
 /* Very simple objectId (mapping) table. newEntry() returns an index
@@ -841,7 +830,7 @@ RS_DBI_lookup(Sint *table, Sint length, Sint obj_id)
   Sint i, indx;
 
   indx = (Sint) -1;
-  for(i = 0; i < length; ++i){
+  for(i = 0; i < length, obj_id > -1; ++i){
     if(table[i]==obj_id){
       indx = i;
       break;
@@ -865,6 +854,7 @@ RS_DBI_listEntries(Sint *table, Sint length, Sint *entries)
   }
   return n;
 }
+
 void 
 RS_DBI_freeEntry(Sint *table, Sint indx)
 { /* no error checking!!! */
@@ -872,6 +862,7 @@ RS_DBI_freeEntry(Sint *table, Sint indx)
   table[indx] = empty_val;
   return;
 }
+
 int 
 is_validHandle(SEXP handle, HANDLE_TYPE handleType)
 {
@@ -892,10 +883,8 @@ is_validHandle(SEXP handle, HANDLE_TYPE handleType)
   if(handleType == MGR_HANDLE_TYPE) return 1;     /* valid manager id */
 
   /* ... on to connections */
-  indx = RS_DBI_lookup(mgr->connectionIds, mgr->length, CON_ID(handle));
-  if(indx<0) return 0;
-  con = mgr->connections[indx];
-  if(!con) return 0;
+  con = R_ExternalPtrAddr(handle);
+  if (!con) return 0;
   if(!con->resultSets) return 0;       /* un-initialized (invalid) */
   if(handleType==CON_HANDLE_TYPE) return 1; /* valid connection id */
 
@@ -1210,7 +1199,7 @@ const struct data_types RS_dataTypeTable[] = {
 
 SEXP DBI_handle_to_string(SEXP xp)
 {
-    char *buf, *fmt;
+    char *buf;
     SEXP ans, tag, ids;
     int len, *v;
     if (TYPEOF(xp) != EXTPTRSXP)
@@ -1218,6 +1207,7 @@ SEXP DBI_handle_to_string(SEXP xp)
                             RS_DBI_ERROR);
     tag = STRING_ELT(R_ExternalPtrTag(xp), 0);
     ids = R_ExternalPtrProtected(xp);
+    if (TYPEOF(ids) == VECSXP) ids = VECTOR_ELT(ids, 0);
     len = strlen(CHAR(tag)) + 20;
     buf = CallocCharBuf(len);
     v = INTEGER(ids);

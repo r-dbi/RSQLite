@@ -18,6 +18,29 @@ Version 0.9-0
 
 - Upgrade to SQLite 3.6.23.1.
 
+- The memory mangement code for keeping track of database connections
+  was significantly refactored.  Instead of tracking connections in a
+  pre-allocated array attached to the driver manager, connections are
+  now managed dynamically using R's external pointers and finalizers.
+  Consequences of this change are as follows:
+
+    * There is no longer a maximum connection limit (values specified
+      using the max.con argument to SQLite() are now ignored).
+
+    * The dbGetInfo(mgr) method no longer lists open connections and
+      dbListConnections will now always return an empty list.  This
+      functionality was only needed because one needed a reference to
+      a connection in order to finalize the resource via
+      dbDisconnect().  While calling dbDisconnect() is still the
+      recommended approach, database connections that are no longer
+      referenced by any R variables will be finalized by R's garbage
+      collector.
+
+    * The behavior of SQLiteConnection objects now follows typical R
+      semantics.  If no R variables reference a given connection, it
+      will be finalized by R's garbage collector.
+
+
 Version 0.8-4
 
 - Fix a memory leak in bound parameter management and resolve a

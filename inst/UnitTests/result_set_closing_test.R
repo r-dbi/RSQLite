@@ -12,7 +12,8 @@ DATA <- new.env(parent=emptyenv(), hash=TRUE)
 }
 
 .tearDown <- function() {
-    file.remove(c(DATA$p1, DATA$p2))
+    f <- c(DATA$p1, DATA$p2)
+    file.remove(f[file.exists(f)])
 }
 
 test_dbGetQuery_auto_close <- function() {
@@ -43,4 +44,20 @@ test_dbGetQuery_error_on_incomplete_open_result_set <- function() {
     checkEquals(TRUE, ans)
     dbClearResult(res)
     dbDisconnect(db)
+}
+
+test_accessing_cleared_result_set <- function()
+{
+    db = dbConnect(SQLite(), ":memory:")
+    res = dbSendQuery(db, "create table t1 (a, b)")
+    rm(db)
+    gc(verbose = FALSE)
+    ## result set keeps connection protected
+    checkEquals(1L, dbGetInfo(SQLite())$num_con)
+    ## clearing a result set no longer protects connection
+    dbClearResult(res)
+    gc(verbose = FALSE)
+    checkEquals(0L, dbGetInfo(SQLite())$num_con)
+    checkEquals(FALSE, isIdCurrent(res))
+    checkException(dbGetInfo(res))
 }

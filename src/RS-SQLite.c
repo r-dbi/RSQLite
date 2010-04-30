@@ -27,6 +27,8 @@ char *compiledVarsion = SQLITE_VERSION;
 int RS_sqlite_import(sqlite3 *db, const char *zTable,
                      const char *zFile, const char *separator, const char *eol, int skip);
 
+void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
+
 /* The macro NA_STRING is a CHRSXP in R but a char * in Splus */
 #define RS_NA_STRING CHAR(NA_STRING)
 
@@ -61,7 +63,7 @@ RS_SQLite_init(SEXP config_params, SEXP reload, SEXP cache)
      */
     RS_DBI_manager *mgr;
     Mgr_Handle mgrHandle;
-    Sint  fetch_default_rec, force_reload, max_con;
+    Sint  fetch_default_rec, force_reload;
     Sint  *shared_cache;
     const char *drvName = "SQLite";
     const char *clientVersion = sqlite3_libversion();
@@ -79,11 +81,18 @@ RS_SQLite_init(SEXP config_params, SEXP reload, SEXP cache)
             "initialization error: must specify max num of conenctions and default number of rows per fetch",
             RS_DBI_ERROR);
     }
-    max_con = INT_EL(config_params, 0);
+    /* max_con is now IGNORED as connections are not tracked by the
+     * manager; instead they are held in external pointers with
+     * finalizers. */
+    /* max_con = INT_EL(config_params, 0); */
     fetch_default_rec = INT_EL(config_params,1);
     force_reload = LGL_EL(reload,0);
 
-    mgrHandle = RS_DBI_allocManager(drvName, max_con, fetch_default_rec,
+    /* The manager does not keep track of connections, so there is no
+       pre-set max connections.  We set this to 1 for now until more
+       of the code is refactored.
+     */
+    mgrHandle = RS_DBI_allocManager(drvName, 1, fetch_default_rec,
                                     force_reload);
 
     mgr = RS_DBI_getManager(mgrHandle);
@@ -227,7 +236,7 @@ RS_SQLite_freeException(RS_DBI_connection *con)
     return;
 }
 
-Con_Handle
+SEXP
 RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
                         SEXP s_flags, SEXP s_vfs)
 {
@@ -235,10 +244,8 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
     RS_SQLite_conParams *conParams;
     Con_Handle conHandle;
     sqlite3     *db_connection;
-    const char  *dbname = NULL;
-    int         rc, loadable_extensions;
-    const char *vfs = NULL;
-    int open_flags = 0;
+    const char  *dbname = NULL, *vfs = NULL;
+    int         rc, loadable_extensions, open_flags = 0;
 
     if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
         RS_DBI_errorMessage("invalid SQLiteManager", RS_DBI_ERROR);
@@ -306,54 +313,51 @@ RS_SQLite_closeConnection(Con_Handle conHandle)
 {
     RS_DBI_connection *con;
     sqlite3 *db_connection;
-    SEXP status;
     int      rc;
 
     con = RS_DBI_getConnection(conHandle);
     if(con->num_res>0){
-        RS_DBI_errorMessage(
-            "close the pending result sets before closing this connection",
-            RS_DBI_ERROR);
+        /* we used to error out here telling the user to
+           close pending result sets.  Now we warn and close the set ourself.
+         */
+        RS_DBI_errorMessage("closing pending result sets before closing "
+                            "this connection", RS_DBI_WARNING);
+        RSQLite_closeResultSet0(con->resultSets[0], con);
     }
 
     db_connection = (sqlite3 *) con->drvConnection;
     rc = sqlite3_close(db_connection);  /* it also frees db_connection */
-    if(rc==SQLITE_BUSY){
+    if (rc == SQLITE_BUSY) {
+        /* This will happen if there is an unfinalized prepared statement or
+           an unfinalized BLOB reference.  Should not happen under normal
+           operation -- even if user is doing things out of order.
+         */
         RS_DBI_errorMessage(
-            "finalize the pending prepared statements before closing this connection",
-            RS_DBI_ERROR);
+            "unfinalized prepared statements before closing this connection",
+            RS_DBI_WARNING);
     }
     else if(rc!=SQLITE_OK){
-        RS_DBI_errorMessage(
-            "internal error: SQLite could not close the connection",
-            RS_DBI_ERROR);
+        RS_DBI_errorMessage("internal error: "
+                            "SQLite could not close the connection",
+                            RS_DBI_WARNING);
     }
 
     /* make sure we first free the conParams and SQLite connection from
      * the RS-RBI connection object.
      */
-
     if(con->conParams){
         RS_SQLite_freeConParams(con->conParams);
         /* we must set con->conParms to NULL (not just free it) to signal
          * RS_DBI_freeConnection that it is okay to free the connection itself.
          */
-        con->conParams = (RS_SQLite_conParams *) NULL;
+        con->conParams = NULL;
     }
-    /* free(db_connection); */    /* freed by sqlite3_close? */
-    con->drvConnection = (void *) NULL;
-
+    con->drvConnection = NULL;
     RS_SQLite_freeException(con);
-    con->drvData = (void *) NULL;
+    con->drvData = NULL;
     RS_DBI_freeConnection(conHandle);
-
-    PROTECT(status = NEW_LOGICAL((Sint) 1));
-    LGL_EL(status, 0) = TRUE;
-    UNPROTECT(1);
-
-    return status;
+    return ScalarLogical(1);
 }
-
 
 int SQLite_decltype_to_type(const char* decltype)
 {
@@ -507,10 +511,8 @@ SEXP RS_SQLite_quick_column(Con_Handle conHandle, SEXP table, SEXP column)
     return ans;
 }
 
-
-static void RSQLite_freeResultSet(Res_Handle rsHandle)
+static void RSQLite_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
 {
-    RS_DBI_resultSet  *result = RS_DBI_getResultSet(rsHandle);
     if (result->drvResultSet) {
         sqlite3_finalize((sqlite3_stmt *)result->drvResultSet);
         result->drvResultSet = NULL;
@@ -521,7 +523,7 @@ static void RSQLite_freeResultSet(Res_Handle rsHandle)
         RS_SQLite_freeParameterBinding(params);
         result->drvData = NULL;
     }
-    RS_DBI_freeResultSet(rsHandle);
+    RS_DBI_freeResultSet0(result, con);
 }
 
 /* Helper function to clean up and report an error during a call to
@@ -540,7 +542,7 @@ exec_error(const char *msg,
     snprintf(buf, sizeof(buf), "%s: %s", msg, db_msg);
     RS_SQLite_setException(con, errcode, buf);
     if (rsHandle) {
-        RSQLite_freeResultSet(rsHandle);
+        RSQLite_freeResultSet0(RS_DBI_getResultSet(rsHandle), con);
         rsHandle = NULL;
     }
     if (params) {
@@ -683,7 +685,7 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
     if (con->num_res>0) {
         Sint res_id = (Sint) con->resultSetIds[0]; /* SQLite has only 1 res */
         rsHandle = RS_DBI_asResHandle(MGR_ID(conHandle),
-                                      CON_ID(conHandle), res_id);
+                                      CON_ID(conHandle), res_id, conHandle);
         res = RS_DBI_getResultSet(rsHandle);
         if (res->completed != 1) {
             free(dyn_statement);
@@ -1206,14 +1208,26 @@ RS_SQLite_getException(SEXP conHandle)
     return output;
 }
 
+void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
+{
+   if(result->drvResultSet == NULL)
+       RS_DBI_errorMessage("corrupt SQLite resultSet, missing statement handle",
+                           RS_DBI_ERROR);
+    RSQLite_freeResultSet0(result, con);
+}
+
 SEXP 
 RS_SQLite_closeResultSet(SEXP resHandle)
 {
-    RS_DBI_resultSet *result = RS_DBI_getResultSet(resHandle);
-    if(result->drvResultSet == NULL)
-        RS_DBI_errorMessage("corrupt SQLite resultSet, missing statement handle",
-                            RS_DBI_ERROR);
-    RSQLite_freeResultSet(resHandle);
+    RSQLite_closeResultSet0(RS_DBI_getResultSet(resHandle),
+                            RS_DBI_getConnection(resHandle));
+    /* The connection external ptr is stored within the result handle
+       so that an active result keeps the connection protected.  When
+       we close the result set, we remove the reference to the
+       connection so that the connection can be gc'd.
+     */
+    SET_VECTOR_ELT(R_ExternalPtrProtected(resHandle), 1, R_NilValue);
+    RES_ID(resHandle) = -1;
     return ScalarLogical(1);
 }
 
@@ -1254,7 +1268,8 @@ RS_SQLite_managerInfo(Mgr_Handle mgrHandle)
 
     cons = (Sint *) S_alloc((long)max_con, (int)sizeof(Sint));
     ncon = RS_DBI_listEntries(mgr->connectionIds, mgr->length, cons);
-    if(ncon != num_con){
+    /* expecting ncon == 0 alwasy */
+    if(ncon != 0){
         RS_DBI_errorMessage(
             "internal error: corrupt RS_DBI connection table",
             RS_DBI_ERROR);

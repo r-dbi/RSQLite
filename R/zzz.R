@@ -37,7 +37,7 @@
     RUnit_opts$silent <- TRUE
     RUnit_opts$verbose_fail_msg <- TRUE
     options(RUnit = RUnit_opts)
-    suite <- defineTestSuite(name="RSQLite RUnit Tests", dirs=dir,
+    suite <- defineTestSuite(name="RSQLite RUnit Tests", dirs=getwd(),
                              testFileRegexp=pattern,
                              rngKind="default",
                              rngNormalKind="default")

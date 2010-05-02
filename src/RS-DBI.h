@@ -282,7 +282,6 @@ extern const struct data_types RS_dataTypeTable[];
 
 SEXP DBI_handle_to_string(SEXP xp);
 SEXP DBI_newResultHandle(SEXP xp, SEXP resId);
-SEXP DBI_newConnectionHandle(SEXP xp, SEXP conId);
 
 #ifdef __cplusplus 
 }

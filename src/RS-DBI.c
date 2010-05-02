@@ -707,13 +707,6 @@ RS_DBI_asMgrHandle(int mgrId)
     return mgrHandle;
 }
 
-SEXP
-DBI_newConnectionHandle(SEXP xp, SEXP conId)
-{
-    int mid = INTEGER(R_ExternalPtrProtected(xp))[0];
-    return RS_DBI_asConHandle(mid, INTEGER(conId)[0], NULL);
-}
-
 /* FIXME: need to address this fwd declaration */
 SEXP
 RS_SQLite_closeConnection(Con_Handle conHandle);

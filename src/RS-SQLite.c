@@ -419,7 +419,7 @@ int RS_SQLite_get_row_count(sqlite3* db, const char* tname) {
         error("SQL error: %s\n", sqlite3_errmsg(db));
     }
     rc = sqlite3_step(stmt);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_ROW && rc != SQLITE_DONE) {
         sqlite3_finalize(stmt);
         error("SQL error: %s\n", sqlite3_errmsg(db));
     }
@@ -431,20 +431,15 @@ int RS_SQLite_get_row_count(sqlite3* db, const char* tname) {
 
 SEXP RS_SQLite_quick_column(Con_Handle conHandle, SEXP table, SEXP column)
 {
-    SEXP ans = R_NilValue;
+    SEXP ans = R_NilValue, rawv;
     RS_DBI_connection *con = NULL;
-    sqlite3           *db_connection = NULL;
-    int               numrows;
-    char              sqlQuery[500];
-    const char        *table_name = NULL;
-    const char        *column_name = NULL;
-    int               rc;
-    sqlite3_stmt      *stmt = NULL;
-    const char        *tail = NULL;
-    int               i = 0;
-    int               col_type;
-    int              *intans = NULL;
-    double           *doubleans = NULL;
+    sqlite3 *db_connection = NULL;
+    sqlite3_stmt *stmt = NULL;
+    int numrows, rc, i = 0, col_type, *intans = NULL, blob_len;
+    char sqlQuery[500];
+    const char *table_name = NULL, *column_name = NULL, *tail = NULL;
+    double *doubleans = NULL;
+    const Rbyte *blob_data;
 
     con = RS_DBI_getConnection(conHandle);
     db_connection = (sqlite3 *) con->drvConnection;
@@ -464,7 +459,7 @@ SEXP RS_SQLite_quick_column(Con_Handle conHandle, SEXP table, SEXP column)
     }
 
     rc = sqlite3_step(stmt);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_ROW) {
         error("SQL error: %s\n", sqlite3_errmsg(db_connection));
     }
     col_type = sqlite3_column_type(stmt, 0);
@@ -484,7 +479,7 @@ SEXP RS_SQLite_quick_column(Con_Handle conHandle, SEXP table, SEXP column)
         error("RS_SQLite_quick_column: encountered NULL column");
         break;
     case SQLITE_BLOB:
-        error("RS_SQLite_quick_column: BLOB column handling not implementing");
+        PROTECT(ans = allocVector(VECSXP, numrows));
         break;
     default:
         error("RS_SQLite_quick_column: unknown column type %d", col_type);
@@ -502,6 +497,15 @@ SEXP RS_SQLite_quick_column(Con_Handle conHandle, SEXP table, SEXP column)
         case SQLITE_TEXT:
             SET_STRING_ELT(ans, i, /* cast for -Wall */
                            mkChar((char*)sqlite3_column_text(stmt, 0)));
+            break;
+        case SQLITE_BLOB:
+            blob_data = (const Rbyte *) sqlite3_column_blob(stmt, 0);
+            blob_len = sqlite3_column_bytes(stmt, 0);
+            PROTECT(rawv = allocVector(RAWSXP, blob_len));
+            memcpy(RAW(rawv), blob_data, blob_len * sizeof(Rbyte));;
+            SET_VECTOR_ELT(ans, i, rawv);
+            UNPROTECT(1);
+            break;
         }
         i++;
         rc = sqlite3_step(stmt);

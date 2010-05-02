@@ -42,7 +42,7 @@ void add_data_to_param_binding(RS_SQLite_bindParams *params, int i, SEXP data)
         case LGLSXP:
             col_data = Rf_coerceVector(data, INTSXP);
             break;
-        case INTSXP: case REALSXP: case STRSXP:
+        case INTSXP: case REALSXP: case STRSXP: case VECSXP: /* VECSXP => BLOB */
             did_alloc = 0;
             col_data = data;
             break;

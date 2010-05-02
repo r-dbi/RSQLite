@@ -153,7 +153,8 @@ enum SQL92_field_types {
      SQL92_TYPE_TIMESTAMP,
      SQL92_TYPE_DATE,
      SQL92_TYPE_TIME,
-     SQL92_TYPE_DATETIME
+     SQL92_TYPE_DATETIME,
+     SQLns_TYPE_BLOB
 };
 
 const struct data_types RS_SQLite_fieldTypes[] = {
@@ -174,6 +175,7 @@ const struct data_types RS_SQLite_fieldTypes[] = {
      { "SQL92_TYPE_DATE",       SQL92_TYPE_DATE     },
      { "SQL92_TYPE_TIME",       SQL92_TYPE_TIME     },
      { "SQL92_TYPE_DATETIME",   SQL92_TYPE_DATETIME },
+     { "SQLns_TYPE_DATETIME",   SQLns_TYPE_BLOB     },
      { (char *) 0,              -1                  }
 };
 

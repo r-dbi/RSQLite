@@ -40,6 +40,14 @@ Version 0.9-0
       semantics.  If no R variables reference a given connection, it
       will be finalized by R's garbage collector.
 
+- Add support for SQLite BLOBs.  You can now insert and retrieve BLOBs
+  using raw vectors.  For parameterized queries using
+  dbSendPreparedQuery the BLOB column should be a list.  When a query
+  returns a result set with a BLOB column, that column will be a list
+  of raw vectors.  Lists as columns in data.frames work for simple
+  access, but may break some code that expects columns to be atomic
+  vectors.
+
 
 Version 0.8-4
 

@@ -429,7 +429,8 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
     case REALSXP:
       SET_VECTOR_ELT(output, j, NEW_NUMERIC(num_rec));
       break;
-    case LIST_TYPE:
+    case RAWSXP:                /* falls through */
+    case VECSXP:
       SET_VECTOR_ELT(output, j, NEW_LIST(num_rec));
       break;
     default:
@@ -648,6 +649,7 @@ RS_DBI_createNamedList(char **names, Stype *types, Sint *lengths, Sint  n)
     case STRSXP:
       PROTECT(obj = NEW_CHARACTER(num_elem));
       break;
+    case RAWSXP:                /* falls through */
     case LIST_TYPE:
       PROTECT(obj = NEW_LIST(num_elem));
       break;
@@ -1185,6 +1187,7 @@ const struct data_types RS_dataTypeTable[] = {
     { "any",		ANYSXP	   },
     { "expression",	EXPRSXP	   },
     { "list",		VECSXP	   },
+    { "raw",		RAWSXP	   },
     /* aliases : */
     { "numeric",	REALSXP	   },
     { "name",		SYMSXP	   },

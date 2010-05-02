@@ -580,9 +580,10 @@ bind_params_to_stmt(RS_SQLite_bindParams *params,
 {
     int state, j;
     for (j = 0; j < params->count; j++) {
-        SEXP pdata = VECTOR_ELT(params->data, j);
+        SEXP pdata = VECTOR_ELT(params->data, j), rawv;
         int integer;
         double number;
+        Rbyte *raw;
         const char *string;
 
         switch(TYPEOF(pdata)){
@@ -599,6 +600,12 @@ bind_params_to_stmt(RS_SQLite_bindParams *params,
                 state = sqlite3_bind_null(db_statement, j+1);
             else
                 state = sqlite3_bind_double(db_statement, j+1, number);
+            break;
+        case VECSXP:            /* BLOB */
+            rawv = VECTOR_ELT(pdata, row);
+            raw = RAW(rawv);
+            state = sqlite3_bind_blob(db_statement, j+1,
+                                      raw, LENGTH(rawv), SQLITE_STATIC);
             break;
         case STRSXP:
             /* falls through */
@@ -810,7 +817,10 @@ RS_SQLite_createDataMappings(Res_Handle rsHandle)
             error("NULL column handling not implemented");
             break;
         case SQLITE_BLOB:
-            error("BLOB column handling not implemented");
+            flds->type[j] = SQLns_TYPE_BLOB;
+            flds->Sclass[j] = VECSXP;
+            flds->length[j] = (Sint) -1;   /* unknown */
+            flds->isVarLength[j] = (Sint) 1;
             break;
         default:
             error("unknown column type %d", col_type);
@@ -833,8 +843,9 @@ RS_SQLite_createDataMappings(Res_Handle rsHandle)
 static void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
                          RS_DBI_fields *flds)
 {
-    int j;
-    int null_item;
+    int j, null_item, blob_len;
+    SEXP rawv;
+    const Rbyte *blob_data;
 
     for (j = 0; j < flds->num_fields; j++) {
         null_item = (sqlite3_column_type(db_statement, j) == SQLITE_NULL);
@@ -852,6 +863,14 @@ static void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
             else
                 LST_NUM_EL(output,j,row_idx) =
                     sqlite3_column_double(db_statement, j);
+            break;
+        case VECSXP:            /* BLOB */
+            blob_data = (const Rbyte *) sqlite3_column_blob(db_statement, j);
+            blob_len = sqlite3_column_bytes(db_statement, j);
+            PROTECT(rawv = allocVector(RAWSXP, blob_len));
+            memcpy(RAW(rawv), blob_data, blob_len * sizeof(Rbyte));;
+            SET_VECTOR_ELT(VECTOR_ELT(output, j), row_idx, rawv);
+            UNPROTECT(1);
             break;
         case STRSXP:
             /* falls through */

@@ -817,17 +817,18 @@ RS_DBI_newEntry(Sint *table, Sint length)
     }
   return indx;
 }
+
 Sint
 RS_DBI_lookup(Sint *table, Sint length, Sint obj_id)
 {
-  Sint i, indx;
-
-  indx = (Sint) -1;
-  for(i = 0; i < length, obj_id > -1; ++i){
-    if(table[i]==obj_id){
-      indx = i;
-      break;
-    }
+  Sint i, indx = (Sint) -1;
+  if (obj_id != -1) {
+      for (i = 0; i < length; ++i) {
+          if (table[i] == obj_id) {
+              indx = i;
+              break;
+          }
+      }
   }
   return indx;
 }

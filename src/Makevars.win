@@ -7,6 +7,6 @@ all: $(SHLIB)
 $(SHLIB): do_includes
 
 do_includes:
-	mkdir -p ../inst/include/sqlite
-	cp sqlite/sqlite3.h ../inst/include/sqlite
+	mkdir -p ../inst/include
+	cp sqlite/sqlite3.h ../inst/include
 

@@ -1,2 +1,10 @@
 PKG_CPPFLAGS=@PKG_CPPFLAGS@ -DTHREADSAFE=0
 PKG_LIBS=@PKG_LIBS@
+
+.PHONY: all do_includes
+
+all: $(SHLIB)
+$(SHLIB): do_includes
+do_includes:
+	mkdir -p ../inst/include/sqlite
+	cp sqlite/sqlite3.h ../inst/include/sqlite

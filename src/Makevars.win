@@ -1,1 +1,12 @@
 PKG_CPPFLAGS=-DRSQLITE_USE_BUNDLED_SQLITE -DSQLITE_ENABLE_RTREE -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS
+
+.PHONY: all do_includes
+
+all: $(SHLIB)
+
+$(SHLIB): do_includes
+
+do_includes:
+	mkdir -p ../inst/include/sqlite
+	cp sqlite/sqlite3.h ../inst/include/sqlite
+

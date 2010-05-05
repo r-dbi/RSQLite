@@ -960,6 +960,7 @@ SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
 
     /* We need to step once to be able to create the data mappings */
     state = do_select_step(res, row_idx);
+    db_statement = (sqlite3_stmt *)res->drvResultSet;
     if (state != SQLITE_ROW && state != SQLITE_DONE) {
         char errMsg[2048];
         (void)sprintf(errMsg, "RS_SQLite_fetch: failed first step: %s",
@@ -982,8 +983,6 @@ SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec)
 
     PROTECT(output = NEW_LIST((Sint) num_fields));
     RS_DBI_allocOutput(output, flds, num_rec, 0);
-
-    db_statement = (sqlite3_stmt *)res->drvResultSet;
     while (state != SQLITE_DONE) {
         fill_one_row(db_statement, output, row_idx, flds);
         row_idx++;

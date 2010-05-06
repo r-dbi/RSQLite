@@ -60,3 +60,34 @@ test_simple_blob_column <- function()
     checkEquals(z, sapply(a$data, rawToChar))
     dbDisconnect(db)
 }
+
+test_null_valued_blobs <- function()
+{
+    db <- dbConnect(SQLite(), ":memory:")
+    df <- data.frame(ii=1:3, aa=letters[1:3])
+    df$blob <- list(NULL, raw(3), raw(0))
+
+    ## verify that you can insert BLOB NULL.  This makes use of
+    ## dbSendPreparedQuery so we are testing that interface here.
+    checkEquals(TRUE, dbWriteTable(db, "t3", df, row.names=FALSE))
+
+    ## db NULL => R NULL
+    ans <- dbGetQuery(db, "SELECT * FROM t3 WHERE blob IS NULL")
+    checkEquals(1, ans[["ii"]])
+    checkEquals("a", ans[["aa"]])
+    checkTrue(is.list(ans[["blob"]]))
+    checkEquals(1, length(ans[["blob"]]))
+    checkTrue(is.null(ans[["blob"]][[1]]))
+
+    ## zero-length BLOBs map correctly
+    ans <- dbGetQuery(db, "SELECT * FROM t3 WHERE blob=x''")
+    checkEquals(3, ans[["ii"]])
+    checkEquals("c", ans[["aa"]])
+    checkEquals(raw(0), ans[["blob"]][[1]])
+
+    ## no rows returned, types inferred correctly
+    ans <- dbGetQuery(db, "SELECT * FROM t3 WHERE 0")
+    checkEquals(0, nrow(ans))
+    wantedTypes <- c("integer", "character", "list")
+    checkEquals(wantedTypes, as.character(sapply(ans, typeof)))
+}

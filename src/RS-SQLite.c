@@ -607,9 +607,13 @@ bind_params_to_stmt(RS_SQLite_bindParams *params,
             break;
         case VECSXP:            /* BLOB */
             rawv = VECTOR_ELT(pdata, row);
-            raw = RAW(rawv);
-            state = sqlite3_bind_blob(db_statement, j+1,
-                                      raw, LENGTH(rawv), SQLITE_STATIC);
+            if (rawv == R_NilValue) {
+                state = sqlite3_bind_null(db_statement, j+1);
+            } else {
+                raw = RAW(rawv);
+                state = sqlite3_bind_blob(db_statement, j+1,
+                                          raw, LENGTH(rawv), SQLITE_STATIC);
+            }
             break;
         case STRSXP:
             /* falls through */
@@ -869,12 +873,16 @@ static void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
                     sqlite3_column_double(db_statement, j);
             break;
         case VECSXP:            /* BLOB */
-            blob_data = (const Rbyte *) sqlite3_column_blob(db_statement, j);
-            blob_len = sqlite3_column_bytes(db_statement, j);
-            PROTECT(rawv = allocVector(RAWSXP, blob_len));
-            memcpy(RAW(rawv), blob_data, blob_len * sizeof(Rbyte));;
+            if (null_item) {
+                rawv = R_NilValue;
+            } else {
+                blob_data = (const Rbyte *)sqlite3_column_blob(db_statement, j);
+                blob_len = sqlite3_column_bytes(db_statement, j);
+                PROTECT(rawv = allocVector(RAWSXP, blob_len));
+                memcpy(RAW(rawv), blob_data, blob_len * sizeof(Rbyte));
+            }
             SET_VECTOR_ELT(VECTOR_ELT(output, j), row_idx, rawv);
-            UNPROTECT(1);
+            if (rawv != R_NilValue) UNPROTECT(1);
             break;
         case STRSXP:
             /* falls through */

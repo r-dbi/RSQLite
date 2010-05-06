@@ -681,6 +681,7 @@ function(value, file, batch, row.names = TRUE, ...,
                   factor = "TEXT",	## up to 65535 characters
                   ordered = "TEXT",
                   "TEXT")
+    if (is.list(obj)) sql.type <- "BLOB"
   }
   sql.type
 }

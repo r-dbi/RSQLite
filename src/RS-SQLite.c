@@ -582,7 +582,7 @@ static int
 bind_params_to_stmt(RS_SQLite_bindParams *params,
                     sqlite3_stmt *db_statement, int row)
 {
-    int state, j;
+    int state = SQLITE_OK, j;
     for (j = 0; j < params->count; j++) {
         SEXP pdata = VECTOR_ELT(params->data, j), rawv;
         int integer;

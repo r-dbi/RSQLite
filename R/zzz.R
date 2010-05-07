@@ -18,9 +18,9 @@
 
     if (missing(dir)) {
         dir <- system.file("unitTests", package="RSQLite")
-        if (!length(dir)) {
+        if (!nzchar(dir)) {
             dir <- system.file("UnitTests", package="RSQLite")
-            if (!length(dir))
+            if (!nzchar(dir))
                 stop("unable to find unit tests, no 'unitTests' dir")
         }
     }

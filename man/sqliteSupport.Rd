@@ -45,7 +45,7 @@
    sqliteCloseDriver(drv, ...)
 
    ## SQLiteConnection-related
-   sqliteNewConnection(drv, dbname, loadable.extensions=FALSE, cache_size=NULL,
+   sqliteNewConnection(drv, dbname, loadable.extensions=TRUE, cache_size=NULL,
                        synchronous=0, flags = NULL, vfs = NULL)
    sqliteConnectionInfo(obj, what, ...)
    sqliteDescribeConnection(obj, verbose = FALSE, ...)

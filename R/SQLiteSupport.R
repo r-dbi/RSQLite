@@ -86,7 +86,7 @@ function(obj, what="", ...)
 ## the SQLite API as the default database (SQLite config specific)
 ## while NULL means "no database".
 "sqliteNewConnection"<-
-function(drv, dbname = "", loadable.extensions = FALSE, cache_size = NULL,
+function(drv, dbname = "", loadable.extensions = TRUE, cache_size = NULL,
          synchronous = 0, flags = NULL, vfs = NULL)
 {
   if (is.null(dbname))

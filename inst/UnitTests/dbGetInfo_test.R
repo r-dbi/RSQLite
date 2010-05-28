@@ -8,7 +8,7 @@ test_dbGetInfo_connection <- function()
     checkEquals(":memory:", info[["dbname"]])
     checkEquals("3.6.23.1", info[["serverVersion"]])
     checkEquals(integer(0), info[["rsId"]])
-    checkEquals("off", info[["loadableExtensions"]])
+    checkEquals("on", info[["loadableExtensions"]])
     checkEquals(SQLITE_RWC, info[["flags"]])
     checkEquals("", info[["vfs"]])
 }
@@ -28,8 +28,8 @@ test_dbGetInfo_connection_vfs <- function()
 
 test_dbGetInfo_extensions <- function()
 {
-    db <- dbConnect(SQLite(), dbname = "", loadable.extensions = TRUE)
+    db <- dbConnect(SQLite(), dbname = "", loadable.extensions = FALSE)
     on.exit(dbDisconnect(db))
     info <- dbGetInfo(db)
-    checkEquals("on", info[["loadableExtensions"]])
+    checkEquals("off", info[["loadableExtensions"]])
 }

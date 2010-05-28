@@ -9,4 +9,5 @@ $(SHLIB): do_includes
 do_includes:
 	mkdir -p ../inst/include
 	cp sqlite/sqlite3.h ../inst/include
+	cp sqlite/sqlite3ext.h ../inst/include
 

@@ -1,3 +1,13 @@
+Version 0.9-1
+
+- SQLite header files needed to compile SQLite extension functions are
+  now made available by RSQLite.  Packages can bundle SQLite extension
+  functions and use LinkingTo: RSQLite in the DESCRIPTION file.
+
+- SQLite loadable extensions are now enabled by default for new
+  connections.  If you wish to disallow loadable extensions for a
+  given connection, loadable.extensions=FALSE to dbConnect.
+
 Version 0.9-0
 
 - The SQLite driver handle validation code, is_ValidHandle, no longer

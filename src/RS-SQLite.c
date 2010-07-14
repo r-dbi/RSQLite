@@ -1230,11 +1230,11 @@ RS_SQLite_getException(SEXP conHandle)
     if(!con->drvConnection)
         RS_DBI_errorMessage("internal error: corrupt connection handle",
                             RS_DBI_ERROR);
-    output = RS_DBI_createNamedList(exDesc, exType, exLen, n);
+    PROTECT(output = RS_DBI_createNamedList(exDesc, exType, exLen, n));
     err = (RS_SQLite_exception *) con->drvData;
     LST_INT_EL(output,0,0) = (Sint) err->errorNum;
     SET_LST_CHR_EL(output,1,0,C_S_CPY(err->errorMsg));
-
+    UNPROTECT(1);
     return output;
 }
 
@@ -1284,12 +1284,7 @@ RS_SQLite_managerInfo(Mgr_Handle mgrHandle)
     shared_cache = (Sint *) mgr->drvData;
     mgrLen[1] = num_con;
 
-    output = RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, n);
-    if(IS_LIST(output))
-        output = AS_LIST(output);
-    else
-        RS_DBI_errorMessage("internal error: could not alloc named list",
-                            RS_DBI_ERROR);
+    PROTECT(output = RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, n));
     j = (Sint) 0;
     if(mgr->drvName)
         SET_LST_CHR_EL(output,j++,0,C_S_CPY(mgr->drvName));
@@ -1317,7 +1312,7 @@ RS_SQLite_managerInfo(Mgr_Handle mgrHandle)
         SET_LST_CHR_EL(output,j++,0,C_S_CPY("on"));
     else
         SET_LST_CHR_EL(output,j++,0,C_S_CPY("off"));
-
+    UNPROTECT(1);
     return output;
 }
 

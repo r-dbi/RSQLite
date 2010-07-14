@@ -1,3 +1,8 @@
+Version 0.9-2
+
+- Fix two missing PROTECTs in RS_SQLite_managerInfo and
+  RS_SQLite_getException, thanks to a patch from Andrew Runnalls
+
 Version 0.9-1
 
 - SQLite header files needed to compile SQLite extension functions are

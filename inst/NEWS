@@ -3,6 +3,10 @@ Version 0.9-3
 - Upgrade SQLite to 3.7.3.  See http://www.sqlite.org/changes.html
   for release notes for SQLite.
 
+- Enable the sounder(X) function via the SQLITE_SOUNDEX compile time
+  flag.  See http://www.sqlite.org/lang_corefunc.html#soundex for
+  details.
+
 Version 0.9-2
 
 - Fix two missing PROTECTs in RS_SQLite_managerInfo and

@@ -1,6 +1,6 @@
 Version 0.9-3
 
-- Upgrade SQLite to 3.7.0.1.  See http://www.sqlite.org/changes.html
+- Upgrade SQLite to 3.7.3.  See http://www.sqlite.org/changes.html
   for release notes for SQLite.
 
 Version 0.9-2

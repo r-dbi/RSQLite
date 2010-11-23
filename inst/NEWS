@@ -1,3 +1,9 @@
+Version 0.9-4
+
+- Fix incorrect handling of NA's for character data in the code that
+  binds parameters to a SQL query.  The string "NA" was incorrectly
+  interpretted as a missing value.
+
 Version 0.9-3
 
 - Upgrade SQLite to 3.7.3.  See http://www.sqlite.org/changes.html

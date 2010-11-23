@@ -13,7 +13,7 @@ DATA <- new.env(parent=emptyenv(), hash=TRUE)
     file.remove(DATA$dbfile)
 }
 
-basicDf <- data.frame(name=c("Alice", "Bob", "Carl", "Diane", NA),
+basicDf <- data.frame(name=c("Alice", "Bob", "Carl", "NA", NA),
                       fldInt=as.integer(c(as.integer(1:4), NA)),
                       fldDbl=as.double(c(1.1, 2.2, 3.3, 4.4, NA)),
                       stringsAsFactors=FALSE)
@@ -31,7 +31,10 @@ testBasicTypeConversion <- function() {
 
     checkEquals(dim(basicDf), dim(gotdf))
     checkEquals(expected_types, sapply(gotdf, typeof))
-    checkTrue(all(is.na(gotdf[5, ])))
+    expect_na <- c(rep(FALSE, 4), TRUE)
+    for (j in ncol(gotdf)) {
+        checkEquals(expect_na, is.na(gotdf[, j]))
+    }
 }
 
 testNAInFirstRow <- function() {

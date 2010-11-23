@@ -584,7 +584,7 @@ bind_params_to_stmt(RS_SQLite_bindParams *params,
 {
     int state = SQLITE_OK, j;
     for (j = 0; j < params->count; j++) {
-        SEXP pdata = VECTOR_ELT(params->data, j), rawv;
+        SEXP pdata = VECTOR_ELT(params->data, j), v_elt;
         int integer;
         double number;
         Rbyte *raw;
@@ -606,25 +606,24 @@ bind_params_to_stmt(RS_SQLite_bindParams *params,
                 state = sqlite3_bind_double(db_statement, j+1, number);
             break;
         case VECSXP:            /* BLOB */
-            rawv = VECTOR_ELT(pdata, row);
-            if (rawv == R_NilValue) {
+            v_elt = VECTOR_ELT(pdata, row);
+            if (v_elt == R_NilValue) {
                 state = sqlite3_bind_null(db_statement, j+1);
             } else {
-                raw = RAW(rawv);
+                raw = RAW(v_elt);
                 state = sqlite3_bind_blob(db_statement, j+1,
-                                          raw, LENGTH(rawv), SQLITE_STATIC);
+                                          raw, LENGTH(v_elt), SQLITE_STATIC);
             }
             break;
         case STRSXP:
             /* falls through */
         default:
-            string = CHR_EL(pdata, row);
-            /* why does IS_NA for character crash? */
-            if(strcmp(string, RS_NA_STRING) == 0)
+            v_elt = STRING_ELT(pdata, row);
+            if (NA_STRING == v_elt)
                 state = sqlite3_bind_null(db_statement, j+1);
             else
                 state = sqlite3_bind_text(db_statement, j+1,
-                                          string, -1, SQLITE_STATIC);
+                                          CHAR(v_elt), -1, SQLITE_STATIC);
             break;
         }
         if (state != SQLITE_OK) break;

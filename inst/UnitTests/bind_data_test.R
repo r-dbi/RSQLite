@@ -46,6 +46,24 @@ testSimpleBindNamed <- function() {
     checkEquals(basicDf, got)
 }
 
+testBindNamedMissing <- function() {
+    db <- DATA$db
+    dbGetQuery(db, basicTableSql)
+    values <- "(:name, :id, :rate)"
+    sql <- paste("insert into t1 values", values)
+    colnames(basicDf)[2] <- "garbled"
+    Got <- tryCatch({
+        dbSendPreparedQuery(db, sql, bind.data=basicDf)
+        FALSE
+    },
+             error = function(e) {
+                 checkTrue(grepl("unable to bind data for parameter",
+                                 conditionMessage(e)))
+                 TRUE
+             })
+    checkTrue(Got)                      # verify exception
+}
+
 testBindNamedReordered <- function() {
     db <- DATA$db
     dbGetQuery(db, basicTableSql)

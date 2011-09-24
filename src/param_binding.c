@@ -108,7 +108,7 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
 
     used_index = init_bindParams(num_cols);
     if (!used_index) {
-        RS_SQLite_freeParameterBinding(params);
+        RS_SQLite_freeParameterBinding(&params);
         sprintf(errorMsg, "could not allocate memory");
         return NULL;
     }
@@ -119,9 +119,15 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
         if (paramName == NULL) { 
             /* assume the first non-used column is the one we want */
             current = first_not_used(used_index, num_cols);
-            if (current >= 0) used_index[current] = 1;
-        }
-        else {
+            if (current >= 0) {
+                used_index[current] = 1;
+            } else {
+                sprintf(errorMsg,
+                        "unable to bind data for positional parameter %d", i+1);
+                err = 1;
+                break;
+            }
+        } else {
             current = find_by_name(paramName, colNames);
             if (current >= 0) {
                 if (used_index[current] == -1) {
@@ -134,16 +140,16 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
                     err = 1;
                     break;
                 }
+            } else { /* current < 0 */
+                /* FIXME: we should pass in size of errorMsg buffer and use
+                   snprint since size of paramName is unknown.
+                 */
+                sprintf(errorMsg,
+                        "unable to bind data for parameter '%s'", paramName);
+                err = 1;
+                break;
             }
         }
-
-        if (!err && current == -1) {
-            sprintf(errorMsg,
-                    "unable to bind data for positional parameter %d", i+1);
-            err = 1;
-            break;
-        }
-
         if (!err) {
             col_data = VECTOR_ELT(bind_data, current);
             add_data_to_param_binding(params, i, col_data);
@@ -152,15 +158,15 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
     free(used_index);
     used_index = NULL;
     if (err) {
-        RS_SQLite_freeParameterBinding(params);
+        RS_SQLite_freeParameterBinding(&params);
     }
     return params;
 }
 
 void
-RS_SQLite_freeParameterBinding(RS_SQLite_bindParams *params)
+RS_SQLite_freeParameterBinding(RS_SQLite_bindParams **params)
 {
-    if (params->data) R_ReleaseObject(params->data);
-    free(params);
-    params = NULL;
+    if ((*params)->data) R_ReleaseObject((*params)->data);
+    free(*params);
+    *params = NULL;
 }

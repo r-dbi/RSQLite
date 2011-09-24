@@ -524,7 +524,7 @@ static void RSQLite_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *
     if (result->drvData) {
         RS_SQLite_bindParams *params = (RS_SQLite_bindParams *)result->drvData;
         R_ReleaseObject(params->data);
-        RS_SQLite_freeParameterBinding(params);
+        RS_SQLite_freeParameterBinding(&params);
         result->drvData = NULL;
     }
     RS_DBI_freeResultSet0(result, con);
@@ -541,16 +541,21 @@ exec_error(const char *msg,
 {
     sqlite3 *db = (sqlite3 *) con->drvConnection;
     int errcode = db ? sqlite3_errcode(db) : -1;
-    const char *db_msg = db ? sqlite3_errmsg(db) : "";
     char buf[2048];
-    snprintf(buf, sizeof(buf), "%s: %s", msg, db_msg);
+    const char *db_msg = "";
+    const char *sep = "";
+    if (db && errcode != SQLITE_OK) {
+        db_msg = sqlite3_errmsg(db);
+        sep = ": ";
+    }
+    snprintf(buf, sizeof(buf), "%s%s%s", msg, sep, db_msg);
     RS_SQLite_setException(con, errcode, buf);
     if (rsHandle) {
         RSQLite_freeResultSet0(RS_DBI_getResultSet(rsHandle), con);
         rsHandle = NULL;
     }
     if (params) {
-        RS_SQLite_freeParameterBinding(params);
+        RS_SQLite_freeParameterBinding(&params);
         params = NULL;
     }
     RS_DBI_errorMessage(buf, RS_DBI_ERROR);
@@ -674,7 +679,7 @@ non_select_prepared_query(sqlite3_stmt *db_statement,
                        con, 0, NULL, rsHandle);
         }
     }
-    RS_SQLite_freeParameterBinding(params);
+    RS_SQLite_freeParameterBinding(&params);
 }
 
 

@@ -18,6 +18,6 @@ RS_SQLite_createParameterBinding(int n,
                                  SEXP bind_data, sqlite3_stmt *stmt,
                                  char *errorMsg);
 
-void RS_SQLite_freeParameterBinding(RS_SQLite_bindParams *);
+void RS_SQLite_freeParameterBinding(RS_SQLite_bindParams **);
 
 #endif  /* PARAM_BINDING_H_ */

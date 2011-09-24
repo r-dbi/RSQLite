@@ -1,3 +1,8 @@
+Version 0.9-5
+
+- Fix error handling for prepared queries when bind data is missing a
+  named parameter.
+
 Version 0.9-4
 
 - Fix incorrect handling of NA's for character data in the code that

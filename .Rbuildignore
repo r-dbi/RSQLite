@@ -15,3 +15,4 @@ src\/.*\.o$
 src\/.*\.so$
 help\/
 inst\/sqlite
+a.out.dSYM

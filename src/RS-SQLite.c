@@ -593,7 +593,6 @@ bind_params_to_stmt(RS_SQLite_bindParams *params,
         int integer;
         double number;
         Rbyte *raw;
-        const char *string;
 
         switch(TYPEOF(pdata)){
         case INTSXP:

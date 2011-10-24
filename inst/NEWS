@@ -1,3 +1,18 @@
+Version 0.11.0
+
+- Enhance type detection in sqliteDataType (dbDataType). The storage
+  mode of a data.frame column is now used as part of the type
+  detection. Prior to this patch, all vectors with class other than
+  numeric or logical were mapped to a TEXT column. This patch uses the
+  output of storage.mode to map to integer and double vectors to
+  INTEGER and REAL columns, respectively.  All other modes are mapped
+  to a TEXT column.
+
+- Detection of BLOBs was narrowed slightly. The code now treats only
+  objects with data.class(obj) == "list" as BLOBs. Previously, is.list
+  was used which Rather than using is.list, could return TRUE for
+  lists of various classes.
+
 Version 0.10.0
 
 - Upgrade to SQLite 3.7.8.

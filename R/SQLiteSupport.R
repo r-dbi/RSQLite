@@ -669,21 +669,26 @@ function(value, file, batch, row.names = TRUE, ...,
 ##
 "sqliteDataType" <- function(obj, ...)
 {
-  rs.class <- data.class(obj)
-  rs.mode <- storage.mode(obj)
-  if(rs.class=="numeric"){
-    sql.type <- if(rs.mode=="integer") "INTEGER" else  "REAL"
-  }
-  else {
-    sql.type <- switch(rs.class,
-                  character = "TEXT",
-                  logical = "INTEGER",
-                  factor = "TEXT",	## up to 65535 characters
-                  ordered = "TEXT",
-                  "TEXT")
-    if (is.list(obj)) sql.type <- "BLOB"
-  }
-  sql.type
+    rs.class <- data.class(obj)
+    rs.mode <- storage.mode(obj)
+    switch(rs.class,
+           numeric = if (rs.mode=="integer") "INTEGER" else "REAL",
+           character = "TEXT",
+           logical = "INTEGER",
+           factor = "TEXT",
+           ordered = "TEXT",
+           ## list maps to BLOB. Although not checked, the list must
+           ## either be empty or contain only raw vectors or NULLs.
+           list = "BLOB",
+           ## attempt to store obj according to its storage mode if it has
+           ## an unrecognized class.
+           switch(rs.mode,
+                  integer = "INTEGER",
+                  double = "REAL",
+                  ## you'll get this if class is AsIs for a list column
+                  ## within a data.frame
+                  list = if (rs.class == "AsIs") "BLOB" else "TEXT",
+                  "TEXT"))
 }
 
 sqliteCopyDatabase <- function(from, to)

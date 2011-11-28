@@ -163,3 +163,20 @@ testLogicalTreatedAsInt <- function() {
     checkEquals(1L, got$y[2])
     checkEquals(0L, got$y[3])
 }
+
+testCommentCharIsRespected <- function()
+{
+    tmp_file <- tempfile()
+    on.exit(file.remove(tmp_file))
+    cat('A,B,C\n11,2#2,33\n', file = tmp_file)
+    ## default comment.char is '#'
+    checkException(dbWriteTable(DATA$db, "t1", tmp_file,
+                                header = TRUE, sep = ","),
+                   silent = TRUE)
+
+    ## specifying a comment.char works
+    dbWriteTable(DATA$db, "t1", tmp_file, header = TRUE, sep = ",",
+                 comment.char = "")
+    got <- as.character(dbGetQuery(DATA$db, "select B from t1"))
+    checkEquals("2#2", got)
+}

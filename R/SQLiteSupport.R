@@ -478,7 +478,7 @@ function(con, name, value, field.types = NULL, overwrite = FALSE,
     if(skip>0)
       readLines(f, n=skip)
     txtcon <- textConnection(readLines(f, n=2))
-    flds <- count.fields(txtcon, sep)
+    flds <- count.fields(txtcon, sep = sep, ...)
     close(txtcon)
     close(f)
     nf <- length(unique(flds))

@@ -16,6 +16,13 @@ Version 0.11.0
 - Fix bug in sqliteImportFile (used by dbWriteTable) that prevented a
   comment character from being specified for the input file.
 
+- Increase compile-time SQLite limits for maximum number of columns in
+  a table to 30000 and maximum number of parameters (?N) in a SELECT
+  to 40000. Use of wide tables is not encouraged. The default values
+  for SQLite are 2000 and 999, respectively. Databases containing
+  tables with more than 2000 columns may not be compatible with
+  versions of SQLite compiled with default settings.
+
 Version 0.10.0
 
 - Upgrade to SQLite 3.7.8.

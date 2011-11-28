@@ -1,4 +1,10 @@
-PKG_CPPFLAGS=-DRSQLITE_USE_BUNDLED_SQLITE -DSQLITE_ENABLE_RTREE -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS -DSQLITE_SOUNDEX
+PKG_CPPFLAGS=-DRSQLITE_USE_BUNDLED_SQLITE \
+             -DSQLITE_ENABLE_RTREE \
+             -DSQLITE_ENABLE_FTS3 \
+             -DSQLITE_ENABLE_FTS3_PARENTHESIS \
+             -DSQLITE_SOUNDEX \
+             -DSQLITE_MAX_VARIABLE_NUMBER=40000 \
+             -DSQLITE_MAX_COLUMN=30000
 
 .PHONY: all do_includes
 
@@ -10,4 +16,3 @@ do_includes:
 	mkdir -p ../inst/include
 	cp sqlite/sqlite3.h ../inst/include
 	cp sqlite/sqlite3ext.h ../inst/include
-

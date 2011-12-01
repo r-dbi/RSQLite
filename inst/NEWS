@@ -10,8 +10,7 @@ Version 0.11.0
 
 - Detection of BLOBs was narrowed slightly. The code now treats only
   objects with data.class(obj) == "list" as BLOBs. Previously, is.list
-  was used which Rather than using is.list, could return TRUE for
-  lists of various classes.
+  was used which could return TRUE for lists of various classes.
 
 - Fix bug in sqliteImportFile (used by dbWriteTable) that prevented a
   comment character from being specified for the input file.

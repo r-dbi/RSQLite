@@ -785,7 +785,9 @@ RS_DBI_getManager(SEXP handle)
 RS_DBI_connection *
 RS_DBI_getConnection(SEXP conHandle)
 {
-    return (RS_DBI_connection *)R_ExternalPtrAddr(conHandle);
+    RS_DBI_connection *con = (RS_DBI_connection *)R_ExternalPtrAddr(conHandle);
+    if (!con) RS_DBI_errorMessage("expired SQLiteConnection", RS_DBI_ERROR);
+    return con;
 }
 
 RS_DBI_resultSet *

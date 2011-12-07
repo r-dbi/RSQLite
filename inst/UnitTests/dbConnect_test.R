@@ -80,3 +80,11 @@ test_open_flags <- function()
     dbDisconnect(dbro)
     dbDisconnect(dbrw2)
 }
+
+test_query_closed_connection <- function()
+{
+    db <- dbConnect(SQLite(), dbname = ":memory:")
+    dbDisconnect(db)
+    checkException(dbGetQuery(db, "select * from foo"))
+}
+

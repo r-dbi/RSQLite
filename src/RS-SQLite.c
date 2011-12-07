@@ -143,17 +143,11 @@ RS_SQLite_closeManager(Mgr_Handle mgrHandle)
 Con_Handle
 RS_SQLite_cloneConnection(Con_Handle conHandle)
 {
-    Mgr_Handle mgrHandle;
-    RS_DBI_connection  *con;
-    RS_SQLite_conParams *conParams;
+    RS_DBI_connection  *con = RS_DBI_getConnection(conHandle);
+    Mgr_Handle mgrHandle = RS_DBI_asMgrHandle(MGR_ID(conHandle));
+    RS_SQLite_conParams *conParams = (RS_SQLite_conParams *) con->conParams;
     SEXP dbname, allow_ext, vfs, flags;
     Con_Handle ans;
-
-    /* get connection params used to open existing connection */
-    con = RS_DBI_getConnection(conHandle);
-    conParams = (RS_SQLite_conParams *) con->conParams;
-
-    mgrHandle = RS_DBI_asMgrHandle(MGR_ID(conHandle));
 
     /* copy dbname and loadable_extensions into a 2-element character
      * vector to be passed to the RS_SQLite_newConnection() function.
@@ -287,6 +281,9 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
 
     /* SQLite connections can only have 1 result set open at a time */
     conHandle = RS_DBI_allocConnection(mgrHandle, (Sint) 1);
+    /* Note, while RS_DBI_getConnection can raise an error, conHandle
+     * will be valid if RS_DBI_allocConnection returns without
+     * error. */
     con = RS_DBI_getConnection(conHandle);
     if(!con){
         (void) sqlite3_close(db_connection);
@@ -311,11 +308,10 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
 SEXP 
 RS_SQLite_closeConnection(Con_Handle conHandle)
 {
-    RS_DBI_connection *con;
+    RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
     sqlite3 *db_connection;
     int      rc;
 
-    con = RS_DBI_getConnection(conHandle);
     if(con->num_res>0){
         /* we used to error out here telling the user to
            close pending result sets.  Now we warn and close the set ourself.
@@ -432,8 +428,8 @@ int RS_SQLite_get_row_count(sqlite3* db, const char* tname) {
 SEXP RS_SQLite_quick_column(Con_Handle conHandle, SEXP table, SEXP column)
 {
     SEXP ans = R_NilValue, rawv;
-    RS_DBI_connection *con = NULL;
-    sqlite3 *db_connection = NULL;
+    RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
+    sqlite3 *db_connection = (sqlite3 *) con->drvConnection;
     sqlite3_stmt *stmt = NULL;
     int numrows, rc, i = 0, col_type, *intans = NULL, blob_len;
     char sqlQuery[500];
@@ -441,8 +437,6 @@ SEXP RS_SQLite_quick_column(Con_Handle conHandle, SEXP table, SEXP column)
     double *doubleans = NULL;
     const Rbyte *blob_data;
 
-    con = RS_DBI_getConnection(conHandle);
-    db_connection = (sqlite3 *) con->drvConnection;
     table_name = CHAR(STRING_ELT(table, 0));
     column_name = CHAR(STRING_ELT(column, 0));
     numrows = RS_SQLite_get_row_count(db_connection, table_name);
@@ -684,18 +678,14 @@ non_select_prepared_query(sqlite3_stmt *db_statement,
 
 Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
 {
-    RS_DBI_connection *con;
+    RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
     Res_Handle rsHandle;
     RS_DBI_resultSet *res;
-    sqlite3 *db_connection;
+    sqlite3 *db_connection = (sqlite3 *) con->drvConnection;
     sqlite3_stmt *db_statement = NULL;
     int state, bind_count;
     int rows = 0, cols = 0;
-    char *dyn_statement;
-
-    con = RS_DBI_getConnection(conHandle);
-    db_connection = (sqlite3 *) con->drvConnection;
-    dyn_statement = RS_DBI_copyString(CHR_EL(statement,0));
+    char *dyn_statement = RS_DBI_copyString(CHR_EL(statement,0));
 
     /* Do we have a pending resultSet in the current connection?
      * SQLite only allows  one resultSet per connection.
@@ -1222,14 +1212,13 @@ SEXP
 RS_SQLite_getException(SEXP conHandle)
 {
     SEXP output;
-    RS_DBI_connection   *con;
+    RS_DBI_connection   *con = RS_DBI_getConnection(conHandle);
     RS_SQLite_exception *err;
     Sint  n = 2;
     char *exDesc[] = {"errorNum", "errorMsg"};
     Stype exType[] = {INTSXP, STRSXP};
     Sint  exLen[]  = {1, 1};
 
-    con = RS_DBI_getConnection(conHandle);
     if(!con->drvConnection)
         RS_DBI_errorMessage("internal error: corrupt connection handle",
                             RS_DBI_ERROR);
@@ -1420,13 +1409,12 @@ RS_SQLite_importFile(
     SEXP s_skip
     )
 {
-    RS_DBI_connection *con;
-    sqlite3           *db_connection;
+    RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
+    sqlite3           *db_connection = (sqlite3 *) con->drvConnection;
     char              *zFile, *zTable, *zSep, *zEol;
     const char *s, *s1;
     Sint              rc, skip;
     SEXP output;
-
 
     s = CHR_EL(s_tablename, 0);
     zTable = (char *) malloc( strlen(s)+1);
@@ -1456,11 +1444,7 @@ RS_SQLite_importFile(
     }
     (void) strcpy(zSep, s);
     (void) strcpy(zEol, s1);
-
     skip = (Sint) INT_EL(s_skip, 0);
-
-    con = RS_DBI_getConnection(conHandle);
-    db_connection = (sqlite3 *) con->drvConnection;
 
     rc = RS_sqlite_import(db_connection, zTable, zFile, zSep, zEol, skip);
 

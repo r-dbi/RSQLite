@@ -478,7 +478,7 @@ function(con, name, value, field.types = NULL, overwrite = FALSE,
     if(skip>0)
       readLines(f, n=skip)
     txtcon <- textConnection(readLines(f, n=2))
-    flds <- count.fields(txtcon, sep = sep, ...)
+    flds <- count.fields.wrapper(file = txtcon, sep = sep, ...)
     close(txtcon)
     close(f)
     nf <- length(unique(flds))
@@ -527,9 +527,21 @@ function(con, name, value, field.types = NULL, overwrite = FALSE,
   TRUE
 }
 
+## wrapper for count.fields that accepts and ignores additional
+## arguments passed via '...'. Note that this duplicates the default
+## values of count.fields and will need to be updated if that function's
+## defaults change.
+count.fields.wrapper <- function(file, sep = "", quote = "\"'", skip = 0,
+                                 blank.lines.skip = TRUE,
+                                 comment.char = "#", ...)
+{
+
+    count.fields(file, sep, quote, skip, blank.lines.skip, comment.char)
+}
+
 sqliteWriteTable <- function(con, name, value, row.names=TRUE,
-                              overwrite=FALSE, append=FALSE,
-                              field.types=NULL, ...)
+                             overwrite=FALSE, append=FALSE,
+                             field.types=NULL, ...)
 {
       if (overwrite && append)
         stop("overwrite and append cannot both be TRUE")

@@ -180,3 +180,15 @@ testCommentCharIsRespected <- function()
     got <- as.character(dbGetQuery(DATA$db, "select B from t1"))
     checkEquals("2#2", got)
 }
+
+testColClasses <- function()
+{
+    tmp_file <- tempfile()
+    on.exit(file.remove(tmp_file))
+    cat('A,B,C\n1,2,3\n4,5,6\na,7,8\n', file = tmp_file)
+    dbWriteTable(DATA$db, "t1", tmp_file, header = TRUE, sep = ",",
+                 colClasses=c("character", "integer", "double"))
+    got <- dbGetQuery(DATA$db, "select * from t1")
+    checkEquals(c(A="character", B="integer", C="numeric"),
+                sapply(got, class))
+}

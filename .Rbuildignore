@@ -18,3 +18,5 @@ inst\/sqlite
 a.out.dSYM
 build
 .gitignore
+^.*\.Rproj$
+^\.Rproj\.user$

@@ -24,7 +24,6 @@ SQLITE_RW <- 2L
 SQLITE_RO <- 1L
 
 .SQLitePkgName <- "RSQLite"
-.SQLitePkgRCS <- "$Id$"
 .SQLite.NA.string <- "\\N"  ## on input SQLite interprets \N as NULL (NA)
 
 setOldClass("data.frame")   ## to avoid warnings in setMethod's valueClass arg

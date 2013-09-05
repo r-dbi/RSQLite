@@ -1,3 +1,10 @@
 build/RSQLite.Rcheck
 build/RSQLite_*.tar.gz
 .Rproj.user
+.Rhistory
+src/*.so
+src/*.o
+src/Makevars
+inst/include
+config.status
+a.out.dSYM

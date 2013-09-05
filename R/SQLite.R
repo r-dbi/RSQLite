@@ -61,7 +61,7 @@ setGeneric("dbBeginTransaction",
 setClass("SQLiteObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
 setClass("SQLiteDriver", representation("DBIDriver", "SQLiteObject"))
 
-"SQLite" <-
+SQLite <-
 function(max.con = 200L, fetch.default.rec = 500, force.reload = FALSE,
          shared.cache=FALSE)
 {

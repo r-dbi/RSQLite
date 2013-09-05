@@ -1,4 +1,3 @@
-% $Id$
 \name{dbReadTable-methods}
 \docType{methods}
 \alias{dbReadTable-methods}

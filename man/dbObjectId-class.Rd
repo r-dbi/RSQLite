@@ -1,4 +1,3 @@
-% $Id$
 \name{dbObjectId-class}
 \docType{class}
 \alias{dbObjectId-class}

@@ -1,4 +1,3 @@
-% $Id$
 \name{SQLiteConnection-class}
 \docType{class}
 \alias{SQLiteConnection-class}

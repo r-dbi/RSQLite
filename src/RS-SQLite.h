@@ -1,8 +1,6 @@
 #ifndef _RS_SQLite_H
 #define _RS_SQLite_H 1
 /*
- * $Id$
- *
  * Copyright (C) 1999-2002 The Omega Project for Statistical Computing.
  *
  * This library is free software; you can redistribute it and/or

@@ -1,4 +1,3 @@
-% $Id$
 \name{dbConnect-methods}
 \docType{methods}
 \alias{dbDisconnect-methods}

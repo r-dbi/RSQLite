@@ -13,4 +13,4 @@ library(devtools)
 install_github("RSQLite", "seth")
 ```
 
-(Note that since RSQlite includes C code you'll need a [development environment](http://www.rstudio.com/ide/docs/packages/prerequisites))
+To install from github, you'll need a [development environment](http://www.rstudio.com/ide/docs/packages/prerequisites)).

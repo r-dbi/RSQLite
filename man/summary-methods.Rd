@@ -1,4 +1,3 @@
-% $Id$
 \name{summary-methods}
 \docType{methods}
 \alias{coerce-methods}

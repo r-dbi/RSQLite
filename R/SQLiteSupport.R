@@ -1,6 +1,3 @@
-##
-## $Id$
-##
 ## Copyright (C) 1999-2002 The Omega Project for Statistical Computing.
 ##
 ## This library is free software; you can redistribute it and/or
@@ -16,9 +13,8 @@
 ## You should have received a copy of the GNU Lesser General Public
 ## License along with this library; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-##
 
-"sqliteInitDriver" <-
+sqliteInitDriver <-
 function(max.con = 16, fetch.default.rec = 500, force.reload=FALSE,
          shared.cache=FALSE)
 ## return a manager id
@@ -30,13 +26,13 @@ function(max.con = 16, fetch.default.rec = 500, force.reload=FALSE,
   new("SQLiteDriver", Id = id)
 }
 
-"sqliteCloseDriver" <-
+sqliteCloseDriver <-
 function(drv, ...)
 {
   .Call("RS_SQLite_closeManager", drv@Id, PACKAGE = .SQLitePkgName)
 }
 
-"sqliteDescribeDriver" <-
+sqliteDescribeDriver <-
 function(obj, verbose = FALSE, ...)
 ## Print out nicely a brief description of the connection Manager
 {
@@ -65,7 +61,7 @@ function(obj, verbose = FALSE, ...)
   invisible(NULL)
 }
 
-"sqliteDriverInfo" <-
+sqliteDriverInfo <-
 function(obj, what="", ...)
 {
   if(!isIdCurrent(obj))
@@ -85,7 +81,7 @@ function(obj, what="", ...)
 ## The distinction between "" and NULL is that "" is interpreted by
 ## the SQLite API as the default database (SQLite config specific)
 ## while NULL means "no database".
-"sqliteNewConnection"<-
+sqliteNewConnection <-
 function(drv, dbname = "", loadable.extensions = TRUE, cache_size = NULL,
          synchronous = 0, flags = NULL, vfs = NULL)
 {
@@ -134,7 +130,7 @@ function(drv, dbname = "", loadable.extensions = TRUE, cache_size = NULL,
   con
 }
 
-"sqliteDescribeConnection" <-
+sqliteDescribeConnection <-
 function(obj, verbose = FALSE, ...)
 {
   if(!isIdCurrent(obj)){
@@ -159,7 +155,7 @@ function(obj, verbose = FALSE, ...)
   invisible(NULL)
 }
 
-"sqliteCloseConnection" <-
+sqliteCloseConnection <-
 function(con, ...)
 {
   if(!isIdCurrent(con)){
@@ -169,7 +165,7 @@ function(con, ...)
   .Call("RS_SQLite_closeConnection", con@Id, PACKAGE = .SQLitePkgName)
 }
 
-"sqliteConnectionInfo" <-
+sqliteConnectionInfo <-
 function(obj, what="", ...)
 {
   if(!isIdCurrent(obj))
@@ -191,7 +187,7 @@ function(obj, what="", ...)
 }
 
 
-"sqliteQuickColumn" <- function(con, table, column)
+sqliteQuickColumn <- function(con, table, column)
 {
     .Call("RS_SQLite_quick_column", con@Id, as.character(table),
           as.character(column), PACKAGE="RSQLite")
@@ -218,7 +214,7 @@ function(con, statement)
 }
 
 
-"sqliteExecStatement" <-
+sqliteExecStatement <-
 function(con, statement, bind.data=NULL)
 ## submits the sql statement to SQLite and creates a
 ## dbResult object if the SQL operation does not produce
@@ -247,7 +243,7 @@ function(con, statement, bind.data=NULL)
 
 ## helper function: it exec's *and* retrieves a statement. It should
 ## be named something else.
-"sqliteQuickSQL" <-
+sqliteQuickSQL <-
 function(con, statement, bind.data=NULL, ...)
 {
    rs <- sqliteExecStatement(con, statement, bind.data)
@@ -264,7 +260,7 @@ function(con, statement, bind.data=NULL, ...)
    res
 }
 
-"sqliteFetch" <-
+sqliteFetch <-
 function(res, n=0, ...)
 ## Fetch at most n records from the opened resultSet (n = -1 meanSQLite
 ## all records, n=0 means extract as many as "default_fetch_rec",
@@ -293,7 +289,7 @@ function(res, n=0, ...)
   rel
 }
 
-"sqliteFetchOneColumn" <-
+sqliteFetchOneColumn <-
 function(con, statement, n=0, ...)
 {
     rs <- dbSendQuery(con, statement)
@@ -306,7 +302,7 @@ function(con, statement, n=0, ...)
     rel[[1]]
 }
 
-"sqliteResultInfo" <-
+sqliteResultInfo <-
 function(obj, what = "", ...)
 {
   if(!isIdCurrent(obj))
@@ -329,7 +325,7 @@ function(obj, what = "", ...)
      info
 }
 
-"sqliteDescribeResult" <-
+sqliteDescribeResult <-
 function(obj, verbose = FALSE, ...)
 {
   if(!isIdCurrent(obj)){
@@ -352,7 +348,7 @@ function(obj, verbose = FALSE, ...)
   invisible(NULL)
 }
 
-"sqliteCloseResult" <-
+sqliteCloseResult <-
 function(res, ...)
 {
   if(!isIdCurrent(res)){
@@ -362,7 +358,7 @@ function(res, ...)
   .Call("RS_SQLite_closeResultSet", res@Id, PACKAGE = .SQLitePkgName)
 }
 
-"sqliteTableFields" <-
+sqliteTableFields <-
 function(con, name, ...)
 {
    if(length(dbListResults(con))>0){
@@ -381,7 +377,7 @@ function(con, name, ...)
       nms
 }
 ## this is exactly the same as ROracle's oraReadTable
-"sqliteReadTable" <-
+sqliteReadTable <-
 function(con, name, row.names = "row_names", check.names = TRUE, ...)
 ## Should we also allow row.names to be a character vector (as in read.table)?
 ## is it "correct" to set the row.names of output data.frame?
@@ -417,7 +413,7 @@ function(con, name, row.names = "row_names", check.names = TRUE, ...)
    out
 }
 
-"dbBuildTableDefinition" <-
+dbBuildTableDefinition <-
 function(dbObj, name, value, field.types = NULL, row.names = TRUE, ...)
 {
   if(!is.data.frame(value))
@@ -442,7 +438,7 @@ function(dbObj, name, value, field.types = NULL, row.names = TRUE, ...)
   paste("CREATE TABLE", name, "\n(", paste(flds, collapse=",\n\t"), "\n)")
 }
 
-"sqliteImportFile" <-
+sqliteImportFile <-
 function(con, name, value, field.types = NULL, overwrite = FALSE,
   append = FALSE, header, row.names, nrows = 50, sep = ",",
   eol="\n", skip = 0, ...)
@@ -648,7 +644,7 @@ sqliteWriteTable <- function(con, name, value, row.names=TRUE,
 }
 
 ## from ROracle, except we don't quote strings here.
-"safe.write" <-
+safe.write <-
 function(value, file, batch, row.names = TRUE, ...,
   sep = ',', eol = '\n', quote.string = FALSE)
 ## safe.write makes sure write.table don't exceed available memory by batching
@@ -679,7 +675,7 @@ function(value, file, batch, row.names = TRUE, ...,
 ##
 ## Utilities
 ##
-"sqliteDataType" <- function(obj, ...)
+sqliteDataType <- function(obj, ...)
 {
     rs.class <- data.class(obj)
     rs.mode <- storage.mode(obj)

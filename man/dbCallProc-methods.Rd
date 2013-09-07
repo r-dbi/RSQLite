@@ -1,4 +1,3 @@
-% $Id$
 \name{dbCallProc-methods}
 \docType{methods}
 \alias{dbCallProc-methods}

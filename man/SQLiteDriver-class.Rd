@@ -1,4 +1,3 @@
-% $Id$
 \name{SQLiteDriver-class}
 \docType{class}
 \alias{SQLiteDriver-class}

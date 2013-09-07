@@ -1,4 +1,3 @@
-% $Id$
 \name{fetch-methods}
 \docType{methods}
 \alias{fetch-methods}

@@ -1,4 +1,3 @@
-% $Id$
 \name{safe.write}
 \alias{safe.write}
 \title{Write a data.frame avoiding exceeding memory limits}

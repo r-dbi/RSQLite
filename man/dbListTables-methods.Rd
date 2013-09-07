@@ -1,4 +1,3 @@
-% $Id$
 \name{dbListTables-methods}
 \docType{methods}
 \alias{dbListTables-methods}

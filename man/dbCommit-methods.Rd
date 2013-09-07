@@ -1,4 +1,3 @@
-% $Id$
 \name{dbCommit-methods}
 \docType{methods}
 \alias{dbBeginTransaction}

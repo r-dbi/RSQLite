@@ -1,4 +1,3 @@
-% $Id$
 \name{dbSetDataMappings-methods}
 \docType{methods}
 \alias{dbSetDataMappings-methods}

@@ -1,4 +1,3 @@
-% $Id$
 \name{S4R}
 \alias{ErrorClass}
 \alias{usingR}

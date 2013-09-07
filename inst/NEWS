@@ -1,5 +1,7 @@
 Version 0.11.5
 
+- Include temporary tables in dbListTables()
+
 - Added Rstudio project file
 
 Version 0.11.4

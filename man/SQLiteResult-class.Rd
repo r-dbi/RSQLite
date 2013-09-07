@@ -1,4 +1,3 @@
-% $Id$
 \name{SQLiteResult-class}
 \docType{class}
 \alias{SQLiteResult-class}

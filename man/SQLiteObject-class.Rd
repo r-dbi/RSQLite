@@ -1,4 +1,3 @@
-% $Id$
 \name{SQLiteObject-class}
 \docType{class}
 \alias{SQLiteObject-class}

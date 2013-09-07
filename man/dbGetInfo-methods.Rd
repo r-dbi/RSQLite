@@ -1,4 +1,3 @@
-% $Id$
 \name{dbGetInfo-methods}
 \docType{methods}
 \alias{dbGetInfo}

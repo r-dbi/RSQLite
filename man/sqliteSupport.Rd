@@ -22,7 +22,6 @@
 \alias{sqliteFetchOneColumn}
 \alias{.SQLitePkgName}              % constants
 \alias{.SQLitePkgVersion}
-\alias{.SQLitePkgRCS}
 \alias{.SQLite.NA.string}
 \alias{SQLITE_RWC}
 \alias{SQLITE_RW}
@@ -288,7 +287,6 @@ See \url{http://www.sqlite.org/compile.html} for details.
 \section{Constants}{
   \code{.SQLitePkgName} (currently \code{"RSQLite"}),
   \code{.SQLitePkgVersion} (the R package version),
-  \code{.SQLitePkgRCS} (the RCS revision),
   \code{.SQLitecle.NA.string} (character that SQLite uses to
   denote \code{NULL} on input),
   \code{.conflicts.OK}.

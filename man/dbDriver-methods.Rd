@@ -1,4 +1,3 @@
-% $Id$
 \name{dbDriver-methods}
 \docType{methods}
 \alias{dbDriver-methods}

@@ -1,6 +1,3 @@
-##
-## $Id$
-##
 ## Copyright (C) 1999-2003 The Omega Project for Statistical Computing.
 ##
 ## This library is free software; you can redistribute it and/or
@@ -27,7 +24,6 @@ SQLITE_RW <- 2L
 SQLITE_RO <- 1L
 
 .SQLitePkgName <- "RSQLite"
-.SQLitePkgRCS <- "$Id$"
 .SQLite.NA.string <- "\\N"  ## on input SQLite interprets \N as NULL (NA)
 
 setOldClass("data.frame")   ## to avoid warnings in setMethod's valueClass arg
@@ -64,7 +60,7 @@ setGeneric("dbBeginTransaction",
 setClass("SQLiteObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
 setClass("SQLiteDriver", representation("DBIDriver", "SQLiteObject"))
 
-"SQLite" <-
+SQLite <-
 function(max.con = 200L, fetch.default.rec = 500, force.reload = FALSE,
          shared.cache=FALSE)
 {

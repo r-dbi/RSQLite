@@ -1,4 +1,3 @@
-% $Id$
 \name{SQLite}
 \alias{SQLite}
 \alias{SQLiteDriver}

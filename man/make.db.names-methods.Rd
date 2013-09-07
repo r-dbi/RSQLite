@@ -1,4 +1,3 @@
-% $Id$
 \name{make.db.names-methods}
 \docType{methods}
 \alias{SQLKeywords-methods}

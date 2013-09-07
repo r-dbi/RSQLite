@@ -1,4 +1,3 @@
-% $Id$
 \name{dbDataType-methods}
 \docType{methods}
 \alias{dbDataType-methods}

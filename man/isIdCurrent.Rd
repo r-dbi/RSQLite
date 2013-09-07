@@ -1,4 +1,3 @@
-% $Id$
 \name{isIdCurrent}
 \alias{isIdCurrent}
 \title{

@@ -1,6 +1,4 @@
-/* $Id$
- *
- *
+/*
  * Copyright (C) 1999-2003 The Omega Project for Statistical Computing.
  *
  * This library is free software; you can redistribute it and/or

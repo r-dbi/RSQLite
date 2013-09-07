@@ -111,3 +111,10 @@ testSchemaChangeDuringWriteTable <- function() {
     dbWriteTable(DATA$db2, "tabley", x)
     checkTrue("tabley" %in% dbListTables(DATA$db2))
 }
+
+
+testTemporaryTables <- function() {
+  dbGetQuery(DATA$db1, "create temporary table tabletemp (a text)")
+  checkTrue("tabletemp" %in% dbListTables(DATA$db1))
+  checkEquals("tabletemp" %in% dbListTables(DATA$db2), FALSE)
+}

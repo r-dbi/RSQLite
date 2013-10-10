@@ -5,7 +5,6 @@ useDynLib(RSQLite)
 
 ## Classes
 exportClasses(
-   dbObjectId,
    SQLiteObject,
    SQLiteDriver,
    SQLiteConnection,

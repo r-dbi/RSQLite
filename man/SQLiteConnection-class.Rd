@@ -10,7 +10,6 @@
 Class \code{"DBIConnection"}, directly.
 Class \code{"SQLiteObject"}, directly.
 Class \code{"DBIObject"}, by class "DBIConnection".
-Class \code{"dbObjectId"}, by class "SQLiteObject".
 }
 \section{Methods}{
   \describe{

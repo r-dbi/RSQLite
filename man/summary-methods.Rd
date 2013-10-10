@@ -4,14 +4,10 @@
 \alias{summary-methods}
 \alias{format-methods}
 \alias{show-methods}
-\alias{coerce,dbObjectId,integer-method}
-\alias{coerce,dbObjectId,numeric-method}
-\alias{coerce,dbObjectId,character-method}
 \alias{coerce,SQLiteConnection,SQLiteDriver-method}
 \alias{coerce,SQLiteResult,SQLiteConnection-method}
-\alias{format,dbObjectId-method}
-\alias{print,dbObjectId-method}
-\alias{show,dbObjectId-method}
+\alias{show,SQLiteDriver-method}
+\alias{show,SQLiteObject-method}
 \alias{summary,SQLiteObject-method}
 \alias{summary,SQLiteDriver-method}
 \alias{summary,SQLiteConnection-method}

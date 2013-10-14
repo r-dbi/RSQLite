@@ -37,7 +37,7 @@ SQLite(max.con = 200, fetch.default.rec = 500, force.reload = FALSE,
 }
 \value{
 An object of class \code{SQLiteDriver} which extends 
-\code{dbDriver} and \code{dbObjectId}.
+\code{dbDriver}.
 This object is needed to create connections
 to the embedded SQLite database.
 There can be many SQLite database instances running

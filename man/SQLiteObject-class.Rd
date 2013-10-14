@@ -10,7 +10,6 @@
 }
 \section{Extends}{
 Class \code{"DBIObject"}, directly.
-Class \code{"dbObjectId"}, directly.
 }
 \section{Methods}{
   \describe{

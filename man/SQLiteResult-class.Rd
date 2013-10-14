@@ -13,7 +13,6 @@
 Class \code{"DBIResult"}, directly.
 Class \code{"SQLiteObject"}, directly.
 Class \code{"DBIObject"}, by class "DBIResult".
-Class \code{"dbObjectId"}, by class "SQLiteObject".
 }
 \section{Methods}{
   \describe{

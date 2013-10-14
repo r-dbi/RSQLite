@@ -13,7 +13,6 @@
 Class \code{"DBIDriver"}, directly.
 Class \code{"SQLiteObject"}, directly.
 Class \code{"DBIObject"}, by class "DBIDriver".
-Class \code{"dbObjectId"}, by class "SQLiteObject".
 }
 \section{Methods}{
   \describe{

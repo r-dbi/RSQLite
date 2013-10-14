@@ -57,8 +57,32 @@ setGeneric("dbBeginTransaction",
 ## Class: SQLiteDriver
 ##
 
-setClass("SQLiteObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
-setClass("SQLiteDriver", representation("DBIDriver", "SQLiteObject"))
+setClass("SQLiteObject", 
+  contains = c("DBIObject", "VIRTUAL"), 
+  slots = list(Id = "externalptr")
+)
+setClass("SQLiteDriver", 
+  contains = "DBIDriver",
+  slots = list(Id = "externalptr")
+)
+
+sqlite_show <- function(object) {
+  expired <- if(isIdCurrent(object)) "" else "Expired "
+  id <- .Call("DBI_handle_to_string", object@Id, PACKAGE = .SQLitePkgName)
+  str <- paste("<", expired, class(object), ": ", id, ">", sep="")
+  cat(str, "\n")
+  invisible(NULL)
+}
+setMethod("show", "SQLiteObject", sqlite_show)
+setMethod("show", "SQLiteDriver", sqlite_show)
+
+"isIdCurrent" <- 
+  function(obj)
+    ## verify that obj refers to a currently open/loaded database
+  { 
+    .Call("RS_DBI_validHandle", obj@Id, PACKAGE = .SQLitePkgName)
+  }
+
 
 SQLite <-
 function(max.con = 200L, fetch.default.rec = 500, force.reload = FALSE,

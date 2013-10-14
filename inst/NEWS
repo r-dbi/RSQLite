@@ -1,5 +1,8 @@
 Version 0.11.5
 
+- Remove dbObjectId class, replacing previous use of multiple inheritance
+  with composition.
+
 - Include temporary tables in dbListTables()
 
 - Added Rstudio project file

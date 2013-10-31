@@ -1,0 +1,22 @@
+\name{dbSendPreparedQuery}
+\alias{dbGetPreparedQuery}
+\alias{dbSendPreparedQuery}
+\title{Generics for getting and sending prepared queries.}
+\usage{
+  dbSendPreparedQuery(conn, statement, bind.data, ...)
+
+  dbGetPreparedQuery(conn, statement, bind.data, ...)
+}
+\arguments{
+  \item{conn}{An \code{DBIConnection} object.}
+
+  \item{statement}{A SQL string}
+
+  \item{bind.data}{A data frame}
+
+  \item{...}{Other arguments used by methods}
+}
+\description{
+  Generics for getting and sending prepared queries.
+}
+

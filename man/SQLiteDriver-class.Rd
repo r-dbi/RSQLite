@@ -2,7 +2,9 @@
 \name{SQLiteDriver-class}
 \alias{SQLite}
 \alias{SQLiteDriver-class}
+\alias{sqliteDescribeDriver}
 \alias{sqliteInitDriver}
+\alias{summary,SQLiteDriver-method}
 \title{Class SQLiteDriver with constructor SQLite.}
 \usage{
   SQLite(max.con = 200L, fetch.default.rec = 500,
@@ -10,6 +12,10 @@
 
   sqliteInitDriver(max.con = 16, fetch.default.rec = 500,
     force.reload = FALSE, shared.cache = FALSE)
+
+  \S4method{summary}{SQLiteDriver}(object, ...)
+
+  sqliteDescribeDriver(obj, verbose = FALSE, ...)
 }
 \arguments{
   \item{max.con}{IGNORED.  As of RSQLite 0.9.0, connections

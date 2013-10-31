@@ -187,9 +187,6 @@
   \code{sqliteDescribeDriver} returns \code{NULL} (displays
   the object's metadata).
 
-  \code{sqliteCloseDriver} returns a logical indicating
-  whether the operation succeeded or not.
-
   \code{sqliteNewConnection} returns an
   \code{SQLiteConnection} object.
 

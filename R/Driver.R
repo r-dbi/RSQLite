@@ -79,85 +79,14 @@ sqliteInitDriver <- function(max.con = 16, fetch.default.rec = 500,
   new("SQLiteDriver", Id = id)
 }
 
-
-#' SQLite implementation of the Database Interface (DBI) classes and drivers
-#' 
-#' SQLite driver initialization and closing
-#' 
-#' @aliases dbDriver,character-method
-#' dbUnloadDriver,SQLiteDriver-method
-#' @docType methods
-#' @section Methods: \describe{ \item{drvName}{ character name of the driver to
-#' instantiate.  } \item{drv}{ an object that inherits from \code{SQLiteDriver}
-#' as created by \code{dbDriver}. } \item{list()}{ any other arguments are
-#' passed to the driver \code{drvName}.  } }
-#' @examples
-#' \dontrun{
-#' # create an SQLite instance for capacity of up to 25 simultaneous
-#' # connections.
-#' m <- dbDriver("SQLite", max.con = 25)
-#' 
-#' con <- dbConnect(m, dbname="sqlite.db")
-#' rs <- dbSubmitQuery(con, 
-#'          "select * from HTTP_ACCESS where IP_ADDRESS = '127.0.0.1'")
-#' df <- fetch(rs, n = 50)
-#' df2 <- fetch(rs, n = -1)
-#' dbClearResult(rs)
-#' 
-#' pcon <- dbConnect(p, "user", "password", "dbname")
-#' dbListTables(pcon)
-#' }
-#' @name dbDriver
-NULL
-
 #' @export
-setMethod("dbUnloadDriver", "SQLiteDriver",
-  definition = function(drv, ...) sqliteCloseDriver(drv, ...),
-  valueClass = "logical"
-)
-#' @export
-sqliteCloseDriver <- function(drv, ...) {
-  .Call("RS_SQLite_closeManager", drv@Id, PACKAGE = .SQLitePkgName)
-}
-
-
-#' @export
-setMethod("dbGetInfo", "SQLiteDriver",
-  definition = function(dbObj, ...) sqliteDriverInfo(dbObj, ...),
-  valueClass = "list"
-)
-#' @export
-sqliteDriverInfo <- function(obj, what="", ...) {
-  if(!isIdCurrent(obj))
-    stop(paste("expired", class(obj)))
-  drvId <- obj@Id
-  info <- .Call("RS_SQLite_managerInfo", drvId, PACKAGE = .SQLitePkgName)
-  info$managerId <- obj
-  ## connection IDs are no longer tracked by the manager.
-  info$connectionIds <- list()
-  if(!missing(what))
-    info[what]
-  else
-    info
-}
-
-
-#' @export
-setMethod("dbListConnections", "SQLiteDriver",
-  definition = function(drv, ...) {
-    cons <- dbGetInfo(drv, what = "connectionIds")[[1]]
-    if(!is.null(cons)) cons else list()
-  },
-  valueClass = "list"
-)
-
-#' @export
+#' @rdname SQLiteDriver-class
 setMethod("summary", "SQLiteDriver",
   definition = function(object, ...) sqliteDescribeDriver(object, ...)
 )
 
-## Print out nicely a brief description of the connection Manager
 #' @export
+#' @rdname SQLiteDriver-class
 sqliteDescribeDriver <- function(obj, verbose = FALSE, ...) {
   if(!isIdCurrent(obj)){
     show(obj)
@@ -183,3 +112,51 @@ sqliteDescribeDriver <- function(obj, verbose = FALSE, ...) {
   cat("  Shared Cache:", info$"shared_cache", "\n")
   invisible(NULL)
 }
+
+
+#' Unload SQLite driver.
+#' 
+#' @param drv Object created by \code{\link{SQLite}}
+#' @param ... Ignored. Needed for compatibility with generic.
+#' @return A logical indicating whether the operation succeeded or not.
+#' @export
+setMethod("dbUnloadDriver", "SQLiteDriver",
+  definition = function(drv, ...) sqliteCloseDriver(drv, ...),
+  valueClass = "logical"
+)
+#' @export
+#' @rdname dbUnloadDriver-SQLiteDriver-method
+sqliteCloseDriver <- function(drv, ...) {
+  .Call("RS_SQLite_closeManager", drv@Id, PACKAGE = .SQLitePkgName)
+}
+
+
+#' @export
+setMethod("dbGetInfo", "SQLiteDriver",
+  definition = function(dbObj, ...) sqliteDriverInfo(dbObj, ...),
+  valueClass = "list"
+)
+#' @export
+sqliteDriverInfo <- function(obj, what="", ...) {
+  if(!isIdCurrent(obj))
+    stop(paste("expired", class(obj)))
+  drvId <- obj@Id
+  info <- .Call("RS_SQLite_managerInfo", drvId, PACKAGE = .SQLitePkgName)
+  info$managerId <- obj
+  ## connection IDs are no longer tracked by the manager.
+  info$connectionIds <- list()
+  if(!missing(what))
+    info[what]
+  else
+    info
+}
+
+#' @export
+setMethod("dbListConnections", "SQLiteDriver",
+  definition = function(drv, ...) {
+    cons <- dbGetInfo(drv, what = "connectionIds")[[1]]
+    if(!is.null(cons)) cons else list()
+  },
+  valueClass = "list"
+)
+

@@ -1,8 +1,7 @@
-\docType{class}
 \name{dbObjectId-class}
 \alias{dbObjectId-class}
 \alias{show,dbObjectId-method}
-\title{Class dbObjectId}
+\title{Class dbObjectId.}
 \usage{
   \S4method{show}{dbObjectId}(object)
 }
@@ -22,12 +21,11 @@
   A virtual Class: No objects may be created from it.
 }
 \examples{
-sqlite <- dbDriver("SQLite")
-  con <- dbConnect(sqlite, ":memory:")
-  is(sqlite, "dbObjectId")   ## True
-  is(con, "dbObjectId")  ## True
-  isIdCurrent(con)       ## True
-  dbDisconnect(con)
-  isIdCurrent(con)       ## False
+con <- dbConnect(SQLite(), ":memory:")
+is(sqlite, "dbObjectId")   ## True
+is(con, "dbObjectId")  ## True
+isIdCurrent(con)       ## True
+dbDisconnect(con)
+isIdCurrent(con)       ## False
 }
 

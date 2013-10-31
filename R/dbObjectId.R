@@ -27,29 +27,23 @@
 ##
 ## TODO: Convert the Id slot to be an external object (as per Luke Tierney's
 ## implementation), even at the expense of S-plus compatibility?
-#' Class dbObjectId
+
+#' Class dbObjectId.
 #' 
 #' A helper (mixin) class to provide external references in an R/S-Plus
 #' portable way.
 #' 
-#' 
-#' @name dbObjectId-class
-#' @docType class
 #' @note A cleaner mechanism would use external references, but historically
 #' this class has existed mainly for R/S-Plus portability.
 #' @section Objects from the Class: A virtual Class: No objects may be created
 #' from it.
 #' @examples
-#' 
-#'   sqlite <- dbDriver("SQLite")
-#'   con <- dbConnect(sqlite, ":memory:")
-#'   is(sqlite, "dbObjectId")   ## True
-#'   is(con, "dbObjectId")  ## True
-#'   isIdCurrent(con)       ## True
-#'   dbDisconnect(con)
-#'   isIdCurrent(con)       ## False
-#' 
-NULL
+#' con <- dbConnect(SQLite(), ":memory:")
+#' is(sqlite, "dbObjectId")   ## True
+#' is(con, "dbObjectId")  ## True
+#' isIdCurrent(con)       ## True
+#' dbDisconnect(con)
+#' isIdCurrent(con)       ## False
 #' @export
 setClass("dbObjectId", representation(Id = "externalptr", "VIRTUAL"))
 

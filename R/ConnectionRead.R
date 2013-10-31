@@ -9,7 +9,7 @@
 #' @note Note that the data.frame returned by \code{dbReadTable} only has
 #' primitive data, e.g., it does not coerce character data to factors.
 #' 
-#' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
+#' @param conn,con a \code{\linkS4class{SQLiteConnection}} object, produced by
 #'   \code{\link[DBI]{dbConnect}}
 #' @param name a character string specifying a table name. SQLite table names 
 #'   are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc} 

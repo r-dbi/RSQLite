@@ -10,7 +10,7 @@
     check.names = TRUE, ...)
 }
 \arguments{
-  \item{conn}{a \code{\linkS4class{SQLiteConnection}}
+  \item{conn,con}{a \code{\linkS4class{SQLiteConnection}}
   object, produced by \code{\link[DBI]{dbConnect}}}
 
   \item{name}{a character string specifying a table name.

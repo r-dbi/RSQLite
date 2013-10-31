@@ -9,7 +9,7 @@
   sqliteTableFields(con, name, ...)
 }
 \arguments{
-  \item{conn}{An existing
+  \item{conn,con}{An existing
   \code{\linkS4class{SQLiteConnection}}}
 
   \item{name}{a length 1 character vector giving the name

@@ -16,11 +16,13 @@
   sqliteTransactionStatement(con, statement)
 }
 \arguments{
-  \item{conn}{a \code{\linkS4class{SQLiteConnection}}
+  \item{conn,con}{a \code{\linkS4class{SQLiteConnection}}
   object, produced by \code{\link[DBI]{dbConnect}}}
 
   \item{...}{Ignored. Needed for compatibility with
   generic.}
+
+  \item{statement}{SQL transaction statement to execute}
 }
 \description{
   By default, SQLite is in auto-commit mode.

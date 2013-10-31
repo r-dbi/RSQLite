@@ -27,9 +27,6 @@
   does not exist, it will be created an initialied with an
   empty database.}
 
-  \item{conn}{an \code{SQLiteConnection} object as produced
-  by \code{dbConnect}.}
-
   \item{...}{Arguments passed on to
   \code{sqliteNewConnection}}
 

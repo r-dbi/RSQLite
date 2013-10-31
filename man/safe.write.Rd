@@ -12,16 +12,8 @@
 
   \item{batch}{maximum number of rows to write at a time.}
 
-  \item{\dots}{any other arguments are passed to
-  \code{write.table}.}
-
-  \item{sep}{field separator passed to \code{write.table}.}
-
-  \item{eol}{end of line character passed to
-  \code{write.table}.}
-
-  \item{quote.string}{logical value passed to
-  \code{write.table}.}
+  \item{...,sep,eol,quote.string,row.names}{arguments are
+  passed to \code{write.table}.}
 }
 \value{
   \code{NULL}, invisibly.

@@ -72,10 +72,8 @@ sqliteResultInfo <- function(obj, what = "", ...) {
 #' @param value a data.frame;
 #' @param file a file object (connection, file name, etc).
 #' @param batch maximum number of rows to write at a time.
-#' @param \dots any other arguments are passed to \code{write.table}.
-#' @param sep field separator passed to \code{write.table}.
-#' @param eol end of line character passed to \code{write.table}.
-#' @param quote.string logical value passed to \code{write.table}.
+#' @param ...,sep,eol,quote.string,row.names 
+#'   arguments are passed to \code{write.table}.
 #' @return \code{NULL}, invisibly.
 #' @note No error checking whatsoever is done.
 #' @seealso \code{\link{write.table}}
@@ -84,8 +82,7 @@ sqliteResultInfo <- function(obj, what = "", ...) {
 #'    ctr.file <- file("dump.sqloader", "w")
 #'    safe.write(big.data, file = ctr.file, batch = 25000)
 #' }
-#' 
-#' @export safe.write
+#' @export
 safe.write <- function(value, file, batch, row.names = TRUE, ..., sep = ',',
   eol = '\n', quote.string = FALSE) {
   N <- nrow(value)

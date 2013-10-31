@@ -89,7 +89,7 @@ sqliteCloseResult <- function(res, ...) {
 #' 
 #' See documentation of generics for more details.
 #' 
-#' @param obj,dbObj,res An object of class \code{\linkS4class{SQLiteResult}}
+#' @param dbObj,res An object of class \code{\linkS4class{SQLiteResult}}
 #' @param ... Ignored. Needed for compatibility with generic
 #' @examples
 #' data(USArrests)
@@ -167,31 +167,3 @@ setMethod("dbHasCompleted", "SQLiteResult",
   },
   valueClass = "logical"
 )
-
-#' @export
-#' @rdname sqlite-meta
-setMethod("summary", "SQLiteResult",
-  definition = function(object, ...) sqliteDescribeResult(object, ...)
-)
-#' @export
-#' @rdname sqlite-meta
-sqliteDescribeResult <- function(obj, verbose = FALSE, ...) {
-  if(!isIdCurrent(obj)){
-    show(obj)
-    invisible(return(NULL))
-  }
-  show(obj)
-  cat("  Statement:", dbGetStatement(obj), "\n")
-  cat("  Has completed?", if(dbHasCompleted(obj)) "yes" else "no", "\n")
-  cat("  Affected rows:", dbGetRowsAffected(obj), "\n")
-  hasOutput <- as.logical(dbGetInfo(obj, "isSelect")[[1]])
-  flds <- dbColumnInfo(obj)
-  if(hasOutput){
-    cat("  Output fields:", nrow(flds), "\n")
-    if(verbose && length(flds)>0){
-      cat("  Fields:\n")
-      out <- print(flds)
-    }
-  }
-  invisible(NULL)
-}

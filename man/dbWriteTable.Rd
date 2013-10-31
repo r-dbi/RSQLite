@@ -20,7 +20,7 @@
     nrows = 50, sep = ",", eol = "\n", skip = 0, ...)
 }
 \arguments{
-  \item{conn}{a \code{\linkS4class{SQLiteConnection}}
+  \item{conn,con}{a \code{\linkS4class{SQLiteConnection}}
   object, produced by \code{\link[DBI]{dbConnect}}}
 
   \item{name}{a character string specifying a table name.
@@ -34,6 +34,8 @@
   imported to SQLite; when \code{value} is a character, it
   is interpreted as a file name and its contents imported
   to SQLite.}
+
+  \item{...}{Passed on to \code{sqliteWriteTable}.}
 
   \item{row.names}{A logical specifying whether the
   \code{row.names} should be output to the output DBMS

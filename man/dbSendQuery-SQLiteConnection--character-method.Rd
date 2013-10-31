@@ -24,7 +24,8 @@
   sqliteQuickSQL(con, statement, bind.data = NULL, ...)
 }
 \arguments{
-  \item{an}{\code{\linkS4class{SQLiteConnection}} object.}
+  \item{conn,con}{an \code{\linkS4class{SQLiteConnection}}
+  object.}
 
   \item{statement}{a character vector of length one
   specifying the SQL statement that should be executed.

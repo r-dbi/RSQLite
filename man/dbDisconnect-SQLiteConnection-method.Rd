@@ -8,7 +8,7 @@
   sqliteCloseConnection(con, ...)
 }
 \arguments{
-  \item{conn}{An existing
+  \item{conn,con}{An existing
   \code{\linkS4class{SQLiteConnection}}}
 
   \item{...}{Ignored. Included for compatibility with

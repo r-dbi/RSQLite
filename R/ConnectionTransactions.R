@@ -10,7 +10,7 @@ NULL
 #' \code{dbRollback} commit and rollback the transaction, respectively and turn
 #' auto-commit on.
 #' 
-#' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
+#' @param conn,con a \code{\linkS4class{SQLiteConnection}} object, produced by
 #'   \code{\link[DBI]{dbConnect}}
 #' @param ... Ignored. Needed for compatibility with generic.
 #' @examples
@@ -62,6 +62,7 @@ setMethod("dbBeginTransaction", "SQLiteConnection",
 
 #' @export
 #' @rdname transactions
+#' @param statement SQL transaction statement to execute
 sqliteTransactionStatement <- function(con, statement) {
   ## are there resultSets pending on con?
   if(length(dbListResults(con)) > 0){

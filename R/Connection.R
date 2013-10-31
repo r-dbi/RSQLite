@@ -20,7 +20,7 @@ setAs("SQLiteConnection", "SQLiteDriver",
 
 #' Disconnect an SQLite connection.
 #' 
-#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
+#' @param conn,con An existing \code{\linkS4class{SQLiteConnection}}
 #' @param ... Ignored. Included for compatibility with generic.
 #' @export
 setMethod("dbDisconnect", "SQLiteConnection",
@@ -44,7 +44,7 @@ sqliteCloseConnection <- function(con, ...) {
 #' These are the primary methods for interacting with a database via SQL
 #' queries.
 #' 
-#' @param an \code{\linkS4class{SQLiteConnection}} object.
+#' @param conn,con an \code{\linkS4class{SQLiteConnection}} object.
 #' @param statement a character vector of length one specifying the SQL
 #'   statement that should be executed.  Only a single SQL statment should be
 #'   provided.
@@ -210,35 +210,6 @@ sqliteQuickSQL <- function(con, statement, bind.data=NULL, ...) {
   res
 }
 
-
-#' @export
-setMethod("summary", "SQLiteConnection",
-  definition = function(object, ...) sqliteDescribeConnection(object, ...)
-)
-#' @export
-sqliteDescribeConnection <- function(obj, verbose = FALSE, ...) {
-  if(!isIdCurrent(obj)){
-    show(obj)
-    invisible(return(NULL))
-  }
-  info <- dbGetInfo(obj)
-  show(obj)
-  cat("  Database name:", info$dbname, "\n")
-  cat("  Loadable extensions:", info$loadableExtensions, "\n")
-  cat("  File open flags:", info$falgs, "\n")
-  cat("  Virtual File System:", info$vfs, "\n")
-  cat("  SQLite engine version: ", info$serverVersion, "\n")
-  cat("  Results Sets:\n")
-  if(length(info$rsId)>0){
-    for(i in seq(along.with = info$rsId)){
-      cat("   ", i, " ")
-      show(info$rsId[[i]])
-    }
-  } else
-    cat("   No open result sets\n")
-  invisible(NULL)
-}
-
 #' @export
 setMethod("dbGetInfo", "SQLiteConnection",
   definition = function(dbObj, ...) sqliteConnectionInfo(dbObj, ...),
@@ -285,6 +256,7 @@ setMethod("dbCallProc", "SQLiteConnection",
 #' Does the table exist?
 #' 
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
+#' @param name character vector of length 1 giving name of table
 #' @param ... Ignored. Included for compatibility with generic.
 #' @export
 setMethod("dbExistsTable",
@@ -341,6 +313,7 @@ dbBuildTableDefinition <- function(dbObj, name, value, field.types = NULL,
 #' Executes the SQL \code{DROP TABLE}.
 #' 
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
+#' @param name character vector of length 1 giving name of table to remove
 #' @param ... Ignored. Included for compatibility with generic.
 #' @export
 setMethod("dbRemoveTable",
@@ -388,7 +361,7 @@ setMethod("dbListTables", "SQLiteConnection",
 
 #' List fields in specified table.
 #' 
-#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
+#' @param conn,con An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name a length 1 character vector giving the name of a table.
 #' @param ... Ignored. Included for compatibility with generic.
 #' @export

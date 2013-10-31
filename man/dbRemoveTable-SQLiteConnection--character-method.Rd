@@ -9,6 +9,9 @@
   \item{conn}{An existing
   \code{\linkS4class{SQLiteConnection}}}
 
+  \item{name}{character vector of length 1 giving name of
+  table to remove}
+
   \item{...}{Ignored. Included for compatibility with
   generic.}
 }

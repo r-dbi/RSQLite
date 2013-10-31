@@ -2,9 +2,7 @@
 \name{SQLiteDriver-class}
 \alias{SQLite}
 \alias{SQLiteDriver-class}
-\alias{sqliteDescribeDriver}
 \alias{sqliteInitDriver}
-\alias{summary,SQLiteDriver-method}
 \title{Class SQLiteDriver with constructor SQLite.}
 \usage{
   SQLite(max.con = 200L, fetch.default.rec = 500,
@@ -12,10 +10,6 @@
 
   sqliteInitDriver(max.con = 16, fetch.default.rec = 500,
     force.reload = FALSE, shared.cache = FALSE)
-
-  \S4method{summary}{SQLiteDriver}(object, ...)
-
-  sqliteDescribeDriver(obj, verbose = FALSE, ...)
 }
 \arguments{
   \item{max.con}{IGNORED.  As of RSQLite 0.9.0, connections
@@ -29,7 +23,7 @@
   calls can override it.}
 
   \item{force.reload}{should the package code be reloaded
-  (reinitialized)? Setting this to \code{TRUE} allows you
+  (reinitialized)?  Setting this to \code{TRUE} allows you
   to change default settings.  Notice that all connections
   should be closed before re-loading.}
 

@@ -2,7 +2,7 @@
 #' 
 #' @export
 #' @rdname dbWriteTable
-#' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
+#' @param conn,con a \code{\linkS4class{SQLiteConnection}} object, produced by
 #'   \code{\link[DBI]{dbConnect}}
 #' @param name a character string specifying a table name. SQLite table names 
 #'   are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc} 
@@ -12,6 +12,7 @@
 #'   written to a temporary file and then imported to SQLite; when \code{value}
 #'   is a character, it is interpreted as a file name and its contents imported
 #'   to SQLite.
+#' @param ... Passed on to \code{sqliteWriteTable}.
 #' @export
 setMethod("dbWriteTable",
   signature = signature(conn = "SQLiteConnection", name = "character",

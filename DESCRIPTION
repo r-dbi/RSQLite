@@ -32,3 +32,4 @@ Collate:
     'ConnectionRead.R'
     'ConnectionTransactions.R'
     'ConnectionWrite.R'
+    'Summary.R'

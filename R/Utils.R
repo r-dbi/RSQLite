@@ -1,3 +1,22 @@
+#' Return an entire column from a SQLite database
+#' 
+#' Return an entire column from a table in a SQLite database as an R vector of
+#' the appropriate type.  This function is experimental and subject to change.
+#' 
+#' This function relies upon the SQLite internal \code{ROWID} column to
+#' determine the number of rows in the table.  This may not work depending on
+#' the table schema definition and pattern of update.
+#' 
+#' @param con a \code{SQLiteConnection} object as produced by
+#' \code{sqliteNewConnection}.
+#' @param table a string specifying the name of the table
+#' @param column a string specifying the name of the column in the specified
+#' table to retrieve.
+#' @return an R vector of the appropriate type (based on the type of the column
+#' in the database).
+#' @author Seth Falcon
+#' @keywords interface
+#' @export sqliteQuickColumn
 sqliteQuickColumn <- function(con, table, column) {
   .Call("RS_SQLite_quick_column", con@Id, as.character(table),
     as.character(column), PACKAGE="RSQLite")
@@ -38,7 +57,35 @@ sqliteResultInfo <- function(obj, what = "", ...) {
 ## from ROracle, except we don't quote strings here.
 ## safe.write makes sure write.table don't exceed available memory by batching
 ## at most batch rows (but it is still slowww)
-#' @export
+
+
+#' Write a data.frame avoiding exceeding memory limits
+#' 
+#' This function batches calls to \code{write.table} to avoid exceeding memory
+#' limits for very large data.frames.
+#' 
+#' The function has a while loop invoking \code{\link{write.table}} for subsets
+#' of \code{batch} rows of \code{value}.  Since this is a helper function for
+#' \code{\link[RMySQL]{mysqlWriteTable}} has hardcoded other arguments to
+#' \code{write.table}.
+#' 
+#' @param value a data.frame;
+#' @param file a file object (connection, file name, etc).
+#' @param batch maximum number of rows to write at a time.
+#' @param \dots any other arguments are passed to \code{write.table}.
+#' @param sep field separator passed to \code{write.table}.
+#' @param eol end of line character passed to \code{write.table}.
+#' @param quote.string logical value passed to \code{write.table}.
+#' @return \code{NULL}, invisibly.
+#' @note No error checking whatsoever is done.
+#' @seealso \code{\link{write.table}}
+#' @examples
+#' \dontrun{
+#'    ctr.file <- file("dump.sqloader", "w")
+#'    safe.write(big.data, file = ctr.file, batch = 25000)
+#' }
+#' 
+#' @export safe.write
 safe.write <- function(value, file, batch, row.names = TRUE, ..., sep = ',',
   eol = '\n', quote.string = FALSE) {
   N <- nrow(value)
@@ -63,7 +110,55 @@ safe.write <- function(value, file, batch, row.names = TRUE, ..., sep = ',',
   invisible(NULL)
 }
 
-#' @export
+
+
+#' Copy a SQLite database
+#' 
+#' This function copies a database connection to a file or to another database
+#' connection.  It can be used to save an in-memory database (created using
+#' \code{dbname = ":memory:"}) to a file or to create an in-memory database as
+#' a copy of anothe database.
+#' 
+#' This function uses SQLite's experimental online backup API to make the copy.
+#' 
+#' @param from A \code{SQLiteConnection} object.  The main database in
+#' \code{from} will be copied to \code{to}.
+#' @param to Either a string specifying the file name where the copy will be
+#' written or a \code{SQLiteConnection} object pointing to an empty database.
+#' If \code{to} specifies an already existing file, it will be overwritten
+#' without a warning.  When \code{to} is a database connection, it is assumed
+#' to point to an empty and unused database; the behavior is undefined
+#' otherwise.
+#' @return Returns \code{NULL}.
+#' @author Seth Falcon
+#' @references \url{http://www.sqlite.org/backup.html}
+#' @examples
+#' 
+#' ## Create an in memory database
+#' db <- dbConnect(SQLite(), dbname = ":memory:")
+#' df <- data.frame(letters=letters[1:4], numbers=1:4, stringsAsFactors = FALSE)
+#' ok <- dbWriteTable(db, "table1", df, row.names = FALSE)
+#' stopifnot(ok)
+#' 
+#' ## Copy the contents of the in memory database to
+#' ## the specified file
+#' backupDbFile <- tempfile()
+#' sqliteCopyDatabase(db, backupDbFile)
+#' diskdb <- dbConnect(SQLite(), dbname = backupDbFile)
+#' stopifnot(identical(df, dbReadTable(diskdb, "table1")))
+#' 
+#' ## Copy from one connection to another
+#' db2 <- dbConnect(SQLite(), dbname = ":memory:")
+#' sqliteCopyDatabase(db, db2)
+#' stopifnot(identical(df, dbReadTable(db2, "table1")))
+#' 
+#' ## cleanup
+#' dbDisconnect(db)
+#' dbDisconnect(diskdb)
+#' dbDisconnect(db2)
+#' unlink(backupDbFile)
+#' 
+#' @export sqliteCopyDatabase
 sqliteCopyDatabase <- function(from, to) {
   if (!is(from, "SQLiteConnection"))
     stop("'from' must be a SQLiteConnection object")

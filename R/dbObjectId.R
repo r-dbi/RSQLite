@@ -27,7 +27,29 @@
 ##
 ## TODO: Convert the Id slot to be an external object (as per Luke Tierney's
 ## implementation), even at the expense of S-plus compatibility?
-
+#' Class dbObjectId
+#' 
+#' A helper (mixin) class to provide external references in an R/S-Plus
+#' portable way.
+#' 
+#' 
+#' @name dbObjectId-class
+#' @docType class
+#' @note A cleaner mechanism would use external references, but historically
+#' this class has existed mainly for R/S-Plus portability.
+#' @section Objects from the Class: A virtual Class: No objects may be created
+#' from it.
+#' @examples
+#' 
+#'   sqlite <- dbDriver("SQLite")
+#'   con <- dbConnect(sqlite, ":memory:")
+#'   is(sqlite, "dbObjectId")   ## True
+#'   is(con, "dbObjectId")  ## True
+#'   isIdCurrent(con)       ## True
+#'   dbDisconnect(con)
+#'   isIdCurrent(con)       ## False
+#' 
+NULL
 #' @export
 setClass("dbObjectId", representation(Id = "externalptr", "VIRTUAL"))
 
@@ -42,6 +64,29 @@ setMethod("show", "dbObjectId",
    }
 )
 
+
+
+#' Check whether an dbObjectId handle object is valid or not
+#' 
+#' Support function that verifies that an dbObjectId holding a reference to a
+#' foreign object is still valid for communicating with the RDBMS
+#' 
+#' \code{dbObjectId} are R/S-Plus remote references to foreign (C code)
+#' objects. This introduces differences to the object's semantics such as
+#' persistence (e.g., connections may be closed unexpectedly), thus this
+#' function provides a minimal verification to ensure that the foreign object
+#' being referenced can be contacted.
+#' 
+#' @param obj any \code{dbObjectId} (e.g., \code{dbDriver},
+#' \code{dbConnection}, \code{dbResult}).
+#' @return a logical scalar.
+#' @examples
+#' \dontrun{
+#' cursor <- dbSendQuery(con, sql.statement)
+#' isIdCurrent(cursor)
+#' }
+#' 
+#' @export isIdCurrent
 "isIdCurrent" <- 
 function(obj)
 ## verify that obj refers to a currently open/loaded database

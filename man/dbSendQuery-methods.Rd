@@ -1,47 +1,31 @@
-\name{dbSendQuery-methods}
 \docType{methods}
-\alias{dbSendQuery-methods}
-\alias{dbGetQuery-methods}
-\alias{dbSendPreparedQuery}
-\alias{dbGetPreparedQuery}
-\alias{dbSendPreparedQuery-methods}
-\alias{dbGetPreparedQuery-methods}
-\alias{dbGetException-methods}
-\alias{dbSendQuery,SQLiteConnection,character-method}
-\alias{dbGetQuery,SQLiteConnection,character-method}
-\alias{dbSendPreparedQuery,SQLiteConnection,character,data.frame-method}
-\alias{dbGetPreparedQuery,SQLiteConnection,character,data.frame-method}
+\name{dbSendQuery-methods}
 \alias{dbClearResult,SQLiteResult-method}
 \alias{dbGetException,SQLiteConnection-method}
-\title{
-  Execute a SQL statement on a database connection
-}
+\alias{dbGetException-methods}
+\alias{dbGetPreparedQuery}
+\alias{dbGetPreparedQuery,SQLiteConnection,character,data.frame-method}
+\alias{dbGetPreparedQuery-methods}
+\alias{dbGetQuery,SQLiteConnection,character-method}
+\alias{dbGetQuery-methods}
+\alias{dbSendPreparedQuery}
+\alias{dbSendPreparedQuery,SQLiteConnection,character,data.frame-method}
+\alias{dbSendPreparedQuery-methods}
+\alias{dbSendQuery,SQLiteConnection,character-method}
+\alias{dbSendQuery-methods}
+\title{Execute a SQL statement on a database connection}
 \description{
-   These are the primary methods for interacting with a database via SQL
-   queries.
+  These are the primary methods for interacting with a
+  database via SQL queries.
 }
-\section{Methods}{\describe{
-\item{conn}{a \code{SQLiteConnection} object.}
-\item{statement}{a character vector of length one specifying the SQL
-statement that should be executed.  Only a single SQL statment should be
-provided.}
-\item{res}{a \code{SQLiteResult} object.}
-\item{\dots }{additional parameters.}
-}
-}
-\references{
-  See the Database Interface definition document
-  \code{DBI.pdf} in the base directory of this package
-  or \url{http://stat.bell-labs.com/RS-DBI}.
-}
-\seealso{
-  \code{\link{SQLite}},
-  \code{\link[DBI]{dbDriver}},
-  \code{\link[DBI]{dbConnect}},
-  \code{\link[DBI]{fetch}},
-  \code{\link[DBI]{dbCommit}},
-  \code{\link[DBI]{dbGetInfo}},
-  \code{\link[DBI]{dbReadTable}}.
+\section{Methods}{
+  \describe{ \item{conn}{a \code{SQLiteConnection} object.}
+  \item{statement}{a character vector of length one
+  specifying the SQL statement that should be executed.
+  Only a single SQL statment should be provided.}
+  \item{res}{a \code{SQLiteResult} object.}
+  \item{list()}{additional parameters.}\item{ }{additional
+  parameters.} }
 }
 \examples{
 con <- dbConnect(SQLite(), ":memory:")
@@ -124,7 +108,4 @@ dbGetPreparedQuery(db, sql, data.frame(cc = c(95, 403)))
 
 dbDisconnect(db)
 }
-\keyword{methods}
-\keyword{interface}
-\keyword{database}
-% vim: syntax=tex
+

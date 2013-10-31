@@ -1,12 +1,75 @@
 #' @include Object.R
 NULL
 
+#' Class SQLiteConnection
+#' 
+#' SQLite connection class.
+#' 
+#' 
+#' @name SQLiteConnection-class
+#' @docType class
+#' @section Generators: The method \code{\link[DBI]{dbConnect}} is the main
+#' generator.
+#' @examples
+#' 
+#' drv <- dbDriver("SQLite")
+#' tfile <- tempfile()
+#' con <- dbConnect(drv, dbname = tfile)
+#' dbDisconnect(con)
+#' dbUnloadDriver(drv)
+#' 
 #' @export
 setClass("SQLiteConnection", representation("DBIConnection", "SQLiteObject"))
 
 setAs("SQLiteConnection", "SQLiteDriver",
   def = function(from) new("SQLiteDriver", Id = from@Id)
 )
+
+#' Create a connection object to an SQLite DBMS
+#' 
+#' These methods are straight-forward implementations of the corresponding
+#' generic functions.
+#' 
+#' @name dbConnect-methods
+#' @aliases dbDisconnect,SQLiteConnection-method dbConnect,SQLiteDriver-method
+#' dbConnect,SQLiteConnection-method dbConnect,character-method
+#' @docType methods
+#' @section Methods: \describe{ \item{drv}{ an object of class
+#' \code{SQLiteDriver}, or the character string "SQLite" or an
+#' \code{SQLiteConnection}.  } \item{conn}{ an \code{SQLiteConnection} object
+#' as produced by \code{dbConnect}.  } \item{list()}{ As of RSQLite 0.4-1 you
+#' may specify values for the two \code{PRAGMAs} \code{cache\_size} and
+#' \code{synchronous} when initializing a new connection (this does not apply
+#' when cloning an existing connection).
+#' 
+#' RSQLite defaults \code{synchronous} to 0 (or "OFF"), although SQLite's
+#' default as of 3.2.8 is 2 (FULL).  Possible values for \code{synchronous} are
+#' 0, 1, or 2 or the corresponding strings "OFF", "NORMAL", or "FULL".  Users
+#' have reported significant speed ups using \code{sychronous=0}, and the
+#' SQLite documentation itself implies considerable improved performance at the
+#' very modest risk of database corruption in the unlikely case of the
+#' operating system (\emph{not} the R application) crashing. See the SQLite
+#' documentation for the full details of this \code{PRAGMA}.
+#' 
+#' \code{cache\_size} can be a positive integer to change the maximum number of
+#' disk pages that SQLite holds in memory (SQLite's default is 2000 pages).
+#' }\item{ }{ As of RSQLite 0.4-1 you may specify values for the two
+#' \code{PRAGMAs} \code{cache\_size} and \code{synchronous} when initializing a
+#' new connection (this does not apply when cloning an existing connection).
+#' 
+#' RSQLite defaults \code{synchronous} to 0 (or "OFF"), although SQLite's
+#' default as of 3.2.8 is 2 (FULL).  Possible values for \code{synchronous} are
+#' 0, 1, or 2 or the corresponding strings "OFF", "NORMAL", or "FULL".  Users
+#' have reported significant speed ups using \code{sychronous=0}, and the
+#' SQLite documentation itself implies considerable improved performance at the
+#' very modest risk of database corruption in the unlikely case of the
+#' operating system (\emph{not} the R application) crashing. See the SQLite
+#' documentation for the full details of this \code{PRAGMA}.
+#' 
+#' \code{cache\_size} can be a positive integer to change the maximum number of
+#' disk pages that SQLite holds in memory (SQLite's default is 2000 pages). } }
+NULL
+
 #' @export
 setMethod("dbConnect", "SQLiteDriver",
   definition = function(drv, ...) sqliteNewConnection(drv, ...),
@@ -238,10 +301,61 @@ sqliteDescribeConnection <- function(obj, verbose = FALSE, ...) {
   invisible(NULL)
 }
 
+#' Call an SQL stored procedure
+#' 
+#' Not yet implemented.
+#' 
+#' @aliases dbCallProc,SQLiteConnection-method
+#' @docType methods
 #' @export
 setMethod("dbCallProc", "SQLiteConnection",
   definition = function(conn, ...) .NotYetImplemented()
 )
+
+# Transactions -----------------
+
+#' DBMS Transaction Management
+#' 
+#' By default, SQLite is in auto-commit mode. \code{dbBeginTransaction} starts
+#' a SQLite transaction and turns auto-commit off. \code{dbCommit} and
+#' \code{dbRollback} commit and rollback the transaction, respectively and turn
+#' auto-commit on.
+#' 
+#' @aliases dbBeginTransaction dbBeginTransaction-methods
+#' dbRollback-methods dbBeginTransaction,SQLiteConnection-method
+#' dbCommit,SQLiteConnection-method dbRollback,SQLiteConnection-method
+#' @docType methods
+#' @section Methods: \describe{ \item{conn}{ a \code{SQLiteConnection} object,
+#' as produced by the function \code{dbConnect}.  } \item{list()}{ any
+#' database-specific arguments.  }\item{ }{ any database-specific arguments.  }
+#' }
+#' @examples
+#' 
+#' drv <- dbDriver("SQLite")
+#' tfile <- tempfile()
+#' con <- dbConnect(drv, dbname = tfile)
+#' data(USArrests)
+#' dbWriteTable(con, "arrests", USArrests)
+#' dbGetQuery(con, "select count(*) from arrests")[1, ]
+#' 
+#' dbBeginTransaction(con)
+#' rs <- dbSendQuery(con, "DELETE from arrests WHERE Murder > 1")
+#' do_commit <- if (dbGetInfo(rs)[["rowsAffected"]] > 40) FALSE else TRUE
+#' dbClearResult(rs)
+#' dbGetQuery(con, "select count(*) from arrests")[1, ]
+#' if (!do_commit)
+#'     dbRollback(con)
+#' dbGetQuery(con, "select count(*) from arrests")[1, ]
+#' 
+#' dbBeginTransaction(con)
+#' rs <- dbSendQuery(con, "DELETE from arrests WHERE Murder > 5")
+#' dbClearResult(rs)
+#' dbCommit(con)
+#' dbGetQuery(con, "select count(*) from arrests")[1, ]
+#' 
+#' dbDisconnect(con)
+#' @name transactions
+NULL
 
 #' @export
 setMethod("dbCommit", "SQLiteConnection",
@@ -281,9 +395,123 @@ sqliteTransactionStatement <- function(con, statement) {
   !inherits(rc, ErrorClass)
 }
 
-##
-## Convenience methods
-##
+# Data frame read/write ---------------
+
+#' Convenience functions for Importing/Exporting DBMS tables
+#' 
+#' These functions mimic their R/S-Plus counterpart \code{get}, \code{assign},
+#' \code{exists}, \code{remove}, and \code{objects}, except that they generate
+#' code that gets remotely executed in a database engine.
+#' 
+#' 
+#' @name dbReadTable-methods
+#' @aliases dbReadTable-methods dbWriteTable-methods dbExistsTable-methods
+#' dbRemoveTable-methods dbReadTable,SQLiteConnection,character-method
+#' dbWriteTable,SQLiteConnection,character,data.frame-method
+#' dbWriteTable,SQLiteConnection,character,character-method
+#' dbExistsTable,SQLiteConnection,character-method
+#' dbRemoveTable,SQLiteConnection,character-method
+#' @docType methods
+#' @return A data.frame in the case of \code{dbReadTable}; otherwise a logical
+#' indicating whether the operation was successful.
+#' @note Note that the data.frame returned by \code{dbReadTable} only has
+#' primitive data, e.g., it does not coerce character data to factors.
+#' 
+#' SQLite table names are \emph{not} case sensitive, e.g., table names
+#' \code{ABC} and \code{abc} are considered equal.
+#' @section Methods: \describe{ \item{conn}{ an \code{SQLiteConnection}
+#' database connection object.  } \item{name}{ a character string specifying a
+#' table name.  } \item{value}{ a data.frame (or coercible to data.frame)
+#' object or a file name (character).  In the first case, the data.frame is
+#' written to a temporary file and then imported to SQLite; when \code{value}
+#' is a character, it is interpreted as a file name and its contents imported
+#' to SQLite.  } \item{row.names}{ in the case of \code{dbReadTable}, this
+#' argument can be a string or an index specifying the column in the DBMS table
+#' to be used as \code{row.names} in the output data.frame (a \code{NULL},
+#' \code{""}, or 0 specifies that no column should be used as \code{row.names}
+#' in the output).
+#' 
+#' In the case of \code{dbWriteTable}, this argument should be a logical
+#' specifying whether the \code{row.names} should be output to the output DBMS
+#' table; if \code{TRUE}, an extra field whose name will be whatever the
+#' R/S-Plus identifier \code{"row.names"} maps to the DBMS (see
+#' \code{\link[DBI]{make.db.names}}).  } \item{overwrite}{ a logical specifying
+#' whether to overwrite an existing table or not.  Its default is \code{FALSE}.
+#' (See the BUGS section below).  } \item{append}{ a logical specifying whether
+#' to append to an existing table in the DBMS.  Its default is \code{FALSE}.  }
+#' \item{list()}{ optional arguments.
+#' 
+#' When \code{dbWriteTable} is used to import data from a file, you may
+#' optionally specify \code{header=}, \code{row.names=}, \code{col.names=},
+#' \code{sep=}, \code{eol=}, \code{field.types=}, and \code{skip=}.
+#' 
+#' \code{header} is a logical indicating whether the first data line (but see
+#' \code{skip}) has a header or not.  If missing, it value is determined
+#' following \code{\link{read.table}} convention, namely, it is set to TRUE if
+#' and only if the first row has one fewer field that the number of columns.
+#' 
+#' \code{row.names} is a logical to specify whether the first column is a set
+#' of row names.  If missing its defualt follows the \code{\link{read.table}}
+#' convention.
+#' 
+#' \code{col.names} a character vector with column names (these names will be
+#' filtered with \code{\link[DBI]{make.db.names}} to ensure valid SQL
+#' identifiers. (See also \code{field.types} below.)
+#' 
+#' The field separator \code{sep=} defaults to \code{','}.
+#' 
+#' The end-of-line delimiter \code{eol} defaults to \code{'\n'}.
+#' 
+#' \code{skip} specifies number of lines to skip before reading the data and it
+#' defaults to 0.
+#' 
+#' \code{field.types} is a list of named field SQL types where
+#' \code{names(field.types)} provide the new table's column names (if missing,
+#' field types are inferred using \code{\link[DBI]{dbDataType}}).  }\item{ }{
+#' optional arguments.
+#' 
+#' When \code{dbWriteTable} is used to import data from a file, you may
+#' optionally specify \code{header=}, \code{row.names=}, \code{col.names=},
+#' \code{sep=}, \code{eol=}, \code{field.types=}, and \code{skip=}.
+#' 
+#' \code{header} is a logical indicating whether the first data line (but see
+#' \code{skip}) has a header or not.  If missing, it value is determined
+#' following \code{\link{read.table}} convention, namely, it is set to TRUE if
+#' and only if the first row has one fewer field that the number of columns.
+#' 
+#' \code{row.names} is a logical to specify whether the first column is a set
+#' of row names.  If missing its defualt follows the \code{\link{read.table}}
+#' convention.
+#' 
+#' \code{col.names} a character vector with column names (these names will be
+#' filtered with \code{\link[DBI]{make.db.names}} to ensure valid SQL
+#' identifiers. (See also \code{field.types} below.)
+#' 
+#' The field separator \code{sep=} defaults to \code{','}.
+#' 
+#' The end-of-line delimiter \code{eol} defaults to \code{'\n'}.
+#' 
+#' \code{skip} specifies number of lines to skip before reading the data and it
+#' defaults to 0.
+#' 
+#' \code{field.types} is a list of named field SQL types where
+#' \code{names(field.types)} provide the new table's column names (if missing,
+#' field types are inferred using \code{\link[DBI]{dbDataType}}).  } }
+#' @examples
+#' \dontrun{
+#' conn <- dbConnect("SQLite", dbname = "sqlite.db")
+#' if(dbExistsTable(con, "fuel_frame")){
+#'    dbRemoveTable(conn, "fuel_frame")
+#'    dbWriteTable(conn, "fuel_frame", fuel.frame)
+#' }
+#' if(dbExistsTable(conn, "RESULTS")){
+#'    dbWriteTable(conn, "RESULTS", results2000, append = TRUE)
+#' else
+#'    dbWriteTable(conn, "RESULTS", results2000)
+#' }
+#' }
+#' 
+NULL
 
 #' @export
 setMethod("dbExistsTable",
@@ -453,7 +681,26 @@ sqliteWriteTable <- function(con, name, value, row.names=TRUE,
   success
 }
 
-#' @export
+
+
+#' Build the SQL CREATE TABLE definition as a string
+#' 
+#' Build the SQL CREATE TABLE definition as a string for the input data.frame
+#' 
+#' The output SQL statement is a simple \code{CREATE TABLE} with suitable for
+#' \code{dbGetQuery}
+#' 
+#' @param dbObj any DBI object (used only to dispatch according to the engine
+#' (e.g., MySQL, SQLite, Oracle)
+#' @param name name of the new SQL table
+#' @param value data.frame for which we want to create a table
+#' @param field.types optional named list of the types for each field in
+#' \code{value}
+#' @param row.names logical, should row.name of \code{value} be exported as a
+#' \code{row\_names} field? Default is \code{TRUE}
+#' @param \dots reserved for future use
+#' @return An SQL string
+#' @export dbBuildTableDefinition
 dbBuildTableDefinition <- function(dbObj, name, value, field.types = NULL, 
   row.names = TRUE, ...) {
   if(!is.data.frame(value))
@@ -604,6 +851,32 @@ setMethod("dbListResults", "SQLiteConnection",
   },
   valueClass = "list"
 )
+
+#' List items from an SQLite DBMS and from objects
+#' 
+#' These methods are straight-forward implementations of the corresponding
+#' generic functions.
+#' 
+#' 
+#' @name dbListTables-methods
+#' @aliases dbListTables-methods dbListFields-methods dbListConnections-methods
+#' dbListResults-methods dbListTables,SQLiteConnection-method
+#' dbListFields,SQLiteConnection,character-method
+#' dbListConnections,SQLiteDriver-method dbListResults,SQLiteConnection-method
+#' @docType methods
+#' @section Methods: \describe{ \item{drv}{an \code{SQLiteDriver}.}
+#' \item{conn}{an \code{SQLiteConnection}.} \item{name}{a character string with
+#' the table name.} \item{list()}{currently not used.} }
+#' @examples
+#' \dontrun{
+#' drv <- dbDriver("SQLite")
+#' # after working awhile...
+#' for(con in dbListConnections(odbc)){
+#'    dbGetStatement(dbListResults(con))
+#' }
+#' }
+#' 
+NULL
 
 #' @export
 setMethod("dbListTables", "SQLiteConnection",

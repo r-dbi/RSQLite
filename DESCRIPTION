@@ -29,3 +29,4 @@ Collate:
     'Constants.R'
     'Result.R'
     'Utils.R'
+    'RSQLite-package.R'

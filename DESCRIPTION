@@ -11,4 +11,5 @@ Depends: R (>= 2.10.0), methods, DBI (>= 0.2-5)
 Imports: methods, DBI (>= 0.2-3)
 Suggests: RUnit (>= 0.4.22)
 License: LGPL (>= 2)
-Collate: zzz.R S4R.R dbObjectId.R SQLite.R SQLiteSupport.R
+Collate: zzz.R dbObjectId.R Object.R Driver.R Connection-extensions.R Connection.R S4R.R 
+  dbObjectId.R Constants.R Result.R Utils.R

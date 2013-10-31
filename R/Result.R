@@ -93,8 +93,7 @@ sqliteCloseResult <- function(res, ...) {
 #' @param ... Ignored. Needed for compatibility with generic
 #' @examples
 #' data(USArrests)
-#' drv <- dbDriver("SQLite")
-#' con <- dbConnect(drv, dbname=":memory:")
+#' con <- dbConnect(SQLite(), dbname=":memory:")
 #' dbWriteTable(con, "t1", USArrests)
 #' dbWriteTable(con, "t2", USArrests)
 #' 

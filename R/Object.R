@@ -3,12 +3,6 @@
 #' Base class for all SQLite-specific DBI classes
 #' 
 #' @docType class
-#' @examples
-#' \dontrun{
-#' drv <- dbDriver("SQLite")
-#' con <- dbConnect(drv, dbname = "rsdbi.db")
-#' }
-#' 
 #' @import methods
 #' @import DBI
 #' @useDynLib RSQLite

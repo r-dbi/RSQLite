@@ -1,7 +1,14 @@
 \docType{class}
 \name{dbObjectId-class}
 \alias{dbObjectId-class}
+\alias{show,dbObjectId-method}
 \title{Class dbObjectId}
+\usage{
+  \S4method{show}{dbObjectId}(object)
+}
+\arguments{
+  \item{object}{of class \code{dbObjectId}}
+}
 \description{
   A helper (mixin) class to provide external references in
   an R/S-Plus portable way.

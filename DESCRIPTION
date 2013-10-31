@@ -31,3 +31,4 @@ Collate:
     'ConnectionTransactions.R'
     'ConnectionWrite.R'
     'Summary.R'
+    'dbGetInfo.R'

@@ -54,6 +54,8 @@ NULL
 setClass("dbObjectId", representation(Id = "externalptr", "VIRTUAL"))
 
 #' @export
+#' @rdname dbObjectId-class
+#' @param object of class \code{dbObjectId}
 setMethod("show", "dbObjectId",
    definition = function(object) {
       expired <- if(isIdCurrent(object)) "" else "Expired "

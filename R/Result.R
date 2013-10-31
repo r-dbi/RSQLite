@@ -89,7 +89,7 @@ sqliteCloseResult <- function(res, ...) {
 #' 
 #' See documentation of generics for more details.
 #' 
-#' @param dbObj,res An object of class \code{\linkS4class{SQLiteResult}}
+#' @param res An object of class \code{\linkS4class{SQLiteResult}}
 #' @param ... Ignored. Needed for compatibility with generic
 #' @examples
 #' data(USArrests)
@@ -123,18 +123,6 @@ sqliteCloseResult <- function(res, ...) {
 #' @name sqlite-meta
 NULL
 
-#' @export
-#' @rdname sqlite-meta
-setMethod("dbGetInfo", "SQLiteResult",
-  definition = function(dbObj, ...) sqliteResultInfo(dbObj, ...),
-  valueClass = "list"
-)
-#' @export
-#' @rdname sqlite-meta
-setMethod("dbGetStatement", "SQLiteResult",
-  definition = function(res, ...) dbGetInfo(res, "statement")[[1]],
-  valueClass = "character"
-)
 #' @export
 #' @rdname sqlite-meta
 setMethod("dbColumnInfo", "SQLiteResult",

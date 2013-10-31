@@ -208,37 +208,10 @@ sqliteQuickSQL <- function(con, statement, bind.data=NULL, ...) {
   res
 }
 
-#' Get metadata about a connection.
+#' Get the last exception from the connection.
 #' 
-#' @param dbObj,obj An \code{\linkS4class{SQLiteConnection}} object
-#' @param what character vector. If supplied used to subset output.
-#' @param ... Ignored. Included for compatibility with generic.
-#' @export
-setMethod("dbGetInfo", "SQLiteConnection",
-  definition = function(dbObj, ...) sqliteConnectionInfo(dbObj, ...),
-  valueClass = "list"
-)
-#' @export
-#' @rdname dbGetInfo-SQLiteConnection-method
-sqliteConnectionInfo <- function(obj, what="", ...) {
-  if(!isIdCurrent(obj))
-    stop(paste("expired", class(obj)))
-  id <- obj@Id
-  info <- .Call("RSQLite_connectionInfo", id, PACKAGE = .SQLitePkgName)
-  if(length(info$rsId)){
-    rsId <- vector("list", length = length(info$rsId))
-    for(i in seq(along.with = info$rsId))
-      rsId[[i]] <- new("SQLiteResult",
-        Id = .Call("DBI_newResultHandle",
-          id, info$rsId[i], PACKAGE = .SQLitePkgName))
-    info$rsId <- rsId
-  }
-  if(!missing(what))
-    info[what]
-  else
-    info
-}
-
+#' @param conn an object of class \code{\linkS4class{SQLiteConnection}}
+#' @param ... Ignored. Needed for compatiblity with generic.
 #' @export
 setMethod("dbGetException", "SQLiteConnection",
   definition = function(conn, ...){

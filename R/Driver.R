@@ -90,26 +90,10 @@ sqliteCloseDriver <- function(drv, ...) {
 }
 
 
-#' @export
-setMethod("dbGetInfo", "SQLiteDriver",
-  definition = function(dbObj, ...) sqliteDriverInfo(dbObj, ...),
-  valueClass = "list"
-)
-#' @export
-sqliteDriverInfo <- function(obj, what="", ...) {
-  if(!isIdCurrent(obj))
-    stop(paste("expired", class(obj)))
-  drvId <- obj@Id
-  info <- .Call("RS_SQLite_managerInfo", drvId, PACKAGE = .SQLitePkgName)
-  info$managerId <- obj
-  ## connection IDs are no longer tracked by the manager.
-  info$connectionIds <- list()
-  if(!missing(what))
-    info[what]
-  else
-    info
-}
-
+#' List active connections
+#' 
+#' @param drv An object of class \code{\linkS4class{SQLiteDriver}}
+#' @param ... Ignored. Needed for compatibility with generic.
 #' @export
 setMethod("dbListConnections", "SQLiteDriver",
   definition = function(drv, ...) {

@@ -1,17 +1,11 @@
 \name{sqlite-meta}
 \alias{dbColumnInfo,SQLiteResult-method}
-\alias{dbGetInfo,SQLiteResult-method}
 \alias{dbGetRowCount,SQLiteResult-method}
 \alias{dbGetRowsAffected,SQLiteResult-method}
-\alias{dbGetStatement,SQLiteResult-method}
 \alias{dbHasCompleted,SQLiteResult-method}
 \alias{sqlite-meta}
 \title{Database interface meta-data.}
 \usage{
-  \S4method{dbGetInfo}{SQLiteResult}(dbObj, ...)
-
-  \S4method{dbGetStatement}{SQLiteResult}(res, ...)
-
   \S4method{dbColumnInfo}{SQLiteResult}(res, ...)
 
   \S4method{dbGetRowsAffected}{SQLiteResult}(res, ...)
@@ -21,7 +15,7 @@
   \S4method{dbHasCompleted}{SQLiteResult}(res, ...)
 }
 \arguments{
-  \item{dbObj,res}{An object of class
+  \item{res}{An object of class
   \code{\linkS4class{SQLiteResult}}}
 
   \item{...}{Ignored. Needed for compatibility with

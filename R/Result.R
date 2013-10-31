@@ -6,10 +6,6 @@ NULL
 #' SQLite's query results class.  This classes encapsulates the result of an
 #' SQL statement (either \code{select} or not).
 #' 
-#' 
-#' @name SQLiteResult-class
-#' @docType class
-#' @section Generators: The main generator is \code{\link[DBI]{dbSendQuery}}.
 #' @export
 setClass("SQLiteResult", representation("DBIResult", "SQLiteObject"))
 
@@ -17,34 +13,20 @@ setAs("SQLiteResult", "SQLiteConnection",
   def = function(from) new("SQLiteConnection", Id = from@Id)
 )
 
-
 #' Fetch records from a previously executed query
-#' 
-#' This method is a straight-forward implementation of the corresponding
-#' generic function.
 #' 
 #' The \code{RSQLite} implementations retrieves all records into a buffer
 #' internally managed by the RSQLite driver (thus this memory in not managed by
-#' R but its part of the R process), and \code{fetch} simple returns records
+#' R but its part of the R process), and \code{fetch} simply returns records
 #' from this internal buffer.
 #' 
-#' @name fetch-methods
-#' @aliases fetch-methods fetch,SQLiteResult,numeric-method
-#' fetch,SQLiteResult-method
-#' @docType methods
-#' @section Methods: \describe{
-#' 
-#' \item{res}{ an \code{SQLiteResult} object.  } \item{n}{ maximum number of
-#' records to retrieve per fetch.  Use \code{n = -1} to retrieve all pending
-#' records; use a value of \code{n = 0} for fetching the default number of rows
-#' \code{fetch.default.rec} defined in the \code{\link{SQLite}} initialization
-#' invocation.  } \item{list()}{currently not used.}\item{ }{currently not
-#' used.} }
+#' @param res an \code{\linkS4class{SQLiteResult}} object.
+#' @param n maximum number of records to retrieve per fetch. Use \code{-1} to 
+#'    retrieve all pending records; use \code{0} for to fetch the default 
+#'    number of rows as defined in \code{\link{SQLite}}
+#' @param ... Ignored. Needed for compatibility with generic.
 #' @examples
-#' 
-#' drv <- dbDriver("SQLite")
-#' tfile <- tempfile()
-#' con <- dbConnect(drv, dbname = tfile)
+#' con <- dbConnect(SQLite(), dbname = tempfile())
 #' data(USJudgeRatings)
 #' dbWriteTable(con, "jratings", USJudgeRatings)
 #' 
@@ -60,30 +42,15 @@ setAs("SQLiteResult", "SQLiteConnection",
 #' 
 #' # let's get all remaining records
 #' data2 <- fetch(res, n = -1)
-#' 
-#' dbClearResult(res)
-#' dbDisconnect(con)
-#' 
-NULL
 #' @export
 setMethod("fetch", "SQLiteResult",
   definition = function(res, n = 0, ...) sqliteFetch(res, n = n, ...),
   valueClass = "data.frame"
 )
 
-## Fetch at most n records from the opened resultSet (n = -1 meanSQLite
-## all records, n=0 means extract as many as "default_fetch_rec",
-## as defined by SQLiteDriver (see summary(drv, TRUE)).
-## The returned object is a data.frame.
-## Note: The method dbHasCompleted() on the resultSet tells you whether
-## or not there are pending records to be fetched.
-##
-## TODO: Make sure we don't exhaust all the memory, or generate
-## an object whose size exceeds option("object.size").  Also,
-## are we sure we want to return a data.frame?
 #' @export
-sqliteFetch <- function(res, n=0, ...) {
-  
+#' @rdname fetch-SQLiteResult-method
+sqliteFetch <- function(res, n=0, ...) {  
   if(!isIdCurrent(res))
     stop("invalid result handle")
   n <- as.integer(n)
@@ -99,12 +66,17 @@ sqliteFetch <- function(res, n=0, ...) {
   rel
 }
 
+#' Clear a result set.
+#' 
 #' @export
+#' @param res an \code{\linkS4class{SQLiteResult}} object.
+#' @param ... Ignored. Needed for compatibility with generic.
 setMethod("dbClearResult", "SQLiteResult",
   definition = function(res, ...) sqliteCloseResult(res, ...),
   valueClass = "logical"
 )
 #' @export
+#' @rdname dbClearResult-SQLiteResult-method
 sqliteCloseResult <- function(res, ...) {
   if(!isIdCurrent(res)){
     warning(paste("expired SQLiteResult"))
@@ -113,29 +85,13 @@ sqliteCloseResult <- function(res, ...) {
   .Call("RS_SQLite_closeResultSet", res@Id, PACKAGE = .SQLitePkgName)
 }
 
-
-#' Database interface meta-data
+#' Database interface meta-data.
 #' 
-#' These methods are straight-forward implementations of the corresponding
-#' generic functions.
+#' See documentation of generics for more details.
 #' 
-#' 
-#' @name dbGetInfo-methods
-#' @aliases dbGetInfo dbGetDBIVersion-methods dbGetStatement-methods
-#' dbGetRowCount-methods dbGetRowsAffected-methods dbColumnInfo-methods
-#' dbHasCompleted-methods dbGetInfo,SQLiteObject-method
-#' dbGetInfo,SQLiteDriver-method dbGetInfo,SQLiteConnection-method
-#' dbGetInfo,SQLiteResult-method dbGetStatement,SQLiteResult-method
-#' dbGetRowCount,SQLiteResult-method dbGetRowsAffected,SQLiteResult-method
-#' dbColumnInfo,SQLiteResult-method dbHasCompleted,SQLiteResult-method
-#' @docType methods
-#' @section Methods: \describe{ \item{dbObj}{ any object that implements some
-#' functionality in the R/S-Plus interface to databases (a driver, a connection
-#' or a result set).  } %\item{drv}{an \code{SQLiteDriver}.} %\item{conn}{an
-#' \code{SQLiteConnection}.} \item{res}{ an \code{SQLiteResult}.}
-#' \item{list()}{currently not being used.} }
+#' @param obj,dbObj,res An object of class \code{\linkS4class{SQLiteResult}}
+#' @param ... Ignored. Needed for compatibility with generic
 #' @examples
-#' 
 #' data(USArrests)
 #' drv <- dbDriver("SQLite")
 #' con <- dbConnect(drv, dbname=":memory:")
@@ -164,20 +120,23 @@ sqliteCloseResult <- function(res, ...) {
 #' names(dbGetInfo(con))
 #' 
 #' dbDisconnect(con)
-#' 
+#' @name sqlite-meta
 NULL
 
 #' @export
+#' @rdname sqlite-meta
 setMethod("dbGetInfo", "SQLiteResult",
   definition = function(dbObj, ...) sqliteResultInfo(dbObj, ...),
   valueClass = "list"
 )
 #' @export
+#' @rdname sqlite-meta
 setMethod("dbGetStatement", "SQLiteResult",
   definition = function(res, ...) dbGetInfo(res, "statement")[[1]],
   valueClass = "character"
 )
 #' @export
+#' @rdname sqlite-meta
 setMethod("dbColumnInfo", "SQLiteResult",
   definition = function(res, ...){
     out <- dbGetInfo(res, "fields")[[1]]
@@ -186,16 +145,19 @@ setMethod("dbColumnInfo", "SQLiteResult",
   valueClass = "data.frame"
 )
 #' @export
+#' @rdname sqlite-meta
 setMethod("dbGetRowsAffected", "SQLiteResult",
   definition = function(res, ...) dbGetInfo(res, "rowsAffected")[[1]],
   valueClass = "integer"
 )
 #' @export
+#' @rdname sqlite-meta
 setMethod("dbGetRowCount", "SQLiteResult",
   definition = function(res, ...) dbGetInfo(res, "rowCount")[[1]],
   valueClass = "integer"
 )
 #' @export
+#' @rdname sqlite-meta
 setMethod("dbHasCompleted", "SQLiteResult",
   definition = function(res, ...){
     out <- dbGetInfo(res, "completed")[[1]]
@@ -207,10 +169,12 @@ setMethod("dbHasCompleted", "SQLiteResult",
 )
 
 #' @export
+#' @rdname sqlite-meta
 setMethod("summary", "SQLiteResult",
   definition = function(object, ...) sqliteDescribeResult(object, ...)
 )
 #' @export
+#' @rdname sqlite-meta
 sqliteDescribeResult <- function(obj, verbose = FALSE, ...) {
   if(!isIdCurrent(obj)){
     show(obj)

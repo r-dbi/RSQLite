@@ -46,8 +46,6 @@ info <- dbGetInfo(rs)
 info$fields
 dbClearResult(rs)
 
-names(dbGetInfo(drv))
-
 # DBIConnection info
 names(dbGetInfo(con))
 

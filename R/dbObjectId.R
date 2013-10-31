@@ -14,20 +14,6 @@
 ## License along with this library; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-## Class: dbObjectId
-##
-## This mixin helper class is NOT part of the database interface definition,
-## but it is extended by the Oracle, MySQL, and SQLite implementations to
-## MySQLObject and OracleObject to allow us to conviniently (and portably) 
-## implement all database foreign objects methods (i.e., methods for show(), 
-## print() format() the dbManger, dbConnection, dbResultSet, etc.) 
-## A dbObjectId is an  identifier into an actual remote database objects.  
-## This class and its derived classes <driver-manager>Object need to 
-## be VIRTUAL to avoid coercion (green book, p.293) during method dispatching.
-##
-## TODO: Convert the Id slot to be an external object (as per Luke Tierney's
-## implementation), even at the expense of S-plus compatibility?
-
 #' Class dbObjectId.
 #' 
 #' A helper (mixin) class to provide external references in an R/S-Plus
@@ -39,7 +25,6 @@
 #' from it.
 #' @examples
 #' con <- dbConnect(SQLite(), ":memory:")
-#' is(sqlite, "dbObjectId")   ## True
 #' is(con, "dbObjectId")  ## True
 #' isIdCurrent(con)       ## True
 #' dbDisconnect(con)

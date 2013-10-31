@@ -22,7 +22,6 @@
 }
 \examples{
 con <- dbConnect(SQLite(), ":memory:")
-is(sqlite, "dbObjectId")   ## True
 is(con, "dbObjectId")  ## True
 isIdCurrent(con)       ## True
 dbDisconnect(con)

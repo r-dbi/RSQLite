@@ -210,12 +210,18 @@ sqliteQuickSQL <- function(con, statement, bind.data=NULL, ...) {
   res
 }
 
+#' Get metadata about a connection.
+#' 
+#' @param dbObj,obj An \code{\linkS4class{SQLiteConnection}} object
+#' @param what character vector. If supplied used to subset output.
+#' @param ... Ignored. Included for compatibility with generic.
 #' @export
 setMethod("dbGetInfo", "SQLiteConnection",
   definition = function(dbObj, ...) sqliteConnectionInfo(dbObj, ...),
   valueClass = "list"
 )
 #' @export
+#' @rdname dbGetInfo-SQLiteConnection-method
 sqliteConnectionInfo <- function(obj, what="", ...) {
   if(!isIdCurrent(obj))
     stop(paste("expired", class(obj)))

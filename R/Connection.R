@@ -292,7 +292,7 @@ setMethod("dbCallProc", "SQLiteConnection",
 #' auto-commit on.
 #' 
 #' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
-#'   \code{\link[DBI](dbConnect)}
+#'   \code{\link[DBI]{dbConnect}}
 #' @param ... Ignored. Needed for compatibility with generic.
 #' @examples
 #' con <- dbConnect(SQLite(), dbname = tempfile())
@@ -371,8 +371,8 @@ sqliteTransactionStatement <- function(con, statement) {
 #' primitive data, e.g., it does not coerce character data to factors.
 #' 
 #' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
-#'   \code{\link[DBI](dbConnect)}
-#' @param name} a character string specifying a table name. SQLite table names 
+#'   \code{\link[DBI]{dbConnect}}
+#' @param name a character string specifying a table name. SQLite table names 
 #'   are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc} 
 #'   are considered equal.
 #' @param value a data.frame (or coercible to data.frame) object or a 
@@ -390,16 +390,16 @@ sqliteTransactionStatement <- function(con, statement) {
 #'   specifying whether the \code{row.names} should be output to the output DBMS
 #'   table; if \code{TRUE}, an extra field whose name will be whatever the
 #'   R identifier \code{"row.names"} maps to the DBMS (see
-#'   \code{\link[DBI]{make.db.names}}).  }
+#'   \code{\link[DBI]{make.db.names}}).
 #' @param overwrite a logical specifying whether to overwrite an existing table 
 #'   or not. Its default is \code{FALSE}. (See the BUGS section below)
 #' @param append a logical specifying whether to append to an existing table 
 #'   in the DBMS.  Its default is \code{FALSE}.
 #' @param ... Ignored. Needed for compatibility with generic.
 #' @param header is a logical indicating whether the first data line (but see
-#' \code{skip}) has a header or not.  If missing, it value is determined
-#' following \code{\link{read.table}} convention, namely, it is set to TRUE if
-#' and only if the first row has one fewer field that the number of columns.
+#'   \code{skip}) has a header or not.  If missing, it value is determined
+#'   following \code{\link{read.table}} convention, namely, it is set to TRUE if
+#'   and only if the first row has one fewer field that the number of columns.
 #' @param col.names a character vector with column names (these names will be
 #'   filtered with \code{\link[DBI]{make.db.names}} to ensure valid SQL
 #'   identifiers. (See also \code{field.types} below.)
@@ -416,11 +416,11 @@ sqliteTransactionStatement <- function(con, statement) {
 #'    dbRemoveTable(conn, "fuel_frame")
 #'    dbWriteTable(conn, "fuel_frame", fuel.frame)
 #' }
-#' if(dbExistsTable(conn, "RESULTS")){
+#' if(dbExistsTable(conn, "RESULTS"))
 #'    dbWriteTable(conn, "RESULTS", results2000, append = TRUE)
 #' else
 #'    dbWriteTable(conn, "RESULTS", results2000)
-#' }
+#' 
 #' }
 #' @name sqlite-io
 NULL

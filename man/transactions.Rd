@@ -17,7 +17,7 @@
 }
 \arguments{
   \item{conn}{a \code{\linkS4class{SQLiteConnection}}
-  object, produced by \code{\link[DBI](dbConnect)}}
+  object, produced by \code{\link[DBI]{dbConnect}}}
 
   \item{...}{Ignored. Needed for compatibility with
   generic.}

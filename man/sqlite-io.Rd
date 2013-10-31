@@ -31,9 +31,9 @@
 }
 \arguments{
   \item{conn}{a \code{\linkS4class{SQLiteConnection}}
-  object, produced by \code{\link[DBI](dbConnect)}}
+  object, produced by \code{\link[DBI]{dbConnect}}}
 
-  \item{name}}{a character string specifying a table name.
+  \item{name}{a character string specifying a table name.
   SQLite table names are \emph{not} case sensitive, e.g.,
   table names \code{ABC} and \code{abc} are considered
   equal.}
@@ -57,7 +57,7 @@
   should be output to the output DBMS table; if
   \code{TRUE}, an extra field whose name will be whatever
   the R identifier \code{"row.names"} maps to the DBMS (see
-  \code{\link[DBI]{make.db.names}}).  }}
+  \code{\link[DBI]{make.db.names}}).}
 
   \item{overwrite}{a logical specifying whether to
   overwrite an existing table or not. Its default is
@@ -118,11 +118,11 @@ if(dbExistsTable(con, "fuel_frame")){
    dbRemoveTable(conn, "fuel_frame")
    dbWriteTable(conn, "fuel_frame", fuel.frame)
 }
-if(dbExistsTable(conn, "RESULTS")){
+if(dbExistsTable(conn, "RESULTS"))
    dbWriteTable(conn, "RESULTS", results2000, append = TRUE)
 else
    dbWriteTable(conn, "RESULTS", results2000)
-}
+
 }
 }
 

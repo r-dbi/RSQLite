@@ -1,4 +1,3 @@
-\docType{methods}
 \name{dbCallProc,SQLiteConnection-method}
 \alias{dbCallProc,SQLiteConnection-method}
 \title{Call an SQL stored procedure}
@@ -8,4 +7,5 @@
 \description{
   Not yet implemented.
 }
+\keyword{internal}
 

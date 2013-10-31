@@ -3,16 +3,11 @@
 \alias{SQLiteConnection-class}
 \title{Class SQLiteConnection}
 \description{
-  SQLite connection class.
-}
-\section{Generators}{
-  The method \code{\link[DBI]{dbConnect}} is the main
-  generator.
+  \code{SQLiteConnection} objects are usually created by
+  \code{\link[DBI]{dbConnect}}
 }
 \examples{
-drv <- dbDriver("SQLite")
-tfile <- tempfile()
-con <- dbConnect(drv, dbname = tfile)
+con <- dbConnect(SQLite(), dbname = tempfile())
 dbDisconnect(con)
 dbUnloadDriver(drv)
 }

@@ -1,13 +1,27 @@
-\docType{methods}
 \name{transactions}
-\alias{dbBeginTransaction}
 \alias{dbBeginTransaction,SQLiteConnection-method}
-\alias{dbBeginTransaction-methods}
 \alias{dbCommit,SQLiteConnection-method}
 \alias{dbRollback,SQLiteConnection-method}
-\alias{dbRollback-methods}
+\alias{sqliteTransactionStatement}
 \alias{transactions}
-\title{DBMS Transaction Management}
+\title{SQLite transaction management.}
+\usage{
+  \S4method{dbCommit}{SQLiteConnection}(conn, ...)
+
+  \S4method{dbRollback}{SQLiteConnection}(conn, ...)
+
+  \S4method{dbBeginTransaction}{SQLiteConnection}(conn,
+    ...)
+
+  sqliteTransactionStatement(con, statement)
+}
+\arguments{
+  \item{conn}{a \code{\linkS4class{SQLiteConnection}}
+  object, produced by \code{\link[DBI](dbConnect)}}
+
+  \item{...}{Ignored. Needed for compatibility with
+  generic.}
+}
 \description{
   By default, SQLite is in auto-commit mode.
   \code{dbBeginTransaction} starts a SQLite transaction and
@@ -15,16 +29,8 @@
   \code{dbRollback} commit and rollback the transaction,
   respectively and turn auto-commit on.
 }
-\section{Methods}{
-  \describe{ \item{conn}{ a \code{SQLiteConnection} object,
-  as produced by the function \code{dbConnect}.  }
-  \item{list()}{ any database-specific arguments.  }\item{
-  }{ any database-specific arguments.  } }
-}
 \examples{
-drv <- dbDriver("SQLite")
-tfile <- tempfile()
-con <- dbConnect(drv, dbname = tfile)
+con <- dbConnect(SQLite(), dbname = tempfile())
 data(USArrests)
 dbWriteTable(con, "arrests", USArrests)
 dbGetQuery(con, "select count(*) from arrests")[1, ]
@@ -34,15 +40,14 @@ rs <- dbSendQuery(con, "DELETE from arrests WHERE Murder > 1")
 do_commit <- if (dbGetInfo(rs)[["rowsAffected"]] > 40) FALSE else TRUE
 dbClearResult(rs)
 dbGetQuery(con, "select count(*) from arrests")[1, ]
-if (!do_commit)
-    dbRollback(con)
+if (!do_commit) dbRollback(con)
 dbGetQuery(con, "select count(*) from arrests")[1, ]
 
 dbBeginTransaction(con)
-rs <- dbSendQuery(con, "DELETE from arrests WHERE Murder > 5")
+rs <- dbSendQuery(con, "DELETE FROM arrests WHERE Murder > 5")
 dbClearResult(rs)
 dbCommit(con)
-dbGetQuery(con, "select count(*) from arrests")[1, ]
+dbGetQuery(con, "SELECT count(*) FROM arrests")[1, ]
 
 dbDisconnect(con)
 }

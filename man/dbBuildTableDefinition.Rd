@@ -6,8 +6,7 @@
     field.types = NULL, row.names = TRUE, ...)
 }
 \arguments{
-  \item{dbObj}{any DBI object (used only to dispatch
-  according to the engine (e.g., MySQL, SQLite, Oracle)}
+  \item{dbObj}{The object created by \code{\link{SQLite}}}
 
   \item{name}{name of the new SQL table}
 
@@ -21,16 +20,12 @@
   be exported as a \code{row\_names} field? Default is
   \code{TRUE}}
 
-  \item{\dots}{reserved for future use}
+  \item{...}{Ignored. Reserved for future use.}
 }
 \value{
   An SQL string
 }
 \description{
-  Build the SQL CREATE TABLE definition as a string for the
-  input data.frame
-}
-\details{
   The output SQL statement is a simple \code{CREATE TABLE}
   with suitable for \code{dbGetQuery}
 }

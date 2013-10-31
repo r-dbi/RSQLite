@@ -1,31 +1,43 @@
-\docType{methods}
-\name{dbSendQuery-methods}
-\alias{dbClearResult,SQLiteResult-method}
-\alias{dbGetException,SQLiteConnection-method}
-\alias{dbGetException-methods}
-\alias{dbGetPreparedQuery}
+\name{dbSendQuery,SQLiteConnection,character-method}
 \alias{dbGetPreparedQuery,SQLiteConnection,character,data.frame-method}
-\alias{dbGetPreparedQuery-methods}
 \alias{dbGetQuery,SQLiteConnection,character-method}
-\alias{dbGetQuery-methods}
-\alias{dbSendPreparedQuery}
 \alias{dbSendPreparedQuery,SQLiteConnection,character,data.frame-method}
-\alias{dbSendPreparedQuery-methods}
 \alias{dbSendQuery,SQLiteConnection,character-method}
-\alias{dbSendQuery-methods}
+\alias{sqliteExecStatement}
+\alias{sqliteQuickSQL}
 \title{Execute a SQL statement on a database connection}
-\description{
-  These are the primary methods for interacting with a
-  database via SQL queries.
+\usage{
+  \S4method{dbSendQuery}{SQLiteConnection,character}(conn,
+    statement, ...)
+
+  \S4method{dbSendPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
+    statement, bind.data, ...)
+
+  sqliteExecStatement(con, statement, bind.data = NULL)
+
+  \S4method{dbGetQuery}{SQLiteConnection,character}(conn,
+    statement, ...)
+
+  \S4method{dbGetPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
+    statement, bind.data, ...)
+
+  sqliteQuickSQL(con, statement, bind.data = NULL, ...)
 }
-\section{Methods}{
-  \describe{ \item{conn}{a \code{SQLiteConnection} object.}
+\arguments{
+  \item{an}{\code{\linkS4class{SQLiteConnection}} object.}
+
   \item{statement}{a character vector of length one
   specifying the SQL statement that should be executed.
   Only a single SQL statment should be provided.}
-  \item{res}{a \code{SQLiteResult} object.}
-  \item{list()}{additional parameters.}\item{ }{additional
-  parameters.} }
+
+  \item{...}{Ignored. Included for compatbility with
+  generic.}
+
+  \item{bind.data}{A data frame of data to be bound.}
+}
+\description{
+  These are the primary methods for interacting with a
+  database via SQL queries.
 }
 \examples{
 con <- dbConnect(SQLite(), ":memory:")

@@ -38,6 +38,7 @@ sqliteResultInfo <- function(obj, what = "", ...) {
 ## from ROracle, except we don't quote strings here.
 ## safe.write makes sure write.table don't exceed available memory by batching
 ## at most batch rows (but it is still slowww)
+#' @export
 safe.write <- function(value, file, batch, row.names = TRUE, ..., sep = ',',
   eol = '\n', quote.string = FALSE) {
   N <- nrow(value)
@@ -62,6 +63,7 @@ safe.write <- function(value, file, batch, row.names = TRUE, ..., sep = ',',
   invisible(NULL)
 }
 
+#' @export
 sqliteCopyDatabase <- function(from, to) {
   if (!is(from, "SQLiteConnection"))
     stop("'from' must be a SQLiteConnection object")

@@ -1,8 +1,10 @@
 #' @include Object.R
 NULL
 
+#' @export
 setClass("SQLiteDriver", representation("DBIDriver", "SQLiteObject"))
 
+#' @export
 SQLite <-
   function(max.con = 200L, fetch.default.rec = 500, force.reload = FALSE,
     shared.cache=FALSE)
@@ -11,6 +13,7 @@ SQLite <-
   }
 
 ## return a manager id
+#' @export
 sqliteInitDriver <- function(max.con = 16, fetch.default.rec = 500, 
                              force.reload=FALSE, shared.cache=FALSE) {
   config.params <- as.integer(c(max.con, fetch.default.rec))
@@ -20,19 +23,23 @@ sqliteInitDriver <- function(max.con = 16, fetch.default.rec = 500,
   new("SQLiteDriver", Id = id)
 }
 
+#' @export
 setMethod("dbUnloadDriver", "SQLiteDriver",
   definition = function(drv, ...) sqliteCloseDriver(drv, ...),
   valueClass = "logical"
 )
+#' @export
 sqliteCloseDriver <- function(drv, ...) {
   .Call("RS_SQLite_closeManager", drv@Id, PACKAGE = .SQLitePkgName)
 }
 
 
+#' @export
 setMethod("dbGetInfo", "SQLiteDriver",
   definition = function(dbObj, ...) sqliteDriverInfo(dbObj, ...),
   valueClass = "list"
 )
+#' @export
 sqliteDriverInfo <- function(obj, what="", ...) {
   if(!isIdCurrent(obj))
     stop(paste("expired", class(obj)))
@@ -48,6 +55,7 @@ sqliteDriverInfo <- function(obj, what="", ...) {
 }
 
 
+#' @export
 setMethod("dbListConnections", "SQLiteDriver",
   definition = function(drv, ...) {
     cons <- dbGetInfo(drv, what = "connectionIds")[[1]]
@@ -56,11 +64,13 @@ setMethod("dbListConnections", "SQLiteDriver",
   valueClass = "list"
 )
 
+#' @export
 setMethod("summary", "SQLiteDriver",
   definition = function(object, ...) sqliteDescribeDriver(object, ...)
 )
 
 ## Print out nicely a brief description of the connection Manager
+#' @export
 sqliteDescribeDriver <- function(obj, verbose = FALSE, ...) {
   if(!isIdCurrent(obj)){
     show(obj)

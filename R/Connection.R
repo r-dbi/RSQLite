@@ -1,10 +1,13 @@
 #' @include Object.R
 NULL
+
+#' @export
 setClass("SQLiteConnection", representation("DBIConnection", "SQLiteObject"))
 
 setAs("SQLiteConnection", "SQLiteDriver",
   def = function(from) new("SQLiteDriver", Id = from@Id)
 )
+#' @export
 setMethod("dbConnect", "SQLiteDriver",
   definition = function(drv, ...) sqliteNewConnection(drv, ...),
   valueClass = "SQLiteConnection"
@@ -13,6 +16,7 @@ setMethod("dbConnect", "SQLiteDriver",
 ## The distinction between "" and NULL is that "" is interpreted by
 ## the SQLite API as the default database (SQLite config specific)
 ## while NULL means "no database".
+#' @export
 sqliteNewConnection <- function(drv, dbname = "", loadable.extensions = TRUE,
   cache_size = NULL, synchronous = 0, 
   flags = NULL, vfs = NULL) {
@@ -62,6 +66,7 @@ sqliteNewConnection <- function(drv, dbname = "", loadable.extensions = TRUE,
 }
 
 
+#' @export
 setMethod("dbConnect", "character",
   definition = function(drv, ...){
     d <- dbDriver(drv)
@@ -69,6 +74,7 @@ setMethod("dbConnect", "character",
   },
   valueClass = "SQLiteConnection"
 )
+#' @export
 setMethod("dbConnect", "SQLiteConnection",
   definition = function(drv, ...){
     new.id <- .Call("RS_SQLite_cloneConnection", drv@Id, PACKAGE = .SQLitePkgName)
@@ -76,10 +82,12 @@ setMethod("dbConnect", "SQLiteConnection",
   },
   valueClass = "SQLiteConnection"
 )
+#' @export
 setMethod("dbDisconnect", "SQLiteConnection",
   definition = function(conn, ...) sqliteCloseConnection(conn, ...),
   valueClass = "logical"
 )
+#' @export
 sqliteCloseConnection <- function(con, ...) {
   if(!isIdCurrent(con)){
     warning(paste("expired SQLiteConnection"))
@@ -89,10 +97,12 @@ sqliteCloseConnection <- function(con, ...) {
 }
 
 
+#' @export
 setMethod("dbGetInfo", "SQLiteConnection",
   definition = function(dbObj, ...) sqliteConnectionInfo(dbObj, ...),
   valueClass = "list"
 )
+#' @export
 sqliteConnectionInfo <- function(obj, what="", ...) {
   if(!isIdCurrent(obj))
     stop(paste("expired", class(obj)))
@@ -113,12 +123,14 @@ sqliteConnectionInfo <- function(obj, what="", ...) {
 }
 
 
+#' @export
 setMethod("dbGetException", "SQLiteConnection",
   definition = function(conn, ...){
     .Call("RS_SQLite_getException", conn@Id, PACKAGE = .SQLitePkgName)
   },
   valueClass = "list"    ## TODO: should return a SQLiteException
 )
+#' @export
 setMethod("dbSendQuery",
   signature = signature(conn = "SQLiteConnection", statement = "character"),
   definition = function(conn, statement, ...){
@@ -126,6 +138,7 @@ setMethod("dbSendQuery",
   },
   valueClass = "SQLiteResult"
 )
+#' @export
 setMethod("dbSendPreparedQuery", 
   signature = signature(conn = "SQLiteConnection", statement = "character",
     bind.data = "data.frame"),
@@ -138,6 +151,7 @@ setMethod("dbSendPreparedQuery",
 ## dbResult object if the SQL operation does not produce
 ## output, otherwise it produces a resultSet that can
 ## be used for fetching rows.
+#' @export
 sqliteExecStatement <- function(con, statement, bind.data=NULL) {
   conId <- con@Id
   statement <- as(statement, "character")
@@ -160,12 +174,14 @@ sqliteExecStatement <- function(con, statement, bind.data=NULL) {
 }
 
 
+#' @export
 setMethod("dbGetQuery",
   signature = signature(conn = "SQLiteConnection", statement = "character"),
   definition = function(conn, statement, ...){
     sqliteQuickSQL(conn, statement, ...)
   },
 )
+#' @export
 setMethod("dbGetPreparedQuery", 
   signature = signature(conn = "SQLiteConnection", statement = "character",
     bind.data = "data.frame"),
@@ -177,6 +193,7 @@ setMethod("dbGetPreparedQuery",
 
 ## helper function: it exec's *and* retrieves a statement. It should
 ## be named something else.
+#' @export
 sqliteQuickSQL <- function(con, statement, bind.data=NULL, ...) {
   rs <- sqliteExecStatement(con, statement, bind.data)
   if(dbHasCompleted(rs)){
@@ -193,9 +210,11 @@ sqliteQuickSQL <- function(con, statement, bind.data=NULL, ...) {
 }
 
 
+#' @export
 setMethod("summary", "SQLiteConnection",
   definition = function(object, ...) sqliteDescribeConnection(object, ...)
 )
+#' @export
 sqliteDescribeConnection <- function(obj, verbose = FALSE, ...) {
   if(!isIdCurrent(obj)){
     show(obj)
@@ -219,14 +238,17 @@ sqliteDescribeConnection <- function(obj, verbose = FALSE, ...) {
   invisible(NULL)
 }
 
+#' @export
 setMethod("dbCallProc", "SQLiteConnection",
   definition = function(conn, ...) .NotYetImplemented()
 )
 
+#' @export
 setMethod("dbCommit", "SQLiteConnection",
   definition = function(conn, ...) sqliteTransactionStatement(conn, "COMMIT")
 )
 
+#' @export
 setMethod("dbRollback", "SQLiteConnection",
   definition = function(conn, ...) {
     rsList <- dbListResults(conn)
@@ -236,6 +258,7 @@ setMethod("dbRollback", "SQLiteConnection",
   }
 )
 
+#' @export
 setMethod("dbBeginTransaction", "SQLiteConnection",
   definition = function(conn, ...) sqliteTransactionStatement(conn, "BEGIN")
 )
@@ -243,6 +266,7 @@ setMethod("dbBeginTransaction", "SQLiteConnection",
 ## checks for any open resultsets, and closes them if completed.
 ## the statement is then executed on the connection, and returns
 ## whether it executed without an error or not.
+#' @export
 sqliteTransactionStatement <- function(con, statement) {
   ## are there resultSets pending on con?
   if(length(dbListResults(con)) > 0){
@@ -261,6 +285,7 @@ sqliteTransactionStatement <- function(con, statement) {
 ## Convenience methods
 ##
 
+#' @export
 setMethod("dbExistsTable",
   signature = signature(conn = "SQLiteConnection", name = "character"),
   definition = function(conn, name, ...){
@@ -269,6 +294,7 @@ setMethod("dbExistsTable",
   },
   valueClass = "logical"
 )
+#' @export
 setMethod("dbReadTable",
   signature = signature(conn = "SQLiteConnection", name = "character"),
   definition = function(conn, name, ...) sqliteReadTable(conn, name, ...),
@@ -278,6 +304,7 @@ setMethod("dbReadTable",
 ## Should we also allow row.names to be a character vector (as in read.table)?
 ## is it "correct" to set the row.names of output data.frame?
 ## Use NULL, "", or 0 as row.names to prevent using any field as row.names.
+#' @export
 sqliteReadTable <- function(con, name, row.names = "row_names",
   check.names = TRUE, ...) {
   out <- try(dbGetQuery(con, paste("SELECT * from", name)))
@@ -310,6 +337,7 @@ sqliteReadTable <- function(con, name, row.names = "row_names",
   out
 }
 
+#' @export
 setMethod("dbWriteTable",
   signature = signature(conn = "SQLiteConnection", name = "character",
     value="data.frame"),
@@ -317,6 +345,7 @@ setMethod("dbWriteTable",
     sqliteWriteTable(conn, name, value, ...),
   valueClass = "logical"
 )
+#' @export
 sqliteWriteTable <- function(con, name, value, row.names=TRUE,
   overwrite=FALSE, append=FALSE,
   field.types=NULL, ...) {
@@ -424,6 +453,7 @@ sqliteWriteTable <- function(con, name, value, row.names=TRUE,
   success
 }
 
+#' @export
 dbBuildTableDefinition <- function(dbObj, name, value, field.types = NULL, 
   row.names = TRUE, ...) {
   if(!is.data.frame(value))
@@ -451,6 +481,7 @@ dbBuildTableDefinition <- function(dbObj, name, value, field.types = NULL,
 
 ## create/load table from a file via dbWriteTable (the argument
 ## value specifies a file name).  TODO, value a connection.
+#' @export
 setMethod("dbWriteTable",
   signature = signature(conn = "SQLiteConnection", name = "character",
     value="character"),
@@ -459,6 +490,7 @@ setMethod("dbWriteTable",
   valueClass = "logical"
 )
 
+#' @export
 sqliteImportFile <- function(con, name, value, field.types = NULL, 
   overwrite = FALSE, append = FALSE, header, 
   row.names, nrows = 50, sep = ",", eol="\n", 
@@ -547,6 +579,7 @@ sqliteImportFile <- function(con, name, value, field.types = NULL,
 ## arguments passed via '...'. Note that this duplicates the default
 ## values of count.fields and will need to be updated if that function's
 ## defaults change.
+#' @export
 count.fields.wrapper <- function(file, sep = "", quote = "\"'", skip = 0,
   blank.lines.skip = TRUE,
   comment.char = "#", ...) {
@@ -554,6 +587,7 @@ count.fields.wrapper <- function(file, sep = "", quote = "\"'", skip = 0,
   count.fields(file, sep, quote, skip, blank.lines.skip, comment.char)
 }
 
+#' @export
 setMethod("dbRemoveTable",
   signature = signature(conn = "SQLiteConnection", name = "character"),
   definition = function(conn, name, ...){
@@ -562,6 +596,7 @@ setMethod("dbRemoveTable",
   },
   valueClass = "logical"
 )
+#' @export
 setMethod("dbListResults", "SQLiteConnection",
   definition = function(conn, ...) {
     rs <- dbGetInfo(conn, "rsId")[[1]]
@@ -570,6 +605,7 @@ setMethod("dbListResults", "SQLiteConnection",
   valueClass = "list"
 )
 
+#' @export
 setMethod("dbListTables", "SQLiteConnection",
   definition = function(conn, ...){
     out <- dbGetQuery(conn, "SELECT name FROM
@@ -585,11 +621,13 @@ setMethod("dbListTables", "SQLiteConnection",
   },
   valueClass = "character"
 )
+#' @export
 setMethod("dbListFields",
   signature = signature(conn = "SQLiteConnection", name = "character"),
   definition = function(conn, name, ...) sqliteTableFields(conn, name, ...),
   valueClass = "character"
 )
+#' @export
 sqliteTableFields <- function(con, name, ...) {
   if(length(dbListResults(con))>0){
     con2 <- dbConnect(con)

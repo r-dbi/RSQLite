@@ -1,83 +1,69 @@
-import(methods)
+export(SQLITE_RO)
+export(SQLITE_RW)
+export(SQLITE_RWC)
+export(SQLite)
+export(count.fields.wrapper)
+export(dbBuildTableDefinition)
+export(safe.write)
+export(sqliteCloseConnection)
+export(sqliteCloseDriver)
+export(sqliteCloseResult)
+export(sqliteConnectionInfo)
+export(sqliteCopyDatabase)
+export(sqliteDataType)
+export(sqliteDescribeConnection)
+export(sqliteDescribeDriver)
+export(sqliteDescribeResult)
+export(sqliteDriverInfo)
+export(sqliteExecStatement)
+export(sqliteFetch)
+export(sqliteImportFile)
+export(sqliteInitDriver)
+export(sqliteNewConnection)
+export(sqliteQuickSQL)
+export(sqliteReadTable)
+export(sqliteTableFields)
+export(sqliteTransactionStatement)
+export(sqliteWriteTable)
+exportClasses(SQLiteConnection)
+exportClasses(SQLiteDriver)
+exportClasses(SQLiteObject)
+exportClasses(SQLiteResult)
+exportClasses(dbObjectId)
+exportMethods(SQLKeywords)
+exportMethods(dbBeginTransaction)
+exportMethods(dbCallProc)
+exportMethods(dbClearResult)
+exportMethods(dbColumnInfo)
+exportMethods(dbCommit)
+exportMethods(dbConnect)
+exportMethods(dbDataType)
+exportMethods(dbDisconnect)
+exportMethods(dbExistsTable)
+exportMethods(dbGetException)
+exportMethods(dbGetInfo)
+exportMethods(dbGetPreparedQuery)
+exportMethods(dbGetQuery)
+exportMethods(dbGetRowCount)
+exportMethods(dbGetRowsAffected)
+exportMethods(dbGetStatement)
+exportMethods(dbHasCompleted)
+exportMethods(dbListConnections)
+exportMethods(dbListFields)
+exportMethods(dbListResults)
+exportMethods(dbListTables)
+exportMethods(dbReadTable)
+exportMethods(dbRemoveTable)
+exportMethods(dbRollback)
+exportMethods(dbSendPreparedQuery)
+exportMethods(dbSendQuery)
+exportMethods(dbUnloadDriver)
+exportMethods(dbWriteTable)
+exportMethods(fetch)
+exportMethods(isSQLKeyword)
+exportMethods(make.db.names)
+exportMethods(show)
+exportMethods(summary)
 import(DBI)
-
+import(methods)
 useDynLib(RSQLite)
-
-## Classes
-exportClasses(
-   dbObjectId,
-   SQLiteObject,
-   SQLiteDriver,
-   SQLiteConnection,
-   SQLiteResult
-)
-
-## Methods/Generics
-exportMethods(
-   coerce,
-   dbBeginTransaction,
-   dbCallProc,
-   dbClearResult,
-   dbColumnInfo,
-   dbCommit,
-   dbConnect,
-   dbDataType,
-   dbDisconnect,
-   dbExistsTable,
-   dbGetException,
-   dbGetInfo,
-   dbGetPreparedQuery,
-   dbGetQuery,
-   dbGetRowCount,
-   dbGetRowsAffected,
-   dbGetStatement,
-   dbHasCompleted,
-   dbListConnections,
-   dbListFields,
-   dbListResults,
-   dbListTables,
-   dbReadTable,
-   dbRemoveTable,
-   dbRollback,
-   dbSendPreparedQuery,
-   dbSendQuery,
-   dbUnloadDriver,
-   dbWriteTable,
-   fetch,
-   initialize,
-   isSQLKeyword,
-   make.db.names,
-   show,
-   SQLKeywords,
-   summary
-)
-
-## regular functions (most of these will be made private)
-export(
-  SQLite,
-  dbBuildTableDefinition,
-  isIdCurrent,
-  sqliteInitDriver,
-  sqliteCloseDriver,
-  sqliteDescribeDriver,
-  sqliteDriverInfo,
-  sqliteNewConnection,
-  sqliteDescribeConnection,
-  sqliteCloseConnection,
-  sqliteConnectionInfo,
-  sqliteExecStatement,
-  sqliteQuickSQL,
-  sqliteFetch,
-  sqliteResultInfo,
-  sqliteDescribeResult,
-  sqliteCloseResult,
-  sqliteTableFields,
-  sqliteReadTable,
-  sqliteWriteTable,
-  sqliteDataType,
-  sqliteCopyDatabase,
-  safe.write
-)
-
-## constants
-export(SQLITE_RWC, SQLITE_RW, SQLITE_RO)

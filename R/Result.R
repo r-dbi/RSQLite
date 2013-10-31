@@ -1,10 +1,13 @@
 #' @include Object.R
 NULL
+
+#' @export
 setClass("SQLiteResult", representation("DBIResult", "SQLiteObject"))
 
 setAs("SQLiteResult", "SQLiteConnection",
   def = function(from) new("SQLiteConnection", Id = from@Id)
 )
+#' @export
 setMethod("fetch", "SQLiteResult",
   definition = function(res, n = 0, ...) sqliteFetch(res, n = n, ...),
   valueClass = "data.frame"
@@ -20,6 +23,7 @@ setMethod("fetch", "SQLiteResult",
 ## TODO: Make sure we don't exhaust all the memory, or generate
 ## an object whose size exceeds option("object.size").  Also,
 ## are we sure we want to return a data.frame?
+#' @export
 sqliteFetch <- function(res, n=0, ...) {
   
   if(!isIdCurrent(res))
@@ -37,10 +41,12 @@ sqliteFetch <- function(res, n=0, ...) {
   rel
 }
 
+#' @export
 setMethod("dbClearResult", "SQLiteResult",
   definition = function(res, ...) sqliteCloseResult(res, ...),
   valueClass = "logical"
 )
+#' @export
 sqliteCloseResult <- function(res, ...) {
   if(!isIdCurrent(res)){
     warning(paste("expired SQLiteResult"))
@@ -50,14 +56,17 @@ sqliteCloseResult <- function(res, ...) {
 }
 
 
+#' @export
 setMethod("dbGetInfo", "SQLiteResult",
   definition = function(dbObj, ...) sqliteResultInfo(dbObj, ...),
   valueClass = "list"
 )
+#' @export
 setMethod("dbGetStatement", "SQLiteResult",
   definition = function(res, ...) dbGetInfo(res, "statement")[[1]],
   valueClass = "character"
 )
+#' @export
 setMethod("dbColumnInfo", "SQLiteResult",
   definition = function(res, ...){
     out <- dbGetInfo(res, "fields")[[1]]
@@ -65,14 +74,17 @@ setMethod("dbColumnInfo", "SQLiteResult",
   },
   valueClass = "data.frame"
 )
+#' @export
 setMethod("dbGetRowsAffected", "SQLiteResult",
   definition = function(res, ...) dbGetInfo(res, "rowsAffected")[[1]],
   valueClass = "integer"
 )
+#' @export
 setMethod("dbGetRowCount", "SQLiteResult",
   definition = function(res, ...) dbGetInfo(res, "rowCount")[[1]],
   valueClass = "integer"
 )
+#' @export
 setMethod("dbHasCompleted", "SQLiteResult",
   definition = function(res, ...){
     out <- dbGetInfo(res, "completed")[[1]]
@@ -83,9 +95,11 @@ setMethod("dbHasCompleted", "SQLiteResult",
   valueClass = "logical"
 )
 
+#' @export
 setMethod("summary", "SQLiteResult",
   definition = function(object, ...) sqliteDescribeResult(object, ...)
 )
+#' @export
 sqliteDescribeResult <- function(obj, verbose = FALSE, ...) {
   if(!isIdCurrent(obj)){
     show(obj)

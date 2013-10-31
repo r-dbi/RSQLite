@@ -1,9 +1,16 @@
+#' @import methods
+#' @import DBI
+#' @useDynLib RSQLite
+#' @export
 setClass("SQLiteObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
 
+#' @export
 setMethod("dbDataType", "SQLiteObject",
   definition = function(dbObj, obj, ...) sqliteDataType(obj, ...),
   valueClass = "character"
 )
+
+#' @export
 sqliteDataType <- function(obj, ...) {
   rs.class <- data.class(obj)
   rs.mode <- storage.mode(obj)
@@ -28,6 +35,7 @@ sqliteDataType <- function(obj, ...) {
 }
 
 
+#' @export
 setMethod("make.db.names",
   signature(dbObj="SQLiteObject", snames = "character"),
   definition = function(dbObj, snames, keywords, unique, allow.keywords, ...){
@@ -36,11 +44,13 @@ setMethod("make.db.names",
   valueClass = "character"
 )
 
+#' @export
 setMethod("SQLKeywords", "SQLiteObject",
   definition = function(dbObj, ...) .SQL92Keywords,
   valueClass = "character"
 )
 
+#' @export
 setMethod("isSQLKeyword",
   signature(dbObj="SQLiteObject", name="character"),
   definition = function(dbObj, name, keywords, case, ...){

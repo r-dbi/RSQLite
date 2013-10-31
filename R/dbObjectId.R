@@ -28,8 +28,10 @@
 ## TODO: Convert the Id slot to be an external object (as per Luke Tierney's
 ## implementation), even at the expense of S-plus compatibility?
 
+#' @export
 setClass("dbObjectId", representation(Id = "externalptr", "VIRTUAL"))
 
+#' @export
 setMethod("show", "dbObjectId",
    definition = function(object) {
       expired <- if(isIdCurrent(object)) "" else "Expired "

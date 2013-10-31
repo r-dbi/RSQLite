@@ -1,4 +1,7 @@
 \name{dbConnect,SQLiteDriver-method}
+\alias{SQLITE_RO}
+\alias{SQLITE_RW}
+\alias{SQLITE_RWC}
 \alias{dbConnect,SQLiteConnection-method}
 \alias{dbConnect,SQLiteDriver-method}
 \alias{dbConnect,character-method}
@@ -45,6 +48,14 @@
   (\emph{not} the R application) crashing. See the SQLite
   documentation for the full details of this
   \code{PRAGMA}.}
+
+  \item{flags}{\code{SQLITE_RWC}: open the database in
+  read/write mode and create the database file if it does
+  not already exist; \code{SQLITE_RW}: open the database in
+  read/write mode. Raise an error if the file does not
+  already exist; \code{SQLITE_RO}: open the database in
+  read only mode.  Raise an error if the file does not
+  already exist}
 }
 \description{
   Create an SQLite connection.

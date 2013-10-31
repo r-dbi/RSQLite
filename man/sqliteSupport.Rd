@@ -243,20 +243,5 @@
   \code{.SQLitePkgVersion} (the R package version),
   \code{.SQLitecle.NA.string} (character that SQLite uses
   to denote \code{NULL} on input), \code{.conflicts.OK}.
-
-  The following constants can be used as the value of the
-  \code{flags} argument to \code{sqliteNewConnection} to
-  control the mode of the databse connection:
-
-  \describe{ \item{list("SQLITE_RWC")}{ open the database
-  in read/write mode and create the database file if it
-  does not already exist}
-
-  \item{list("SQLITE_RW")}{open the database in read/write
-  mode.  Raise an error if the file does not already exist}
-
-  \item{list("SQLITE_RO")}{open the database in read only
-  mode.  Raise an error if the file does not already exist}
-  }
 }
 

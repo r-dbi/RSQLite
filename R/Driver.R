@@ -209,9 +209,15 @@ setMethod("dbConnect", "SQLiteConnection",
 
 #' @export
 #' @rdname dbConnect-SQLiteDriver-method
+#' @param flags \code{SQLITE_RWC}: open the database in read/write mode
+#'   and create the database file if it does not already exist; 
+#'   \code{SQLITE_RW}: open the database in read/write mode. Raise an error 
+#'   if the file does not already exist; \code{SQLITE_RO}: open the database in 
+#'   read only mode.  Raise an error if the file does not already exist
+#' @aliases SQLITE_RWC SQLITE_RW SQLITE_RO
 sqliteNewConnection <- function(drv, dbname = "", loadable.extensions = TRUE,
-  cache_size = NULL, synchronous = 0, 
-  flags = NULL, vfs = NULL) {
+                                cache_size = NULL, synchronous = 0, flags = NULL, 
+                                vfs = NULL) {
   if (is.null(dbname))
     dbname <- ""
   ## path.expand converts as.character(NA) => "NA"

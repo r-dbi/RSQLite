@@ -22,7 +22,6 @@ setClass("SQLiteObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
 #' generic function.
 #' 
 #' @name dbDataType,SQLiteObject-method
-#' @rdname dbDataType-SQLiteObject-method
 #' @docType methods
 #' @param dbObj a \code{SQLiteDriver} object,
 #' @param obj an R object whose SQL type we want to determine.
@@ -75,7 +74,6 @@ sqliteDataType <- function(obj, ...) {
 #' generic functions.
 #' 
 #' @name make.db.names,SQLiteObject-method
-#' @rdname make.db.names-SQLiteObject-method
 #' @docType methods
 #' @param dbObj any SQLite object (e.g., \code{SQLiteDriver}).
 #' @param snames a character vector of R identifiers (symbols) from which to 

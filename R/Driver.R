@@ -1,33 +1,12 @@
 #' @include Object.R
 NULL
 
-#' Class SQLiteDriver
+#' Class SQLiteDriver with constructor SQLite.
 #' 
 #' An SQLite driver implementing the R/S-Plus database (DBI) API.
-#' 
-#' 
-#' @name SQLiteDriver-class
-#' @docType class
-#' @section Generators: The main generators are \code{\link[DBI]{dbDriver}} and
-#' \code{\link{SQLite}}.
-
-#' \dontrun{
-#' drv <- dbDriver("SQLite")
-#' con <- dbConnect(drv, dbname="path/to/dbfile")
-#' }
-#' 
-#' @export
-setClass("SQLiteDriver", representation("DBIDriver", "SQLiteObject"))
-
-
-
-#' Initialize the SQLite engine for the current R session.
-#' 
-#' This function initializes the SQLite engine. It returns an object that
-#' allows you to connect to the SQLite engine embedded in R.
-#' 
-#' This object is a singleton, that is, on subsequent invocations it returns
-#' the same initialized object.
+#' This class should always be initializes with the \code{SQLite()} function.
+#' It returns a singleton object that allows you to connect to the SQLite 
+#' engine embedded in R.
 #' 
 #' This implementation allows the R embedded SQLite engine to work with
 #' multiple database instances through multiple connections simultaneously.
@@ -36,7 +15,36 @@ setClass("SQLiteDriver", representation("DBIDriver", "SQLiteObject"))
 #' database \emph{is} the file name, thus database names should be legal file
 #' names in the running platform.
 #' 
-#' @aliases SQLite SQLiteDriver
+#' @name SQLiteDriver-class
+#' @docType class
+#'
+#' @examples
+#' # create a SQLite instance and create one connection.
+#' m <- dbDriver(SQLite())
+#' 
+#' # initialize a new database to a tempfile and copy some data.frame
+#' # from the base package into it
+#' tfile <- tempfile()
+#' con <- dbConnect(m, dbname = tfile)
+#' data(USArrests)
+#' dbWriteTable(con, "USArrests", USArrests)
+#' 
+#' # query
+#' rs <- dbSendQuery(con, "select * from USArrests")
+#' d1 <- fetch(rs, n = 10)      # extract data in chunks of 10 rows
+#' dbHasCompleted(rs)
+#' d2 <- fetch(rs, n = -1)      # extract all remaining data
+#' dbHasCompleted(rs)
+#' dbClearResult(rs)
+#' dbListTables(con)
+#' 
+#' # clean up
+#' dbDisconnect(con)
+#' file.info(tfile)
+#' file.remove(tfile)
+#' @export
+setClass("SQLiteDriver", representation("DBIDriver", "SQLiteObject"))
+
 #' @param max.con IGNORED.  As of RSQLite 0.9.0, connections are managed
 #' dynamically and there is no predefined limit to the number of connections
 #' you can have in a given R session.
@@ -52,44 +60,25 @@ setClass("SQLiteDriver", representation("DBIDriver", "SQLiteObject"))
 #' and \code{dbObjectId}. This object is needed to create connections to the
 #' embedded SQLite database. There can be many SQLite database instances
 #' running simultaneously.
-#' @section Side Effects: The R client part of the database communication is
-#' initialized, but note that connecting to database instances needs to be done
-#' through calls to \code{dbConnect}.
-#' @author David A. James
-#' @keywords interface database
-#' @examples
 #' 
-#'    # create a SQLite instance and create one connection.
-#'    m <- dbDriver("SQLite")
-#'    
-#'    # initialize a new database to a tempfile and copy some data.frame
-#'    # from the base package into it
-#'    tfile <- tempfile()
-#'    con <- dbConnect(m, dbname = tfile)
-#'    data(USArrests)
-#'    dbWriteTable(con, "USArrests", USArrests)
-#'    
-#'    # query
-#'    rs <- dbSendQuery(con, "select * from USArrests")
-#'    d1 <- fetch(rs, n = 10)      # extract data in chunks of 10 rows
-#'    dbHasCompleted(rs)
-#'    d2 <- fetch(rs, n = -1)      # extract all remaining data
-#'    dbHasCompleted(rs)
-#'    dbClearResult(rs)
-#'    dbListTables(con)
-#' 
-#'    # clean up
-#'    dbDisconnect(con)
-#'    file.info(tfile)
-#'    file.remove(tfile)
-#' 
-#' @export SQLite
-SQLite <-
-  function(max.con = 200L, fetch.default.rec = 500, force.reload = FALSE,
-    shared.cache=FALSE)
-  {
-    sqliteInitDriver(max.con, fetch.default.rec, force.reload, shared.cache)
-  }
+#' @rdname SQLiteDriver-class
+#' @export
+SQLite <- function(max.con = 200L, fetch.default.rec = 500, 
+                   force.reload = FALSE, shared.cache=FALSE) {
+  sqliteInitDriver(max.con, fetch.default.rec, force.reload, shared.cache)
+}
+
+#' @rdname SQLiteDriver-class
+#' @export
+sqliteInitDriver <- function(max.con = 16, fetch.default.rec = 500, 
+                             force.reload=FALSE, shared.cache=FALSE) {
+  config.params <- as.integer(c(max.con, fetch.default.rec))
+  force <- as.logical(force.reload)
+  cache <- as.logical(shared.cache)
+  id <- .Call("RS_SQLite_init", config.params, force, cache, PACKAGE = .SQLitePkgName)
+  new("SQLiteDriver", Id = id)
+}
+
 
 #' SQLite implementation of the Database Interface (DBI) classes and drivers
 #' 
@@ -120,17 +109,6 @@ SQLite <-
 #' }
 #' @name dbDriver
 NULL
-
-## return a manager id
-#' @export
-sqliteInitDriver <- function(max.con = 16, fetch.default.rec = 500, 
-                             force.reload=FALSE, shared.cache=FALSE) {
-  config.params <- as.integer(c(max.con, fetch.default.rec))
-  force <- as.logical(force.reload)
-  cache <- as.logical(shared.cache)
-  id <- .Call("RS_SQLite_init", config.params, force, cache, PACKAGE = .SQLitePkgName)
-  new("SQLiteDriver", Id = id)
-}
 
 #' @export
 setMethod("dbUnloadDriver", "SQLiteDriver",

@@ -1,14 +1,83 @@
 \docType{class}
 \name{SQLiteDriver-class}
+\alias{SQLite}
 \alias{SQLiteDriver-class}
-\title{Class SQLiteDriver}
+\alias{sqliteInitDriver}
+\title{Class SQLiteDriver with constructor SQLite.}
+\usage{
+  SQLite(max.con = 200L, fetch.default.rec = 500,
+    force.reload = FALSE, shared.cache = FALSE)
+
+  sqliteInitDriver(max.con = 16, fetch.default.rec = 500,
+    force.reload = FALSE, shared.cache = FALSE)
+}
+\arguments{
+  \item{max.con}{IGNORED.  As of RSQLite 0.9.0, connections
+  are managed dynamically and there is no predefined limit
+  to the number of connections you can have in a given R
+  session.}
+
+  \item{fetch.default.rec}{default number of records to
+  fetch at one time from the database.  The \code{fetch}
+  method will use this number as a default, but individual
+  calls can override it.}
+
+  \item{force.reload}{should the package code be reloaded
+  (reinitialized)? Setting this to \code{TRUE} allows you
+  to change default settings.  Notice that all connections
+  should be closed before re-loading.}
+
+  \item{shared.cache}{logical describing whether
+  shared-cache mode should be enabled on the SQLite driver.
+  The default is \code{FALSE}.}
+}
+\value{
+  An object of class \code{SQLiteDriver} which extends
+  \code{dbDriver} and \code{dbObjectId}. This object is
+  needed to create connections to the embedded SQLite
+  database. There can be many SQLite database instances
+  running simultaneously.
+}
 \description{
   An SQLite driver implementing the R/S-Plus database (DBI)
-  API.
+  API. This class should always be initializes with the
+  \code{SQLite()} function. It returns a singleton object
+  that allows you to connect to the SQLite engine embedded
+  in R.
 }
-\section{Generators}{
-  The main generators are \code{\link[DBI]{dbDriver}} and
-  \code{\link{SQLite}}. \dontrun{ drv <- dbDriver("SQLite")
-  con <- dbConnect(drv, dbname="path/to/dbfile") }
+\details{
+  This implementation allows the R embedded SQLite engine
+  to work with multiple database instances through multiple
+  connections simultaneously.
+
+  SQLite keeps each database instance in one single file.
+  The name of the database \emph{is} the file name, thus
+  database names should be legal file names in the running
+  platform.
+}
+\examples{
+# create a SQLite instance and create one connection.
+m <- dbDriver(SQLite())
+
+# initialize a new database to a tempfile and copy some data.frame
+# from the base package into it
+tfile <- tempfile()
+con <- dbConnect(m, dbname = tfile)
+data(USArrests)
+dbWriteTable(con, "USArrests", USArrests)
+
+# query
+rs <- dbSendQuery(con, "select * from USArrests")
+d1 <- fetch(rs, n = 10)      # extract data in chunks of 10 rows
+dbHasCompleted(rs)
+d2 <- fetch(rs, n = -1)      # extract all remaining data
+dbHasCompleted(rs)
+dbClearResult(rs)
+dbListTables(con)
+
+# clean up
+dbDisconnect(con)
+file.info(tfile)
+file.remove(tfile)
 }
 

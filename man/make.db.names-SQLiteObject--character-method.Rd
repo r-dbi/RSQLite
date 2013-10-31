@@ -1,8 +1,8 @@
 \docType{methods}
-\name{make.db.names,SQLiteObject-method}
-\alias{SQLKeywords-SQLiteObject-method}
-\alias{isSQLKeyword-SQLiteObject-method}
-\alias{make.db.names,SQLiteObject-method}
+\name{make.db.names,SQLiteObject,character-method}
+\alias{SQLKeywords,SQLiteObject-method}
+\alias{isSQLKeyword,SQLiteObject,character-method}
+\alias{make.db.names,SQLiteObject,character-method}
 \title{Make R/S-Plus identifiers into legal SQL identifiers}
 \usage{
   \S4method{make.db.names}{SQLiteObject,character}(dbObj,

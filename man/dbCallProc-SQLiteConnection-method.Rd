@@ -1,6 +1,5 @@
 \docType{methods}
-\name{dbCallProc}
-\alias{dbCallProc}
+\name{dbCallProc,SQLiteConnection-method}
 \alias{dbCallProc,SQLiteConnection-method}
 \title{Call an SQL stored procedure}
 \usage{

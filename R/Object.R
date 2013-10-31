@@ -2,7 +2,6 @@
 #' 
 #' Base class for all SQLite-specific DBI classes
 #' 
-#' @name SQLiteObject-class
 #' @docType class
 #' @examples
 #' \dontrun{
@@ -21,7 +20,6 @@ setClass("SQLiteObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
 #' This method is a straight-forward implementation of the corresponding
 #' generic function.
 #' 
-#' @name dbDataType,SQLiteObject-method
 #' @docType methods
 #' @param dbObj a \code{SQLiteDriver} object,
 #' @param obj an R object whose SQL type we want to determine.
@@ -73,7 +71,6 @@ sqliteDataType <- function(obj, ...) {
 #' These methods are straight-forward implementations of the corresponding
 #' generic functions.
 #' 
-#' @name make.db.names,SQLiteObject-method
 #' @docType methods
 #' @param dbObj any SQLite object (e.g., \code{SQLiteDriver}).
 #' @param snames a character vector of R identifiers (symbols) from which to 
@@ -109,16 +106,14 @@ setMethod("make.db.names",
 )
 
 #' @export
-#' @name SQLKeywords-SQLiteObject-method
-#' @rdname make.db.names-SQLiteObject-method
+#' @rdname make.db.names-SQLiteObject--character-method
 setMethod("SQLKeywords", "SQLiteObject",
   definition = function(dbObj, ...) .SQL92Keywords,
   valueClass = "character"
 )
 
 #' @export
-#' @name isSQLKeyword-SQLiteObject-method
-#' @rdname make.db.names-SQLiteObject-method
+#' @rdname make.db.names-SQLiteObject--character-method
 #' @param name a character vector of SQL identifiers we want to check against
 #'   keywords from the DBMS. 
 #' @param keywords a character vector with SQL keywords, namely 

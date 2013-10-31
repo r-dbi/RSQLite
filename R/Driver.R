@@ -19,13 +19,9 @@ NULL
 #' @docType class
 #'
 #' @examples
-#' # create a SQLite instance and create one connection.
-#' m <- dbDriver(SQLite())
-#' 
 #' # initialize a new database to a tempfile and copy some data.frame
 #' # from the base package into it
-#' tfile <- tempfile()
-#' con <- dbConnect(m, dbname = tfile)
+#' con <- dbConnect(SQLite(), ":memory:")
 #' data(USArrests)
 #' dbWriteTable(con, "USArrests", USArrests)
 #' 
@@ -40,8 +36,6 @@ NULL
 #' 
 #' # clean up
 #' dbDisconnect(con)
-#' file.info(tfile)
-#' file.remove(tfile)
 #' @export
 setClass("SQLiteDriver", representation("DBIDriver", "SQLiteObject"))
 

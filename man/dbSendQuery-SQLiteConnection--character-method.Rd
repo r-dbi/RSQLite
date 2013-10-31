@@ -119,6 +119,6 @@ bulk_insert(sql, key_counts)
 sql <- "select * from keys where count = :cc"
 dbGetPreparedQuery(db, sql, data.frame(cc = c(95, 403)))
 
-dbDisconnect(db)
+dbDisconnect(con)
 }
 

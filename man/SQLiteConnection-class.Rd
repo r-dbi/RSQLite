@@ -9,6 +9,5 @@
 \examples{
 con <- dbConnect(SQLite(), dbname = tempfile())
 dbDisconnect(con)
-dbUnloadDriver(drv)
 }
 

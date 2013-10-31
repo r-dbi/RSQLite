@@ -10,7 +10,6 @@ NULL
 #' @examples
 #' con <- dbConnect(SQLite(), dbname = tempfile())
 #' dbDisconnect(con)
-#' dbUnloadDriver(drv)
 #' @export
 setClass("SQLiteConnection", representation("DBIConnection", "SQLiteObject"))
 
@@ -128,8 +127,7 @@ sqliteCloseConnection <- function(con, ...) {
 #' sql <- "select * from keys where count = :cc"
 #' dbGetPreparedQuery(db, sql, data.frame(cc = c(95, 403)))
 #' 
-#' dbDisconnect(db)
-#' 
+#' dbDisconnect(con)
 #' @export
 setMethod("dbSendQuery",
   signature = signature(conn = "SQLiteConnection", statement = "character"),

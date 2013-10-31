@@ -16,21 +16,21 @@
 #' @export
 setClass("SQLiteObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
 
-#' Determine the SQL Data Type of an S object.
+#' Determine the SQL Data Type of an R object.
 #' 
 #' This method is a straight-forward implementation of the corresponding
 #' generic function.
 #' 
-#' @aliases dbDataType,SQLiteObject-method
+#' @name dbDataType,SQLiteObject-method
+#' @rdname dbDataType-SQLiteObject-method
 #' @docType methods
-#' @section Methods: \describe{ \item{dbObj}{ a \code{SQLiteDriver} object,
-#' e.g., \code{ODBCDriver}, \code{OracleDriver}.  } \item{obj}{ R/S-Plus object
-#' whose SQL type we want to determine.  } \item{list()}{ any other parameters
-#' that individual methods may need.  }\item{ }{ any other parameters that
-#' individual methods may need.  } }
+#' @param dbObj a \code{SQLiteDriver} object,
+#' @param obj an R object whose SQL type we want to determine.
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @examples
 #' data(quakes)
-#' drv <- dbDriver("SQLite")
+#' drv <- SQLite()
+#'
 #' sapply(quakes, function(x) dbDataType(drv, x))
 #' 
 #' dbDataType(drv, 1)
@@ -44,6 +44,7 @@ setMethod("dbDataType", "SQLiteObject",
 )
 
 #' @export
+#' @rdname dbDataType-SQLiteObject-method
 sqliteDataType <- function(obj, ...) {
   rs.class <- data.class(obj)
   rs.mode <- storage.mode(obj)
@@ -73,27 +74,19 @@ sqliteDataType <- function(obj, ...) {
 #' These methods are straight-forward implementations of the corresponding
 #' generic functions.
 #' 
-#' 
-#' @name make.db.names-methods
-#' @aliases SQLKeywords-methods isSQLKeyword-methods
-#' make.db.names,SQLiteObject,character-method SQLKeywords,SQLiteObject-method
-#' SQLKeywords,missing-method isSQLKeyword,SQLiteObject,character-method
+#' @name make.db.names,SQLiteObject-method
+#' @rdname make.db.names-SQLiteObject-method
 #' @docType methods
-#' @section Methods: \describe{ \item{dbObj}{ any SQLite object (e.g.,
-#' \code{SQLiteDriver}).  } \item{snames}{ a character vector of R/S-Plus
-#' identifiers (symbols) from which we need to make SQL identifiers.  }
-#' \item{name}{ a character vector of SQL identifiers we want to check against
-#' keywords from the DBMS. } \item{unique}{ logical describing whether the
-#' resulting set of SQL names should be unique.  Its default is \code{TRUE}.
-#' Following the SQL 92 standard, uniqueness of SQL identifiers is determined
-#' regardless of whether letters are upper or lower case.  }
-#' \item{allow.keywords }{ logical describing whether SQL keywords should be
-#' allowed in the resulting set of SQL names.  Its default is \code{TRUE} }
-#' \item{keywords}{ a character vector with SQL keywords, namely
-#' \code{.SQL92Keywords} defined in the \code{DBI} package.  } \item{case}{ a
-#' character string specifying whether to make the comparison as lower case,
-#' upper case, or any of the two.  it defaults to \code{any}.  }
-#' \item{list()}{currently not used.} }
+#' @param dbObj any SQLite object (e.g., \code{SQLiteDriver}).
+#' @param snames a character vector of R identifiers (symbols) from which to 
+#'   make SQL identifiers.
+#' @param unique logical describing whether the resulting set of SQL names 
+#'   should be unique.  The default is \code{TRUE}. Following the SQL 92 
+#'   standard, uniqueness of SQL identifiers is determined regardless of whether 
+#'   letters are upper or lower case.
+#' @param allow.keywords logical describing whether SQL keywords should be
+#'   allowed in the resulting set of SQL names.  The default is \code{TRUE}.
+#' @param ... Not used. Included for compatiblity with generic.
 #' @examples
 #' \dontrun{
 #' # This example shows how we could export a bunch of data.frames
@@ -108,7 +101,7 @@ sqliteDataType <- function(obj, ...) {
 #'    dbWriteTable(con, name = tabs[i],  get(export[i]))
 #' }
 #' 
-NULL#' @export
+#' @export
 setMethod("make.db.names",
   signature(dbObj="SQLiteObject", snames = "character"),
   definition = function(dbObj, snames, keywords, unique, allow.keywords, ...){
@@ -118,12 +111,22 @@ setMethod("make.db.names",
 )
 
 #' @export
+#' @name SQLKeywords-SQLiteObject-method
+#' @rdname make.db.names-SQLiteObject-method
 setMethod("SQLKeywords", "SQLiteObject",
   definition = function(dbObj, ...) .SQL92Keywords,
   valueClass = "character"
 )
 
 #' @export
+#' @name isSQLKeyword-SQLiteObject-method
+#' @rdname make.db.names-SQLiteObject-method
+#' @param name a character vector of SQL identifiers we want to check against
+#'   keywords from the DBMS. 
+#' @param keywords a character vector with SQL keywords, namely 
+#'   \code{.SQL92Keywords} defined in the \code{DBI} package.
+#' @param case a character string specifying whether to make the comparison 
+#'   as lower case, upper case, or any of the two.  it defaults to \code{"any"}.
 setMethod("isSQLKeyword",
   signature(dbObj="SQLiteObject", name="character"),
   definition = function(dbObj, name, keywords, case, ...){

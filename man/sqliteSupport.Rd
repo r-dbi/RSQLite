@@ -61,7 +61,7 @@
 
    ## data mappings and convenience functions
    sqliteDataType(obj, ...)
-   sqliteReadTable(con, name, row.names = "row_names", check.names = TRUE, ...)
+   sqliteReadTable(con, name, row.names = "row_names", check.names = TRUE, select.cols="*", ...)
    sqliteImportFile(con, name, value, field.types, overwrite=FALSE,
       append=FALSE, header, row.names, nrows=50, sep=",", eol="\n",
       skip = 0, ...)
@@ -199,6 +199,9 @@ See \url{http://www.sqlite.org/compile.html} for details.
 \item{row.names}{
    a logical specifying whether to prepend the \code{value} data.frame
    row names or not.  The default is \code{TRUE}.
+}
+\item{select.cols}{
+   A SQL statement (in the form of a character vector of length 1) giving the columns to select. E.g. "*" selects all columns, "x,y,z" selects three columns named as listed
 }
 \item{check.names}{
    a logical specifying whether to convert DBMS field names into

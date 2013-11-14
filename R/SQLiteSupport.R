@@ -378,12 +378,12 @@ function(con, name, ...)
 }
 ## this is exactly the same as ROracle's oraReadTable
 sqliteReadTable <-
-function(con, name, row.names = "row_names", check.names = TRUE, ...)
+function(con, name, row.names = "row_names", check.names = TRUE, select.cols="*", ...)
 ## Should we also allow row.names to be a character vector (as in read.table)?
 ## is it "correct" to set the row.names of output data.frame?
 ## Use NULL, "", or 0 as row.names to prevent using any field as row.names.
 {
-   out <- try(dbGetQuery(con, paste("SELECT * from", name)))
+   out <- try(dbGetQuery(con, paste("SELECT", select.cols, "FROM", name)))
    if(inherits(out, ErrorClass))
       stop(paste("could not find table", name))
    if(check.names)

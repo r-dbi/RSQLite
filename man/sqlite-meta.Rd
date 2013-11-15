@@ -23,7 +23,7 @@
   generic}
 }
 \description{
-See documentation of generics for more details.
+  See documentation of generics for more details.
 }
 \examples{
 data(USArrests)

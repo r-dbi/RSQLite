@@ -45,8 +45,8 @@
   two.  it defaults to \code{"any"}.}
 }
 \description{
-These methods are straight-forward implementations of the
-corresponding generic functions.
+  These methods are straight-forward implementations of the
+  corresponding generic functions.
 }
 \examples{
 \dontrun{

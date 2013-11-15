@@ -19,6 +19,6 @@ sqliteTableFields(con, name, ...)
   generic.}
 }
 \description{
-List fields in specified table.
+  List fields in specified table.
 }
 

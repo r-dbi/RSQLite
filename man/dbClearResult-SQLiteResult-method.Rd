@@ -15,6 +15,6 @@ sqliteCloseResult(res, ...)
   generic.}
 }
 \description{
-Clear a result set.
+  Clear a result set.
 }
 

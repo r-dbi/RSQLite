@@ -30,19 +30,20 @@ sqliteReadTable(con, name, row.names = "row_names", check.names = TRUE, ...)
   \code{row.names} in the output.)}
 }
 \value{
-A data.frame in the case of \code{dbReadTable}; otherwise a
-logical indicating whether the operation was successful.
+  A data.frame in the case of \code{dbReadTable}; otherwise
+  a logical indicating whether the operation was
+  successful.
 }
 \description{
-These functions mimic their R/S-Plus counterpart
-\code{get}, \code{assign}, \code{exists}, \code{remove},
-and \code{objects}, except that they generate code that
-gets remotely executed in a database engine.
+  These functions mimic their R/S-Plus counterpart
+  \code{get}, \code{assign}, \code{exists}, \code{remove},
+  and \code{objects}, except that they generate code that
+  gets remotely executed in a database engine.
 }
 \note{
-Note that the data.frame returned by \code{dbReadTable}
-only has primitive data, e.g., it does not coerce character
-data to factors.
+  Note that the data.frame returned by \code{dbReadTable}
+  only has primitive data, e.g., it does not coerce
+  character data to factors.
 }
 \examples{
 \dontrun{

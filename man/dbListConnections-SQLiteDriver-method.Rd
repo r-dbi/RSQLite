@@ -13,6 +13,6 @@
   generic.}
 }
 \description{
-List active connections
+  List active connections
 }
 

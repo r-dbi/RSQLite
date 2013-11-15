@@ -18,8 +18,8 @@ sqliteDataType(obj, ...)
   Otherwise ignored.}
 }
 \description{
-This method is a straight-forward implementation of the
-corresponding generic function.
+  This method is a straight-forward implementation of the
+  corresponding generic function.
 }
 \examples{
 data(quakes)

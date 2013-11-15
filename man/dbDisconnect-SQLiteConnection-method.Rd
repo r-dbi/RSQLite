@@ -16,6 +16,6 @@ sqliteCloseConnection(con, ...)
   generic.}
 }
 \description{
-Disconnect an SQLite connection.
+  Disconnect an SQLite connection.
 }
 

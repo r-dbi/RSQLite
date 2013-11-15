@@ -14,22 +14,22 @@ sqliteQuickColumn(con, table, column)
   in the specified table to retrieve.}
 }
 \value{
-an R vector of the appropriate type (based on the type of
-the column in the database).
+  an R vector of the appropriate type (based on the type of
+  the column in the database).
 }
 \description{
-Return an entire column from a table in a SQLite database
-as an R vector of the appropriate type.  This function is
-experimental and subject to change.
+  Return an entire column from a table in a SQLite database
+  as an R vector of the appropriate type.  This function is
+  experimental and subject to change.
 }
 \details{
-This function relies upon the SQLite internal \code{ROWID}
-column to determine the number of rows in the table.  This
-may not work depending on the table schema definition and
-pattern of update.
+  This function relies upon the SQLite internal
+  \code{ROWID} column to determine the number of rows in
+  the table.  This may not work depending on the table
+  schema definition and pattern of update.
 }
 \author{
-Seth Falcon
+  Seth Falcon
 }
 \keyword{interface}
 

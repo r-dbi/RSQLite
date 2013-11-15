@@ -18,18 +18,18 @@ sqliteCopyDatabase(from, to)
   otherwise.}
 }
 \value{
-Returns \code{NULL}.
+  Returns \code{NULL}.
 }
 \description{
-This function copies a database connection to a file or to
-another database connection.  It can be used to save an
-in-memory database (created using \code{dbname =
-":memory:"}) to a file or to create an in-memory database
-as a copy of anothe database.
+  This function copies a database connection to a file or
+  to another database connection.  It can be used to save
+  an in-memory database (created using \code{dbname =
+  ":memory:"}) to a file or to create an in-memory database
+  as a copy of anothe database.
 }
 \details{
-This function uses SQLite's experimental online backup API
-to make the copy.
+  This function uses SQLite's experimental online backup
+  API to make the copy.
 }
 \examples{
 ## Create an in memory database
@@ -57,9 +57,9 @@ dbDisconnect(db2)
 unlink(backupDbFile)
 }
 \author{
-Seth Falcon
+  Seth Falcon
 }
 \references{
-\url{http://www.sqlite.org/backup.html}
+  \url{http://www.sqlite.org/backup.html}
 }
 

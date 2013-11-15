@@ -17,6 +17,6 @@ dbGetPreparedQuery(conn, statement, bind.data, ...)
   \item{...}{Other arguments used by methods}
 }
 \description{
-Generics for getting and sending prepared queries.
+  Generics for getting and sending prepared queries.
 }
 

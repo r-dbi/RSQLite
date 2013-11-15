@@ -34,6 +34,6 @@ sqliteConnectionInfo(obj, what = "", ...)
   generic.}
 }
 \description{
-Get metadata about a database object.
+  Get metadata about a database object.
 }
 

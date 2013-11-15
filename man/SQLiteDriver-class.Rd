@@ -32,27 +32,28 @@ sqliteInitDriver(max.con = 16, fetch.default.rec = 500,
   The default is \code{FALSE}.}
 }
 \value{
-An object of class \code{SQLiteDriver} which extends
-\code{dbDriver} and \code{dbObjectId}. This object is
-needed to create connections to the embedded SQLite
-database. There can be many SQLite database instances
-running simultaneously.
+  An object of class \code{SQLiteDriver} which extends
+  \code{dbDriver} and \code{dbObjectId}. This object is
+  needed to create connections to the embedded SQLite
+  database. There can be many SQLite database instances
+  running simultaneously.
 }
 \description{
-An SQLite driver implementing the R/S-Plus database (DBI)
-API. This class should always be initializes with the
-\code{SQLite()} function. It returns a singleton object
-that allows you to connect to the SQLite engine embedded in
-R.
+  An SQLite driver implementing the R/S-Plus database (DBI)
+  API. This class should always be initializes with the
+  \code{SQLite()} function. It returns a singleton object
+  that allows you to connect to the SQLite engine embedded
+  in R.
 }
 \details{
-This implementation allows the R embedded SQLite engine to
-work with multiple database instances through multiple
-connections simultaneously.
+  This implementation allows the R embedded SQLite engine
+  to work with multiple database instances through multiple
+  connections simultaneously.
 
-SQLite keeps each database instance in one single file. The
-name of the database \emph{is} the file name, thus database
-names should be legal file names in the running platform.
+  SQLite keeps each database instance in one single file.
+  The name of the database \emph{is} the file name, thus
+  database names should be legal file names in the running
+  platform.
 }
 \examples{
 # initialize a new database to a tempfile and copy some data.frame

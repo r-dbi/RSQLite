@@ -15,10 +15,10 @@ sqliteCloseDriver(drv, ...)
   generic.}
 }
 \value{
-A logical indicating whether the operation succeeded or
-not.
+  A logical indicating whether the operation succeeded or
+  not.
 }
 \description{
-Unload SQLite driver.
+  Unload SQLite driver.
 }
 

@@ -10,6 +10,6 @@ dbBeginTransaction(conn, ...)
   \item{...}{Other arguments used by methods}
 }
 \description{
-See method documentation for details.
+  See method documentation for details.
 }
 

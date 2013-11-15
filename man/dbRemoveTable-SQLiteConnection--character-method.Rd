@@ -16,6 +16,6 @@
   generic.}
 }
 \description{
-Executes the SQL \code{DROP TABLE}.
+  Executes the SQL \code{DROP TABLE}.
 }
 

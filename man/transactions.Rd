@@ -25,11 +25,11 @@ sqliteTransactionStatement(con, statement)
   \item{statement}{SQL transaction statement to execute}
 }
 \description{
-By default, SQLite is in auto-commit mode.
-\code{dbBeginTransaction} starts a SQLite transaction and
-turns auto-commit off. \code{dbCommit} and
-\code{dbRollback} commit and rollback the transaction,
-respectively and turn auto-commit on.
+  By default, SQLite is in auto-commit mode.
+  \code{dbBeginTransaction} starts a SQLite transaction and
+  turns auto-commit off. \code{dbCommit} and
+  \code{dbRollback} commit and rollback the transaction,
+  respectively and turn auto-commit on.
 }
 \examples{
 con <- dbConnect(SQLite(), dbname = tempfile())

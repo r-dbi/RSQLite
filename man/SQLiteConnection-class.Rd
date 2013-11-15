@@ -3,8 +3,8 @@
 \alias{SQLiteConnection-class}
 \title{Class SQLiteConnection}
 \description{
-\code{SQLiteConnection} objects are usually created by
-\code{\link[DBI]{dbConnect}}
+  \code{SQLiteConnection} objects are usually created by
+  \code{\link[DBI]{dbConnect}}
 }
 \examples{
 con <- dbConnect(SQLite(), dbname = tempfile())

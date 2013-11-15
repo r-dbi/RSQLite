@@ -22,7 +22,7 @@ sqliteDescribeConnection(obj, verbose = FALSE, ...)
 sqliteDescribeResult(obj, verbose = FALSE, ...)
 }
 \description{
-Summary methods
+  Summary methods
 }
 \keyword{internal}
 

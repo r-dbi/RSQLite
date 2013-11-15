@@ -54,6 +54,6 @@ sqliteNewConnection(drv, dbname = "", loadable.extensions = TRUE,
   already exist}
 }
 \description{
-Create an SQLite connection.
+  Create an SQLite connection.
 }
 

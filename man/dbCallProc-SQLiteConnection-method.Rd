@@ -6,7 +6,7 @@
 \S4method{dbCallProc}{SQLiteConnection}(conn, ...)
 }
 \description{
-Not yet implemented.
+  Not yet implemented.
 }
 \keyword{internal}
 

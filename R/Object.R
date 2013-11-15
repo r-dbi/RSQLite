@@ -1,3 +1,6 @@
+#' @include dbObjectId.R
+NULL
+
 #' Class SQLiteObject
 #' 
 #' Base class for all SQLite-specific DBI classes

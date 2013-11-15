@@ -1,4 +1,5 @@
 #' @include Object.R
+#' @include ConnectionExtensions.R
 NULL
 
 #' Class SQLiteConnection

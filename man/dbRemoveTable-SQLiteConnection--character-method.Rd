@@ -1,9 +1,9 @@
+\docType{methods}
 \name{dbRemoveTable,SQLiteConnection,character-method}
 \alias{dbRemoveTable,SQLiteConnection,character-method}
 \title{Remove a table from the database.}
 \usage{
-  \S4method{dbRemoveTable}{SQLiteConnection,character}(conn,
-    name, ...)
+\S4method{dbRemoveTable}{SQLiteConnection,character}(conn, name, ...)
 }
 \arguments{
   \item{conn}{An existing
@@ -16,6 +16,6 @@
   generic.}
 }
 \description{
-  Executes the SQL \code{DROP TABLE}.
+Executes the SQL \code{DROP TABLE}.
 }
 

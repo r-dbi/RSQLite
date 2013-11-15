@@ -14,7 +14,8 @@ Depends:
 Imports:
     methods
 Suggests:
-    RUnit (>= 0.4.22)
+    RUnit (>= 0.4.22),
+    roxygen2 (>= 3.0)
 License: LGPL (>= 2)
 Collate:
     'dbObjectId.R'

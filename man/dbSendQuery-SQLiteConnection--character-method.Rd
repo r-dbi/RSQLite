@@ -1,3 +1,4 @@
+\docType{methods}
 \name{dbSendQuery,SQLiteConnection,character-method}
 \alias{dbGetPreparedQuery,SQLiteConnection,character,data.frame-method}
 \alias{dbGetQuery,SQLiteConnection,character-method}
@@ -7,21 +8,19 @@
 \alias{sqliteQuickSQL}
 \title{Execute a SQL statement on a database connection}
 \usage{
-  \S4method{dbSendQuery}{SQLiteConnection,character}(conn,
-    statement, ...)
+\S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement, ...)
 
-  \S4method{dbSendPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
-    statement, bind.data, ...)
+\S4method{dbSendPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
+  statement, bind.data, ...)
 
-  sqliteExecStatement(con, statement, bind.data = NULL)
+sqliteExecStatement(con, statement, bind.data = NULL)
 
-  \S4method{dbGetQuery}{SQLiteConnection,character}(conn,
-    statement, ...)
+\S4method{dbGetQuery}{SQLiteConnection,character}(conn, statement, ...)
 
-  \S4method{dbGetPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
-    statement, bind.data, ...)
+\S4method{dbGetPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
+  statement, bind.data, ...)
 
-  sqliteQuickSQL(con, statement, bind.data = NULL, ...)
+sqliteQuickSQL(con, statement, bind.data = NULL, ...)
 }
 \arguments{
   \item{conn,con}{an \code{\linkS4class{SQLiteConnection}}
@@ -37,8 +36,8 @@
   \item{bind.data}{A data frame of data to be bound.}
 }
 \description{
-  These are the primary methods for interacting with a
-  database via SQL queries.
+These are the primary methods for interacting with a
+database via SQL queries.
 }
 \examples{
 con <- dbConnect(SQLite(), ":memory:")

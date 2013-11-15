@@ -1,8 +1,9 @@
+\docType{methods}
 \name{dbListResults,SQLiteConnection-method}
 \alias{dbListResults,SQLiteConnection-method}
 \title{List available SQLite result sets.}
 \usage{
-  \S4method{dbListResults}{SQLiteConnection}(conn, ...)
+\S4method{dbListResults}{SQLiteConnection}(conn, ...)
 }
 \arguments{
   \item{conn}{An existing
@@ -12,6 +13,6 @@
   generic.}
 }
 \description{
-  List available SQLite result sets.
+List available SQLite result sets.
 }
 

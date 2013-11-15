@@ -1,11 +1,12 @@
+\docType{methods}
 \name{dbClearResult,SQLiteResult-method}
 \alias{dbClearResult,SQLiteResult-method}
 \alias{sqliteCloseResult}
 \title{Clear a result set.}
 \usage{
-  \S4method{dbClearResult}{SQLiteResult}(res, ...)
+\S4method{dbClearResult}{SQLiteResult}(res, ...)
 
-  sqliteCloseResult(res, ...)
+sqliteCloseResult(res, ...)
 }
 \arguments{
   \item{res}{an \code{\linkS4class{SQLiteResult}} object.}
@@ -14,6 +15,6 @@
   generic.}
 }
 \description{
-  Clear a result set.
+Clear a result set.
 }
 

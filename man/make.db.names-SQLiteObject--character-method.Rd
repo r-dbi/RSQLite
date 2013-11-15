@@ -5,15 +5,13 @@
 \alias{make.db.names,SQLiteObject,character-method}
 \title{Make R/S-Plus identifiers into legal SQL identifiers}
 \usage{
-  \S4method{make.db.names}{SQLiteObject,character}(dbObj,
-    snames, keywords = .SQL92Keywords, unique = TRUE,
-    allow.keywords = TRUE, ...)
+\S4method{make.db.names}{SQLiteObject,character}(dbObj, snames,
+  keywords = .SQL92Keywords, unique = TRUE, allow.keywords = TRUE, ...)
 
-  \S4method{SQLKeywords}{SQLiteObject}(dbObj, ...)
+\S4method{SQLKeywords}{SQLiteObject}(dbObj, ...)
 
-  \S4method{isSQLKeyword}{SQLiteObject,character}(dbObj,
-    name, keywords = .SQL92Keywords,
-    case = c("lower", "upper", "any")[3], ...)
+\S4method{isSQLKeyword}{SQLiteObject,character}(dbObj, name,
+  keywords = .SQL92Keywords, case = c("lower", "upper", "any")[3], ...)
 }
 \arguments{
   \item{dbObj}{any SQLite object (e.g.,
@@ -47,8 +45,8 @@
   two.  it defaults to \code{"any"}.}
 }
 \description{
-  These methods are straight-forward implementations of the
-  corresponding generic functions.
+These methods are straight-forward implementations of the
+corresponding generic functions.
 }
 \examples{
 \dontrun{

@@ -4,9 +4,9 @@
 \alias{sqliteDataType}
 \title{Determine the SQL Data Type of an R object.}
 \usage{
-  \S4method{dbDataType}{SQLiteObject}(dbObj, obj, ...)
+\S4method{dbDataType}{SQLiteObject}(dbObj, obj, ...)
 
-  sqliteDataType(obj, ...)
+sqliteDataType(obj, ...)
 }
 \arguments{
   \item{dbObj}{a \code{SQLiteDriver} object,}
@@ -18,8 +18,8 @@
   Otherwise ignored.}
 }
 \description{
-  This method is a straight-forward implementation of the
-  corresponding generic function.
+This method is a straight-forward implementation of the
+corresponding generic function.
 }
 \examples{
 data(quakes)

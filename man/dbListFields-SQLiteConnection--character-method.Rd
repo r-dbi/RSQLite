@@ -1,12 +1,12 @@
+\docType{methods}
 \name{dbListFields,SQLiteConnection,character-method}
 \alias{dbListFields,SQLiteConnection,character-method}
 \alias{sqliteTableFields}
 \title{List fields in specified table.}
 \usage{
-  \S4method{dbListFields}{SQLiteConnection,character}(conn,
-    name, ...)
+\S4method{dbListFields}{SQLiteConnection,character}(conn, name, ...)
 
-  sqliteTableFields(con, name, ...)
+sqliteTableFields(con, name, ...)
 }
 \arguments{
   \item{conn,con}{An existing
@@ -19,6 +19,6 @@
   generic.}
 }
 \description{
-  List fields in specified table.
+List fields in specified table.
 }
 

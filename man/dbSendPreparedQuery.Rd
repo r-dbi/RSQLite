@@ -3,9 +3,9 @@
 \alias{dbSendPreparedQuery}
 \title{Generics for getting and sending prepared queries.}
 \usage{
-  dbSendPreparedQuery(conn, statement, bind.data, ...)
+dbSendPreparedQuery(conn, statement, bind.data, ...)
 
-  dbGetPreparedQuery(conn, statement, bind.data, ...)
+dbGetPreparedQuery(conn, statement, bind.data, ...)
 }
 \arguments{
   \item{conn}{An \code{DBIConnection} object.}
@@ -17,6 +17,6 @@
   \item{...}{Other arguments used by methods}
 }
 \description{
-  Generics for getting and sending prepared queries.
+Generics for getting and sending prepared queries.
 }
 

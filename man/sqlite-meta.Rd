@@ -1,3 +1,4 @@
+\docType{methods}
 \name{sqlite-meta}
 \alias{dbColumnInfo,SQLiteResult-method}
 \alias{dbGetRowCount,SQLiteResult-method}
@@ -6,13 +7,13 @@
 \alias{sqlite-meta}
 \title{Database interface meta-data.}
 \usage{
-  \S4method{dbColumnInfo}{SQLiteResult}(res, ...)
+\S4method{dbColumnInfo}{SQLiteResult}(res, ...)
 
-  \S4method{dbGetRowsAffected}{SQLiteResult}(res, ...)
+\S4method{dbGetRowsAffected}{SQLiteResult}(res, ...)
 
-  \S4method{dbGetRowCount}{SQLiteResult}(res, ...)
+\S4method{dbGetRowCount}{SQLiteResult}(res, ...)
 
-  \S4method{dbHasCompleted}{SQLiteResult}(res, ...)
+\S4method{dbHasCompleted}{SQLiteResult}(res, ...)
 }
 \arguments{
   \item{res}{An object of class
@@ -22,7 +23,7 @@
   generic}
 }
 \description{
-  See documentation of generics for more details.
+See documentation of generics for more details.
 }
 \examples{
 data(USArrests)

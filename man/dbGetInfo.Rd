@@ -1,3 +1,4 @@
+\docType{methods}
 \name{dbGetInfo}
 \alias{dbGetInfo}
 \alias{dbGetInfo,SQLiteConnection-method}
@@ -8,17 +9,17 @@
 \alias{sqliteDriverInfo}
 \title{Get metadata about a database object.}
 \usage{
-  \S4method{dbGetInfo}{SQLiteDriver}(dbObj, ...)
+\S4method{dbGetInfo}{SQLiteDriver}(dbObj, ...)
 
-  sqliteDriverInfo(obj, what = "", ...)
+sqliteDriverInfo(obj, what = "", ...)
 
-  \S4method{dbGetInfo}{SQLiteConnection}(dbObj, ...)
+\S4method{dbGetInfo}{SQLiteConnection}(dbObj, ...)
 
-  sqliteConnectionInfo(obj, what = "", ...)
+sqliteConnectionInfo(obj, what = "", ...)
 
-  \S4method{dbGetInfo}{SQLiteResult}(dbObj, ...)
+\S4method{dbGetInfo}{SQLiteResult}(dbObj, ...)
 
-  \S4method{dbGetStatement}{SQLiteResult}(res, ...)
+\S4method{dbGetStatement}{SQLiteResult}(res, ...)
 }
 \arguments{
   \item{dbObj,obj,res}{An object of class
@@ -33,6 +34,6 @@
   generic.}
 }
 \description{
-  Get metadata about a database object.
+Get metadata about a database object.
 }
 

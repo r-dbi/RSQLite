@@ -1,8 +1,9 @@
+\docType{methods}
 \name{dbListConnections,SQLiteDriver-method}
 \alias{dbListConnections,SQLiteDriver-method}
 \title{List active connections}
 \usage{
-  \S4method{dbListConnections}{SQLiteDriver}(drv, ...)
+\S4method{dbListConnections}{SQLiteDriver}(drv, ...)
 }
 \arguments{
   \item{drv}{An object of class
@@ -12,6 +13,6 @@
   generic.}
 }
 \description{
-  List active connections
+List active connections
 }
 

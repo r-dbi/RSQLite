@@ -1,3 +1,4 @@
+\docType{methods}
 \name{dbWriteTable,SQLiteConnection,character,data.frame-method}
 \alias{dbWriteTable,SQLiteConnection,character,character-method}
 \alias{dbWriteTable,SQLiteConnection,character,data.frame-method}
@@ -5,19 +6,18 @@
 \alias{sqliteWriteTable}
 \title{Write a local data frame or file to the database.}
 \usage{
-  \S4method{dbWriteTable}{SQLiteConnection,character,data.frame}(conn,
-    name, value, ...)
+\S4method{dbWriteTable}{SQLiteConnection,character,data.frame}(conn, name,
+  value, ...)
 
-  \S4method{dbWriteTable}{SQLiteConnection,character,character}(conn,
-    name, value, ...)
+\S4method{dbWriteTable}{SQLiteConnection,character,character}(conn, name, value,
+  ...)
 
-  sqliteWriteTable(con, name, value, row.names = TRUE,
-    overwrite = FALSE, append = FALSE, field.types = NULL,
-    ...)
+sqliteWriteTable(con, name, value, row.names = TRUE, overwrite = FALSE,
+  append = FALSE, field.types = NULL, ...)
 
-  sqliteImportFile(con, name, value, field.types = NULL,
-    overwrite = FALSE, append = FALSE, header, row.names,
-    nrows = 50, sep = ",", eol = "\n", skip = 0, ...)
+sqliteImportFile(con, name, value, field.types = NULL, overwrite = FALSE,
+  append = FALSE, header, row.names, nrows = 50, sep = ",", eol = "\\n",
+  skip = 0, ...)
 }
 \arguments{
   \item{conn,con}{a \code{\linkS4class{SQLiteConnection}}
@@ -74,6 +74,6 @@
   \item{nrows}{Number of rows to read to determine types}
 }
 \description{
-  Write a local data frame or file to the database.
+Write a local data frame or file to the database.
 }
 

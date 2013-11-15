@@ -1,8 +1,9 @@
+\docType{methods}
 \name{dbGetException,SQLiteConnection-method}
 \alias{dbGetException,SQLiteConnection-method}
 \title{Get the last exception from the connection.}
 \usage{
-  \S4method{dbGetException}{SQLiteConnection}(conn, ...)
+\S4method{dbGetException}{SQLiteConnection}(conn, ...)
 }
 \arguments{
   \item{conn}{an object of class
@@ -12,6 +13,6 @@
   generic.}
 }
 \description{
-  Get the last exception from the connection.
+Get the last exception from the connection.
 }
 

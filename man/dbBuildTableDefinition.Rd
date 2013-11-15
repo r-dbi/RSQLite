@@ -2,8 +2,8 @@
 \alias{dbBuildTableDefinition}
 \title{Build the SQL CREATE TABLE definition as a string}
 \usage{
-  dbBuildTableDefinition(dbObj, name, value,
-    field.types = NULL, row.names = TRUE, ...)
+dbBuildTableDefinition(dbObj, name, value, field.types = NULL,
+  row.names = TRUE, ...)
 }
 \arguments{
   \item{dbObj}{The object created by \code{\link{SQLite}}}
@@ -23,10 +23,10 @@
   \item{...}{Ignored. Reserved for future use.}
 }
 \value{
-  An SQL string
+An SQL string
 }
 \description{
-  The output SQL statement is a simple \code{CREATE TABLE}
-  with suitable for \code{dbGetQuery}
+The output SQL statement is a simple \code{CREATE TABLE}
+with suitable for \code{dbGetQuery}
 }
 

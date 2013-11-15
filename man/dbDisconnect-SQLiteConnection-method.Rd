@@ -1,11 +1,12 @@
+\docType{methods}
 \name{dbDisconnect,SQLiteConnection-method}
 \alias{dbDisconnect,SQLiteConnection-method}
 \alias{sqliteCloseConnection}
 \title{Disconnect an SQLite connection.}
 \usage{
-  \S4method{dbDisconnect}{SQLiteConnection}(conn, ...)
+\S4method{dbDisconnect}{SQLiteConnection}(conn, ...)
 
-  sqliteCloseConnection(con, ...)
+sqliteCloseConnection(con, ...)
 }
 \arguments{
   \item{conn,con}{An existing
@@ -15,6 +16,6 @@
   generic.}
 }
 \description{
-  Disconnect an SQLite connection.
+Disconnect an SQLite connection.
 }
 

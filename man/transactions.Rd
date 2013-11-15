@@ -1,3 +1,4 @@
+\docType{methods}
 \name{transactions}
 \alias{dbBeginTransaction,SQLiteConnection-method}
 \alias{dbCommit,SQLiteConnection-method}
@@ -6,14 +7,13 @@
 \alias{transactions}
 \title{SQLite transaction management.}
 \usage{
-  \S4method{dbCommit}{SQLiteConnection}(conn, ...)
+\S4method{dbCommit}{SQLiteConnection}(conn, ...)
 
-  \S4method{dbRollback}{SQLiteConnection}(conn, ...)
+\S4method{dbRollback}{SQLiteConnection}(conn, ...)
 
-  \S4method{dbBeginTransaction}{SQLiteConnection}(conn,
-    ...)
+\S4method{dbBeginTransaction}{SQLiteConnection}(conn, ...)
 
-  sqliteTransactionStatement(con, statement)
+sqliteTransactionStatement(con, statement)
 }
 \arguments{
   \item{conn,con}{a \code{\linkS4class{SQLiteConnection}}
@@ -25,11 +25,11 @@
   \item{statement}{SQL transaction statement to execute}
 }
 \description{
-  By default, SQLite is in auto-commit mode.
-  \code{dbBeginTransaction} starts a SQLite transaction and
-  turns auto-commit off. \code{dbCommit} and
-  \code{dbRollback} commit and rollback the transaction,
-  respectively and turn auto-commit on.
+By default, SQLite is in auto-commit mode.
+\code{dbBeginTransaction} starts a SQLite transaction and
+turns auto-commit off. \code{dbCommit} and
+\code{dbRollback} commit and rollback the transaction,
+respectively and turn auto-commit on.
 }
 \examples{
 con <- dbConnect(SQLite(), dbname = tempfile())

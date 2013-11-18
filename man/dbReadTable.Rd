@@ -34,6 +34,8 @@ sqliteReadTable(con, name, row.names = "row_names", check.names = TRUE,
   character vector of length 1) giving the columns to
   select. E.g. "*" selects all columns, "x,y,z" selects
   three columns named as listed.}
+
+  \item{conn}{ a database connection object.  }
 }
 \value{
   A data.frame in the case of \code{dbReadTable}; otherwise

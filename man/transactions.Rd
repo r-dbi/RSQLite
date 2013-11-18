@@ -23,6 +23,9 @@ sqliteTransactionStatement(con, statement)
   generic.}
 
   \item{statement}{SQL transaction statement to execute}
+
+  \item{conn}{ a \code{DBIConnection} object, as produced
+  by the function \code{dbConnect}. }
 }
 \description{
   By default, SQLite is in auto-commit mode.

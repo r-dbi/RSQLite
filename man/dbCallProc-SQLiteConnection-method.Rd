@@ -5,6 +5,9 @@
 \usage{
 \S4method{dbCallProc}{SQLiteConnection}(conn, ...)
 }
+\arguments{
+  \item{conn}{ a \code{DBIConnection} object. }
+}
 \description{
   Not yet implemented.
 }

@@ -21,6 +21,9 @@ sqliteDescribeConnection(obj, verbose = FALSE, ...)
 
 sqliteDescribeResult(obj, verbose = FALSE, ...)
 }
+\arguments{
+  \item{object}{an object for which a summary is desired.}
+}
 \description{
   Summary methods
 }

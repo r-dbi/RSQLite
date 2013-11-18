@@ -103,14 +103,14 @@ setMethod("make.db.names",
 )
 
 #' @export
-#' @rdname make.db.names-SQLiteObject--character-method
+#' @rdname make.db.names-SQLiteObject-character-method
 setMethod("SQLKeywords", "SQLiteObject",
   definition = function(dbObj, ...) .SQL92Keywords,
   valueClass = "character"
 )
 
 #' @export
-#' @rdname make.db.names-SQLiteObject--character-method
+#' @rdname make.db.names-SQLiteObject-character-method
 #' @param name a character vector of SQL identifiers we want to check against
 #'   keywords from the DBMS. 
 #' @param keywords a character vector with SQL keywords, namely 

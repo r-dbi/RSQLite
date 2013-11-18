@@ -134,7 +134,7 @@ setMethod("dbSendQuery",
   valueClass = "SQLiteResult"
 )
 
-#' @rdname dbSendQuery-SQLiteConnection--character-method
+#' @rdname dbSendQuery-SQLiteConnection-character-method
 #' @param bind.data A data frame of data to be bound.
 #' @export
 setMethod("dbSendPreparedQuery", 
@@ -146,7 +146,7 @@ setMethod("dbSendPreparedQuery",
   valueClass = "SQLiteResult"
 )
 
-#' @rdname dbSendQuery-SQLiteConnection--character-method
+#' @rdname dbSendQuery-SQLiteConnection-character-method
 #' @export
 sqliteExecStatement <- function(con, statement, bind.data=NULL) {
   conId <- con@Id
@@ -169,7 +169,7 @@ sqliteExecStatement <- function(con, statement, bind.data=NULL) {
   out
 }
 
-#' @rdname dbSendQuery-SQLiteConnection--character-method
+#' @rdname dbSendQuery-SQLiteConnection-character-method
 #' @export
 setMethod("dbGetQuery",
   signature = signature(conn = "SQLiteConnection", statement = "character"),
@@ -177,7 +177,7 @@ setMethod("dbGetQuery",
     sqliteQuickSQL(conn, statement, ...)
   },
 )
-#' @rdname dbSendQuery-SQLiteConnection--character-method
+#' @rdname dbSendQuery-SQLiteConnection-character-method
 #' @export
 setMethod("dbGetPreparedQuery", 
   signature = signature(conn = "SQLiteConnection", statement = "character",
@@ -188,7 +188,7 @@ setMethod("dbGetPreparedQuery",
   valueClass = "SQLiteResult"
 )
 
-#' @rdname dbSendQuery-SQLiteConnection--character-method
+#' @rdname dbSendQuery-SQLiteConnection-character-method
 #' @export
 sqliteQuickSQL <- function(con, statement, bind.data=NULL, ...) {
   rs <- sqliteExecStatement(con, statement, bind.data)
@@ -346,7 +346,7 @@ setMethod("dbListFields",
   valueClass = "character"
 )
 #' @export
-#' @rdname dbListFields-SQLiteConnection--character-method
+#' @rdname dbListFields-SQLiteConnection-character-method
 sqliteTableFields <- function(con, name, ...) {
   if(length(dbListResults(con))>0){
     con2 <- dbConnect(con)

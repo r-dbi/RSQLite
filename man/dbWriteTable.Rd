@@ -72,6 +72,8 @@ sqliteImportFile(con, name, value, field.types = NULL, overwrite = FALSE,
   data. Defaults to 0.}
 
   \item{nrows}{Number of rows to read to determine types}
+
+  \item{conn}{ a database connection object.  }
 }
 \description{
   Write a local data frame or file to the database.

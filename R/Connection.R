@@ -11,7 +11,9 @@ NULL
 #' con <- dbConnect(SQLite(), dbname = tempfile())
 #' dbDisconnect(con)
 #' @export
-setClass("SQLiteConnection", slots = list(Id = "externalptr"))
+setClass("SQLiteConnection", 
+  contains = "DBIConnection",
+  slots = list(Id = "externalptr"))
 
 #' Disconnect an SQLite connection.
 #' 

@@ -34,7 +34,9 @@
 #' # clean up
 #' dbDisconnect(con)
 #' @export
-setClass("SQLiteDriver", slots = list(Id = "externalptr"))
+setClass("SQLiteDriver", 
+  contains = "DBIDriver",
+  slots = list(Id = "externalptr"))
 
 setAs("SQLiteConnection", "SQLiteDriver",
   def = function(from) new("SQLiteDriver", Id = from@Id)

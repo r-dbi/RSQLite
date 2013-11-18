@@ -4,7 +4,9 @@
 #' SQL statement (either \code{select} or not).
 #' 
 #' @export
-setClass("SQLiteResult", slots = list(Id = "externalptr"))
+setClass("SQLiteResult", 
+  contains = "DBIResult",
+  slots = list(Id = "externalptr"))
 
 setAs("SQLiteResult", "SQLiteConnection",
   def = function(from) new("SQLiteConnection", Id = from@Id)

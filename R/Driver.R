@@ -153,11 +153,31 @@ setMethod("dbConnect", "SQLiteConnection",
 
 #' @export
 #' @rdname dbConnect-SQLiteDriver-method
+#' @param drv Object created by \code{\link{SQLite}}
+#' @param dbname The path to the database file. If the value is an empty
+#'   string (\code{""}), then a temporary on-disk database is created. The
+#'   temporary file will be deleted when the connection is closed. If the
+#'   value is \code{":memory:"}, then an temporary in-memory only database
+#'   is created.
 #' @param flags \code{SQLITE_RWC}: open the database in read/write mode
 #'   and create the database file if it does not already exist; 
 #'   \code{SQLITE_RW}: open the database in read/write mode. Raise an error 
 #'   if the file does not already exist; \code{SQLITE_RO}: open the database in 
 #'   read only mode.  Raise an error if the file does not already exist
+#' @param loadable.extensions When \code{TRUE} (default) SQLite3
+#'   loadable extensions are enabled. Setting this value to \code{FALSE}
+#'   prevents extensions from being loaded.
+#' @param cache_size Advanced option. See
+#'   \url{http://www.sqlite.org/pragma.html#pragma_cache_size} for
+#'   details.
+#' @param synchronous Advanced options. See
+#'   \url{http://www.sqlite.org/pragma.html#pragma_synchronous} for
+#'   details.
+#' @param vfs Select the SQLite3 OS interface. See
+#'   \url{http://www.sqlite.org/vfs.html} for details. Allowed values are
+#'   \code{"unix-posix"}, \code{"unix-unix-afp"},
+#'   \code{"unix-unix-flock"}, \code{"unix-dotfile"}, and
+#'   \code{"unix-none"}.
 #' @aliases SQLITE_RWC SQLITE_RW SQLITE_RO
 sqliteNewConnection <- function(drv, dbname = "", loadable.extensions = TRUE,
                                 cache_size = NULL, synchronous = 0, flags = NULL, 

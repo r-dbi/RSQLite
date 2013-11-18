@@ -1,47 +1,43 @@
-\name{dbSendQuery-methods}
 \docType{methods}
-\alias{dbSendQuery-methods}
-\alias{dbGetQuery-methods}
-\alias{dbSendPreparedQuery}
-\alias{dbGetPreparedQuery}
-\alias{dbSendPreparedQuery-methods}
-\alias{dbGetPreparedQuery-methods}
-\alias{dbGetException-methods}
-\alias{dbSendQuery,SQLiteConnection,character-method}
+\name{dbSendQuery,SQLiteConnection,character-method}
+\alias{dbGetPreparedQuery,SQLiteConnection,character,data.frame-method}
 \alias{dbGetQuery,SQLiteConnection,character-method}
 \alias{dbSendPreparedQuery,SQLiteConnection,character,data.frame-method}
-\alias{dbGetPreparedQuery,SQLiteConnection,character,data.frame-method}
-\alias{dbClearResult,SQLiteResult-method}
-\alias{dbGetException,SQLiteConnection-method}
-\title{
-  Execute a SQL statement on a database connection
+\alias{dbSendQuery,SQLiteConnection,character-method}
+\alias{sqliteExecStatement}
+\alias{sqliteQuickSQL}
+\title{Execute a SQL statement on a database connection}
+\usage{
+\S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement, ...)
+
+\S4method{dbSendPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
+  statement, bind.data, ...)
+
+sqliteExecStatement(con, statement, bind.data = NULL)
+
+\S4method{dbGetQuery}{SQLiteConnection,character}(conn, statement, ...)
+
+\S4method{dbGetPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
+  statement, bind.data, ...)
+
+sqliteQuickSQL(con, statement, bind.data = NULL, ...)
+}
+\arguments{
+  \item{conn,con}{an \code{\linkS4class{SQLiteConnection}}
+  object.}
+
+  \item{statement}{a character vector of length one
+  specifying the SQL statement that should be executed.
+  Only a single SQL statment should be provided.}
+
+  \item{...}{Ignored. Included for compatbility with
+  generic.}
+
+  \item{bind.data}{A data frame of data to be bound.}
 }
 \description{
-   These are the primary methods for interacting with a database via SQL
-   queries.
-}
-\section{Methods}{\describe{
-\item{conn}{a \code{SQLiteConnection} object.}
-\item{statement}{a character vector of length one specifying the SQL
-statement that should be executed.  Only a single SQL statment should be
-provided.}
-\item{res}{a \code{SQLiteResult} object.}
-\item{\dots }{additional parameters.}
-}
-}
-\references{
-  See the Database Interface definition document
-  \code{DBI.pdf} in the base directory of this package
-  or \url{http://stat.bell-labs.com/RS-DBI}.
-}
-\seealso{
-  \code{\link{SQLite}},
-  \code{\link[DBI]{dbDriver}},
-  \code{\link[DBI]{dbConnect}},
-  \code{\link[DBI]{fetch}},
-  \code{\link[DBI]{dbCommit}},
-  \code{\link[DBI]{dbGetInfo}},
-  \code{\link[DBI]{dbReadTable}}.
+  These are the primary methods for interacting with a
+  database via SQL queries.
 }
 \examples{
 con <- dbConnect(SQLite(), ":memory:")
@@ -122,9 +118,6 @@ bulk_insert(sql, key_counts)
 sql <- "select * from keys where count = :cc"
 dbGetPreparedQuery(db, sql, data.frame(cc = c(95, 403)))
 
-dbDisconnect(db)
+dbDisconnect(con)
 }
-\keyword{methods}
-\keyword{interface}
-\keyword{database}
-% vim: syntax=tex
+

@@ -14,7 +14,7 @@ or install the latest development version from github with:
 
 ```r
 library(devtools)
-install_github("RSQLite", "rstats-dbi")
+install_github("RSQLite", "rstats-db")
 ```
 
 To install from github, you'll need a [development environment](http://www.rstudio.com/ide/docs/packages/prerequisites)).

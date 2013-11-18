@@ -14,10 +14,6 @@ NULL
 #' @export
 setClass("SQLiteConnection", representation("DBIConnection", "SQLiteObject"))
 
-setAs("SQLiteConnection", "SQLiteDriver",
-  def = function(from) new("SQLiteDriver", Id = from@Id)
-)
-
 #' Disconnect an SQLite connection.
 #' 
 #' @param conn,con An existing \code{\linkS4class{SQLiteConnection}}

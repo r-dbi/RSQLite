@@ -39,6 +39,10 @@ NULL
 #' @export
 setClass("SQLiteDriver", representation("DBIDriver", "SQLiteObject"))
 
+setAs("SQLiteConnection", "SQLiteDriver",
+  def = function(from) new("SQLiteDriver", Id = from@Id)
+)
+
 #' @param max.con IGNORED.  As of RSQLite 0.9.0, connections are managed
 #'   dynamically and there is no predefined limit to the number of connections
 #'   you can have in a given R session.

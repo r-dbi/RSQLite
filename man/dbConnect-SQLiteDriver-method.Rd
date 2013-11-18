@@ -45,6 +45,15 @@ sqliteNewConnection(drv, dbname = "", loadable.extensions = TRUE,
   documentation for the full details of this
   \code{PRAGMA}.}
 
+  \item{drv}{Object created by \code{\link{SQLite}}}
+
+  \item{dbname}{The path to the database file. If the value
+  is an empty string (\code{""}), then a temporary on-disk
+  database is created. The temporary file will be deleted
+  when the connection is closed. If the value is
+  \code{":memory:"}, then an temporary in-memory only
+  database is created.}
+
   \item{flags}{\code{SQLITE_RWC}: open the database in
   read/write mode and create the database file if it does
   not already exist; \code{SQLITE_RW}: open the database in
@@ -52,6 +61,25 @@ sqliteNewConnection(drv, dbname = "", loadable.extensions = TRUE,
   already exist; \code{SQLITE_RO}: open the database in
   read only mode.  Raise an error if the file does not
   already exist}
+
+  \item{loadable.extensions}{When \code{TRUE} (default)
+  SQLite3 loadable extensions are enabled. Setting this
+  value to \code{FALSE} prevents extensions from being
+  loaded.}
+
+  \item{cache_size}{Advanced option. See
+  \url{http://www.sqlite.org/pragma.html#pragma_cache_size}
+  for details.}
+
+  \item{synchronous}{Advanced options. See
+  \url{http://www.sqlite.org/pragma.html#pragma_synchronous}
+  for details.}
+
+  \item{vfs}{Select the SQLite3 OS interface. See
+  \url{http://www.sqlite.org/vfs.html} for details. Allowed
+  values are \code{"unix-posix"}, \code{"unix-unix-afp"},
+  \code{"unix-unix-flock"}, \code{"unix-dotfile"}, and
+  \code{"unix-none"}.}
 }
 \description{
   Create an SQLite connection.

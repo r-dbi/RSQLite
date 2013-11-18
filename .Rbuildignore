@@ -20,3 +20,4 @@ build
 .gitignore
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.travis\.yml$

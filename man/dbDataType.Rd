@@ -1,10 +1,17 @@
 \docType{methods}
-\name{dbDataType,SQLiteObject-method}
-\alias{dbDataType,SQLiteObject-method}
+\name{dbDataType}
+\alias{dbDataType}
+\alias{dbDataType,SQLiteConnection-method}
+\alias{dbDataType,SQLiteDriver-method}
+\alias{dbDataType,SQLiteResult-method}
 \alias{sqliteDataType}
 \title{Determine the SQL Data Type of an R object.}
 \usage{
-\S4method{dbDataType}{SQLiteObject}(dbObj, obj, ...)
+\S4method{dbDataType}{SQLiteDriver}(dbObj, obj, ...)
+
+\S4method{dbDataType}{SQLiteConnection}(dbObj, obj, ...)
+
+\S4method{dbDataType}{SQLiteResult}(dbObj, obj, ...)
 
 sqliteDataType(obj, ...)
 }

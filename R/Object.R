@@ -1,16 +1,10 @@
-#' @include dbObjectId.R
-NULL
-
-#' Class SQLiteObject
-#' 
-#' Base class for all SQLite-specific DBI classes
-#' 
-#' @docType class
+#' @include Driver.R
+#' @include Connection.R
+#' @include Result.R
 #' @import methods
 #' @import DBI
 #' @useDynLib RSQLite
-#' @export
-setClass("SQLiteObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
+NULL
 
 #' Determine the SQL Data Type of an R object.
 #' 
@@ -31,14 +25,26 @@ setClass("SQLiteObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
 #' dbDataType(drv, as.integer(1))
 #' dbDataType(drv, "1")
 #' dbDataType(drv, charToRaw("1"))
-#' @export
-setMethod("dbDataType", "SQLiteObject",
-  definition = function(dbObj, obj, ...) sqliteDataType(obj, ...),
-  valueClass = "character"
-)
+#' @name dbDataType
+NULL
 
 #' @export
-#' @rdname dbDataType-SQLiteObject-method
+#' @rdname dbDataType
+setMethod("dbDataType", "SQLiteDriver", 
+  function(dbObj, obj, ...) sqliteDataType(obj, ...))
+
+#' @export
+#' @rdname dbDataType
+setMethod("dbDataType", "SQLiteConnection", 
+  function(dbObj, obj, ...) sqliteDataType(obj, ...))
+
+#' @export
+#' @rdname dbDataType
+setMethod("dbDataType", "SQLiteResult", 
+  function(dbObj, obj, ...) sqliteDataType(obj, ...))
+
+#' @export
+#' @rdname dbDataType
 sqliteDataType <- function(obj, ...) {
   rs.class <- data.class(obj)
   rs.mode <- storage.mode(obj)
@@ -92,35 +98,50 @@ sqliteDataType <- function(obj, ...) {
 #' for(i in seq_along(export) )
 #'    dbWriteTable(con, name = tabs[i],  get(export[i]))
 #' }
-#' 
-#' @export
-setMethod("make.db.names",
-  signature(dbObj="SQLiteObject", snames = "character"),
-  definition = function(dbObj, snames, keywords, unique, allow.keywords, ...){
-    make.db.names.default(snames, keywords, unique, allow.keywords)
-  },
-  valueClass = "character"
-)
+#' @name make.db.names
+NULL
 
+sqliteMakeDbNames <- function(dbObj, snames, keywords, unique, allow.keywords, 
+                              ...){
+  make.db.names.default(snames, keywords, unique, allow.keywords)
+}
+#' @rdname make.db.names
 #' @export
-#' @rdname make.db.names-SQLiteObject-character-method
-setMethod("SQLKeywords", "SQLiteObject",
-  definition = function(dbObj, ...) .SQL92Keywords,
-  valueClass = "character"
-)
+setMethod("make.db.names", c("SQLiteDriver", "character"), sqliteMakeDbNames)
+#' @rdname make.db.names
+#' @export
+setMethod("make.db.names", c("SQLiteConnection", "character"), sqliteMakeDbNames)
+#' @rdname make.db.names
+#' @export
+setMethod("make.db.names", c("SQLiteResult", "character"), sqliteMakeDbNames)
 
+sqliteKeywords <- function(dbObj, ...) .SQL92Keywords
+#' @rdname make.db.names
 #' @export
-#' @rdname make.db.names-SQLiteObject-character-method
+setMethod("SQLKeywords", "SQLiteDriver", sqliteKeywords)
+#' @rdname make.db.names
+#' @export
+setMethod("SQLKeywords", "SQLiteConnection", sqliteKeywords)
+#' @rdname make.db.names
+#' @export
+setMethod("SQLKeywords", "SQLiteResult", sqliteKeywords)
+
+
+sqliteIsSQLKeyword <- function(dbObj, name, keywords, case, ...) {
+  make.db.names.default(name, keywords = .SQL92Keywords, case)
+}
 #' @param name a character vector of SQL identifiers we want to check against
 #'   keywords from the DBMS. 
 #' @param keywords a character vector with SQL keywords, namely 
 #'   \code{.SQL92Keywords} defined in the \code{DBI} package.
 #' @param case a character string specifying whether to make the comparison 
 #'   as lower case, upper case, or any of the two.  it defaults to \code{"any"}.
-setMethod("isSQLKeyword",
-  signature(dbObj="SQLiteObject", name="character"),
-  definition = function(dbObj, name, keywords, case, ...){
-    isSQLKeyword.default(name, keywords = .SQL92Keywords, case)
-  },
-  valueClass = "character"
-)
+#' @export
+#' @rdname make.db.names
+setMethod("isSQLKeyword", c("SQLiteDriver", "character"), sqliteIsSQLKeyword)
+#' @export
+#' @rdname make.db.names
+setMethod("isSQLKeyword", c("SQLiteConnection", "character"), sqliteIsSQLKeyword)
+#' @export
+#' @rdname make.db.names
+setMethod("isSQLKeyword", c("SQLiteResult", "character"), sqliteIsSQLKeyword)

@@ -1,13 +1,10 @@
-#' @include Object.R
-NULL
-
 #' Class SQLiteResult
 #' 
 #' SQLite's query results class.  This classes encapsulates the result of an
 #' SQL statement (either \code{select} or not).
 #' 
 #' @export
-setClass("SQLiteResult", representation("DBIResult", "SQLiteObject"))
+setClass("SQLiteResult", slots = list(Id = "externalptr"))
 
 setAs("SQLiteResult", "SQLiteConnection",
   def = function(from) new("SQLiteConnection", Id = from@Id)

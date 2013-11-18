@@ -1,6 +1,3 @@
-#' @include Object.R
-NULL
-
 #' Class SQLiteDriver with constructor SQLite.
 #' 
 #' An SQLite driver implementing the R/S-Plus database (DBI) API.
@@ -37,7 +34,7 @@ NULL
 #' # clean up
 #' dbDisconnect(con)
 #' @export
-setClass("SQLiteDriver", representation("DBIDriver", "SQLiteObject"))
+setClass("SQLiteDriver", slots = list(Id = "externalptr"))
 
 setAs("SQLiteConnection", "SQLiteDriver",
   def = function(from) new("SQLiteDriver", Id = from@Id)

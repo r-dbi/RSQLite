@@ -1,16 +1,39 @@
 \docType{methods}
-\name{make.db.names,SQLiteObject,character-method}
-\alias{SQLKeywords,SQLiteObject-method}
-\alias{isSQLKeyword,SQLiteObject,character-method}
-\alias{make.db.names,SQLiteObject,character-method}
+\name{make.db.names}
+\alias{SQLKeywords,SQLiteConnection-method}
+\alias{SQLKeywords,SQLiteDriver-method}
+\alias{SQLKeywords,SQLiteResult-method}
+\alias{isSQLKeyword,SQLiteConnection,character-method}
+\alias{isSQLKeyword,SQLiteDriver,character-method}
+\alias{isSQLKeyword,SQLiteResult,character-method}
+\alias{make.db.names}
+\alias{make.db.names,SQLiteConnection,character-method}
+\alias{make.db.names,SQLiteDriver,character-method}
+\alias{make.db.names,SQLiteResult,character-method}
 \title{Make R/S-Plus identifiers into legal SQL identifiers}
 \usage{
-\S4method{make.db.names}{SQLiteObject,character}(dbObj, snames,
+\S4method{make.db.names}{SQLiteDriver,character}(dbObj, snames,
   keywords = .SQL92Keywords, unique = TRUE, allow.keywords = TRUE, ...)
 
-\S4method{SQLKeywords}{SQLiteObject}(dbObj, ...)
+\S4method{make.db.names}{SQLiteConnection,character}(dbObj, snames,
+  keywords = .SQL92Keywords, unique = TRUE, allow.keywords = TRUE, ...)
 
-\S4method{isSQLKeyword}{SQLiteObject,character}(dbObj, name,
+\S4method{make.db.names}{SQLiteResult,character}(dbObj, snames,
+  keywords = .SQL92Keywords, unique = TRUE, allow.keywords = TRUE, ...)
+
+\S4method{SQLKeywords}{SQLiteDriver}(dbObj, ...)
+
+\S4method{SQLKeywords}{SQLiteConnection}(dbObj, ...)
+
+\S4method{SQLKeywords}{SQLiteResult}(dbObj, ...)
+
+\S4method{isSQLKeyword}{SQLiteDriver,character}(dbObj, name,
+  keywords = .SQL92Keywords, case = c("lower", "upper", "any")[3], ...)
+
+\S4method{isSQLKeyword}{SQLiteConnection,character}(dbObj, name,
+  keywords = .SQL92Keywords, case = c("lower", "upper", "any")[3], ...)
+
+\S4method{isSQLKeyword}{SQLiteResult,character}(dbObj, name,
   keywords = .SQL92Keywords, case = c("lower", "upper", "any")[3], ...)
 }
 \arguments{

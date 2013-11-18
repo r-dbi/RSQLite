@@ -1,6 +1,6 @@
 \name{isIdCurrent}
 \alias{isIdCurrent}
-\title{Check whether an dbObjectId handle object is valid or not}
+\title{Check whether an SQLite object is valid or not}
 \usage{
 isIdCurrent(obj)
 }

@@ -1,4 +1,3 @@
-#' @include Object.R
 #' @include ConnectionExtensions.R
 NULL
 
@@ -12,7 +11,9 @@ NULL
 #' con <- dbConnect(SQLite(), dbname = tempfile())
 #' dbDisconnect(con)
 #' @export
-setClass("SQLiteConnection", representation("DBIConnection", "SQLiteObject"))
+setClass("SQLiteConnection", 
+  contains = "DBIConnection",
+  slots = list(Id = "externalptr"))
 
 #' Disconnect an SQLite connection.
 #' 

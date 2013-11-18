@@ -18,8 +18,6 @@ Suggests:
     roxygen2 (>= 3.0)
 License: LGPL (>= 2)
 Collate:
-    'dbObjectId.R'
-    'Object.R'
     'ConnectionExtensions.R'
     'Connection.R'
     'ConnectionRead.R'
@@ -28,8 +26,10 @@ Collate:
     'Constants.R'
     'Driver.R'
     'Result.R'
+    'Object.R'
     'S4R.R'
     'Summary.R'
     'Utils.R'
     'dbGetInfo.R'
+    'dbObjectId.R'
     'zzz.R'

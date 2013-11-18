@@ -1,5 +1,9 @@
 Version 0.11.5
 
+- Remove SqliteObject and dbObject classes, modifying SqliteDriver, 
+  SqliteConnection, and SqliteResult to use composition instead of multiple
+  inheritance.
+
 - Include temporary tables in dbListTables()
 
 - Added Rstudio project file

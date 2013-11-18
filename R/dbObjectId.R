@@ -14,40 +14,8 @@
 ## License along with this library; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#' Class dbObjectId.
-#' 
-#' A helper (mixin) class to provide external references in an R/S-Plus
-#' portable way.
-#' 
-#' @note A cleaner mechanism would use external references, but historically
-#' this class has existed mainly for R/S-Plus portability.
-#' @section Objects from the Class: A virtual Class: No objects may be created
-#' from it.
-#' @examples
-#' con <- dbConnect(SQLite(), ":memory:")
-#' is(con, "dbObjectId")  ## True
-#' isIdCurrent(con)       ## True
-#' dbDisconnect(con)
-#' isIdCurrent(con)       ## False
-#' @export
-setClass("dbObjectId", representation(Id = "externalptr", "VIRTUAL"))
 
-#' @export
-#' @rdname dbObjectId-class
-#' @param object of class \code{dbObjectId}
-setMethod("show", "dbObjectId",
-   definition = function(object) {
-      expired <- if(isIdCurrent(object)) "" else "Expired "
-      id <- .Call("DBI_handle_to_string", object@Id, PACKAGE = .SQLitePkgName)
-      str <- paste("<", expired, class(object), ": ", id, ">", sep="")
-      cat(str, "\n")
-      invisible(NULL)
-   }
-)
-
-
-
-#' Check whether an dbObjectId handle object is valid or not
+#' Check whether an SQLite object is valid or not
 #' 
 #' Support function that verifies that an dbObjectId holding a reference to a
 #' foreign object is still valid for communicating with the RDBMS

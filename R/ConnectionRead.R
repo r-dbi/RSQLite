@@ -44,9 +44,12 @@ setMethod("dbReadTable",
 #'   to use as \code{row.names} in the output data.frame (a \code{NULL}, 
 #'   \code{""}, or 0 specifies that no column should be used as \code{row.names}
 #'   in the output.)
+#' @param select.cols  A SQL statement (in the form of a character vector of 
+#'    length 1) giving the columns to select. E.g. "*" selects all columns, 
+#'    "x,y,z" selects three columns named as listed.
 sqliteReadTable <- function(con, name, row.names = "row_names", 
-  check.names = TRUE, ...) {
-  out <- try(dbGetQuery(con, paste("SELECT * from", name)))
+                            check.names = TRUE, select.cols="*", ...) {
+  out <- try(dbGetQuery(con, paste("SELECT", select.cols, "FROM", name)))
   if(inherits(out, ErrorClass))
     stop(paste("could not find table", name))
   if(check.names)

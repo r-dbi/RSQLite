@@ -6,7 +6,8 @@
 \usage{
 \S4method{dbReadTable}{SQLiteConnection,character}(conn, name, ...)
 
-sqliteReadTable(con, name, row.names = "row_names", check.names = TRUE, ...)
+sqliteReadTable(con, name, row.names = "row_names", check.names = TRUE,
+  select.cols = "*", ...)
 }
 \arguments{
   \item{conn,con}{a \code{\linkS4class{SQLiteConnection}}
@@ -28,6 +29,11 @@ sqliteReadTable(con, name, row.names = "row_names", check.names = TRUE, ...)
   the output data.frame (a \code{NULL}, \code{""}, or 0
   specifies that no column should be used as
   \code{row.names} in the output.)}
+
+  \item{select.cols}{A SQL statement (in the form of a
+  character vector of length 1) giving the columns to
+  select. E.g. "*" selects all columns, "x,y,z" selects
+  three columns named as listed.}
 }
 \value{
   A data.frame in the case of \code{dbReadTable}; otherwise

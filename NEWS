@@ -4,6 +4,8 @@ Version 0.11.5
 
 - Added Rstudio project file
 
+- Added select.cols capability to sqliteReadTable()
+
 Version 0.11.4
 
 - Upgrade to SQLite 3.7.7

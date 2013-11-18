@@ -23,36 +23,34 @@ sqliteNewConnection(drv, dbname = "", loadable.extensions = TRUE,
   or an existing \code{\linkS4class{SQLiteConnection}}. If
   an connection, the connection will be cloned.}
 
-  \item{dbname}{A path to a SQLite database. If the path
-  does not exist, it will be created an initialied with an
-  empty database.}
-
-  \item{...}{Arguments passed on to
-  \code{sqliteNewConnection}}
-
-  \item{cache_size}{a positive integer to change the
-  maximum number of disk pages that SQLite holds in memory
-  (SQLite's default is 2000 pages).}
-
-  \item{synchronous}{Possible values for \code{synchronous}
-  are 0 (the default), 1, or 2 or the corresponding strings
-  "OFF", "NORMAL", or "FULL".  Users have reported
-  significant speed ups using \code{sychronous=0}, and the
-  SQLite documentation itself implies considerable improved
-  performance at the very modest risk of database
-  corruption in the unlikely case of the operating system
-  (\emph{not} the R application) crashing. See the SQLite
-  documentation for the full details of this
-  \code{PRAGMA}.}
-
-  \item{drv}{Object created by \code{\link{SQLite}}}
-
   \item{dbname}{The path to the database file. If the value
   is an empty string (\code{""}), then a temporary on-disk
   database is created. The temporary file will be deleted
   when the connection is closed. If the value is
   \code{":memory:"}, then an temporary in-memory only
   database is created.}
+
+  \item{...}{Arguments passed on to
+  \code{sqliteNewConnection}}
+
+  \item{cache_size}{Advanced option. A positive integer to
+  change the maximum number of disk pages that SQLite holds
+  in memory (SQLite's default is 2000 pages). See
+  \url{http://www.sqlite.org/pragma.html#pragma_cache_size}
+  for details.}
+
+  \item{synchronous}{Advanced options. Possible values for
+  \code{synchronous} are 0 (the default), 1, or 2 or the
+  corresponding strings "OFF", "NORMAL", or "FULL".  Users
+  have reported significant speed ups using
+  \code{sychronous=0}, and the SQLite documentation itself
+  implies considerable improved performance at the very
+  modest risk of database corruption in the unlikely case
+  of the operating system (\emph{not} the R application)
+  crashing. See the SQLite documentation for the full
+  details of this \code{PRAGMA}. See
+  \url{http://www.sqlite.org/pragma.html#pragma_synchronous}
+  for details.}
 
   \item{flags}{\code{SQLITE_RWC}: open the database in
   read/write mode and create the database file if it does
@@ -66,14 +64,6 @@ sqliteNewConnection(drv, dbname = "", loadable.extensions = TRUE,
   SQLite3 loadable extensions are enabled. Setting this
   value to \code{FALSE} prevents extensions from being
   loaded.}
-
-  \item{cache_size}{Advanced option. See
-  \url{http://www.sqlite.org/pragma.html#pragma_cache_size}
-  for details.}
-
-  \item{synchronous}{Advanced options. See
-  \url{http://www.sqlite.org/pragma.html#pragma_synchronous}
-  for details.}
 
   \item{vfs}{Select the SQLite3 OS interface. See
   \url{http://www.sqlite.org/vfs.html} for details. Allowed

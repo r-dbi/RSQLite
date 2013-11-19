@@ -7,9 +7,12 @@
 }
 \arguments{
   \item{conn}{ a \code{DBIConnection} object. }
+
+  \item{...}{ additional arguments are passed to the
+  implementing method. }
 }
 \description{
-  Not yet implemented.
+Not yet implemented.
 }
 \keyword{internal}
 

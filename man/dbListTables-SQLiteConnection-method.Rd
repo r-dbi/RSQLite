@@ -13,6 +13,6 @@
   generic.}
 }
 \description{
-  List available SQLite tables.
+List available SQLite tables.
 }
 

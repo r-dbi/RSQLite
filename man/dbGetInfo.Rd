@@ -32,14 +32,8 @@ sqliteConnectionInfo(obj, what = "", ...)
 
   \item{...}{Ignored. Included for compatibility with
   generic.}
-
-  \item{dbObj}{ any object that implements some
-  functionality in the R/Splus interface to databases (a
-  driver, a connection or a result set). }
-
-  \item{res}{ refers to a \code{DBIResult} object. }
 }
 \description{
-  Get metadata about a database object.
+Get metadata about a database object.
 }
 

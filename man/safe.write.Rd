@@ -16,21 +16,21 @@ safe.write(value, file, batch, row.names = TRUE, ..., sep = ",",
   passed to \code{write.table}.}
 }
 \value{
-  \code{NULL}, invisibly.
+\code{NULL}, invisibly.
 }
 \description{
-  This function batches calls to \code{write.table} to
-  avoid exceeding memory limits for very large data.frames.
+This function batches calls to \code{write.table} to avoid
+exceeding memory limits for very large data.frames.
 }
 \details{
-  The function has a while loop invoking
-  \code{\link{write.table}} for subsets of \code{batch}
-  rows of \code{value}.  Since this is a helper function
-  for \code{\link[RMySQL]{mysqlWriteTable}} has hardcoded
-  other arguments to \code{write.table}.
+The function has a while loop invoking
+\code{\link{write.table}} for subsets of \code{batch} rows
+of \code{value}.  Since this is a helper function for
+\code{\link[RMySQL]{mysqlWriteTable}} has hardcoded other
+arguments to \code{write.table}.
 }
 \note{
-  No error checking whatsoever is done.
+No error checking whatsoever is done.
 }
 \examples{
 \dontrun{
@@ -39,6 +39,6 @@ safe.write(value, file, batch, row.names = TRUE, ..., sep = ",",
 }
 }
 \seealso{
-  \code{\link{write.table}}
+\code{\link{write.table}}
 }
 

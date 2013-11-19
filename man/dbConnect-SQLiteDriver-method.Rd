@@ -72,6 +72,6 @@ sqliteNewConnection(drv, dbname = "", loadable.extensions = TRUE,
   \code{"unix-none"}.}
 }
 \description{
-  Create an SQLite connection.
+Create an SQLite connection.
 }
 

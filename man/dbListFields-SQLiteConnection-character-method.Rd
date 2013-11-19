@@ -17,10 +17,8 @@ sqliteTableFields(con, name, ...)
 
   \item{...}{Ignored. Included for compatibility with
   generic.}
-
-  \item{conn}{a connection object}
 }
 \description{
-  List fields in specified table.
+List fields in specified table.
 }
 

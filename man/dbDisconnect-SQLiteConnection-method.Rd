@@ -14,11 +14,8 @@ sqliteCloseConnection(con, ...)
 
   \item{...}{Ignored. Included for compatibility with
   generic.}
-
-  \item{conn}{ a connection object as produced by
-  \code{dbConnect}.  }
 }
 \description{
-  Disconnect an SQLite connection.
+Disconnect an SQLite connection.
 }
 

@@ -13,6 +13,6 @@
   generic.}
 }
 \description{
-  List available SQLite result sets.
+List available SQLite result sets.
 }
 

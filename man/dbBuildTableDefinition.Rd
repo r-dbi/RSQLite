@@ -23,10 +23,10 @@ dbBuildTableDefinition(dbObj, name, value, field.types = NULL,
   \item{...}{Ignored. Reserved for future use.}
 }
 \value{
-  An SQL string
+An SQL string
 }
 \description{
-  The output SQL statement is a simple \code{CREATE TABLE}
-  with suitable for \code{dbGetQuery}
+The output SQL statement is a simple \code{CREATE TABLE}
+with suitable for \code{dbGetQuery}
 }
 

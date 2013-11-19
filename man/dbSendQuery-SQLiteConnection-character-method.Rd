@@ -34,12 +34,10 @@ sqliteQuickSQL(con, statement, bind.data = NULL, ...)
   generic.}
 
   \item{bind.data}{A data frame of data to be bound.}
-
-  \item{conn}{ a connection object. }
 }
 \description{
-  These are the primary methods for interacting with a
-  database via SQL queries.
+These are the primary methods for interacting with a
+database via SQL queries.
 }
 \examples{
 con <- dbConnect(SQLite(), ":memory:")

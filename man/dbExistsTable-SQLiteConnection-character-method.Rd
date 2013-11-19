@@ -16,6 +16,6 @@
   generic.}
 }
 \description{
-  Does the table exist?
+Does the table exist?
 }
 

@@ -13,6 +13,6 @@
   generic.}
 }
 \description{
-  Get the last exception from the connection.
+Get the last exception from the connection.
 }
 

@@ -17,7 +17,7 @@ setClass("SQLiteConnection", representation("DBIConnection", "SQLiteObject"))
 #' Disconnect an SQLite connection.
 #' 
 #' @param conn,con An existing \code{\linkS4class{SQLiteConnection}}
-#' @param ... Ignored. Included for compatibility with generic.
+#' @param ... Pass additional arguments.  Currently the only such argument is \code{temporary} which is a logical that specifies whether the table to be created is to be a temporary table or not.
 #' @export
 setMethod("dbDisconnect", "SQLiteConnection",
   definition = function(conn, ...) sqliteCloseConnection(conn, ...),
@@ -254,11 +254,12 @@ setMethod("dbExistsTable",
 #'   \code{value}
 #' @param row.names logical, should row.name of \code{value} be exported as a
 #'   \code{row\_names} field? Default is \code{TRUE}
+#' @param temporary logical, should temporary tables be included in result?
 #' @param ... Ignored. Reserved for future use.
 #' @return An SQL string
 #' @export
 dbBuildTableDefinition <- function(dbObj, name, value, field.types = NULL, 
-                                   row.names = TRUE, ...) {
+                                   row.names = TRUE, temporary = FALSE, ...) {
   if(!is.data.frame(value))
     value <- as.data.frame(value)
   if(!is.null(row.names) && row.names){
@@ -278,7 +279,8 @@ dbBuildTableDefinition <- function(dbObj, name, value, field.types = NULL,
   
   ## need to create a new (empty) table
   flds <- paste(names(field.types), field.types)
-  paste("CREATE TABLE", name, "\n(", paste(flds, collapse=",\n\t"), "\n)")
+  paste(if (temporary) "CREATE TEMPORARY TABLE" else "CREATE TABLE", 
+	name, "\n(", paste(flds, collapse=",\n\t"), "\n)")
 }
 
 
@@ -315,15 +317,23 @@ setMethod("dbListResults", "SQLiteConnection",
 #' List available SQLite tables.
 #' 
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
+#' @param temporary If TRUE then temporary tables are included.
 #' @param ... Ignored. Included for compatibility with generic.
 #' @export
 setMethod("dbListTables", "SQLiteConnection",
-  definition = function(conn, ...){
-    out <- dbGetQuery(conn, "SELECT name FROM
+  definition = function(conn, temporary = FALSE, ...){
+    out <- if (temporary) {
+        dbGetQuery(conn, "SELECT name FROM
         (SELECT * FROM sqlite_master UNION ALL
          SELECT * FROM sqlite_temp_master)
         WHERE type = 'table' OR type = 'view'
         ORDER BY name", ...)
+    } else {
+        dbGetQuery(conn, "SELECT name FROM
+        (SELECT * FROM sqlite_master)
+        WHERE type = 'table' OR type = 'view'
+        ORDER BY name", ...)
+    }
     if (is.null(out) || nrow(out) == 0)
       out <- character(0)
     else

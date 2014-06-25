@@ -4,11 +4,13 @@ Version 0.11.6
 
 Version 0.11.5
 
-- Include temporary tables in dbListTables()
-
 - Added Rstudio project file
 
 - Added select.cols capability to sqliteReadTable()
+
+- dbWriteTable and dbListTable have new temporary argument
+
+- new demo file temporary.R
 
 Version 0.11.4
 

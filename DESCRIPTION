@@ -17,6 +17,7 @@ Suggests:
     RUnit (>= 0.4.22),
     roxygen2 (>= 3.0)
 License: LGPL (>= 2)
+URL: https://github.com/rstats-db/RSQLite
 Collate:
     'dbObjectId.R'
     'Object.R'

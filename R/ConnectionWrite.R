@@ -27,8 +27,8 @@ setMethod("dbWriteTable",
 setMethod("dbWriteTable",
   signature = signature(conn = "SQLiteConnection", name = "character",
     value="character"),
-  definition = function(conn, name, value, ...)
-    sqliteImportFile(conn, name, value, ...),
+  definition = function(conn, name, value, temporary = FALSE, ...)
+    sqliteImportFile(conn, name, value, temporary = FALSE, ...),
   valueClass = "logical"
 )
 
@@ -43,11 +43,12 @@ setMethod("dbWriteTable",
 #' @param field.types character vector of named  SQL field types where
 #'   the names are the names of new table's columns. If missing, types inferred
 #'   with \code{\link[DBI]{dbDataType}}).
+#' @param temporary logical which is TRUE if temporary table to be created and FALSE otherwise.
 #' @export
 #' @rdname dbWriteTable
 sqliteWriteTable <- function(con, name, value, row.names = TRUE, 
                              overwrite = FALSE, append = FALSE, 
-                             field.types = NULL, ...) {
+                             field.types = NULL, temporary = FALSE, ...) {
   if (overwrite && append)
     stop("overwrite and append cannot both be TRUE")
   
@@ -108,7 +109,7 @@ sqliteWriteTable <- function(con, name, value, row.names = TRUE,
   if (createTable) {
     sql <- dbBuildTableDefinition(new.con, name, value,
       field.types=field.types,
-      row.names=FALSE)
+      row.names=FALSE, temporary = temporary)
     success <- tryCatch({
       dbGetQuery(new.con, sql)
       TRUE
@@ -166,7 +167,7 @@ sqliteWriteTable <- function(con, name, value, row.names = TRUE,
 sqliteImportFile <- function(con, name, value, field.types = NULL, 
                              overwrite = FALSE, append = FALSE, header, 
                              row.names, nrows = 50, sep = ",", eol="\n", 
-                             skip = 0, ...) {
+                             skip = 0, temporary = FALSE, ...) {
   if(overwrite && append)
     stop("overwrite and append cannot both be TRUE")
   
@@ -221,7 +222,7 @@ sqliteImportFile <- function(con, name, value, field.types = NULL,
       stringsAsFactors=FALSE, ...)
     sql <-
       dbBuildTableDefinition(new.con, name, d, field.types = field.types,
-        row.names = row.names)
+        row.names = row.names, temporary = temporary)
     rs <- try(dbSendQuery(new.con, sql))
     if(inherits(rs, ErrorClass)){
       warning("could not create table: aborting sqliteImportFile")

@@ -15,9 +15,20 @@
 #' @param ... Passed on to \code{sqliteWriteTable}.
 #' @export
 setMethod("dbWriteTable",
-  signature = signature("SQLiteConnection"),
+  signature = signature(conn = "SQLiteConnection", name = "character",
+    value="data.frame"),
   definition = function(conn, name, value, ...)
     sqliteWriteTable(conn, name, value, ...),
+  valueClass = "logical"
+)
+
+#' @export
+#' @rdname dbWriteTable
+setMethod("dbWriteTable",
+  signature = signature(conn = "SQLiteConnection", name = "character",
+    value="character"),
+  definition = function(conn, name, value, ...)
+    sqliteImportFile(conn, name, value, ...),
   valueClass = "logical"
 )
 

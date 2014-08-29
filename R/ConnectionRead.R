@@ -31,7 +31,7 @@
 #' @export
 #' @rdname dbReadTable
 setMethod("dbReadTable",
-  signature = signature("SQLiteConnection"),
+  signature = signature(conn = "SQLiteConnection", name = "character"),
   definition = function(conn, name, ...) sqliteReadTable(conn, name, ...),
   valueClass = "data.frame"
 )

@@ -16,7 +16,7 @@ src\/.*\.so$
 help\/
 inst\/sqlite
 a.out.dSYM
-build
+^build$
 .gitignore
 ^.*\.Rproj$
 ^\.Rproj\.user$

@@ -3,7 +3,7 @@ Version: 0.11.6
 Title: SQLite interface for R
 Author: David A. James, Seth Falcon, and (for the included SQLite sources) the
     authors of SQLite
-Maintainer: Seth Falcon <seth@userprimary.net>
+Maintainer: Hadley Wickham <hadley@rstudio.com>
 Description: Database Interface R driver for SQLite.
     This package embeds the SQLite database engine in R and
     provides an interface compliant with the DBI package.

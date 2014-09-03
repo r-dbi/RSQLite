@@ -2,7 +2,7 @@
 #' @include ConnectionExtensions.R
 NULL
 
-#' Class SQLiteConnection
+#' Class SQLiteConnection.
 #' 
 #' \code{SQLiteConnection} objects are usually created by 
 #' \code{\link[DBI]{dbConnect}}
@@ -17,20 +17,15 @@ setClass("SQLiteConnection", representation("DBIConnection", "SQLiteObject"))
 #' Disconnect an SQLite connection.
 #' 
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
-#' @param ... Ignored. Included for compatibility with generic.
 #' @export
-setMethod("dbDisconnect", "SQLiteConnection",
-  definition = function(conn, ...) sqliteCloseConnection(conn, ...),
-  valueClass = "logical"
-)
-
-sqliteCloseConnection <- function(con, ...) {
-  if(!isIdCurrent(con)){
-    warning(paste("expired SQLiteConnection"))
+#' @useDynLib RSQLite RS_SQLite_closeConnection
+setMethod("dbDisconnect", "SQLiteConnection", function(conn) {
+  if(!isIdCurrent(conn)){
+    warning("expired SQLiteConnection")
     return(TRUE)
   }
-  .Call("RS_SQLite_closeConnection", con@Id, PACKAGE = .SQLitePkgName)
-}
+  .Call(RS_SQLite_closeConnection, conn@Id)
+})
 
 
 #' Execute a SQL statement on a database connection
@@ -204,11 +199,11 @@ sqliteQuickSQL <- function(con, statement, bind.data=NULL, ...) {
 #' @param conn an object of class \code{\linkS4class{SQLiteConnection}}
 #' @param ... Ignored. Needed for compatiblity with generic.
 #' @export
+#' @useDynLib RSQLite RS_SQLite_getException
 setMethod("dbGetException", "SQLiteConnection",
-  definition = function(conn, ...){
-    .Call("RS_SQLite_getException", conn@Id, PACKAGE = .SQLitePkgName)
-  },
-  valueClass = "list"    ## TODO: should return a SQLiteException
+  definition = function(conn){
+    .Call(RS_SQLite_getException, conn@Id)
+  }
 )
 
 #' Does the table exist?

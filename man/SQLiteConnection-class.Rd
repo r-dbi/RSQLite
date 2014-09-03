@@ -2,7 +2,7 @@
 \docType{class}
 \name{SQLiteConnection-class}
 \alias{SQLiteConnection-class}
-\title{Class SQLiteConnection}
+\title{Class SQLiteConnection.}
 \description{
 \code{SQLiteConnection} objects are usually created by
 \code{\link[DBI]{dbConnect}}

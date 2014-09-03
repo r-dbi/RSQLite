@@ -4,12 +4,10 @@
 \alias{dbDisconnect,SQLiteConnection-method}
 \title{Disconnect an SQLite connection.}
 \usage{
-\S4method{dbDisconnect}{SQLiteConnection}(conn, ...)
+\S4method{dbDisconnect}{SQLiteConnection}(conn)
 }
 \arguments{
 \item{conn}{An existing \code{\linkS4class{SQLiteConnection}}}
-
-\item{...}{Ignored. Included for compatibility with generic.}
 }
 \description{
 Disconnect an SQLite connection.

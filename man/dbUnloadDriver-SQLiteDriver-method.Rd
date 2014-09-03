@@ -18,7 +18,9 @@ A logical indicating whether the operation succeeded or not.
 Unload SQLite driver.
 }
 \examples{
+\dontrun{
 db <- SQLite()
 dbUnloadDriver(db)
+}
 }
 

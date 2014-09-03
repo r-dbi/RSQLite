@@ -6,13 +6,10 @@
 \alias{SQLITE_RWC}
 \alias{dbConnect,SQLiteConnection-method}
 \alias{dbConnect,SQLiteDriver-method}
-\alias{dbConnect,character-method}
 \alias{sqliteNewConnection}
 \title{Create an SQLite connection.}
 \usage{
 \S4method{dbConnect}{SQLiteDriver}(drv, ...)
-
-\S4method{dbConnect}{character}(drv, ...)
 
 \S4method{dbConnect}{SQLiteConnection}(drv, ...)
 

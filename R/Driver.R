@@ -126,16 +126,6 @@ setMethod("dbConnect", "SQLiteDriver",
 
 #' @export
 #' @rdname dbConnect-SQLiteDriver-method
-setMethod("dbConnect", "character",
-  definition = function(drv, ...){
-    d <- dbDriver(drv)
-    dbConnect(d, ...)
-  },
-  valueClass = "SQLiteConnection"
-)
-
-#' @export
-#' @rdname dbConnect-SQLiteDriver-method
 setMethod("dbConnect", "SQLiteConnection",
   definition = function(drv, ...){
     new.id <- .Call("RS_SQLite_cloneConnection", drv@Id, PACKAGE = .SQLitePkgName)

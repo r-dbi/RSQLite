@@ -29,7 +29,6 @@ Collate:
     'Constants.R'
     'Driver.R'
     'Result.R'
-    'S4R.R'
     'Summary.R'
     'Utils.R'
     'dbGetInfo.R'

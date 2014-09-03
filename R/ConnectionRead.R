@@ -50,7 +50,7 @@ setMethod("dbReadTable",
 sqliteReadTable <- function(con, name, row.names = "row_names", 
                             check.names = TRUE, select.cols="*", ...) {
   out <- try(dbGetQuery(con, paste("SELECT", select.cols, "FROM", name)))
-  if(inherits(out, ErrorClass))
+  if(inherits(out, "try-error"))
     stop(paste("could not find table", name))
   if(check.names)
     names(out) <- make.names(names(out), unique = TRUE)

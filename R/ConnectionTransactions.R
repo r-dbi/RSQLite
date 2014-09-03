@@ -69,5 +69,5 @@ sqliteTransactionStatement <- function(con, statement) {
   }
   
   rc <- try(dbGetQuery(con, statement), silent = TRUE)
-  !inherits(rc, ErrorClass)
+  !inherits(rc, "try-error")
 }

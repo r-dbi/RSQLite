@@ -278,7 +278,7 @@ setMethod("dbRemoveTable",
   signature = signature(conn = "SQLiteConnection", name = "character"),
   definition = function(conn, name, ...){
     rc <- try(dbGetQuery(conn, paste("DROP TABLE", name)))
-    !inherits(rc, ErrorClass)
+    !inherits(rc, "try-error")
   },
   valueClass = "logical"
 )

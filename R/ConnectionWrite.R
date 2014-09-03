@@ -223,7 +223,7 @@ sqliteImportFile <- function(con, name, value, field.types = NULL,
       dbBuildTableDefinition(new.con, name, d, field.types = field.types,
         row.names = row.names)
     rs <- try(dbSendQuery(new.con, sql))
-    if(inherits(rs, ErrorClass)){
+    if(inherits(rs, "try-error")){
       warning("could not create table: aborting sqliteImportFile")
       return(FALSE)
     }
@@ -240,7 +240,7 @@ sqliteImportFile <- function(con, name, value, field.types = NULL,
       .Call("RS_SQLite_importFile", conId, name, fn, sep, eol,
         as.integer(skip), PACKAGE = .SQLitePkgName)
     })
-  if(inherits(rc, ErrorClass)){
+  if(inherits(rc, "try-error")){
     if(new.table) dbRemoveTable(new.con, name)
     return(FALSE)
   }

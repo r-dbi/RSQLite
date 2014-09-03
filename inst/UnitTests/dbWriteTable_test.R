@@ -4,7 +4,7 @@ DATA <- new.env(parent=emptyenv(), hash=TRUE)
 
 .setUp <- function() {
     DATA$dbfile <- tempfile()
-    DATA$db <- dbConnect(dbDriver("SQLite"), dbname=DATA$dbfile)
+    DATA$db <- dbConnect(SQLite(), dbname=DATA$dbfile)
 }
 
 .tearDown <- function() {
@@ -56,7 +56,7 @@ testCanCloseAfterFailedWriteTable <- function() {
     ## handle DB connection manually since we want
     ## to explicitly check dbDisconnect is error free.
     tf <- tempfile()
-    con <- dbConnect(dbDriver("SQLite"), dbname=tf)
+    con <- dbConnect(SQLite(), dbname=tf)
 
     x <- data.frame(col1=1:10, col2=letters[1:10])
 

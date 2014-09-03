@@ -4,7 +4,7 @@ DATA <- new.env(parent=emptyenv(), hash=TRUE)
 
 .setUp <- function() {
     DATA$dbfile <- tempfile()
-    DATA$db <- dbConnect(dbDriver("SQLite"), DATA$dbfile)
+    DATA$db <- dbConnect(SQLite(), DATA$dbfile)
 }
 
 .tearDown <- function() {

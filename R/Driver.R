@@ -137,8 +137,8 @@ setMethod("dbListConnections", "SQLiteDriver", function(drv, ...) {
 #' @export
 #' @useDynLib RSQLite RS_SQLite_newConnection
 setMethod("dbConnect", "SQLiteDriver",
-  function(drv, ..., dbname = "", loadable.extensions = TRUE, cache_size = NULL, 
-           synchronous = 0, flags = NULL, vfs = NULL) {
+  function(drv, dbname = "", loadable.extensions = TRUE, cache_size = NULL, 
+           synchronous = 0, flags = NULL, vfs = NULL, ...) {
     if (is.null(dbname))
       dbname <- ""
     ## path.expand converts as.character(NA) => "NA"
@@ -189,7 +189,7 @@ setMethod("dbConnect", "SQLiteDriver",
   
 #' @export
 #' @rdname dbConnect-SQLiteDriver-method
-#' @rdname RSQLite RS_SQLite_cloneConnection
+#' @useDynLib RSQLite RS_SQLite_cloneConnection
 setMethod("dbConnect", "SQLiteConnection", function(drv, ...){
   new.id <- .Call(RS_SQLite_cloneConnection, drv@Id)
   new("SQLiteConnection", Id = new.id)

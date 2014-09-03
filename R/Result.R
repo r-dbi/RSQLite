@@ -1,4 +1,5 @@
 #' @include Object.R
+#' @include Result.R
 NULL
 
 #' Class SQLiteResult

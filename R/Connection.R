@@ -14,19 +14,6 @@ NULL
 #' @export
 setClass("SQLiteConnection", representation("DBIConnection", "SQLiteObject"))
 
-#' Disconnect an SQLite connection.
-#' 
-#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
-#' @export
-#' @useDynLib RSQLite RS_SQLite_closeConnection
-setMethod("dbDisconnect", "SQLiteConnection", function(conn) {
-  if(!isIdCurrent(conn)){
-    warning("expired SQLiteConnection")
-    return(TRUE)
-  }
-  .Call(RS_SQLite_closeConnection, conn@Id)
-})
-
 
 #' Execute a SQL statement on a database connection
 #' 

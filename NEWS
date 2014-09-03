@@ -1,5 +1,7 @@
 Version 0.11.6.9000
 
+- Tests have been converted from RUnit to testthat
+
 - Internal `sqlite*()` functions are no longer exported (#20).
 
 - `dbFetch()` method added (`fetch()` will be deprecated in the future)

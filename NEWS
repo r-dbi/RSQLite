@@ -1,5 +1,7 @@
 Version 0.11.6.9000
 
+- `dbCallProc()` method remove, since generic is now deprecated.
+
 Version 0.11.6
 
 - Upgrade to SQLite 3.8.4.2

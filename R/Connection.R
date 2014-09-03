@@ -217,16 +217,6 @@ setMethod("dbGetException", "SQLiteConnection",
   valueClass = "list"    ## TODO: should return a SQLiteException
 )
 
-#' Call an SQL stored procedure
-#' 
-#' Not yet implemented.
-#' 
-#' @keywords internal
-#' @export
-setMethod("dbCallProc", "SQLiteConnection",
-  definition = function(conn, ...) .NotYetImplemented()
-)
-
 #' Does the table exist?
 #' 
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}

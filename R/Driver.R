@@ -15,9 +15,6 @@ NULL
 #' database \emph{is} the file name, thus database names should be legal file
 #' names in the running platform.
 #' 
-#' @name SQLiteDriver-class
-#' @docType class
-#'
 #' @examples
 #' # initialize a new database to a tempfile and copy some data.frame
 #' # from the base package into it
@@ -61,17 +58,15 @@ setAs("SQLiteConnection", "SQLiteDriver",
 #' 
 #' @rdname SQLiteDriver-class
 #' @export
+#' @useDynLib RSQLite RS_SQLite_init
 SQLite <- function(max.con = 200L, fetch.default.rec = 500, 
                    force.reload = FALSE, shared.cache = FALSE) {
-  sqliteInitDriver(max.con, fetch.default.rec, force.reload, shared.cache)
-}
 
-sqliteInitDriver <- function(max.con = 16, fetch.default.rec = 500, 
-                             force.reload=FALSE, shared.cache=FALSE) {
   config.params <- as.integer(c(max.con, fetch.default.rec))
   force <- as.logical(force.reload)
   cache <- as.logical(shared.cache)
-  id <- .Call("RS_SQLite_init", config.params, force, cache, PACKAGE = .SQLitePkgName)
+  
+  id <- .Call(RS_SQLite_init, config.params, force, cache)
   new("SQLiteDriver", Id = id)
 }
 
@@ -80,29 +75,24 @@ sqliteInitDriver <- function(max.con = 16, fetch.default.rec = 500,
 #' @param drv Object created by \code{\link{SQLite}}
 #' @param ... Ignored. Needed for compatibility with generic.
 #' @return A logical indicating whether the operation succeeded or not.
+#' @useDynLib RSQLite RS_SQLite_closeManager
 #' @export
-setMethod("dbUnloadDriver", "SQLiteDriver",
-  definition = function(drv, ...) sqliteCloseDriver(drv, ...),
-  valueClass = "logical"
-)
-
-sqliteCloseDriver <- function(drv, ...) {
-  .Call("RS_SQLite_closeManager", drv@Id, PACKAGE = .SQLitePkgName)
-}
-
+#' @examples
+#' db <- SQLite()
+#' dbUnloadDriver(db)
+setMethod("dbUnloadDriver", "SQLiteDriver", function(drv, ...) {
+  .Call(RS_SQLite_closeManager, drv@Id)  
+})
 
 #' List active connections
 #' 
 #' @param drv An object of class \code{\linkS4class{SQLiteDriver}}
 #' @param ... Ignored. Needed for compatibility with generic.
 #' @export
-setMethod("dbListConnections", "SQLiteDriver",
-  definition = function(drv, ...) {
-    cons <- dbGetInfo(drv, what = "connectionIds")[[1]]
-    if(!is.null(cons)) cons else list()
-  },
-  valueClass = "list"
-)
+setMethod("dbListConnections", "SQLiteDriver", function(drv, ...) {
+  cons <- dbGetInfo(drv, what = "connectionIds")[[1]]
+  if(!is.null(cons)) cons else list()
+})
 
 #' Create an SQLite connection.
 #' 

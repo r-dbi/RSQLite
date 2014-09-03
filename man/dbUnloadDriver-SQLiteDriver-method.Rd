@@ -17,4 +17,8 @@ A logical indicating whether the operation succeeded or not.
 \description{
 Unload SQLite driver.
 }
+\examples{
+db <- SQLite()
+dbUnloadDriver(db)
+}
 

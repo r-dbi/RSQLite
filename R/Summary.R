@@ -10,8 +10,6 @@ setMethod("summary", "SQLiteDriver",
   definition = function(object, ...) sqliteDescribeDriver(object, ...)
 )
 
-#' @export
-#' @rdname summary
 sqliteDescribeDriver <- function(obj, verbose = FALSE, ...) {
   if(!isIdCurrent(obj)){
     show(obj)
@@ -44,8 +42,6 @@ setMethod("summary", "SQLiteConnection",
   definition = function(object, ...) sqliteDescribeConnection(object, ...)
 )
 
-#' @export
-#' @rdname summary
 sqliteDescribeConnection <- function(obj, verbose = FALSE, ...) {
   if(!isIdCurrent(obj)){
     show(obj)
@@ -75,8 +71,6 @@ setMethod("summary", "SQLiteResult",
   definition = function(object, ...) sqliteDescribeResult(object, ...)
 )
 
-#' @export
-#' @rdname summary
 sqliteDescribeResult <- function(obj, verbose = FALSE, ...) {
   if(!isIdCurrent(obj)){
     show(obj)

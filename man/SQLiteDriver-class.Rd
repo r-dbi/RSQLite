@@ -3,14 +3,10 @@
 \name{SQLiteDriver-class}
 \alias{SQLite}
 \alias{SQLiteDriver-class}
-\alias{sqliteInitDriver}
 \title{Class SQLiteDriver with constructor SQLite.}
 \usage{
 SQLite(max.con = 200L, fetch.default.rec = 500, force.reload = FALSE,
   shared.cache = FALSE)
-
-sqliteInitDriver(max.con = 16, fetch.default.rec = 500,
-  force.reload = FALSE, shared.cache = FALSE)
 }
 \arguments{
 \item{max.con}{IGNORED.  As of RSQLite 0.9.0, connections are managed

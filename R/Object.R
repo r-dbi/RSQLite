@@ -37,8 +37,6 @@ setMethod("dbDataType", "SQLiteObject",
   valueClass = "character"
 )
 
-#' @export
-#' @rdname dbDataType-SQLiteObject-method
 sqliteDataType <- function(obj, ...) {
   rs.class <- data.class(obj)
   rs.mode <- storage.mode(obj)

@@ -2,12 +2,9 @@
 \docType{methods}
 \name{dbUnloadDriver,SQLiteDriver-method}
 \alias{dbUnloadDriver,SQLiteDriver-method}
-\alias{sqliteCloseDriver}
 \title{Unload SQLite driver.}
 \usage{
 \S4method{dbUnloadDriver}{SQLiteDriver}(drv, ...)
-
-sqliteCloseDriver(drv, ...)
 }
 \arguments{
 \item{drv}{Object created by \code{\link{SQLite}}}

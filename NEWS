@@ -1,6 +1,9 @@
 Version 0.11.6.9000
 
+- Internal `sqlite*()` functions are no longer exported (#20).
+
 - `dbFetch()` method added (`fetch()` will be deprecated in the future)
+
 - `dbCallProc()` method removed, since generic is now deprecated.
 
 Version 0.11.6

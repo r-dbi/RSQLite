@@ -3,14 +3,11 @@
 \name{dbFetch,SQLiteResult-method}
 \alias{dbFetch,SQLiteResult-method}
 \alias{fetch,SQLiteResult-method}
-\alias{sqliteFetch}
 \title{Fetch records from a previously executed query}
 \usage{
 \S4method{dbFetch}{SQLiteResult}(res, n = 0, ...)
 
 \S4method{fetch}{SQLiteResult}(res, n = 0, ...)
-
-sqliteFetch(res, n = 0, ...)
 }
 \arguments{
 \item{res}{an \code{\linkS4class{SQLiteResult}} object.}

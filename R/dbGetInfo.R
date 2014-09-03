@@ -1,9 +1,8 @@
 #' Get metadata about a database object.
 #' 
-#' @param dbObj,obj,res An object of class \code{\linkS4class{SQLiteDriver}},
+#' @param dbObj,res An object of class \code{\linkS4class{SQLiteDriver}},
 #'   \code{\linkS4class{SQLiteConnection}} or 
 #'   \code{\linkS4class{SQLiteResult}}
-#' @param what character vector. If supplied used to subset output.
 #' @param ... Ignored. Included for compatibility with generic.
 #' @name dbGetInfo
 NULL
@@ -14,8 +13,7 @@ setMethod("dbGetInfo", "SQLiteDriver",
   definition = function(dbObj, ...) sqliteDriverInfo(dbObj, ...),
   valueClass = "list"
 )
-#' @rdname dbGetInfo
-#' @export
+
 sqliteDriverInfo <- function(obj, what="", ...) {
   if(!isIdCurrent(obj))
     stop(paste("expired", class(obj)))
@@ -36,8 +34,7 @@ setMethod("dbGetInfo", "SQLiteConnection",
   definition = function(dbObj, ...) sqliteConnectionInfo(dbObj, ...),
   valueClass = "list"
 )
-#' @rdname dbGetInfo
-#' @export
+
 sqliteConnectionInfo <- function(obj, what="", ...) {
   if(!isIdCurrent(obj))
     stop(paste("expired", class(obj)))

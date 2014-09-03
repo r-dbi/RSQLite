@@ -3,26 +3,18 @@
 \name{transactions}
 \alias{dbBeginTransaction,SQLiteConnection-method}
 \alias{dbCommit,SQLiteConnection-method}
-\alias{dbRollback,SQLiteConnection-method}
-\alias{sqliteTransactionStatement}
 \alias{transactions}
 \title{SQLite transaction management.}
 \usage{
 \S4method{dbCommit}{SQLiteConnection}(conn, ...)
 
-\S4method{dbRollback}{SQLiteConnection}(conn, ...)
-
 \S4method{dbBeginTransaction}{SQLiteConnection}(conn, ...)
-
-sqliteTransactionStatement(con, statement)
 }
 \arguments{
-\item{conn,con}{a \code{\linkS4class{SQLiteConnection}} object, produced by
+\item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
 \code{\link[DBI]{dbConnect}}}
 
 \item{...}{Ignored. Needed for compatibility with generic.}
-
-\item{statement}{SQL transaction statement to execute}
 }
 \description{
 By default, SQLite is in auto-commit mode. \code{dbBeginTransaction} starts

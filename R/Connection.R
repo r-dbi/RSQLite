@@ -16,7 +16,7 @@ setClass("SQLiteConnection", representation("DBIConnection", "SQLiteObject"))
 
 #' Disconnect an SQLite connection.
 #' 
-#' @param conn,con An existing \code{\linkS4class{SQLiteConnection}}
+#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param ... Ignored. Included for compatibility with generic.
 #' @export
 setMethod("dbDisconnect", "SQLiteConnection",
@@ -24,8 +24,6 @@ setMethod("dbDisconnect", "SQLiteConnection",
   valueClass = "logical"
 )
 
-#' @export
-#' @rdname dbDisconnect-SQLiteConnection-method
 sqliteCloseConnection <- function(con, ...) {
   if(!isIdCurrent(con)){
     warning(paste("expired SQLiteConnection"))
@@ -40,7 +38,7 @@ sqliteCloseConnection <- function(con, ...) {
 #' These are the primary methods for interacting with a database via SQL
 #' queries.
 #' 
-#' @param conn,con an \code{\linkS4class{SQLiteConnection}} object.
+#' @param conn an \code{\linkS4class{SQLiteConnection}} object.
 #' @param statement a character vector of length one specifying the SQL
 #'   statement that should be executed.  Only a single SQL statment should be
 #'   provided.
@@ -146,8 +144,6 @@ setMethod("dbSendPreparedQuery",
   valueClass = "SQLiteResult"
 )
 
-#' @rdname dbSendQuery-SQLiteConnection-character-method
-#' @export
 sqliteExecStatement <- function(con, statement, bind.data=NULL) {
   conId <- con@Id
   statement <- as(statement, "character")
@@ -188,8 +184,6 @@ setMethod("dbGetPreparedQuery",
   valueClass = "SQLiteResult"
 )
 
-#' @rdname dbSendQuery-SQLiteConnection-character-method
-#' @export
 sqliteQuickSQL <- function(con, statement, bind.data=NULL, ...) {
   rs <- sqliteExecStatement(con, statement, bind.data)
   if(dbHasCompleted(rs)){
@@ -325,7 +319,7 @@ setMethod("dbListTables", "SQLiteConnection",
 
 #' List fields in specified table.
 #' 
-#' @param conn,con An existing \code{\linkS4class{SQLiteConnection}}
+#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name a length 1 character vector giving the name of a table.
 #' @param ... Ignored. Included for compatibility with generic.
 #' @export
@@ -335,8 +329,7 @@ setMethod("dbListFields",
   definition = function(conn, name, ...) sqliteTableFields(conn, name, ...),
   valueClass = "character"
 )
-#' @export
-#' @rdname dbListFields-SQLiteConnection-character-method
+
 sqliteTableFields <- function(con, name, ...) {
   if(length(dbListResults(con))>0){
     con2 <- dbConnect(con)

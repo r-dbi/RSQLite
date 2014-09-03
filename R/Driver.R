@@ -66,8 +66,6 @@ SQLite <- function(max.con = 200L, fetch.default.rec = 500,
   sqliteInitDriver(max.con, fetch.default.rec, force.reload, shared.cache)
 }
 
-#' @rdname SQLiteDriver-class
-#' @export
 sqliteInitDriver <- function(max.con = 16, fetch.default.rec = 500, 
                              force.reload=FALSE, shared.cache=FALSE) {
   config.params <- as.integer(c(max.con, fetch.default.rec))
@@ -87,8 +85,7 @@ setMethod("dbUnloadDriver", "SQLiteDriver",
   definition = function(drv, ...) sqliteCloseDriver(drv, ...),
   valueClass = "logical"
 )
-#' @export
-#' @rdname dbUnloadDriver-SQLiteDriver-method
+
 sqliteCloseDriver <- function(drv, ...) {
   .Call("RS_SQLite_closeManager", drv@Id, PACKAGE = .SQLitePkgName)
 }

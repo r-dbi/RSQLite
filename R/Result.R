@@ -55,8 +55,6 @@ setMethod("fetch", "SQLiteResult",
   valueClass = "data.frame"
 )
 
-#' @export
-#' @rdname dbFetch-SQLiteResult-method
 sqliteFetch <- function(res, n=0, ...) {  
   if(!isIdCurrent(res))
     stop("invalid result handle")
@@ -82,8 +80,7 @@ setMethod("dbClearResult", "SQLiteResult",
   definition = function(res, ...) sqliteCloseResult(res, ...),
   valueClass = "logical"
 )
-#' @export
-#' @rdname dbClearResult-SQLiteResult-method
+
 sqliteCloseResult <- function(res, ...) {
   if(!isIdCurrent(res)){
     warning(paste("expired SQLiteResult"))

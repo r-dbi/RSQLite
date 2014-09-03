@@ -10,8 +10,7 @@ Description: Database Interface R driver for SQLite.
     The source for the SQLite engine (version 3.8.4.2) is included.
 Depends:
     R (>= 2.10.0),
-    DBI (>= 0.3)
-Imports:
+    DBI (>= 0.3),
     methods
 Suggests:
     RUnit (>= 0.4.22),

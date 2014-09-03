@@ -43,13 +43,20 @@ setAs("SQLiteResult", "SQLiteConnection",
 #' # let's get all remaining records
 #' data2 <- fetch(res, n = -1)
 #' @export
+setMethod("dbFetch", "SQLiteResult",
+  definition = function(res, n = 0, ...) sqliteFetch(res, n = n, ...),
+  valueClass = "data.frame"
+)
+
+#' @export
+#' @rdname dbFetch-SQLiteResult-method
 setMethod("fetch", "SQLiteResult",
   definition = function(res, n = 0, ...) sqliteFetch(res, n = n, ...),
   valueClass = "data.frame"
 )
 
 #' @export
-#' @rdname fetch-SQLiteResult-method
+#' @rdname dbFetch-SQLiteResult-method
 sqliteFetch <- function(res, n=0, ...) {  
   if(!isIdCurrent(res))
     stop("invalid result handle")

@@ -26,7 +26,7 @@ testSimpleBindPositional <- function() {
     dbGetQuery(db, basicTableSql)
     values <- "(?, ?, ?)"
     sql <- paste("insert into t1 values", values)
-    dbBeginTransaction(db)
+    dbBegin(db)
     rs <- dbSendPreparedQuery(db, sql, bind.data=basicDf)
     dbClearResult(rs)
     dbCommit(db)

@@ -5,29 +5,30 @@ NULL
 
 #' SQLite transaction management.
 #' 
-#' By default, SQLite is in auto-commit mode. \code{dbBeginTransaction} starts
+#' By default, SQLite is in auto-commit mode. \code{dbBegin} starts
 #' a SQLite transaction and turns auto-commit off. \code{dbCommit} and
 #' \code{dbRollback} commit and rollback the transaction, respectively and turn
 #' auto-commit on.
 #' 
 #' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
 #'   \code{\link[DBI]{dbConnect}}
-#' @param ... Ignored. Needed for compatibility with generic.
+#' @return A boolean, indicating success or failure.
 #' @examples
-#' con <- dbConnect(SQLite(), dbname = tempfile())
-#' data(USArrests)
-#' dbWriteTable(con, "arrests", USArrests)
-#' dbGetQuery(con, "select count(*) from arrests")[1, ]
+#' con <- dbConnect(SQLite(), ":memory:")
+#' dbWriteTable(con, "arrests", datasets::USArrests)
+#' dbGetQuery(con, "select count(*) from arrests")
 #' 
-#' dbBeginTransaction(con)
+#' dbBegin(con)
 #' rs <- dbSendQuery(con, "DELETE from arrests WHERE Murder > 1")
-#' do_commit <- if (dbGetInfo(rs)[["rowsAffected"]] > 40) FALSE else TRUE
+#' dbGetRowsAffected(rs)
 #' dbClearResult(rs)
-#' dbGetQuery(con, "select count(*) from arrests")[1, ]
-#' if (!do_commit) dbRollback(con)
+#' 
+#' dbGetQuery(con, "select count(*) from arrests")
+#' 
+#' dbRollback(con)
 #' dbGetQuery(con, "select count(*) from arrests")[1, ]
 #' 
-#' dbBeginTransaction(con)
+#' dbBegin(con)
 #' rs <- dbSendQuery(con, "DELETE FROM arrests WHERE Murder > 5")
 #' dbClearResult(rs)
 #' dbCommit(con)
@@ -39,24 +40,24 @@ NULL
 
 #' @export
 #' @rdname transactions
-setMethod("dbCommit", "SQLiteConnection",
-  definition = function(conn, ...) sqliteTransactionStatement(conn, "COMMIT")
-)
-
-setMethod("dbRollback", "SQLiteConnection",
-  definition = function(conn, ...) {
-    rsList <- dbListResults(conn)
-    if (length(rsList))
-      dbClearResult(rsList[[1]])
-    sqliteTransactionStatement(conn, "ROLLBACK")
-  }
-)
+setMethod("dbBegin", "SQLiteConnection", function(conn) {
+  sqliteTransactionStatement(conn, "BEGIN")
+})
 
 #' @export
 #' @rdname transactions
-setMethod("dbBeginTransaction", "SQLiteConnection",
-  definition = function(conn, ...) sqliteTransactionStatement(conn, "BEGIN")
-)
+setMethod("dbCommit", "SQLiteConnection", function(conn) {
+  sqliteTransactionStatement(conn, "COMMIT")
+})
+
+#' @export
+#' @rdname transactions
+setMethod("dbRollback", "SQLiteConnection", function(conn) {
+  rsList <- dbListResults(conn)
+  if (length(rsList))
+    dbClearResult(rsList[[1]])
+  sqliteTransactionStatement(conn, "ROLLBACK")
+})
 
 sqliteTransactionStatement <- function(con, statement) {
   ## are there resultSets pending on con?

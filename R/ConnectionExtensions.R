@@ -25,8 +25,8 @@ setGeneric("dbGetPreparedQuery",
 #' @export
 #' @param conn An \code{DBIConnection} object.
 #' @param ... Other arguments used by methods
-setGeneric("dbBeginTransaction", 
-  def = function(conn, ...)
-    standardGeneric("dbBeginTransaction"),
-  valueClass = "logical"
-)
+#' @keywords internal
+setGeneric("dbBeginTransaction", function(conn, ...) {
+  .Deprecated("dbBegin")
+  dbBegin(...)
+})

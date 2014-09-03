@@ -79,7 +79,7 @@ dbGetQuery(db, sql)
 
 bulk_insert <- function(sql, key_counts)
 {
-    dbBeginTransaction(db)
+    dbBegin(db)
     dbGetPreparedQuery(db, sql, bind.data = key_counts)
     dbCommit(db)
     dbGetQuery(db, "select count(*) from keys")[[1]]

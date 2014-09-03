@@ -63,7 +63,7 @@ sqliteWriteTable <- function(con, name, value, row.names = TRUE,
   new.table <- !foundTable
   createTable <- (new.table || foundTable && overwrite)
   removeTable <- (foundTable && overwrite)
-  success <- dbBeginTransaction(con)
+  success <- dbBegin(con)
   if (!success) {
     warning("unable to begin transaction")
     return(FALSE)

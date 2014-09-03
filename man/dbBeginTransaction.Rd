@@ -13,4 +13,5 @@ dbBeginTransaction(conn, ...)
 \description{
 See method documentation for details.
 }
+\keyword{internal}
 

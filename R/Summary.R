@@ -4,7 +4,10 @@
 #' @name summary
 NULL
 
+setGeneric("summary")
+
 #' @export
+#' 
 #' @rdname summary
 setMethod("summary", "SQLiteDriver",
   definition = function(object, ...) sqliteDescribeDriver(object, ...)

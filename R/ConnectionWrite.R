@@ -29,6 +29,11 @@
 #' con <- dbConnect(SQLite())
 #' dbWriteTable(con, "mtcars", mtcars)
 #' dbReadTable(con, "mtcars")
+#' 
+#' # A zero row data frame just creates a table definition.
+#' dbWriteTable(con, "mtcars2", mtcars[0, ])
+#' dbReadTable(con, "mtcars2")
+#' 
 #' dbDisconnect(con)
 setMethod("dbWriteTable", signature("SQLiteConnection", "character", "data.frame"),
   function(conn, name, value, row.names = NA, overwrite = FALSE, append = FALSE, 
@@ -62,9 +67,11 @@ setMethod("dbWriteTable", signature("SQLiteConnection", "character", "data.frame
       dbGetQuery(conn, sql)
     }
     
-    valStr <- paste(rep("?", ncol(value)), collapse = ",")
-    sql <- sprintf("insert into %s values (%s)", name, valStr)
-    rs <- dbSendPreparedQuery(conn, sql, bind.data = value)
+    if (nrow(value) > 0) {
+      valStr <- paste(rep("?", ncol(value)), collapse = ",")
+      sql <- sprintf("insert into %s values (%s)", name, valStr)
+      rs <- dbSendPreparedQuery(conn, sql, bind.data = value)
+    }
 
     on.exit(NULL)
     dbCommit(conn)

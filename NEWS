@@ -1,5 +1,8 @@
 Version 0.11.6.9000
 
+- `dbWriteTable()` just creates the table definition when given a zero-row
+  data frame (#35).
+
 - Methods no longer automatically clone the connection is there is an open
   result set. This was implement inconsistently in a handful of places - it's
   better to always clean up after yourself (#22).

@@ -4,17 +4,14 @@
 \alias{dbWriteTable,SQLiteConnection,character,character-method}
 \alias{dbWriteTable,SQLiteConnection,character,data.frame-method}
 \alias{sqliteImportFile}
-\alias{sqliteWriteTable}
 \title{Write a local data frame or file to the database.}
 \usage{
 \S4method{dbWriteTable}{SQLiteConnection,character,data.frame}(conn, name,
-  value, ...)
+  value, row.names = NA, overwrite = FALSE, append = FALSE,
+  field.types = NULL)
 
 \S4method{dbWriteTable}{SQLiteConnection,character,character}(conn, name, value,
   ...)
-
-sqliteWriteTable(con, name, value, row.names = NA, overwrite = FALSE,
-  append = FALSE, field.types = NULL, ...)
 
 sqliteImportFile(con, name, value, field.types = NULL, overwrite = FALSE,
   append = FALSE, header, row.names, nrows = 50, sep = ",", eol = "\\n",
@@ -33,8 +30,6 @@ file name (character).  In the first case, the data.frame is
 written to a temporary file and then imported to SQLite; when \code{value}
 is a character, it is interpreted as a file name and its contents imported
 to SQLite.}
-
-\item{...}{Passed on to \code{sqliteWriteTable}.}
 
 \item{row.names}{A logical specifying whether the \code{row.names} should be
 output to the output DBMS table; if \code{TRUE}, an extra field whose name

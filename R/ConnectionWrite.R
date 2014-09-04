@@ -12,31 +12,6 @@
 #'   written to a temporary file and then imported to SQLite; when \code{value}
 #'   is a character, it is interpreted as a file name and its contents imported
 #'   to SQLite.
-#' @param ... Passed on to \code{sqliteWriteTable}.
-#' @export
-#' @examples
-#' con <- dbConnect(SQLite())
-#' dbWriteTable(con, "mtcars", mtcars)
-#' dbReadTable(con, "mtcars")
-#' dbDisconnect(con)
-setMethod("dbWriteTable",
-  signature = signature(conn = "SQLiteConnection", name = "character",
-    value="data.frame"),
-  definition = function(conn, name, value, ...)
-    sqliteWriteTable(conn, name, value, ...),
-  valueClass = "logical"
-)
-
-#' @export
-#' @rdname dbWriteTable
-setMethod("dbWriteTable",
-  signature = signature(conn = "SQLiteConnection", name = "character",
-    value="character"),
-  definition = function(conn, name, value, ...)
-    sqliteImportFile(conn, name, value, ...),
-  valueClass = "logical"
-)
-
 #' @param row.names A logical specifying whether the \code{row.names} should be 
 #'   output to the output DBMS table; if \code{TRUE}, an extra field whose name 
 #'   will be whatever the R identifier \code{"row.names"} maps to the DBMS (see
@@ -50,63 +25,78 @@ setMethod("dbWriteTable",
 #'   the names are the names of new table's columns. If missing, types inferred
 #'   with \code{\link[DBI]{dbDataType}}).
 #' @export
-#' @rdname dbWriteTable
-sqliteWriteTable <- function(con, name, value, row.names = NA, 
-                             overwrite = FALSE, append = FALSE, 
-                             field.types = NULL, ...) {
-  if (overwrite && append)
-    stop("overwrite and append cannot both be TRUE", call. = FALSE)
-  
-  if (!dbBegin(con)) {
-    stop("Unable to begin transaction.", call. = FALSE)
-  }
-
-  found <- dbExistsTable(con, name)
-  if (found && !overwrite && !append) {
-    dbRollback(con)
-    stop("Table ", name, " exists in database, and both overwrite and", 
-      " append are FALSE", call. = FALSE)
-  }
-  if (found && overwrite) {
-    if (!dbRemoveTable(con, name)) {
-      dbRollback(con)
-      stop("Table", name, "couldn't be overwritten", call. = FALSE)
-    }
-  }
-  
-  if (is.na(row.names)) {
-    row.names <- is.character(attr(value, "row.names"))
-  }
-  if (row.names) {
-    value$row.names <- row.names(value)
-  }
-  
-  if (!found || overwrite) {
-    sql <- dbBuildTableDefinition(con, name, value, 
-      field.types = field.types, row.names = FALSE)
+#' @examples
+#' con <- dbConnect(SQLite())
+#' dbWriteTable(con, "mtcars", mtcars)
+#' dbReadTable(con, "mtcars")
+#' dbDisconnect(con)
+setMethod("dbWriteTable", signature("SQLiteConnection", "character", "data.frame"),
+  function(conn, name, value, row.names = NA, overwrite = FALSE, 
+           append = FALSE, field.types = NULL) {
     
+    if (overwrite && append)
+      stop("overwrite and append cannot both be TRUE", call. = FALSE)
+    
+    if (!dbBegin(con)) {
+      stop("Unable to begin transaction.", call. = FALSE)
+    }
+    
+    found <- dbExistsTable(con, name)
+    if (found && !overwrite && !append) {
+      dbRollback(con)
+      stop("Table ", name, " exists in database, and both overwrite and", 
+        " append are FALSE", call. = FALSE)
+    }
+    if (found && overwrite) {
+      if (!dbRemoveTable(con, name)) {
+        dbRollback(con)
+        stop("Table", name, "couldn't be overwritten", call. = FALSE)
+      }
+    }
+    
+    if (is.na(row.names)) {
+      row.names <- is.character(attr(value, "row.names"))
+    }
+    if (row.names) {
+      value$row.names <- row.names(value)
+    }
+    
+    if (!found || overwrite) {
+      sql <- dbBuildTableDefinition(con, name, value, 
+        field.types = field.types, row.names = FALSE)
+      
+      tryCatch(
+        dbGetQuery(con, sql), 
+        error = function(e) {
+          dbRollback(con)
+          stop(e)
+        }  
+      )
+    }
+    
+    valStr <- paste(rep("?", ncol(value)), collapse = ",")
+    sql <- sprintf("insert into %s values (%s)", name, valStr)
     tryCatch(
-      dbGetQuery(con, sql), 
+      rs <- dbSendPreparedQuery(con, sql, bind.data = value), 
       error = function(e) {
         dbRollback(con)
         stop(e)
-      }  
-    )
+      })
+    
+    dbCommit(con)
+    TRUE
   }
-  
-  valStr <- paste(rep("?", ncol(value)), collapse = ",")
-  sql <- sprintf("insert into %s values (%s)", name, valStr)
-  tryCatch(
-    rs <- dbSendPreparedQuery(con, sql, bind.data = value), 
-    error = function(e) {
-      dbRollback(con)
-      stop(e)
-  })
-  
-  dbCommit(con)
-  TRUE
-}
+)
 
+#' @export
+#' @rdname dbWriteTable
+setMethod("dbWriteTable",
+  signature = signature(conn = "SQLiteConnection", name = "character",
+    value="character"),
+  definition = function(conn, name, value, ...)
+    sqliteImportFile(conn, name, value, ...),
+  valueClass = "logical"
+)
 
 #' @export
 #' @rdname dbWriteTable

@@ -13,7 +13,7 @@
 \S4method{dbWriteTable}{SQLiteConnection,character,character}(conn, name, value,
   ...)
 
-sqliteWriteTable(con, name, value, row.names = TRUE, overwrite = FALSE,
+sqliteWriteTable(con, name, value, row.names = NA, overwrite = FALSE,
   append = FALSE, field.types = NULL, ...)
 
 sqliteImportFile(con, name, value, field.types = NULL, overwrite = FALSE,
@@ -39,7 +39,8 @@ to SQLite.}
 \item{row.names}{A logical specifying whether the \code{row.names} should be
 output to the output DBMS table; if \code{TRUE}, an extra field whose name
 will be whatever the R identifier \code{"row.names"} maps to the DBMS (see
-\code{\link[DBI]{make.db.names}}).}
+\code{\link[DBI]{make.db.names}}). If \code{NA} will add rows names if
+they are characters, otherwise will ignore.}
 
 \item{overwrite}{a logical specifying whether to overwrite an existing table
 or not. Its default is \code{FALSE}. (See the BUGS section below)}
@@ -66,5 +67,11 @@ and only if the first row has one fewer field that the number of columns.}
 }
 \description{
 Write a local data frame or file to the database.
+}
+\examples{
+con <- dbConnect(SQLite())
+dbWriteTable(con, "mtcars", mtcars)
+dbReadTable(con, "mtcars")
+dbDisconnect(con)
 }
 

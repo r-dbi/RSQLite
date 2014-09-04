@@ -1,5 +1,9 @@
 Version 0.11.6.9000
 
+- `dbWriteTable()` now throws errors on failure, rather than returning
+  FALSE. It will automatically add row names only if they are character,
+  not integer.
+
 - `dbBeginTransaction()` has been deprecated. Please use `dbBegin()` instead.
   (#)
 

@@ -44,7 +44,7 @@ test_that("forbidden operations throw errors", {
   dbDisconnect(dbrw)
   
   dbro <- dbConnect(SQLite(), dbname = tmpFile, flags = SQLITE_RO)
-  expect_false(dbWriteTable(dbro, "t2", df))
+  expect_error(dbWriteTable(dbro, "t2", df), "readonly database")
   dbDisconnect(dbro)
   
   dbrw2 <- dbConnect(SQLite(), dbname = tmpFile, flags = SQLITE_RW)

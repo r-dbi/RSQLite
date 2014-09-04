@@ -14,6 +14,11 @@
 #'   to SQLite.
 #' @param ... Passed on to \code{sqliteWriteTable}.
 #' @export
+#' @examples
+#' con <- dbConnect(SQLite())
+#' dbWriteTable(con, "mtcars", mtcars)
+#' dbReadTable(con, "mtcars")
+#' dbDisconnect(con)
 setMethod("dbWriteTable",
   signature = signature(conn = "SQLiteConnection", name = "character",
     value="data.frame"),
@@ -35,7 +40,8 @@ setMethod("dbWriteTable",
 #' @param row.names A logical specifying whether the \code{row.names} should be 
 #'   output to the output DBMS table; if \code{TRUE}, an extra field whose name 
 #'   will be whatever the R identifier \code{"row.names"} maps to the DBMS (see
-#'   \code{\link[DBI]{make.db.names}}).
+#'   \code{\link[DBI]{make.db.names}}). If \code{NA} will add rows names if
+#'   they are characters, otherwise will ignore.
 #' @param overwrite a logical specifying whether to overwrite an existing table 
 #'   or not. Its default is \code{FALSE}. (See the BUGS section below)
 #' @param append a logical specifying whether to append to an existing table 
@@ -45,111 +51,60 @@ setMethod("dbWriteTable",
 #'   with \code{\link[DBI]{dbDataType}}).
 #' @export
 #' @rdname dbWriteTable
-sqliteWriteTable <- function(con, name, value, row.names = TRUE, 
+sqliteWriteTable <- function(con, name, value, row.names = NA, 
                              overwrite = FALSE, append = FALSE, 
                              field.types = NULL, ...) {
   if (overwrite && append)
-    stop("overwrite and append cannot both be TRUE")
+    stop("overwrite and append cannot both be TRUE", call. = FALSE)
   
-  ## Do we need to clone the connection (ie., if it is in use)?
-  if (length(dbListResults(con))){
-    new.con <- dbConnect(con)              # there's pending work, so clone
-    on.exit(dbDisconnect(new.con))
-  } else {
-    new.con <- con
+  if (!dbBegin(con)) {
+    stop("Unable to begin transaction.", call. = FALSE)
   }
-  
-  foundTable <- dbExistsTable(con, name)
-  new.table <- !foundTable
-  createTable <- (new.table || foundTable && overwrite)
-  removeTable <- (foundTable && overwrite)
-  success <- dbBegin(con)
-  if (!success) {
-    warning("unable to begin transaction")
-    return(FALSE)
-  }
-  ## sanity check
-  if (foundTable && !removeTable && !append) {
-    warning(paste("table", name,
-      "exists in database: aborting dbWriteTable"))
-    success <- FALSE
-  }
-  
-  if (removeTable) {
-    success <- tryCatch({
-      if (dbRemoveTable(con, name)) {
-        TRUE
-      } else {
-        warning(paste("table", name, "couldn't be overwritten"))
-        FALSE
-      }
-    }, error=function(e) {
-      warning(conditionMessage(e))
-      FALSE
-    })
-  }
-  
-  if (!success) {
+
+  found <- dbExistsTable(con, name)
+  if (found && !overwrite && !append) {
     dbRollback(con)
-    return(FALSE)
+    stop("Table ", name, " exists in database, and both overwrite and", 
+      " append are FALSE", call. = FALSE)
+  }
+  if (found && overwrite) {
+    if (!dbRemoveTable(con, name)) {
+      dbRollback(con)
+      stop("Table", name, "couldn't be overwritten", call. = FALSE)
+    }
   }
   
+  if (is.na(row.names)) {
+    row.names <- is.character(attr(value, "row.names"))
+  }
   if (row.names) {
-    ## Need to handle row.names at this level
-    ## for the bind.data to work correctly.
-    ##
-    ## FIXME: for R >= 2.5, we should check
-    ## for numeric row.names and not convert
-    ## to character.
-    value <- cbind(row.names(value), value, stringsAsFactors=FALSE)
-    names(value)[1] <- "row.names"
+    value$row.names <- row.names(value)
   }
   
-  if (createTable) {
-    sql <- dbBuildTableDefinition(new.con, name, value,
-      field.types=field.types,
-      row.names=FALSE)
-    success <- tryCatch({
-      dbGetQuery(new.con, sql)
-      TRUE
-    }, error=function(e) {
-      warning(conditionMessage(e))
-      FALSE
-    })
-    if (!success) {
+  if (!found || overwrite) {
+    sql <- dbBuildTableDefinition(con, name, value, 
+      field.types = field.types, row.names = FALSE)
+    
+    tryCatch(
+      dbGetQuery(con, sql), 
+      error = function(e) {
+        dbRollback(con)
+        stop(e)
+      }  
+    )
+  }
+  
+  valStr <- paste(rep("?", ncol(value)), collapse = ",")
+  sql <- sprintf("insert into %s values (%s)", name, valStr)
+  tryCatch(
+    rs <- dbSendPreparedQuery(con, sql, bind.data = value), 
+    error = function(e) {
       dbRollback(con)
-      return(FALSE)
-    }
-  }
-  
-  valStr <- paste(rep("?", ncol(value)), collapse=",")
-  sql <- sprintf("insert into %s values (%s)",
-    name, valStr)
-  success <- tryCatch({
-    ## The 'finally' expression will have access to
-    ## this frame, not that of 'error'.  We want ret
-    ## to be defined even if an error occurs.
-    ret <- FALSE
-    rs <- dbSendPreparedQuery(new.con, sql, bind.data=value)
-    ret <- TRUE
-  }, error=function(e) {
-    warning(conditionMessage(e))
-    ret <- FALSE
-  }, finally={
-    if (exists("rs"))
-      dbClearResult(rs)
-    ret
+      stop(e)
   })
-  if (!success)
-    dbRollback(con)
-  else {
-    success <- dbCommit(con)
-    if (!success) {
-      warning(dbGetException(con)[["errorMsg"]])
-      dbRollback(con)
-    }
-  }
-  success
+  
+  dbCommit(con)
+  TRUE
 }
 
 
@@ -170,14 +125,6 @@ sqliteImportFile <- function(con, name, value, field.types = NULL,
   if(overwrite && append)
     stop("overwrite and append cannot both be TRUE")
   
-  ## Do we need to clone the connection (ie., if it is in use)?
-  if(length(dbListResults(con))!=0){
-    new.con <- dbConnect(con)              ## there's pending work, so clone
-    on.exit(dbDisconnect(new.con))
-  }
-  else
-    new.con <- con
-  
   if(dbExistsTable(con,name)){
     if(overwrite){
       if(!dbRemoveTable(con, name)){
@@ -192,7 +139,7 @@ sqliteImportFile <- function(con, name, value, field.types = NULL,
   }
   
   ## compute full path name (have R expand ~, etc)
-  fn <- file.path(dirname(value), basename(value))
+  fn <- path.expand(value)
   if(missing(header) || missing(row.names)){
     f <- file(fn, open="r")
     if(skip>0)

@@ -23,26 +23,6 @@ DATA <- new.env(parent=emptyenv(), hash=TRUE)
     file.remove(DATA$dbfile)
 }
 
-testSchemaChangeDuringQuery <- function() {
-    rs1 <- dbSendQuery(DATA$db1, "select * from t1")
-    junk <- fetch(rs1, n=1)
-    checkEquals("a", junk[["a"]])
-    ## This should cause an error because the DB is locked
-    ## by the active select.
-    checkException(dbGetQuery(DATA$db2,
-                              "create table t2 (x text, y integer)"),
-                   silent=TRUE)
-    dbClearResult(rs1)
-
-    ## if we haven't started fetching, it is ok on unix,
-    ## but not on Windows
-    ## rs1 <- dbSendQuery(DATA$db1, "select * from t1")
-    ## dbGetQuery(DATA$db2,
-    ##            "create table t2 (x text, y integer)")
-    ## junk <- fetch(rs1, n=2)
-    ## checkEquals(c("a", "b"), junk[["a"]])
-}
-
 testSimultaneousSelects <- function() {
     dbfile <- tempfile()
     db1 <- dbConnect(SQLite(), dbname = dbfile)
@@ -91,28 +71,6 @@ testSimultaneousSelects2 <- function() {
     dbDisconnect(db1)
     dbDisconnect(db2)
 }
-
-testSchemaChangeDuringWriteTable <- function() {
-    if (.Platform[["OS.type"]] == "windows") {
-        cat("skipping test, schema change on write table on Windows\n")
-        return(TRUE)
-    }
-    rs1 <- dbSendQuery(DATA$db1, "select * from t1")
-    junk <- fetch(rs1, n=1)
-    checkEquals("a", junk[["a"]])
-    x <- data.frame(col1=1:10, col2=letters[1:10])
-    ## This fails because the active select locks the DB
-    checkEquals(FALSE,
-                suppressWarnings(dbWriteTable(DATA$db2, "tablex", x)))
-    dbClearResult(rs1)
-    checkEquals(TRUE, dbWriteTable(DATA$db2, "tablex", x))
-    checkTrue("tablex" %in% dbListTables(DATA$db2))
-
-    dbGetQuery(DATA$db1, "create table foobar (a text)")
-    dbWriteTable(DATA$db2, "tabley", x)
-    checkTrue("tabley" %in% dbListTables(DATA$db2))
-}
-
 
 testTemporaryTables <- function() {
   dbGetQuery(DATA$db1, "create temporary table tabletemp (a text)")

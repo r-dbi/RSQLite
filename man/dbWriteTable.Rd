@@ -3,7 +3,6 @@
 \name{dbWriteTable,SQLiteConnection,character,data.frame-method}
 \alias{dbWriteTable,SQLiteConnection,character,character-method}
 \alias{dbWriteTable,SQLiteConnection,character,data.frame-method}
-\alias{sqliteImportFile}
 \title{Write a local data frame or file to the database.}
 \usage{
 \S4method{dbWriteTable}{SQLiteConnection,character,data.frame}(conn, name,
@@ -11,11 +10,9 @@
   field.types = NULL)
 
 \S4method{dbWriteTable}{SQLiteConnection,character,character}(conn, name, value,
-  ...)
-
-sqliteImportFile(con, name, value, field.types = NULL, overwrite = FALSE,
-  append = FALSE, header = TRUE, colClasses = NA, row.names = FALSE,
-  nrows = 50, sep = ",", eol = "\\n", skip = 0, ...)
+  field.types = NULL, overwrite = FALSE, append = FALSE, header = TRUE,
+  colClasses = NA, row.names = FALSE, nrows = 50, sep = ",",
+  eol = "\\n", skip = 0)
 }
 \arguments{
 \item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
@@ -52,7 +49,10 @@ with \code{\link[DBI]{dbDataType}}).}
 following \code{\link{read.table}} convention, namely, it is set to TRUE if
 and only if the first row has one fewer field that the number of columns.}
 
-\item{nrows}{Number of rows to read to determine types}
+\item{colClasses}{Character vector of R type names, used to override
+defaults when imputing classes from on-disk file.}
+
+\item{nrows}{Number of rows to read to determine types.}
 
 \item{sep}{The field separator, defaults to \code{','}.}
 

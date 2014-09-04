@@ -303,28 +303,17 @@ setMethod("dbListTables", "SQLiteConnection",
 #' 
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name a length 1 character vector giving the name of a table.
-#' @param ... Ignored. Included for compatibility with generic.
 #' @export
-#' @export
-setMethod("dbListFields",
-  signature = signature(conn = "SQLiteConnection", name = "character"),
-  definition = function(conn, name, ...) sqliteTableFields(conn, name, ...),
-  valueClass = "character"
-)
-
-sqliteTableFields <- function(con, name, ...) {
-  if(length(dbListResults(con))>0){
-    con2 <- dbConnect(con)
-    on.exit(dbDisconnect(con2))
+#' @examples
+#' con <- dbConnect(SQLite())
+#' dbWriteTable(con, "iris", iris)
+#' dbListFields(con, "iris")
+#' dbDisconnect(con)
+setMethod("dbListFields", c("SQLiteConnection", "character"),
+  function(conn, name) {
+    rs <- dbSendQuery(conn, paste("select * from ", name, "limit 1"))
+    on.exit(dbClearResult(rs))
+    
+    names(fetch(rs, n = 1))
   }
-  else
-    con2 <- con
-  rs <- dbSendQuery(con2, paste("select * from ", name, "limit 1"))
-  dummy <- fetch(rs, n = 1)
-  dbClearResult(rs)
-  nms <- names(dummy)
-  if(is.null(nms))
-    character()
-  else
-    nms
-}
+)

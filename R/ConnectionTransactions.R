@@ -41,34 +41,20 @@ NULL
 #' @export
 #' @rdname transactions
 setMethod("dbBegin", "SQLiteConnection", function(conn) {
-  sqliteTransactionStatement(conn, "BEGIN")
+  dbGetQuery(conn, "BEGIN")
+  TRUE
 })
 
 #' @export
 #' @rdname transactions
 setMethod("dbCommit", "SQLiteConnection", function(conn) {
-  sqliteTransactionStatement(conn, "COMMIT")
+  dbGetQuery(conn, "COMMIT")
+  TRUE
 })
 
 #' @export
 #' @rdname transactions
 setMethod("dbRollback", "SQLiteConnection", function(conn) {
-  rsList <- dbListResults(conn)
-  if (length(rsList))
-    dbClearResult(rsList[[1]])
-  sqliteTransactionStatement(conn, "ROLLBACK")
+  dbGetQuery(conn, "ROLLBACK")
+  TRUE
 })
-
-sqliteTransactionStatement <- function(con, statement) {
-  ## are there resultSets pending on con?
-  if(length(dbListResults(con)) > 0){
-    res <- dbListResults(con)[[1]]
-    if(!dbHasCompleted(res)){
-      stop("connection with pending rows, close resultSet before continuing")
-    }
-    dbClearResult(res)
-  }
-  
-  dbGetQuery(con, statement)
-  invisible(TRUE)
-}

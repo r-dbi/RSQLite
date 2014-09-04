@@ -757,83 +757,77 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
     return rsHandle;
 }
 
-RS_DBI_fields *
-RS_SQLite_createDataMappings(Res_Handle rsHandle)
-{
-    sqlite3_stmt  *db_statement;
-    RS_DBI_resultSet   *result;
-    RS_DBI_fields      *flds;
-    int     j, ncol, col_type;
-    const char *col_decltype = NULL;
-    char *col_name;
+RS_DBI_fields*
+RS_SQLite_createDataMappings(Res_Handle rsHandle) {
+  const char* col_decltype = NULL;
 
-    result = RS_DBI_getResultSet(rsHandle);
-    db_statement = (sqlite3_stmt *) result->drvResultSet;
+  RS_DBI_resultSet* result = RS_DBI_getResultSet(rsHandle);
+  sqlite3_stmt* db_statement = (sqlite3_stmt *) result->drvResultSet;
 
-    ncol = sqlite3_column_count(db_statement);
-    flds = RS_DBI_allocFields(ncol); /* BUG: mem leak if this fails? */
-    flds->num_fields = (Sint) ncol;
+  int ncol = sqlite3_column_count(db_statement);
+  RS_DBI_fields* flds = RS_DBI_allocFields(ncol); /* BUG: mem leak if this fails? */
+  flds->num_fields = ncol;
 
-    for(j=0; j<ncol; j++){
-        col_name = (char*)sqlite3_column_name(db_statement, j); /* -Wall */
-        if (col_name)
-            flds->name[j] = RS_DBI_copyString(col_name);
-        else {                   /* weird failure */
-            RS_DBI_freeFields(flds);
-            flds = NULL;
-            return NULL;
-        }
-        /* XXX: We do our best to determine the type of the column.  When
-           the first row retrieved contains a NULL and does not reference
-           a table column, we give up.
-        */
-        col_type = sqlite3_column_type(db_statement, j);
-        if (col_type == SQLITE_NULL) {
-            /* try to get type from origin column */
-            col_decltype = sqlite3_column_decltype(db_statement, j);
-            col_type = SQLite_decltype_to_type(col_decltype);
-        }
-        switch(col_type) {
-        case SQLITE_INTEGER:
-            flds->type[j] = SQL92_TYPE_INTEGER;
-            flds->Sclass[j] = INTSXP;
-            flds->length[j] = (Sint) sizeof(int);
-            flds->isVarLength[j] = (Sint) 0;
-            break;
-        case SQLITE_FLOAT:
-            flds->type[j] = SQL92_TYPE_DOUBLE;
-            flds->Sclass[j] = REALSXP;
-            flds->length[j] = (Sint) sizeof(double);
-            flds->isVarLength[j] = (Sint) 0;
-            break;
-        case SQLITE_TEXT:
-            flds->type[j] = SQL92_TYPE_CHAR_VAR;
-            flds->Sclass[j] = STRSXP;
-            flds->length[j] = (Sint) -1;   /* unknown */
-            flds->isVarLength[j] = (Sint) 1;
-            break;
-        case SQLITE_NULL:
-            error("NULL column handling not implemented");
-            break;
-        case SQLITE_BLOB:
-            flds->type[j] = SQLns_TYPE_BLOB;
-            flds->Sclass[j] = VECSXP;
-            flds->length[j] = (Sint) -1;   /* unknown */
-            flds->isVarLength[j] = (Sint) 1;
-            break;
-        default:
-            error("unknown column type %d", col_type);
-        }
-        flds->precision[j] = (Sint) -1;
-        flds->scale[j] = (Sint) -1;
-        /* For nullOk, could use sqlite3_column_origin_name and
-           sqlite3_table_column_metadata to determine this.  It
-           won't always be possible as the query column may not
-           refer to a table column.
-        */
-        flds->nullOk[j] = (Sint) -1;
+  for(int j = 0; j < ncol; j++){
+    char* col_name = (char*) sqlite3_column_name(db_statement, j);
+    if (col_name)
+      flds->name[j] = RS_DBI_copyString(col_name);
+    else { 
+      // weird failure
+      RS_DBI_freeFields(flds);
+      flds = NULL;
+      return NULL;
     }
-    return flds;
+    // We do our best to determine the type of the column.  When the first 
+    // row retrieved contains a NULL and does not reference a table column, we 
+    // give up.
+    int col_type = sqlite3_column_type(db_statement, j);
+    if (col_type == SQLITE_NULL) {
+        /* try to get type from origin column */
+        col_decltype = sqlite3_column_decltype(db_statement, j);
+        col_type = SQLite_decltype_to_type(col_decltype);
+    }
+    switch(col_type) {
+      case SQLITE_INTEGER:
+        flds->type[j] = SQL92_TYPE_INTEGER;
+        flds->Sclass[j] = INTSXP;
+        flds->length[j] = (Sint) sizeof(int);
+        flds->isVarLength[j] = (Sint) 0;
+        break;
+      case SQLITE_FLOAT:
+        flds->type[j] = SQL92_TYPE_DOUBLE;
+        flds->Sclass[j] = REALSXP;
+        flds->length[j] = (Sint) sizeof(double);
+        flds->isVarLength[j] = (Sint) 0;
+        break;
+     case SQLITE_TEXT:
+        flds->type[j] = SQL92_TYPE_CHAR_VAR;
+        flds->Sclass[j] = STRSXP;
+        flds->length[j] = (Sint) -1;   /* unknown */
+        flds->isVarLength[j] = (Sint) 1;
+        break;
+      case SQLITE_NULL:
+        error("NULL column handling not implemented");
+        break;
+     case SQLITE_BLOB:
+        flds->type[j] = SQLns_TYPE_BLOB;
+        flds->Sclass[j] = VECSXP;
+        flds->length[j] = (Sint) -1;   /* unknown */
+        flds->isVarLength[j] = (Sint) 1;
+        break;
+      default:
+        error("unknown column type %d", col_type);
+    }
+    flds->precision[j] = (Sint) -1;
+    flds->scale[j] = (Sint) -1;
+    /* For nullOk, could use sqlite3_column_origin_name and
+       sqlite3_table_column_metadata to determine this.  It
+       won't always be possible as the query column may not
+       refer to a table column.
+    */
+    flds->nullOk[j] = (Sint) -1;
+  }
+  return flds;
 }
 
 

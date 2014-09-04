@@ -113,9 +113,15 @@ setMethod("dbConnect", "SQLiteConnection", function(drv){
 #' @rdname dbConnect-SQLiteDriver-method
 #' @useDynLib RSQLite RS_SQLite_closeConnection
 setMethod("dbDisconnect", "SQLiteConnection", function(conn) {
-  if(!isIdCurrent(conn)){
-    warning("expired SQLiteConnection")
+  if (!isIdCurrent(conn)) {
+    warning("Expired SQLiteConnection.", call. = FALSE)
     return(TRUE)
   }
+  res <- dbListResults(conn)
+  if (length(res) > 0) {
+    warning("Result set open; closing automatically.", call. = FALSE)
+    dbClearResult(res[[1]])
+  }
+  
   .Call(RS_SQLite_closeConnection, conn@Id)
 })

@@ -1,14 +1,13 @@
-#' @include Object.R
-#' @include Result.R
-NULL
-
 #' Class SQLiteResult
 #' 
 #' SQLite's query results class.  This classes encapsulates the result of an
 #' SQL statement (either \code{select} or not).
 #' 
 #' @export
-setClass("SQLiteResult", representation("DBIResult", "SQLiteObject"))
+setClass("SQLiteResult", 
+  contains = "DBIResult",
+  slots = list(Id = "externalptr")
+)
 
 setAs("SQLiteResult", "SQLiteConnection",
   def = function(from) new("SQLiteConnection", Id = from@Id)
@@ -27,22 +26,21 @@ setAs("SQLiteResult", "SQLiteConnection",
 #'    number of rows as defined in \code{\link{SQLite}}
 #' @param ... Ignored. Needed for compatibility with generic.
 #' @examples
-#' con <- dbConnect(SQLite(), dbname = tempfile())
-#' data(USJudgeRatings)
-#' dbWriteTable(con, "jratings", USJudgeRatings)
+#' con <- dbConnect(SQLite())
+#' dbWriteTable(con, "jratings", datasets::USJudgeRatings)
 #' 
-#' res <- dbSendQuery(con, statement = paste(
-#'                       "SELECT row_names, ORAL, DILG, FAMI",
-#'                       "FROM jratings"))
+#' res <- dbSendQuery(con, "SELECT row_names, ORAL, DILG, FAMI FROM jratings")
 #' 
 #' # we now fetch the first 10 records from the resultSet into a data.frame
-#' data1 <- fetch(res, n = 10)   
+#' data1 <- dbFetch(res, n = 10)   
 #' dim(data1)
 #' 
 #' dbHasCompleted(res)
 #' 
 #' # let's get all remaining records
-#' data2 <- fetch(res, n = -1)
+#' data2 <- dbFetch(res, n = -1)
+#' dbClearResult(res)
+#' dbDisconnect(con)
 #' @export
 setMethod("dbFetch", "SQLiteResult",
   definition = function(res, n = 0, ...) sqliteFetch(res, n = n, ...),

@@ -1,16 +1,7 @@
-#' @include dbObjectId.R
+#' @include Driver.R
+#' @include Connection.R
+#' @include Result.R
 NULL
-
-#' Class SQLiteObject
-#' 
-#' Base class for all SQLite-specific DBI classes
-#' 
-#' @docType class
-#' @import methods
-#' @import DBI
-#' @useDynLib RSQLite
-#' @export
-setClass("SQLiteObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
 
 #' Determine the SQL Data Type of an R object.
 #' 
@@ -32,10 +23,18 @@ setClass("SQLiteObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
 #' dbDataType(drv, "1")
 #' dbDataType(drv, charToRaw("1"))
 #' @export
-setMethod("dbDataType", "SQLiteObject",
+setMethod("dbDataType", "SQLiteConnection",
   definition = function(dbObj, obj, ...) sqliteDataType(obj, ...),
   valueClass = "character"
 )
+
+#' @rdname dbDataType-SQLiteConnection-method
+#' @export
+setMethod("dbDataType", "SQLiteDriver",
+  definition = function(dbObj, obj, ...) sqliteDataType(obj, ...),
+  valueClass = "character"
+)
+
 
 sqliteDataType <- function(obj, ...) {
   rs.class <- data.class(obj)
@@ -93,7 +92,7 @@ sqliteDataType <- function(obj, ...) {
 #' 
 #' @export
 setMethod("make.db.names",
-  signature(dbObj="SQLiteObject", snames = "character"),
+  signature(dbObj="SQLiteConnection", snames = "character"),
   definition = function(dbObj, snames, keywords, unique, allow.keywords, ...){
     make.db.names.default(snames, keywords, unique, allow.keywords)
   },
@@ -101,14 +100,14 @@ setMethod("make.db.names",
 )
 
 #' @export
-#' @rdname make.db.names-SQLiteObject-character-method
-setMethod("SQLKeywords", "SQLiteObject",
+#' @rdname make.db.names-SQLiteConnection-character-method
+setMethod("SQLKeywords", "SQLiteConnection",
   definition = function(dbObj, ...) .SQL92Keywords,
   valueClass = "character"
 )
 
 #' @export
-#' @rdname make.db.names-SQLiteObject-character-method
+#' @rdname make.db.names-SQLiteConnection-character-method
 #' @param name a character vector of SQL identifiers we want to check against
 #'   keywords from the DBMS. 
 #' @param keywords a character vector with SQL keywords, namely 
@@ -116,9 +115,34 @@ setMethod("SQLKeywords", "SQLiteObject",
 #' @param case a character string specifying whether to make the comparison 
 #'   as lower case, upper case, or any of the two.  it defaults to \code{"any"}.
 setMethod("isSQLKeyword",
-  signature(dbObj="SQLiteObject", name="character"),
+  signature(dbObj="SQLiteConnection", name="character"),
   definition = function(dbObj, name, keywords, case, ...){
     isSQLKeyword.default(name, keywords = .SQL92Keywords, case)
   },
   valueClass = "character"
 )
+
+#' Check whether an SQLite object is valid or not
+#' 
+#' Support function that verifies that an dbObjectId holding a reference to a
+#' foreign object is still valid for communicating with the RDBMS
+#' 
+#' \code{dbObjectId} are R/S-Plus remote references to foreign (C code)
+#' objects. This introduces differences to the object's semantics such as
+#' persistence (e.g., connections may be closed unexpectedly), thus this
+#' function provides a minimal verification to ensure that the foreign object
+#' being referenced can be contacted.
+#' 
+#' @param obj any \code{dbObjectId} (e.g., \code{dbDriver},
+#' \code{dbConnection}, \code{dbResult}).
+#' @return a logical scalar.
+#' @examples
+#' \dontrun{
+#' cursor <- dbSendQuery(con, sql.statement)
+#' isIdCurrent(cursor)
+#' }
+#' 
+#' @export isIdCurrent
+"isIdCurrent" <- function(obj) { 
+  .Call("RS_DBI_validHandle", obj@Id, PACKAGE = .SQLitePkgName)
+}

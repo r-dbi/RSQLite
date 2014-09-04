@@ -25,21 +25,20 @@ R but its part of the R process), and \code{fetch} simply returns records
 from this internal buffer.
 }
 \examples{
-con <- dbConnect(SQLite(), dbname = tempfile())
-data(USJudgeRatings)
-dbWriteTable(con, "jratings", USJudgeRatings)
+con <- dbConnect(SQLite())
+dbWriteTable(con, "jratings", datasets::USJudgeRatings)
 
-res <- dbSendQuery(con, statement = paste(
-                      "SELECT row_names, ORAL, DILG, FAMI",
-                      "FROM jratings"))
+res <- dbSendQuery(con, "SELECT row_names, ORAL, DILG, FAMI FROM jratings")
 
 # we now fetch the first 10 records from the resultSet into a data.frame
-data1 <- fetch(res, n = 10)
+data1 <- dbFetch(res, n = 10)
 dim(data1)
 
 dbHasCompleted(res)
 
 # let's get all remaining records
-data2 <- fetch(res, n = -1)
+data2 <- dbFetch(res, n = -1)
+dbClearResult(res)
+dbDisconnect(con)
 }
 

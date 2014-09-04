@@ -1,5 +1,9 @@
 Version 0.11.6.9000
 
+- Remove SqliteObject and dbObject classes, modifying SqliteDriver, 
+  SqliteConnection, and SqliteResult to use composition instead of multiple
+  inheritance.
+
 - `dbWriteTable()` just creates the table definition when given a zero-row
   data frame (#35).
 

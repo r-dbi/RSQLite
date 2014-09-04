@@ -22,11 +22,13 @@
 \code{\linkS4class{SQLiteConnection}}. If an connection, the connection
 will be cloned.}
 
-\item{dbname}{The path to the database file. If the value is an empty
-string (\code{""}), then a temporary on-disk database is created. The
-temporary file will be deleted when the connection is closed. If the
-value is \code{":memory:"}, then an temporary in-memory only database
-is created.}
+\item{dbname}{The path to the database file. There are two special values:
+
+  \itemize{
+  \item \code{""}: creates a temporary on-disk database The file will be
+     deleted when the connection is closed.
+  \item \code{":memory:"}: create a temporary in-memory database.
+  }}
 
 \item{loadable.extensions}{When \code{TRUE} (default) SQLite3
 loadable extensions are enabled. Setting this value to \code{FALSE}

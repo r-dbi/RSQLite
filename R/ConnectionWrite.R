@@ -37,9 +37,7 @@ setMethod("dbWriteTable", signature("SQLiteConnection", "character", "data.frame
     if (overwrite && append)
       stop("overwrite and append cannot both be TRUE", call. = FALSE)
     
-    if (!dbBegin(conn)) {
-      stop("Unable to begin transaction.", call. = FALSE)
-    }
+    dbBegin(conn)
     on.exit(dbRollback(conn))
     
     found <- dbExistsTable(conn, name)
@@ -48,9 +46,7 @@ setMethod("dbWriteTable", signature("SQLiteConnection", "character", "data.frame
         " append are FALSE", call. = FALSE)
     }
     if (found && overwrite) {
-      if (!dbRemoveTable(conn, name)) {
-        stop("Table", name, "couldn't be overwritten", call. = FALSE)
-      }
+      dbRemoveTable(conn, name)
     }
     
     if (is.na(row.names)) {
@@ -97,9 +93,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
       stop("overwrite and append cannot both be TRUE")
     value <- path.expand(value)
     
-    if (!dbBegin(conn)) {
-      stop("Unable to begin transaction.", call. = FALSE)
-    }
+    dbBegin(conn)
     on.exit(dbRollback(conn))
     
     found <- dbExistsTable(conn, name)
@@ -108,9 +102,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
         " append are FALSE", call. = FALSE)
     }
     if (found && overwrite) {
-      if (!dbRemoveTable(conn, name)) {
-        stop("Table", name, "couldn't be overwritten", call. = FALSE)
-      }
+      dbRemoveTable(conn, name)
     }
     
     if (!found || overwrite) {

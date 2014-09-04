@@ -49,9 +49,8 @@ setMethod("dbReadTable",
 #'    "x,y,z" selects three columns named as listed.
 sqliteReadTable <- function(con, name, row.names = "row_names", 
                             check.names = TRUE, select.cols="*", ...) {
-  out <- try(dbGetQuery(con, paste("SELECT", select.cols, "FROM", name)))
-  if(inherits(out, "try-error"))
-    stop(paste("could not find table", name))
+  out <- dbGetQuery(con, paste("SELECT", select.cols, "FROM", name))
+
   if(check.names)
     names(out) <- make.names(names(out), unique = TRUE)
   ## should we set the row.names of the output data.frame?

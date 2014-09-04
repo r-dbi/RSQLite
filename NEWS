@@ -1,5 +1,8 @@
 Version 0.11.6.9000
 
+- `dbBegin()`, `dbCommit()`, `dbRollback()` and `dbRemoveTable()` now throw
+  errors on failure, rather than return `FALSE`.
+
 - `dbWriteTable()` now throws errors on failure, rather than returning
   FALSE. It will automatically add row names only if they are character,
   not integer.  When loading a file from disk, `dbWriteTable()` will no longer

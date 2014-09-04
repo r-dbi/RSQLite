@@ -1478,7 +1478,6 @@ RS_sqlite_import(
     char *zSql;                 /* An SQL statement */
     char *zLine = NULL;         /* A single line of input from the file */
     char **azCol;               /* zLine[] broken up into columns */
-    char *zCommit;              /* How to commit changes */
     FILE *in;                   /* The input file */
     int lineno = 0;             /* Line number of input file */
     char errMsg[512];
@@ -1530,8 +1529,7 @@ RS_sqlite_import(
     }
     azCol = malloc( sizeof(azCol[0])*(nCol+1) );
     if( azCol==0 ) return 0;
-    sqlite3_exec(db, "BEGIN", 0, 0, 0);
-    zCommit = "COMMIT";
+
     while( (zLine = RS_sqlite_getline(in, eol)) != NULL){
         lineno++;
         if(lineno <= skip) continue;
@@ -1551,8 +1549,7 @@ RS_sqlite_import(
             (void) sprintf(errMsg,
                            "RS_sqlite_import: %s line %d expected %d columns of data but found %d",
                            zFile, lineno, nCol, i+1);
-            zCommit = "ROLLBACK";
-            break;
+            RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
         }
 
         for(i=0; i<nCol; i++){
@@ -1576,17 +1573,12 @@ RS_sqlite_import(
         if (rc != SQLITE_OK) {
             sqlite3_finalize(pStmt);
             (void) sprintf(errMsg,"RS_sqlite_import: %s", sqlite3_errmsg(db));
-            zCommit = "ROLLBACK";
-            break;
+            RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
         }
     }
     free(azCol);
     fclose(in);
     sqlite3_finalize(pStmt);
-    sqlite3_exec(db, zCommit, 0, 0, 0);
-    if (strcmp(zCommit, "ROLLBACK") == 0) {
-        RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
-    }
     return 1;
 }
 

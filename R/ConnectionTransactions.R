@@ -69,6 +69,6 @@ sqliteTransactionStatement <- function(con, statement) {
     dbClearResult(res)
   }
   
-  rc <- try(dbGetQuery(con, statement), silent = TRUE)
-  !inherits(rc, "try-error")
+  dbGetQuery(con, statement)
+  invisible(TRUE)
 }

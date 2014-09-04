@@ -259,8 +259,8 @@ dbBuildTableDefinition <- function(dbObj, name, value, field.types = NULL,
 setMethod("dbRemoveTable",
   signature = signature(conn = "SQLiteConnection", name = "character"),
   definition = function(conn, name, ...){
-    rc <- try(dbGetQuery(conn, paste("DROP TABLE", name)))
-    !inherits(rc, "try-error")
+    dbGetQuery(conn, paste("DROP TABLE", name))
+    invisible(TRUE)
   },
   valueClass = "logical"
 )

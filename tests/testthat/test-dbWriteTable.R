@@ -85,3 +85,51 @@ test_that("logical converted to int", {
   
   expect_equal(remote$y, as.integer(local$y))
 })
+
+# From file -------------------------------------------------------------------
+
+test_that("comments are preserved", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con))
+  
+  tmp_file <- tempfile()
+  cat('A,B,C\n11,2#2,33\n', file = tmp_file)
+  on.exit(file.remove(tmp_file), add = TRUE)
+  
+  dbWriteTable(con, "t1", tmp_file, header = TRUE, sep = ",")
+  remote <- dbReadTable(con, "t1")
+  expect_equal(remote$B, "2#2")
+})
+
+test_that("colclasses overridden by argument", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con))
+  
+  tmp_file <- tempfile()
+  cat('A,B,C\n1,2,3\n4,5,6\na,7,8\n', file = tmp_file)
+  on.exit(file.remove(tmp_file), add = TRUE)
+  
+  dbWriteTable(con, "t1", tmp_file, header = TRUE, sep = ",",
+    colClasses = c("character", "integer", "double"))
+  
+  remote <- dbReadTable(con, "t1")
+  expect_equal(sapply(remote, class), 
+    c(A="character", B="integer", C="numeric"))
+})
+
+test_that("options work", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con))
+
+  expected <- data.frame(
+    a = c(1:3, NA), 
+    b = c("x", "y", "z", "E"),
+    stringsAsFactors = FALSE
+  )
+
+  dbWriteTable(con, "dat", "dat-n.txt", sep="|", eol="\n", overwrite = TRUE)
+  expect_equal(dbReadTable(con, "dat"), expected)
+  
+  dbWriteTable(con, "dat", "dat-rn.txt", sep="|", eol="\r\n", overwrite = TRUE)
+  expect_equal(dbReadTable(con, "dat"), expected)
+})

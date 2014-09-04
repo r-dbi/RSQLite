@@ -2,7 +2,7 @@
 #' 
 #' @export
 #' @rdname dbWriteTable
-#' @param conn,con a \code{\linkS4class{SQLiteConnection}} object, produced by
+#' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
 #'   \code{\link[DBI]{dbConnect}}
 #' @param name a character string specifying a table name. SQLite table names 
 #'   are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc} 
@@ -37,19 +37,18 @@ setMethod("dbWriteTable", signature("SQLiteConnection", "character", "data.frame
     if (overwrite && append)
       stop("overwrite and append cannot both be TRUE", call. = FALSE)
     
-    if (!dbBegin(con)) {
+    if (!dbBegin(conn)) {
       stop("Unable to begin transaction.", call. = FALSE)
     }
+    on.exit(dbRollback(conn))
     
-    found <- dbExistsTable(con, name)
+    found <- dbExistsTable(conn, name)
     if (found && !overwrite && !append) {
-      dbRollback(con)
       stop("Table ", name, " exists in database, and both overwrite and", 
         " append are FALSE", call. = FALSE)
     }
     if (found && overwrite) {
-      if (!dbRemoveTable(con, name)) {
-        dbRollback(con)
+      if (!dbRemoveTable(conn, name)) {
         stop("Table", name, "couldn't be overwritten", call. = FALSE)
       }
     }
@@ -62,28 +61,17 @@ setMethod("dbWriteTable", signature("SQLiteConnection", "character", "data.frame
     }
     
     if (!found || overwrite) {
-      sql <- dbBuildTableDefinition(con, name, value, 
+      sql <- dbBuildTableDefinition(conn, name, value, 
         field.types = field.types, row.names = FALSE)
-      
-      tryCatch(
-        dbGetQuery(con, sql), 
-        error = function(e) {
-          dbRollback(con)
-          stop(e)
-        }  
-      )
+      dbGetQuery(conn, sql)
     }
     
     valStr <- paste(rep("?", ncol(value)), collapse = ",")
     sql <- sprintf("insert into %s values (%s)", name, valStr)
-    tryCatch(
-      rs <- dbSendPreparedQuery(con, sql, bind.data = value), 
-      error = function(e) {
-        dbRollback(con)
-        stop(e)
-      })
-    
-    dbCommit(con)
+    rs <- dbSendPreparedQuery(conn, sql, bind.data = value)
+
+    on.exit(NULL)
+    dbCommit(conn)
     TRUE
   }
 )
@@ -108,89 +96,46 @@ setMethod("dbWriteTable",
 #' @param eol The end-of-line delimiter, defaults to \code{'\n'}.
 #' @param skip number of lines to skip before reading the data. Defaults to 0.
 #' @param nrows Number of rows to read to determine types 
+#' @useDynLib RSQLite RS_SQLite_importFile
 sqliteImportFile <- function(con, name, value, field.types = NULL, 
-                             overwrite = FALSE, append = FALSE, header, 
-                             row.names, nrows = 50, sep = ",", eol="\n", 
+                             overwrite = FALSE, append = FALSE, header = TRUE, 
+                             colClasses = NA,
+                             row.names = FALSE, nrows = 50, sep = ",", eol="\n", 
                              skip = 0, ...) {
   if(overwrite && append)
     stop("overwrite and append cannot both be TRUE")
+  value <- path.expand(value)
   
-  if(dbExistsTable(con,name)){
-    if(overwrite){
-      if(!dbRemoveTable(con, name)){
-        warning(paste("table", name, "couldn't be overwritten"))
-        return(FALSE)
-      }
-    }
-    else if(!append){
-      warning(paste("table", name, "exists in database: aborting dbWriteTable"))
-      return(FALSE)
-    }
+  if (!dbBegin(con)) {
+    stop("Unable to begin transaction.", call. = FALSE)
   }
+  on.exit(dbRollback(con))
   
-  ## compute full path name (have R expand ~, etc)
-  fn <- path.expand(value)
-  if(missing(header) || missing(row.names)){
-    f <- file(fn, open="r")
-    if(skip>0)
-      readLines(f, n=skip)
-    txtcon <- textConnection(readLines(f, n=2))
-    flds <- count.fields.wrapper(file = txtcon, sep = sep, ...)
-    close(txtcon)
-    close(f)
-    nf <- length(unique(flds))
+  found <- dbExistsTable(con, name)
+  if (found && !overwrite && !append) {
+    stop("Table ", name, " exists in database, and both overwrite and", 
+      " append are FALSE", call. = FALSE)
   }
-  if(missing(header)){
-    header <- nf==2
-  }
-  if(missing(row.names)){
-    if(header)
-      row.names <- if(nf==2) TRUE else FALSE
-    else
-      row.names <- FALSE
-  }
-  
-  new.table <- !dbExistsTable(con, name)
-  if(new.table){
-    ## need to init table, say, with the first nrows lines
-    d <- read.table(fn, sep=sep, header=header, skip=skip, nrows=nrows,
-      na.strings=.SQLite.NA.string,
-      stringsAsFactors=FALSE, ...)
-    sql <-
-      dbBuildTableDefinition(new.con, name, d, field.types = field.types,
-        row.names = row.names)
-    rs <- try(dbSendQuery(new.con, sql))
-    if(inherits(rs, "try-error")){
-      warning("could not create table: aborting sqliteImportFile")
-      return(FALSE)
+  if (found && overwrite) {
+    if (!dbRemoveTable(con, name)) {
+      stop("Table", name, "couldn't be overwritten", call. = FALSE)
     }
-    else
-      dbClearResult(rs)
   }
-  else if(!append){
-    warning(sprintf("table %s already exists -- use append=TRUE?", name))
-  }
-  rc <-
-    try({
-      skip <- skip + as.integer(header)
-      conId <- con@Id
-      .Call("RS_SQLite_importFile", conId, name, fn, sep, eol,
-        as.integer(skip), PACKAGE = .SQLitePkgName)
-    })
-  if(inherits(rc, "try-error")){
-    if(new.table) dbRemoveTable(new.con, name)
-    return(FALSE)
-  }
-  TRUE
-}
 
-## wrapper for count.fields that accepts and ignores additional
-## arguments passed via '...'. Note that this duplicates the default
-## values of count.fields and will need to be updated if that function's
-## defaults change.
-count.fields.wrapper <- function(file, sep = "", quote = "\"'", skip = 0,
-  blank.lines.skip = TRUE,
-  comment.char = "#", ...) {
+  if (!found || overwrite) {
+    # Initialise table with first `nrows` lines
+    d <- read.table(value, sep = sep, header = header, skip = skip, nrows = nrows,
+      na.strings = .SQLite.NA.string, comment.char = "", colClasses = colClasses,
+      stringsAsFactors = FALSE)
+    sql <- dbBuildTableDefinition(con, name, d, field.types = field.types,
+        row.names = row.names)
+    dbGetQuery(con, sql)
+  }
   
-  count.fields(file, sep, quote, skip, blank.lines.skip, comment.char)
+  skip <- skip + as.integer(header)
+  .Call(RS_SQLite_importFile, con@Id, name, value, sep, eol, as.integer(skip))
+  
+  on.exit(NULL)
+  dbCommit(con)
+  TRUE
 }

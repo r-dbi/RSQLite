@@ -2,7 +2,9 @@ Version 0.11.6.9000
 
 - `dbWriteTable()` now throws errors on failure, rather than returning
   FALSE. It will automatically add row names only if they are character,
-  not integer.
+  not integer.  When loading a file from disk, `dbWriteTable()` will no longer
+  attempt to guess the correct values for `row.names` and `header` - instead
+  supply them explicitly if the defaults are incorrect.
 
 - `dbBeginTransaction()` has been deprecated. Please use `dbBegin()` instead.
   (#)

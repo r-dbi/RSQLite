@@ -10,8 +10,8 @@
 \title{Connect to/disconnect from a SQLite database.}
 \usage{
 \S4method{dbConnect}{SQLiteDriver}(drv, dbname = "",
-  loadable.extensions = TRUE, cache_size = NULL, synchronous = 0,
-  flags = NULL, vfs = NULL)
+  loadable.extensions = TRUE, cache_size = NULL, synchronous = "off",
+  flags = SQLITE_RWC, vfs = NULL)
 
 \S4method{dbConnect}{SQLiteConnection}(drv)
 
@@ -40,13 +40,11 @@ number of disk pages that SQLite holds in memory (SQLite's default is
 for details.}
 
 \item{synchronous}{Advanced options. Possible values for \code{synchronous}
-are 0 (the default), 1, or 2 or the corresponding strings "OFF", "NORMAL",
-or  "FULL".  Users have reported significant speed ups using
-\code{sychronous=0}, and the SQLite documentation itself implies
-considerable improved performance at the very modest risk of database
-corruption in the unlikely case of the operating system (\emph{not} the
-R application) crashing. See the SQLite documentation for the full details
-of this \code{PRAGMA}. See
+are "OFF" (the default), "NORMAL", or  "FULL".  Users have reported
+significant speed ups using \code{sychronous = "OFF"}, and the SQLite
+documentation itself implies considerable improved performance at the very
+modest risk of database corruption in the unlikely case of the operating
+system (\emph{not} the R application) crashing. See
 \url{http://www.sqlite.org/pragma.html#pragma_synchronous} for details.}
 
 \item{flags}{\code{SQLITE_RWC}: open the database in read/write mode
@@ -63,5 +61,16 @@ read only mode.  Raise an error if the file does not already exist}
 }
 \description{
 Connect to/disconnect from a SQLite database.
+}
+\examples{
+# Create temporary in-memory db
+tmp <- dbConnect(SQLite(), ":memory:")
+summary(tmp)
+dbDisconnect(tmp)
+
+# Create temporary on-disk db with bigger cache and safer synchronisation
+tmp <- dbConnect(SQLite(), "", cache_size = 5000, synchronous = "full")
+summary(tmp)
+dbDisconnect(tmp)
 }
 

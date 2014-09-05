@@ -77,14 +77,9 @@ sqliteResultInfo <- function(obj, what = "", ...) {
 #' @return \code{NULL}, invisibly.
 #' @note No error checking whatsoever is done.
 #' @seealso \code{\link{write.table}}
-#' @examples
-#' \dontrun{
-#'    ctr.file <- file("dump.sqloader", "w")
-#'    safe.write(big.data, file = ctr.file, batch = 25000)
-#' }
-#' @export
+#' @noRd
 safe.write <- function(value, file, batch, row.names = TRUE, ..., sep = ',',
-  eol = '\n', quote.string = FALSE) {
+                       eol = '\n', quote.string = FALSE) {
   N <- nrow(value)
   if(N<1){
     warning("no rows in data.frame")

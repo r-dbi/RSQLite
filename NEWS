@@ -1,5 +1,8 @@
 Version 0.11.6.9000
 
+- `safe.write()` is no longer exported as it shouldn't be part of the 
+  public RSQLite interface (#26).
+
 - `dbBegin()`, `dbCommit()` and `dbRollback()` gain a named argument to
   specify named savepoints.
 

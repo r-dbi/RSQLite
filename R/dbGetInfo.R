@@ -13,11 +13,12 @@ setMethod("dbGetInfo", "SQLiteDriver", function(dbObj, ...) {
   sqliteDriverInfo(dbObj, ...)
 })
 
+#' @useDynLib RSQLite RS_SQLite_managerInfo
 sqliteDriverInfo <- function(obj, what="", ...) {
   if(!isIdCurrent(obj))
     stop(paste("expired", class(obj)))
   drvId <- obj@Id
-  info <- .Call("RS_SQLite_managerInfo", drvId, PACKAGE = .SQLitePkgName)
+  info <- .Call(RS_SQLite_managerInfo, drvId)
   info$managerId <- obj
   ## connection IDs are no longer tracked by the manager.
   info$connectionIds <- list()
@@ -33,17 +34,17 @@ setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
   sqliteConnectionInfo(dbObj, ...)
 })
 
+#' @useDynLib RSQLite RSQLite_connectionInfo DBI_newResultHandle
 sqliteConnectionInfo <- function(obj, what="", ...) {
   if(!isIdCurrent(obj))
     stop(paste("expired", class(obj)))
   id <- obj@Id
-  info <- .Call("RSQLite_connectionInfo", id, PACKAGE = .SQLitePkgName)
+  info <- .Call(RSQLite_connectionInfo, id)
   if(length(info$rsId)){
     rsId <- vector("list", length = length(info$rsId))
     for(i in seq(along.with = info$rsId))
       rsId[[i]] <- new("SQLiteResult",
-        Id = .Call("DBI_newResultHandle",
-          id, info$rsId[i], PACKAGE = .SQLitePkgName))
+        Id = .Call(DBI_newResultHandle, id, info$rsId[i]))
     info$rsId <- rsId
   }
   if(!missing(what))

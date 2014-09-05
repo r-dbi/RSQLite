@@ -22,28 +22,28 @@ sqliteQuickColumn <- function(con, table, column) {
     as.character(column), PACKAGE="RSQLite")
 }
 
+#' @useDynLib RSQLite RS_SQLite_fetch
 sqliteFetchOneColumn <- function(con, statement, n=0, ...) {
   rs <- dbSendQuery(con, statement)
   on.exit(dbClearResult(rs))
   n <- as.integer(n)
   rsId <- rs@Id
-  rel <- .Call("RS_SQLite_fetch", rsId, nrec = n, PACKAGE = .SQLitePkgName)
+  rel <- .Call(RS_SQLite_fetch, rsId, nrec = n)
   if (length(rel) == 0 || length(rel[[1]]) == 0)
     return(NULL)
   rel[[1]]
 }
 
+#' @useDynLib RSQLite RS_SQLite_resultSetInfo RS_DBI_SclassNames RS_SQLite_typeNames
 sqliteResultInfo <- function(obj, what = "", ...) {
   if(!isIdCurrent(obj))
     stop(paste("expired", class(obj)))
   id <- obj@Id
-  info <- .Call("RS_SQLite_resultSetInfo", id, PACKAGE = .SQLitePkgName)
+  info <- .Call(RS_SQLite_resultSetInfo, id)
   flds <- info$fieldDescription[[1]]
   if(!is.null(flds)){
-    flds$Sclass <- .Call("RS_DBI_SclassNames", flds$Sclass,
-      PACKAGE = .SQLitePkgName)
-    flds$type <- .Call("RS_SQLite_typeNames", flds$type,
-      PACKAGE = .SQLitePkgName)
+    flds$Sclass <- .Call(RS_DBI_SclassNames, flds$Sclass)
+    flds$type <- .Call(RS_SQLite_typeNames, flds$type)
     ## no factors
     info$fields <- structure(flds, row.names = paste(seq(along.with=flds$type)),
       class="data.frame")
@@ -151,6 +151,7 @@ safe.write <- function(value, file, batch, row.names = TRUE, ..., sep = ',',
 #' unlink(backupDbFile)
 #' 
 #' @export sqliteCopyDatabase
+#' @useDynLib RSQLite RS_SQLite_copy_database
 sqliteCopyDatabase <- function(from, to) {
   if (!is(from, "SQLiteConnection"))
     stop("'from' must be a SQLiteConnection object")
@@ -166,7 +167,7 @@ sqliteCopyDatabase <- function(from, to) {
       stop("'to' must be SQLiteConnection object or a non-empty string")
     }
   }
-  .Call("RS_SQLite_copy_database", from@Id, destdb@Id, PACKAGE = .SQLitePkgName)
+  .Call(RS_SQLite_copy_database, from@Id, destdb@Id)
   invisible(NULL)
 }
 

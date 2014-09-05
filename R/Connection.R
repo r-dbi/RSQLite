@@ -124,6 +124,7 @@ setMethod("dbSendPreparedQuery",
   }
 )
 
+#' @useDynLib RSQLite RS_SQLite_exec
 sqliteExecStatement <- function(con, statement, bind.data=NULL) {
   conId <- con@Id
   statement <- as(statement, "character")
@@ -134,13 +135,7 @@ sqliteExecStatement <- function(con, statement, bind.data=NULL) {
       stop("bind.data must have non-zero dimensions")
     }
   }
-  rsId <- .Call("RS_SQLite_exec",
-    conId, statement, bind.data,
-    PACKAGE = .SQLitePkgName)
-  #  out <- new("SQLitedbResult", Id = rsId)
-  #  if(dbGetInfo(out, what="isSelect")
-  #    out <- new("SQLiteResultSet", Id = rsId)
-  #  out
+  rsId <- .Call(RS_SQLite_exec, conId, statement, bind.data)
   out <- new("SQLiteResult", Id = rsId)
   out
 }

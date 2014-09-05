@@ -78,6 +78,7 @@ sqliteDataType <- function(obj, ...) {
 #' }
 #' 
 #' @export isIdCurrent
+#' @useDynLib RSQLite RS_DBI_validHandle
 "isIdCurrent" <- function(obj) { 
-  .Call("RS_DBI_validHandle", obj@Id, PACKAGE = .SQLitePkgName)
+  .Call(RS_DBI_validHandle, obj@Id)
 }

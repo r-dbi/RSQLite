@@ -48,12 +48,13 @@ setMethod("fetch", "SQLiteResult", function(res, n = 0, ...) {
   sqliteFetch(res, n = n, ...)
 })
 
+#' @useDynLib RSQLite RS_SQLite_fetch
 sqliteFetch <- function(res, n=0, ...) {  
   if(!isIdCurrent(res))
     stop("invalid result handle")
   n <- as.integer(n)
   rsId <- res@Id
-  rel <- .Call("RS_SQLite_fetch", rsId, nrec = n, PACKAGE = .SQLitePkgName)
+  rel <- .Call(RS_SQLite_fetch, rsId, nrec = n)
   if (is.null(rel)) rel <- list()       # result set is completed
   ## create running row index as of previous fetch (if any)
   cnt <- dbGetRowCount(res)
@@ -69,17 +70,14 @@ sqliteFetch <- function(res, n=0, ...) {
 #' @export
 #' @param res an \code{\linkS4class{SQLiteResult}} object.
 #' @param ... Ignored. Needed for compatibility with generic.
+#' @useDynLib RSQLite RS_SQLite_closeResultSet
 setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
-  sqliteCloseResult(res, ...)
-})
-
-sqliteCloseResult <- function(res, ...) {
-  if(!isIdCurrent(res)){
-    warning(paste("expired SQLiteResult"))
+  if (!isIdCurrent(res)){
+    warning("Expired SQLiteResult", call. = FALSE)
     return(TRUE)
   }
-  .Call("RS_SQLite_closeResultSet", res@Id, PACKAGE = .SQLitePkgName)
-}
+  .Call(RS_SQLite_closeResultSet, res@Id)
+})
 
 #' Database interface meta-data.
 #' 

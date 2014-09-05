@@ -7,14 +7,30 @@
 \alias{summary,SQLiteResult-method}
 \title{Summary methods}
 \usage{
-\S4method{summary}{SQLiteDriver}(object, ...)
+\S4method{summary}{SQLiteDriver}(object)
 
-\S4method{summary}{SQLiteConnection}(object, ...)
+\S4method{summary}{SQLiteConnection}(object)
 
-\S4method{summary}{SQLiteResult}(object, ...)
+\S4method{summary}{SQLiteResult}(object)
+}
+\arguments{
+\item{verbose}{Show extra information.}
 }
 \description{
 Summary methods
+}
+\examples{
+summary(SQLite())
+
+con <- dbConnect(SQLite())
+summary(con)
+
+dbWriteTable(con, "mtcars", mtcars)
+rs <- dbSendQuery(con, "SELECT * FROM mtcars")
+summary(rs)
+
+dbClearResults(rs)
+dbDisconnect(con)
 }
 \keyword{internal}
 

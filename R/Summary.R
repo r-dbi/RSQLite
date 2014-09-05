@@ -2,95 +2,84 @@
 #' 
 #' @keywords internal
 #' @name summary
+#' @examples
+#' summary(SQLite())
+#' 
+#' con <- dbConnect(SQLite())
+#' summary(con)
+#' 
+#' dbWriteTable(con, "mtcars", mtcars)
+#' rs <- dbSendQuery(con, "SELECT * FROM mtcars")
+#' summary(rs)
+#' 
+#' dbClearResults(rs)
+#' dbDisconnect(con)
 NULL
 
 setGeneric("summary")
 
 #' @export
 #' 
+#' @param verbose Show extra information.
 #' @rdname summary
-setMethod("summary", "SQLiteDriver", function(object, ...) {
-  sqliteDescribeDriver(object, ...)
-})
-
-sqliteDescribeDriver <- function(obj, verbose = FALSE, ...) {
-  if(!isIdCurrent(obj)){
-    show(obj)
-    invisible(return(NULL))
+setMethod("summary", "SQLiteDriver", function(object) {
+  cat("<SQLiteDriver>\n")
+  if (!isIdCurrent(object)) {
+    cat("EXPIRED\n")
+  } else {
+    info <- dbGetInfo(object)
+    cat("  Driver name:       ", info$drvName, "\n", sep = "")
+    cat("  Max connections:   ", info$length, "\n", sep = "")
+    cat("  Conn. processed:   ", info$counter, "\n", sep = "")
+    cat("  Records per fetch: ", info$fetch_default_rec, "\n", sep = "")
+    cat("  SQLite version:    ", info$clientVersion, "\n", sep = "")
+    cat("  DBI version:       ", as.character(packageVersion("DBI")), "\n", sep = "")
+    cat("  Open connections:  ", info$num_con, "\n", sep = "")
+    cat("  Shared Cache:      ", info$shared_cache, "\n", sep = "")
   }
-  info <- dbGetInfo(obj)
-  show(obj)
-  cat("  Driver name: ", info$drvName, "\n")
-  cat("  Max  connections:", info$length, "\n")
-  cat("  Conn. processed:", info$counter, "\n")
-  cat("  Default records per fetch:", info$"fetch_default_rec", "\n")
-  if(verbose){
-    cat("  SQLite client version: ", info$clientVersion, "\n")
-    cat("  DBI version: ", dbGetDBIVersion(), "\n")
-  }
-  cat("  Open connections:", info$"num_con", "\n")
-  if(verbose && !is.null(info$connectionIds)){
-    for(i in seq(along.with = info$connectionIds)){
-      cat("   ", i, " ")
-      show(info$connectionIds[[i]])
-    }
-  }
-  cat("  Shared Cache:", info$"shared_cache", "\n")
+  
   invisible(NULL)
-}
+})
 
 #' @export
 #' @rdname summary
-setMethod("summary", "SQLiteConnection", function(object, ...) {
-  sqliteDescribeConnection(object, ...)
-})
-
-sqliteDescribeConnection <- function(obj, verbose = FALSE, ...) {
-  if(!isIdCurrent(obj)){
-    show(obj)
-    invisible(return(NULL))
+setMethod("summary", "SQLiteConnection", function(object) {
+  cat("<SQLiteConnection>\n")
+  if(!isIdCurrent(object)){
+    cat("EXPIRED")
+  } else {
+    info <- dbGetInfo(object)
+    cat("  SQLite version:      ", info$serverVersion, "\n", sep = "")
+    cat("  Database name:       ", info$dbname, "\n", sep = "")
+    cat("  Loadable extensions: ", info$loadableExtensions, "\n", sep = "")
+    cat("  File open flags:     ", info$falgs, "\n", sep = "")
+    cat("  VFS:                 ", info$vfs, "\n", sep = "")
   }
-  info <- dbGetInfo(obj)
-  show(obj)
-  cat("  Database name:", info$dbname, "\n")
-  cat("  Loadable extensions:", info$loadableExtensions, "\n")
-  cat("  File open flags:", info$falgs, "\n")
-  cat("  Virtual File System:", info$vfs, "\n")
-  cat("  SQLite engine version: ", info$serverVersion, "\n")
-  cat("  Results Sets:\n")
-  if(length(info$rsId)>0){
-    for(i in seq(along.with = info$rsId)){
-      cat("   ", i, " ")
-      show(info$rsId[[i]])
-    }
-  } else
-    cat("   No open result sets\n")
+
   invisible(NULL)
-}
+})
 
 #' @export
 #' @rdname summary
-setMethod("summary", "SQLiteResult", function(object, ...) {
-  sqliteDescribeResult(object, ...)
+setMethod("summary", "SQLiteResult", function(object) {
+  cat("<SQLiteResult>\n")
+  if(!isIdCurrent(object)){
+    cat("EXPIRED")
+  } else {  
+    cat("  Statement:     ", dbGetStatement(object), "\n", sep = "")
+    cat("  Has completed? ", if(dbHasCompleted(object)) "yes" else "no", "\n", sep = "")
+    cat("  Affected rows: ", dbGetRowsAffected(object), "\n", sep = "")
+  }
+  invisible(NULL)  
 })
 
-sqliteDescribeResult <- function(obj, verbose = FALSE, ...) {
-  if(!isIdCurrent(obj)){
-    show(obj)
-    invisible(return(NULL))
-  }
-  show(obj)
-  cat("  Statement:", dbGetStatement(obj), "\n")
-  cat("  Has completed?", if(dbHasCompleted(obj)) "yes" else "no", "\n")
-  cat("  Affected rows:", dbGetRowsAffected(obj), "\n")
-  hasOutput <- as.logical(dbGetInfo(obj, "isSelect")[[1]])
-  flds <- dbColumnInfo(obj)
-  if(hasOutput){
-    cat("  Output fields:", nrow(flds), "\n")
-    if(verbose && length(flds)>0){
-      cat("  Fields:\n")
-      out <- print(flds)
-    }
-  }
-  invisible(NULL)
-}
+
+setMethod("show", "SQLiteDriver", function(object) {
+  cat("<SQLiteDriver>\n")
+})
+setMethod("show", "SQLiteConnection", function(object) {
+  cat("<SQLiteConnection>\n")
+})
+setMethod("show", "SQLiteResult", function(object) {
+  cat("<SQLiteResult>\n")
+})

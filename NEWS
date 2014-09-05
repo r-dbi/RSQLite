@@ -1,5 +1,9 @@
 Version 0.11.6.9000
 
+- Renamed `dbBuildTableDefinition()` to `sqliteBuildTableDefinition()` 
+  to avoid implying it's a DBI generic. Old function is aliased to new with
+  a warning.
+
 - `safe.write()` is no longer exported as it shouldn't be part of the 
   public RSQLite interface (#26).
 

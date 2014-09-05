@@ -73,5 +73,10 @@ dbWriteTable(con, "mtcars2", mtcars[0, ])
 dbReadTable(con, "mtcars2")
 
 dbDisconnect(con)
+
+con <- dbConnect(SQLite())
+torture <- data.frame(x = 1:3, select = 1:3, `  ` = 1:3, check.names = FALSE)
+dbWriteTable(con, "torture", torture)
+dbReadTable(con, "torture")
 }
 

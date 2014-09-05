@@ -35,6 +35,11 @@
 #' dbReadTable(con, "mtcars2")
 #' 
 #' dbDisconnect(con)
+#' 
+#' con <- dbConnect(SQLite())
+#' torture <- data.frame(x = 1:3, select = 1:3, `  ` = 1:3, check.names = FALSE)
+#' dbWriteTable(con, "torture", torture)
+#' dbReadTable(con, "torture")
 setMethod("dbWriteTable", signature("SQLiteConnection", "character", "data.frame"),
   function(conn, name, value, row.names = NA, overwrite = FALSE, append = FALSE, 
            field.types = NULL) {
@@ -62,7 +67,7 @@ setMethod("dbWriteTable", signature("SQLiteConnection", "character", "data.frame
     }
     
     if (!found || overwrite) {
-      sql <- dbBuildTableDefinition(conn, name, value, 
+      sql <- sqliteBuildTableDefinition(conn, name, value, 
         field.types = field.types, row.names = FALSE)
       dbGetQuery(conn, sql)
     }
@@ -117,7 +122,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
       d <- read.table(value, sep = sep, header = header, skip = skip, nrows = nrows,
         na.strings = .SQLite.NA.string, comment.char = "", colClasses = colClasses,
         stringsAsFactors = FALSE)
-      sql <- dbBuildTableDefinition(conn, name, d, field.types = field.types,
+      sql <- sqliteBuildTableDefinition(conn, name, d, field.types = field.types,
         row.names = row.names)
       dbGetQuery(conn, sql)
     }

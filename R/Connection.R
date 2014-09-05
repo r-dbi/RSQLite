@@ -224,8 +224,10 @@ setMethod("dbExistsTable",
 #'   \code{row\_names} field? Default is \code{TRUE}
 #' @param ... Ignored. Reserved for future use.
 #' @return An SQL string
+#' @keywords internal
+#' @aliases dbBuildTableDefinition
 #' @export
-dbBuildTableDefinition <- function(dbObj, name, value, field.types = NULL, 
+sqliteBuildTableDefinition <- function(dbObj, name, value, field.types = NULL, 
                                    row.names = TRUE, ...) {
   if(!is.data.frame(value))
     value <- as.data.frame(value)
@@ -249,6 +251,12 @@ dbBuildTableDefinition <- function(dbObj, name, value, field.types = NULL,
   paste("CREATE TABLE", name, "\n(", paste(flds, collapse=",\n\t"), "\n)")
 }
 
+#' @export
+dbBuildTableDefinition <- function(...) {
+  .Deprecated("sqliteBuildTableDefinition")
+  sqliteBuildTableDefinition(...)
+}
+  
 
 #' Remove a table from the database.
 #' 

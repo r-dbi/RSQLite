@@ -37,15 +37,13 @@ setMethod("make.db.names",
   signature(dbObj="SQLiteConnection", snames = "character"),
   definition = function(dbObj, snames, keywords, unique, allow.keywords, ...){
     make.db.names.default(snames, keywords, unique, allow.keywords)
-  },
-  valueClass = "character"
+  }
 )
 
 #' @export
 #' @rdname make.db.names-SQLiteConnection-character-method
 setMethod("SQLKeywords", "SQLiteConnection",
-  definition = function(dbObj, ...) .SQL92Keywords,
-  valueClass = "character"
+  definition = function(dbObj, ...) .SQL92Keywords
 )
 
 #' @export
@@ -60,6 +58,5 @@ setMethod("isSQLKeyword",
   signature(dbObj="SQLiteConnection", name="character"),
   definition = function(dbObj, name, keywords, case, ...){
     isSQLKeyword.default(name, keywords = .SQL92Keywords, case)
-  },
-  valueClass = "character"
+  }
 )

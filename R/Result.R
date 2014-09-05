@@ -43,15 +43,13 @@ setAs("SQLiteResult", "SQLiteConnection",
 #' dbDisconnect(con)
 #' @export
 setMethod("dbFetch", "SQLiteResult",
-  definition = function(res, n = 0, ...) sqliteFetch(res, n = n, ...),
-  valueClass = "data.frame"
+  definition = function(res, n = 0, ...) sqliteFetch(res, n = n, ...)
 )
 
 #' @export
 #' @rdname dbFetch-SQLiteResult-method
 setMethod("fetch", "SQLiteResult",
-  definition = function(res, n = 0, ...) sqliteFetch(res, n = n, ...),
-  valueClass = "data.frame"
+  definition = function(res, n = 0, ...) sqliteFetch(res, n = n, ...)
 )
 
 sqliteFetch <- function(res, n=0, ...) {  
@@ -76,8 +74,7 @@ sqliteFetch <- function(res, n=0, ...) {
 #' @param res an \code{\linkS4class{SQLiteResult}} object.
 #' @param ... Ignored. Needed for compatibility with generic.
 setMethod("dbClearResult", "SQLiteResult",
-  definition = function(res, ...) sqliteCloseResult(res, ...),
-  valueClass = "logical"
+  definition = function(res, ...) sqliteCloseResult(res, ...)
 )
 
 sqliteCloseResult <- function(res, ...) {
@@ -129,20 +126,17 @@ setMethod("dbColumnInfo", "SQLiteResult",
   definition = function(res, ...){
     out <- dbGetInfo(res, "fields")[[1]]
     if(!is.null(out)) out else data.frame(out)
-  },
-  valueClass = "data.frame"
+  }
 )
 #' @export
 #' @rdname sqlite-meta
 setMethod("dbGetRowsAffected", "SQLiteResult",
-  definition = function(res, ...) dbGetInfo(res, "rowsAffected")[[1]],
-  valueClass = "integer"
+  definition = function(res, ...) dbGetInfo(res, "rowsAffected")[[1]]
 )
 #' @export
 #' @rdname sqlite-meta
 setMethod("dbGetRowCount", "SQLiteResult",
-  definition = function(res, ...) dbGetInfo(res, "rowCount")[[1]],
-  valueClass = "integer"
+  definition = function(res, ...) dbGetInfo(res, "rowCount")[[1]]
 )
 #' @export
 #' @rdname sqlite-meta
@@ -152,6 +146,5 @@ setMethod("dbHasCompleted", "SQLiteResult",
     if(out<0)
       NA
     else out == 1L
-  },
-  valueClass = "logical"
+  }
 )

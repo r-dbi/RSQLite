@@ -10,8 +10,7 @@ NULL
 #' @rdname dbGetInfo
 #' @export
 setMethod("dbGetInfo", "SQLiteDriver",
-  definition = function(dbObj, ...) sqliteDriverInfo(dbObj, ...),
-  valueClass = "list"
+  definition = function(dbObj, ...) sqliteDriverInfo(dbObj, ...)
 )
 
 sqliteDriverInfo <- function(obj, what="", ...) {
@@ -31,8 +30,7 @@ sqliteDriverInfo <- function(obj, what="", ...) {
 #' @rdname dbGetInfo
 #' @export
 setMethod("dbGetInfo", "SQLiteConnection",
-  definition = function(dbObj, ...) sqliteConnectionInfo(dbObj, ...),
-  valueClass = "list"
+  definition = function(dbObj, ...) sqliteConnectionInfo(dbObj, ...)
 )
 
 sqliteConnectionInfo <- function(obj, what="", ...) {
@@ -57,12 +55,10 @@ sqliteConnectionInfo <- function(obj, what="", ...) {
 #' @rdname dbGetInfo
 #' @export
 setMethod("dbGetInfo", "SQLiteResult",
-  definition = function(dbObj, ...) sqliteResultInfo(dbObj, ...),
-  valueClass = "list"
+  definition = function(dbObj, ...) sqliteResultInfo(dbObj, ...)
 )
 #' @rdname dbGetInfo
 #' @export
 setMethod("dbGetStatement", "SQLiteResult",
-  definition = function(res, ...) dbGetInfo(res, "statement")[[1]],
-  valueClass = "character"
+  definition = function(res, ...) dbGetInfo(res, "statement")[[1]]
 )

@@ -112,9 +112,7 @@ setMethod("dbSendQuery",
   signature = signature(conn = "SQLiteConnection", statement = "character"),
   definition = function(conn, statement, ...){
     sqliteExecStatement(conn, statement, ...)
-  },
-  valueClass = "SQLiteResult"
-)
+  })
 
 #' @rdname dbSendQuery-SQLiteConnection-character-method
 #' @param bind.data A data frame of data to be bound.
@@ -124,8 +122,7 @@ setMethod("dbSendPreparedQuery",
     bind.data = "data.frame"),
   definition = function(conn, statement, bind.data, ...){
     sqliteExecStatement(conn, statement, bind.data, ...)
-  },
-  valueClass = "SQLiteResult"
+  }
 )
 
 sqliteExecStatement <- function(con, statement, bind.data=NULL) {
@@ -164,8 +161,7 @@ setMethod("dbGetPreparedQuery",
     bind.data = "data.frame"),
   definition = function(conn, statement, bind.data, ...){
     sqliteQuickSQL(conn, statement, bind.data, ...)
-  },
-  valueClass = "SQLiteResult"
+  }
 )
 
 sqliteQuickSQL <- function(con, statement, bind.data=NULL, ...) {
@@ -206,8 +202,7 @@ setMethod("dbExistsTable",
   definition = function(conn, name, ...){
     lst <- dbListTables(conn)
     match(tolower(name), tolower(lst), nomatch = 0) > 0
-  },
-  valueClass = "logical"
+  }
 )
 
 #' Build the SQL CREATE TABLE definition as a string
@@ -265,8 +260,7 @@ setMethod("dbRemoveTable",
   definition = function(conn, name, ...){
     dbGetQuery(conn, paste("DROP TABLE", name))
     invisible(TRUE)
-  },
-  valueClass = "logical"
+  }
 )
 
 #' List available SQLite result sets.
@@ -278,8 +272,7 @@ setMethod("dbListResults", "SQLiteConnection",
   definition = function(conn, ...) {
     rs <- dbGetInfo(conn, "rsId")[[1]]
     if(length(rs)>0) rs else list()
-  },
-  valueClass = "list"
+  }
 )
 
 #' List available SQLite tables.
@@ -299,8 +292,7 @@ setMethod("dbListTables", "SQLiteConnection",
     else
       out <- out[, 1]
     out
-  },
-  valueClass = "character"
+  }
 )
 
 #' List fields in specified table.

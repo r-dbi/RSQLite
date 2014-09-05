@@ -7,8 +7,7 @@
 #' @export
 setGeneric("dbSendPreparedQuery", 
   def = function(conn, statement, bind.data, ...) 
-    standardGeneric("dbSendPreparedQuery"),
-  valueClass = "DBIResult"
+    standardGeneric("dbSendPreparedQuery")
 )
 
 #' @rdname dbSendPreparedQuery

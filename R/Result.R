@@ -9,10 +9,6 @@ setClass("SQLiteResult",
   slots = list(Id = "externalptr")
 )
 
-setAs("SQLiteResult", "SQLiteConnection",
-  def = function(from) new("SQLiteConnection", Id = from@Id)
-)
-
 #' Fetch records from a previously executed query
 #' 
 #' The \code{RSQLite} implementations retrieves all records into a buffer

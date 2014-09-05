@@ -7,15 +7,18 @@
 \alias{transactions}
 \title{SQLite transaction management.}
 \usage{
-\S4method{dbBegin}{SQLiteConnection}(conn)
+\S4method{dbBegin}{SQLiteConnection}(conn, name = NULL)
 
-\S4method{dbCommit}{SQLiteConnection}(conn)
+\S4method{dbCommit}{SQLiteConnection}(conn, name = NULL)
 
-\S4method{dbRollback}{SQLiteConnection}(conn)
+\S4method{dbRollback}{SQLiteConnection}(conn, name = NULL)
 }
 \arguments{
 \item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
 \code{\link[DBI]{dbConnect}}}
+
+\item{name}{Supply a name to use a named savepoint. This allows you to
+nest multiple transaction}
 }
 \value{
 A boolean, indicating success or failure.
@@ -46,6 +49,12 @@ rs <- dbSendQuery(con, "DELETE FROM arrests WHERE Murder > 5")
 dbClearResult(rs)
 dbCommit(con)
 dbGetQuery(con, "SELECT count(*) FROM arrests")[1, ]
+
+# Named savepoints can be nested --------------------------------------------
+dbBegin(con, "a")
+dbBegin(con, "b")
+dbRollback(con, "b")
+dbCommit(con, "a")
 
 dbDisconnect(con)
 }

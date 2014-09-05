@@ -1,5 +1,8 @@
 Version 0.11.6.9000
 
+- `dbBegin()`, `dbCommit()` and `dbRollback()` gain a named argument to
+  specify named savepoints.
+
 - Remove SqliteObject and dbObject classes, modifying SqliteDriver, 
   SqliteConnection, and SqliteResult to use composition instead of multiple
   inheritance.

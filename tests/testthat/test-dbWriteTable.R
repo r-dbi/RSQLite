@@ -49,7 +49,6 @@ test_that("rownames preserved", {
   expect_equal(rownames(t1), rownames(df))  
 })
 
-
 test_that("commas in fields are preserved", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con))
@@ -84,6 +83,17 @@ test_that("logical converted to int", {
   remote <- dbReadTable(con, "t1")
   
   expect_equal(remote$y, as.integer(local$y))
+})
+
+test_that("can roundtrip special field names", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con))
+  
+  local <- data.frame(x = 1:3, select = 1:3, `  ` = 1:3, check.names = FALSE)
+  dbWriteTable(con, "torture", local)
+  remote <- dbReadTable(con, "torture", check.names = FALSE)
+  
+  expect_equal(local, remote)
 })
 
 # From file -------------------------------------------------------------------

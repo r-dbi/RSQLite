@@ -24,16 +24,12 @@ NULL
 #' dbDataType(drv, charToRaw("1"))
 #' @export
 setMethod("dbDataType", "SQLiteConnection",
-  definition = function(dbObj, obj, ...) sqliteDataType(obj, ...),
-  valueClass = "character"
-)
+  definition = function(dbObj, obj, ...) sqliteDataType(obj, ...))
 
 #' @rdname dbDataType-SQLiteConnection-method
 #' @export
 setMethod("dbDataType", "SQLiteDriver",
-  definition = function(dbObj, obj, ...) sqliteDataType(obj, ...),
-  valueClass = "character"
-)
+  definition = function(dbObj, obj, ...) sqliteDataType(obj, ...))
 
 
 sqliteDataType <- function(obj, ...) {

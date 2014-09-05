@@ -4,23 +4,23 @@
 \alias{sqliteBuildTableDefinition}
 \title{Build the SQL CREATE TABLE definition as a string}
 \usage{
-sqliteBuildTableDefinition(dbObj, name, value, field.types = NULL,
-  row.names = TRUE, ...)
+sqliteBuildTableDefinition(con, name, value, field.types = NULL,
+  row.names = NA, ...)
 }
 \arguments{
-\item{dbObj}{The object created by \code{\link{SQLite}}}
+\item{name}{Name of the new SQL table}
 
-\item{name}{name of the new SQL table}
+\item{value}{A data.frame, for which we want to create a table.}
 
-\item{value}{data.frame for which we want to create a table}
+\item{field.types}{Optional, named character vector of the types for each
+field in \code{value}}
 
-\item{field.types}{optional named list of the types for each field in
-\code{value}}
-
-\item{row.names}{logical, should row.name of \code{value} be exported as a
+\item{row.names}{Logical. Should row.name of \code{value} be exported as a
 \code{row\_names} field? Default is \code{TRUE}}
 
 \item{...}{Ignored. Reserved for future use.}
+
+\item{conn}{A database connection.}
 }
 \value{
 An SQL string

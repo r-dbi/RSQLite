@@ -215,38 +215,32 @@ setMethod("dbExistsTable",
 #' The output SQL statement is a simple \code{CREATE TABLE} with suitable for
 #' \code{dbGetQuery}
 #' 
-#' @param dbObj The object created by \code{\link{SQLite}}
-#' @param name name of the new SQL table
-#' @param value data.frame for which we want to create a table
-#' @param field.types optional named list of the types for each field in
-#'   \code{value}
-#' @param row.names logical, should row.name of \code{value} be exported as a
+#' @param conn A database connection.
+#' @param name Name of the new SQL table
+#' @param value A data.frame, for which we want to create a table.
+#' @param field.types Optional, named character vector of the types for each 
+#'   field in \code{value}
+#' @param row.names Logical. Should row.name of \code{value} be exported as a
 #'   \code{row\_names} field? Default is \code{TRUE}
 #' @param ... Ignored. Reserved for future use.
 #' @return An SQL string
 #' @keywords internal
 #' @aliases dbBuildTableDefinition
 #' @export
-sqliteBuildTableDefinition <- function(dbObj, name, value, field.types = NULL, 
-                                   row.names = TRUE, ...) {
-  if(!is.data.frame(value))
+sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL, 
+                                       row.names = NA, ...) {
+  if (!is.data.frame(value)) {
     value <- as.data.frame(value)
-  if(!is.null(row.names) && row.names){
-    value  <- cbind(row.names(value), value)  ## can't use row.names= here
-    names(value)[1] <- "row.names"
   }
-  if(is.null(field.types)){
-    ## the following mapping should be coming from some kind of table
-    ## also, need to use converter functions (for dates, etc.)
-    field.types <- sapply(value, dbDataType, dbObj = dbObj)
+  value <- explict_rownames(value, row.names)
+
+  if (is.null(field.types)) {
+    field.types <- vapply(value, dbDataType, dbObj = con, 
+      FUN.VALUE = character(1))
   }
-  i <- match("row.names", names(field.types), nomatch=0)
-  if(i>0) ## did we add a row.names value?  If so, it's a text field.
-    field.types[i] <- dbDataType(dbObj, field.types[["row.names"]])
-  names(field.types) <-
-    make.db.names(dbObj, names(field.types), allow.keywords = FALSE)
-  
-  ## need to create a new (empty) table
+  # Escape field names
+  names(field.types) <- dbQuoteIdentifier(con, names(field.types))
+    
   flds <- paste(names(field.types), field.types)
   paste("CREATE TABLE", name, "\n(", paste(flds, collapse=",\n\t"), "\n)")
 }

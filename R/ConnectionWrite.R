@@ -35,11 +35,6 @@
 #' dbReadTable(con, "mtcars2")
 #' 
 #' dbDisconnect(con)
-#' 
-#' con <- dbConnect(SQLite())
-#' torture <- data.frame(x = 1:3, select = 1:3, `  ` = 1:3, check.names = FALSE)
-#' dbWriteTable(con, "torture", torture)
-#' dbReadTable(con, "torture")
 setMethod("dbWriteTable", signature("SQLiteConnection", "character", "data.frame"),
   function(conn, name, value, row.names = NA, overwrite = FALSE, append = FALSE, 
            field.types = NULL) {
@@ -59,12 +54,7 @@ setMethod("dbWriteTable", signature("SQLiteConnection", "character", "data.frame
       dbRemoveTable(conn, name)
     }
     
-    if (is.na(row.names)) {
-      row.names <- is.character(attr(value, "row.names"))
-    }
-    if (row.names) {
-      value$row.names <- row.names(value)
-    }
+    value <- explict_rownames(value, row.names)
     
     if (!found || overwrite) {
       sql <- sqliteBuildTableDefinition(conn, name, value, 

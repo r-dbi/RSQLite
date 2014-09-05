@@ -57,4 +57,5 @@ for(i in seq_along(export) )
    dbWriteTable(con, name = tabs[i],  get(export[i]))
 }
 }
+\keyword{internal}
 

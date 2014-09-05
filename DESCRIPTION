@@ -27,6 +27,7 @@ Collate:
     'ConnectionTransactions.R'
     'ConnectionWrite.R'
     'Constants.R'
+    'Escaping.R'
     'Result.R'
     'Object.R'
     'Summary.R'

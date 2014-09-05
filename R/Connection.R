@@ -257,8 +257,7 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
 #' @param ... Ignored. Included for compatibility with generic.
 #' @export
 setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
-  rs <- dbGetInfo(conn, "rsId")[[1]]
-  if(length(rs)>0) rs else list()
+  dbGetInfo(conn)$rsId
 })
 
 #' List available SQLite tables.

@@ -26,4 +26,17 @@
 \description{
 Get metadata about a database object.
 }
+\examples{
+dbGetInfo(SQLite())
+
+con <- dbConnect(SQLite())
+dbGetInfo(con)
+
+dbWriteTable(con, "mtcars", mtcars)
+rs <- dbSendQuery(con, "SELECT * FROM mtcars")
+dbGetInfo(rs)
+
+dbClearResult(rs)
+dbDisconnect(con)
+}
 

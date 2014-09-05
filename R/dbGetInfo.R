@@ -5,58 +5,60 @@
 #'   \code{\linkS4class{SQLiteResult}}
 #' @param ... Ignored. Included for compatibility with generic.
 #' @name dbGetInfo
+#' @examples
+#' dbGetInfo(SQLite())
+#' 
+#' con <- dbConnect(SQLite())
+#' dbGetInfo(con)
+#' 
+#' dbWriteTable(con, "mtcars", mtcars)
+#' rs <- dbSendQuery(con, "SELECT * FROM mtcars")
+#' dbGetInfo(rs)
+#' 
+#' dbClearResult(rs)
+#' dbDisconnect(con)
 NULL
 
 #' @rdname dbGetInfo
 #' @export
-setMethod("dbGetInfo", "SQLiteDriver", function(dbObj, ...) {
-  sqliteDriverInfo(dbObj, ...)
-})
-
 #' @useDynLib RSQLite RS_SQLite_managerInfo
-sqliteDriverInfo <- function(obj, what="", ...) {
-  if(!isIdCurrent(obj))
-    stop(paste("expired", class(obj)))
-  drvId <- obj@Id
-  info <- .Call(RS_SQLite_managerInfo, drvId)
-  info$managerId <- obj
-  ## connection IDs are no longer tracked by the manager.
-  info$connectionIds <- list()
-  if(!missing(what))
-    info[what]
-  else
-    info
-}
-
-#' @rdname dbGetInfo
-#' @export
-setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
-  sqliteConnectionInfo(dbObj, ...)
+setMethod("dbGetInfo", "SQLiteDriver", function(dbObj, ...) {
+  check_valid(dbObj)  
+  .Call(RS_SQLite_managerInfo, dbObj@Id)
 })
 
+#' @rdname dbGetInfo
+#' @export
 #' @useDynLib RSQLite RSQLite_connectionInfo DBI_newResultHandle
-sqliteConnectionInfo <- function(obj, what="", ...) {
-  if(!isIdCurrent(obj))
-    stop(paste("expired", class(obj)))
-  id <- obj@Id
-  info <- .Call(RSQLite_connectionInfo, id)
-  if(length(info$rsId)){
-    rsId <- vector("list", length = length(info$rsId))
-    for(i in seq(along.with = info$rsId))
-      rsId[[i]] <- new("SQLiteResult",
-        Id = .Call(DBI_newResultHandle, id, info$rsId[i]))
-    info$rsId <- rsId
+setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
+  check_valid(dbObj)
+  info <- .Call(RSQLite_connectionInfo, dbObj@Id)
+  
+  if (length(info$rsId) > 0){
+    id <- .Call(DBI_newResultHandle, dbObj@Id, info$rsId)
+    info$rsId <- list(new("SQLiteResult", Id = id))
   }
-  if(!missing(what))
-    info[what]
-  else
-    info
-}
+  
+  info
+})
 
 #' @rdname dbGetInfo
 #' @export
+#' @useDynLib RSQLite RS_SQLite_resultSetInfo RS_DBI_SclassNames RS_SQLite_typeNames
 setMethod("dbGetInfo", "SQLiteResult", function(dbObj, ...) {
-  sqliteResultInfo(dbObj, ...)
+  check_valid(dbObj)
+  
+  info <- .Call(RS_SQLite_resultSetInfo, dbObj@Id)
+  flds <- info$fieldDescription[[1]]
+  if (!is.null(flds)){
+    flds$Sclass <- .Call(RS_DBI_SclassNames, flds$Sclass)
+    flds$type <- .Call(RS_SQLite_typeNames, flds$type)
+    ## no factors
+    info$fields <- structure(flds, row.names = paste(seq(along.with=flds$type)),
+      class="data.frame")
+  }
+  
+  info
 })
 
 #' @rdname dbGetInfo

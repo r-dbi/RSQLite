@@ -34,31 +34,6 @@ sqliteFetchOneColumn <- function(con, statement, n=0, ...) {
   rel[[1]]
 }
 
-#' @useDynLib RSQLite RS_SQLite_resultSetInfo RS_DBI_SclassNames RS_SQLite_typeNames
-sqliteResultInfo <- function(obj, what = "", ...) {
-  if(!isIdCurrent(obj))
-    stop(paste("expired", class(obj)))
-  id <- obj@Id
-  info <- .Call(RS_SQLite_resultSetInfo, id)
-  flds <- info$fieldDescription[[1]]
-  if(!is.null(flds)){
-    flds$Sclass <- .Call(RS_DBI_SclassNames, flds$Sclass)
-    flds$type <- .Call(RS_SQLite_typeNames, flds$type)
-    ## no factors
-    info$fields <- structure(flds, row.names = paste(seq(along.with=flds$type)),
-      class="data.frame")
-  }
-  if(!missing(what))
-    info[what]
-  else
-    info
-}
-
-## from ROracle, except we don't quote strings here.
-## safe.write makes sure write.table don't exceed available memory by batching
-## at most batch rows (but it is still slowww)
-
-
 #' Write a data.frame avoiding exceeding memory limits
 #' 
 #' This function batches calls to \code{write.table} to avoid exceeding memory
@@ -181,4 +156,10 @@ explict_rownames <- function(df, row.names = NA) {
   
   rn <- data.frame(row_names = row.names(df))
   cbind(rn, df)
+}
+
+check_valid <- function(x) {
+  if (isIdCurrent(x)) return(TRUE)
+  
+  stop("Expired ", class(x)[1])
 }

@@ -91,7 +91,7 @@ setMethod("dbUnloadDriver", "SQLiteDriver", function(drv, ...) {
 #' @param ... Ignored. Needed for compatibility with generic.
 #' @export
 setMethod("dbListConnections", "SQLiteDriver", function(drv, ...) {
-  cons <- dbGetInfo(drv, what = "connectionIds")[[1]]
+  cons <- dbGetInfo(drv)$connectionIds[[1]]
   if(!is.null(cons)) cons else list()
 })
 

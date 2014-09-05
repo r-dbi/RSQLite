@@ -117,23 +117,23 @@ NULL
 #' @export
 #' @rdname sqlite-meta
 setMethod("dbColumnInfo", "SQLiteResult", function(res, ...) {
-  out <- dbGetInfo(res, "fields")[[1]]
+  out <- dbGetInfo(res)$fields
   if(!is.null(out)) out else data.frame(out)
 })
 #' @export
 #' @rdname sqlite-meta
 setMethod("dbGetRowsAffected", "SQLiteResult", function(res, ...) {
-  dbGetInfo(res, "rowsAffected")[[1]]
+  dbGetInfo(res)$rowsAffected
 })
 #' @export
 #' @rdname sqlite-meta
 setMethod("dbGetRowCount", "SQLiteResult", function(res, ...) {
-  dbGetInfo(res, "rowCount")[[1]]
+  dbGetInfo(res)$rowCount
 })
 #' @export
 #' @rdname sqlite-meta
 setMethod("dbHasCompleted", "SQLiteResult", function(res, ...) {
-  out <- dbGetInfo(res, "completed")[[1]]
+  out <- dbGetInfo(res)$completed
   if(out<0)
     NA
   else out == 1L

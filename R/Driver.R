@@ -57,6 +57,7 @@ setClass("SQLiteDriver",
 #' 
 #' @rdname SQLiteDriver-class
 #' @export
+#' @import methods DBI
 #' @useDynLib RSQLite RS_SQLite_init
 SQLite <- function(max.con = 200L, fetch.default.rec = 500, 
                    force.reload = FALSE, shared.cache = FALSE) {

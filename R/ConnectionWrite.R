@@ -42,8 +42,8 @@ setMethod("dbWriteTable", signature("SQLiteConnection", "character", "data.frame
     if (overwrite && append)
       stop("overwrite and append cannot both be TRUE", call. = FALSE)
     
-    dbBegin(conn)
-    on.exit(dbRollback(conn))
+    dbBegin(conn, "dbWriteTable")
+    on.exit(dbRollback(conn, "dbWriteTable"))
     
     found <- dbExistsTable(conn, name)
     if (found && !overwrite && !append) {
@@ -74,7 +74,7 @@ setMethod("dbWriteTable", signature("SQLiteConnection", "character", "data.frame
     }
 
     on.exit(NULL)
-    dbCommit(conn)
+    dbCommit(conn, "dbWriteTable")
     TRUE
   }
 )

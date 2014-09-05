@@ -29,7 +29,7 @@ dbWriteTable(con, "mtcars", mtcars)
 rs <- dbSendQuery(con, "SELECT * FROM mtcars")
 summary(rs)
 
-dbClearResults(rs)
+dbClearResult(rs)
 dbDisconnect(con)
 }
 \keyword{internal}

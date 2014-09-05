@@ -9,9 +9,9 @@ setGeneric("summary")
 #' @export
 #' 
 #' @rdname summary
-setMethod("summary", "SQLiteDriver",
-  definition = function(object, ...) sqliteDescribeDriver(object, ...)
-)
+setMethod("summary", "SQLiteDriver", function(object, ...) {
+  sqliteDescribeDriver(object, ...)
+})
 
 sqliteDescribeDriver <- function(obj, verbose = FALSE, ...) {
   if(!isIdCurrent(obj)){
@@ -41,9 +41,9 @@ sqliteDescribeDriver <- function(obj, verbose = FALSE, ...) {
 
 #' @export
 #' @rdname summary
-setMethod("summary", "SQLiteConnection",
-  definition = function(object, ...) sqliteDescribeConnection(object, ...)
-)
+setMethod("summary", "SQLiteConnection", function(object, ...) {
+  sqliteDescribeConnection(object, ...)
+})
 
 sqliteDescribeConnection <- function(obj, verbose = FALSE, ...) {
   if(!isIdCurrent(obj)){
@@ -70,9 +70,9 @@ sqliteDescribeConnection <- function(obj, verbose = FALSE, ...) {
 
 #' @export
 #' @rdname summary
-setMethod("summary", "SQLiteResult",
-  definition = function(object, ...) sqliteDescribeResult(object, ...)
-)
+setMethod("summary", "SQLiteResult", function(object, ...) {
+  sqliteDescribeResult(object, ...)
+})
 
 sqliteDescribeResult <- function(obj, verbose = FALSE, ...) {
   if(!isIdCurrent(obj)){

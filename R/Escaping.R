@@ -35,16 +35,16 @@ NULL
 #' @export
 setMethod("make.db.names",
   signature(dbObj="SQLiteConnection", snames = "character"),
-  definition = function(dbObj, snames, keywords, unique, allow.keywords, ...){
+  function(dbObj, snames, keywords, unique, allow.keywords, ...) {
     make.db.names.default(snames, keywords, unique, allow.keywords)
   }
 )
 
 #' @export
 #' @rdname make.db.names-SQLiteConnection-character-method
-setMethod("SQLKeywords", "SQLiteConnection",
-  definition = function(dbObj, ...) .SQL92Keywords
-)
+setMethod("SQLKeywords", "SQLiteConnection", function(dbObj, ...) {
+  .SQL92Keywords
+})
 
 #' @export
 #' @rdname make.db.names-SQLiteConnection-character-method
@@ -56,7 +56,7 @@ setMethod("SQLKeywords", "SQLiteConnection",
 #'   as lower case, upper case, or any of the two.  it defaults to \code{"any"}.
 setMethod("isSQLKeyword",
   signature(dbObj="SQLiteConnection", name="character"),
-  definition = function(dbObj, name, keywords, case, ...){
+  function(dbObj, name, keywords, case, ...) {
     isSQLKeyword.default(name, keywords = .SQL92Keywords, case)
   }
 )

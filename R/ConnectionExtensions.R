@@ -5,17 +5,15 @@
 #' @param bind.data A data frame
 #' @param ... Other arguments used by methods
 #' @export
-setGeneric("dbSendPreparedQuery", 
-  def = function(conn, statement, bind.data, ...) 
-    standardGeneric("dbSendPreparedQuery")
-)
+setGeneric("dbSendPreparedQuery", function(conn, statement, bind.data, ...) {
+  standardGeneric("dbSendPreparedQuery")
+})
 
 #' @rdname dbSendPreparedQuery
 #' @export
-setGeneric("dbGetPreparedQuery", 
-  def = function(conn, statement, bind.data, ...) 
-    standardGeneric("dbGetPreparedQuery")
-)
+setGeneric("dbGetPreparedQuery", function(conn, statement, bind.data, ...) {
+  standardGeneric("dbGetPreparedQuery")
+})
 
 #' Generic for creating a new transaction.
 #' 

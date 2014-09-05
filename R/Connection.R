@@ -108,19 +108,18 @@ setClass("SQLiteConnection",
 #' 
 #' dbDisconnect(con)
 #' @export
-setMethod("dbSendQuery",
-  signature = signature(conn = "SQLiteConnection", statement = "character"),
-  definition = function(conn, statement, ...){
+setMethod("dbSendQuery", c("SQLiteConnection", "character"),
+  function(conn, statement, ...) {
     sqliteExecStatement(conn, statement, ...)
-  })
+  }
+)
 
 #' @rdname dbSendQuery-SQLiteConnection-character-method
 #' @param bind.data A data frame of data to be bound.
 #' @export
 setMethod("dbSendPreparedQuery", 
-  signature = signature(conn = "SQLiteConnection", statement = "character",
-    bind.data = "data.frame"),
-  definition = function(conn, statement, bind.data, ...){
+  c("SQLiteConnection", "character", "data.frame"),
+  function(conn, statement, bind.data, ...) {
     sqliteExecStatement(conn, statement, bind.data, ...)
   }
 )
@@ -148,18 +147,16 @@ sqliteExecStatement <- function(con, statement, bind.data=NULL) {
 
 #' @rdname dbSendQuery-SQLiteConnection-character-method
 #' @export
-setMethod("dbGetQuery",
-  signature = signature(conn = "SQLiteConnection", statement = "character"),
-  definition = function(conn, statement, ...){
+setMethod("dbGetQuery", c("SQLiteConnection", "character"),
+  function(conn, statement, ...){
     sqliteQuickSQL(conn, statement, ...)
   },
 )
 #' @rdname dbSendQuery-SQLiteConnection-character-method
 #' @export
 setMethod("dbGetPreparedQuery", 
-  signature = signature(conn = "SQLiteConnection", statement = "character",
-    bind.data = "data.frame"),
-  definition = function(conn, statement, bind.data, ...){
+  c("SQLiteConnection", "character", "data.frame"),
+  function(conn, statement, bind.data, ...) {
     sqliteQuickSQL(conn, statement, bind.data, ...)
   }
 )
@@ -185,11 +182,9 @@ sqliteQuickSQL <- function(con, statement, bind.data=NULL, ...) {
 #' @param ... Ignored. Needed for compatiblity with generic.
 #' @export
 #' @useDynLib RSQLite RS_SQLite_getException
-setMethod("dbGetException", "SQLiteConnection",
-  definition = function(conn){
-    .Call(RS_SQLite_getException, conn@Id)
-  }
-)
+setMethod("dbGetException", "SQLiteConnection", function(conn){
+  .Call(RS_SQLite_getException, conn@Id)
+})
 
 #' Does the table exist?
 #' 
@@ -197,9 +192,8 @@ setMethod("dbGetException", "SQLiteConnection",
 #' @param name character vector of length 1 giving name of table
 #' @param ... Ignored. Included for compatibility with generic.
 #' @export
-setMethod("dbExistsTable",
-  signature = signature(conn = "SQLiteConnection", name = "character"),
-  definition = function(conn, name, ...){
+setMethod("dbExistsTable", c("SQLiteConnection", "character"),
+  function(conn, name, ...){
     lst <- dbListTables(conn)
     match(tolower(name), tolower(lst), nomatch = 0) > 0
   }
@@ -255,9 +249,8 @@ dbBuildTableDefinition <- function(...) {
 #' @param name character vector of length 1 giving name of table to remove
 #' @param ... Ignored. Included for compatibility with generic.
 #' @export
-setMethod("dbRemoveTable",
-  signature = signature(conn = "SQLiteConnection", name = "character"),
-  definition = function(conn, name, ...){
+setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
+  function(conn, name, ...) {
     dbGetQuery(conn, paste("DROP TABLE", name))
     invisible(TRUE)
   }
@@ -268,32 +261,28 @@ setMethod("dbRemoveTable",
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param ... Ignored. Included for compatibility with generic.
 #' @export
-setMethod("dbListResults", "SQLiteConnection",
-  definition = function(conn, ...) {
-    rs <- dbGetInfo(conn, "rsId")[[1]]
-    if(length(rs)>0) rs else list()
-  }
-)
+setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
+  rs <- dbGetInfo(conn, "rsId")[[1]]
+  if(length(rs)>0) rs else list()
+})
 
 #' List available SQLite tables.
 #' 
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param ... Ignored. Included for compatibility with generic.
 #' @export
-setMethod("dbListTables", "SQLiteConnection",
-  definition = function(conn, ...){
-    out <- dbGetQuery(conn, "SELECT name FROM
-        (SELECT * FROM sqlite_master UNION ALL
-         SELECT * FROM sqlite_temp_master)
-        WHERE type = 'table' OR type = 'view'
-        ORDER BY name", ...)
-    if (is.null(out) || nrow(out) == 0)
-      out <- character(0)
-    else
-      out <- out[, 1]
-    out
-  }
-)
+setMethod("dbListTables", "SQLiteConnection", function(conn, ...) {
+  out <- dbGetQuery(conn, "SELECT name FROM
+      (SELECT * FROM sqlite_master UNION ALL
+       SELECT * FROM sqlite_temp_master)
+      WHERE type = 'table' OR type = 'view'
+      ORDER BY name", ...)
+  if (is.null(out) || nrow(out) == 0)
+    out <- character(0)
+  else
+    out <- out[, 1]
+  out
+})
 
 #' List fields in specified table.
 #' 

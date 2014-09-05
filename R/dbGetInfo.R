@@ -9,9 +9,9 @@ NULL
 
 #' @rdname dbGetInfo
 #' @export
-setMethod("dbGetInfo", "SQLiteDriver",
-  definition = function(dbObj, ...) sqliteDriverInfo(dbObj, ...)
-)
+setMethod("dbGetInfo", "SQLiteDriver", function(dbObj, ...) {
+  sqliteDriverInfo(dbObj, ...)
+})
 
 sqliteDriverInfo <- function(obj, what="", ...) {
   if(!isIdCurrent(obj))
@@ -29,9 +29,9 @@ sqliteDriverInfo <- function(obj, what="", ...) {
 
 #' @rdname dbGetInfo
 #' @export
-setMethod("dbGetInfo", "SQLiteConnection",
-  definition = function(dbObj, ...) sqliteConnectionInfo(dbObj, ...)
-)
+setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
+  sqliteConnectionInfo(dbObj, ...)
+})
 
 sqliteConnectionInfo <- function(obj, what="", ...) {
   if(!isIdCurrent(obj))
@@ -54,11 +54,12 @@ sqliteConnectionInfo <- function(obj, what="", ...) {
 
 #' @rdname dbGetInfo
 #' @export
-setMethod("dbGetInfo", "SQLiteResult",
-  definition = function(dbObj, ...) sqliteResultInfo(dbObj, ...)
-)
+setMethod("dbGetInfo", "SQLiteResult", function(dbObj, ...) {
+  sqliteResultInfo(dbObj, ...)
+})
+
 #' @rdname dbGetInfo
 #' @export
-setMethod("dbGetStatement", "SQLiteResult",
-  definition = function(res, ...) dbGetInfo(res, "statement")[[1]]
-)
+setMethod("dbGetStatement", "SQLiteResult", function(res, ...) {
+  dbGetInfo(res, "statement")[[1]]
+})

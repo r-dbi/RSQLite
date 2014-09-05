@@ -42,15 +42,15 @@ setAs("SQLiteResult", "SQLiteConnection",
 #' dbClearResult(res)
 #' dbDisconnect(con)
 #' @export
-setMethod("dbFetch", "SQLiteResult",
-  definition = function(res, n = 0, ...) sqliteFetch(res, n = n, ...)
-)
+setMethod("dbFetch", "SQLiteResult", function(res, n = 0, ...) {
+  sqliteFetch(res, n = n, ...)
+})
 
 #' @export
 #' @rdname dbFetch-SQLiteResult-method
-setMethod("fetch", "SQLiteResult",
-  definition = function(res, n = 0, ...) sqliteFetch(res, n = n, ...)
-)
+setMethod("fetch", "SQLiteResult", function(res, n = 0, ...) {
+  sqliteFetch(res, n = n, ...)
+})
 
 sqliteFetch <- function(res, n=0, ...) {  
   if(!isIdCurrent(res))
@@ -73,9 +73,9 @@ sqliteFetch <- function(res, n=0, ...) {
 #' @export
 #' @param res an \code{\linkS4class{SQLiteResult}} object.
 #' @param ... Ignored. Needed for compatibility with generic.
-setMethod("dbClearResult", "SQLiteResult",
-  definition = function(res, ...) sqliteCloseResult(res, ...)
-)
+setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
+  sqliteCloseResult(res, ...)
+})
 
 sqliteCloseResult <- function(res, ...) {
   if(!isIdCurrent(res)){
@@ -122,29 +122,25 @@ NULL
 
 #' @export
 #' @rdname sqlite-meta
-setMethod("dbColumnInfo", "SQLiteResult",
-  definition = function(res, ...){
-    out <- dbGetInfo(res, "fields")[[1]]
-    if(!is.null(out)) out else data.frame(out)
-  }
-)
+setMethod("dbColumnInfo", "SQLiteResult", function(res, ...) {
+  out <- dbGetInfo(res, "fields")[[1]]
+  if(!is.null(out)) out else data.frame(out)
+})
 #' @export
 #' @rdname sqlite-meta
-setMethod("dbGetRowsAffected", "SQLiteResult",
-  definition = function(res, ...) dbGetInfo(res, "rowsAffected")[[1]]
-)
+setMethod("dbGetRowsAffected", "SQLiteResult", function(res, ...) {
+  dbGetInfo(res, "rowsAffected")[[1]]
+})
 #' @export
 #' @rdname sqlite-meta
-setMethod("dbGetRowCount", "SQLiteResult",
-  definition = function(res, ...) dbGetInfo(res, "rowCount")[[1]]
-)
+setMethod("dbGetRowCount", "SQLiteResult", function(res, ...) {
+  dbGetInfo(res, "rowCount")[[1]]
+})
 #' @export
 #' @rdname sqlite-meta
-setMethod("dbHasCompleted", "SQLiteResult",
-  definition = function(res, ...){
-    out <- dbGetInfo(res, "completed")[[1]]
-    if(out<0)
-      NA
-    else out == 1L
-  }
-)
+setMethod("dbHasCompleted", "SQLiteResult", function(res, ...) {
+  out <- dbGetInfo(res, "completed")[[1]]
+  if(out<0)
+    NA
+  else out == 1L
+})

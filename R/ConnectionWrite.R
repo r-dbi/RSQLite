@@ -35,7 +35,7 @@
 #' dbReadTable(con, "mtcars2")
 #' 
 #' dbDisconnect(con)
-setMethod("dbWriteTable", signature("SQLiteConnection", "character", "data.frame"),
+setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
   function(conn, name, value, row.names = NA, overwrite = FALSE, append = FALSE, 
            field.types = NULL) {
     

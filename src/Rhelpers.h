@@ -96,14 +96,6 @@ extern "C" {
 #  define SET_LST_CHR_EL(x,i,j,val) (CHR_EL(LST_EL(x,i),j)=val)
 #endif
 
-/* setting and querying NA's -- in the case of R, we need to
- * use our own RS_na_set and RS_is_na functions (these need work!)
- */
-
-#  define NA_SET(p,t)   RS_na_set((p),(t))
-#  define NA_CHR_SET(p) SET_CHR_EL(p, 0, NA_STRING)
-#  define IS_NA(p,t)    RS_is_na((p),(t))
-
 
 /* SET_ROWNAMES() and SET_CLASS_NAME() don't exist in S4 
  */

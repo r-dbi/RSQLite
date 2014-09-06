@@ -589,14 +589,14 @@ bind_params_to_stmt(RS_SQLite_bindParams *params,
         switch(TYPEOF(pdata)){
         case INTSXP:
             integer = INTEGER(pdata)[row];
-            if (IS_NA(&integer, INTSXP))
+            if (integer == NA_INTEGER)
                 state = sqlite3_bind_null(db_statement, j+1);
             else
                 state = sqlite3_bind_int(db_statement, j+1, integer);
             break;
         case REALSXP:
             number = NUM_EL(pdata, row);
-            if (IS_NA(&number, REALSXP))
+            if (ISNA(number))
                 state = sqlite3_bind_null(db_statement, j+1);
             else
                 state = sqlite3_bind_double(db_statement, j+1, number);
@@ -837,14 +837,14 @@ static void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
         switch (flds->Sclass[j]) {
         case INTSXP:
             if (null_item)
-                NA_SET(&(LST_INT_EL(output, j, row_idx)), INTSXP);
+                LST_INT_EL(output, j, row_idx) = NA_INTEGER;
             else
                 LST_INT_EL(output, j, row_idx) =
                     sqlite3_column_int(db_statement, j);
             break;
         case REALSXP:
             if (null_item)
-                NA_SET(&(LST_NUM_EL(output,j,row_idx)), REALSXP);
+                LST_NUM_EL(output,j,row_idx) = NA_REAL;
             else
                 LST_NUM_EL(output,j,row_idx) =
                     sqlite3_column_double(db_statement, j);
@@ -1098,14 +1098,14 @@ RS_SQLite_mget(SEXP rsHandle, SEXP max_rec)
             switch(flds->Sclass[j]){
             case INTSXP:
                 if(null_item)
-                    NA_SET(&(LST_INT_EL(output,j,row_idx)), INTSXP);
+                    LST_INT_EL(output,j,row_idx) = NA_INTEGER;
                 else
                     LST_INT_EL(output,j,row_idx) =
                         sqlite3_column_int(db_statement, j);
                 break;
             case REALSXP:
                 if(null_item)
-                    NA_SET(&(LST_NUM_EL(output,j,row_idx)), REALSXP);
+                    LST_NUM_EL(output,j,row_idx) = NA_REAL;
                 else
                     LST_NUM_EL(output,j,row_idx) =
                         sqlite3_column_double(db_statement, j);

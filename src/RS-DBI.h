@@ -271,11 +271,8 @@ SEXP RS_DBI_createNamedList(char  **names,
 				 Sint  n);
 SEXP RS_DBI_copyFields(RS_DBI_fields *flds);
 
-void RS_na_set(void *ptr, Stype type);
-int  RS_is_na(void *ptr, Stype type);
 extern const struct data_types RS_dataTypeTable[];
 
-SEXP DBI_handle_to_string(SEXP xp);
 SEXP DBI_newResultHandle(SEXP xp, SEXP resId);
 
 #ifdef __cplusplus 

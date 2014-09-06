@@ -1093,59 +1093,6 @@ RS_DBI_makeSQLNames(SEXP snames)
    return snames;
 }
 
-/*  These 2 R-specific functions are used by the C macros IS_NA(p,t) 
- *  and NA_SET(p,t) (in this way one simply use macros to test and set
- *  NA's regardless whether we're using R or S.
- */
-void RS_na_set(void *ptr, Stype type)
-{
-  double *d;
-  Sint   *i;
-  const char   *c;
-  switch(type){
-  case INTSXP:
-    i = (Sint *) ptr;
-    *i = NA_INTEGER;
-    break;
-  case LGLSXP:
-    i = (Sint *) ptr;
-    *i = NA_LOGICAL;
-    break;
-  case REALSXP:
-    d = (double *) ptr;
-    *d = NA_REAL;
-    break;
-  case CHARSXP:
-    c = (const char *) ptr;
-    c = CHAR(NA_STRING);
-    break;
-  }
-}
-
-int RS_is_na(void *ptr, Stype type)
-{
-   int *i, out = -2;
-   const char *c;
-   double *d;
-
-   switch(type){
-   case INTSXP:
-   case LGLSXP:
-      i = (int *) ptr;
-      out = (int) ((*i) == NA_INTEGER);
-      break;
-   case REALSXP:
-      d = (double *) ptr;
-      out = ISNA(*d);
-      break;
-   case CHARSXP:
-      c = (const char *) ptr;
-      out = (int) (strcmp(c, CHAR(NA_STRING))==0);
-      break;
-   }
-   return out;
-}
-
 /* the codes come from from R/src/main/util.c */
 const struct data_types RS_dataTypeTable[] = {
     { "NULL",		NILSXP	   },  /* real types */
@@ -1173,35 +1120,3 @@ const struct data_types RS_dataTypeTable[] = {
     { "name",		SYMSXP	   },
     { (char *)0,	-1	   }
 };
-
-SEXP DBI_handle_to_string(SEXP xp)
-{
-    char *buf;
-    SEXP ans, tag, ids;
-    int len, *v;
-    if (TYPEOF(xp) != EXTPTRSXP)
-        RS_DBI_errorMessage("DBI_handle_to_string: invalid handle",
-                            RS_DBI_ERROR);
-    tag = STRING_ELT(R_ExternalPtrTag(xp), 0);
-    ids = R_ExternalPtrProtected(xp);
-    if (TYPEOF(ids) == VECSXP) ids = VECTOR_ELT(ids, 0);
-    len = strlen(CHAR(tag)) + 20;
-    buf = CallocCharBuf(len);
-    v = INTEGER(ids);
-    switch (length(ids)) {
-    case 1:
-        snprintf(buf, len, "%s (%d)", CHAR(tag), v[0]);
-        break;
-    case 2:
-        snprintf(buf, len, "%s (%d, %d)", CHAR(tag), v[0], v[1]);
-        break;
-    case 3:
-        snprintf(buf, len, "%s (%d, %d, %d)", CHAR(tag), v[0], v[1], v[2]);
-        break;
-    default:
-        snprintf(buf, len, "%s", "BAD LENGTH");
-    }
-    ans = mkString(buf);
-    Free(buf);
-    return ans;
-}

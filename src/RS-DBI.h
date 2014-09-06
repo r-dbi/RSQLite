@@ -185,7 +185,6 @@ Mgr_Handle RS_DBI_allocManager(const char *drvName, Sint max_con,
 void            RS_DBI_freeManager(Mgr_Handle mgrHandle);
 RS_DBI_manager *RS_DBI_getManager(Db_Handle handle);
 Mgr_Handle RS_DBI_asMgrHandle(Sint pid);   
-SEXP RS_DBI_managerInfo(Mgr_Handle mgrHandle);
 
 /* dbConnection */
 Con_Handle RS_DBI_allocConnection(Mgr_Handle mgrHandle, 
@@ -193,7 +192,6 @@ Con_Handle RS_DBI_allocConnection(Mgr_Handle mgrHandle,
 void               RS_DBI_freeConnection(Con_Handle conHandle);
 RS_DBI_connection *RS_DBI_getConnection(Db_Handle handle);
 Con_Handle RS_DBI_asConHandle(Sint mgrId, Sint conId, RS_DBI_connection *con);
-SEXP RS_DBI_connectionInfo(Con_Handle con_Handle);
 
 /* dbResultSet */
 Res_Handle RS_DBI_allocResultSet(Con_Handle conHandle);

@@ -858,7 +858,7 @@ static void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
                 SET_LST_CHR_EL(output,j,row_idx, NA_STRING);
             else
                 SET_LST_CHR_EL(output,j,row_idx, /* cast for -Wall */
-                               C_S_CPY((char*)sqlite3_column_text(db_statement, j)));
+                               mkChar((char*)sqlite3_column_text(db_statement, j)));
             break;
         }
     }
@@ -1007,7 +1007,7 @@ RS_SQLite_getException(SEXP conHandle)
     PROTECT(output = RS_DBI_createNamedList(exDesc, exType, exLen, n));
     err = (RS_SQLite_exception *) con->drvData;
     LST_INT_EL(output,0,0) = (Sint) err->errorNum;
-    SET_LST_CHR_EL(output,1,0,C_S_CPY(err->errorMsg));
+    SET_LST_CHR_EL(output,1,0,mkChar(err->errorMsg));
     UNPROTECT(1);
     return output;
 }
@@ -1061,9 +1061,9 @@ RS_SQLite_managerInfo(Mgr_Handle mgrHandle)
     PROTECT(output = RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, n));
     j = (Sint) 0;
     if(mgr->drvName)
-        SET_LST_CHR_EL(output,j++,0,C_S_CPY(mgr->drvName));
+        SET_LST_CHR_EL(output,j++,0,mkChar(mgr->drvName));
     else
-        SET_LST_CHR_EL(output,j++,0,C_S_CPY(""));
+        SET_LST_CHR_EL(output,j++,0,mkChar(""));
 
     cons = (Sint *) S_alloc((long)max_con, (int)sizeof(Sint));
     ncon = RS_DBI_listEntries(mgr->connectionIds, mgr->length, cons);
@@ -1081,11 +1081,11 @@ RS_SQLite_managerInfo(Mgr_Handle mgrHandle)
     LST_INT_EL(output,j++,0) = mgr->length;
     LST_INT_EL(output,j++,0) = mgr->num_con;
     LST_INT_EL(output,j++,0) = mgr->counter;
-    SET_LST_CHR_EL(output,j++,0,C_S_CPY(SQLITE_VERSION));
+    SET_LST_CHR_EL(output,j++,0,mkChar(SQLITE_VERSION));
     if(*shared_cache)
-        SET_LST_CHR_EL(output,j++,0,C_S_CPY("on"));
+        SET_LST_CHR_EL(output,j++,0,mkChar("on"));
     else
-        SET_LST_CHR_EL(output,j++,0,C_S_CPY("off"));
+        SET_LST_CHR_EL(output,j++,0,mkChar("off"));
     UNPROTECT(1);
     return output;
 }
@@ -1149,7 +1149,7 @@ RS_SQLite_resultSetInfo(Res_Handle rsHandle)
         PROTECT(flds = R_NilValue);
 
     PROTECT(output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n));
-    SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
+    SET_LST_CHR_EL(output,0,0,mkChar(result->statement));
     LST_INT_EL(output,1,0) = result->isSelect;
     LST_INT_EL(output,2,0) = result->rowsAffected;
     LST_INT_EL(output,3,0) = result->rowCount;
@@ -1175,7 +1175,7 @@ RS_SQLite_typeNames(SEXP typeIds)
     PROTECT(typeNames = NEW_CHARACTER(n));
     for(i = 0; i < n; i++) {
         s = RS_DBI_getTypeName(typeCodes[i], RS_SQLite_fieldTypes);
-        SET_CHR_EL(typeNames, i, C_S_CPY(s));
+        SET_CHR_EL(typeNames, i, mkChar(s));
     }
     UNPROTECT(1);
     return typeNames;

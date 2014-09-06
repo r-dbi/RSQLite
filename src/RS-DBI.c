@@ -396,7 +396,7 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
 
   PROTECT(names = NEW_CHARACTER((Sint) num_fields));
   for(j = 0; j< (Sint) num_fields; j++){
-    SET_CHR_EL(names,j, C_S_CPY(flds->name[j]));
+    SET_CHR_EL(names,j, mkChar(flds->name[j]));
   }
   SET_NAMES(output, names);
   UNPROTECT(2);
@@ -519,7 +519,7 @@ RS_DBI_createNamedList(char **names, SEXPTYPE *types, Sint *lengths, Sint  n)
       RS_DBI_errorMessage("unsupported data type", RS_DBI_ERROR);
     }
     SET_VECTOR_ELT(output, (Sint)j, obj);
-    SET_CHR_EL(output_names, j, C_S_CPY(names[j]));
+    SET_CHR_EL(output_names, j, mkChar(names[j]));
   }
   SET_NAMES(output, output_names);
   UNPROTECT(n+2);
@@ -548,7 +548,7 @@ RS_DBI_SclassNames(SEXP type)
       RS_DBI_errorMessage(
             "internal error RS_DBI_SclassNames: unrecognized S type", 
             RS_DBI_ERROR);
-    SET_CHR_EL(typeNames, i, C_S_CPY(s));
+    SET_CHR_EL(typeNames, i, mkChar(s));
   }
   UNPROTECT(1);
   return typeNames;
@@ -769,7 +769,7 @@ RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
   
   SEXP S_fields = PROTECT(RS_DBI_createNamedList(desc, types, lengths, n));
   for (int i = 0; i < num_fields; i++) {
-    SET_LST_CHR_EL(S_fields,0,i,C_S_CPY(flds->name[i]));
+    SET_LST_CHR_EL(S_fields,0,i,mkChar(flds->name[i]));
     LST_INT_EL(S_fields,1,i) = (Sint) flds->Sclass[i];
     LST_INT_EL(S_fields,2,i) = (Sint) flds->type[i];
     LST_INT_EL(S_fields,3,i) = (Sint) flds->length[i];

@@ -11,8 +11,6 @@ extern "C" {
 #include "Rdefines.h"
 #include "S.h"
 #define Sint  int
-#define C_S_CPY(p)    COPY_TO_USER_STRING(p)    /* cpy C string to R */
-
 
 /* x[i] */
 #define LGL_EL(x,i) LOGICAL_POINTER((x))[(i)]

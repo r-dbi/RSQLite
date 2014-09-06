@@ -120,7 +120,7 @@ RS_SQLite_freeConParams(RS_SQLite_conParams *conParams)
 }
 
 /* set exception object (allocate memory if needed) */
-void
+void 
 RS_SQLite_setException(RS_DBI_connection *con, int err_no, const char *err_msg)
 {
     RS_SQLite_exception *ex;
@@ -156,76 +156,59 @@ RS_SQLite_freeException(RS_DBI_connection *con)
     return;
 }
 
-SEXP
-RS_SQLite_newConnection(SEXP dbfile, SEXP allow_ext,
-                        SEXP s_flags, SEXP s_vfs)
-{
-    RS_DBI_connection   *con;
-    RS_SQLite_conParams *conParams;
-    Con_Handle conHandle;
-    sqlite3     *db_connection;
-    const char  *dbname = NULL, *vfs = NULL;
-    int         rc, loadable_extensions, open_flags = 0;
-
-    if (TYPEOF(dbfile) != STRSXP || length(dbfile) != 1
-        || STRING_ELT(dbfile, 0) == NA_STRING)
-        error("'dbname' must be a length one character vector and not NA");
-    dbname = CHAR(STRING_ELT(dbfile, 0));
-
-    if (!isLogical(allow_ext))
-        error("'allow_ext' must be TRUE or FALSE");
-    loadable_extensions = LOGICAL(allow_ext)[0];
-    if (loadable_extensions == NA_LOGICAL)
-        error("'allow_ext' must be TRUE or FALSE, not NA");
-
-    if (!isNull(s_vfs)) {
-        if (!isString(s_vfs) || length(s_vfs) != 1
-            || STRING_ELT(s_vfs, 0) == NA_STRING) {
-            error("invalid argument 'vfs'");
-        }
-        vfs = CHAR(STRING_ELT(s_vfs, 0));
-        /* "" is not valid, NULL gives default value */
-        if (strlen(vfs) == 0) vfs = NULL;
-    }
+SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_, 
+                             SEXP vfs_) {
+  const char* dbname = CHAR(asChar(dbname_));
   
-    if (!isInteger(s_flags) || length(s_flags) != 1)
-        error("argument 'mode' must be length 1 integer, got %s, length: %d",
-              type2char(TYPEOF(s_flags)), length(s_flags));
-    open_flags = INTEGER(s_flags)[0];
+  if (!isLogical(allow_ext_)) {
+    error("'allow_ext' must be TRUE or FALSE");
+  }
+  int allow_ext = asLogical(allow_ext_);
+  if (allow_ext == NA_LOGICAL)
+    error("'allow_ext' must be TRUE or FALSE, not NA");
   
-    rc = sqlite3_open_v2(dbname, &db_connection, open_flags, vfs);
-    if(rc != SQLITE_OK){
-        char buf[256];
-        sprintf(buf, "could not connect to dbname:\n%s\n",
-                sqlite3_errmsg(db_connection));
+  if (!isInteger(flags_)) {
+    error("'flags' must be integer");
+  }
+  int flags = asInteger(flags_);
+  
+  const char* vfs = NULL;
+  if (!isNull(vfs_)) {
+    vfs = CHAR(asChar(vfs_));
+    if (strlen(vfs) == 0) vfs = NULL;
+  }
+  
+  sqlite3 *db_connection;
+  int rc = sqlite3_open_v2(dbname, &db_connection, flags, vfs);
+  if (rc != SQLITE_OK) {
+    error("Could not connect to database:\n%s", sqlite3_errmsg(db_connection));
+  }
+  if (allow_ext) {
+    sqlite3_enable_load_extension(db_connection, 1);
+  }
 
-        RS_DBI_errorMessage(buf, RS_DBI_ERROR);
-    }
+  /* SQLite connections can only have 1 result set open at a time */
+  Con_Handle conHandle = RS_DBI_allocConnection(1);
+  /* Note, while RS_DBI_getConnection can raise an error, conHandle
+   * will be valid if RS_DBI_allocConnection returns without
+   * error. */
+  RS_DBI_connection* con = RS_DBI_getConnection(conHandle);
+  if (!con) {
+    (void) sqlite3_close(db_connection);
+    RS_DBI_freeConnection(conHandle);
+    error("Could not allocate space for connection object");
+  }
 
-    /* SQLite connections can only have 1 result set open at a time */
-    conHandle = RS_DBI_allocConnection(1);
-    /* Note, while RS_DBI_getConnection can raise an error, conHandle
-     * will be valid if RS_DBI_allocConnection returns without
-     * error. */
-    con = RS_DBI_getConnection(conHandle);
-    if(!con){
-        (void) sqlite3_close(db_connection);
-        RS_DBI_freeConnection(conHandle);
-        RS_DBI_errorMessage("could not alloc space for connection object",
-                            RS_DBI_ERROR);
-    }
-    /* save connection parameters in the connection object */
-    conParams = RS_SQLite_allocConParams(dbname, loadable_extensions,
-                                         open_flags, vfs);
-    con->drvConnection = (void *) db_connection;
-    con->conParams = (void *) conParams;
-    RS_SQLite_setException(con, SQLITE_OK, "OK");
+  /* save connection parameters in the connection object */
+  RS_SQLite_conParams* conParams = RS_SQLite_allocConParams(dbname, allow_ext, 
+    flags, vfs);
+  con->conParams = (void *) conParams;
 
-    /* enable loadable extensions if required */
-    if(loadable_extensions != 0)
-        sqlite3_enable_load_extension(db_connection, 1);
-
-    return conHandle;
+  con->drvConnection = (void *) db_connection;
+  RS_SQLite_setException(con, SQLITE_OK, "OK");
+  
+  
+  return conHandle;
 }
 
 SEXP 

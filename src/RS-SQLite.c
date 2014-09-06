@@ -818,14 +818,6 @@ RS_SQLite_createDataMappings(Res_Handle rsHandle) {
       default:
         error("unknown column type %d", col_type);
     }
-    flds->precision[j] = (Sint) -1;
-    flds->scale[j] = (Sint) -1;
-    /* For nullOk, could use sqlite3_column_origin_name and
-       sqlite3_table_column_metadata to determine this.  It
-       won't always be possible as the query column may not
-       refer to a table column.
-    */
-    flds->nullOk[j] = (Sint) -1;
   }
   return flds;
 }

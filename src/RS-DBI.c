@@ -337,9 +337,6 @@ RS_DBI_allocFields(int num_fields)
   flds->name =     (char **) calloc(n, sizeof(char *));
   flds->type =     (Sint *) calloc(n, sizeof(Sint));
   flds->length =   (Sint *) calloc(n, sizeof(Sint));
-  flds->precision= (Sint *) calloc(n, sizeof(Sint));
-  flds->scale =    (Sint *) calloc(n, sizeof(Sint));
-  flds->nullOk =   (Sint *) calloc(n, sizeof(Sint));
   flds->isVarLength = (Sint *) calloc(n, sizeof(Sint));
   flds->Sclass =   (Stype *) calloc(n, sizeof(Stype));
 
@@ -352,9 +349,6 @@ RS_DBI_freeFields(RS_DBI_fields *flds)
   if(flds->name) free(flds->name);
   if(flds->type) free(flds->type);
   if(flds->length) free(flds->length);
-  if(flds->precision) free(flds->precision);
-  if(flds->scale) free(flds->scale);
-  if(flds->nullOk) free(flds->nullOk);
   if(flds->isVarLength) free(flds->isVarLength);
   if(flds->Sclass) free(flds->Sclass);
   free(flds);
@@ -597,13 +591,10 @@ SEXP
 RS_DBI_copyfields(RS_DBI_fields *flds)
 {
   SEXP S_fields;
-  Sint  n = (Sint) 8;
-  char  *desc[]={"name", "Sclass", "type", "len", "precision",
- 		 "scale","isVarLength", "nullOK"};
-  Stype types[] = {STRSXP, INTSXP, INTSXP,
-		   INTSXP, INTSXP, INTSXP,
-		   LGLSXP, LGLSXP};
-  Sint  lengths[8];
+  Sint  n = (Sint) 4;
+  char  *desc[] = {"name", "Sclass", "type", "len"};
+  Stype types[] = {STRSXP, INTSXP,   INTSXP, INTSXP};
+  Sint  lengths[n];
   int   i, j, num_fields;
 
   num_fields = flds->num_fields;
@@ -616,10 +607,6 @@ RS_DBI_copyfields(RS_DBI_fields *flds)
     LST_INT_EL(S_fields,1,i) = (Sint) flds->Sclass[i];
     LST_INT_EL(S_fields,2,i) = (Sint) flds->type[i];
     LST_INT_EL(S_fields,3,i) = (Sint) flds->length[i];
-    LST_INT_EL(S_fields,4,i) = (Sint) flds->precision[i];
-    LST_INT_EL(S_fields,5,i) = (Sint) flds->scale[i];
-    LST_INT_EL(S_fields,6,i) = (Sint) flds->isVarLength[i];
-    LST_INT_EL(S_fields,7,i) = (Sint) flds->nullOk[i];
   }
 
   return S_fields;
@@ -1008,9 +995,9 @@ RS_DBI_resultSetInfo(Res_Handle rsHandle)
 SEXP     /* named list */
 RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
 {
-  int n = 5;
-  char  *desc[] = {"name", "Sclass", "type", "len",  "nullOK"};
-  Stype types[] = {STRSXP, INTSXP,   INTSXP, INTSXP, LGLSXP};
+  int n = 4;
+  char  *desc[] = {"name", "Sclass", "type", "len"};
+  Stype types[] = {STRSXP, INTSXP,   INTSXP, INTSXP};
   int lengths[n];
   int num_fields = flds->num_fields;
   for (int j = 0; j < n; j++) 
@@ -1022,7 +1009,6 @@ RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
     LST_INT_EL(S_fields,1,i) = (Sint) flds->Sclass[i];
     LST_INT_EL(S_fields,2,i) = (Sint) flds->type[i];
     LST_INT_EL(S_fields,3,i) = (Sint) flds->length[i];
-    LST_INT_EL(S_fields,4,i) = (Sint) flds->nullOk[i];
   }
   UNPROTECT(1);
   

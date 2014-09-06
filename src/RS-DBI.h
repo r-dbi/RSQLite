@@ -108,9 +108,6 @@ typedef struct st_sdbi_fields {
   char  **name;         /* DBMS field names */
   Sint  *type;          /* DBMS internal types */
   Sint  *length;        /* DBMS lengths in bytes */
-  Sint  *precision;     /* DBMS num of digits for numeric types */
-  Sint  *scale;         /* DBMS num of decimals for numeric types */
-  Sint  *nullOk;        /* DBMS indicator for DBMS'  NULL type */
   Sint  *isVarLength;   /* DBMS variable-length char type */
   Stype *Sclass;        /* R/S class (type) -- may be overriden */
   /* TODO: Need a table of fun pointers to converters */

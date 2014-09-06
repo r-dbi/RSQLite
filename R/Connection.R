@@ -26,7 +26,6 @@ setClass("SQLiteConnection",
 #' @param statement a character vector of length one specifying the SQL
 #'   statement that should be executed.  Only a single SQL statment should be
 #'   provided.
-#' @param ... Ignored. Included for compatbility with generic.
 #' @examples
 #' con <- dbConnect(SQLite(), ":memory:")
 #' data(USArrests)
@@ -109,8 +108,8 @@ setClass("SQLiteConnection",
 #' dbDisconnect(con)
 #' @export
 setMethod("dbSendQuery", c("SQLiteConnection", "character"),
-  function(conn, statement, ...) {
-    sqliteExecStatement(conn, statement, ...)
+  function(conn, statement) {
+    sqliteExecStatement(conn, statement)
   }
 )
 
@@ -119,8 +118,8 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
 #' @export
 setMethod("dbSendPreparedQuery", 
   c("SQLiteConnection", "character", "data.frame"),
-  function(conn, statement, bind.data, ...) {
-    sqliteExecStatement(conn, statement, bind.data, ...)
+  function(conn, statement, bind.data) {
+    sqliteExecStatement(conn, statement, bind.data)
   }
 )
 
@@ -143,27 +142,27 @@ sqliteExecStatement <- function(con, statement, bind.data=NULL) {
 #' @rdname dbSendQuery-SQLiteConnection-character-method
 #' @export
 setMethod("dbGetQuery", c("SQLiteConnection", "character"),
-  function(conn, statement, ...){
-    sqliteQuickSQL(conn, statement, ...)
+  function(conn, statement){
+    sqliteQuickSQL(conn, statement)
   },
 )
 #' @rdname dbSendQuery-SQLiteConnection-character-method
 #' @export
 setMethod("dbGetPreparedQuery", 
   c("SQLiteConnection", "character", "data.frame"),
-  function(conn, statement, bind.data, ...) {
-    sqliteQuickSQL(conn, statement, bind.data, ...)
+  function(conn, statement, bind.data) {
+    sqliteQuickSQL(conn, statement, bind.data)
   }
 )
 
-sqliteQuickSQL <- function(con, statement, bind.data=NULL, ...) {
+sqliteQuickSQL <- function(con, statement, bind.data=NULL) {
   rs <- sqliteExecStatement(con, statement, bind.data)
   if(dbHasCompleted(rs)){
     dbClearResult(rs)            ## no records to fetch, we're done
     invisible()
     return(NULL)
   }
-  res <- sqliteFetch(rs, n = -1, ...)
+  res <- sqliteFetch(rs, n = -1)
   if(dbHasCompleted(rs))
     dbClearResult(rs)
   else
@@ -174,10 +173,9 @@ sqliteQuickSQL <- function(con, statement, bind.data=NULL, ...) {
 #' Get the last exception from the connection.
 #' 
 #' @param conn an object of class \code{\linkS4class{SQLiteConnection}}
-#' @param ... Ignored. Needed for compatiblity with generic.
 #' @export
 #' @useDynLib RSQLite RS_SQLite_getException
-setMethod("dbGetException", "SQLiteConnection", function(conn){
+setMethod("dbGetException", "SQLiteConnection", function(conn) {
   .Call(RS_SQLite_getException, conn@Id)
 })
 
@@ -185,10 +183,9 @@ setMethod("dbGetException", "SQLiteConnection", function(conn){
 #' 
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name character vector of length 1 giving name of table
-#' @param ... Ignored. Included for compatibility with generic.
 #' @export
 setMethod("dbExistsTable", c("SQLiteConnection", "character"),
-  function(conn, name, ...){
+  function(conn, name){
     lst <- dbListTables(conn)
     match(tolower(name), tolower(lst), nomatch = 0) > 0
   }
@@ -206,13 +203,12 @@ setMethod("dbExistsTable", c("SQLiteConnection", "character"),
 #'   field in \code{value}
 #' @param row.names Logical. Should row.name of \code{value} be exported as a
 #'   \code{row\_names} field? Default is \code{TRUE}
-#' @param ... Ignored. Reserved for future use.
 #' @return An SQL string
 #' @keywords internal
 #' @aliases dbBuildTableDefinition
 #' @export
 sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL, 
-                                       row.names = NA, ...) {
+                                       row.names = NA) {
   if (!is.data.frame(value)) {
     value <- as.data.frame(value)
   }
@@ -242,11 +238,10 @@ dbBuildTableDefinition <- function(...) {
 #' 
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name character vector of length 1 giving name of table to remove
-#' @param ... Ignored. Included for compatibility with generic.
 #' @export
 setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
-  function(conn, name, ...) {
-    dbGetQuery(conn, paste("DROP TABLE", name))
+  function(conn, name) {
+    dbGetQuery(conn, paste("DROP TABLE ", name))
     invisible(TRUE)
   }
 )
@@ -254,16 +249,14 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
 #' List available SQLite result sets.
 #' 
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
-#' @param ... Ignored. Included for compatibility with generic.
 #' @export
-setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
+setMethod("dbListResults", "SQLiteConnection", function(conn) {
   dbGetInfo(conn)$rsId
 })
 
 #' List available SQLite tables.
 #' 
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
-#' @param ... Ignored. Included for compatibility with generic.
 #' @export
 setMethod("dbListTables", "SQLiteConnection", function(conn) {
   dbGetQuery(conn, "SELECT name FROM
@@ -284,7 +277,7 @@ setMethod("dbListTables", "SQLiteConnection", function(conn) {
 #' dbDisconnect(con)
 setMethod("dbListFields", c("SQLiteConnection", "character"),
   function(conn, name) {
-    rs <- dbSendQuery(conn, paste("select * from ", name, "limit 1"))
+    rs <- dbSendQuery(conn, paste("SELECT * FROM ", name, "LIMIT 1"))
     on.exit(dbClearResult(rs))
     
     names(fetch(rs, n = 1))

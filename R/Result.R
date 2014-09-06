@@ -20,7 +20,6 @@ setClass("SQLiteResult",
 #' @param n maximum number of records to retrieve per fetch. Use \code{-1} to 
 #'    retrieve all pending records; use \code{0} for to fetch the default 
 #'    number of rows as defined in \code{\link{SQLite}}
-#' @param ... Ignored. Needed for compatibility with generic.
 #' @examples
 #' con <- dbConnect(SQLite())
 #' dbWriteTable(con, "jratings", datasets::USJudgeRatings)
@@ -38,18 +37,18 @@ setClass("SQLiteResult",
 #' dbClearResult(res)
 #' dbDisconnect(con)
 #' @export
-setMethod("dbFetch", "SQLiteResult", function(res, n = 0, ...) {
-  sqliteFetch(res, n = n, ...)
+setMethod("dbFetch", "SQLiteResult", function(res, n = 0) {
+  sqliteFetch(res, n = n)
 })
 
 #' @export
 #' @rdname dbFetch-SQLiteResult-method
-setMethod("fetch", "SQLiteResult", function(res, n = 0, ...) {
-  sqliteFetch(res, n = n, ...)
+setMethod("fetch", "SQLiteResult", function(res, n = 0) {
+  sqliteFetch(res, n = n)
 })
 
 #' @useDynLib RSQLite RS_SQLite_fetch
-sqliteFetch <- function(res, n = 0, ...) {  
+sqliteFetch <- function(res, n = 0) {  
   check_valid(res)
 
   # Returns NULL, or a list

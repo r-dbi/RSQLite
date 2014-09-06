@@ -72,13 +72,6 @@ typedef enum enum_handle_type {
   RES_HANDLE_TYPE = 3      /* dbResult handle */
 } HANDLE_TYPE; 
 
-static int MGR_ID(SEXP handle)
-{
-    SEXP h = R_ExternalPtrProtected(handle);
-    if (TYPEOF(h) == VECSXP) h = VECTOR_ELT(h, 0);
-    return INTEGER(h)[0];
-}
-
 static int CON_ID(SEXP handle)
 {
     SEXP h = R_ExternalPtrProtected(handle);
@@ -120,7 +113,6 @@ typedef struct st_sdbi_exception {
 typedef struct st_sdbi_resultset {
   void  *drvResultSet;   /* the actual (driver's) cursor/result set */
   void  *drvData;        /* a pointer to driver-specific data */
-  int  managerId;       /* the 3 *Id's are used for   */
   int  connectionId;    /* validating stuff coming from S */
   int  resultSetId;  
   int  isSelect;        /* boolean for testing SELECTs */
@@ -147,7 +139,6 @@ typedef struct st_sdbi_connection {
   int   length;                     /* max num of concurrent resultSets */
   int   num_res;                    /* num of open resultSets */
   int   counter;                    /* total number of queries */
-  int   managerId;
   int   connectionId; 
   RS_DBI_exception *exception;
 } RS_DBI_connection;
@@ -177,7 +168,7 @@ Res_Handle RS_DBI_allocResultSet(Con_Handle conHandle);
 void               RS_DBI_freeResultSet(Res_Handle rsHandle);
 void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
 RS_DBI_resultSet  *RS_DBI_getResultSet(Res_Handle rsHandle);
-Res_Handle RS_DBI_asResHandle(int pid, int conId, int resId, SEXP conxp);
+Res_Handle RS_DBI_asResHandle(int conId, int resId, SEXP conxp);
 
 /* utility funs */
 SEXP RS_DBI_validHandle(Db_Handle handle); /* callable from S/R */

@@ -151,7 +151,6 @@ RS_DBI_allocResultSet(SEXP conHandle)
   result->drvResultSet = (void *) NULL; /* driver's own resultSet (cursor)*/
   result->drvData = (void *) NULL;   /* this can be used by driver*/
   result->statement = (char *) NULL;
-  result->managerId = MGR_ID(conHandle);
   result->connectionId = CON_ID(conHandle);
   result->resultSetId = con->counter;
   result->isSelect = -1;
@@ -167,8 +166,7 @@ RS_DBI_allocResultSet(SEXP conHandle)
   con->resultSets[indx] = result;
   con->resultSetIds[indx] = res_id;
 
-  return RS_DBI_asResHandle(MGR_ID(conHandle), CON_ID(conHandle), res_id,
-                            conHandle);
+  return RS_DBI_asResHandle(CON_ID(conHandle), res_id, conHandle);
 }
 
 void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
@@ -499,17 +497,17 @@ SEXP
 DBI_newResultHandle(SEXP xp, SEXP resId)
 {
     int *ids = INTEGER(R_ExternalPtrProtected(xp));
-    return RS_DBI_asResHandle(ids[0], ids[1], INTEGER(resId)[0], xp);
+    return RS_DBI_asResHandle(ids[1], INTEGER(resId)[0], xp);
 }
 
 SEXP
-RS_DBI_asResHandle(int mgrId, int conId, int resId, SEXP conxp)
+RS_DBI_asResHandle(int conId, int resId, SEXP conxp)
 {
     SEXP resHandle, s_ids, label, v;
     int *ids;
     PROTECT(s_ids = allocVector(INTSXP, 3));
     ids = INTEGER(s_ids);
-    ids[0] = mgrId;
+    ids[0] = 0;
     ids[1] = conId;
     ids[2] = resId;
     PROTECT(v = allocVector(VECSXP, 2));

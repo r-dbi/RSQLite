@@ -636,8 +636,7 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
      */
     if (con->num_res>0) {
         int res_id = con->resultSetIds[0]; /* SQLite has only 1 res */
-        rsHandle = RS_DBI_asResHandle(MGR_ID(conHandle),
-                                      CON_ID(conHandle), res_id, conHandle);
+        rsHandle = RS_DBI_asResHandle(CON_ID(conHandle), res_id, conHandle);
         res = RS_DBI_getResultSet(rsHandle);
         if (res->completed != 1) {
             free(dyn_statement);

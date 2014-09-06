@@ -1008,33 +1008,25 @@ RS_DBI_resultSetInfo(Res_Handle rsHandle)
 SEXP     /* named list */
 RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
 {
-  SEXP S_fields;
-  Sint  n = (Sint) 7;
-  Sint  lengths[7];
-  char  *desc[]={"name", "Sclass", "type", "len", "precision",
-		"scale","nullOK"};
-  Stype types[] = {STRSXP, INTSXP, INTSXP,
-		   INTSXP, INTSXP, INTSXP,
-		   LGLSXP};
-  Sint   i, j;
-  int    num_fields;
-
-  num_fields = flds->num_fields;
-  for(j = 0; j < n; j++) 
-    lengths[j] = (Sint) num_fields;
-  PROTECT(S_fields =  RS_DBI_createNamedList(desc, types, lengths, n));
-  /* copy contentes from flds into an R/S list */
-  for(i = 0; i < (Sint) num_fields; i++){
+  int n = 5;
+  char  *desc[] = {"name", "Sclass", "type", "len",  "nullOK"};
+  Stype types[] = {STRSXP, INTSXP,   INTSXP, INTSXP, LGLSXP};
+  int lengths[n];
+  int num_fields = flds->num_fields;
+  for (int j = 0; j < n; j++) 
+    lengths[j] = num_fields;
+  
+  SEXP S_fields = PROTECT(RS_DBI_createNamedList(desc, types, lengths, n));
+  for (int i = 0; i < num_fields; i++) {
     SET_LST_CHR_EL(S_fields,0,i,C_S_CPY(flds->name[i]));
     LST_INT_EL(S_fields,1,i) = (Sint) flds->Sclass[i];
     LST_INT_EL(S_fields,2,i) = (Sint) flds->type[i];
     LST_INT_EL(S_fields,3,i) = (Sint) flds->length[i];
-    LST_INT_EL(S_fields,4,i) = (Sint) flds->precision[i];
-    LST_INT_EL(S_fields,5,i) = (Sint) flds->scale[i];
-    LST_INT_EL(S_fields,6,i) = (Sint) flds->nullOk[i];
+    LST_INT_EL(S_fields,4,i) = (Sint) flds->nullOk[i];
   }
   UNPROTECT(1);
-  return(S_fields);
+  
+  return S_fields;
 }
 
 /* given a type id return its human-readable name.

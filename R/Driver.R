@@ -35,8 +35,7 @@ NULL
 #' dbDisconnect(con)
 #' @export
 setClass("SQLiteDriver", 
-  contains = "DBIDriver", 
-  slots = list(Id = "externalptr")
+  contains = "DBIDriver"
 )
 
 #' @param max.con IGNORED.  As of RSQLite 0.9.0, connections are managed
@@ -66,8 +65,8 @@ SQLite <- function(max.con = 200L, fetch.default.rec = 500,
   force <- as.logical(force.reload)
   cache <- as.logical(shared.cache)
   
-  id <- .Call(RS_SQLite_init, config.params, force, cache)
-  new("SQLiteDriver", Id = id)
+  .Call(RS_SQLite_init, config.params, force, cache)
+  new("SQLiteDriver")
 }
 
 #' Unload SQLite driver.
@@ -83,7 +82,7 @@ SQLite <- function(max.con = 200L, fetch.default.rec = 500,
 #' dbUnloadDriver(db)
 #' }
 setMethod("dbUnloadDriver", "SQLiteDriver", function(drv, ...) {
-  .Call(RS_SQLite_closeManager, drv@Id)  
+  .Call(RS_SQLite_closeManager)  
 })
 
 #' List active connections

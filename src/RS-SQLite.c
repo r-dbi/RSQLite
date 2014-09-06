@@ -43,14 +43,12 @@ void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
  * For details on SQLite see http://www.sqlite.org.
  */
 
-Mgr_Handle
-RS_SQLite_init(SEXP config_params, SEXP reload, SEXP cache)
+void RS_SQLite_init(SEXP config_params, SEXP reload, SEXP cache)
 {
     /* Currently we can specify the 2 defaults max conns and records per
      * fetch (this last one can be over-ridden explicitly in the S call to fetch).
      */
     RS_DBI_manager *mgr;
-    Mgr_Handle mgrHandle;
     int  fetch_default_rec, force_reload;
     int  *shared_cache;
     const char *drvName = "SQLite";
@@ -80,8 +78,7 @@ RS_SQLite_init(SEXP config_params, SEXP reload, SEXP cache)
        pre-set max connections.  We set this to 1 for now until more
        of the code is refactored.
      */
-    mgrHandle = RS_DBI_allocManager(drvName, 1, fetch_default_rec,
-                                    force_reload);
+    RS_DBI_allocManager(drvName, 1, fetch_default_rec, force_reload);
 
     mgr = RS_DBI_getManager();
 
@@ -97,11 +94,11 @@ RS_SQLite_init(SEXP config_params, SEXP reload, SEXP cache)
     if(*shared_cache)
         sqlite3_enable_shared_cache(1);
 
-    return mgrHandle;
+    return;
 }
 
 SEXP 
-RS_SQLite_closeManager(Mgr_Handle mgrHandle)
+RS_SQLite_closeManager()
 {
     RS_DBI_manager *mgr;
     SEXP status;
@@ -119,7 +116,7 @@ RS_SQLite_closeManager(Mgr_Handle mgrHandle)
         mgr->drvData = NULL;
     }
 
-    RS_DBI_freeManager(mgrHandle);
+    RS_DBI_freeManager();
 
     PROTECT(status = NEW_LOGICAL(1));
     LGL_EL(status,0) = TRUE;
@@ -132,7 +129,6 @@ Con_Handle
 RS_SQLite_cloneConnection(Con_Handle conHandle)
 {
     RS_DBI_connection  *con = RS_DBI_getConnection(conHandle);
-    Mgr_Handle mgrHandle = RS_DBI_asMgrHandle(MGR_ID(conHandle));
     RS_SQLite_conParams *conParams = (RS_SQLite_conParams *) con->conParams;
     SEXP dbname, allow_ext, vfs, flags;
     Con_Handle ans;
@@ -144,7 +140,7 @@ RS_SQLite_cloneConnection(Con_Handle conHandle)
     PROTECT(allow_ext = ScalarLogical(conParams->loadable_extensions));
     PROTECT(vfs = mkString(conParams->vfs));
     PROTECT(flags = ScalarInteger(conParams->flags));
-    ans = RS_SQLite_newConnection(mgrHandle, dbname, allow_ext, flags, vfs);
+    ans = RS_SQLite_newConnection(dbname, allow_ext, flags, vfs);
     UNPROTECT(4);
     return ans;
 }
@@ -219,7 +215,7 @@ RS_SQLite_freeException(RS_DBI_connection *con)
 }
 
 SEXP
-RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
+RS_SQLite_newConnection(SEXP dbfile, SEXP allow_ext,
                         SEXP s_flags, SEXP s_vfs)
 {
     RS_DBI_connection   *con;
@@ -228,9 +224,6 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
     sqlite3     *db_connection;
     const char  *dbname = NULL, *vfs = NULL;
     int         rc, loadable_extensions, open_flags = 0;
-
-    if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
-        RS_DBI_errorMessage("invalid SQLiteManager", RS_DBI_ERROR);
 
     if (TYPEOF(dbfile) != STRSXP || length(dbfile) != 1
         || STRING_ELT(dbfile, 0) == NA_STRING)
@@ -268,7 +261,7 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
     }
 
     /* SQLite connections can only have 1 result set open at a time */
-    conHandle = RS_DBI_allocConnection(mgrHandle, 1);
+    conHandle = RS_DBI_allocConnection(1);
     /* Note, while RS_DBI_getConnection can raise an error, conHandle
      * will be valid if RS_DBI_allocConnection returns without
      * error. */

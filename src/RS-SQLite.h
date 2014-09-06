@@ -77,12 +77,12 @@ int                 SQLite_decltype_to_type(const char *decltype);
  */
 
 /* dbManager */
-Mgr_Handle RS_SQLite_init(SEXP config_params, SEXP reload,
+void RS_SQLite_init(SEXP config_params, SEXP reload,
                            SEXP cache);
 SEXP RS_SQLite_close(Mgr_Handle mgrHandle);
 
 /* dbConnection */
-Con_Handle RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile,
+Con_Handle RS_SQLite_newConnection(SEXP dbfile,
                                    SEXP allow_ext, SEXP s_flags, SEXP s_vfs);
 Con_Handle RS_SQLite_cloneConnection(Con_Handle conHandle);
 SEXP RS_SQLite_closeConnection(Con_Handle conHandle);

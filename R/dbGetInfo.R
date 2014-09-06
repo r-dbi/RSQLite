@@ -25,7 +25,6 @@ NULL
 #' @export
 #' @useDynLib RSQLite driverInfo
 setMethod("dbGetInfo", "SQLiteDriver", function(dbObj, ...) {
-  check_valid(dbObj)  
   .Call(driverInfo)
 })
 

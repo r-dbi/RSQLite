@@ -173,19 +173,18 @@ typedef struct st_sdbi_manager {
  * return handles.  All DBI functions (free/get/etc) use the handle 
  * to work with the various dbObjects.
  */
-Mgr_Handle RS_DBI_allocManager(const char *drvName, int max_con, 
+void RS_DBI_allocManager(const char *drvName, int max_con, 
 				    int fetch_default_rec, 
 				    int force_realloc);
-void            RS_DBI_freeManager(Mgr_Handle mgrHandle);
+void            RS_DBI_freeManager();
 RS_DBI_manager *RS_DBI_getManager();
 Mgr_Handle RS_DBI_asMgrHandle(int pid);   
 
 /* dbConnection */
-Con_Handle RS_DBI_allocConnection(Mgr_Handle mgrHandle, 
-					  int max_res);
+Con_Handle RS_DBI_allocConnection(int max_res);
 void               RS_DBI_freeConnection(Con_Handle conHandle);
 RS_DBI_connection *RS_DBI_getConnection(Db_Handle handle);
-Con_Handle RS_DBI_asConHandle(int mgrId, int conId, RS_DBI_connection *con);
+Con_Handle RS_DBI_asConHandle(int conId, RS_DBI_connection *con);
 
 /* dbResultSet */
 Res_Handle RS_DBI_allocResultSet(Con_Handle conHandle);

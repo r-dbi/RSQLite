@@ -28,71 +28,26 @@ static int HANDLE_LENGTH(SEXP handle)
     return Rf_length(h);
 }
 
-Mgr_Handle
-RS_DBI_allocManager(const char *drvName, int max_con,
-		    int fetch_default_rec, int force_realloc)
-{
-  /* Currently, the dbManager is a singleton (therefore we don't 
-   * completly free all the space).  Here we alloc space
-   * for the dbManager and return its mgrHandle.  force_realloc
-   * means to re-allocate number of connections, etc. (in this case
-   * we require to have all connections closed).  (Note that if we
-   * re-allocate, we don't re-set the counter, and thus we make sure
-   * we don't recycle connection Ids in a giver S/R session).
-   */
-  Mgr_Handle mgrHandle;
-  RS_DBI_manager *mgr;
-  int counter;
-  int mgr_id = getpid();
-  int i;
-
-  mgrHandle = RS_DBI_asMgrHandle(mgr_id);
-
-  if(!dbManager){                      /* alloc for the first time */
-    counter = 0;                       /* connections handled so far */
-    mgr = (RS_DBI_manager*) malloc(sizeof(RS_DBI_manager));
-  }
-  else {                               /* we're re-entering */
-    if(dbManager->connections){        /* and mgr is valid */
-      if(!force_realloc)            
-	return mgrHandle;
-      else
-	RS_DBI_freeManager(mgrHandle);  /* i.e., free connection arrays*/    
-    }
-    counter = dbManager->counter;
-    mgr = dbManager;
-  }
- /* Ok, we're here to expand number of connections, etc.*/
-  if(!mgr)
+// Allocate driver singleton
+void RS_DBI_allocManager(const char *drvName, int max_con, 
+                         int fetch_default_rec, int force_realloc) {
+  
+  // Already allocated
+  if (dbManager) return;
+  
+  RS_DBI_manager *mgr = (RS_DBI_manager*) malloc(sizeof(RS_DBI_manager));
+  if (!mgr) {
     RS_DBI_errorMessage("could not malloc the dbManger", RS_DBI_ERROR);
+  }
+    
   mgr->drvName = RS_DBI_copyString(drvName);
   mgr->drvData = (void *) NULL;
-  mgr->managerId = mgr_id;
-  mgr->connections =  (RS_DBI_connection **) 
-    calloc((size_t) max_con, sizeof(RS_DBI_connection));
-  if(!mgr->connections){
-    free(mgr);
-    RS_DBI_errorMessage("could not calloc RS_DBI_connections", RS_DBI_ERROR);
-  }
-  mgr->connectionIds = (int *) calloc((size_t)max_con, sizeof(int));
-  if(!mgr->connectionIds){
-    free(mgr->connections);
-    free(mgr);
-    RS_DBI_errorMessage("could not calloc vector of connection Ids",
-          RS_DBI_ERROR);
-  }
-  mgr->counter = counter;
+  mgr->counter = 0;
   mgr->length = max_con;
   mgr->num_con = 0;
   mgr->fetch_default_rec = fetch_default_rec;
-  for(i=0; i < max_con; i++){
-    mgr->connectionIds[i] = -1;
-    mgr->connections[i] = (RS_DBI_connection *) NULL;
-  }
   
   dbManager = mgr;
-
-  return mgrHandle;
 }
 
 /* We don't want to completely free the dbManager, but rather we 
@@ -100,12 +55,8 @@ RS_DBI_allocManager(const char *drvName, int max_con,
  * re-cycle connection ids across R/S DBI sessions in the the same pid
  * (S/R session).
  */
-void
-RS_DBI_freeManager(Mgr_Handle mgrHandle)
-{
-  RS_DBI_manager *mgr;
-
-  mgr = RS_DBI_getManager();
+void RS_DBI_freeManager() {
+  RS_DBI_manager *mgr = RS_DBI_getManager();
   if(mgr->num_con > 0){    
     char *errMsg = "all opened connections were forcebly closed";
     RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
@@ -130,7 +81,7 @@ RS_DBI_freeManager(Mgr_Handle mgrHandle)
 }
 
 Con_Handle
-RS_DBI_allocConnection(Mgr_Handle mgrHandle, int max_res)
+RS_DBI_allocConnection(int max_res)
 {
   RS_DBI_manager    *mgr;
   RS_DBI_connection *con;
@@ -142,7 +93,6 @@ RS_DBI_allocConnection(Mgr_Handle mgrHandle, int max_res)
   if(!con){
     RS_DBI_errorMessage("could not malloc dbConnection", RS_DBI_ERROR);
   }
-  con->managerId = MGR_ID(mgrHandle);
   con_id = mgr->counter;
   con->connectionId = con_id;
   con->drvConnection = (void *) NULL;
@@ -175,7 +125,7 @@ RS_DBI_allocConnection(Mgr_Handle mgrHandle, int max_res)
   /* Finally, update connection table in mgr */
   mgr->num_con += 1;
   mgr->counter += 1;
-  conHandle = RS_DBI_asConHandle(MGR_ID(mgrHandle), con_id, con);
+  conHandle = RS_DBI_asConHandle(con_id, con);
   return conHandle;
 }
 
@@ -584,13 +534,13 @@ static void _finalize_con_handle(SEXP xp)
 }
 
 SEXP
-RS_DBI_asConHandle(int mgrId, int conId, RS_DBI_connection *con)
+RS_DBI_asConHandle(int conId, RS_DBI_connection *con)
 {
     SEXP conHandle, s_ids, label;
     int *ids;
     PROTECT(s_ids = allocVector(INTSXP, 2));
     ids = INTEGER(s_ids);
-    ids[0] = mgrId;
+    ids[0] = 0;
     ids[1] = conId;
     PROTECT(label = mkString("DBI CON"));
     conHandle = R_MakeExternalPtr(con, label, s_ids);
@@ -729,12 +679,10 @@ is_validHandle(SEXP handle, HANDLE_TYPE handleType)
   len = HANDLE_LENGTH(handle);
   if(len<handleType || handleType<1 || handleType>3) 
     return 0;
-  mgr_id = MGR_ID(handle);
-  if(mgr_id <= 0) return 0;
 
   /* at least we have a potential valid dbManager */
   mgr = dbManager;
-  if(!mgr || !mgr->connections)  return 0;   /* expired manager*/
+  if(!mgr) return 0;   /* expired manager*/
   if(handleType == MGR_HANDLE_TYPE) return 1;     /* valid manager id */
 
   /* ... on to connections */

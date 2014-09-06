@@ -68,7 +68,7 @@ setMethod("dbConnect", "SQLiteDriver",
     vfs <- check_vfs(vfs)
     stopifnot(is.integer(flags), length(flags) == 1)
 
-    conId <- .Call(RS_SQLite_newConnection, drv@Id, dbname, loadable.extensions, 
+    conId <- .Call(RS_SQLite_newConnection, dbname, loadable.extensions, 
       flags, vfs)
     con <- new("SQLiteConnection", Id = conId)
     

@@ -109,7 +109,7 @@ setClass("SQLiteConnection",
 #' @export
 setMethod("dbSendQuery", c("SQLiteConnection", "character"),
   function(conn, statement) {
-    sqliteExecStatement(conn, statement)
+    sqliteSendQuery(conn, statement)
   }
 )
 
@@ -119,24 +119,23 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
 setMethod("dbSendPreparedQuery", 
   c("SQLiteConnection", "character", "data.frame"),
   function(conn, statement, bind.data) {
-    sqliteExecStatement(conn, statement, bind.data)
+    sqliteSendQuery(conn, statement, bind.data)
   }
 )
 
 #' @useDynLib RSQLite RS_SQLite_exec
-sqliteExecStatement <- function(con, statement, bind.data=NULL) {
-  conId <- con@Id
-  statement <- as(statement, "character")
+sqliteSendQuery <- function(con, statement, bind.data = NULL) {
   if (!is.null(bind.data)) {
-    if (class(bind.data)[1] != "data.frame")
+    if (!is.data.frame(bind.data)) {
       bind.data <- as.data.frame(bind.data)
-    if (min(dim(bind.data)) <= 0) {
+    }
+    if (nrow(bind.data) == 0 || ncol(bind.data) == 0) {
       stop("bind.data must have non-zero dimensions")
     }
   }
-  rsId <- .Call(RS_SQLite_exec, conId, statement, bind.data)
-  out <- new("SQLiteResult", Id = rsId)
-  out
+  
+  rsId <- .Call(RS_SQLite_exec, con@Id, as.character(statement), bind.data)
+  new("SQLiteResult", Id = rsId)
 }
 
 #' @rdname dbSendQuery-SQLiteConnection-character-method
@@ -156,7 +155,7 @@ setMethod("dbGetPreparedQuery",
 )
 
 sqliteGetQuery <- function(con, statement, bind.data = NULL) {
-  rs <- sqliteExecStatement(con, statement, bind.data)
+  rs <- sqliteSendQuery(con, statement, bind.data)
   on.exit(dbClearResult(rs))
 
   if (dbHasCompleted(rs)) {

@@ -14,23 +14,10 @@ extern "C" {
  */
 
 #include "Rversion.h"
-
 #include "Rdefines.h"
 #include "S.h"
-#define singl double
 #define Sint  int
-#define charPtr SEXP *
 #define C_S_CPY(p)    COPY_TO_USER_STRING(p)    /* cpy C string to R */
-
-/* The following are macros defined in the Green Book, but missing
- * in Rdefines.h.  The semantics are as close to S4's as possible (?).
- */
-
-#define COPY(x) duplicate(x)                  
-#define COPY_ALL(x) duplicate(x)               
-#define EVAL_IN_FRAME(expr,n)  eval(expr,n)     
-#define GET_FROM_FRAME(name,n) findVar(install(name),n)
-#define ASSIGN_IN_FRAME(name,obj,n) defineVar(install(name),COPY(obj),n)
 
 /* We simplify one- and two-level access to object and list
  * (mostly built on top of jmc's macros)
@@ -73,13 +60,6 @@ extern "C" {
 
 /* x[[i]][j] -- for the case when x[[i]] is a character type */
 #define SET_LST_CHR_EL(x,i,j,val) SET_STRING_ELT(LST_EL(x,i), j, val)
-
-
-/* SET_ROWNAMES() and SET_CLASS_NAME() don't exist in S4 
- */
-#define SET_ROWNAMES(df,n)  setAttrib(df, R_RowNamesSymbol, n)
-#define GET_CLASS_NAME(x)   GET_CLASS(x)
-#define SET_CLASS_NAME(x,n) SET_CLASS(x, n)
 
 /* end of RS-DBI macros */
 

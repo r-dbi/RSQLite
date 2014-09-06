@@ -779,19 +779,19 @@ RS_SQLite_createDataMappings(Res_Handle rsHandle) {
     }
     switch(col_type) {
       case SQLITE_INTEGER:
-        flds->type[j] = SQL92_TYPE_INTEGER;
+        flds->type[j] = SQLITE_TYPE_INTEGER;
         flds->Sclass[j] = INTSXP;
         flds->length[j] = (Sint) sizeof(int);
         flds->isVarLength[j] = (Sint) 0;
         break;
       case SQLITE_FLOAT:
-        flds->type[j] = SQL92_TYPE_DOUBLE;
+        flds->type[j] = SQLITE_TYPE_REAL;
         flds->Sclass[j] = REALSXP;
         flds->length[j] = (Sint) sizeof(double);
         flds->isVarLength[j] = (Sint) 0;
         break;
      case SQLITE_TEXT:
-        flds->type[j] = SQL92_TYPE_CHAR_VAR;
+        flds->type[j] = SQLITE_TYPE_TEXT;
         flds->Sclass[j] = STRSXP;
         flds->length[j] = (Sint) -1;   /* unknown */
         flds->isVarLength[j] = (Sint) 1;
@@ -800,7 +800,7 @@ RS_SQLite_createDataMappings(Res_Handle rsHandle) {
         error("NULL column handling not implemented");
         break;
      case SQLITE_BLOB:
-        flds->type[j] = SQLns_TYPE_BLOB;
+        flds->type[j] = SQLITE_TYPE_BLOB;
         flds->Sclass[j] = VECSXP;
         flds->length[j] = (Sint) -1;   /* unknown */
         flds->isVarLength[j] = (Sint) 1;
@@ -1161,24 +1161,27 @@ RS_SQLite_resultSetInfo(Res_Handle rsHandle)
     return output;
 }
 
-SEXP 
-RS_SQLite_typeNames(SEXP typeIds)
-{
-    SEXP typeNames;
-    Sint n;
-    Sint *typeCodes;
-    int i;
-    char *s;
+char* field_type(int type) {
+  switch(type) {
+    case SQLITE_TYPE_NULL:    return "NULL";
+    case SQLITE_TYPE_INTEGER: return "INTEGER";
+    case SQLITE_TYPE_REAL:    return "REAL";
+    case SQLITE_TYPE_TEXT:    return "TEXT";
+    case SQLITE_TYPE_BLOB:    return "BLOB";
+    default:                  return "unknown";
+  }
+}
 
-    n = LENGTH(typeIds);
-    typeCodes = INTEGER_DATA(typeIds);
-    PROTECT(typeNames = NEW_CHARACTER(n));
-    for(i = 0; i < n; i++) {
-        s = RS_DBI_getTypeName(typeCodes[i], RS_SQLite_fieldTypes);
-        SET_CHR_EL(typeNames, i, mkChar(s));
-    }
-    UNPROTECT(1);
-    return typeNames;
+SEXP RS_SQLite_typeNames(SEXP typeIds) {
+  int n = LENGTH(typeIds);
+  int* typeCodes = INTEGER(typeIds);
+  SEXP typeNames = PROTECT(allocVector(STRSXP, n));
+  for(int i = 0; i < n; i++) {
+    char* s = field_type(typeCodes[i]);
+    SET_STRING_ELT(typeNames, i, mkChar(s));
+  }
+  UNPROTECT(1);
+  return typeNames;
 }
 
 SEXP     /* returns TRUE/FALSE */

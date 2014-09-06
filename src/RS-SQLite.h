@@ -132,50 +132,13 @@ char * RS_sqlite_getline(FILE *in, const char *eol);
 /* the following type names should be the  SQL-92 data types, and should
  * be moved to the RS-DBI.h
  */
-enum SQL92_field_types {
-     SQL92_TYPE_NULL,
-     SQL92_TYPE_BIT,
-     SQL92_TYPE_BIT_VAR,
-     SQL92_TYPE_CHAR,
-     SQL92_TYPE_CHAR_VAR,
-     SQL92_TYPE_NCHAR,
-     SQL92_TYPE_NCHAR_VAR,
-     SQL92_TYPE_SMALLINT,
-     SQL92_TYPE_INTEGER,
-     SQL92_TYPE_DECIMAL,
-     SQL92_TYPE_FLOAT,
-     SQL92_TYPE_REAL,
-     SQL92_TYPE_DOUBLE,
-     SQL92_TYPE_TIMESTAMP,
-     SQL92_TYPE_DATE,
-     SQL92_TYPE_TIME,
-     SQL92_TYPE_DATETIME,
-     SQLns_TYPE_BLOB
+enum SQLITE_TYPE {
+  SQLITE_TYPE_NULL,
+  SQLITE_TYPE_INTEGER,
+  SQLITE_TYPE_REAL,
+  SQLITE_TYPE_TEXT,
+  SQLITE_TYPE_BLOB
 };
-
-const struct data_types RS_SQLite_fieldTypes[] = {
-     { "SQL92_TYPE_NULL",       SQL92_TYPE_NULL     },
-     { "SQL92_TYPE_BIT",        SQL92_TYPE_BIT      },
-     { "SQL92_TYPE_BIT_VAR",    SQL92_TYPE_BIT_VAR  },
-     { "SQL92_TYPE_CHAR",       SQL92_TYPE_CHAR     },
-     { "SQL92_TYPE_CHAR_VAR",   SQL92_TYPE_CHAR_VAR },
-     { "SQL92_TYPE_NCHAR",      SQL92_TYPE_NCHAR    },
-     { "SQL92_TYPE_NCHAR_VAR",  SQL92_TYPE_NCHAR_VAR},
-     { "SQL92_TYPE_SMALLINT",   SQL92_TYPE_SMALLINT },
-     { "SQL92_TYPE_INTEGER",    SQL92_TYPE_INTEGER  },
-     { "SQL92_TYPE_DECIMAL",    SQL92_TYPE_DECIMAL  },
-     { "SQL92_TYPE_FLOAT",      SQL92_TYPE_FLOAT    },
-     { "SQL92_TYPE_REAL",       SQL92_TYPE_REAL     },
-     { "SQL92_TYPE_DOUBLE",     SQL92_TYPE_DOUBLE   },
-     { "SQL92_TYPE_TIMESTAMP",  SQL92_TYPE_TIMESTAMP},
-     { "SQL92_TYPE_DATE",       SQL92_TYPE_DATE     },
-     { "SQL92_TYPE_TIME",       SQL92_TYPE_TIME     },
-     { "SQL92_TYPE_DATETIME",   SQL92_TYPE_DATETIME },
-     { "SQLns_TYPE_DATETIME",   SQLns_TYPE_BLOB     },
-     { (char *) 0,              -1                  }
-};
-
-SEXP RS_SQLite_typeNames(SEXP typeIds);
 
 #ifdef _cplusplus
 }

@@ -1,6 +1,4 @@
-/* Convenience macros for R programming
- *
- */
+/* Convenience macros for R programming */
 
 #ifndef RHELPERS_H
 #define RHELPERS_H
@@ -9,31 +7,12 @@
 extern "C" {
 #endif
 
-/* Some of these come from MASS, some from packages developed under
- * the Omega project, and some from RS-DBI itself.
- */
-
 #include "Rversion.h"
 #include "Rdefines.h"
 #include "S.h"
 #define Sint  int
 #define C_S_CPY(p)    COPY_TO_USER_STRING(p)    /* cpy C string to R */
 
-/* We simplify one- and two-level access to object and list
- * (mostly built on top of jmc's macros)
- *
- * NOTE: Recall that list element vectors should *not* be set 
- * directly, but only thru SET_ELEMENT (Green book, Appendix A), e.g.,
- *      LIST_POINTER(x)[i] = NEW_CHARACTER(100);    BAD!!
- *      LST_EL(x,i) = NEW_CHARACTER(100);           BAD!!
- *      SET_ELEMENT(x, i, NEW_CHARACTER(100));      Okay
- *
- * It's okay to directly set the i'th element of the j'th list element:
- *      LST_CHR_EL(x,i,j) = C_S_CPY(str);           Okay (but not in R-1.2.1)
- *
- * For R >= 1.2.0 define
- *      SET_LST_CHR_EL(x,i,j,val)
- */
 
 /* x[i] */
 #define LGL_EL(x,i) LOGICAL_POINTER((x))[(i)]

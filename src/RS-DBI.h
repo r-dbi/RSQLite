@@ -142,7 +142,7 @@ SQLiteDriver* getDriver();
 Mgr_Handle RS_DBI_asMgrHandle(int pid);   
 
 /* dbConnection */
-Con_Handle RS_DBI_allocConnection(int max_res);
+Con_Handle RS_DBI_allocConnection();
 void               RS_DBI_freeConnection(Con_Handle conHandle);
 RS_DBI_connection *RS_DBI_getConnection(Db_Handle handle);
 Con_Handle RS_DBI_asConHandle(int conId, RS_DBI_connection *con);

@@ -27,12 +27,12 @@ static int HANDLE_LENGTH(SEXP handle)
 }
 
 Con_Handle
-RS_DBI_allocConnection(int max_res)
+RS_DBI_allocConnection()
 {
   SQLiteDriver    *mgr;
   RS_DBI_connection *con;
   Con_Handle conHandle;
-  int  i, con_id;
+  int con_id;
   
   mgr = getDriver();
   con = (RS_DBI_connection *) malloc(sizeof(RS_DBI_connection));
@@ -43,28 +43,26 @@ RS_DBI_allocConnection(int max_res)
   con->drvConnection = (void *) NULL;
   con->drvData = (void *) NULL;    /* to be used by the driver in any way*/
   con->counter = 0;
-  con->length = max_res;           /* length of resultSet vector */
+  con->length = 1;           /* length of resultSet vector */
   
   /* result sets for this connection */
   con->resultSets = (RS_DBI_resultSet **)
-    calloc((size_t) max_res, sizeof(RS_DBI_resultSet));
+    calloc((size_t) 1, sizeof(RS_DBI_resultSet));
   if(!con->resultSets){
     free(con);
     RS_DBI_errorMessage("could not calloc resultSets for the dbConnection",
                         RS_DBI_ERROR);
   }
   con->num_res = 0;
-  con->resultSetIds = (int *) calloc((size_t) max_res, sizeof(int));
+  con->resultSetIds = (int *) calloc((size_t) 1, sizeof(int));
   if(!con->resultSetIds) {
     free(con->resultSets);
     free(con);
     RS_DBI_errorMessage("could not calloc vector of resultSet Ids",
                         RS_DBI_ERROR);
   }
-  for(i=0; i<max_res; i++){
-    con->resultSets[i] = (RS_DBI_resultSet *) NULL;
-    con->resultSetIds[i] = -1;
-  }
+  con->resultSets[0] = (RS_DBI_resultSet *) NULL;
+  con->resultSetIds[0] = -1;
 
   /* Finally, update connection table in mgr */
   mgr->num_con += 1;

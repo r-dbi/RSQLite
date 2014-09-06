@@ -69,14 +69,6 @@ void RS_DBI_freeManager() {
     free(mgr->drvName);
     mgr->drvName = (char *) NULL;
   }
-  if(mgr->connections) {
-    free(mgr->connections);
-    mgr->connections = (RS_DBI_connection **) NULL;
-  }
-  if(mgr->connectionIds) {
-    free(mgr->connectionIds);
-    mgr->connectionIds = (int *) NULL;
-  }
   return;
 }
 
@@ -671,7 +663,7 @@ RS_DBI_freeEntry(int *table, int indx)
 int 
 is_validHandle(SEXP handle, HANDLE_TYPE handleType)
 {
-    int mgr_id, len, indx;
+    int len, indx;
     RS_DBI_manager *mgr;
     RS_DBI_connection *con;
 

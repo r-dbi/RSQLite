@@ -12,4 +12,5 @@
 \description{
 List available SQLite result sets.
 }
+\keyword{internal}
 

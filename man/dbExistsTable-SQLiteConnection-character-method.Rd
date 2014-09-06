@@ -9,7 +9,7 @@
 \arguments{
 \item{conn}{An existing \code{\linkS4class{SQLiteConnection}}}
 
-\item{name}{character vector of length 1 giving name of table}
+\item{name}{String, name of table. Match is case insensitive.}
 }
 \description{
 Does the table exist?

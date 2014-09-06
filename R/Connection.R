@@ -122,12 +122,11 @@ setMethod("dbGetException", "SQLiteConnection", function(conn) {
 #' Does the table exist?
 #' 
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
-#' @param name character vector of length 1 giving name of table
+#' @param name String, name of table. Match is case insensitive.
 #' @export
 setMethod("dbExistsTable", c("SQLiteConnection", "character"),
-  function(conn, name){
-    lst <- dbListTables(conn)
-    match(tolower(name), tolower(lst), nomatch = 0) > 0
+  function(conn, name) {
+    tolower(name) %in% tolower(dbListTables(conn))
   }
 )
 
@@ -162,7 +161,7 @@ sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL,
   names(field.types) <- dbQuoteIdentifier(con, names(field.types))
     
   flds <- paste(names(field.types), field.types)
-  paste("CREATE TABLE", name, "\n(", paste(flds, collapse=",\n\t"), "\n)")
+  paste("CREATE TABLE", name, "\n(", paste(flds, collapse = ",\n\t"), "\n)")
 }
 
 #' @export
@@ -190,6 +189,7 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
 #' 
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @export
+#' @keywords internal
 setMethod("dbListResults", "SQLiteConnection", function(conn) {
   dbGetInfo(conn)$rsId
 })

@@ -977,15 +977,16 @@ SEXP driverInfo() {
   SEXPTYPE mgrType[] = {INTSXP, INTSXP, INTSXP,
                         STRSXP, STRSXP };
   int  mgrLen[]  = {1, 1, 1, 1, 1};
-  SEXP output = PROTECT(RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, 5));
 
-  int j = 0;
-  LST_INT_EL(output,j++,0) = mgr->fetch_default_rec;
-  LST_INT_EL(output,j++,0) = mgr->num_con;
-  LST_INT_EL(output,j++,0) = mgr->counter;
-  SET_LST_CHR_EL(output,j++,0,mkChar(SQLITE_VERSION));
-  SET_LST_CHR_EL(output,j++,0,mkChar(mgr->shared_cache ? "on" : "off"));
+  int j = 0;  
+  SEXP output = PROTECT(RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, 5));
+  SET_VECTOR_ELT(output, j++, ScalarInteger(mgr->fetch_default_rec));
+  SET_VECTOR_ELT(output, j++, ScalarInteger(mgr->num_con));
+  SET_VECTOR_ELT(output, j++, ScalarInteger(mgr->counter));
+  SET_VECTOR_ELT(output, j++, mkString(SQLITE_VERSION));
+  SET_VECTOR_ELT(output, j++, ScalarLogical(mgr->shared_cache));
   UNPROTECT(1);
+  
   return output;
 }
 

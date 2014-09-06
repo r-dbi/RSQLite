@@ -24,20 +24,13 @@ setGeneric("summary")
 #' @rdname summary
 setMethod("summary", "SQLiteDriver", function(object) {
   cat("<SQLiteDriver>\n")
-  if (!isIdCurrent(object)) {
-    cat("EXPIRED\n")
-  } else {
-    info <- dbGetInfo(object)
-    cat("  Driver name:       ", info$drvName, "\n", sep = "")
-    cat("  Max connections:   ", info$length, "\n", sep = "")
-    cat("  Conn. processed:   ", info$counter, "\n", sep = "")
-    cat("  Records per fetch: ", info$fetch_default_rec, "\n", sep = "")
-    cat("  SQLite version:    ", info$clientVersion, "\n", sep = "")
-    cat("  DBI version:       ", as.character(packageVersion("DBI")), "\n", sep = "")
-    cat("  Open connections:  ", info$num_con, "\n", sep = "")
-    cat("  Shared Cache:      ", info$shared_cache, "\n", sep = "")
-  }
-  
+  info <- dbGetInfo(object)
+  cat("  Records per fetch: ", info$fetch_default_rec, "\n", sep = "")
+  cat("  SQLite version:    ", info$clientVersion, "\n", sep = "")
+  cat("  DBI version:       ", as.character(packageVersion("DBI")), "\n", sep = "")
+  cat("  Open connections:  ", info$num_con, "\n", sep = "")
+  cat("  Conn. processed:   ", info$counter, "\n", sep = "")
+  cat("  Shared cache:      ", info$shared_cache, "\n", sep = "")
   invisible(NULL)
 })
 

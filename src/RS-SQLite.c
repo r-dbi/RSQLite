@@ -972,12 +972,12 @@ RS_SQLite_closeResultSet(SEXP resHandle)
 SEXP driverInfo() {
   SQLiteDriver* mgr = getDriver();
    
-  char *mgrDesc[] = {"fetch_default_rec", "num_con",
+  char *mgrDesc[] = {"fetch_default_rec", "num_con", 
                      "counter",   "clientVersion", "shared_cache"};
   SEXPTYPE mgrType[] = {INTSXP, INTSXP, INTSXP,
                         STRSXP, STRSXP };
   int  mgrLen[]  = {1, 1, 1, 1, 1};
-  SEXP output = PROTECT(RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, 6));
+  SEXP output = PROTECT(RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, 5));
 
   int j = 0;
   LST_INT_EL(output,j++,0) = mgr->fetch_default_rec;

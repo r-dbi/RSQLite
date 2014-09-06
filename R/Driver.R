@@ -41,9 +41,6 @@ setClass("SQLiteDriver",
 #' @param fetch.default.rec default number of records to fetch at one time from
 #'   the database.  The \code{fetch} method will use this number as a default,
 #'   but individual calls can override it.
-#' @param force.reload should the package code be reloaded (reinitialized)?
-#'   Setting this to \code{TRUE} allows you to change default settings.  Notice
-#'   that all connections should be closed before re-loading.
 #' @param shared.cache logical describing whether shared-cache mode should be
 #'   enabled on the SQLite driver. The default is \code{FALSE}.
 #' @param max.con,force.reload Ignored and deprecated.

@@ -15,10 +15,6 @@ SQLite(max.con = 200L, fetch.default.rec = 500, force.reload = FALSE,
 the database.  The \code{fetch} method will use this number as a default,
 but individual calls can override it.}
 
-\item{force.reload}{should the package code be reloaded (reinitialized)?
-Setting this to \code{TRUE} allows you to change default settings.  Notice
-that all connections should be closed before re-loading.}
-
 \item{shared.cache}{logical describing whether shared-cache mode should be
 enabled on the SQLite driver. The default is \code{FALSE}.}
 }

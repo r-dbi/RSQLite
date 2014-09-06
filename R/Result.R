@@ -130,7 +130,7 @@ setMethod("dbHasCompleted", "SQLiteResult", function(res, ...) {
   out <- dbGetInfo(res)$completed
   if(out < 0) NA else out == 1L
 })
-#' @rdname dbGetInfo
+#' @rdname sqlite-meta
 #' @export
 setMethod("dbGetStatement", "SQLiteResult", function(res, ...) {
   dbGetInfo(res)$statement

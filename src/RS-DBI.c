@@ -553,40 +553,6 @@ RS_DBI_copyString(const char *str)
   return strcpy(buffer, str);
 }
 
-/* wrapper to strncpy, plus (optionally) deleting trailing spaces */
-char *
-RS_DBI_nCopyString(const char *str, size_t len, int del_blanks)
-{
-  char *str_buffer, *end;
-  
-  str_buffer = (char *) malloc(len+1);
-  if(!str_buffer){
-    char errMsg[128];
-    (void) sprintf(errMsg, 
-		   "could not malloc %ld bytes in RS_DBI_nCopyString",
-		   (long) len+1);
-    RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
-  }
-  if(len==0){
-    *str_buffer = '\0';
-    return str_buffer;
-  }
-
-  (void) strncpy(str_buffer, str, len);
-
-  /* null terminate string whether we delete trailing blanks or not*/
-  if(del_blanks){
-    for(end = str_buffer+len-1; end>=str_buffer; end--)
-      if(*end != ' ') { end++; break; }
-    *end = '\0';
-  }
-  else { 
-    end = str_buffer + len;
-    *end = '\0';
-  }
-  return str_buffer;
-}
-
 SEXP 
 RS_DBI_copyfields(RS_DBI_fields *flds)
 {

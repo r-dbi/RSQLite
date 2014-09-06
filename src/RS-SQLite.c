@@ -27,21 +27,6 @@ int RS_sqlite_import(sqlite3 *db, const char *zTable,
 
 void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
 
-/* R and S Database Interface to the SQLite embedded SQL engine
- *
- * C Function library which can be used to run SQL queries from
- * inside of Splus5.x, or R.
- * This driver hooks R/S and SQLite and implements the proposed S-DBI
- * generic R/S-database interface 0.2.
- *
- * We need to simulate (fake) exception objects. We do this piggy-
- * backing on the member "drvData" of the RS_DBI_connection structure.
- * The exception is a 2-member struct with errorNum and erroMsg
- * (this should be extended to allow multiple errors in the structure,
- * like in the ODBC API.)
- *
- * For details on SQLite see http://www.sqlite.org.
- */
 
 // Driver ----------------------------------------------------------------------
 

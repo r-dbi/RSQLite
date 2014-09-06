@@ -40,7 +40,6 @@ void RS_DBI_allocManager(const char *drvName, int max_con,
     RS_DBI_errorMessage("could not malloc the dbManger", RS_DBI_ERROR);
   }
     
-  mgr->drvName = RS_DBI_copyString(drvName);
   mgr->drvData = (void *) NULL;
   mgr->counter = 0;
   mgr->length = max_con;
@@ -64,10 +63,6 @@ void RS_DBI_freeManager() {
   if(mgr->drvData){
     char *errMsg = "mgr->drvData was not freed (some memory leaked)";
     RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
-  }
-  if(mgr->drvName){
-    free(mgr->drvName);
-    mgr->drvName = (char *) NULL;
   }
   return;
 }

@@ -29,18 +29,14 @@ static int HANDLE_LENGTH(SEXP handle)
 }
 
 // Allocate driver singleton
-void RS_DBI_allocManager(const char *drvName, int max_con, 
-                         int fetch_default_rec, int force_realloc) {
-  
-  // Already allocated
-  if (dbManager) return;
+void RS_DBI_allocManager(int fetch_default_rec) {
+  if (dbManager) return; // Already allocated
   
   RS_DBI_manager *mgr = (RS_DBI_manager*) malloc(sizeof(RS_DBI_manager));
   if (!mgr) {
     RS_DBI_errorMessage("could not malloc the dbManger", RS_DBI_ERROR);
   }
     
-  mgr->drvData = (void *) NULL;
   mgr->counter = 0;
   mgr->num_con = 0;
   mgr->fetch_default_rec = fetch_default_rec;
@@ -57,10 +53,6 @@ void RS_DBI_freeManager() {
   RS_DBI_manager *mgr = RS_DBI_getManager();
   if(mgr->num_con > 0){    
     char *errMsg = "all opened connections were forcebly closed";
-    RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
-  }
-  if(mgr->drvData){
-    char *errMsg = "mgr->drvData was not freed (some memory leaked)";
     RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
   }
   return;

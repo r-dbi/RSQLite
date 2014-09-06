@@ -38,9 +38,6 @@ setClass("SQLiteDriver",
   contains = "DBIDriver"
 )
 
-#' @param max.con IGNORED.  As of RSQLite 0.9.0, connections are managed
-#'   dynamically and there is no predefined limit to the number of connections
-#'   you can have in a given R session.
 #' @param fetch.default.rec default number of records to fetch at one time from
 #'   the database.  The \code{fetch} method will use this number as a default,
 #'   but individual calls can override it.
@@ -49,6 +46,7 @@ setClass("SQLiteDriver",
 #'   that all connections should be closed before re-loading.
 #' @param shared.cache logical describing whether shared-cache mode should be
 #'   enabled on the SQLite driver. The default is \code{FALSE}.
+#' @param max.con,force.reload Ignored and deprecated.
 #' @return An object of class \code{SQLiteDriver} which extends \code{dbDriver}
 #'   and \code{dbObjectId}. This object is needed to create connections to the
 #'   embedded SQLite database. There can be many SQLite database instances
@@ -61,11 +59,13 @@ setClass("SQLiteDriver",
 SQLite <- function(max.con = 200L, fetch.default.rec = 500, 
                    force.reload = FALSE, shared.cache = FALSE) {
 
-  config.params <- as.integer(c(max.con, fetch.default.rec))
-  force <- as.logical(force.reload)
+  if (!missing(max.con)) warning("max.con is ignored", call. = FALSE)
+  if (!missing(force.reload)) warning("force.reload is ignored", call. = FALSE)
+  
+  records <- as.integer(fetch.default.rec)
   cache <- as.logical(shared.cache)
   
-  .Call(RS_SQLite_init, config.params, force, cache)
+  .Call(RS_SQLite_init, records, cache)
   new("SQLiteDriver")
 }
 

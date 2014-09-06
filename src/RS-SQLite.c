@@ -20,7 +20,7 @@
 #include "param_binding.h"
 
 /* size_t getline(char**, size_t*, FILE*); */
-char *compiledVarsion = SQLITE_VERSION;
+char *compiledVersion = SQLITE_VERSION;
 
 int RS_sqlite_import(sqlite3 *db, const char *zTable,
                      const char *zFile, const char *separator, const char *eol, int skip);
@@ -43,78 +43,48 @@ void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
  * For details on SQLite see http://www.sqlite.org.
  */
 
-void RS_SQLite_init(SEXP config_params, SEXP reload, SEXP cache)
-{
-    /* Currently we can specify the 2 defaults max conns and records per
-     * fetch (this last one can be over-ridden explicitly in the S call to fetch).
-     */
-    RS_DBI_manager *mgr;
-    int  fetch_default_rec, force_reload;
-    int  *shared_cache;
-    const char *drvName = "SQLite";
-    const char *clientVersion = sqlite3_libversion();
+/* Currently we can specify the 2 defaults max conns and records per
+ * fetch (this last one can be over-ridden explicitly in the S call to fetch).
+ */
+void RS_SQLite_init(SEXP records_, SEXP cache_) {
+  const char *clientVersion = sqlite3_libversion();
+  if (strcmp(clientVersion, compiledVersion)) {
+    char  buf[256];
+    sprintf(buf, 
+      "SQLite mismatch between compiled version %s and runtime version %s",
+      compiledVersion, clientVersion
+    );
+    RS_DBI_errorMessage(buf, RS_DBI_WARNING);
+  }
+  
+  int records = asInteger(records_);
+  RS_DBI_allocManager(records);      
 
-    /* make sure we're running with the "right" version of the SQLite library */
-    if(strcmp(clientVersion, compiledVarsion)){
-        char  buf[256];
-        (void) sprintf(buf,
-                       "%s mismatch between compiled version %s and runtime version %s",
-                       drvName, compiledVarsion, clientVersion);
-        RS_DBI_errorMessage(buf, RS_DBI_WARNING);
-    }
-    if(GET_LENGTH(config_params)!=2){
-        RS_DBI_errorMessage(
-            "initialization error: must specify max num of conenctions and default number of rows per fetch",
-            RS_DBI_ERROR);
-    }
-    /* max_con is now IGNORED as connections are not tracked by the
-     * manager; instead they are held in external pointers with
-     * finalizers. */
-    /* max_con = INT_EL(config_params, 0); */
-    fetch_default_rec = INT_EL(config_params,1);
-    force_reload = LGL_EL(reload,0);
+  // This belongs in RS_DBI_allocManager but currently that lives in RS-DBI
+  // which doesn't have access to SQLite API
+  RS_DBI_manager *mgr = RS_DBI_getManager();
+  int cache = asLogical(cache_);
+  mgr->shared_cache = cache;
+  if (cache) {
+    sqlite3_enable_shared_cache(1);
+  }
+  
 
-    /* The manager does not keep track of connections, so there is no
-       pre-set max connections.  We set this to 1 for now until more
-       of the code is refactored.
-     */
-    RS_DBI_allocManager(drvName, 1, fetch_default_rec, force_reload);
 
-    mgr = RS_DBI_getManager();
-
-    shared_cache = (int *)malloc(sizeof(int));
-    if(!shared_cache){
-        RS_DBI_errorMessage(
-            "could not malloc space for driver data", RS_DBI_ERROR);
-    }
-
-    *shared_cache = LGL_EL(cache,0);
-    mgr->drvData = (void *)shared_cache;
-
-    if(*shared_cache)
-        sqlite3_enable_shared_cache(1);
-
-    return;
+  return;
 }
 
 SEXP 
 RS_SQLite_closeManager()
 {
-    RS_DBI_manager *mgr;
     SEXP status;
-    int *shared_cache;
 
-    mgr = RS_DBI_getManager();
+    RS_DBI_manager *mgr = RS_DBI_getManager();
     if(mgr->num_con)
         RS_DBI_errorMessage("there are opened connections -- close them first",
                             RS_DBI_ERROR);
 
     sqlite3_enable_shared_cache(0);
-    shared_cache = (int *)mgr->drvData;
-    if(shared_cache){
-        free(shared_cache);
-        mgr->drvData = NULL;
-    }
 
     RS_DBI_freeManager();
 
@@ -1030,7 +1000,7 @@ RS_SQLite_closeResultSet(SEXP resHandle)
 
 SEXP driverInfo() {
   RS_DBI_manager* mgr = RS_DBI_getManager();
-  
+   
   char *mgrDesc[] = {"fetch_default_rec", "num_con",
                      "counter",   "clientVersion", "shared_cache"};
   SEXPTYPE mgrType[] = {INTSXP, INTSXP, INTSXP,
@@ -1043,7 +1013,7 @@ SEXP driverInfo() {
   LST_INT_EL(output,j++,0) = mgr->num_con;
   LST_INT_EL(output,j++,0) = mgr->counter;
   SET_LST_CHR_EL(output,j++,0,mkChar(SQLITE_VERSION));
-  SET_LST_CHR_EL(output,j++,0,mkChar(mgr->drvData ? "on" : "off"));
+  SET_LST_CHR_EL(output,j++,0,mkChar(mgr->shared_cache ? "on" : "off"));
   UNPROTECT(1);
   return output;
 }

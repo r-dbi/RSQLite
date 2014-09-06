@@ -77,8 +77,7 @@ int                 SQLite_decltype_to_type(const char *decltype);
  */
 
 /* dbManager */
-void RS_SQLite_init(SEXP config_params, SEXP reload,
-                           SEXP cache);
+void RS_SQLite_init(SEXP records_, SEXP cache_);
 SEXP RS_SQLite_close(Mgr_Handle mgrHandle);
 
 /* dbConnection */

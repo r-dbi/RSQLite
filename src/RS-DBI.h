@@ -154,7 +154,7 @@ typedef struct st_sdbi_connection {
 
 /* dbManager */
 typedef struct st_sdbi_manager {
-  void *drvData;                    /* to be used by the drv implementation*/
+  int shared_cache;                /* use SQLite shared cache? */
   int num_con;                     /* num of opened connections */
   int counter;                     /* num of connections handled so far*/
   int fetch_default_rec;           /* default num of records per fetch */
@@ -168,9 +168,7 @@ typedef struct st_sdbi_manager {
  * return handles.  All DBI functions (free/get/etc) use the handle 
  * to work with the various dbObjects.
  */
-void RS_DBI_allocManager(const char *drvName, int max_con, 
-				    int fetch_default_rec, 
-				    int force_realloc);
+void RS_DBI_allocManager(int fetch_default_rec);
 void            RS_DBI_freeManager();
 RS_DBI_manager *RS_DBI_getManager();
 Mgr_Handle RS_DBI_asMgrHandle(int pid);   

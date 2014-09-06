@@ -173,9 +173,7 @@ SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
   return conHandle;
 }
 
-SEXP 
-RS_SQLite_closeConnection(Con_Handle conHandle)
-{
+SEXP RS_SQLite_closeConnection(Con_Handle conHandle) {
     RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
     sqlite3 *db_connection;
     int      rc;

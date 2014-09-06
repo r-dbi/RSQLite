@@ -40,7 +40,6 @@ RS_DBI_allocConnection(int max_res)
     RS_DBI_errorMessage("could not malloc dbConnection", RS_DBI_ERROR);
   }
   con_id = mgr->counter;
-  con->connectionId = con_id;
   con->drvConnection = (void *) NULL;
   con->drvData = (void *) NULL;    /* to be used by the driver in any way*/
   con->counter = 0;
@@ -145,7 +144,6 @@ RS_DBI_allocResultSet(SEXP conHandle)
   result->drvResultSet = (void *) NULL; /* driver's own resultSet (cursor)*/
   result->drvData = (void *) NULL;   /* this can be used by driver*/
   result->statement = (char *) NULL;
-  result->connectionId = CON_ID(conHandle);
   result->resultSetId = con->counter;
   result->isSelect = -1;
   result->rowsAffected = -1;

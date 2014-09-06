@@ -81,14 +81,3 @@ SQLite <- function(max.con = 200L, fetch.default.rec = 500,
 setMethod("dbUnloadDriver", "SQLiteDriver", function(drv, ...) {
   .Call(closeDriver)  
 })
-
-#' List active connections
-#' 
-#' @param drv An object of class \code{\linkS4class{SQLiteDriver}}
-#' @param ... Ignored. Needed for compatibility with generic.
-#' @export
-setMethod("dbListConnections", "SQLiteDriver", function(drv, ...) {
-  cons <- dbGetInfo(drv)$connectionIds[[1]]
-  if(!is.null(cons)) cons else list()
-})
-

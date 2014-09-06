@@ -100,7 +100,6 @@ typedef struct st_sdbi_exception {
 typedef struct st_sdbi_resultset {
   void  *drvResultSet;   /* the actual (driver's) cursor/result set */
   void  *drvData;        /* a pointer to driver-specific data */
-  int  connectionId;    /* validating stuff coming from S */
   int  resultSetId;  
   int  isSelect;        /* boolean for testing SELECTs */
   char  *statement;      /* SQL statement */
@@ -125,7 +124,6 @@ typedef struct st_sdbi_connection {
   int   length;                     /* max num of concurrent resultSets */
   int   num_res;                    /* num of open resultSets */
   int   counter;                    /* total number of queries */
-  int   connectionId; 
   RS_DBI_exception *exception;
 } RS_DBI_connection;
 

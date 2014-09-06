@@ -356,34 +356,6 @@ RS_DBI_freeFields(RS_DBI_fields *flds)
   return;
 }
 
-/* Make a data.frame from a named list by adding row.names, and class 
- * attribute.  Use "1", "2", .. as row.names.
- * NOTE: Only tested  under R (not tested at all under S4 or Splus5+).
- */
-void
-RS_DBI_makeDataFrame(SEXP data)
-{
-   SEXP row_names, df_class_name; 
-   Sint   i, n;
-   char   buf[1024];
-   
-   PROTECT(data);
-   PROTECT(df_class_name = NEW_CHARACTER((Sint) 1));
-   SET_CHR_EL(df_class_name, 0, C_S_CPY("data.frame"));
-
-   /* row.names */
-   n = GET_LENGTH(LST_EL(data,0));            /* length(data[[1]]) */
-   PROTECT(row_names = NEW_CHARACTER(n));
-   for(i=0; i<n; i++){
-      (void) sprintf(buf, "%d", i+1);
-      SET_CHR_EL(row_names, i, C_S_CPY(buf));
-   }
-   SET_ROWNAMES(data, row_names);
-   SET_CLASS_NAME(data, df_class_name);
-   UNPROTECT(3);
-   return;
-}
-
 void
 RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
 		   Sint num_rec, Sint  expand)

@@ -231,7 +231,6 @@ void  RS_DBI_allocOutput(SEXP output,
 			RS_DBI_fields *flds,
 			Sint num_rec,
 			Sint expand);
-void RS_DBI_makeDataFrame(SEXP data);
 
 /* TODO: We need to elevate RS_DBI_errorMessage to either
  * dbManager and/or dbConnection methods.  I still need to 

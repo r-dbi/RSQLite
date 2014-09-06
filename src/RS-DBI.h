@@ -25,19 +25,6 @@ extern "C" {
 #include "Rhelpers.h"
 #include <ctype.h>
 
-#ifdef WIN64
-# include <process.h>
-# define pid_t int
-/* Microsoft Visual C++ uses int _getpid()  */
-#elif defined(WIN32)
-# include <process.h>
-# define getpid _getpid
-# define pid_t int
-#else
-# include <sys/types.h>
-# include <unistd.h>
-#endif
-
 
 /* We now define 4 important data structures:
  * SQLiteDriver, RS_DBI_connection, RS_DBI_resultSet, and

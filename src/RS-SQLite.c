@@ -45,19 +45,19 @@ void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
 
 // Driver ----------------------------------------------------------------------
 
-static RS_DBI_manager *dbManager = NULL;
+static SQLiteDriver *dbManager = NULL;
 
-RS_DBI_manager* RS_DBI_getManager() {
+SQLiteDriver* getDriver() {
   if (!dbManager) {
     RS_DBI_errorMessage(
-      "internal error in RS_DBI_getManager: corrupt dbManager handle",
+      "internal error in getDriver: corrupt dbManager handle",
       RS_DBI_ERROR
     );
   }
   return dbManager;
 }
 
-void RS_SQLite_init(SEXP records_, SEXP cache_) {
+void initDriver(SEXP records_, SEXP cache_) {
   if (dbManager) return; // Already allocated
 
   const char *clientVersion = sqlite3_libversion();
@@ -70,7 +70,7 @@ void RS_SQLite_init(SEXP records_, SEXP cache_) {
     RS_DBI_errorMessage(buf, RS_DBI_WARNING);
   }
   
-  dbManager = (RS_DBI_manager*) malloc(sizeof(RS_DBI_manager));
+  dbManager = (SQLiteDriver*) malloc(sizeof(SQLiteDriver));
   if (!dbManager) {
     RS_DBI_errorMessage("could not malloc the dbManger", RS_DBI_ERROR);
   }
@@ -89,8 +89,8 @@ void RS_SQLite_init(SEXP records_, SEXP cache_) {
   return;
 }
 
-SEXP RS_SQLite_closeManager() {
-  RS_DBI_manager *mgr = RS_DBI_getManager();
+SEXP closeDriver() {
+  SQLiteDriver *mgr = getDriver();
   if (mgr->num_con) {
     RS_DBI_errorMessage("there are opened connections -- close them first",
       RS_DBI_ERROR);    
@@ -99,6 +99,8 @@ SEXP RS_SQLite_closeManager() {
 
   return ScalarLogical(1);
 }
+
+// Connections -----------------------------------------------------------------
 
 /* open a connection with the same parameters used for in conHandle */
 Con_Handle
@@ -911,7 +913,7 @@ SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec) {
   int num_rec = INT_EL(max_rec, 0);
   int expand = (num_rec < 0);   /* dyn expand output to accommodate all rows*/
   if (expand || num_rec == 0) {
-    num_rec = RS_DBI_getManager()->fetch_default_rec;
+    num_rec = getDriver()->fetch_default_rec;
   }
 
   SEXP output = PROTECT(NEW_LIST(num_fields));
@@ -1005,7 +1007,7 @@ RS_SQLite_closeResultSet(SEXP resHandle)
 }
 
 SEXP driverInfo() {
-  RS_DBI_manager* mgr = RS_DBI_getManager();
+  SQLiteDriver* mgr = getDriver();
    
   char *mgrDesc[] = {"fetch_default_rec", "num_con",
                      "counter",   "clientVersion", "shared_cache"};

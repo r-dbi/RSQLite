@@ -29,12 +29,12 @@ static int HANDLE_LENGTH(SEXP handle)
 Con_Handle
 RS_DBI_allocConnection(int max_res)
 {
-  RS_DBI_manager    *mgr;
+  SQLiteDriver    *mgr;
   RS_DBI_connection *con;
   Con_Handle conHandle;
   int  i, con_id;
   
-  mgr = RS_DBI_getManager();
+  mgr = getDriver();
   con = (RS_DBI_connection *) malloc(sizeof(RS_DBI_connection));
   if(!con){
     RS_DBI_errorMessage("could not malloc dbConnection", RS_DBI_ERROR);
@@ -84,10 +84,10 @@ void
 RS_DBI_freeConnection(SEXP conHandle)
 {
   RS_DBI_connection *con;
-  RS_DBI_manager    *mgr;
+  SQLiteDriver    *mgr;
 
   con = RS_DBI_getConnection(conHandle);
-  mgr = RS_DBI_getManager();
+  mgr = getDriver();
 
   /* Are there open resultSets? If so, free them first */
   if(con->num_res > 0) {
@@ -608,7 +608,7 @@ int
 is_validHandle(SEXP handle, HANDLE_TYPE handleType)
 {
     int len, indx;
-    RS_DBI_manager *mgr;
+    SQLiteDriver *mgr;
     RS_DBI_connection *con;
 
   if (TYPEOF(handle) != EXTPTRSXP) return 0;
@@ -617,7 +617,7 @@ is_validHandle(SEXP handle, HANDLE_TYPE handleType)
     return 0;
 
   /* at least we have a potential valid dbManager */
-  mgr = RS_DBI_getManager();
+  mgr = getDriver();
   if(!mgr) return 0;   /* expired manager*/
   if(handleType == MGR_HANDLE_TYPE) return 1;     /* valid manager id */
 

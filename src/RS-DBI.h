@@ -40,7 +40,7 @@ extern "C" {
 
 
 /* We now define 4 important data structures:
- * RS_DBI_manager, RS_DBI_connection, RS_DBI_resultSet, and
+ * SQLiteDriver, RS_DBI_connection, RS_DBI_resultSet, and
  * RS_DBI_fields, corresponding to dbManager, dbConnection,
  * dbResultSet, and list of field descriptions.
  */
@@ -159,11 +159,11 @@ typedef struct st_sdbi_manager {
   int counter;                     /* num of connections handled so far*/
   int fetch_default_rec;           /* default num of records per fetch */
   RS_DBI_exception *exception;    
-} RS_DBI_manager;
+} SQLiteDriver;
 
 /* All RS_DBI functions and their signatures */
 
-RS_DBI_manager *RS_DBI_getManager();
+SQLiteDriver* getDriver();
 Mgr_Handle RS_DBI_asMgrHandle(int pid);   
 
 /* dbConnection */

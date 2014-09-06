@@ -54,12 +54,6 @@ typedef struct st_sqlite_err {
 
 #define RSQLITE_MSG(msg, err_type) DBI_MSG(msg, err_type, "RSQLite")
 
-RS_SQLite_conParams *RS_SQLite_allocConParams(const char *dbname,
-                                              int loadable_extensions,
-                                              int flags, const char *vfs);
-
-void                RS_SQLite_freeConParams(RS_SQLite_conParams *conParams);
-
 /* Convert declared column type string to SQLite column type.
  * For example, "varchar" => SQLITE_TEXT
  *

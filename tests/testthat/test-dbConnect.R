@@ -25,7 +25,7 @@ test_that("can get and set vfs values", {
   checkVfs <- function(v) {
     db <- dbConnect(SQLite(), vfs = v)
     on.exit(dbDisconnect(db))
-    expect_equal(v, dbGetInfo(db)$vfs)
+    expect_equal(v, db@vfs)
   }  
   for (v in allowed) checkVfs(v)
 }) 

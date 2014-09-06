@@ -70,7 +70,13 @@ setMethod("dbConnect", "SQLiteDriver",
 
     conId <- .Call(RS_SQLite_newConnection, dbname, loadable.extensions, 
       flags, vfs)
-    con <- new("SQLiteConnection", Id = conId)
+    con <- new("SQLiteConnection", 
+      Id = conId,
+      dbname = dbname,
+      loadable.extensions = loadable.extensions,
+      flags = flags,
+      vfs = vfs
+    )
     
     ## experimental PRAGMAs
     if (!is.null(cache_size)) {
@@ -88,12 +94,12 @@ setMethod("dbConnect", "SQLiteDriver",
 )
 
 check_vfs <- function(vfs) {
-  if (is.null(vfs) || vfs == "") return(NULL)
+  if (is.null(vfs) || vfs == "") return("")
   
   if (.Platform[["OS.type"]] == "windows") {
     warning("vfs customization not available on this platform.",
       " Ignoring value: vfs = ", vfs, call. = FALSE)
-    return(NULL)
+    return("")
   }
 
   match.arg(vfs, c("unix-posix", "unix-afp", "unix-flock", "unix-dotfile",
@@ -103,14 +109,12 @@ check_vfs <- function(vfs) {
 #' @export
 #' @rdname dbConnect-SQLiteDriver-method
 setMethod("dbConnect", "SQLiteConnection", function(drv){
-  info <- dbGetInfo(drv)
-  
-  if (info$dbname %in% c("", ":memory:")) {
+  if (drv@dbname %in% c("", ":memory:")) {
     stop("Can't clone a temporary database", call. = FALSE)
   }
   
-  dbConnect(SQLite(), info$dbname, vfs = info$vfs, flags = info$flags, 
-    loadable.extensions = info$loadableExtensions == "on")
+  dbConnect(SQLite(), drv@dbname, vfs = drv@vfs, flags = drv@flags, 
+    loadable.extensions = drv@loadable.extensions)
 })
 
 

@@ -43,7 +43,6 @@ RS_DBI_allocConnection(int max_res)
   con->connectionId = con_id;
   con->drvConnection = (void *) NULL;
   con->drvData = (void *) NULL;    /* to be used by the driver in any way*/
-  con->conParams = (void *) NULL;
   con->counter = 0;
   con->length = max_res;           /* length of resultSet vector */
   
@@ -101,11 +100,6 @@ RS_DBI_freeConnection(SEXP conHandle)
   if(con->drvConnection) {
     char *errMsg = 
       "internal error in RS_DBI_freeConnection: driver might have left open its connection on the server";
-    RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
-  }
-  if(con->conParams){
-    char *errMsg =
-      "internal error in RS_DBI_freeConnection: non-freed con->conParams (tiny memory leaked)";
     RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
   }
   if(con->drvData){

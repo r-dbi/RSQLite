@@ -87,38 +87,6 @@ SEXP closeDriver() {
 
 // Connections -----------------------------------------------------------------
 
-RS_SQLite_conParams *
-RS_SQLite_allocConParams(const char *dbname, int loadable_extensions,
-                         int flags, const char *vfs)
-{
-    RS_SQLite_conParams *conParams;
-
-    conParams = (RS_SQLite_conParams *) malloc(sizeof(RS_SQLite_conParams));
-    if(!conParams){
-        RS_DBI_errorMessage("could not malloc space for connection params",
-                            RS_DBI_ERROR);
-    }
-    conParams->dbname = RS_DBI_copyString(dbname);
-    if (vfs)
-        conParams->vfs = RS_DBI_copyString(vfs);
-    else
-        conParams->vfs = RS_DBI_copyString("");
-    conParams->loadable_extensions = loadable_extensions;
-    conParams->flags = flags;
-    return conParams;
-}
-
-void
-RS_SQLite_freeConParams(RS_SQLite_conParams *conParams)
-{
-    if (conParams->dbname) free(conParams->dbname);
-    if (conParams->vfs) free(conParams->vfs);
-    /* conParams->loadable_extensions is an int, thus needs no free */
-    free(conParams);
-    conParams = (RS_SQLite_conParams *)NULL;
-    return;
-}
-
 /* set exception object (allocate memory if needed) */
 void 
 RS_SQLite_setException(RS_DBI_connection *con, int err_no, const char *err_msg)
@@ -199,15 +167,9 @@ SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
     error("Could not allocate space for connection object");
   }
 
-  /* save connection parameters in the connection object */
-  RS_SQLite_conParams* conParams = RS_SQLite_allocConParams(dbname, allow_ext, 
-    flags, vfs);
-  con->conParams = (void *) conParams;
-
   con->drvConnection = (void *) db_connection;
   RS_SQLite_setException(con, SQLITE_OK, "OK");
-  
-  
+    
   return conHandle;
 }
 
@@ -244,16 +206,6 @@ RS_SQLite_closeConnection(Con_Handle conHandle)
                             RS_DBI_WARNING);
     }
 
-    /* make sure we first free the conParams and SQLite connection from
-     * the RS-RBI connection object.
-     */
-    if(con->conParams){
-        RS_SQLite_freeConParams(con->conParams);
-        /* we must set con->conParms to NULL (not just free it) to signal
-         * RS_DBI_freeConnection that it is okay to free the connection itself.
-         */
-        con->conParams = NULL;
-    }
     con->drvConnection = NULL;
     RS_SQLite_freeException(con);
     con->drvData = NULL;
@@ -976,15 +928,11 @@ SEXP driverInfo() {
 SEXP connectionInfo(Con_Handle conHandle) {
   int info_count = 6, i = 0;
   RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
-  RS_SQLite_conParams *params = (RS_SQLite_conParams *) con->conParams;
 
   SEXP info = PROTECT(allocVector(VECSXP, info_count));
   SEXP info_nms = PROTECT(allocVector(STRSXP, info_count));
   SET_NAMES(info, info_nms);
   UNPROTECT(1);
-
-  SET_STRING_ELT(info_nms, i, mkChar("dbname"));
-  SET_VECTOR_ELT(info, i++, mkString(params->dbname));
 
   SET_STRING_ELT(info_nms, i, mkChar("serverVersion"));
   SET_VECTOR_ELT(info, i++, mkString(SQLITE_VERSION));
@@ -995,16 +943,6 @@ SEXP connectionInfo(Con_Handle conHandle) {
   SET_LENGTH(rsIds, nres);
   SET_VECTOR_ELT(info, i++, rsIds);
   UNPROTECT(1);
-
-  SET_STRING_ELT(info_nms, i, mkChar("loadableExtensions"));
-  SET_VECTOR_ELT(info, i++,
-    mkString(params->loadable_extensions ? "on" : "off"));
-
-  SET_STRING_ELT(info_nms, i, mkChar("flags"));
-  SET_VECTOR_ELT(info, i++, ScalarInteger(params->flags));
-
-  SET_STRING_ELT(info_nms, i, mkChar("vfs"));
-  SET_VECTOR_ELT(info, i++, mkString(params->vfs));
 
   UNPROTECT(1);
   return info;

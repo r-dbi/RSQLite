@@ -118,7 +118,6 @@ typedef struct st_sdbi_resultset {
  */
 
 typedef struct st_sdbi_connection {
-  void  *conParams;      /* pointer to connection params (host, user, etc)*/
   void  *drvConnection;  /* pointer to the actual DBMS connection struct*/
   void  *drvData;        /* to be used at will by individual drivers */
   RS_DBI_resultSet  **resultSets;    /* vector to result set ptrs  */

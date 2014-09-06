@@ -13,7 +13,13 @@ NULL
 #' @export
 setClass("SQLiteConnection", 
   contains = "DBIConnection",
-  slots = list(Id = "externalptr")
+  slots = list(
+    Id = "externalptr",
+    dbname = "character", 
+    loadable.extensions = "logical", 
+    flags = "integer", 
+    vfs = "character"
+  )
 )
 
 

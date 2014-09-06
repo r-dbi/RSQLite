@@ -143,7 +143,7 @@ sqliteExecStatement <- function(con, statement, bind.data=NULL) {
 #' @export
 setMethod("dbGetQuery", c("SQLiteConnection", "character"),
   function(conn, statement){
-    sqliteQuickSQL(conn, statement)
+    sqliteGetQuery(conn, statement)
   },
 )
 #' @rdname dbSendQuery-SQLiteConnection-character-method
@@ -151,22 +151,23 @@ setMethod("dbGetQuery", c("SQLiteConnection", "character"),
 setMethod("dbGetPreparedQuery", 
   c("SQLiteConnection", "character", "data.frame"),
   function(conn, statement, bind.data) {
-    sqliteQuickSQL(conn, statement, bind.data)
+    sqliteGetQuery(conn, statement, bind.data)
   }
 )
 
-sqliteQuickSQL <- function(con, statement, bind.data=NULL) {
+sqliteGetQuery <- function(con, statement, bind.data = NULL) {
   rs <- sqliteExecStatement(con, statement, bind.data)
-  if(dbHasCompleted(rs)){
-    dbClearResult(rs)            ## no records to fetch, we're done
-    invisible()
-    return(NULL)
+  on.exit(dbClearResult(rs))
+
+  if (dbHasCompleted(rs)) {
+    return(invisible())
   }
+  
   res <- sqliteFetch(rs, n = -1)
-  if(dbHasCompleted(rs))
-    dbClearResult(rs)
-  else
-    warning("pending rows")
+  if (!dbHasCompleted(rs)) {
+    warning("Pending rows")
+  }
+  
   res
 }
 

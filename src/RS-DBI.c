@@ -328,7 +328,7 @@ RS_DBI_allocFields(int num_fields)
   flds->type =     (Sint *) calloc(n, sizeof(Sint));
   flds->length =   (Sint *) calloc(n, sizeof(Sint));
   flds->isVarLength = (Sint *) calloc(n, sizeof(Sint));
-  flds->Sclass =   (Stype *) calloc(n, sizeof(Stype));
+  flds->Sclass =   (SEXPTYPE *) calloc(n, sizeof(SEXPTYPE));
 
   return flds;
 }
@@ -353,7 +353,7 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
   SEXP names, s_tmp;
   Sint   j; 
   int    num_fields;
-  Stype  *fld_Sclass;
+  SEXPTYPE  *fld_Sclass;
 
   PROTECT(output);
 
@@ -488,9 +488,9 @@ RS_DBI_copyString(const char *str)
 
 
 SEXP 
-RS_DBI_createNamedList(char **names, Stype *types, Sint *lengths, Sint  n)
+RS_DBI_createNamedList(char **names, SEXPTYPE *types, Sint *lengths, Sint  n)
 {
-  SEXP output, output_names, obj = S_NULL_ENTRY;
+  SEXP output, output_names, obj = R_NilValue;
   Sint  num_elem;
   int   j;
 
@@ -512,7 +512,7 @@ RS_DBI_createNamedList(char **names, Stype *types, Sint *lengths, Sint  n)
       PROTECT(obj = NEW_CHARACTER(num_elem));
       break;
     case RAWSXP:                /* falls through */
-    case LIST_TYPE:
+    case VECSXP:
       PROTECT(obj = NEW_LIST(num_elem));
       break;
     default:
@@ -535,7 +535,7 @@ RS_DBI_SclassNames(SEXP type)
   int  i;
   char *s;
   
-  if(type==S_NULL_ENTRY)
+  if(type==R_NilValue)
      RS_DBI_errorMessage(
            "internal error in RS_DBI_SclassNames: input S types must be nonNULL",
            RS_DBI_ERROR);
@@ -761,7 +761,7 @@ RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
 {
   int n = 4;
   char  *desc[] = {"name", "Sclass", "type", "len"};
-  Stype types[] = {STRSXP, INTSXP,   INTSXP, INTSXP};
+  SEXPTYPE types[] = {STRSXP, INTSXP,   INTSXP, INTSXP};
   int lengths[n];
   int num_fields = flds->num_fields;
   for (int j = 0; j < n; j++) 

@@ -32,22 +32,6 @@ extern "C" {
 #define GET_FROM_FRAME(name,n) findVar(install(name),n)
 #define ASSIGN_IN_FRAME(name,obj,n) defineVar(install(name),COPY(obj),n)
 
-
-/* data types common to R and S4 */
-
-#define Stype          SEXPTYPE
-#define LOGICAL_TYPE	 LGLSXP
-#define INTEGER_TYPE	 INTSXP
-#define NUMERIC_TYPE	 REALSXP
-#define SINGLE_TYPE    REALSXP
-#define REAL_TYPE      REALSXP
-#define CHARACTER_TYPE STRSXP
-#define STRING_TYPE    STRSXP
-#define COMPLEX_TYPE	 CPLXSXP
-#define LIST_TYPE	     VECSXP
-
-#define S_NULL_ENTRY R_NilValue
-
 /* We simplify one- and two-level access to object and list
  * (mostly built on top of jmc's macros)
  *

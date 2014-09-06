@@ -998,7 +998,7 @@ RS_SQLite_getException(SEXP conHandle)
     RS_SQLite_exception *err;
     Sint  n = 2;
     char *exDesc[] = {"errorNum", "errorMsg"};
-    Stype exType[] = {INTSXP, STRSXP};
+    SEXPTYPE exType[] = {INTSXP, STRSXP};
     Sint  exLen[]  = {1, 1};
 
     if(!con->drvConnection)
@@ -1045,7 +1045,7 @@ RS_SQLite_managerInfo(Mgr_Handle mgrHandle)
     char *mgrDesc[] = {"drvName",   "connectionIds", "fetch_default_rec",
                        "managerId", "length",        "num_con",
                        "counter",   "clientVersion", "shared_cache"};
-    Stype mgrType[] = {STRSXP, INTSXP, INTSXP,
+    SEXPTYPE mgrType[] = {STRSXP, INTSXP, INTSXP,
                        INTSXP,   INTSXP, INTSXP,
                        INTSXP,   STRSXP, STRSXP };
     Sint  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -1138,15 +1138,15 @@ RS_SQLite_resultSetInfo(Res_Handle rsHandle)
     Sint  n = 6;
     char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
                        "rowCount", "completed", "fieldDescription"};
-    Stype rsType[]  = {STRSXP, INTSXP, INTSXP,
-                       INTSXP,   INTSXP, LIST_TYPE};
+    SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP,
+                       INTSXP,   INTSXP, VECSXP};
     Sint  rsLen[]   = {1, 1, 1, 1, 1, 1};
 
     result = RS_DBI_getResultSet(rsHandle);
     if(result->fields)
         PROTECT(flds = RS_DBI_getFieldDescriptions(result->fields));
     else
-        PROTECT(flds = S_NULL_ENTRY);
+        PROTECT(flds = R_NilValue);
 
     PROTECT(output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n));
     SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
@@ -1154,7 +1154,7 @@ RS_SQLite_resultSetInfo(Res_Handle rsHandle)
     LST_INT_EL(output,2,0) = result->rowsAffected;
     LST_INT_EL(output,3,0) = result->rowCount;
     LST_INT_EL(output,4,0) = result->completed;
-    if(flds != S_NULL_ENTRY)
+    if(flds != R_NilValue)
         SET_VECTOR_ELT(LST_EL(output, 5), (Sint) 0, flds);
 
     UNPROTECT(2);

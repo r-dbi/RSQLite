@@ -109,7 +109,7 @@ typedef struct st_sdbi_fields {
   Sint  *type;          /* DBMS internal types */
   Sint  *length;        /* DBMS lengths in bytes */
   Sint  *isVarLength;   /* DBMS variable-length char type */
-  Stype *Sclass;        /* R/S class (type) -- may be overriden */
+  SEXPTYPE *Sclass;        /* R/S class (type) -- may be overriden */
 } RS_DBI_fields;
 
 typedef struct st_sdbi_exception {
@@ -252,7 +252,7 @@ char     *RS_DBI_getTypeName(Sint typeCode, const struct data_types table[]);
 SEXP RS_DBI_SclassNames(SEXP types);  
 
 SEXP RS_DBI_createNamedList(char  **names, 
-				 Stype *types,
+				 SEXPTYPE *types,
 				 Sint  *lengths,
 				 Sint  n);
 SEXP RS_DBI_copyFields(RS_DBI_fields *flds);

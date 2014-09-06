@@ -201,7 +201,6 @@ void               RS_DBI_freeResultSet(Res_Handle rsHandle);
 void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
 RS_DBI_resultSet  *RS_DBI_getResultSet(Res_Handle rsHandle);
 Res_Handle RS_DBI_asResHandle(Sint pid, Sint conId, Sint resId, SEXP conxp);
-SEXP RS_DBI_resultSetInfo(Res_Handle rsHandle);
 
 /* utility funs */
 SEXP RS_DBI_validHandle(Db_Handle handle); /* callable from S/R */

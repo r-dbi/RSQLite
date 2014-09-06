@@ -553,30 +553,6 @@ RS_DBI_copyString(const char *str)
   return strcpy(buffer, str);
 }
 
-SEXP 
-RS_DBI_copyfields(RS_DBI_fields *flds)
-{
-  SEXP S_fields;
-  Sint  n = (Sint) 4;
-  char  *desc[] = {"name", "Sclass", "type", "len"};
-  Stype types[] = {STRSXP, INTSXP,   INTSXP, INTSXP};
-  Sint  lengths[n];
-  int   i, j, num_fields;
-
-  num_fields = flds->num_fields;
-  for(j = 0; j < n; j++) 
-    lengths[j] = (Sint) num_fields;
-  S_fields =  RS_DBI_createNamedList(desc, types, lengths, n);
-  /* copy contentes from flds into an R/S list */
-  for(i = 0; i < num_fields; i++){
-    SET_LST_CHR_EL(S_fields,0,i, C_S_CPY(flds->name[i]));
-    LST_INT_EL(S_fields,1,i) = (Sint) flds->Sclass[i];
-    LST_INT_EL(S_fields,2,i) = (Sint) flds->type[i];
-    LST_INT_EL(S_fields,3,i) = (Sint) flds->length[i];
-  }
-
-  return S_fields;
-} 
 
 SEXP 
 RS_DBI_createNamedList(char **names, Stype *types, Sint *lengths, Sint  n)
@@ -929,34 +905,6 @@ RS_DBI_connectionInfo(Con_Handle conHandle)
   return output;
 }
 
-SEXP        /* return a named list */
-RS_DBI_resultSetInfo(Res_Handle rsHandle)
-{
-  RS_DBI_resultSet       *result;
-  SEXP output, flds;
-  Sint  n = (Sint) 6;
-  char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
-		     "rowCount", "completed", "fields"};
-  Stype rsType[]  = {STRSXP, INTSXP, INTSXP,
-		     INTSXP,   INTSXP, LIST_TYPE};
-  Sint  rsLen[]   = {1, 1, 1, 1, 1, 1};
-
-  result = RS_DBI_getResultSet(rsHandle);
-  if(result->fields)
-    flds = RS_DBI_copyfields(result->fields);
-  else
-    flds = S_NULL_ENTRY;
-
-  output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
-  SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
-  LST_INT_EL(output,1,0) = result->isSelect;
-  LST_INT_EL(output,2,0) = result->rowsAffected;
-  LST_INT_EL(output,3,0) = result->rowCount;
-  LST_INT_EL(output,4,0) = result->completed;
-  SET_VECTOR_ELT(LST_EL(output, 5), (Sint) 0, flds);
-
-  return output;
-}
 
 SEXP     /* named list */
 RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)

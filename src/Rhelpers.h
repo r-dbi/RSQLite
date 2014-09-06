@@ -10,7 +10,6 @@ extern "C" {
 #include "Rversion.h"
 #include "Rdefines.h"
 #include "S.h"
-#define Sint  int
 
 /* x[i] */
 #define LGL_EL(x,i) LOGICAL_POINTER((x))[(i)]

@@ -29,8 +29,8 @@ static int HANDLE_LENGTH(SEXP handle)
 }
 
 Mgr_Handle
-RS_DBI_allocManager(const char *drvName, Sint max_con,
-		    Sint fetch_default_rec, Sint force_realloc)
+RS_DBI_allocManager(const char *drvName, int max_con,
+		    int fetch_default_rec, int force_realloc)
 {
   /* Currently, the dbManager is a singleton (therefore we don't 
    * completly free all the space).  Here we alloc space
@@ -42,8 +42,8 @@ RS_DBI_allocManager(const char *drvName, Sint max_con,
    */
   Mgr_Handle mgrHandle;
   RS_DBI_manager *mgr;
-  Sint counter;
-  Sint mgr_id = (Sint) getpid();
+  int counter;
+  int mgr_id = getpid();
   int i;
 
   mgrHandle = RS_DBI_asMgrHandle(mgr_id);
@@ -74,7 +74,7 @@ RS_DBI_allocManager(const char *drvName, Sint max_con,
     free(mgr);
     RS_DBI_errorMessage("could not calloc RS_DBI_connections", RS_DBI_ERROR);
   }
-  mgr->connectionIds = (Sint *) calloc((size_t)max_con, sizeof(Sint));
+  mgr->connectionIds = (int *) calloc((size_t)max_con, sizeof(int));
   if(!mgr->connectionIds){
     free(mgr->connections);
     free(mgr);
@@ -83,7 +83,7 @@ RS_DBI_allocManager(const char *drvName, Sint max_con,
   }
   mgr->counter = counter;
   mgr->length = max_con;
-  mgr->num_con = (Sint) 0;
+  mgr->num_con = 0;
   mgr->fetch_default_rec = fetch_default_rec;
   for(i=0; i < max_con; i++){
     mgr->connectionIds[i] = -1;
@@ -124,18 +124,18 @@ RS_DBI_freeManager(Mgr_Handle mgrHandle)
   }
   if(mgr->connectionIds) {
     free(mgr->connectionIds);
-    mgr->connectionIds = (Sint *) NULL;
+    mgr->connectionIds = (int *) NULL;
   }
   return;
 }
 
 Con_Handle
-RS_DBI_allocConnection(Mgr_Handle mgrHandle, Sint max_res)
+RS_DBI_allocConnection(Mgr_Handle mgrHandle, int max_res)
 {
   RS_DBI_manager    *mgr;
   RS_DBI_connection *con;
   Con_Handle conHandle;
-  Sint  i, con_id;
+  int  i, con_id;
   
   mgr = RS_DBI_getManager(mgrHandle);
   con = (RS_DBI_connection *) malloc(sizeof(RS_DBI_connection));
@@ -148,7 +148,7 @@ RS_DBI_allocConnection(Mgr_Handle mgrHandle, Sint max_res)
   con->drvConnection = (void *) NULL;
   con->drvData = (void *) NULL;    /* to be used by the driver in any way*/
   con->conParams = (void *) NULL;
-  con->counter = (Sint) 0;
+  con->counter = 0;
   con->length = max_res;           /* length of resultSet vector */
   
   /* result sets for this connection */
@@ -159,8 +159,8 @@ RS_DBI_allocConnection(Mgr_Handle mgrHandle, Sint max_res)
     RS_DBI_errorMessage("could not calloc resultSets for the dbConnection",
                         RS_DBI_ERROR);
   }
-  con->num_res = (Sint) 0;
-  con->resultSetIds = (Sint *) calloc((size_t) max_res, sizeof(Sint));
+  con->num_res = 0;
+  con->resultSetIds = (int *) calloc((size_t) max_res, sizeof(int));
   if(!con->resultSetIds) {
     free(con->resultSets);
     free(con);
@@ -173,8 +173,8 @@ RS_DBI_allocConnection(Mgr_Handle mgrHandle, Sint max_res)
   }
 
   /* Finally, update connection table in mgr */
-  mgr->num_con += (Sint) 1;
-  mgr->counter += (Sint) 1;
+  mgr->num_con += 1;
+  mgr->counter += 1;
   conHandle = RS_DBI_asConHandle(MGR_ID(mgrHandle), con_id, con);
   return conHandle;
 }
@@ -222,7 +222,7 @@ RS_DBI_freeConnection(SEXP conHandle)
   if(con->resultSetIds) free(con->resultSetIds);
 
   /* update the manager's connection table */
-  mgr->num_con -= (Sint) 1;
+  mgr->num_con -= 1;
 
   free(con);
   con = (RS_DBI_connection *) NULL;
@@ -234,7 +234,7 @@ RS_DBI_allocResultSet(SEXP conHandle)
 {
   RS_DBI_connection *con = NULL;
   RS_DBI_resultSet  *result = NULL;
-  Sint indx, res_id;
+  int indx, res_id;
 
   con = RS_DBI_getConnection(conHandle);
   indx = RS_DBI_newEntry(con->resultSetIds, con->length);
@@ -258,16 +258,16 @@ RS_DBI_allocResultSet(SEXP conHandle)
   result->managerId = MGR_ID(conHandle);
   result->connectionId = CON_ID(conHandle);
   result->resultSetId = con->counter;
-  result->isSelect = (Sint) -1;
-  result->rowsAffected = (Sint) -1;
-  result->rowCount = (Sint) 0;
-  result->completed = (Sint) -1;
+  result->isSelect = -1;
+  result->rowsAffected = -1;
+  result->rowCount = 0;
+  result->completed = -1;
   result->fields = (RS_DBI_fields *) NULL;
   
   /* update connection's resultSet table */
   res_id = con->counter;
-  con->num_res += (Sint) 1;
-  con->counter += (Sint) 1;
+  con->num_res += 1;
+  con->counter += 1;
   con->resultSets[indx] = result;
   con->resultSetIds[indx] = res_id;
 
@@ -325,9 +325,9 @@ RS_DBI_allocFields(int num_fields)
   n = (size_t) num_fields;
   flds->num_fields = num_fields;
   flds->name =     (char **) calloc(n, sizeof(char *));
-  flds->type =     (Sint *) calloc(n, sizeof(Sint));
-  flds->length =   (Sint *) calloc(n, sizeof(Sint));
-  flds->isVarLength = (Sint *) calloc(n, sizeof(Sint));
+  flds->type =     (int *) calloc(n, sizeof(int));
+  flds->length =   (int *) calloc(n, sizeof(int));
+  flds->isVarLength = (int *) calloc(n, sizeof(int));
   flds->Sclass =   (SEXPTYPE *) calloc(n, sizeof(SEXPTYPE));
 
   return flds;
@@ -348,10 +348,10 @@ RS_DBI_freeFields(RS_DBI_fields *flds)
 
 void
 RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
-		   Sint num_rec, Sint  expand)
+		   int num_rec, int  expand)
 {
   SEXP names, s_tmp;
-  Sint   j; 
+  int   j; 
   int    num_fields;
   SEXPTYPE  *fld_Sclass;
 
@@ -359,7 +359,7 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
 
   num_fields = flds->num_fields;
   if(expand){
-    for(j = 0; j < (Sint) num_fields; j++){
+    for(j = 0; j < num_fields; j++){
       /* Note that in R-1.2.3 (at least) we need to protect SET_LENGTH */
       s_tmp = LST_EL(output,j);
       PROTECT(SET_LENGTH(s_tmp, num_rec));  
@@ -371,7 +371,7 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
   }
 
   fld_Sclass = flds->Sclass;
-  for(j = 0; j < (Sint) num_fields; j++){
+  for(j = 0; j < num_fields; j++){
     switch((int)fld_Sclass[j]){
     case LGLSXP:    
       SET_VECTOR_ELT(output, j, NEW_LOGICAL(num_rec));
@@ -394,8 +394,8 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
     }
   }
 
-  PROTECT(names = NEW_CHARACTER((Sint) num_fields));
-  for(j = 0; j< (Sint) num_fields; j++){
+  PROTECT(names = NEW_CHARACTER(num_fields));
+  for(j = 0; j< num_fields; j++){
     SET_CHR_EL(names,j, mkChar(flds->name[j]));
   }
   SET_NAMES(output, names);
@@ -425,8 +425,8 @@ RS_DBI_validHandle(Db_Handle handle)
             break;
         }
     }
-    PROTECT(valid = NEW_LOGICAL((Sint) 1));
-    LGL_EL(valid,0) = (Sint) is_validHandle(handle, handleType);
+    PROTECT(valid = NEW_LOGICAL(1));
+    LGL_EL(valid,0) = is_validHandle(handle, handleType);
     UNPROTECT(1);
     return valid;
 }
@@ -488,10 +488,10 @@ RS_DBI_copyString(const char *str)
 
 
 SEXP 
-RS_DBI_createNamedList(char **names, SEXPTYPE *types, Sint *lengths, Sint  n)
+RS_DBI_createNamedList(char **names, SEXPTYPE *types, int *lengths, int  n)
 {
   SEXP output, output_names, obj = R_NilValue;
-  Sint  num_elem;
+  int  num_elem;
   int   j;
 
   PROTECT(output = NEW_LIST(n));
@@ -518,7 +518,7 @@ RS_DBI_createNamedList(char **names, SEXPTYPE *types, Sint *lengths, Sint  n)
     default:
       RS_DBI_errorMessage("unsupported data type", RS_DBI_ERROR);
     }
-    SET_VECTOR_ELT(output, (Sint)j, obj);
+    SET_VECTOR_ELT(output, (int)j, obj);
     SET_CHR_EL(output_names, j, mkChar(names[j]));
   }
   SET_NAMES(output, output_names);
@@ -530,8 +530,8 @@ SEXP
 RS_DBI_SclassNames(SEXP type)
 {
   SEXP typeNames;
-  Sint *typeCodes;
-  Sint n;
+  int *typeCodes;
+  int n;
   int  i;
   char *s;
   
@@ -670,12 +670,12 @@ RS_DBI_getResultSet(SEXP rsHandle)
  * themselves to give total control to the invoking functions (this 
  * simplify error management in the invoking routines.)
  */
-Sint
-RS_DBI_newEntry(Sint *table, Sint length)
+int
+RS_DBI_newEntry(int *table, int length)
 {
-  Sint i, indx, empty_val;
+  int i, indx, empty_val;
 
-  indx = empty_val = (Sint) -1;
+  indx = empty_val = -1;
   for(i = 0; i < length; i++)
     if(table[i] == empty_val){
       indx = i;
@@ -684,10 +684,10 @@ RS_DBI_newEntry(Sint *table, Sint length)
   return indx;
 }
 
-Sint
-RS_DBI_lookup(Sint *table, Sint length, Sint obj_id)
+int
+RS_DBI_lookup(int *table, int length, int obj_id)
 {
-  Sint i, indx = (Sint) -1;
+  int i, indx = -1;
   if (obj_id != -1) {
       for (i = 0; i < length; ++i) {
           if (table[i] == obj_id) {
@@ -703,8 +703,8 @@ RS_DBI_lookup(Sint *table, Sint length, Sint obj_id)
  * but the caller should free() it).  The function returns the number
  * of entries.
  */
-Sint 
-RS_DBI_listEntries(Sint *table, Sint length, Sint *entries)
+int 
+RS_DBI_listEntries(int *table, int length, int *entries)
 {
   int i,n;
 
@@ -716,9 +716,9 @@ RS_DBI_listEntries(Sint *table, Sint length, Sint *entries)
 }
 
 void 
-RS_DBI_freeEntry(Sint *table, Sint indx)
+RS_DBI_freeEntry(int *table, int indx)
 { /* no error checking!!! */
-  Sint empty_val = (Sint) -1;
+  int empty_val = -1;
   table[indx] = empty_val;
   return;
 }
@@ -770,9 +770,9 @@ RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
   SEXP S_fields = PROTECT(RS_DBI_createNamedList(desc, types, lengths, n));
   for (int i = 0; i < num_fields; i++) {
     SET_LST_CHR_EL(S_fields,0,i,mkChar(flds->name[i]));
-    LST_INT_EL(S_fields,1,i) = (Sint) flds->Sclass[i];
-    LST_INT_EL(S_fields,2,i) = (Sint) flds->type[i];
-    LST_INT_EL(S_fields,3,i) = (Sint) flds->length[i];
+    LST_INT_EL(S_fields,1,i) = flds->Sclass[i];
+    LST_INT_EL(S_fields,2,i) = flds->type[i];
+    LST_INT_EL(S_fields,3,i) = flds->length[i];
   }
   UNPROTECT(1);
   
@@ -782,7 +782,7 @@ RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
 /* given a type id return its human-readable name.
  * We define an RS_DBI_dataTypeTable */
 char *
-RS_DBI_getTypeName(Sint t, const struct data_types table[])
+RS_DBI_getTypeName(int t, const struct data_types table[])
 {
   int i;
   char buf[128];

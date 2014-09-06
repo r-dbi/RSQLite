@@ -18,11 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* The following include file defines a number of C macros that hide
- * differences between R and S (e.g., the macro for type "Sint" expand
- * to "long" in the case of S and to int in the case of R, etc.)
- */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -106,9 +101,9 @@ static int CON_ID(SEXP handle)
 typedef struct st_sdbi_fields {
   int num_fields;
   char  **name;         /* DBMS field names */
-  Sint  *type;          /* DBMS internal types */
-  Sint  *length;        /* DBMS lengths in bytes */
-  Sint  *isVarLength;   /* DBMS variable-length char type */
+  int  *type;          /* DBMS internal types */
+  int  *length;        /* DBMS lengths in bytes */
+  int  *isVarLength;   /* DBMS variable-length char type */
   SEXPTYPE *Sclass;        /* R/S class (type) -- may be overriden */
 } RS_DBI_fields;
 
@@ -125,14 +120,14 @@ typedef struct st_sdbi_exception {
 typedef struct st_sdbi_resultset {
   void  *drvResultSet;   /* the actual (driver's) cursor/result set */
   void  *drvData;        /* a pointer to driver-specific data */
-  Sint  managerId;       /* the 3 *Id's are used for   */
-  Sint  connectionId;    /* validating stuff coming from S */
-  Sint  resultSetId;  
-  Sint  isSelect;        /* boolean for testing SELECTs */
+  int  managerId;       /* the 3 *Id's are used for   */
+  int  connectionId;    /* validating stuff coming from S */
+  int  resultSetId;  
+  int  isSelect;        /* boolean for testing SELECTs */
   char  *statement;      /* SQL statement */
-  Sint  rowsAffected;    /* used by non-SELECT statements */
-  Sint  rowCount;        /* rows fetched so far (SELECT-types)*/
-  Sint  completed;       /* have we fetched all rows? */
+  int  rowsAffected;    /* used by non-SELECT statements */
+  int  rowCount;        /* rows fetched so far (SELECT-types)*/
+  int  completed;       /* have we fetched all rows? */
   RS_DBI_fields *fields;
 } RS_DBI_resultSet;
 
@@ -148,12 +143,12 @@ typedef struct st_sdbi_connection {
   void  *drvConnection;  /* pointer to the actual DBMS connection struct*/
   void  *drvData;        /* to be used at will by individual drivers */
   RS_DBI_resultSet  **resultSets;    /* vector to result set ptrs  */
-  Sint   *resultSetIds;
-  Sint   length;                     /* max num of concurrent resultSets */
-  Sint   num_res;                    /* num of open resultSets */
-  Sint   counter;                    /* total number of queries */
-  Sint   managerId;
-  Sint   connectionId; 
+  int   *resultSetIds;
+  int   length;                     /* max num of concurrent resultSets */
+  int   num_res;                    /* num of open resultSets */
+  int   counter;                    /* total number of queries */
+  int   managerId;
+  int   connectionId; 
   RS_DBI_exception *exception;
 } RS_DBI_connection;
 
@@ -162,12 +157,12 @@ typedef struct st_sdbi_manager {
   char *drvName;                    /* what driver are we implementing?*/
   void *drvData;                    /* to be used by the drv implementation*/
   RS_DBI_connection **connections;  /* list of dbConnections */
-  Sint *connectionIds;              /* array of connectionIds */
-  Sint length;                      /* max num of concurrent connections */
-  Sint num_con;                     /* num of opened connections */
-  Sint counter;                     /* num of connections handled so far*/
-  Sint fetch_default_rec;           /* default num of records per fetch */
-  Sint managerId;                   /* typically, process id */
+  int *connectionIds;              /* array of connectionIds */
+  int length;                      /* max num of concurrent connections */
+  int num_con;                     /* num of opened connections */
+  int counter;                     /* num of connections handled so far*/
+  int fetch_default_rec;           /* default num of records per fetch */
+  int managerId;                   /* typically, process id */
   RS_DBI_exception *exception;    
 } RS_DBI_manager;
 
@@ -178,26 +173,26 @@ typedef struct st_sdbi_manager {
  * return handles.  All DBI functions (free/get/etc) use the handle 
  * to work with the various dbObjects.
  */
-Mgr_Handle RS_DBI_allocManager(const char *drvName, Sint max_con, 
-				    Sint fetch_default_rec, 
-				    Sint force_realloc);
+Mgr_Handle RS_DBI_allocManager(const char *drvName, int max_con, 
+				    int fetch_default_rec, 
+				    int force_realloc);
 void            RS_DBI_freeManager(Mgr_Handle mgrHandle);
 RS_DBI_manager *RS_DBI_getManager(Db_Handle handle);
-Mgr_Handle RS_DBI_asMgrHandle(Sint pid);   
+Mgr_Handle RS_DBI_asMgrHandle(int pid);   
 
 /* dbConnection */
 Con_Handle RS_DBI_allocConnection(Mgr_Handle mgrHandle, 
-					  Sint max_res);
+					  int max_res);
 void               RS_DBI_freeConnection(Con_Handle conHandle);
 RS_DBI_connection *RS_DBI_getConnection(Db_Handle handle);
-Con_Handle RS_DBI_asConHandle(Sint mgrId, Sint conId, RS_DBI_connection *con);
+Con_Handle RS_DBI_asConHandle(int mgrId, int conId, RS_DBI_connection *con);
 
 /* dbResultSet */
 Res_Handle RS_DBI_allocResultSet(Con_Handle conHandle);
 void               RS_DBI_freeResultSet(Res_Handle rsHandle);
 void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
 RS_DBI_resultSet  *RS_DBI_getResultSet(Res_Handle rsHandle);
-Res_Handle RS_DBI_asResHandle(Sint pid, Sint conId, Sint resId, SEXP conxp);
+Res_Handle RS_DBI_asResHandle(int pid, int conId, int resId, SEXP conxp);
 
 /* utility funs */
 SEXP RS_DBI_validHandle(Db_Handle handle); /* callable from S/R */
@@ -212,10 +207,10 @@ int       is_validHandle(Db_Handle handle, HANDLE_TYPE handleType);
  * connection object;  of course, this is transparent to the various
  * drivers -- they should deal with handles exclusively.
  */
-Sint  RS_DBI_newEntry(Sint *table, Sint length);
-Sint  RS_DBI_lookup(Sint *table, Sint length, Sint obj_id);
-Sint  RS_DBI_listEntries(Sint *table, Sint length, Sint *entries);
-void  RS_DBI_freeEntry(Sint *table, Sint indx);
+int  RS_DBI_newEntry(int *table, int length);
+int  RS_DBI_lookup(int *table, int length, int obj_id);
+int  RS_DBI_listEntries(int *table, int length, int *entries);
+void  RS_DBI_freeEntry(int *table, int indx);
 
 /* description of the fields in a result set */
 RS_DBI_fields *RS_DBI_allocFields(int num_fields);
@@ -228,8 +223,8 @@ void           RS_DBI_freeFields(RS_DBI_fields *flds);
  */
 void  RS_DBI_allocOutput(SEXP output, 
 			RS_DBI_fields *flds,
-			Sint num_rec,
-			Sint expand);
+			int num_rec,
+			int expand);
 
 void  RS_DBI_errorMessage(const char *msg, DBI_EXCEPTION exceptionType);
 void DBI_MSG(char *msg, DBI_EXCEPTION exception_type, char *driver);
@@ -243,18 +238,18 @@ char     *RS_DBI_copyString(const char *str);
  */
 struct data_types {
     char *typeName;
-    Sint typeId;
+    int typeId;
 };
 
 /* return the primitive type name for a primitive type id */
-char     *RS_DBI_getTypeName(Sint typeCode, const struct data_types table[]);
+char     *RS_DBI_getTypeName(int typeCode, const struct data_types table[]);
 /* same, but callable from S/R and vectorized */
 SEXP RS_DBI_SclassNames(SEXP types);  
 
 SEXP RS_DBI_createNamedList(char  **names, 
 				 SEXPTYPE *types,
-				 Sint  *lengths,
-				 Sint  n);
+				 int  *lengths,
+				 int  n);
 SEXP RS_DBI_copyFields(RS_DBI_fields *flds);
 
 extern const struct data_types RS_dataTypeTable[];

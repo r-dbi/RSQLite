@@ -51,8 +51,8 @@ RS_SQLite_init(SEXP config_params, SEXP reload, SEXP cache)
      */
     RS_DBI_manager *mgr;
     Mgr_Handle mgrHandle;
-    Sint  fetch_default_rec, force_reload;
-    Sint  *shared_cache;
+    int  fetch_default_rec, force_reload;
+    int  *shared_cache;
     const char *drvName = "SQLite";
     const char *clientVersion = sqlite3_libversion();
 
@@ -85,7 +85,7 @@ RS_SQLite_init(SEXP config_params, SEXP reload, SEXP cache)
 
     mgr = RS_DBI_getManager(mgrHandle);
 
-    shared_cache = (Sint *)malloc(sizeof(Sint));
+    shared_cache = (int *)malloc(sizeof(int));
     if(!shared_cache){
         RS_DBI_errorMessage(
             "could not malloc space for driver data", RS_DBI_ERROR);
@@ -105,7 +105,7 @@ RS_SQLite_closeManager(Mgr_Handle mgrHandle)
 {
     RS_DBI_manager *mgr;
     SEXP status;
-    Sint *shared_cache;
+    int *shared_cache;
 
     mgr = RS_DBI_getManager(mgrHandle);
     if(mgr->num_con)
@@ -113,7 +113,7 @@ RS_SQLite_closeManager(Mgr_Handle mgrHandle)
                             RS_DBI_ERROR);
 
     sqlite3_enable_shared_cache(0);
-    shared_cache = (Sint *)mgr->drvData;
+    shared_cache = (int *)mgr->drvData;
     if(shared_cache){
         free(shared_cache);
         mgr->drvData = NULL;
@@ -121,7 +121,7 @@ RS_SQLite_closeManager(Mgr_Handle mgrHandle)
 
     RS_DBI_freeManager(mgrHandle);
 
-    PROTECT(status = NEW_LOGICAL((Sint) 1));
+    PROTECT(status = NEW_LOGICAL(1));
     LGL_EL(status,0) = TRUE;
     UNPROTECT(1);
     return status;
@@ -268,7 +268,7 @@ RS_SQLite_newConnection(Mgr_Handle mgrHandle, SEXP dbfile, SEXP allow_ext,
     }
 
     /* SQLite connections can only have 1 result set open at a time */
-    conHandle = RS_DBI_allocConnection(mgrHandle, (Sint) 1);
+    conHandle = RS_DBI_allocConnection(mgrHandle, 1);
     /* Note, while RS_DBI_getConnection can raise an error, conHandle
      * will be valid if RS_DBI_allocConnection returns without
      * error. */
@@ -679,7 +679,7 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
      * SQLite only allows  one resultSet per connection.
      */
     if (con->num_res>0) {
-        Sint res_id = (Sint) con->resultSetIds[0]; /* SQLite has only 1 res */
+        int res_id = con->resultSetIds[0]; /* SQLite has only 1 res */
         rsHandle = RS_DBI_asResHandle(MGR_ID(conHandle),
                                       CON_ID(conHandle), res_id, conHandle);
         res = RS_DBI_getResultSet(rsHandle);
@@ -695,7 +695,7 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
     /* allocate and init a new result set */
     PROTECT(rsHandle = RS_DBI_allocResultSet(conHandle));
     res = RS_DBI_getResultSet(rsHandle);
-    res->completed = (Sint) 0;
+    res->completed = 0;
     res->statement = dyn_statement;
     res->drvResultSet = db_statement;
     state = sqlite3_prepare_v2(db_connection, dyn_statement, -1,
@@ -740,8 +740,8 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
                            con, 0, NULL, rsHandle);
             }
         }
-        res->completed = (Sint) 1;          /* BUG: what if query is async?*/
-        res->rowsAffected = (Sint) sqlite3_changes(db_connection);
+        res->completed = 1;          /* BUG: what if query is async?*/
+        res->rowsAffected = sqlite3_changes(db_connection);
     }
     UNPROTECT(1);
     return rsHandle;
@@ -781,20 +781,20 @@ RS_SQLite_createDataMappings(Res_Handle rsHandle) {
       case SQLITE_INTEGER:
         flds->type[j] = SQLITE_TYPE_INTEGER;
         flds->Sclass[j] = INTSXP;
-        flds->length[j] = (Sint) sizeof(int);
-        flds->isVarLength[j] = (Sint) 0;
+        flds->length[j] = sizeof(int);
+        flds->isVarLength[j] = 0;
         break;
       case SQLITE_FLOAT:
         flds->type[j] = SQLITE_TYPE_REAL;
         flds->Sclass[j] = REALSXP;
-        flds->length[j] = (Sint) sizeof(double);
-        flds->isVarLength[j] = (Sint) 0;
+        flds->length[j] = sizeof(double);
+        flds->isVarLength[j] = 0;
         break;
      case SQLITE_TEXT:
         flds->type[j] = SQLITE_TYPE_TEXT;
         flds->Sclass[j] = STRSXP;
-        flds->length[j] = (Sint) -1;   /* unknown */
-        flds->isVarLength[j] = (Sint) 1;
+        flds->length[j] = -1;   /* unknown */
+        flds->isVarLength[j] = 1;
         break;
       case SQLITE_NULL:
         error("NULL column handling not implemented");
@@ -802,8 +802,8 @@ RS_SQLite_createDataMappings(Res_Handle rsHandle) {
      case SQLITE_BLOB:
         flds->type[j] = SQLITE_TYPE_BLOB;
         flds->Sclass[j] = VECSXP;
-        flds->length[j] = (Sint) -1;   /* unknown */
-        flds->isVarLength[j] = (Sint) 1;
+        flds->length[j] = -1;   /* unknown */
+        flds->isVarLength[j] = 1;
         break;
       default:
         error("unknown column type %d", col_type);
@@ -945,7 +945,7 @@ SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec) {
     num_rec = RS_DBI_getManager(rsHandle)->fetch_default_rec;
   }
 
-  SEXP output = PROTECT(NEW_LIST((Sint) num_fields));
+  SEXP output = PROTECT(NEW_LIST(num_fields));
   RS_DBI_allocOutput(output, flds, num_rec, 0);
   while (state != SQLITE_DONE) {
     fill_one_row(db_statement, output, row_idx, flds);
@@ -968,7 +968,7 @@ SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec) {
   } /* end row loop */
 
   if (state == SQLITE_DONE) {
-    res->completed = (Sint) 1;
+    res->completed = 1;
   }
   
   /* size to actual number of records fetched */
@@ -996,17 +996,17 @@ RS_SQLite_getException(SEXP conHandle)
     SEXP output;
     RS_DBI_connection   *con = RS_DBI_getConnection(conHandle);
     RS_SQLite_exception *err;
-    Sint  n = 2;
+    int n = 2;
     char *exDesc[] = {"errorNum", "errorMsg"};
     SEXPTYPE exType[] = {INTSXP, STRSXP};
-    Sint  exLen[]  = {1, 1};
+    int  exLen[]  = {1, 1};
 
     if(!con->drvConnection)
         RS_DBI_errorMessage("internal error: corrupt connection handle",
                             RS_DBI_ERROR);
     PROTECT(output = RS_DBI_createNamedList(exDesc, exType, exLen, n));
     err = (RS_SQLite_exception *) con->drvData;
-    LST_INT_EL(output,0,0) = (Sint) err->errorNum;
+    LST_INT_EL(output,0,0) = err->errorNum;
     SET_LST_CHR_EL(output,1,0,mkChar(err->errorMsg));
     UNPROTECT(1);
     return output;
@@ -1045,7 +1045,7 @@ SEXP driverInfo(Mgr_Handle mgrHandle) {
                      "counter",   "clientVersion", "shared_cache"};
   SEXPTYPE mgrType[] = {INTSXP, INTSXP, INTSXP, INTSXP, INTSXP,
                         STRSXP, STRSXP };
-  Sint  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1};
+  int  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1};
   SEXP output = PROTECT(RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, 7));
 
   int j = 0;
@@ -1113,7 +1113,7 @@ SEXP resultSetInfo(Res_Handle rsHandle) {
 
   if (result->fields) {
     SEXP flds = PROTECT(RS_DBI_getFieldDescriptions(result->fields));
-    SET_VECTOR_ELT(LST_EL(output, 5), (Sint) 0, flds);
+    SET_VECTOR_ELT(LST_EL(output, 5), 0, flds);
     UNPROTECT(1);
   } else {
     SET_VECTOR_ELT(output, 5, R_NilValue);
@@ -1160,7 +1160,7 @@ RS_SQLite_importFile(
     sqlite3           *db_connection = (sqlite3 *) con->drvConnection;
     char              *zFile, *zTable, *zSep, *zEol;
     const char *s, *s1;
-    Sint              rc, skip;
+    int              rc, skip;
     SEXP output;
 
     s = CHR_EL(s_tablename, 0);
@@ -1191,7 +1191,7 @@ RS_SQLite_importFile(
     }
     (void) strcpy(zSep, s);
     (void) strcpy(zEol, s1);
-    skip = (Sint) INT_EL(s_skip, 0);
+    skip = INT_EL(s_skip, 0);
 
     rc = RS_sqlite_import(db_connection, zTable, zFile, zSep, zEol, skip);
 
@@ -1199,7 +1199,7 @@ RS_SQLite_importFile(
     free(zFile);
     free(zSep);
 
-    PROTECT(output = NEW_LOGICAL((Sint) 1));
+    PROTECT(output = NEW_LOGICAL(1));
     LOGICAL_POINTER(output)[0] = rc;
     UNPROTECT(1);
     return output;
@@ -1215,7 +1215,7 @@ RS_sqlite_import(
     const char *zFile,
     const char *separator,
     const char *eol,
-    Sint skip
+    int skip
     )
 {
     sqlite3_stmt *pStmt;        /* A statement */

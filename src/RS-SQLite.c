@@ -1035,7 +1035,7 @@ RS_SQLite_closeResultSet(SEXP resHandle)
     return ScalarLogical(1);
 }
 
-SEXP RS_SQLite_managerInfo(Mgr_Handle mgrHandle) {
+SEXP driverInfo(Mgr_Handle mgrHandle) {
   RS_DBI_manager* mgr = RS_DBI_getManager(mgrHandle);
   if (!mgr) {
     RS_DBI_errorMessage("driver not loaded yet", RS_DBI_ERROR);
@@ -1060,7 +1060,7 @@ SEXP RS_SQLite_managerInfo(Mgr_Handle mgrHandle) {
   return output;
 }
 
-SEXP RSQLite_connectionInfo(Con_Handle conHandle) {
+SEXP connectionInfo(Con_Handle conHandle) {
   int info_count = 6, i = 0;
   RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
   RS_SQLite_conParams *params = (RS_SQLite_conParams *) con->conParams;
@@ -1097,7 +1097,7 @@ SEXP RSQLite_connectionInfo(Con_Handle conHandle) {
   return info;
 }
 
-SEXP RS_SQLite_resultSetInfo(Res_Handle rsHandle) {
+SEXP resultSetInfo(Res_Handle rsHandle) {
   char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
                      "rowCount", "completed", "fieldDescription"};
   SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP, INTSXP, INTSXP, VECSXP};
@@ -1134,7 +1134,7 @@ char* field_type(int type) {
   }
 }
 
-SEXP RS_SQLite_typeNames(SEXP typeIds) {
+SEXP typeNames(SEXP typeIds) {
   int n = LENGTH(typeIds);
   int* typeCodes = INTEGER(typeIds);
   SEXP typeNames = PROTECT(allocVector(STRSXP, n));

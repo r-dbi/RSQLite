@@ -1,9 +1,8 @@
 #' Get metadata about a database object.
 #' 
-#' @param dbObj,res An object of class \code{\linkS4class{SQLiteDriver}},
+#' @param dbObj An object of class \code{\linkS4class{SQLiteDriver}},
 #'   \code{\linkS4class{SQLiteConnection}} or 
 #'   \code{\linkS4class{SQLiteResult}}
-#' @param ... Ignored. Included for compatibility with generic.
 #' @name dbGetInfo
 #' @examples
 #' dbGetInfo(SQLite())
@@ -24,14 +23,14 @@ NULL
 #' @rdname dbGetInfo
 #' @export
 #' @useDynLib RSQLite driverInfo
-setMethod("dbGetInfo", "SQLiteDriver", function(dbObj, ...) {
+setMethod("dbGetInfo", "SQLiteDriver", function(dbObj) {
   .Call(driverInfo)
 })
 
 #' @rdname dbGetInfo
 #' @export
 #' @useDynLib RSQLite connectionInfo DBI_newResultHandle
-setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
+setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
   check_valid(dbObj)
   info <- .Call(connectionInfo, dbObj@Id)
   
@@ -46,7 +45,7 @@ setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
 #' @rdname dbGetInfo
 #' @export
 #' @useDynLib RSQLite resultSetInfo RS_DBI_SclassNames typeNames
-setMethod("dbGetInfo", "SQLiteResult", function(dbObj, ...) {
+setMethod("dbGetInfo", "SQLiteResult", function(dbObj) {
   check_valid(dbObj)
   
   info <- .Call(resultSetInfo, dbObj@Id)

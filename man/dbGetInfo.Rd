@@ -7,18 +7,16 @@
 \alias{dbGetInfo,SQLiteResult-method}
 \title{Get metadata about a database object.}
 \usage{
-\S4method{dbGetInfo}{SQLiteDriver}(dbObj, ...)
+\S4method{dbGetInfo}{SQLiteDriver}(dbObj)
 
-\S4method{dbGetInfo}{SQLiteConnection}(dbObj, ...)
+\S4method{dbGetInfo}{SQLiteConnection}(dbObj)
 
-\S4method{dbGetInfo}{SQLiteResult}(dbObj, ...)
+\S4method{dbGetInfo}{SQLiteResult}(dbObj)
 }
 \arguments{
-\item{dbObj,res}{An object of class \code{\linkS4class{SQLiteDriver}},
+\item{dbObj}{An object of class \code{\linkS4class{SQLiteDriver}},
 \code{\linkS4class{SQLiteConnection}} or
 \code{\linkS4class{SQLiteResult}}}
-
-\item{...}{Ignored. Included for compatibility with generic.}
 }
 \description{
 Get metadata about a database object.

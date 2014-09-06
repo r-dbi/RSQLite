@@ -238,10 +238,6 @@ void RS_DBI_makeDataFrame(SEXP data);
  * go back and re-code the error-handling throughout, darn!
  */
 void  RS_DBI_errorMessage(const char *msg, DBI_EXCEPTION exceptionType);
-void  RS_DBI_setException(Db_Handle handle, 
-			  DBI_EXCEPTION exceptionType,
-			  int errorNum, 
-			  const char *errorMsg);
 void DBI_MSG(char *msg, DBI_EXCEPTION exception_type, char *driver);
 
 /* utility funs (copy strings, convert from R/S types to string, etc.*/

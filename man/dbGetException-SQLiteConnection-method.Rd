@@ -8,8 +8,6 @@
 }
 \arguments{
 \item{conn}{an object of class \code{\linkS4class{SQLiteConnection}}}
-
-\item{...}{Ignored. Needed for compatiblity with generic.}
 }
 \description{
 Get the last exception from the connection.

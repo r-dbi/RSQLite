@@ -5,9 +5,9 @@
 \alias{fetch,SQLiteResult-method}
 \title{Fetch records from a previously executed query}
 \usage{
-\S4method{dbFetch}{SQLiteResult}(res, n = 0, ...)
+\S4method{dbFetch}{SQLiteResult}(res, n = 0)
 
-\S4method{fetch}{SQLiteResult}(res, n = 0, ...)
+\S4method{fetch}{SQLiteResult}(res, n = 0)
 }
 \arguments{
 \item{res}{an \code{\linkS4class{SQLiteResult}} object.}
@@ -15,8 +15,6 @@
 \item{n}{maximum number of records to retrieve per fetch. Use \code{-1} to
 retrieve all pending records; use \code{0} for to fetch the default
 number of rows as defined in \code{\link{SQLite}}}
-
-\item{...}{Ignored. Needed for compatibility with generic.}
 }
 \description{
 The \code{RSQLite} implementations retrieves all records into a buffer

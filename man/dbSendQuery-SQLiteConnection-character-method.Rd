@@ -7,15 +7,15 @@
 \alias{dbSendQuery,SQLiteConnection,character-method}
 \title{Execute a SQL statement on a database connection}
 \usage{
-\S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement, ...)
+\S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement)
 
 \S4method{dbSendPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
-  statement, bind.data, ...)
+  statement, bind.data)
 
-\S4method{dbGetQuery}{SQLiteConnection,character}(conn, statement, ...)
+\S4method{dbGetQuery}{SQLiteConnection,character}(conn, statement)
 
 \S4method{dbGetPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
-  statement, bind.data, ...)
+  statement, bind.data)
 }
 \arguments{
 \item{conn}{an \code{\linkS4class{SQLiteConnection}} object.}
@@ -23,8 +23,6 @@
 \item{statement}{a character vector of length one specifying the SQL
 statement that should be executed.  Only a single SQL statment should be
 provided.}
-
-\item{...}{Ignored. Included for compatbility with generic.}
 
 \item{bind.data}{A data frame of data to be bound.}
 }

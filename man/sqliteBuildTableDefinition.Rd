@@ -5,7 +5,7 @@
 \title{Build the SQL CREATE TABLE definition as a string}
 \usage{
 sqliteBuildTableDefinition(con, name, value, field.types = NULL,
-  row.names = NA, ...)
+  row.names = NA)
 }
 \arguments{
 \item{name}{Name of the new SQL table}
@@ -17,8 +17,6 @@ field in \code{value}}
 
 \item{row.names}{Logical. Should row.name of \code{value} be exported as a
 \code{row\_names} field? Default is \code{TRUE}}
-
-\item{...}{Ignored. Reserved for future use.}
 
 \item{conn}{A database connection.}
 }

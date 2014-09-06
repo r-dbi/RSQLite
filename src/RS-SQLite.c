@@ -547,8 +547,7 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
      * SQLite only allows  one resultSet per connection.
      */
     if (con->num_res>0) {
-        int res_id = con->resultSetIds[0]; /* SQLite has only 1 res */
-        rsHandle = RS_DBI_asResHandle(CON_ID(conHandle), res_id, conHandle);
+        rsHandle = RS_DBI_asResHandle(conHandle);
         res = RS_DBI_getResultSet(rsHandle);
         if (res->completed != 1) {
             free(dyn_statement);
@@ -936,8 +935,8 @@ SEXP connectionInfo(Con_Handle conHandle) {
   SET_VECTOR_ELT(info, i++, mkString(SQLITE_VERSION));
 
   SET_STRING_ELT(info_nms, i, mkChar("rsId"));
-  SEXP rsIds = PROTECT(allocVector(INTSXP, con->length));
-  int nres = RS_DBI_listEntries(con->resultSetIds, con->length, INTEGER(rsIds));
+  SEXP rsIds = PROTECT(allocVector(INTSXP, 1));
+  int nres = RS_DBI_listEntries(con->resultSetIds, 1, INTEGER(rsIds));
   SET_LENGTH(rsIds, nres);
   SET_VECTOR_ELT(info, i++, rsIds);
   UNPROTECT(1);

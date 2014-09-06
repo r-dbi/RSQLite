@@ -33,8 +33,6 @@ SEXP RS_DBI_allocConnection() {
   }
   con->drvConnection = (void *) NULL;
   con->drvData = (void *) NULL;
-  con->counter = 0;
-  con->length = 1;
   
   /* result sets for this connection */
   con->resultSets = (RS_DBI_resultSet **)
@@ -113,15 +111,15 @@ RS_DBI_allocResultSet(SEXP conHandle)
 {
   RS_DBI_connection *con = NULL;
   RS_DBI_resultSet  *result = NULL;
-  int indx, res_id;
+  int indx;
 
   con = RS_DBI_getConnection(conHandle);
-  indx = RS_DBI_newEntry(con->resultSetIds, con->length);
+  indx = RS_DBI_newEntry(con->resultSetIds, 1);
   if(indx < 0){
     char msg[128], fmt[128];
     (void) strcpy(fmt, "cannot allocate a new resultSet -- ");
     (void) strcat(fmt, "maximum of %d resultSets already reached");
-    (void) sprintf(msg, fmt, con->length);
+    (void) sprintf(msg, fmt, 1);
     RS_DBI_errorMessage(msg, RS_DBI_ERROR);
   }
 
@@ -134,7 +132,6 @@ RS_DBI_allocResultSet(SEXP conHandle)
   result->drvResultSet = (void *) NULL; /* driver's own resultSet (cursor)*/
   result->drvData = (void *) NULL;   /* this can be used by driver*/
   result->statement = (char *) NULL;
-  result->resultSetId = con->counter;
   result->isSelect = -1;
   result->rowsAffected = -1;
   result->rowCount = 0;
@@ -142,13 +139,11 @@ RS_DBI_allocResultSet(SEXP conHandle)
   result->fields = (RS_DBI_fields *) NULL;
   
   /* update connection's resultSet table */
-  res_id = con->counter;
   con->num_res += 1;
-  con->counter += 1;
   con->resultSets[indx] = result;
-  con->resultSetIds[indx] = res_id;
+  con->resultSetIds[indx] = 1;
 
-  return RS_DBI_asResHandle(CON_ID(conHandle), res_id, conHandle);
+  return RS_DBI_asResHandle(conHandle);
 }
 
 void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
@@ -478,20 +473,19 @@ RS_DBI_asConHandle(RS_DBI_connection *con)
 SEXP
 DBI_newResultHandle(SEXP xp, SEXP resId)
 {
-    int *ids = INTEGER(R_ExternalPtrProtected(xp));
-    return RS_DBI_asResHandle(ids[1], INTEGER(resId)[0], xp);
+    return RS_DBI_asResHandle(xp);
 }
 
 SEXP
-RS_DBI_asResHandle(int conId, int resId, SEXP conxp)
+RS_DBI_asResHandle(SEXP conxp)
 {
     SEXP resHandle, s_ids, label, v;
     int *ids;
     PROTECT(s_ids = allocVector(INTSXP, 3));
     ids = INTEGER(s_ids);
     ids[0] = 0;
-    ids[1] = conId;
-    ids[2] = resId;
+    ids[1] = 0;
+    ids[2] = 0;
     PROTECT(v = allocVector(VECSXP, 2));
     SET_VECTOR_ELT(v, 0, s_ids);
     /* this ensures the connection is preserved as long as
@@ -587,12 +581,11 @@ RS_DBI_freeEntry(int *table, int indx)
 int 
 is_validHandle(SEXP handle, HANDLE_TYPE handleType)
 {
-    int len, indx;
     SQLiteDriver *mgr;
     RS_DBI_connection *con;
 
   if (TYPEOF(handle) != EXTPTRSXP) return 0;
-  len = HANDLE_LENGTH(handle);
+  int len = HANDLE_LENGTH(handle);
   if(len<handleType || handleType<1 || handleType>3) 
     return 0;
 
@@ -608,9 +601,7 @@ is_validHandle(SEXP handle, HANDLE_TYPE handleType)
   if(handleType==CON_HANDLE_TYPE) return 1; /* valid connection id */
 
   /* .. on to resultSets */
-  indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(handle));
-  if(indx < 0) return 0;
-  if(!con->resultSets[indx]) return 0;
+  if(!con->resultSets[0]) return 0;
 
   return 1;
 }

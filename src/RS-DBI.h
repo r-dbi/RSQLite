@@ -155,7 +155,6 @@ typedef struct st_sdbi_connection {
 /* dbManager */
 typedef struct st_sdbi_manager {
   void *drvData;                    /* to be used by the drv implementation*/
-  int length;                      /* max num of concurrent connections */
   int num_con;                     /* num of opened connections */
   int counter;                     /* num of connections handled so far*/
   int fetch_default_rec;           /* default num of records per fetch */

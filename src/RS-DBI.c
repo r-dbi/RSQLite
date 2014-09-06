@@ -42,7 +42,6 @@ void RS_DBI_allocManager(const char *drvName, int max_con,
     
   mgr->drvData = (void *) NULL;
   mgr->counter = 0;
-  mgr->length = max_con;
   mgr->num_con = 0;
   mgr->fetch_default_rec = fetch_default_rec;
   

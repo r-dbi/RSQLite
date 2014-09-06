@@ -35,7 +35,7 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
            select.cols = "*") {
     out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM", name))
     
-    if(check.names) {
+    if (check.names) {
       names(out) <- make.names(names(out), unique = TRUE)
     }
     

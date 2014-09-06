@@ -1,8 +1,3 @@
-#' @include ConnectionTransactions.R
-NULL
-
-# Transactions -----------------------------------------------------------------
-
 #' SQLite transaction management.
 #' 
 #' By default, SQLite is in auto-commit mode. \code{dbBegin} starts

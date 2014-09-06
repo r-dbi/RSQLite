@@ -52,13 +52,16 @@ setMethod("dbGetInfo", "SQLiteResult", function(dbObj, ...) {
   
   info <- .Call(RS_SQLite_resultSetInfo, dbObj@Id)
   flds <- info$fieldDescription[[1]]
-  if (!is.null(flds)){
-    flds$Sclass <- .Call(RS_DBI_SclassNames, flds$Sclass)
-    flds$type <- .Call(RS_SQLite_typeNames, flds$type)
-    ## no factors
-    info$fields <- structure(flds, row.names = paste(seq(along.with=flds$type)),
-      class="data.frame")
-  }
+  if (is.null(flds)) return(info)
+  
+  flds$Sclass <- .Call(RS_DBI_SclassNames, flds$Sclass)
+  flds$type <- .Call(RS_SQLite_typeNames, flds$type)
+
+  info$fields <- structure(flds, 
+    row.names = .set_row_names(length(flds[[1]])),
+    class = "data.frame"
+  )
+  info$fieldDescription <- NULL
   
   info
 })

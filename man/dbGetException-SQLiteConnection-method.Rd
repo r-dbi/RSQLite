@@ -12,4 +12,5 @@
 \description{
 Get the last exception from the connection.
 }
+\keyword{internal}
 

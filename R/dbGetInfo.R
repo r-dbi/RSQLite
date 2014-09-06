@@ -66,9 +66,3 @@ setMethod("dbGetInfo", "SQLiteResult", function(dbObj, ...) {
   
   info
 })
-
-#' @rdname dbGetInfo
-#' @export
-setMethod("dbGetStatement", "SQLiteResult", function(res, ...) {
-  dbGetInfo(res, "statement")[[1]]
-})

@@ -19,29 +19,11 @@
 #include "RS-DBI.h"
 #include <R_ext/RS.h>
 
-static RS_DBI_manager *dbManager = NULL;
-
 static int HANDLE_LENGTH(SEXP handle)
 {
     SEXP h = R_ExternalPtrProtected(handle);
     if (TYPEOF(h) == VECSXP) h = VECTOR_ELT(h, 0);
     return Rf_length(h);
-}
-
-// Allocate driver singleton
-void RS_DBI_allocManager(int fetch_default_rec) {
-  if (dbManager) return; // Already allocated
-  
-  RS_DBI_manager *mgr = (RS_DBI_manager*) malloc(sizeof(RS_DBI_manager));
-  if (!mgr) {
-    RS_DBI_errorMessage("could not malloc the dbManger", RS_DBI_ERROR);
-  }
-    
-  mgr->counter = 0;
-  mgr->num_con = 0;
-  mgr->fetch_default_rec = fetch_default_rec;
-  
-  dbManager = mgr;
 }
 
 Con_Handle
@@ -543,16 +525,6 @@ RS_DBI_asResHandle(int mgrId, int conId, int resId, SEXP conxp)
     return resHandle;
 }
 
-RS_DBI_manager* RS_DBI_getManager() {
-  if (!dbManager) {
-    RS_DBI_errorMessage(
-      "internal error in RS_DBI_getManager: corrupt dbManager handle",
-  	  RS_DBI_ERROR
-    );
-  }
-  return dbManager;
-}
-
 RS_DBI_connection *
 RS_DBI_getConnection(SEXP conHandle)
 {
@@ -645,7 +617,7 @@ is_validHandle(SEXP handle, HANDLE_TYPE handleType)
     return 0;
 
   /* at least we have a potential valid dbManager */
-  mgr = dbManager;
+  mgr = RS_DBI_getManager();
   if(!mgr) return 0;   /* expired manager*/
   if(handleType == MGR_HANDLE_TYPE) return 1;     /* valid manager id */
 

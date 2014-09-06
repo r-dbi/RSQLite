@@ -163,12 +163,6 @@ typedef struct st_sdbi_manager {
 
 /* All RS_DBI functions and their signatures */
 
-/* Note: the following alloc functions allocate the space for the
- * corresponding manager, connection, resultSet; they all 
- * return handles.  All DBI functions (free/get/etc) use the handle 
- * to work with the various dbObjects.
- */
-void RS_DBI_allocManager(int fetch_default_rec);
 RS_DBI_manager *RS_DBI_getManager();
 Mgr_Handle RS_DBI_asMgrHandle(int pid);   
 

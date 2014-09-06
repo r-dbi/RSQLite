@@ -43,10 +43,23 @@ void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
  * For details on SQLite see http://www.sqlite.org.
  */
 
-/* Currently we can specify the 2 defaults max conns and records per
- * fetch (this last one can be over-ridden explicitly in the S call to fetch).
- */
+// Driver ----------------------------------------------------------------------
+
+static RS_DBI_manager *dbManager = NULL;
+
+RS_DBI_manager* RS_DBI_getManager() {
+  if (!dbManager) {
+    RS_DBI_errorMessage(
+      "internal error in RS_DBI_getManager: corrupt dbManager handle",
+      RS_DBI_ERROR
+    );
+  }
+  return dbManager;
+}
+
 void RS_SQLite_init(SEXP records_, SEXP cache_) {
+  if (dbManager) return; // Already allocated
+
   const char *clientVersion = sqlite3_libversion();
   if (strcmp(clientVersion, compiledVersion)) {
     char  buf[256];
@@ -57,16 +70,20 @@ void RS_SQLite_init(SEXP records_, SEXP cache_) {
     RS_DBI_errorMessage(buf, RS_DBI_WARNING);
   }
   
-  int records = asInteger(records_);
-  RS_DBI_allocManager(records);      
-
-  // This belongs in RS_DBI_allocManager but currently that lives in RS-DBI
-  // which doesn't have access to SQLite API
-  RS_DBI_manager *mgr = RS_DBI_getManager();
-  int cache = asLogical(cache_);
-  mgr->shared_cache = cache;
-  if (cache) {
+  dbManager = (RS_DBI_manager*) malloc(sizeof(RS_DBI_manager));
+  if (!dbManager) {
+    RS_DBI_errorMessage("could not malloc the dbManger", RS_DBI_ERROR);
+  }
+    
+  dbManager->counter = 0;
+  dbManager->num_con = 0;
+  dbManager->fetch_default_rec = asInteger(records_);
+  
+  if (asLogical(cache_)) {
+    dbManager->shared_cache = 1;
     sqlite3_enable_shared_cache(1);
+  } else {
+    dbManager->shared_cache = 0;
   }
   
   return;
@@ -74,7 +91,7 @@ void RS_SQLite_init(SEXP records_, SEXP cache_) {
 
 SEXP RS_SQLite_closeManager() {
   RS_DBI_manager *mgr = RS_DBI_getManager();
-  if(mgr->num_con) {
+  if (mgr->num_con) {
     RS_DBI_errorMessage("there are opened connections -- close them first",
       RS_DBI_ERROR);    
   }

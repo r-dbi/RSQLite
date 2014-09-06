@@ -105,7 +105,7 @@ RS_DBI_freeManager(Mgr_Handle mgrHandle)
 {
   RS_DBI_manager *mgr;
 
-  mgr = RS_DBI_getManager(mgrHandle);
+  mgr = RS_DBI_getManager();
   if(mgr->num_con > 0){    
     char *errMsg = "all opened connections were forcebly closed";
     RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
@@ -137,7 +137,7 @@ RS_DBI_allocConnection(Mgr_Handle mgrHandle, int max_res)
   Con_Handle conHandle;
   int  i, con_id;
   
-  mgr = RS_DBI_getManager(mgrHandle);
+  mgr = RS_DBI_getManager();
   con = (RS_DBI_connection *) malloc(sizeof(RS_DBI_connection));
   if(!con){
     RS_DBI_errorMessage("could not malloc dbConnection", RS_DBI_ERROR);
@@ -191,7 +191,7 @@ RS_DBI_freeConnection(SEXP conHandle)
   RS_DBI_manager    *mgr;
 
   con = RS_DBI_getConnection(conHandle);
-  mgr = RS_DBI_getManager(conHandle);
+  mgr = RS_DBI_getManager();
 
   /* Are there open resultSets? If so, free them first */
   if(con->num_res > 0) {
@@ -629,19 +629,14 @@ RS_DBI_asResHandle(int mgrId, int conId, int resId, SEXP conxp)
     return resHandle;
 }
 
-RS_DBI_manager *
-RS_DBI_getManager(SEXP handle)
-{
-  RS_DBI_manager  *mgr;
-
-  if(!is_validHandle(handle, MGR_HANDLE_TYPE))
-    RS_DBI_errorMessage("invalid dbManager handle", RS_DBI_ERROR);
-  mgr = dbManager;
-  if(!mgr)
+RS_DBI_manager* RS_DBI_getManager() {
+  if (!dbManager) {
     RS_DBI_errorMessage(
-          "internal error in RS_DBI_getManager: corrupt dbManager handle",
-	  RS_DBI_ERROR);
-  return mgr;
+      "internal error in RS_DBI_getManager: corrupt dbManager handle",
+  	  RS_DBI_ERROR
+    );
+  }
+  return dbManager;
 }
 
 RS_DBI_connection *

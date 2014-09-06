@@ -83,7 +83,7 @@ RS_SQLite_init(SEXP config_params, SEXP reload, SEXP cache)
     mgrHandle = RS_DBI_allocManager(drvName, 1, fetch_default_rec,
                                     force_reload);
 
-    mgr = RS_DBI_getManager(mgrHandle);
+    mgr = RS_DBI_getManager();
 
     shared_cache = (int *)malloc(sizeof(int));
     if(!shared_cache){
@@ -107,7 +107,7 @@ RS_SQLite_closeManager(Mgr_Handle mgrHandle)
     SEXP status;
     int *shared_cache;
 
-    mgr = RS_DBI_getManager(mgrHandle);
+    mgr = RS_DBI_getManager();
     if(mgr->num_con)
         RS_DBI_errorMessage("there are opened connections -- close them first",
                             RS_DBI_ERROR);
@@ -942,7 +942,7 @@ SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec) {
   int num_rec = INT_EL(max_rec, 0);
   int expand = (num_rec < 0);   /* dyn expand output to accommodate all rows*/
   if (expand || num_rec == 0) {
-    num_rec = RS_DBI_getManager(rsHandle)->fetch_default_rec;
+    num_rec = RS_DBI_getManager()->fetch_default_rec;
   }
 
   SEXP output = PROTECT(NEW_LIST(num_fields));
@@ -1036,7 +1036,7 @@ RS_SQLite_closeResultSet(SEXP resHandle)
 }
 
 SEXP driverInfo(Mgr_Handle mgrHandle) {
-  RS_DBI_manager* mgr = RS_DBI_getManager(mgrHandle);
+  RS_DBI_manager* mgr = RS_DBI_getManager();
   if (!mgr) {
     RS_DBI_errorMessage("driver not loaded yet", RS_DBI_ERROR);
   }

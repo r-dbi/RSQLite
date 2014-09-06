@@ -177,7 +177,7 @@ Mgr_Handle RS_DBI_allocManager(const char *drvName, int max_con,
 				    int fetch_default_rec, 
 				    int force_realloc);
 void            RS_DBI_freeManager(Mgr_Handle mgrHandle);
-RS_DBI_manager *RS_DBI_getManager(Db_Handle handle);
+RS_DBI_manager *RS_DBI_getManager();
 Mgr_Handle RS_DBI_asMgrHandle(int pid);   
 
 /* dbConnection */

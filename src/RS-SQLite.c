@@ -1035,11 +1035,8 @@ RS_SQLite_closeResultSet(SEXP resHandle)
     return ScalarLogical(1);
 }
 
-SEXP driverInfo(Mgr_Handle mgrHandle) {
+SEXP driverInfo() {
   RS_DBI_manager* mgr = RS_DBI_getManager();
-  if (!mgr) {
-    RS_DBI_errorMessage("driver not loaded yet", RS_DBI_ERROR);
-  }
   
   char *mgrDesc[] = {"fetch_default_rec", "managerId", "length", "num_con",
                      "counter",   "clientVersion", "shared_cache"};

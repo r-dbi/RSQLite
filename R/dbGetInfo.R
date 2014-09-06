@@ -26,7 +26,7 @@ NULL
 #' @useDynLib RSQLite driverInfo
 setMethod("dbGetInfo", "SQLiteDriver", function(dbObj, ...) {
   check_valid(dbObj)  
-  .Call(driverInfo, dbObj@Id)
+  .Call(driverInfo)
 })
 
 #' @rdname dbGetInfo

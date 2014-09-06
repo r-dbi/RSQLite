@@ -27,9 +27,6 @@ int RS_sqlite_import(sqlite3 *db, const char *zTable,
 
 void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
 
-/* The macro NA_STRING is a CHRSXP in R but a char * in Splus */
-#define RS_NA_STRING CHAR(NA_STRING)
-
 /* R and S Database Interface to the SQLite embedded SQL engine
  *
  * C Function library which can be used to run SQL queries from
@@ -45,7 +42,6 @@ void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
  *
  * For details on SQLite see http://www.sqlite.org.
  */
-
 
 Mgr_Handle
 RS_SQLite_init(SEXP config_params, SEXP reload, SEXP cache)

@@ -13,40 +13,40 @@ extern "C" {
  * the Omega project, and some from RS-DBI itself.
  */
 
-#  include "Rversion.h"
+#include "Rversion.h"
 
-#  include "Rdefines.h"
-#  include "S.h"
-#  define singl double
-#  define Sint  int
-#  define charPtr SEXP *
-#  define C_S_CPY(p)    COPY_TO_USER_STRING(p)    /* cpy C string to R */
+#include "Rdefines.h"
+#include "S.h"
+#define singl double
+#define Sint  int
+#define charPtr SEXP *
+#define C_S_CPY(p)    COPY_TO_USER_STRING(p)    /* cpy C string to R */
 
 /* The following are macros defined in the Green Book, but missing
  * in Rdefines.h.  The semantics are as close to S4's as possible (?).
  */
 
-#  define COPY(x) duplicate(x)                  
-#  define COPY_ALL(x) duplicate(x)               
-#  define EVAL_IN_FRAME(expr,n)  eval(expr,n)     
-#  define GET_FROM_FRAME(name,n) findVar(install(name),n)
-#  define ASSIGN_IN_FRAME(name,obj,n) defineVar(install(name),COPY(obj),n)
+#define COPY(x) duplicate(x)                  
+#define COPY_ALL(x) duplicate(x)               
+#define EVAL_IN_FRAME(expr,n)  eval(expr,n)     
+#define GET_FROM_FRAME(name,n) findVar(install(name),n)
+#define ASSIGN_IN_FRAME(name,obj,n) defineVar(install(name),COPY(obj),n)
 
 
 /* data types common to R and S4 */
 
-#  define Stype          SEXPTYPE
-#  define LOGICAL_TYPE	 LGLSXP
-#  define INTEGER_TYPE	 INTSXP
-#  define NUMERIC_TYPE	 REALSXP
-#  define SINGLE_TYPE    REALSXP
-#  define REAL_TYPE      REALSXP
-#  define CHARACTER_TYPE STRSXP
-#  define STRING_TYPE    STRSXP
-#  define COMPLEX_TYPE	 CPLXSXP
-#  define LIST_TYPE	 VECSXP
+#define Stype          SEXPTYPE
+#define LOGICAL_TYPE	 LGLSXP
+#define INTEGER_TYPE	 INTSXP
+#define NUMERIC_TYPE	 REALSXP
+#define SINGLE_TYPE    REALSXP
+#define REAL_TYPE      REALSXP
+#define CHARACTER_TYPE STRSXP
+#define STRING_TYPE    STRSXP
+#define COMPLEX_TYPE	 CPLXSXP
+#define LIST_TYPE	     VECSXP
 
-#  define S_NULL_ENTRY R_NilValue
+#define S_NULL_ENTRY R_NilValue
 
 /* We simplify one- and two-level access to object and list
  * (mostly built on top of jmc's macros)
@@ -72,11 +72,9 @@ extern "C" {
 #define NUM_EL(x,i) NUMERIC_POINTER((x))[(i)]
 #define DBL_EL(x,i) NUM_EL((x),(i))
 #define RAW_EL(x,i) RAW_POINTER((x))[(i)]
-#if defined(R_VERSION) && R_VERSION >= R_Version(1,2,0) 
-#  define LST_EL(x,i) VECTOR_ELT((x),(i))
-#  define CHR_EL(x,i) CHAR(STRING_ELT((x),(i)))
-#  define SET_CHR_EL(x,i,val)  SET_STRING_ELT((x),(i), (val))
-#endif
+#define LST_EL(x,i) VECTOR_ELT((x),(i))
+#define CHR_EL(x,i) CHAR(STRING_ELT((x),(i)))
+#define SET_CHR_EL(x,i,val)  SET_STRING_ELT((x),(i), (val))
 
 /* x[[i]][j] -- can be also assigned if x[[i]] is a numeric type */
 #define LST_CHR_EL(x,i,j) CHR_EL(LST_EL((x),(i)), (j))
@@ -90,18 +88,14 @@ extern "C" {
 #define LST_LST_EL(x,i,j) LST_EL(LST_EL((x),(i)), (j))
 
 /* x[[i]][j] -- for the case when x[[i]] is a character type */
-#if defined(R_VERSION) && R_VERSION >= R_Version(1,2,0) 
-#  define SET_LST_CHR_EL(x,i,j,val) SET_STRING_ELT(LST_EL(x,i), j, val)
-#else   
-#  define SET_LST_CHR_EL(x,i,j,val) (CHR_EL(LST_EL(x,i),j)=val)
-#endif
+#define SET_LST_CHR_EL(x,i,j,val) SET_STRING_ELT(LST_EL(x,i), j, val)
 
 
 /* SET_ROWNAMES() and SET_CLASS_NAME() don't exist in S4 
  */
-#  define SET_ROWNAMES(df,n)  setAttrib(df, R_RowNamesSymbol, n)
-#  define GET_CLASS_NAME(x)   GET_CLASS(x)
-#  define SET_CLASS_NAME(x,n) SET_CLASS(x, n)
+#define SET_ROWNAMES(df,n)  setAttrib(df, R_RowNamesSymbol, n)
+#define GET_CLASS_NAME(x)   GET_CLASS(x)
+#define SET_CLASS_NAME(x,n) SET_CLASS(x, n)
 
 /* end of RS-DBI macros */
 

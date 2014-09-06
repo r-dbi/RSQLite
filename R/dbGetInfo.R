@@ -52,6 +52,7 @@ setMethod("dbGetInfo", "SQLiteResult", function(dbObj, ...) {
   
   info <- .Call(RS_SQLite_resultSetInfo, dbObj@Id)
   flds <- info$fieldDescription[[1]]
+  
   if (is.null(flds)) return(info)
   
   flds$Sclass <- .Call(RS_DBI_SclassNames, flds$Sclass)

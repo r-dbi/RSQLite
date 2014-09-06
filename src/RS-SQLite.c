@@ -1035,130 +1035,92 @@ RS_SQLite_closeResultSet(SEXP resHandle)
     return ScalarLogical(1);
 }
 
-SEXP 
-RS_SQLite_managerInfo(Mgr_Handle mgrHandle)
-{
-    RS_DBI_manager *mgr;
-    SEXP output;
-    Sint i, num_con, max_con, *cons, ncon, *shared_cache;
-    Sint j, n = 9;
-    char *mgrDesc[] = {"drvName",   "connectionIds", "fetch_default_rec",
-                       "managerId", "length",        "num_con",
-                       "counter",   "clientVersion", "shared_cache"};
-    SEXPTYPE mgrType[] = {STRSXP, INTSXP, INTSXP,
-                       INTSXP,   INTSXP, INTSXP,
-                       INTSXP,   STRSXP, STRSXP };
-    Sint  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+SEXP RS_SQLite_managerInfo(Mgr_Handle mgrHandle) {
+  RS_DBI_manager* mgr = RS_DBI_getManager(mgrHandle);
+  if (!mgr) {
+    RS_DBI_errorMessage("driver not loaded yet", RS_DBI_ERROR);
+  }
+  
+  char *mgrDesc[] = {"fetch_default_rec", "managerId", "length", "num_con",
+                     "counter",   "clientVersion", "shared_cache"};
+  SEXPTYPE mgrType[] = {INTSXP, INTSXP, INTSXP, INTSXP, INTSXP,
+                        STRSXP, STRSXP };
+  Sint  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1};
+  SEXP output = PROTECT(RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, 7));
 
-    mgr = RS_DBI_getManager(mgrHandle);
-    if(!mgr)
-        RS_DBI_errorMessage("driver not loaded yet", RS_DBI_ERROR);
-    num_con = (Sint) mgr->num_con;
-    max_con = (Sint) mgr->length;
-    shared_cache = (Sint *) mgr->drvData;
-    mgrLen[1] = num_con;
-
-    PROTECT(output = RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, n));
-    j = (Sint) 0;
-    if(mgr->drvName)
-        SET_LST_CHR_EL(output,j++,0,mkChar(mgr->drvName));
-    else
-        SET_LST_CHR_EL(output,j++,0,mkChar(""));
-
-    cons = (Sint *) S_alloc((long)max_con, (int)sizeof(Sint));
-    ncon = RS_DBI_listEntries(mgr->connectionIds, mgr->length, cons);
-    /* expecting ncon == 0 alwasy */
-    if(ncon != 0){
-        RS_DBI_errorMessage(
-            "internal error: corrupt RS_DBI connection table",
-            RS_DBI_ERROR);
-    }
-    for(i = 0; i < num_con; i++)
-        LST_INT_EL(output, j, i) = cons[i];
-    j++;
-    LST_INT_EL(output,j++,0) = mgr->fetch_default_rec;
-    LST_INT_EL(output,j++,0) = mgr->managerId;
-    LST_INT_EL(output,j++,0) = mgr->length;
-    LST_INT_EL(output,j++,0) = mgr->num_con;
-    LST_INT_EL(output,j++,0) = mgr->counter;
-    SET_LST_CHR_EL(output,j++,0,mkChar(SQLITE_VERSION));
-    if(*shared_cache)
-        SET_LST_CHR_EL(output,j++,0,mkChar("on"));
-    else
-        SET_LST_CHR_EL(output,j++,0,mkChar("off"));
-    UNPROTECT(1);
-    return output;
+  int j = 0;
+  LST_INT_EL(output,j++,0) = mgr->fetch_default_rec;
+  LST_INT_EL(output,j++,0) = mgr->managerId;
+  LST_INT_EL(output,j++,0) = mgr->length;
+  LST_INT_EL(output,j++,0) = mgr->num_con;
+  LST_INT_EL(output,j++,0) = mgr->counter;
+  SET_LST_CHR_EL(output,j++,0,mkChar(SQLITE_VERSION));
+  SET_LST_CHR_EL(output,j++,0,mkChar(mgr->drvData ? "on" : "off"));
+  UNPROTECT(1);
+  return output;
 }
 
-SEXP 
-RSQLite_connectionInfo(Con_Handle conHandle)
-{
-    int info_count = 6, i = 0, nres;
-    RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
-    RS_SQLite_conParams *params = (RS_SQLite_conParams *) con->conParams;
-    SEXP rsIds;
+SEXP RSQLite_connectionInfo(Con_Handle conHandle) {
+  int info_count = 6, i = 0;
+  RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
+  RS_SQLite_conParams *params = (RS_SQLite_conParams *) con->conParams;
 
-    SEXP info = PROTECT(NEW_LIST(info_count));
-    SEXP info_nms = PROTECT(NEW_CHARACTER(info_count));
-    SET_NAMES(info, info_nms);
-    UNPROTECT(1);
+  SEXP info = PROTECT(allocVector(VECSXP, info_count));
+  SEXP info_nms = PROTECT(allocVector(STRSXP, info_count));
+  SET_NAMES(info, info_nms);
+  UNPROTECT(1);
 
-    SET_STRING_ELT(info_nms, i, mkChar("dbname"));
-    SET_VECTOR_ELT(info, i++, mkString(params->dbname));
+  SET_STRING_ELT(info_nms, i, mkChar("dbname"));
+  SET_VECTOR_ELT(info, i++, mkString(params->dbname));
 
-    SET_STRING_ELT(info_nms, i, mkChar("serverVersion"));
-    SET_VECTOR_ELT(info, i++, mkString(SQLITE_VERSION));
+  SET_STRING_ELT(info_nms, i, mkChar("serverVersion"));
+  SET_VECTOR_ELT(info, i++, mkString(SQLITE_VERSION));
 
-    SET_STRING_ELT(info_nms, i, mkChar("rsId"));
-    rsIds = PROTECT(NEW_INTEGER(con->length));
-    nres = RS_DBI_listEntries(con->resultSetIds, con->length, INTEGER(rsIds));
-    SET_LENGTH(rsIds, nres);
-    SET_VECTOR_ELT(info, i++, rsIds);
-    UNPROTECT(1);
+  SET_STRING_ELT(info_nms, i, mkChar("rsId"));
+  SEXP rsIds = PROTECT(allocVector(INTSXP, con->length));
+  int nres = RS_DBI_listEntries(con->resultSetIds, con->length, INTEGER(rsIds));
+  SET_LENGTH(rsIds, nres);
+  SET_VECTOR_ELT(info, i++, rsIds);
+  UNPROTECT(1);
 
-    SET_STRING_ELT(info_nms, i, mkChar("loadableExtensions"));
-    SET_VECTOR_ELT(info, i++,
-                   mkString(params->loadable_extensions ? "on" : "off"));
+  SET_STRING_ELT(info_nms, i, mkChar("loadableExtensions"));
+  SET_VECTOR_ELT(info, i++,
+    mkString(params->loadable_extensions ? "on" : "off"));
 
-    SET_STRING_ELT(info_nms, i, mkChar("flags"));
-    SET_VECTOR_ELT(info, i++, ScalarInteger(params->flags));
+  SET_STRING_ELT(info_nms, i, mkChar("flags"));
+  SET_VECTOR_ELT(info, i++, ScalarInteger(params->flags));
 
-    SET_STRING_ELT(info_nms, i, mkChar("vfs"));
-    SET_VECTOR_ELT(info, i++, mkString(params->vfs));
+  SET_STRING_ELT(info_nms, i, mkChar("vfs"));
+  SET_VECTOR_ELT(info, i++, mkString(params->vfs));
 
-    UNPROTECT(1);
-    return info;
+  UNPROTECT(1);
+  return info;
 }
 
-SEXP 
-RS_SQLite_resultSetInfo(Res_Handle rsHandle)
-{
-    RS_DBI_resultSet   *result;
-    SEXP output, flds;
-    Sint  n = 6;
-    char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
-                       "rowCount", "completed", "fieldDescription"};
-    SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP,
-                       INTSXP,   INTSXP, VECSXP};
-    Sint  rsLen[]   = {1, 1, 1, 1, 1, 1};
+SEXP RS_SQLite_resultSetInfo(Res_Handle rsHandle) {
+  char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
+                     "rowCount", "completed", "fieldDescription"};
+  SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP, INTSXP, INTSXP, VECSXP};
+  int rsLen[]   = {1, 1, 1, 1, 1, 1};
+  SEXP output = PROTECT(RS_DBI_createNamedList(rsDesc, rsType, rsLen, 6));
 
-    result = RS_DBI_getResultSet(rsHandle);
-    if(result->fields)
-        PROTECT(flds = RS_DBI_getFieldDescriptions(result->fields));
-    else
-        PROTECT(flds = R_NilValue);
+  RS_DBI_resultSet* result = RS_DBI_getResultSet(rsHandle);
+  SET_LST_CHR_EL(output,0,0,mkChar(result->statement));
+  LST_INT_EL(output,1,0) = result->isSelect;
+  LST_INT_EL(output,2,0) = result->rowsAffected;
+  LST_INT_EL(output,3,0) = result->rowCount;
+  LST_INT_EL(output,4,0) = result->completed;
 
-    PROTECT(output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n));
-    SET_LST_CHR_EL(output,0,0,mkChar(result->statement));
-    LST_INT_EL(output,1,0) = result->isSelect;
-    LST_INT_EL(output,2,0) = result->rowsAffected;
-    LST_INT_EL(output,3,0) = result->rowCount;
-    LST_INT_EL(output,4,0) = result->completed;
-    if(flds != R_NilValue)
-        SET_VECTOR_ELT(LST_EL(output, 5), (Sint) 0, flds);
+  if (result->fields) {
+    SEXP flds = PROTECT(RS_DBI_getFieldDescriptions(result->fields));
+    SET_VECTOR_ELT(LST_EL(output, 5), (Sint) 0, flds);
+    UNPROTECT(1);
+  } else {
+    SET_VECTOR_ELT(output, 5, R_NilValue);
+  }
 
-    UNPROTECT(2);
-    return output;
+  UNPROTECT(1);
+  return output;
 }
 
 char* field_type(int type) {

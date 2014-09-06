@@ -26,49 +26,41 @@ static int HANDLE_LENGTH(SEXP handle)
     return Rf_length(h);
 }
 
-Con_Handle
-RS_DBI_allocConnection()
-{
-  SQLiteDriver    *mgr;
-  RS_DBI_connection *con;
-  Con_Handle conHandle;
-  int con_id;
-  
-  mgr = getDriver();
-  con = (RS_DBI_connection *) malloc(sizeof(RS_DBI_connection));
-  if(!con){
+SEXP RS_DBI_allocConnection() {
+  RS_DBI_connection* con = (RS_DBI_connection *) malloc(sizeof(RS_DBI_connection));
+  if (!con){
     RS_DBI_errorMessage("could not malloc dbConnection", RS_DBI_ERROR);
   }
-  con_id = mgr->counter;
   con->drvConnection = (void *) NULL;
-  con->drvData = (void *) NULL;    /* to be used by the driver in any way*/
+  con->drvData = (void *) NULL;
   con->counter = 0;
-  con->length = 1;           /* length of resultSet vector */
+  con->length = 1;
   
   /* result sets for this connection */
   con->resultSets = (RS_DBI_resultSet **)
     calloc((size_t) 1, sizeof(RS_DBI_resultSet));
-  if(!con->resultSets){
+  if (!con->resultSets){
     free(con);
     RS_DBI_errorMessage("could not calloc resultSets for the dbConnection",
-                        RS_DBI_ERROR);
+      RS_DBI_ERROR);
   }
   con->num_res = 0;
   con->resultSetIds = (int *) calloc((size_t) 1, sizeof(int));
-  if(!con->resultSetIds) {
+  if (!con->resultSetIds) {
     free(con->resultSets);
     free(con);
     RS_DBI_errorMessage("could not calloc vector of resultSet Ids",
-                        RS_DBI_ERROR);
+      RS_DBI_ERROR);
   }
   con->resultSets[0] = (RS_DBI_resultSet *) NULL;
   con->resultSetIds[0] = -1;
 
-  /* Finally, update connection table in mgr */
-  mgr->num_con += 1;
-  mgr->counter += 1;
-  conHandle = RS_DBI_asConHandle(con_id, con);
-  return conHandle;
+  /* Finally, update connection table in driver */
+  SQLiteDriver* driver = getDriver();
+  driver->num_con += 1;
+  driver->counter += 1;
+
+  return RS_DBI_asConHandle(con);
 }
 
 /* the invoking (freeing) function must provide a function for
@@ -468,14 +460,14 @@ static void _finalize_con_handle(SEXP xp)
 }
 
 SEXP
-RS_DBI_asConHandle(int conId, RS_DBI_connection *con)
+RS_DBI_asConHandle(RS_DBI_connection *con)
 {
     SEXP conHandle, s_ids, label;
     int *ids;
     PROTECT(s_ids = allocVector(INTSXP, 2));
     ids = INTEGER(s_ids);
     ids[0] = 0;
-    ids[1] = conId;
+    ids[1] = 0;
     PROTECT(label = mkString("DBI CON"));
     conHandle = R_MakeExternalPtr(con, label, s_ids);
     UNPROTECT(2);

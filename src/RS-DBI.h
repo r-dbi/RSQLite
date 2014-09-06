@@ -145,7 +145,7 @@ Mgr_Handle RS_DBI_asMgrHandle(int pid);
 Con_Handle RS_DBI_allocConnection();
 void               RS_DBI_freeConnection(Con_Handle conHandle);
 RS_DBI_connection *RS_DBI_getConnection(Db_Handle handle);
-Con_Handle RS_DBI_asConHandle(int conId, RS_DBI_connection *con);
+Con_Handle RS_DBI_asConHandle(RS_DBI_connection *con);
 
 /* dbResultSet */
 Res_Handle RS_DBI_allocResultSet(Con_Handle conHandle);

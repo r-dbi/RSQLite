@@ -169,7 +169,6 @@ typedef struct st_sdbi_manager {
  * to work with the various dbObjects.
  */
 void RS_DBI_allocManager(int fetch_default_rec);
-void            RS_DBI_freeManager();
 RS_DBI_manager *RS_DBI_getManager();
 Mgr_Handle RS_DBI_asMgrHandle(int pid);   
 

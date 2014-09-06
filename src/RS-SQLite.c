@@ -69,29 +69,18 @@ void RS_SQLite_init(SEXP records_, SEXP cache_) {
     sqlite3_enable_shared_cache(1);
   }
   
-
-
   return;
 }
 
-SEXP 
-RS_SQLite_closeManager()
-{
-    SEXP status;
+SEXP RS_SQLite_closeManager() {
+  RS_DBI_manager *mgr = RS_DBI_getManager();
+  if(mgr->num_con) {
+    RS_DBI_errorMessage("there are opened connections -- close them first",
+      RS_DBI_ERROR);    
+  }
+  sqlite3_enable_shared_cache(0);
 
-    RS_DBI_manager *mgr = RS_DBI_getManager();
-    if(mgr->num_con)
-        RS_DBI_errorMessage("there are opened connections -- close them first",
-                            RS_DBI_ERROR);
-
-    sqlite3_enable_shared_cache(0);
-
-    RS_DBI_freeManager();
-
-    PROTECT(status = NEW_LOGICAL(1));
-    LGL_EL(status,0) = TRUE;
-    UNPROTECT(1);
-    return status;
+  return ScalarLogical(1);
 }
 
 /* open a connection with the same parameters used for in conHandle */

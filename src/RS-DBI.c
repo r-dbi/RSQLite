@@ -44,20 +44,6 @@ void RS_DBI_allocManager(int fetch_default_rec) {
   dbManager = mgr;
 }
 
-/* We don't want to completely free the dbManager, but rather we 
- * re-initialize all the fields except for mgr->counter to ensure we don't
- * re-cycle connection ids across R/S DBI sessions in the the same pid
- * (S/R session).
- */
-void RS_DBI_freeManager() {
-  RS_DBI_manager *mgr = RS_DBI_getManager();
-  if(mgr->num_con > 0){    
-    char *errMsg = "all opened connections were forcebly closed";
-    RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
-  }
-  return;
-}
-
 Con_Handle
 RS_DBI_allocConnection(int max_res)
 {

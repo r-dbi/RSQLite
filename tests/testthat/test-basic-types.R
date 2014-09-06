@@ -37,7 +37,7 @@ test_that("row-by-row fetch is equivalent", {
   on.exit(dbClearResult(rs))
   for (i in 1:5) {
     row <- dbFetch(rs, 1L)
-    expect_equal(row, basicDf[i, ])
+    expect_equal(row, basicDf[i, ], check.attributes = FALSE)
   }
   
   row <- dbFetch(rs, 1L)

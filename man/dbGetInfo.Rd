@@ -35,6 +35,8 @@ dbGetInfo(con)
 dbWriteTable(con, "mtcars", mtcars)
 rs <- dbSendQuery(con, "SELECT * FROM mtcars")
 dbGetInfo(rs)
+dbFetch(rs, 1)
+dbGetInfo(rs)
 
 dbClearResult(rs)
 dbDisconnect(con)

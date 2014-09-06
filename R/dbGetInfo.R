@@ -14,6 +14,8 @@
 #' dbWriteTable(con, "mtcars", mtcars)
 #' rs <- dbSendQuery(con, "SELECT * FROM mtcars")
 #' dbGetInfo(rs)
+#' dbFetch(rs, 1)
+#' dbGetInfo(rs)
 #' 
 #' dbClearResult(rs)
 #' dbDisconnect(con)
@@ -34,7 +36,7 @@ setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
   check_valid(dbObj)
   info <- .Call(RSQLite_connectionInfo, dbObj@Id)
   
-  if (length(info$rsId) > 0){
+  if (length(info$rsId) > 0) {
     id <- .Call(DBI_newResultHandle, dbObj@Id, info$rsId)
     info$rsId <- list(new("SQLiteResult", Id = id))
   }

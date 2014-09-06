@@ -1,5 +1,7 @@
 Version 0.11.6.9000
 
+- `dbFetch()` no longer numbers row names sequentially between fetches.
+
 - `dbWriteTable()` quotes field names using `dbQuoteIdentifier()`, rather
   than use a flawed black-list based approach with name munging.
 

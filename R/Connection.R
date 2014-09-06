@@ -265,17 +265,11 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param ... Ignored. Included for compatibility with generic.
 #' @export
-setMethod("dbListTables", "SQLiteConnection", function(conn, ...) {
-  out <- dbGetQuery(conn, "SELECT name FROM
-      (SELECT * FROM sqlite_master UNION ALL
-       SELECT * FROM sqlite_temp_master)
-      WHERE type = 'table' OR type = 'view'
-      ORDER BY name", ...)
-  if (is.null(out) || nrow(out) == 0)
-    out <- character(0)
-  else
-    out <- out[, 1]
-  out
+setMethod("dbListTables", "SQLiteConnection", function(conn) {
+  dbGetQuery(conn, "SELECT name FROM
+    (SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master)
+    WHERE type = 'table' OR type = 'view'
+    ORDER BY name")$name
 })
 
 #' List fields in specified table.

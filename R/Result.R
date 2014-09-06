@@ -49,19 +49,15 @@ setMethod("fetch", "SQLiteResult", function(res, n = 0, ...) {
 })
 
 #' @useDynLib RSQLite RS_SQLite_fetch
-sqliteFetch <- function(res, n=0, ...) {  
-  if(!isIdCurrent(res))
-    stop("invalid result handle")
-  n <- as.integer(n)
-  rsId <- res@Id
-  rel <- .Call(RS_SQLite_fetch, rsId, nrec = n)
-  if (is.null(rel)) rel <- list()       # result set is completed
-  ## create running row index as of previous fetch (if any)
-  cnt <- dbGetRowCount(res)
-  nrec <- if (length(rel) > 0L) length(rel[[1L]]) else 0L
-  indx <- seq(from = cnt - nrec + 1L, length.out = nrec)
-  attr(rel, "row.names") <- as.integer(indx)
-  class(rel) <- "data.frame"
+sqliteFetch <- function(res, n = 0, ...) {  
+  check_valid(res)
+
+  # Returns NULL, or a list
+  rel <- .Call(RS_SQLite_fetch, res@Id, nrec = as.integer(n))
+  if (is.null(rel)) return(data.frame())
+  
+  attr(rel, "row.names") <- .set_row_names(length(rel[[1]]))
+  attr(rel, "class") <- "data.frame"
   rel
 }
 
@@ -117,8 +113,7 @@ NULL
 #' @export
 #' @rdname sqlite-meta
 setMethod("dbColumnInfo", "SQLiteResult", function(res, ...) {
-  out <- dbGetInfo(res)$fields
-  if(!is.null(out)) out else data.frame(out)
+  dbGetInfo(res)$fields
 })
 #' @export
 #' @rdname sqlite-meta
@@ -134,7 +129,5 @@ setMethod("dbGetRowCount", "SQLiteResult", function(res, ...) {
 #' @rdname sqlite-meta
 setMethod("dbHasCompleted", "SQLiteResult", function(res, ...) {
   out <- dbGetInfo(res)$completed
-  if(out<0)
-    NA
-  else out == 1L
+  if(out < 0) NA else out == 1L
 })

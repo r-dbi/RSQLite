@@ -863,67 +863,6 @@ RS_DBI_getTypeName(Sint t, const struct data_types table[])
   return (char *) 0; /* for -Wall */
 }
 
-/* Translate R/S identifiers (and only R/S names!!!) into 
- * valid SQL identifiers;  overwrite input vector. Currently,
- *   (1) translate "." into "_".  
- *   (2) first character should be a letter (traslate to "X" if not),
- *       but a double quote signals a "delimited identifier"
- *   (3) check that length <= 18, but only warn, since most (all?)
- *       dbms allow much longer identifiers.
- *   (4) SQL reserved keywords are handled in the R/S calling 
- *       function make.SQL.names(), not here.
- * BUG: Compound SQL identifiers are not handled properly.
- *      Note the the dot "." is a valid SQL delimiter, used for specifying
- *      user/table in a compound identifier.  Thus, it's possible that 
- *      such compound name is mapped into a legal R/S identifier (preserving
- *      the "."), and then we incorrectly map such delimiting "dot" into "_" 
- *      thus loosing the original SQL compound identifier.  
- */
-#define RS_DBI_MAX_IDENTIFIER_LENGTH 18      /* as per SQL92 */
-SEXP 
-RS_DBI_makeSQLNames(SEXP snames)
-{
-   long     nstrings;
-   char *name;
-   SEXP schar;
-   char c;
-   char     errMsg[128];
-   size_t   len;
-   Sint     i;
-
-   nstrings = (Sint) GET_LENGTH(snames);
-   for(i = 0; i<nstrings; i++){
-       schar = STRING_ELT(snames, i);
-       name = CallocCharBuf(length(schar));
-       strncpy(name, CHAR(schar), length(schar));
-
-      if(strlen(name)> RS_DBI_MAX_IDENTIFIER_LENGTH){
-	 (void) sprintf(errMsg,"SQL identifier %s longer than %d chars", 
-			name, RS_DBI_MAX_IDENTIFIER_LENGTH);
-	 RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
-      }
-      /* check for delimited-identifiers (those in double-quotes);
-       * if missing closing double-quote, warn and treat as non-delim 
-       */
-      c = *name;
-      len = strlen(name);
-      if(c=='"' && name[len-1] =='"') 
-         continue;  
-      if(!isalpha(c) && c!='"') *name = 'X';
-      name++;
-      while((c=*name)){
-	 /* TODO: recognize SQL delim "." instances that may have
-	  * originated in SQL and R/S make.names() left alone */
-	 if(c=='.') *name='_';
-	 name++;
-      }
-      SET_STRING_ELT(snames, i, mkChar(name));
-      Free(name);
-   }
-
-   return snames;
-}
-
 /* the codes come from from R/src/main/util.c */
 const struct data_types RS_dataTypeTable[] = {
     { "NULL",		NILSXP	   },  /* real types */

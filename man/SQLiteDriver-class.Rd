@@ -9,9 +9,7 @@ SQLite(max.con = 200L, fetch.default.rec = 500, force.reload = FALSE,
   shared.cache = FALSE)
 }
 \arguments{
-\item{max.con}{IGNORED.  As of RSQLite 0.9.0, connections are managed
-dynamically and there is no predefined limit to the number of connections
-you can have in a given R session.}
+\item{max.con,force.reload}{Ignored and deprecated.}
 
 \item{fetch.default.rec}{default number of records to fetch at one time from
 the database.  The \code{fetch} method will use this number as a default,

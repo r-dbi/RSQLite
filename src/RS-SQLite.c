@@ -87,27 +87,6 @@ SEXP closeDriver() {
 
 // Connections -----------------------------------------------------------------
 
-/* open a connection with the same parameters used for in conHandle */
-Con_Handle
-RS_SQLite_cloneConnection(Con_Handle conHandle)
-{
-    RS_DBI_connection  *con = RS_DBI_getConnection(conHandle);
-    RS_SQLite_conParams *conParams = (RS_SQLite_conParams *) con->conParams;
-    SEXP dbname, allow_ext, vfs, flags;
-    Con_Handle ans;
-
-    /* copy dbname and loadable_extensions into a 2-element character
-     * vector to be passed to the RS_SQLite_newConnection() function.
-     */
-    PROTECT(dbname = mkString(conParams->dbname));
-    PROTECT(allow_ext = ScalarLogical(conParams->loadable_extensions));
-    PROTECT(vfs = mkString(conParams->vfs));
-    PROTECT(flags = ScalarInteger(conParams->flags));
-    ans = RS_SQLite_newConnection(dbname, allow_ext, flags, vfs);
-    UNPROTECT(4);
-    return ans;
-}
-
 RS_SQLite_conParams *
 RS_SQLite_allocConParams(const char *dbname, int loadable_extensions,
                          int flags, const char *vfs)

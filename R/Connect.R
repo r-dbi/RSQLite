@@ -88,7 +88,7 @@ setMethod("dbConnect", "SQLiteDriver",
 )
 
 check_vfs <- function(vfs) {
-  if (is.null(vfs)) return(NULL)
+  if (is.null(vfs) || vfs == "") return(NULL)
   
   if (.Platform[["OS.type"]] == "windows") {
     warning("vfs customization not available on this platform.",
@@ -102,10 +102,15 @@ check_vfs <- function(vfs) {
 
 #' @export
 #' @rdname dbConnect-SQLiteDriver-method
-#' @useDynLib RSQLite RS_SQLite_cloneConnection
 setMethod("dbConnect", "SQLiteConnection", function(drv){
-  new.id <- .Call(RS_SQLite_cloneConnection, drv@Id)
-  new("SQLiteConnection", Id = new.id)
+  info <- dbGetInfo(drv)
+  
+  if (info$dbname %in% c("", ":memory:")) {
+    stop("Can't clone a temporary database", call. = FALSE)
+  }
+  
+  dbConnect(SQLite(), info$dbname, vfs = info$vfs, flags = info$flags, 
+    loadable.extensions = info$loadableExtensions == "on")
 })
 
 

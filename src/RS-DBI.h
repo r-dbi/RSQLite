@@ -162,7 +162,6 @@ typedef struct st_sdbi_manager {
   int num_con;                     /* num of opened connections */
   int counter;                     /* num of connections handled so far*/
   int fetch_default_rec;           /* default num of records per fetch */
-  int managerId;                   /* typically, process id */
   RS_DBI_exception *exception;    
 } RS_DBI_manager;
 

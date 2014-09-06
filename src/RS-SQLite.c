@@ -1031,16 +1031,15 @@ RS_SQLite_closeResultSet(SEXP resHandle)
 SEXP driverInfo() {
   RS_DBI_manager* mgr = RS_DBI_getManager();
   
-  char *mgrDesc[] = {"fetch_default_rec", "managerId", "length", "num_con",
+  char *mgrDesc[] = {"fetch_default_rec", "length", "num_con",
                      "counter",   "clientVersion", "shared_cache"};
-  SEXPTYPE mgrType[] = {INTSXP, INTSXP, INTSXP, INTSXP, INTSXP,
+  SEXPTYPE mgrType[] = {INTSXP, INTSXP, INTSXP, INTSXP,
                         STRSXP, STRSXP };
-  int  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1};
-  SEXP output = PROTECT(RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, 7));
+  int  mgrLen[]  = {1, 1, 1, 1, 1, 1};
+  SEXP output = PROTECT(RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, 6));
 
   int j = 0;
   LST_INT_EL(output,j++,0) = mgr->fetch_default_rec;
-  LST_INT_EL(output,j++,0) = mgr->managerId;
   LST_INT_EL(output,j++,0) = mgr->length;
   LST_INT_EL(output,j++,0) = mgr->num_con;
   LST_INT_EL(output,j++,0) = mgr->counter;

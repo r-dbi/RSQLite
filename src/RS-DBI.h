@@ -110,7 +110,6 @@ typedef struct st_sdbi_fields {
   Sint  *length;        /* DBMS lengths in bytes */
   Sint  *isVarLength;   /* DBMS variable-length char type */
   Stype *Sclass;        /* R/S class (type) -- may be overriden */
-  /* TODO: Need a table of fun pointers to converters */
 } RS_DBI_fields;
 
 typedef struct st_sdbi_exception {
@@ -232,10 +231,6 @@ void  RS_DBI_allocOutput(SEXP output,
 			Sint num_rec,
 			Sint expand);
 
-/* TODO: We need to elevate RS_DBI_errorMessage to either
- * dbManager and/or dbConnection methods.  I still need to 
- * go back and re-code the error-handling throughout, darn!
- */
 void  RS_DBI_errorMessage(const char *msg, DBI_EXCEPTION exceptionType);
 void DBI_MSG(char *msg, DBI_EXCEPTION exception_type, char *driver);
 

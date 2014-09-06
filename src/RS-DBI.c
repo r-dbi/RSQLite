@@ -17,17 +17,7 @@
  */
 
 #include "RS-DBI.h"
-
 #include <R_ext/RS.h>
-/* TODO: monitor memory/object size consumption against S limits 
- *       in $SHOME/include/options.h we find "max_memory". We then
- *       mem_size to make sure we're not bumping into problems.
- *       But, is mem_size() reliable?  How should we do this?
- *
- * TODO: invoke user-specified generators 
- *
- * TODO: Implement exception objects for each dbObject.
- */
 
 static RS_DBI_manager *dbManager = NULL;
 

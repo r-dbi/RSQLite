@@ -44,12 +44,6 @@ void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
  * like in the ODBC API.)
  *
  * For details on SQLite see http://www.sqlite.org.
- * TODO:
- *    1. Make sure the code is thread-safe, in particular,
- *       we need to remove the PROBLEM ... ERROR macros
- *       in RS_DBI_errorMessage() because it's definetely not
- *       thread-safe.  But see RS_DBI_setException().
- *     2. Use proper types instead of getting everything as character
  */
 
 
@@ -914,15 +908,6 @@ static int do_select_step(RS_DBI_resultSet *res, int row_idx)
    guess the type based on the DB schema definition for the column.
    If the NULL value does not correspond to a table column, then we
    force character.
-
-   TODO: consider making this smarter by keeping track of unknown
-   columns and setting the type based on the first non-NULL.
-
-   TODO: consider adding ability for users to specify desired types
-   for result columns.  This could happen either via coercion in R or
-   at the SQLite level (which would be more efficient, but less
-   flexible).
-
 */
 SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec) {
   RS_DBI_resultSet* res = RS_DBI_getResultSet(rsHandle);

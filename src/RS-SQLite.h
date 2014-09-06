@@ -38,7 +38,6 @@ extern  "C" {
 
 /* SQLite connection parameters struct, allocating and freeing
  * methods.  This is pretty simple, since SQLite does not recognise users
- * TODO: SQLite 3.0 api allows for key/value strings.
  */
 typedef struct st_sdbi_conParams {
   char *dbname;
@@ -128,7 +127,6 @@ SEXP RS_SQLite_importFile(Con_Handle conHandle, SEXP s_tablename,
 
 SEXP RS_SQLite_copy_database(Con_Handle fromConHandle, Con_Handle toConHandle);
 
-/* TODO: general connection */
 char * RS_sqlite_getline(FILE *in, const char *eol);
 
 /* the following type names should be the  SQL-92 data types, and should

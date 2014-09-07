@@ -113,7 +113,6 @@ SEXP RS_DBI_asConHandle(RS_DBI_connection *con);
 
 /* dbResultSet */
 SEXP RS_DBI_allocResultSet(SEXP conHandle);
-void RS_DBI_freeResultSet(SEXP rsHandle);
 void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
 RS_DBI_resultSet  *RS_DBI_getResultSet(SEXP rsHandle);
 SEXP RS_DBI_asResHandle(SEXP conxp);

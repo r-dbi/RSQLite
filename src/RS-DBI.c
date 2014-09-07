@@ -104,13 +104,6 @@ void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
     con->resultSet = NULL;
 }
 
-void
-RS_DBI_freeResultSet(SEXP rsHandle)
-{
-  RS_DBI_freeResultSet0(RS_DBI_getResultSet(rsHandle),
-                        RS_DBI_getConnection(rsHandle));
-}
-
 RS_DBI_fields *
 RS_DBI_allocFields(int num_fields)
 {

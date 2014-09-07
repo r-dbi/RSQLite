@@ -47,22 +47,27 @@ RS_DBI_allocResultSet(SEXP conHandle)
   return RS_DBI_asResHandle(conHandle);
 }
 
-void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con)
-{
-    if(result->drvResultSet) {
-      warning("freeResultSet failed (result->drvResultSet)");
-    }
-    if (result->drvData) {
-      warning("freeResultSet failed (result->drvData)");
-    }
-    if (result->statement)
-      free(result->statement);
-    if (result->fields)
-      RS_DBI_freeFields(result->fields);
-    free(result);
-    
-    result = NULL;
-    con->resultSet = NULL;
+void RSQLite_freeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con) {
+  if (result->drvResultSet) {
+    sqlite3_finalize(result->drvResultSet);
+    result->drvResultSet = NULL;
+  }
+  if (result->drvData) {
+    RS_SQLite_bindParams *params = result->drvData;
+    R_ReleaseObject(params->data);
+    RS_SQLite_freeParameterBinding(&params);
+    result->drvData = NULL;
+  }
+  
+  if (result->statement)
+    free(result->statement);
+  if (result->fields)
+    RS_DBI_freeFields(result->fields);
+  
+  free(result);
+  
+  result = NULL;
+  con->resultSet = NULL;
 }
 
 

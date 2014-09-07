@@ -64,8 +64,8 @@ typedef struct RS_SQLite_exception {
  * defined by the RS-DBI implementation. 
  */
 typedef struct RS_DBI_resultSet {
-  void  *drvResultSet;   /* the actual (driver's) cursor/result set */
-  void  *drvData;        /* a pointer to driver-specific data */
+  sqlite3_stmt* drvResultSet;   /* the actual (driver's) cursor/result set */
+  RS_SQLite_bindParams* drvData;        /* a pointer to driver-specific data */
   int  resultSetId;  
   int  isSelect;        /* boolean for testing SELECTs */
   char  *statement;      /* SQL statement */
@@ -101,7 +101,6 @@ typedef struct SQLiteDriver {
 // Result ----------------------------------------------------------------------
 
 SEXP RS_DBI_allocResultSet(SEXP conHandle);
-void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con);
 RS_DBI_resultSet  *RS_DBI_getResultSet(SEXP rsHandle);
 SEXP RS_DBI_asResHandle(SEXP conxp);
 void RSQLite_freeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con);

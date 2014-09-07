@@ -223,21 +223,6 @@ SEXP RS_SQLite_quick_column(SEXP conHandle, SEXP table, SEXP column)
     return ans;
 }
 
-void RSQLite_freeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con)
-{
-    if (result->drvResultSet) {
-        sqlite3_finalize((sqlite3_stmt *)result->drvResultSet);
-        result->drvResultSet = NULL;
-    }
-    if (result->drvData) {
-        RS_SQLite_bindParams *params = (RS_SQLite_bindParams *)result->drvData;
-        R_ReleaseObject(params->data);
-        RS_SQLite_freeParameterBinding(&params);
-        result->drvData = NULL;
-    }
-    RS_DBI_freeResultSet0(result, con);
-}
-
 /* Helper function to clean up and report an error during a call to
    RS_SQLite_exec */
 static void

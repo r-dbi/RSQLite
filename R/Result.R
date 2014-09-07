@@ -9,39 +9,86 @@ setClass("SQLiteResult",
   slots = list(Id = "externalptr")
 )
 
-#' Fetch records from a previously executed query
+#' Execute a SQL statement on a database connection
 #' 
-#' The \code{RSQLite} implementations retrieves all records into a buffer
-#' internally managed by the RSQLite driver (thus this memory in not managed by
-#' R but its part of the R process), and \code{fetch} simply returns records
-#' from this internal buffer.
+#' To retrieve results a chunk at a time, use \code{dbSendQuery}, 
+#' \code{dbFetch}, then \code{ClearResult}. Alternatively, if you want all the 
+#' results (and they'll fit in memory) use \code{dbGetQuery} which sends, 
+#' fetches and clears for you.
 #' 
+#' @param conn an \code{\linkS4class{SQLiteConnection}} object.
+#' @param statement a character vector of length one specifying the SQL
+#'   statement that should be executed.  Only a single SQL statment should be
+#'   provided.
+#' @examples
+#' con <- dbConnect(SQLite(), ":memory:")
+#' dbWriteTable(con, "arrests", datasets::USArrests)
+#' 
+#' # Run query to get results as dataframe
+#' dbGetQuery(con, "SELECT * FROM arrests limit 3")
+#'
+#' # Send query to pull requests in batches
+#' res <- dbSendQuery(con, "SELECT * FROM arrests")
+#' data <- fetch(res, n = 2)
+#' data
+#' dbHasCompleted(res)
+#' dbClearResult(res)
+#' 
+#' # Use dbSendPreparedQuery/dbGetPreparedQuery for "prepared" queries
+#' dbGetPreparedQuery(con, "SELECT * FROM arrests WHERE Murder < ?", 
+#'    data.frame(x = 3))
+#' dbGetPreparedQuery(con, "SELECT * FROM arrests WHERE Murder < (:x)", 
+#'    data.frame(x = 3))
+#' 
+#' dbDisconnect(con)
+#' @name query
+NULL 
+
+#' @rdname query
+#' @export
+setMethod("dbSendQuery", c("SQLiteConnection", "character"),
+  function(conn, statement) {
+    sqliteSendQuery(conn, statement)
+  }
+)
+
+#' @rdname query
+#' @param bind.data A data frame of data to be bound.
+#' @export
+setMethod("dbSendPreparedQuery", 
+  c("SQLiteConnection", "character", "data.frame"),
+  function(conn, statement, bind.data) {
+    sqliteSendQuery(conn, statement, bind.data)
+  }
+)
+
+#' @useDynLib RSQLite RS_SQLite_exec
+sqliteSendQuery <- function(con, statement, bind.data = NULL) {
+  if (!is.null(bind.data)) {
+    if (!is.data.frame(bind.data)) {
+      bind.data <- as.data.frame(bind.data)
+    }
+    if (nrow(bind.data) == 0 || ncol(bind.data) == 0) {
+      stop("bind.data must have non-zero dimensions")
+    }
+  }
+  
+  rsId <- .Call(RS_SQLite_exec, con@Id, as.character(statement), bind.data)
+  new("SQLiteResult", Id = rsId)
+}
+
+
 #' @param res an \code{\linkS4class{SQLiteResult}} object.
 #' @param n maximum number of records to retrieve per fetch. Use \code{-1} to 
 #'    retrieve all pending records; use \code{0} for to fetch the default 
 #'    number of rows as defined in \code{\link{SQLite}}
-#' @examples
-#' con <- dbConnect(SQLite())
-#' dbWriteTable(con, "jratings", datasets::USJudgeRatings)
-#' 
-#' res <- dbSendQuery(con, "SELECT row_names, ORAL, DILG, FAMI FROM jratings")
-#' 
-#' # we now fetch the first 10 records from the resultSet into a data.frame
-#' data1 <- dbFetch(res, n = 10)   
-#' dim(data1)
-#' 
-#' dbHasCompleted(res)
-#' 
-#' # let's get all remaining records
-#' data2 <- dbFetch(res, n = -1)
-#' dbClearResult(res)
-#' dbDisconnect(con)
 #' @export
+#' @rdname query
 setMethod("dbFetch", "SQLiteResult", function(res, n = 0) {
   sqliteFetch(res, n = n)
 })
 
-#' @export
+#' @rdname query
 #' @rdname dbFetch-SQLiteResult-method
 setMethod("fetch", "SQLiteResult", function(res, n = 0) {
   sqliteFetch(res, n = n)
@@ -60,11 +107,8 @@ sqliteFetch <- function(res, n = 0) {
   rel
 }
 
-#' Clear a result set.
-#' 
 #' @export
-#' @param res an \code{\linkS4class{SQLiteResult}} object.
-#' @param ... Ignored. Needed for compatibility with generic.
+#' @rdname query
 #' @useDynLib RSQLite rsqlite_result_free_handle
 setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
   if (!dbIsValid(res)){
@@ -73,6 +117,39 @@ setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
   }
   .Call(rsqlite_result_free_handle, res@Id)
 })
+
+#' @rdname query
+#' @export
+setMethod("dbGetQuery", c("SQLiteConnection", "character"),
+  function(conn, statement){
+    sqliteGetQuery(conn, statement)
+  },
+)
+#' @rdname query
+#' @export
+setMethod("dbGetPreparedQuery", 
+  c("SQLiteConnection", "character", "data.frame"),
+  function(conn, statement, bind.data) {
+    sqliteGetQuery(conn, statement, bind.data)
+  }
+)
+
+sqliteGetQuery <- function(con, statement, bind.data = NULL) {
+  rs <- sqliteSendQuery(con, statement, bind.data)
+  on.exit(dbClearResult(rs))
+  
+  if (dbHasCompleted(rs)) {
+    return(invisible())
+  }
+  
+  res <- sqliteFetch(rs, n = -1)
+  if (!dbHasCompleted(rs)) {
+    warning("Pending rows")
+  }
+  
+  res
+}
+
 
 #' Database interface meta-data.
 #' 

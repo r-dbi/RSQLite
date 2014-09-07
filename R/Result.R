@@ -20,6 +20,7 @@ setClass("SQLiteResult",
 #' @param statement a character vector of length one specifying the SQL
 #'   statement that should be executed.  Only a single SQL statment should be
 #'   provided.
+#' @param ... Unused. Needed for compatibility with generic.
 #' @examples
 #' con <- dbConnect(SQLite(), ":memory:")
 #' dbWriteTable(con, "arrests", datasets::USArrests)

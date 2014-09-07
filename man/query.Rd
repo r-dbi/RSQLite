@@ -44,6 +44,8 @@ provided.}
 \item{n}{maximum number of records to retrieve per fetch. Use \code{-1} to
 retrieve all pending records; use \code{0} for to fetch the default
 number of rows as defined in \code{\link{SQLite}}}
+
+\item{...}{Unused. Needed for compatibility with generic.}
 }
 \description{
 To retrieve results a chunk at a time, use \code{dbSendQuery},

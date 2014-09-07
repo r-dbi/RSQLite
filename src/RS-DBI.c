@@ -16,8 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "RS-DBI.h"
-#include <R_ext/RS.h>
+#include "rsqlite.h"
 
 /* the invoking (freeing) function must provide a function for
  * freeing the conParams, and by setting the (*free_drvConParams)(void *)

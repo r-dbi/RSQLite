@@ -16,8 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "RS-SQLite.h"
-#include "param_binding.h"
+#include "rsqlite.h"
 
 /* size_t getline(char**, size_t*, FILE*); */
 char *compiledVersion = SQLITE_VERSION;

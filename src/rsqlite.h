@@ -1,5 +1,5 @@
-#ifndef _RS_DBI_H
-#define _RS_DBI_H 1
+#ifndef _RSQLITE_H
+#define _RSQLITE_H 1
 /*  
  * Copyright (C) 1999-2002 The Omega Project for Statistical Computing.
  *
@@ -22,9 +22,14 @@
 extern "C" {
 #endif
 
-#include "Rhelpers.h"
 #include <ctype.h>
+#include <string.h>
+#include "sqlite.h"
+#include "Rversion.h"
+#include "Rdefines.h"
+#include <R_ext/RS.h>
 
+// DBI -------------------------------------------------------------------------
 
 /* We now define 4 important data structures:
  * SQLiteDriver, RS_DBI_connection, RS_DBI_resultSet, and
@@ -127,7 +132,7 @@ void           RS_DBI_freeFields(RS_DBI_fields *flds);
  * table, not a dataframe nor a list.
  */
 void  RS_DBI_allocOutput(SEXP output, 
-			RS_DBI_fields *flds,
+  		RS_DBI_fields *flds,
 			int num_rec,
 			int expand);
 
@@ -145,7 +150,148 @@ SEXP RS_DBI_copyFields(RS_DBI_fields *flds);
 
 SEXP DBI_newResultHandle(SEXP xp, SEXP resId);
 
+// SQLite ----------------------------------------------------------------------
+
+
+/* These control the open mode for new connections and
+   are mapped to the appropriate SQLite flag.
+ */
+#define RSQLITE_RWC 0
+#define RSQLITE_RW  1
+#define RSQLITE_RO  2
+
+/* SQLite connection parameters struct, allocating and freeing
+ * methods.  This is pretty simple, since SQLite does not recognise users
+ */
+typedef struct st_sdbi_conParams {
+  char *dbname;
+  int  loadable_extensions;
+  int  flags;
+  char *vfs;
+} RS_SQLite_conParams;
+
+typedef struct st_sqlite_err {
+   int  errorNum;
+   char *errorMsg;
+} RS_SQLite_exception;
+
+/* Convert declared column type string to SQLite column type.
+ * For example, "varchar" => SQLITE_TEXT
+ *
+ */
+int                 SQLite_decltype_to_type(const char *decltype);
+
+/* The following functions are the S/R entry into the C implementation (i.e.,
+ * these are the only ones visible from R/S) we use the prefix "RS_SQLite" in
+ * function names to denote this.  These functions are  built on top of the
+ * underlying RS_DBI manager, connection, and resultsets structures and
+ * functions (see RS-DBI.h).
+ *
+ */
+
+/* dbManager */
+void initDriver(SEXP records_, SEXP cache_);
+SEXP RS_SQLite_close(SEXP mgrHandle);
+
+/* dbConnection */
+SEXP RS_SQLite_newConnection(SEXP dbfile,
+                                   SEXP allow_ext, SEXP s_flags, SEXP s_vfs);
+SEXP RS_SQLite_cloneConnection(SEXP conHandle);
+SEXP RS_SQLite_closeConnection(SEXP conHandle);
+/* we simulate db exceptions ourselves */
+void        RS_SQLite_setException(RS_DBI_connection *con, int errorNum,
+                                   const char *errorMsg);
+SEXP RS_SQLite_getException(SEXP conHandle);
+/* err No, Msg */
+
+/* currently we only provide a "standard" callback to sqlite_exec() -- this
+ * callback collects all the rows and puts them in a cache in the results set
+ * (res->drvData) to simulate a cursor so that we can fetch() like in any other
+ * driver.  Other interesting callbacks should allow us to easily implement the
+ * dbApply() ideas also in the RMySQL driver
+ */
+int       RS_SQLite_stdCallback(void *resHandle, int ncol, char **row,
+                                char **colNames);
+
+/* dbResultSet */
+SEXP RS_SQLite_exec(SEXP conHandle, SEXP statement,
+                           SEXP bind_data);
+SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec);
+SEXP RS_SQLite_closeResultSet(SEXP rsHandle);
+void        RS_SQLite_initFields(RS_DBI_resultSet *res, int ncol,
+                                 char **colNames);
+
+SEXP RS_SQLite_validHandle(SEXP handle);      /* boolean */
+
+RS_DBI_fields *RS_SQLite_createDataMappings(SEXP resHandle);
+
+/* the following funs return named lists with meta-data for
+ * the manager, connections, and  result sets, respectively.
+ */
+SEXP RS_SQLite_managerInfo(SEXP mgrHandle);
+SEXP RSQLite_connectionInfo(SEXP conHandle);
+SEXP RS_SQLite_resultSetInfo(SEXP rsHandle);
+
+/*  The following imports the delim-fields of a file into an existing table*/
+SEXP RS_SQLite_importFile(SEXP conHandle, SEXP s_tablename,
+             SEXP s_filename, SEXP s_separator, SEXP s_obj,
+             SEXP s_skip);
+
+SEXP RS_SQLite_copy_database(SEXP fromConHandle, SEXP toConHandle);
+
+char * RS_sqlite_getline(FILE *in, const char *eol);
+
+/* the following type names should be the  SQL-92 data types, and should
+ * be moved to the RS-DBI.h
+ */
+enum SQLITE_TYPE {
+  SQLITE_TYPE_NULL,
+  SQLITE_TYPE_INTEGER,
+  SQLITE_TYPE_REAL,
+  SQLITE_TYPE_TEXT,
+  SQLITE_TYPE_BLOB
+};
+
+// R helpers -------------------------------------------------------------------
+
+/* x[i] */
+#define LGL_EL(x,i) LOGICAL_POINTER((x))[(i)]
+#define INT_EL(x,i) INTEGER_POINTER((x))[(i)]
+#define NUM_EL(x,i) NUMERIC_POINTER((x))[(i)]
+#define LST_EL(x,i) VECTOR_ELT((x),(i))
+#define CHR_EL(x,i) CHAR(STRING_ELT((x),(i)))
+#define SET_CHR_EL(x,i,val)  SET_STRING_ELT((x),(i), (val))
+
+/* x[[i]][j] -- can be also assigned if x[[i]] is a numeric type */
+#define LST_CHR_EL(x,i,j) CHR_EL(LST_EL((x),(i)), (j))
+#define LST_LGL_EL(x,i,j) LGL_EL(LST_EL((x),(i)), (j))
+#define LST_INT_EL(x,i,j) INT_EL(LST_EL((x),(i)), (j))
+#define LST_NUM_EL(x,i,j) NUM_EL(LST_EL((x),(i)), (j))
+#define LST_LST_EL(x,i,j) LST_EL(LST_EL((x),(i)), (j))
+
+/* x[[i]][j] -- for the case when x[[i]] is a character type */
+#define SET_LST_CHR_EL(x,i,j,val) SET_STRING_ELT(LST_EL(x,i), j, val)
+
+// Param binding ---------------------------------------------------------------
+
+typedef struct st_sqlite_bindparams {
+    int count;
+    int row_count;
+    int rows_used;
+    int row_complete;
+    SEXP data;
+} RS_SQLite_bindParams;
+
+
+RS_SQLite_bindParams *
+RS_SQLite_createParameterBinding(int n,
+                                 SEXP bind_data, sqlite3_stmt *stmt,
+                                 char *errorMsg);
+
+void RS_SQLite_freeParameterBinding(RS_SQLite_bindParams **);
+
+
 #ifdef __cplusplus 
 }
 #endif
-#endif   /* _RS_DBI_H */
+#endif   /* _RSQLITE_H */

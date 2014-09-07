@@ -1,8 +1,4 @@
-#include "param_binding.h"
-#include "Rhelpers.h"
-#include <string.h>
-#include <stdlib.h>
-
+#include "rsqlite.h"
 
 static int *
 init_bindParams(int num_cols)

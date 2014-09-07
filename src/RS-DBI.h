@@ -137,17 +137,6 @@ void  RS_DBI_allocOutput(SEXP output,
 /* utility funs (copy strings, convert from R/S types to string, etc.*/
 char     *RS_DBI_copyString(const char *str);
 
-/* We now define a generic data type name-Id mapping struct
- * and initialize the RS_dataTypeTable[].  Each driver could
- * define similar table for generating friendly type names
- */
-struct data_types {
-    char *typeName;
-    int typeId;
-};
-
-/* return the primitive type name for a primitive type id */
-char     *RS_DBI_getTypeName(int typeCode, const struct data_types table[]);
 /* same, but callable from S/R and vectorized */
 SEXP RS_DBI_SclassNames(SEXP types);  
 
@@ -156,8 +145,6 @@ SEXP RS_DBI_createNamedList(char  **names,
 				 int  *lengths,
 				 int  n);
 SEXP RS_DBI_copyFields(RS_DBI_fields *flds);
-
-extern const struct data_types RS_dataTypeTable[];
 
 SEXP DBI_newResultHandle(SEXP xp, SEXP resId);
 

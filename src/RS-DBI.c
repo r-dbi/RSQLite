@@ -278,7 +278,6 @@ RS_DBI_SclassNames(SEXP type)
   int *typeCodes;
   int n;
   int  i;
-  char *s;
   
   if(type==R_NilValue)
      error("internal error in RS_DBI_SclassNames: input S types must be nonNULL");
@@ -286,9 +285,7 @@ RS_DBI_SclassNames(SEXP type)
   typeCodes = INTEGER_DATA(type);
   PROTECT(typeNames = NEW_CHARACTER(n));
   for(i = 0; i < n; i++) {
-    s = RS_DBI_getTypeName(typeCodes[i], RS_dataTypeTable);
-    if(!s)
-      error("internal error RS_DBI_SclassNames: unrecognized S type");
+    const char* s = type2char(typeCodes[i]);
     SET_CHR_EL(typeNames, i, mkChar(s));
   }
   UNPROTECT(1);
@@ -392,46 +389,3 @@ RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
   
   return S_fields;
 }
-
-/* given a type id return its human-readable name.
- * We define an RS_DBI_dataTypeTable */
-char *
-RS_DBI_getTypeName(int t, const struct data_types table[])
-{
-  int i;
-
-  for (i = 0; table[i].typeName != (char *) 0; i++) {
-    if (table[i].typeId == t)
-      return table[i].typeName;
-  }
-  warning("unknown (%ld)", (long) t);
-  return (char *) 0; /* for -Wall */
-}
-
-/* the codes come from from R/src/main/util.c */
-const struct data_types RS_dataTypeTable[] = {
-    { "NULL",		NILSXP	   },  /* real types */
-    { "symbol",		SYMSXP	   },
-    { "pairlist",	LISTSXP	   },
-    { "closure",	CLOSXP	   },
-    { "environment",	ENVSXP	   },
-    { "promise",	PROMSXP	   },
-    { "language",	LANGSXP	   },
-    { "special",	SPECIALSXP },
-    { "builtin",	BUILTINSXP },
-    { "char",		CHARSXP	   },
-    { "logical",	LGLSXP	   },
-    { "integer",	INTSXP	   },
-    { "double",		REALSXP	   }, /*-  "real", for R <= 0.61.x */
-    { "complex",	CPLXSXP	   },
-    { "character",	STRSXP	   },
-    { "...",		DOTSXP	   },
-    { "any",		ANYSXP	   },
-    { "expression",	EXPRSXP	   },
-    { "list",		VECSXP	   },
-    { "raw",		RAWSXP	   },
-    /* aliases : */
-    { "numeric",	REALSXP	   },
-    { "name",		SYMSXP	   },
-    { (char *)0,	-1	   }
-};

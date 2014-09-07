@@ -19,7 +19,7 @@
 #include "rsqlite.h"
 
 void
-RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
+RS_DBI_allocOutput(SEXP output, SQLiteFields *flds,
   	   int num_rec, int  expand)
 {
   SEXP names, s_tmp;
@@ -393,7 +393,7 @@ SEXP RS_SQLite_exec(SEXP handle, SEXP statement, SEXP bind_data) {
 /* Fills the output VECSXP with one row of data from the resultset
  */
 void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
-                  RS_DBI_fields *flds) {
+                  SQLiteFields *flds) {
   
   for (int j = 0; j < flds->num_fields; j++) {
     int is_null = (sqlite3_column_type(db_statement, j) == SQLITE_NULL);
@@ -490,14 +490,7 @@ SEXP RS_SQLite_fetch(SEXP handle, SEXP max_rec) {
       sqlite3_errmsg(sqlite3_db_handle(db_statement)));
   }
   
-  // Cache field mappings
-  if (!res->fields) {
-    res->fields = RS_SQLite_createDataMappings(handle);
-    if (!res->fields) {
-      error("corrupt SQLite resultSet, missing fieldDescription");
-    }
-  }
-  RS_DBI_fields* flds = res->fields;
+  SQLiteFields* flds = rsqlite_result_fields(res);
 
   int num_fields = flds->num_fields;
   int num_rec = asInteger(max_rec);

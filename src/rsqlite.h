@@ -45,14 +45,14 @@ typedef struct RS_SQLite_bindParams {
  * to build the R/S list (or data.frame) that will receive the SQL
  * output.
  */
-typedef struct RS_DBI_fields {
+typedef struct SQLiteFields {
   int num_fields;
   char  **name;         /* DBMS field names */
   int  *type;          /* DBMS internal types */
   int  *length;        /* DBMS lengths in bytes */
   int  *isVarLength;   /* DBMS variable-length char type */
   SEXPTYPE *Sclass;        /* R/S class (type) -- may be overriden */
-} RS_DBI_fields;
+} SQLiteFields;
 
 typedef struct RS_SQLite_exception {
    int  errorNum;
@@ -72,7 +72,7 @@ typedef struct SQLiteResult {
   int  rowsAffected;    /* used by non-SELECT statements */
   int  rowCount;        /* rows fetched so far (SELECT-types)*/
   int  completed;       /* have we fetched all rows? */
-  RS_DBI_fields *fields;
+  SQLiteFields *fields;
 } SQLiteResult;
 
 enum SQLITE_TYPE {
@@ -100,10 +100,9 @@ typedef struct SQLiteDriver {
 
 // Fields ----------------------------------------------------------------------
 
-RS_DBI_fields *RS_DBI_allocFields(int num_fields);
-SEXP fieldInfo(RS_DBI_fields *flds);
-void RS_DBI_freeFields(RS_DBI_fields *flds);
-RS_DBI_fields *RS_SQLite_createDataMappings(SEXP handle);
+SQLiteFields*  rsqlite_fields_alloc(int num_fields);
+void           rsqlite_fields_free(SQLiteFields *flds);
+SEXP           rsqlite_field_info(SQLiteFields *flds);
 
 // Result ----------------------------------------------------------------------
 
@@ -113,8 +112,9 @@ SEXP           rsqlite_result_free_handle(SEXP con);
 SQLiteResult*  rsqlite_result_from_handle(SEXP handle);
 SEXP           rsqlite_result_valid(SEXP handle);
 SEXP           rsqlite_result_info(SEXP handle);
+SQLiteFields*  rsqlite_result_fields(SQLiteResult* handle);
 
-void RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds, int num_rec, int expand);
+void RS_DBI_allocOutput(SEXP output, SQLiteFields *flds, int num_rec, int expand);
 SEXP RS_SQLite_exec(SEXP handle, SEXP statement, SEXP bind_data);
 SEXP RS_SQLite_fetch(SEXP handle, SEXP max_rec);
 RS_SQLite_bindParams* RS_SQLite_createParameterBinding(int n, SEXP bind_data, sqlite3_stmt *stmt, char *errorMsg);
@@ -144,7 +144,7 @@ SEXP RS_SQLite_close(SEXP mgrHandle);
 // Utilities -------------------------------------------------------------------
 
 char* RS_DBI_copyString(const char *str);
-SEXP RS_DBI_copyFields(RS_DBI_fields *flds);
+SEXP RS_DBI_copyFields(SQLiteFields *flds);
 int SQLite_decltype_to_type(const char *decltype);
 SEXP RS_SQLite_importFile(SEXP conHandle, SEXP s_tablename, SEXP s_filename, SEXP s_separator, SEXP s_obj, SEXP s_skip);
 char * RS_sqlite_getline(FILE *in, const char *eol);

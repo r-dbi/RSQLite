@@ -52,7 +52,7 @@ void rsqlite_result_free(SQLiteConnection* con) {
   if (result->statement)
     free(result->statement);
   if (result->fields)
-    RS_DBI_freeFields(result->fields);
+    rsqlite_fields_free(result->fields);
   
   free(result);
   
@@ -110,10 +110,78 @@ SEXP rsqlite_result_info(SEXP handle) {
   SET_VECTOR_ELT(info, i++, ScalarInteger(result->completed));
   
   SET_STRING_ELT(info_nms, i, mkChar("fields"));
-  SEXP fields = PROTECT(fieldInfo(result->fields));
+  SEXP fields = PROTECT(rsqlite_field_info(result->fields));
   SET_VECTOR_ELT(info, i++, fields);
   UNPROTECT(1);
 
   UNPROTECT(1);
   return info;
+}
+
+SQLiteFields* rsqlite_result_fields(SQLiteResult* result) {
+  // Already computed, return cached result
+  if (result->fields) 
+    return result->fields;
+  
+  const char* col_decltype = NULL;
+
+  sqlite3_stmt* db_statement = (sqlite3_stmt *) result->drvResultSet;
+
+  int ncol = sqlite3_column_count(db_statement);
+  SQLiteFields* flds = rsqlite_fields_alloc(ncol); /* BUG: mem leak if this fails? */
+  flds->num_fields = ncol;
+
+  for(int j = 0; j < ncol; j++){
+    char* col_name = (char*) sqlite3_column_name(db_statement, j);
+    if (col_name)
+      flds->name[j] = RS_DBI_copyString(col_name);
+    else { 
+      // weird failure
+      rsqlite_fields_free(flds);
+      flds = NULL;
+      return NULL;
+    }
+    // We do our best to determine the type of the column.  When the first 
+    // row retrieved contains a NULL and does not reference a table column, we 
+    // give up.
+    int col_type = sqlite3_column_type(db_statement, j);
+    if (col_type == SQLITE_NULL) {
+        /* try to get type from origin column */
+        col_decltype = sqlite3_column_decltype(db_statement, j);
+        col_type = SQLite_decltype_to_type(col_decltype);
+    }
+    switch(col_type) {
+      case SQLITE_INTEGER:
+        flds->type[j] = SQLITE_TYPE_INTEGER;
+        flds->Sclass[j] = INTSXP;
+        flds->length[j] = sizeof(int);
+        flds->isVarLength[j] = 0;
+        break;
+      case SQLITE_FLOAT:
+        flds->type[j] = SQLITE_TYPE_REAL;
+        flds->Sclass[j] = REALSXP;
+        flds->length[j] = sizeof(double);
+        flds->isVarLength[j] = 0;
+        break;
+     case SQLITE_TEXT:
+        flds->type[j] = SQLITE_TYPE_TEXT;
+        flds->Sclass[j] = STRSXP;
+        flds->length[j] = -1;   /* unknown */
+        flds->isVarLength[j] = 1;
+        break;
+      case SQLITE_NULL:
+        error("NULL column handling not implemented");
+        break;
+     case SQLITE_BLOB:
+        flds->type[j] = SQLITE_TYPE_BLOB;
+        flds->Sclass[j] = VECSXP;
+        flds->length[j] = -1;   /* unknown */
+        flds->isVarLength[j] = 1;
+        break;
+      default:
+        error("unknown column type %d", col_type);
+    }
+  }
+  result->fields = flds;
+  return flds;
 }

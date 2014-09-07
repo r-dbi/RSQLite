@@ -482,7 +482,7 @@ SEXP RS_SQLite_fetch(SEXP handle, SEXP max_rec) {
     row_idx++;
     if (row_idx == num_rec) {  /* request satisfied or exhausted allocated space */
       if (expand) {    /* do we extend or return the records fetched so far*/
-        num_rec = 2 * num_rec;
+        num_rec = 1.5 * num_rec;
         rsqlite_output_expand(output, flds, num_rec);
       } else {
         break;       /* okay, no more fetching for now */

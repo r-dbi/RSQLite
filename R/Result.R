@@ -111,12 +111,18 @@ sqliteFetch <- function(res, n = 0) {
 #' @rdname query
 #' @useDynLib RSQLite rsqlite_result_free_handle
 setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
-  if (!dbIsValid(res)){
-    warning("Expired SQLiteResult", call. = FALSE)
-    return(TRUE)
-  }
+  check_valid(res)
   .Call(rsqlite_result_free_handle, res@Id)
 })
+
+#' @export
+#' @rdname query
+#' @useDynLib RSQLite rsqlite_result_free_handle
+setMethod("dbClearResult", "SQLiteConnection", function(res, ...) {
+  check_valid(res)
+  .Call(rsqlite_result_free_handle, res@Id)
+})
+
 
 #' @rdname query
 #' @export

@@ -44,9 +44,9 @@ RS_DBI_freeConnection(SEXP conHandle)
       "internal error in RS_DBI_freeConnection: driver might have left open its connection on the server";
     warning(errMsg);
   }
-  if(con->drvData){
+  if(con->exception){
     char *errMsg = 
-      "internal error in RS_DBI_freeConnection: non-freed con->drvData (some memory leaked)";
+      "internal error in RS_DBI_freeConnection: non-freed con->exception (some memory leaked)";
     warning(errMsg);
   }
 

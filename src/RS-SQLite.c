@@ -91,7 +91,7 @@ RS_SQLite_setException(RS_DBI_connection *con, int err_no, const char *err_msg)
 {
     RS_SQLite_exception *ex;
 
-    ex = (RS_SQLite_exception *) con->drvData;
+    ex = (RS_SQLite_exception *) con->exception;
     if(!ex){    /* brand new exception object */
         ex = (RS_SQLite_exception *) malloc(sizeof(RS_SQLite_exception));
         if(!ex)
@@ -106,18 +106,20 @@ RS_SQLite_setException(RS_DBI_connection *con, int err_no, const char *err_msg)
     else
         ex->errorMsg = (char *) NULL;
 
-    con->drvData = (void *) ex;
+    con->exception = (void *) ex;
     return;
 }
 
 void
 RS_SQLite_freeException(RS_DBI_connection *con)
 {
-    RS_SQLite_exception *ex = (RS_SQLite_exception *) con->drvData;
+    RS_SQLite_exception *ex = (RS_SQLite_exception *) con->exception;
 
     if(!ex) return;
     if(ex->errorMsg) free(ex->errorMsg);
     free(ex);
+    
+    con->exception = NULL;
     return;
 }
 
@@ -148,7 +150,7 @@ SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
   if (!con){
     error("could not malloc dbConnection");
   }
-  con->drvData = (void *) NULL;  
+  con->exception = (RS_DBI_exception *) NULL;  
   con->resultSet = (RS_DBI_resultSet *) NULL;
 
   // Initialise SQLite3 database connection
@@ -189,7 +191,6 @@ SEXP RS_SQLite_closeConnection(SEXP conHandle) {
   }
   con->drvConnection = NULL;
   RS_SQLite_freeException(con);
-  con->drvData = NULL;
   RS_DBI_freeConnection(conHandle);
   
   return ScalarLogical(1);
@@ -855,7 +856,7 @@ RS_SQLite_getException(SEXP conHandle)
     if(!con->drvConnection)
         error("internal error: corrupt connection handle");
     PROTECT(output = RS_DBI_createNamedList(exDesc, exType, exLen, n));
-    err = (RS_SQLite_exception *) con->drvData;
+    err = (RS_SQLite_exception *) con->exception;
     LST_INT_EL(output,0,0) = err->errorNum;
     SET_LST_CHR_EL(output,1,0,mkChar(err->errorMsg));
     UNPROTECT(1);

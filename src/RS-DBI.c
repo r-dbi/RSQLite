@@ -19,23 +19,6 @@
 #include "RS-DBI.h"
 #include <R_ext/RS.h>
 
-SEXP RS_DBI_allocConnection() {
-  RS_DBI_connection* con = (RS_DBI_connection *) malloc(sizeof(RS_DBI_connection));
-  if (!con){
-    error("could not malloc dbConnection");
-  }
-  con->drvConnection = (void *) NULL;
-  con->drvData = (void *) NULL;  
-  con->resultSet = (RS_DBI_resultSet *) NULL;
-
-  /* Finally, update connection table in driver */
-  SQLiteDriver* driver = getDriver();
-  driver->num_con += 1;
-  driver->counter += 1;
-
-  return RS_DBI_asConHandle(con);
-}
-
 /* the invoking (freeing) function must provide a function for
  * freeing the conParams, and by setting the (*free_drvConParams)(void *)
  * pointer.

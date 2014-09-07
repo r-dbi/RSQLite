@@ -144,13 +144,14 @@ SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
   }
   
   // Create external pointer to connection object
-  SEXP conHandle = RS_DBI_allocConnection();
-  RS_DBI_connection* con = RS_DBI_getConnection(conHandle);
-  if (!con) {
-    RS_DBI_freeConnection(conHandle);
-    error("Could not allocate space for connection object");
+  RS_DBI_connection* con = (RS_DBI_connection *) malloc(sizeof(RS_DBI_connection));
+  if (!con){
+    error("could not malloc dbConnection");
   }
+  con->drvData = (void *) NULL;  
+  con->resultSet = (RS_DBI_resultSet *) NULL;
 
+  // Initialise SQLite3 database connection
   sqlite3* db_connection;
   int rc = sqlite3_open_v2(dbname, &db_connection, flags, vfs);
   if (rc != SQLITE_OK) {
@@ -161,9 +162,14 @@ SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
   }
   con->drvConnection = db_connection;
   
+  // Finally, update connection table in driver
+  SQLiteDriver* driver = getDriver();
+  driver->num_con += 1;
+  driver->counter += 1;
+  
   RS_SQLite_setException(con, SQLITE_OK, "OK");
     
-  return conHandle;
+  return RS_DBI_asConHandle(con);
 }
 
 SEXP RS_SQLite_closeConnection(SEXP conHandle) {

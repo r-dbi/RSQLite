@@ -108,7 +108,6 @@ typedef struct st_sdbi_manager {
 SQLiteDriver* getDriver();
 
 /* dbConnection */
-SEXP RS_DBI_allocConnection();
 void RS_DBI_freeConnection(SEXP conHandle);
 RS_DBI_connection *RS_DBI_getConnection(SEXP handle);
 SEXP RS_DBI_asConHandle(RS_DBI_connection *con);

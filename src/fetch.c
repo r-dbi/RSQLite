@@ -142,7 +142,7 @@ int RS_SQLite_get_row_count(sqlite3* db, const char* tname) {
 SEXP RS_SQLite_quick_column(SEXP conHandle, SEXP table, SEXP column)
 {
     SEXP ans = R_NilValue, rawv;
-    RS_DBI_connection *con = get_connection(conHandle);
+    SQLiteConnection *con = get_connection(conHandle);
     sqlite3 *db_connection = (sqlite3 *) con->drvConnection;
     sqlite3_stmt *stmt = NULL;
     int numrows, rc, i = 0, col_type, *intans = NULL, blob_len;
@@ -223,7 +223,7 @@ SEXP RS_SQLite_quick_column(SEXP conHandle, SEXP table, SEXP column)
     return ans;
 }
 
-void RSQLite_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
+void RSQLite_freeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con)
 {
     if (result->drvResultSet) {
         sqlite3_finalize((sqlite3_stmt *)result->drvResultSet);
@@ -242,7 +242,7 @@ void RSQLite_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
    RS_SQLite_exec */
 static void
 exec_error(const char *msg,
-           RS_DBI_connection *con,
+           SQLiteConnection *con,
            int bind_count,
            RS_SQLite_bindParams *params,
            SEXP rsHandle)
@@ -274,7 +274,7 @@ select_prepared_query(sqlite3_stmt *db_statement,
                       SEXP bind_data,
                       int bind_count,
                       int rows,
-                      RS_DBI_connection *con,
+                      SQLiteConnection *con,
                       SEXP rsHandle)
 {
     RS_DBI_resultSet *res;
@@ -348,7 +348,7 @@ non_select_prepared_query(sqlite3_stmt *db_statement,
                           SEXP bind_data,
                           int bind_count,
                           int rows,
-                          RS_DBI_connection *con,
+                          SQLiteConnection *con,
                           SEXP rsHandle)
 {
     int state, i;
@@ -392,7 +392,7 @@ non_select_prepared_query(sqlite3_stmt *db_statement,
 
 SEXP RS_SQLite_exec(SEXP conHandle, SEXP statement, SEXP bind_data)
 {
-    RS_DBI_connection *con = get_connection(conHandle);
+    SQLiteConnection *con = get_connection(conHandle);
     SEXP rsHandle;
     RS_DBI_resultSet *res;
     sqlite3 *db_connection = (sqlite3 *) con->drvConnection;

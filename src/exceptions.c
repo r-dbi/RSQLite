@@ -18,7 +18,7 @@
 
 #include "rsqlite.h"
 
-void setException(RS_DBI_connection *con, int err_no, 
+void setException(SQLiteConnection *con, int err_no, 
                             const char *err_msg) {
 
   RS_SQLite_exception* ex = (RS_SQLite_exception *) con->exception;
@@ -44,7 +44,7 @@ void setException(RS_DBI_connection *con, int err_no,
   return;
 }
 
-void freeException(RS_DBI_connection *con) {
+void freeException(SQLiteConnection *con) {
   RS_SQLite_exception *ex = (RS_SQLite_exception *) con->exception;
 
   if (!ex) 
@@ -58,7 +58,7 @@ void freeException(RS_DBI_connection *con) {
 }
 
 SEXP RS_SQLite_getException(SEXP conHandle) {
-  RS_DBI_connection* con = get_connection(conHandle);
+  SQLiteConnection* con = get_connection(conHandle);
   if (!con->drvConnection)
     error("internal error: corrupt connection handle");
 

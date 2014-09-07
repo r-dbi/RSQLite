@@ -90,11 +90,11 @@ enum SQLITE_TYPE {
  * defined by the actual driver -- we just set aside a void pointer.
  */
 
-typedef struct RS_DBI_connection {
+typedef struct SQLiteConnection {
   void  *drvConnection;  /* pointer to the actual DBMS connection struct*/
   RS_DBI_resultSet  *resultSet;    /* vector to result set ptrs  */
   RS_SQLite_exception *exception;
-} RS_DBI_connection;
+} SQLiteConnection;
 
 typedef struct SQLiteDriver {
   int shared_cache;                /* use SQLite shared cache? */
@@ -108,10 +108,10 @@ typedef struct SQLiteDriver {
 // Result ----------------------------------------------------------------------
 
 SEXP RS_DBI_allocResultSet(SEXP conHandle);
-void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
+void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con);
 RS_DBI_resultSet  *RS_DBI_getResultSet(SEXP rsHandle);
 SEXP RS_DBI_asResHandle(SEXP conxp);
-void RSQLite_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
+void RSQLite_freeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con);
 RS_DBI_fields *RS_DBI_allocFields(int num_fields);
 SEXP fieldInfo(RS_DBI_fields *flds);
 void RS_DBI_freeFields(RS_DBI_fields *flds);
@@ -124,19 +124,19 @@ void  RS_SQLite_initFields(RS_DBI_resultSet *res, int ncol, char **colNames);
 RS_DBI_fields *RS_SQLite_createDataMappings(SEXP resHandle);
 RS_SQLite_bindParams* RS_SQLite_createParameterBinding(int n, SEXP bind_data, sqlite3_stmt *stmt, char *errorMsg);
 void RS_SQLite_freeParameterBinding(RS_SQLite_bindParams **);
-void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
+void RSQLite_closeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con);
 
 // Exception -------------------------------------------------------------------
 
-void setException(RS_DBI_connection *con, int err_no, const char *err_msg);
-void freeException(RS_DBI_connection *con);
-void RS_SQLite_setException(RS_DBI_connection *con, int errorNum, const char *errorMsg);
+void setException(SQLiteConnection *con, int err_no, const char *err_msg);
+void freeException(SQLiteConnection *con);
+void RS_SQLite_setException(SQLiteConnection *con, int errorNum, const char *errorMsg);
 SEXP RS_SQLite_getException(SEXP conHandle);
 
 // Connection ------------------------------------------------------------------
 
-RS_DBI_connection *get_connection(SEXP handle);
-SEXP connection_handle(RS_DBI_connection *con);
+SQLiteConnection *get_connection(SEXP handle);
+SEXP connection_handle(SQLiteConnection *con);
 SEXP new_connection(SEXP dbfile, SEXP allow_ext, SEXP s_flags, SEXP s_vfs);
 SEXP close_connection(SEXP conHandle);
 

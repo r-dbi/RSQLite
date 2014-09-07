@@ -24,14 +24,14 @@ static void _finalize_connection_handle(SEXP xp) {
   close_connection(xp);
 }
 
-SEXP connection_handle(RS_DBI_connection *con) {
+SEXP connection_handle(SQLiteConnection *con) {
   SEXP handle = R_MakeExternalPtr(con, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(handle, _finalize_connection_handle, 1);
   return handle;
 }
 
-RS_DBI_connection* get_connection(SEXP handle) {
-  RS_DBI_connection* con = (RS_DBI_connection*) R_ExternalPtrAddr(handle);
+SQLiteConnection* get_connection(SEXP handle) {
+  SQLiteConnection* con = (SQLiteConnection*) R_ExternalPtrAddr(handle);
   if (!con) 
     error("expired SQLiteConnection");
   
@@ -61,7 +61,7 @@ SEXP new_connection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
   }
   
   // Create external pointer to connection object
-  RS_DBI_connection* con = (RS_DBI_connection *) malloc(sizeof(RS_DBI_connection));
+  SQLiteConnection* con = (SQLiteConnection *) malloc(sizeof(SQLiteConnection));
   if (!con) {
     error("could not malloc dbConnection");
   }
@@ -90,7 +90,7 @@ SEXP new_connection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
 }
 
 SEXP close_connection(SEXP handle) {
-  RS_DBI_connection *con = get_connection(handle);
+  SQLiteConnection *con = get_connection(handle);
   
   // close & free result set (if open)
   if (con->resultSet) {
@@ -114,14 +114,14 @@ SEXP close_connection(SEXP handle) {
   drv->num_con -= 1;
 
   free(con);
-  con = (RS_DBI_connection *) NULL;
+  con = (SQLiteConnection *) NULL;
   R_ClearExternalPtr(handle);
   
   return ScalarLogical(1);
 }
 
 SEXP isValidConnection(SEXP dbObj) {
-  RS_DBI_connection* con = R_ExternalPtrAddr(dbObj);
+  SQLiteConnection* con = R_ExternalPtrAddr(dbObj);
 
   if (!con) 
     return ScalarLogical(0);

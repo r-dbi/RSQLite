@@ -22,7 +22,7 @@
 SEXP
 RS_DBI_allocResultSet(SEXP conHandle)
 {
-  RS_DBI_connection *con = NULL;
+  SQLiteConnection *con = NULL;
   RS_DBI_resultSet  *result = NULL;
 
   con = get_connection(conHandle);
@@ -47,7 +47,7 @@ RS_DBI_allocResultSet(SEXP conHandle)
   return RS_DBI_asResHandle(conHandle);
 }
 
-void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
+void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con)
 {
     if(result->drvResultSet) {
       warning("freeResultSet failed (result->drvResultSet)");
@@ -99,7 +99,7 @@ RS_DBI_asResHandle(SEXP conxp)
 RS_DBI_resultSet *
 RS_DBI_getResultSet(SEXP rsHandle)
 {
-  RS_DBI_connection *con;
+  SQLiteConnection *con;
   con = get_connection(rsHandle);
   if(!con)
     error("internal error in RS_DBI_getResultSet: bad connection");
@@ -107,7 +107,7 @@ RS_DBI_getResultSet(SEXP rsHandle)
 }
 
 
-void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
+void RSQLite_closeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con)
 {
    if(result->drvResultSet == NULL)
        error("corrupt SQLite resultSet, missing statement handle");

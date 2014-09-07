@@ -57,26 +57,24 @@ void freeException(RS_DBI_connection *con) {
   return;
 }
 
-/* return a 2-elem list with the last exception number and exception message on a given connection.
- * NOTE: RS_SQLite_getException() is meant to be used mostly directory R.
- */
-SEXP 
-RS_SQLite_getException(SEXP conHandle)
-{
-    SEXP output;
-    RS_DBI_connection   *con = RS_DBI_getConnection(conHandle);
-    RS_SQLite_exception *err;
-    int n = 2;
-    char *exDesc[] = {"errorNum", "errorMsg"};
-    SEXPTYPE exType[] = {INTSXP, STRSXP};
-    int  exLen[]  = {1, 1};
+SEXP RS_SQLite_getException(SEXP conHandle) {
+  RS_DBI_connection* con = RS_DBI_getConnection(conHandle);
+  if (!con->drvConnection)
+    error("internal error: corrupt connection handle");
 
-    if(!con->drvConnection)
-        error("internal error: corrupt connection handle");
-    PROTECT(output = RS_DBI_createNamedList(exDesc, exType, exLen, n));
-    err = (RS_SQLite_exception *) con->exception;
-    LST_INT_EL(output,0,0) = err->errorNum;
-    SET_LST_CHR_EL(output,1,0,mkChar(err->errorMsg));
-    UNPROTECT(1);
-    return output;
+  RS_SQLite_exception* err = (RS_SQLite_exception *) con->exception;
+  
+  SEXP output = PROTECT(allocVector(VECSXP, 2));
+  SEXP output_nms = PROTECT(allocVector(STRSXP, 2));
+  SET_NAMES(output, output_nms);
+  UNPROTECT(1);
+  
+  SET_STRING_ELT(output_nms, 0, mkChar("errorNum"));
+  SET_VECTOR_ELT(output, 0, ScalarInteger(err->errorNum));
+  
+  SET_STRING_ELT(output_nms, 1, mkChar("errorMsg"));
+  SET_VECTOR_ELT(output, 1, mkString(err->errorMsg));
+
+  UNPROTECT(1);
+  return output;
 }

@@ -30,69 +30,6 @@ RS_DBI_copyString(const char *str)
   return strcpy(buffer, str);
 }
 
-
-SEXP 
-RS_DBI_createNamedList(char **names, SEXPTYPE *types, int *lengths, int  n)
-{
-  SEXP output, output_names, obj = R_NilValue;
-  int  num_elem;
-  int   j;
-
-  PROTECT(output = NEW_LIST(n));
-  PROTECT(output_names = NEW_CHARACTER(n));
-  for(j = 0; j < n; j++){
-    num_elem = lengths[j];
-    switch((int)types[j]){
-    case LGLSXP: 
-      PROTECT(obj = NEW_LOGICAL(num_elem));
-      break;
-    case INTSXP:
-      PROTECT(obj = NEW_INTEGER(num_elem));
-      break;
-    case REALSXP:
-      PROTECT(obj = NEW_NUMERIC(num_elem));
-      break;
-    case STRSXP:
-      PROTECT(obj = NEW_CHARACTER(num_elem));
-      break;
-    case RAWSXP:                /* falls through */
-    case VECSXP:
-      PROTECT(obj = NEW_LIST(num_elem));
-      break;
-    default:
-      error("unsupported data type");
-    }
-    SET_VECTOR_ELT(output, (int)j, obj);
-    SET_CHR_EL(output_names, j, mkChar(names[j]));
-  }
-  SET_NAMES(output, output_names);
-  UNPROTECT(n+2);
-  return(output);
-}
-
-SEXP 
-RS_DBI_SclassNames(SEXP type)
-{
-  SEXP typeNames;
-  int *typeCodes;
-  int n;
-  int  i;
-  
-  if(type==R_NilValue)
-     error("internal error in RS_DBI_SclassNames: input S types must be nonNULL");
-  n = LENGTH(type);
-  typeCodes = INTEGER_DATA(type);
-  PROTECT(typeNames = NEW_CHARACTER(n));
-  for(i = 0; i < n; i++) {
-    const char* s = type2char(typeCodes[i]);
-    SET_CHR_EL(typeNames, i, mkChar(s));
-  }
-  UNPROTECT(1);
-  return typeNames;
-}
-
-
-
 int SQLite_decltype_to_type(const char* decltype)
 {
     unsigned int h = 0;
@@ -145,18 +82,6 @@ char* field_type(int type) {
     case SQLITE_TYPE_BLOB:    return "BLOB";
     default:                  return "unknown";
   }
-}
-
-SEXP typeNames(SEXP typeIds) {
-  int n = LENGTH(typeIds);
-  int* typeCodes = INTEGER(typeIds);
-  SEXP typeNames = PROTECT(allocVector(STRSXP, n));
-  for(int i = 0; i < n; i++) {
-    char* s = field_type(typeCodes[i]);
-    SET_STRING_ELT(typeNames, i, mkChar(s));
-  }
-  UNPROTECT(1);
-  return typeNames;
 }
 
 

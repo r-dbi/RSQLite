@@ -169,13 +169,13 @@ SEXP isValidConnection(SEXP dbObj) {
 
 
 SEXP connectionInfo(SEXP conHandle) {
-  int info_count = 6, i = 0;
 
-  SEXP info = PROTECT(allocVector(VECSXP, info_count));
-  SEXP info_nms = PROTECT(allocVector(STRSXP, info_count));
+  SEXP info = PROTECT(allocVector(VECSXP, 1));
+  SEXP info_nms = PROTECT(allocVector(STRSXP, 1));
   SET_NAMES(info, info_nms);
   UNPROTECT(1);
 
+  int i = 0;
   SET_STRING_ELT(info_nms, i, mkChar("serverVersion"));
   SET_VECTOR_ELT(info, i++, mkString(SQLITE_VERSION));
 

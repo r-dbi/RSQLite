@@ -78,21 +78,28 @@ SEXP isValidDriver() {
 
 SEXP driverInfo() {
   SQLiteDriver* mgr = getDriver();
-   
-  char *mgrDesc[] = {"fetch_default_rec", "num_con", 
-                     "counter",   "clientVersion", "shared_cache"};
-  SEXPTYPE mgrType[] = {INTSXP, INTSXP, INTSXP,
-                        STRSXP, STRSXP };
-  int  mgrLen[]  = {1, 1, 1, 1, 1};
-
-  int j = 0;  
-  SEXP output = PROTECT(RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, 5));
-  SET_VECTOR_ELT(output, j++, ScalarInteger(mgr->fetch_default_rec));
-  SET_VECTOR_ELT(output, j++, ScalarInteger(mgr->num_con));
-  SET_VECTOR_ELT(output, j++, ScalarInteger(mgr->counter));
-  SET_VECTOR_ELT(output, j++, mkString(SQLITE_VERSION));
-  SET_VECTOR_ELT(output, j++, ScalarLogical(mgr->shared_cache));
-  UNPROTECT(1);
   
-  return output;
+  SEXP info = PROTECT(allocVector(VECSXP, 5));
+  SEXP info_nms = PROTECT(allocVector(STRSXP, 5));
+  SET_NAMES(info, info_nms);
+  UNPROTECT(1);
+
+  int i = 0;
+  SET_STRING_ELT(info_nms, i, mkChar("fetch_default_rec"));
+  SET_VECTOR_ELT(info, i++, ScalarInteger(mgr->fetch_default_rec));
+
+  SET_STRING_ELT(info_nms, i, mkChar("num_con"));
+  SET_VECTOR_ELT(info, i++, ScalarInteger(mgr->num_con));
+
+  SET_STRING_ELT(info_nms, i, mkChar("counter"));
+  SET_VECTOR_ELT(info, i++, ScalarInteger(mgr->counter));
+
+  SET_STRING_ELT(info_nms, i, mkChar("clientVersion"));
+  SET_VECTOR_ELT(info, i++, mkString(SQLITE_VERSION));
+
+  SET_STRING_ELT(info_nms, i, mkChar("shared_cache"));
+  SET_VECTOR_ELT(info, i++, ScalarLogical(mgr->shared_cache));
+  
+  UNPROTECT(1);
+  return info;
 }

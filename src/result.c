@@ -107,29 +107,6 @@ RS_DBI_getResultSet(SEXP rsHandle)
 }
 
 
-SEXP     /* named list */
-RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
-{
-  int n = 4;
-  char  *desc[] = {"name", "Sclass", "type", "len"};
-  SEXPTYPE types[] = {STRSXP, INTSXP,   INTSXP, INTSXP};
-  int lengths[n];
-  int num_fields = flds->num_fields;
-  for (int j = 0; j < n; j++) 
-    lengths[j] = num_fields;
-  
-  SEXP S_fields = PROTECT(RS_DBI_createNamedList(desc, types, lengths, n));
-  for (int i = 0; i < num_fields; i++) {
-    SET_LST_CHR_EL(S_fields,0,i,mkChar(flds->name[i]));
-    LST_INT_EL(S_fields,1,i) = flds->Sclass[i];
-    LST_INT_EL(S_fields,2,i) = flds->type[i];
-    LST_INT_EL(S_fields,3,i) = flds->length[i];
-  }
-  UNPROTECT(1);
-  
-  return S_fields;
-}
-
 void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
 {
    if(result->drvResultSet == NULL)
@@ -151,33 +128,87 @@ RS_SQLite_closeResultSet(SEXP resHandle)
     return ScalarLogical(1);
 }
 
-SEXP resultSetInfo(SEXP rsHandle) {
-  char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
-                     "rowCount", "completed", "fieldDescription"};
-  SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP, INTSXP, INTSXP, VECSXP};
-  int rsLen[]   = {1, 1, 1, 1, 1, 1};
-  SEXP output = PROTECT(RS_DBI_createNamedList(rsDesc, rsType, rsLen, 6));
+SEXP fieldInfo(RS_DBI_fields *flds) {
+  int n = flds ? flds->num_fields : 0;
 
-  RS_DBI_resultSet* result = RS_DBI_getResultSet(rsHandle);
-  SET_LST_CHR_EL(output,0,0,mkChar(result->statement));
-  LST_INT_EL(output,1,0) = result->isSelect;
-  LST_INT_EL(output,2,0) = result->rowsAffected;
-  LST_INT_EL(output,3,0) = result->rowCount;
-  LST_INT_EL(output,4,0) = result->completed;
+  SEXP info = PROTECT(allocVector(VECSXP, 4));
+  SEXP info_nms = PROTECT(allocVector(STRSXP, 4));
+  SET_NAMES(info, info_nms);
+  UNPROTECT(1);
 
-  if (result->fields) {
-    SEXP flds = PROTECT(RS_DBI_getFieldDescriptions(result->fields));
-    SET_VECTOR_ELT(LST_EL(output, 5), 0, flds);
-    UNPROTECT(1);
-  } else {
-    SET_VECTOR_ELT(output, 5, R_NilValue);
+  int i = 0;
+  SET_STRING_ELT(info_nms, i, mkChar("name"));
+  SEXP names = PROTECT(allocVector(STRSXP, n));
+  for (int j = 0; j < n; j++) {
+    SET_STRING_ELT(names, j, mkChar(flds->name[j]));
   }
+  SET_VECTOR_ELT(info, i++, names);
+  UNPROTECT(1);
+
+  SET_STRING_ELT(info_nms, i, mkChar("Sclass"));
+  SEXP sclass = PROTECT(allocVector(STRSXP, n));
+  for (int j = 0; j < n; j++) {
+    const char* type = type2char(flds->Sclass[j]);
+    SET_STRING_ELT(sclass, j, mkChar(type));
+  }
+  SET_VECTOR_ELT(info, i++, sclass);
+  UNPROTECT(1);
+  
+  SET_STRING_ELT(info_nms, i, mkChar("type"));
+  SEXP types = PROTECT(allocVector(STRSXP, n));
+  for (int j = 0; j < n; j++) {
+    char* type = field_type(flds->type[j]);
+    SET_STRING_ELT(types, j, mkChar(type));
+  }
+  SET_VECTOR_ELT(info, i++, types);
+  UNPROTECT(1);
+  
+  SET_STRING_ELT(info_nms, i, mkChar("len"));
+  SEXP lens = PROTECT(allocVector(INTSXP, n));
+  for (int j = 0; j < n; j++) {
+    INTEGER(lens)[j] = flds->length[j];
+  }
+  SET_VECTOR_ELT(info, i++, lens);
+  UNPROTECT(1);
+
 
   UNPROTECT(1);
-  return output;
+  return info;
 }
 
 
+SEXP resultSetInfo(SEXP rsHandle) {
+  RS_DBI_resultSet* result = RS_DBI_getResultSet(rsHandle);
+
+  SEXP info = PROTECT(allocVector(VECSXP, 6));
+  SEXP info_nms = PROTECT(allocVector(STRSXP, 6));
+  SET_NAMES(info, info_nms);
+  UNPROTECT(1);
+
+  int i = 0;
+  SET_STRING_ELT(info_nms, i, mkChar("statement"));
+  SET_VECTOR_ELT(info, i++, mkString(result->statement));
+
+  SET_STRING_ELT(info_nms, i, mkChar("isSelect"));
+  SET_VECTOR_ELT(info, i++, ScalarInteger(result->isSelect));
+
+  SET_STRING_ELT(info_nms, i, mkChar("rowsAffected"));
+  SET_VECTOR_ELT(info, i++, ScalarInteger(result->rowsAffected));
+
+  SET_STRING_ELT(info_nms, i, mkChar("rowCount"));
+  SET_VECTOR_ELT(info, i++, ScalarInteger(result->rowCount));
+
+  SET_STRING_ELT(info_nms, i, mkChar("completed"));
+  SET_VECTOR_ELT(info, i++, ScalarInteger(result->completed));
+  
+  SET_STRING_ELT(info_nms, i, mkChar("fields"));
+  SEXP fields = PROTECT(fieldInfo(result->fields));
+  SET_VECTOR_ELT(info, i++, fields);
+  UNPROTECT(1);
+
+  UNPROTECT(1);
+  return info;
+}
 
 SEXP isValidResult(SEXP dbObj) {
   RS_DBI_resultSet *res = R_ExternalPtrAddr(dbObj);

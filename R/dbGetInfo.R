@@ -44,23 +44,17 @@ setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
 
 #' @rdname dbGetInfo
 #' @export
-#' @useDynLib RSQLite resultSetInfo RS_DBI_SclassNames typeNames
+#' @useDynLib RSQLite resultSetInfo
 setMethod("dbGetInfo", "SQLiteResult", function(dbObj) {
   check_valid(dbObj)
   
   info <- .Call(resultSetInfo, dbObj@Id)
   flds <- info$fieldDescription[[1]]
   
-  if (is.null(flds)) return(info)
-  
-  flds$Sclass <- .Call(RS_DBI_SclassNames, flds$Sclass)
-  flds$type <- .Call(typeNames, flds$type)
-
-  info$fields <- structure(flds, 
-    row.names = .set_row_names(length(flds[[1]])),
+  info$fields <- structure(info$fields, 
+    row.names = .set_row_names(length(info$fields[[1]])),
     class = "data.frame"
   )
-  info$fieldDescription <- NULL
   
   info
 })

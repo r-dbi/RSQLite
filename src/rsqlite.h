@@ -121,7 +121,7 @@ void freeException(RS_DBI_connection *con);
 
 /* description of the fields in a result set */
 RS_DBI_fields *RS_DBI_allocFields(int num_fields);
-SEXP RS_DBI_getFieldDescriptions(RS_DBI_fields *flds);
+SEXP fieldInfo(RS_DBI_fields *flds);
 void           RS_DBI_freeFields(RS_DBI_fields *flds);
 
 /* we (re)allocate the actual output list in here (with the help of
@@ -136,13 +136,6 @@ void  RS_DBI_allocOutput(SEXP output,
 /* utility funs (copy strings, convert from R/S types to string, etc.*/
 char     *RS_DBI_copyString(const char *str);
 
-/* same, but callable from S/R and vectorized */
-SEXP RS_DBI_SclassNames(SEXP types);  
-
-SEXP RS_DBI_createNamedList(char  **names, 
-				 SEXPTYPE *types,
-				 int  *lengths,
-				 int  n);
 SEXP RS_DBI_copyFields(RS_DBI_fields *flds);
 
 SEXP DBI_newResultHandle(SEXP xp, SEXP resId);
@@ -248,6 +241,8 @@ int RS_sqlite_import(sqlite3 *db, const char *zTable,
                      const char *zFile, const char *separator, const char *eol, int skip);
 
 void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
+
+char* field_type(int type);
 
 // R helpers -------------------------------------------------------------------
 

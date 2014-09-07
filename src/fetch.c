@@ -331,7 +331,7 @@ SEXP RS_SQLite_exec(SEXP handle, SEXP statement, SEXP bind_data) {
   SQLiteResult* res = con->resultSet;
   if (res) {
     if (res->completed != 1) {
-      error("connection with pending rows, close resultSet before continuing");
+      warning("Closing result set with pending rows");
     } else {
       rsqlite_result_free(con);
     }

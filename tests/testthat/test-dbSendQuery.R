@@ -1,6 +1,6 @@
 context("dbSendQuery")
 
-test_that("can't change schema with pending rows", {
+test_that("attempting to change schema with pending rows generates warning", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con))
   
@@ -11,6 +11,6 @@ test_that("can't change schema with pending rows", {
   row1 <- fetch(rs, n = 1)
   expect_equal(row1, df[1, ])
   
-  expect_error(dbSendQuery(con, "CREATE TABLE t2 (x text, y integer)"), 
+  expect_warning(dbSendQuery(con, "CREATE TABLE t2 (x text, y integer)"), 
     "pending rows")
 })

@@ -262,7 +262,7 @@ select_prepared_query(sqlite3_stmt *db_statement,
                       SQLiteConnection *con,
                       SEXP rsHandle)
 {
-    RS_DBI_resultSet *res;
+    SQLiteResult *res;
     char bindingErrorMsg[2048]; bindingErrorMsg[0] = '\0';
     RS_SQLite_bindParams *params =
         RS_SQLite_createParameterBinding(bind_count, bind_data,
@@ -379,7 +379,7 @@ SEXP RS_SQLite_exec(SEXP conHandle, SEXP statement, SEXP bind_data)
 {
     SQLiteConnection *con = get_connection(conHandle);
     SEXP rsHandle;
-    RS_DBI_resultSet *res;
+    SQLiteResult *res;
     sqlite3 *db_connection = (sqlite3 *) con->drvConnection;
     sqlite3_stmt *db_statement = NULL;
     int state, bind_count;
@@ -458,7 +458,7 @@ RS_DBI_fields*
 RS_SQLite_createDataMappings(SEXP rsHandle) {
   const char* col_decltype = NULL;
 
-  RS_DBI_resultSet* result = RS_DBI_getResultSet(rsHandle);
+  SQLiteResult* result = RS_DBI_getResultSet(rsHandle);
   sqlite3_stmt* db_statement = (sqlite3_stmt *) result->drvResultSet;
 
   int ncol = sqlite3_column_count(db_statement);
@@ -559,7 +559,7 @@ void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
   }
 }
 
-static int do_select_step(RS_DBI_resultSet *res, int row_idx)
+static int do_select_step(SQLiteResult *res, int row_idx)
 {
     int state;
     RS_SQLite_bindParams * params = NULL;
@@ -601,7 +601,7 @@ static int do_select_step(RS_DBI_resultSet *res, int row_idx)
    force character.
 */
 SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec) {
-  RS_DBI_resultSet* res = RS_DBI_getResultSet(rsHandle);
+  SQLiteResult* res = RS_DBI_getResultSet(rsHandle);
   if (res->isSelect != 1) {
     warning("resultSet does not correspond to a SELECT statement");
     return R_NilValue;

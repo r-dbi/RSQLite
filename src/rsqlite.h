@@ -63,7 +63,7 @@ typedef struct RS_SQLite_exception {
  * resultSet (e.g., MySQL, Oracle) possibly NULL,  plus the fields 
  * defined by the RS-DBI implementation. 
  */
-typedef struct RS_DBI_resultSet {
+typedef struct SQLiteResult {
   sqlite3_stmt* drvResultSet;   /* the actual (driver's) cursor/result set */
   RS_SQLite_bindParams* drvData;        /* a pointer to driver-specific data */
   int  resultSetId;  
@@ -73,7 +73,7 @@ typedef struct RS_DBI_resultSet {
   int  rowCount;        /* rows fetched so far (SELECT-types)*/
   int  completed;       /* have we fetched all rows? */
   RS_DBI_fields *fields;
-} RS_DBI_resultSet;
+} SQLiteResult;
 
 enum SQLITE_TYPE {
   SQLITE_TYPE_NULL,
@@ -85,7 +85,7 @@ enum SQLITE_TYPE {
 
 typedef struct SQLiteConnection {
   sqlite3* drvConnection;  
-  RS_DBI_resultSet  *resultSet;
+  SQLiteResult  *resultSet;
   RS_SQLite_exception *exception;
 } SQLiteConnection;
 
@@ -101,9 +101,9 @@ typedef struct SQLiteDriver {
 // Result ----------------------------------------------------------------------
 
 SEXP RS_DBI_allocResultSet(SEXP conHandle);
-RS_DBI_resultSet  *RS_DBI_getResultSet(SEXP rsHandle);
+SQLiteResult  *RS_DBI_getResultSet(SEXP rsHandle);
 SEXP RS_DBI_asResHandle(SEXP conxp);
-void RSQLite_freeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con);
+void RSQLite_freeResultSet0(SQLiteResult *result, SQLiteConnection *con);
 RS_DBI_fields *RS_DBI_allocFields(int num_fields);
 SEXP fieldInfo(RS_DBI_fields *flds);
 void RS_DBI_freeFields(RS_DBI_fields *flds);
@@ -112,11 +112,11 @@ SEXP DBI_newResultHandle(SEXP xp, SEXP resId);
 SEXP RS_SQLite_exec(SEXP conHandle, SEXP statement, SEXP bind_data);
 SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec);
 SEXP RS_SQLite_closeResultSet(SEXP rsHandle);
-void  RS_SQLite_initFields(RS_DBI_resultSet *res, int ncol, char **colNames);
+void  RS_SQLite_initFields(SQLiteResult *res, int ncol, char **colNames);
 RS_DBI_fields *RS_SQLite_createDataMappings(SEXP resHandle);
 RS_SQLite_bindParams* RS_SQLite_createParameterBinding(int n, SEXP bind_data, sqlite3_stmt *stmt, char *errorMsg);
 void RS_SQLite_freeParameterBinding(RS_SQLite_bindParams **);
-void RSQLite_closeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con);
+void RSQLite_closeResultSet0(SQLiteResult *result, SQLiteConnection *con);
 
 // Exception -------------------------------------------------------------------
 

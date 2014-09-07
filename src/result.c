@@ -23,11 +23,11 @@ SEXP
 RS_DBI_allocResultSet(SEXP conHandle)
 {
   SQLiteConnection *con = NULL;
-  RS_DBI_resultSet  *result = NULL;
+  SQLiteResult  *result = NULL;
 
   con = get_connection(conHandle);
 
-  result = malloc(sizeof(RS_DBI_resultSet));
+  result = malloc(sizeof(SQLiteResult));
   if (!result){
     char *errMsg = "could not malloc dbResultSet";
     error(errMsg);
@@ -47,7 +47,7 @@ RS_DBI_allocResultSet(SEXP conHandle)
   return RS_DBI_asResHandle(conHandle);
 }
 
-void RSQLite_freeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con) {
+void RSQLite_freeResultSet0(SQLiteResult *result, SQLiteConnection *con) {
   if (result->drvResultSet) {
     sqlite3_finalize(result->drvResultSet);
     result->drvResultSet = NULL;
@@ -101,7 +101,7 @@ RS_DBI_asResHandle(SEXP conxp)
 }
 
 
-RS_DBI_resultSet *
+SQLiteResult *
 RS_DBI_getResultSet(SEXP rsHandle)
 {
   SQLiteConnection *con;
@@ -112,7 +112,7 @@ RS_DBI_getResultSet(SEXP rsHandle)
 }
 
 
-void RSQLite_closeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con)
+void RSQLite_closeResultSet0(SQLiteResult *result, SQLiteConnection *con)
 {
    if(result->drvResultSet == NULL)
        error("corrupt SQLite resultSet, missing statement handle");
@@ -183,7 +183,7 @@ SEXP fieldInfo(RS_DBI_fields *flds) {
 
 
 SEXP resultSetInfo(SEXP rsHandle) {
-  RS_DBI_resultSet* result = RS_DBI_getResultSet(rsHandle);
+  SQLiteResult* result = RS_DBI_getResultSet(rsHandle);
 
   SEXP info = PROTECT(allocVector(VECSXP, 6));
   SEXP info_nms = PROTECT(allocVector(STRSXP, 6));
@@ -216,7 +216,7 @@ SEXP resultSetInfo(SEXP rsHandle) {
 }
 
 SEXP isValidResult(SEXP dbObj) {
-  RS_DBI_resultSet *res = R_ExternalPtrAddr(dbObj);
+  SQLiteResult *res = R_ExternalPtrAddr(dbObj);
 
   if (!res) return ScalarLogical(0);
 

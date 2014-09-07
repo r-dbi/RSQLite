@@ -83,45 +83,48 @@ SEXP isValidDriver() {
   return ScalarLogical(1);
 }
 
-// Connections -----------------------------------------------------------------
+// Exceptions -----------------------------------------------------------------
 
-/* set exception object (allocate memory if needed) */
-void 
-RS_SQLite_setException(RS_DBI_connection *con, int err_no, const char *err_msg)
-{
-    RS_SQLite_exception *ex;
+void setException(RS_DBI_connection *con, int err_no, 
+                            const char *err_msg) {
 
-    ex = (RS_SQLite_exception *) con->exception;
-    if(!ex){    /* brand new exception object */
-        ex = (RS_SQLite_exception *) malloc(sizeof(RS_SQLite_exception));
-        if(!ex)
-            error("could not allocate SQLite exception object");
+  RS_SQLite_exception* ex = (RS_SQLite_exception *) con->exception;
+  if (!ex) {
+    // Create new exception object
+    ex = (RS_SQLite_exception *) malloc(sizeof(RS_SQLite_exception));
+    if (!ex) {
+      error("could not allocate SQLite exception object");
     }
-    else
-        free(ex->errorMsg);      /* re-use existing object */
+  } else {
+    // Reuse existing
+    free(ex->errorMsg);
+  }
 
-    ex->errorNum = err_no;
-    if(err_msg)
-        ex->errorMsg = RS_DBI_copyString(err_msg);
-    else
-        ex->errorMsg = (char *) NULL;
-
-    con->exception = (void *) ex;
-    return;
+  ex->errorNum = err_no;
+  if (err_msg) {
+    ex->errorMsg = RS_DBI_copyString(err_msg);
+  } else { 
+    ex->errorMsg = (char *) NULL;
+  }
+  
+  con->exception = ex;
+  return;
 }
 
-void
-RS_SQLite_freeException(RS_DBI_connection *con)
-{
-    RS_SQLite_exception *ex = (RS_SQLite_exception *) con->exception;
+void freeException(RS_DBI_connection *con) {
+  RS_SQLite_exception *ex = (RS_SQLite_exception *) con->exception;
 
-    if(!ex) return;
-    if(ex->errorMsg) free(ex->errorMsg);
-    free(ex);
-    
-    con->exception = NULL;
+  if (!ex) 
     return;
+  if (ex->errorMsg) 
+    free(ex->errorMsg);
+  free(ex);
+  
+  con->exception = NULL;
+  return;
 }
+
+// Connections -----------------------------------------------------------------
 
 SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_, 
                              SEXP vfs_) {
@@ -169,7 +172,7 @@ SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
   driver->num_con += 1;
   driver->counter += 1;
   
-  RS_SQLite_setException(con, SQLITE_OK, "OK");
+  setException(con, SQLITE_OK, "OK");
     
   return RS_DBI_asConHandle(con);
 }
@@ -190,7 +193,7 @@ SEXP RS_SQLite_closeConnection(SEXP conHandle) {
     warning("Internal error: could not close SQLte connection.");
   }
   con->drvConnection = NULL;
-  RS_SQLite_freeException(con);
+  freeException(con);
   RS_DBI_freeConnection(conHandle);
   
   return ScalarLogical(1);
@@ -393,7 +396,7 @@ exec_error(const char *msg,
         sep = ": ";
     }
     snprintf(buf, sizeof(buf), "%s%s%s", msg, sep, db_msg);
-    RS_SQLite_setException(con, errcode, buf);
+    setException(con, errcode, buf);
     if (rsHandle) {
         RSQLite_freeResultSet0(RS_DBI_getResultSet(rsHandle), con);
         rsHandle = NULL;
@@ -578,7 +581,7 @@ SEXP RS_SQLite_exec(SEXP conHandle, SEXP statement, SEXP bind_data)
     res->isSelect = sqlite3_column_count(db_statement) > 0;
     res->rowCount = 0;      /* fake's cursor's row count */
     res->rowsAffected = -1; /* no rows affected */
-    RS_SQLite_setException(con, state, "OK");
+    setException(con, state, "OK");
 
     if (res->isSelect) {
         if (bind_count > 0) {
@@ -1216,7 +1219,7 @@ SEXP RS_SQLite_copy_database(SEXP fromConHandle, SEXP toConHandle)
     }
     rc = sqlite3_errcode(dbTo);
     if (rc != SQLITE_OK) {
-        RS_SQLite_setException(toCon, rc, sqlite3_errmsg(dbTo));
+        setException(toCon, rc, sqlite3_errmsg(dbTo));
         error(sqlite3_errmsg(dbTo));
     }
     return R_NilValue;

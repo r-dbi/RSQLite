@@ -22,18 +22,6 @@ sqliteQuickColumn <- function(con, table, column) {
     as.character(column), PACKAGE="RSQLite")
 }
 
-#' @useDynLib RSQLite RS_SQLite_fetch
-sqliteFetchOneColumn <- function(con, statement, n=0, ...) {
-  rs <- dbSendQuery(con, statement)
-  on.exit(dbClearResult(rs))
-  n <- as.integer(n)
-  rsId <- rs@Id
-  rel <- .Call(RS_SQLite_fetch, rsId, nrec = n)
-  if (length(rel) == 0 || length(rel[[1]]) == 0)
-    return(NULL)
-  rel[[1]]
-}
-
 #' Write a data.frame avoiding exceeding memory limits
 #' 
 #' This function batches calls to \code{write.table} to avoid exceeding memory

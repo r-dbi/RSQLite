@@ -165,25 +165,25 @@ non_select_prepared_query(sqlite3_stmt *db_statement,
         state = bind_params_to_stmt(params, db_statement, i);
         if (state != SQLITE_OK) {
             UNPROTECT(1);
-            exec_error(con, "RS_SQLite_exec: could not bind data");
+            exec_error(con, "rsqlite_query_send: could not bind data");
         }
         state = sqlite3_step(db_statement);
         if (state != SQLITE_DONE) {
             UNPROTECT(1);
-            exec_error(con, "RS_SQLite_exec: could not execute");
+            exec_error(con, "rsqlite_query_send: could not execute");
         }
         state = sqlite3_reset(db_statement);
         sqlite3_clear_bindings(db_statement);
         if (state != SQLITE_OK) {
             UNPROTECT(1);
-            exec_error(con, "RS_SQLite_exec: could not reset statement");
+            exec_error(con, "rsqlite_query_send: could not reset statement");
         }
     }
     RS_SQLite_freeParameterBinding(&params);
 }
 
 
-SEXP RS_SQLite_exec(SEXP handle, SEXP statement, SEXP bind_data) {
+SEXP rsqlite_query_send(SEXP handle, SEXP statement, SEXP bind_data) {
   SQLiteConnection *con = get_connection(handle);
   sqlite3 *db_connection = con->drvConnection;
   sqlite3_stmt *db_statement = NULL;
@@ -234,7 +234,7 @@ SEXP RS_SQLite_exec(SEXP handle, SEXP statement, SEXP bind_data) {
     } else {
       state = sqlite3_step(db_statement);
       if (state != SQLITE_DONE) {
-        exec_error(con, "RS_SQLite_exec: could not execute1");
+        exec_error(con, "rsqlite_query_send: could not execute1");
       }
     }
     res->completed = 1;
@@ -322,7 +322,7 @@ static int do_select_step(SQLiteResult *res, int row_idx) {
    If the NULL value does not correspond to a table column, then we
    force character.
 */
-SEXP RS_SQLite_fetch(SEXP handle, SEXP max_rec) {
+SEXP rsqlite_query_fetch(SEXP handle, SEXP max_rec) {
   SQLiteResult* res = rsqlite_result_from_handle(handle);
   if (res->isSelect != 1) {
     warning("resultSet does not correspond to a SELECT statement");
@@ -338,7 +338,7 @@ SEXP RS_SQLite_fetch(SEXP handle, SEXP max_rec) {
   sqlite3_stmt* db_statement = (sqlite3_stmt *) res->drvResultSet;
 
   if (state != SQLITE_ROW && state != SQLITE_DONE) {
-    error("RS_SQLite_fetch: failed first step: %s",
+    error("rsqlite_query_fetch: failed first step: %s",
       sqlite3_errmsg(sqlite3_db_handle(db_statement)));
   }
   
@@ -366,7 +366,7 @@ SEXP RS_SQLite_fetch(SEXP handle, SEXP max_rec) {
     }
     state = do_select_step(res, row_idx);
     if (state != SQLITE_ROW && state != SQLITE_DONE) {
-      error("RS_SQLite_fetch: failed: %s", 
+      error("rsqlite_query_fetch: failed: %s", 
         sqlite3_errmsg(sqlite3_db_handle(db_statement)));
     }
   } /* end row loop */

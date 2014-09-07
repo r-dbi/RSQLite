@@ -62,7 +62,7 @@ setMethod("dbSendPreparedQuery",
   }
 )
 
-#' @useDynLib RSQLite RS_SQLite_exec
+#' @useDynLib RSQLite rsqlite_query_send
 sqliteSendQuery <- function(con, statement, bind.data = NULL) {
   if (!is.null(bind.data)) {
     if (!is.data.frame(bind.data)) {
@@ -73,7 +73,7 @@ sqliteSendQuery <- function(con, statement, bind.data = NULL) {
     }
   }
   
-  rsId <- .Call(RS_SQLite_exec, con@Id, as.character(statement), bind.data)
+  rsId <- .Call(rsqlite_query_send, con@Id, as.character(statement), bind.data)
   new("SQLiteResult", Id = rsId)
 }
 
@@ -94,12 +94,12 @@ setMethod("fetch", "SQLiteResult", function(res, n = 0) {
   sqliteFetch(res, n = n)
 })
 
-#' @useDynLib RSQLite RS_SQLite_fetch
+#' @useDynLib RSQLite rsqlite_query_fetch
 sqliteFetch <- function(res, n = 0) {  
   check_valid(res)
 
   # Returns NULL, or a list
-  rel <- .Call(RS_SQLite_fetch, res@Id, nrec = as.integer(n))
+  rel <- .Call(rsqlite_query_fetch, res@Id, nrec = as.integer(n))
   if (is.null(rel)) return(data.frame())
   
   attr(rel, "row.names") <- .set_row_names(length(rel[[1]]))

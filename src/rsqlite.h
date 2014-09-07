@@ -22,13 +22,12 @@
 extern "C" {
 #endif
 
+#include <R.h>
+#include <Rdefines.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 #include "sqlite.h"
-#include "Rversion.h"
-#include "Rdefines.h"
-#include "S.h"
-#include <R_ext/RS.h>
 
 // DBI -------------------------------------------------------------------------
 

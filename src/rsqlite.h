@@ -27,6 +27,7 @@ extern "C" {
 #include "sqlite.h"
 #include "Rversion.h"
 #include "Rdefines.h"
+#include "S.h"
 #include <R_ext/RS.h>
 
 // DBI -------------------------------------------------------------------------
@@ -251,6 +252,11 @@ enum SQLITE_TYPE {
   SQLITE_TYPE_TEXT,
   SQLITE_TYPE_BLOB
 };
+
+int RS_sqlite_import(sqlite3 *db, const char *zTable,
+                     const char *zFile, const char *separator, const char *eol, int skip);
+
+void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
 
 // R helpers -------------------------------------------------------------------
 

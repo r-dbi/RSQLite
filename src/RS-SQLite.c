@@ -21,12 +21,6 @@
 /* size_t getline(char**, size_t*, FILE*); */
 char *compiledVersion = SQLITE_VERSION;
 
-int RS_sqlite_import(sqlite3 *db, const char *zTable,
-                     const char *zFile, const char *separator, const char *eol, int skip);
-
-void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
-
-
 // Driver ----------------------------------------------------------------------
 
 static SQLiteDriver *dbManager = NULL;

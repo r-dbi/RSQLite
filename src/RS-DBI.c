@@ -267,10 +267,6 @@ RS_DBI_SclassNames(SEXP type)
   return typeNames;
 }
 
-/* FIXME: need to address this fwd declaration */
-SEXP
-RS_SQLite_closeConnection(SEXP conHandle);
-
 static void _finalize_con_handle(SEXP xp)
 {
     if (R_ExternalPtrAddr(xp)) {

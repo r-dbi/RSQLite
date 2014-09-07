@@ -123,31 +123,28 @@ SQLiteFields* rsqlite_result_fields(SQLiteResult* result) {
   if (result->fields) 
     return result->fields;
   
-  const char* col_decltype = NULL;
-
   sqlite3_stmt* db_statement = (sqlite3_stmt *) result->drvResultSet;
 
   int ncol = sqlite3_column_count(db_statement);
-  SQLiteFields* flds = rsqlite_fields_alloc(ncol); /* BUG: mem leak if this fails? */
-  flds->num_fields = ncol;
+  SQLiteFields* flds = rsqlite_fields_alloc(ncol);
 
   for(int j = 0; j < ncol; j++){
     char* col_name = (char*) sqlite3_column_name(db_statement, j);
-    if (col_name)
+    if (col_name) {
       flds->name[j] = RS_DBI_copyString(col_name);
-    else { 
+    } else { 
       // weird failure
       rsqlite_fields_free(flds);
       flds = NULL;
       return NULL;
     }
-    // We do our best to determine the type of the column.  When the first 
-    // row retrieved contains a NULL and does not reference a table column, we 
+    // We do our best to determine the type of the column. If the first row 
+    // retrieved contains a NULL and does not reference a table column, we 
     // give up.
     int col_type = sqlite3_column_type(db_statement, j);
     if (col_type == SQLITE_NULL) {
         /* try to get type from origin column */
-        col_decltype = sqlite3_column_decltype(db_statement, j);
+        const char* col_decltype = sqlite3_column_decltype(db_statement, j);
         col_type = SQLite_decltype_to_type(col_decltype);
     }
     switch(col_type) {
@@ -169,14 +166,14 @@ SQLiteFields* rsqlite_result_fields(SQLiteResult* result) {
         flds->length[j] = -1;   /* unknown */
         flds->isVarLength[j] = 1;
         break;
-      case SQLITE_NULL:
-        error("NULL column handling not implemented");
-        break;
      case SQLITE_BLOB:
         flds->type[j] = SQLITE_TYPE_BLOB;
         flds->Sclass[j] = VECSXP;
         flds->length[j] = -1;   /* unknown */
         flds->isVarLength[j] = 1;
+        break;
+      case SQLITE_NULL:
+        error("NULL column handling not implemented");
         break;
       default:
         error("unknown column type %d", col_type);

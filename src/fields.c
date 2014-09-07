@@ -18,28 +18,24 @@
  
  #include "rsqlite.h"
 
-
-SQLiteFields* rsqlite_fields_alloc (int num_fields) {
+SQLiteFields* rsqlite_fields_alloc(int n) {
   SQLiteFields *flds;
-  size_t n;
 
   flds = malloc(sizeof(SQLiteFields));
-  if(!flds){
-    error("could not malloc SQLiteFields");
+  if (!flds) {
+    error("Could not malloc SQLiteFields.");
   }
-  n = (size_t) num_fields;
-  flds->num_fields = num_fields;
-  flds->name =     calloc(n, sizeof(char *));
-  flds->type =     calloc(n, sizeof(int));
-  flds->length =   calloc(n, sizeof(int));
+  flds->num_fields = n;
+  flds->name = calloc(n, sizeof(char *));
+  flds->type = calloc(n, sizeof(int));
+  flds->length = calloc(n, sizeof(int));
   flds->isVarLength = calloc(n, sizeof(int));
-  flds->Sclass =   calloc(n, sizeof(SEXPTYPE));
+  flds->Sclass = calloc(n, sizeof(SEXPTYPE));
 
   return flds;
 }
 
-void rsqlite_fields_free (SQLiteFields *flds)
-{
+void rsqlite_fields_free (SQLiteFields *flds) {
   if(flds->name) free(flds->name);
   if(flds->type) free(flds->type);
   if(flds->length) free(flds->length);
@@ -93,8 +89,6 @@ SEXP rsqlite_field_info(SQLiteFields *flds) {
   SET_VECTOR_ELT(info, i++, lens);
   UNPROTECT(1);
 
-
   UNPROTECT(1);
   return info;
 }
-

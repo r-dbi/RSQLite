@@ -43,7 +43,7 @@ void rsqlite_result_free(SQLiteConnection* con) {
     result->drvResultSet = NULL;
   }
   if (result->drvData) {
-    RS_SQLite_bindParams *params = result->drvData;
+    RSQLiteParams *params = result->drvData;
     R_ReleaseObject(params->data);
     RS_SQLite_freeParameterBinding(&params);
     result->drvData = NULL;

@@ -26,7 +26,7 @@ static int first_not_used(const int *used_index, int len)
     return current;
 }
 
-void add_data_to_param_binding(RS_SQLite_bindParams *params, int i, SEXP data)
+void add_data_to_param_binding(RSQLiteParams *params, int i, SEXP data)
 {
     int did_alloc = 1;
     SEXP col_data;
@@ -71,11 +71,11 @@ static int find_by_name(const char *paramName, SEXP colNames)
     return ans;
 }
 
-RS_SQLite_bindParams *
+RSQLiteParams *
 RS_SQLite_createParameterBinding(int n, SEXP bind_data,
                                  sqlite3_stmt *stmt, char *errorMsg)
 {
-    RS_SQLite_bindParams *params;
+    RSQLiteParams *params;
     int i, *used_index, current, num_cols, err = 0;
     SEXP colNames, col_data;
 
@@ -89,7 +89,7 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
     }
 
     /* could this move to R_alloc? */
-    params = malloc(sizeof(RS_SQLite_bindParams));
+    params = malloc(sizeof(RSQLiteParams));
     if (!params) {
         sprintf(errorMsg, "could not allocate memory");
         return NULL;
@@ -160,7 +160,7 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
 }
 
 void
-RS_SQLite_freeParameterBinding(RS_SQLite_bindParams **params)
+RS_SQLite_freeParameterBinding(RSQLiteParams **params)
 {
     if ((*params)->data) R_ReleaseObject((*params)->data);
     free(*params);

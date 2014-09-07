@@ -29,15 +29,15 @@ extern "C" {
 #include <stdlib.h>
 #include "sqlite.h"
 
-// DBI -------------------------------------------------------------------------
+// Objects =====================================================================
 
-typedef struct RS_SQLite_bindParams {
+typedef struct RSQLiteParams {
     int count;
     int row_count;
     int rows_used;
     int row_complete;
     SEXP data;
-} RS_SQLite_bindParams;
+} RSQLiteParams;
 
 /* First, the following fully describes the field output by a select
  * (or select-like) statement, and the mappings from the internal
@@ -47,11 +47,11 @@ typedef struct RS_SQLite_bindParams {
  */
 typedef struct SQLiteFields {
   int num_fields;
-  char  **name;         /* DBMS field names */
-  int  *type;          /* DBMS internal types */
+  char  **name;        /* DBMS field names */
+  int  *type;          /* DBMS types */
   int  *length;        /* DBMS lengths in bytes */
   int  *isVarLength;   /* DBMS variable-length char type */
-  SEXPTYPE *Sclass;        /* R/S class (type) -- may be overriden */
+  SEXPTYPE *Sclass;    /* R class */
 } SQLiteFields;
 
 typedef struct RSQLiteException {
@@ -65,7 +65,7 @@ typedef struct RSQLiteException {
  */
 typedef struct SQLiteResult {
   sqlite3_stmt* drvResultSet;   /* the actual (driver's) cursor/result set */
-  RS_SQLite_bindParams* drvData;        /* a pointer to driver-specific data */
+  RSQLiteParams* drvData;        /* a pointer to driver-specific data */
   int  resultSetId;  
   int  isSelect;        /* boolean for testing SELECTs */
   char  *statement;      /* SQL statement */
@@ -119,8 +119,8 @@ void           rsqlite_output_expand(SEXP output, SQLiteFields *flds, int num_re
 
 SEXP           rsqlite_query_send(SEXP handle, SEXP statement, SEXP bind_data);
 SEXP           rsqlite_query_fetch(SEXP handle, SEXP max_rec);
-RS_SQLite_bindParams* RS_SQLite_createParameterBinding(int n, SEXP bind_data, sqlite3_stmt *stmt, char *errorMsg);
-void RS_SQLite_freeParameterBinding(RS_SQLite_bindParams **);
+RSQLiteParams* RS_SQLite_createParameterBinding(int n, SEXP bind_data, sqlite3_stmt *stmt, char *errorMsg);
+void RS_SQLite_freeParameterBinding(RSQLiteParams **);
 
 
 // Exception -------------------------------------------------------------------

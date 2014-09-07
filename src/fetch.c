@@ -79,7 +79,7 @@ select_prepared_query(sqlite3_stmt *db_statement,
                       SQLiteConnection *con)
 {
     char bindingErrorMsg[2048]; bindingErrorMsg[0] = '\0';
-    RS_SQLite_bindParams *params =
+    RSQLiteParams *params =
         RS_SQLite_createParameterBinding(bind_count, bind_data,
                                          db_statement, bindingErrorMsg);
     if (params == NULL) {
@@ -91,7 +91,7 @@ select_prepared_query(sqlite3_stmt *db_statement,
 }
 
 static int
-bind_params_to_stmt(RS_SQLite_bindParams *params,
+bind_params_to_stmt(RSQLiteParams *params,
                     sqlite3_stmt *db_statement, int row)
 {
     int state = SQLITE_OK, j;
@@ -151,7 +151,7 @@ non_select_prepared_query(sqlite3_stmt *db_statement,
 {
     int state, i;
     char bindingErrorMsg[2048]; bindingErrorMsg[0] = '\0';
-    RS_SQLite_bindParams *params =
+    RSQLiteParams *params =
         RS_SQLite_createParameterBinding(bind_count, bind_data,
                                          db_statement, bindingErrorMsg);
     if (params == NULL) {
@@ -284,10 +284,10 @@ void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
 
 static int do_select_step(SQLiteResult *res, int row_idx) {
     int state;
-    RS_SQLite_bindParams * params = NULL;
+    RSQLiteParams * params = NULL;
     sqlite3_stmt *stmt = (sqlite3_stmt *)res->drvResultSet;
     if (res->drvData) {         /* we have parameters to bind */
-        params = (RS_SQLite_bindParams *)res->drvData;
+        params = (RSQLiteParams *)res->drvData;
         if (params->row_complete) {
             params->row_complete = 0;
             sqlite3_clear_bindings(stmt);

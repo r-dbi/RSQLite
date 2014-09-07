@@ -24,17 +24,17 @@ RS_DBI_allocFields(int num_fields)
   RS_DBI_fields *flds;
   size_t n;
 
-  flds = (RS_DBI_fields *)malloc(sizeof(RS_DBI_fields));
+  flds = malloc(sizeof(RS_DBI_fields));
   if(!flds){
     error("could not malloc RS_DBI_fields");
   }
   n = (size_t) num_fields;
   flds->num_fields = num_fields;
-  flds->name =     (char **) calloc(n, sizeof(char *));
-  flds->type =     (int *) calloc(n, sizeof(int));
-  flds->length =   (int *) calloc(n, sizeof(int));
-  flds->isVarLength = (int *) calloc(n, sizeof(int));
-  flds->Sclass =   (SEXPTYPE *) calloc(n, sizeof(SEXPTYPE));
+  flds->name =     calloc(n, sizeof(char *));
+  flds->type =     calloc(n, sizeof(int));
+  flds->length =   calloc(n, sizeof(int));
+  flds->isVarLength = calloc(n, sizeof(int));
+  flds->Sclass =   calloc(n, sizeof(SEXPTYPE));
 
   return flds;
 }
@@ -48,7 +48,7 @@ RS_DBI_freeFields(RS_DBI_fields *flds)
   if(flds->isVarLength) free(flds->isVarLength);
   if(flds->Sclass) free(flds->Sclass);
   free(flds);
-  flds = (RS_DBI_fields *) NULL;
+  flds = NULL;
   return;
 }
 

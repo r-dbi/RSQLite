@@ -27,19 +27,19 @@ RS_DBI_allocResultSet(SEXP conHandle)
 
   con = get_connection(conHandle);
 
-  result = (RS_DBI_resultSet *) malloc(sizeof(RS_DBI_resultSet));
+  result = malloc(sizeof(RS_DBI_resultSet));
   if (!result){
     char *errMsg = "could not malloc dbResultSet";
     error(errMsg);
   }
-  result->drvResultSet = (void *) NULL; /* driver's own resultSet (cursor)*/
-  result->drvData = (void *) NULL;   /* this can be used by driver*/
-  result->statement = (char *) NULL;
+  result->drvResultSet = NULL; /* driver's own resultSet (cursor)*/
+  result->drvData = NULL;   /* this can be used by driver*/
+  result->statement = NULL;
   result->isSelect = -1;
   result->rowsAffected = -1;
   result->rowCount = 0;
   result->completed = -1;
-  result->fields = (RS_DBI_fields *) NULL;
+  result->fields = NULL;
   
   /* update connection's resultSet table */
   con->resultSet = result;
@@ -61,7 +61,7 @@ void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, SQLiteConnection *con)
       RS_DBI_freeFields(result->fields);
     free(result);
     
-    result = (RS_DBI_resultSet *) NULL;
+    result = NULL;
     con->resultSet = NULL;
 }
 

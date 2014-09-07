@@ -21,10 +21,10 @@
 void setException(SQLiteConnection *con, int err_no, 
                             const char *err_msg) {
 
-  RS_SQLite_exception* ex = (RS_SQLite_exception *) con->exception;
+  RS_SQLite_exception* ex = con->exception;
   if (!ex) {
     // Create new exception object
-    ex = (RS_SQLite_exception *) malloc(sizeof(RS_SQLite_exception));
+    ex = malloc(sizeof(RS_SQLite_exception));
     if (!ex) {
       error("could not allocate SQLite exception object");
     }
@@ -37,7 +37,7 @@ void setException(SQLiteConnection *con, int err_no,
   if (err_msg) {
     ex->errorMsg = RS_DBI_copyString(err_msg);
   } else { 
-    ex->errorMsg = (char *) NULL;
+    ex->errorMsg = NULL;
   }
   
   con->exception = ex;

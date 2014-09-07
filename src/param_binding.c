@@ -5,7 +5,7 @@ init_bindParams(int num_cols)
 {
     int i;
     /* FIXME: this could probably move to R_alloc */
-    int *used_index = (int *)malloc(sizeof(int) * num_cols);
+    int *used_index = malloc(sizeof(int) * num_cols);
     if (!used_index) return NULL;
 
     for (i = 0; i < num_cols; i++){
@@ -89,7 +89,7 @@ RS_SQLite_createParameterBinding(int n, SEXP bind_data,
     }
 
     /* could this move to R_alloc? */
-    params = (RS_SQLite_bindParams *)malloc(sizeof(RS_SQLite_bindParams));
+    params = malloc(sizeof(RS_SQLite_bindParams));
     if (!params) {
         sprintf(errorMsg, "could not allocate memory");
         return NULL;

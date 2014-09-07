@@ -61,12 +61,12 @@ SEXP new_connection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
   }
   
   // Create external pointer to connection object
-  SQLiteConnection* con = (SQLiteConnection *) malloc(sizeof(SQLiteConnection));
+  SQLiteConnection* con = malloc(sizeof(SQLiteConnection));
   if (!con) {
     error("could not malloc dbConnection");
   }
-  con->exception = (RS_SQLite_exception *) NULL;  
-  con->resultSet = (RS_DBI_resultSet *) NULL;
+  con->exception = NULL;  
+  con->resultSet = NULL;
 
   // Initialise SQLite3 database connection
   sqlite3* db_connection;
@@ -114,7 +114,7 @@ SEXP close_connection(SEXP handle) {
   drv->num_con -= 1;
 
   free(con);
-  con = (SQLiteConnection *) NULL;
+  con = NULL;
   R_ClearExternalPtr(handle);
   
   return ScalarLogical(1);

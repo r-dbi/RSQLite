@@ -39,7 +39,7 @@ void initDriver(SEXP records_, SEXP cache_) {
     );
   }
   
-  dbManager = (SQLiteDriver*) malloc(sizeof(SQLiteDriver));
+  dbManager = malloc(sizeof(SQLiteDriver));
   if (!dbManager) {
     error("could not malloc the dbManger");
   }

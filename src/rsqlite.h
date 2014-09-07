@@ -83,16 +83,9 @@ enum SQLITE_TYPE {
   SQLITE_TYPE_BLOB
 };
 
-/* A dbConnection consists of a pointer to the actual implementation
- * (MySQL, Oracle, etc.) connection plus a resultSet and other
- * goodies used by the RS-DBI implementation.
- * The connection parameters (user, password, database name, etc.) are
- * defined by the actual driver -- we just set aside a void pointer.
- */
-
 typedef struct SQLiteConnection {
-  void  *drvConnection;  /* pointer to the actual DBMS connection struct*/
-  RS_DBI_resultSet  *resultSet;    /* vector to result set ptrs  */
+  sqlite3* drvConnection;  
+  RS_DBI_resultSet  *resultSet;
   RS_SQLite_exception *exception;
 } SQLiteConnection;
 

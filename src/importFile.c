@@ -36,14 +36,14 @@ RS_SQLite_importFile(
     SEXP output;
 
     s = CHAR(asChar(s_tablename));
-    zTable = (char *) malloc( strlen(s)+1);
+    zTable = malloc( strlen(s)+1);
     if(!zTable){
         error("could not allocate memory");
     }
     (void) strcpy(zTable, s);
 
     s = CHAR(asChar(s_filename));
-    zFile = (char *) malloc( strlen(s)+1);
+    zFile = malloc( strlen(s)+1);
     if(!zFile){
         free(zTable);
         error("could not allocate memory");
@@ -52,8 +52,8 @@ RS_SQLite_importFile(
 
     s = CHAR(asChar(s_separator));
     s1 = CHAR(asChar(s_eol));
-    zSep = (char *) malloc( strlen(s)+1);
-    zEol = (char *) malloc(strlen(s1)+1);
+    zSep = malloc( strlen(s)+1);
+    zEol = malloc(strlen(s1)+1);
     if(!zSep || !zEol){
         free(zTable);
         free(zFile);
@@ -209,7 +209,7 @@ RS_sqlite_getline(FILE *in, const char *eol)
     int found_eol = 0;
 
     nc = 1024; i = 0;
-    buf = (char *) malloc(nc);
+    buf = malloc(nc);
     if(!buf) error("RS_sqlite_getline could not malloc");
 
     neol = strlen(eol);  /* num of eol chars */
@@ -243,7 +243,7 @@ RS_sqlite_getline(FILE *in, const char *eol)
 
     if (i == 0 || strlen(buf) == 0) {    /* empty line */
         free(buf);
-        buf = (char *) NULL;
+        buf = NULL;
     }
 
     return buf;

@@ -24,7 +24,7 @@ RS_DBI_copyString(const char *str)
 {
   char *buffer;
 
-  buffer = (char *) malloc((size_t) strlen(str)+1);
+  buffer = malloc((size_t) strlen(str)+1);
   if(!buffer)
     error("internal error in RS_DBI_copyString: could not alloc string space");
   return strcpy(buffer, str);

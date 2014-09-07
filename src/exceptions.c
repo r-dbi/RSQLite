@@ -45,7 +45,7 @@ void setException(SQLiteConnection *con, int err_no,
 }
 
 void freeException(SQLiteConnection *con) {
-  RS_SQLite_exception *ex = (RS_SQLite_exception *) con->exception;
+  RS_SQLite_exception *ex = con->exception;
 
   if (!ex) 
     return;

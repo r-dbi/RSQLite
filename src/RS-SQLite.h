@@ -25,7 +25,6 @@ extern  "C" {
 #include "sqlite.h"
 
 #include <string.h>
-#include <unistd.h>   /* needed by getlogin() -- is this portable??? */
 
 #include "RS-DBI.h"
 

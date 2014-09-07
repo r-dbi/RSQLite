@@ -190,14 +190,13 @@ SEXP RS_SQLite_exec(SEXP handle, SEXP statement, SEXP bind_data) {
   int state, bind_count;
   int rows = 0, cols = 0;
 
-  SQLiteResult* res = con->resultSet;
-  if (res) {
-    if (res->completed != 1)
+  if (con->resultSet) {
+    if (con->resultSet->completed != 1) 
       warning("Closing result set with pending rows");
     rsqlite_result_free(con);
   }
   rsqlite_result_alloc(con);
-  res = con->resultSet;
+  SQLiteResult* res = con->resultSet;
 
   /* allocate and init a new result set */
   res->completed = 0;
@@ -205,11 +204,11 @@ SEXP RS_SQLite_exec(SEXP handle, SEXP statement, SEXP bind_data) {
   res->statement = dyn_statement;
   res->drvResultSet = db_statement;
   state = sqlite3_prepare_v2(db_connection, dyn_statement, -1,
-                             &db_statement, NULL);
+    &db_statement, NULL);
+  
   if (state != SQLITE_OK) {
     exec_error(con, "error in statement");
   }
-
   if (db_statement == NULL) {
     exec_error(con, "nothing to execute");
   }
@@ -220,35 +219,30 @@ SEXP RS_SQLite_exec(SEXP handle, SEXP statement, SEXP bind_data) {
       cols = GET_LENGTH(bind_data);
   }
 
-
   res->isSelect = sqlite3_column_count(db_statement) > 0;
   res->rowCount = 0;      /* fake's cursor's row count */
   res->rowsAffected = -1; /* no rows affected */
   rsqlite_exception_set(con, state, "OK");
 
   if (res->isSelect) {
-      if (bind_count > 0) {
-          select_prepared_query(db_statement, bind_data, bind_count,
-                                rows, con);
-      }
+    if (bind_count > 0) {
+      select_prepared_query(db_statement, bind_data, bind_count, rows, con);
+    }
   } else {
-      if (bind_count > 0) {
-          non_select_prepared_query(db_statement, bind_data, bind_count,
-                                    rows, con);
+    if (bind_count > 0) {
+      non_select_prepared_query(db_statement, bind_data, bind_count, rows, con);
+    } else {
+      state = sqlite3_step(db_statement);
+      if (state != SQLITE_DONE) {
+        exec_error(con, "RS_SQLite_exec: could not execute1");
       }
-      else {
-          state = sqlite3_step(db_statement);
-          if (state != SQLITE_DONE) {
-              exec_error(con, "RS_SQLite_exec: could not execute1");
-          }
-      }
-      res->completed = 1;          /* BUG: what if query is async?*/
-      res->rowsAffected = sqlite3_changes(db_connection);
+    }
+    res->completed = 1;
+    res->rowsAffected = sqlite3_changes(db_connection);
   }
   
   return handle;
 }
-
 
 /* Fills the output VECSXP with one row of data from the resultset
  */
@@ -259,7 +253,6 @@ void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
     int is_null = (sqlite3_column_type(db_statement, j) == SQLITE_NULL);
     
     SEXP col = VECTOR_ELT(output, j);
-    
     switch (flds->Sclass[j]) {
       case INTSXP:
         INTEGER(col)[row_idx] = is_null ? NA_INTEGER : 
@@ -289,8 +282,7 @@ void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
   }
 }
 
-static int do_select_step(SQLiteResult *res, int row_idx)
-{
+static int do_select_step(SQLiteResult *res, int row_idx) {
     int state;
     RS_SQLite_bindParams * params = NULL;
     sqlite3_stmt *stmt = (sqlite3_stmt *)res->drvResultSet;

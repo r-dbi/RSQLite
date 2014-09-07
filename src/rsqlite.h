@@ -135,11 +135,10 @@ SEXP RS_SQLite_getException(SEXP conHandle);
 
 // Connection ------------------------------------------------------------------
 
-RS_DBI_connection *RS_DBI_getConnection(SEXP handle);
-SEXP RS_DBI_asConHandle(RS_DBI_connection *con);
-SEXP RS_SQLite_newConnection(SEXP dbfile, SEXP allow_ext, SEXP s_flags, SEXP s_vfs);
-SEXP RS_SQLite_cloneConnection(SEXP conHandle);
-SEXP RS_SQLite_closeConnection(SEXP conHandle);
+RS_DBI_connection *get_connection(SEXP handle);
+SEXP connection_handle(RS_DBI_connection *con);
+SEXP new_connection(SEXP dbfile, SEXP allow_ext, SEXP s_flags, SEXP s_vfs);
+SEXP close_connection(SEXP conHandle);
 
 // Driver ----------------------------------------------------------------------
 

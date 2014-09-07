@@ -88,8 +88,8 @@ char* field_type(int type) {
 SEXP RS_SQLite_copy_database(SEXP fromConHandle, SEXP toConHandle)
 {
     sqlite3_backup *backup = NULL;
-    RS_DBI_connection *fromCon = RS_DBI_getConnection(fromConHandle);
-    RS_DBI_connection *toCon = RS_DBI_getConnection(toConHandle);
+    RS_DBI_connection *fromCon = get_connection(fromConHandle);
+    RS_DBI_connection *toCon = get_connection(toConHandle);
     sqlite3 *dbFrom = (sqlite3 *)fromCon->drvConnection;
     sqlite3 *dbTo = (sqlite3 *)toCon->drvConnection;
     int rc = 0;

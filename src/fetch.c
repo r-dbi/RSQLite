@@ -142,7 +142,7 @@ int RS_SQLite_get_row_count(sqlite3* db, const char* tname) {
 SEXP RS_SQLite_quick_column(SEXP conHandle, SEXP table, SEXP column)
 {
     SEXP ans = R_NilValue, rawv;
-    RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
+    RS_DBI_connection *con = get_connection(conHandle);
     sqlite3 *db_connection = (sqlite3 *) con->drvConnection;
     sqlite3_stmt *stmt = NULL;
     int numrows, rc, i = 0, col_type, *intans = NULL, blob_len;
@@ -392,7 +392,7 @@ non_select_prepared_query(sqlite3_stmt *db_statement,
 
 SEXP RS_SQLite_exec(SEXP conHandle, SEXP statement, SEXP bind_data)
 {
-    RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
+    RS_DBI_connection *con = get_connection(conHandle);
     SEXP rsHandle;
     RS_DBI_resultSet *res;
     sqlite3 *db_connection = (sqlite3 *) con->drvConnection;

@@ -25,7 +25,7 @@ RS_DBI_allocResultSet(SEXP conHandle)
   RS_DBI_connection *con = NULL;
   RS_DBI_resultSet  *result = NULL;
 
-  con = RS_DBI_getConnection(conHandle);
+  con = get_connection(conHandle);
 
   result = (RS_DBI_resultSet *) malloc(sizeof(RS_DBI_resultSet));
   if (!result){
@@ -100,7 +100,7 @@ RS_DBI_resultSet *
 RS_DBI_getResultSet(SEXP rsHandle)
 {
   RS_DBI_connection *con;
-  con = RS_DBI_getConnection(rsHandle);
+  con = get_connection(rsHandle);
   if(!con)
     error("internal error in RS_DBI_getResultSet: bad connection");
   return con->resultSet;
@@ -118,7 +118,7 @@ SEXP
 RS_SQLite_closeResultSet(SEXP resHandle)
 {
     RSQLite_closeResultSet0(RS_DBI_getResultSet(resHandle),
-                            RS_DBI_getConnection(resHandle));
+                            get_connection(resHandle));
     /* The connection external ptr is stored within the result handle
        so that an active result keeps the connection protected.  When
        we close the result set, we remove the reference to the

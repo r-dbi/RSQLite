@@ -28,7 +28,7 @@ RS_SQLite_importFile(
     SEXP s_skip
     )
 {
-    RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
+    RS_DBI_connection *con = get_connection(conHandle);
     sqlite3           *db_connection = (sqlite3 *) con->drvConnection;
     char              *zFile, *zTable, *zSep, *zEol;
     const char *s, *s1;

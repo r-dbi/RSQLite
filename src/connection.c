@@ -18,40 +18,27 @@
 
 #include "rsqlite.h"
 
-static void _finalize_con_handle(SEXP xp)
-{
-    if (R_ExternalPtrAddr(xp)) {
-        RS_SQLite_closeConnection(xp);
-        R_ClearExternalPtr(xp);
-    }
+static void _finalize_connection_handle(SEXP xp) {
+  if (!R_ExternalPtrAddr(xp)) return;
+  
+  close_connection(xp);
 }
 
-SEXP
-RS_DBI_asConHandle(RS_DBI_connection *con)
-{
-    SEXP conHandle, s_ids, label;
-    int *ids;
-    PROTECT(s_ids = allocVector(INTSXP, 2));
-    ids = INTEGER(s_ids);
-    ids[0] = 0;
-    ids[1] = 0;
-    PROTECT(label = mkString("DBI CON"));
-    conHandle = R_MakeExternalPtr(con, label, s_ids);
-    UNPROTECT(2);
-    R_RegisterCFinalizerEx(conHandle, _finalize_con_handle, 1);
-    return conHandle;
+SEXP connection_handle(RS_DBI_connection *con) {
+  SEXP handle = R_MakeExternalPtr(con, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(handle, _finalize_connection_handle, 1);
+  return handle;
 }
 
-RS_DBI_connection *
-RS_DBI_getConnection(SEXP conHandle)
-{
-    RS_DBI_connection *con = (RS_DBI_connection *)R_ExternalPtrAddr(conHandle);
-    if (!con) error("expired SQLiteConnection");
-    return con;
+RS_DBI_connection* get_connection(SEXP handle) {
+  RS_DBI_connection* con = (RS_DBI_connection*) R_ExternalPtrAddr(handle);
+  if (!con) 
+    error("expired SQLiteConnection");
+  
+  return con;
 }
 
-
-SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_, 
+SEXP new_connection(SEXP dbname_, SEXP allow_ext_, SEXP flags_, 
                              SEXP vfs_) {
   const char* dbname = CHAR(asChar(dbname_));
   
@@ -75,7 +62,7 @@ SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
   
   // Create external pointer to connection object
   RS_DBI_connection* con = (RS_DBI_connection *) malloc(sizeof(RS_DBI_connection));
-  if (!con){
+  if (!con) {
     error("could not malloc dbConnection");
   }
   con->exception = (RS_SQLite_exception *) NULL;  
@@ -99,11 +86,11 @@ SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
   
   setException(con, SQLITE_OK, "OK");
     
-  return RS_DBI_asConHandle(con);
+  return connection_handle(con);
 }
 
-SEXP RS_SQLite_closeConnection(SEXP conHandle) {
-  RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
+SEXP close_connection(SEXP handle) {
+  RS_DBI_connection *con = get_connection(handle);
   
   // close & free result set (if open)
   if (con->resultSet) {
@@ -128,7 +115,7 @@ SEXP RS_SQLite_closeConnection(SEXP conHandle) {
 
   free(con);
   con = (RS_DBI_connection *) NULL;
-  R_ClearExternalPtr(conHandle);
+  R_ClearExternalPtr(handle);
   
   return ScalarLogical(1);
 }
@@ -136,15 +123,15 @@ SEXP RS_SQLite_closeConnection(SEXP conHandle) {
 SEXP isValidConnection(SEXP dbObj) {
   RS_DBI_connection* con = R_ExternalPtrAddr(dbObj);
 
-  if (!con) return ScalarLogical(0);
-  if (!con->drvConnection) return ScalarLogical(0);
+  if (!con) 
+    return ScalarLogical(0);
+  if (!con->drvConnection) 
+    return ScalarLogical(0);
   
   return ScalarLogical(1);
 }
 
-
 SEXP connectionInfo(SEXP conHandle) {
-
   SEXP info = PROTECT(allocVector(VECSXP, 1));
   SEXP info_nms = PROTECT(allocVector(STRSXP, 1));
   SET_NAMES(info, info_nms);

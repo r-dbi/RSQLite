@@ -47,7 +47,7 @@ SQLITE_RO <- 1L
 #'   \code{"unix-none"}.
 #' @aliases SQLITE_RWC SQLITE_RW SQLITE_RO
 #' @export
-#' @useDynLib RSQLite RS_SQLite_newConnection
+#' @useDynLib RSQLite new_connection
 #' @examples
 #' # Create temporary in-memory db
 #' tmp <- dbConnect(SQLite(), ":memory:")
@@ -68,8 +68,7 @@ setMethod("dbConnect", "SQLiteDriver",
     vfs <- check_vfs(vfs)
     stopifnot(is.integer(flags), length(flags) == 1)
 
-    conId <- .Call(RS_SQLite_newConnection, dbname, loadable.extensions, 
-      flags, vfs)
+    conId <- .Call(new_connection, dbname, loadable.extensions, flags, vfs)
     con <- new("SQLiteConnection", 
       Id = conId,
       dbname = dbname,
@@ -120,12 +119,12 @@ setMethod("dbConnect", "SQLiteConnection", function(drv){
 
 #' @export
 #' @rdname dbConnect-SQLiteDriver-method
-#' @useDynLib RSQLite RS_SQLite_closeConnection
+#' @useDynLib RSQLite close_connection
 setMethod("dbDisconnect", "SQLiteConnection", function(conn) {
   if (!dbIsValid(conn)) {
     warning("Expired SQLiteConnection.", call. = FALSE)
     return(TRUE)
   }
   
-  .Call(RS_SQLite_closeConnection, conn@Id)
+  .Call(close_connection, conn@Id)
 })

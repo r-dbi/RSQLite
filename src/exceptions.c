@@ -58,7 +58,7 @@ void freeException(RS_DBI_connection *con) {
 }
 
 SEXP RS_SQLite_getException(SEXP conHandle) {
-  RS_DBI_connection* con = RS_DBI_getConnection(conHandle);
+  RS_DBI_connection* con = get_connection(conHandle);
   if (!con->drvConnection)
     error("internal error: corrupt connection handle");
 

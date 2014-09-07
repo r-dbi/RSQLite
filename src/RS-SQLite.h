@@ -63,23 +63,21 @@ int                 SQLite_decltype_to_type(const char *decltype);
  * underlying RS_DBI manager, connection, and resultsets structures and
  * functions (see RS-DBI.h).
  *
- * Note: A handle is just an R/S object (see RS-DBI.h for details), i.e.,
- * Mgr_Handle, Con_Handle, Res_Handle, Db_Handle are s_object.
  */
 
 /* dbManager */
 void initDriver(SEXP records_, SEXP cache_);
-SEXP RS_SQLite_close(Mgr_Handle mgrHandle);
+SEXP RS_SQLite_close(SEXP mgrHandle);
 
 /* dbConnection */
-Con_Handle RS_SQLite_newConnection(SEXP dbfile,
+SEXP RS_SQLite_newConnection(SEXP dbfile,
                                    SEXP allow_ext, SEXP s_flags, SEXP s_vfs);
-Con_Handle RS_SQLite_cloneConnection(Con_Handle conHandle);
-SEXP RS_SQLite_closeConnection(Con_Handle conHandle);
+SEXP RS_SQLite_cloneConnection(SEXP conHandle);
+SEXP RS_SQLite_closeConnection(SEXP conHandle);
 /* we simulate db exceptions ourselves */
 void        RS_SQLite_setException(RS_DBI_connection *con, int errorNum,
                                    const char *errorMsg);
-SEXP RS_SQLite_getException(Con_Handle conHandle);
+SEXP RS_SQLite_getException(SEXP conHandle);
 /* err No, Msg */
 
 /* currently we only provide a "standard" callback to sqlite_exec() -- this
@@ -92,30 +90,30 @@ int       RS_SQLite_stdCallback(void *resHandle, int ncol, char **row,
                                 char **colNames);
 
 /* dbResultSet */
-Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement,
+SEXP RS_SQLite_exec(SEXP conHandle, SEXP statement,
                            SEXP bind_data);
-SEXP RS_SQLite_fetch(Res_Handle rsHandle, SEXP max_rec);
-SEXP RS_SQLite_closeResultSet(Res_Handle rsHandle);
+SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec);
+SEXP RS_SQLite_closeResultSet(SEXP rsHandle);
 void        RS_SQLite_initFields(RS_DBI_resultSet *res, int ncol,
                                  char **colNames);
 
-SEXP RS_SQLite_validHandle(Db_Handle handle);      /* boolean */
+SEXP RS_SQLite_validHandle(SEXP handle);      /* boolean */
 
-RS_DBI_fields *RS_SQLite_createDataMappings(Res_Handle resHandle);
+RS_DBI_fields *RS_SQLite_createDataMappings(SEXP resHandle);
 
 /* the following funs return named lists with meta-data for
  * the manager, connections, and  result sets, respectively.
  */
-SEXP RS_SQLite_managerInfo(Mgr_Handle mgrHandle);
-SEXP RSQLite_connectionInfo(Con_Handle conHandle);
-SEXP RS_SQLite_resultSetInfo(Res_Handle rsHandle);
+SEXP RS_SQLite_managerInfo(SEXP mgrHandle);
+SEXP RSQLite_connectionInfo(SEXP conHandle);
+SEXP RS_SQLite_resultSetInfo(SEXP rsHandle);
 
 /*  The following imports the delim-fields of a file into an existing table*/
-SEXP RS_SQLite_importFile(Con_Handle conHandle, SEXP s_tablename,
+SEXP RS_SQLite_importFile(SEXP conHandle, SEXP s_tablename,
              SEXP s_filename, SEXP s_separator, SEXP s_obj,
              SEXP s_skip);
 
-SEXP RS_SQLite_copy_database(Con_Handle fromConHandle, Con_Handle toConHandle);
+SEXP RS_SQLite_copy_database(SEXP fromConHandle, SEXP toConHandle);
 
 char * RS_sqlite_getline(FILE *in, const char *eol);
 

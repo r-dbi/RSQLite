@@ -166,7 +166,7 @@ SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
   return conHandle;
 }
 
-SEXP RS_SQLite_closeConnection(Con_Handle conHandle) {
+SEXP RS_SQLite_closeConnection(SEXP conHandle) {
   RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
   
   if (con->num_res > 0) {
@@ -268,7 +268,7 @@ int RS_SQLite_get_row_count(sqlite3* db, const char* tname) {
 }
 
 
-SEXP RS_SQLite_quick_column(Con_Handle conHandle, SEXP table, SEXP column)
+SEXP RS_SQLite_quick_column(SEXP conHandle, SEXP table, SEXP column)
 {
     SEXP ans = R_NilValue, rawv;
     RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
@@ -374,7 +374,7 @@ exec_error(const char *msg,
            RS_DBI_connection *con,
            int bind_count,
            RS_SQLite_bindParams *params,
-           Res_Handle rsHandle)
+           SEXP rsHandle)
 {
     sqlite3 *db = (sqlite3 *) con->drvConnection;
     int errcode = db ? sqlite3_errcode(db) : -1;
@@ -519,10 +519,10 @@ non_select_prepared_query(sqlite3_stmt *db_statement,
 }
 
 
-Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
+SEXP RS_SQLite_exec(SEXP conHandle, SEXP statement, SEXP bind_data)
 {
     RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
-    Res_Handle rsHandle;
+    SEXP rsHandle;
     RS_DBI_resultSet *res;
     sqlite3 *db_connection = (sqlite3 *) con->drvConnection;
     sqlite3_stmt *db_statement = NULL;
@@ -599,7 +599,7 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
 }
 
 RS_DBI_fields*
-RS_SQLite_createDataMappings(Res_Handle rsHandle) {
+RS_SQLite_createDataMappings(SEXP rsHandle) {
   const char* col_decltype = NULL;
 
   RS_DBI_resultSet* result = RS_DBI_getResultSet(rsHandle);
@@ -899,7 +899,7 @@ SEXP driverInfo() {
   return output;
 }
 
-SEXP connectionInfo(Con_Handle conHandle) {
+SEXP connectionInfo(SEXP conHandle) {
   int info_count = 6, i = 0;
   RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
 
@@ -922,7 +922,7 @@ SEXP connectionInfo(Con_Handle conHandle) {
   return info;
 }
 
-SEXP resultSetInfo(Res_Handle rsHandle) {
+SEXP resultSetInfo(SEXP rsHandle) {
   char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
                      "rowCount", "completed", "fieldDescription"};
   SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP, INTSXP, INTSXP, VECSXP};
@@ -973,7 +973,7 @@ SEXP typeNames(SEXP typeIds) {
 
 SEXP     /* returns TRUE/FALSE */
 RS_SQLite_importFile(
-    Con_Handle conHandle,
+    SEXP conHandle,
     SEXP s_tablename,
     SEXP s_filename,
     SEXP s_separator,
@@ -1202,7 +1202,7 @@ RS_sqlite_getline(FILE *in, const char *eol)
     return buf;
 }
 
-SEXP RS_SQLite_copy_database(Con_Handle fromConHandle, Con_Handle toConHandle)
+SEXP RS_SQLite_copy_database(SEXP fromConHandle, SEXP toConHandle)
 {
     sqlite3_backup *backup = NULL;
     RS_DBI_connection *fromCon = RS_DBI_getConnection(fromConHandle);

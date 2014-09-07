@@ -157,7 +157,7 @@ void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
 }
 
 void
-RS_DBI_freeResultSet(Res_Handle rsHandle)
+RS_DBI_freeResultSet(SEXP rsHandle)
 {
   RS_DBI_freeResultSet0(RS_DBI_getResultSet(rsHandle),
                         RS_DBI_getConnection(rsHandle));
@@ -349,7 +349,7 @@ RS_DBI_asMgrHandle(int mgrId)
 
 /* FIXME: need to address this fwd declaration */
 SEXP
-RS_SQLite_closeConnection(Con_Handle conHandle);
+RS_SQLite_closeConnection(SEXP conHandle);
 
 static void _finalize_con_handle(SEXP xp)
 {

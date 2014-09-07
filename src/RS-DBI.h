@@ -39,10 +39,6 @@ typedef enum enum_dbi_exception {
   RS_DBI_TERMINATE
 } DBI_EXCEPTION;
 
-#define Mgr_Handle SEXP
-#define Con_Handle SEXP
-#define Res_Handle SEXP
-#define Db_Handle  SEXP
 
 #define RES_ID(handle) INTEGER(VECTOR_ELT(R_ExternalPtrProtected(handle), 0))[2]
 
@@ -114,20 +110,20 @@ typedef struct st_sdbi_manager {
 /* All RS_DBI functions and their signatures */
 
 SQLiteDriver* getDriver();
-Mgr_Handle RS_DBI_asMgrHandle(int pid);   
+SEXP RS_DBI_asMgrHandle(int pid);   
 
 /* dbConnection */
-Con_Handle RS_DBI_allocConnection();
-void               RS_DBI_freeConnection(Con_Handle conHandle);
-RS_DBI_connection *RS_DBI_getConnection(Db_Handle handle);
-Con_Handle RS_DBI_asConHandle(RS_DBI_connection *con);
+SEXP RS_DBI_allocConnection();
+void RS_DBI_freeConnection(SEXP conHandle);
+RS_DBI_connection *RS_DBI_getConnection(SEXP handle);
+SEXP RS_DBI_asConHandle(RS_DBI_connection *con);
 
 /* dbResultSet */
-Res_Handle RS_DBI_allocResultSet(Con_Handle conHandle);
-void               RS_DBI_freeResultSet(Res_Handle rsHandle);
+SEXP RS_DBI_allocResultSet(SEXP conHandle);
+void RS_DBI_freeResultSet(SEXP rsHandle);
 void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
-RS_DBI_resultSet  *RS_DBI_getResultSet(Res_Handle rsHandle);
-Res_Handle RS_DBI_asResHandle(SEXP conxp);
+RS_DBI_resultSet  *RS_DBI_getResultSet(SEXP rsHandle);
+SEXP RS_DBI_asResHandle(SEXP conxp);
 
 /* a simple object database (mapping table) -- it uses simple linear 
  * search (we don't expect to have more than a handful of simultaneous 

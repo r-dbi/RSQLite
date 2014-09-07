@@ -119,10 +119,10 @@ sqliteGetQuery <- function(con, statement, bind.data = NULL) {
 #' 
 #' @param conn an object of class \code{\linkS4class{SQLiteConnection}}
 #' @export
-#' @useDynLib RSQLite RS_SQLite_getException
+#' @useDynLib RSQLite rsqlite_exception_info
 #' @keywords internal
 setMethod("dbGetException", "SQLiteConnection", function(conn) {
-  .Call(RS_SQLite_getException, conn@Id)
+  .Call(rsqlite_exception_info, conn@Id)
 })
 
 #' Does the table exist?

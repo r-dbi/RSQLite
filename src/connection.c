@@ -84,7 +84,7 @@ SEXP new_connection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
   driver->num_con += 1;
   driver->counter += 1;
   
-  setException(con, SQLITE_OK, "OK");
+  rsqlite_exception_set(con, SQLITE_OK, "OK");
     
   return connection_handle(con);
 }
@@ -107,7 +107,7 @@ SEXP close_connection(SEXP handle) {
     warning("Internal error: could not close SQLte connection.");
   }
   con->drvConnection = NULL;
-  freeException(con);
+  rsqlite_exception_free(con);
 
   // update driver connection table
   SQLiteDriver* drv = getDriver();

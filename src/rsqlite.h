@@ -54,10 +54,10 @@ typedef struct SQLiteFields {
   SEXPTYPE *Sclass;        /* R/S class (type) -- may be overriden */
 } SQLiteFields;
 
-typedef struct RS_SQLite_exception {
+typedef struct RSQLiteException {
    int  errorNum;
    char *errorMsg;
-} RS_SQLite_exception;
+} RSQLiteException;
 
 /* The RS-DBI resultSet consists of a pointer to the actual DBMS 
  * resultSet (e.g., MySQL, Oracle) possibly NULL,  plus the fields 
@@ -86,7 +86,7 @@ enum SQLITE_TYPE {
 typedef struct SQLiteConnection {
   sqlite3* drvConnection;  
   SQLiteResult  *resultSet;
-  RS_SQLite_exception *exception;
+  RSQLiteException *exception;
 } SQLiteConnection;
 
 typedef struct SQLiteDriver {
@@ -123,10 +123,9 @@ void RS_SQLite_freeParameterBinding(RS_SQLite_bindParams **);
 
 // Exception -------------------------------------------------------------------
 
-void setException(SQLiteConnection *con, int err_no, const char *err_msg);
-void freeException(SQLiteConnection *con);
-void RS_SQLite_setException(SQLiteConnection *con, int errorNum, const char *errorMsg);
-SEXP RS_SQLite_getException(SEXP conHandle);
+void rsqlite_exception_set(SQLiteConnection *con, int err_no, const char *err_msg);
+void rsqlite_exception_free(SQLiteConnection *con);
+SEXP rsqlite_exception_info(SEXP handle);
 
 // Connection ------------------------------------------------------------------
 

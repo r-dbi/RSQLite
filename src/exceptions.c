@@ -18,13 +18,12 @@
 
 #include "rsqlite.h"
 
-void setException(SQLiteConnection *con, int err_no, 
-                            const char *err_msg) {
+void rsqlite_exception_set(SQLiteConnection *con, int err_no, const char *err_msg) {
 
-  RS_SQLite_exception* ex = con->exception;
+  RSQLiteException* ex = con->exception;
   if (!ex) {
     // Create new exception object
-    ex = malloc(sizeof(RS_SQLite_exception));
+    ex = malloc(sizeof(RSQLiteException));
     if (!ex) {
       error("could not allocate SQLite exception object");
     }
@@ -44,8 +43,8 @@ void setException(SQLiteConnection *con, int err_no,
   return;
 }
 
-void freeException(SQLiteConnection *con) {
-  RS_SQLite_exception *ex = con->exception;
+void rsqlite_exception_free(SQLiteConnection *con) {
+  RSQLiteException *ex = con->exception;
 
   if (!ex) 
     return;
@@ -57,12 +56,12 @@ void freeException(SQLiteConnection *con) {
   return;
 }
 
-SEXP RS_SQLite_getException(SEXP conHandle) {
-  SQLiteConnection* con = get_connection(conHandle);
+SEXP rsqlite_exception_info(SEXP handle) {
+  SQLiteConnection* con = get_connection(handle);
   if (!con->drvConnection)
     error("internal error: corrupt connection handle");
 
-  RS_SQLite_exception* err = (RS_SQLite_exception *) con->exception;
+  RSQLiteException* err = con->exception;
   
   SEXP output = PROTECT(allocVector(VECSXP, 2));
   SEXP output_nms = PROTECT(allocVector(STRSXP, 2));

@@ -37,15 +37,7 @@ extern "C" {
  * RS_DBI_fields, corresponding to dbManager, dbConnection,
  * dbResultSet, and list of field descriptions.
  */
-
-typedef enum enum_dbi_exception {
-  RS_DBI_MESSAGE,
-  RS_DBI_WARNING,
-  RS_DBI_ERROR,
-  RS_DBI_TERMINATE
-} DBI_EXCEPTION;
-
-
+ 
 /* First, the following fully describes the field output by a select
  * (or select-like) statement, and the mappings from the internal
  * database types to S classes.  This structure contains the info we need

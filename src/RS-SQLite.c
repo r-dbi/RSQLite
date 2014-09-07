@@ -169,9 +169,9 @@ SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
 SEXP RS_SQLite_closeConnection(SEXP conHandle) {
   RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
   
-  if (con->num_res > 0) {
+  if (con->resultSet) {
     warning("Closing open result set");
-    RSQLite_closeResultSet0(con->resultSets[0], con);
+    RSQLite_closeResultSet0(con->resultSet, con);
   }
 
   sqlite3* db_connection = con->drvConnection;
@@ -533,7 +533,7 @@ SEXP RS_SQLite_exec(SEXP conHandle, SEXP statement, SEXP bind_data)
     /* Do we have a pending resultSet in the current connection?
      * SQLite only allows  one resultSet per connection.
      */
-    if (con->num_res>0) {
+    if (con->resultSet) {
         rsHandle = RS_DBI_asResHandle(conHandle);
         res = RS_DBI_getResultSet(rsHandle);
         if (res->completed != 1) {

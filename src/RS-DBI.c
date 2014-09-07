@@ -25,24 +25,8 @@ SEXP RS_DBI_allocConnection() {
     error("could not malloc dbConnection");
   }
   con->drvConnection = (void *) NULL;
-  con->drvData = (void *) NULL;
-  
-  /* result sets for this connection */
-  con->resultSets = (RS_DBI_resultSet **)
-    calloc((size_t) 1, sizeof(RS_DBI_resultSet));
-  if (!con->resultSets){
-    free(con);
-    error("could not calloc resultSets for the dbConnection");
-  }
-  con->num_res = 0;
-  con->resultSetIds = (int *) calloc((size_t) 1, sizeof(int));
-  if (!con->resultSetIds) {
-    free(con->resultSets);
-    free(con);
-    error("could not calloc vector of resultSet Ids");
-  }
-  con->resultSets[0] = (RS_DBI_resultSet *) NULL;
-  con->resultSetIds[0] = -1;
+  con->drvData = (void *) NULL;  
+  con->resultSet = (RS_DBI_resultSet *) NULL;
 
   /* Finally, update connection table in driver */
   SQLiteDriver* driver = getDriver();
@@ -67,14 +51,11 @@ RS_DBI_freeConnection(SEXP conHandle)
   mgr = getDriver();
 
   /* Are there open resultSets? If so, free them first */
-  if(con->num_res > 0) {
-    char *errMsg = "opened resultSet(s) forcebly closed";
-    int  i;
-    for(i=0; i < con->num_res; i++){
-        RS_DBI_freeResultSet0(con->resultSets[i], con);
-    }
-    warning(errMsg);
+  if(con->resultSet) {
+    warning("opened resultSet(s) forcebly closed");
+    RS_DBI_freeResultSet0(con->resultSet, con);
   }
+
   if(con->drvConnection) {
     char *errMsg = 
       "internal error in RS_DBI_freeConnection: driver might have left open its connection on the server";
@@ -85,12 +66,9 @@ RS_DBI_freeConnection(SEXP conHandle)
       "internal error in RS_DBI_freeConnection: non-freed con->drvData (some memory leaked)";
     warning(errMsg);
   }
-  /* delete this connection from manager's connection table */
-  if(con->resultSets) free(con->resultSets);
-  if(con->resultSetIds) free(con->resultSetIds);
 
   /* update the manager's connection table */
-  mgr->num_con -= 1;
+  mgr->num_con = 0;
 
   free(con);
   con = (RS_DBI_connection *) NULL;
@@ -120,9 +98,7 @@ RS_DBI_allocResultSet(SEXP conHandle)
   result->fields = (RS_DBI_fields *) NULL;
   
   /* update connection's resultSet table */
-  con->num_res = 1;
-  con->resultSets[0] = result;
-  con->resultSetIds[0] = 1;
+  con->resultSet = result;
 
   return RS_DBI_asResHandle(conHandle);
 }
@@ -130,20 +106,19 @@ RS_DBI_allocResultSet(SEXP conHandle)
 void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
 {
     if(result->drvResultSet) {
-        warning("freeResultSet failed (result->drvResultSet)");
+      warning("freeResultSet failed (result->drvResultSet)");
     }
     if (result->drvData) {
-        warning("freeResultSet failed (result->drvData)");
+      warning("freeResultSet failed (result->drvData)");
     }
     if (result->statement)
-        free(result->statement);
+      free(result->statement);
     if (result->fields)
-        RS_DBI_freeFields(result->fields);
+      RS_DBI_freeFields(result->fields);
     free(result);
+    
     result = (RS_DBI_resultSet *) NULL;
-
-    con->resultSets[0] = NULL;
-    con->num_res = 0;
+    con->resultSet = NULL;
 }
 
 void
@@ -392,7 +367,7 @@ RS_DBI_getResultSet(SEXP rsHandle)
   con = RS_DBI_getConnection(rsHandle);
   if(!con)
     error("internal error in RS_DBI_getResultSet: bad connection");
-  return con->resultSets[0];
+  return con->resultSet;
 }
 
 SEXP     /* named list */

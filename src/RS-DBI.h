@@ -90,9 +90,7 @@ typedef struct st_sdbi_resultset {
 typedef struct st_sdbi_connection {
   void  *drvConnection;  /* pointer to the actual DBMS connection struct*/
   void  *drvData;        /* to be used at will by individual drivers */
-  RS_DBI_resultSet  **resultSets;    /* vector to result set ptrs  */
-  int   *resultSetIds;
-  int   num_res;                    /* num of open resultSets */
+  RS_DBI_resultSet  *resultSet;    /* vector to result set ptrs  */
   RS_DBI_exception *exception;
 } RS_DBI_connection;
 

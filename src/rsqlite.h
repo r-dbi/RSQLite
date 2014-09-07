@@ -105,7 +105,7 @@ void           rsqlite_result_free(SQLiteConnection* con);
 SEXP           rsqlite_result_free_handle(SEXP con);
 SQLiteResult*  rsqlite_result_from_handle(SEXP handle);
 SEXP           rsqlite_result_valid(SEXP handle);
-
+SEXP           rsqlite_result_info(SEXP handle);
 
 RS_DBI_fields *RS_DBI_allocFields(int num_fields);
 SEXP fieldInfo(RS_DBI_fields *flds);

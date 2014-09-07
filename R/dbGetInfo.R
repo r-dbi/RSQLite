@@ -38,11 +38,11 @@ setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
 
 #' @rdname dbGetInfo
 #' @export
-#' @useDynLib RSQLite resultSetInfo
+#' @useDynLib RSQLite rsqlite_result_info
 setMethod("dbGetInfo", "SQLiteResult", function(dbObj) {
   check_valid(dbObj)
   
-  info <- .Call(resultSetInfo, dbObj@Id)
+  info <- .Call(rsqlite_result_info, dbObj@Id)
   flds <- info$fieldDescription[[1]]
   
   info$fields <- structure(info$fields, 

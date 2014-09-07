@@ -35,7 +35,6 @@ void rsqlite_result_alloc(SQLiteConnection* con) {
   con->resultSet = result;
 }
 
-
 void rsqlite_result_free(SQLiteConnection* con) {
   SQLiteResult* result = con->resultSet;
     
@@ -136,7 +135,7 @@ SEXP fieldInfo(RS_DBI_fields *flds) {
 }
 
 
-SEXP resultSetInfo(SEXP handle) {
+SEXP rsqlite_result_info(SEXP handle) {
   SQLiteResult* result = rsqlite_result_from_handle(handle);
 
   SEXP info = PROTECT(allocVector(VECSXP, 6));

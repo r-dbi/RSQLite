@@ -66,13 +66,6 @@ sqliteFetch <- function(res, n = 0) {
 #' @param res an \code{\linkS4class{SQLiteResult}} object.
 #' @param ... Ignored. Needed for compatibility with generic.
 #' @useDynLib RSQLite rsqlite_result_free_handle
-#' @examples
-#' con <- dbConnect(SQLite())
-#' res <- dbSendQuery(con, "SELECT 1")
-#' res@Id
-#' dbFetch(res)
-#' dbGetInfo(res)
-#' dbClearResult(res)
 setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
   if (!dbIsValid(res)){
     warning("Expired SQLiteResult", call. = FALSE)

@@ -122,6 +122,11 @@ SEXP RS_DBI_allocResultSet(SEXP conHandle);
 void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
 RS_DBI_resultSet  *RS_DBI_getResultSet(SEXP rsHandle);
 SEXP RS_DBI_asResHandle(SEXP conxp);
+void RSQLite_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
+
+void setException(RS_DBI_connection *con, int err_no, 
+                            const char *err_msg);
+void freeException(RS_DBI_connection *con);
 
 /* description of the fields in a result set */
 RS_DBI_fields *RS_DBI_allocFields(int num_fields);

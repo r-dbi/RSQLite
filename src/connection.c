@@ -18,40 +18,6 @@
 
 #include "rsqlite.h"
 
-void 
-RS_DBI_freeConnection(SEXP conHandle)
-{
-  RS_DBI_connection *con;
-  SQLiteDriver    *mgr;
-
-  con = RS_DBI_getConnection(conHandle);
-  mgr = getDriver();
-
-  /* Are there open resultSets? If so, free them first */
-  if(con->resultSet) {
-    warning("opened resultSet(s) forcebly closed");
-    RS_DBI_freeResultSet0(con->resultSet, con);
-  }
-
-  if(con->drvConnection) {
-    char *errMsg = 
-      "internal error in RS_DBI_freeConnection: driver might have left open its connection on the server";
-    warning(errMsg);
-  }
-  if(con->exception){
-    char *errMsg = 
-      "internal error in RS_DBI_freeConnection: non-freed con->exception (some memory leaked)";
-    warning(errMsg);
-  }
-
-  /* update the manager's connection table */
-  mgr->num_con = 0;
-
-  free(con);
-  con = (RS_DBI_connection *) NULL;
-  R_ClearExternalPtr(conHandle);
-}
-
 static void _finalize_con_handle(SEXP xp)
 {
     if (R_ExternalPtrAddr(xp)) {
@@ -139,11 +105,13 @@ SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
 SEXP RS_SQLite_closeConnection(SEXP conHandle) {
   RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
   
+  // close & free result set (if open)
   if (con->resultSet) {
     warning("Closing open result set");
     RSQLite_closeResultSet0(con->resultSet, con);
   }
 
+  // close & free db connection
   sqlite3* db_connection = con->drvConnection;
   int rc = sqlite3_close(db_connection);  /* it also frees db_connection */
   if (rc == SQLITE_BUSY) {
@@ -153,7 +121,14 @@ SEXP RS_SQLite_closeConnection(SEXP conHandle) {
   }
   con->drvConnection = NULL;
   freeException(con);
-  RS_DBI_freeConnection(conHandle);
+
+  // update driver connection table
+  SQLiteDriver* drv = getDriver();
+  drv->num_con -= 1;
+
+  free(con);
+  con = (RS_DBI_connection *) NULL;
+  R_ClearExternalPtr(conHandle);
   
   return ScalarLogical(1);
 }

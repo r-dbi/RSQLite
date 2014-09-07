@@ -191,15 +191,6 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
   }
 )
 
-#' List available SQLite result sets.
-#' 
-#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
-#' @export
-#' @keywords internal
-setMethod("dbListResults", "SQLiteConnection", function(conn) {
-  dbGetInfo(conn)$rsId
-})
-
 #' List available SQLite tables.
 #' 
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}

@@ -126,11 +126,6 @@ setMethod("dbDisconnect", "SQLiteConnection", function(conn) {
     warning("Expired SQLiteConnection.", call. = FALSE)
     return(TRUE)
   }
-  res <- dbListResults(conn)
-  if (length(res) > 0) {
-    warning("Result set open; closing automatically.", call. = FALSE)
-    dbClearResult(res[[1]])
-  }
   
   .Call(RS_SQLite_closeConnection, conn@Id)
 })

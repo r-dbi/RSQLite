@@ -135,7 +135,6 @@ SEXP RS_SQLite_getException(SEXP conHandle);
 
 // Connection ------------------------------------------------------------------
 
-void RS_DBI_freeConnection(SEXP conHandle);
 RS_DBI_connection *RS_DBI_getConnection(SEXP handle);
 SEXP RS_DBI_asConHandle(RS_DBI_connection *con);
 SEXP RS_SQLite_newConnection(SEXP dbfile, SEXP allow_ext, SEXP s_flags, SEXP s_vfs);

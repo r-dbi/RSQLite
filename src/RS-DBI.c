@@ -330,23 +330,6 @@ RS_DBI_SclassNames(SEXP type)
   return typeNames;
 }
 
-/* The following functions roughly implement a simple object
- * database. 
- */
-
-SEXP
-RS_DBI_asMgrHandle(int mgrId)
-{
-    SEXP mgrHandle, label, ids;
-    PROTECT(ids = allocVector(INTSXP, 1));
-    INTEGER(ids)[0] = mgrId;
-    PROTECT(label = mkString("DBI MGR"));
-    mgrHandle = R_MakeExternalPtr(NULL, label, ids);
-    UNPROTECT(2);
-    /* FIXME: add finalizer code */
-    return mgrHandle;
-}
-
 /* FIXME: need to address this fwd declaration */
 SEXP
 RS_SQLite_closeConnection(SEXP conHandle);

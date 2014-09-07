@@ -110,7 +110,6 @@ typedef struct st_sdbi_manager {
 /* All RS_DBI functions and their signatures */
 
 SQLiteDriver* getDriver();
-SEXP RS_DBI_asMgrHandle(int pid);   
 
 /* dbConnection */
 SEXP RS_DBI_allocConnection();

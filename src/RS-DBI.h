@@ -31,10 +31,7 @@ extern "C" {
  * RS_DBI_fields, corresponding to dbManager, dbConnection,
  * dbResultSet, and list of field descriptions.
  */
-/* In R/S a dbObject is a foreign reference consisting of a vector
- * of 1, 2 or 3 integers.  In the C implementation we use these 
- * R/S vectors as handles (we could have use pointers).
- */
+
 typedef enum enum_dbi_exception {
   RS_DBI_MESSAGE,
   RS_DBI_WARNING,
@@ -42,25 +39,12 @@ typedef enum enum_dbi_exception {
   RS_DBI_TERMINATE
 } DBI_EXCEPTION;
 
-/* dbObject handles are simple S/R integer vectors of 1, 2, or 3 integers
- * the *_ID macros extract the appropriate scalar.
- */
-
 #define Mgr_Handle SEXP
 #define Con_Handle SEXP
 #define Res_Handle SEXP
-#define Db_Handle  SEXP       /* refers to any one of the above */
-/* The integer value for the following enum's needs to equal 
- * GET_LENGTH(handle) for the various handles.
- */
-typedef enum enum_handle_type {
-  MGR_HANDLE_TYPE = 1,     /* dbManager handle */
-  CON_HANDLE_TYPE = 2,     /* dbConnection handle */
-  RES_HANDLE_TYPE = 3      /* dbResult handle */
-} HANDLE_TYPE; 
+#define Db_Handle  SEXP
 
 #define RES_ID(handle) INTEGER(VECTOR_ELT(R_ExternalPtrProtected(handle), 0))[2]
-
 
 /* First, the following fully describes the field output by a select
  * (or select-like) statement, and the mappings from the internal

@@ -223,32 +223,24 @@ SEXP RS_SQLite_quick_column(SEXP conHandle, SEXP table, SEXP column)
     return ans;
 }
 
-/* Helper function to clean up and report an error during a call to
-   RS_SQLite_exec */
-static void
-exec_error(const char *msg,
-           SQLiteConnection *con,
-           int bind_count,
-           RS_SQLite_bindParams *params)
-{
-    sqlite3 *db = con->drvConnection;
-    int errcode = db ? sqlite3_errcode(db) : -1;
-    char buf[2048];
-    const char *db_msg = "";
-    const char *sep = "";
-    if (db && errcode != SQLITE_OK) {
-        db_msg = sqlite3_errmsg(db);
-        sep = ": ";
-    }
-    snprintf(buf, sizeof(buf), "%s%s%s", msg, sep, db_msg);
-    setException(con, errcode, buf);
-    rsqlite_result_free(con);
+// Combines error text with error message from database, and frees result set
+void exec_error(SQLiteConnection *con, const char *msg) {
+  const char *db_msg = "";
+  const char *sep = "";
 
-    if (params) {
-        RS_SQLite_freeParameterBinding(&params);
-        params = NULL;
-    }
-    error(buf);
+  sqlite3 *db = con->drvConnection;
+  int errcode = db ? sqlite3_errcode(db) : -1;
+  if (errcode != SQLITE_OK) {
+    db_msg = sqlite3_errmsg(db);
+    sep = ": ";
+  }
+  char buf[2048];
+  snprintf(buf, sizeof(buf), "%s%s%s", msg, sep, db_msg);
+  setException(con, errcode, buf);
+
+  rsqlite_result_free(con);
+
+  error(buf);
 }
 
 static void
@@ -265,7 +257,7 @@ select_prepared_query(sqlite3_stmt *db_statement,
     if (params == NULL) {
         /* FIXME: this UNPROTECT is ugly, paired to caller */
         UNPROTECT(1);
-        exec_error(bindingErrorMsg, con, 0, NULL);
+        exec_error(con, bindingErrorMsg);
     }
     con->resultSet->drvData = params;
 }
@@ -337,7 +329,7 @@ non_select_prepared_query(sqlite3_stmt *db_statement,
     if (params == NULL) {
         /* FIXME: this UNPROTECT is ugly, paired to caller */
         UNPROTECT(1);
-        exec_error(bindingErrorMsg, con, 0, NULL);
+        exec_error(con, bindingErrorMsg);
     }
 
     /* we need to step through the query for each row */
@@ -345,21 +337,18 @@ non_select_prepared_query(sqlite3_stmt *db_statement,
         state = bind_params_to_stmt(params, db_statement, i);
         if (state != SQLITE_OK) {
             UNPROTECT(1);
-            exec_error("RS_SQLite_exec: could not bind data",
-                       con, 0, NULL);
+            exec_error(con, "RS_SQLite_exec: could not bind data");
         }
         state = sqlite3_step(db_statement);
         if (state != SQLITE_DONE) {
             UNPROTECT(1);
-            exec_error("RS_SQLite_exec: could not execute",
-                       con, 0, NULL);
+            exec_error(con, "RS_SQLite_exec: could not execute");
         }
         state = sqlite3_reset(db_statement);
         sqlite3_clear_bindings(db_statement);
         if (state != SQLITE_OK) {
             UNPROTECT(1);
-            exec_error("RS_SQLite_exec: could not reset statement",
-                       con, 0, NULL);
+            exec_error(con, "RS_SQLite_exec: could not reset statement");
         }
     }
     RS_SQLite_freeParameterBinding(&params);
@@ -392,11 +381,11 @@ SEXP RS_SQLite_exec(SEXP handle, SEXP statement, SEXP bind_data) {
   state = sqlite3_prepare_v2(db_connection, dyn_statement, -1,
                              &db_statement, NULL);
   if (state != SQLITE_OK) {
-    exec_error("error in statement", con, 0, NULL);
+    exec_error(con, "error in statement");
   }
 
   if (db_statement == NULL) {
-    exec_error("nothing to execute", con, 0, NULL);
+    exec_error(con, "nothing to execute");
   }
   res->drvResultSet = (void *) db_statement;
   bind_count = sqlite3_bind_parameter_count(db_statement);
@@ -424,8 +413,7 @@ SEXP RS_SQLite_exec(SEXP handle, SEXP statement, SEXP bind_data) {
       else {
           state = sqlite3_step(db_statement);
           if (state != SQLITE_DONE) {
-              exec_error("RS_SQLite_exec: could not execute1",
-                         con, 0, NULL);
+              exec_error(con, "RS_SQLite_exec: could not execute1");
           }
       }
       res->completed = 1;          /* BUG: what if query is async?*/

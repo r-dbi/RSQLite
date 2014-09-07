@@ -85,56 +85,6 @@ SEXP rsqlite_result_valid(SEXP handle) {
   return ScalarLogical(1);
 }
 
-
-SEXP fieldInfo(RS_DBI_fields *flds) {
-  int n = flds ? flds->num_fields : 0;
-
-  SEXP info = PROTECT(allocVector(VECSXP, 4));
-  SEXP info_nms = PROTECT(allocVector(STRSXP, 4));
-  SET_NAMES(info, info_nms);
-  UNPROTECT(1);
-
-  int i = 0;
-  SET_STRING_ELT(info_nms, i, mkChar("name"));
-  SEXP names = PROTECT(allocVector(STRSXP, n));
-  for (int j = 0; j < n; j++) {
-    SET_STRING_ELT(names, j, mkChar(flds->name[j]));
-  }
-  SET_VECTOR_ELT(info, i++, names);
-  UNPROTECT(1);
-
-  SET_STRING_ELT(info_nms, i, mkChar("Sclass"));
-  SEXP sclass = PROTECT(allocVector(STRSXP, n));
-  for (int j = 0; j < n; j++) {
-    const char* type = type2char(flds->Sclass[j]);
-    SET_STRING_ELT(sclass, j, mkChar(type));
-  }
-  SET_VECTOR_ELT(info, i++, sclass);
-  UNPROTECT(1);
-  
-  SET_STRING_ELT(info_nms, i, mkChar("type"));
-  SEXP types = PROTECT(allocVector(STRSXP, n));
-  for (int j = 0; j < n; j++) {
-    char* type = field_type(flds->type[j]);
-    SET_STRING_ELT(types, j, mkChar(type));
-  }
-  SET_VECTOR_ELT(info, i++, types);
-  UNPROTECT(1);
-  
-  SET_STRING_ELT(info_nms, i, mkChar("len"));
-  SEXP lens = PROTECT(allocVector(INTSXP, n));
-  for (int j = 0; j < n; j++) {
-    INTEGER(lens)[j] = flds->length[j];
-  }
-  SET_VECTOR_ELT(info, i++, lens);
-  UNPROTECT(1);
-
-
-  UNPROTECT(1);
-  return info;
-}
-
-
 SEXP rsqlite_result_info(SEXP handle) {
   SQLiteResult* result = rsqlite_result_from_handle(handle);
 

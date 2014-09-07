@@ -98,6 +98,13 @@ typedef struct SQLiteDriver {
 
 // Functions ===================================================================
 
+// Fields ----------------------------------------------------------------------
+
+RS_DBI_fields *RS_DBI_allocFields(int num_fields);
+SEXP fieldInfo(RS_DBI_fields *flds);
+void RS_DBI_freeFields(RS_DBI_fields *flds);
+RS_DBI_fields *RS_SQLite_createDataMappings(SEXP handle);
+
 // Result ----------------------------------------------------------------------
 
 void           rsqlite_result_alloc(SQLiteConnection* con);
@@ -107,14 +114,9 @@ SQLiteResult*  rsqlite_result_from_handle(SEXP handle);
 SEXP           rsqlite_result_valid(SEXP handle);
 SEXP           rsqlite_result_info(SEXP handle);
 
-RS_DBI_fields *RS_DBI_allocFields(int num_fields);
-SEXP fieldInfo(RS_DBI_fields *flds);
-void RS_DBI_freeFields(RS_DBI_fields *flds);
 void RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds, int num_rec, int expand);
 SEXP RS_SQLite_exec(SEXP handle, SEXP statement, SEXP bind_data);
 SEXP RS_SQLite_fetch(SEXP handle, SEXP max_rec);
-void  RS_SQLite_initFields(SQLiteResult *res, int ncol, char **colNames);
-RS_DBI_fields *RS_SQLite_createDataMappings(SEXP handle);
 RS_SQLite_bindParams* RS_SQLite_createParameterBinding(int n, SEXP bind_data, sqlite3_stmt *stmt, char *errorMsg);
 void RS_SQLite_freeParameterBinding(RS_SQLite_bindParams **);
 

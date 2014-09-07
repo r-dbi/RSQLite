@@ -32,22 +32,21 @@ extern "C" {
 
 // DBI -------------------------------------------------------------------------
 
-/* We now define 4 important data structures:
- * SQLiteDriver, RS_DBI_connection, RS_DBI_resultSet, and
- * RS_DBI_fields, corresponding to dbManager, dbConnection,
- * dbResultSet, and list of field descriptions.
- */
- 
+typedef struct RS_SQLite_bindParams {
+    int count;
+    int row_count;
+    int rows_used;
+    int row_complete;
+    SEXP data;
+} RS_SQLite_bindParams;
+
 /* First, the following fully describes the field output by a select
  * (or select-like) statement, and the mappings from the internal
  * database types to S classes.  This structure contains the info we need
  * to build the R/S list (or data.frame) that will receive the SQL
- * output.  It still needs some work to handle arbitrty BLOB's (namely
- * methods to map BLOBs into user-defined S objects).
- * Each element is an array of num_fields, this flds->Sclass[3] stores
- * the S class for the 4th output fields.
+ * output.
  */
-typedef struct st_sdbi_fields {
+typedef struct RS_DBI_fields {
   int num_fields;
   char  **name;         /* DBMS field names */
   int  *type;          /* DBMS internal types */
@@ -56,8 +55,7 @@ typedef struct st_sdbi_fields {
   SEXPTYPE *Sclass;        /* R/S class (type) -- may be overriden */
 } RS_DBI_fields;
 
-
-typedef struct st_sqlite_err {
+typedef struct RS_SQLite_exception {
    int  errorNum;
    char *errorMsg;
 } RS_SQLite_exception;
@@ -66,7 +64,7 @@ typedef struct st_sqlite_err {
  * resultSet (e.g., MySQL, Oracle) possibly NULL,  plus the fields 
  * defined by the RS-DBI implementation. 
  */
-typedef struct st_sdbi_resultset {
+typedef struct RS_DBI_resultSet {
   void  *drvResultSet;   /* the actual (driver's) cursor/result set */
   void  *drvData;        /* a pointer to driver-specific data */
   int  resultSetId;  
@@ -78,157 +76,6 @@ typedef struct st_sdbi_resultset {
   RS_DBI_fields *fields;
 } RS_DBI_resultSet;
 
-/* A dbConnection consists of a pointer to the actual implementation
- * (MySQL, Oracle, etc.) connection plus a resultSet and other
- * goodies used by the RS-DBI implementation.
- * The connection parameters (user, password, database name, etc.) are
- * defined by the actual driver -- we just set aside a void pointer.
- */
-
-typedef struct st_sdbi_connection {
-  void  *drvConnection;  /* pointer to the actual DBMS connection struct*/
-  RS_DBI_resultSet  *resultSet;    /* vector to result set ptrs  */
-  RS_SQLite_exception *exception;
-} RS_DBI_connection;
-
-/* dbManager */
-typedef struct st_sdbi_manager {
-  int shared_cache;                /* use SQLite shared cache? */
-  int num_con;                     /* num of opened connections */
-  int counter;                     /* num of connections handled so far*/
-  int fetch_default_rec;           /* default num of records per fetch */
-} SQLiteDriver;
-
-/* All RS_DBI functions and their signatures */
-
-SQLiteDriver* getDriver();
-
-/* dbConnection */
-void RS_DBI_freeConnection(SEXP conHandle);
-RS_DBI_connection *RS_DBI_getConnection(SEXP handle);
-SEXP RS_DBI_asConHandle(RS_DBI_connection *con);
-
-/* dbResultSet */
-SEXP RS_DBI_allocResultSet(SEXP conHandle);
-void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
-RS_DBI_resultSet  *RS_DBI_getResultSet(SEXP rsHandle);
-SEXP RS_DBI_asResHandle(SEXP conxp);
-void RSQLite_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
-
-void setException(RS_DBI_connection *con, int err_no, 
-                            const char *err_msg);
-void freeException(RS_DBI_connection *con);
-
-/* description of the fields in a result set */
-RS_DBI_fields *RS_DBI_allocFields(int num_fields);
-SEXP fieldInfo(RS_DBI_fields *flds);
-void           RS_DBI_freeFields(RS_DBI_fields *flds);
-
-/* we (re)allocate the actual output list in here (with the help of
- * RS_DBI_fields).  This should be some kind of R/S "relation"
- * table, not a dataframe nor a list.
- */
-void  RS_DBI_allocOutput(SEXP output, 
-  		RS_DBI_fields *flds,
-			int num_rec,
-			int expand);
-
-/* utility funs (copy strings, convert from R/S types to string, etc.*/
-char     *RS_DBI_copyString(const char *str);
-
-SEXP RS_DBI_copyFields(RS_DBI_fields *flds);
-
-SEXP DBI_newResultHandle(SEXP xp, SEXP resId);
-
-// SQLite ----------------------------------------------------------------------
-
-
-/* These control the open mode for new connections and
-   are mapped to the appropriate SQLite flag.
- */
-#define RSQLITE_RWC 0
-#define RSQLITE_RW  1
-#define RSQLITE_RO  2
-
-/* SQLite connection parameters struct, allocating and freeing
- * methods.  This is pretty simple, since SQLite does not recognise users
- */
-typedef struct st_sdbi_conParams {
-  char *dbname;
-  int  loadable_extensions;
-  int  flags;
-  char *vfs;
-} RS_SQLite_conParams;
-
-/* Convert declared column type string to SQLite column type.
- * For example, "varchar" => SQLITE_TEXT
- *
- */
-int                 SQLite_decltype_to_type(const char *decltype);
-
-/* The following functions are the S/R entry into the C implementation (i.e.,
- * these are the only ones visible from R/S) we use the prefix "RS_SQLite" in
- * function names to denote this.  These functions are  built on top of the
- * underlying RS_DBI manager, connection, and resultsets structures and
- * functions (see RS-DBI.h).
- *
- */
-
-/* dbManager */
-void initDriver(SEXP records_, SEXP cache_);
-SEXP RS_SQLite_close(SEXP mgrHandle);
-
-/* dbConnection */
-SEXP RS_SQLite_newConnection(SEXP dbfile,
-                                   SEXP allow_ext, SEXP s_flags, SEXP s_vfs);
-SEXP RS_SQLite_cloneConnection(SEXP conHandle);
-SEXP RS_SQLite_closeConnection(SEXP conHandle);
-/* we simulate db exceptions ourselves */
-void        RS_SQLite_setException(RS_DBI_connection *con, int errorNum,
-                                   const char *errorMsg);
-SEXP RS_SQLite_getException(SEXP conHandle);
-/* err No, Msg */
-
-/* currently we only provide a "standard" callback to sqlite_exec() -- this
- * callback collects all the rows and puts them in a cache in the results set
- * (res->drvData) to simulate a cursor so that we can fetch() like in any other
- * driver.  Other interesting callbacks should allow us to easily implement the
- * dbApply() ideas also in the RMySQL driver
- */
-int       RS_SQLite_stdCallback(void *resHandle, int ncol, char **row,
-                                char **colNames);
-
-/* dbResultSet */
-SEXP RS_SQLite_exec(SEXP conHandle, SEXP statement,
-                           SEXP bind_data);
-SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec);
-SEXP RS_SQLite_closeResultSet(SEXP rsHandle);
-void        RS_SQLite_initFields(RS_DBI_resultSet *res, int ncol,
-                                 char **colNames);
-
-SEXP RS_SQLite_validHandle(SEXP handle);      /* boolean */
-
-RS_DBI_fields *RS_SQLite_createDataMappings(SEXP resHandle);
-
-/* the following funs return named lists with meta-data for
- * the manager, connections, and  result sets, respectively.
- */
-SEXP RS_SQLite_managerInfo(SEXP mgrHandle);
-SEXP RSQLite_connectionInfo(SEXP conHandle);
-SEXP RS_SQLite_resultSetInfo(SEXP rsHandle);
-
-/*  The following imports the delim-fields of a file into an existing table*/
-SEXP RS_SQLite_importFile(SEXP conHandle, SEXP s_tablename,
-             SEXP s_filename, SEXP s_separator, SEXP s_obj,
-             SEXP s_skip);
-
-SEXP RS_SQLite_copy_database(SEXP fromConHandle, SEXP toConHandle);
-
-char * RS_sqlite_getline(FILE *in, const char *eol);
-
-/* the following type names should be the  SQL-92 data types, and should
- * be moved to the RS-DBI.h
- */
 enum SQLITE_TYPE {
   SQLITE_TYPE_NULL,
   SQLITE_TYPE_INTEGER,
@@ -237,11 +84,80 @@ enum SQLITE_TYPE {
   SQLITE_TYPE_BLOB
 };
 
-int RS_sqlite_import(sqlite3 *db, const char *zTable,
-                     const char *zFile, const char *separator, const char *eol, int skip);
+/* A dbConnection consists of a pointer to the actual implementation
+ * (MySQL, Oracle, etc.) connection plus a resultSet and other
+ * goodies used by the RS-DBI implementation.
+ * The connection parameters (user, password, database name, etc.) are
+ * defined by the actual driver -- we just set aside a void pointer.
+ */
 
+typedef struct RS_DBI_connection {
+  void  *drvConnection;  /* pointer to the actual DBMS connection struct*/
+  RS_DBI_resultSet  *resultSet;    /* vector to result set ptrs  */
+  RS_SQLite_exception *exception;
+} RS_DBI_connection;
+
+typedef struct SQLiteDriver {
+  int shared_cache;                /* use SQLite shared cache? */
+  int num_con;                     /* num of opened connections */
+  int counter;                     /* num of connections handled so far*/
+  int fetch_default_rec;           /* default num of records per fetch */
+} SQLiteDriver;
+
+// Functions ===================================================================
+
+// Result ----------------------------------------------------------------------
+
+SEXP RS_DBI_allocResultSet(SEXP conHandle);
+void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
+RS_DBI_resultSet  *RS_DBI_getResultSet(SEXP rsHandle);
+SEXP RS_DBI_asResHandle(SEXP conxp);
+void RSQLite_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
+RS_DBI_fields *RS_DBI_allocFields(int num_fields);
+SEXP fieldInfo(RS_DBI_fields *flds);
+void RS_DBI_freeFields(RS_DBI_fields *flds);
+void RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds, int num_rec, int expand);
+SEXP DBI_newResultHandle(SEXP xp, SEXP resId);
+SEXP RS_SQLite_exec(SEXP conHandle, SEXP statement, SEXP bind_data);
+SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec);
+SEXP RS_SQLite_closeResultSet(SEXP rsHandle);
+void  RS_SQLite_initFields(RS_DBI_resultSet *res, int ncol, char **colNames);
+RS_DBI_fields *RS_SQLite_createDataMappings(SEXP resHandle);
+RS_SQLite_bindParams* RS_SQLite_createParameterBinding(int n, SEXP bind_data, sqlite3_stmt *stmt, char *errorMsg);
+void RS_SQLite_freeParameterBinding(RS_SQLite_bindParams **);
 void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
 
+// Exception -------------------------------------------------------------------
+
+void setException(RS_DBI_connection *con, int err_no, const char *err_msg);
+void freeException(RS_DBI_connection *con);
+void RS_SQLite_setException(RS_DBI_connection *con, int errorNum, const char *errorMsg);
+SEXP RS_SQLite_getException(SEXP conHandle);
+
+// Connection ------------------------------------------------------------------
+
+void RS_DBI_freeConnection(SEXP conHandle);
+RS_DBI_connection *RS_DBI_getConnection(SEXP handle);
+SEXP RS_DBI_asConHandle(RS_DBI_connection *con);
+SEXP RS_SQLite_newConnection(SEXP dbfile, SEXP allow_ext, SEXP s_flags, SEXP s_vfs);
+SEXP RS_SQLite_cloneConnection(SEXP conHandle);
+SEXP RS_SQLite_closeConnection(SEXP conHandle);
+
+// Driver ----------------------------------------------------------------------
+
+SQLiteDriver* getDriver();
+void initDriver(SEXP records_, SEXP cache_);
+SEXP RS_SQLite_close(SEXP mgrHandle);
+
+// Utilities -------------------------------------------------------------------
+
+char* RS_DBI_copyString(const char *str);
+SEXP RS_DBI_copyFields(RS_DBI_fields *flds);
+int SQLite_decltype_to_type(const char *decltype);
+SEXP RS_SQLite_importFile(SEXP conHandle, SEXP s_tablename, SEXP s_filename, SEXP s_separator, SEXP s_obj, SEXP s_skip);
+char * RS_sqlite_getline(FILE *in, const char *eol);
+SEXP RS_SQLite_copy_database(SEXP fromConHandle, SEXP toConHandle);
+int RS_sqlite_import(sqlite3 *db, const char *zTable, const char *zFile, const char *separator, const char *eol, int skip);
 char* field_type(int type);
 
 // R helpers -------------------------------------------------------------------
@@ -263,25 +179,6 @@ char* field_type(int type);
 
 /* x[[i]][j] -- for the case when x[[i]] is a character type */
 #define SET_LST_CHR_EL(x,i,j,val) SET_STRING_ELT(LST_EL(x,i), j, val)
-
-// Param binding ---------------------------------------------------------------
-
-typedef struct st_sqlite_bindparams {
-    int count;
-    int row_count;
-    int rows_used;
-    int row_complete;
-    SEXP data;
-} RS_SQLite_bindParams;
-
-
-RS_SQLite_bindParams *
-RS_SQLite_createParameterBinding(int n,
-                                 SEXP bind_data, sqlite3_stmt *stmt,
-                                 char *errorMsg);
-
-void RS_SQLite_freeParameterBinding(RS_SQLite_bindParams **);
-
 
 #ifdef __cplusplus 
 }

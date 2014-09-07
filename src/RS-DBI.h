@@ -173,9 +173,6 @@ void  RS_DBI_allocOutput(SEXP output,
 			int num_rec,
 			int expand);
 
-void  RS_DBI_errorMessage(const char *msg, DBI_EXCEPTION exceptionType);
-void DBI_MSG(char *msg, DBI_EXCEPTION exception_type, char *driver);
-
 /* utility funs (copy strings, convert from R/S types to string, etc.*/
 char     *RS_DBI_copyString(const char *str);
 

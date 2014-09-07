@@ -22,7 +22,7 @@
 SEXP RS_DBI_allocConnection() {
   RS_DBI_connection* con = (RS_DBI_connection *) malloc(sizeof(RS_DBI_connection));
   if (!con){
-    RS_DBI_errorMessage("could not malloc dbConnection", RS_DBI_ERROR);
+    error("could not malloc dbConnection");
   }
   con->drvConnection = (void *) NULL;
   con->drvData = (void *) NULL;
@@ -32,16 +32,14 @@ SEXP RS_DBI_allocConnection() {
     calloc((size_t) 1, sizeof(RS_DBI_resultSet));
   if (!con->resultSets){
     free(con);
-    RS_DBI_errorMessage("could not calloc resultSets for the dbConnection",
-      RS_DBI_ERROR);
+    error("could not calloc resultSets for the dbConnection");
   }
   con->num_res = 0;
   con->resultSetIds = (int *) calloc((size_t) 1, sizeof(int));
   if (!con->resultSetIds) {
     free(con->resultSets);
     free(con);
-    RS_DBI_errorMessage("could not calloc vector of resultSet Ids",
-      RS_DBI_ERROR);
+    error("could not calloc vector of resultSet Ids");
   }
   con->resultSets[0] = (RS_DBI_resultSet *) NULL;
   con->resultSetIds[0] = -1;
@@ -75,17 +73,17 @@ RS_DBI_freeConnection(SEXP conHandle)
     for(i=0; i < con->num_res; i++){
         RS_DBI_freeResultSet0(con->resultSets[i], con);
     }
-    RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
+    warning(errMsg);
   }
   if(con->drvConnection) {
     char *errMsg = 
       "internal error in RS_DBI_freeConnection: driver might have left open its connection on the server";
-    RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
+    warning(errMsg);
   }
   if(con->drvData){
     char *errMsg = 
       "internal error in RS_DBI_freeConnection: non-freed con->drvData (some memory leaked)";
-    RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
+    warning(errMsg);
   }
   /* delete this connection from manager's connection table */
   if(con->resultSets) free(con->resultSets);
@@ -109,18 +107,14 @@ RS_DBI_allocResultSet(SEXP conHandle)
   con = RS_DBI_getConnection(conHandle);
   indx = RS_DBI_newEntry(con->resultSetIds, 1);
   if (indx < 0){
-    char msg[128], fmt[128];
-    (void) strcpy(fmt, "cannot allocate a new resultSet -- ");
-    (void) strcat(fmt, "maximum of %d resultSets already reached");
-    (void) sprintf(msg, fmt, 1);
-    RS_DBI_errorMessage(msg, RS_DBI_ERROR);
+    error("cannot allocate a new resultSet");
   }
 
   result = (RS_DBI_resultSet *) malloc(sizeof(RS_DBI_resultSet));
   if (!result){
     char *errMsg = "could not malloc dbResultSet";
     RS_DBI_freeEntry(con->resultSetIds, indx);
-    RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+    error(errMsg);
   }
   result->drvResultSet = (void *) NULL; /* driver's own resultSet (cursor)*/
   result->drvData = (void *) NULL;   /* this can be used by driver*/
@@ -142,16 +136,10 @@ RS_DBI_allocResultSet(SEXP conHandle)
 void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
 {
     if(result->drvResultSet) {
-        char *errMsg =
-            "internal error in RS_DBI_freeResultSet: "
-            "non-freed result->drvResultSet (some memory leaked)";
-        RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+        warning("freeResultSet failed (result->drvResultSet)");
     }
     if (result->drvData) {
-        char *errMsg =
-            "internal error in RS_DBI_freeResultSet: "
-            "non-freed result->drvData (some memory leaked)";
-        RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
+        warning("freeResultSet failed (result->drvData)");
     }
     if (result->statement)
         free(result->statement);
@@ -183,8 +171,7 @@ RS_DBI_allocFields(int num_fields)
 
   flds = (RS_DBI_fields *)malloc(sizeof(RS_DBI_fields));
   if(!flds){
-    char *errMsg = "could not malloc RS_DBI_fields";
-    RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+    error("could not malloc RS_DBI_fields");
   }
   n = (size_t) num_fields;
   flds->num_fields = num_fields;
@@ -254,7 +241,7 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
       SET_VECTOR_ELT(output, j, NEW_LIST(num_rec));
       break;
     default:
-      RS_DBI_errorMessage("unsupported data type", RS_DBI_ERROR);
+      error("unsupported data type");
     }
   }
 
@@ -267,47 +254,6 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
   return;
 }
 
-void 
-RS_DBI_errorMessage(const char *msg, DBI_EXCEPTION exception_type)
-{
-  char *driver = "RS-DBI";   /* TODO: use the actual driver name */
-  
-  switch(exception_type) {
-  case RS_DBI_MESSAGE:
-    PROBLEM "%s driver message: (%s)", driver, msg WARN; /* was PRINT_IT */
-    break;
-  case RS_DBI_WARNING:
-    PROBLEM "%s driver warning: (%s)", driver, msg WARN;
-    break;
-  case RS_DBI_ERROR:
-    PROBLEM  "%s driver: (%s)", driver, msg ERROR;
-    break;
-  case RS_DBI_TERMINATE:
-    PROBLEM "%s driver fatal: (%s)", driver, msg ERROR; /* was TERMINATE */
-    break;
-  }
-  return;
-}
-
-void DBI_MSG(char *msg, DBI_EXCEPTION exception_type, char *driver)
-{
-  switch (exception_type) {
-  case RS_DBI_MESSAGE:
-    PROBLEM "%s driver message: (%s)", driver, msg WARN;
-    break;
-  case RS_DBI_WARNING:
-    PROBLEM "%s driver warning: (%s)", driver, msg WARN;
-    break;
-  case RS_DBI_ERROR:
-    PROBLEM  "%s driver: (%s)", driver, msg ERROR;
-    break;
-  case RS_DBI_TERMINATE:        /* is this used? */
-    PROBLEM "%s driver fatal: (%s)", driver, msg ERROR;
-    break;
-  }
-  return;
-}
-
 /* wrapper to strcpy */
 char *
 RS_DBI_copyString(const char *str)
@@ -316,9 +262,7 @@ RS_DBI_copyString(const char *str)
 
   buffer = (char *) malloc((size_t) strlen(str)+1);
   if(!buffer)
-    RS_DBI_errorMessage(
-          "internal error in RS_DBI_copyString: could not alloc string space", 
-          RS_DBI_ERROR);
+    error("internal error in RS_DBI_copyString: could not alloc string space");
   return strcpy(buffer, str);
 }
 
@@ -352,7 +296,7 @@ RS_DBI_createNamedList(char **names, SEXPTYPE *types, int *lengths, int  n)
       PROTECT(obj = NEW_LIST(num_elem));
       break;
     default:
-      RS_DBI_errorMessage("unsupported data type", RS_DBI_ERROR);
+      error("unsupported data type");
     }
     SET_VECTOR_ELT(output, (int)j, obj);
     SET_CHR_EL(output_names, j, mkChar(names[j]));
@@ -372,18 +316,14 @@ RS_DBI_SclassNames(SEXP type)
   char *s;
   
   if(type==R_NilValue)
-     RS_DBI_errorMessage(
-           "internal error in RS_DBI_SclassNames: input S types must be nonNULL",
-           RS_DBI_ERROR);
+     error("internal error in RS_DBI_SclassNames: input S types must be nonNULL");
   n = LENGTH(type);
   typeCodes = INTEGER_DATA(type);
   PROTECT(typeNames = NEW_CHARACTER(n));
   for(i = 0; i < n; i++) {
     s = RS_DBI_getTypeName(typeCodes[i], RS_dataTypeTable);
     if(!s)
-      RS_DBI_errorMessage(
-            "internal error RS_DBI_SclassNames: unrecognized S type", 
-            RS_DBI_ERROR);
+      error("internal error RS_DBI_SclassNames: unrecognized S type");
     SET_CHR_EL(typeNames, i, mkChar(s));
   }
   UNPROTECT(1);
@@ -468,7 +408,7 @@ RS_DBI_connection *
 RS_DBI_getConnection(SEXP conHandle)
 {
     RS_DBI_connection *con = (RS_DBI_connection *)R_ExternalPtrAddr(conHandle);
-    if (!con) RS_DBI_errorMessage("expired SQLiteConnection", RS_DBI_ERROR);
+    if (!con) error("expired SQLiteConnection");
     return con;
 }
 
@@ -478,9 +418,7 @@ RS_DBI_getResultSet(SEXP rsHandle)
   RS_DBI_connection *con;
   con = RS_DBI_getConnection(rsHandle);
   if(!con)
-    RS_DBI_errorMessage(
-          "internal error in RS_DBI_getResultSet: bad connection",
-          RS_DBI_ERROR);
+    error("internal error in RS_DBI_getResultSet: bad connection");
   return con->resultSets[0];
 }
 
@@ -572,14 +510,12 @@ char *
 RS_DBI_getTypeName(int t, const struct data_types table[])
 {
   int i;
-  char buf[128];
 
   for (i = 0; table[i].typeName != (char *) 0; i++) {
     if (table[i].typeId == t)
       return table[i].typeName;
   }
-  sprintf(buf, "unknown (%ld)", (long) t);
-  RS_DBI_errorMessage(buf, RS_DBI_WARNING);
+  warning("unknown (%ld)", (long) t);
   return (char *) 0; /* for -Wall */
 }
 

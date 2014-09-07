@@ -33,12 +33,7 @@ void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
 static SQLiteDriver *dbManager = NULL;
 
 SQLiteDriver* getDriver() {
-  if (!dbManager) {
-    RS_DBI_errorMessage(
-      "internal error in getDriver: corrupt dbManager handle",
-      RS_DBI_ERROR
-    );
-  }
+  if (!dbManager) error("Corrupt dbManager handle.");
   return dbManager;
 }
 
@@ -47,17 +42,14 @@ void initDriver(SEXP records_, SEXP cache_) {
 
   const char *clientVersion = sqlite3_libversion();
   if (strcmp(clientVersion, compiledVersion)) {
-    char  buf[256];
-    sprintf(buf, 
-      "SQLite mismatch between compiled version %s and runtime version %s",
+    error("SQLite mismatch between compiled version %s and runtime version %s",
       compiledVersion, clientVersion
     );
-    RS_DBI_errorMessage(buf, RS_DBI_WARNING);
   }
   
   dbManager = (SQLiteDriver*) malloc(sizeof(SQLiteDriver));
   if (!dbManager) {
-    RS_DBI_errorMessage("could not malloc the dbManger", RS_DBI_ERROR);
+    error("could not malloc the dbManger");
   }
     
   dbManager->counter = 0;
@@ -77,8 +69,7 @@ void initDriver(SEXP records_, SEXP cache_) {
 SEXP closeDriver() {
   SQLiteDriver *mgr = getDriver();
   if (mgr->num_con) {
-    RS_DBI_errorMessage("there are opened connections -- close them first",
-      RS_DBI_ERROR);    
+    error("Open connections -- close them first");    
   }
   sqlite3_enable_shared_cache(0);
 
@@ -104,8 +95,7 @@ RS_SQLite_setException(RS_DBI_connection *con, int err_no, const char *err_msg)
     if(!ex){    /* brand new exception object */
         ex = (RS_SQLite_exception *) malloc(sizeof(RS_SQLite_exception));
         if(!ex)
-            RS_DBI_errorMessage("could not allocate SQLite exception object",
-                                RS_DBI_ERROR);
+            error("could not allocate SQLite exception object");
     }
     else
         free(ex->errorMsg);      /* re-use existing object */
@@ -405,7 +395,7 @@ exec_error(const char *msg,
         RS_SQLite_freeParameterBinding(&params);
         params = NULL;
     }
-    RS_DBI_errorMessage(buf, RS_DBI_ERROR);
+    error(buf);
 }
 
 static void
@@ -548,9 +538,7 @@ Res_Handle RS_SQLite_exec(Con_Handle conHandle, SEXP statement, SEXP bind_data)
         res = RS_DBI_getResultSet(rsHandle);
         if (res->completed != 1) {
             free(dyn_statement);
-            RS_DBI_errorMessage(
-                "connection with pending rows, close resultSet before continuing",
-                RS_DBI_ERROR);
+            error("connection with pending rows, close resultSet before continuing");
         } else
             RS_SQLite_closeResultSet(rsHandle);
     }
@@ -771,8 +759,7 @@ static int do_select_step(RS_DBI_resultSet *res, int row_idx)
 SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec) {
   RS_DBI_resultSet* res = RS_DBI_getResultSet(rsHandle);
   if (res->isSelect != 1) {
-    RSQLITE_MSG("resultSet does not correspond to a SELECT statement",
-      RS_DBI_WARNING);
+    warning("resultSet does not correspond to a SELECT statement");
     return R_NilValue;
   }
   if (res->completed == 1) {
@@ -785,18 +772,15 @@ SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec) {
   sqlite3_stmt* db_statement = (sqlite3_stmt *) res->drvResultSet;
 
   if (state != SQLITE_ROW && state != SQLITE_DONE) {
-    char errMsg[2048];
-    (void) sprintf(errMsg, "RS_SQLite_fetch: failed first step: %s",
+    error("RS_SQLite_fetch: failed first step: %s",
       sqlite3_errmsg(sqlite3_db_handle(db_statement)));
-    RSQLITE_MSG(errMsg, RS_DBI_ERROR);
   }
   
   // Cache field mappings
   if (!res->fields) {
     res->fields = RS_SQLite_createDataMappings(rsHandle);
     if (!res->fields) {
-      RSQLITE_MSG("corrupt SQLite resultSet, missing fieldDescription",
-        RS_DBI_ERROR);
+      error("corrupt SQLite resultSet, missing fieldDescription");
     }
   }
   RS_DBI_fields* flds = res->fields;
@@ -823,10 +807,8 @@ SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec) {
     }
     state = do_select_step(res, row_idx);
     if (state != SQLITE_ROW && state != SQLITE_DONE) {
-      char errMsg[2048];
-      (void)sprintf(errMsg, "RS_SQLite_fetch: failed: %s",
-                    sqlite3_errmsg(sqlite3_db_handle(db_statement)));
-      RSQLITE_MSG(errMsg, RS_DBI_ERROR);
+      error("RS_SQLite_fetch: failed: %s", 
+        sqlite3_errmsg(sqlite3_db_handle(db_statement)));
     }
   } /* end row loop */
 
@@ -865,8 +847,7 @@ RS_SQLite_getException(SEXP conHandle)
     int  exLen[]  = {1, 1};
 
     if(!con->drvConnection)
-        RS_DBI_errorMessage("internal error: corrupt connection handle",
-                            RS_DBI_ERROR);
+        error("internal error: corrupt connection handle");
     PROTECT(output = RS_DBI_createNamedList(exDesc, exType, exLen, n));
     err = (RS_SQLite_exception *) con->drvData;
     LST_INT_EL(output,0,0) = err->errorNum;
@@ -878,8 +859,7 @@ RS_SQLite_getException(SEXP conHandle)
 void RSQLite_closeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
 {
    if(result->drvResultSet == NULL)
-       RS_DBI_errorMessage("corrupt SQLite resultSet, missing statement handle",
-                           RS_DBI_ERROR);
+       error("corrupt SQLite resultSet, missing statement handle");
     RSQLite_freeResultSet0(result, con);
 }
 
@@ -1011,7 +991,7 @@ RS_SQLite_importFile(
     s = CHR_EL(s_tablename, 0);
     zTable = (char *) malloc( strlen(s)+1);
     if(!zTable){
-        RS_DBI_errorMessage("could not allocate memory", RS_DBI_ERROR);
+        error("could not allocate memory");
     }
     (void) strcpy(zTable, s);
 
@@ -1019,7 +999,7 @@ RS_SQLite_importFile(
     zFile = (char *) malloc( strlen(s)+1);
     if(!zFile){
         free(zTable);
-        RS_DBI_errorMessage("could not allocate memory", RS_DBI_ERROR);
+        error("could not allocate memory");
     }
     (void) strcpy(zFile, s);
 
@@ -1032,7 +1012,7 @@ RS_SQLite_importFile(
         free(zFile);
         if(zSep) free(zSep);
         if(zEol) free(zEol);
-        RS_DBI_errorMessage("could not allocate memory", RS_DBI_ERROR);
+        error("could not allocate memory");
     }
     (void) strcpy(zSep, s);
     (void) strcpy(zEol, s1);
@@ -1074,14 +1054,11 @@ RS_sqlite_import(
     char **azCol;               /* zLine[] broken up into columns */
     FILE *in;                   /* The input file */
     int lineno = 0;             /* Line number of input file */
-    char errMsg[512];
     char *z;
 
     nSep = strlen(separator);
     if( nSep==0 ){
-        RS_DBI_errorMessage(
-            "RS_sqlite_import: non-null separator required for import",
-            RS_DBI_ERROR);
+        error("RS_sqlite_import: non-null separator required for import");
     }
     zSql = sqlite3_mprintf("SELECT * FROM '%q'", zTable);
     if( zSql==0 ) return 0;
@@ -1090,8 +1067,7 @@ RS_sqlite_import(
     sqlite3_free(zSql);
     if (rc != SQLITE_OK) {
         sqlite3_finalize(pStmt);
-        (void) sprintf(errMsg, "RS_sqlite_import: %s", sqlite3_errmsg(db));
-        RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+        error("RS_sqlite_import: %s", sqlite3_errmsg(db));
         nCol = 0;
     }else{
         nCol = sqlite3_column_count(pStmt);
@@ -1112,14 +1088,12 @@ RS_sqlite_import(
     free(zSql);
     if (rc != SQLITE_OK) {
         sqlite3_finalize(pStmt);
-        (void) sprintf(errMsg, "RS_sqlite_import: %s", sqlite3_errmsg(db));
-        RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+        error("RS_sqlite_import: %s", sqlite3_errmsg(db));
     }
     in = fopen(zFile, "rb");
     if( in==0 ){
-        (void) sprintf(errMsg, "RS_sqlite_import: cannot open file %s", zFile);
+        error("RS_sqlite_import: cannot open file %s", zFile);
         sqlite3_finalize(pStmt);
-        RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
     }
     azCol = malloc( sizeof(azCol[0])*(nCol+1) );
     if( azCol==0 ) return 0;
@@ -1140,10 +1114,8 @@ RS_sqlite_import(
             }
         }
         if( i+1!=nCol ){
-            (void) sprintf(errMsg,
-                           "RS_sqlite_import: %s line %d expected %d columns of data but found %d",
-                           zFile, lineno, nCol, i+1);
-            RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+            error("RS_sqlite_import: %s line %d expected %d columns of data but found %d",
+              zFile, lineno, nCol, i+1);
         }
 
         for(i=0; i<nCol; i++){
@@ -1158,16 +1130,14 @@ RS_sqlite_import(
         rc = sqlite3_step(pStmt);
         if (rc != SQLITE_DONE && rc != SQLITE_SCHEMA) {
             sqlite3_finalize(pStmt);
-            (void) sprintf(errMsg, "RS_sqlite_import: %s", sqlite3_errmsg(db));
-            RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+            error("RS_sqlite_import: %s", sqlite3_errmsg(db));
         }
         rc = sqlite3_reset(pStmt);
         free(zLine);
         zLine = NULL;
         if (rc != SQLITE_OK) {
             sqlite3_finalize(pStmt);
-            (void) sprintf(errMsg,"RS_sqlite_import: %s", sqlite3_errmsg(db));
-            RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+            error("RS_sqlite_import: %s", sqlite3_errmsg(db));
         }
     }
     free(azCol);
@@ -1193,8 +1163,7 @@ RS_sqlite_getline(FILE *in, const char *eol)
 
     nc = 1024; i = 0;
     buf = (char *) malloc(nc);
-    if(!buf)
-        RS_DBI_errorMessage("RS_sqlite_getline could not malloc", RS_DBI_ERROR);
+    if(!buf) error("RS_sqlite_getline could not malloc");
 
     neol = strlen(eol);  /* num of eol chars */
     ceol = eol[neol-1];  /* last char in eol */
@@ -1204,8 +1173,7 @@ RS_sqlite_getline(FILE *in, const char *eol)
             nc = 2 * nc;
             buf = (char *) realloc((void *) buf, nc);
             if(!buf)
-                RS_DBI_errorMessage(
-                    "RS_sqlite_getline could not realloc", RS_DBI_ERROR);
+                error("RS_sqlite_getline could not realloc");
         }
         if(c==EOF)
             break;
@@ -1251,7 +1219,7 @@ SEXP RS_SQLite_copy_database(Con_Handle fromConHandle, Con_Handle toConHandle)
     rc = sqlite3_errcode(dbTo);
     if (rc != SQLITE_OK) {
         RS_SQLite_setException(toCon, rc, sqlite3_errmsg(dbTo));
-        RS_DBI_errorMessage(sqlite3_errmsg(dbTo), RS_DBI_ERROR);
+        error(sqlite3_errmsg(dbTo));
     }
     return R_NilValue;
 }

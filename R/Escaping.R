@@ -6,7 +6,6 @@ NULL
 #' These methods are straight-forward implementations of the corresponding
 #' generic functions.
 #' 
-#' @docType methods
 #' @param dbObj any SQLite object (e.g., \code{SQLiteDriver}).
 #' @param snames a character vector of R identifiers (symbols) from which to 
 #'   make SQL identifiers.

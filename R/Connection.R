@@ -6,7 +6,6 @@ NULL
 #' \code{SQLiteConnection} objects are usually created by 
 #' \code{\link[DBI]{dbConnect}}
 #' 
-#' @docType class
 #' @examples
 #' con <- dbConnect(SQLite(), dbname = tempfile())
 #' dbDisconnect(con)

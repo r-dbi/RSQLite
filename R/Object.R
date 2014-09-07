@@ -8,7 +8,6 @@ NULL
 #' This method is a straight-forward implementation of the corresponding
 #' generic function.
 #' 
-#' @docType methods
 #' @param dbObj a \code{SQLiteDriver} object,
 #' @param obj an R object whose SQL type we want to determine.
 #' @param ... Needed for compatibility with generic. Otherwise ignored.

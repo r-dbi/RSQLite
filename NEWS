@@ -52,7 +52,7 @@ Version 0.11.6.9000
 
 - RSQLite is no longer nominally compatible with S (#39).
 
-- Tests have been converted from RUnit to testthat
+- All tests have been converted from RUnit to testthat.
 
 - Internal `sqlite*()` functions are no longer exported (#20).
 

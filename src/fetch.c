@@ -18,61 +18,37 @@
 
 #include "rsqlite.h"
 
-void
-RS_DBI_allocOutput(SEXP output, SQLiteFields *flds,
-  	   int num_rec, int  expand)
-{
-  SEXP names, s_tmp;
-  int   j; 
-  int    num_fields;
-  SEXPTYPE  *fld_Sclass;
-
+void rsqlite_output_alloc(SEXP output, SQLiteFields *flds, int num_rec) {
   PROTECT(output);
+  int p = flds->num_fields;
 
-  num_fields = flds->num_fields;
-  if(expand){
-    for(j = 0; j < num_fields; j++){
-      /* Note that in R-1.2.3 (at least) we need to protect SET_LENGTH */
-      s_tmp = VECTOR_ELT(output, j);
-      PROTECT(SET_LENGTH(s_tmp, num_rec));  
-      SET_VECTOR_ELT(output, j, s_tmp);
-      UNPROTECT(1);
-    }
-    UNPROTECT(1);
-    return;
+  for(int j = 0; j < p; j++){
+    SET_VECTOR_ELT(output, j, allocVector(flds->Sclass[j], num_rec));
   }
 
-  fld_Sclass = flds->Sclass;
-  for(j = 0; j < num_fields; j++){
-    switch((int)fld_Sclass[j]){
-    case LGLSXP:    
-      SET_VECTOR_ELT(output, j, NEW_LOGICAL(num_rec));
-      break;
-    case STRSXP:
-      SET_VECTOR_ELT(output, j, NEW_CHARACTER(num_rec));
-      break;
-    case INTSXP:
-      SET_VECTOR_ELT(output, j, NEW_INTEGER(num_rec));
-      break;
-    case REALSXP:
-      SET_VECTOR_ELT(output, j, NEW_NUMERIC(num_rec));
-      break;
-    case RAWSXP:                /* falls through */
-    case VECSXP:
-      SET_VECTOR_ELT(output, j, NEW_LIST(num_rec));
-      break;
-    default:
-      error("unsupported data type");
-    }
-  }
-
-  PROTECT(names = NEW_CHARACTER(num_fields));
-  for(j = 0; j< num_fields; j++){
-    SET_STRING_ELT(names,j, mkChar(flds->name[j]));
-  }
+  SEXP names = PROTECT(allocVector(STRSXP, p));
   SET_NAMES(output, names);
-  UNPROTECT(2);
+  UNPROTECT(1);
+  for(int j = 0; j < p; j++){
+    SET_STRING_ELT(names, j, mkChar(flds->name[j]));
+  }
+  
+  UNPROTECT(1);
   return;
+}
+
+void rsqlite_output_expand(SEXP output, SQLiteFields *flds, int num_rec) {
+  PROTECT(output);
+  int p = flds->num_fields;
+
+  for(int j = 0; j < p; j++){
+    /* Note that in R-1.2.3 (at least) we need to protect SET_LENGTH */
+    SEXP s_tmp = VECTOR_ELT(output, j);
+    PROTECT(SET_LENGTH(s_tmp, num_rec));  
+    SET_VECTOR_ELT(output, j, s_tmp);
+    UNPROTECT(1);
+  }
+  UNPROTECT(1);
 }
 
 
@@ -500,14 +476,14 @@ SEXP RS_SQLite_fetch(SEXP handle, SEXP max_rec) {
   }
 
   SEXP output = PROTECT(NEW_LIST(num_fields));
-  RS_DBI_allocOutput(output, flds, num_rec, 0);
+  rsqlite_output_alloc(output, flds, num_rec);
   while (state != SQLITE_DONE) {
     fill_one_row(db_statement, output, row_idx, flds);
     row_idx++;
     if (row_idx == num_rec) {  /* request satisfied or exhausted allocated space */
       if (expand) {    /* do we extend or return the records fetched so far*/
         num_rec = 2 * num_rec;
-        RS_DBI_allocOutput(output, flds, num_rec, expand);
+        rsqlite_output_expand(output, flds, num_rec);
       } else {
         break;       /* okay, no more fetching for now */
       }            

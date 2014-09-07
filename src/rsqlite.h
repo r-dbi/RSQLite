@@ -114,7 +114,9 @@ SEXP           rsqlite_result_valid(SEXP handle);
 SEXP           rsqlite_result_info(SEXP handle);
 SQLiteFields*  rsqlite_result_fields(SQLiteResult* handle);
 
-void RS_DBI_allocOutput(SEXP output, SQLiteFields *flds, int num_rec, int expand);
+void rsqlite_output_alloc(SEXP output, SQLiteFields *flds, int num_rec);
+void rsqlite_output_expand(SEXP output, SQLiteFields *flds, int num_rec);
+
 SEXP RS_SQLite_exec(SEXP handle, SEXP statement, SEXP bind_data);
 SEXP RS_SQLite_fetch(SEXP handle, SEXP max_rec);
 RS_SQLite_bindParams* RS_SQLite_createParameterBinding(int n, SEXP bind_data, sqlite3_stmt *stmt, char *errorMsg);

@@ -95,7 +95,7 @@ SEXP close_connection(SEXP handle) {
   // close & free result set (if open)
   if (con->resultSet) {
     warning("Closing open result set");
-    RSQLite_closeResultSet0(con->resultSet, con);
+    rsqlite_result_free(con);
   }
 
   // close & free db connection
@@ -132,14 +132,19 @@ SEXP isValidConnection(SEXP dbObj) {
 }
 
 SEXP connectionInfo(SEXP conHandle) {
-  SEXP info = PROTECT(allocVector(VECSXP, 1));
-  SEXP info_nms = PROTECT(allocVector(STRSXP, 1));
+  SQLiteConnection* con = get_connection(conHandle);
+  
+  SEXP info = PROTECT(allocVector(VECSXP, 2));
+  SEXP info_nms = PROTECT(allocVector(STRSXP, 2));
   SET_NAMES(info, info_nms);
   UNPROTECT(1);
 
   int i = 0;
   SET_STRING_ELT(info_nms, i, mkChar("serverVersion"));
   SET_VECTOR_ELT(info, i++, mkString(SQLITE_VERSION));
+
+  SET_STRING_ELT(info_nms, i, mkChar("results"));
+  SET_VECTOR_ELT(info, i++, ScalarLogical(con->resultSet != NULL));
 
   UNPROTECT(1);
   return info;

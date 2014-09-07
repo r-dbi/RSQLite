@@ -229,10 +229,9 @@ static void
 exec_error(const char *msg,
            SQLiteConnection *con,
            int bind_count,
-           RS_SQLite_bindParams *params,
-           SEXP rsHandle)
+           RS_SQLite_bindParams *params)
 {
-    sqlite3 *db = (sqlite3 *) con->drvConnection;
+    sqlite3 *db = con->drvConnection;
     int errcode = db ? sqlite3_errcode(db) : -1;
     char buf[2048];
     const char *db_msg = "";
@@ -243,10 +242,8 @@ exec_error(const char *msg,
     }
     snprintf(buf, sizeof(buf), "%s%s%s", msg, sep, db_msg);
     setException(con, errcode, buf);
-    if (rsHandle) {
-        RSQLite_freeResultSet0(RS_DBI_getResultSet(rsHandle), con);
-        rsHandle = NULL;
-    }
+    rsqlite_result_free(con);
+
     if (params) {
         RS_SQLite_freeParameterBinding(&params);
         params = NULL;
@@ -259,10 +256,8 @@ select_prepared_query(sqlite3_stmt *db_statement,
                       SEXP bind_data,
                       int bind_count,
                       int rows,
-                      SQLiteConnection *con,
-                      SEXP rsHandle)
+                      SQLiteConnection *con)
 {
-    SQLiteResult *res;
     char bindingErrorMsg[2048]; bindingErrorMsg[0] = '\0';
     RS_SQLite_bindParams *params =
         RS_SQLite_createParameterBinding(bind_count, bind_data,
@@ -270,10 +265,9 @@ select_prepared_query(sqlite3_stmt *db_statement,
     if (params == NULL) {
         /* FIXME: this UNPROTECT is ugly, paired to caller */
         UNPROTECT(1);
-        exec_error(bindingErrorMsg, con, 0, NULL, rsHandle);
+        exec_error(bindingErrorMsg, con, 0, NULL);
     }
-    res = RS_DBI_getResultSet(rsHandle);
-    res->drvData = params;
+    con->resultSet->drvData = params;
 }
 
 static int
@@ -333,8 +327,7 @@ non_select_prepared_query(sqlite3_stmt *db_statement,
                           SEXP bind_data,
                           int bind_count,
                           int rows,
-                          SQLiteConnection *con,
-                          SEXP rsHandle)
+                          SQLiteConnection *con)
 {
     int state, i;
     char bindingErrorMsg[2048]; bindingErrorMsg[0] = '\0';
@@ -344,7 +337,7 @@ non_select_prepared_query(sqlite3_stmt *db_statement,
     if (params == NULL) {
         /* FIXME: this UNPROTECT is ugly, paired to caller */
         UNPROTECT(1);
-        exec_error(bindingErrorMsg, con, 0, NULL, rsHandle);
+        exec_error(bindingErrorMsg, con, 0, NULL);
     }
 
     /* we need to step through the query for each row */
@@ -352,113 +345,101 @@ non_select_prepared_query(sqlite3_stmt *db_statement,
         state = bind_params_to_stmt(params, db_statement, i);
         if (state != SQLITE_OK) {
             UNPROTECT(1);
-            /* FIXME: add errmsg from sqlite */
             exec_error("RS_SQLite_exec: could not bind data",
-                       con, 0, NULL, rsHandle);
+                       con, 0, NULL);
         }
         state = sqlite3_step(db_statement);
         if (state != SQLITE_DONE) {
             UNPROTECT(1);
-            /* FIXME: add errmsg from sqlite */
             exec_error("RS_SQLite_exec: could not execute",
-                       con, 0, NULL, rsHandle);
+                       con, 0, NULL);
         }
         state = sqlite3_reset(db_statement);
         sqlite3_clear_bindings(db_statement);
         if (state != SQLITE_OK) {
             UNPROTECT(1);
             exec_error("RS_SQLite_exec: could not reset statement",
-                       con, 0, NULL, rsHandle);
+                       con, 0, NULL);
         }
     }
     RS_SQLite_freeParameterBinding(&params);
 }
 
 
-SEXP RS_SQLite_exec(SEXP conHandle, SEXP statement, SEXP bind_data)
-{
-    SQLiteConnection *con = get_connection(conHandle);
-    SEXP rsHandle;
-    SQLiteResult *res;
-    sqlite3 *db_connection = (sqlite3 *) con->drvConnection;
-    sqlite3_stmt *db_statement = NULL;
-    int state, bind_count;
-    int rows = 0, cols = 0;
-    char *dyn_statement = RS_DBI_copyString(CHAR(asChar(statement)));
+SEXP RS_SQLite_exec(SEXP handle, SEXP statement, SEXP bind_data) {
+  SQLiteConnection *con = get_connection(handle);
+  sqlite3 *db_connection = con->drvConnection;
+  sqlite3_stmt *db_statement = NULL;
+  int state, bind_count;
+  int rows = 0, cols = 0;
 
-    /* Do we have a pending resultSet in the current connection?
-     * SQLite only allows  one resultSet per connection.
-     */
-    if (con->resultSet) {
-        rsHandle = RS_DBI_asResHandle(conHandle);
-        res = RS_DBI_getResultSet(rsHandle);
-        if (res->completed != 1) {
-            free(dyn_statement);
-            error("connection with pending rows, close resultSet before continuing");
-        } else
-            RS_SQLite_closeResultSet(rsHandle);
-    }
-
-    /* allocate and init a new result set */
-    PROTECT(rsHandle = RS_DBI_allocResultSet(conHandle));
-    res = RS_DBI_getResultSet(rsHandle);
-    res->completed = 0;
-    res->statement = dyn_statement;
-    res->drvResultSet = db_statement;
-    state = sqlite3_prepare_v2(db_connection, dyn_statement, -1,
-                               &db_statement, NULL);
-    if (state != SQLITE_OK) {
-        UNPROTECT(1);
-        exec_error("error in statement", con, 0, NULL, rsHandle);
-    }
-
-    if (db_statement == NULL) {
-        UNPROTECT(1);
-        exec_error("nothing to execute", con, 0, NULL, rsHandle);
-    }
-    res->drvResultSet = (void *) db_statement;
-    bind_count = sqlite3_bind_parameter_count(db_statement);
-    if (bind_count > 0 && bind_data != R_NilValue) {
-        rows = GET_LENGTH(GET_ROWNAMES(bind_data));
-        cols = GET_LENGTH(bind_data);
-    }
-
-
-    res->isSelect = sqlite3_column_count(db_statement) > 0;
-    res->rowCount = 0;      /* fake's cursor's row count */
-    res->rowsAffected = -1; /* no rows affected */
-    setException(con, state, "OK");
-
-    if (res->isSelect) {
-        if (bind_count > 0) {
-            select_prepared_query(db_statement, bind_data, bind_count,
-                                  rows, con, rsHandle);
-        }
+  SQLiteResult* res = con->resultSet;
+  if (res) {
+    if (res->completed != 1) {
+      error("connection with pending rows, close resultSet before continuing");
     } else {
-        if (bind_count > 0) {
-            non_select_prepared_query(db_statement, bind_data, bind_count,
-                                      rows, con, rsHandle);
-        }
-        else {
-            state = sqlite3_step(db_statement);
-            if (state != SQLITE_DONE) {
-                UNPROTECT(1);
-                exec_error("RS_SQLite_exec: could not execute1",
-                           con, 0, NULL, rsHandle);
-            }
-        }
-        res->completed = 1;          /* BUG: what if query is async?*/
-        res->rowsAffected = sqlite3_changes(db_connection);
+      rsqlite_result_free(con);
     }
-    UNPROTECT(1);
-    return rsHandle;
+  }
+  rsqlite_result_alloc(con);
+  res = con->resultSet;
+
+  /* allocate and init a new result set */
+  res->completed = 0;
+  char *dyn_statement = RS_DBI_copyString(CHAR(asChar(statement)));
+  res->statement = dyn_statement;
+  res->drvResultSet = db_statement;
+  state = sqlite3_prepare_v2(db_connection, dyn_statement, -1,
+                             &db_statement, NULL);
+  if (state != SQLITE_OK) {
+    exec_error("error in statement", con, 0, NULL);
+  }
+
+  if (db_statement == NULL) {
+    exec_error("nothing to execute", con, 0, NULL);
+  }
+  res->drvResultSet = (void *) db_statement;
+  bind_count = sqlite3_bind_parameter_count(db_statement);
+  if (bind_count > 0 && bind_data != R_NilValue) {
+      rows = GET_LENGTH(GET_ROWNAMES(bind_data));
+      cols = GET_LENGTH(bind_data);
+  }
+
+
+  res->isSelect = sqlite3_column_count(db_statement) > 0;
+  res->rowCount = 0;      /* fake's cursor's row count */
+  res->rowsAffected = -1; /* no rows affected */
+  setException(con, state, "OK");
+
+  if (res->isSelect) {
+      if (bind_count > 0) {
+          select_prepared_query(db_statement, bind_data, bind_count,
+                                rows, con);
+      }
+  } else {
+      if (bind_count > 0) {
+          non_select_prepared_query(db_statement, bind_data, bind_count,
+                                    rows, con);
+      }
+      else {
+          state = sqlite3_step(db_statement);
+          if (state != SQLITE_DONE) {
+              exec_error("RS_SQLite_exec: could not execute1",
+                         con, 0, NULL);
+          }
+      }
+      res->completed = 1;          /* BUG: what if query is async?*/
+      res->rowsAffected = sqlite3_changes(db_connection);
+  }
+  
+  return handle;
 }
 
 RS_DBI_fields*
-RS_SQLite_createDataMappings(SEXP rsHandle) {
+RS_SQLite_createDataMappings(SEXP handle) {
   const char* col_decltype = NULL;
 
-  SQLiteResult* result = RS_DBI_getResultSet(rsHandle);
+  SQLiteResult* result = rsqlite_result_from_handle(handle);
   sqlite3_stmt* db_statement = (sqlite3_stmt *) result->drvResultSet;
 
   int ncol = sqlite3_column_count(db_statement);
@@ -600,8 +581,8 @@ static int do_select_step(SQLiteResult *res, int row_idx)
    If the NULL value does not correspond to a table column, then we
    force character.
 */
-SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec) {
-  SQLiteResult* res = RS_DBI_getResultSet(rsHandle);
+SEXP RS_SQLite_fetch(SEXP handle, SEXP max_rec) {
+  SQLiteResult* res = rsqlite_result_from_handle(handle);
   if (res->isSelect != 1) {
     warning("resultSet does not correspond to a SELECT statement");
     return R_NilValue;
@@ -622,7 +603,7 @@ SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec) {
   
   // Cache field mappings
   if (!res->fields) {
-    res->fields = RS_SQLite_createDataMappings(rsHandle);
+    res->fields = RS_SQLite_createDataMappings(handle);
     if (!res->fields) {
       error("corrupt SQLite resultSet, missing fieldDescription");
     }

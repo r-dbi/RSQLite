@@ -18,22 +18,13 @@
 
 #include "rsqlite.h"
 
-
-SEXP
-RS_DBI_allocResultSet(SEXP conHandle)
-{
-  SQLiteConnection *con = NULL;
-  SQLiteResult  *result = NULL;
-
-  con = get_connection(conHandle);
-
-  result = malloc(sizeof(SQLiteResult));
-  if (!result){
-    char *errMsg = "could not malloc dbResultSet";
-    error(errMsg);
+void rsqlite_result_alloc(SQLiteConnection* con) {
+  SQLiteResult* result = malloc(sizeof(SQLiteResult));
+  if (!result) {
+    error("could not malloc dbResultSet");
   }
-  result->drvResultSet = NULL; /* driver's own resultSet (cursor)*/
-  result->drvData = NULL;   /* this can be used by driver*/
+  result->drvResultSet = NULL; 
+  result->drvData = NULL; 
   result->statement = NULL;
   result->isSelect = -1;
   result->rowsAffected = -1;
@@ -41,13 +32,13 @@ RS_DBI_allocResultSet(SEXP conHandle)
   result->completed = -1;
   result->fields = NULL;
   
-  /* update connection's resultSet table */
   con->resultSet = result;
-
-  return RS_DBI_asResHandle(conHandle);
 }
 
-void RSQLite_freeResultSet0(SQLiteResult *result, SQLiteConnection *con) {
+
+void rsqlite_result_free(SQLiteConnection* con) {
+  SQLiteResult* result = con->resultSet;
+    
   if (result->drvResultSet) {
     sqlite3_finalize(result->drvResultSet);
     result->drvResultSet = NULL;
@@ -66,72 +57,35 @@ void RSQLite_freeResultSet0(SQLiteResult *result, SQLiteConnection *con) {
   
   free(result);
   
-  result = NULL;
   con->resultSet = NULL;
 }
 
-
-SEXP
-DBI_newResultHandle(SEXP xp, SEXP resId)
-{
-    return RS_DBI_asResHandle(xp);
-}
-
-SEXP
-RS_DBI_asResHandle(SEXP conxp)
-{
-    SEXP resHandle, s_ids, label, v;
-    int *ids;
-    PROTECT(s_ids = allocVector(INTSXP, 3));
-    ids = INTEGER(s_ids);
-    ids[0] = 0;
-    ids[1] = 0;
-    ids[2] = 0;
-    PROTECT(v = allocVector(VECSXP, 2));
-    SET_VECTOR_ELT(v, 0, s_ids);
-    /* this ensures the connection is preserved as long as
-       there is a reference to a result set
-     */
-    SET_VECTOR_ELT(v, 1, conxp);
-    PROTECT(label = mkString("DBI RES"));
-    resHandle = R_MakeExternalPtr(R_ExternalPtrAddr(conxp), label, v);
-    UNPROTECT(3);
-    /* FIXME: add finalizer code */
-    return resHandle;
+SEXP rsqlite_result_free_handle(SEXP handle) {
+  SQLiteConnection* con = get_connection(handle);
+  rsqlite_result_free(con);
+  
+  return ScalarLogical(1);
 }
 
 
-SQLiteResult *
-RS_DBI_getResultSet(SEXP rsHandle)
-{
-  SQLiteConnection *con;
-  con = get_connection(rsHandle);
-  if(!con)
-    error("internal error in RS_DBI_getResultSet: bad connection");
+SQLiteResult* rsqlite_result_from_handle(SEXP handle) {
+  SQLiteConnection* con = get_connection(handle);
+  
+  if (!con->resultSet) {
+    error("Invalid result");
+  }
+  
   return con->resultSet;
 }
 
+SEXP rsqlite_result_valid(SEXP handle) {
+  SQLiteConnection *con = get_connection(handle);
+  if (!con->resultSet)
+    return ScalarLogical(0);
 
-void RSQLite_closeResultSet0(SQLiteResult *result, SQLiteConnection *con)
-{
-   if(result->drvResultSet == NULL)
-       error("corrupt SQLite resultSet, missing statement handle");
-    RSQLite_freeResultSet0(result, con);
+  return ScalarLogical(1);
 }
 
-SEXP 
-RS_SQLite_closeResultSet(SEXP resHandle)
-{
-    RSQLite_closeResultSet0(RS_DBI_getResultSet(resHandle),
-                            get_connection(resHandle));
-    /* The connection external ptr is stored within the result handle
-       so that an active result keeps the connection protected.  When
-       we close the result set, we remove the reference to the
-       connection so that the connection can be gc'd.
-     */
-    SET_VECTOR_ELT(R_ExternalPtrProtected(resHandle), 1, R_NilValue);
-    return ScalarLogical(1);
-}
 
 SEXP fieldInfo(RS_DBI_fields *flds) {
   int n = flds ? flds->num_fields : 0;
@@ -182,8 +136,8 @@ SEXP fieldInfo(RS_DBI_fields *flds) {
 }
 
 
-SEXP resultSetInfo(SEXP rsHandle) {
-  SQLiteResult* result = RS_DBI_getResultSet(rsHandle);
+SEXP resultSetInfo(SEXP handle) {
+  SQLiteResult* result = rsqlite_result_from_handle(handle);
 
   SEXP info = PROTECT(allocVector(VECSXP, 6));
   SEXP info_nms = PROTECT(allocVector(STRSXP, 6));
@@ -213,12 +167,4 @@ SEXP resultSetInfo(SEXP rsHandle) {
 
   UNPROTECT(1);
   return info;
-}
-
-SEXP isValidResult(SEXP dbObj) {
-  SQLiteResult *res = R_ExternalPtrAddr(dbObj);
-
-  if (!res) return ScalarLogical(0);
-
-  return ScalarLogical(1);
 }

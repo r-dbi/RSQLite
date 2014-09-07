@@ -85,9 +85,9 @@ setMethod("dbIsValid", "SQLiteConnection", function(dbObj) {
   .Call(isValidConnection, dbObj@Id)
 })
 #' @rdname dbIsValid
-#' @useDynLib RSQLite isValidResult
+#' @useDynLib RSQLite rsqlite_result_valid
 setMethod("dbIsValid", "SQLiteResult", function(dbObj) {
-  .Call(isValidResult, dbObj@Id)
+  .Call(rsqlite_result_valid, dbObj@Id)
 })
 
 #' @rdname dbIsValid

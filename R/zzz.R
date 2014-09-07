@@ -1,5 +1,6 @@
 .onUnload <- function(libpath) {
-    library.dynam.unload("RSQLite", libpath)
+  gc() # Force garbage collection of connections
+  library.dynam.unload("RSQLite", libpath)
 }
 
 .test <- function(dir, pattern = ".*_test\\.R$")

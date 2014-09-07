@@ -67,7 +67,7 @@ sqliteFetch <- function(res, n = 0) {
 #' @param ... Ignored. Needed for compatibility with generic.
 #' @useDynLib RSQLite RS_SQLite_closeResultSet
 setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
-  if (!isIdCurrent(res)){
+  if (!dbIsValid(res)){
     warning("Expired SQLiteResult", call. = FALSE)
     return(TRUE)
   }

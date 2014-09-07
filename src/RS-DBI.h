@@ -145,10 +145,6 @@ void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
 RS_DBI_resultSet  *RS_DBI_getResultSet(Res_Handle rsHandle);
 Res_Handle RS_DBI_asResHandle(SEXP conxp);
 
-/* utility funs */
-SEXP RS_DBI_validHandle(Db_Handle handle); /* callable from S/R */
-int       is_validHandle(Db_Handle handle, HANDLE_TYPE handleType);
-
 /* a simple object database (mapping table) -- it uses simple linear 
  * search (we don't expect to have more than a handful of simultaneous 
  * connections and/or resultSets. If this is not the case, we could

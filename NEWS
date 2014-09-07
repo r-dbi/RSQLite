@@ -1,5 +1,7 @@
 Version 0.11.6.9000
 
+- `idIsValid()` is deprecated. Please use `dbIsValid()` instead.
+
 - The `dbname`, `loadable.extensions`, `flags` and `vfs` properties of
   a SqliteConnection are now slots. Access them directly instead of using 
   `dbGetInfo()`.

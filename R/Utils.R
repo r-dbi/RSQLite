@@ -157,9 +157,3 @@ explict_rownames <- function(df, row.names = NA) {
   rn <- data.frame(row_names = row.names(df))
   cbind(rn, df)
 }
-
-check_valid <- function(x) {
-  if (isIdCurrent(x)) return(TRUE)
-  
-  stop("Expired ", class(x)[1])
-}

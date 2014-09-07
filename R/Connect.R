@@ -122,7 +122,7 @@ setMethod("dbConnect", "SQLiteConnection", function(drv){
 #' @rdname dbConnect-SQLiteDriver-method
 #' @useDynLib RSQLite RS_SQLite_closeConnection
 setMethod("dbDisconnect", "SQLiteConnection", function(conn) {
-  if (!isIdCurrent(conn)) {
+  if (!dbIsValid(conn)) {
     warning("Expired SQLiteConnection.", call. = FALSE)
     return(TRUE)
   }

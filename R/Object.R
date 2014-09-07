@@ -57,28 +57,48 @@ sqliteDataType <- function(obj, ...) {
 }
 
 
-#' Check whether an SQLite object is valid or not
+#' Check whether an SQLite object is valid or not.
 #' 
-#' Support function that verifies that an dbObjectId holding a reference to a
+#' Support function that verifies that the holding a reference to a
 #' foreign object is still valid for communicating with the RDBMS
 #' 
-#' \code{dbObjectId} are R/S-Plus remote references to foreign (C code)
-#' objects. This introduces differences to the object's semantics such as
-#' persistence (e.g., connections may be closed unexpectedly), thus this
-#' function provides a minimal verification to ensure that the foreign object
-#' being referenced can be contacted.
-#' 
-#' @param obj any \code{dbObjectId} (e.g., \code{dbDriver},
-#' \code{dbConnection}, \code{dbResult}).
-#' @return a logical scalar.
+#' @param dbObj,obj A driver, connection or result.
+#' @return A logical scalar.
 #' @examples
-#' \dontrun{
-#' cursor <- dbSendQuery(con, sql.statement)
-#' isIdCurrent(cursor)
-#' }
+#' dbIsValid(SQLite())
 #' 
-#' @export isIdCurrent
-#' @useDynLib RSQLite RS_DBI_validHandle
-"isIdCurrent" <- function(obj) { 
-  .Call(RS_DBI_validHandle, obj@Id)
+#' con <- dbConnect(SQLite())
+#' dbIsValid(con)
+#' 
+#' dbDisconnect(con)
+#' dbIsValid(con)
+#' @name dbIsValid
+NULL
+
+#' @rdname dbIsValid
+#' @useDynLib RSQLite isValidDriver
+setMethod("dbIsValid", "SQLiteDriver", function(dbObj) {
+  .Call(isValidDriver)
+})
+#' @rdname dbIsValid
+#' @useDynLib RSQLite isValidConnection
+setMethod("dbIsValid", "SQLiteConnection", function(dbObj) {
+  .Call(isValidConnection, dbObj@Id)
+})
+#' @rdname dbIsValid
+#' @useDynLib RSQLite isValidResult
+setMethod("dbIsValid", "SQLiteResult", function(dbObj) {
+  .Call(isValidResult, dbObj@Id)
+})
+
+#' @rdname dbIsValid
+#' @export
+isIdCurrent <- function(obj) {
+  .Deprecated("dbIsValid")
+  dbIsValid(obj)
+}
+
+check_valid <- function(x) {
+  if (dbIsValid(x)) return(TRUE)  
+  stop("Expired ", class(x)[1], call. = FALSE)
 }

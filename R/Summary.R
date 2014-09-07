@@ -38,7 +38,7 @@ setMethod("summary", "SQLiteDriver", function(object) {
 #' @rdname summary
 setMethod("summary", "SQLiteConnection", function(object) {
   cat("<SQLiteConnection>\n")
-  if(!isIdCurrent(object)){
+  if(!dbIsValid(object)){
     cat("EXPIRED")
   } else {
     info <- dbGetInfo(object)
@@ -56,7 +56,7 @@ setMethod("summary", "SQLiteConnection", function(object) {
 #' @rdname summary
 setMethod("summary", "SQLiteResult", function(object) {
   cat("<SQLiteResult>\n")
-  if(!isIdCurrent(object)){
+  if(!dbIsValid(object)){
     cat("EXPIRED")
   } else {  
     cat("  Statement:     ", dbGetStatement(object), "\n", sep = "")

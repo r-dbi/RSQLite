@@ -85,6 +85,13 @@ SEXP closeDriver() {
   return ScalarLogical(1);
 }
 
+
+SEXP isValidDriver() {
+  if (!getDriver()) return ScalarLogical(0);
+      
+  return ScalarLogical(1);
+}
+
 // Connections -----------------------------------------------------------------
 
 /* set exception object (allocate memory if needed) */
@@ -146,7 +153,15 @@ SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
     if (strlen(vfs) == 0) vfs = NULL;
   }
   
-  sqlite3 *db_connection;
+  // Create external pointer to connection object
+  SEXP conHandle = RS_DBI_allocConnection();
+  RS_DBI_connection* con = RS_DBI_getConnection(conHandle);
+  if (!con) {
+    RS_DBI_freeConnection(conHandle);
+    error("Could not allocate space for connection object");
+  }
+
+  sqlite3* db_connection;
   int rc = sqlite3_open_v2(dbname, &db_connection, flags, vfs);
   if (rc != SQLITE_OK) {
     error("Could not connect to database:\n%s", sqlite3_errmsg(db_connection));
@@ -154,61 +169,43 @@ SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
   if (allow_ext) {
     sqlite3_enable_load_extension(db_connection, 1);
   }
-
-  /* SQLite connections can only have 1 result set open at a time */
-  Con_Handle conHandle = RS_DBI_allocConnection(1);
-  /* Note, while RS_DBI_getConnection can raise an error, conHandle
-   * will be valid if RS_DBI_allocConnection returns without
-   * error. */
-  RS_DBI_connection* con = RS_DBI_getConnection(conHandle);
-  if (!con) {
-    (void) sqlite3_close(db_connection);
-    RS_DBI_freeConnection(conHandle);
-    error("Could not allocate space for connection object");
-  }
-
-  con->drvConnection = (void *) db_connection;
+  con->drvConnection = db_connection;
+  
   RS_SQLite_setException(con, SQLITE_OK, "OK");
     
   return conHandle;
 }
 
 SEXP RS_SQLite_closeConnection(Con_Handle conHandle) {
-    RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
-    sqlite3 *db_connection;
-    int      rc;
+  RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
+  
+  if (con->num_res > 0) {
+    warning("Closing open result set");
+    RSQLite_closeResultSet0(con->resultSets[0], con);
+  }
 
-    if(con->num_res>0){
-        /* we used to error out here telling the user to
-           close pending result sets.  Now we warn and close the set ourself.
-         */
-        RS_DBI_errorMessage("closing pending result sets before closing "
-                            "this connection", RS_DBI_WARNING);
-        RSQLite_closeResultSet0(con->resultSets[0], con);
-    }
+  sqlite3* db_connection = con->drvConnection;
+  int rc = sqlite3_close(db_connection);  /* it also frees db_connection */
+  if (rc == SQLITE_BUSY) {
+    warning("Unfinalized prepared statements.");
+  } else if(rc!=SQLITE_OK){
+    warning("Internal error: could not close SQLte connection.");
+  }
+  con->drvConnection = NULL;
+  RS_SQLite_freeException(con);
+  con->drvData = NULL;
+  RS_DBI_freeConnection(conHandle);
+  
+  return ScalarLogical(1);
+}
 
-    db_connection = (sqlite3 *) con->drvConnection;
-    rc = sqlite3_close(db_connection);  /* it also frees db_connection */
-    if (rc == SQLITE_BUSY) {
-        /* This will happen if there is an unfinalized prepared statement or
-           an unfinalized BLOB reference.  Should not happen under normal
-           operation -- even if user is doing things out of order.
-         */
-        RS_DBI_errorMessage(
-            "unfinalized prepared statements before closing this connection",
-            RS_DBI_WARNING);
-    }
-    else if(rc!=SQLITE_OK){
-        RS_DBI_errorMessage("internal error: "
-                            "SQLite could not close the connection",
-                            RS_DBI_WARNING);
-    }
+SEXP isValidConnection(SEXP dbObj) {
+  RS_DBI_connection* con = R_ExternalPtrAddr(dbObj);
 
-    con->drvConnection = NULL;
-    RS_SQLite_freeException(con);
-    con->drvData = NULL;
-    RS_DBI_freeConnection(conHandle);
-    return ScalarLogical(1);
+  if (!con) return ScalarLogical(0);
+  if (!con->drvConnection) return ScalarLogical(0);
+  
+  return ScalarLogical(1);
 }
 
 int SQLite_decltype_to_type(const char* decltype)
@@ -1257,4 +1254,16 @@ SEXP RS_SQLite_copy_database(Con_Handle fromConHandle, Con_Handle toConHandle)
         RS_DBI_errorMessage(sqlite3_errmsg(dbTo), RS_DBI_ERROR);
     }
     return R_NilValue;
+}
+
+
+// Validation ------------------------------------------------------------------
+
+
+SEXP isValidResult(SEXP dbObj) {
+  RS_DBI_resultSet *res = R_ExternalPtrAddr(dbObj);
+
+  if (!res) return ScalarLogical(0);
+
+  return ScalarLogical(1);
 }

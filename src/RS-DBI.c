@@ -19,13 +19,6 @@
 #include "RS-DBI.h"
 #include <R_ext/RS.h>
 
-static int HANDLE_LENGTH(SEXP handle)
-{
-    SEXP h = R_ExternalPtrProtected(handle);
-    if (TYPEOF(h) == VECSXP) h = VECTOR_ELT(h, 0);
-    return Rf_length(h);
-}
-
 SEXP RS_DBI_allocConnection() {
   RS_DBI_connection* con = (RS_DBI_connection *) malloc(sizeof(RS_DBI_connection));
   if (!con){
@@ -115,7 +108,7 @@ RS_DBI_allocResultSet(SEXP conHandle)
 
   con = RS_DBI_getConnection(conHandle);
   indx = RS_DBI_newEntry(con->resultSetIds, 1);
-  if(indx < 0){
+  if (indx < 0){
     char msg[128], fmt[128];
     (void) strcpy(fmt, "cannot allocate a new resultSet -- ");
     (void) strcat(fmt, "maximum of %d resultSets already reached");
@@ -124,7 +117,7 @@ RS_DBI_allocResultSet(SEXP conHandle)
   }
 
   result = (RS_DBI_resultSet *) malloc(sizeof(RS_DBI_resultSet));
-  if(!result){
+  if (!result){
     char *errMsg = "could not malloc dbResultSet";
     RS_DBI_freeEntry(con->resultSetIds, indx);
     RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
@@ -272,34 +265,6 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
   SET_NAMES(output, names);
   UNPROTECT(2);
   return;
-}
-
-SEXP  		/* boolean */
-RS_DBI_validHandle(Db_Handle handle)
-{ 
-    SEXP valid, contents;
-    int  handleType = 0;
-    if (TYPEOF(handle) != EXTPTRSXP) return 0;
-    contents = R_ExternalPtrProtected(handle);
-    if (TYPEOF(contents) == VECSXP) {
-        handleType = RES_HANDLE_TYPE;
-    } else {
-        switch(length(contents)) {
-        case MGR_HANDLE_TYPE:
-            handleType = MGR_HANDLE_TYPE;
-            break;
-        case CON_HANDLE_TYPE:
-            handleType = CON_HANDLE_TYPE;
-            break;
-        case RES_HANDLE_TYPE:
-            handleType = RES_HANDLE_TYPE;
-            break;
-        }
-    }
-    PROTECT(valid = NEW_LOGICAL(1));
-    LGL_EL(valid,0) = is_validHandle(handle, handleType);
-    UNPROTECT(1);
-    return valid;
 }
 
 void 
@@ -576,34 +541,6 @@ RS_DBI_freeEntry(int *table, int indx)
   int empty_val = -1;
   table[indx] = empty_val;
   return;
-}
-
-int 
-is_validHandle(SEXP handle, HANDLE_TYPE handleType)
-{
-    SQLiteDriver *mgr;
-    RS_DBI_connection *con;
-
-  if (TYPEOF(handle) != EXTPTRSXP) return 0;
-  int len = HANDLE_LENGTH(handle);
-  if(len<handleType || handleType<1 || handleType>3) 
-    return 0;
-
-  /* at least we have a potential valid dbManager */
-  mgr = getDriver();
-  if(!mgr) return 0;   /* expired manager*/
-  if(handleType == MGR_HANDLE_TYPE) return 1;     /* valid manager id */
-
-  /* ... on to connections */
-  con = R_ExternalPtrAddr(handle);
-  if (!con) return 0;
-  if(!con->resultSets) return 0;       /* un-initialized (invalid) */
-  if(handleType==CON_HANDLE_TYPE) return 1; /* valid connection id */
-
-  /* .. on to resultSets */
-  if(!con->resultSets[0]) return 0;
-
-  return 1;
 }
 
 SEXP     /* named list */

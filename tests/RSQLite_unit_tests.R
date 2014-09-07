@@ -1,3 +1,0 @@
-library("RSQLite")
-RSQLite:::.test()
-

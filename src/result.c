@@ -152,25 +152,21 @@ SQLiteFields* rsqlite_result_fields(SQLiteResult* result) {
         flds->type[j] = SQLITE_TYPE_INTEGER;
         flds->Sclass[j] = INTSXP;
         flds->length[j] = sizeof(int);
-        flds->isVarLength[j] = 0;
         break;
       case SQLITE_FLOAT:
         flds->type[j] = SQLITE_TYPE_REAL;
         flds->Sclass[j] = REALSXP;
         flds->length[j] = sizeof(double);
-        flds->isVarLength[j] = 0;
         break;
      case SQLITE_TEXT:
         flds->type[j] = SQLITE_TYPE_TEXT;
         flds->Sclass[j] = STRSXP;
-        flds->length[j] = -1;   /* unknown */
-        flds->isVarLength[j] = 1;
+        flds->length[j] = NA_INTEGER;
         break;
      case SQLITE_BLOB:
         flds->type[j] = SQLITE_TYPE_BLOB;
         flds->Sclass[j] = VECSXP;
-        flds->length[j] = -1;   /* unknown */
-        flds->isVarLength[j] = 1;
+        flds->length[j] = NA_INTEGER;
         break;
       case SQLITE_NULL:
         error("NULL column handling not implemented");

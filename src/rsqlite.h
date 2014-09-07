@@ -50,7 +50,6 @@ typedef struct SQLiteFields {
   char  **name;        /* DBMS field names */
   int  *type;          /* DBMS types */
   int  *length;        /* DBMS lengths in bytes */
-  int  *isVarLength;   /* DBMS variable-length char type */
   SEXPTYPE *Sclass;    /* R class */
 } SQLiteFields;
 

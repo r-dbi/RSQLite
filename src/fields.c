@@ -29,7 +29,6 @@ SQLiteFields* rsqlite_fields_alloc(int n) {
   flds->name = calloc(n, sizeof(char *));
   flds->type = calloc(n, sizeof(int));
   flds->length = calloc(n, sizeof(int));
-  flds->isVarLength = calloc(n, sizeof(int));
   flds->Sclass = calloc(n, sizeof(SEXPTYPE));
 
   return flds;
@@ -39,7 +38,6 @@ void rsqlite_fields_free (SQLiteFields *flds) {
   if(flds->name) free(flds->name);
   if(flds->type) free(flds->type);
   if(flds->length) free(flds->length);
-  if(flds->isVarLength) free(flds->isVarLength);
   if(flds->Sclass) free(flds->Sclass);
   free(flds);
   flds = NULL;

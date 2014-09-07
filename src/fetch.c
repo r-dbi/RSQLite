@@ -67,7 +67,7 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
   if(expand){
     for(j = 0; j < num_fields; j++){
       /* Note that in R-1.2.3 (at least) we need to protect SET_LENGTH */
-      s_tmp = LST_EL(output,j);
+      s_tmp = VECTOR_ELT(output, j);
       PROTECT(SET_LENGTH(s_tmp, num_rec));  
       SET_VECTOR_ELT(output, j, s_tmp);
       UNPROTECT(1);
@@ -102,7 +102,7 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
 
   PROTECT(names = NEW_CHARACTER(num_fields));
   for(j = 0; j< num_fields; j++){
-    SET_CHR_EL(names,j, mkChar(flds->name[j]));
+    SET_STRING_ELT(names,j, mkChar(flds->name[j]));
   }
   SET_NAMES(output, names);
   UNPROTECT(2);
@@ -311,7 +311,7 @@ bind_params_to_stmt(RS_SQLite_bindParams *params,
                 state = sqlite3_bind_int(db_statement, j+1, integer);
             break;
         case REALSXP:
-            number = NUM_EL(pdata, row);
+            number = REAL(pdata)[row];
             if (ISNA(number))
                 state = sqlite3_bind_null(db_statement, j+1);
             else
@@ -399,7 +399,7 @@ SEXP RS_SQLite_exec(SEXP conHandle, SEXP statement, SEXP bind_data)
     sqlite3_stmt *db_statement = NULL;
     int state, bind_count;
     int rows = 0, cols = 0;
-    char *dyn_statement = RS_DBI_copyString(CHR_EL(statement,0));
+    char *dyn_statement = RS_DBI_copyString(CHAR(asChar(statement)));
 
     /* Do we have a pending resultSet in the current connection?
      * SQLite only allows  one resultSet per connection.
@@ -537,53 +537,41 @@ RS_SQLite_createDataMappings(SEXP rsHandle) {
 
 /* Fills the output VECSXP with one row of data from the resultset
  */
-static void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
-                         RS_DBI_fields *flds)
-{
-    int j, null_item, blob_len;
-    SEXP rawv;
-    const Rbyte *blob_data;
-
-    for (j = 0; j < flds->num_fields; j++) {
-        null_item = (sqlite3_column_type(db_statement, j) == SQLITE_NULL);
-        switch (flds->Sclass[j]) {
-        case INTSXP:
-            if (null_item)
-                LST_INT_EL(output, j, row_idx) = NA_INTEGER;
-            else
-                LST_INT_EL(output, j, row_idx) =
-                    sqlite3_column_int(db_statement, j);
-            break;
-        case REALSXP:
-            if (null_item)
-                LST_NUM_EL(output,j,row_idx) = NA_REAL;
-            else
-                LST_NUM_EL(output,j,row_idx) =
-                    sqlite3_column_double(db_statement, j);
-            break;
-        case VECSXP:            /* BLOB */
-            if (null_item) {
-                rawv = R_NilValue;
-            } else {
-                blob_data = (const Rbyte *)sqlite3_column_blob(db_statement, j);
-                blob_len = sqlite3_column_bytes(db_statement, j);
-                PROTECT(rawv = allocVector(RAWSXP, blob_len));
-                memcpy(RAW(rawv), blob_data, blob_len * sizeof(Rbyte));
-            }
-            SET_VECTOR_ELT(VECTOR_ELT(output, j), row_idx, rawv);
-            if (rawv != R_NilValue) UNPROTECT(1);
-            break;
-        case STRSXP:
-            /* falls through */
-        default:
-            if (null_item)
-                SET_LST_CHR_EL(output,j,row_idx, NA_STRING);
-            else
-                SET_LST_CHR_EL(output,j,row_idx, /* cast for -Wall */
-                               mkChar((char*)sqlite3_column_text(db_statement, j)));
-            break;
-        }
+void fill_one_row(sqlite3_stmt *db_statement, SEXP output, int row_idx,
+                  RS_DBI_fields *flds) {
+  
+  for (int j = 0; j < flds->num_fields; j++) {
+    int is_null = (sqlite3_column_type(db_statement, j) == SQLITE_NULL);
+    
+    SEXP col = VECTOR_ELT(output, j);
+    
+    switch (flds->Sclass[j]) {
+      case INTSXP:
+        INTEGER(col)[row_idx] = is_null ? NA_INTEGER : 
+          sqlite3_column_int(db_statement, j);
+        break;
+      case REALSXP:
+        REAL(col)[row_idx] = is_null ? NA_REAL :
+          sqlite3_column_double(db_statement, j);
+        break;
+      case VECSXP:            /* BLOB */
+        if (is_null) continue;
+        
+        const Rbyte* blob_data = (const Rbyte *)sqlite3_column_blob(db_statement, j);
+        int blob_len = sqlite3_column_bytes(db_statement, j);
+        SEXP rawv = PROTECT(allocVector(RAWSXP, blob_len));
+        memcpy(RAW(rawv), blob_data, blob_len * sizeof(Rbyte));
+        SET_VECTOR_ELT(col, row_idx, rawv);
+        UNPROTECT(1);
+        break;
+      case STRSXP:
+        /* falls through */
+      default:
+        SET_STRING_ELT(col, row_idx, is_null ? NA_STRING : 
+          mkChar((char*) sqlite3_column_text(db_statement, j)));
+        break;
     }
+  }
 }
 
 static int do_select_step(RS_DBI_resultSet *res, int row_idx)
@@ -657,7 +645,7 @@ SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec) {
   RS_DBI_fields* flds = res->fields;
 
   int num_fields = flds->num_fields;
-  int num_rec = INT_EL(max_rec, 0);
+  int num_rec = asInteger(max_rec);
   int expand = (num_rec < 0);   /* dyn expand output to accommodate all rows*/
   if (expand || num_rec == 0) {
     num_rec = getDriver()->fetch_default_rec;
@@ -692,7 +680,7 @@ SEXP RS_SQLite_fetch(SEXP rsHandle, SEXP max_rec) {
     num_rec = row_idx;
     /* adjust the length of each of the members in the output_list */
     for (int j = 0; j<num_fields; j++) {
-      SEXP s_tmp = LST_EL(output, j);
+      SEXP s_tmp = VECTOR_ELT(output, j);
       PROTECT(SET_LENGTH(s_tmp, num_rec));
       SET_VECTOR_ELT(output, j, s_tmp);
       UNPROTECT(1);

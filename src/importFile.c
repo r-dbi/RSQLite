@@ -35,14 +35,14 @@ RS_SQLite_importFile(
     int              rc, skip;
     SEXP output;
 
-    s = CHR_EL(s_tablename, 0);
+    s = CHAR(asChar(s_tablename));
     zTable = (char *) malloc( strlen(s)+1);
     if(!zTable){
         error("could not allocate memory");
     }
     (void) strcpy(zTable, s);
 
-    s = CHR_EL(s_filename, 0);
+    s = CHAR(asChar(s_filename));
     zFile = (char *) malloc( strlen(s)+1);
     if(!zFile){
         free(zTable);
@@ -50,8 +50,8 @@ RS_SQLite_importFile(
     }
     (void) strcpy(zFile, s);
 
-    s = CHR_EL(s_separator, 0);
-    s1 = CHR_EL(s_eol, 0);
+    s = CHAR(asChar(s_separator));
+    s1 = CHAR(asChar(s_eol));
     zSep = (char *) malloc( strlen(s)+1);
     zEol = (char *) malloc(strlen(s1)+1);
     if(!zSep || !zEol){
@@ -63,7 +63,7 @@ RS_SQLite_importFile(
     }
     (void) strcpy(zSep, s);
     (void) strcpy(zEol, s1);
-    skip = INT_EL(s_skip, 0);
+    skip = asInteger(s_skip);
 
     rc = RS_sqlite_import(db_connection, zTable, zFile, zSep, zEol, skip);
 

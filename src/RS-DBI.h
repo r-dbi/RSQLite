@@ -40,8 +40,6 @@ typedef enum enum_dbi_exception {
 } DBI_EXCEPTION;
 
 
-#define RES_ID(handle) INTEGER(VECTOR_ELT(R_ExternalPtrProtected(handle), 0))[2]
-
 /* First, the following fully describes the field output by a select
  * (or select-like) statement, and the mappings from the internal
  * database types to S classes.  This structure contains the info we need

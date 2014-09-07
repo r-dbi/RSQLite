@@ -149,7 +149,6 @@ void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
     result = (RS_DBI_resultSet *) NULL;
 
     /* update connection's resultSet table */
-    /* indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(rsHandle)); */
     /* SQLite connections only ever have one result set */
     RS_DBI_freeEntry(con->resultSetIds, 0);
     con->resultSets[0] = NULL;

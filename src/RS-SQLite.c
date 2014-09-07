@@ -874,7 +874,6 @@ RS_SQLite_closeResultSet(SEXP resHandle)
        connection so that the connection can be gc'd.
      */
     SET_VECTOR_ELT(R_ExternalPtrProtected(resHandle), 1, R_NilValue);
-    RES_ID(resHandle) = -1;
     return ScalarLogical(1);
 }
 

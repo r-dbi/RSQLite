@@ -57,3 +57,22 @@ test_that("querying closed connection throws error", {
   dbDisconnect(db)
   expect_error(dbGetQuery(db, "select * from foo"), "expired")  
 })
+
+test_that("can connect to same db from multiple connections", {
+  dbfile <- tempfile()
+  con1 <- dbConnect(SQLite(), dbfile)  
+  con2 <- dbConnect(SQLite(), dbfile)
+  
+  dbWriteTable(con1, "mtcars", mtcars)
+  expect_equal(dbReadTable(con2, "mtcars"), mtcars)
+})
+
+test_that("temporary tables are connection local", {
+  dbfile <- tempfile()
+  con1 <- dbConnect(SQLite(), dbfile)  
+  con2 <- dbConnect(SQLite(), dbfile)
+
+  dbGetQuery(con1, "CREATE TEMPORARY TABLE temp (a TEXT)")
+  expect_true(dbExistsTable(con1, "temp"))
+  expect_false(dbExistsTable(con2, "temp"))  
+})

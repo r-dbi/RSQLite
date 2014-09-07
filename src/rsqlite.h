@@ -64,11 +64,11 @@ typedef struct st_sdbi_fields {
   SEXPTYPE *Sclass;        /* R/S class (type) -- may be overriden */
 } RS_DBI_fields;
 
-typedef struct st_sdbi_exception {
-  DBI_EXCEPTION  exceptionType; /* one of RS_DBI_WARN, RS_RBI_ERROR, etc */
-  int  errorNum;            /* SQL error number (possibly driver-dependent*/
-  char *errorMsg;           /* SQL error message */
-} RS_DBI_exception;
+
+typedef struct st_sqlite_err {
+   int  errorNum;
+   char *errorMsg;
+} RS_SQLite_exception;
 
 /* The RS-DBI resultSet consists of a pointer to the actual DBMS 
  * resultSet (e.g., MySQL, Oracle) possibly NULL,  plus the fields 
@@ -96,7 +96,7 @@ typedef struct st_sdbi_resultset {
 typedef struct st_sdbi_connection {
   void  *drvConnection;  /* pointer to the actual DBMS connection struct*/
   RS_DBI_resultSet  *resultSet;    /* vector to result set ptrs  */
-  RS_DBI_exception *exception;
+  RS_SQLite_exception *exception;
 } RS_DBI_connection;
 
 /* dbManager */
@@ -105,7 +105,6 @@ typedef struct st_sdbi_manager {
   int num_con;                     /* num of opened connections */
   int counter;                     /* num of connections handled so far*/
   int fetch_default_rec;           /* default num of records per fetch */
-  RS_DBI_exception *exception;    
 } SQLiteDriver;
 
 /* All RS_DBI functions and their signatures */
@@ -175,11 +174,6 @@ typedef struct st_sdbi_conParams {
   int  flags;
   char *vfs;
 } RS_SQLite_conParams;
-
-typedef struct st_sqlite_err {
-   int  errorNum;
-   char *errorMsg;
-} RS_SQLite_exception;
 
 /* Convert declared column type string to SQLite column type.
  * For example, "varchar" => SQLITE_TEXT

@@ -112,7 +112,7 @@ SEXP RS_SQLite_newConnection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
   if (!con){
     error("could not malloc dbConnection");
   }
-  con->exception = (RS_DBI_exception *) NULL;  
+  con->exception = (RS_SQLite_exception *) NULL;  
   con->resultSet = (RS_DBI_resultSet *) NULL;
 
   // Initialise SQLite3 database connection

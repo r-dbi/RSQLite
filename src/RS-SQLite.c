@@ -900,7 +900,6 @@ SEXP driverInfo() {
 
 SEXP connectionInfo(SEXP conHandle) {
   int info_count = 6, i = 0;
-  RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
 
   SEXP info = PROTECT(allocVector(VECSXP, info_count));
   SEXP info_nms = PROTECT(allocVector(STRSXP, info_count));
@@ -909,13 +908,6 @@ SEXP connectionInfo(SEXP conHandle) {
 
   SET_STRING_ELT(info_nms, i, mkChar("serverVersion"));
   SET_VECTOR_ELT(info, i++, mkString(SQLITE_VERSION));
-
-  SET_STRING_ELT(info_nms, i, mkChar("rsId"));
-  SEXP rsIds = PROTECT(allocVector(INTSXP, 1));
-  int nres = RS_DBI_listEntries(con->resultSetIds, 1, INTEGER(rsIds));
-  SET_LENGTH(rsIds, nres);
-  SET_VECTOR_ELT(info, i++, rsIds);
-  UNPROTECT(1);
 
   UNPROTECT(1);
   return info;

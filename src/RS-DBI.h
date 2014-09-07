@@ -122,20 +122,6 @@ void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con);
 RS_DBI_resultSet  *RS_DBI_getResultSet(SEXP rsHandle);
 SEXP RS_DBI_asResHandle(SEXP conxp);
 
-/* a simple object database (mapping table) -- it uses simple linear 
- * search (we don't expect to have more than a handful of simultaneous 
- * connections and/or resultSets. If this is not the case, we could
- * use a hash table, but I doubt it's worth it (famous last words!).
- * These are used for storing/retrieving object ids, such as
- * connection ids from the manager object, and resultSet ids from a 
- * connection object;  of course, this is transparent to the various
- * drivers -- they should deal with handles exclusively.
- */
-int  RS_DBI_newEntry(int *table, int length);
-int  RS_DBI_lookup(int *table, int length, int obj_id);
-int  RS_DBI_listEntries(int *table, int length, int *entries);
-void  RS_DBI_freeEntry(int *table, int indx);
-
 /* description of the fields in a result set */
 RS_DBI_fields *RS_DBI_allocFields(int num_fields);
 SEXP RS_DBI_getFieldDescriptions(RS_DBI_fields *flds);

@@ -102,18 +102,12 @@ RS_DBI_allocResultSet(SEXP conHandle)
 {
   RS_DBI_connection *con = NULL;
   RS_DBI_resultSet  *result = NULL;
-  int indx;
 
   con = RS_DBI_getConnection(conHandle);
-  indx = RS_DBI_newEntry(con->resultSetIds, 1);
-  if (indx < 0){
-    error("cannot allocate a new resultSet");
-  }
 
   result = (RS_DBI_resultSet *) malloc(sizeof(RS_DBI_resultSet));
   if (!result){
     char *errMsg = "could not malloc dbResultSet";
-    RS_DBI_freeEntry(con->resultSetIds, indx);
     error(errMsg);
   }
   result->drvResultSet = (void *) NULL; /* driver's own resultSet (cursor)*/
@@ -126,9 +120,9 @@ RS_DBI_allocResultSet(SEXP conHandle)
   result->fields = (RS_DBI_fields *) NULL;
   
   /* update connection's resultSet table */
-  con->num_res += 1;
-  con->resultSets[indx] = result;
-  con->resultSetIds[indx] = 1;
+  con->num_res = 1;
+  con->resultSets[0] = result;
+  con->resultSetIds[0] = 1;
 
   return RS_DBI_asResHandle(conHandle);
 }
@@ -148,11 +142,8 @@ void RS_DBI_freeResultSet0(RS_DBI_resultSet *result, RS_DBI_connection *con)
     free(result);
     result = (RS_DBI_resultSet *) NULL;
 
-    /* update connection's resultSet table */
-    /* SQLite connections only ever have one result set */
-    RS_DBI_freeEntry(con->resultSetIds, 0);
     con->resultSets[0] = NULL;
-    con->num_res -= 1;
+    con->num_res = 0;
 }
 
 void
@@ -402,65 +393,6 @@ RS_DBI_getResultSet(SEXP rsHandle)
   if(!con)
     error("internal error in RS_DBI_getResultSet: bad connection");
   return con->resultSets[0];
-}
-
-/* Very simple objectId (mapping) table. newEntry() returns an index
- * to an empty cell in table, and lookup() returns the position in the
- * table of obj_id.  Notice that we decided not to touch the entries
- * themselves to give total control to the invoking functions (this 
- * simplify error management in the invoking routines.)
- */
-int
-RS_DBI_newEntry(int *table, int length)
-{
-  int i, indx, empty_val;
-
-  indx = empty_val = -1;
-  for(i = 0; i < length; i++)
-    if(table[i] == empty_val){
-      indx = i;
-      break;
-    }
-  return indx;
-}
-
-int
-RS_DBI_lookup(int *table, int length, int obj_id)
-{
-  int i, indx = -1;
-  if (obj_id != -1) {
-      for (i = 0; i < length; ++i) {
-          if (table[i] == obj_id) {
-              indx = i;
-              break;
-          }
-      }
-  }
-  return indx;
-}
-
-/* return a list of entries pointed by *entries (we allocate the space,
- * but the caller should free() it).  The function returns the number
- * of entries.
- */
-int 
-RS_DBI_listEntries(int *table, int length, int *entries)
-{
-  int i,n;
-
-  for(i=n=0; i<length; i++){
-    if(table[i]<0) continue;
-    entries[n++] = table[i];
-  }
-  return n;
-}
-
-void 
-RS_DBI_freeEntry(int *table, int indx)
-{ /* no error checking!!! */
-  int empty_val = -1;
-  table[indx] = empty_val;
-  return;
 }
 
 SEXP     /* named list */

@@ -1,5 +1,3 @@
-build/RSQLite.Rcheck
-build/RSQLite_*.tar.gz
 .Rproj.user
 .Rhistory
 src/*.so

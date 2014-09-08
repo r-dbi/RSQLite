@@ -33,3 +33,21 @@ D. Ripley for comments, suggestions, bug reports, and/or patches.
 3. Update `DESCRIPTION` for included version of SQLite
 4. Update `NEWS`
 5. Build and check
+
+## Update datasets database
+
+RSQLite includes one SQLite database (accessible from `datasetsDb()` that contains all data frames in the datasets package. This is the code that created it.
+
+```R
+tables <- unique(data(package = "datasets")$results[, 3])
+tables <- tables[!grepl("(", tables, fixed = TRUE)]
+
+con <- dbConnect(SQLite(), "inst/db/datasets.sqlite")
+for(table in tables) {
+  df <- getExportedValue("datasets", table)
+  if (!is.data.frame(df)) next
+  
+  message("Creating table: ", table)
+  dbWriteTable(con, table, as.data.frame(df), overwrite = TRUE)
+}
+```

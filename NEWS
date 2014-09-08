@@ -1,5 +1,8 @@
 Version 0.11.6.9000
 
+- Added `datasetsDb()`, a bundled SQLite database containing all data frames 
+  in the datasets package (#15).
+
 - RSQLite is now more forgiving if you forget to close a result set - it will
   close it for you, with a warning. It's still good practice to clean up
   after yourself, but you don't have to.

@@ -31,5 +31,6 @@ Collate:
     'Object.R'
     'Summary.R'
     'Utils.R'
+    'datasetsDb.R'
     'dbGetInfo.R'
     'zzz.R'

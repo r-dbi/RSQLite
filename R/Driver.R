@@ -52,7 +52,7 @@ setClass("SQLiteDriver",
 #' @rdname SQLiteDriver-class
 #' @export
 #' @import methods DBI
-#' @useDynLib RSQLite initDriver
+#' @useDynLib RSQLite rsqlite_driver_init
 SQLite <- function(max.con = 200L, fetch.default.rec = 500, 
                    force.reload = FALSE, shared.cache = FALSE) {
 
@@ -62,7 +62,7 @@ SQLite <- function(max.con = 200L, fetch.default.rec = 500,
   records <- as.integer(fetch.default.rec)
   cache <- as.logical(shared.cache)
   
-  .Call(initDriver, records, cache)
+  .Call(rsqlite_driver_init, records, cache)
   new("SQLiteDriver")
 }
 
@@ -71,7 +71,7 @@ SQLite <- function(max.con = 200L, fetch.default.rec = 500,
 #' @param drv Object created by \code{\link{SQLite}}
 #' @param ... Ignored. Needed for compatibility with generic.
 #' @return A logical indicating whether the operation succeeded or not.
-#' @useDynLib RSQLite closeDriver
+#' @useDynLib RSQLite rsqlite_driver_close
 #' @export
 #' @examples
 #' \dontrun{
@@ -79,5 +79,5 @@ SQLite <- function(max.con = 200L, fetch.default.rec = 500,
 #' dbUnloadDriver(db)
 #' }
 setMethod("dbUnloadDriver", "SQLiteDriver", function(drv, ...) {
-  .Call(closeDriver)  
+  .Call(rsqlite_driver_close)  
 })

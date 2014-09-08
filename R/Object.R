@@ -75,9 +75,9 @@ sqliteDataType <- function(obj, ...) {
 NULL
 
 #' @rdname dbIsValid
-#' @useDynLib RSQLite isValidDriver
+#' @useDynLib RSQLite rsqlite_driver_valid
 setMethod("dbIsValid", "SQLiteDriver", function(dbObj) {
-  .Call(isValidDriver)
+  .Call(rsqlite_driver_valid)
 })
 #' @rdname dbIsValid
 #' @useDynLib RSQLite isValidConnection

@@ -137,9 +137,11 @@ SEXP close_connection(SEXP conHandle);
 
 // Driver ----------------------------------------------------------------------
 
-SQLiteDriver* getDriver();
-void initDriver(SEXP records_, SEXP cache_);
-SEXP RS_SQLite_close(SEXP mgrHandle);
+SQLiteDriver* rsqlite_driver();
+void          rsqlite_driver_init(SEXP records_, SEXP cache_);
+SEXP          rsqlite_driver_close();
+SEXP          rsqlite_driver_valid();
+SEXP          rsqlite_driver_info();
 
 // Utilities -------------------------------------------------------------------
 

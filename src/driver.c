@@ -24,12 +24,12 @@ char *compiledVersion = SQLITE_VERSION;
 
 static SQLiteDriver *dbManager = NULL;
 
-SQLiteDriver* getDriver() {
+SQLiteDriver* rsqlite_driver() {
   if (!dbManager) error("Corrupt dbManager handle.");
   return dbManager;
 }
 
-void initDriver(SEXP records_, SEXP cache_) {
+void rsqlite_driver_init(SEXP records_, SEXP cache_) {
   if (dbManager) return; // Already allocated
 
   const char *clientVersion = sqlite3_libversion();
@@ -58,8 +58,8 @@ void initDriver(SEXP records_, SEXP cache_) {
   return;
 }
 
-SEXP closeDriver() {
-  SQLiteDriver *mgr = getDriver();
+SEXP rsqlite_driver_close() {
+  SQLiteDriver *mgr = rsqlite_driver();
   if (mgr->num_con) {
     error("Open connections -- close them first");    
   }
@@ -69,15 +69,15 @@ SEXP closeDriver() {
 }
 
 
-SEXP isValidDriver() {
-  if (!getDriver()) return ScalarLogical(0);
+SEXP rsqlite_driver_valid() {
+  if (!rsqlite_driver()) return ScalarLogical(0);
       
   return ScalarLogical(1);
 }
 
 
-SEXP driverInfo() {
-  SQLiteDriver* mgr = getDriver();
+SEXP rsqlite_driver_info() {
+  SQLiteDriver* mgr = rsqlite_driver();
   
   SEXP info = PROTECT(allocVector(VECSXP, 5));
   SEXP info_nms = PROTECT(allocVector(STRSXP, 5));

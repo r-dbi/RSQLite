@@ -80,7 +80,7 @@ SEXP new_connection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
   con->drvConnection = db_connection;
   
   // Finally, update connection table in driver
-  SQLiteDriver* driver = getDriver();
+  SQLiteDriver* driver = rsqlite_driver();
   driver->num_con += 1;
   driver->counter += 1;
   
@@ -110,7 +110,7 @@ SEXP close_connection(SEXP handle) {
   rsqlite_exception_free(con);
 
   // update driver connection table
-  SQLiteDriver* drv = getDriver();
+  SQLiteDriver* drv = rsqlite_driver();
   drv->num_con -= 1;
 
   free(con);

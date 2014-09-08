@@ -118,9 +118,11 @@ void           rsqlite_output_expand(SEXP output, SQLiteFields *flds, int num_re
 
 SEXP           rsqlite_query_send(SEXP handle, SEXP statement, SEXP bind_data);
 SEXP           rsqlite_query_fetch(SEXP handle, SEXP max_rec);
+
+// Param binding 
+
 RSQLiteParams* RS_SQLite_createParameterBinding(int n, SEXP bind_data, sqlite3_stmt *stmt, char *errorMsg);
 void RS_SQLite_freeParameterBinding(RSQLiteParams **);
-
 
 // Exception -------------------------------------------------------------------
 

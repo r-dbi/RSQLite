@@ -8,3 +8,4 @@ src/Makevars
 inst/include
 config.status
 a.out.dSYM
+autom4te.cache

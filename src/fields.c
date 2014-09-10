@@ -15,18 +15,18 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
- 
- #include "rsqlite.h"
+
+#include "rsqlite.h"
 
 SQLiteFields* rsqlite_fields_alloc(int n) {
-  SQLiteFields *flds;
+  SQLiteFields* flds;
 
   flds = malloc(sizeof(SQLiteFields));
   if (!flds) {
     error("Could not malloc SQLiteFields.");
   }
   flds->num_fields = n;
-  flds->name = calloc(n, sizeof(char *));
+  flds->name = calloc(n, sizeof(char*));
   flds->type = calloc(n, sizeof(int));
   flds->length = calloc(n, sizeof(int));
   flds->Sclass = calloc(n, sizeof(SEXPTYPE));
@@ -34,17 +34,17 @@ SQLiteFields* rsqlite_fields_alloc(int n) {
   return flds;
 }
 
-void rsqlite_fields_free (SQLiteFields *flds) {
-  if(flds->name) free(flds->name);
-  if(flds->type) free(flds->type);
-  if(flds->length) free(flds->length);
-  if(flds->Sclass) free(flds->Sclass);
+void rsqlite_fields_free(SQLiteFields* flds) {
+  if (flds->name) free(flds->name);
+  if (flds->type) free(flds->type);
+  if (flds->length) free(flds->length);
+  if (flds->Sclass) free(flds->Sclass);
   free(flds);
   flds = NULL;
   return;
 }
 
-SEXP rsqlite_field_info(SQLiteFields *flds) {
+SEXP rsqlite_field_info(SQLiteFields* flds) {
   int n = flds ? flds->num_fields : 0;
 
   SEXP info = PROTECT(allocVector(VECSXP, 4));
@@ -69,7 +69,7 @@ SEXP rsqlite_field_info(SQLiteFields *flds) {
   }
   SET_VECTOR_ELT(info, i++, sclass);
   UNPROTECT(1);
-  
+
   SET_STRING_ELT(info_nms, i, mkChar("type"));
   SEXP types = PROTECT(allocVector(STRSXP, n));
   for (int j = 0; j < n; j++) {
@@ -78,7 +78,7 @@ SEXP rsqlite_field_info(SQLiteFields *flds) {
   }
   SET_VECTOR_ELT(info, i++, types);
   UNPROTECT(1);
-  
+
   SET_STRING_ELT(info_nms, i, mkChar("len"));
   SEXP lens = PROTECT(allocVector(INTSXP, n));
   for (int j = 0; j < n; j++) {

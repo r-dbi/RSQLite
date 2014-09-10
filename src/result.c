@@ -23,62 +23,62 @@ void rsqlite_result_alloc(SQLiteConnection* con) {
   if (!result) {
     error("could not malloc dbResultSet");
   }
-  result->drvResultSet = NULL; 
-  result->drvData = NULL; 
+  result->drvResultSet = NULL;
+  result->drvData = NULL;
   result->statement = NULL;
   result->isSelect = -1;
   result->rowsAffected = -1;
   result->rowCount = 0;
   result->completed = -1;
   result->fields = NULL;
-  
+
   con->resultSet = result;
 }
 
 void rsqlite_result_free(SQLiteConnection* con) {
   SQLiteResult* result = con->resultSet;
-    
+
   if (result->drvResultSet) {
     sqlite3_finalize(result->drvResultSet);
     result->drvResultSet = NULL;
   }
   if (result->drvData) {
-    RSQLiteParams *params = result->drvData;
+    RSQLiteParams* params = result->drvData;
     R_ReleaseObject(params->data);
     RS_SQLite_freeParameterBinding(&params);
     result->drvData = NULL;
   }
-  
+
   if (result->statement)
     free(result->statement);
   if (result->fields)
     rsqlite_fields_free(result->fields);
-  
+
   free(result);
-  
+
   con->resultSet = NULL;
 }
 
 SEXP rsqlite_result_free_handle(SEXP handle) {
   SQLiteConnection* con = get_connection(handle);
   rsqlite_result_free(con);
-  
+
   return ScalarLogical(1);
 }
 
 
 SQLiteResult* rsqlite_result_from_handle(SEXP handle) {
   SQLiteConnection* con = get_connection(handle);
-  
+
   if (!con->resultSet) {
     error("Invalid result");
   }
-  
+
   return con->resultSet;
 }
 
 SEXP rsqlite_result_valid(SEXP handle) {
-  SQLiteConnection *con = get_connection(handle);
+  SQLiteConnection* con = get_connection(handle);
   if (!con->resultSet)
     return ScalarLogical(0);
 
@@ -108,7 +108,7 @@ SEXP rsqlite_result_info(SEXP handle) {
 
   SET_STRING_ELT(info_nms, i, mkChar("completed"));
   SET_VECTOR_ELT(info, i++, ScalarInteger(result->completed));
-  
+
   SET_STRING_ELT(info_nms, i, mkChar("fields"));
   SEXP fields = PROTECT(rsqlite_field_info(result->fields));
   SET_VECTOR_ELT(info, i++, fields);
@@ -120,19 +120,19 @@ SEXP rsqlite_result_info(SEXP handle) {
 
 SQLiteFields* rsqlite_result_fields(SQLiteResult* result) {
   // Already computed, return cached result
-  if (result->fields) 
+  if (result->fields)
     return result->fields;
-  
-  sqlite3_stmt* db_statement = (sqlite3_stmt *) result->drvResultSet;
+
+  sqlite3_stmt* db_statement = (sqlite3_stmt*) result->drvResultSet;
 
   int ncol = sqlite3_column_count(db_statement);
   SQLiteFields* flds = rsqlite_fields_alloc(ncol);
 
-  for(int j = 0; j < ncol; j++){
+  for (int j = 0; j < ncol; j++) {
     char* col_name = (char*) sqlite3_column_name(db_statement, j);
     if (col_name) {
       flds->name[j] = RS_DBI_copyString(col_name);
-    } else { 
+    } else {
       // weird failure
       rsqlite_fields_free(flds);
       flds = NULL;
@@ -143,11 +143,11 @@ SQLiteFields* rsqlite_result_fields(SQLiteResult* result) {
     // give up.
     int col_type = sqlite3_column_type(db_statement, j);
     if (col_type == SQLITE_NULL) {
-        /* try to get type from origin column */
-        const char* col_decltype = sqlite3_column_decltype(db_statement, j);
-        col_type = SQLite_decltype_to_type(col_decltype);
+      /* try to get type from origin column */
+      const char* col_decltype = sqlite3_column_decltype(db_statement, j);
+      col_type = SQLite_decltype_to_type(col_decltype);
     }
-    switch(col_type) {
+    switch (col_type) {
       case SQLITE_INTEGER:
         flds->type[j] = SQLITE_TYPE_INTEGER;
         flds->Sclass[j] = INTSXP;
@@ -158,12 +158,12 @@ SQLiteFields* rsqlite_result_fields(SQLiteResult* result) {
         flds->Sclass[j] = REALSXP;
         flds->length[j] = sizeof(double);
         break;
-     case SQLITE_TEXT:
+      case SQLITE_TEXT:
         flds->type[j] = SQLITE_TYPE_TEXT;
         flds->Sclass[j] = STRSXP;
         flds->length[j] = NA_INTEGER;
         break;
-     case SQLITE_BLOB:
+      case SQLITE_BLOB:
         flds->type[j] = SQLITE_TYPE_BLOB;
         flds->Sclass[j] = VECSXP;
         flds->length[j] = NA_INTEGER;

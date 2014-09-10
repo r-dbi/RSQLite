@@ -20,11 +20,11 @@
 
 static void _finalize_connection_handle(SEXP xp) {
   if (!R_ExternalPtrAddr(xp)) return;
-  
+
   close_connection(xp);
 }
 
-SEXP connection_handle(SQLiteConnection *con) {
+SEXP connection_handle(SQLiteConnection* con) {
   SEXP handle = R_MakeExternalPtr(con, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(handle, _finalize_connection_handle, 1);
   return handle;
@@ -32,40 +32,40 @@ SEXP connection_handle(SQLiteConnection *con) {
 
 SQLiteConnection* get_connection(SEXP handle) {
   SQLiteConnection* con = (SQLiteConnection*) R_ExternalPtrAddr(handle);
-  if (!con) 
+  if (!con)
     error("expired SQLiteConnection");
-  
+
   return con;
 }
 
-SEXP new_connection(SEXP dbname_, SEXP allow_ext_, SEXP flags_, 
-                             SEXP vfs_) {
+SEXP new_connection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
+                    SEXP vfs_) {
   const char* dbname = CHAR(asChar(dbname_));
-  
+
   if (!isLogical(allow_ext_)) {
     error("'allow_ext' must be TRUE or FALSE");
   }
   int allow_ext = asLogical(allow_ext_);
   if (allow_ext == NA_LOGICAL)
     error("'allow_ext' must be TRUE or FALSE, not NA");
-  
+
   if (!isInteger(flags_)) {
     error("'flags' must be integer");
   }
   int flags = asInteger(flags_);
-  
+
   const char* vfs = NULL;
   if (!isNull(vfs_)) {
     vfs = CHAR(asChar(vfs_));
     if (strlen(vfs) == 0) vfs = NULL;
   }
-  
+
   // Create external pointer to connection object
   SQLiteConnection* con = malloc(sizeof(SQLiteConnection));
   if (!con) {
     error("could not malloc dbConnection");
   }
-  con->exception = NULL;  
+  con->exception = NULL;
   con->resultSet = NULL;
 
   // Initialise SQLite3 database connection
@@ -78,20 +78,20 @@ SEXP new_connection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
     sqlite3_enable_load_extension(db_connection, 1);
   }
   con->drvConnection = db_connection;
-  
+
   // Finally, update connection table in driver
   SQLiteDriver* driver = rsqlite_driver();
   driver->num_con += 1;
   driver->counter += 1;
-  
+
   rsqlite_exception_set(con, SQLITE_OK, "OK");
-    
+
   return connection_handle(con);
 }
 
 SEXP close_connection(SEXP handle) {
-  SQLiteConnection *con = get_connection(handle);
-  
+  SQLiteConnection* con = get_connection(handle);
+
   // close & free result set (if open)
   if (con->resultSet) {
     warning("Closing open result set");
@@ -103,7 +103,7 @@ SEXP close_connection(SEXP handle) {
   int rc = sqlite3_close(db_connection);  /* it also frees db_connection */
   if (rc == SQLITE_BUSY) {
     warning("Unfinalized prepared statements.");
-  } else if(rc!=SQLITE_OK){
+  } else if (rc != SQLITE_OK) {
     warning("Internal error: could not close SQLte connection.");
   }
   con->drvConnection = NULL;
@@ -116,24 +116,24 @@ SEXP close_connection(SEXP handle) {
   free(con);
   con = NULL;
   R_ClearExternalPtr(handle);
-  
+
   return ScalarLogical(1);
 }
 
 SEXP isValidConnection(SEXP dbObj) {
   SQLiteConnection* con = R_ExternalPtrAddr(dbObj);
 
-  if (!con) 
+  if (!con)
     return ScalarLogical(0);
-  if (!con->drvConnection) 
+  if (!con->drvConnection)
     return ScalarLogical(0);
-  
+
   return ScalarLogical(1);
 }
 
 SEXP connectionInfo(SEXP conHandle) {
   SQLiteConnection* con = get_connection(conHandle);
-  
+
   SEXP info = PROTECT(allocVector(VECSXP, 2));
   SEXP info_nms = PROTECT(allocVector(STRSXP, 2));
   SET_NAMES(info, info_nms);

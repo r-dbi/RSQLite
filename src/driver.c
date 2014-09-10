@@ -18,11 +18,11 @@
 
 #include "rsqlite.h"
 
-char *compiledVersion = SQLITE_VERSION;
+char* compiledVersion = SQLITE_VERSION;
 
 // Driver ----------------------------------------------------------------------
 
-static SQLiteDriver *dbManager = NULL;
+static SQLiteDriver* dbManager = NULL;
 
 SQLiteDriver* rsqlite_driver() {
   if (!dbManager) error("Corrupt dbManager handle.");
@@ -32,36 +32,36 @@ SQLiteDriver* rsqlite_driver() {
 void rsqlite_driver_init(SEXP records_, SEXP cache_) {
   if (dbManager) return; // Already allocated
 
-  const char *clientVersion = sqlite3_libversion();
+  const char* clientVersion = sqlite3_libversion();
   if (strcmp(clientVersion, compiledVersion)) {
     error("SQLite mismatch between compiled version %s and runtime version %s",
-      compiledVersion, clientVersion
+        compiledVersion, clientVersion
     );
   }
-  
+
   dbManager = malloc(sizeof(SQLiteDriver));
   if (!dbManager) {
     error("could not malloc the dbManger");
   }
-    
+
   dbManager->counter = 0;
   dbManager->num_con = 0;
   dbManager->fetch_default_rec = asInteger(records_);
-  
+
   if (asLogical(cache_)) {
     dbManager->shared_cache = 1;
     sqlite3_enable_shared_cache(1);
   } else {
     dbManager->shared_cache = 0;
   }
-  
+
   return;
 }
 
 SEXP rsqlite_driver_close() {
-  SQLiteDriver *mgr = rsqlite_driver();
+  SQLiteDriver* mgr = rsqlite_driver();
   if (mgr->num_con) {
-    error("Open connections -- close them first");    
+    error("Open connections -- close them first");
   }
   sqlite3_enable_shared_cache(0);
 
@@ -71,14 +71,14 @@ SEXP rsqlite_driver_close() {
 
 SEXP rsqlite_driver_valid() {
   if (!rsqlite_driver()) return ScalarLogical(0);
-      
+
   return ScalarLogical(1);
 }
 
 
 SEXP rsqlite_driver_info() {
   SQLiteDriver* mgr = rsqlite_driver();
-  
+
   SEXP info = PROTECT(allocVector(VECSXP, 5));
   SEXP info_nms = PROTECT(allocVector(STRSXP, 5));
   SET_NAMES(info, info_nms);
@@ -99,7 +99,7 @@ SEXP rsqlite_driver_info() {
 
   SET_STRING_ELT(info_nms, i, mkChar("shared_cache"));
   SET_VECTOR_ELT(info, i++, ScalarLogical(mgr->shared_cache));
-  
+
   UNPROTECT(1);
   return info;
 }

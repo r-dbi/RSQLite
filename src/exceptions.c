@@ -18,7 +18,7 @@
 
 #include "rsqlite.h"
 
-void rsqlite_exception_set(SQLiteConnection *con, int err_no, const char *err_msg) {
+void rsqlite_exception_set(SQLiteConnection* con, int err_no, const char* err_msg) {
 
   RSQLiteException* ex = con->exception;
   if (!ex) {
@@ -35,23 +35,23 @@ void rsqlite_exception_set(SQLiteConnection *con, int err_no, const char *err_ms
   ex->errorNum = err_no;
   if (err_msg) {
     ex->errorMsg = RS_DBI_copyString(err_msg);
-  } else { 
+  } else {
     ex->errorMsg = NULL;
   }
-  
+
   con->exception = ex;
   return;
 }
 
-void rsqlite_exception_free(SQLiteConnection *con) {
-  RSQLiteException *ex = con->exception;
+void rsqlite_exception_free(SQLiteConnection* con) {
+  RSQLiteException* ex = con->exception;
 
-  if (!ex) 
+  if (!ex)
     return;
-  if (ex->errorMsg) 
+  if (ex->errorMsg)
     free(ex->errorMsg);
   free(ex);
-  
+
   con->exception = NULL;
   return;
 }
@@ -62,15 +62,15 @@ SEXP rsqlite_exception_info(SEXP handle) {
     error("internal error: corrupt connection handle");
 
   RSQLiteException* err = con->exception;
-  
+
   SEXP output = PROTECT(allocVector(VECSXP, 2));
   SEXP output_nms = PROTECT(allocVector(STRSXP, 2));
   SET_NAMES(output, output_nms);
   UNPROTECT(1);
-  
+
   SET_STRING_ELT(output_nms, 0, mkChar("errorNum"));
   SET_VECTOR_ELT(output, 0, ScalarInteger(err->errorNum));
-  
+
   SET_STRING_ELT(output_nms, 1, mkChar("errorMsg"));
   SET_VECTOR_ELT(output, 1, mkString(err->errorMsg));
 

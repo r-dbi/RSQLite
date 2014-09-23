@@ -12,7 +12,7 @@ Authors@R: as.person(c(
 Description: Database Interface R driver for SQLite.
     This package embeds the SQLite database engine in R and
     provides an interface compliant with the DBI package.
-    The source for the SQLite engine (version 3.8.4.2) is included.
+    The source for the SQLite engine (version 3.8.6) is included.
 Depends:
     R (>= 2.10.0),
     DBI (>= 0.3.0.9000),

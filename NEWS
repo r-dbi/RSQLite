@@ -1,5 +1,8 @@
 Version 0.11.6.9000
 
+- Inlined `RSQLite.extfuns` - use `initExtension()` to load the many
+  useful extension functions (#44).
+
 - Added `datasetsDb()`, a bundled SQLite database containing all data frames 
   in the datasets package (#15).
 

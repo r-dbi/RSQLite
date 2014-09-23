@@ -25,5 +25,5 @@ setGeneric("dbGetPreparedQuery", function(conn, statement, bind.data, ...) {
 #' @keywords internal
 setGeneric("dbBeginTransaction", function(conn, ...) {
   .Deprecated("dbBegin")
-  dbBegin(...)
+  dbBegin(conn, ...)
 })

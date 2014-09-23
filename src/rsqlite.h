@@ -132,10 +132,9 @@ SEXP rsqlite_exception_info(SEXP handle);
 
 // Connection ------------------------------------------------------------------
 
-SQLiteConnection *get_connection(SEXP handle);
-SEXP connection_handle(SQLiteConnection *con);
-SEXP new_connection(SEXP dbfile, SEXP allow_ext, SEXP s_flags, SEXP s_vfs);
-SEXP close_connection(SEXP conHandle);
+SQLiteConnection* get_connection(SEXP handle);
+SEXP              new_connection(SEXP dbfile, SEXP allow_ext, SEXP s_flags, SEXP s_vfs);
+SEXP              close_connection(SEXP conHandle);
 
 // Driver ----------------------------------------------------------------------
 

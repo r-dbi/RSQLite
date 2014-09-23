@@ -24,12 +24,6 @@ static void _finalize_connection_handle(SEXP xp) {
   close_connection(xp);
 }
 
-SEXP connection_handle(SQLiteConnection* con) {
-  SEXP handle = R_MakeExternalPtr(con, R_NilValue, R_NilValue);
-  R_RegisterCFinalizerEx(handle, _finalize_connection_handle, 1);
-  return handle;
-}
-
 SQLiteConnection* get_connection(SEXP handle) {
   SQLiteConnection* con = (SQLiteConnection*) R_ExternalPtrAddr(handle);
   if (!con)
@@ -62,7 +56,7 @@ SEXP new_connection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
 
   // Create external pointer to connection object
   SQLiteConnection* con = malloc(sizeof(SQLiteConnection));
-  if (!con) {
+  if (con == NULL) {
     error("could not malloc dbConnection");
   }
   con->exception = NULL;
@@ -86,8 +80,12 @@ SEXP new_connection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
 
   rsqlite_exception_set(con, SQLITE_OK, "OK");
 
-  return connection_handle(con);
+  // Create handle
+  SEXP handle = R_MakeExternalPtr(con, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(handle, _finalize_connection_handle, 1);
+  return handle;
 }
+
 
 SEXP close_connection(SEXP handle) {
   SQLiteConnection* con = get_connection(handle);

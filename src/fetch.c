@@ -183,7 +183,7 @@ non_select_prepared_query(sqlite3_stmt* db_statement,
 
 
 SEXP rsqlite_query_send(SEXP handle, SEXP statement, SEXP bind_data) {
-  SQLiteConnection* con = get_connection(handle);
+  SQLiteConnection* con = rsqlite_connection_from_handle(handle);
   sqlite3* db_connection = con->drvConnection;
   sqlite3_stmt* db_statement = NULL;
   int state, bind_count;

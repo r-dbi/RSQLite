@@ -48,7 +48,7 @@ int RS_SQLite_get_row_count(sqlite3* db, const char* tname) {
 
 SEXP RS_SQLite_quick_column(SEXP conHandle, SEXP table, SEXP column) {
   SEXP ans = R_NilValue, rawv;
-  SQLiteConnection* con = get_connection(conHandle);
+  SQLiteConnection* con = rsqlite_connection_from_handle(conHandle);
   sqlite3* db_connection = (sqlite3*) con->drvConnection;
   sqlite3_stmt* stmt = NULL;
   int numrows, rc, i = 0, col_type, * intans = NULL, blob_len;

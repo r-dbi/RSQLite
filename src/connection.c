@@ -24,7 +24,7 @@ static void _finalize_connection_handle(SEXP xp) {
   close_connection(xp);
 }
 
-SQLiteConnection* get_connection(SEXP handle) {
+SQLiteConnection* rsqlite_connection_from_handle(SEXP handle) {
   SQLiteConnection* con = (SQLiteConnection*) R_ExternalPtrAddr(handle);
   if (!con)
     error("expired SQLiteConnection");
@@ -88,7 +88,7 @@ SEXP new_connection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
 
 
 SEXP close_connection(SEXP handle) {
-  SQLiteConnection* con = get_connection(handle);
+  SQLiteConnection* con = rsqlite_connection_from_handle(handle);
 
   // close & free result set (if open)
   if (con->resultSet) {
@@ -130,7 +130,7 @@ SEXP isValidConnection(SEXP dbObj) {
 }
 
 SEXP connectionInfo(SEXP conHandle) {
-  SQLiteConnection* con = get_connection(conHandle);
+  SQLiteConnection* con = rsqlite_connection_from_handle(conHandle);
 
   SEXP info = PROTECT(allocVector(VECSXP, 2));
   SEXP info_nms = PROTECT(allocVector(STRSXP, 2));

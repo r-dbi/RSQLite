@@ -57,7 +57,7 @@ void rsqlite_exception_free(SQLiteConnection* con) {
 }
 
 SEXP rsqlite_exception_info(SEXP handle) {
-  SQLiteConnection* con = get_connection(handle);
+  SQLiteConnection* con = rsqlite_connection_from_handle(handle);
   if (!con->drvConnection)
     error("internal error: corrupt connection handle");
 

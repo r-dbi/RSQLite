@@ -60,7 +60,7 @@ void rsqlite_result_free(SQLiteConnection* con) {
 }
 
 SEXP rsqlite_result_free_handle(SEXP handle) {
-  SQLiteConnection* con = get_connection(handle);
+  SQLiteConnection* con = rsqlite_connection_from_handle(handle);
   rsqlite_result_free(con);
 
   return ScalarLogical(1);
@@ -68,7 +68,7 @@ SEXP rsqlite_result_free_handle(SEXP handle) {
 
 
 SQLiteResult* rsqlite_result_from_handle(SEXP handle) {
-  SQLiteConnection* con = get_connection(handle);
+  SQLiteConnection* con = rsqlite_connection_from_handle(handle);
 
   if (!con->resultSet) {
     error("Invalid result");
@@ -78,7 +78,7 @@ SQLiteResult* rsqlite_result_from_handle(SEXP handle) {
 }
 
 SEXP rsqlite_result_valid(SEXP handle) {
-  SQLiteConnection* con = get_connection(handle);
+  SQLiteConnection* con = rsqlite_connection_from_handle(handle);
   if (!con->resultSet)
     return ScalarLogical(0);
 

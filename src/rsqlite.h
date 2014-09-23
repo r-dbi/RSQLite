@@ -132,7 +132,7 @@ SEXP rsqlite_exception_info(SEXP handle);
 
 // Connection ------------------------------------------------------------------
 
-SQLiteConnection* get_connection(SEXP handle);
+SQLiteConnection* rsqlite_connection_from_handle(SEXP handle);
 SEXP              new_connection(SEXP dbfile, SEXP allow_ext, SEXP s_flags, SEXP s_vfs);
 SEXP              close_connection(SEXP conHandle);
 

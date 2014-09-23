@@ -6,7 +6,8 @@ Authors@R: as.person(c(
     "David A. James [aut]",
     "Seth Falcon [aut]",
     "SQLite Authors (for the included SQLite sources) [ctb]",
-    "Liam Healy (for the include SQLite extensions) [ctb]"
+    "Liam Healy (for the include SQLite extensions) [ctb]",
+    "RStudio [cph]"
     ))
 Description: Database Interface R driver for SQLite.
     This package embeds the SQLite database engine in R and

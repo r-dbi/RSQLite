@@ -1,72 +1,77 @@
 # Version 1.0.0
 
-- Updated to SQLite 3.8.6
+## New features
 
-- Inlined `RSQLite.extfuns` - use `initExtension()` to load the many
-  useful extension functions (#44).
+- Updated to SQLite 3.8.6
 
 - Added `datasetsDb()`, a bundled SQLite database containing all data frames 
   in the datasets package (#15).
 
-- RSQLite is now more forgiving if you forget to close a result set - it will
+- Inlined `RSQLite.extfuns` - use `initExtension()` to load the many
+  useful extension functions (#44).
+
+- Methods no longer automatically clone the connection is there is an open
+  result set. This was implement inconsistently in a handful of places (#22).
+  RSQLite is now more forgiving if you forget to close a result set - it will
   close it for you, with a warning. It's still good practice to clean up
   after yourself, but you don't have to.
 
-- `idIsValid()` is deprecated. Please use `dbIsValid()` instead.
+- `dbBegin()`, `dbCommit()`, `dbRollback()` throw errors on failure, rather than 
+  return `FALSE`.  They all gain a `name` argument to specify named savepoints.
+
+- `dbFetch()` method added (`fetch()` will be deprecated in the future)
+
+- `dbRemoveTable()` throws errors on failure, rather than returning `FALSE`.
+
+- `dbWriteTable()` has been rewritten:
+
+    * It quotes field names using `dbQuoteIdentifier()`, rather
+      than use a flawed black-list based approach with name munging.
+
+    * It now throws errors on failure, rather than returning FALSE. 
+    
+    * It will automatically add row names only if they are character, not integer.
+    
+    * When loading a file from disk, `dbWriteTable()` will no longer
+      attempt to guess the correct values for `row.names` and `header` - instead
+      supply them explicitly if the defaults are incorrect. 
+    
+    * It uses named save points so it can be nested inside other 
+      transactions (#41). 
+    
+    * When given a zero-row data frame it will just creates the table 
+      definition (#35). 
+
+## Changes to objects
 
 - The `dbname`, `loadable.extensions`, `flags` and `vfs` properties of
   a SqliteConnection are now slots. Access them directly instead of using 
   `dbGetInfo()`.
 
-- `dbFetch()` no longer numbers row names sequentially between fetches.
+## Deprecated and removed functions
 
-- `dbWriteTable()` quotes field names using `dbQuoteIdentifier()`, rather
-  than use a flawed black-list based approach with name munging.
+- RSQLite is no longer nominally compatible with S (#39).
+
+- `idIsValid()` is deprecated. Please use `dbIsValid()` instead.
+
+- `dbBeginTransaction()` has been deprecated. Please use `dbBegin()` instead.
+
+- `dbCallProc()` method removed, since generic is now deprecated.
 
 - Renamed `dbBuildTableDefinition()` to `sqliteBuildTableDefinition()` 
   to avoid implying it's a DBI generic. Old function is aliased to new with
   a warning.
 
+- `dbFetch()` no longer numbers row names sequentially between fetches.
+
 - `safe.write()` is no longer exported as it shouldn't be part of the 
   public RSQLite interface (#26).
 
-- `dbBegin()`, `dbCommit()` and `dbRollback()` gain a named argument to
-  specify named savepoints.
-
-- Remove SqliteObject and dbObject classes, modifying SqliteDriver, 
-  SqliteConnection, and SqliteResult to use composition instead of multiple
-  inheritance.
-
-- `dbWriteTable()` just creates the table definition when given a zero-row
-  data frame (#35).
-
-- Methods no longer automatically clone the connection is there is an open
-  result set. This was implement inconsistently in a handful of places - it's
-  better to always clean up after yourself (#22).
-
-- `dbBegin()`, `dbCommit()`, `dbRollback()` and `dbRemoveTable()` now throw
-  errors on failure, rather than return `FALSE`.
-
-- `dbWriteTable()` now throws errors on failure, rather than returning
-  FALSE. It will automatically add row names only if they are character,
-  not integer.  When loading a file from disk, `dbWriteTable()` will no longer
-  attempt to guess the correct values for `row.names` and `header` - instead
-  supply them explicitly if the defaults are incorrect. It now uses 
-  named save points so `dbWriteTable()` can be nested inside other 
-  transactions (#41).
-
-- `dbBeginTransaction()` has been deprecated. Please use `dbBegin()` instead.
-  (#)
-
-- RSQLite is no longer nominally compatible with S (#39).
-
-- All tests have been converted from RUnit to testthat.
-
 - Internal `sqlite*()` functions are no longer exported (#20).
 
-- `dbFetch()` method added (`fetch()` will be deprecated in the future)
-
-- `dbCallProc()` method removed, since generic is now deprecated.
+- Removed `SqliteObject` and `dbObject` classes, modifying `SqliteDriver`, 
+  `SqliteConnection`, and `SqliteResult` to use composition instead of multiple
+  inheritance.
 
 # Version 0.11.6
 

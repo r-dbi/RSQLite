@@ -29,10 +29,10 @@ setMethod("dbGetInfo", "SQLiteDriver", function(dbObj) {
 
 #' @rdname dbGetInfo
 #' @export
-#' @useDynLib RSQLite connectionInfo
+#' @useDynLib RSQLite rsqlite_connection_info
 setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
   check_valid(dbObj)
-  info <- .Call(connectionInfo, dbObj@Id)
+  info <- .Call(rsqlite_connection_info, dbObj@Id)
   info
 })
 

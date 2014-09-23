@@ -134,7 +134,9 @@ SEXP rsqlite_exception_info(SEXP handle);
 
 SQLiteConnection* rsqlite_connection_from_handle(SEXP handle);
 SEXP              rsqlite_connection_create(SEXP dbfile, SEXP allow_ext, SEXP s_flags, SEXP s_vfs);
-SEXP              close_connection(SEXP conHandle);
+SEXP              rsqlite_connection_destroy(SEXP conHandle);
+SEXP              rsqlite_connection_valid(SEXP dbObj);
+SEXP              rsqlite_connection_info(SEXP conHandle);
 
 // Driver ----------------------------------------------------------------------
 

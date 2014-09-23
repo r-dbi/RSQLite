@@ -21,7 +21,7 @@
 static void _finalize_connection_handle(SEXP xp) {
   if (!R_ExternalPtrAddr(xp)) return;
 
-  close_connection(xp);
+  rsqlite_connection_destroy(xp);
 }
 
 SQLiteConnection* rsqlite_connection_from_handle(SEXP handle) {
@@ -87,7 +87,7 @@ SEXP rsqlite_connection_create(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
 }
 
 
-SEXP close_connection(SEXP handle) {
+SEXP rsqlite_connection_destroy(SEXP handle) {
   SQLiteConnection* con = rsqlite_connection_from_handle(handle);
 
   // close & free result set (if open)
@@ -118,7 +118,7 @@ SEXP close_connection(SEXP handle) {
   return ScalarLogical(1);
 }
 
-SEXP isValidConnection(SEXP dbObj) {
+SEXP rsqlite_connection_valid(SEXP dbObj) {
   SQLiteConnection* con = R_ExternalPtrAddr(dbObj);
 
   if (!con)
@@ -129,7 +129,7 @@ SEXP isValidConnection(SEXP dbObj) {
   return ScalarLogical(1);
 }
 
-SEXP connectionInfo(SEXP conHandle) {
+SEXP rsqlite_connection_info(SEXP conHandle) {
   SQLiteConnection* con = rsqlite_connection_from_handle(conHandle);
 
   SEXP info = PROTECT(allocVector(VECSXP, 2));

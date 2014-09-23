@@ -6,30 +6,28 @@ RSQLite embeds the SQLite database engine in R, providing a DBI-compliant interf
 
 You can install the latest released version from CRAN with:
 
-```r
+```R
 install.packages("RSQLite")
 ```
 
-or install the latest development version from github with:
+Or install the latest development version from github with:
 
-```r
+```R
 library(devtools)
 install_github("RSQLite", "rstats-db")
 ```
 
-To install from github, you'll need a [development environment](http://www.rstudio.com/ide/docs/packages/prerequisites)).
+To install from github, you'll need a [development environment](http://www.rstudio.com/ide/docs/packages/prerequisites).
 
 ## Acknowledgements
 
-Many thanks to Doug Bates, Seth Falcon, Detlef Groth, Ronggui Huang,
-Kurt Hornik, Uwe Ligges, Charles Loboz, Duncan Murdoch, and Brian
-D. Ripley for comments, suggestions, bug reports, and/or patches.
+Many thanks to Doug Bates, Seth Falcon, Detlef Groth, Ronggui Huang, Kurt Hornik, Uwe Ligges, Charles Loboz, Duncan Murdoch, and Brian D. Ripley for comments, suggestions, bug reports, and/or patches.
 
 ## Update version of SQLite
 
 1.  Download latest SQLite source
 
-    ```r
+    ```R
     latest <- "http://sqlite.org/2014/sqlite-amalgamation-3080600.zip"
     tmp <- tempfile()
     download.file(latest, tmp)

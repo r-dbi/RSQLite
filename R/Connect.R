@@ -47,7 +47,7 @@ SQLITE_RO <- 1L
 #'   \code{"unix-none"}.
 #' @aliases SQLITE_RWC SQLITE_RW SQLITE_RO
 #' @export
-#' @useDynLib RSQLite new_connection
+#' @useDynLib RSQLite rsqlite_connection_create
 #' @examples
 #' # Create temporary in-memory db
 #' tmp <- dbConnect(SQLite(), ":memory:")
@@ -68,7 +68,7 @@ setMethod("dbConnect", "SQLiteDriver",
     vfs <- check_vfs(vfs)
     stopifnot(is.integer(flags), length(flags) == 1)
 
-    conId <- .Call(new_connection, dbname, loadable.extensions, flags, vfs)
+    conId <- .Call(rsqlite_connection_create, dbname, loadable.extensions, flags, vfs)
     con <- new("SQLiteConnection", 
       Id = conId,
       dbname = dbname,

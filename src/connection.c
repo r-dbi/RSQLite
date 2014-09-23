@@ -32,7 +32,7 @@ SQLiteConnection* rsqlite_connection_from_handle(SEXP handle) {
   return con;
 }
 
-SEXP new_connection(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
+SEXP rsqlite_connection_create(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
                     SEXP vfs_) {
   const char* dbname = CHAR(asChar(dbname_));
 

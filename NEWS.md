@@ -1,4 +1,4 @@
-Version 1.0.0
+# Version 1.0.0
 
 - Updated to SQLite 3.8.6
 
@@ -68,11 +68,11 @@ Version 1.0.0
 
 - `dbCallProc()` method removed, since generic is now deprecated.
 
-Version 0.11.6
+# Version 0.11.6
 
 - Upgrade to SQLite 3.8.4.2
 
-Version 0.11.5
+# Version 0.11.5
 
 - Include temporary tables in dbListTables()
 
@@ -80,27 +80,27 @@ Version 0.11.5
 
 - Added select.cols capability to sqliteReadTable()
 
-Version 0.11.4
+# Version 0.11.4
 
 - Upgrade to SQLite 3.7.7
 
 - Fix bug in dbWriteTable preventing use of colClasses argument from
   being used to control input types.
 
-Version 0.11.3
+# Version 0.11.3
 
 - Upgrade to SQLite 3.7.16.2
 
-Version 0.11.2
+# Version 0.11.2
 
 - Upgrade to SQLite 3.7.14
 
-Version 0.11.1
+# Version 0.11.1
 
 - Prevent RSQLite from crashing R when operations are attempted on
   expired (closed) connections.
 
-Version 0.11.0
+# Version 0.11.0
 
 - Enhance type detection in sqliteDataType (dbDataType). The storage
   mode of a data.frame column is now used as part of the type
@@ -126,22 +126,22 @@ Version 0.11.0
 
 - Upgrade to SQLite 3.7.9.
 
-Version 0.10.0
+# Version 0.10.0
 
 - Upgrade to SQLite 3.7.8.
 
-Version 0.9-5
+# Version 0.9-5
 
 - Fix error handling for prepared queries when bind data is missing a
   named parameter.
 
-Version 0.9-4
+# Version 0.9-4
 
 - Fix incorrect handling of NA's for character data in the code that
   binds parameters to a SQL query.  The string "NA" was incorrectly
   interpretted as a missing value.
 
-Version 0.9-3
+# Version 0.9-3
 
 - Upgrade SQLite to 3.7.3.  See http://www.sqlite.org/changes.html
   for release notes for SQLite.
@@ -150,12 +150,12 @@ Version 0.9-3
   flag.  See http://www.sqlite.org/lang_corefunc.html#soundex for
   details.
 
-Version 0.9-2
+# Version 0.9-2
 
 - Fix two missing PROTECTs in RS_SQLite_managerInfo and
   RS_SQLite_getException, thanks to a patch from Andrew Runnalls
 
-Version 0.9-1
+# Version 0.9-1
 
 - SQLite header files needed to compile SQLite extension functions are
   now made available by RSQLite.  Packages can bundle SQLite extension
@@ -165,7 +165,7 @@ Version 0.9-1
   connections.  If you wish to disallow loadable extensions for a
   given connection, loadable.extensions=FALSE to dbConnect.
 
-Version 0.9-0
+# Version 0.9-0
 
 - The SQLite driver handle validation code, is_ValidHandle, no longer
   requires the driver ID to be equal to the current process ID.
@@ -224,7 +224,7 @@ Version 0.9-0
 
 - RSQLite now depends on R >= 2.10.0.
 
-Version 0.8-4
+# Version 0.8-4
 
 - Fix a memory leak in bound parameter management and resolve a
   missing PROTECT bug that caused spurious crashes when performing
@@ -258,16 +258,16 @@ Version 0.8-4
   results of the individual queries.  This means that parameters that
   return no results are ignored in the result.
 
-Version 0.8-3
+# Version 0.8-3
 
 - Enable RTree module for the Windows build.  The configure script is
   not run on Windows, options are set directly in src/Makevars.win.
 
-Version 0.8-2
+# Version 0.8-2
 
 - Changes to support WIN64
 
-Version 0.8-1
+# Version 0.8-1
 
 - sqliteFetch now returns a data.frame with the expected number of
   columns when a query returns zero rows.  Before, a 0 x 0 data.frame
@@ -287,8 +287,7 @@ Version 0.8-1
 - Calling dbSendPreparedQuery with a non-NULL bind.data that has zero
   rows or zero columns is now an error.
 
-
-Version 0.8-0
+# Version 0.8-0
 
 - Upgrade to SQLite 3.6.21
 
@@ -344,7 +343,7 @@ Version 0.8-0
       ignored with a warning.
 
 
-Version 0.7-3
+# Version 0.7-3
 
 - Use the default value for SQLITE_MAX_SQL_LENGTH which has now been
   significantly increased over the value of 2 million that we had set
@@ -352,14 +351,14 @@ Version 0.7-3
 
 - Fix some Rd cross references in the documentation.
 
-Version 0.7-2
+# Version 0.7-2
 
 - Fixed some partial argument matching warnings.  Thanks to Matthias
   Burger for reporting and sending a patch.
 
 - Added dbBuildTableDefinition to exports per user request.
 
-Version 0.7-1
+# Version 0.7-1
 
 - Upgraded included SQLite from 3.6.0 to 3.6.4
 
@@ -369,13 +368,11 @@ Version 0.7-1
 - Added a HACKING file where we will add notes about how to do
   development on RSQLite.
 
---------------------
-
-Version 0.4-12
+# Version 0.4-12
 
 * Fix bug in dbListTables for empty databases
 
-Version 0.4-11
+# Version 0.4-11
 
 * Implemented dbCommit() and dbRollback(). There is also a new
   generic method dbBeginTransaction(), which begins a transaction.
@@ -411,7 +408,7 @@ Version 0.4-11
   to share a single data and schema cache. See
   http://www.sqlite.org/sharedcache.html
 
-Version 0.4-9
+# Version 0.4-9
 
 * Upgraded to SQLite 3.3.8
 
@@ -423,7 +420,7 @@ Version 0.4-9
   Extensions documentation:
   http://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions
 
-Version 0.4-4
+# Version 0.4-4
 
 * Upgraded to SQLite 3.3.7
 
@@ -432,7 +429,7 @@ Version 0.4-4
 
 * Fixed unclosed textConnections
 
-Version 0.4-1
+# Version 0.4-1
 
 * Added a method for dbWriteTable to write table from a text file, e.g.,
   dbWriteTable(con, "tablename", "filename")
@@ -448,7 +445,7 @@ Version 0.4-1
   performance (thanks to Charles Loboz for pointing these out, see the
   file "rsqlitePerf.txt").
 
-Version 0.4-0
+# Version 0.4-0
 
 * First attempt at using the new SQLite Version 3 API.  This version
   is a bridge to the new API, but it does not make available the new
@@ -472,16 +469,16 @@ Version 0.4-0
   (as suggested by Brian D. Ripley to get it to compile on 64-bit machines).
   As of today, I can't test this myself.
 
-Version 0.3-5
+# Version 0.3-5
 
 * Documentation typos, trivial packaging changes, as per CRAN maintainer
   request.
 
-Version 0.3-4
+# Version 0.3-4
 
 * Fixed documentation typos.
 
-Version 0.3-3
+# Version 0.3-3
 
 * Minor fixes to accommadate R 1.8.0 changes to data.frame subsetting.
 
@@ -492,7 +489,7 @@ Version 0.3-3
 * Added file NAMESPACE.future to prepare for namespace implementation
   at some future release.
 
-Version 0.3-2
+# Version 0.3-2
 
 * Ported to Windows.  It now installs fine under Windows with
 
@@ -511,7 +508,7 @@ Version 0.3-2
 * The package now installs as a binary image by default (use the --no-save
   argument to R CMD INSTALL to override this).
 
-Version 0.3-1
+# Version 0.3-1
 
 * Moved the implementation to version 4 style classes, and it now
   it is fully compliant with the DBI 0.1-3.
@@ -523,13 +520,13 @@ Version 0.3-1
   database file from a version prior to 2.6 you'll need to update
   it -- for details see http://www.hwaic.com/sw/sqlite).
 
-Version 0.2-1
+# Version 0.2-1
 
 * Worked mostly in the configuration;  added the --enable-sqlite and
   --with-sqlite arguments to have the RSQLite configuration also install
   SQLite or locate it, respectively.
 
-Version 0.1-1
+# Version 0.1-1
 
 * First implementation -- used the RS-DBI.[ch] code (which is the core
   connection/cursor manager) "as is" and modified the RS-MySQL.[hc],

@@ -66,6 +66,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
       valStr <- paste(rep("?", ncol(value)), collapse = ",")
       sql <- sprintf("insert into %s values (%s)", name, valStr)
       rs <- dbSendPreparedQuery(conn, sql, bind.data = value)
+      dbClearResult(rs)
     }
 
     on.exit(NULL)

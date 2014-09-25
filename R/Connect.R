@@ -26,8 +26,8 @@ SQLITE_RO <- 1L
 #'   2000 pages). See \url{http://www.sqlite.org/pragma.html#pragma_cache_size} 
 #'   for details.
 #' @param synchronous Advanced options. Possible values for \code{synchronous} 
-#'   are "OFF" (the default), "NORMAL", or  "FULL".  Users have reported 
-#'   significant speed ups using \code{sychronous = "OFF"}, and the SQLite 
+#'   are "off" (the default), "normal", or  "full".  Users have reported 
+#'   significant speed ups using \code{sychronous = "off"}, and the SQLite 
 #'   documentation itself implies considerable improved performance at the very 
 #'   modest risk of database corruption in the unlikely case of the operating 
 #'   system (\emph{not} the R application) crashing. See

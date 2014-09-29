@@ -17,9 +17,9 @@
 #' @param check.names If \code{TRUE}, the default, column names will be
 #'   converted to valid R identifiers.
 #' @param row.names A string or an index specifying the column in the DBMS table 
-#'   to use as \code{row.names} in the output data.frame (a \code{NULL}, 
-#'   \code{""}, or 0 specifies that no column should be used as \code{row.names}
-#'   in the output.)
+#'   to use as \code{row.names} in the output data.frame. Defaults to using the
+#'   \code{row_names} column if present. Set to \code{NULL} to never use
+#'   row names.
 #' @param select.cols  A SQL statement (in the form of a character vector of 
 #'    length 1) giving the columns to select. E.g. "*" selects all columns, 
 #'    "x,y,z" selects three columns named as listed.
@@ -29,9 +29,12 @@
 #' dbWriteTable(con, "mtcars", mtcars)
 #' dbReadTable(con, "mtcars")
 #' 
+#' # Supress row names
+#' dbReadTable(con, "mtcars", row.names = FALSE)
+#' 
 #' dbDisconnect(con)
 setMethod("dbReadTable", c("SQLiteConnection", "character"),
-  function(conn, name, row.names = "row_names", check.names = TRUE, 
+  function(conn, name, row.names, check.names = TRUE, 
            select.cols = "*") {
     out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM", name))
     
@@ -39,26 +42,12 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
       names(out) <- make.names(names(out), unique = TRUE)
     }
     
-    ## should we set the row.names of the output data.frame?
-    nms <- names(out)
-    if (is.character(row.names)) {
-      row.names <- match(tolower(row.names), tolower(nms), nomatch = 0L)
-    } else {
-      row.names <- as.integer(row.names)
-    }
-    stopifnot(length(row.names) == 1)
+    row.names <- rownames_column(out, row.names)
+    if (is.null(row.names)) return(out)
     
-    if (row.names == 0L) return(out)
-    
-    if(row.names < 1 || row.names > ncol(out)) {
-      warning("row.names not set (non-existing field)",
-        call. = FALSE)
-      return(out)
-    }
     rnms <- as.character(out[[row.names]])
     if (anyDuplicated(rnms)) {
-      warning("row.names not set (duplicate elements in field)",
-        call. = FALSE)
+      warning("row.names not set (duplicate elements in field)", call. = FALSE)
     } else {
       out <- out[, -row.names, drop = F]
       row.names(out) <- rnms
@@ -66,3 +55,31 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
     out
   }
 )
+
+# Figure out which column to 
+rownames_column <- function(df, row.names) {
+  if (missing(row.names)) {
+    if (!"row_names" %in% names(df)) {
+      return(NULL)
+    }
+
+    row.names <- "row_names"
+  } 
+  
+  if (is.null(row.names) || identical(row.names, FALSE)) {
+    NULL
+  } else if (is.character(row.names)) {
+    if (!(row.names %in% names(df))) {
+      stop("Column ", row.names, " not present in output", call. = FALSE)
+    }
+    match(row.names, names(df))
+  } else if (is.numeric(row.names)) {
+    if (row.names == 0) return(NULL)
+    if (row.names < 0 || row.names > ncol(df)) {
+      stop("Column ", row.names, " not present in output", call. = FALSE)
+    }
+    row.names
+  } else {
+    stop("Unknown specification for row.names")
+  }
+}

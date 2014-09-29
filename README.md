@@ -19,6 +19,38 @@ devtools::install_github("rstats-db/RSQLite")
 
 To install from github, you'll need a [development environment](http://www.rstudio.com/ide/docs/packages/prerequisites).
 
+## Basic usage
+
+```R
+library(DBI)
+# Create an ephemeral in-memory RSQLite database
+con <- dbConnect(RSQLite::SQLite(), ":memory:")
+
+dbListTables(con)
+dbWriteTable(con, "mtcars", mtcars)
+dbListTables(con)
+
+dbListFields(con, "mtcars")
+dbReadTable(con, "mtcars")
+
+# You can fetch all results:
+res <- dbSendQuery(con, "SELECT * FROM mtcars WHERE cyl = 4")
+dbFetch(res)
+dbClearResult(res)
+
+# Or a chunk at a time
+res <- dbSendQuery(con, "SELECT * FROM mtcars WHERE cyl = 4")
+while(!dbHasCompleted(res)){
+  chunk <- dbFetch(res, n = 5)
+  print(nrow(chunk))
+}
+# Clear the result
+dbClearResult(res)
+
+# Disconnect from the database
+dbDisconnect(con)
+```
+
 ## Acknowledgements
 
 Many thanks to Doug Bates, Seth Falcon, Detlef Groth, Ronggui Huang, Kurt Hornik, Uwe Ligges, Charles Loboz, Duncan Murdoch, and Brian D. Ripley for comments, suggestions, bug reports, and/or patches.

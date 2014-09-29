@@ -4,8 +4,8 @@
 \alias{dbReadTable,SQLiteConnection,character-method}
 \title{Convenience functions for importing/exporting DBMS tables}
 \usage{
-\S4method{dbReadTable}{SQLiteConnection,character}(conn, name,
-  row.names = "row_names", check.names = TRUE, select.cols = "*")
+\S4method{dbReadTable}{SQLiteConnection,character}(conn, name, row.names,
+  check.names = TRUE, select.cols = "*")
 }
 \arguments{
 \item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
@@ -16,9 +16,9 @@ are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc}
 are considered equal.}
 
 \item{row.names}{A string or an index specifying the column in the DBMS table
-to use as \code{row.names} in the output data.frame (a \code{NULL},
-\code{""}, or 0 specifies that no column should be used as \code{row.names}
-in the output.)}
+to use as \code{row.names} in the output data.frame. Defaults to using the
+\code{row_names} column if present. Set to \code{NULL} to never use
+row names.}
 
 \item{check.names}{If \code{TRUE}, the default, column names will be
 converted to valid R identifiers.}
@@ -44,6 +44,9 @@ primitive data, e.g., it does not coerce character data to factors.
 con <- dbConnect(SQLite())
 dbWriteTable(con, "mtcars", mtcars)
 dbReadTable(con, "mtcars")
+
+# Supress row names
+dbReadTable(con, "mtcars", row.names = FALSE)
 
 dbDisconnect(con)
 }

@@ -6,6 +6,7 @@
 \alias{dbFetch,SQLiteResult-method}
 \alias{dbGetPreparedQuery,SQLiteConnection,character,data.frame-method}
 \alias{dbGetQuery,SQLiteConnection,character-method}
+\alias{dbListResults,SQLiteConnection-method}
 \alias{dbSendPreparedQuery,SQLiteConnection,character,data.frame-method}
 \alias{dbSendQuery,SQLiteConnection,character-method}
 \alias{fetch,SQLiteResult-method}
@@ -24,6 +25,8 @@
 \S4method{dbClearResult}{SQLiteResult}(res, ...)
 
 \S4method{dbClearResult}{SQLiteConnection}(res, ...)
+
+\S4method{dbListResults}{SQLiteConnection}(conn, ...)
 
 \S4method{dbGetQuery}{SQLiteConnection,character}(conn, statement)
 
@@ -65,6 +68,8 @@ res <- dbSendQuery(con, "SELECT * FROM arrests")
 data <- fetch(res, n = 2)
 data
 dbHasCompleted(res)
+
+dbListResults(con)
 dbClearResult(res)
 
 # Use dbSendPreparedQuery/dbGetPreparedQuery for "prepared" queries

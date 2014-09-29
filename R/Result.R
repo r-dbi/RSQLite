@@ -33,6 +33,8 @@ setClass("SQLiteResult",
 #' data <- fetch(res, n = 2)
 #' data
 #' dbHasCompleted(res)
+#' 
+#' dbListResults(con)
 #' dbClearResult(res)
 #' 
 #' # Use dbSendPreparedQuery/dbGetPreparedQuery for "prepared" queries
@@ -122,6 +124,14 @@ setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
 setMethod("dbClearResult", "SQLiteConnection", function(res, ...) {
   check_valid(res)
   .Call(rsqlite_result_free_handle, res@Id)
+})
+
+#' @export
+#' @rdname query
+#' @useDynLib RSQLite rsqlite_result_free_handle
+setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
+  check_valid(conn)
+  list(new("SQLiteResult", Id = conn@Id))
 })
 
 

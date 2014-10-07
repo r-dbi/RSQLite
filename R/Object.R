@@ -76,16 +76,19 @@ NULL
 
 #' @rdname dbIsValid
 #' @useDynLib RSQLite rsqlite_driver_valid
+#' @export
 setMethod("dbIsValid", "SQLiteDriver", function(dbObj) {
   .Call(rsqlite_driver_valid)
 })
 #' @rdname dbIsValid
 #' @useDynLib RSQLite rsqlite_connection_valid
+#' @export
 setMethod("dbIsValid", "SQLiteConnection", function(dbObj) {
   .Call(rsqlite_connection_valid, dbObj@Id)
 })
 #' @rdname dbIsValid
 #' @useDynLib RSQLite rsqlite_result_valid
+#' @export
 setMethod("dbIsValid", "SQLiteResult", function(dbObj) {
   .Call(rsqlite_result_valid, dbObj@Id)
 })

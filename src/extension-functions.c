@@ -1936,9 +1936,3 @@ int double_cmp(const void *a, const void *b){
   else
     return 1;
 }
-
-void print_elem(void *e, int64_t c, void* p){
-  int ee = *(int*)(e);
-  printf("%d => %lld\n", ee,c);
-}
-

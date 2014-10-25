@@ -1,5 +1,5 @@
 Package: RSQLite
-Version: 1.0.0
+Version: 1.0.9000
 Title: SQLite Interface for R
 Authors@R: as.person(c(
     "Hadley Wickham <hadley@rstudio.com> [aut, cre]",

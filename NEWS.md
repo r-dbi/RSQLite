@@ -12,7 +12,7 @@
 - Inlined `RSQLite.extfuns` - use `initExtension()` to load the many
   useful extension functions (#44).
 
-- Methods no longer automatically clone the connection is there is an open
+- Methods no longer automatically clone the connection if there is an open
   result set. This was implement inconsistently in a handful of places (#22).
   RSQLite is now more forgiving if you forget to close a result set - it will
   close it for you, with a warning. It's still good practice to clean up

@@ -63,6 +63,12 @@ defaults when imputing classes from on-disk file.}
 \description{
 Write a local data frame or file to the database.
 }
+\details{
+If a column is specified \code{AUTOINCREMENT} in the database and
+  you wish to allow the database to automatically assign a value, the column
+  must exist (in the \code{data.frame} passed to the write function's
+  \code{value} parameter), and be filled with \code{NA} values.
+}
 \examples{
 con <- dbConnect(SQLite())
 dbWriteTable(con, "mtcars", mtcars)

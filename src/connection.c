@@ -102,7 +102,7 @@ SEXP rsqlite_connection_destroy(SEXP handle) {
   if (rc == SQLITE_BUSY) {
     warning("Unfinalized prepared statements.");
   } else if (rc != SQLITE_OK) {
-    warning("Internal error: could not close SQLte connection.");
+    warning("Internal error: could not close SQLite connection.");
   }
   con->drvConnection = NULL;
   rsqlite_exception_free(con);

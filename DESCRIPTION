@@ -39,3 +39,6 @@ Collate:
     'dbGetInfo.R'
     'extensions.R'
     'zzz.R'
+LinkingTo: Rcpp
+Imports:
+    Rcpp

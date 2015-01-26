@@ -1,3 +1,5 @@
+#' @useDynLib RSQLite
+#' @importFrom Rcpp sourceCpp
 #' @include Connection.R
 NULL
 

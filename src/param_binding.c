@@ -1,4 +1,4 @@
-#include "rsqlite.h"
+#include "rsqlite-c.h"
 
 static int*
 init_bindParams(int num_cols) {

@@ -581,7 +581,7 @@ PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 PACKAGE_URL=
 
-ac_unique_file="src/rsqlite.h"
+ac_unique_file="src/rsqlite-c.h"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 PKG_LIBS

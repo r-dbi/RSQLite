@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "rsqlite.h"
+#include "rsqlite-c.h"
 
 SEXP     /* returns TRUE/FALSE */
 RS_SQLite_importFile(

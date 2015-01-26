@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "rsqlite.h"
+#include "rsqlite-c.h"
 
 void rsqlite_result_alloc(SQLiteConnection* con) {
   SQLiteResult* result = malloc(sizeof(SQLiteResult));

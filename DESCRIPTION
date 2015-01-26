@@ -33,6 +33,7 @@ Collate:
     'Escaping.R'
     'Result.R'
     'Object.R'
+    'RcppExports.R'
     'Summary.R'
     'Utils.R'
     'datasetsDb.R'

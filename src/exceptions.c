@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "rsqlite.h"
+#include "rsqlite-c.h"
 
 void rsqlite_exception_set(SQLiteConnection* con, int err_no, const char* err_msg) {
 

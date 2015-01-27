@@ -124,12 +124,6 @@ SEXP           rsqlite_query_fetch(SEXP handle, SEXP max_rec);
 RSQLiteParams* RS_SQLite_createParameterBinding(int n, SEXP bind_data, sqlite3_stmt *stmt, char *errorMsg);
 void RS_SQLite_freeParameterBinding(RSQLiteParams **);
 
-// Exception -------------------------------------------------------------------
-
-void rsqlite_exception_set(SQLiteConnection *con, int err_no, const char *err_msg);
-void rsqlite_exception_free(SQLiteConnection *con);
-SEXP rsqlite_exception_info(SEXP handle);
-
 // Connection ------------------------------------------------------------------
 
 SQLiteConnection* rsqlite_connection_from_handle(SEXP handle);

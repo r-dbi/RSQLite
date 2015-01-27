@@ -73,8 +73,6 @@ SEXP rsqlite_connection_create(SEXP dbname_, SEXP allow_ext_, SEXP flags_,
   }
   con->drvConnection = db_connection;
 
-  rsqlite_exception_set(con, SQLITE_OK, "OK");
-
   // Create handle
   SEXP handle = R_MakeExternalPtr(con, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(handle, _finalize_connection_handle, 1);
@@ -100,7 +98,6 @@ SEXP rsqlite_connection_destroy(SEXP handle) {
     warning("Internal error: could not close SQLite connection.");
   }
   con->drvConnection = NULL;
-  rsqlite_exception_free(con);
 
   free(con);
   con = NULL;

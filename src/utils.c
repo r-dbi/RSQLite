@@ -102,9 +102,5 @@ SEXP RS_SQLite_copy_database(SEXP fromConHandle, SEXP toConHandle) {
     sqlite3_backup_finish(backup);
   }
   rc = sqlite3_errcode(dbTo);
-  if (rc != SQLITE_OK) {
-    rsqlite_exception_set(toCon, rc, sqlite3_errmsg(dbTo));
-    error(sqlite3_errmsg(dbTo));
-  }
   return R_NilValue;
 }

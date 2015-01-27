@@ -65,7 +65,6 @@ void exec_error(SQLiteConnection* con, const char* msg) {
   char buf[2048];
   snprintf(buf, sizeof(buf), "%s%s%s", msg, sep, db_msg);
 
-  rsqlite_exception_set(con, errcode, buf);
   rsqlite_result_free(con);
 
   error(buf);
@@ -221,7 +220,6 @@ SEXP rsqlite_query_send(SEXP handle, SEXP statement, SEXP bind_data) {
   res->isSelect = sqlite3_column_count(db_statement) > 0;
   res->rowCount = 0;      /* fake's cursor's row count */
   res->rowsAffected = -1; /* no rows affected */
-  rsqlite_exception_set(con, state, "OK");
 
   if (res->isSelect) {
     if (bind_count > 0) {

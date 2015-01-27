@@ -121,10 +121,6 @@ setMethod("dbConnect", "SQLiteConnection", function(drv){
 #' @rdname dbConnect-SQLiteDriver-method
 #' @useDynLib RSQLite rsqlite_connection_destroy
 setMethod("dbDisconnect", "SQLiteConnection", function(conn) {
-  if (!dbIsValid(conn)) {
-    warning("Expired SQLiteConnection.", call. = FALSE)
-    return(TRUE)
-  }
-  
-  .Call(rsqlite_connection_destroy, conn@Id)
+  rsqlite_disconnect(conn@ptr)
+  invisible(TRUE)
 })

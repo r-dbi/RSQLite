@@ -24,3 +24,30 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// rsqlite_disconnect
+void rsqlite_disconnect(XPtr<SqliteConnection> con);
+RcppExport SEXP RSQLite_rsqlite_disconnect(SEXP conSEXP) {
+BEGIN_RCPP
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< XPtr<SqliteConnection> >::type con(conSEXP );
+        rsqlite_disconnect(con);
+    }
+    return R_NilValue;
+END_RCPP
+}
+// rsqlite_is_valid
+bool rsqlite_is_valid(XPtr<SqliteConnection> con);
+RcppExport SEXP RSQLite_rsqlite_is_valid(SEXP conSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< XPtr<SqliteConnection> >::type con(conSEXP );
+        bool __result = rsqlite_is_valid(con);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}

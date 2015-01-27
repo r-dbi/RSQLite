@@ -23,8 +23,12 @@ setClass("SQLiteConnection",
 #' @export
 setMethod("show", "SQLiteConnection", function(object) {
   cat("<SQLiteConnection>\n")
-  cat("  Path: ", object@dbname, "\n", sep = "")
-  cat("  Extensions: ", object@loadable.extensions, "\n", sep = "")
+  if (dbIsValid(object)) {
+    cat("  Path: ", object@dbname, "\n", sep = "")
+    cat("  Extensions: ", object@loadable.extensions, "\n", sep = "")
+  } else {
+    cat("  DISCONNECTED\n")
+  }
 })
 
 #' Get the last exception from the connection.

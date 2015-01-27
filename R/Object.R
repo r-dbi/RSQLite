@@ -80,10 +80,9 @@ setMethod("dbIsValid", "SQLiteDriver", function(dbObj) {
   TRUE
 })
 #' @rdname dbIsValid
-#' @useDynLib RSQLite rsqlite_connection_valid
 #' @export
 setMethod("dbIsValid", "SQLiteConnection", function(dbObj) {
-  .Call(rsqlite_connection_valid, dbObj@Id)
+  rsqlite_is_valid(dbObj@ptr)
 })
 #' @rdname dbIsValid
 #' @useDynLib RSQLite rsqlite_result_valid

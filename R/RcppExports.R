@@ -5,3 +5,11 @@ rsqlite_connect <- function(path, allow_ext, flags, vfs = "") {
     .Call('RSQLite_rsqlite_connect', PACKAGE = 'RSQLite', path, allow_ext, flags, vfs)
 }
 
+rsqlite_disconnect <- function(con) {
+    invisible(.Call('RSQLite_rsqlite_disconnect', PACKAGE = 'RSQLite', con))
+}
+
+rsqlite_is_valid <- function(con) {
+    .Call('RSQLite_rsqlite_is_valid', PACKAGE = 'RSQLite', con)
+}
+

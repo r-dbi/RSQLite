@@ -31,14 +31,10 @@ setMethod("show", "SQLiteConnection", function(object) {
   }
 })
 
-#' Get the last exception from the connection.
-#' 
-#' @param conn an object of class \code{\linkS4class{SQLiteConnection}}
+#' @rdname SQLiteConnection-class
 #' @export
-#' @useDynLib RSQLite rsqlite_exception_info
-#' @keywords internal
 setMethod("dbGetException", "SQLiteConnection", function(conn) {
-  .Call(rsqlite_exception_info, conn@Id)
+  rsqlite_get_exception(conn@ptr)
 })
 
 #' Does the table exist?

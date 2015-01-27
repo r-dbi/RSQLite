@@ -3,10 +3,13 @@
 \docType{class}
 \name{SQLiteConnection-class}
 \alias{SQLiteConnection-class}
+\alias{dbGetException,SQLiteConnection-method}
 \alias{show,SQLiteConnection-method}
 \title{Class SQLiteConnection.}
 \usage{
 \S4method{show}{SQLiteConnection}(object)
+
+\S4method{dbGetException}{SQLiteConnection}(conn)
 }
 \description{
 \code{SQLiteConnection} objects are usually created by

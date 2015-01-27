@@ -19,7 +19,11 @@ public:
     try {
       sqlite3_close_v2(pConn_); 
     } catch(...) {}
-  }    
+  }
+  
+  std::string getException() {
+    return std::string(sqlite3_errmsg(pConn_));
+  }
     
 // Prevent copying because of shared resource
 private:

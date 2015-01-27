@@ -36,6 +36,21 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// rsqlite_get_exception
+std::string rsqlite_get_exception(XPtr<SqliteConnection> con);
+RcppExport SEXP RSQLite_rsqlite_get_exception(SEXP conSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< XPtr<SqliteConnection> >::type con(conSEXP );
+        std::string __result = rsqlite_get_exception(con);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // rsqlite_is_valid
 bool rsqlite_is_valid(XPtr<SqliteConnection> con);
 RcppExport SEXP RSQLite_rsqlite_is_valid(SEXP conSEXP) {

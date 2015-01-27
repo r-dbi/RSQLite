@@ -19,6 +19,14 @@ void rsqlite_disconnect(XPtr<SqliteConnection> con) {
 }
 
 // [[Rcpp::export]]
+std::string rsqlite_get_exception(XPtr<SqliteConnection> con) {
+  if (R_ExternalPtrAddr(con) == NULL) stop("Connection already closed");
+  
+  return con->getException();
+}
+
+// [[Rcpp::export]]
 bool rsqlite_is_valid(XPtr<SqliteConnection> con) {
   return R_ExternalPtrAddr(con) != NULL;
 }
+

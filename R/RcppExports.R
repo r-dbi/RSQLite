@@ -9,6 +9,10 @@ rsqlite_disconnect <- function(con) {
     invisible(.Call('RSQLite_rsqlite_disconnect', PACKAGE = 'RSQLite', con))
 }
 
+rsqlite_get_exception <- function(con) {
+    .Call('RSQLite_rsqlite_get_exception', PACKAGE = 'RSQLite', con)
+}
+
 rsqlite_is_valid <- function(con) {
     .Call('RSQLite_rsqlite_is_valid', PACKAGE = 'RSQLite', con)
 }

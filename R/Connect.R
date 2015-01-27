@@ -73,7 +73,8 @@ setMethod("dbConnect", "SQLiteDriver",
       ptr = rsqlite_connect(dbname, loadable.extensions, flags, vfs),
       dbname = dbname,
       flags = flags,
-      vfs = vfs
+      vfs = vfs,
+      loadable.extensions = loadable.extensions
     )
     
     ## experimental PRAGMAs

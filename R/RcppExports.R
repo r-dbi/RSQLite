@@ -17,3 +17,11 @@ rsqlite_is_valid <- function(con) {
     .Call('RSQLite_rsqlite_is_valid', PACKAGE = 'RSQLite', con)
 }
 
+rsqlite_send_query <- function(con, sql) {
+    .Call('RSQLite_rsqlite_send_query', PACKAGE = 'RSQLite', con, sql)
+}
+
+rsqlite_clear_result <- function(res) {
+    invisible(.Call('RSQLite_rsqlite_clear_result', PACKAGE = 'RSQLite', res))
+}
+

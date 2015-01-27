@@ -7,7 +7,7 @@
 #' @keywords internal
 setClass("SQLiteResult", 
   contains = "DBIResult",
-  slots = list(Id = "externalptr")
+  slots = list(ptr = "externalptr")
 )
 
 #' @rdname SQLiteResult-class
@@ -58,7 +58,7 @@ NULL
 #' @export
 setMethod("dbSendQuery", c("SQLiteConnection", "character"),
   function(conn, statement) {
-    sqliteSendQuery(conn, statement)
+    new("SQLiteResult", ptr = rsqlite_send_query(conn@ptr, statement))
   }
 )
 

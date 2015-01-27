@@ -66,3 +66,31 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// rsqlite_send_query
+XPtr<SqliteResult> rsqlite_send_query(XPtr<SqliteConnection> con, std::string sql);
+RcppExport SEXP RSQLite_rsqlite_send_query(SEXP conSEXP, SEXP sqlSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< XPtr<SqliteConnection> >::type con(conSEXP );
+        Rcpp::traits::input_parameter< std::string >::type sql(sqlSEXP );
+        XPtr<SqliteResult> __result = rsqlite_send_query(con, sql);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// rsqlite_clear_result
+void rsqlite_clear_result(XPtr<SqliteResult> res);
+RcppExport SEXP RSQLite_rsqlite_clear_result(SEXP resSEXP) {
+BEGIN_RCPP
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP );
+        rsqlite_clear_result(res);
+    }
+    return R_NilValue;
+END_RCPP
+}

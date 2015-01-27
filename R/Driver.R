@@ -33,6 +33,11 @@ setClass("SQLiteDriver",
 )
 
 #' @rdname SQLiteDriver-class
+setMethod("show", "SQLiteDriver", function(object) {
+  cat("<SQLiteDriver>\n")
+})
+
+#' @rdname SQLiteDriver-class
 #' @export
 #' @import methods DBI
 SQLite <- function(...) {

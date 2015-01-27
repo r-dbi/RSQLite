@@ -3,13 +3,14 @@
 \docType{class}
 \name{SQLiteConnection-class}
 \alias{SQLiteConnection-class}
+\alias{show,SQLiteConnection-method}
 \title{Class SQLiteConnection.}
+\usage{
+\S4method{show}{SQLiteConnection}(object)
+}
 \description{
 \code{SQLiteConnection} objects are usually created by
-\code{\link[DBI]{dbConnect}}
+\code{\link[DBI]{dbConnect}}.
 }
-\examples{
-con <- dbConnect(SQLite(), dbname = tempfile())
-dbDisconnect(con)
-}
+\keyword{internal}
 

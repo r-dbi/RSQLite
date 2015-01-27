@@ -3,9 +3,14 @@
 \docType{class}
 \name{SQLiteResult-class}
 \alias{SQLiteResult-class}
+\alias{show,SQLiteResult-method}
 \title{Class SQLiteResult}
+\usage{
+\S4method{show}{SQLiteResult}(object)
+}
 \description{
 SQLite's query results class.  This classes encapsulates the result of an
 SQL statement (either \code{select} or not).
 }
+\keyword{internal}
 

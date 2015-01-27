@@ -65,14 +65,3 @@ setMethod("summary", "SQLiteResult", function(object) {
   }
   invisible(NULL)  
 })
-
-
-setMethod("show", "SQLiteDriver", function(object) {
-  cat("<SQLiteDriver>\n")
-})
-setMethod("show", "SQLiteConnection", function(object) {
-  cat("<SQLiteConnection>\n")
-})
-setMethod("show", "SQLiteResult", function(object) {
-  cat("<SQLiteResult>\n")
-})

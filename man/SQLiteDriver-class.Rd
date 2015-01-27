@@ -4,8 +4,11 @@
 \name{SQLiteDriver-class}
 \alias{SQLite}
 \alias{SQLiteDriver-class}
+\alias{show,SQLiteDriver-method}
 \title{Class SQLiteDriver with constructor SQLite (and methods).}
 \usage{
+\S4method{show}{SQLiteDriver}(object)
+
 SQLite(...)
 }
 \description{

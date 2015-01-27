@@ -4,11 +4,9 @@ NULL
 #' Class SQLiteConnection.
 #' 
 #' \code{SQLiteConnection} objects are usually created by 
-#' \code{\link[DBI]{dbConnect}}
+#' \code{\link[DBI]{dbConnect}}.
 #' 
-#' @examples
-#' con <- dbConnect(SQLite(), dbname = tempfile())
-#' dbDisconnect(con)
+#' @keywords internal
 #' @export
 setClass("SQLiteConnection", 
   contains = "DBIConnection",
@@ -20,6 +18,12 @@ setClass("SQLiteConnection",
     vfs = "character"
   )
 )
+
+#' @rdname SQLiteConnection-class
+#' @export
+setMethod("show", "SQLiteConnection", function(object) {
+  cat("<SQLiteConnection>\n")
+})
 
 #' Get the last exception from the connection.
 #' 

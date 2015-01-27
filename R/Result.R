@@ -4,10 +4,17 @@
 #' SQL statement (either \code{select} or not).
 #' 
 #' @export
+#' @keywords internal
 setClass("SQLiteResult", 
   contains = "DBIResult",
   slots = list(Id = "externalptr")
 )
+
+#' @rdname SQLiteResult-class
+#' @export
+setMethod("show", "SQLiteResult", function(object) {
+  cat("<SQLiteResult>\n")
+})
 
 #' Execute a SQL statement on a database connection
 #' 

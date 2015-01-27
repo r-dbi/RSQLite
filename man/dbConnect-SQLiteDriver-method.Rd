@@ -23,12 +23,15 @@
 \code{\linkS4class{SQLiteConnection}}. If an connection, the connection
 will be cloned.}
 
-\item{dbname}{The path to the database file. There are two special values:
+\item{dbname}{The path to the database file. SQLite keeps each database
+  instance in one single file. The name of the database \emph{is} the file
+  name, thus database names should be legal file names in the running
+  platform. There are two exceptions:
 
   \itemize{
-  \item \code{""}: creates a temporary on-disk database The file will be
-     deleted when the connection is closed.
-  \item \code{":memory:"}: create a temporary in-memory database.
+  \item \code{""} will create a temporary on-disk database. The file
+    will be deleted when the connection is closed.
+  \item \code{":memory:"} will create a temporary in-memory database.
   }}
 
 \item{loadable.extensions}{When \code{TRUE} (default) SQLite3
@@ -65,7 +68,7 @@ Connect to/disconnect from a SQLite database.
 }
 \examples{
 # Create temporary in-memory db
-tmp <- dbConnect(SQLite(), ":memory:")
+tmp <- dbConnect(RSQLite::SQLite(), ":memory:")
 summary(tmp)
 dbDisconnect(tmp)
 

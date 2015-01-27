@@ -1,5 +1,9 @@
 # Version 1.0.9000
 
+- All arguments to `SQLite()` are now ignored. Most of them didn't work any
+  way, and rather than using global variables, it's better set specific values 
+  when creating a connection.
+
 # Version 1.0.0
 
 ## New features

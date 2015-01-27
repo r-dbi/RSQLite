@@ -22,9 +22,8 @@ NULL
 
 #' @rdname dbGetInfo
 #' @export
-#' @useDynLib RSQLite rsqlite_driver_info
 setMethod("dbGetInfo", "SQLiteDriver", function(dbObj) {
-  .Call(rsqlite_driver_info)
+  list()
 })
 
 #' @rdname dbGetInfo

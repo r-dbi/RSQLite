@@ -4,45 +4,18 @@
 \name{SQLiteDriver-class}
 \alias{SQLite}
 \alias{SQLiteDriver-class}
-\title{Class SQLiteDriver with constructor SQLite.}
+\title{Class SQLiteDriver with constructor SQLite (and methods).}
 \usage{
-SQLite(max.con = 200L, fetch.default.rec = 500, force.reload = FALSE,
-  shared.cache = FALSE)
-}
-\arguments{
-\item{max.con,force.reload}{Ignored and deprecated.}
-
-\item{fetch.default.rec}{default number of records to fetch at one time from
-the database.  The \code{fetch} method will use this number as a default,
-but individual calls can override it.}
-
-\item{shared.cache}{logical describing whether shared-cache mode should be
-enabled on the SQLite driver. The default is \code{FALSE}.}
-}
-\value{
-An object of class \code{SQLiteDriver} which extends \code{dbDriver}
-  and \code{dbObjectId}. This object is needed to create connections to the
-  embedded SQLite database. There can be many SQLite database instances
-  running simultaneously.
+SQLite(...)
 }
 \description{
-An SQLite driver implementing the R/S-Plus database (DBI) API.
-This class should always be initializes with the \code{SQLite()} function.
-It returns a singleton object that allows you to connect to the SQLite
-engine embedded in R.
-}
-\details{
-This implementation allows the R embedded SQLite engine to work with
-multiple database instances through multiple connections simultaneously.
-
-SQLite keeps each database instance in one single file. The name of the
-database \emph{is} the file name, thus database names should be legal file
-names in the running platform.
+\code{SQLite()} returns a SQLiteDriver, which is used to select the correct
+method in \code{dbConnect()}.
 }
 \examples{
 # initialize a new database to a tempfile and copy some data.frame
 # from the base package into it
-con <- dbConnect(SQLite(), ":memory:")
+con <- dbConnect(RSQLite::SQLite(), ":memory:")
 data(USArrests)
 dbWriteTable(con, "USArrests", USArrests)
 
@@ -58,4 +31,5 @@ dbListTables(con)
 # clean up
 dbDisconnect(con)
 }
+\keyword{internal}
 

@@ -138,14 +138,6 @@ SEXP              rsqlite_connection_destroy(SEXP conHandle);
 SEXP              rsqlite_connection_valid(SEXP dbObj);
 SEXP              rsqlite_connection_info(SEXP conHandle);
 
-// Driver ----------------------------------------------------------------------
-
-SQLiteDriver* rsqlite_driver();
-void          rsqlite_driver_init(SEXP records_, SEXP cache_);
-SEXP          rsqlite_driver_close();
-SEXP          rsqlite_driver_valid();
-SEXP          rsqlite_driver_info();
-
 // Utilities -------------------------------------------------------------------
 
 char* RS_DBI_copyString(const char *str);

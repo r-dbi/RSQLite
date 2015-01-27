@@ -13,7 +13,7 @@ NULL
 setClass("SQLiteConnection", 
   contains = "DBIConnection",
   slots = list(
-    Id = "externalptr",
+    ptr = "externalptr",
     dbname = "character", 
     loadable.extensions = "logical", 
     flags = "integer", 

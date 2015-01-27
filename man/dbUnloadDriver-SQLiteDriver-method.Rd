@@ -12,16 +12,8 @@
 
 \item{...}{Ignored. Needed for compatibility with generic.}
 }
-\value{
-A logical indicating whether the operation succeeded or not.
-}
 \description{
-Unload SQLite driver.
+This function is no longer needed.
 }
-\examples{
-\dontrun{
-db <- SQLite()
-dbUnloadDriver(db)
-}
-}
+\keyword{internal}
 

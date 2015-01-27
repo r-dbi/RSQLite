@@ -7,16 +7,17 @@
 using namespace Rcpp;
 
 // rsqlite_connect
-XPtr<SqliteConnection> rsqlite_connect(std::string path, int flags, std::string vfs = "");
-RcppExport SEXP RSQLite_rsqlite_connect(SEXP pathSEXP, SEXP flagsSEXP, SEXP vfsSEXP) {
+XPtr<SqliteConnection> rsqlite_connect(std::string path, bool allow_ext, int flags, std::string vfs = "");
+RcppExport SEXP RSQLite_rsqlite_connect(SEXP pathSEXP, SEXP allow_extSEXP, SEXP flagsSEXP, SEXP vfsSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< std::string >::type path(pathSEXP );
+        Rcpp::traits::input_parameter< bool >::type allow_ext(allow_extSEXP );
         Rcpp::traits::input_parameter< int >::type flags(flagsSEXP );
         Rcpp::traits::input_parameter< std::string >::type vfs(vfsSEXP );
-        XPtr<SqliteConnection> __result = rsqlite_connect(path, flags, vfs);
+        XPtr<SqliteConnection> __result = rsqlite_connect(path, allow_ext, flags, vfs);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

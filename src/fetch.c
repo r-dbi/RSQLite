@@ -347,7 +347,7 @@ SEXP rsqlite_query_fetch(SEXP handle, SEXP max_rec) {
   int num_rec = asInteger(max_rec);
   int expand = (num_rec < 0);   /* dyn expand output to accommodate all rows*/
   if (expand || num_rec == 0) {
-    num_rec = rsqlite_driver()->fetch_default_rec;
+    num_rec = 200;
   }
 
   SEXP output = PROTECT(NEW_LIST(num_fields));

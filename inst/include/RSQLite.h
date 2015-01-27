@@ -1,13 +1,15 @@
 #include <Rcpp.h>
 #include "sqlite3.h"
 
+class SqliteResult;
 
 // Connection ------------------------------------------------------------------
 
 class SqliteConnection {
-public:
+  friend class SqliteResult;
   sqlite3* pConn_;
 
+public:
     SqliteConnection(std::string path, bool allow_ext, int flags, std::string vfs = "") {
     int rc = sqlite3_open_v2(path.c_str(), &pConn_, flags, vfs.size() ? vfs.c_str() : NULL);
     if (rc != SQLITE_OK) {

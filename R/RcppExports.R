@@ -37,3 +37,7 @@ rsqlite_row_count <- function(res) {
     .Call('RSQLite_rsqlite_row_count', PACKAGE = 'RSQLite', res)
 }
 
+rsqlite_rows_affected <- function(res) {
+    .Call('RSQLite_rsqlite_rows_affected', PACKAGE = 'RSQLite', res)
+}
+

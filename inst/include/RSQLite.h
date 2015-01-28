@@ -92,7 +92,7 @@ private:
 class SqliteResult {
   sqlite3_stmt* pStatement_;
   bool complete_;
-  int nrows_, ncols_;
+  int nrows_, ncols_, rows_affected_;
   std::vector<SEXPTYPE> types_;
   std::vector<std::string> names_;
   
@@ -107,6 +107,7 @@ public:
     
     nrows_ = 0;
     ncols_ = sqlite3_column_count(pStatement_);
+    rows_affected_ = sqlite3_changes(con->pConn_);
     complete_ = false;
     
     step();
@@ -119,6 +120,10 @@ public:
   
   int nrows() {
     return nrows_;
+  }
+  
+  int rows_affected() {
+    return rows_affected_;
   }
 
   void step() {

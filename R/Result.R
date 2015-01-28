@@ -188,7 +188,7 @@ setMethod("dbColumnInfo", "SQLiteResult", function(res, ...) {
 #' @export
 #' @rdname sqlite-meta
 setMethod("dbGetRowsAffected", "SQLiteResult", function(res, ...) {
-  dbGetInfo(res)$rowsAffected
+  rsqlite_rows_affected(res@ptr)
 })
 #' @export
 #' @rdname sqlite-meta

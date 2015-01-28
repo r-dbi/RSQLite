@@ -43,3 +43,10 @@ int rsqlite_row_count(XPtr<SqliteResult> res) {
   
   return res->nrows() - 1;
 }
+
+// [[Rcpp::export]]
+int rsqlite_rows_affected(XPtr<SqliteResult> res) {
+  if (R_ExternalPtrAddr(res) == NULL) stop("Results closed");
+  
+  return res->rows_affected();
+}

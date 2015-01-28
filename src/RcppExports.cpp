@@ -140,3 +140,18 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// rsqlite_rows_affected
+int rsqlite_rows_affected(XPtr<SqliteResult> res);
+RcppExport SEXP RSQLite_rsqlite_rows_affected(SEXP resSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP );
+        int __result = rsqlite_rows_affected(res);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}

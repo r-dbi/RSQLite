@@ -117,6 +117,10 @@ public:
     return complete_;
   }
   
+  int nrows() {
+    return nrows_;
+  }
+
   void step() {
     nrows_++;
     int rc = sqlite3_step(pStatement_);

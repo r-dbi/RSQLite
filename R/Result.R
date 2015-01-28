@@ -193,7 +193,7 @@ setMethod("dbGetRowsAffected", "SQLiteResult", function(res, ...) {
 #' @export
 #' @rdname sqlite-meta
 setMethod("dbGetRowCount", "SQLiteResult", function(res, ...) {
-  dbGetInfo(res)$rowCount
+  rsqlite_row_count(res@ptr)
 })
 #' @export
 #' @rdname sqlite-meta

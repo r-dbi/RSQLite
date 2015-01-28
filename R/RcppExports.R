@@ -33,3 +33,7 @@ rsqlite_has_completed <- function(res) {
     .Call('RSQLite_rsqlite_has_completed', PACKAGE = 'RSQLite', res)
 }
 
+rsqlite_row_count <- function(res) {
+    .Call('RSQLite_rsqlite_row_count', PACKAGE = 'RSQLite', res)
+}
+

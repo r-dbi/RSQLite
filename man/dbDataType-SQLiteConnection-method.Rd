@@ -22,14 +22,12 @@ This method is a straight-forward implementation of the corresponding
 generic function.
 }
 \examples{
-data(quakes)
-drv <- SQLite()
+dbDataType(SQLite(), 1)
+dbDataType(SQLite(), 1L)
+dbDataType(SQLite(), "1")
+dbDataType(SQLite(), TRUE)
+dbDataType(SQLite(), list())
 
-sapply(quakes, function(x) dbDataType(drv, x))
-
-dbDataType(drv, 1)
-dbDataType(drv, as.integer(1))
-dbDataType(drv, "1")
-dbDataType(drv, charToRaw("1"))
+sapply(datasets::quakes, dbDataType, dbObj = SQLite())
 }
 

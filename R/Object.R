@@ -12,49 +12,32 @@ NULL
 #' @param obj an R object whose SQL type we want to determine.
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @examples
-#' data(quakes)
-#' drv <- SQLite()
-#'
-#' sapply(quakes, function(x) dbDataType(drv, x))
+#' dbDataType(SQLite(), 1)
+#' dbDataType(SQLite(), 1L)
+#' dbDataType(SQLite(), "1")
+#' dbDataType(SQLite(), TRUE)
+#' dbDataType(SQLite(), list())
 #' 
-#' dbDataType(drv, 1)
-#' dbDataType(drv, as.integer(1))
-#' dbDataType(drv, "1")
-#' dbDataType(drv, charToRaw("1"))
+#' sapply(datasets::quakes, dbDataType, dbObj = SQLite())
 #' @export
 setMethod("dbDataType", "SQLiteConnection", function(dbObj, obj, ...) {
-  sqliteDataType(obj, ...)
+  sqliteDataType(SQLite(), ...)
 })
 
 #' @rdname dbDataType-SQLiteConnection-method
 #' @export
 setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
-  sqliteDataType(obj, ...)
-})
-
-sqliteDataType <- function(obj, ...) {
-  rs.class <- data.class(obj)
-  rs.mode <- storage.mode(obj)
-  switch(rs.class,
-    numeric = if (rs.mode=="integer") "INTEGER" else "REAL",
+  if (is.factor(obj)) return("TEXT")
+  
+  switch(typeof(obj), 
+    integer = "INTEGER",
+    double = "REAL",
     character = "TEXT",
     logical = "INTEGER",
-    factor = "TEXT",
-    ordered = "TEXT",
-    ## list maps to BLOB. Although not checked, the list must
-    ## either be empty or contain only raw vectors or NULLs.
     list = "BLOB",
-    ## attempt to store obj according to its storage mode if it has
-    ## an unrecognized class.
-    switch(rs.mode,
-      integer = "INTEGER",
-      double = "REAL",
-      ## you'll get this if class is AsIs for a list column
-      ## within a data.frame
-      list = if (rs.class == "AsIs") "BLOB" else "TEXT",
-      "TEXT"))
-}
-
+    stop("Unsupported type", call. = FALSE)
+  )
+})
 
 #' Check whether an SQLite object is valid or not.
 #' 

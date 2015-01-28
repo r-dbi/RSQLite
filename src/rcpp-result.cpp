@@ -22,7 +22,11 @@ void rsqlite_clear_result(XPtr<SqliteResult> res) {
 List rsqlite_fetch(XPtr<SqliteResult> res, int n = 10) {
   if (R_ExternalPtrAddr(res) == NULL) stop("Results closed");
   
-  return res->fetch(n);
+  if (n < 0) {
+    return res->fetch_all();  
+  } else {
+    return res->fetch(n);
+  }
 }
 
 // [[Rcpp::export]]

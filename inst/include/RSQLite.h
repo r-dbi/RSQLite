@@ -92,7 +92,7 @@ private:
 class SqliteResult {
   sqlite3_stmt* pStatement_;
   bool complete_;
-  int nrows_;
+  int nrows_, ncols_;
   std::vector<SEXPTYPE> types_;
   std::vector<std::string> names_;
   
@@ -106,6 +106,7 @@ public:
     }
     
     nrows_ = 0;
+    ncols_ = sqlite3_column_count(pStatement_);
     complete_ = false;
     
     step();
@@ -133,7 +134,7 @@ public:
   // corresponds to a DB table column, we guess the type based on the schema
   // Otherwise, we default to character.
   std::vector<SEXPTYPE> cache_field_data() {
-    int p = ncol();
+    int p = ncols_;
     for (int j = 0; j < p; ++j) {
       names_.push_back(sqlite3_column_name(pStatement_, j));
       
@@ -169,7 +170,6 @@ public:
   
   
   Rcpp::List fetch(int n_max = 10) {
-    int p = ncol();
     if (complete_) 
       n_max = 0;
 
@@ -177,7 +177,7 @@ public:
 
     int i;
     for (i = 0; i < n_max && !complete_; ++i) {
-      for (int j = 0; j < p; ++j) {
+      for (int j = 0; j < ncols_; ++j) {
         set_col_value(out[j], types_[j], pStatement_, i, j);  
       }
       step();
@@ -195,8 +195,35 @@ public:
     return out;
   }
   
-  int ncol() const {
-    return sqlite3_column_count(pStatement_);
+  Rcpp::List fetch_all() {
+    int n = 3;
+    Rcpp::List out = df_create(types_, n);
+    
+    int i = 0;
+    while(!complete_) {
+      if (i >= n) {
+        n *= 2;
+        out = df_resize(out, n);
+      }
+      
+      for (int j = 0; j < ncols_; ++j) {
+        set_col_value(out[j], types_[j], pStatement_, i, j);  
+      }
+      
+      step();
+      ++i;
+    }
+
+    // Trim back to what we actually used
+    if (i < n) {
+      out = df_resize(out, i);
+    }
+    
+    out.attr("row.names") = Rcpp::IntegerVector::create(NA_INTEGER, -i);
+    out.attr("class") = "data.frame";
+    out.attr("names") = names_;
+    
+    return out;
   }
   
   virtual ~SqliteResult() {

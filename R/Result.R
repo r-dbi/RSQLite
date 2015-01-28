@@ -94,13 +94,13 @@ sqliteSendQuery <- function(con, statement, bind.data = NULL) {
 #'    number of rows as defined in \code{\link{SQLite}}
 #' @export
 #' @rdname query
-setMethod("dbFetch", "SQLiteResult", function(res, n = 0, ...) {
+setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ...) {
   rsqlite_fetch(res@ptr, n = n)
 })
 
 #' @rdname query
 #' @rdname dbFetch-SQLiteResult-method
-setMethod("fetch", "SQLiteResult", function(res, n = 0, ...) {
+setMethod("fetch", "SQLiteResult", function(res, n = -1, ...) {
   rsqlite_fetch(res@ptr, n = n)
 })
 

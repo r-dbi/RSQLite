@@ -2,11 +2,9 @@
 % Please edit documentation in R/Result.R
 \docType{methods}
 \name{query}
-\alias{dbClearResult,SQLiteConnection-method}
 \alias{dbClearResult,SQLiteResult-method}
 \alias{dbFetch,SQLiteResult-method}
 \alias{dbGetPreparedQuery,SQLiteConnection,character,data.frame-method}
-\alias{dbGetQuery,SQLiteConnection,character-method}
 \alias{dbListResults,SQLiteConnection-method}
 \alias{dbSendPreparedQuery,SQLiteConnection,character,data.frame-method}
 \alias{dbSendQuery,SQLiteConnection,character-method}
@@ -19,17 +17,13 @@
 \S4method{dbSendPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
   statement, bind.data)
 
-\S4method{dbFetch}{SQLiteResult}(res, n = 0)
+\S4method{dbFetch}{SQLiteResult}(res, n = 0, ...)
 
-\S4method{fetch}{SQLiteResult}(res, n = 0)
+\S4method{fetch}{SQLiteResult}(res, n = 0, ...)
 
 \S4method{dbClearResult}{SQLiteResult}(res, ...)
 
-\S4method{dbClearResult}{SQLiteConnection}(res, ...)
-
 \S4method{dbListResults}{SQLiteConnection}(conn, ...)
-
-\S4method{dbGetQuery}{SQLiteConnection,character}(conn, statement)
 
 \S4method{dbGetPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
   statement, bind.data)

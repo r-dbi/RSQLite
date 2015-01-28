@@ -52,7 +52,7 @@ setMethod("show", "SQLiteResult", function(object) {
 #' 
 #' dbDisconnect(con)
 #' @name query
-NULL 
+NULL
 
 #' @rdname query
 #' @export
@@ -94,43 +94,21 @@ sqliteSendQuery <- function(con, statement, bind.data = NULL) {
 #'    number of rows as defined in \code{\link{SQLite}}
 #' @export
 #' @rdname query
-setMethod("dbFetch", "SQLiteResult", function(res, n = 0) {
-  sqliteFetch(res, n = n)
+setMethod("dbFetch", "SQLiteResult", function(res, n = 0, ...) {
+  rsqlite_fetch(res@ptr, n = n)
 })
 
 #' @rdname query
 #' @rdname dbFetch-SQLiteResult-method
-setMethod("fetch", "SQLiteResult", function(res, n = 0) {
-  sqliteFetch(res, n = n)
+setMethod("fetch", "SQLiteResult", function(res, n = 0, ...) {
+  rsqlite_fetch(res@ptr, n = n)
 })
-
-#' @useDynLib RSQLite rsqlite_query_fetch
-sqliteFetch <- function(res, n = 0) {  
-  check_valid(res)
-
-  # Returns NULL, or a list
-  rel <- .Call(rsqlite_query_fetch, res@Id, nrec = as.integer(n))
-  if (is.null(rel)) return(data.frame())
-  
-  attr(rel, "row.names") <- .set_row_names(length(rel[[1]]))
-  attr(rel, "class") <- "data.frame"
-  rel
-}
 
 #' @export
 #' @rdname query
-#' @useDynLib RSQLite rsqlite_result_free_handle
 setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
-  check_valid(res)
-  .Call(rsqlite_result_free_handle, res@Id)
-})
-
-#' @export
-#' @rdname query
-#' @useDynLib RSQLite rsqlite_result_free_handle
-setMethod("dbClearResult", "SQLiteConnection", function(res, ...) {
-  check_valid(res)
-  .Call(rsqlite_result_free_handle, res@Id)
+  rsqlite_clear_result(res@ptr)
+  invisible(TRUE)
 })
 
 #' @export
@@ -141,14 +119,6 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
   list(new("SQLiteResult", Id = conn@Id))
 })
 
-
-#' @rdname query
-#' @export
-setMethod("dbGetQuery", c("SQLiteConnection", "character"),
-  function(conn, statement){
-    sqliteGetQuery(conn, statement)
-  },
-)
 #' @rdname query
 #' @export
 setMethod("dbGetPreparedQuery", 

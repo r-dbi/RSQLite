@@ -25,3 +25,7 @@ rsqlite_clear_result <- function(res) {
     invisible(.Call('RSQLite_rsqlite_clear_result', PACKAGE = 'RSQLite', res))
 }
 
+rsqlite_fetch <- function(res, n = 10L) {
+    .Call('RSQLite_rsqlite_fetch', PACKAGE = 'RSQLite', res, n)
+}
+

@@ -44,6 +44,7 @@ class SqliteResult {
   bool complete_;
   int nrows_;
   std::vector<SEXPTYPE> types_;
+  std::vector<std::string> names_;
   
 public:
   SqliteResult(SqliteConnection* con, std::string sql) {
@@ -79,6 +80,8 @@ public:
     
     int p = ncol();
     for (int j = 0; j < p; ++j) {
+      names_.push_back(sqlite3_column_name(pStatement_, j));
+      
       switch(sqlite3_column_type(pStatement_, j)) {
       case SQLITE_INTEGER:
         types_.push_back(INTSXP);
@@ -112,7 +115,7 @@ public:
   
   Rcpp::List fetch(int n_max = 10) {
     step();
-    if (!complete_) Rcpp::stop("No rows to fetch");
+    if (complete_) Rcpp::stop("No rows to fetch");
 
     int p = ncol();
     std::vector<SEXPTYPE> types = column_info();
@@ -129,13 +132,25 @@ public:
         
         switch(types[j]) {
         case INTSXP:
-          INTEGER(col)[i] = sqlite3_column_int(pStatement_, j);
+          if (sqlite3_column_type(pStatement_, j) == SQLITE_NULL) {
+            INTEGER(col)[i] = NA_INTEGER;
+          } else {
+            INTEGER(col)[i] = sqlite3_column_int(pStatement_, j);
+          }
           break;
         case REALSXP:
-          REAL(col)[i] = sqlite3_column_double(pStatement_, j);
+          if (sqlite3_column_type(pStatement_, j) == SQLITE_NULL) {
+            REAL(col)[i] = NA_REAL;
+          } else {
+            REAL(col)[i] = sqlite3_column_double(pStatement_, j);
+          }
           break;
         case STRSXP:
-          SET_STRING_ELT(col, i, Rf_mkCharCE((const char*) sqlite3_column_text(pStatement_, j), CE_UTF8));
+          if (sqlite3_column_type(pStatement_, j) == SQLITE_NULL) {
+            SET_STRING_ELT(col, i, NA_STRING);
+          } else {
+            SET_STRING_ELT(col, i, Rf_mkCharCE((const char*) sqlite3_column_text(pStatement_, j), CE_UTF8));
+          }
           break;
         case RAWSXP:
           // Something with memcpy & RAW?
@@ -145,6 +160,10 @@ public:
       step();
     }
     
+    out.attr("row.names") = Rcpp::IntegerVector::create(NA_INTEGER, -n_max);
+    out.attr("class") = "data.frame";
+    out.attr("names") = names_;
+
     return out;
   }
   

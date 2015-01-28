@@ -30,3 +30,4 @@ bool rsqlite_is_valid(XPtr<SqliteConnection> con) {
   return R_ExternalPtrAddr(con) != NULL;
 }
 
+

@@ -94,3 +94,19 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// rsqlite_fetch
+List rsqlite_fetch(XPtr<SqliteResult> res, int n = 10);
+RcppExport SEXP RSQLite_rsqlite_fetch(SEXP resSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP );
+        Rcpp::traits::input_parameter< int >::type n(nSEXP );
+        List __result = rsqlite_fetch(res, n);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}

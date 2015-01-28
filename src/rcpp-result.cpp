@@ -17,3 +17,10 @@ void rsqlite_clear_result(XPtr<SqliteResult> res) {
   delete ress;
   R_ClearExternalPtr(res);
 }
+
+// [[Rcpp::export]]
+List rsqlite_fetch(XPtr<SqliteResult> res, int n = 10) {
+  if (R_ExternalPtrAddr(res) == NULL) stop("Results closed");
+  
+  return res->fetch(n);
+}

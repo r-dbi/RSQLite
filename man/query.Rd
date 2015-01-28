@@ -17,9 +17,9 @@
 \S4method{dbSendPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
   statement, bind.data)
 
-\S4method{dbFetch}{SQLiteResult}(res, n = 0, ...)
+\S4method{dbFetch}{SQLiteResult}(res, n = -1, ...)
 
-\S4method{fetch}{SQLiteResult}(res, n = 0, ...)
+\S4method{fetch}{SQLiteResult}(res, n = -1, ...)
 
 \S4method{dbClearResult}{SQLiteResult}(res, ...)
 

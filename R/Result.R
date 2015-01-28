@@ -7,7 +7,10 @@
 #' @keywords internal
 setClass("SQLiteResult", 
   contains = "DBIResult",
-  slots = list(ptr = "externalptr")
+  slots = list(
+    sql = "character",
+    ptr = "externalptr"
+  )
 )
 
 #' @rdname SQLiteResult-class
@@ -58,7 +61,10 @@ NULL
 #' @export
 setMethod("dbSendQuery", c("SQLiteConnection", "character"),
   function(conn, statement) {
-    new("SQLiteResult", ptr = rsqlite_send_query(conn@ptr, statement))
+    new("SQLiteResult", 
+      sql = statement,
+      ptr = rsqlite_send_query(conn@ptr, statement)
+    )
   }
 )
 
@@ -203,5 +209,5 @@ setMethod("dbHasCompleted", "SQLiteResult", function(res, ...) {
 #' @rdname sqlite-meta
 #' @export
 setMethod("dbGetStatement", "SQLiteResult", function(res, ...) {
-  dbGetInfo(res)$statement
+  res@sql
 })

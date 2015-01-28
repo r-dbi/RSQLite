@@ -14,10 +14,11 @@ Description: This package embeds the SQLite database engine in R and
     The source for the SQLite engine (version 3.8.6) is included.
 Depends:
     R (>= 2.10.0),
-    DBI (>= 0.3.1),
     methods
 Suggests:
     testthat
+Imports:
+    DBI (>= 0.3.1)
 License: LGPL (>= 2)
 URL: https://github.com/rstats-db/RSQLite
 BugReports: https://github.com/rstats-db/RSQLite/issues

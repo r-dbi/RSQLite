@@ -4,6 +4,9 @@
   way, and rather than using global variables, it's better set specific values 
   when creating a connection.
 
+- `RSQLite()` no longer automatically attached DBI when loaded. This is to 
+  encourage you to use `library(DBI); dbConnect(RSQLite::SQLite())`.
+
 # Version 1.0.0
 
 ## New features

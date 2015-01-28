@@ -3,6 +3,35 @@
 
 class SqliteResult;
 
+void inline set_col_value(SEXP col, SEXPTYPE type, sqlite3_stmt* pStatement_, int i, int j) {
+  switch(type) {
+  case INTSXP:
+    if (sqlite3_column_type(pStatement_, j) == SQLITE_NULL) {
+      INTEGER(col)[i] = NA_INTEGER;
+    } else {
+      INTEGER(col)[i] = sqlite3_column_int(pStatement_, j);
+    }
+    break;
+  case REALSXP:
+    if (sqlite3_column_type(pStatement_, j) == SQLITE_NULL) {
+      REAL(col)[i] = NA_REAL;
+    } else {
+      REAL(col)[i] = sqlite3_column_double(pStatement_, j);
+    }
+    break;
+  case STRSXP:
+    if (sqlite3_column_type(pStatement_, j) == SQLITE_NULL) {
+      SET_STRING_ELT(col, i, NA_STRING);
+    } else {
+      SET_STRING_ELT(col, i, Rf_mkCharCE((const char*) sqlite3_column_text(pStatement_, j), CE_UTF8));
+    }
+    break;
+  case RAWSXP:
+    // Something with memcpy & RAW?
+    break;
+  }
+}
+
 // Connection ------------------------------------------------------------------
 
 class SqliteConnection {
@@ -133,35 +162,8 @@ public:
     int i = 0;
     for (; i < n_max && !complete_; ++i) {
       for (int j = 0; j < p; ++j) {
-        SEXP col = out[j];
-        
-        switch(types_[j]) {
-        case INTSXP:
-          if (sqlite3_column_type(pStatement_, j) == SQLITE_NULL) {
-            INTEGER(col)[i] = NA_INTEGER;
-          } else {
-            INTEGER(col)[i] = sqlite3_column_int(pStatement_, j);
-          }
-          break;
-        case REALSXP:
-          if (sqlite3_column_type(pStatement_, j) == SQLITE_NULL) {
-            REAL(col)[i] = NA_REAL;
-          } else {
-            REAL(col)[i] = sqlite3_column_double(pStatement_, j);
-          }
-          break;
-        case STRSXP:
-          if (sqlite3_column_type(pStatement_, j) == SQLITE_NULL) {
-            SET_STRING_ELT(col, i, NA_STRING);
-          } else {
-            SET_STRING_ELT(col, i, Rf_mkCharCE((const char*) sqlite3_column_text(pStatement_, j), CE_UTF8));
-          }
-          break;
-        case RAWSXP:
-          // Something with memcpy & RAW?
-          break;
-        }
-      }      
+        set_col_value(out[j], types_[j], pStatement_, i, j);  
+      }
       step();
     }
     

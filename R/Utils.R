@@ -57,7 +57,7 @@ safe.write <- function(value, file, batch, row.names = TRUE, ..., sep = ',',
   while(from<=N){
     write.table(value[from:to,, drop=FALSE], file = file,
       append = from>1,
-      quote = quote.string, sep=sep, na = .SQLite.NA.string,
+      quote = quote.string, sep=sep, na = "\\N",
       row.names=row.names, col.names=(from==1), eol = eol, ...)
     from <- to+1
     to <- min(to+batch, N)

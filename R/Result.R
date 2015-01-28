@@ -115,8 +115,8 @@ setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
 #' @rdname query
 #' @useDynLib RSQLite rsqlite_result_free_handle
 setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
-  check_valid(conn)
-  list(new("SQLiteResult", Id = conn@Id))
+  stop("Querying the results associated with a connection is no longer supported", 
+    call. = FALSE)
 })
 
 #' @rdname query

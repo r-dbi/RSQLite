@@ -1,5 +1,10 @@
 # Version 1.0.9000
 
+- `dbListResults()` is no longer supported. Adding a result registry in the
+  connection would add significant work, especially when trying to avoid
+  memory leaks. You shouldn't need this function anyway, as RSQLite will
+  lazily cleanup results when they go out of scope.
+
 - All arguments to `SQLite()` are now ignored. Most of them didn't work any
   way, and rather than using global variables, it's better set specific values 
   when creating a connection.

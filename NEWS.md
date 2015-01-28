@@ -7,7 +7,8 @@
 
 - All arguments to `SQLite()` are now ignored. Most of them didn't work any
   way, and rather than using global variables, it's better set specific values 
-  when creating a connection.
+  when creating a connection. The `summary()` for `SQLiteDriver()` has
+  been removed since it no longer does anything useful.
 
 - `RSQLite()` no longer automatically attached DBI when loaded. This is to 
   encourage you to use `library(DBI); dbConnect(RSQLite::SQLite())`.

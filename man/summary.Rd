@@ -4,18 +4,12 @@
 \name{summary}
 \alias{summary}
 \alias{summary,SQLiteConnection-method}
-\alias{summary,SQLiteDriver-method}
 \alias{summary,SQLiteResult-method}
 \title{Summary methods}
 \usage{
-\S4method{summary}{SQLiteDriver}(object)
-
 \S4method{summary}{SQLiteConnection}(object)
 
 \S4method{summary}{SQLiteResult}(object)
-}
-\arguments{
-\item{verbose}{Show extra information.}
 }
 \description{
 Summary methods

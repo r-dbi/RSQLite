@@ -19,22 +19,6 @@ NULL
 setGeneric("summary")
 
 #' @export
-#' 
-#' @param verbose Show extra information.
-#' @rdname summary
-setMethod("summary", "SQLiteDriver", function(object) {
-  cat("<SQLiteDriver>\n")
-  info <- dbGetInfo(object)
-  cat("  Records per fetch: ", info$fetch_default_rec, "\n", sep = "")
-  cat("  SQLite version:    ", info$clientVersion, "\n", sep = "")
-  cat("  DBI version:       ", as.character(packageVersion("DBI")), "\n", sep = "")
-  cat("  Open connections:  ", info$num_con, "\n", sep = "")
-  cat("  Conn. processed:   ", info$counter, "\n", sep = "")
-  cat("  Shared cache:      ", info$shared_cache, "\n", sep = "")
-  invisible(NULL)
-})
-
-#' @export
 #' @rdname summary
 setMethod("summary", "SQLiteConnection", function(object) {
   cat("<SQLiteConnection>\n")

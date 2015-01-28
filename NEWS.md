@@ -1,5 +1,9 @@
 # Version 1.0.9000
 
+- The `SQLiteResult` method of `dbGetInfo()` has been deprecated: it's now
+  better to access the metadata with individual functions. `dbColumnInfo()`
+  will now return information even before you've retrieved any data.
+
 - `dbListResults()` is no longer supported. Adding a result registry in the
   connection would add significant work, especially when trying to avoid
   memory leaks. You shouldn't need this function anyway, as RSQLite will

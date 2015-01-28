@@ -36,7 +36,6 @@ bool rsqlite_has_completed(XPtr<SqliteResult> res) {
   return res->complete();
 }
 
-
 // [[Rcpp::export]]
 int rsqlite_row_count(XPtr<SqliteResult> res) {
   if (R_ExternalPtrAddr(res) == NULL) stop("Results closed");
@@ -49,4 +48,11 @@ int rsqlite_rows_affected(XPtr<SqliteResult> res) {
   if (R_ExternalPtrAddr(res) == NULL) stop("Results closed");
   
   return res->rows_affected();
+}
+
+// [[Rcpp::export]]
+List rsqlite_column_info(XPtr<SqliteResult> res) {
+  if (R_ExternalPtrAddr(res) == NULL) stop("Results closed");
+  
+  return res->column_info();
 }

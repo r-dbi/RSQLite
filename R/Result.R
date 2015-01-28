@@ -189,7 +189,7 @@ NULL
 #' @export
 #' @rdname sqlite-meta
 setMethod("dbColumnInfo", "SQLiteResult", function(res, ...) {
-  dbGetInfo(res)$fields
+  rsqlite_column_info(res@ptr)
 })
 #' @export
 #' @rdname sqlite-meta

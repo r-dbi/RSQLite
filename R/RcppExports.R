@@ -41,3 +41,7 @@ rsqlite_rows_affected <- function(res) {
     .Call('RSQLite_rsqlite_rows_affected', PACKAGE = 'RSQLite', res)
 }
 
+rsqlite_column_info <- function(res) {
+    .Call('RSQLite_rsqlite_column_info', PACKAGE = 'RSQLite', res)
+}
+

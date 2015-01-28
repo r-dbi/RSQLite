@@ -39,15 +39,8 @@ setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
 #' @export
 #' @useDynLib RSQLite rsqlite_result_info
 setMethod("dbGetInfo", "SQLiteResult", function(dbObj) {
-  check_valid(dbObj)
+  warning("dbGetInfo is deprecated: please use individual metadata functions instead", 
+    call. = FALSE)
   
-  info <- .Call(rsqlite_result_info, dbObj@Id)
-  flds <- info$fieldDescription[[1]]
-  
-  info$fields <- structure(info$fields, 
-    row.names = .set_row_names(length(info$fields[[1]])),
-    class = "data.frame"
-  )
-  
-  info
+  list()
 })

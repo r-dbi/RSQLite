@@ -155,3 +155,18 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// rsqlite_column_info
+List rsqlite_column_info(XPtr<SqliteResult> res);
+RcppExport SEXP RSQLite_rsqlite_column_info(SEXP resSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP );
+        List __result = rsqlite_column_info(res);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}

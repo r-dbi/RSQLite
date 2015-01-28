@@ -3,30 +3,12 @@
 #' @include Connection.R
 NULL
 
-#' Class SQLiteDriver with constructor SQLite (and methods).
+#' Class SQLiteDriver (and methods).
 #' 
-#' \code{SQLite()} returns a SQLiteDriver, which is used to select the correct
-#' method in \code{dbConnect()}.
+#' The SQLiteDriver, which is used to select the correct method in 
+#' \code{dbConnect()}. See more details in \code{\link{SQLite}}
 #' 
 #' @keywords internal
-#' @examples
-#' # initialize a new database to a tempfile and copy some data.frame
-#' # from the base package into it
-#' con <- dbConnect(RSQLite::SQLite(), ":memory:")
-#' data(USArrests)
-#' dbWriteTable(con, "USArrests", USArrests)
-#' 
-#' # query
-#' rs <- dbSendQuery(con, "select * from USArrests")
-#' d1 <- fetch(rs, n = 10)      # extract data in chunks of 10 rows
-#' dbHasCompleted(rs)
-#' d2 <- fetch(rs, n = -1)      # extract all remaining data
-#' dbHasCompleted(rs)
-#' dbClearResult(rs)
-#' dbListTables(con)
-#' 
-#' # clean up
-#' dbDisconnect(con)
 #' @export
 setClass("SQLiteDriver", 
   contains = "DBIDriver"
@@ -36,16 +18,6 @@ setClass("SQLiteDriver",
 setMethod("show", "SQLiteDriver", function(object) {
   cat("<SQLiteDriver>\n")
 })
-
-#' @rdname SQLiteDriver-class
-#' @export
-#' @import methods DBI
-SQLite <- function(...) {
-  if (nargs() > 0) {
-    warning("All arguments to RSQLite Driver are ignored.", call. = FALSE)
-  }
-  new("SQLiteDriver")
-}
 
 #' Unload SQLite driver.
 #' 

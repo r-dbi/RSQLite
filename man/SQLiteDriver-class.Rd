@@ -2,37 +2,15 @@
 % Please edit documentation in R/Driver.R
 \docType{class}
 \name{SQLiteDriver-class}
-\alias{SQLite}
 \alias{SQLiteDriver-class}
 \alias{show,SQLiteDriver-method}
-\title{Class SQLiteDriver with constructor SQLite (and methods).}
+\title{Class SQLiteDriver (and methods).}
 \usage{
 \S4method{show}{SQLiteDriver}(object)
-
-SQLite(...)
 }
 \description{
-\code{SQLite()} returns a SQLiteDriver, which is used to select the correct
-method in \code{dbConnect()}.
-}
-\examples{
-# initialize a new database to a tempfile and copy some data.frame
-# from the base package into it
-con <- dbConnect(RSQLite::SQLite(), ":memory:")
-data(USArrests)
-dbWriteTable(con, "USArrests", USArrests)
-
-# query
-rs <- dbSendQuery(con, "select * from USArrests")
-d1 <- fetch(rs, n = 10)      # extract data in chunks of 10 rows
-dbHasCompleted(rs)
-d2 <- fetch(rs, n = -1)      # extract all remaining data
-dbHasCompleted(rs)
-dbClearResult(rs)
-dbListTables(con)
-
-# clean up
-dbDisconnect(con)
+The SQLiteDriver, which is used to select the correct method in
+\code{dbConnect()}. See more details in \code{\link{SQLite}}
 }
 \keyword{internal}
 

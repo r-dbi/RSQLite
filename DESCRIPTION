@@ -18,7 +18,8 @@ Depends:
 Suggests:
     testthat
 Imports:
-    DBI (>= 0.3.1)
+    DBI (>= 0.3.1),
+    Rcpp
 License: LGPL (>= 2)
 URL: https://github.com/rstats-db/RSQLite
 BugReports: https://github.com/rstats-db/RSQLite/issues
@@ -42,5 +43,3 @@ Collate:
     'extensions.R'
     'zzz.R'
 LinkingTo: Rcpp
-Imports:
-    Rcpp

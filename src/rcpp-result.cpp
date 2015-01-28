@@ -24,3 +24,10 @@ List rsqlite_fetch(XPtr<SqliteResult> res, int n = 10) {
   
   return res->fetch(n);
 }
+
+// [[Rcpp::export]]
+bool rsqlite_has_completed(XPtr<SqliteResult> res) {
+  if (R_ExternalPtrAddr(res) == NULL) stop("Results closed");
+  
+  return res->complete();
+}

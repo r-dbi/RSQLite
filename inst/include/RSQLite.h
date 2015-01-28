@@ -57,6 +57,13 @@ public:
     
     nrows_ = 0;
     complete_ = false;
+    
+    step();
+    cache_field_data();
+  }
+  
+  bool complete() {
+    return complete_;
   }
   
   void step() {
@@ -75,9 +82,7 @@ public:
   // If a NULL value appears in the first row of the result and the column 
   // corresponds to a DB table column, we guess the type based on the schema
   // Otherwise, we default to character.
-  std::vector<SEXPTYPE> column_info() {
-    if (types_.size() != 0) return types_;
-    
+  std::vector<SEXPTYPE> cache_field_data() {
     int p = ncol();
     for (int j = 0; j < p; ++j) {
       names_.push_back(sqlite3_column_name(pStatement_, j));
@@ -93,17 +98,17 @@ public:
         types_.push_back(STRSXP);
         break;
       case SQLITE_BLOB:
-        // Needs to be list of raw?
-        types_.push_back(RAWSXP);
+        // List of raw vectors
+        types_.push_back(VECSXP);
         break;
       default: // SQLITE_NULL
         std::string decl(sqlite3_column_decltype(pStatement_, j));
         if (decl == "INTEGER") {
           types_.push_back(INTSXP);
-        } else if (decl == "DOUBLE") {
+        } else if (decl == "REAL") {
           types_.push_back(REALSXP);
-        } else if (decl == "RAW") {
-          types_.push_back(RAWSXP);
+        } else if (decl == "BLOB") {
+          types_.push_back(VECSXP);
         } else {
           types_.push_back(STRSXP);
         }
@@ -114,23 +119,22 @@ public:
   
   
   Rcpp::List fetch(int n_max = 10) {
-    step();
-    if (complete_) Rcpp::stop("No rows to fetch");
+    if (complete_) 
+      n_max = 0;
 
     int p = ncol();
-    std::vector<SEXPTYPE> types = column_info();
 
     // Space for output
     Rcpp::List out(p);
     for (int j = 0; j < p; ++j) {
-      out[j] = Rf_allocVector(types[j], n_max);
+      out[j] = Rf_allocVector(types_[j], n_max);
     }
     
     for (int i = 0; i < n_max && !complete_; ++i) {
       for (int j = 0; j < p; ++j) {
         SEXP col = out[j];
         
-        switch(types[j]) {
+        switch(types_[j]) {
         case INTSXP:
           if (sqlite3_column_type(pStatement_, j) == SQLITE_NULL) {
             INTEGER(col)[i] = NA_INTEGER;

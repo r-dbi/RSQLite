@@ -198,8 +198,7 @@ setMethod("dbGetRowCount", "SQLiteResult", function(res, ...) {
 #' @export
 #' @rdname sqlite-meta
 setMethod("dbHasCompleted", "SQLiteResult", function(res, ...) {
-  out <- dbGetInfo(res)$completed
-  if(out < 0) NA else out == 1L
+  rsqlite_has_completed(res@ptr)
 })
 #' @rdname sqlite-meta
 #' @export

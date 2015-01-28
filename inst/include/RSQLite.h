@@ -130,7 +130,8 @@ public:
       out[j] = Rf_allocVector(types_[j], n_max);
     }
     
-    for (int i = 0; i < n_max && !complete_; ++i) {
+    int i = 0;
+    for (; i < n_max && !complete_; ++i) {
       for (int j = 0; j < p; ++j) {
         SEXP col = out[j];
         
@@ -164,7 +165,14 @@ public:
       step();
     }
     
-    out.attr("row.names") = Rcpp::IntegerVector::create(NA_INTEGER, -n_max);
+    // If there weren't enough rows to fill up the initial set, trim them back
+    if (i < n_max) {
+      for (int j = 0; j < p; ++j) {
+        out[j] = Rf_lengthgets(out[j], i);
+      }
+    }
+    
+    out.attr("row.names") = Rcpp::IntegerVector::create(NA_INTEGER, -i);
     out.attr("class") = "data.frame";
     out.attr("names") = names_;
 

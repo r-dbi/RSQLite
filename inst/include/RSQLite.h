@@ -32,6 +32,27 @@ void inline set_col_value(SEXP col, SEXPTYPE type, sqlite3_stmt* pStatement_, in
   }
 }
 
+Rcpp::List inline df_resize(Rcpp::List df, int n) {
+  int p = df.size();
+  
+  Rcpp::List out(p);
+  for (int j = 0; j < p; ++j) {
+    out[j] = Rf_lengthgets(df[j], n);
+  }
+  
+  return out;
+}
+
+Rcpp::List inline df_create(std::vector<SEXPTYPE> types, int n) {
+  int p = types.size();
+  
+  Rcpp::List out(p);
+  for (int j = 0; j < p; ++j) {
+    out[j] = Rf_allocVector(types[j], n);
+  }
+  return out;
+}
+
 // Connection ------------------------------------------------------------------
 
 class SqliteConnection {
@@ -148,19 +169,14 @@ public:
   
   
   Rcpp::List fetch(int n_max = 10) {
+    int p = ncol();
     if (complete_) 
       n_max = 0;
 
-    int p = ncol();
+    Rcpp::List out = df_create(types_, n_max);
 
-    // Space for output
-    Rcpp::List out(p);
-    for (int j = 0; j < p; ++j) {
-      out[j] = Rf_allocVector(types_[j], n_max);
-    }
-    
-    int i = 0;
-    for (; i < n_max && !complete_; ++i) {
+    int i;
+    for (i = 0; i < n_max && !complete_; ++i) {
       for (int j = 0; j < p; ++j) {
         set_col_value(out[j], types_[j], pStatement_, i, j);  
       }
@@ -169,9 +185,7 @@ public:
     
     // If there weren't enough rows to fill up the initial set, trim them back
     if (i < n_max) {
-      for (int j = 0; j < p; ++j) {
-        out[j] = Rf_lengthgets(out[j], i);
-      }
+      out = df_resize(out, i);
     }
     
     out.attr("row.names") = Rcpp::IntegerVector::create(NA_INTEGER, -i);
@@ -180,7 +194,6 @@ public:
 
     return out;
   }
-  
   
   int ncol() const {
     return sqlite3_column_count(pStatement_);

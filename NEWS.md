@@ -1,5 +1,8 @@
 # Version 1.0.9000
 
+- All summary methods have been removed: the same information is now displayed
+  in the show methods, which were previously pretty useless.
+
 - New `sqliteVersion()` prints the header and library versions of RSQLite.
 
 - The `SQLiteResult` method of `dbGetInfo()` has been deprecated: it's now

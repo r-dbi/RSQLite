@@ -26,8 +26,7 @@ std::string rsqlite_get_exception(XPtr<SqliteConnection> con) {
 }
 
 // [[Rcpp::export]]
-bool rsqlite_is_valid(XPtr<SqliteConnection> con) {
+bool rsqlite_connection_valid(XPtr<SqliteConnection> con) {
   return R_ExternalPtrAddr(con) != NULL;
 }
-
 

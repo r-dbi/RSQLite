@@ -13,8 +13,8 @@ rsqlite_get_exception <- function(con) {
     .Call('RSQLite_rsqlite_get_exception', PACKAGE = 'RSQLite', con)
 }
 
-rsqlite_is_valid <- function(con) {
-    .Call('RSQLite_rsqlite_is_valid', PACKAGE = 'RSQLite', con)
+rsqlite_connection_valid <- function(con) {
+    .Call('RSQLite_rsqlite_connection_valid', PACKAGE = 'RSQLite', con)
 }
 
 rsqlite_send_query <- function(con, sql) {
@@ -43,6 +43,10 @@ rsqlite_rows_affected <- function(res) {
 
 rsqlite_column_info <- function(res) {
     .Call('RSQLite_rsqlite_column_info', PACKAGE = 'RSQLite', res)
+}
+
+rsqlite_result_valid <- function(res) {
+    .Call('RSQLite_rsqlite_result_valid', PACKAGE = 'RSQLite', res)
 }
 
 #' RSQLite version

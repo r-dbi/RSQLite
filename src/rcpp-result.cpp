@@ -56,3 +56,8 @@ List rsqlite_column_info(XPtr<SqliteResult> res) {
   
   return res->column_info();
 }
+
+// [[Rcpp::export]]
+bool rsqlite_result_valid(XPtr<SqliteResult> res) {
+  return R_ExternalPtrAddr(res) != NULL;
+}

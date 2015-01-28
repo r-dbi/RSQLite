@@ -35,7 +35,6 @@ Collate:
     'Result.R'
     'Object.R'
     'RcppExports.R'
-    'Summary.R'
     'Utils.R'
     'datasetsDb.R'
     'dbGetInfo.R'

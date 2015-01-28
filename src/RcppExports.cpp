@@ -51,15 +51,15 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
-// rsqlite_is_valid
-bool rsqlite_is_valid(XPtr<SqliteConnection> con);
-RcppExport SEXP RSQLite_rsqlite_is_valid(SEXP conSEXP) {
+// rsqlite_connection_valid
+bool rsqlite_connection_valid(XPtr<SqliteConnection> con);
+RcppExport SEXP RSQLite_rsqlite_connection_valid(SEXP conSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< XPtr<SqliteConnection> >::type con(conSEXP );
-        bool __result = rsqlite_is_valid(con);
+        bool __result = rsqlite_connection_valid(con);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -164,6 +164,21 @@ BEGIN_RCPP
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP );
         List __result = rsqlite_column_info(res);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// rsqlite_result_valid
+bool rsqlite_result_valid(XPtr<SqliteResult> res);
+RcppExport SEXP RSQLite_rsqlite_result_valid(SEXP resSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP );
+        bool __result = rsqlite_result_valid(res);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

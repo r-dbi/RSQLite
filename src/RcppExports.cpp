@@ -170,3 +170,17 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// rsqliteVersion
+CharacterVector rsqliteVersion();
+RcppExport SEXP RSQLite_rsqliteVersion() {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        CharacterVector __result = rsqliteVersion();
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}

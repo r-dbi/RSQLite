@@ -45,3 +45,12 @@ rsqlite_column_info <- function(res) {
     .Call('RSQLite_rsqlite_column_info', PACKAGE = 'RSQLite', res)
 }
 
+#' RSQLite version
+#' 
+#' @return A character vector containing header and library versions of 
+#'   RSQLite.
+#' @export
+rsqliteVersion <- function() {
+    .Call('RSQLite_rsqliteVersion', PACKAGE = 'RSQLite')
+}
+

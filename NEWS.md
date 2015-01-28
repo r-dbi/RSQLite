@@ -1,5 +1,7 @@
 # Version 1.0.9000
 
+- New `sqliteVersion()` prints the header and library versions of RSQLite.
+
 - The `SQLiteResult` method of `dbGetInfo()` has been deprecated: it's now
   better to access the metadata with individual functions. `dbColumnInfo()`
   will now return information even before you've retrieved any data.

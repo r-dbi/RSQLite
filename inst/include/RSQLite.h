@@ -139,6 +139,20 @@ public:
     }
   }
   
+  void copy_to(SqliteConnection* dest) {
+    sqlite3_backup* backup = sqlite3_backup_init(dest->pConn_, "main", 
+      pConn_, "main");
+
+    int rc = sqlite3_backup_step(backup, -1);
+    if (rc != SQLITE_DONE) {
+      Rcpp::stop("Failed to copy all data:\n%s", getException());
+    }
+    rc = sqlite3_backup_finish(backup);
+    if (rc != SQLITE_OK) {
+      Rcpp::stop("Could not finish copy:\n%s", getException());
+    }
+  }
+  
   virtual ~SqliteConnection() {
     try {
       sqlite3_close_v2(pConn_); 

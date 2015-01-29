@@ -21,66 +21,28 @@ sqliteQuickColumn <- function(con, table, column) {
 #' Copy a SQLite database
 #' 
 #' This function copies a database connection to a file or to another database
-#' connection.  It can be used to save an in-memory database (created using
+#' connection.It can be used to save an in-memory database (created using
 #' \code{dbname = ":memory:"}) to a file or to create an in-memory database as
 #' a copy of anothe database.
 #' 
-#' This function uses SQLite's experimental online backup API to make the copy.
-#' 
-#' @param from A \code{SQLiteConnection} object.  The main database in
-#' \code{from} will be copied to \code{to}.
-#' @param to Either a string specifying the file name where the copy will be
-#' written or a \code{SQLiteConnection} object pointing to an empty database.
-#' If \code{to} specifies an already existing file, it will be overwritten
-#' without a warning.  When \code{to} is a database connection, it is assumed
-#' to point to an empty and unused database; the behavior is undefined
-#' otherwise.
-#' @return Returns \code{NULL}.
+#' @param from A \code{SQLiteConnection} object. The main database in
+#'   \code{from} will be copied to \code{to}.
+#' @param to A \code{SQLiteConnection} object pointing to an empty database.
+#' @return Returns \code{NULL} (invisibly).
 #' @author Seth Falcon
 #' @references \url{http://www.sqlite.org/backup.html}
+#' @export
 #' @examples
-#' 
-#' ## Create an in memory database
-#' db <- dbConnect(SQLite(), dbname = ":memory:")
-#' df <- data.frame(letters=letters[1:4], numbers=1:4, stringsAsFactors = FALSE)
-#' ok <- dbWriteTable(db, "table1", df, row.names = FALSE)
-#' stopifnot(ok)
-#' 
-#' ## Copy the contents of the in memory database to
-#' ## the specified file
-#' backupDbFile <- tempfile()
-#' sqliteCopyDatabase(db, backupDbFile)
-#' diskdb <- dbConnect(SQLite(), dbname = backupDbFile)
-#' stopifnot(identical(df, dbReadTable(diskdb, "table1")))
-#' 
-#' ## Copy from one connection to another
-#' db2 <- dbConnect(SQLite(), dbname = ":memory:")
-#' sqliteCopyDatabase(db, db2)
-#' stopifnot(identical(df, dbReadTable(db2, "table1")))
-#' 
-#' ## cleanup
-#' dbDisconnect(db)
-#' dbDisconnect(diskdb)
-#' dbDisconnect(db2)
-#' unlink(backupDbFile)
-#' 
-#' @export sqliteCopyDatabase
-#' @useDynLib RSQLite RS_SQLite_copy_database
+#' # Copy the built in databaseDb() to an in memory dataset
+#' db <- dbConnect(RSQLite::SQLite(), ":memory:")
+#' sqliteCopyDatabase(datasetsDb(), db)
+#' dbListTables(db)
 sqliteCopyDatabase <- function(from, to) {
   if (!is(from, "SQLiteConnection"))
     stop("'from' must be a SQLiteConnection object")
-  destdb <- to
-  if (!is(to, "SQLiteConnection")) {
-    if (is.character(to) && length(to) == 1L && !is.na(to) && nzchar(to)) {
-      if (":memory:" == to)
-        stop("invalid file name for 'to'.  Use a SQLiteConnection",
-          " object to copy to an in-memory database")
-      destdb <- dbConnect(SQLite(), dbname = path.expand(to))
-      on.exit(dbDisconnect(destdb))
-    } else {
-      stop("'to' must be SQLiteConnection object or a non-empty string")
-    }
-  }
-  .Call(RS_SQLite_copy_database, from@Id, destdb@Id)
+  if (!is(to, "SQLiteConnection"))
+    stop("'to' must be a SQLiteConnection object")
+  
+  rsqlite_copy_database(from@ptr, to@ptr)
   invisible(NULL)
 }

@@ -13,6 +13,10 @@ rsqlite_get_exception <- function(con) {
     .Call('RSQLite_rsqlite_get_exception', PACKAGE = 'RSQLite', con)
 }
 
+rsqlite_copy_database <- function(from, to) {
+    invisible(.Call('RSQLite_rsqlite_copy_database', PACKAGE = 'RSQLite', from, to))
+}
+
 rsqlite_connection_valid <- function(con) {
     .Call('RSQLite_rsqlite_connection_valid', PACKAGE = 'RSQLite', con)
 }

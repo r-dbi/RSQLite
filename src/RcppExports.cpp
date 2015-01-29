@@ -51,6 +51,19 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// rsqlite_copy_database
+void rsqlite_copy_database(XPtr<SqliteConnection> from, XPtr<SqliteConnection> to);
+RcppExport SEXP RSQLite_rsqlite_copy_database(SEXP fromSEXP, SEXP toSEXP) {
+BEGIN_RCPP
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< XPtr<SqliteConnection> >::type from(fromSEXP );
+        Rcpp::traits::input_parameter< XPtr<SqliteConnection> >::type to(toSEXP );
+        rsqlite_copy_database(from, to);
+    }
+    return R_NilValue;
+END_RCPP
+}
 // rsqlite_connection_valid
 bool rsqlite_connection_valid(XPtr<SqliteConnection> con);
 RcppExport SEXP RSQLite_rsqlite_connection_valid(SEXP conSEXP) {

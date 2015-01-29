@@ -26,6 +26,15 @@ std::string rsqlite_get_exception(XPtr<SqliteConnection> con) {
 }
 
 // [[Rcpp::export]]
+void rsqlite_copy_database(XPtr<SqliteConnection> from, 
+                           XPtr<SqliteConnection> to) {
+  if (R_ExternalPtrAddr(from) == NULL) stop("From connection expired");
+  if (R_ExternalPtrAddr(to) == NULL) stop("To connection expired");
+  
+  from->copy_to((SqliteConnection*) to);
+}
+
+// [[Rcpp::export]]
 bool rsqlite_connection_valid(XPtr<SqliteConnection> con) {
   return R_ExternalPtrAddr(con) != NULL;
 }

@@ -23,13 +23,5 @@ in the database).
 Return an entire column from a table in a SQLite database as an R vector of
 the appropriate type.  This function is experimental and subject to change.
 }
-\details{
-This function relies upon the SQLite internal \code{ROWID} column to
-determine the number of rows in the table.  This may not work depending on
-the table schema definition and pattern of update.
-}
-\author{
-Seth Falcon
-}
-\keyword{interface}
+\keyword{internal}
 

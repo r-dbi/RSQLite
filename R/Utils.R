@@ -3,10 +3,6 @@
 #' Return an entire column from a table in a SQLite database as an R vector of
 #' the appropriate type.  This function is experimental and subject to change.
 #' 
-#' This function relies upon the SQLite internal \code{ROWID} column to
-#' determine the number of rows in the table.  This may not work depending on
-#' the table schema definition and pattern of update.
-#' 
 #' @param con a \code{SQLiteConnection} object as produced by
 #' \code{sqliteNewConnection}.
 #' @param table a string specifying the name of the table
@@ -14,12 +10,12 @@
 #' table to retrieve.
 #' @return an R vector of the appropriate type (based on the type of the column
 #' in the database).
-#' @author Seth Falcon
-#' @keywords interface
-#' @export sqliteQuickColumn
+#' @keywords internal
+#' @export
 sqliteQuickColumn <- function(con, table, column) {
-  .Call("RS_SQLite_quick_column", con@Id, as.character(table),
-    as.character(column), PACKAGE="RSQLite")
+  warning("Deprecated. Please use dbReadTable instead.")
+
+  dbReadTable(con, table, select.cols = column, row.names = FALSE)[[1]]
 }
 
 #' Copy a SQLite database

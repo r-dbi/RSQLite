@@ -1,5 +1,8 @@
 # Version 1.0.9000
 
+- `sqliteQuickColumn()` has been deprecated. Use regular querying functions
+  instead.
+
 - New strategy for prepared queries. Create a prepared query with 
   `dbSendQuery()` and bind values with `dbBind()`. You can also create 
   and execute in one step with `dbSendQuery(con, sql, params)`: this

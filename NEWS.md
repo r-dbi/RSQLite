@@ -1,5 +1,8 @@
 # Version 1.0.9000
 
+- New strategy for prepared queries. Create a prepared query with 
+  `dbSendQuery()` and bind values with `dbBind()`.
+
 - All summary methods have been removed: the same information is now displayed
   in the show methods, which were previously pretty useless.
 

@@ -60,8 +60,8 @@ setMethod("show", "SQLiteResult", function(object) {
 #' # Use dbSendPreparedQuery/dbGetPreparedQuery for "prepared" queries
 #' dbGetPreparedQuery(con, "SELECT * FROM arrests WHERE Murder < ?", 
 #'    data.frame(x = 3))
-#' dbGetPreparedQuery(con, "SELECT * FROM arrests WHERE Murder < (:x)", 
-#'    data.frame(x = 3))
+#' dbGetPreparedQuery(con, "SELECT * FROM arrests WHERE Murder < (:x) AND Murder != (:y)", 
+#'    data.frame(y = 3, x=2.2))
 #' 
 #' dbDisconnect(con)
 #' @name query
@@ -88,6 +88,13 @@ setMethod("dbGetQuery", signature("SQLiteConnection", "character"),
     dbFetch(rs, n = -1, ...)
   }
 )
+
+#' @rdname query
+#' @export
+setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
+  rsqlite_bind_params(res@ptr, params)
+  invisible(res)
+})
 
 #' @rdname query
 #' @param bind.data A data frame of data to be bound.

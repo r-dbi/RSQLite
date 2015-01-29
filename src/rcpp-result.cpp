@@ -32,6 +32,14 @@ List rsqlite_fetch(XPtr<SqliteResult> res, int n = 10) {
 }
 
 // [[Rcpp::export]]
+void rsqlite_bind_params(XPtr<SqliteResult> res, List params) {
+  if (R_ExternalPtrAddr(res) == NULL) stop("Results expired");
+  
+  res->bind(params);
+}
+
+
+// [[Rcpp::export]]
 bool rsqlite_has_completed(XPtr<SqliteResult> res) {
   if (R_ExternalPtrAddr(res) == NULL) stop("Results expired");
   

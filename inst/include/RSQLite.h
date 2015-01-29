@@ -55,13 +55,16 @@ Rcpp::List inline df_create(std::vector<SEXPTYPE> types, int n) {
 
 void inline bind_parameter(sqlite3_stmt* stmt, int i, std::string name, SEXP value_) {
   if (name != "") {
-    int i = sqlite3_bind_parameter_index(stmt, name.c_str());
-    if (i == 0) 
-      Rcpp::stop("No parameter with name %s", name);
+    i = sqlite3_bind_parameter_index(stmt, name.c_str());
+    if (i == 0) {
+      Rcpp::stop("No parameter with name %s.", name);
+    }
+  } else {
+    i++; // sqlite parameters are 1-indexed
   }
-  
+
   if (Rf_length(value_) != 1)
-    Rcpp::stop("Parameter %i does not have length 1", i);
+    Rcpp::stop("Parameter %i does not have length 1.", i);
 
   if (TYPEOF(value_) == LGLSXP) {
     Rcpp::LogicalVector value(value_);
@@ -95,7 +98,7 @@ void inline bind_parameter(sqlite3_stmt* stmt, int i, std::string name, SEXP val
         SQLITE_TRANSIENT);
     }
   } else {
-    Rcpp::stop("Don't know how to handle inputs of type: %s", 
+    Rcpp::stop("Don't know how to handle parameter of type %s.", 
       Rf_type2char(TYPEOF(value_)));
   }
 }
@@ -138,8 +141,8 @@ private:
 
 class SqliteResult {
   sqlite3_stmt* pStatement_;
-  bool complete_;
-  int nrows_, ncols_, rows_affected_;
+  bool complete_, ready_;
+  int nrows_, ncols_, rows_affected_, nparams_;
   std::vector<SEXPTYPE> types_;
   std::vector<std::string> names_;
   
@@ -152,13 +155,44 @@ public:
       Rcpp::stop("Could not send query:\n%s", con->getException());
     }
     
+    nparams_ = sqlite3_bind_parameter_count(pStatement_);
+    if (nparams_ == 0) {
+      init();
+    }
+  }
+  
+  void init() {
+    ready_ = true;
     nrows_ = 0;
     ncols_ = sqlite3_column_count(pStatement_);
-    rows_affected_ = sqlite3_changes(con->pConn_);
     complete_ = false;
     
     step();
+    // rows_affected_ = sqlite3_changes(con->pConn_);
     cache_field_data();
+  }
+  
+  void bind(Rcpp::List params) {
+    if (params.size() != nparams_) {
+      Rcpp::stop("Query requires %i params; %i supplied.",
+        params.size(), nparams_);
+    }
+
+    sqlite3_reset(pStatement_);
+    sqlite3_clear_bindings(pStatement_);
+    
+    Rcpp::CharacterVector names;
+    if (params.attr("names") == R_NilValue) {
+      names = Rcpp::CharacterVector(params.size());
+    } else {
+      names = params.attr("names");
+    }
+    
+    for (int i = 0; i < params.size(); ++i) {
+      bind_parameter(pStatement_, i, std::string(names[i]), params[i]);
+    }
+    
+    init();
   }
   
   bool complete() {
@@ -190,6 +224,9 @@ public:
   // corresponds to a DB table column, we guess the type based on the schema
   // Otherwise, we default to character.
   std::vector<SEXPTYPE> cache_field_data() {
+    types_.clear();
+    names_.clear();
+    
     int p = ncols_;
     for (int j = 0; j < p; ++j) {
       names_.push_back(sqlite3_column_name(pStatement_, j));
@@ -231,6 +268,9 @@ public:
   
   
   Rcpp::List fetch(int n_max = 10) {
+    if (!ready_)
+      Rcpp::stop("Prepared query needs to be bound first");
+
     if (complete_) 
       n_max = 0;
 
@@ -258,6 +298,9 @@ public:
   
 
   Rcpp::List fetch_all() {
+    if (!ready_)
+      Rcpp::stop("Prepared query needs to be bound first");
+    
     int n = 100;
     Rcpp::List out = df_create(types_, n);
     

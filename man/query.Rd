@@ -2,6 +2,7 @@
 % Please edit documentation in R/Result.R
 \docType{methods}
 \name{query}
+\alias{dbBind,SQLiteResult-method}
 \alias{dbClearResult,SQLiteResult-method}
 \alias{dbFetch,SQLiteResult-method}
 \alias{dbGetPreparedQuery,SQLiteConnection,character,data.frame-method}
@@ -16,6 +17,8 @@
 \S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement)
 
 \S4method{dbGetQuery}{SQLiteConnection,character}(conn, statement, ...)
+
+\S4method{dbBind}{SQLiteResult}(res, params, ...)
 
 \S4method{dbSendPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
   statement, bind.data)
@@ -40,9 +43,9 @@ provided.}
 
 \item{...}{Unused. Needed for compatibility with generic.}
 
-\item{bind.data}{A data frame of data to be bound.}
-
 \item{res}{an \code{\linkS4class{SQLiteResult}} object.}
+
+\item{bind.data}{A data frame of data to be bound.}
 
 \item{n}{maximum number of records to retrieve per fetch. Use \code{-1} to
 retrieve all pending records; use \code{0} for to fetch the default
@@ -73,8 +76,8 @@ dbClearResult(res)
 # Use dbSendPreparedQuery/dbGetPreparedQuery for "prepared" queries
 dbGetPreparedQuery(con, "SELECT * FROM arrests WHERE Murder < ?",
    data.frame(x = 3))
-dbGetPreparedQuery(con, "SELECT * FROM arrests WHERE Murder < (:x)",
-   data.frame(x = 3))
+dbGetPreparedQuery(con, "SELECT * FROM arrests WHERE Murder < (:x) AND Murder != (:y)",
+   data.frame(y = 3, x=2.2))
 
 dbDisconnect(con)
 }

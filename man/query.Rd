@@ -5,23 +5,19 @@
 \alias{dbBind,SQLiteResult-method}
 \alias{dbClearResult,SQLiteResult-method}
 \alias{dbFetch,SQLiteResult-method}
-\alias{dbGetPreparedQuery,SQLiteConnection,character,data.frame-method}
 \alias{dbGetQuery,SQLiteConnection,character-method}
 \alias{dbListResults,SQLiteConnection-method}
-\alias{dbSendPreparedQuery,SQLiteConnection,character,data.frame-method}
 \alias{dbSendQuery,SQLiteConnection,character-method}
 \alias{fetch,SQLiteResult-method}
 \alias{query}
 \title{Execute a SQL statement on a database connection}
 \usage{
-\S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement)
+\S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement,
+  params = NULL, ...)
 
 \S4method{dbGetQuery}{SQLiteConnection,character}(conn, statement, ...)
 
 \S4method{dbBind}{SQLiteResult}(res, params, ...)
-
-\S4method{dbSendPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
-  statement, bind.data)
 
 \S4method{dbFetch}{SQLiteResult}(res, n = -1, ...)
 
@@ -30,9 +26,6 @@
 \S4method{dbClearResult}{SQLiteResult}(res, ...)
 
 \S4method{dbListResults}{SQLiteConnection}(conn, ...)
-
-\S4method{dbGetPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
-  statement, bind.data)
 }
 \arguments{
 \item{conn}{an \code{\linkS4class{SQLiteConnection}} object.}
@@ -45,8 +38,6 @@ provided.}
 
 \item{res}{an \code{\linkS4class{SQLiteResult}} object.}
 
-\item{bind.data}{A data frame of data to be bound.}
-
 \item{n}{maximum number of records to retrieve per fetch. Use \code{-1} to
 retrieve all pending records; use \code{0} for to fetch the default
 number of rows as defined in \code{\link{SQLite}}}
@@ -58,27 +49,26 @@ results (and they'll fit in memory) use \code{dbGetQuery} which sends,
 fetches and clears for you.
 }
 \examples{
-con <- dbConnect(SQLite(), ":memory:")
-dbWriteTable(con, "arrests", datasets::USArrests)
+db <- RSQLite::datasetsDb()
 
 # Run query to get results as dataframe
-dbGetQuery(con, "SELECT * FROM arrests limit 3")
+dbGetQuery(db, "SELECT * FROM USArrests LIMIT 3")
 
 # Send query to pull requests in batches
-res <- dbSendQuery(con, "SELECT * FROM arrests")
-data <- fetch(res, n = 2)
-data
+res <- dbSendQuery(con, "SELECT * FROM USArrests")
+fetch(res, n = 2)
+fetch(res, n = 2)
 dbHasCompleted(res)
-
-dbListResults(con)
 dbClearResult(res)
 
-# Use dbSendPreparedQuery/dbGetPreparedQuery for "prepared" queries
-dbGetPreparedQuery(con, "SELECT * FROM arrests WHERE Murder < ?",
-   data.frame(x = 3))
-dbGetPreparedQuery(con, "SELECT * FROM arrests WHERE Murder < (:x) AND Murder != (:y)",
-   data.frame(y = 3, x=2.2))
+# Parameterised queries are safest when you accept user input
+dbGetQuery(db, "SELECT * FROM USArrests WHERE Murder < ?", list(3))
 
-dbDisconnect(con)
+# Or create and then bind
+rs <- dbSendQuery(db, "SELECT * FROM USArrests WHERE Murder < ?")
+dbBind(rs, list(3))
+dbFetch(rs)
+
+dbDisconnect(db)
 }
 

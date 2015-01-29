@@ -42,39 +42,44 @@ setMethod("show", "SQLiteResult", function(object) {
 #'   provided.
 #' @param ... Unused. Needed for compatibility with generic.
 #' @examples
-#' con <- dbConnect(SQLite(), ":memory:")
-#' dbWriteTable(con, "arrests", datasets::USArrests)
+#' db <- RSQLite::datasetsDb()
 #' 
 #' # Run query to get results as dataframe
-#' dbGetQuery(con, "SELECT * FROM arrests limit 3")
+#' dbGetQuery(db, "SELECT * FROM USArrests LIMIT 3")
 #'
 #' # Send query to pull requests in batches
-#' res <- dbSendQuery(con, "SELECT * FROM arrests")
-#' data <- fetch(res, n = 2)
-#' data
+#' res <- dbSendQuery(con, "SELECT * FROM USArrests")
+#' fetch(res, n = 2)
+#' fetch(res, n = 2)
 #' dbHasCompleted(res)
-#' 
-#' dbListResults(con)
 #' dbClearResult(res)
 #' 
-#' # Use dbSendPreparedQuery/dbGetPreparedQuery for "prepared" queries
-#' dbGetPreparedQuery(con, "SELECT * FROM arrests WHERE Murder < ?", 
-#'    data.frame(x = 3))
-#' dbGetPreparedQuery(con, "SELECT * FROM arrests WHERE Murder < (:x) AND Murder != (:y)", 
-#'    data.frame(y = 3, x=2.2))
+#' # Parameterised queries are safest when you accept user input
+#' dbGetQuery(db, "SELECT * FROM USArrests WHERE Murder < ?", list(3))
 #' 
-#' dbDisconnect(con)
+#' # Or create and then bind
+#' rs <- dbSendQuery(db, "SELECT * FROM USArrests WHERE Murder < ?")
+#' dbBind(rs, list(3))
+#' dbFetch(rs)
+#' 
+#' dbDisconnect(db)
 #' @name query
 NULL
 
 #' @rdname query
 #' @export
 setMethod("dbSendQuery", c("SQLiteConnection", "character"),
-  function(conn, statement) {
-    new("SQLiteResult", 
+  function(conn, statement, params = NULL, ...) {
+    rs <- new("SQLiteResult", 
       sql = statement,
       ptr = rsqlite_send_query(conn@ptr, statement)
     )
+    
+    if (!is.null(params)) {
+      dbBind(rs, params)
+    }
+    
+    rs
   }
 )
 
@@ -83,6 +88,7 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
 setMethod("dbGetQuery", signature("SQLiteConnection", "character"), 
   function(conn, statement, ...) {
     rs <- dbSendQuery(conn, statement, ...)
+
     on.exit(dbClearResult(rs))
     
     dbFetch(rs, n = -1, ...)
@@ -92,34 +98,16 @@ setMethod("dbGetQuery", signature("SQLiteConnection", "character"),
 #' @rdname query
 #' @export
 setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
+  if (is.null(names(params))) {
+    names(params) <- rep("", length(params))
+  } else {
+    present <- names(params) != ""
+    names(params)[present] <- paste0("$", names(params)[present])
+  }
+  
   rsqlite_bind_params(res@ptr, params)
   invisible(res)
 })
-
-#' @rdname query
-#' @param bind.data A data frame of data to be bound.
-#' @export
-setMethod("dbSendPreparedQuery", 
-  c("SQLiteConnection", "character", "data.frame"),
-  function(conn, statement, bind.data) {
-    sqliteSendQuery(conn, statement, bind.data)
-  }
-)
-
-#' @useDynLib RSQLite rsqlite_query_send
-sqliteSendQuery <- function(con, statement, bind.data = NULL) {
-  if (!is.null(bind.data)) {
-    if (!is.data.frame(bind.data)) {
-      bind.data <- as.data.frame(bind.data)
-    }
-    if (nrow(bind.data) == 0 || ncol(bind.data) == 0) {
-      stop("bind.data must have non-zero dimensions")
-    }
-  }
-  
-  rsId <- .Call(rsqlite_query_send, con@Id, as.character(statement), bind.data)
-  new("SQLiteResult", Id = rsId)
-}
 
 
 #' @param res an \code{\linkS4class{SQLiteResult}} object.
@@ -152,32 +140,6 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
   stop("Querying the results associated with a connection is no longer supported", 
     call. = FALSE)
 })
-
-#' @rdname query
-#' @export
-setMethod("dbGetPreparedQuery", 
-  c("SQLiteConnection", "character", "data.frame"),
-  function(conn, statement, bind.data) {
-    sqliteGetQuery(conn, statement, bind.data)
-  }
-)
-
-sqliteGetQuery <- function(con, statement, bind.data = NULL) {
-  rs <- sqliteSendQuery(con, statement, bind.data)
-  on.exit(dbClearResult(rs))
-  
-  if (dbHasCompleted(rs)) {
-    return(invisible())
-  }
-  
-  res <- sqliteFetch(rs, n = -1)
-  if (!dbHasCompleted(rs)) {
-    warning("Pending rows")
-  }
-  
-  res
-}
-
 
 #' Database interface meta-data.
 #' 

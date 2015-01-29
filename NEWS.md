@@ -1,7 +1,13 @@
 # Version 1.0.9000
 
 - New strategy for prepared queries. Create a prepared query with 
-  `dbSendQuery()` and bind values with `dbBind()`.
+  `dbSendQuery()` and bind values with `dbBind()`. You can also create 
+  and execute in one step with `dbSendQuery(con, sql, params)`: this
+  has no performance benefits but protects you from SQL injection attacks.
+  `dbSendPreparedQuery()` and `dbGetPreparedQuery()` have been removed:
+  they were never part of the official API, were dangerous because they
+  issued multiple queries, and always matched on position, even if you 
+  used names.
 
 - All summary methods have been removed: the same information is now displayed
   in the show methods, which were previously pretty useless.

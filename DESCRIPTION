@@ -36,6 +36,7 @@ Collate:
     'Result.R'
     'Object.R'
     'RcppExports.R'
+    'Result-deprecated.R'
     'Utils.R'
     'datasetsDb.R'
     'dbGetInfo.R'

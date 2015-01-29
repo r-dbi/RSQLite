@@ -177,17 +177,14 @@ public:
       Rcpp::stop("Query requires %i params; %i supplied.",
         params.size(), nparams_);
     }
-
+    if (params.attr("names") == R_NilValue) {
+      Rcpp::stop("Parameters must be a named list.");
+    }
+    
     sqlite3_reset(pStatement_);
     sqlite3_clear_bindings(pStatement_);
     
-    Rcpp::CharacterVector names;
-    if (params.attr("names") == R_NilValue) {
-      names = Rcpp::CharacterVector(params.size());
-    } else {
-      names = params.attr("names");
-    }
-    
+    Rcpp::CharacterVector names = params.attr("names");
     for (int i = 0; i < params.size(); ++i) {
       bind_parameter(pStatement_, i, std::string(names[i]), params[i]);
     }

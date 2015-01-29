@@ -32,7 +32,7 @@ dnl 3. If the user did not specify a SQLite installation, we set a
 dnl    preprocessor define to include the SQLite amalgamation.
 dnl
 
-AC_INIT(src/rsqlite-c.h)
+AC_INIT(src/rcpp-rsqlite.cpp)
 
 # As suggested by BDR, I may need to use CFLAGS to compile under 64-bit
 # (I can't test this), but see "Writing R Extensions"

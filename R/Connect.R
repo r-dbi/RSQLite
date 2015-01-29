@@ -92,6 +92,8 @@ setMethod("dbConnect", "SQLiteDriver",
            synchronous = "off", flags = SQLITE_RWC, vfs = NULL) {
     dbname <- path.expand(dbname)
     
+    stopifnot(length(dbname) == 1, !is.na(dbname))
+    
     vfs <- check_vfs(vfs)
     stopifnot(is.integer(flags), length(flags) == 1)
 

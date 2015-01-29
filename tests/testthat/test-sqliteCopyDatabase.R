@@ -20,7 +20,7 @@ test_that("can backup memory db to disk", {
   dbWriteTable(con1, "mtcars", mtcars)
   
   dbfile <- tempfile()
-  sqliteCopyDatabase(con1, dbfile)
+  sqliteCopyDatabase(con1, dbConnect(SQLite(), dbfile))
   
   con2 <- dbConnect(SQLite(), dbfile)
   expect_true(dbExistsTable(con2, "mtcars"))

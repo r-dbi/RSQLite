@@ -79,6 +79,17 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
 )
 
 #' @rdname query
+#' @export
+setMethod("dbGetQuery", signature("SQLiteConnection", "character"), 
+  function(conn, statement, ...) {
+    rs <- dbSendQuery(conn, statement, ...)
+    on.exit(dbClearResult(rs))
+    
+    dbFetch(rs, n = -1, ...)
+  }
+)
+
+#' @rdname query
 #' @param bind.data A data frame of data to be bound.
 #' @export
 setMethod("dbSendPreparedQuery", 

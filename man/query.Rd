@@ -5,6 +5,7 @@
 \alias{dbClearResult,SQLiteResult-method}
 \alias{dbFetch,SQLiteResult-method}
 \alias{dbGetPreparedQuery,SQLiteConnection,character,data.frame-method}
+\alias{dbGetQuery,SQLiteConnection,character-method}
 \alias{dbListResults,SQLiteConnection-method}
 \alias{dbSendPreparedQuery,SQLiteConnection,character,data.frame-method}
 \alias{dbSendQuery,SQLiteConnection,character-method}
@@ -13,6 +14,8 @@
 \title{Execute a SQL statement on a database connection}
 \usage{
 \S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement)
+
+\S4method{dbGetQuery}{SQLiteConnection,character}(conn, statement, ...)
 
 \S4method{dbSendPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
   statement, bind.data)
@@ -35,6 +38,8 @@
 statement that should be executed.  Only a single SQL statment should be
 provided.}
 
+\item{...}{Unused. Needed for compatibility with generic.}
+
 \item{bind.data}{A data frame of data to be bound.}
 
 \item{res}{an \code{\linkS4class{SQLiteResult}} object.}
@@ -42,8 +47,6 @@ provided.}
 \item{n}{maximum number of records to retrieve per fetch. Use \code{-1} to
 retrieve all pending records; use \code{0} for to fetch the default
 number of rows as defined in \code{\link{SQLite}}}
-
-\item{...}{Unused. Needed for compatibility with generic.}
 }
 \description{
 To retrieve results a chunk at a time, use \code{dbSendQuery},

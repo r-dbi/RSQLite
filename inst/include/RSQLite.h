@@ -175,7 +175,7 @@ public:
   void bind(Rcpp::List params) {
     if (params.size() != nparams_) {
       Rcpp::stop("Query requires %i params; %i supplied.",
-        params.size(), nparams_);
+        nparams_, params.size());
     }
     if (params.attr("names") == R_NilValue) {
       Rcpp::stop("Parameters must be a named list.");

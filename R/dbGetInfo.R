@@ -28,16 +28,15 @@ setMethod("dbGetInfo", "SQLiteDriver", function(dbObj) {
 
 #' @rdname dbGetInfo
 #' @export
-#' @useDynLib RSQLite rsqlite_connection_info
 setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
-  check_valid(dbObj)
-  info <- .Call(rsqlite_connection_info, dbObj@Id)
-  info
+  warning("dbGetInfo is deprecated: please use individual metadata functions instead", 
+    call. = FALSE)
+  
+  list()
 })
 
 #' @rdname dbGetInfo
 #' @export
-#' @useDynLib RSQLite rsqlite_result_info
 setMethod("dbGetInfo", "SQLiteResult", function(dbObj) {
   warning("dbGetInfo is deprecated: please use individual metadata functions instead", 
     call. = FALSE)

@@ -68,15 +68,3 @@ test_that("correct number of columns, even if 0 rows", {
   ans <- dbGetQuery(db, "select 1 as a, 2 as b where 0")
   expect_equal(dim(ans), c(0L, 2L))  
 })
-
-test_that("BLOBs retrieve as raw vectors", {
-  con <- dbConnect(SQLite(), ":memory:")
-  local <- data.frame(
-    a = 1:10,
-    z = I(lapply(paste("hello", 1:10), charToRaw))
-  )
-  dbWriteTable(con, "t1", local)
-  
-  remote <- dbReadTable(con, "t1")
-  expect_equal(remote$z, unclass(local$z))
-})

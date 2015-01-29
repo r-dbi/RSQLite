@@ -21,7 +21,7 @@ NULL
 #' sapply(datasets::quakes, dbDataType, dbObj = SQLite())
 #' @export
 setMethod("dbDataType", "SQLiteConnection", function(dbObj, obj, ...) {
-  sqliteDataType(SQLite(), ...)
+  dbDataType(SQLite(), obj, ...)
 })
 
 #' @rdname dbDataType-SQLiteConnection-method

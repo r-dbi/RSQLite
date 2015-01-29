@@ -80,44 +80,13 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
 #' @param nrows Number of rows to read to determine types.
 #' @param colClasses Character vector of R type names, used to override
 #'   defaults when imputing classes from on-disk file.
-#' @useDynLib RSQLite RS_SQLite_importFile
 #' @export
 #' @rdname dbWriteTable
 setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
   function(conn, name, value, field.types = NULL, overwrite = FALSE, 
            append = FALSE, header = TRUE, colClasses = NA, row.names = FALSE, 
            nrows = 50, sep = ",", eol="\n", skip = 0) {
-    if(overwrite && append)
-      stop("overwrite and append cannot both be TRUE")
-    value <- path.expand(value)
     
-    dbBegin(conn)
-    on.exit(dbRollback(conn))
-    
-    found <- dbExistsTable(conn, name)
-    if (found && !overwrite && !append) {
-      stop("Table ", name, " exists in database, and both overwrite and", 
-        " append are FALSE", call. = FALSE)
-    }
-    if (found && overwrite) {
-      dbRemoveTable(conn, name)
-    }
-    
-    if (!found || overwrite) {
-      # Initialise table with first `nrows` lines
-      d <- read.table(value, sep = sep, header = header, skip = skip, nrows = nrows,
-        na.strings = "\\N", comment.char = "", colClasses = colClasses,
-        stringsAsFactors = FALSE)
-      sql <- sqliteBuildTableDefinition(conn, name, d, field.types = field.types,
-        row.names = row.names)
-      dbGetQuery(conn, sql)
-    }
-    
-    skip <- skip + as.integer(header)
-    .Call(RS_SQLite_importFile, conn@Id, name, value, sep, eol, as.integer(skip))
-    
-    on.exit(NULL)
-    dbCommit(conn)
-    TRUE
+    stop("Deprecated. This will come back at some point in the future")
   }
 )

@@ -1,5 +1,9 @@
 # Version 1.0.9000
 
+- `dbWriteTable()` with a file path has been deprecated due to the high
+  maintenance burden of the existing code. It will eventually come back when
+  we have a good API for parsing files from disk.
+
 - `sqliteQuickColumn()` has been deprecated. Use regular querying functions
   instead.
 

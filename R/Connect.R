@@ -66,7 +66,6 @@ SQLITE_RO <- 1L
 #' @aliases SQLITE_RWC SQLITE_RW SQLITE_RO
 #' @export
 #' @rdname SQLite
-#' @useDynLib RSQLite rsqlite_connection_create
 #' @examples
 #' # Initialize a temporary in memory database and copy a data.frame into it
 #' con <- dbConnect(RSQLite::SQLite(), ":memory:")
@@ -147,7 +146,6 @@ setMethod("dbConnect", "SQLiteConnection", function(drv){
 
 #' @export
 #' @rdname SQLite
-#' @useDynLib RSQLite rsqlite_connection_destroy
 setMethod("dbDisconnect", "SQLiteConnection", function(conn) {
   rsqlite_disconnect(conn@ptr)
   invisible(TRUE)

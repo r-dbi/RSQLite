@@ -162,15 +162,20 @@ public:
         types_.push_back(VECSXP);
         break;
       default: // SQLITE_NULL
-        std::string decl(sqlite3_column_decltype(pStatement_, j));
-        if (decl == "INTEGER") {
-          types_.push_back(INTSXP);
-        } else if (decl == "REAL") {
-          types_.push_back(REALSXP);
-        } else if (decl == "BLOB") {
-          types_.push_back(VECSXP);
+        const char* decl_raw = sqlite3_column_decltype(pStatement_, j);
+        if (decl_raw == NULL) {
+          types_.push_back(CHARSXP);
         } else {
-          types_.push_back(STRSXP);
+          std::string decl(decl_raw);
+          if (decl == "INTEGER") {
+            types_.push_back(INTSXP);
+          } else if (decl == "REAL") {
+            types_.push_back(REALSXP);
+          } else if (decl == "BLOB") {
+            types_.push_back(VECSXP);
+          } else {
+            types_.push_back(STRSXP);
+          }
         }
       }
     }

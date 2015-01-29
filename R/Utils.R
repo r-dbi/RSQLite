@@ -133,15 +133,3 @@ sqliteCopyDatabase <- function(from, to) {
   .Call(RS_SQLite_copy_database, from@Id, destdb@Id)
   invisible(NULL)
 }
-
-
-
-explict_rownames <- function(df, row.names = NA) {
-  if (is.na(row.names)) {
-    row.names <- is.character(attr(df, "row.names"))
-  }
-  if (!row.names) return(df)
-  
-  rn <- data.frame(row_names = row.names(df))
-  cbind(rn, df)
-}

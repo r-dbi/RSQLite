@@ -34,52 +34,13 @@
 #' 
 #' dbDisconnect(con)
 setMethod("dbReadTable", c("SQLiteConnection", "character"),
-  function(conn, name, row.names, check.names = TRUE, 
-           select.cols = "*") {
+  function(conn, name, row.names = NA, check.names = TRUE, select.cols = "*") {
     out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM", name))
     
     if (check.names) {
       names(out) <- make.names(names(out), unique = TRUE)
     }
     
-    row.names <- rownames_column(out, row.names)
-    if (is.null(row.names)) return(out)
-    
-    rnms <- as.character(out[[row.names]])
-    if (anyDuplicated(rnms)) {
-      warning("row.names not set (duplicate elements in field)", call. = FALSE)
-    } else {
-      out <- out[, -row.names, drop = F]
-      row.names(out) <- rnms
-    }
-    out
+    SQL::columnToRownames(out, row.names)
   }
 )
-
-# Figure out which column to 
-rownames_column <- function(df, row.names) {
-  if (missing(row.names)) {
-    if (!"row_names" %in% names(df)) {
-      return(NULL)
-    }
-
-    row.names <- "row_names"
-  } 
-  
-  if (is.null(row.names) || identical(row.names, FALSE)) {
-    NULL
-  } else if (is.character(row.names)) {
-    if (!(row.names %in% names(df))) {
-      stop("Column ", row.names, " not present in output", call. = FALSE)
-    }
-    match(row.names, names(df))
-  } else if (is.numeric(row.names)) {
-    if (row.names == 0) return(NULL)
-    if (row.names < 0 || row.names > ncol(df)) {
-      stop("Column ", row.names, " not present in output", call. = FALSE)
-    }
-    row.names
-  } else {
-    stop("Unknown specification for row.names")
-  }
-}

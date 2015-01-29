@@ -54,19 +54,14 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
       dbRemoveTable(conn, name)
     }
     
-    value <- explict_rownames(value, row.names)
-    
     if (!found || overwrite) {
-      sql <- sqliteBuildTableDefinition(conn, name, value, 
-        field.types = field.types, row.names = FALSE)
+      sql <- SQL::sqlTableCreate(conn, name, value, row.names = row.names)
       dbGetQuery(conn, sql)
     }
     
     if (nrow(value) > 0) {
-      valStr <- paste(rep("?", ncol(value)), collapse = ",")
-      sql <- sprintf("insert into %s values (%s)", name, valStr)
-      rs <- dbSendPreparedQuery(conn, sql, bind.data = value)
-      dbClearResult(rs)
+      sql <- SQL::sqlTableInsertInto(conn, name, value, row.names = row.names)
+      dbGetQuery(conn, sql)
     }
 
     on.exit(NULL)

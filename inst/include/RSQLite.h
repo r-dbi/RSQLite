@@ -235,7 +235,7 @@ public:
   }
   
   Rcpp::List fetch_all() {
-    int n = 3;
+    int n = 100;
     Rcpp::List out = df_create(types_, n);
     
     int i = 0;

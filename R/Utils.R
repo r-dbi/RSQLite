@@ -22,51 +22,6 @@ sqliteQuickColumn <- function(con, table, column) {
     as.character(column), PACKAGE="RSQLite")
 }
 
-#' Write a data.frame avoiding exceeding memory limits
-#' 
-#' This function batches calls to \code{write.table} to avoid exceeding memory
-#' limits for very large data.frames.
-#' 
-#' The function has a while loop invoking \code{\link{write.table}} for subsets
-#' of \code{batch} rows of \code{value}.  Since this is a helper function for
-#' \code{\link[RMySQL]{mysqlWriteTable}} has hardcoded other arguments to
-#' \code{write.table}.
-#' 
-#' @param value a data.frame;
-#' @param file a file object (connection, file name, etc).
-#' @param batch maximum number of rows to write at a time.
-#' @param ...,sep,eol,quote.string,row.names 
-#'   arguments are passed to \code{write.table}.
-#' @return \code{NULL}, invisibly.
-#' @note No error checking whatsoever is done.
-#' @seealso \code{\link{write.table}}
-#' @noRd
-safe.write <- function(value, file, batch, row.names = TRUE, ..., sep = ',',
-                       eol = '\n', quote.string = FALSE) {
-  N <- nrow(value)
-  if(N<1){
-    warning("no rows in data.frame")
-    return(NULL)
-  }
-  if(missing(batch) || is.null(batch))
-    batch <- 10000
-  else if(batch<=0)
-    batch <- N
-  from <- 1
-  to <- min(batch, N)
-  while(from<=N){
-    write.table(value[from:to,, drop=FALSE], file = file,
-      append = from>1,
-      quote = quote.string, sep=sep, na = "\\N",
-      row.names=row.names, col.names=(from==1), eol = eol, ...)
-    from <- to+1
-    to <- min(to+batch, N)
-  }
-  invisible(NULL)
-}
-
-
-
 #' Copy a SQLite database
 #' 
 #' This function copies a database connection to a file or to another database

@@ -5,7 +5,7 @@
 \alias{dbReadTable,SQLiteConnection,character-method}
 \title{Convenience functions for importing/exporting DBMS tables}
 \usage{
-\S4method{dbReadTable}{SQLiteConnection,character}(conn, name, row.names,
+\S4method{dbReadTable}{SQLiteConnection,character}(conn, name, row.names = NA,
   check.names = TRUE, select.cols = "*")
 }
 \arguments{

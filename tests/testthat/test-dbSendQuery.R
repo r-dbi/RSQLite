@@ -14,8 +14,10 @@ test_that("simple named binding works", {
   dbWriteTable(con, "t1", data.frame(x = 1, y = 2))
   
   dbSendQuery(con, "INSERT INTO t1 VALUES ($x, $y)", list(y = 1, x = 2))
-  
   expect_equal(dbReadTable(con, "t1")$x, c(1, 2)) 
+  
+  dbSendQuery(con, "INSERT INTO t1 VALUES (:x, :y)", list(y = 3, x = 4))
+  expect_equal(dbReadTable(con, "t1")$x, c(1, 2, 4)) 
 })
 
 test_that("bound params must match query params", {

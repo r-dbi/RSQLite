@@ -53,12 +53,31 @@ Rcpp::List inline df_create(std::vector<SEXPTYPE> types, int n) {
   return out;
 }
 
+int inline find_parameter(sqlite3_stmt* stmt, std::string name) {
+  int i = 0;
+  
+  i = sqlite3_bind_parameter_index(stmt, name.c_str());
+  if (i != 0) 
+    return i;
+  
+  std::string colon = ":" + name;
+  i = sqlite3_bind_parameter_index(stmt, colon.c_str());
+  if (i != 0) 
+    return i;
+
+  std::string dollar = "$" + name;
+  i = sqlite3_bind_parameter_index(stmt, dollar.c_str());
+  if (i != 0) 
+    return i;
+  
+  return 0;
+}
+
 void inline bind_parameter(sqlite3_stmt* stmt, int i, std::string name, SEXP value_) {
   if (name != "") {
-    i = sqlite3_bind_parameter_index(stmt, name.c_str());
-    if (i == 0) {
+    i = find_parameter(stmt, name);
+    if (i == 0)
       Rcpp::stop("No parameter with name %s.", name);
-    }
   } else {
     i++; // sqlite parameters are 1-indexed
   }

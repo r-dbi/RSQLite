@@ -100,9 +100,6 @@ setMethod("dbGetQuery", signature("SQLiteConnection", "character"),
 setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
   if (is.null(names(params))) {
     names(params) <- rep("", length(params))
-  } else {
-    present <- names(params) != ""
-    names(params)[present] <- paste0("$", names(params)[present])
   }
   
   rsqlite_bind_params(res@ptr, params)

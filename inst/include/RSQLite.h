@@ -53,6 +53,53 @@ Rcpp::List inline df_create(std::vector<SEXPTYPE> types, int n) {
   return out;
 }
 
+void inline bind_parameter(sqlite3_stmt* stmt, int i, std::string name, SEXP value_) {
+  if (name != "") {
+    int i = sqlite3_bind_parameter_index(stmt, name.c_str());
+    if (i == 0) 
+      Rcpp::stop("No parameter with name %s", name);
+  }
+  
+  if (Rf_length(value_) != 1)
+    Rcpp::stop("Parameter %i does not have length 1", i);
+
+  if (TYPEOF(value_) == LGLSXP) {
+    Rcpp::LogicalVector value(value_);
+    if (value[0] == NA_LOGICAL) {
+      sqlite3_bind_null(stmt, i);
+    } else {
+      sqlite3_bind_int(stmt, i, value[0]);
+    }
+  } else if (TYPEOF(value_) == INTSXP) {
+    Rcpp::IntegerVector value(value_);
+    if (value[0] == NA_INTEGER) {
+      sqlite3_bind_null(stmt, i);
+    } else {
+      sqlite3_bind_int(stmt, i, value[0]);
+    }
+  } else if (TYPEOF(value_) == REALSXP) {
+    Rcpp::NumericVector value(value_);
+    if (value[0] == NA_REAL) {
+      sqlite3_bind_null(stmt, i);
+    } else {
+      sqlite3_bind_double(stmt, i, value[0]);
+    }
+  } else if (TYPEOF(value_) == STRSXP) {
+    Rcpp::CharacterVector value(value_);
+    if (value[0] == NA_STRING) {
+      sqlite3_bind_null(stmt, i);
+    } else {
+      Rcpp::String value2 = value[0];
+      std::string value3(value2);
+      sqlite3_bind_text(stmt, i, value3.c_str(), value3.size() + 1, 
+        SQLITE_TRANSIENT);
+    }
+  } else {
+    Rcpp::stop("Don't know how to handle inputs of type: %s", 
+      Rf_type2char(TYPEOF(value_)));
+  }
+}
+
 // Connection ------------------------------------------------------------------
 
 class SqliteConnection {

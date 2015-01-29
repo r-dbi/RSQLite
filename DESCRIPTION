@@ -42,4 +42,5 @@ Collate:
     'dbGetInfo.R'
     'extensions.R'
     'zzz.R'
-LinkingTo: Rcpp
+LinkingTo: Rcpp,
+    BH

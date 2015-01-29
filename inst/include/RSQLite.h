@@ -1,7 +1,11 @@
 #include <Rcpp.h>
+#include <boost/shared_ptr.hpp>
 #include "sqlite3.h"
 
 class SqliteResult;
+class SqliteConnection;
+typedef boost::shared_ptr<SqliteConnection> SqliteConnectionPtr;
+
 
 void inline set_col_value(SEXP col, SEXPTYPE type, sqlite3_stmt* pStatement_, int i, int j) {
   switch(type) {
@@ -139,7 +143,7 @@ public:
     }
   }
   
-  void copy_to(SqliteConnection* dest) {
+  void copy_to(SqliteConnectionPtr dest) {
     sqlite3_backup* backup = sqlite3_backup_init(dest->pConn_, "main", 
       pConn_, "main");
 
@@ -170,22 +174,36 @@ private:
   
 };
 
+// Connection wrapper ----------------------------------------------------------
+
+class SqliteConnectionWrapper {
+public:
+  SqliteConnectionPtr pConn;
+  SqliteConnectionWrapper(std::string path, bool allow_ext, int flags, std::string vfs = "") {
+    pConn = SqliteConnectionPtr(new SqliteConnection(path, allow_ext, flags, vfs));
+  }
+};
+
+
 // Result ----------------------------------------------------------------------
 
 class SqliteResult {
   sqlite3_stmt* pStatement_;
+  SqliteConnectionPtr pConn_;
   bool complete_, ready_;
   int nrows_, ncols_, rows_affected_, nparams_;
   std::vector<SEXPTYPE> types_;
   std::vector<std::string> names_;
   
 public:
-  SqliteResult(SqliteConnection* con, std::string sql) {
-    int rc = sqlite3_prepare_v2(con->pConn_, sql.c_str(), sql.size() + 1, 
+  SqliteResult(SqliteConnectionPtr pConn, std::string sql) {
+    pConn_ = pConn;
+    
+    int rc = sqlite3_prepare_v2(pConn_->pConn_, sql.c_str(), sql.size() + 1, 
       &pStatement_, NULL);
     
     if (rc != SQLITE_OK) {
-      Rcpp::stop("Could not send query:\n%s", con->getException());
+      Rcpp::stop(pConn_->getException());
     }
     
     nparams_ = sqlite3_bind_parameter_count(pStatement_);
@@ -201,7 +219,7 @@ public:
     complete_ = false;
     
     step();
-    // rows_affected_ = sqlite3_changes(con->pConn_);
+    rows_affected_ = sqlite3_changes(pConn_->pConn_);
     cache_field_data();
   }
   
@@ -244,7 +262,7 @@ public:
     if (rc == SQLITE_DONE) {
       complete_ = true;
     } else if (rc != SQLITE_ROW) {
-      Rcpp::stop("Could not fetch row");
+      Rcpp::stop(pConn_->getException());
     }
   }
   

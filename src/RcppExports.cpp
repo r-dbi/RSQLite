@@ -7,7 +7,7 @@
 using namespace Rcpp;
 
 // rsqlite_connect
-XPtr<SqliteConnection> rsqlite_connect(std::string path, bool allow_ext, int flags, std::string vfs = "");
+XPtr<SqliteConnectionWrapper> rsqlite_connect(std::string path, bool allow_ext, int flags, std::string vfs = "");
 RcppExport SEXP RSQLite_rsqlite_connect(SEXP pathSEXP, SEXP allow_extSEXP, SEXP flagsSEXP, SEXP vfsSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
@@ -17,7 +17,7 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< bool >::type allow_ext(allow_extSEXP );
         Rcpp::traits::input_parameter< int >::type flags(flagsSEXP );
         Rcpp::traits::input_parameter< std::string >::type vfs(vfsSEXP );
-        XPtr<SqliteConnection> __result = rsqlite_connect(path, allow_ext, flags, vfs);
+        XPtr<SqliteConnectionWrapper> __result = rsqlite_connect(path, allow_ext, flags, vfs);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -25,25 +25,25 @@ BEGIN_RCPP
 END_RCPP
 }
 // rsqlite_disconnect
-void rsqlite_disconnect(XPtr<SqliteConnection> con);
+void rsqlite_disconnect(XPtr<SqliteConnectionWrapper> con);
 RcppExport SEXP RSQLite_rsqlite_disconnect(SEXP conSEXP) {
 BEGIN_RCPP
     {
         Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< XPtr<SqliteConnection> >::type con(conSEXP );
+        Rcpp::traits::input_parameter< XPtr<SqliteConnectionWrapper> >::type con(conSEXP );
         rsqlite_disconnect(con);
     }
     return R_NilValue;
 END_RCPP
 }
 // rsqlite_get_exception
-std::string rsqlite_get_exception(XPtr<SqliteConnection> con);
+std::string rsqlite_get_exception(XPtr<SqliteConnectionWrapper> con);
 RcppExport SEXP RSQLite_rsqlite_get_exception(SEXP conSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< XPtr<SqliteConnection> >::type con(conSEXP );
+        Rcpp::traits::input_parameter< XPtr<SqliteConnectionWrapper> >::type con(conSEXP );
         std::string __result = rsqlite_get_exception(con);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
@@ -52,26 +52,26 @@ BEGIN_RCPP
 END_RCPP
 }
 // rsqlite_copy_database
-void rsqlite_copy_database(XPtr<SqliteConnection> from, XPtr<SqliteConnection> to);
+void rsqlite_copy_database(XPtr<SqliteConnectionWrapper> from, XPtr<SqliteConnectionWrapper> to);
 RcppExport SEXP RSQLite_rsqlite_copy_database(SEXP fromSEXP, SEXP toSEXP) {
 BEGIN_RCPP
     {
         Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< XPtr<SqliteConnection> >::type from(fromSEXP );
-        Rcpp::traits::input_parameter< XPtr<SqliteConnection> >::type to(toSEXP );
+        Rcpp::traits::input_parameter< XPtr<SqliteConnectionWrapper> >::type from(fromSEXP );
+        Rcpp::traits::input_parameter< XPtr<SqliteConnectionWrapper> >::type to(toSEXP );
         rsqlite_copy_database(from, to);
     }
     return R_NilValue;
 END_RCPP
 }
 // rsqlite_connection_valid
-bool rsqlite_connection_valid(XPtr<SqliteConnection> con);
+bool rsqlite_connection_valid(XPtr<SqliteConnectionWrapper> con);
 RcppExport SEXP RSQLite_rsqlite_connection_valid(SEXP conSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< XPtr<SqliteConnection> >::type con(conSEXP );
+        Rcpp::traits::input_parameter< XPtr<SqliteConnectionWrapper> >::type con(conSEXP );
         bool __result = rsqlite_connection_valid(con);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
@@ -80,13 +80,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // rsqlite_send_query
-XPtr<SqliteResult> rsqlite_send_query(XPtr<SqliteConnection> con, std::string sql);
+XPtr<SqliteResult> rsqlite_send_query(XPtr<SqliteConnectionWrapper> con, std::string sql);
 RcppExport SEXP RSQLite_rsqlite_send_query(SEXP conSEXP, SEXP sqlSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< XPtr<SqliteConnection> >::type con(conSEXP );
+        Rcpp::traits::input_parameter< XPtr<SqliteConnectionWrapper> >::type con(conSEXP );
         Rcpp::traits::input_parameter< std::string >::type sql(sqlSEXP );
         XPtr<SqliteResult> __result = rsqlite_send_query(con, sql);
         PROTECT(__sexp_result = Rcpp::wrap(__result));

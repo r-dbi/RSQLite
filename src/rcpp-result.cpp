@@ -20,7 +20,7 @@ void rsqlite_clear_result(XPtr<SqliteResult> res) {
 
 // [[Rcpp::export]]
 List rsqlite_fetch(XPtr<SqliteResult> res, int n = 10) {
-  if (R_ExternalPtrAddr(res) == NULL) stop("Results closed");
+  if (R_ExternalPtrAddr(res) == NULL) stop("Results expired");
   
   if (n < 0) {
     return res->fetch_all();  
@@ -31,14 +31,14 @@ List rsqlite_fetch(XPtr<SqliteResult> res, int n = 10) {
 
 // [[Rcpp::export]]
 bool rsqlite_has_completed(XPtr<SqliteResult> res) {
-  if (R_ExternalPtrAddr(res) == NULL) stop("Results closed");
+  if (R_ExternalPtrAddr(res) == NULL) stop("Results expired");
   
   return res->complete();
 }
 
 // [[Rcpp::export]]
 int rsqlite_row_count(XPtr<SqliteResult> res) {
-  if (R_ExternalPtrAddr(res) == NULL) stop("Results closed");
+  if (R_ExternalPtrAddr(res) == NULL) stop("Results expired");
   
   return res->nrows() - 1;
 }
@@ -52,7 +52,7 @@ int rsqlite_rows_affected(XPtr<SqliteResult> res) {
 
 // [[Rcpp::export]]
 List rsqlite_column_info(XPtr<SqliteResult> res) {
-  if (R_ExternalPtrAddr(res) == NULL) stop("Results closed");
+  if (R_ExternalPtrAddr(res) == NULL) stop("Results expired");
   
   return res->column_info();
 }

@@ -3,9 +3,12 @@
 \docType{methods}
 \name{dbDataType,SQLiteConnection,ANY-method}
 \alias{dbDataType,SQLiteConnection,ANY-method}
+\alias{dbDataType,SQLiteDriver,ANY-method}
 \title{Determine the SQL Data Type of an R object.}
 \usage{
 \S4method{dbDataType}{SQLiteConnection,ANY}(dbObj, obj, ...)
+
+\S4method{dbDataType}{SQLiteDriver,ANY}(dbObj, obj, ...)
 }
 \arguments{
 \item{dbObj}{a \code{SQLiteDriver} object,}

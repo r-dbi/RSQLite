@@ -164,7 +164,7 @@ public:
       default: // SQLITE_NULL
         const char* decl_raw = sqlite3_column_decltype(pStatement_, j);
         if (decl_raw == NULL) {
-          types_.push_back(CHARSXP);
+          types_.push_back(STRSXP);
         } else {
           std::string decl(decl_raw);
           if (decl == "INTEGER") {

@@ -88,7 +88,6 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
 setMethod("dbGetQuery", signature("SQLiteConnection", "character"), 
   function(conn, statement, ...) {
     rs <- dbSendQuery(conn, statement, ...)
-
     on.exit(dbClearResult(rs))
     
     dbFetch(rs, n = -1, ...)

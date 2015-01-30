@@ -1,5 +1,21 @@
 # Version 1.0.9000
 
+- RSQLite has been rewritten (essentially from scratch) in C++ with
+  Rcpp. This has considerably reduced the amount of code, and allow us to
+  take advantage of the more sophisticated memory management tools available in
+  Rcpp. This rewrite should yield some minor performance improvements, but 
+  most importantly protect against memory leaks and crashes. It also provides
+  a better base for future development.
+  
+- You can now have multiple result sets per connection. The database connection
+  will be terminated when all connection and result objects are closed 
+  explicitly with `dbDisconnect()` and `dbClearResult()`, or implicitly when
+  they are deleted and garbage collected. This protects against both memory
+  leaks and null pointers.
+
+- `sqliteBuildTableDefinition()` has been deprecated. Use `SQL::sqlTableCreate()`
+  instead.
+
 - `dbWriteTable()` with a file path has been deprecated due to the high
   maintenance burden of the existing code. It will eventually come back when
   we have a good API for parsing files from disk.
@@ -8,13 +24,15 @@
   instead.
 
 - New strategy for prepared queries. Create a prepared query with 
-  `dbSendQuery()` and bind values with `dbBind()`. You can also create 
-  and execute in one step with `dbSendQuery(con, sql, params)`: this
-  has no performance benefits but protects you from SQL injection attacks.
-  `dbSendPreparedQuery()` and `dbGetPreparedQuery()` have been removed:
-  they were never part of the official API, were dangerous because they
-  issued multiple queries, and always matched on position, even if you 
-  used names.
+  `dbSendQuery()` and bind values with `dbBind()`. `dbSendPreparedQuery()` and 
+  `dbGetPreparedQuery()` have been removed: they were never part of the official 
+  API, were dangerous because they issued multiple queries, and always matched 
+  on position, even if you used names.
+
+- `dbSendQuery()` and `dbGetQuery()` also support inline parameterised queries,
+  like `dbGetQuery(datasetsDb(), "SELECT * FROM mtcars WHERE cyl = :cyl", 
+  params = list(cyl = 4))`. This has no performance benefits but protects you 
+  from SQL injection attacks.
 
 - All summary methods have been removed: the same information is now displayed
   in the show methods, which were previously pretty useless.

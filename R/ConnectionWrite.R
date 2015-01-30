@@ -60,6 +60,10 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     }
     
     if (nrow(value) > 0) {
+      # SQLite doesn't support boolean literals, so convert to int
+      is_logical <- vapply(value, is.logical, logical(1))
+      value[is_logical] <- lapply(value[is_logical], as.integer)
+        
       sql <- SQL::sqlTableInsertInto(conn, name, value, row.names = row.names)
       dbGetQuery(conn, sql)
     }

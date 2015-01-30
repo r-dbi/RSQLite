@@ -208,7 +208,12 @@ public:
     
     nparams_ = sqlite3_bind_parameter_count(pStatement_);
     if (nparams_ == 0) {
-      init();
+      try {
+        init(); 
+      } catch(...) {
+        sqlite3_finalize(pStatement_);
+        throw;
+      }
     }
   }
   

@@ -49,8 +49,8 @@ setMethod("show", "SQLiteResult", function(object) {
 #'
 #' # Send query to pull requests in batches
 #' res <- dbSendQuery(con, "SELECT * FROM USArrests")
-#' fetch(res, n = 2)
-#' fetch(res, n = 2)
+#' dbFetch(res, n = 2)
+#' dbFetch(res, n = 2)
 #' dbHasCompleted(res)
 #' dbClearResult(res)
 #' 
@@ -158,7 +158,7 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
 #' names(info)
 #' info$fields
 #' 
-#' fetch(rs, n=2)
+#' dbFetch(rs, n=2)
 #' dbHasCompleted(rs)
 #' info <- dbGetInfo(rs)
 #' info$fields

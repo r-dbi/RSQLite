@@ -56,8 +56,8 @@ dbGetQuery(db, "SELECT * FROM USArrests LIMIT 3")
 
 # Send query to pull requests in batches
 res <- dbSendQuery(con, "SELECT * FROM USArrests")
-fetch(res, n = 2)
-fetch(res, n = 2)
+dbFetch(res, n = 2)
+dbFetch(res, n = 2)
 dbHasCompleted(res)
 dbClearResult(res)
 

@@ -44,7 +44,7 @@ info <- dbGetInfo(rs)
 names(info)
 info$fields
 
-fetch(rs, n=2)
+dbFetch(rs, n=2)
 dbHasCompleted(rs)
 info <- dbGetInfo(rs)
 info$fields

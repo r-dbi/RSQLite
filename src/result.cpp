@@ -3,10 +3,10 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-XPtr<SqliteResult> rsqlite_send_query(XPtr<SqliteConnectionWrapper> con, std::string sql) {
+XPtr<SqliteResult> rsqlite_send_query(XPtr<SqliteConnectionPtr> con, std::string sql) {
   if (R_ExternalPtrAddr(con) == NULL) stop("Connection expired");
 
-  SqliteResult* res = new SqliteResult(con->pConn, sql);
+  SqliteResult* res = new SqliteResult((*con), sql);
   return XPtr<SqliteResult>(res, true);
 }
 

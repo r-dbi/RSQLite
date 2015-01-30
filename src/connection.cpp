@@ -3,38 +3,42 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-XPtr<SqliteConnectionWrapper> rsqlite_connect(std::string path, bool allow_ext, 
-                                       int flags, std::string vfs = "") {
-  SqliteConnectionWrapper* conn = new SqliteConnectionWrapper(path, allow_ext, flags, vfs);
-  return XPtr<SqliteConnectionWrapper>(conn, true);
+XPtr<SqliteConnectionPtr> rsqlite_connect(std::string path, bool allow_ext, 
+                                          int flags, std::string vfs = "") {
+  
+  SqliteConnectionPtr* pConn = new SqliteConnectionPtr(
+    new SqliteConnectionWrapper(path, allow_ext, flags, vfs)
+  );
+  
+  return XPtr<SqliteConnectionPtr>(pConn, true);
 }
 
 // [[Rcpp::export]]
-void rsqlite_disconnect(XPtr<SqliteConnectionWrapper> con) {
+void rsqlite_disconnect(XPtr<SqliteConnectionPtr> con) {
   if (R_ExternalPtrAddr(con) == NULL) stop("Connection already closed");
   
-  delete (SqliteConnectionWrapper*) con;
+  delete con.operator->();
   R_ClearExternalPtr(con);
 }
 
 // [[Rcpp::export]]
-std::string rsqlite_get_exception(XPtr<SqliteConnectionWrapper> con) {
+std::string rsqlite_get_exception(XPtr<SqliteConnectionPtr> con) {
   if (R_ExternalPtrAddr(con) == NULL) stop("Connection already closed");
   
-  return con->pConn->getException();
+  return (*con)->getException();
 }
 
 // [[Rcpp::export]]
-void rsqlite_copy_database(XPtr<SqliteConnectionWrapper> from, 
-                           XPtr<SqliteConnectionWrapper> to) {
+void rsqlite_copy_database(XPtr<SqliteConnectionPtr> from, 
+                           XPtr<SqliteConnectionPtr> to) {
   if (R_ExternalPtrAddr(from) == NULL) stop("From connection expired");
   if (R_ExternalPtrAddr(to) == NULL) stop("To connection expired");
   
-  from->pConn->copy_to(to->pConn);
+  (*from)->copy_to((*to));
 }
 
 // [[Rcpp::export]]
-bool rsqlite_connection_valid(XPtr<SqliteConnectionWrapper> con) {
+bool rsqlite_connection_valid(XPtr<SqliteConnectionPtr> con) {
   return R_ExternalPtrAddr(con) != NULL;
 }
 

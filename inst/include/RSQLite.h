@@ -1,11 +1,7 @@
 #include <Rcpp.h>
+#include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include "sqlite3.h"
-
-class SqliteResult;
-class SqliteConnection;
-typedef boost::shared_ptr<SqliteConnection> SqliteConnectionPtr;
-
 
 void inline set_col_value(SEXP col, SEXPTYPE type, sqlite3_stmt* pStatement_, int i, int j) {
   switch(type) {
@@ -128,12 +124,21 @@ void inline bind_parameter(sqlite3_stmt* stmt, int i, std::string name, SEXP val
 
 // Connection ------------------------------------------------------------------
 
-class SqliteConnection {
-  friend class SqliteResult;
-  sqlite3* pConn_;
+// Reference counted wrapper for a sqlite3* connnection which will keep the
+// connection alive as long as there are references to this object alive.
 
+// convenience typedef for shared_ptr to SqliteConnectionWrapper
+class SqliteConnectionWrapper;
+typedef boost::shared_ptr<SqliteConnectionWrapper> SqliteConnectionPtr;
+
+class SqliteConnectionWrapper : boost::noncopyable {
 public:
-    SqliteConnection(std::string path, bool allow_ext, int flags, std::string vfs = "") {
+  // Create a new connection handle
+  SqliteConnectionWrapper(std::string path, bool allow_ext, 
+                          int flags, std::string vfs = "")
+      : pConn_(NULL) {
+    
+    // Get the underlying database connection
     int rc = sqlite3_open_v2(path.c_str(), &pConn_, flags, vfs.size() ? vfs.c_str() : NULL);
     if (rc != SQLITE_OK) {
       Rcpp::stop("Could not connect to database:\n%s", getException());
@@ -143,8 +148,8 @@ public:
     }
   }
   
-  void copy_to(SqliteConnectionPtr dest) {
-    sqlite3_backup* backup = sqlite3_backup_init(dest->pConn_, "main", 
+  void copy_to(SqliteConnectionPtr pDest) {
+    sqlite3_backup* backup = sqlite3_backup_init(pDest->conn(), "main", 
       pConn_, "main");
 
     int rc = sqlite3_backup_step(backup, -1);
@@ -157,37 +162,31 @@ public:
     }
   }
   
-  virtual ~SqliteConnection() {
+  virtual ~SqliteConnectionWrapper() {
     try {
       sqlite3_close_v2(pConn_); 
     } catch(...) {}
   }
 
-  std::string getException() const {
-    return std::string(sqlite3_errmsg(pConn_));
-  }
-    
-// Prevent copying because of shared resource
-private:
-  SqliteConnection( SqliteConnection const& );
-  SqliteConnection operator=( SqliteConnection const& );
   
-};
-
-// Connection wrapper ----------------------------------------------------------
-
-class SqliteConnectionWrapper {
-public:
-  SqliteConnectionPtr pConn;
-  SqliteConnectionWrapper(std::string path, bool allow_ext, int flags, std::string vfs = "") {
-    pConn = SqliteConnectionPtr(new SqliteConnection(path, allow_ext, flags, vfs));
+  // Get access to the underlying sqlite3*
+  sqlite3* conn() const { return pConn_; }
+  
+  // Get the last exception as a string
+  std::string getException() const {
+    if (pConn_ != NULL)
+      return std::string(sqlite3_errmsg(pConn_));
+    else
+      return std::string();
   }
+  
+private:
+  sqlite3* pConn_;
 };
-
 
 // Result ----------------------------------------------------------------------
 
-class SqliteResult {
+class SqliteResult : boost::noncopyable {
   sqlite3_stmt* pStatement_;
   SqliteConnectionPtr pConn_;
   bool complete_, ready_;
@@ -196,10 +195,11 @@ class SqliteResult {
   std::vector<std::string> names_;
   
 public:
-  SqliteResult(SqliteConnectionPtr pConn, std::string sql) {
-    pConn_ = pConn;
+  SqliteResult(SqliteConnectionPtr pConn, std::string sql)
+    : pStatement_(NULL), pConn_(pConn), complete_(false), ready_(false),
+      nrows_(0), ncols_(0), rows_affected_(0), nparams_(0) {
     
-    int rc = sqlite3_prepare_v2(pConn_->pConn_, sql.c_str(), sql.size() + 1, 
+    int rc = sqlite3_prepare_v2(pConn_->conn(), sql.c_str(), sql.size() + 1, 
       &pStatement_, NULL);
     
     if (rc != SQLITE_OK) {
@@ -219,7 +219,7 @@ public:
     complete_ = false;
     
     step();
-    rows_affected_ = sqlite3_changes(pConn_->pConn_);
+    rows_affected_ = sqlite3_changes(pConn_->conn());
     cache_field_data();
   }
   
@@ -409,12 +409,6 @@ public:
       sqlite3_finalize(pStatement_); 
     } catch(...) {}
   }
-  
-  // Prevent copying because of shared resource
-private:
-  SqliteResult( SqliteResult const& );
-  SqliteResult operator=( SqliteResult const& );
-  
 };
 
 

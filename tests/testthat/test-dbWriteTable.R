@@ -23,9 +23,7 @@ test_that("throws error if constraint violated", {
     "UNIQUE constraint failed")
 })
 
-test_that("can't add table when result set open", {
-  # This needs to fail because cloning a temporary file or in memory 
-  # database creates new database
+test_that("modifications retrieved by open result set", {
   con <- dbConnect(SQLite(), tempfile())
   on.exit(dbDisconnect(con))
   
@@ -33,8 +31,9 @@ test_that("can't add table when result set open", {
   dbWriteTable(con, "t1", x)
   
   res <- dbSendQuery(con, "SELECT * FROM t1")
-  expect_warning(dbWriteTable(con, "t2", x), "pending rows")
-  expect_error(dbClearResult(res), "Expired")
+  dbWriteTable(con, "t1", x, append = TRUE)
+  expect_equal(nrow(dbFetch(res)), 20)
+  dbClearResult(res)
 })
 
 test_that("rownames preserved", {

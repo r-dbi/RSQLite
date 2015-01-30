@@ -17,6 +17,12 @@ XPtr<SqliteConnectionPtr> rsqlite_connect(std::string path, bool allow_ext,
 void rsqlite_disconnect(XPtr<SqliteConnectionPtr> con) {
   if (R_ExternalPtrAddr(con) == NULL) stop("Connection already closed");
   
+  int n = con->use_count();
+  if (n > 1) {
+    Rcout << "There are " << n - 1 << " result objects in use.\n" <<
+      "The connection will be automatically released when they are closed\n";
+  } 
+  
   delete con.operator->();
   R_ClearExternalPtr(con);
 }

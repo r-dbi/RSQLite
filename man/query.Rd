@@ -34,6 +34,9 @@
 statement that should be executed.  Only a single SQL statment should be
 provided.}
 
+\item{params}{A named list of query parameters to be substituted into
+a parameterised query.}
+
 \item{...}{Unused. Needed for compatibility with generic.}
 
 \item{res}{an \code{\linkS4class{SQLiteResult}} object.}
@@ -55,7 +58,7 @@ db <- RSQLite::datasetsDb()
 dbGetQuery(db, "SELECT * FROM USArrests LIMIT 3")
 
 # Send query to pull requests in batches
-res <- dbSendQuery(con, "SELECT * FROM USArrests")
+res <- dbSendQuery(db, "SELECT * FROM USArrests")
 dbFetch(res, n = 2)
 dbFetch(res, n = 2)
 dbHasCompleted(res)

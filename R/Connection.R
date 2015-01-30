@@ -66,10 +66,13 @@ setMethod("dbExistsTable", c("SQLiteConnection", "character"),
 #' @export
 sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL, 
                                        row.names = NA) {
+  
+  warning("Deprecated: please use SQL::sqlTableCreate instead")
+  
   if (!is.data.frame(value)) {
     value <- as.data.frame(value)
   }
-  value <- explict_rownames(value, row.names)
+  value <- SQL::columnToRownames(value, row.names)
 
   if (is.null(field.types)) {
     field.types <- vapply(value, dbDataType, dbObj = con, 

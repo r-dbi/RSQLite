@@ -40,6 +40,8 @@ setMethod("show", "SQLiteResult", function(object) {
 #' @param statement a character vector of length one specifying the SQL
 #'   statement that should be executed.  Only a single SQL statment should be
 #'   provided.
+#' @param params A named list of query parameters to be substituted into
+#'   a parameterised query.
 #' @param ... Unused. Needed for compatibility with generic.
 #' @examples
 #' db <- RSQLite::datasetsDb()
@@ -48,7 +50,7 @@ setMethod("show", "SQLiteResult", function(object) {
 #' dbGetQuery(db, "SELECT * FROM USArrests LIMIT 3")
 #'
 #' # Send query to pull requests in batches
-#' res <- dbSendQuery(con, "SELECT * FROM USArrests")
+#' res <- dbSendQuery(db, "SELECT * FROM USArrests")
 #' dbFetch(res, n = 2)
 #' dbFetch(res, n = 2)
 #' dbHasCompleted(res)

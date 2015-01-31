@@ -2,8 +2,6 @@
 .Rhistory
 src/*.so
 src/*.o
-src/Makevars
-inst/include/sqlite*
 config.status
 a.out.dSYM
 autom4te.cache

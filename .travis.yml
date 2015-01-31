@@ -14,7 +14,7 @@ install:
   - ./travis-tool.sh install_github rstats-db/DBI
   - ./travis-tool.sh install_github rstats-db/SQL
   - ./travis-tool.sh install_deps
-  - R CMD install .
+  - R CMD INSTALL .
 
 script: ./travis-tool.sh run_tests
 

@@ -11,8 +11,8 @@ before_install:
   - ./travis-tool.sh bootstrap
 
 install:
-  - ./travis-tool.sh install_github rstats-dbi/DBI
-  - ./travis-tool.sh install_github rstats-dbi/SQL
+  - ./travis-tool.sh install_github rstats-db/DBI
+  - ./travis-tool.sh install_github rstats-db/SQL
   - ./travis-tool.sh install_deps
 
 script: ./travis-tool.sh run_tests

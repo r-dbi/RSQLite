@@ -62,11 +62,11 @@ Many thanks to Doug Bates, Seth Falcon, Detlef Groth, Ronggui Huang, Kurt Hornik
 1.  Download latest SQLite source
 
     ```R
-    latest <- "http://sqlite.org/2014/sqlite-amalgamation-3080600.zip"
+    latest <- "http://www.sqlite.org/2015/sqlite-amalgamation-3080802.zip"
     tmp <- tempfile()
     download.file(latest, tmp)
-    unzip(tmp, exdir = "src/sqlite", junkpaths = TRUE)
-    unlink("src/sqlite/shell.c")
+    unzip(tmp, exdir = "src/", junkpaths = TRUE)
+    unlink("src/shell.c")
     ```
 1.  Update `DESCRIPTION` for included version of SQLite
 

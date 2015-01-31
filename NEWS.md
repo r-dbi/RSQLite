@@ -1,5 +1,10 @@
 # Version 1.0.9000
 
+- Updated to SQLite 3.8.8.2
+
+- RSQLite always builds with the included source. This prevent bugs due to 
+  API mismatches and considerably simplifies the build process.
+
 - Compilation limits `SQLITE_MAX_VARIABLE_NUMBER` and `SQLITE_MAX_COLUMN`
   have been reset to the defaults. The documentation suggests setting to
   such high values is a bad idea.

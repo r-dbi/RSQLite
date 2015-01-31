@@ -1,5 +1,9 @@
 # Version 1.0.9000
 
+- Compilation limits `SQLITE_MAX_VARIABLE_NUMBER` and `SQLITE_MAX_COLUMN`
+  have been reset to the defaults. The documentation suggests setting to
+  such high values is a bad idea.
+
 - RSQLite has been rewritten (essentially from scratch) in C++ with
   Rcpp. This has considerably reduced the amount of code, and allow us to
   take advantage of the more sophisticated memory management tools available in

@@ -1,8 +1,6 @@
 config.log
 config.cache
 config.status
-src/Makefile$
-src/Makevars$
 a.out.dSYM
 .gitignore
 ^.*\.Rproj$

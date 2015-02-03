@@ -1,5 +1,5 @@
 #include <Rcpp.h>
-#include "RSQLite.h"
+#include "sqlite3.h"
 using namespace Rcpp;
 
 //' RSQLite version

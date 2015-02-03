@@ -38,6 +38,6 @@ void rsqlite_copy_database(XPtr<SqliteConnectionPtr> from,
 
 // [[Rcpp::export]]
 bool rsqlite_connection_valid(XPtr<SqliteConnectionPtr> con) {
-  return con;
+  return con.get() != NULL;
 }
 

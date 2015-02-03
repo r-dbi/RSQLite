@@ -50,5 +50,5 @@ List rsqlite_column_info(XPtr<SqliteResult> res) {
 
 // [[Rcpp::export]]
 bool rsqlite_result_valid(XPtr<SqliteResult> res) {
-  return res;
+  return res.get() != NULL;
 }

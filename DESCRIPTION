@@ -20,7 +20,7 @@ Suggests:
 Imports:
     DBI (>= 0.3.1.9004),
     SQL,
-    Rcpp (>= 0.11.4)
+    Rcpp (>= 0.11.4.2)
 License: LGPL (>= 2)
 URL: https://github.com/rstats-db/RSQLite
 BugReports: https://github.com/rstats-db/RSQLite/issues

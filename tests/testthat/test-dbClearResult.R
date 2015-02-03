@@ -7,5 +7,5 @@ test_that("accessing cleared result throws error", {
   res <- dbSendQuery(con, "SELECT 1;")
   dbClearResult(res)
   
-  expect_error(dbFetch(res), "expired")
+  expect_error(dbFetch(res), "not valid")
 })

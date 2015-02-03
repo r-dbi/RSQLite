@@ -1,5 +1,5 @@
 #include <Rcpp.h>
-#include "SqliteResult.hpp"
+#include "SqliteResult.h"
 using namespace Rcpp;
 
 // [[Rcpp::export]]

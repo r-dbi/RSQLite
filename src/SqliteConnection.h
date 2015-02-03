@@ -6,7 +6,7 @@
 #include <boost/shared_ptr.hpp>
 #include "sqlite3.h"
 
-#include "SqliteUtils.hpp"
+#include "SqliteUtils.h"
 
 // Connection ------------------------------------------------------------------
 

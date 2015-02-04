@@ -5,3 +5,4 @@ src/*.o
 config.status
 a.out.dSYM
 autom4te.cache
+inst/doc

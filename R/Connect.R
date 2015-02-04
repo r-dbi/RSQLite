@@ -89,9 +89,10 @@ SQLITE_RO <- 1L
 setMethod("dbConnect", "SQLiteDriver",
   function(drv, dbname = "", loadable.extensions = TRUE, cache_size = NULL, 
            synchronous = "off", flags = SQLITE_RWC, vfs = NULL) {
-    dbname <- path.expand(dbname)
-    
     stopifnot(length(dbname) == 1, !is.na(dbname))
+    if (!is_url(dbname)) {
+      dbname <- normalizePath(dbname, mustWork = FALSE)
+    }
     
     vfs <- check_vfs(vfs)
     stopifnot(is.integer(flags), length(flags) == 1)
@@ -131,6 +132,8 @@ check_vfs <- function(vfs) {
   match.arg(vfs, c("unix-posix", "unix-afp", "unix-flock", "unix-dotfile",
     "unix-none"))
 }
+
+is_url <- function(x) grepl("^(file|http|ftp|https):", x)
 
 #' @export
 #' @rdname SQLite

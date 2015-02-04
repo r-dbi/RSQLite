@@ -1,5 +1,7 @@
 # Version 1.0.9000
 
+- Queries are always converted to UTF-8 before being sent to database (#69).
+
 - Start on a basic vignette: `vignette("RSQLite")` (#50).
 
 - `dbFetch()` uses the same row name strategy as `dbReadTable()` (#53).

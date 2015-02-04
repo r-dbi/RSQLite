@@ -72,6 +72,8 @@ NULL
 #' @export
 setMethod("dbSendQuery", c("SQLiteConnection", "character"),
   function(conn, statement, params = NULL, ...) {
+    statement <- enc2utf8(statement)
+    
     rs <- new("SQLiteResult", 
       sql = statement,
       ptr = rsqlite_send_query(conn@ptr, statement)

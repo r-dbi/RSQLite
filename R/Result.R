@@ -88,11 +88,11 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
 #' @rdname query
 #' @export
 setMethod("dbGetQuery", signature("SQLiteConnection", "character"), 
-  function(conn, statement, ...) {
+  function(conn, statement, ..., row.names = NA) {
     rs <- dbSendQuery(conn, statement, ...)
     on.exit(dbClearResult(rs))
     
-    dbFetch(rs, n = -1, ...)
+    dbFetch(rs, n = -1, ..., row.names = row.names)
   }
 )
 
@@ -109,19 +109,23 @@ setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
 
 
 #' @param res an \code{\linkS4class{SQLiteResult}} object.
+#' @param row.names A string or an index specifying the column in the DBMS table 
+#'   to use as \code{row.names} in the output data.frame. Defaults to using the
+#'   \code{row_names} column if present. Set to \code{NULL} to never use
+#'   row names.
 #' @param n maximum number of records to retrieve per fetch. Use \code{-1} to 
 #'    retrieve all pending records; use \code{0} for to fetch the default 
 #'    number of rows as defined in \code{\link{SQLite}}
 #' @export
 #' @rdname query
-setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ...) {
-  rsqlite_fetch(res@ptr, n = n)
+setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
+  SQL::columnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
 })
 
 #' @rdname query
 #' @rdname dbFetch-SQLiteResult-method
-setMethod("fetch", "SQLiteResult", function(res, n = -1, ...) {
-  rsqlite_fetch(res@ptr, n = n)
+setMethod("fetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
+  SQL::columnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
 })
 
 #' @export

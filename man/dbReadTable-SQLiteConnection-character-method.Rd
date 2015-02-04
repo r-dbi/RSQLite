@@ -45,9 +45,11 @@ primitive data, e.g., it does not coerce character data to factors.
 con <- dbConnect(SQLite())
 dbWriteTable(con, "mtcars", mtcars)
 dbReadTable(con, "mtcars")
+dbGetQuery(con, "SELECT * FROM mtcars WHERE cyl = 8")
 
 # Supress row names
 dbReadTable(con, "mtcars", row.names = FALSE)
+dbGetQuery(con, "SELECT * FROM mtcars WHERE cyl = 8", row.names = FALSE)
 
 dbDisconnect(con)
 }

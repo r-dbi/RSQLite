@@ -1,5 +1,7 @@
 # Version 1.0.9000
 
+- `dbFetch()` uses the same row name strategy as `dbReadTable()` (#53).
+
 - Updated to SQLite 3.8.8.2
 
 - RSQLite always builds with the included source. This prevent bugs due to 

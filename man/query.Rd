@@ -15,13 +15,14 @@
 \S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement,
   params = NULL, ...)
 
-\S4method{dbGetQuery}{SQLiteConnection,character}(conn, statement, ...)
+\S4method{dbGetQuery}{SQLiteConnection,character}(conn, statement, ...,
+  row.names = NA)
 
 \S4method{dbBind}{SQLiteResult}(res, params, ...)
 
-\S4method{dbFetch}{SQLiteResult}(res, n = -1, ...)
+\S4method{dbFetch}{SQLiteResult}(res, n = -1, ..., row.names = NA)
 
-\S4method{fetch}{SQLiteResult}(res, n = -1, ...)
+\S4method{fetch}{SQLiteResult}(res, n = -1, ..., row.names = NA)
 
 \S4method{dbClearResult}{SQLiteResult}(res, ...)
 
@@ -38,6 +39,11 @@ provided.}
 a parameterised query.}
 
 \item{...}{Unused. Needed for compatibility with generic.}
+
+\item{row.names}{A string or an index specifying the column in the DBMS table
+to use as \code{row.names} in the output data.frame. Defaults to using the
+\code{row_names} column if present. Set to \code{NULL} to never use
+row names.}
 
 \item{res}{an \code{\linkS4class{SQLiteResult}} object.}
 

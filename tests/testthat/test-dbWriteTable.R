@@ -1,11 +1,8 @@
 context("dbWriteTable")
 
-# In memory --------------------------------------------------------------------
-
 test_that("can't override existing table with default options", {
   con <- dbConnect(SQLite())
-  on.exit(dbDisconnect(con))
-  
+
   x <- data.frame(col1 = 1:10, col2 = letters[1:10])  
   dbWriteTable(con, "t1", x)
   expect_error(dbWriteTable(con, "t1", x), "exists in database")
@@ -13,8 +10,7 @@ test_that("can't override existing table with default options", {
 
 test_that("throws error if constraint violated", {
   con <- dbConnect(SQLite())
-  on.exit(dbDisconnect(con))
-  
+
   x <- data.frame(col1 = 1:10, col2 = letters[1:10])
   
   dbWriteTable(con, "t1", x)
@@ -25,8 +21,7 @@ test_that("throws error if constraint violated", {
 
 test_that("modifications retrieved by open result set", {
   con <- dbConnect(SQLite(), tempfile())
-  on.exit(dbDisconnect(con))
-  
+
   x <- data.frame(col1 = 1:10, col2 = letters[1:10])
   dbWriteTable(con, "t1", x)
   
@@ -38,8 +33,7 @@ test_that("modifications retrieved by open result set", {
 
 test_that("rownames preserved", {
   con <- dbConnect(SQLite())
-  on.exit(dbDisconnect(con))
-  
+
   df <- data.frame(x = 1:10)
   row.names(df) <- paste(letters[1:10], 1:10, sep="")
   
@@ -50,7 +44,6 @@ test_that("rownames preserved", {
 
 test_that("commas in fields are preserved", {
   con <- dbConnect(SQLite())
-  on.exit(dbDisconnect(con))
   
   df <- data.frame(
     x = c("ABC, Inc.","DEF Holdings"), 
@@ -62,8 +55,7 @@ test_that("commas in fields are preserved", {
 
 test_that("NAs preserved in factors", {
   con <- dbConnect(SQLite())
-  on.exit(dbDisconnect(con))
-  
+
   df <- data.frame(x = 1:10, y = factor(LETTERS[1:10]))
   df$y[4] <- NA
   
@@ -75,7 +67,6 @@ test_that("NAs preserved in factors", {
 
 test_that("logical converted to int", {
   con <- dbConnect(SQLite())
-  on.exit(dbDisconnect(con))
   
   local <- data.frame(x = 1:3, y = c(NA, TRUE, FALSE))
   dbWriteTable(con, "t1", local)
@@ -86,11 +77,11 @@ test_that("logical converted to int", {
 
 test_that("can roundtrip special field names", {
   con <- dbConnect(SQLite())
-  on.exit(dbDisconnect(con))
-  
+
   local <- data.frame(x = 1:3, select = 1:3, `  ` = 1:3, check.names = FALSE)
   dbWriteTable(con, "torture", local)
   remote <- dbReadTable(con, "torture", check.names = FALSE)
   
   expect_equal(local, remote)
 })
+

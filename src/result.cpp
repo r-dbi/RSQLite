@@ -27,6 +27,11 @@ void rsqlite_bind_params(XPtr<SqliteResult> res, List params) {
   res->bind(params);
 }
 
+// [[Rcpp::export]]
+void rsqlite_bind_rows(XPtr<SqliteResult> res, List params) {
+  res->bind_rows(params);
+}
+
 
 // [[Rcpp::export]]
 bool rsqlite_has_completed(XPtr<SqliteResult> res) {

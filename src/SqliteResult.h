@@ -60,15 +60,51 @@ public:
       Rcpp::stop("Parameters must be a named list.");
     }
     
+    for (int j = 0; j < params.size(); ++j) {
+      SEXP col = params[j];
+      if (Rf_length(col) != 1)
+        Rcpp::stop("Parameter %i does not have length 1.", j);
+    }
+    
     sqlite3_reset(pStatement_);
     sqlite3_clear_bindings(pStatement_);
     
     Rcpp::CharacterVector names = params.attr("names");
-    for (int i = 0; i < params.size(); ++i) {
-      bind_parameter(pStatement_, i, std::string(names[i]), params[i]);
+    for (int j = 0; j < params.size(); ++j) {
+      bind_parameter(pStatement_, 0, j, std::string(names[j]), params[j]);
     }
     
     init();
+  }
+  
+  void bind_rows(Rcpp::List params) {
+    if (params.size() != nparams_) {
+      Rcpp::stop("Query requires %i params; %i supplied.",
+        nparams_, params.size());
+    }
+    if (params.size() == 0) {
+      Rcpp::stop("Need at least one column");
+    }
+    
+    SEXP first_col = params[0];
+    int n = Rf_length(first_col);
+    
+    rows_affected_ = 0;
+
+    Rcpp::CharacterVector names_ = params.attr("names");
+    std::vector<std::string> names(names_.begin(), names_.end());
+    
+    for (int i = 0; i < n; ++i) {
+      sqlite3_reset(pStatement_);
+      sqlite3_clear_bindings(pStatement_);
+      
+      for (int j = 0; j < params.size(); ++j) {
+        bind_parameter(pStatement_, i, j, names[j], params[j]);
+      }
+      
+      step();
+      rows_affected_ += sqlite3_changes(pConn_->conn());
+    }
   }
   
   bool complete() {

@@ -4,6 +4,7 @@
 \name{dbWriteTable,SQLiteConnection,character,data.frame-method}
 \alias{dbWriteTable,SQLiteConnection,character,character-method}
 \alias{dbWriteTable,SQLiteConnection,character,data.frame-method}
+\alias{sqlData,SQLiteConnection-method}
 \title{Write a local data frame or file to the database.}
 \usage{
 \S4method{dbWriteTable}{SQLiteConnection,character,data.frame}(conn, name,
@@ -14,6 +15,8 @@
   field.types = NULL, overwrite = FALSE, append = FALSE, header = TRUE,
   colClasses = NA, row.names = FALSE, nrows = 50, sep = ",",
   eol = "\\n", skip = 0)
+
+\S4method{sqlData}{SQLiteConnection}(con, values, row.names = NA, ...)
 }
 \arguments{
 \item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by

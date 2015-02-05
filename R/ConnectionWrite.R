@@ -60,12 +60,15 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     }
     
     if (nrow(value) > 0) {
-      # SQLite doesn't support boolean literals, so convert to int
-      is_logical <- vapply(value, is.logical, logical(1))
-      value[is_logical] <- lapply(value[is_logical], as.integer)
-        
-      sql <- SQL::sqlTableInsertInto(conn, name, value, row.names = row.names)
-      dbGetQuery(conn, sql)
+      value <- sqlData(conn, value, row.names = row.names)
+      sql <- parameterised_insert(conn, name, value)
+      rs <- dbSendQuery(conn, sql)
+      
+      names(value) <- rep("", length(value))
+      tryCatch(
+        rsqlite_bind_rows(rs@ptr, value),
+        finally = dbClearResult(rs)
+      )
     }
 
     on.exit(NULL)
@@ -73,6 +76,21 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     TRUE
   }
 )
+
+parameterised_insert <- function(con, name, values) {
+  table <- dbQuoteIdentifier(con, name)
+  fields <- dbQuoteIdentifier(con, names(values))
+  
+  # Convert fields into a character matrix
+  SQL(paste0(
+    "INSERT INTO ", table, "\n",
+    "  (", paste(fields, collapse = ", "), ")\n",
+    "VALUES\n",
+    paste0("  (", paste(rep("?", length(fields)), collapse = ", "), ")", collapse = ",\n")
+  ))
+ 
+}
+
 
 #' @param header is a logical indicating whether the first data line (but see
 #'   \code{skip}) has a header or not.  If missing, it value is determined
@@ -94,3 +112,20 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
     stop("Deprecated. This will come back at some point in the future")
   }
 )
+
+#' @importFrom SQL sqlData
+#' @export
+#' @rdname dbWriteTable
+setMethod("sqlData", "SQLiteConnection", function(con, values, row.names = NA, ...) {
+  values <- SQL::rownamesToColumn(values, row.names)
+  
+  # Convert factors to strings
+  is_factor <- vapply(values, is.factor, logical(1))
+  values[is_factor] <- lapply(values[is_factor], as.character)
+  
+  # Convert all strings to utf-8
+  is_char <- vapply(values, is.character, logical(1))
+  values[is_char] <- lapply(values[is_char], enc2utf8)
+  
+  values
+})

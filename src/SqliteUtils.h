@@ -86,7 +86,7 @@ int inline find_parameter(sqlite3_stmt* stmt, std::string name) {
   return 0;
 }
 
-void inline bind_parameter(sqlite3_stmt* stmt, int j, std::string name, SEXP value_) {
+void inline bind_parameter(sqlite3_stmt* stmt, int i, int j, std::string name, SEXP value_) {
   if (name != "") {
     j = find_parameter(stmt, name);
     if (j == 0)
@@ -95,42 +95,39 @@ void inline bind_parameter(sqlite3_stmt* stmt, int j, std::string name, SEXP val
     j++; // sqlite parameters are 1-indexed
   }
 
-  if (Rf_length(value_) != 1)
-    Rcpp::stop("Parameter %i does not have length 1.", j);
-
   if (TYPEOF(value_) == LGLSXP) {
     Rcpp::LogicalVector value(value_);
-    if (value[0] == NA_LOGICAL) {
+    if (value[i] == NA_LOGICAL) {
       sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_int(stmt, j, value[0]);
+      sqlite3_bind_int(stmt, j, value[i]);
     }
   } else if (TYPEOF(value_) == INTSXP) {
     Rcpp::IntegerVector value(value_);
-    if (value[0] == NA_INTEGER) {
+    if (value[i] == NA_INTEGER) {
       sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_int(stmt, j, value[0]);
+      sqlite3_bind_int(stmt, j, value[i]);
     }
   } else if (TYPEOF(value_) == REALSXP) {
     Rcpp::NumericVector value(value_);
-    if (value[0] == NA_REAL) {
+    if (value[i] == NA_REAL) {
       sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_double(stmt, j, value[0]);
+      sqlite3_bind_double(stmt, j, value[i]);
     }
   } else if (TYPEOF(value_) == STRSXP) {
     Rcpp::CharacterVector value(value_);
-    if (value[0] == NA_STRING) {
+    if (value[i] == NA_STRING) {
       sqlite3_bind_null(stmt, j);
     } else {
-      Rcpp::String value2 = value[0];
+      Rcpp::String value2 = value[i];
       std::string value3(value2);
       sqlite3_bind_text(stmt, j, value3.c_str(), value3.size() + 1, 
         SQLITE_TRANSIENT);
     }
   } else if (TYPEOF(value_) == VECSXP) {
-    SEXP raw = VECTOR_ELT(value_, 0); 
+    SEXP raw = VECTOR_ELT(value_, i); 
     if (TYPEOF(raw) != RAWSXP) {
       Rcpp::stop("Can only bind lists of raw vectors");
     }

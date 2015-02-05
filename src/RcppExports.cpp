@@ -108,6 +108,17 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// rsqlite_bind_rows
+void rsqlite_bind_rows(XPtr<SqliteResult> res, List params);
+RcppExport SEXP RSQLite_rsqlite_bind_rows(SEXP resSEXP, SEXP paramsSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP);
+    Rcpp::traits::input_parameter< List >::type params(paramsSEXP);
+    rsqlite_bind_rows(res, params);
+    return R_NilValue;
+END_RCPP
+}
 // rsqlite_has_completed
 bool rsqlite_has_completed(XPtr<SqliteResult> res);
 RcppExport SEXP RSQLite_rsqlite_has_completed(SEXP resSEXP) {

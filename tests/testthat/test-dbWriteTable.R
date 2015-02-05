@@ -85,3 +85,12 @@ test_that("can roundtrip special field names", {
   expect_equal(local, remote)
 })
 
+test_that("can round-trip utf-8", {
+  con <- dbConnect(SQLite())
+  
+  local <- data.frame(x = "å")
+  dbWriteTable(con, "utf8", local)
+  remote <- dbReadTable(con, "utf8")
+  
+  expect_equal(remote$x, enc2utf8("å"))
+})

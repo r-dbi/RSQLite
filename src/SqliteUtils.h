@@ -4,6 +4,16 @@
 #include <Rcpp.h>
 #include "sqlite3.h"
 
+void inline set_raw_value(SEXP col, sqlite3_stmt* pStatement_, int i, int j) {
+  int size = sqlite3_column_bytes(pStatement_, j);
+  const void* blob = sqlite3_column_blob(pStatement_, j);
+  
+  SEXP bytes = Rf_allocVector(RAWSXP, size);
+  memcpy(RAW(bytes), blob, size);
+
+  SET_VECTOR_ELT(col, i, bytes);
+}
+
 void inline set_col_value(SEXP col, SEXPTYPE type, sqlite3_stmt* pStatement_, int i, int j) {
   switch(type) {
   case INTSXP:
@@ -27,11 +37,13 @@ void inline set_col_value(SEXP col, SEXPTYPE type, sqlite3_stmt* pStatement_, in
       SET_STRING_ELT(col, i, Rf_mkCharCE((const char*) sqlite3_column_text(pStatement_, j), CE_UTF8));
     }
     break;
-  case RAWSXP:
+  case VECSXP:
+    set_raw_value(col, pStatement_, i, j);
     // Something with memcpy & RAW?
     break;
   }
 }
+
 
 Rcpp::List inline df_resize(Rcpp::List df, int n) {
   int p = df.size();
@@ -117,6 +129,13 @@ void inline bind_parameter(sqlite3_stmt* stmt, int i, std::string name, SEXP val
       sqlite3_bind_text(stmt, i, value3.c_str(), value3.size() + 1, 
         SQLITE_TRANSIENT);
     }
+  } else if (TYPEOF(value_) == VECSXP) {
+    SEXP raw = VECTOR_ELT(value_, 0); 
+    if (TYPEOF(raw) != RAWSXP) {
+      Rcpp::stop("Can only bind lists of raw vectors");
+    }
+    
+    sqlite3_bind_blob(stmt, i, RAW(raw), Rf_length(raw), SQLITE_TRANSIENT);
   } else {
     Rcpp::stop("Don't know how to handle parameter of type %s.", 
       Rf_type2char(TYPEOF(value_)));

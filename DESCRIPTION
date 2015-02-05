@@ -20,7 +20,7 @@ Suggests:
     knitr
 Imports:
     DBI (>= 0.3.1.9004),
-    SQL (>= 0.0.0.9001),
+    SQL (>= 0.0.0.9002),
     Rcpp (>= 0.11.4.2)
 License: LGPL (>= 2)
 URL: https://github.com/rstats-db/RSQLite

@@ -2,7 +2,7 @@
 #' 
 #' @export
 #' @rdname dbWriteTable
-#' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
+#' @param con,conn a \code{\linkS4class{SQLiteConnection}} object, produced by
 #'   \code{\link[DBI]{dbConnect}}
 #' @param name a character string specifying a table name. SQLite table names 
 #'   are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc} 
@@ -116,16 +116,16 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 #' @importFrom SQL sqlData
 #' @export
 #' @rdname dbWriteTable
-setMethod("sqlData", "SQLiteConnection", function(con, values, row.names = NA, ...) {
-  values <- SQL::rownamesToColumn(values, row.names)
+setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
+  value <- SQL::rownamesToColumn(value, row.names)
   
   # Convert factors to strings
-  is_factor <- vapply(values, is.factor, logical(1))
-  values[is_factor] <- lapply(values[is_factor], as.character)
+  is_factor <- vapply(value, is.factor, logical(1))
+  value[is_factor] <- lapply(value[is_factor], as.character)
   
   # Convert all strings to utf-8
-  is_char <- vapply(values, is.character, logical(1))
-  values[is_char] <- lapply(values[is_char], enc2utf8)
+  is_char <- vapply(value, is.character, logical(1))
+  value[is_char] <- lapply(value[is_char], enc2utf8)
   
-  values
+  value
 })

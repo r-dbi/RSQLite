@@ -16,10 +16,16 @@
 are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc}
 are considered equal.}
 
-\item{row.names}{A string or an index specifying the column in the DBMS table
-to use as \code{row.names} in the output data.frame. Defaults to using the
-\code{row_names} column if present. Set to \code{NULL} to never use
-row names.}
+\item{row.names}{Either \code{TRUE}, \code{FALSE}, \code{NA} or a string.
+
+  If \code{TRUE}, always translate row names to a column called "row_names".
+  If \code{FALSE}, never translate row names. If \code{NA}, translate
+  rownames only if they're a character vector.
+
+  A string is equivalent to \code{TRUE}, but allows you to override the
+  default name.
+
+  For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
 
 \item{check.names}{If \code{TRUE}, the default, column names will be
 converted to valid R identifiers.}

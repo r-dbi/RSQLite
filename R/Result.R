@@ -111,10 +111,7 @@ setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
 
 
 #' @param res an \code{\linkS4class{SQLiteResult}} object.
-#' @param row.names A string or an index specifying the column in the DBMS table 
-#'   to use as \code{row.names} in the output data.frame. Defaults to using the
-#'   \code{row_names} column if present. Set to \code{NULL} to never use
-#'   row names.
+#' @inheritParams SQL::rownamesToColumn
 #' @param n maximum number of records to retrieve per fetch. Use \code{-1} to 
 #'    retrieve all pending records; use \code{0} for to fetch the default 
 #'    number of rows as defined in \code{\link{SQLite}}

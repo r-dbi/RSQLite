@@ -19,7 +19,7 @@
 #' @param select.cols  A SQL statement (in the form of a character vector of 
 #'    length 1) giving the columns to select. E.g. "*" selects all columns, 
 #'    "x,y,z" selects three columns named as listed.
-#' @inheritParams query
+#' @inheritParams SQL::rownamesToColumn
 #' @export
 #' @examples
 #' con <- dbConnect(SQLite())

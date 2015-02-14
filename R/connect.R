@@ -1,5 +1,5 @@
-#' @include Connection.R
-#' @include Driver.R
+#' @include SQLiteConnection.R
+#' @include SQLiteDriver.R
 NULL
 
 #' Connect to an SQLite datbase

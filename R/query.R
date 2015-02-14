@@ -1,4 +1,4 @@
-#' @include Result.R
+#' @include SQLiteResult.R
 NULL
 
 #' Execute a SQL statement on a database connection

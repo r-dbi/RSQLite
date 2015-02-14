@@ -1,4 +1,4 @@
-#' @include Connection.R
+#' @include SQLiteConnection.R
 NULL
 
 #' Generics for getting and sending prepared queries.

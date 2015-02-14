@@ -20,21 +20,7 @@
 \code{\linkS4class{SQLiteResult}}}
 }
 \description{
-Get metadata about a database object.
+Deprecated. Please use individual functions.
 }
-\examples{
-dbGetInfo(SQLite())
-
-con <- dbConnect(SQLite())
-dbGetInfo(con)
-
-dbWriteTable(con, "mtcars", mtcars)
-rs <- dbSendQuery(con, "SELECT * FROM mtcars")
-dbGetInfo(rs)
-dbFetch(rs, 1)
-dbGetInfo(rs)
-
-dbClearResult(rs)
-dbDisconnect(con)
-}
+\keyword{internal}
 

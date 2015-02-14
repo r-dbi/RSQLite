@@ -1,23 +1,3 @@
-#' Return an entire column from a SQLite database
-#' 
-#' Return an entire column from a table in a SQLite database as an R vector of
-#' the appropriate type.  This function is experimental and subject to change.
-#' 
-#' @param con a \code{SQLiteConnection} object as produced by
-#' \code{sqliteNewConnection}.
-#' @param table a string specifying the name of the table
-#' @param column a string specifying the name of the column in the specified
-#' table to retrieve.
-#' @return an R vector of the appropriate type (based on the type of the column
-#' in the database).
-#' @keywords internal
-#' @export
-sqliteQuickColumn <- function(con, table, column) {
-  warning("Deprecated. Please use dbReadTable instead.")
-
-  dbReadTable(con, table, select.cols = column, row.names = FALSE)[[1]]
-}
-
 #' Copy a SQLite database
 #' 
 #' This function copies a database connection to a file or to another database

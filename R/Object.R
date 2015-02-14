@@ -1,6 +1,5 @@
 #' @include Driver.R
 #' @include Connection.R
-#' @include Result.R
 NULL
 
 #' Determine the SQL Data Type of an R object.
@@ -38,49 +37,3 @@ setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
     stop("Unsupported type", call. = FALSE)
   )
 })
-
-#' Check whether an SQLite object is valid or not.
-#' 
-#' Support function that verifies that the holding a reference to a
-#' foreign object is still valid for communicating with the RDBMS
-#' 
-#' @param dbObj,obj A driver, connection or result.
-#' @return A logical scalar.
-#' @examples
-#' dbIsValid(SQLite())
-#' 
-#' con <- dbConnect(SQLite())
-#' dbIsValid(con)
-#' 
-#' dbDisconnect(con)
-#' dbIsValid(con)
-#' @name dbIsValid
-NULL
-
-#' @rdname dbIsValid
-#' @export
-setMethod("dbIsValid", "SQLiteDriver", function(dbObj) {
-  TRUE
-})
-#' @rdname dbIsValid
-#' @export
-setMethod("dbIsValid", "SQLiteConnection", function(dbObj) {
-  rsqlite_connection_valid(dbObj@ptr)
-})
-#' @rdname dbIsValid
-#' @export
-setMethod("dbIsValid", "SQLiteResult", function(dbObj) {
-  rsqlite_result_valid(dbObj@ptr)
-})
-
-#' @rdname dbIsValid
-#' @export
-isIdCurrent <- function(obj) {
-  .Deprecated("dbIsValid")
-  dbIsValid(obj)
-}
-
-check_valid <- function(x) {
-  if (dbIsValid(x)) return(TRUE)  
-  stop("Expired ", class(x)[1], call. = FALSE)
-}

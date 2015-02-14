@@ -1,3 +1,6 @@
+#' @include Connection.R
+NULL
+
 #' Write a local data frame or file to the database.
 #' 
 #' @export
@@ -37,7 +40,7 @@
 #' dbDisconnect(con)
 setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
   function(conn, name, value, row.names = NA, overwrite = FALSE, append = FALSE, 
-           field.types = NULL) {
+    field.types = NULL) {
     
     if (overwrite && append)
       stop("overwrite and append cannot both be TRUE", call. = FALSE)
@@ -70,7 +73,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
         finally = dbClearResult(rs)
       )
     }
-
+    
     on.exit(NULL)
     dbCommit(conn, "dbWriteTable")
     TRUE
@@ -88,7 +91,7 @@ parameterised_insert <- function(con, name, values) {
     "VALUES\n",
     paste0("  (", paste(rep("?", length(fields)), collapse = ", "), ")", collapse = ",\n")
   ))
- 
+  
 }
 
 
@@ -106,8 +109,8 @@ parameterised_insert <- function(con, name, values) {
 #' @rdname dbWriteTable
 setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
   function(conn, name, value, field.types = NULL, overwrite = FALSE, 
-           append = FALSE, header = TRUE, colClasses = NA, row.names = FALSE, 
-           nrows = 50, sep = ",", eol="\n", skip = 0) {
+    append = FALSE, header = TRUE, colClasses = NA, row.names = FALSE, 
+    nrows = 50, sep = ",", eol="\n", skip = 0) {
     
     stop("Deprecated. This will come back at some point in the future")
   }
@@ -129,3 +132,107 @@ setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
   
   value
 })
+
+#' Convenience functions for importing/exporting DBMS tables
+#' 
+#' These functions mimic their R/S-Plus counterpart \code{get}, \code{assign},
+#' \code{exists}, \code{remove}, and \code{objects}, except that they generate
+#' code that gets remotely executed in a database engine.
+#' 
+#' @return A data.frame in the case of \code{dbReadTable}; otherwise a logical
+#' indicating whether the operation was successful.
+#' @note Note that the data.frame returned by \code{dbReadTable} only has
+#' primitive data, e.g., it does not coerce character data to factors.
+#' 
+#' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
+#'   \code{\link[DBI]{dbConnect}}
+#' @param name a character string specifying a table name. SQLite table names 
+#'   are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc} 
+#'   are considered equal.
+#' @param check.names If \code{TRUE}, the default, column names will be
+#'   converted to valid R identifiers.
+#' @param select.cols  A SQL statement (in the form of a character vector of 
+#'    length 1) giving the columns to select. E.g. "*" selects all columns, 
+#'    "x,y,z" selects three columns named as listed.
+#' @inheritParams SQL::rownamesToColumn
+#' @export
+#' @examples
+#' con <- dbConnect(SQLite())
+#' dbWriteTable(con, "mtcars", mtcars)
+#' dbReadTable(con, "mtcars")
+#' dbGetQuery(con, "SELECT * FROM mtcars WHERE cyl = 8")
+#' 
+#' # Supress row names
+#' dbReadTable(con, "mtcars", row.names = FALSE)
+#' dbGetQuery(con, "SELECT * FROM mtcars WHERE cyl = 8", row.names = FALSE)
+#' 
+#' dbDisconnect(con)
+setMethod("dbReadTable", c("SQLiteConnection", "character"),
+  function(conn, name, row.names = NA, check.names = TRUE, select.cols = "*") {
+    out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM", name), 
+      row.names = row.names)
+    
+    if (check.names) {
+      names(out) <- make.names(names(out), unique = TRUE)
+    }
+    
+    out
+  }
+)
+
+
+#' Does the table exist?
+#' 
+#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
+#' @param name String, name of table. Match is case insensitive.
+#' @export
+setMethod("dbExistsTable", c("SQLiteConnection", "character"),
+  function(conn, name) {
+    tolower(name) %in% tolower(dbListTables(conn))
+  }
+)
+
+
+#' Remove a table from the database.
+#' 
+#' Executes the SQL \code{DROP TABLE}.
+#' 
+#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
+#' @param name character vector of length 1 giving name of table to remove
+#' @export
+setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
+  function(conn, name) {
+    dbGetQuery(conn, paste("DROP TABLE ", name))
+    invisible(TRUE)
+  }
+)
+
+#' List available SQLite tables.
+#' 
+#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
+#' @export
+setMethod("dbListTables", "SQLiteConnection", function(conn) {
+  dbGetQuery(conn, "SELECT name FROM
+    (SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master)
+    WHERE type = 'table' OR type = 'view'
+    ORDER BY name")$name
+})
+
+#' List fields in specified table.
+#' 
+#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
+#' @param name a length 1 character vector giving the name of a table.
+#' @export
+#' @examples
+#' con <- dbConnect(SQLite())
+#' dbWriteTable(con, "iris", iris)
+#' dbListFields(con, "iris")
+#' dbDisconnect(con)
+setMethod("dbListFields", c("SQLiteConnection", "character"),
+  function(conn, name) {
+    rs <- dbSendQuery(conn, paste("SELECT * FROM ", name, "LIMIT 1"))
+    on.exit(dbClearResult(rs))
+    
+    names(fetch(rs, n = 1))
+  }
+)

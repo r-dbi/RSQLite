@@ -3,14 +3,22 @@
 \docType{class}
 \name{SQLiteDriver-class}
 \alias{SQLiteDriver-class}
+\alias{dbIsValid,SQLiteDriver-method}
+\alias{dbUnloadDriver,SQLiteDriver-method}
 \alias{show,SQLiteDriver-method}
 \title{Class SQLiteDriver (and methods).}
 \usage{
 \S4method{show}{SQLiteDriver}(object)
+
+\S4method{dbIsValid}{SQLiteDriver}(dbObj)
+
+\S4method{dbUnloadDriver}{SQLiteDriver}(drv, ...)
 }
 \description{
 The SQLiteDriver, which is used to select the correct method in
-\code{dbConnect()}. See more details in \code{\link{SQLite}}
+\code{dbConnect()}. See more details in \code{\link{SQLite}}.
+It is used purely for dispatch and \code{dbUnloadDriver} is unnecessary
+(and a null-op).
 }
 \keyword{internal}
 

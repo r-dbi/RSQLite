@@ -26,22 +26,20 @@ License: LGPL (>= 2)
 URL: https://github.com/rstats-db/RSQLite
 BugReports: https://github.com/rstats-db/RSQLite/issues
 Collate:
-    'ConnectionExtensions.R'
-    'Connection.R'
     'Driver.R'
+    'Connection.R'
     'Connect.R'
-    'ConnectionRead.R'
-    'ConnectionTransactions.R'
-    'ConnectionWrite.R'
-    'Escaping.R'
-    'Result.R'
     'Object.R'
     'RcppExports.R'
-    'Result-deprecated.R'
+    'Result.R'
     'Utils.R'
     'datasetsDb.R'
     'dbGetInfo.R'
+    'deprecated.R'
     'extensions.R'
+    'query.R'
+    'table.R'
+    'transactions.R'
     'zzz.R'
 LinkingTo: Rcpp,
     BH

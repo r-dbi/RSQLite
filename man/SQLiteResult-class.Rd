@@ -3,9 +3,12 @@
 \docType{class}
 \name{SQLiteResult-class}
 \alias{SQLiteResult-class}
+\alias{dbIsValid,SQLiteResult-method}
 \alias{show,SQLiteResult-method}
 \title{Class SQLiteResult}
 \usage{
+\S4method{dbIsValid}{SQLiteResult}(dbObj)
+
 \S4method{show}{SQLiteResult}(object)
 }
 \description{

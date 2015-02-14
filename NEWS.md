@@ -1,5 +1,8 @@
 # Version 1.0.9000
 
+- `make.db.names()` has been formally deprecated. Please use 
+  `dbQuoteIdentifier()` instead.
+
 - You can now use SQLite's url specification for databases. This allows you to
   create [shared in-memory](https://www.sqlite.org/inmemorydb.html) databases
   (#70).

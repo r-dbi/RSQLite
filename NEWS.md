@@ -1,5 +1,9 @@
 # Version 1.0.9000
 
+- You can now use SQLite's url specification for databases. This allows you to
+  create [shared in-memory](https://www.sqlite.org/inmemorydb.html) databases
+  (#70).
+
 - Queries are always converted to UTF-8 before being sent to database (#69).
 
 - Start on a basic vignette: `vignette("RSQLite")` (#50).

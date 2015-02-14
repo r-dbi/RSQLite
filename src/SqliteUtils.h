@@ -123,7 +123,7 @@ void inline bind_parameter(sqlite3_stmt* stmt, int i, int j, std::string name, S
     } else {
       Rcpp::String value2 = value[i];
       std::string value3(value2);
-      sqlite3_bind_text(stmt, j, value3.c_str(), value3.size() + 1, 
+      sqlite3_bind_text(stmt, j, value3.data(), value3.size(), 
         SQLITE_TRANSIENT);
     }
   } else if (TYPEOF(value_) == VECSXP) {

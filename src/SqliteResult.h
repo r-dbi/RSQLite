@@ -178,67 +178,38 @@ public:
     return types_;
   }
   
-  
-  Rcpp::List fetch(int n_max = 10) {
+  Rcpp::List fetch(int n_max = -1) {
     if (!ready_)
-      Rcpp::stop("Prepared query needs to be bound first");
-    
-    if (complete_) 
-      n_max = 0;
-    
-    Rcpp::List out = df_create(types_, n_max);
-    
-    int i;
-    for (i = 0; i < n_max && !complete_; ++i) {
-      for (int j = 0; j < ncols_; ++j) {
-        set_col_value(out[j], types_[j], pStatement_, i, j);  
-      }
-      step();
-    }
-    
-    // If there weren't enough rows to fill up the initial set, trim them back
-    if (i < n_max) {
-      out = df_resize(out, i);
-    }
-    
-    out.attr("row.names") = Rcpp::IntegerVector::create(NA_INTEGER, -i);
-    out.attr("class") = "data.frame";
-    out.attr("names") = names_;
-    
-    return out;
-  }
-  
-  
-  Rcpp::List fetch_all() {
-    if (!ready_)
-      Rcpp::stop("Prepared query needs to be bound first");
-    
-    int n = 100;
-    Rcpp::List out = df_create(types_, n);
+      Rcpp::stop("Query needs to be bound before fetching");
+
+    int n = (n_max < 0) ? 100 : n_max;
+    Rcpp::List out = dfCreate(types_, names_, n);
     
     int i = 0;
     while(!complete_) {
       if (i >= n) {
-        n *= 2;
-        out = df_resize(out, n);
+        if (n_max < 0) {
+          n *= 2;
+          out = dfResize(out, n);
+        } else {
+          break;
+        }
       }
       
       for (int j = 0; j < ncols_; ++j) {
         set_col_value(out[j], types_[j], pStatement_, i, j);  
       }
-      
       step();
       ++i;
+      
+      if (i % 1000 == 0)
+        Rcpp::checkUserInterrupt();
     }
     
     // Trim back to what we actually used
     if (i < n) {
-      out = df_resize(out, i);
+      out = dfResize(out, i);
     }
-    
-    out.attr("row.names") = Rcpp::IntegerVector::create(NA_INTEGER, -i);
-    out.attr("class") = "data.frame";
-    out.attr("names") = names_;
     
     return out;
   }

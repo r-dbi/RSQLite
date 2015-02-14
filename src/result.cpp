@@ -15,11 +15,7 @@ void rsqlite_clear_result(XPtr<SqliteResult> res) {
 
 // [[Rcpp::export]]
 List rsqlite_fetch(XPtr<SqliteResult> res, int n = 10) {
-  if (n < 0) {
-    return res->fetch_all();  
-  } else {
-    return res->fetch(n);
-  }
+  return res->fetch(n);
 }
 
 // [[Rcpp::export]]

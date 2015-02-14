@@ -15,11 +15,12 @@ XPtr<SqliteConnectionPtr> rsqlite_connect(std::string path, bool allow_ext,
 
 // [[Rcpp::export]]
 void rsqlite_disconnect(XPtr<SqliteConnectionPtr> con) {
-
   int n = con->use_count();
   if (n > 1) {
-    Rcout << "There are " << n - 1 << " result objects in use.\n" <<
-      "The connection will be automatically released when they are closed\n";
+    warning(
+      "There are %i result in use. The connection will be released when they are closed",
+      n - 1
+    );
   } 
   
   con.release();

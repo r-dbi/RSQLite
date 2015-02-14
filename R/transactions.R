@@ -41,11 +41,11 @@ NULL
 #' dbCommit(con, "a")
 #' 
 #' dbDisconnect(con)
-#' @name transactions
+#' @name sqlite-transaction
 NULL
 
 #' @export
-#' @rdname transactions
+#' @rdname sqlite-transaction
 setMethod("dbBegin", "SQLiteConnection", function(conn, name = NULL) {
   if (is.null(name)) {
     dbGetQuery(conn, "BEGIN")  
@@ -57,7 +57,7 @@ setMethod("dbBegin", "SQLiteConnection", function(conn, name = NULL) {
 })
 
 #' @export
-#' @rdname transactions
+#' @rdname sqlite-transaction
 setMethod("dbCommit", "SQLiteConnection", function(conn, name = NULL) {
   if (is.null(name)) {
     dbGetQuery(conn, "COMMIT")
@@ -69,7 +69,7 @@ setMethod("dbCommit", "SQLiteConnection", function(conn, name = NULL) {
 })
 
 #' @export
-#' @rdname transactions
+#' @rdname sqlite-transaction
 setMethod("dbRollback", "SQLiteConnection", function(conn, name = NULL) {
   if (is.null(name)) {
     dbGetQuery(conn, "ROLLBACK")

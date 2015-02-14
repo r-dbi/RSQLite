@@ -188,3 +188,26 @@ setMethod("dbGetInfo", "SQLiteResult", function(dbObj) {
   
   list()
 })
+
+#' dbListResults
+#' 
+#' DEPRECATED
+#' 
+#' @keywords internal
+#' @export
+setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
+  stop("Querying the results associated with a connection is no longer supported", 
+    call. = FALSE)
+})
+
+
+#' Fetch.
+#' 
+#' Deprecated. Please use \code{dbFetch} instead.
+#' 
+#' @keywords internal
+#' @export
+setMethod("fetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
+  SQL::columnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
+})
+

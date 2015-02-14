@@ -72,7 +72,14 @@ read only mode.  Raise an error if the file does not already exist}
 }
 \description{
 Together, \code{SQLite()} and \code{dbConnect()} allow you to connect to
-a SQLite database file.
+a SQLite database file. See \link{sqlite-query} for how to issue queries
+and receive results.
+}
+\details{
+Connections are automatically cleaned-up after they're deleted and
+reclaimed by the GC. You can use \code{dbDisconnect()} to terminate the
+connection early, but it will not actually close until all open result
+sets have been closed (and you'll get a warning message to this effect).
 }
 \examples{
 # Initialize a temporary in memory database and copy a data.frame into it

@@ -4,9 +4,12 @@ NULL
 #' Execute a SQL statement on a database connection
 #' 
 #' To retrieve results a chunk at a time, use \code{dbSendQuery}, 
-#' \code{dbFetch}, then \code{ClearResult}. Alternatively, if you want all the 
+#' \code{dbFetch}, then \code{dbClearResult}. Alternatively, if you want all the 
 #' results (and they'll fit in memory) use \code{dbGetQuery} which sends, 
-#' fetches and clears for you.
+#' fetches and clears for you. To run the same prepared query with multiple
+#' inputs, use \code{dbBind}.
+#' 
+#' See \link{sqlite-meta} for how to extract other metadata from the result set.
 #' 
 #' @param conn an \code{\linkS4class{SQLiteConnection}} object.
 #' @param statement a character vector of length one specifying the SQL
@@ -36,11 +39,16 @@ NULL
 #' dbBind(rs, list(3))
 #' dbFetch(rs)
 #' 
+#' # Named parameters are a little more convenient
+#' rs <- dbSendQuery(db, "SELECT * FROM USArrests WHERE Murder < :x")
+#' dbBind(rs, list(x = 3))
+#' dbFetch(rs)
+#' 
 #' dbDisconnect(db)
-#' @name query
+#' @name sqlite-query
 NULL
 
-#' @rdname query
+#' @rdname sqlite-query
 #' @export
 setMethod("dbSendQuery", c("SQLiteConnection", "character"),
   function(conn, statement, params = NULL, ...) {
@@ -59,7 +67,7 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
   }
 )
 
-#' @rdname query
+#' @rdname sqlite-query
 #' @export
 setMethod("dbGetQuery", signature("SQLiteConnection", "character"), 
   function(conn, statement, ..., row.names = NA) {
@@ -70,7 +78,7 @@ setMethod("dbGetQuery", signature("SQLiteConnection", "character"),
   }
 )
 
-#' @rdname query
+#' @rdname sqlite-query
 #' @export
 setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
   if (is.null(names(params))) {
@@ -88,29 +96,16 @@ setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
 #'    retrieve all pending records; use \code{0} for to fetch the default 
 #'    number of rows as defined in \code{\link{SQLite}}
 #' @export
-#' @rdname query
+#' @rdname sqlite-query
 setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
   SQL::columnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
 })
 
-#' @rdname query
-#' @rdname dbFetch-SQLiteResult-method
-setMethod("fetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
-  SQL::columnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
-})
-
 #' @export
-#' @rdname query
+#' @rdname sqlite-query
 setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
   rsqlite_clear_result(res@ptr)
   invisible(TRUE)
-})
-
-#' @export
-#' @rdname query
-setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
-  stop("Querying the results associated with a connection is no longer supported", 
-    call. = FALSE)
 })
 
 #' Database interface meta-data.

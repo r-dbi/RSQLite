@@ -69,17 +69,6 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
 
 #' @rdname sqlite-query
 #' @export
-setMethod("dbGetQuery", signature("SQLiteConnection", "character"), 
-  function(conn, statement, ..., row.names = NA) {
-    rs <- dbSendQuery(conn, statement, ...)
-    on.exit(dbClearResult(rs))
-    
-    dbFetch(rs, n = -1, ..., row.names = row.names)
-  }
-)
-
-#' @rdname sqlite-query
-#' @export
 setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
   if (is.null(names(params))) {
     names(params) <- rep("", length(params))
@@ -91,14 +80,13 @@ setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
 
 
 #' @param res an \code{\linkS4class{SQLiteResult}} object.
-#' @inheritParams SQL::rownamesToColumn
 #' @param n maximum number of records to retrieve per fetch. Use \code{-1} to 
 #'    retrieve all pending records; use \code{0} for to fetch the default 
 #'    number of rows as defined in \code{\link{SQLite}}
 #' @export
 #' @rdname sqlite-query
 setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
-  SQL::columnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
+  columnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
 })
 
 #' @export

@@ -50,12 +50,12 @@ setGeneric("dbBeginTransaction", function(conn, ...) {
 sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL, 
   row.names = NA) {
   
-  warning("Deprecated: please use SQL::sqlTableCreate instead")
+  warning("Deprecated: please use DBI::sqlCreateTable instead")
   
   if (!is.data.frame(value)) {
     value <- as.data.frame(value)
   }
-  value <- SQL::columnToRownames(value, row.names)
+  value <- columnToRownames(value, row.names)
   
   if (is.null(field.types)) {
     field.types <- vapply(value, dbDataType, dbObj = con, 
@@ -208,6 +208,6 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
 #' @keywords internal
 #' @export
 setMethod("fetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
-  SQL::columnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
+  columnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
 })
 

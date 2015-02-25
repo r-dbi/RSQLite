@@ -5,11 +5,8 @@
 \alias{SQLiteDriver-class}
 \alias{dbIsValid,SQLiteDriver-method}
 \alias{dbUnloadDriver,SQLiteDriver-method}
-\alias{show,SQLiteDriver-method}
 \title{Class SQLiteDriver (and methods).}
 \usage{
-\S4method{show}{SQLiteDriver}(object)
-
 \S4method{dbIsValid}{SQLiteDriver}(dbObj)
 
 \S4method{dbUnloadDriver}{SQLiteDriver}(drv, ...)

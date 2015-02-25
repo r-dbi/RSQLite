@@ -35,7 +35,7 @@
   they are deleted and garbage collected. This protects against both memory
   leaks and null pointers.
 
-- `sqliteBuildTableDefinition()` has been deprecated. Use `SQL::sqlTableCreate()`
+- `sqliteBuildTableDefinition()` has been deprecated. Use `DBI::sqlCreateTable()`
   instead.
 
 - `dbWriteTable()` with a file path has been deprecated due to the high

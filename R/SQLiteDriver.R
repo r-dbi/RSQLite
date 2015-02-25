@@ -17,12 +17,6 @@ setClass("SQLiteDriver",
 
 #' @rdname SQLiteDriver-class
 #' @export
-setMethod("show", "SQLiteDriver", function(object) {
-  cat("<SQLiteDriver>\n")
-})
-
-#' @rdname SQLiteDriver-class
-#' @export
 setMethod("dbIsValid", "SQLiteDriver", function(dbObj) {
   TRUE
 })

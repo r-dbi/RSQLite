@@ -58,7 +58,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     }
     
     if (!found || overwrite) {
-      sql <- SQL::sqlTableCreate(conn, name, value, row.names = row.names)
+      sql <- sqlCreateTable(conn, name, value, row.names = row.names)
       dbGetQuery(conn, sql)
     }
     
@@ -116,11 +116,10 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
   }
 )
 
-#' @importFrom SQL sqlData
 #' @export
 #' @rdname dbWriteTable
 setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
-  value <- SQL::rownamesToColumn(value, row.names)
+  value <- rownamesToColumn(value, row.names)
   
   # Convert factors to strings
   is_factor <- vapply(value, is.factor, logical(1))
@@ -154,7 +153,7 @@ setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
 #' @param select.cols  A SQL statement (in the form of a character vector of 
 #'    length 1) giving the columns to select. E.g. "*" selects all columns, 
 #'    "x,y,z" selects three columns named as listed.
-#' @inheritParams SQL::rownamesToColumn
+#' @inheritParams DBI::rownamesToColumn
 #' @export
 #' @examples
 #' con <- dbConnect(SQLite())
@@ -169,6 +168,7 @@ setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
 #' dbDisconnect(con)
 setMethod("dbReadTable", c("SQLiteConnection", "character"),
   function(conn, name, row.names = NA, check.names = TRUE, select.cols = "*") {
+    name <- dbQuoteIdentifier(conn, name)
     out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM", name), 
       row.names = row.names)
     

@@ -34,17 +34,6 @@ a parameterised query.}
 
 \item{...}{Unused. Needed for compatibility with generic.}
 
-\item{row.names}{Either \code{TRUE}, \code{FALSE}, \code{NA} or a string.
-
-  If \code{TRUE}, always translate row names to a column called "row_names".
-  If \code{FALSE}, never translate row names. If \code{NA}, translate
-  rownames only if they're a character vector.
-
-  A string is equivalent to \code{TRUE}, but allows you to override the
-  default name.
-
-  For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
-
 \item{res}{an \code{\linkS4class{SQLiteResult}} object.}
 
 \item{n}{maximum number of records to retrieve per fetch. Use \code{-1} to

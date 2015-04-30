@@ -14,6 +14,7 @@ before_install:
 install:
   - ./travis-tool.sh install_github rstats-db/DBI
   - ./travis-tool.sh install_github RcppCore/Rcpp
+  - ./travis-tool.sh install_github jimhester/covr
   - ./travis-tool.sh install_deps
   - R CMD INSTALL .
 
@@ -21,6 +22,9 @@ script: ./travis-tool.sh run_tests
 
 on_failure:
   - ./travis-tool.sh dump_logs
+
+on_success:
+  - Rscript -e "library(covr);coveralls(exclusions='src/sqlite3.c')"
 
 notifications:
   email:

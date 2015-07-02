@@ -5,6 +5,7 @@
 #' 
 #' @export
 #' @examples
+#' library(DBI)
 #' db <- datasetsDb()
 #' dbListTables(db)
 #' 

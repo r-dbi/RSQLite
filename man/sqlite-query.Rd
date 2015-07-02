@@ -58,6 +58,7 @@ inputs, use \code{dbBind}.
 See \link{sqlite-meta} for how to extract other metadata from the result set.
 }
 \examples{
+library(DBI)
 db <- RSQLite::datasetsDb()
 
 # Run query to get results as dataframe

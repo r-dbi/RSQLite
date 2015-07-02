@@ -19,6 +19,7 @@ NULL
 #'   a parameterised query.
 #' @param ... Unused. Needed for compatibility with generic.
 #' @examples
+#' library(DBI)
 #' db <- RSQLite::datasetsDb()
 #' 
 #' # Run query to get results as dataframe

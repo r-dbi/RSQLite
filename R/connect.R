@@ -75,6 +75,7 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #' @export
 #' @rdname SQLite
 #' @examples
+#' library(DBI)
 #' # Initialize a temporary in memory database and copy a data.frame into it
 #' con <- dbConnect(RSQLite::SQLite(), ":memory:")
 #' data(USArrests)

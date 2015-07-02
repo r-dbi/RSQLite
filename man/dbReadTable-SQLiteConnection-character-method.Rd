@@ -48,6 +48,7 @@ Note that the data.frame returned by \code{dbReadTable} only has
 primitive data, e.g., it does not coerce character data to factors.
 }
 \examples{
+library(DBI)
 con <- dbConnect(SQLite())
 dbWriteTable(con, "mtcars", mtcars)
 dbReadTable(con, "mtcars")

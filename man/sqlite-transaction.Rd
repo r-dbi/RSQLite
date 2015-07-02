@@ -31,6 +31,7 @@ a SQLite transaction and turns auto-commit off. \code{dbCommit} and
 auto-commit on.
 }
 \examples{
+library(DBI)
 con <- dbConnect(SQLite(), ":memory:")
 dbWriteTable(con, "arrests", datasets::USArrests)
 dbGetQuery(con, "select count(*) from arrests")

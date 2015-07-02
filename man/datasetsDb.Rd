@@ -11,6 +11,7 @@ This database is bundled with the package, and contains all data frames
 in the datasets package.
 }
 \examples{
+library(DBI)
 db <- datasetsDb()
 dbListTables(db)
 

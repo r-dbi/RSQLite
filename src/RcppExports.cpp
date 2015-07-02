@@ -7,7 +7,7 @@
 using namespace Rcpp;
 
 // rsqlite_connect
-XPtr<SqliteConnectionPtr> rsqlite_connect(std::string path, bool allow_ext, int flags, std::string vfs = "");
+XPtr<SqliteConnectionPtr> rsqlite_connect(std::string path, bool allow_ext, int flags, std::string vfs);
 RcppExport SEXP RSQLite_rsqlite_connect(SEXP pathSEXP, SEXP allow_extSEXP, SEXP flagsSEXP, SEXP vfsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
@@ -86,7 +86,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // rsqlite_fetch
-List rsqlite_fetch(XPtr<SqliteResult> res, int n = 10);
+List rsqlite_fetch(XPtr<SqliteResult> res, int n);
 RcppExport SEXP RSQLite_rsqlite_fetch(SEXP resSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;

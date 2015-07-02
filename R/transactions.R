@@ -14,6 +14,7 @@ NULL
 #'   nest multiple transaction
 #' @return A boolean, indicating success or failure.
 #' @examples
+#' library(DBI)
 #' con <- dbConnect(SQLite(), ":memory:")
 #' dbWriteTable(con, "arrests", datasets::USArrests)
 #' dbGetQuery(con, "select count(*) from arrests")

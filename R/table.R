@@ -156,6 +156,7 @@ setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
 #' @inheritParams DBI::rownamesToColumn
 #' @export
 #' @examples
+#' library(DBI)
 #' con <- dbConnect(SQLite())
 #' dbWriteTable(con, "mtcars", mtcars)
 #' dbReadTable(con, "mtcars")

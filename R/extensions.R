@@ -17,6 +17,7 @@
 #' @param db A database to load these extensions.
 #' @export
 #' @examples
+#' library(DBI)
 #' db <- dbConnect(SQLite())
 #' initExtension(db)
 #' 

@@ -5,16 +5,12 @@
 \alias{dbBind,SQLiteResult-method}
 \alias{dbClearResult,SQLiteResult-method}
 \alias{dbFetch,SQLiteResult-method}
-\alias{dbGetQuery,SQLiteConnection,character-method}
 \alias{dbSendQuery,SQLiteConnection,character-method}
 \alias{sqlite-query}
 \title{Execute a SQL statement on a database connection}
 \usage{
 \S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement,
   params = NULL, ...)
-
-\S4method{dbGetQuery}{SQLiteConnection,character}(conn, statement, ...,
-  row.names = NA)
 
 \S4method{dbBind}{SQLiteResult}(res, params, ...)
 
@@ -39,6 +35,17 @@ a parameterised query.}
 \item{n}{maximum number of records to retrieve per fetch. Use \code{-1} to
 retrieve all pending records; use \code{0} for to fetch the default
 number of rows as defined in \code{\link{SQLite}}}
+
+\item{row.names}{Either \code{TRUE}, \code{FALSE}, \code{NA} or a string.
+
+  If \code{TRUE}, always translate row names to a column called "row_names".
+  If \code{FALSE}, never translate row names. If \code{NA}, translate
+  rownames only if they're a character vector.
+
+  A string is equivalent to \code{TRUE}, but allows you to override the
+  default name.
+
+  For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
 }
 \description{
 To retrieve results a chunk at a time, use \code{dbSendQuery},
@@ -51,6 +58,7 @@ inputs, use \code{dbBind}.
 See \link{sqlite-meta} for how to extract other metadata from the result set.
 }
 \examples{
+library(DBI)
 db <- RSQLite::datasetsDb()
 
 # Run query to get results as dataframe

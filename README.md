@@ -1,6 +1,7 @@
 # RSQLite
 
-[![Build Status](https://travis-ci.org/rstats-db/RSQLite.png?branch=master)](https://travis-ci.org/rstats-db/RSQLite)
+[![Build Status](https://travis-ci.org/rstats-db/RSQLite.png?branch=master)](https://travis-ci.org/rstats-db/RSQLite) [![Coverage Status](https://img.shields.io/codecov/c/github/rstats-db/RSQLite/master.svg)](https://codecov.io/github/rstats-db/RSQLite?branch=master)
+
 
 RSQLite embeds the SQLite database engine in R, providing a DBI-compliant interface. [SQLite](http://www.sqlite.org) is a public-domain, single-user, very light-weight database engine that implements a decent subset of the SQL 92 standard, including the core table creation, updating, insertion, and selection operations, plus transaction management.
 

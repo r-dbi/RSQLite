@@ -27,6 +27,7 @@ through the SQLite website (\url{http://www.sqlite.org/contrib}).
 }
 }
 \examples{
+library(DBI)
 db <- dbConnect(SQLite())
 initExtension(db)
 

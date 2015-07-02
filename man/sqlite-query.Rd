@@ -5,16 +5,12 @@
 \alias{dbBind,SQLiteResult-method}
 \alias{dbClearResult,SQLiteResult-method}
 \alias{dbFetch,SQLiteResult-method}
-\alias{dbGetQuery,SQLiteConnection,character-method}
 \alias{dbSendQuery,SQLiteConnection,character-method}
 \alias{sqlite-query}
 \title{Execute a SQL statement on a database connection}
 \usage{
 \S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement,
   params = NULL, ...)
-
-\S4method{dbGetQuery}{SQLiteConnection,character}(conn, statement, ...,
-  row.names = NA)
 
 \S4method{dbBind}{SQLiteResult}(res, params, ...)
 

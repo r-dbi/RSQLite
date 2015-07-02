@@ -25,7 +25,7 @@ on_failure:
   - ./travis-tool.sh dump_logs
 
 after_success:
-  - Rscript -e 'covr::codecov(exclusions='src/sqlite3.c')"
+  - Rscript -e "covr::codecov(exclusions='src/sqlite3.c')"
 
 notifications:
   email:

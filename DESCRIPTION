@@ -17,7 +17,8 @@ Depends:
     methods
 Suggests:
     testthat,
-    knitr
+    knitr,
+    DBItest
 Imports:
     DBI (>= 0.3.1.9006),
     Rcpp (>= 0.11.4.2)

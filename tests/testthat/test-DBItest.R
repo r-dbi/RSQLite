@@ -1,2 +1,9 @@
 DBItest::make_context(SQLite(), NULL)
-DBItest::test_all(c("package_dependencies", "constructor_strict", "show", "get_info", "data_logical", "data_64_bit"))
+DBItest::test_all(c(
+  "package_dependencies", # #102
+  "constructor_strict",   # relaxed constructor check still active
+  "show",                 # rstats-db/RPostgres#49
+  "get_info",             # to be discussed
+  "data_logical",         # not an error, no logical data type
+  "data_64_bit"           # rstats-db/RPostgres#51
+))

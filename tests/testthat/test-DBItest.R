@@ -5,5 +5,7 @@ DBItest::test_all(c(
   "show",                 # rstats-db/RPostgres#49
   "get_info",             # to be discussed
   "data_logical",         # not an error, no logical data type
-  "data_64_bit"           # rstats-db/RPostgres#51
+  "data_64_bit",          # rstats-db/RPostgres#51
+  "data_date",            # #103
+  NULL
 ))

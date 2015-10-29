@@ -11,5 +11,6 @@ DBItest::test_all(c(
   "data_timestamp",        # syntax not supported
   "data_timestamp_utc",    # syntax not supported
   "data_timestamp_parens", # #104
+  "roundtrip_keywords",    # #106
   NULL
 ))

@@ -15,5 +15,6 @@ DBItest::test_all(c(
   "roundtrip_quotes",      # #107
   "roundtrip_logical",     # not an error, no logical data type
   "roundtrip_64_bit",      # not an error, loose typing
+  "roundtrip_date",        # #109
   NULL
 ))

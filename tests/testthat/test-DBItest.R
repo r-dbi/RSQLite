@@ -4,13 +4,20 @@ DBItest::test_all(c(
   "constructor_strict",    # relaxed constructor check still active
   "show",                  # rstats-db/RPostgres#49
   "get_info",              # to be discussed
+  "data_integer_null",     # not an error, no logical data type
   "data_logical",          # not an error, no logical data type
   "data_64_bit",           # rstats-db/RPostgres#51
+  "data_64_bit_null",      # rstats-db/RPostgres#51
   "data_date",             # #103
+  "data_date_null",        # #111
   "data_time",             # syntax not supported
+  "data_time_null",        # syntax not supported
   "data_timestamp",        # syntax not supported
+  "data_timestamp_null",   # syntax not supported
   "data_timestamp_utc",    # syntax not supported
+  "data_timestamp_utc_null", # syntax not supported
   "data_timestamp_parens", # #104
+  "data_timestamp_parens_null", # 111
   "roundtrip_keywords",    # #106
   "roundtrip_quotes",      # #107
   "roundtrip_logical",     # not an error, no logical data type

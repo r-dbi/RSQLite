@@ -19,6 +19,7 @@ DBItest::test_all(c(
   "data_timestamp_parens", # #104
   "data_timestamp_parens_null", # 111
   "append_table_error",    # #112
+  "temporary_table",       # #113
   "roundtrip_keywords",    # #106
   "roundtrip_quotes",      # #107
   "roundtrip_logical",     # not an error, no logical data type

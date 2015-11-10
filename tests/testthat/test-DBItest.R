@@ -26,14 +26,8 @@ DBItest::test_all(c(
   "roundtrip_64_bit",      # not an error, loose typing
   "roundtrip_date",        # #109
   "roundtrip_timestamp",   # #110
-  "bind_logical_positional", # not an error, no logical data type
-  "bind_logical_named_colon", # not an error, no logical data type
-  "bind_logical_named_dollar", # not an error, no logical data type
-  "bind_date_positional",  # #114
-  "bind_timestamp_positional", # #114
-  "bind_date_named_colon", # #114
-  "bind_timestamp_named_colon", # #114
-  "bind_date_named_dollar", # #114
-  "bind_timestamp_named_dollar", # #114
+  "bind_logical_.*", # not an error, no logical data type
+  "bind_date_.*",  # #114
+  "bind_timestamp_.*", # #114
   NULL
 ))

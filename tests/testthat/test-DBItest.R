@@ -2,10 +2,10 @@ DBItest::make_context(SQLite(), NULL)
 DBItest::test_all(c(
   "package_dependencies",  # #102
   "constructor_strict",    # relaxed constructor check still active
-  "show",                  # rstats-db/RPostgres#49
-  "get_info",              # to be discussed
-  "data_integer_null",     # not an error, no logical data type
+  "get_info_driver",       # #117
+  "get_info_connection",   # #117
   "data_logical",          # not an error, no logical data type
+  "data_logical_null",     # not an error, no logical data type
   "data_64_bit",           # rstats-db/RPostgres#51
   "data_64_bit_null",      # rstats-db/RPostgres#51
   "data_raw_null",         # #115

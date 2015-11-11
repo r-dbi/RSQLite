@@ -6,8 +6,8 @@ DBItest::test_all(c(
   "get_info_connection",   # #117
   "data_logical",          # not an error, no logical data type
   "data_logical_null",     # not an error, no logical data type
-  "data_64_bit",           # rstats-db/RPostgres#51
-  "data_64_bit_null",      # rstats-db/RPostgres#51
+  "data_64_bit",           # #65
+  "data_64_bit_null",      # #65
   "data_raw_null",         # #115
   "data_date",             # #103
   "data_date_null",        # #111

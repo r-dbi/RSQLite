@@ -13,20 +13,20 @@ DBItest::test_all(c(
   # result
   "stale_result_warning",  # #120
   "data_logical",          # not an error, no logical data type
-  "data_logical_null_below",     # not an error, no logical data type
+  "data_logical_null_.*",     # not an error, no logical data type
   "data_64_bit",           # #65
-  "data_64_bit_null_below",      # #65
-  "data_raw_null_below",         # #115
+  "data_64_bit_null_.*",      # #65
+  "data_raw_null_.*",         # #115
   "data_date",             # #103
-  "data_date_null_below",        # #111
+  "data_date_null_.*",        # #111
   "data_time",             # syntax not supported
-  "data_time_null_below",        # syntax not supported
+  "data_time_null_.*",        # syntax not supported
   "data_timestamp",        # syntax not supported
-  "data_timestamp_null_below",   # syntax not supported
+  "data_timestamp_null_.*",   # syntax not supported
   "data_timestamp_utc",    # syntax not supported
-  "data_timestamp_utc_null_below", # syntax not supported
+  "data_timestamp_utc_null_.*", # syntax not supported
   "data_timestamp_parens", # #104
-  "data_timestamp_parens_null_below", # 111
+  "data_timestamp_parens_null_.*", # 111
 
   # sql
   "append_table_error",    # #112

@@ -149,7 +149,7 @@ test_that("autoincrement populated before database with integers", {
   expect_equal(ds_remote$id, 100 + rev(ds_remote$score), label = "The autoincrement values should be assigned correctly.")
 })
 
-test_that("autoincrement populated before database with NAs", {
+test_that("autoincrement populated before database with all NAs", {
   con <- dbConnect(SQLite())
   
   ddl <- "CREATE TABLE `tbl` (
@@ -174,4 +174,34 @@ test_that("autoincrement populated before database with NAs", {
   expect_equal(ds_remote$name,  ds_local$name)
   expect_equal(ds_remote$score, ds_local$score)
   expect_equal(ds_remote$id, ds_remote$score, label = "The autoincrement values should be assigned correctly.")
+})
+
+
+test_that("autoincrement populated before database with some NAs in sequential order", {
+  con <- dbConnect(SQLite())
+  
+  ddl <- "CREATE TABLE `tbl` (
+    `id`    INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  	`name`  TEXT    NOT NULL UNIQUE,
+  	`score` INTEGER NOT NULL
+  );"
+  ds_local <- data.frame(
+    #Notice the 'id' column is set locally, which overrides the autoincrement assignment in the DB.
+    id               = c(101, 102, NA_integer_, 204, NA_integer_, 306, NA_integer_),
+    name             = letters[1:7],
+    score            = 1:7,
+    stringsAsFactors = FALSE
+  )
+  
+  dbSendQuery(con, ddl)  
+  dbWriteTable(con, name = 'tbl', value = ds_local, append = TRUE, row.names = FALSE)
+  
+  ds_remote <- dbReadTable(con, "tbl")
+  ds_remote <- ds_remote[order(ds_remote$id), ] #Sort returned data.frame so comparisons are more robust.
+  
+  expected_ids <- c(101, 102, 103, 204, 205, 306, 307) #Notice the jumps to 204 and 306.
+  
+  expect_equal(ds_remote$name,  ds_local$name)
+  expect_equal(ds_remote$score, ds_local$score)
+  expect_equal(ds_remote$id, expected_ids, label = "The autoincrement values should be assigned correctly.")
 })

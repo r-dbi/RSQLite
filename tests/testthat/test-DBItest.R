@@ -1,9 +1,17 @@
 DBItest::make_context(SQLite(), NULL)
 DBItest::test_all(c(
+  # getting_started
   "package_dependencies",  # #102
+
+  # driver
   "constructor_strict",    # relaxed constructor check still active
   "get_info_driver",       # #117
+
+  # connection
   "get_info_connection",   # #117
+
+  # result
+  "stale_result_warning",  # #120
   "data_logical",          # not an error, no logical data type
   "data_logical_null",     # not an error, no logical data type
   "data_64_bit",           # #65

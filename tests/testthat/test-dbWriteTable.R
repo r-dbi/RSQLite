@@ -119,7 +119,7 @@ test_that("autoincrement correctly populated by database", {
   expect_equal(ds_remote$id, ds_remote$score, label = "The two autoincrement values should be correct.")
 })
 
-test_that("autoincrement populated before database", {
+test_that("autoincrement populated before database with integers", {
   con <- dbConnect(SQLite())
   
   ddl <- "CREATE TABLE `tbl` (
@@ -143,4 +143,29 @@ test_that("autoincrement populated before database", {
   expect_equal(ds_remote$name,  ds_local$name[26:1],   label = "The two non-autoincrement columns should be correct (and reversed).")
   expect_equal(ds_remote$score, ds_local$score[26:1],  label = "The two non-autoincrement columns should be correct (and reversed).")
   expect_equal(ds_remote$id, rev(100+ds_remote$score), label = "The two autoincrement values should not be assigned by the database.")
+})
+
+test_that("autoincrement populated before database with NAs", {
+  con <- dbConnect(SQLite())
+  
+  ddl <- "CREATE TABLE `tbl` (
+    `id`    INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  	`name`  TEXT    NOT NULL UNIQUE,
+  	`score` INTEGER NOT NULL
+  );"
+  ds_local <- data.frame(
+    #Notice the 'id' column is set locally, which overrides the autoincrement assignment in the DB.
+    id               = NA_integer_,
+    name             = letters,
+    score            = 1:26,
+    stringsAsFactors = FALSE
+  )
+  
+  dbSendQuery(con, ddl)  
+  dbWriteTable(con, name = 'tbl', value = ds_local, append = TRUE, row.names = FALSE)
+  
+  ds_remote <- dbReadTable(con, "tbl")
+  
+  expect_equal(ds_remote[, c("name", "score")], ds_local[, c("name", "score")], label = "The two non-autoincrement columns should be correct.")
+  expect_equal(ds_remote$id, ds_remote$score, label = "The two autoincrement values should be correct.")
 })

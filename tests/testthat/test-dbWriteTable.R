@@ -114,9 +114,11 @@ test_that("autoincrement correctly populated by database", {
   dbWriteTable(con, name = 'tbl', value = ds_local, append = TRUE, row.names = FALSE)
   
   ds_remote <- dbReadTable(con, "tbl")
+  ds_remote <- ds_remote[order(ds_remote$id), ] #Sort returned data.frame so comparisons are more robust.
   
-  expect_equal(ds_remote[, c("name", "score")], ds_local[, c("name", "score")], label = "The two non-autoincrement columns should be correct.")
-  expect_equal(ds_remote$id, ds_remote$score, label = "The two autoincrement values should be correct.")
+  expect_equal(ds_remote$name,  ds_local$name)
+  expect_equal(ds_remote$score, ds_local$score)
+  expect_equal(ds_remote$id, ds_remote$score, label = "The autoincrement values should be assigned correctly.")
 })
 
 test_that("autoincrement populated before database with integers", {
@@ -139,10 +141,12 @@ test_that("autoincrement populated before database with integers", {
   dbWriteTable(con, name = 'tbl', value = ds_local, append = TRUE, row.names = FALSE)
   
   ds_remote <- dbReadTable(con, "tbl")
+  ds_remote <- ds_remote[order(ds_remote$id), ] #Sort returned data.frame so comparisons are more robust.
+  ds_local  <- ds_local[order(ds_local$id), ]
   
-  expect_equal(ds_remote$name,  ds_local$name[26:1],   label = "The two non-autoincrement columns should be correct (and reversed).")
-  expect_equal(ds_remote$score, ds_local$score[26:1],  label = "The two non-autoincrement columns should be correct (and reversed).")
-  expect_equal(ds_remote$id, rev(100+ds_remote$score), label = "The two autoincrement values should not be assigned by the database.")
+  expect_equal(ds_remote$name,  ds_local$name)
+  expect_equal(ds_remote$score, ds_local$score)
+  expect_equal(ds_remote$id, 100 + rev(ds_remote$score), label = "The autoincrement values should be assigned correctly.")
 })
 
 test_that("autoincrement populated before database with NAs", {
@@ -165,7 +169,9 @@ test_that("autoincrement populated before database with NAs", {
   dbWriteTable(con, name = 'tbl', value = ds_local, append = TRUE, row.names = FALSE)
   
   ds_remote <- dbReadTable(con, "tbl")
+  ds_remote <- ds_remote[order(ds_remote$id), ] #Sort returned data.frame so comparisons are more robust.
   
-  expect_equal(ds_remote[, c("name", "score")], ds_local[, c("name", "score")], label = "The two non-autoincrement columns should be correct.")
-  expect_equal(ds_remote$id, ds_remote$score, label = "The two autoincrement values should be correct.")
+  expect_equal(ds_remote$name,  ds_local$name)
+  expect_equal(ds_remote$score, ds_local$score)
+  expect_equal(ds_remote$id, ds_remote$score, label = "The autoincrement values should be assigned correctly.")
 })

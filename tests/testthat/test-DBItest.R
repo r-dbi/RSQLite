@@ -13,20 +13,22 @@ DBItest::test_all(c(
   # result
   "stale_result_warning",  # #120
   "data_logical",          # not an error, no logical data type
-  "data_logical_null",     # not an error, no logical data type
+  "data_logical_null_below",     # not an error, no logical data type
   "data_64_bit",           # #65
-  "data_64_bit_null",      # #65
-  "data_raw_null",         # #115
+  "data_64_bit_null_below",      # #65
+  "data_raw_null_below",         # #115
   "data_date",             # #103
-  "data_date_null",        # #111
+  "data_date_null_below",        # #111
   "data_time",             # syntax not supported
-  "data_time_null",        # syntax not supported
+  "data_time_null_below",        # syntax not supported
   "data_timestamp",        # syntax not supported
-  "data_timestamp_null",   # syntax not supported
+  "data_timestamp_null_below",   # syntax not supported
   "data_timestamp_utc",    # syntax not supported
-  "data_timestamp_utc_null", # syntax not supported
+  "data_timestamp_utc_null_below", # syntax not supported
   "data_timestamp_parens", # #104
-  "data_timestamp_parens_null", # 111
+  "data_timestamp_parens_null_below", # 111
+
+  # sql
   "append_table_error",    # #112
   "temporary_table",       # #113
   "quote_identifier_not_vectorized", # rstats-db/DBI#24
@@ -37,6 +39,8 @@ DBItest::test_all(c(
   "roundtrip_raw",         # #116
   "roundtrip_date",        # #109
   "roundtrip_timestamp",   # #110
+
+  # result_meta
   "bind_logical_.*", # not an error, no logical data type
   "bind_date_.*",  # #114
   "bind_timestamp_.*", # #114

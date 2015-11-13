@@ -94,3 +94,27 @@ test_that("can round-trip utf-8", {
   
   expect_equal(remote$x, enc2utf8("å"))
 })
+
+test_that("autoincrement correctly populated by database", {
+  con <- dbConnect(SQLite())
+  
+  ddl <- "CREATE TABLE `tbl` (
+    `id`    INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  	`name`  TEXT    NOT NULL UNIQUE,
+  	`score` INTEGER NOT NULL
+  );"
+  ds_local <- data.frame(
+    #Notice the 'id' column isn't set locally, only remotely.
+    name             = letters,
+    score            = 1:26,
+    stringsAsFactors = FALSE
+  )
+  
+  dbSendQuery(con, ddl)  
+  dbWriteTable(con, name = 'tbl', value = ds_local, append = TRUE, row.names = FALSE)
+  
+  ds_remote <- dbReadTable(con, "tbl")
+  
+  expect_equal(ds_remote[, c("name", "score")], ds_local[, c("name", "score")], label = "The two non-autoincrement columns should be correct.")
+  expect_equal(ds_remote$id, ds_remote$score, label = "The two autoincrement values should be correct.")
+})

@@ -55,15 +55,6 @@ test_that("forbidden operations throw errors", {
   dbDisconnect(dbrw2)
 })
 
-test_that("can connect to same db from multiple connections", {
-  dbfile <- tempfile()
-  con1 <- dbConnect(SQLite(), dbfile)
-  con2 <- dbConnect(SQLite(), dbfile)
-
-  dbWriteTable(con1, "mtcars", mtcars)
-  expect_equal(dbReadTable(con2, "mtcars"), mtcars)
-})
-
 test_that("temporary tables are connection local", {
   dbfile <- tempfile()
   con1 <- dbConnect(SQLite(), dbfile)

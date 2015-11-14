@@ -26,18 +26,6 @@ test_that("modifications retrieved by open result set", {
   dbClearResult(res)
 })
 
-test_that("NAs preserved in factors", {
-  con <- dbConnect(SQLite())
-
-  df <- data.frame(x = 1:10, y = factor(LETTERS[1:10]))
-  df$y[4] <- NA
-  
-  dbWriteTable(con, "bad_table", df)
-  bad_table <- dbReadTable(con, "bad_table")
-  expect_equal(bad_table$x, df$x)
-  expect_equal(bad_table$y, as.character(df$y))
-})
-
 test_that("logical converted to int", {
   con <- dbConnect(SQLite())
   

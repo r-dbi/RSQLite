@@ -1,5 +1,6 @@
 context("sqliteCopyDatabase")
 
+# Specific to RSQLite
 test_that("fails with bad arguments", {
   dbfile <- tempfile()
   con <- dbConnect(SQLite(), dbfile)
@@ -15,6 +16,7 @@ test_that("fails with bad arguments", {
   }
 })
 
+# Specific to RSQLite
 test_that("can backup memory db to disk", {
   con1 <- dbConnect(SQLite(), ":memory:")
   dbWriteTable(con1, "mtcars", mtcars)
@@ -26,6 +28,7 @@ test_that("can backup memory db to disk", {
   expect_true(dbExistsTable(con2, "mtcars"))
 })
 
+# Specific to RSQLite
 test_that("can backup to connection", {
   con1 <- dbConnect(SQLite(), ":memory:")
   dbWriteTable(con1, "mtcars", mtcars)

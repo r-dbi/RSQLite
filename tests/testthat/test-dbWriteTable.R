@@ -8,6 +8,7 @@ test_that("can't override existing table with default options", {
   expect_error(dbWriteTable(con, "t1", x), "exists in database")
 })
 
+# Not generic enough for DBItest
 test_that("throws error if constraint violated", {
   con <- dbConnect(SQLite())
 

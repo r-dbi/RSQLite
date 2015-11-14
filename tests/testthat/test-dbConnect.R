@@ -7,6 +7,7 @@ os <- function() {
   ostype
 }
 
+# Specific to RSQLite
 test_that("invalid dbnames throw errors", {
   expect_error(dbConnect(SQLite(), dbname = 1:3))
   expect_error(dbConnect(SQLite(), dbname = c("a", "b")))
@@ -14,6 +15,7 @@ test_that("invalid dbnames throw errors", {
   expect_error(dbConnect(SQLite(), dbname = as.character(NA)))
 })
 
+# Specific to RSQLite
 test_that("can get and set vfs values", {
   allowed <- switch(os(),
     osx = c("unix-posix", "unix-afp", "unix-flock", "unix-dotfile", "unix-none"),
@@ -30,6 +32,7 @@ test_that("can get and set vfs values", {
   for (v in allowed) checkVfs(v)
 })
 
+# Specific to RSQLite
 test_that("forbidden operations throw errors", {
   tmpFile <- tempfile()
   on.exit(unlink(tmpFile))

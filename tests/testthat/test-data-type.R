@@ -25,27 +25,8 @@ test_that("raw and list stored as BLOB", {
   expect_equal(dbDataType(SQLite(), list(a=NULL)), "BLOB")
 })
 
-test_that("AsIs class is ignored", {
-  df <- data.frame(
-    a = I(1:2),
-    b = I(c("x", "y")),
-    c = I(list(raw(3), raw(1))),
-    d = I(c(1.1, 2.2))
-  )
-  got <- sapply(df, dbDataType, dbObj = SQLite())
-  expect_equal(got, c(a="INTEGER", b="TEXT", c="BLOB", d="REAL"))
-})
-
-test_that("unknown cloasses default to typeof()", {
+# Specific to RSQLite
+test_that("dates are stored as REAL", {
   expect_equal(dbDataType(SQLite(), Sys.Date()), "REAL")
   expect_equal(dbDataType(SQLite(), Sys.time()), "REAL")
-  
-  intClass <- structure(1L, class="unknown1")
-  expect_equal(dbDataType(SQLite(), intClass), "INTEGER")
-  
-  dblClass <- structure(3.14, class="unknown1")
-  expect_equal(dbDataType(SQLite(), dblClass), "REAL")
-  
-  strClass <- structure("abc", class="unknown1")
-  expect_equal(dbDataType(SQLite(), strClass), "TEXT")
 })

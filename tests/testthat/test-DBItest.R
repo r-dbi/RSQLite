@@ -1,4 +1,4 @@
-DBItest::make_context(SQLite(), NULL)
+DBItest::make_context(SQLite(), list(dbname = tempfile("DBItest", fileext = ".sqlite")))
 DBItest::test_all(c(
   # getting_started
   "package_dependencies",  # #102

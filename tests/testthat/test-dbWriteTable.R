@@ -1,13 +1,5 @@
 context("dbWriteTable")
 
-test_that("can't override existing table with default options", {
-  con <- dbConnect(SQLite())
-
-  x <- data.frame(col1 = 1:10, col2 = letters[1:10])  
-  dbWriteTable(con, "t1", x)
-  expect_error(dbWriteTable(con, "t1", x), "exists in database")
-})
-
 # Not generic enough for DBItest
 test_that("throws error if constraint violated", {
   con <- dbConnect(SQLite())

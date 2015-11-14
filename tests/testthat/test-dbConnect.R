@@ -54,13 +54,3 @@ test_that("forbidden operations throw errors", {
   expect_true(dbWriteTable(dbrw2, "t2", df))
   dbDisconnect(dbrw2)
 })
-
-test_that("temporary tables are connection local", {
-  dbfile <- tempfile()
-  con1 <- dbConnect(SQLite(), dbfile)
-  con2 <- dbConnect(SQLite(), dbfile)
-
-  dbGetQuery(con1, "CREATE TEMPORARY TABLE temp (a TEXT)")
-  expect_true(dbExistsTable(con1, "temp"))
-  expect_false(dbExistsTable(con2, "temp"))
-})

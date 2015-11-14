@@ -75,7 +75,14 @@ setMethod("dbRollback", "SQLiteConnection", function(conn, name = NULL) {
   if (is.null(name)) {
     dbGetQuery(conn, "ROLLBACK")
   } else {
+    # The ROLLBACK TO command reverts the state of the database back to what it
+    # was just after the corresponding SAVEPOINT. Note that unlike that plain
+    # ROLLBACK command (without the TO keyword) the ROLLBACK TO command does not
+    # cancel the transaction. Instead of cancelling the transaction, the
+    # ROLLBACK TO command restarts the transaction again at the beginning. All
+    # intervening SAVEPOINTs are canceled, however.
     dbGetQuery(conn, paste("ROLLBACK TO ", name))
+    dbGetQuery(conn, paste("RELEASE SAVEPOINT ", name))
   }
   TRUE
 })

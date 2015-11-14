@@ -45,5 +45,11 @@ DBItest::test_all(c(
   "bind_logical_.*", # not an error, no logical data type
   "bind_date_.*",  # #114
   "bind_timestamp_.*", # #114
+  "read_only",             # default connection is read-write
   NULL
 ))
+
+DBItest::make_context(SQLite(), list(flags = SQLITE_RO))
+# Only read_only and interface compliance test run here
+# (opt-in not yet implemented, rstats-db/DBItest#33)
+DBItest::test_compliance()

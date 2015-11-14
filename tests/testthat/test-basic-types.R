@@ -7,19 +7,6 @@ basicDf <- data.frame(
   stringsAsFactors = FALSE
 )
 
-test_that("column types as expected in presence of NULLs", {
-  db <- dbConnect(SQLite(), ":memory:")
-  dbWriteTable(db, "t1", datasets::USArrests)
-  
-  a1 <- dbGetQuery(db, "SELECT Murder/(Murder - 8.1) FROM t1 LIMIT 10")
-  expect_is(a1[[1]], "numeric")
-
-  ## This isn't ideal, but for now, if the first row of a result set
-  ## contains a NULL, then that column is forced to be character.
-  a2 <- dbGetQuery(db, "SELECT Murder/(Murder - 13.2) FROM t1 LIMIT 10")
-  expect_is(a2[[1]], "character")
-})
-
 test_that("correct number of columns, even if 0 rows", {
   db <- dbConnect(SQLite(), ":memory:")
 

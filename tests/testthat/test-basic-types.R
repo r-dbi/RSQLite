@@ -7,24 +7,6 @@ basicDf <- data.frame(
   stringsAsFactors = FALSE
 )
 
-test_that("round-trip leaves data.frame unchanged", {
-  db <- dbConnect(SQLite(), ":memory:")
-  dbWriteTable(db, "t1", basicDf, row.names = FALSE)
-
-  expect_equal(dbGetQuery(db, "select * from t1"), basicDf)
-  expect_equal(dbReadTable(db, "t1"), basicDf)
-})
-
-test_that("NAs work in first row", {
-  db <- dbConnect(SQLite(), ":memory:")
-
-  na_first <- basicDf[c(5, 1:4), ]
-  rownames(na_first) <- NULL
-  dbWriteTable(db, "t1", na_first, row.names = FALSE)
-  
-  expect_equal(dbReadTable(db, "t1"), na_first)
-})
-
 test_that("row-by-row fetch is equivalent", {
   db <- dbConnect(SQLite(), ":memory:")
   dbWriteTable(db, "t1", basicDf, row.names = FALSE)

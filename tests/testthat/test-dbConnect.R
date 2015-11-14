@@ -55,12 +55,6 @@ test_that("forbidden operations throw errors", {
   dbDisconnect(dbrw2)
 })
 
-test_that("querying closed connection throws error", {
-  db <- dbConnect(SQLite(), dbname = ":memory:")
-  dbDisconnect(db)
-  expect_error(dbGetQuery(db, "select * from foo"), "not valid")
-})
-
 test_that("can connect to same db from multiple connections", {
   dbfile <- tempfile()
   con1 <- dbConnect(SQLite(), dbfile)

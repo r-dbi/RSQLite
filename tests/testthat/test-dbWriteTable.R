@@ -43,17 +43,6 @@ test_that("rownames preserved", {
   expect_equal(rownames(t1), rownames(df))  
 })
 
-test_that("commas in fields are preserved", {
-  con <- dbConnect(SQLite())
-  
-  df <- data.frame(
-    x = c("ABC, Inc.","DEF Holdings"), 
-    stringsAsFactors = FALSE
-  )
-  dbWriteTable(con, "t1", df, row.names = FALSE)
-  expect_equal(dbReadTable(con, "t1"), df)
-})
-
 test_that("NAs preserved in factors", {
   con <- dbConnect(SQLite())
 

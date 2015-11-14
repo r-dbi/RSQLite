@@ -26,16 +26,6 @@ test_that("modifications retrieved by open result set", {
   dbClearResult(res)
 })
 
-test_that("logical converted to int", {
-  con <- dbConnect(SQLite())
-  
-  local <- data.frame(x = 1:3, y = c(NA, TRUE, FALSE))
-  dbWriteTable(con, "t1", local)
-  remote <- dbReadTable(con, "t1")
-  
-  expect_equal(remote$y, as.integer(local$y))
-})
-
 test_that("can roundtrip special field names", {
   con <- dbConnect(SQLite())
 

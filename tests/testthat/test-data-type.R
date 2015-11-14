@@ -13,10 +13,9 @@ test_that("doubles stored as REAL", {
   expect_equal(dbDataType(SQLite(), 1.0), "REAL")
 })
 
-test_that("character and factor stored as TEXT", {
+# Specific to RSQLite
+test_that("character is stored as TEXT", {
   expect_equal(dbDataType(SQLite(), "a"), "TEXT")
-  expect_equal(dbDataType(SQLite(), factor(letters)), "TEXT")
-  expect_equal(dbDataType(SQLite(), ordered(letters)), "TEXT")
 })
 
 # Specific to RSQLite

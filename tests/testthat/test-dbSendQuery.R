@@ -1,14 +1,5 @@
 context("dbSendQuery")
 
-test_that("simple position binding works", {
-  con <- dbConnect(SQLite(), ":memory:")
-  dbWriteTable(con, "t1", data.frame(x = 1, y = 2))
-
-  dbSendQuery(con, "INSERT INTO t1 VALUES (?, ?)", list(2, 1))
-  
-  expect_equal(dbReadTable(con, "t1")$x, c(1, 2)) 
-})
-
 test_that("simple named binding works", {
   con <- dbConnect(SQLite(), ":memory:")
   dbWriteTable(con, "t1", data.frame(x = 1, y = 2))

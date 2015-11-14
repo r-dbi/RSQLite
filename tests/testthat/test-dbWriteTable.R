@@ -12,6 +12,8 @@ test_that("throws error if constraint violated", {
     "UNIQUE constraint failed")
 })
 
+# Test requires that two result sets can be open at the same time, which is
+# undesired (see DBItest "stale_result_warning")
 test_that("modifications retrieved by open result set", {
   con <- dbConnect(SQLite(), tempfile())
 

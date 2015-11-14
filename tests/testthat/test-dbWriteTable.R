@@ -26,17 +26,6 @@ test_that("modifications retrieved by open result set", {
   dbClearResult(res)
 })
 
-test_that("rownames preserved", {
-  con <- dbConnect(SQLite())
-
-  df <- data.frame(x = 1:10)
-  row.names(df) <- paste(letters[1:10], 1:10, sep="")
-  
-  dbWriteTable(con, "t1", df)
-  t1 <- dbReadTable(con, "t1")
-  expect_equal(rownames(t1), rownames(df))  
-})
-
 test_that("NAs preserved in factors", {
   con <- dbConnect(SQLite())
 

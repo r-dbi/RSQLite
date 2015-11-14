@@ -7,23 +7,6 @@ basicDf <- data.frame(
   stringsAsFactors = FALSE
 )
 
-test_that("row-by-row fetch is equivalent", {
-  db <- dbConnect(SQLite(), ":memory:")
-  dbWriteTable(db, "t1", basicDf, row.names = FALSE)
-  
-  rs <- dbSendQuery(db, "SELECT * FROM t1")
-  on.exit(dbClearResult(rs))
-  for (i in 1:5) {
-    row <- dbFetch(rs, 1L)
-    expect_equal(row, basicDf[i, ], check.attributes = FALSE)
-  }
-  
-  row <- dbFetch(rs, 1L)
-  expect_equal(nrow(row), 0L)
-  
-  expect_true(dbHasCompleted(rs))
-})
-
 test_that("column types as expected in presence of NULLs", {
   db <- dbConnect(SQLite(), ":memory:")
   dbWriteTable(db, "t1", datasets::USArrests)

@@ -12,6 +12,7 @@ DBItest::test_all(c(
 
   # result
   "stale_result_warning",  # #120
+  "data_(integer|numeric|logical_int)_null_.*", #111
   "data_logical",          # not an error, no logical data type
   "data_logical_null_.*",     # not an error, no logical data type
   "data_64_bit",           # #65

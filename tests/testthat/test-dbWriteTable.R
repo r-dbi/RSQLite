@@ -25,13 +25,3 @@ test_that("modifications retrieved by open result set", {
   expect_equal(nrow(dbFetch(res)), 20)
   dbClearResult(res)
 })
-
-test_that("can roundtrip special field names", {
-  con <- dbConnect(SQLite())
-
-  local <- data.frame(x = 1:3, select = 1:3, `  ` = 1:3, check.names = FALSE)
-  dbWriteTable(con, "torture", local)
-  remote <- dbReadTable(con, "torture", check.names = FALSE)
-  
-  expect_equal(local, remote)
-})

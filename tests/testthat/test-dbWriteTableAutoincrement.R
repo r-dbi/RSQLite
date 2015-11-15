@@ -4,8 +4,7 @@ context("dbWriteTable Autoincrement with a Primary Key")
 sql_ddl <- "CREATE TABLE `tbl` (
   `id`    INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	`name`  TEXT    NOT NULL UNIQUE,
-	`score` INTEGER NOT NULL
-);"
+	`score` INTEGER NOT NULL);"
 
 create_and_compare_table <- function( d_local, expected_remote_id ) {
   #Create a connection, create a table, and populate the table.
@@ -18,9 +17,9 @@ create_and_compare_table <- function( d_local, expected_remote_id ) {
   d_remote <- d_remote[order(d_remote$score), ]
   
   #Compares actual to expected values.
+  expect_equal(d_remote$id,    expected_remote_id, label = "The autoincrement values should be assigned correctly.")
   expect_equal(d_remote$name,  d_local$name)
   expect_equal(d_remote$score, d_local$score)
-  expect_equal(d_remote$id,    expected_remote_id, label = "The autoincrement values should be assigned correctly.")
 }
 
 test_that("autoincrement column not present before sending to database", {

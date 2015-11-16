@@ -1,4 +1,4 @@
-context("dbWriteTable Autoincrement with a Primary Key")
+context("dbWriteTable autoincrement")
 
 # Helper variable and function
 sql_ddl <- "CREATE TABLE `tbl` (
@@ -10,7 +10,8 @@ create_and_compare_table <- function( d_local, expected_remote_id ) {
   #Create a connection, create a table, and populate the table.
   con <- dbConnect(SQLite())
   dbSendQuery(con, sql_ddl)  
-  dbWriteTable(con, name = 'tbl', value = d_local, append = TRUE, row.names = FALSE)
+  write_successful <- dbWriteTable(con, name = 'tbl', value = d_local, append = TRUE, row.names = FALSE)
+  expect_true(write_successful)
   
   #Reads from the database and sort so comparisons are more robust.
   d_remote <- dbReadTable(con, "tbl")
@@ -20,6 +21,8 @@ create_and_compare_table <- function( d_local, expected_remote_id ) {
   expect_equal(d_remote$id,    expected_remote_id, label = "The autoincrement values should be assigned correctly.")
   expect_equal(d_remote$name,  d_local$name)
   expect_equal(d_remote$score, d_local$score)
+  # rm(d_remote, d_local)
+  # dbDisconnect(con)
 }
 
 test_that("autoincrement column not present before sending to database", {
@@ -107,7 +110,7 @@ test_that("autoincrement partially populated with duplicate IDs throws an error"
   )
   
   con <- dbConnect(SQLite())
-  dbSendQuery(con, sql_ddl)  
+  dbSendQuery(con, sql_ddl)
   expect_error(
     dbWriteTable(con, name = 'tbl', value = ds_local, append = TRUE, row.names = FALSE),
     "Error : UNIQUE constraint failed: tbl\\.id\n"

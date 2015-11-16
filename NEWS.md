@@ -78,6 +78,8 @@
 - `RSQLite()` no longer automatically attached DBI when loaded. This is to 
   encourage you to use `library(DBI); dbConnect(RSQLite::SQLite())`.
 
+- Additional documentation and unit tests for [autoincrement keys](https://www.sqlite.org/autoinc.html) (#119).
+
 # Version 1.0.0
 
 ## New features

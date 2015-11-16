@@ -68,10 +68,15 @@ defaults when imputing classes from on-disk file.}
 Write a local data frame or file to the database.
 }
 \details{
-If a column is specified \code{AUTOINCREMENT} in the database and
-  you wish to allow the database to automatically assign a value, the column
-  must exist (in the \code{data.frame} passed to the write function's 
-  \code{value} parameter), and be filled with \code{NA} values.
+In a primary key column qualified with 
+\href{https://www.sqlite.org/autoinc.html}{\code{AUTOINCREMENT}}, missing
+values will be assigned the next largest positive integer,
+while nonmissing elements/cells retain their value.  If the 
+autoincrement column exists in the \code{data.frame} 
+(passed to \code{dbWriteTable}'s \code{value} parameter), the \code{NA} 
+elements are overwritten. 
+Similarly, if the key column is not present in the \code{data.frame}, all
+elements are automatically assigned a value.
 }
 \examples{
 con <- dbConnect(SQLite())

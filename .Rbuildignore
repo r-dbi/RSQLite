@@ -8,3 +8,4 @@ a.out.dSYM
 ^\.travis\.yml$
 ^NEWS\.md$
 ^cran-comments\.md$
+^src-raw$

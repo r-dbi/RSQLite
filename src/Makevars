@@ -3,3 +3,14 @@ PKG_CPPFLAGS= \
  -DSQLITE_ENABLE_FTS3 \
  -DSQLITE_ENABLE_FTS3_PARENTHESIS \
  -DSQLITE_SOUNDEX
+
+PKG_LIBS=-L. -lsqlite
+
+CXX_STD=CXX11
+
+LIBMONGOC=sqlite/sqlite3.o
+
+$(SHLIB): libsqlite.a
+
+libsqlite.a: $(LIBMONGOC)
+	$(AR) rcs libsqlite.a $(LIBMONGOC)

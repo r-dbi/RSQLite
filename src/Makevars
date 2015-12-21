@@ -1,4 +1,4 @@
-PKG_CPPFLAGS= \
+PKG_CPPFLAGS=-Isqlite \
  -DSQLITE_ENABLE_RTREE \
  -DSQLITE_ENABLE_FTS3 \
  -DSQLITE_ENABLE_FTS3_PARENTHESIS \
@@ -8,9 +8,9 @@ PKG_LIBS=-L. -lsqlite
 
 CXX_STD=CXX11
 
-LIBMONGOC=sqlite/sqlite3.o
+LIBSQLITE=sqlite/sqlite3.o
 
 $(SHLIB): libsqlite.a
 
-libsqlite.a: $(LIBMONGOC)
-	$(AR) rcs libsqlite.a $(LIBMONGOC)
+libsqlite.a: $(LIBSQLITE)
+	$(AR) rcs libsqlite.a $(LIBSQLITE)

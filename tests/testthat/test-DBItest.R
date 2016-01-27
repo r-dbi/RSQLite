@@ -1,8 +1,5 @@
 DBItest::make_context(SQLite(), list(dbname = tempfile("DBItest", fileext = ".sqlite")))
 DBItest::test_all(c(
-  # getting_started
-  "package_dependencies",                       # #102
-
   # driver
   "constructor_strict",                         # relaxed constructor check still active
   "get_info_driver",                            # #117

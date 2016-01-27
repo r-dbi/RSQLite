@@ -6,6 +6,7 @@ DBItest::test_all(c(
 
   # connection
   "get_info_connection",                        # #117
+  "cannot_disconnect_twice",                    # TODO
 
   # result
   "stale_result_warning",                       # #120

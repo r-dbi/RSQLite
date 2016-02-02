@@ -27,6 +27,15 @@ NULL
 #' @param field.types character vector of named  SQL field types where
 #'   the names are the names of new table's columns. If missing, types inferred
 #'   with \code{\link[DBI]{dbDataType}}).
+#' @details In a primary key column qualified with 
+#' \href{https://www.sqlite.org/autoinc.html}{\code{AUTOINCREMENT}}, missing
+#' values will be assigned the next largest positive integer,
+#' while nonmissing elements/cells retain their value.  If the 
+#' autoincrement column exists in the \code{data.frame} 
+#' (passed to \code{dbWriteTable}'s \code{value} parameter), the \code{NA} 
+#' elements are overwritten. 
+#' Similarly, if the key column is not present in the \code{data.frame}, all
+#' elements are automatically assigned a value.
 #' @export
 #' @examples
 #' con <- dbConnect(SQLite())

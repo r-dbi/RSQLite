@@ -17,6 +17,7 @@ Depends:
 Suggests:
     testthat,
     knitr,
+    rmarkdown,
     DBItest
 Imports:
     methods,

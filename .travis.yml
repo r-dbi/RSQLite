@@ -19,6 +19,8 @@ install:
   - ./travis-tool.sh install_github jimhester/covr
   - ./travis-tool.sh install_github rstats-db/DBItest@production
   - ./travis-tool.sh install_deps
+  - sed -i '/^VignetteBuilder:/d' DESCRIPTION
+  - rm -r vignettes
   - R CMD INSTALL .
 
 script: ./travis-tool.sh run_tests

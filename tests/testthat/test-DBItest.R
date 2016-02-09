@@ -40,6 +40,7 @@ DBItest::test_all(c(
   "roundtrip_timestamp",                        # #110
 
   # result_meta
+  "get_info_result",                            # rstats-db/DBI#55
   "bind_logical_.*",                            # not an error, no logical data type
   "bind_date_.*",                               # #114
   "bind_timestamp_.*",                          # #114

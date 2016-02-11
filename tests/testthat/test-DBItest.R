@@ -9,6 +9,7 @@ DBItest::test_all(c(
   "cannot_disconnect_twice",                    # TODO
 
   # result
+  "clear_result_return",                        # error: need to warn if closing result twice
   "stale_result_warning",                       # #120
   "data_(integer|numeric|logical_int)_null_.*", # #111
   "data_logical",                               # not an error, no logical data type

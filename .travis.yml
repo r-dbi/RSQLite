@@ -1,6 +1,7 @@
 # Sample .travis.yml for R projects from https://github.com/craigcitro/r-travis
 
 language: c
+sudo: required
 env:
   - global:
     - WARNINGS_ARE_ERRORS=1
@@ -17,6 +18,8 @@ install:
   - ./travis-tool.sh install_github rstats-db/DBI
   - ./travis-tool.sh install_github jimhester/covr
   - ./travis-tool.sh install_deps
+  - sed -i '/^VignetteBuilder:/d' DESCRIPTION
+  - rm -r vignettes
   - R CMD INSTALL .
 
 script: ./travis-tool.sh run_tests

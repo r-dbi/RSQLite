@@ -179,7 +179,8 @@ setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
 setMethod("dbReadTable", c("SQLiteConnection", "character"),
   function(conn, name, row.names = NA, check.names = TRUE, select.cols = "*") {
     name <- dbQuoteIdentifier(conn, name)
-    out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM", name), 
+    out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM",
+                                  dbQuoteIdentifier(conn, name)),
       row.names = row.names)
     
     if (check.names) {
@@ -212,7 +213,7 @@ setMethod("dbExistsTable", c("SQLiteConnection", "character"),
 #' @export
 setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
   function(conn, name) {
-    dbGetQuery(conn, paste("DROP TABLE ", name))
+    dbGetQuery(conn, paste("DROP TABLE ", dbQuoteIdentifier(conn, name)))
     invisible(TRUE)
   }
 )
@@ -240,7 +241,8 @@ setMethod("dbListTables", "SQLiteConnection", function(conn) {
 #' dbDisconnect(con)
 setMethod("dbListFields", c("SQLiteConnection", "character"),
   function(conn, name) {
-    rs <- dbSendQuery(conn, paste("SELECT * FROM ", name, "LIMIT 1"))
+    rs <- dbSendQuery(conn, paste("SELECT * FROM ",
+                                  dbQuoteIdentifier(conn, name), "LIMIT 1"))
     on.exit(dbClearResult(rs))
     
     names(fetch(rs, n = 1))

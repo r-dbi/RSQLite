@@ -113,6 +113,6 @@ test_that("autoincrement partially populated with duplicate IDs throws an error"
   dbSendQuery(con, sql_ddl)
   expect_error(
     dbWriteTable(con, name = 'tbl', value = ds_local, append = TRUE, row.names = FALSE),
-    "Error : UNIQUE constraint failed: tbl\\.id\n"
+    "UNIQUE constraint failed: tbl[.]id"
   )
 })

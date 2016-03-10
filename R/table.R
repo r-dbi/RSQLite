@@ -180,7 +180,7 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
   function(conn, name, row.names = NA, check.names = TRUE, select.cols = "*") {
     name <- dbQuoteIdentifier(conn, name)
     out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM",
-                                  dbQuoteIdentifier(name)),
+                                  dbQuoteIdentifier(conn, name)),
       row.names = row.names)
     
     if (check.names) {
@@ -241,8 +241,8 @@ setMethod("dbListTables", "SQLiteConnection", function(conn) {
 #' dbDisconnect(con)
 setMethod("dbListFields", c("SQLiteConnection", "character"),
   function(conn, name) {
-    rs <- dbSendQuery(conn, paste("SELECT * FROM ", dbQuoteIdentifier(name),
-                                  "LIMIT 1"))
+    rs <- dbSendQuery(conn, paste("SELECT * FROM ",
+                                  dbQuoteIdentifier(conn, name), "LIMIT 1"))
     on.exit(dbClearResult(rs))
     
     names(fetch(rs, n = 1))

@@ -27,6 +27,15 @@ NULL
 #' @param field.types character vector of named  SQL field types where
 #'   the names are the names of new table's columns. If missing, types inferred
 #'   with \code{\link[DBI]{dbDataType}}).
+#' @details In a primary key column qualified with 
+#' \href{https://www.sqlite.org/autoinc.html}{\code{AUTOINCREMENT}}, missing
+#' values will be assigned the next largest positive integer,
+#' while nonmissing elements/cells retain their value.  If the 
+#' autoincrement column exists in the \code{data.frame} 
+#' (passed to \code{dbWriteTable}'s \code{value} parameter), the \code{NA} 
+#' elements are overwritten. 
+#' Similarly, if the key column is not present in the \code{data.frame}, all
+#' elements are automatically assigned a value.
 #' @export
 #' @examples
 #' con <- dbConnect(SQLite())
@@ -170,7 +179,8 @@ setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
 setMethod("dbReadTable", c("SQLiteConnection", "character"),
   function(conn, name, row.names = NA, check.names = TRUE, select.cols = "*") {
     name <- dbQuoteIdentifier(conn, name)
-    out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM", name), 
+    out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM",
+                                  dbQuoteIdentifier(name)),
       row.names = row.names)
     
     if (check.names) {
@@ -203,7 +213,7 @@ setMethod("dbExistsTable", c("SQLiteConnection", "character"),
 #' @export
 setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
   function(conn, name) {
-    dbGetQuery(conn, paste("DROP TABLE ", name))
+    dbGetQuery(conn, paste("DROP TABLE ", dbQuoteIdentifier(conn, name)))
     invisible(TRUE)
   }
 )
@@ -231,7 +241,8 @@ setMethod("dbListTables", "SQLiteConnection", function(conn) {
 #' dbDisconnect(con)
 setMethod("dbListFields", c("SQLiteConnection", "character"),
   function(conn, name) {
-    rs <- dbSendQuery(conn, paste("SELECT * FROM ", name, "LIMIT 1"))
+    rs <- dbSendQuery(conn, paste("SELECT * FROM ", dbQuoteIdentifier(name),
+                                  "LIMIT 1"))
     on.exit(dbClearResult(rs))
     
     names(fetch(rs, n = 1))

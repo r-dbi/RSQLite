@@ -29,7 +29,7 @@ test_that("can get and set vfs values", {
     on.exit(dbDisconnect(db))
     expect_equal(v, db@vfs)
   }
-  for (v in allowed) checkVfs(v)
+  for (v in allowed) eval(bquote(checkVfs(.(v))))
 })
 
 # Specific to RSQLite

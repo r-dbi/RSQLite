@@ -130,6 +130,41 @@ public:
     }
   }
   
+  static SEXPTYPE datatype_to_sexptype(const int field_type) {
+    switch(field_type) {
+    case SQLITE_INTEGER:
+      return INTSXP;
+
+    case SQLITE_FLOAT:
+      return REALSXP;
+
+    case SQLITE_TEXT:
+      return STRSXP;
+
+    case SQLITE_BLOB:
+      // List of raw vectors
+      return VECSXP;
+
+    case SQLITE_NULL:
+    default:
+      return NILSXP;
+    }
+  }
+  
+  static SEXPTYPE decltype_to_sexptype(const char* decl_type) {
+    if (decl_type == NULL)
+      return STRSXP;
+    
+    if (std::string("INTEGER") == decl_type)
+      return INTSXP;
+    if (std::string("REAL") == decl_type)
+      return REALSXP;
+    if (std::string("BLOB") == decl_type)
+      return VECSXP;
+
+    return STRSXP;
+  }
+  
   // We try to determine the correct R type for each column in the
   // result. Currently only the first row is used to guess the type.
   // If a NULL value appears in the first row of the result and the column 
@@ -143,37 +178,11 @@ public:
     for (int j = 0; j < p; ++j) {
       names_.push_back(sqlite3_column_name(pStatement_, j));
       
-      switch(sqlite3_column_type(pStatement_, j)) {
-      case SQLITE_INTEGER:
-        types_.push_back(INTSXP);
-        break;
-      case SQLITE_FLOAT:
-        types_.push_back(REALSXP);
-        break;
-      case SQLITE_TEXT:
-        types_.push_back(STRSXP);
-        break;
-      case SQLITE_BLOB:
-        // List of raw vectors
-        types_.push_back(VECSXP);
-        break;
-      default: // SQLITE_NULL
-        const char* decl_raw = sqlite3_column_decltype(pStatement_, j);
-      if (decl_raw == NULL) {
-        types_.push_back(STRSXP);
-      } else {
-        std::string decl(decl_raw);
-        if (decl == "INTEGER") {
-          types_.push_back(INTSXP);
-        } else if (decl == "REAL") {
-          types_.push_back(REALSXP);
-        } else if (decl == "BLOB") {
-          types_.push_back(VECSXP);
-        } else {
-          types_.push_back(STRSXP);
-        }
-      }
-      }
+      SEXPTYPE type = datatype_to_sexptype(sqlite3_column_type(pStatement_, j));
+      if (type == NILSXP)
+        type = decltype_to_sexptype(sqlite3_column_decltype(pStatement_, j));
+      
+      types_.push_back(type);
     }
     return types_;
   }

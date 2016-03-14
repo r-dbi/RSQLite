@@ -1,3 +1,92 @@
+# Version 1.0.9000 (2016-03-15)
+
+- `make.db.names()` has been formally deprecated. Please use 
+  `dbQuoteIdentifier()` instead.  This function is also used in `dbReadTable()`,
+  `dbRemoveTable()`, and `dbListFields()` (#106, #132. @krlmlr).
+
+- You can now use SQLite's url specification for databases. This allows you to
+  create [shared in-memory](https://www.sqlite.org/inmemorydb.html) databases
+  (#70).
+
+- Queries are always converted to UTF-8 before being sent to database (#69).
+
+- Start on a basic vignette: `vignette("RSQLite")` (#50).
+
+- `dbFetch()` uses the same row name strategy as `dbReadTable()` (#53).
+
+- Updated to SQLite 3.8.8.2
+
+- RSQLite always builds with the included source. This prevent bugs due to 
+  API mismatches and considerably simplifies the build process.
+
+- Compilation limits `SQLITE_MAX_VARIABLE_NUMBER` and `SQLITE_MAX_COLUMN`
+  have been reset to the defaults. The documentation suggests setting to
+  such high values is a bad idea.
+
+- RSQLite has been rewritten (essentially from scratch) in C++ with
+  Rcpp. This has considerably reduced the amount of code, and allow us to
+  take advantage of the more sophisticated memory management tools available in
+  Rcpp. This rewrite should yield some minor performance improvements, but 
+  most importantly protect against memory leaks and crashes. It also provides
+  a better base for future development.
+  
+- You can now have multiple result sets per connection. The database connection
+  will be terminated when all connection and result objects are closed 
+  explicitly with `dbDisconnect()` and `dbClearResult()`, or implicitly when
+  they are deleted and garbage collected. This protects against both memory
+  leaks and null pointers.
+
+- `sqliteBuildTableDefinition()` has been deprecated. Use `DBI::sqlCreateTable()`
+  instead.
+
+- `dbWriteTable()` with a file path has been deprecated due to the high
+  maintenance burden of the existing code. It will eventually come back when
+  we have a good API for parsing files from disk.
+
+- `sqliteQuickColumn()` has been deprecated. Use regular querying functions
+  instead.
+
+- New strategy for prepared queries. Create a prepared query with 
+  `dbSendQuery()` and bind values with `dbBind()`. `dbSendPreparedQuery()` and 
+  `dbGetPreparedQuery()` have been removed: they were never part of the official 
+  API, were dangerous because they issued multiple queries, and always matched 
+  on position, even if you used names.
+
+- `dbSendQuery()` and `dbGetQuery()` also support inline parameterised queries,
+  like `dbGetQuery(datasetsDb(), "SELECT * FROM mtcars WHERE cyl = :cyl", 
+  params = list(cyl = 4))`. This has no performance benefits but protects you 
+  from SQL injection attacks.
+
+- All summary methods have been removed: the same information is now displayed
+  in the show methods, which were previously pretty useless.
+
+- New `sqliteVersion()` prints the header and library versions of RSQLite.
+
+- All `dbGetInfo()` methods have been deprecated: it's now better to access the 
+  metadata with individual functions. `dbColumnInfo()` will now return 
+  information even before you've retrieved any data.
+
+- `dbListResults()` is no longer supported. Adding a result registry in the
+  connection would add significant work, especially when trying to avoid
+  memory leaks. You shouldn't need this function anyway, as RSQLite will
+  lazily cleanup results when they go out of scope.
+
+- All arguments to `SQLite()` are now ignored. Most of them didn't work anyway,
+  and rather than using global variables, it's better set specific values
+  when creating a connection. The `summary()` for `SQLiteDriver()` has
+  been removed since it no longer does anything useful.
+
+- `RSQLite()` no longer automatically attached DBI when loaded. This is to 
+  encourage you to use `library(DBI); dbConnect(RSQLite::SQLite())`.
+
+- Additional documentation and unit tests for
+  [autoincrement keys](https://www.sqlite.org/autoinc.html) (#119).
+
+- Use new-style Travis.
+
+- Use development version of `testthat`.
+
+
 # Version 1.0.0
 
 ## New features
@@ -10,7 +99,7 @@
 - Inlined `RSQLite.extfuns` - use `initExtension()` to load the many
   useful extension functions (#44).
 
-- Methods no longer automatically clone the connection is there is an open
+- Methods no longer automatically clone the connection if there is an open
   result set. This was implement inconsistently in a handful of places (#22).
   RSQLite is now more forgiving if you forget to close a result set - it will
   close it for you, with a warning. It's still good practice to clean up

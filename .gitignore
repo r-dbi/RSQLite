@@ -2,8 +2,7 @@
 .Rhistory
 src/*.so
 src/*.o
-src/Makevars
-inst/include
 config.status
 a.out.dSYM
 autom4te.cache
+inst/doc

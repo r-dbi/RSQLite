@@ -1,5 +1,6 @@
 Package: RSQLite
-Version: 1.0.0
+Version: 1.0.9000
+Date: 2016-03-15
 Title: SQLite Interface for R
 Authors@R: as.person(c(
     "Hadley Wickham <hadley@rstudio.com> [aut, cre]",
@@ -11,31 +12,35 @@ Authors@R: as.person(c(
     ))
 Description: This package embeds the SQLite database engine in R and
     provides an interface compliant with the DBI package.
-    The source for the SQLite engine (version 3.8.6) is included.
+    The source for the SQLite engine (version 3.8.8.2) is included.
 Depends:
-    R (>= 2.10.0),
-    DBI (>= 0.3.1),
+    R (>= 3.1.0),
     methods
 Suggests:
-    testthat
+    testthat,
+    rmarkdown,
+    knitr
+Imports:
+    DBI (>= 0.3.1.9006),
+    Rcpp (>= 0.11.4.2)
 License: LGPL (>= 2)
 URL: https://github.com/rstats-db/RSQLite
 BugReports: https://github.com/rstats-db/RSQLite/issues
 Collate:
-    'ConnectionExtensions.R'
-    'Connection.R'
-    'Driver.R'
-    'Connect.R'
-    'ConnectionRead.R'
-    'ConnectionTransactions.R'
-    'ConnectionWrite.R'
-    'Constants.R'
-    'Escaping.R'
-    'Result.R'
-    'Object.R'
-    'Summary.R'
-    'Utils.R'
+    'RcppExports.R'
+    'SQLiteConnection.R'
+    'SQLiteDriver.R'
+    'SQLiteResult.R'
+    'connect.R'
     'datasetsDb.R'
-    'dbGetInfo.R'
+    'deprecated.R'
     'extensions.R'
+    'query.R'
+    'table.R'
+    'transactions.R'
+    'utils.R'
     'zzz.R'
+LinkingTo: Rcpp,
+    BH
+VignetteBuilder: knitr
+RoxygenNote: 5.0.1

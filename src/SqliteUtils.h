@@ -20,17 +20,14 @@ Rcpp::List inline dfResize(Rcpp::List df, int n) {
   return out;
 }
 
-Rcpp::List inline dfCreate(std::vector<SEXPTYPE> types, std::vector<std::string> names, int n) {
-  int p = types.size();
+Rcpp::List inline dfCreate(std::vector<std::string> names, int n) {
+  int p = names.size();
   
   Rcpp::List out(p);
   out.attr("names") = names;
   out.attr("class") = "data.frame";
   out.attr("row.names") = Rcpp::IntegerVector::create(NA_INTEGER, -n);
   
-  for (int j = 0; j < p; ++j) {
-    out[j] = Rf_allocVector(types[j], n);
-  }
   return out;
 }
 

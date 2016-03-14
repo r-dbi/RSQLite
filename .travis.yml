@@ -1,28 +1,13 @@
-# Sample .travis.yml for R projects from https://github.com/craigcitro/r-travis
+# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
-language: c
-env:
-  - global:
-    - WARNINGS_ARE_ERRORS=1
-    - R_CHECK_ARGS=--no-manual --as-cran
-    - R_BUILD_ARGS=--no-manual
+language: r
+cache: packages
 
-before_install:
-  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
-  - chmod 755 ./travis-tool.sh
-  - ./travis-tool.sh bootstrap
-
-install:
-  - ./travis-tool.sh install_github RcppCore/Rcpp
-  - ./travis-tool.sh install_github rstats-db/DBI
-  - ./travis-tool.sh install_github jimhester/covr
-  - ./travis-tool.sh install_deps
-  - R CMD INSTALL .
-
-script: ./travis-tool.sh run_tests
-
-on_failure:
-  - ./travis-tool.sh dump_logs
+r_github_packages:
+  - RcppCore/Rcpp
+  - rstats-db/DBI
+  - jimhester/covr
+  - hadley/testthat
 
 after_success:
   - Rscript -e "covr::codecov(exclusions='src/sqlite3.c')"

@@ -1,6 +1,7 @@
-PKG_CPPFLAGS= \
- -DSQLITE_ENABLE_RTREE \
- -DSQLITE_ENABLE_FTS3 \
- -DSQLITE_ENABLE_FTS3_PARENTHESIS \
- -DSQLITE_ENABLE_FTS5 \
- -DSQLITE_SOUNDEX
+$(SHLIB): sqlite3/libsqlite3.a
+
+PKG_LIBS = -Lsqlite3/sqlite3 -lsqlite3
+
+sqlite3/libsqlite3.a:
+	@(cd sqlite3 && $(MAKE) \
+	  CC="$(CC)" CFLAGS="$(CFLAGS) $(CPICFLAGS)" AR="$(AR)" RANLIB="$(RANLIB)")

@@ -4,46 +4,6 @@
 #include <Rcpp.h>
 #include "sqlite3/sqlite3.h"
 
-void inline set_raw_value(SEXP col, sqlite3_stmt* pStatement_, int i, int j) {
-  int size = sqlite3_column_bytes(pStatement_, j);
-  const void* blob = sqlite3_column_blob(pStatement_, j);
-  
-  SEXP bytes = Rf_allocVector(RAWSXP, size);
-  memcpy(RAW(bytes), blob, size);
-
-  SET_VECTOR_ELT(col, i, bytes);
-}
-
-void inline set_col_value(SEXP col, SEXPTYPE type, sqlite3_stmt* pStatement_, int i, int j) {
-  switch(type) {
-  case INTSXP:
-    if (sqlite3_column_type(pStatement_, j) == SQLITE_NULL) {
-      INTEGER(col)[i] = NA_INTEGER;
-    } else {
-      INTEGER(col)[i] = sqlite3_column_int(pStatement_, j);
-    }
-    break;
-  case REALSXP:
-    if (sqlite3_column_type(pStatement_, j) == SQLITE_NULL) {
-      REAL(col)[i] = NA_REAL;
-    } else {
-      REAL(col)[i] = sqlite3_column_double(pStatement_, j);
-    }
-    break;
-  case STRSXP:
-    if (sqlite3_column_type(pStatement_, j) == SQLITE_NULL) {
-      SET_STRING_ELT(col, i, NA_STRING);
-    } else {
-      SET_STRING_ELT(col, i, Rf_mkCharCE((const char*) sqlite3_column_text(pStatement_, j), CE_UTF8));
-    }
-    break;
-  case VECSXP:
-    set_raw_value(col, pStatement_, i, j);
-    // Something with memcpy & RAW?
-    break;
-  }
-}
-
 
 Rcpp::List inline dfResize(Rcpp::List df, int n) {
   int p = df.size();

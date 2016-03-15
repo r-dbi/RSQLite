@@ -7,6 +7,7 @@ os <- function() {
   ostype
 }
 
+# Specific to RSQLite
 test_that("invalid dbnames throw errors", {
   expect_error(dbConnect(SQLite(), dbname = 1:3))
   expect_error(dbConnect(SQLite(), dbname = c("a", "b")))
@@ -14,6 +15,7 @@ test_that("invalid dbnames throw errors", {
   expect_error(dbConnect(SQLite(), dbname = as.character(NA)))
 })
 
+# Specific to RSQLite
 test_that("can get and set vfs values", {
   allowed <- switch(os(),
     osx = c("unix-posix", "unix-afp", "unix-flock", "unix-dotfile", "unix-none"),
@@ -31,6 +33,7 @@ test_that("can get and set vfs values", {
   for (v in allowed) checkVfs(v)
 })
 
+# Specific to RSQLite
 test_that("forbidden operations throw errors", {
   tmpFile <- tempfile()
   on.exit(unlink(tmpFile))
@@ -51,29 +54,4 @@ test_that("forbidden operations throw errors", {
   dbrw2 <- dbConnect(SQLite(), dbname = tmpFile, flags = SQLITE_RW)
   expect_true(dbWriteTable(dbrw2, "t2", df))
   dbDisconnect(dbrw2)
-})
-
-test_that("querying closed connection throws error", {
-  db <- dbConnect(SQLite(), dbname = ":memory:")
-  dbDisconnect(db)
-  expect_error(dbGetQuery(db, "select * from foo"), "not valid")
-})
-
-test_that("can connect to same db from multiple connections", {
-  dbfile <- tempfile()
-  con1 <- dbConnect(SQLite(), dbfile)
-  con2 <- dbConnect(SQLite(), dbfile)
-
-  dbWriteTable(con1, "mtcars", mtcars)
-  expect_equal(dbReadTable(con2, "mtcars"), mtcars)
-})
-
-test_that("temporary tables are connection local", {
-  dbfile <- tempfile()
-  con1 <- dbConnect(SQLite(), dbfile)
-  con2 <- dbConnect(SQLite(), dbfile)
-
-  dbGetQuery(con1, "CREATE TEMPORARY TABLE temp (a TEXT)")
-  expect_true(dbExistsTable(con1, "temp"))
-  expect_false(dbExistsTable(con2, "temp"))
 })

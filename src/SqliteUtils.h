@@ -2,7 +2,7 @@
 #define __RSQLSITE_SQLITE_UTILS__
 
 #include <Rcpp.h>
-#include "sqlite3.h"
+#include "sqlite3/sqlite3.h"
 
 void inline set_raw_value(SEXP col, sqlite3_stmt* pStatement_, int i, int j) {
   int size = sqlite3_column_bytes(pStatement_, j);

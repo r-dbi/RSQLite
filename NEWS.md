@@ -1,7 +1,13 @@
+# Version 1.0.9002 (2016-03-15)
+
+- Use the `DBItest` package for testing (#105).
+- Compile SQLite independently of main modules (#134).
+
+
 # Version 1.0.9001 (2016-03-15)
 
 - Upgrade SQLite to 3.11.1.
-- Include support for FTS5.
+- Include support for FTS5 (krlmlr#1, @mkuhn).
 - Upgrade script now located in `src-raw` directory.
 
 

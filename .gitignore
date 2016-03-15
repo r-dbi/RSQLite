@@ -1,7 +1,8 @@
 .Rproj.user
 .Rhistory
 src/*.so
-src/*.o
+src/**/*.o
+src/**/*.a
 config.status
 a.out.dSYM
 autom4te.cache

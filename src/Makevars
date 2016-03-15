@@ -5,10 +5,12 @@ SQLITE_CFLAGS= \
  -DSQLITE_ENABLE_FTS5 \
  -DSQLITE_SOUNDEX
 
-$(SHLIB): sqlite3/libsqlite3.a
+SUBDIR_OBJECTS = sqlite3/extension-functions.o sqlite3/sqlite3.o
 
-PKG_LIBS = -Lsqlite3 -lsqlite3
+$(SHLIB): ${SUBDIR_OBJECTS}
 
-sqlite3/libsqlite3.a:
+sqlite3/extension-functions.o: sqlite3/sqlite3.o
+
+${SUBDIR_OBJECTS}:
 	@(cd sqlite3 && $(MAKE) \
-	  CC="$(CC)" CFLAGS="$(CFLAGS) $(CPICFLAGS) $(SQLITE_CFLAGS)" AR="$(AR)" RANLIB="$(RANLIB)")
+	  CC="$(CC)" CFLAGS="$(CFLAGS) $(CPICFLAGS) $(SQLITE_CFLAGS)")

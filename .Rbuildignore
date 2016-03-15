@@ -9,3 +9,5 @@ a.out.dSYM
 ^NEWS\.md$
 ^cran-comments\.md$
 ^src-raw$
+^src/sqlite3/.*\.o$
+^src/sqlite3/.*\.a$

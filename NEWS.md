@@ -1,7 +1,8 @@
-# Version 1.0.9000
+# Version 1.0.9000 (2016-03-15)
 
 - `make.db.names()` has been formally deprecated. Please use 
-  `dbQuoteIdentifier()` instead.
+  `dbQuoteIdentifier()` instead.  This function is also used in `dbReadTable()`,
+  `dbRemoveTable()`, and `dbListFields()` (#106, #132. @krlmlr).
 
 - You can now use SQLite's url specification for databases. This allows you to
   create [shared in-memory](https://www.sqlite.org/inmemorydb.html) databases
@@ -70,15 +71,21 @@
   memory leaks. You shouldn't need this function anyway, as RSQLite will
   lazily cleanup results when they go out of scope.
 
-- All arguments to `SQLite()` are now ignored. Most of them didn't work any
-  way, and rather than using global variables, it's better set specific values 
+- All arguments to `SQLite()` are now ignored. Most of them didn't work anyway,
+  and rather than using global variables, it's better set specific values
   when creating a connection. The `summary()` for `SQLiteDriver()` has
   been removed since it no longer does anything useful.
 
 - `RSQLite()` no longer automatically attached DBI when loaded. This is to 
   encourage you to use `library(DBI); dbConnect(RSQLite::SQLite())`.
 
-- Additional documentation and unit tests for [autoincrement keys](https://www.sqlite.org/autoinc.html) (#119).
+- Additional documentation and unit tests for
+  [autoincrement keys](https://www.sqlite.org/autoinc.html) (#119).
+
+- Use new-style Travis.
+
+- Use development version of `testthat`.
+
 
 # Version 1.0.0
 

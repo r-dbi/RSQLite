@@ -3,6 +3,10 @@
 language: r
 cache: packages
 
+# Seems to be necessary with devtools 1.10.0, check again when the next version is on CRAN
+r_github_packages:
+  hadley/testthat
+
 after_success:
   - Rscript -e "devtools::install_github('jimhester/covr'); covr::codecov(exclusions=c('src/sqlite3.c', 'src/extension-functions.c'))"
 

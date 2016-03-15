@@ -1,7 +1,7 @@
 # Version 1.0.9001 (2016-03-15)
 
 - Upgrade SQLite to 3.11.1.
-- Include support for FTS5.
+- Include support for FTS5 (krlmlr#1, @mkuhn).
 - Upgrade script now located in `src-raw` directory.
 
 

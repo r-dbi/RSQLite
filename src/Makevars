@@ -11,4 +11,4 @@ PKG_LIBS = -Lsqlite3 -lsqlite3
 
 sqlite3/libsqlite3.a:
 	@(cd sqlite3 && $(MAKE) \
-	  CC="$(CC)" CFLAGS="$(CFLAGS) $(SQLITE_CFLAGS)" AR="$(AR)" RANLIB="$(RANLIB)")
+	  CC="$(CC)" CFLAGS="$(CFLAGS) $(CPICFLAGS) $(SQLITE_CFLAGS)" AR="$(AR)" RANLIB="$(RANLIB)")

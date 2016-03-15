@@ -1,6 +1,6 @@
 $(SHLIB): sqlite3/libsqlite3.a
 
-PKG_LIBS = -Lsqlite3/sqlite3 -lsqlite3
+PKG_LIBS = -Lsqlite3 -lsqlite3
 
 sqlite3/libsqlite3.a:
 	@(cd sqlite3 && $(MAKE) \

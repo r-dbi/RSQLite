@@ -1,13 +1,6 @@
 context("dbWriteTable")
 
-test_that("can't override existing table with default options", {
-  con <- dbConnect(SQLite())
-
-  x <- data.frame(col1 = 1:10, col2 = letters[1:10])  
-  dbWriteTable(con, "t1", x)
-  expect_error(dbWriteTable(con, "t1", x), "exists in database")
-})
-
+# Not generic enough for DBItest
 test_that("throws error if constraint violated", {
   con <- dbConnect(SQLite())
 
@@ -19,6 +12,8 @@ test_that("throws error if constraint violated", {
     "UNIQUE constraint failed")
 })
 
+# Test requires that two result sets can be open at the same time, which is
+# undesired (see DBItest "stale_result_warning")
 test_that("modifications retrieved by open result set", {
   con <- dbConnect(SQLite(), tempfile())
 
@@ -29,68 +24,4 @@ test_that("modifications retrieved by open result set", {
   dbWriteTable(con, "t1", x, append = TRUE)
   expect_equal(nrow(dbFetch(res)), 20)
   dbClearResult(res)
-})
-
-test_that("rownames preserved", {
-  con <- dbConnect(SQLite())
-
-  df <- data.frame(x = 1:10)
-  row.names(df) <- paste(letters[1:10], 1:10, sep="")
-  
-  dbWriteTable(con, "t1", df)
-  t1 <- dbReadTable(con, "t1")
-  expect_equal(rownames(t1), rownames(df))  
-})
-
-test_that("commas in fields are preserved", {
-  con <- dbConnect(SQLite())
-  
-  df <- data.frame(
-    x = c("ABC, Inc.","DEF Holdings"), 
-    stringsAsFactors = FALSE
-  )
-  dbWriteTable(con, "t1", df, row.names = FALSE)
-  expect_equal(dbReadTable(con, "t1"), df)
-})
-
-test_that("NAs preserved in factors", {
-  con <- dbConnect(SQLite())
-
-  df <- data.frame(x = 1:10, y = factor(LETTERS[1:10]))
-  df$y[4] <- NA
-  
-  dbWriteTable(con, "bad_table", df)
-  bad_table <- dbReadTable(con, "bad_table")
-  expect_equal(bad_table$x, df$x)
-  expect_equal(bad_table$y, as.character(df$y))
-})
-
-test_that("logical converted to int", {
-  con <- dbConnect(SQLite())
-  
-  local <- data.frame(x = 1:3, y = c(NA, TRUE, FALSE))
-  dbWriteTable(con, "t1", local)
-  remote <- dbReadTable(con, "t1")
-  
-  expect_equal(remote$y, as.integer(local$y))
-})
-
-test_that("can roundtrip special field names", {
-  con <- dbConnect(SQLite())
-
-  local <- data.frame(x = 1:3, select = 1:3, `  ` = 1:3, check.names = FALSE)
-  dbWriteTable(con, "torture", local)
-  remote <- dbReadTable(con, "torture", check.names = FALSE)
-  
-  expect_equal(local, remote)
-})
-
-test_that("can round-trip utf-8", {
-  con <- dbConnect(SQLite())
-  
-  local <- data.frame(x = "å")
-  dbWriteTable(con, "utf8", local)
-  remote <- dbReadTable(con, "utf8")
-  
-  expect_equal(remote$x, enc2utf8("å"))
 })

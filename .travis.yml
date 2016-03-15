@@ -3,14 +3,8 @@
 language: r
 cache: packages
 
-r_github_packages:
-  - RcppCore/Rcpp
-  - rstats-db/DBI
-  - jimhester/covr
-  - hadley/testthat
-
 after_success:
-  - Rscript -e "covr::codecov(exclusions='src/sqlite3.c')"
+  - Rscript -e "devtools::install_github('jimhester/covr'); covr::codecov(exclusions=c('src/sqlite3.c', 'src/extension-functions.c'))"
 
 notifications:
   email:

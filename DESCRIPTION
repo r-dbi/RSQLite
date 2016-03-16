@@ -15,7 +15,8 @@ Suggests:
     testthat,
     knitr,
     rmarkdown,
-    DBItest
+    DBItest,
+    covr
 Imports:
     methods,
     DBI (>= 0.3.1.9006),

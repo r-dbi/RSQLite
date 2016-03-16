@@ -11,3 +11,5 @@ a.out.dSYM
 ^src-raw$
 ^src/sqlite3/.*\.o$
 ^src/sqlite3/.*\.a$
+^src/.*\.d$
+^src/Makevars\.local$

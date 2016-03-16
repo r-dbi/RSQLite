@@ -36,7 +36,7 @@ will be whatever the R identifier \code{"row.names"} maps to the DBMS (see
 they are characters, otherwise will ignore.}
 
 \item{overwrite}{a logical specifying whether to overwrite an existing table 
-or not. Its default is \code{FALSE}. (See the BUGS section below)}
+or not. Its default is \code{FALSE}.}
 
 \item{append}{a logical specifying whether to append to an existing table 
 in the DBMS.  Its default is \code{FALSE}.}

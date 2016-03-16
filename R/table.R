@@ -21,7 +21,7 @@ NULL
 #'   \code{\link[DBI]{make.db.names}}). If \code{NA} will add rows names if
 #'   they are characters, otherwise will ignore.
 #' @param overwrite a logical specifying whether to overwrite an existing table 
-#'   or not. Its default is \code{FALSE}. (See the BUGS section below)
+#'   or not. Its default is \code{FALSE}.
 #' @param append a logical specifying whether to append to an existing table 
 #'   in the DBMS.  Its default is \code{FALSE}.
 #' @param field.types character vector of named  SQL field types where

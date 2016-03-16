@@ -1,6 +1,7 @@
 .Rproj.user
 .Rhistory
 src/*.so
+src/*.d
 src/**/*.o
 src/**/*.a
 config.status

@@ -8,3 +8,9 @@ PKG_CPPFLAGS=-DRSQLITE_USE_BUNDLED_SQLITE \
 PKG_LIBS = sqlite3/extension-functions.o sqlite3/sqlite3.o
 
 $(SHLIB): ${PKG_LIBS}
+
+# This file exists only for R CMD INSTALL, is created as empty file
+# for building from source archive
+Makevars.local:
+	touch "$@"
+include Makevars.local

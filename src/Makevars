@@ -10,3 +10,9 @@ ${PKG_LIBS}:
 
 clean:
 	@(cd sqlite3 && $(MAKE) clean
+
+# This file exists only for R CMD INSTALL, is created as empty file
+# for building from source archive
+Makevars.local:
+	touch "$@"
+include Makevars.local

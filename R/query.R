@@ -84,11 +84,11 @@ setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
 #' @param n maximum number of records to retrieve per fetch. Use \code{-1} to 
 #'    retrieve all pending records; use \code{0} for to fetch the default 
 #'    number of rows as defined in \code{\link{SQLite}}
-#' @inheritParams DBI::columnToRownames
+#' @inheritParams DBI::sqlColumnToRownames
 #' @export
 #' @rdname sqlite-query
 setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
-  columnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
+  sqlColumnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
 })
 
 #' @export

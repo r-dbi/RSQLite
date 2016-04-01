@@ -55,7 +55,7 @@ sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL,
   if (!is.data.frame(value)) {
     value <- as.data.frame(value)
   }
-  value <- columnToRownames(value, row.names)
+  value <- sqlColumnToRownames(value, row.names)
   
   if (is.null(field.types)) {
     field.types <- vapply(value, dbDataType, dbObj = con, 
@@ -208,6 +208,6 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
 #' @keywords internal
 #' @export
 setMethod("fetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
-  columnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
+  sqlColumnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
 })
 

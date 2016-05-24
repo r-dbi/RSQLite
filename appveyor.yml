@@ -21,6 +21,7 @@ environment:
     GCC_PATH: mingw_32
 
   - R_VERSION: patched
+    GCC_PATH: mingw_32
 
 build_script:
   - travis-tool.sh install_github rstats-db/DBI rstats-db/DBItest@production

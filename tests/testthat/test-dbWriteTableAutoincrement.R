@@ -9,14 +9,14 @@ sql_ddl <- "CREATE TABLE `tbl` (
 create_and_compare_table <- function( d_local, expected_remote_id ) {
   #Create a connection, create a table, and populate the table.
   con <- dbConnect(SQLite())
-  dbSendQuery(con, sql_ddl)  
+  dbSendQuery(con, sql_ddl)
   write_successful <- dbWriteTable(con, name = 'tbl', value = d_local, append = TRUE, row.names = FALSE)
   expect_true(write_successful)
-  
+
   #Reads from the database and sort so comparisons are more robust.
   d_remote <- dbReadTable(con, "tbl")
   d_remote <- d_remote[order(d_remote$score), ]
-  
+
   #Compares actual to expected values.
   expect_equal(d_remote$id,    expected_remote_id, label = "The autoincrement values should be assigned correctly.")
   expect_equal(d_remote$name,  d_local$name)
@@ -108,7 +108,7 @@ test_that("autoincrement partially populated with duplicate IDs throws an error"
     score            = 1:7,
     stringsAsFactors = FALSE
   )
-  
+
   con <- dbConnect(SQLite())
   dbSendQuery(con, sql_ddl)
   expect_error(

@@ -1,17 +1,17 @@
 #' Class SQLiteConnection.
-#' 
-#' \code{SQLiteConnection} objects are usually created by 
+#'
+#' \code{SQLiteConnection} objects are usually created by
 #' \code{\link[DBI]{dbConnect}}.
-#' 
+#'
 #' @keywords internal
 #' @export
-setClass("SQLiteConnection", 
+setClass("SQLiteConnection",
   contains = "DBIConnection",
   slots = list(
     ptr = "externalptr",
-    dbname = "character", 
-    loadable.extensions = "logical", 
-    flags = "integer", 
+    dbname = "character",
+    loadable.extensions = "logical",
+    flags = "integer",
     vfs = "character"
   )
 )

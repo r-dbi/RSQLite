@@ -3,8 +3,8 @@
 using namespace Rcpp;
 
 //' RSQLite version
-//' 
-//' @return A character vector containing header and library versions of 
+//'
+//' @return A character vector containing header and library versions of
 //'   RSQLite.
 //' @export
 // [[Rcpp::export]]

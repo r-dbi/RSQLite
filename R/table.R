@@ -271,7 +271,6 @@ setMethod("dbDataType", "SQLiteConnection", function(dbObj, obj, ...) {
   dbDataType(SQLite(), obj, ...)
 })
 
-#' @rdname dbDataType-SQLiteConnection-ANY-method
 #' @export
 setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
   if (is.factor(obj)) return("TEXT")

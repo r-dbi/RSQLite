@@ -106,7 +106,7 @@ setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
 #' @param ... Ignored. Needed for compatibility with generic
 #' @examples
 #' data(USArrests)
-#' con <- dbConnect(SQLite(), dbname=":memory:")
+#' con <- dbConnect(SQLite(), dbname="file::memory:")
 #' dbWriteTable(con, "t1", USArrests)
 #' dbWriteTable(con, "t2", USArrests)
 #'

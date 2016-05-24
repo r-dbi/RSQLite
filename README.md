@@ -27,7 +27,7 @@ To install from github, you'll need a [development environment](http://www.rstud
 ```R
 library(DBI)
 # Create an ephemeral in-memory RSQLite database
-con <- dbConnect(RSQLite::SQLite(), ":memory:")
+con <- dbConnect(RSQLite::SQLite(), "file::memory:")
 
 dbListTables(con)
 dbWriteTable(con, "mtcars", mtcars)

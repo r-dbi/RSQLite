@@ -45,7 +45,8 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #'   \itemize{
 #'   \item \code{""} will create a temporary on-disk database. The file
 #'     will be deleted when the connection is closed.
-#'   \item \code{":memory:"} will create a temporary in-memory database.
+#'   \item \code{":memory:"} or \code{"file::memory:"} will create a temporary
+#'     in-memory database.
 #'   }
 #' @param cache_size Advanced option. A positive integer to change the maximum
 #'   number of disk pages that SQLite holds in memory (SQLite's default is
@@ -77,7 +78,7 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #' @examples
 #' library(DBI)
 #' # Initialize a temporary in memory database and copy a data.frame into it
-#' con <- dbConnect(RSQLite::SQLite(), ":memory:")
+#' con <- dbConnect(RSQLite::SQLite(), "file::memory:")
 #' data(USArrests)
 #' dbWriteTable(con, "USArrests", USArrests)
 #' dbListTables(con)
@@ -147,7 +148,7 @@ is_url <- function(x) grepl("^(file|http|ftp|https):", x)
 #' @export
 #' @rdname SQLite
 setMethod("dbConnect", "SQLiteConnection", function(drv){
-  if (drv@dbname %in% c("", ":memory:")) {
+  if (drv@dbname %in% c("", ":memory:", "file::memory:")) {
     stop("Can't clone a temporary database", call. = FALSE)
   }
 

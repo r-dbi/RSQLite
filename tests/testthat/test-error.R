@@ -27,7 +27,4 @@ test_that("parameters with length != 1 (#89)", {
     ),
     "Parameter 2 does not have length 1")
 
-  # Why is this necessary???
-  gc()
-
 })

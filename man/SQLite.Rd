@@ -38,8 +38,8 @@ platform. There are two exceptions:
 \itemize{ 
 \item \code{""} will create a temporary on-disk database. The file
   will be deleted when the connection is closed. 
-\item \code{":memory:"} or \code{"file::memory:"} will create a temporary
-  in-memory database.
+\item \code{"file::memory:"} (recommended on Windows) or \code{":memory:"}
+  will create a temporary in-memory database.
 }}
 
 \item{loadable.extensions}{When \code{TRUE} (default) SQLite3

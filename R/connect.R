@@ -45,8 +45,8 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #'   \itemize{
 #'   \item \code{""} will create a temporary on-disk database. The file
 #'     will be deleted when the connection is closed.
-#'   \item \code{":memory:"} or \code{"file::memory:"} will create a temporary
-#'     in-memory database.
+#'   \item \code{"file::memory:"} (recommended on Windows) or \code{":memory:"}
+#'     will create a temporary in-memory database.
 #'   }
 #' @param cache_size Advanced option. A positive integer to change the maximum
 #'   number of disk pages that SQLite holds in memory (SQLite's default is

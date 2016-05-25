@@ -17,12 +17,12 @@ through the SQLite website (\url{http://www.sqlite.org/contrib}).
 
 
 \describe{
-\item{Math functions}{acos, acosh, asin, asinh, atan, atan2, atanh, atn2, 
-  ceil, cos, cosh, cot, coth, degrees, difference, exp, floor, log, log10, 
+\item{Math functions}{acos, acosh, asin, asinh, atan, atan2, atanh, atn2,
+  ceil, cos, cosh, cot, coth, degrees, difference, exp, floor, log, log10,
   pi, power, radians, sign, sin, sinh, sqrt, square, tan, tanh}
-\item{String functions}{charindex, leftstr, ltrim, padc, padl, padr, proper, 
+\item{String functions}{charindex, leftstr, ltrim, padc, padl, padr, proper,
   replace, replicate, reverse, rightstr, rtrim, strfilter, trim}
-\item{Aggregate functions}{stdev, variance, mode, median, lower_quartile, 
+\item{Aggregate functions}{stdev, variance, mode, median, lower_quartile,
   upper_quartile}
 }
 }

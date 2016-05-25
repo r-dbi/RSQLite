@@ -16,7 +16,7 @@
 }
 \arguments{
 \item{dbObj}{An object of class \code{\linkS4class{SQLiteDriver}},
-\code{\linkS4class{SQLiteConnection}} or 
+\code{\linkS4class{SQLiteConnection}} or
 \code{\linkS4class{SQLiteResult}}}
 }
 \description{

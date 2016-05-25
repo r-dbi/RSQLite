@@ -13,7 +13,7 @@ sqliteBuildTableDefinition(con, name, value, field.types = NULL,
 
 \item{value}{A data.frame, for which we want to create a table.}
 
-\item{field.types}{Optional, named character vector of the types for each 
+\item{field.types}{Optional, named character vector of the types for each
 field in \code{value}}
 
 \item{row.names}{Logical. Should row.name of \code{value} be exported as a

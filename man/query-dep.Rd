@@ -17,7 +17,7 @@
 \item{bind.data}{A data frame of data to be bound.}
 }
 \description{
-These functions have been deprecated. Please switch to using 
+These functions have been deprecated. Please switch to using
 \code{dbSendQuery}/\code{dbGetQuery} + \code{dbBind} instead.
 }
 \keyword{internal}

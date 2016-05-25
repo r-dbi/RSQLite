@@ -59,10 +59,12 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
       sql = statement,
       ptr = rsqlite_send_query(conn@ptr, statement)
     )
+    on.exit(dbClearResult(rs), add = TRUE)
 
     if (!is.null(params)) {
       dbBind(rs, params)
     }
+    on.exit(NULL, add = FALSE)
 
     rs
   }

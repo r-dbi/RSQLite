@@ -63,7 +63,7 @@ public:
     for (int j = 0; j < params.size(); ++j) {
       SEXP col = params[j];
       if (Rf_length(col) != 1)
-        Rcpp::stop("Parameter %i does not have length 1.", j);
+        Rcpp::stop("Parameter %i does not have length 1.", j + 1);
     }
     
     sqlite3_reset(pStatement_);

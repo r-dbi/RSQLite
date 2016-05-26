@@ -66,6 +66,8 @@ Many thanks to Doug Bates, Seth Falcon, Detlef Groth, Ronggui Huang, Kurt Hornik
 
 1.  Update `NEWS`
 
+Ideally this should happen right *after* each CRAN release, so that a new SQLite version is tested for some time before it's released to CRAN.
+
 ## Update datasets database
 
 RSQLite includes one SQLite database (accessible from `datasetsDb()` that contains all data frames in the datasets package. This is the code that created it.

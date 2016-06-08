@@ -3,13 +3,13 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-XPtr<SqliteConnectionPtr> rsqlite_connect(std::string path, bool allow_ext, 
+XPtr<SqliteConnectionPtr> rsqlite_connect(std::string path, bool allow_ext,
                                           int flags, std::string vfs = "") {
-  
+
   SqliteConnectionPtr* pConn = new SqliteConnectionPtr(
     new SqliteConnectionWrapper(path, allow_ext, flags, vfs)
   );
-  
+
   return XPtr<SqliteConnectionPtr>(pConn, true);
 }
 
@@ -21,8 +21,8 @@ void rsqlite_disconnect(XPtr<SqliteConnectionPtr> con) {
       "There are %i result in use. The connection will be released when they are closed",
       n - 1
     );
-  } 
-  
+  }
+
   con.release();
 }
 
@@ -32,7 +32,7 @@ std::string rsqlite_get_exception(XPtr<SqliteConnectionPtr> con) {
 }
 
 // [[Rcpp::export]]
-void rsqlite_copy_database(XPtr<SqliteConnectionPtr> from, 
+void rsqlite_copy_database(XPtr<SqliteConnectionPtr> from,
                            XPtr<SqliteConnectionPtr> to) {
   (*from)->copy_to((*to));
 }

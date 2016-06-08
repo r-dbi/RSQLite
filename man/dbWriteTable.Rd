@@ -19,26 +19,26 @@
 \S4method{sqlData}{SQLiteConnection}(con, value, row.names = NA)
 }
 \arguments{
-\item{name}{a character string specifying a table name. SQLite table names 
-are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc} 
+\item{name}{a character string specifying a table name. SQLite table names
+are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc}
 are considered equal.}
 
-\item{value}{a data.frame (or coercible to data.frame) object or a 
+\item{value}{a data.frame (or coercible to data.frame) object or a
 file name (character).  In the first case, the data.frame is
 written to a temporary file and then imported to SQLite; when \code{value}
 is a character, it is interpreted as a file name and its contents imported
 to SQLite.}
 
-\item{row.names}{A logical specifying whether the \code{row.names} should be 
-output to the output DBMS table; if \code{TRUE}, an extra field whose name 
+\item{row.names}{A logical specifying whether the \code{row.names} should be
+output to the output DBMS table; if \code{TRUE}, an extra field whose name
 will be whatever the R identifier \code{"row.names"} maps to the DBMS (see
 \code{\link[DBI]{make.db.names}}). If \code{NA} will add rows names if
 they are characters, otherwise will ignore.}
 
-\item{overwrite}{a logical specifying whether to overwrite an existing table 
-or not. Its default is \code{FALSE}. (See the BUGS section below)}
+\item{overwrite}{a logical specifying whether to overwrite an existing table
+or not. Its default is \code{FALSE}.}
 
-\item{append}{a logical specifying whether to append to an existing table 
+\item{append}{a logical specifying whether to append to an existing table
 in the DBMS.  Its default is \code{FALSE}.}
 
 \item{field.types}{character vector of named  SQL field types where
@@ -68,13 +68,13 @@ defaults when imputing classes from on-disk file.}
 Write a local data frame or file to the database.
 }
 \details{
-In a primary key column qualified with 
+In a primary key column qualified with
 \href{https://www.sqlite.org/autoinc.html}{\code{AUTOINCREMENT}}, missing
 values will be assigned the next largest positive integer,
-while nonmissing elements/cells retain their value.  If the 
-autoincrement column exists in the \code{data.frame} 
-(passed to \code{dbWriteTable}'s \code{value} parameter), the \code{NA} 
-elements are overwritten. 
+while nonmissing elements/cells retain their value.  If the
+autoincrement column exists in the \code{data.frame}
+(passed to \code{dbWriteTable}'s \code{value} parameter), the \code{NA}
+elements are overwritten.
 Similarly, if the key column is not present in the \code{data.frame}, all
 elements are automatically assigned a value.
 }

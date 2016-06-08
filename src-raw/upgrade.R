@@ -12,5 +12,5 @@ latest_name <- html %>%
 latest <- paste0("http://www.sqlite.org/", Sys.Date() %>% strftime("%Y"), "/", latest_name)
 tmp <- tempfile()
 download.file(latest, tmp)
-unzip(tmp, exdir = "src/", junkpaths = TRUE)
+unzip(tmp, exdir = "src/sqlite3", junkpaths = TRUE)
 unlink("src/shell.c")

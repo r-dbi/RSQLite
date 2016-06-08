@@ -1,6 +1,6 @@
 # RSQLite
 
-[![Build Status](https://travis-ci.org/rstats-db/RSQLite.png?branch=master)](https://travis-ci.org/rstats-db/RSQLite) [![Coverage Status](https://img.shields.io/codecov/c/github/rstats-db/RSQLite/master.svg)](https://codecov.io/github/rstats-db/RSQLite?branch=master)
+[![Build Status](https://travis-ci.org/rstats-db/RSQLite.png?branch=master)](https://travis-ci.org/rstats-db/RSQLite) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rstats-db/RSQLite?branch=master&svg=true)](https://ci.appveyor.com/project/rstats-db/RSQLite) [![Coverage Status](https://img.shields.io/codecov/c/github/rstats-db/RSQLite/master.svg)](https://codecov.io/github/rstats-db/RSQLite?branch=master)
 
 
 RSQLite embeds the SQLite database engine in R, providing a DBI-compliant interface. [SQLite](http://www.sqlite.org) is a public-domain, single-user, very light-weight database engine that implements a decent subset of the SQL 92 standard, including the core table creation, updating, insertion, and selection operations, plus transaction management.
@@ -27,7 +27,7 @@ To install from github, you'll need a [development environment](http://www.rstud
 ```R
 library(DBI)
 # Create an ephemeral in-memory RSQLite database
-con <- dbConnect(RSQLite::SQLite(), ":memory:")
+con <- dbConnect(RSQLite::SQLite(), "file::memory:")
 
 dbListTables(con)
 dbWriteTable(con, "mtcars", mtcars)
@@ -65,6 +65,8 @@ Many thanks to Doug Bates, Seth Falcon, Detlef Groth, Ronggui Huang, Kurt Hornik
 1.  Update `DESCRIPTION` for included version of SQLite
 
 1.  Update `NEWS`
+
+Ideally this should happen right *after* each CRAN release, so that a new SQLite version is tested for some time before it's released to CRAN.
 
 ## Update datasets database
 

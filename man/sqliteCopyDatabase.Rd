@@ -18,12 +18,12 @@ Returns \code{NULL} (invisibly).
 \description{
 This function copies a database connection to a file or to another database
 connection.It can be used to save an in-memory database (created using
-\code{dbname = ":memory:"}) to a file or to create an in-memory database as
-a copy of anothe database.
+\code{dbname = "file::memory:"}) to a file or to create an in-memory database
+as a copy of anothe database.
 }
 \examples{
 # Copy the built in databaseDb() to an in memory dataset
-db <- dbConnect(RSQLite::SQLite(), ":memory:")
+db <- dbConnect(RSQLite::SQLite(), "file::memory:")
 sqliteCopyDatabase(datasetsDb(), db)
 dbListTables(db)
 }

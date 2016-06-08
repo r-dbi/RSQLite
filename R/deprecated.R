@@ -2,7 +2,7 @@
 NULL
 
 #' Generics for getting and sending prepared queries.
-#' 
+#'
 #' @param conn An \code{DBIConnection} object.
 #' @param statement A SQL string
 #' @param bind.data A data frame
@@ -19,9 +19,9 @@ setGeneric("dbGetPreparedQuery", function(conn, statement, bind.data, ...) {
 })
 
 #' Generic for creating a new transaction.
-#' 
+#'
 #' See method documentation for details.
-#' 
+#'
 #' @export
 #' @param conn An \code{DBIConnection} object.
 #' @param ... Other arguments used by methods
@@ -32,14 +32,14 @@ setGeneric("dbBeginTransaction", function(conn, ...) {
 })
 
 #' Build the SQL CREATE TABLE definition as a string
-#' 
+#'
 #' The output SQL statement is a simple \code{CREATE TABLE} with suitable for
 #' \code{dbGetQuery}
-#' 
+#'
 #' @param conn A database connection.
 #' @param name Name of the new SQL table
 #' @param value A data.frame, for which we want to create a table.
-#' @param field.types Optional, named character vector of the types for each 
+#' @param field.types Optional, named character vector of the types for each
 #'   field in \code{value}
 #' @param row.names Logical. Should row.name of \code{value} be exported as a
 #'   \code{row\_names} field? Default is \code{TRUE}
@@ -47,23 +47,23 @@ setGeneric("dbBeginTransaction", function(conn, ...) {
 #' @keywords internal
 #' @aliases dbBuildTableDefinition
 #' @export
-sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL, 
+sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL,
   row.names = NA) {
-  
+
   warning("Deprecated: please use DBI::sqlCreateTable instead")
-  
+
   if (!is.data.frame(value)) {
     value <- as.data.frame(value)
   }
-  value <- columnToRownames(value, row.names)
-  
+  value <- sqlColumnToRownames(value, row.names)
+
   if (is.null(field.types)) {
-    field.types <- vapply(value, dbDataType, dbObj = con, 
+    field.types <- vapply(value, dbDataType, dbObj = con,
       FUN.VALUE = character(1))
   }
   # Escape field names
   names(field.types) <- dbQuoteIdentifier(con, names(field.types))
-  
+
   flds <- paste(names(field.types), field.types)
   paste("CREATE TABLE", name, "\n(", paste(flds, collapse = ",\n\t"), "\n)")
 }
@@ -75,9 +75,9 @@ dbBuildTableDefinition <- function(...) {
 }
 
 #' isIdCurrent.
-#' 
+#'
 #' Deprecated. Please use dbIsValid instead.
-#' 
+#'
 #' @keywords internal
 #' @export
 isIdCurrent <- function(obj) {
@@ -86,9 +86,9 @@ isIdCurrent <- function(obj) {
 }
 
 #' Make R/S-Plus identifiers into legal SQL identifiers
-#' 
+#'
 #' Deprecated. Please use \code{dbQuoteIdentifier} instead.
-#' 
+#'
 #' @keywords internal
 #' @export
 setMethod("make.db.names",
@@ -116,10 +116,10 @@ setMethod("isSQLKeyword",
 )
 
 #' Deprecated querying tools
-#' 
-#' These functions have been deprecated. Please switch to using 
+#'
+#' These functions have been deprecated. Please switch to using
 #' \code{dbSendQuery}/\code{dbGetQuery} + \code{dbBind} instead.
-#' 
+#'
 #' @keywords internal
 #' @name query-dep
 NULL
@@ -127,7 +127,7 @@ NULL
 #' @rdname query-dep
 #' @param bind.data A data frame of data to be bound.
 #' @export
-setMethod("dbSendPreparedQuery", 
+setMethod("dbSendPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
   function(conn, statement, bind.data) {
     stop("Please use dbSendQuery instead", call. = FALSE)
@@ -136,7 +136,7 @@ setMethod("dbSendPreparedQuery",
 
 #' @rdname query-dep
 #' @export
-setMethod("dbGetPreparedQuery", 
+setMethod("dbGetPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
   function(conn, statement, bind.data) {
     stop("Please use dbGetQuery instead", call. = FALSE)
@@ -144,9 +144,9 @@ setMethod("dbGetPreparedQuery",
 )
 
 #' Return an entire column from a SQLite database
-#' 
+#'
 #' DEPRECATED. Please use dbReadTable instead.
-#' 
+#'
 #' @keywords internal
 #' @export
 sqliteQuickColumn <- function(con, table, column) {
@@ -155,11 +155,11 @@ sqliteQuickColumn <- function(con, table, column) {
 }
 
 #' Get metadata about a database object.
-#' 
+#'
 #' Deprecated. Please use individual functions.
-#' 
+#'
 #' @param dbObj An object of class \code{\linkS4class{SQLiteDriver}},
-#'   \code{\linkS4class{SQLiteConnection}} or 
+#'   \code{\linkS4class{SQLiteConnection}} or
 #'   \code{\linkS4class{SQLiteResult}}
 #' @name dbGetInfo
 #' @keywords internal
@@ -174,40 +174,40 @@ setMethod("dbGetInfo", "SQLiteDriver", function(dbObj) {
 #' @rdname dbGetInfo
 #' @export
 setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
-  warning("dbGetInfo is deprecated: please use individual metadata functions instead", 
+  warning("dbGetInfo is deprecated: please use individual metadata functions instead",
     call. = FALSE)
-  
+
   list()
 })
 
 #' @rdname dbGetInfo
 #' @export
 setMethod("dbGetInfo", "SQLiteResult", function(dbObj) {
-  warning("dbGetInfo is deprecated: please use individual metadata functions instead", 
+  warning("dbGetInfo is deprecated: please use individual metadata functions instead",
     call. = FALSE)
-  
+
   list()
 })
 
 #' dbListResults
-#' 
+#'
 #' DEPRECATED
-#' 
+#'
 #' @keywords internal
 #' @export
 setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
-  stop("Querying the results associated with a connection is no longer supported", 
+  stop("Querying the results associated with a connection is no longer supported",
     call. = FALSE)
 })
 
 
 #' Fetch.
-#' 
+#'
 #' Deprecated. Please use \code{dbFetch} instead.
-#' 
+#'
 #' @keywords internal
 #' @export
 setMethod("fetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
-  columnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
+  sqlColumnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
 })
 

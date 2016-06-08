@@ -15,7 +15,7 @@
 \S4method{dbGetException}{SQLiteConnection}(conn)
 }
 \description{
-\code{SQLiteConnection} objects are usually created by 
+\code{SQLiteConnection} objects are usually created by
 \code{\link[DBI]{dbConnect}}.
 }
 \keyword{internal}

@@ -1,3 +1,15 @@
+# RSQLite 1.0.9003 (2016-06-08)
+
+- Fix one-off glitch in error message issued by `dbBind()`.
+- Release opened result set if binding fails in `dbSendQuery()` (#89).
+- Use `"file::memory:"` instead of `":memory:"` for memory-only databases, the latter doesn't seem to work well on Windows for unknown reasons.
+- Enable AppVeyor testing.
+- Strip space at end of line in all source files.
+- Use new `sqlRownamesToColumn()` and `sqlColumnToRownames()` (rstats-db/DBI#91).
+- Use container-based builds on Travis.
+- Remove old documentation (#121).
+
+
 # Version 1.0.9002 (2016-03-15)
 
 - Use the `DBItest` package for testing (#105).

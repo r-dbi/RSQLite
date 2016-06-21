@@ -31,9 +31,7 @@ dbDisconnect(mydb)
 unlink("my-db.sqlite")
 ```
 
-If you just need a temporary database, use either `""` (for an on-disk database)
-or `":memory:"` or `"file::memory:"` (for a in-memory database). This database
-will be automatically deleted when you disconnect from it.
+If you just need a temporary database, use either `""` (for an on-disk database) or `":memory:"` or `"file::memory:"` (for a in-memory database). This database will be automatically deleted when you disconnect from it.
 
 ```{r}
 mydb <- dbConnect(RSQLite::SQLite(), "")

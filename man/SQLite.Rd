@@ -38,8 +38,8 @@ will be cloned.}
   \itemize{
   \item \code{""} will create a temporary on-disk database. The file
     will be deleted when the connection is closed.
-  \item \code{"file::memory:"} (recommended on Windows) or \code{":memory:"}
-    will create a temporary in-memory database.
+  \item \code{":memory:"} or \code{"file::memory:"} will create a temporary
+    in-memory database.
   }}
 
 \item{loadable.extensions}{When \code{TRUE} (default) SQLite3
@@ -85,7 +85,7 @@ sets have been closed (and you'll get a warning message to this effect).
 \examples{
 library(DBI)
 # Initialize a temporary in memory database and copy a data.frame into it
-con <- dbConnect(RSQLite::SQLite(), "file::memory:")
+con <- dbConnect(RSQLite::SQLite(), ":memory:")
 data(USArrests)
 dbWriteTable(con, "USArrests", USArrests)
 dbListTables(con)

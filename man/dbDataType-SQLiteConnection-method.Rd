@@ -11,7 +11,7 @@
 \S4method{dbDataType}{SQLiteDriver}(dbObj, obj, ...)
 }
 \arguments{
-\item{dbObj}{a \code{SQLiteDriver} object,}
+\item{dbObj}{a \code{SQLiteConnection} or \code{SQLiteDriver} object}
 
 \item{obj}{an R object whose SQL type we want to determine.}
 

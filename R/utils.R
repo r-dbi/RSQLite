@@ -1,9 +1,10 @@
 #' Copy a SQLite database
 #'
 #' This function copies a database connection to a file or to another database
-#' connection.It can be used to save an in-memory database (created using
+#' connection.  It can be used to save an in-memory database (created using
+#' \code{dbname = ":memory:"} or
 #' \code{dbname = "file::memory:"}) to a file or to create an in-memory database
-#' as a copy of anothe database.
+#' a copy of anothe database.
 #'
 #' @param from A \code{SQLiteConnection} object. The main database in
 #'   \code{from} will be copied to \code{to}.
@@ -14,7 +15,7 @@
 #' @export
 #' @examples
 #' # Copy the built in databaseDb() to an in memory dataset
-#' db <- dbConnect(RSQLite::SQLite(), "file::memory:")
+#' db <- dbConnect(RSQLite::SQLite(), ":memory:")
 #' sqliteCopyDatabase(datasetsDb(), db)
 #' dbListTables(db)
 sqliteCopyDatabase <- function(from, to) {

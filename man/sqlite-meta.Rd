@@ -30,7 +30,7 @@ See documentation of generics for more details.
 }
 \examples{
 data(USArrests)
-con <- dbConnect(SQLite(), dbname="file::memory:")
+con <- dbConnect(SQLite(), dbname=":memory:")
 dbWriteTable(con, "t1", USArrests)
 dbWriteTable(con, "t2", USArrests)
 

@@ -255,7 +255,7 @@ setMethod("dbListFields", c("SQLiteConnection", "character"),
 #' This method is a straight-forward implementation of the corresponding
 #' generic function.
 #'
-#' @param dbObj a \code{SQLiteDriver} object,
+#' @param dbObj a \code{SQLiteConnection} or \code{SQLiteDriver} object
 #' @param obj an R object whose SQL type we want to determine.
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @examples
@@ -271,6 +271,7 @@ setMethod("dbDataType", "SQLiteConnection", function(dbObj, obj, ...) {
   dbDataType(SQLite(), obj, ...)
 })
 
+#' @rdname dbDataType-SQLiteConnection-method
 #' @export
 #' @rdname dbDataType-SQLiteConnection-method
 setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {

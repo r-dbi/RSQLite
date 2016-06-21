@@ -8,6 +8,11 @@ os <- function() {
 }
 
 # Specific to RSQLite
+test_that("can connect to memory database (#140)", {
+  dbDisconnect(dbConnect(SQLite(), ":memory:"))
+})
+
+# Specific to RSQLite
 test_that("invalid dbnames throw errors", {
   expect_error(dbConnect(SQLite(), dbname = 1:3))
   expect_error(dbConnect(SQLite(), dbname = c("a", "b")))

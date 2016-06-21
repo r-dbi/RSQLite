@@ -45,8 +45,8 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #'   \itemize{
 #'   \item \code{""} will create a temporary on-disk database. The file
 #'     will be deleted when the connection is closed.
-#'   \item \code{"file::memory:"} (recommended on Windows) or \code{":memory:"}
-#'     will create a temporary in-memory database.
+#'   \item \code{":memory:"} or \code{"file::memory:"} will create a temporary
+#'     in-memory database.
 #'   }
 #' @param cache_size Advanced option. A positive integer to change the maximum
 #'   number of disk pages that SQLite holds in memory (SQLite's default is
@@ -78,7 +78,7 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #' @examples
 #' library(DBI)
 #' # Initialize a temporary in memory database and copy a data.frame into it
-#' con <- dbConnect(RSQLite::SQLite(), "file::memory:")
+#' con <- dbConnect(RSQLite::SQLite(), ":memory:")
 #' data(USArrests)
 #' dbWriteTable(con, "USArrests", USArrests)
 #' dbListTables(con)
@@ -100,7 +100,8 @@ setMethod("dbConnect", "SQLiteDriver",
   function(drv, dbname = "", loadable.extensions = TRUE, cache_size = NULL,
            synchronous = "off", flags = SQLITE_RWC, vfs = NULL) {
     stopifnot(length(dbname) == 1, !is.na(dbname))
-    if (!is_url(dbname)) {
+
+    if (!is_url_or_special_filename(dbname)) {
       dbname <- normalizePath(dbname, mustWork = FALSE)
     }
 
@@ -143,7 +144,16 @@ check_vfs <- function(vfs) {
     "unix-none"))
 }
 
-is_url <- function(x) grepl("^(file|http|ftp|https):", x)
+# From the SQLite docs: If the filename is ":memory:", then a private,
+# temporary in-memory database is created for the connection. This in-memory
+# database will vanish when the database connection is closed. Future versions
+# of SQLite might make use of additional special filenames that begin with the
+# ":" character. It is recommended that when a database filename actually does
+# begin with a ":" character you should prefix the filename with a pathname
+# such as "./" to avoid ambiguity.
+#
+# This function checks for known protocols, or for a colon at the beginning.
+is_url_or_special_filename <- function(x) grepl("^(?:file|http|ftp|https|):", x)
 
 #' @export
 #' @rdname SQLite

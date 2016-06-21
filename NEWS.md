@@ -1,3 +1,10 @@
+# RSQLite 1.0.9004 (2016-06-21)
+
+- Simplify compilation of SQLite library.
+- Use both `":memory:"` and `":file::memory:"` in documentation.
+- Support `":memory:"` file again on Windows, regression introduced after 1.0.0 (#140).
+
+
 # RSQLite 1.0.9003 (2016-06-08)
 
 - Fix one-off glitch in error message issued by `dbBind()`.

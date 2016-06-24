@@ -1,7 +1,7 @@
 DBItest::make_context(
   SQLite(),
   list(dbname = tempfile("DBItest", fileext = ".sqlite")),
-  tweaks = tweaks(
+  tweaks = DBItest::tweaks(
     constructor_relax_args = TRUE
   ),
   name = "RSQLite"

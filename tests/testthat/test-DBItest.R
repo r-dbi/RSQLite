@@ -1,4 +1,11 @@
-DBItest::make_context(SQLite(), list(dbname = tempfile("DBItest", fileext = ".sqlite")), name = "RSQLite")
+DBItest::make_context(
+  SQLite(),
+  list(dbname = tempfile("DBItest", fileext = ".sqlite")),
+  tweaks = tweaks(
+    constructor_relax_args = TRUE
+  ),
+  name = "RSQLite"
+)
 DBItest::test_all(c(
   # driver
   "constructor_strict",                         # relaxed constructor check still active

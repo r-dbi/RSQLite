@@ -10,7 +10,7 @@ I found: {{{your_summary}}}.
 
 If I got an ERROR because I couldn't install your package (or one of it's dependencies), my apologies. You'll have to run the checks yourself (unfortunately I don't have the time to diagnose installation failures).
 
-If I got a WARNING about undocumented `dbDataType()`, it's because `dbDataType()` is now correctly exported, and you'll need to update your documentation. See <https://github.com/rstats-db/DBI/pull/90#discussion_r57762115> for discussion.
+Regressions may arise due to changes in the public API. In particular, the `dbGetQuery()` and `summary()` methods are not exported anymore.  Instead, use `DBI::dbGetQuery()` and `show()`, respectively. Furthermore, `dbSendPreparedQuery()`, `dbGetPreparedQuery()` and `dbListResults()` have been deprecated, these functions now raise an error. Use `dbBind()` for parametrized queries, listing the results of a connection is not supported anymore.
 
 Otherwise, please carefully look at the results, and let me know if I've introduced a bug in {{{ my_package }}}.
 

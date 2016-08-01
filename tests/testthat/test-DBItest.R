@@ -1,11 +1,3 @@
-DBItest::make_context(
-  SQLite(),
-  list(dbname = tempfile("DBItest", fileext = ".sqlite")),
-  tweaks = DBItest::tweaks(
-    constructor_relax_args = TRUE
-  ),
-  name = "RSQLite"
-)
 DBItest::test_all(c(
   # driver
   "constructor_strict",                         # relaxed constructor check still active
@@ -55,7 +47,8 @@ DBItest::test_all(c(
   NULL
 ))
 
-DBItest::make_context(SQLite(), list(flags = SQLITE_RO), name = "RSQLite-RO")
 # Only read_only and interface compliance test run here
 # (opt-in not yet implemented, rstats-db/DBItest#33)
-DBItest::test_compliance()
+DBItest::test_compliance(ctx = DBItest::make_context(
+  SQLite(), list(flags = SQLITE_RO), set_as_default = FALSE, name = "RSQLite-RO")
+)

@@ -17,23 +17,23 @@ NULL
 #' library(DBI)
 #' con <- dbConnect(SQLite(), ":memory:")
 #' dbWriteTable(con, "arrests", datasets::USArrests)
-#' dbGetQuery(con, "select count(*) from arrests")
+#' dbExecute(con, "select count(*) from arrests")
 #'
 #' dbBegin(con)
-#' rs <- dbSendQuery(con, "DELETE from arrests WHERE Murder > 1")
+#' rs <- dbSendStatement(con, "DELETE from arrests WHERE Murder > 1")
 #' dbGetRowsAffected(rs)
 #' dbClearResult(rs)
 #'
-#' dbGetQuery(con, "select count(*) from arrests")
+#' dbExecute(con, "select count(*) from arrests")
 #'
 #' dbRollback(con)
-#' dbGetQuery(con, "select count(*) from arrests")[1, ]
+#' dbExecute(con, "select count(*) from arrests")[1, ]
 #'
 #' dbBegin(con)
-#' rs <- dbSendQuery(con, "DELETE FROM arrests WHERE Murder > 5")
+#' rs <- dbSendStatement(con, "DELETE FROM arrests WHERE Murder > 5")
 #' dbClearResult(rs)
 #' dbCommit(con)
-#' dbGetQuery(con, "SELECT count(*) FROM arrests")[1, ]
+#' dbExecute(con, "SELECT count(*) FROM arrests")[1, ]
 #'
 #' # Named savepoints can be nested --------------------------------------------
 #' dbBegin(con, "a")
@@ -49,31 +49,31 @@ NULL
 #' @rdname sqlite-transaction
 setMethod("dbBegin", "SQLiteConnection", function(conn, name = NULL) {
   if (is.null(name)) {
-    dbGetQuery(conn, "BEGIN")
+    dbExecute(conn, "BEGIN")
   } else {
-    dbGetQuery(conn, paste("SAVEPOINT ", name))
+    dbExecute(conn, paste("SAVEPOINT ", name))
   }
 
-  TRUE
+  invisible(TRUE)
 })
 
 #' @export
 #' @rdname sqlite-transaction
 setMethod("dbCommit", "SQLiteConnection", function(conn, name = NULL) {
   if (is.null(name)) {
-    dbGetQuery(conn, "COMMIT")
+    dbExecute(conn, "COMMIT")
   } else {
-    dbGetQuery(conn, paste("RELEASE SAVEPOINT ", name))
+    dbExecute(conn, paste("RELEASE SAVEPOINT ", name))
   }
 
-  TRUE
+  invisible(TRUE)
 })
 
 #' @export
 #' @rdname sqlite-transaction
 setMethod("dbRollback", "SQLiteConnection", function(conn, name = NULL) {
   if (is.null(name)) {
-    dbGetQuery(conn, "ROLLBACK")
+    dbExecute(conn, "ROLLBACK")
   } else {
     # The ROLLBACK TO command reverts the state of the database back to what it
     # was just after the corresponding SAVEPOINT. Note that unlike that plain
@@ -81,8 +81,9 @@ setMethod("dbRollback", "SQLiteConnection", function(conn, name = NULL) {
     # cancel the transaction. Instead of cancelling the transaction, the
     # ROLLBACK TO command restarts the transaction again at the beginning. All
     # intervening SAVEPOINTs are canceled, however.
-    dbGetQuery(conn, paste("ROLLBACK TO ", name))
-    dbGetQuery(conn, paste("RELEASE SAVEPOINT ", name))
+    dbExecute(conn, paste("ROLLBACK TO ", name))
+    dbExecute(conn, paste("RELEASE SAVEPOINT ", name))
   }
-  TRUE
+
+  invisible(TRUE)
 })

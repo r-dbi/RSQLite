@@ -34,23 +34,23 @@ auto-commit on.
 library(DBI)
 con <- dbConnect(SQLite(), ":memory:")
 dbWriteTable(con, "arrests", datasets::USArrests)
-dbGetQuery(con, "select count(*) from arrests")
+dbExecute(con, "select count(*) from arrests")
 
 dbBegin(con)
-rs <- dbSendQuery(con, "DELETE from arrests WHERE Murder > 1")
+rs <- dbSendStatement(con, "DELETE from arrests WHERE Murder > 1")
 dbGetRowsAffected(rs)
 dbClearResult(rs)
 
-dbGetQuery(con, "select count(*) from arrests")
+dbExecute(con, "select count(*) from arrests")
 
 dbRollback(con)
-dbGetQuery(con, "select count(*) from arrests")[1, ]
+dbExecute(con, "select count(*) from arrests")[1, ]
 
 dbBegin(con)
-rs <- dbSendQuery(con, "DELETE FROM arrests WHERE Murder > 5")
+rs <- dbSendStatement(con, "DELETE FROM arrests WHERE Murder > 5")
 dbClearResult(rs)
 dbCommit(con)
-dbGetQuery(con, "SELECT count(*) FROM arrests")[1, ]
+dbExecute(con, "SELECT count(*) FROM arrests")[1, ]
 
 # Named savepoints can be nested --------------------------------------------
 dbBegin(con, "a")

@@ -1,3 +1,9 @@
+## RSQLite 1.0.9005 (2016-08-19)
+
+- Adapt to DBI 0.4-9, use `dbExecute()` instead of `dbGetQuery()`, and `dbSendStatement()` instead of `dbSendQuery()` where appropriate.
+- Use new `constructor_relax_args` tweak.
+
+
 # RSQLite 1.0.9004 (2016-06-21)
 
 - Simplify compilation of SQLite library.

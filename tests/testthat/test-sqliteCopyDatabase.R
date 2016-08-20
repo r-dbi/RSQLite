@@ -29,6 +29,18 @@ test_that("can backup memory db to disk", {
 })
 
 # Specific to RSQLite
+test_that("can backup memory db to disk", {
+  con1 <- dbConnect(SQLite(), ":memory:")
+  dbWriteTable(con1, "mtcars", mtcars)
+
+  dbfile <- tempfile()
+  sqliteCopyDatabase(con1, dbfile)
+
+  con2 <- dbConnect(SQLite(), dbfile)
+  expect_true(dbExistsTable(con2, "mtcars"))
+})
+
+# Specific to RSQLite
 test_that("can backup to connection", {
   con1 <- dbConnect(SQLite(), ":memory:")
   dbWriteTable(con1, "mtcars", mtcars)

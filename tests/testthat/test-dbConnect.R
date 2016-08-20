@@ -30,10 +30,10 @@ test_that("can get and set vfs values", {
   )
 
   checkVfs <- function(v) {
+    force(v)
     db <- dbConnect(SQLite(), vfs = v)
     on.exit(dbDisconnect(db))
-    vv <- v
-    expect_equal(vv, db@vfs)
+    expect_equal(v, db@vfs)
   }
   for (v in allowed) checkVfs(v)
 })
@@ -59,4 +59,29 @@ test_that("forbidden operations throw errors", {
   dbrw2 <- dbConnect(SQLite(), dbname = tmpFile, flags = SQLITE_RW)
   expect_true(dbWriteTable(dbrw2, "t2", df))
   dbDisconnect(dbrw2)
+})
+
+test_that("querying closed connection throws error", {
+  db <- dbConnect(SQLite(), dbname = ":memory:")
+  dbDisconnect(db)
+  expect_error(dbGetQuery(db, "select * from foo"), "expired")
+})
+
+test_that("can connect to same db from multiple connections", {
+  dbfile <- tempfile()
+  con1 <- dbConnect(SQLite(), dbfile)
+  con2 <- dbConnect(SQLite(), dbfile)
+
+  dbWriteTable(con1, "mtcars", mtcars)
+  expect_equal(dbReadTable(con2, "mtcars"), mtcars)
+})
+
+test_that("temporary tables are connection local", {
+  dbfile <- tempfile()
+  con1 <- dbConnect(SQLite(), dbfile)
+  con2 <- dbConnect(SQLite(), dbfile)
+
+  dbGetQuery(con1, "CREATE TEMPORARY TABLE temp (a TEXT)")
+  expect_true(dbExistsTable(con1, "temp"))
+  expect_false(dbExistsTable(con2, "temp"))
 })

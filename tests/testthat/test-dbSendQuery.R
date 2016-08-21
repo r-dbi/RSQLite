@@ -62,6 +62,7 @@ bind_select_setup <- function() {
 
 test_that("one row per bound select", {
   con <- bind_select_setup()
+  on.exit(dbDisconnect(con), add = TRUE)
 
   got <- dbGetPreparedQuery(con, "select * from t1 where id = ?",
     data.frame(id = c("e", "a", "c")))

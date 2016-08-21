@@ -88,15 +88,15 @@ test_that("failed matches are silently dropped", {
   con <- bind_select_setup()
   sql <- "SELECT * FROM t1 WHERE id = ?"
 
-  df1 <- dbGetPreparedQuery(con, sql, data.frame(id = "X"))
+  df1 <- dbGetPreparedQuery(con, sql, data.frame(id = I("X")))
   expect_equal(nrow(df1), 0)
   expect_equal(names(df1), c("id", "x", "y"))
 
-  df2 <- dbGetPreparedQuery(con, sql, data.frame(id = c("X", "Y")))
+  df2 <- dbGetPreparedQuery(con, sql, data.frame(id = I(c("X", "Y"))))
   expect_equal(nrow(df2), 0)
   expect_equal(names(df2), c("id", "x", "y"))
 
-  df3 <- dbGetPreparedQuery(con, sql, data.frame(id = c("X", "a", "Y")))
+  df3 <- dbGetPreparedQuery(con, sql, data.frame(id = I(c("X", "a", "Y"))))
   expect_equal(nrow(df3), 1)
   expect_equal(names(df3), c("id", "x", "y"))
 })

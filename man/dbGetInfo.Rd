@@ -5,14 +5,11 @@
 \alias{dbGetInfo}
 \alias{dbGetInfo,SQLiteConnection-method}
 \alias{dbGetInfo,SQLiteDriver-method}
-\alias{dbGetInfo,SQLiteResult-method}
 \title{Get metadata about a database object.}
 \usage{
 \S4method{dbGetInfo}{SQLiteDriver}(dbObj)
 
 \S4method{dbGetInfo}{SQLiteConnection}(dbObj)
-
-\S4method{dbGetInfo}{SQLiteResult}(dbObj)
 }
 \arguments{
 \item{dbObj}{An object of class \code{\linkS4class{SQLiteDriver}},

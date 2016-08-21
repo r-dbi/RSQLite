@@ -180,15 +180,6 @@ setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
   list()
 })
 
-#' @rdname dbGetInfo
-#' @export
-setMethod("dbGetInfo", "SQLiteResult", function(dbObj) {
-  warning("dbGetInfo is deprecated: please use individual metadata functions instead",
-    call. = FALSE)
-
-  list()
-})
-
 #' dbListResults
 #'
 #' DEPRECATED

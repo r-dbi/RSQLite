@@ -64,7 +64,7 @@ test_that("forbidden operations throw errors", {
 test_that("querying closed connection throws error", {
   db <- dbConnect(SQLite(), dbname = ":memory:")
   dbDisconnect(db)
-  expect_error(dbGetQuery(db, "select * from foo"), "expired")
+  expect_error(dbGetQuery(db, "select * from foo"), "external pointer")
 })
 
 test_that("can connect to same db from multiple connections", {

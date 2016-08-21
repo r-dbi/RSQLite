@@ -60,12 +60,26 @@ bind_select_setup <- function() {
   con
 }
 
+test_that("one row per bound select, with factor", {
+  con <- bind_select_setup()
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  id_frame <- data.frame(id = c("e", "a", "c"))
+
+  expect_warning(
+    got <- dbGetPreparedQuery(con, "select * from t1 where id = ?", id_frame),
+    "factor")
+
+  expect_equal(got$id, c("e", "a", "c"))
+})
+
 test_that("one row per bound select", {
   con <- bind_select_setup()
   on.exit(dbDisconnect(con), add = TRUE)
 
-  got <- dbGetPreparedQuery(con, "select * from t1 where id = ?",
-    data.frame(id = c("e", "a", "c")))
+  id_frame <- data.frame(id = I(c("e", "a", "c")))
+
+  got <- dbGetPreparedQuery(con, "select * from t1 where id = ?", id_frame)
 
   expect_equal(got$id, c("e", "a", "c"))
 })

@@ -22,6 +22,6 @@ test_that("accessing cleared result throws error", {
   res <- dbSendQuery(con, "SELECT 1;")
   dbClearResult(res)
 
-  expect_error(dbFetch(res), "Expired")
-  expect_error(dbGetInfo(res), "Expired")
+  expect_error(dbFetch(res), "external")
+  expect_error(dbGetInfo(res), "external")
 })

@@ -116,7 +116,8 @@ setMethod("dbConnect", "SQLiteDriver",
       dbname = dbname,
       flags = flags,
       vfs = vfs,
-      loadable.extensions = loadable.extensions
+      loadable.extensions = loadable.extensions,
+      ref = new.env(parent = emptyenv())
     )
 
     ## experimental PRAGMAs

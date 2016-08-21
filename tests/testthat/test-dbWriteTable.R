@@ -12,19 +12,6 @@ test_that("throws error if constraint violated", {
     "UNIQUE constraint failed")
 })
 
-# Test requires that two result sets can be open at the same time, which is
-# undesired (see DBItest "stale_result_warning")
-test_that("modifications retrieved by open result set", {
-  con <- dbConnect(SQLite(), tempfile())
-
-  x <- data.frame(col1 = 1:10, col2 = letters[1:10])
-  dbWriteTable(con, "t1", x)
-
-  res <- dbSendQuery(con, "SELECT * FROM t1")
-  dbWriteTable(con, "t1", x, append = TRUE)
-  expect_equal(nrow(dbFetch(res)), 20)
-  dbClearResult(res)
-})
 
 # In memory --------------------------------------------------------------------
 
@@ -50,8 +37,6 @@ test_that("throws error if constrainted violated", {
 })
 
 test_that("can't add table when result set open", {
-  skip("Currently failing")
-
   # This needs to fail because cloning a temporary file or in memory
   # database creates new database
   con <- dbConnect(SQLite(), tempfile())

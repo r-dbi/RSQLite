@@ -12,7 +12,8 @@ setClass("SQLiteConnection",
     dbname = "character",
     loadable.extensions = "logical",
     flags = "integer",
-    vfs = "character"
+    vfs = "character",
+    ref = "environment"
   )
 )
 

@@ -16,8 +16,8 @@ test_that("sqliteQuickColumn round trips cleanly", {
   db <- dbConnect(SQLite(), dbname = ":memory:")
   dbWriteTable(db, "t", df)
 
-  expect_equal(sqliteQuickColumn(db, "t", "a"), df$a)
-  expect_equal(sqliteQuickColumn(db, "t", "b"), df$b)
-  expect_equal(sqliteQuickColumn(db, "t", "c"), df$c)
-  expect_equal(sqliteQuickColumn(db, "t", "d"), unclass(df$d))
+  expect_warning(expect_equal(sqliteQuickColumn(db, "t", "a"), df$a), "Deprecated.*dbReadTable")
+  expect_warning(expect_equal(sqliteQuickColumn(db, "t", "b"), df$b), "Deprecated.*dbReadTable")
+  expect_warning(expect_equal(sqliteQuickColumn(db, "t", "c"), df$c), "Deprecated.*dbReadTable")
+  expect_warning(expect_equal(sqliteQuickColumn(db, "t", "d"), unclass(df$d)), "Deprecated.*dbReadTable")
 })

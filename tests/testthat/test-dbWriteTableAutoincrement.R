@@ -9,7 +9,9 @@ sql_ddl <- "CREATE TABLE `tbl` (
 create_and_compare_table <- function( d_local, expected_remote_id ) {
   #Create a connection, create a table, and populate the table.
   con <- dbConnect(SQLite())
-  dbSendQuery(con, sql_ddl)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, sql_ddl)
   write_successful <- dbWriteTable(con, name = 'tbl', value = d_local, append = TRUE, row.names = FALSE)
   expect_true(write_successful)
 
@@ -22,7 +24,6 @@ create_and_compare_table <- function( d_local, expected_remote_id ) {
   expect_equal(d_remote$name,  d_local$name)
   expect_equal(d_remote$score, d_local$score)
   # rm(d_remote, d_local)
-  # dbDisconnect(con)
 }
 
 test_that("autoincrement column not present before sending to database", {
@@ -110,7 +111,7 @@ test_that("autoincrement partially populated with duplicate IDs throws an error"
   )
 
   con <- dbConnect(SQLite())
-  dbSendQuery(con, sql_ddl)
+  dbExecute(con, sql_ddl)
   expect_error(
     dbWriteTable(con, name = 'tbl', value = ds_local, append = TRUE, row.names = FALSE),
     "UNIQUE constraint failed: tbl[.]id"

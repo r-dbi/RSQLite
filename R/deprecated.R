@@ -186,6 +186,9 @@ NULL
 #' @rdname dbGetInfo
 #' @export
 setMethod("dbGetInfo", "SQLiteDriver", function(dbObj) {
+  warning("dbGetInfo is deprecated: please use individual metadata functions instead",
+    call. = FALSE)
+
   list()
 })
 

@@ -2,6 +2,17 @@
 #include "SqliteConnection.h"
 using namespace Rcpp;
 
+extern "C" {
+  int RS_sqlite_import(
+    sqlite3* db,
+    const char* zTable,          /* table must already exist */
+    const char* zFile,
+    const char* separator,
+    const char* eol,
+    int skip
+  );
+}
+
 // [[Rcpp::export]]
 XPtr<SqliteConnectionPtr> rsqlite_connect(std::string path, bool allow_ext,
                                           int flags, std::string vfs = "") {
@@ -42,3 +53,11 @@ bool rsqlite_connection_valid(XPtr<SqliteConnectionPtr> con) {
   return con.get() != NULL;
 }
 
+// [[Rcpp::export]]
+bool rsqlite_import_file(XPtr<SqliteConnectionPtr> con,
+                         const std::string& name, const std::string& value,
+                         const std::string& sep, const std::string& eol,
+                         int skip) {
+  return !!RS_sqlite_import(con->get()->conn(), name.c_str(), value.c_str(),
+                            sep.c_str(), eol.c_str(), skip);
+}

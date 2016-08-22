@@ -55,9 +55,16 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
   function(conn, statement, params = NULL, ...) {
     statement <- enc2utf8(statement)
 
+    if (!is.null(conn@ref$result)) {
+      warning("Closing open result set, pending rows", call. = FALSE)
+      dbClearResult(conn@ref$result)
+      stopifnot(is.null(conn@ref$result))
+    }
+
     rs <- new("SQLiteResult",
       sql = statement,
-      ptr = rsqlite_send_query(conn@ptr, statement)
+      ptr = rsqlite_send_query(conn@ptr, statement),
+      conn = conn
     )
     on.exit(dbClearResult(rs), add = TRUE)
 
@@ -66,15 +73,25 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
     }
     on.exit(NULL, add = FALSE)
 
+    conn@ref$result <- rs
     rs
   }
 )
+
+#' @export
+DBI::dbGetQuery
 
 #' @rdname sqlite-query
 #' @export
 setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
   if (is.null(names(params))) {
     names(params) <- rep("", length(params))
+  }
+
+  is_factor <- vlapply(params, is.factor)
+  if (any(is_factor)) {
+    warning("Converting factor to character for binding", call. = FALSE)
+    params[is_factor] <- lapply(params[is_factor], as.character)
   }
 
   rsqlite_bind_params(res@ptr, params)
@@ -96,7 +113,11 @@ setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) 
 #' @export
 #' @rdname sqlite-query
 setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
+  if (!dbIsValid(res)) {
+    stop("Expired, result set already closed", call. = FALSE)
+  }
   rsqlite_clear_result(res@ptr)
+  res@conn@ref$result <- NULL
   invisible(TRUE)
 })
 

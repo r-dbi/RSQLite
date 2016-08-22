@@ -51,7 +51,11 @@ sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL,
   row.names = NA) {
 
   warning("Deprecated: please use DBI::sqlCreateTable instead")
+  sqliteBuildTableDefinitionNoWarn(con, name, value, field.types, row.names)
+}
 
+sqliteBuildTableDefinitionNoWarn <- function(con, name, value, field.types = NULL,
+                                             row.names = NA) {
   if (!is.data.frame(value)) {
     value <- as.data.frame(value)
   }
@@ -130,7 +134,27 @@ NULL
 setMethod("dbSendPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
   function(conn, statement, bind.data) {
-    stop("Please use dbSendQuery instead", call. = FALSE)
+    .Deprecated("dbBind")
+
+    res <- dbSendQuery(conn, statement)
+
+    bind_data_rows <- by(bind.data, seq_len(nrow(bind.data)), identity, simplify = FALSE)
+
+    lapply(
+      bind_data_rows,
+      function(row) {
+        tryCatch(
+          dbBind(res, unclass(row)),
+          error = function(e) {
+            dbBind(res, unclass(unname(row)))
+          }
+        )
+        dbFetch(res)
+        NULL
+      }
+    )
+
+    res
   }
 )
 
@@ -139,7 +163,27 @@ setMethod("dbSendPreparedQuery",
 setMethod("dbGetPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
   function(conn, statement, bind.data) {
-    stop("Please use dbGetQuery instead", call. = FALSE)
+    .Deprecated("dbBind")
+
+    res <- dbSendQuery(conn, statement)
+    on.exit(dbClearResult(res), add = TRUE)
+
+    bind_data_rows <- by(bind.data, seq_len(nrow(bind.data)), identity, simplify = FALSE)
+
+    results <- lapply(
+      bind_data_rows,
+      function(row) {
+        tryCatch(
+          dbBind(res, unclass(row)),
+          error = function(e) {
+            dbBind(res, unclass(unname(row)))
+          }
+        )
+        dbFetch(res)
+      }
+    )
+
+    do.call(rbind, results)
   }
 )
 
@@ -168,12 +212,6 @@ NULL
 #' @rdname dbGetInfo
 #' @export
 setMethod("dbGetInfo", "SQLiteDriver", function(dbObj) {
-  list()
-})
-
-#' @rdname dbGetInfo
-#' @export
-setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
   warning("dbGetInfo is deprecated: please use individual metadata functions instead",
     call. = FALSE)
 
@@ -182,7 +220,7 @@ setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
 
 #' @rdname dbGetInfo
 #' @export
-setMethod("dbGetInfo", "SQLiteResult", function(dbObj) {
+setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
   warning("dbGetInfo is deprecated: please use individual metadata functions instead",
     call. = FALSE)
 
@@ -196,8 +234,12 @@ setMethod("dbGetInfo", "SQLiteResult", function(dbObj) {
 #' @keywords internal
 #' @export
 setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
-  stop("Querying the results associated with a connection is no longer supported",
+  warning("Querying the results associated with a connection is no longer supported",
     call. = FALSE)
+  if (is.null(conn@ref$result))
+    list()
+  else
+    list(conn@ref$result)
 })
 
 

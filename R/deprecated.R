@@ -27,7 +27,7 @@ setGeneric("dbGetPreparedQuery", function(conn, statement, bind.data, ...) {
 #' @param ... Other arguments used by methods
 #' @keywords internal
 setGeneric("dbBeginTransaction", function(conn, ...) {
-  .Deprecated("dbBegin")
+  .Deprecated("dbBegin", old = "dbBeginTransaction")
   dbBegin(conn, ...)
 })
 
@@ -98,7 +98,7 @@ isIdCurrent <- function(obj) {
 setMethod("make.db.names",
   signature(dbObj="SQLiteConnection", snames = "character"),
   function(dbObj, snames, keywords, unique, allow.keywords, ...) {
-    .Deprecated("dbQuoteIdentifier")
+    .Deprecated("dbQuoteIdentifier", old = "make.db.names")
     make.db.names.default(snames, keywords, unique, allow.keywords)
   }
 )
@@ -114,7 +114,7 @@ setMethod("SQLKeywords", "SQLiteConnection", function(dbObj, ...) {
 setMethod("isSQLKeyword",
   signature(dbObj="SQLiteConnection", name="character"),
   function(dbObj, name, keywords, case, ...) {
-    .Deprecated("dbQuoteIdentifier")
+    .Deprecated("dbQuoteIdentifier", old = "isSQLKeyword")
     isSQLKeyword.default(name, keywords = .SQL92Keywords, case)
   }
 )
@@ -134,7 +134,7 @@ NULL
 setMethod("dbSendPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
   function(conn, statement, bind.data) {
-    .Deprecated("dbBind")
+    .Deprecated("dbBind", old = "dbSendPreparedQuery")
 
     res <- dbSendQuery(conn, statement)
 
@@ -163,7 +163,7 @@ setMethod("dbSendPreparedQuery",
 setMethod("dbGetPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
   function(conn, statement, bind.data) {
-    .Deprecated("dbBind")
+    .Deprecated("dbBind", old = "dbGetPreparedQuery")
 
     res <- dbSendQuery(conn, statement)
     on.exit(dbClearResult(res), add = TRUE)

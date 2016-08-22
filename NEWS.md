@@ -1,6 +1,6 @@
 ## RSQLite 1.0.9007 (2016-08-23)
 
-- Deprecate `dbGetException()` (#51).
+- Deprecate `dbGetException()` (#129).
 - Fix all warnings in tests (#157).
 - Clarify message for deprecation warnings (#157).
 

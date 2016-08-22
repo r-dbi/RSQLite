@@ -38,5 +38,6 @@ setMethod("dbIsValid", "SQLiteConnection", function(dbObj) {
 #' @rdname SQLiteConnection-class
 #' @export
 setMethod("dbGetException", "SQLiteConnection", function(conn) {
+  .Deprecated("tryCatch", old = "dbGetException")
   rsqlite_get_exception(conn@ptr)
 })

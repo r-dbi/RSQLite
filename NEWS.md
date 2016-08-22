@@ -1,3 +1,18 @@
+## RSQLite 1.0.9006 (2016-08-22)
+
+- Reimplement `dbSendPreparedQuery()` (with warning) for compatibility with existing packages (#153).
+- Reimplement `dbWriteTable("SQLiteConnection", "character", "character")` for import of CSV files (#151).
+- Reimplement `dbListResults()` (with warning) for compatibility with existing packages (#154).
+- Soft-deprecate `dbGetInfo()`: The "Result" method is implemented by DBI, the methods for the other classes raise a warning (#137).
+- Reimplement `dbGetPreparedQuery()` (with warning) using `dbSendQuery()`, `dbBind()` and `dbFetch()` (#100).
+- Binding a factor with `dbBind()` converts to character, with warning.
+- `sqliteCopyDatabase()` accepts character as `to` argument again, in this case a temporary connection is opened.
+- Allow only one open result set (#150).
+- Fix `dbExecute()` usage in examples.
+- Reexport `dbDriver()` (#147).
+- The `dbGetQuery()` function is reexported again from DBI to avoid revdep check errors (#148).
+
+
 ## RSQLite 1.0.9005 (2016-08-19)
 
 - Adapt to DBI 0.4-9, use `dbExecute()` instead of `dbGetQuery()`, and `dbSendStatement()` instead of `dbSendQuery()` where appropriate.

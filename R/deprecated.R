@@ -139,6 +139,8 @@ setMethod("dbSendPreparedQuery",
 setMethod("dbGetPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
   function(conn, statement, bind.data) {
+    .Deprecated("dbBind")
+
     res <- dbSendQuery(conn, statement)
     on.exit(dbClearResult(res), add = TRUE)
 

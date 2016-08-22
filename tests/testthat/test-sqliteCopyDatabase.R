@@ -6,23 +6,34 @@ test_that("fails with bad arguments", {
   con <- dbConnect(SQLite(), dbfile)
 
   badnames <- list(
-    1:5,
-    character(0),
-    as.character(NA),
-    ""
+    "must be" = 1:5,
+    "length" = character(0),
+    "is[.]na" = as.character(NA)
   )
-  for (badname in badnames) {
-    expect_error(sqliteCopyDatabase(con, badname), "must be")
+  for (i in seq_along(badnames)) {
+    expect_error(sqliteCopyDatabase(con, badnames[[i]]), names(badnames)[[i]])
   }
 })
 
 # Specific to RSQLite
-test_that("can backup memory db to disk", {
+test_that("can backup memory db to connection", {
   con1 <- dbConnect(SQLite(), ":memory:")
   dbWriteTable(con1, "mtcars", mtcars)
 
   dbfile <- tempfile()
   sqliteCopyDatabase(con1, dbConnect(SQLite(), dbfile))
+
+  con2 <- dbConnect(SQLite(), dbfile)
+  expect_true(dbExistsTable(con2, "mtcars"))
+})
+
+# Specific to RSQLite
+test_that("can backup memory db to file", {
+  con1 <- dbConnect(SQLite(), ":memory:")
+  dbWriteTable(con1, "mtcars", mtcars)
+
+  dbfile <- tempfile()
+  sqliteCopyDatabase(con1, dbfile)
 
   con2 <- dbConnect(SQLite(), dbfile)
   expect_true(dbExistsTable(con2, "mtcars"))

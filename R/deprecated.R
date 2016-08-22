@@ -139,7 +139,25 @@ setMethod("dbSendPreparedQuery",
 setMethod("dbGetPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
   function(conn, statement, bind.data) {
-    stop("Please use dbGetQuery instead", call. = FALSE)
+    res <- dbSendQuery(conn, statement)
+    on.exit(dbClearResult(res), add = TRUE)
+
+    bind_data_rows <- by(bind.data, seq_len(nrow(bind.data)), identity, simplify = FALSE)
+
+    results <- lapply(
+      bind_data_rows,
+      function(row) {
+        tryCatch(
+          dbBind(res, unclass(row)),
+          error = function(e) {
+            dbBind(res, unclass(unname(row)))
+          }
+        )
+        dbFetch(res)
+      }
+    )
+
+    do.call(rbind, results)
   }
 )
 
@@ -174,15 +192,6 @@ setMethod("dbGetInfo", "SQLiteDriver", function(dbObj) {
 #' @rdname dbGetInfo
 #' @export
 setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
-  warning("dbGetInfo is deprecated: please use individual metadata functions instead",
-    call. = FALSE)
-
-  list()
-})
-
-#' @rdname dbGetInfo
-#' @export
-setMethod("dbGetInfo", "SQLiteResult", function(dbObj) {
   warning("dbGetInfo is deprecated: please use individual metadata functions instead",
     call. = FALSE)
 

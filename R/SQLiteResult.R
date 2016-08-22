@@ -9,7 +9,8 @@ setClass("SQLiteResult",
   contains = "DBIResult",
   slots = list(
     sql = "character",
-    ptr = "externalptr"
+    ptr = "externalptr",
+    conn = "SQLiteConnection"
   )
 )
 

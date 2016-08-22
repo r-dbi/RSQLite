@@ -112,8 +112,6 @@ test_that("can roundtrip special field names", {
 # From file -------------------------------------------------------------------
 
 test_that("comments are preserved", {
-  skip("Currently failing")
-
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con))
 
@@ -127,8 +125,6 @@ test_that("comments are preserved", {
 })
 
 test_that("colclasses overridden by argument", {
-  skip("Currently failing")
-
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con))
 
@@ -145,8 +141,6 @@ test_that("colclasses overridden by argument", {
 })
 
 test_that("options work", {
-  skip("Currently failing")
-
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con))
 

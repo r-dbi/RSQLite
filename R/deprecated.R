@@ -51,7 +51,11 @@ sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL,
   row.names = NA) {
 
   warning("Deprecated: please use DBI::sqlCreateTable instead")
+  sqliteBuildTableDefinitionNoWarn(con, name, value, field.types, row.names)
+}
 
+sqliteBuildTableDefinitionNoWarn <- function(con, name, value, field.types = NULL,
+                                             row.names = NA) {
   if (!is.data.frame(value)) {
     value <- as.data.frame(value)
   }

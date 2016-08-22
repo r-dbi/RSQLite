@@ -1,3 +1,10 @@
+## RSQLite 1.0.9007 (2016-08-23)
+
+- Deprecate `dbGetException()` (#51).
+- Fix all warnings in tests (#157).
+- Clarify message for deprecation warnings (#157).
+
+
 ## RSQLite 1.0.9006 (2016-08-22)
 
 - Reimplement `dbSendPreparedQuery()` (with warning) for compatibility with existing packages (#153).

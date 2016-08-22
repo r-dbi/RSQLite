@@ -63,6 +63,22 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// rsqlite_import_file
+bool rsqlite_import_file(XPtr<SqliteConnectionPtr> con, const std::string& name, const std::string& value, const std::string& sep, const std::string& eol, int skip);
+RcppExport SEXP RSQLite_rsqlite_import_file(SEXP conSEXP, SEXP nameSEXP, SEXP valueSEXP, SEXP sepSEXP, SEXP eolSEXP, SEXP skipSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< XPtr<SqliteConnectionPtr> >::type con(conSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type name(nameSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type value(valueSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type sep(sepSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type eol(eolSEXP);
+    Rcpp::traits::input_parameter< int >::type skip(skipSEXP);
+    __result = Rcpp::wrap(rsqlite_import_file(con, name, value, sep, eol, skip));
+    return __result;
+END_RCPP
+}
 // rsqlite_send_query
 XPtr<SqliteResult> rsqlite_send_query(XPtr<SqliteConnectionPtr> con, std::string sql);
 RcppExport SEXP RSQLite_rsqlite_send_query(SEXP conSEXP, SEXP sqlSEXP) {

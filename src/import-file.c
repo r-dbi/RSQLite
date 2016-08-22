@@ -20,63 +20,7 @@
 #include <Rinternals.h>
 #include "sqlite3/sqlite3.h"
 
-SEXP     /* returns TRUE/FALSE */
-RS_SQLite_importFile(
-    SEXP conHandle,
-    SEXP s_tablename,
-    SEXP s_filename,
-    SEXP s_separator,
-    SEXP s_eol,
-    SEXP s_skip
-) {
-  SQLiteConnection* con = rsqlite_connection_from_handle(conHandle);
-  sqlite3* db_connection = (sqlite3*) con->drvConnection;
-  char* zFile, * zTable, * zSep, * zEol;
-  const char* s, * s1;
-  int rc, skip;
-  SEXP output;
-
-  s = CHAR(asChar(s_tablename));
-  zTable = malloc(strlen(s) + 1);
-  if (!zTable) {
-    error("could not allocate memory");
-  }
-  (void) strcpy(zTable, s);
-
-  s = CHAR(asChar(s_filename));
-  zFile = malloc(strlen(s) + 1);
-  if (!zFile) {
-    free(zTable);
-    error("could not allocate memory");
-  }
-  (void) strcpy(zFile, s);
-
-  s = CHAR(asChar(s_separator));
-  s1 = CHAR(asChar(s_eol));
-  zSep = malloc(strlen(s) + 1);
-  zEol = malloc(strlen(s1) + 1);
-  if (!zSep || !zEol) {
-    free(zTable);
-    free(zFile);
-    if (zSep) free(zSep);
-    if (zEol) free(zEol);
-    error("could not allocate memory");
-  }
-  (void) strcpy(zSep, s);
-  (void) strcpy(zEol, s1);
-  skip = asInteger(s_skip);
-
-  rc = RS_sqlite_import(db_connection, zTable, zFile, zSep, zEol, skip);
-
-  free(zTable);
-  free(zFile);
-  free(zSep);
-
-  PROTECT(output = NEW_LOGICAL(1));
-  LOGICAL_POINTER(output)[0] = rc;
-  UNPROTECT(1);
-  return output;
-}
+char* RS_sqlite_getline(FILE* in, const char* eol);
 
 /* The following code comes directly from SQLite's shell.c, with
  * obvious minor changes.

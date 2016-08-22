@@ -141,13 +141,14 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
       d <- read.table(value, sep = sep, header = header, skip = skip, nrows = nrows,
                       na.strings = "\\N", comment.char = "", colClasses = colClasses,
                       stringsAsFactors = FALSE)
-      sql <- sqliteBuildTableDefinition(conn, name, d, field.types = field.types,
-                                        row.names = row.names)
+      sql <- sqliteBuildTableDefinitionNoWarn(conn, name, d,
+                                              field.types = field.types,
+                                              row.names = row.names)
       dbGetQuery(conn, sql)
     }
 
     skip <- skip + as.integer(header)
-    .Call(RS_SQLite_importFile, conn@Id, name, value, sep, eol, as.integer(skip))
+    rsqlite_import_file(conn@ptr, name, value, sep, eol, skip)
 
     on.exit(NULL)
     dbCommit(conn)

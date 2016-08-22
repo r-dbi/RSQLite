@@ -21,6 +21,10 @@ rsqlite_connection_valid <- function(con) {
     .Call('RSQLite_rsqlite_connection_valid', PACKAGE = 'RSQLite', con)
 }
 
+rsqlite_import_file <- function(con, name, value, sep, eol, skip) {
+    .Call('RSQLite_rsqlite_import_file', PACKAGE = 'RSQLite', con, name, value, sep, eol, skip)
+}
+
 rsqlite_send_query <- function(con, sql) {
     .Call('RSQLite_rsqlite_send_query', PACKAGE = 'RSQLite', con, sql)
 }

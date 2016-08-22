@@ -1,6 +1,6 @@
 Package: RSQLite
-Version: 1.0.9005
-Date: 2016-08-19
+Version: 1.0.9006
+Date: 2016-08-22
 Title: SQLite Interface for R
 Authors@R: as.person(c( "Hadley Wickham <hadley@rstudio.com> [aut,
         cre]", "David A. James [aut]", "Seth Falcon [aut]", "SQLite

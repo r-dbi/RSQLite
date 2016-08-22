@@ -134,7 +134,27 @@ NULL
 setMethod("dbSendPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
   function(conn, statement, bind.data) {
-    stop("Please use dbSendQuery instead", call. = FALSE)
+    .Deprecated("dbBind")
+
+    res <- dbSendQuery(conn, statement)
+
+    bind_data_rows <- by(bind.data, seq_len(nrow(bind.data)), identity, simplify = FALSE)
+
+    lapply(
+      bind_data_rows,
+      function(row) {
+        tryCatch(
+          dbBind(res, unclass(row)),
+          error = function(e) {
+            dbBind(res, unclass(unname(row)))
+          }
+        )
+        dbFetch(res)
+        NULL
+      }
+    )
+
+    res
   }
 )
 
@@ -143,6 +163,8 @@ setMethod("dbSendPreparedQuery",
 setMethod("dbGetPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
   function(conn, statement, bind.data) {
+    .Deprecated("dbBind")
+
     res <- dbSendQuery(conn, statement)
     on.exit(dbClearResult(res), add = TRUE)
 

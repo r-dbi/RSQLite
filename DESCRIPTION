@@ -30,6 +30,7 @@ Collate:
     'SQLiteDriver.R'
     'SQLiteResult.R'
     'connect.R'
+    'copy.R'
     'datasetsDb.R'
     'deprecated.R'
     'extensions.R'

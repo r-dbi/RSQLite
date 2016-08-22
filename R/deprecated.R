@@ -208,8 +208,12 @@ setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
 #' @keywords internal
 #' @export
 setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
-  stop("Querying the results associated with a connection is no longer supported",
+  warning("Querying the results associated with a connection is no longer supported",
     call. = FALSE)
+  if (is.null(conn@ref$result))
+    list()
+  else
+    list(conn@ref$result)
 })
 
 

@@ -78,8 +78,12 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
   }
 )
 
+
 #' @export
-DBI::dbGetQuery
+setMethod("dbGetQuery", "NULL", function(conn, statement, ...) {
+  stop("conn cannot be NULL", call. = FALSE)
+})
+
 
 #' @rdname sqlite-query
 #' @export

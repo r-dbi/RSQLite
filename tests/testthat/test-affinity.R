@@ -45,7 +45,6 @@ test_that("affinity checks", {
   check_affinity("INTEGER", "integer")
   check_affinity("TEXT", "character")
   check_affinity("REAL", "numeric")
-  check_affinity("NUMERIC", "numeric")
   skip("NYI")
   check_affinity("INT", "integer")
   check_affinity("CHAR", "character")
@@ -53,6 +52,7 @@ test_that("affinity checks", {
   check_affinity("BLOB", "list")
   check_affinity("FLOA", "numeric")
   check_affinity("DOUB", "numeric")
+  check_affinity("NUMERIC", "numeric")
 })
 
 test_that("affinity checks for inline queries", {

@@ -222,7 +222,10 @@ public:
     SEXPTYPE type = types_[j];
     int column_type = sqlite3_column_type(pStatement_, j);
     
+    std::cerr << "type: " << type << "\n";
+    
     if (type == NILSXP) {
+      std::cerr << "datatype_to_sexptype\n";
       type = datatype_to_sexptype(column_type);
     }
 
@@ -296,6 +299,7 @@ public:
       if (i == 0 || types_[j] == NILSXP) {
         types_[j] = decltype_to_sexptype(
           sqlite3_column_decltype(pStatement_, j));
+        std::cerr << j << ": " << types_[j] << "\n";
         out[j] = alloc_col(types_[j], n, n);
       }
     }

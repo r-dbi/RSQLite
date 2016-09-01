@@ -282,9 +282,7 @@ public:
         }
       }
       
-      for (int j = 0; j < ncols_; ++j) {
-        out[j] = set_col_value(out[j], i, j, n);
-      }
+      set_col_values(out, i, n);
       step();
       ++i;
       
@@ -309,6 +307,12 @@ public:
     }
     
     return out;
+  }
+  
+  void set_col_values(Rcpp::List& out, const int i, const int n) {
+    for (int j = 0; j < ncols_; ++j) {
+      out[j] = set_col_value(out[j], i, j, n);
+    }
   }
   
   Rcpp::List column_info() {

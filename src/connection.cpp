@@ -40,8 +40,8 @@ void rsqlite_disconnect(XPtr<SqliteConnectionPtr> con) {
 // [[Rcpp::export]]
 Rcpp::List rsqlite_get_exception(XPtr<SqliteConnectionPtr> con) {
   return Rcpp::List::create(
-    Rcpp::Named("errNum") = (*con)->getExceptionCode(),
-    Rcpp::Named("errMsg") = (*con)->getException());
+    Rcpp::Named("errorNum") = (*con)->getExceptionCode(),
+    Rcpp::Named("errorMsg") = (*con)->getException());
 }
 
 // [[Rcpp::export]]

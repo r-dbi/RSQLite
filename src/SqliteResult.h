@@ -191,7 +191,7 @@ public:
     SET_VECTOR_ELT(col, i, bytes);
   }
   
-  SEXP fill_default_col_value(SEXP col, const int i, const SEXPTYPE type) {
+  void fill_default_col_value(SEXP col, const int i, const SEXPTYPE type) {
     switch(type) {
     case INTSXP:
       INTEGER(col)[i] = NA_INTEGER;

@@ -20,8 +20,8 @@ rm -rf revdep/install
 git add revdep
 git commit -m "revdep update for clean state" || true
 
-#R -f revdep/check.R
-echo $old_tag >> revdep/README.md
+R -f revdep/check.R
+#echo $old_tag >> revdep/README.md
 
 mv revdep revdep-$old_tag
 git checkout .
@@ -40,8 +40,8 @@ rm -rf revdep/install
 git add revdep
 git commit -m "revdep update for clean state" || true
 
-#R -f revdep/check.R
-echo $branch >> revdep/README.md
+R -f revdep/check.R
+#echo $branch >> revdep/README.md
 
 cp revdep/README.md revdep/README-${branch}.md
 cp revdep/problems.md revdep/problems-${branch}.md

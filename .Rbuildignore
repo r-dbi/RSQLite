@@ -15,3 +15,5 @@ a.out.dSYM
 ^revdep$
 ^src/.*\.d$
 ^src/Makevars\.local$
+^\.metadata^
+^src/[.].*$

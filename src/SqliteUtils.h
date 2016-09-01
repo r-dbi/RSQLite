@@ -5,7 +5,7 @@
 #include "sqlite3/sqlite3.h"
 
 
-Rcpp::List inline dfResize(Rcpp::List df, int n) {
+Rcpp::List inline dfResize(const Rcpp::List& df, const int n) {
   int p = df.size();
   
   Rcpp::List out(p);

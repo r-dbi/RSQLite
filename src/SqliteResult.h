@@ -282,7 +282,7 @@ public:
       if (types_[j] == NILSXP) {
         types_[j] = decltype_to_sexptype(
           sqlite3_column_decltype(pStatement_, j));
-        std::cerr << j << ": " << types_[j] << "\n";
+        // std::cerr << j << ": " << types_[j] << "\n";
         out[j] = alloc_col(types_[j], n, n);
       }
     }

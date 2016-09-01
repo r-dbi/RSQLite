@@ -1,3 +1,11 @@
+## RSQLite 1.0.9008 (2016-09-01)
+
+- Improve column type inference, especially if the first value is `NULL` (#111).
+- Track dependencies between source and header files (#138).
+- Define a dummy `dbGetQuery()` method (with signature `"NULL", "ANY"`) so that dependent packages can have `importMethodsFrom(RSQLite, dbGetQuery)` in their `NAMESPACE`. Also reexport `dbGetQuery()` (#148).
+- `dbGetException()` now returns a named list again (#51).
+
+
 ## RSQLite 1.0.9007 (2016-08-23)
 
 - Deprecate `dbGetException()` (#129).

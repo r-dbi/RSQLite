@@ -130,60 +130,170 @@ public:
     }
   }
   
-  // We try to determine the correct R type for each column in the
-  // result. Currently only the first row is used to guess the type.
-  // If a NULL value appears in the first row of the result and the column 
-  // corresponds to a DB table column, we guess the type based on the schema
-  // Otherwise, we default to character.
-  std::vector<SEXPTYPE> cache_field_data() {
+  static SEXPTYPE datatype_to_sexptype(const int field_type) {
+    switch(field_type) {
+    case SQLITE_INTEGER:
+      return INTSXP;
+
+    case SQLITE_FLOAT:
+      return REALSXP;
+
+    case SQLITE_TEXT:
+      return STRSXP;
+
+    case SQLITE_BLOB:
+      // List of raw vectors
+      return VECSXP;
+
+    case SQLITE_NULL:
+    default:
+      return NILSXP;
+    }
+  }
+  
+  static SEXPTYPE decltype_to_sexptype(const char* decl_type) {
+    if (decl_type == NULL)
+      return LGLSXP;
+    
+    // TODO: steal sqlite3AffinityType() from sqlite3.c
+    if (std::string("INTEGER") == decl_type)
+      return INTSXP;
+    if (std::string("REAL") == decl_type)
+      return REALSXP;
+    if (std::string("BLOB") == decl_type)
+      return VECSXP;
+
+    return STRSXP;
+  }
+  
+  // We guess the correct R type for each column from the declared column type,
+  // if possible.  The type of the column can be amended as new values come in,
+  // but will be fixed after the first call to fetch().
+  void cache_field_data() {
     types_.clear();
     names_.clear();
     
     int p = ncols_;
     for (int j = 0; j < p; ++j) {
       names_.push_back(sqlite3_column_name(pStatement_, j));
-      
-      switch(sqlite3_column_type(pStatement_, j)) {
-      case SQLITE_INTEGER:
-        types_.push_back(INTSXP);
-        break;
-      case SQLITE_FLOAT:
-        types_.push_back(REALSXP);
-        break;
-      case SQLITE_TEXT:
-        types_.push_back(STRSXP);
-        break;
-      case SQLITE_BLOB:
-        // List of raw vectors
-        types_.push_back(VECSXP);
-        break;
-      default: // SQLITE_NULL
-        const char* decl_raw = sqlite3_column_decltype(pStatement_, j);
-      if (decl_raw == NULL) {
-        types_.push_back(STRSXP);
-      } else {
-        std::string decl(decl_raw);
-        if (decl == "INTEGER") {
-          types_.push_back(INTSXP);
-        } else if (decl == "REAL") {
-          types_.push_back(REALSXP);
-        } else if (decl == "BLOB") {
-          types_.push_back(VECSXP);
-        } else {
-          types_.push_back(STRSXP);
-        }
-      }
+      types_.push_back(NILSXP);
+    }
+  }
+  
+  void set_raw_value(SEXP col, const int i, const int j) {
+    int size = sqlite3_column_bytes(pStatement_, j);
+    const void* blob = sqlite3_column_blob(pStatement_, j);
+    
+    SEXP bytes = Rf_allocVector(RAWSXP, size);
+    memcpy(RAW(bytes), blob, size);
+    
+    SET_VECTOR_ELT(col, i, bytes);
+  }
+  
+  void fill_default_col_value(SEXP col, const int i, const SEXPTYPE type) {
+    switch(type) {
+    case LGLSXP:
+      LOGICAL(col)[i] = NA_LOGICAL;
+      break;
+    case INTSXP:
+      INTEGER(col)[i] = NA_INTEGER;
+      break;
+    case REALSXP:
+      REAL(col)[i] = NA_REAL;
+      break;
+    case STRSXP:
+      SET_STRING_ELT(col, i, NA_STRING);
+      break;
+    case VECSXP:
+      SET_VECTOR_ELT(col, i, Rcpp::RawVector(0));
+      break;
+    }
+  }
+  
+  SEXP alloc_col(const SEXPTYPE type, const int i, const int n) {
+    SEXP col = Rf_allocVector(type, n);
+    PROTECT(col);
+    for (int i_ = 0; i_ < i; i_++) {
+      fill_default_col_value(col, i_, type);
+    }
+    UNPROTECT(1);
+    return col;
+  }
+  
+  SEXP set_col_value(SEXP col, const int i, const int j, const int n) {
+    SEXPTYPE type = types_[j];
+    int column_type = sqlite3_column_type(pStatement_, j);
+    
+    // std::cerr << "column_type: " << column_type << "\n";
+    // std::cerr << "type: " << type << "\n";
+    
+    if (type == NILSXP) {
+      // std::cerr << "datatype_to_sexptype\n";
+      type = datatype_to_sexptype(column_type);
+      // std::cerr << "type: " << type << "\n";
+    }
+
+    if (Rf_isNull(col)) {
+      if (type == NILSXP)
+        return col;
+      else {
+        col = alloc_col(type, i, n);
+        types_[j] = type;
       }
     }
-    return types_;
+
+    if (column_type == SQLITE_NULL) {
+      fill_default_col_value(col, i, type);
+    }
+    else {
+      switch(type) {
+      case INTSXP:
+        INTEGER(col)[i] = sqlite3_column_int(pStatement_, j);
+        break;
+      case REALSXP:
+        REAL(col)[i] = sqlite3_column_double(pStatement_, j);
+        break;
+      case STRSXP:
+        SET_STRING_ELT(col, i, Rf_mkCharCE((const char*) sqlite3_column_text(pStatement_, j), CE_UTF8));
+        break;
+      case VECSXP:
+        set_raw_value(col, i, j);
+        break;
+      }
+    }
+    return col;
   }
   
   Rcpp::List fetch(int n_max = -1) {
     if (!ready_)
       Rcpp::stop("Query needs to be bound before fetching");
 
-    int n = (n_max < 0) ? 100 : n_max;
-    Rcpp::List out = dfCreate(types_, names_, n);
+    int n = 0;
+    Rcpp::List out;
+    
+    if (n_max != 0) 
+      out = fetch_rows(n_max, n);
+    else
+      out = peek_first_row();
+
+    // Create data for columns where all values were NULL (or for all columns
+    // in the case of a 0-row data frame)
+    for (int j = 0; j < ncols_; ++j) {
+      if (types_[j] == NILSXP) {
+        types_[j] = decltype_to_sexptype(
+          sqlite3_column_decltype(pStatement_, j));
+        // std::cerr << j << ": " << types_[j] << "\n";
+        out[j] = alloc_col(types_[j], n, n);
+      }
+    }
+    
+    return out;
+  }
+  
+  Rcpp::List fetch_rows(int n_max, int& n) {
+    n = (n_max < 0) ? 100 : n_max;
+    
+    Rcpp::List out = dfCreate(names_, n);
     
     int i = 0;
     while(!complete_) {
@@ -196,9 +306,7 @@ public:
         }
       }
       
-      for (int j = 0; j < ncols_; ++j) {
-        set_col_value(out[j], types_[j], pStatement_, i, j);  
-      }
+      set_col_values(out, i, n);
       step();
       ++i;
       
@@ -209,12 +317,29 @@ public:
     // Trim back to what we actually used
     if (i < n) {
       out = dfResize(out, i);
+      n = i;
     }
     
     return out;
   }
   
+  Rcpp::List peek_first_row() {
+    Rcpp::List out = dfCreate(names_, 1);
+    set_col_values(out, 0, 1);
+    out = dfResize(out, 0);
+    
+    return out;
+  }
+  
+  void set_col_values(Rcpp::List& out, const int i, const int n) {
+    for (int j = 0; j < ncols_; ++j) {
+      out[j] = set_col_value(out[j], i, j, n);
+    }
+  }
+  
   Rcpp::List column_info() {
+    peek_first_row();
+    
     Rcpp::CharacterVector names(ncols_);
     for (int i = 0; i < ncols_; i++) {
       names[i] = names_[i]; 
@@ -223,6 +348,8 @@ public:
     Rcpp::CharacterVector types(ncols_);
     for (int i = 0; i < ncols_; i++) {
       switch(types_[i]) {
+      case NILSXP:
+      case LGLSXP:  types[i] = "logical"; break;
       case STRSXP:  types[i] = "character"; break;
       case INTSXP:  types[i] = "integer"; break;
       case REALSXP: types[i] = "double"; break;

@@ -269,7 +269,12 @@ public:
       Rcpp::stop("Query needs to be bound before fetching");
 
     int n = 0;
-    Rcpp::List out = fetch_rows(n_max, n);
+    Rcpp::List out;
+    
+    if (n_max != 0) 
+      out = fetch_rows(n_max, n);
+    else
+      out = peek_first_row();
 
     // Create data for columns where all values were NULL (or for all columns
     // in the case of a 0-row data frame)
@@ -313,6 +318,14 @@ public:
     if (i < n) {
       out = dfResize(out, i);
     }
+    
+    return out;
+  }
+  
+  Rcpp::List peek_first_row() {
+    Rcpp::List out = dfCreate(names_, 1);
+    set_col_values(out, 0, 1);
+    out = dfResize(out, 0);
     
     return out;
   }

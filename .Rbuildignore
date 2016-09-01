@@ -13,3 +13,5 @@ a.out.dSYM
 ^src/sqlite3/.*\.a$
 ^appveyor\.yml$
 ^revdep$
+^src/.*\.d$
+^src/Makevars\.local$

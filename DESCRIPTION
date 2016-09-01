@@ -33,6 +33,7 @@ Collate:
     'copy.R'
     'datasetsDb.R'
     'deprecated.R'
+    'dummy.R'
     'extensions.R'
     'query.R'
     'table.R'

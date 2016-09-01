@@ -18,28 +18,78 @@
 |:---------|:--|:----------|:----------|:----------------------------------|
 |BH        |   |1.60.0-2   |2016-05-07 |cran (@1.60.0-)                    |
 |DBI       |   |0.5        |2016-09-01 |Github (rstats-db/DBI@bc730b9)     |
-|DBItest   |   |1.3-6      |2016-08-25 |Github (rstats-db/DBItest@aa3339a) |
+|DBItest   |   |1.3-7      |2016-09-01 |Github (rstats-db/DBItest@75c8ebc) |
 |knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
 |Rcpp      |   |0.12.6     |2016-07-19 |cran (@0.12.6)                     |
 |rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
-|RSQLite   |   |1.0.9007   |2016-09-01 |local (rstats-db/RSQLite@d167aa8)  |
+|RSQLite   |   |1.0.9008   |2016-09-01 |local (rstats-db/RSQLite@4b16bda)  |
 |testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
 
 9 packages with problems
 
-|package     |version | errors| warnings| notes|
-|:-----------|:-------|------:|--------:|-----:|
-|cummeRbund  |2.14.0  |      1|        1|     7|
-|DECIPHER    |2.0.2   |      1|        3|     3|
-|GWASTools   |1.18.0  |      2|        0|     2|
-|mgsa        |1.20.0  |      2|        2|     4|
-|plethy      |1.10.0  |      2|        1|     3|
-|poplite     |0.99.16 |      1|        1|     1|
-|rangeMapper |0.3-0   |      2|        1|     0|
-|specL       |1.6.2   |      1|        1|     4|
-|tcpl        |1.2.2   |      1|        1|     1|
+|package       |version | errors| warnings| notes|
+|:-------------|:-------|------:|--------:|-----:|
+|AnnotationHub |2.4.2   |      1|        1|     0|
+|cummeRbund    |2.14.0  |      1|        1|     7|
+|DECIPHER      |2.0.2   |      1|        3|     3|
+|GWASTools     |1.18.0  |      2|        0|     2|
+|mgsa          |1.20.0  |      2|        2|     4|
+|poplite       |0.99.16 |      1|        1|     1|
+|rangeMapper   |0.3-0   |      2|        1|     0|
+|specL         |1.6.2   |      1|        1|     4|
+|tcpl          |1.2.2   |      1|        1|     1|
+
+## AnnotationHub (2.4.2)
+Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
+
+1 error  | 1 warning  | 0 notes
+
+```
+checking tests ... ERROR
+Running the tests in ‘tests/runTests.R’ failed.
+Last 13 lines of output:
+  FAILURE in test_cache_datapathIds: Error in checkIdentical(result, setNames(integer(), character())) : 
+    FALSE 
+   
+  
+  Test files with failing tests
+  
+     test_cache.R 
+       test_cache_datapathIds 
+  
+  
+  Error in BiocGenerics:::testPackage("AnnotationHub") : 
+    unit tests failed for package AnnotationHub
+  Execution halted
+
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because AnnotationHub-HOWTO.Rmd appears to be an R Markdown v2 document.
+loading from cache '/home/muelleki/.AnnotationHub/57158'
+    '/home/muelleki/.AnnotationHub/57159'
+
+ *** caught segfault ***
+address (nil), cause 'memory not mapped'
+
+Traceback:
+ 1: .Call(rmd_render_markdown, file, output, text, renderer, renderer.options,     extensions)
+ 2: renderMarkdown(file, output = NULL, text, renderer = "HTML",     renderer.options = options, extensions = extensions, encoding = encoding)
+ 3: markdown::markdownToHTML(out, output, encoding = encoding, ...)
+ 4: (if (grepl("\\.[Rr]md$", file)) knit2html else if (grepl("\\.[Rr]rst$",     file)) knit2pdf else knit)(file, encoding = encoding, quiet = quiet,     envir = globalenv())
+ 5: vweave(...)
+ 6: engine$weave(file, quiet = quiet, encoding = enc)
+ 7: doTryCatch(return(expr), name, parentenv, handler)
+ 8: tryCatchOne(expr, names, parentenv, handlers[[1L]])
+ 9: tryCatchList(expr, classes, parentenv, handlers)
+10: tryCatch({    engine$weave(file, quiet = quiet, encoding = enc)    setwd(startdir)    find_vignette_product(name, by = "weave", engine = engine)}, error = function(e) {    stop(gettextf("processing vignette '%s' failed with diagnostics:\n%s",         file, conditionMessage(e)), domain = NA, call. = FALSE)})
+11: buildVignettes(dir = "/home/muelleki/git/R/RSQLite/revdep/checks/AnnotationHub.Rcheck/vign_test/AnnotationHub")
+An irrecoverable exception occurred. R is aborting now ...
+Segmentation fault (core dumped)
+
+```
 
 ## cummeRbund (2.14.0)
 Maintainer: Loyal A. Goff <lgoff@csail.mit.edu>
@@ -485,121 +535,6 @@ to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
 contains 'methods').
 ```
 
-## plethy (1.10.0)
-Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
-
-2 errors | 1 warning  | 3 notes
-
-```
-checking examples ... ERROR
-Running examples in ‘plethy-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: BuxcoDB-class
-> ### Title: Class '"BuxcoDB"'
-> ### Aliases: BuxcoDB-class BuxcoDB addAnnotation,BuxcoDB-method
-> ###   addAnnotation annoTable,BuxcoDB-method annoTable
-> ###   annoCols,BuxcoDB-method annoCols annoLevels,BuxcoDB-method annoLevels
-... 53 lines ...
-> 
-> tables(bux.db)
-[1] "WBPth"
-> 
-> variables(bux.db)
- [1] "f"     "TVb"   "MVb"   "Penh"  "PAU"   "Rpef"  "Comp"  "PIFb"  "PEFb" 
-[10] "Ti"    "Te"    "EF50"  "Tr"    "Tbody" "Tc"    "RH"    "Rinx" 
-> 
-> addAnnotation(bux.db, query=day.infer.query, index=FALSE)
-Error: is.null(dbGetQuery(db.con, i)) is not TRUE
-Execution halted
-
-checking tests ... ERROR
-Running the tests in ‘tests/runTests.R’ failed.
-Last 13 lines of output:
-       test.db.insert.autoincrement 
-       test.dbImport 
-       test.examine.table.lines 
-       test.get.err.breaks 
-       test.parse.buxco 
-       test.retrieveData 
-       test.summaryMeasures 
-       test.write.sample.db 
-  
-  
-  Error in BiocGenerics:::testPackage("plethy") : 
-    unit tests failed for package plethy
-  Execution halted
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-
-    IQR, mad, xtabs
-
-The following objects are masked from ‘package:base’:
-
-    Filter, Find, Map, Position, Reduce, anyDuplicated, append, as.data.frame,
-    cbind, colnames, do.call, duplicated, eval, evalq, get, grep, grepl,
-... 8 lines ...
-Attaching package: ‘S4Vectors’
-
-The following objects are masked from ‘package:base’:
-
-    colMeans, colSums, expand.grid, rowMeans, rowSums
-
-
-Error: processing vignette 'plethy.Rnw' failed with diagnostics:
- chunk 3 
-Error : is.null(dbGetQuery(db.con, query.list[[i]])) is not TRUE
-Execution halted
-
-checking dependencies in R code ... NOTE
-There are ::: calls to the package's namespace in its code. A package
-  almost never needs to use ::: for its own objects:
-  ‘csv.to.table’ ‘find.break.ranges.integer’ ‘fix.time’ ‘multi.grep’
-
-checking R code for possible problems ... NOTE
-generate.sample.buxco : <anonymous> : <anonymous> : <anonymous> :
-  <anonymous>: no visible global function definition for ‘rnorm’
-make.db.package: no visible global function definition for
-  ‘packageDescription’
-mvtsplot.data.frame: no visible global function definition for ‘colors’
-mvtsplot.data.frame: no visible global function definition for ‘par’
-mvtsplot.data.frame: no visible global function definition for ‘layout’
-mvtsplot.data.frame: no visible global function definition for
-  ‘strwidth’
-... 14 lines ...
-tsplot,BuxcoDB: no visible binding for global variable ‘Sample_Name’
-Undefined global functions or variables:
-  Axis Days Sample_Name Value abline bxp colors layout legend lines
-  median mtext packageDescription par plot rnorm strwidth terms
-Consider adding
-  importFrom("grDevices", "colors")
-  importFrom("graphics", "Axis", "abline", "bxp", "layout", "legend",
-             "lines", "mtext", "par", "plot", "strwidth")
-  importFrom("stats", "median", "rnorm", "terms")
-  importFrom("utils", "packageDescription")
-to your NAMESPACE file.
-
-checking Rd line widths ... NOTE
-Rd file 'parsing.Rd':
-  \usage lines wider than 90 characters:
-     parse.buxco(file.name = NULL, table.delim = "Table", burn.in.lines = c("Measurement", "Create measurement", "Waiting for", "Site Acknow ... [TRUNCATED]
-       chunk.size = 500, db.name = "bux_test.db", max.run.time.minutes = 60, overwrite = TRUE, verbose=TRUE, make.package = F, author = NULL ... [TRUNCATED]
-     parse.buxco.basic(file.name=NULL, table.delim="Table", burn.in.lines=c("Measurement", "Create measurement", "Waiting for", "Site Acknow ... [TRUNCATED]
-
-Rd file 'utilities.Rd':
-  \usage lines wider than 90 characters:
-     get.err.breaks(bux.db, max.exp.count=150, max.acc.count=900, vary.perc=.1, label.val="ERR")
-     proc.sanity(bux.db, max.exp.time=300, max.acc.time=1800, max.exp.count=150, max.acc.count=900)
-  \examples lines wider than 100 characters:
-     err.dta <- data.frame(samples=samples, count=count, measure_break=measure_break, table_break=table_break, phase=phase, stringsAsFactors ... [TRUNCATED]
-     sample.labels <- data.frame(samples=c("sample_1","sample_3"), response_type=c("high", "low"),stringsAsFactors=FALSE)
-
-These lines will be truncated in the PDF manual.
-```
-
 ## poplite (0.99.16)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
@@ -675,9 +610,9 @@ The error most likely occurred in:
 > 
 > 
 > dbcon = rangeMap.start(file = "test.sqlite", overwrite = TRUE, dir = tempdir() )
-New session 2016-09-01 19:14:38
+New session 2016-09-01 20:04:14
 PROJECT: test.sqlite 
-DIRECTORY: /tmp/RtmpNApxzB
+DIRECTORY: /tmp/RtmpaPeHx6
 > global.bbox.save(con = dbcon, bbox = X)
 Error: table bbox has no column named min
 Execution halted
@@ -686,7 +621,7 @@ checking tests ... ERROR
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
   PROJECT: wrens.sqlite 
-  DIRECTORY: /tmp/RtmpGjTYQH
+  DIRECTORY: /tmp/RtmpFHmzgd
   Error: table bbox has no column named min
   testthat results ================================================================
   OK: 9 SKIPPED: 0 FAILED: 5
@@ -723,12 +658,12 @@ Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
   1 Test Suite : 
   specL RUnit Tests - 9 test functions, 1 error, 0 failures
-  ERROR in /tmp/RtmpiN1kNU/RLIBS_486335e32ad6/specL/unitTests/test_read.bibliospec.R: Error while sourcing  /tmp/RtmpiN1kNU/RLIBS_486335e32ad6/specL/unitTests/test_read.bibliospec.R : Error in msg$errorMsg : $ operator is invalid for atomic vectors
+  ERROR in /tmp/RtmpWceZxP/RLIBS_3e684ee5a1cf/specL/unitTests/test_read.bibliospec.R: Error while sourcing  /tmp/RtmpWceZxP/RLIBS_3e684ee5a1cf/specL/unitTests/test_read.bibliospec.R : Error in msg$errorMsg : $ operator is invalid for atomic vectors
   
   Test files with failing tests
   
      test_read.bibliospec.R 
-       /tmp/RtmpiN1kNU/RLIBS_486335e32ad6/specL/unitTests/test_read.bibliospec.R 
+       /tmp/RtmpWceZxP/RLIBS_3e684ee5a1cf/specL/unitTests/test_read.bibliospec.R 
   
   
   Error in BiocGenerics:::testPackage("specL") : 

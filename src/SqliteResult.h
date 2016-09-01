@@ -268,7 +268,26 @@ public:
     if (!ready_)
       Rcpp::stop("Query needs to be bound before fetching");
 
-    int n = (n_max < 0) ? 100 : n_max;
+    int n = 0;
+    Rcpp::List out = fetch_rows(n_max, n);
+
+    // Create data for columns where all values were NULL (or for all columns
+    // in the case of a 0-row data frame)
+    for (int j = 0; j < ncols_; ++j) {
+      if (types_[j] == NILSXP) {
+        types_[j] = decltype_to_sexptype(
+          sqlite3_column_decltype(pStatement_, j));
+        std::cerr << j << ": " << types_[j] << "\n";
+        out[j] = alloc_col(types_[j], n, n);
+      }
+    }
+    
+    return out;
+  }
+  
+  Rcpp::List fetch_rows(int n_max, int& n) {
+    n = (n_max < 0) ? 100 : n_max;
+    
     Rcpp::List out = dfCreate(names_, n);
     
     int i = 0;
@@ -293,17 +312,6 @@ public:
     // Trim back to what we actually used
     if (i < n) {
       out = dfResize(out, i);
-    }
-    
-    // Create data for columns where all values were NULL (or for all columns
-    // in the case of a 0-row data frame)
-    for (int j = 0; j < ncols_; ++j) {
-      if (i == 0 || types_[j] == NILSXP) {
-        types_[j] = decltype_to_sexptype(
-          sqlite3_column_decltype(pStatement_, j));
-        std::cerr << j << ": " << types_[j] << "\n";
-        out[j] = alloc_col(types_[j], n, n);
-      }
     }
     
     return out;

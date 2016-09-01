@@ -176,7 +176,9 @@ public:
     int p = ncols_;
     for (int j = 0; j < p; ++j) {
       names_.push_back(sqlite3_column_name(pStatement_, j));
-      types_.push_back(NILSXP);
+      
+      SEXPTYPE type = decltype_to_sexptype(sqlite3_column_decltype(pStatement_, j));
+      types_.push_back(type);
     }
   }
   

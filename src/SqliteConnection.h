@@ -51,7 +51,7 @@ public:
   virtual ~SqliteConnectionWrapper() {
     try {
       sqlite3_close_v2(pConn_);
-    } catch(...) {}
+    } catch (...) {}
   }
 
 

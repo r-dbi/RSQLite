@@ -33,7 +33,7 @@ public:
     if (nparams_ == 0) {
       try {
         init();
-      } catch(...) {
+      } catch (...) {
         sqlite3_finalize(pStatement_);
         throw;
       }
@@ -131,7 +131,7 @@ public:
   }
 
   static SEXPTYPE datatype_to_sexptype(const int field_type) {
-    switch(field_type) {
+    switch (field_type) {
     case SQLITE_INTEGER:
       return INTSXP;
 
@@ -191,7 +191,7 @@ public:
   }
 
   void fill_default_col_value(SEXP col, const int i, const SEXPTYPE type) {
-    switch(type) {
+    switch (type) {
     case LGLSXP:
       LOGICAL(col)[i] = NA_LOGICAL;
       break;
@@ -246,7 +246,7 @@ public:
       fill_default_col_value(col, i, type);
     }
     else {
-      switch(type) {
+      switch (type) {
       case INTSXP:
         INTEGER(col)[i] = sqlite3_column_int(pStatement_, j);
         break;
@@ -296,7 +296,7 @@ public:
     Rcpp::List out = dfCreate(names_, n);
 
     int i = 0;
-    while(!complete_) {
+    while (!complete_) {
       if (i >= n) {
         if (n_max < 0) {
           n *= 2;
@@ -380,7 +380,7 @@ public:
   virtual ~SqliteResult() {
     try {
       sqlite3_finalize(pStatement_);
-    } catch(...) {}
+    } catch (...) {}
   }
 };
 

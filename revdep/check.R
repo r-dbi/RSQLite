@@ -3,7 +3,7 @@ library("devtools")
 ignore <- c(
   "AnnotationDbi", # deprecation warnings
   "AnnotationForge",
-  "AnnotationHub",
+  # "AnnotationHub",
   "AnnotationHubData",
   "APSIM",
   "archivist",
@@ -67,7 +67,7 @@ ignore <- c(
   "pdInfoBuilder", # one fewer warning (Rcpp)
   "PGA",
   "pitchRx",
-  # "plethy",
+  "plethy", # doesn't work with stable version
   # "poplite",
   "ProjectTemplate",
   "quantmod",

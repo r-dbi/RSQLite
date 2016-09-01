@@ -46,4 +46,4 @@ git commit -m "revdep update with $branch results"
 
 git fetch --all
 git rebase
-git push
+git push origin HEAD

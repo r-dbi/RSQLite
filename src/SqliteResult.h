@@ -153,7 +153,7 @@ public:
   
   static SEXPTYPE decltype_to_sexptype(const char* decl_type) {
     if (decl_type == NULL)
-      return STRSXP;
+      return LGLSXP;
     
     if (std::string("INTEGER") == decl_type)
       return INTSXP;
@@ -191,6 +191,9 @@ public:
   
   void fill_default_col_value(SEXP col, const int i, const SEXPTYPE type) {
     switch(type) {
+    case LGLSXP:
+      LOGICAL(col)[i] = NA_LOGICAL;
+      break;
     case INTSXP:
       INTEGER(col)[i] = NA_INTEGER;
       break;
@@ -316,6 +319,7 @@ public:
     Rcpp::CharacterVector types(ncols_);
     for (int i = 0; i < ncols_; i++) {
       switch(types_[i]) {
+      case LGLSXP:  types[i] = "logical"; break;
       case STRSXP:  types[i] = "character"; break;
       case INTSXP:  types[i] = "integer"; break;
       case REALSXP: types[i] = "double"; break;

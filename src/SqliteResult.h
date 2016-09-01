@@ -338,6 +338,8 @@ public:
   }
   
   Rcpp::List column_info() {
+    peek_first_row();
+    
     Rcpp::CharacterVector names(ncols_);
     for (int i = 0; i < ncols_; i++) {
       names[i] = names_[i]; 
@@ -346,6 +348,7 @@ public:
     Rcpp::CharacterVector types(ncols_);
     for (int i = 0; i < ncols_; i++) {
       switch(types_[i]) {
+      case NILSXP:
       case LGLSXP:  types[i] = "logical"; break;
       case STRSXP:  types[i] = "character"; break;
       case INTSXP:  types[i] = "integer"; break;

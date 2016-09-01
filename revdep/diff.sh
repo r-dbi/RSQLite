@@ -40,6 +40,10 @@ rm -rf revdep/install
 git add revdep
 git commit -m "revdep update for clean state" || true
 
+git fetch --all
+git rebase
+git push origin HEAD
+
 R -f revdep/check.R
 #echo $branch >> revdep/README.md
 

@@ -60,6 +60,8 @@ void inline bind_parameter(sqlite3_stmt* stmt, int i, int j, std::string name, S
   } else {
     j++; // sqlite parameters are 1-indexed
   }
+  
+  // std::cerr << "TYPEOF(value_): " << TYPEOF(value_) << "\n";
 
   if (TYPEOF(value_) == LGLSXP) {
     Rcpp::LogicalVector value(value_);

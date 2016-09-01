@@ -14,8 +14,9 @@ extern "C" {
 }
 
 // [[Rcpp::export]]
-XPtr<SqliteConnectionPtr> rsqlite_connect(std::string path, bool allow_ext,
-                                          int flags, std::string vfs = "") {
+XPtr<SqliteConnectionPtr> rsqlite_connect(
+  std::string path, bool allow_ext, int flags, std::string vfs = "")
+{
 
   SqliteConnectionPtr* pConn = new SqliteConnectionPtr(
     new SqliteConnectionWrapper(path, allow_ext, flags, vfs)
@@ -39,9 +40,10 @@ void rsqlite_disconnect(XPtr<SqliteConnectionPtr> con) {
 
 // [[Rcpp::export]]
 Rcpp::List rsqlite_get_exception(XPtr<SqliteConnectionPtr> con) {
-  return Rcpp::List::create(
-    Rcpp::Named("errorNum") = (*con)->getExceptionCode(),
-    Rcpp::Named("errorMsg") = (*con)->getException());
+  return
+    Rcpp::List::create(
+      Rcpp::Named("errorNum") = (*con)->getExceptionCode(),
+      Rcpp::Named("errorMsg") = (*con)->getException());
 }
 
 // [[Rcpp::export]]

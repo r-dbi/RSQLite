@@ -92,7 +92,7 @@ void inline bind_parameter(sqlite3_stmt* stmt, int i, int j, std::string name, S
       Rcpp::String value2 = value[i];
       std::string value3(value2);
       sqlite3_bind_text(stmt, j, value3.data(), value3.size(),
-        SQLITE_TRANSIENT);
+                        SQLITE_TRANSIENT);
     }
   } else if (TYPEOF(value_) == VECSXP) {
     SEXP raw = VECTOR_ELT(value_, i);
@@ -103,7 +103,7 @@ void inline bind_parameter(sqlite3_stmt* stmt, int i, int j, std::string name, S
     sqlite3_bind_blob(stmt, j, RAW(raw), Rf_length(raw), SQLITE_TRANSIENT);
   } else {
     Rcpp::stop("Don't know how to handle parameter of type %s.",
-      Rf_type2char(TYPEOF(value_)));
+               Rf_type2char(TYPEOF(value_)));
   }
 }
 

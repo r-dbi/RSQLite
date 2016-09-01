@@ -9,8 +9,9 @@ using namespace Rcpp;
 //' @export
 // [[Rcpp::export]]
 CharacterVector rsqliteVersion() {
-  return CharacterVector::create(
-    _["header"] = SQLITE_VERSION,
-    _["library"] = sqlite3_libversion()
-  );
+  return
+    CharacterVector::create(
+      _["header"] = SQLITE_VERSION,
+      _["library"] = sqlite3_libversion()
+    );
 }

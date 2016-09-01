@@ -80,7 +80,7 @@ public:
   void bind_rows(Rcpp::List params) {
     if (params.size() != nparams_) {
       Rcpp::stop("Query requires %i params; %i supplied.",
-        nparams_, params.size());
+                 nparams_, params.size());
     }
     if (params.size() == 0) {
       Rcpp::stop("Need at least one column");
@@ -280,8 +280,8 @@ public:
     // in the case of a 0-row data frame)
     for (int j = 0; j < ncols_; ++j) {
       if (types_[j] == NILSXP) {
-        types_[j] = decltype_to_sexptype(
-          sqlite3_column_decltype(pStatement_, j));
+        types_[j] =
+          decltype_to_sexptype(sqlite3_column_decltype(pStatement_, j));
         // std::cerr << j << ": " << types_[j] << "\n";
         out[j] = alloc_col(types_[j], n, n);
       }

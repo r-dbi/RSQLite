@@ -35,8 +35,8 @@ public:
   }
 
   void copy_to(SqliteConnectionPtr pDest) {
-    sqlite3_backup* backup = sqlite3_backup_init(pDest->conn(), "main",
-                                                 pConn_, "main");
+    sqlite3_backup* backup =
+      sqlite3_backup_init(pDest->conn(), "main", pConn_, "main");
 
     int rc = sqlite3_backup_step(backup, -1);
     if (rc != SQLITE_DONE) {

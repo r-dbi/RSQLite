@@ -27,52 +27,22 @@
 
 # Check results
 
-15 packages
+12 packages with problems
 
 |package          |version | errors| warnings| notes|
 |:----------------|:-------|------:|--------:|-----:|
-|Category         |2.38.0  |      0|        0|     1|
 |cummeRbund       |2.14.0  |      1|        1|     7|
 |DECIPHER         |2.0.2   |      1|        3|     3|
 |GWASTools        |1.18.0  |      2|        0|     2|
 |mgsa             |1.20.0  |      2|        2|     4|
-|pdInfoBuilder    |1.36.0  |      0|        0|     1|
 |plethy           |1.10.0  |      2|        1|     3|
 |poplite          |0.99.16 |      1|        1|     1|
-|ProjectTemplate  |0.7     |      0|        0|     0|
 |rangeMapper      |0.3-0   |      2|        1|     0|
 |RObsDat          |16.03   |      1|        0|     0|
 |specL            |1.6.2   |      1|        1|     4|
 |tcpl             |1.2.2   |      1|        1|     1|
 |TFBSTools        |1.10.3  |      0|        1|     1|
 |VariantFiltering |1.8.6   |      0|        3|     3|
-
-Slowest checks
-
-|   |package          | check_time|
-|:--|:----------------|----------:|
-|15 |VariantFiltering |      362.6|
-|2  |cummeRbund       |      321.9|
-|4  |GWASTools        |      258.2|
-|14 |TFBSTools        |      254.6|
-|1  |Category         |      225.4|
-|3  |DECIPHER         |      153.8|
-
-## Category (2.38.0)
-Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
-
-0 errors | 0 warnings | 1 note 
-
-```
-checking R code for possible problems ... NOTE
-.linearMTestInternal: no visible global function definition for
-  ‘setNames’
-Undefined global functions or variables:
-  setNames
-Consider adding
-  importFrom("stats", "setNames")
-to your NAMESPACE file.
-```
 
 ## cummeRbund (2.14.0)
 Maintainer: Loyal A. Goff <lgoff@csail.mit.edu>
@@ -518,37 +488,6 @@ to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
 contains 'methods').
 ```
 
-## pdInfoBuilder (1.36.0)
-Maintainer: Benilton Carvalho <beniltoncarvalho@gmail.com>
-
-0 errors | 0 warnings | 1 note 
-
-```
-checking R code for possible problems ... NOTE
-cdf2table: no visible global function definition for ‘getDoParWorkers’
-cdf2table: no visible global function definition for ‘%dopar%’
-cdf2table: no visible global function definition for ‘foreach’
-cdf2table: no visible binding for global variable ‘unitLst’
-cdfUnits2table: no visible global function definition for ‘%do%’
-cdfUnits2table: no visible global function definition for ‘foreach’
-cdfUnits2table: no visible binding for global variable ‘i’
-createChrDict: no visible global function definition for ‘na.omit’
-getAllFSetMpsTables: no visible global function definition for
-  ‘%dopar%’
-getAllFSetMpsTables: no visible global function definition for
-  ‘foreach’
-getAllFSetMpsTables: no visible binding for global variable ‘i’
-parseBpmapCel: no visible global function definition for ‘aggregate’
-parseCdfSeqAnnotSnp: no visible global function definition for
-  ‘aggregate’
-parseNgsTrio: no visible global function definition for ‘aggregate’
-Undefined global functions or variables:
-  %do% %dopar% aggregate foreach getDoParWorkers i na.omit unitLst
-Consider adding
-  importFrom("stats", "aggregate", "na.omit")
-to your NAMESPACE file.
-```
-
 ## plethy (1.10.0)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
@@ -716,12 +655,6 @@ Consider adding
   importFrom("utils", "stack")
 to your NAMESPACE file.
 ```
-
-## ProjectTemplate (0.7)
-Maintainer: Kenton White <jkentonwhite@gmail.com>  
-Bug reports: https://github.com/johnmyleswhite/ProjectTemplate/issues
-
-0 errors | 0 warnings | 0 notes
 
 ## rangeMapper (0.3-0)
 Maintainer: Mihai Valcu <valcu@orn.mpg.de>
@@ -1031,4 +964,3 @@ Rd file 'autosomalRecessiveHomozygous.Rd':
 These lines will be truncated in the PDF manual.
 ```
 
-v1.0.0

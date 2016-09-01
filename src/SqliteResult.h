@@ -317,6 +317,7 @@ public:
     // Trim back to what we actually used
     if (i < n) {
       out = dfResize(out, i);
+      n = i;
     }
     
     return out;

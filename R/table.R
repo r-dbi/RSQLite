@@ -138,9 +138,10 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 
     if (!found || overwrite) {
       # Initialise table with first `nrows` lines
-      d <- read.table(value, sep = sep, header = header, skip = skip, nrows = nrows,
-                      na.strings = "\\N", comment.char = "", colClasses = colClasses,
-                      stringsAsFactors = FALSE)
+      d <- utils::read.table(
+        value, sep = sep, header = header, skip = skip, nrows = nrows,
+        na.strings = "\\N", comment.char = "", colClasses = colClasses,
+        stringsAsFactors = FALSE)
       sql <- sqliteBuildTableDefinitionNoWarn(conn, name, d,
                                               field.types = field.types,
                                               row.names = row.names)

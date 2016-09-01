@@ -9,14 +9,14 @@ Authors@R: as.person(c( "Hadley Wickham <hadley@rstudio.com> [aut,
 Description: This package embeds the SQLite database engine in R and
     provides an interface compliant with the DBI package. The
     source for the SQLite engine (version 3.8.8.2) is included.
-Depends:
+Depends: 
     R (>= 3.1.0)
-Suggests:
+Suggests: 
     testthat,
     knitr,
     rmarkdown,
     DBItest
-Imports:
+Imports: 
     methods,
     DBI (>= 0.4-9),
     Rcpp (>= 0.11.4.2)
@@ -24,7 +24,7 @@ Remotes: rstats-db/DBI, rstats-db/DBItest@production, hadley/testthat
 License: LGPL (>= 2)
 URL: https://github.com/rstats-db/RSQLite
 BugReports: https://github.com/rstats-db/RSQLite/issues
-Collate:
+Collate: 
     'RcppExports.R'
     'SQLiteConnection.R'
     'SQLiteDriver.R'
@@ -33,6 +33,7 @@ Collate:
     'copy.R'
     'datasetsDb.R'
     'deprecated.R'
+    'dummy.R'
     'extensions.R'
     'query.R'
     'table.R'
@@ -41,4 +42,4 @@ Collate:
     'zzz.R'
 LinkingTo: Rcpp, BH
 VignetteBuilder: knitr
-RoxygenNote: 5.0.1
+RoxygenNote: 5.0.1.9000

@@ -1,17 +1,17 @@
 library("devtools")
 
 ignore <- c(
-  # "AnnotationDbi",
+  "AnnotationDbi", # deprecation warnings
   "AnnotationForge",
   "AnnotationHub",
   "AnnotationHubData",
   "APSIM",
   "archivist",
-  # "BatchExperiments",
-  # "BatchJobs",
+  "BatchExperiments", # deprecation warnings
+  "BatchJobs", # deprecation warnings
   "bibliospec",
   "biglm",
-  # "bioassayR",
+  "bioassayR", # deprecation warnings
   "caroline",
   # "Category",
   "ChemmineR",
@@ -37,7 +37,7 @@ ignore <- c(
   "gcbd",
   "GeneAnswers",
   "GenomicFeatures",
-  # "Genominator",
+  "Genominator", # one fewer warning (Rcpp)
   "GEOmetadb",
   # "GWASTools",
   "imputeMulti",
@@ -60,10 +60,10 @@ ignore <- c(
   "nutshell.bbdb",
   "oai",
   "oce",
-  # "oligo",
+  "oligo", # one fewer warning (Rcpp)
   "oligoClasses",
   "OrganismDbi",
-  # "PAnnBuilder",
+  "PAnnBuilder", # one fewer warning (Rcpp)
   # "pdInfoBuilder",
   "PGA",
   "pitchRx",
@@ -72,14 +72,14 @@ ignore <- c(
   # "ProjectTemplate",
   "quantmod",
   # "rangeMapper",
-  # "RecordLinkage",
+  "RecordLinkage", # deprecation warnings
   "recordr",
   "recoup",
   "refGenome",
   "rgrass7",
   "RImmPort",
   # "RObsDat",
-  # "rplexos",
+  "rplexos", # deprecation warnings
   "RQDA",
   "rTRM",
   "rvertnet",
@@ -90,7 +90,7 @@ ignore <- c(
   "smnet",
   "snplist",
   # "specL",
-  # "sqldf",
+  "sqldf", # bug fixed downstream
   "sqliter",
   "SRAdb",
   "SSN",
@@ -100,14 +100,14 @@ ignore <- c(
   "taRifx",
   # "tcpl",
   # "TFBSTools",
-  # "tigre",
+  "tigre", # one fewer warning (Rcpp)
   "trackeR",
   "TSdata",
   "TSsql",
   "TSSQLite",
   "tweet2r",
   "twitteR",
-  # "UniProt.ws",
+  "UniProt.ws", # one fewer warning (Rcpp)
   "Uniquorn",
   "UPMASK",
   # "VariantFiltering",

@@ -2,6 +2,7 @@
 % Please edit documentation in R/dummy.R
 \docType{methods}
 \name{dummy-methods}
+\alias{dbGetQuery,NULL-method}
 \alias{dummy-methods}
 \title{Dummy methods}
 \usage{

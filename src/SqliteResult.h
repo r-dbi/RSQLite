@@ -290,12 +290,12 @@ public:
       out = dfResize(out, i);
     }
     
-    // Create data for columns where all values were NULL
+    // Create data for columns where all values were NULL (or for all columns
+    // in the case of a 0-row data frame)
     for (int j = 0; j < ncols_; ++j) {
-      if (types_[j] == NILSXP) {
+      if (i == 0 || types_[j] == NILSXP) {
         types_[j] = decltype_to_sexptype(
           sqlite3_column_decltype(pStatement_, j));
-        std::cerr << j << ": " << types_[j] << "\n";
         out[j] = alloc_col(types_[j], n, n);
       }
     }

@@ -13,7 +13,7 @@ ignore <- c(
   "biglm",
   "bioassayR", # deprecation warnings
   "caroline",
-  # "Category",
+  "Category", # one fewer warning (Rcpp)
   "ChemmineR",
   "chunked",
   "CITAN",
@@ -64,12 +64,12 @@ ignore <- c(
   "oligoClasses",
   "OrganismDbi",
   "PAnnBuilder", # one fewer warning (Rcpp)
-  # "pdInfoBuilder",
+  "pdInfoBuilder", # one fewer warning (Rcpp)
   "PGA",
   "pitchRx",
   # "plethy",
   # "poplite",
-  # "ProjectTemplate",
+  "ProjectTemplate",
   "quantmod",
   # "rangeMapper",
   "RecordLinkage", # deprecation warnings
@@ -99,7 +99,7 @@ ignore <- c(
   "survey",
   "taRifx",
   # "tcpl",
-  # "TFBSTools",
+  "TFBSTools",
   "tigre", # one fewer warning (Rcpp)
   "trackeR",
   "TSdata",
@@ -110,7 +110,7 @@ ignore <- c(
   "UniProt.ws", # one fewer warning (Rcpp)
   "Uniquorn",
   "UPMASK",
-  # "VariantFiltering",
+  "VariantFiltering",
   "vegdata",
   "vmsbase"
 )

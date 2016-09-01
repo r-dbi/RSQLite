@@ -10,3 +10,4 @@ autom4te.cache
 inst/doc
 /.metadata
 /src/.*
+/*.pro*

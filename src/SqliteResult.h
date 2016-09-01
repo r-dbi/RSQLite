@@ -347,14 +347,25 @@ public:
 
     Rcpp::CharacterVector types(ncols_);
     for (int i = 0; i < ncols_; i++) {
-      switch(types_[i]) {
+      switch (types_[i]) {
       case NILSXP:
-      case LGLSXP:  types[i] = "logical"; break;
-      case STRSXP:  types[i] = "character"; break;
-      case INTSXP:  types[i] = "integer"; break;
-      case REALSXP: types[i] = "double"; break;
-      case VECSXP:  types[i] = "list"; break;
-      default: Rcpp::stop("Unknown variable type");
+      case LGLSXP:
+        types[i] = "logical";
+        break;
+      case STRSXP:
+        types[i] = "character";
+        break;
+      case INTSXP:
+        types[i] = "integer";
+        break;
+      case REALSXP:
+        types[i] = "double";
+        break;
+      case VECSXP:
+        types[i] = "list";
+        break;
+      default:
+        Rcpp::stop("Unknown variable type");
       }
     }
 

@@ -56,7 +56,9 @@ public:
 
 
   // Get access to the underlying sqlite3*
-  sqlite3* conn() const { return pConn_; }
+  sqlite3* conn() const {
+    return pConn_;
+  }
 
   // Get the last exception code
   int getExceptionCode() const {

@@ -155,6 +155,7 @@ public:
     if (decl_type == NULL)
       return LGLSXP;
     
+    // TODO: steal sqlite3AffinityType() from sqlite3.c
     if (std::string("INTEGER") == decl_type)
       return INTSXP;
     if (std::string("REAL") == decl_type)

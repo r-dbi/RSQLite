@@ -22,57 +22,36 @@
 |knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
 |Rcpp      |   |0.12.6     |2016-07-19 |cran (@0.12.6)                     |
 |rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
-|RSQLite   |   |1.0.9007   |2016-09-01 |local (rstats-db/RSQLite@141c4f6)  |
+|RSQLite   |   |1.0.9007   |2016-09-01 |local (rstats-db/RSQLite@d167aa8)  |
 |testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
 
-15 packages
+10 packages
 
-|package          |version | errors| warnings| notes|
-|:----------------|:-------|------:|--------:|-----:|
-|Category         |2.38.0  |      0|        0|     1|
-|cummeRbund       |2.14.0  |      1|        1|     7|
-|DECIPHER         |2.0.2   |      1|        3|     3|
-|GWASTools        |1.18.0  |      2|        0|     2|
-|mgsa             |1.20.0  |      2|        2|     4|
-|pdInfoBuilder    |1.36.0  |      0|        0|     1|
-|plethy           |1.10.0  |      2|        1|     3|
-|poplite          |0.99.16 |      1|        1|     1|
-|ProjectTemplate  |0.7     |      0|        0|     0|
-|rangeMapper      |0.3-0   |      2|        1|     0|
-|RObsDat          |16.03   |      1|        0|     0|
-|specL            |1.6.2   |      1|        1|     4|
-|tcpl             |1.2.2   |      1|        1|     1|
-|TFBSTools        |1.10.3  |      0|        1|     1|
-|VariantFiltering |1.8.6   |      0|        3|     3|
+|package     |version | errors| warnings| notes|
+|:-----------|:-------|------:|--------:|-----:|
+|cummeRbund  |2.14.0  |      1|        1|     7|
+|DECIPHER    |2.0.2   |      1|        3|     3|
+|GWASTools   |1.18.0  |      2|        0|     2|
+|mgsa        |1.20.0  |      2|        2|     4|
+|plethy      |1.10.0  |      2|        1|     3|
+|poplite     |0.99.16 |      1|        1|     1|
+|rangeMapper |0.3-0   |      2|        1|     0|
+|RObsDat     |16.03   |      0|        0|     0|
+|specL       |1.6.2   |      1|        1|     4|
+|tcpl        |1.2.2   |      1|        1|     1|
 
 Slowest checks
 
-|   |package          | check_time|
-|:--|:----------------|----------:|
-|15 |VariantFiltering |      362.6|
-|2  |cummeRbund       |      321.9|
-|4  |GWASTools        |      258.2|
-|14 |TFBSTools        |      254.6|
-|1  |Category         |      225.4|
-|3  |DECIPHER         |      153.8|
-
-## Category (2.38.0)
-Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
-
-0 errors | 0 warnings | 1 note 
-
-```
-checking R code for possible problems ... NOTE
-.linearMTestInternal: no visible global function definition for
-  ‘setNames’
-Undefined global functions or variables:
-  setNames
-Consider adding
-  importFrom("stats", "setNames")
-to your NAMESPACE file.
-```
+|   |package     | check_time|
+|:--|:-----------|----------:|
+|1  |cummeRbund  |      304.1|
+|3  |GWASTools   |      240.6|
+|2  |DECIPHER    |      145.7|
+|7  |rangeMapper |       98.4|
+|6  |poplite     |       93.5|
+|5  |plethy      |         85|
 
 ## cummeRbund (2.14.0)
 Maintainer: Loyal A. Goff <lgoff@csail.mit.edu>
@@ -518,37 +497,6 @@ to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
 contains 'methods').
 ```
 
-## pdInfoBuilder (1.36.0)
-Maintainer: Benilton Carvalho <beniltoncarvalho@gmail.com>
-
-0 errors | 0 warnings | 1 note 
-
-```
-checking R code for possible problems ... NOTE
-cdf2table: no visible global function definition for ‘getDoParWorkers’
-cdf2table: no visible global function definition for ‘%dopar%’
-cdf2table: no visible global function definition for ‘foreach’
-cdf2table: no visible binding for global variable ‘unitLst’
-cdfUnits2table: no visible global function definition for ‘%do%’
-cdfUnits2table: no visible global function definition for ‘foreach’
-cdfUnits2table: no visible binding for global variable ‘i’
-createChrDict: no visible global function definition for ‘na.omit’
-getAllFSetMpsTables: no visible global function definition for
-  ‘%dopar%’
-getAllFSetMpsTables: no visible global function definition for
-  ‘foreach’
-getAllFSetMpsTables: no visible binding for global variable ‘i’
-parseBpmapCel: no visible global function definition for ‘aggregate’
-parseCdfSeqAnnotSnp: no visible global function definition for
-  ‘aggregate’
-parseNgsTrio: no visible global function definition for ‘aggregate’
-Undefined global functions or variables:
-  %do% %dopar% aggregate foreach getDoParWorkers i na.omit unitLst
-Consider adding
-  importFrom("stats", "aggregate", "na.omit")
-to your NAMESPACE file.
-```
-
 ## plethy (1.10.0)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
@@ -717,12 +665,6 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## ProjectTemplate (0.7)
-Maintainer: Kenton White <jkentonwhite@gmail.com>  
-Bug reports: https://github.com/johnmyleswhite/ProjectTemplate/issues
-
-0 errors | 0 warnings | 0 notes
-
 ## rangeMapper (0.3-0)
 Maintainer: Mihai Valcu <valcu@orn.mpg.de>
 
@@ -745,9 +687,9 @@ The error most likely occurred in:
 > 
 > 
 > dbcon = rangeMap.start(file = "test.sqlite", overwrite = TRUE, dir = tempdir() )
-New session 2016-09-01 13:54:57
+New session 2016-09-01 19:14:38
 PROJECT: test.sqlite 
-DIRECTORY: /tmp/RtmpeBWh23
+DIRECTORY: /tmp/RtmpNApxzB
 > global.bbox.save(con = dbcon, bbox = X)
 Error: table bbox has no column named min
 Execution halted
@@ -756,7 +698,7 @@ checking tests ... ERROR
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
   PROJECT: wrens.sqlite 
-  DIRECTORY: /tmp/Rtmpqg02Pa
+  DIRECTORY: /tmp/RtmpGjTYQH
   Error: table bbox has no column named min
   testthat results ================================================================
   OK: 9 SKIPPED: 0 FAILED: 5
@@ -773,9 +715,10 @@ checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
 Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because Appendix_S2_Valcu_et_al_2012.Rmd appears to be an R Markdown v2 document.
-Quitting from lines 74-86 (Appendix_S2_Valcu_et_al_2012.Rmd) 
-Error: processing vignette 'Appendix_S2_Valcu_et_al_2012.Rmd' failed with diagnostics:
-non-numeric argument to binary operator
+Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because Appendix_S3_Valcu_et_al_2012.Rmd appears to be an R Markdown v2 document.
+Quitting from lines 27-35 (Appendix_S3_Valcu_et_al_2012.Rmd) 
+Error: processing vignette 'Appendix_S3_Valcu_et_al_2012.Rmd' failed with diagnostics:
+table bbox has no column named min
 Execution halted
 
 ```
@@ -783,32 +726,7 @@ Execution halted
 ## RObsDat (16.03)
 Maintainer: Dominik Reusser <reusser@pik-potsdam.de>
 
-1 error  | 0 warnings | 0 notes
-
-```
-checking examples ... ERROR
-Running examples in ‘RObsDat-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: RObsDat-package
-> ### Title: R-Package to the observations Data Model from CUAHSI
-> ### Aliases: RObsDat-package RObsDat
-> ### Keywords: package
-> 
-... 125 lines ...
-
-addDtV> ver3 <- inDB
-
-addDtV> if(NROW(ver3@data)>=32){
-addDtV+    ver3@data[30:32,] <- 33
-addDtV+    updateDataValues(ver3, "Ups, I used 60 instead of 33 by mistake")
-addDtV+ }
-Error in `[.data.frame`(getDataResult@DerivedFromIDs@data, selectMeta) : 
-  undefined columns selected
-Calls: example ... IupdateDataValues -> .local -> paste -> sv -> [ -> [.data.frame
-Execution halted
-```
+0 errors | 0 warnings | 0 notes
 
 ## specL (1.6.2)
 Maintainer: Christian Panse <cp@fgcz.ethz.ch>, Witold E. Wolski <wewolski@gmail.com>  
@@ -822,12 +740,12 @@ Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
   1 Test Suite : 
   specL RUnit Tests - 9 test functions, 1 error, 0 failures
-  ERROR in /tmp/RtmpiHfHSa/RLIBS_501d4f934b94/specL/unitTests/test_read.bibliospec.R: Error while sourcing  /tmp/RtmpiHfHSa/RLIBS_501d4f934b94/specL/unitTests/test_read.bibliospec.R : Error in msg$errorMsg : $ operator is invalid for atomic vectors
+  ERROR in /tmp/RtmpiN1kNU/RLIBS_486335e32ad6/specL/unitTests/test_read.bibliospec.R: Error while sourcing  /tmp/RtmpiN1kNU/RLIBS_486335e32ad6/specL/unitTests/test_read.bibliospec.R : Error in msg$errorMsg : $ operator is invalid for atomic vectors
   
   Test files with failing tests
   
      test_read.bibliospec.R 
-       /tmp/RtmpiHfHSa/RLIBS_501d4f934b94/specL/unitTests/test_read.bibliospec.R 
+       /tmp/RtmpiN1kNU/RLIBS_486335e32ad6/specL/unitTests/test_read.bibliospec.R 
   
   
   Error in BiocGenerics:::testPackage("specL") : 
@@ -879,9 +797,9 @@ Running examples in ‘tcpl-Ex.R’ failed
 The error most likely occurred in:
 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: tcplCytoPt
-> ### Title: Calculate the cytotoxicity point based on the "burst" endpoints
-> ### Aliases: tcplCytoPt
+> ### Name: tcplPlotM4ID
+> ### Title: Plot fit summary plot by m4id
+> ### Aliases: tcplPlotM4ID
 > 
 > ### ** Examples
 > 
@@ -889,15 +807,11 @@ The error most likely occurred in:
 > ## of the examples
 > conf_store <- tcplConfList()
 > tcplConfDefault()
-> 
-> ## Load the "burst" endpoints -- none are defined in the example dataset
-> tcplLoadAeid(fld = "burst_assay", val = 1)
-Empty data.table (0 rows) of 3 cols: burst_assay,aeid,aenm
-> 
-> ## Calculate the cytotoxicity distributions using both example endpoints
-> tcplCytoPt(aeid = 1:2)
-Error in x - center : non-numeric argument to binary operator
-Calls: tcplCytoPt -> [ -> [.data.table -> mad -> median
+>  
+> tcplPlotM4ID(m4id = 686, lvl = 4) ## Create a level 4 plot
+Error in signif(c(gnls_tp_sd, gnls_ga_sd, gnls_gw_sd, gnls_la_sd, gnls_lw_sd),  : 
+  non-numeric argument to mathematical function
+Calls: tcplPlotM4ID ... tcplPlotFits -> .plotFit -> with -> with.default -> eval -> eval
 Execution halted
 
 checking re-building of vignette outputs ... WARNING
@@ -932,104 +846,3 @@ checking installed package size ... NOTE
     sql   8.7Mb
 ```
 
-## TFBSTools (1.10.3)
-Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>  
-Bug reports: https://github.com/ge11232002/TFBSTools/issues
-
-0 errors | 1 warning  | 1 note 
-
-```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because TFBSTools.Rmd appears to be an R Markdown v2 document.
-Quitting from lines 2-16 (TFBSTools.Rmd) 
-Error: processing vignette 'TFBSTools.Rmd' failed with diagnostics:
-could not find function "doc_date"
-Execution halted
-
-
-checking dependencies in R code ... NOTE
-Unexported objects imported by ':::' calls:
-  ‘S4Vectors:::new_SimpleList_from_list’ ‘seqLogo:::pwm2ic’
-  See the note in ?`:::` about the use of this operator.
-```
-
-## VariantFiltering (1.8.6)
-Maintainer: Robert Castelo <robert.castelo@upf.edu>  
-Bug reports: https://github.com/rcastelo/VariantFiltering/issues
-
-0 errors | 3 warnings | 3 notes
-
-```
-checking Rd cross-references ... WARNING
-package ‘MafDb.1Kgenomes.phase3.hs37d5’ exists but was not installed under R >= 2.10.0 so xrefs cannot be checked
-Packages unavailable to check Rd xrefs: ‘MafDb.1Kgenomes.phase1.hs37d5’, ‘phastCons100way.UCSC.hg38’
-
-checking sizes of PDF files under ‘inst/doc’ ... WARNING
-  ‘gs+qpdf’ made some significant size reductions:
-     compacted ‘usingVariantFiltering.pdf’ from 436Kb to 154Kb
-  consider running tools::compactPDF(gs_quality = "ebook") on these files
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Loading required package: Biostrings
-Loading required package: XVector
-
-Attaching package: ‘VariantAnnotation’
-
-The following object is masked from ‘package:base’:
-
-... 8 lines ...
-Error in eval(expr, envir, enclos) : database disk image is malformed
-Error in eval(expr, envir, enclos) : database disk image is malformed
-Error : .onLoad failed in loadNamespace() for 'MafDb.1Kgenomes.phase3.hs37d5', details:
-  call: eval(expr, envir, enclos)
-  error: database disk image is malformed
-
-Error: processing vignette 'usingVariantFiltering.Rnw' failed with diagnostics:
- chunk 3 
-Error in VariantFilteringParam(vcfFilenames = CEUvcf) : 
-  package MafDb.1Kgenomes.phase3.hs37d5 could not be loaded.
-Execution halted
-
-checking installed package size ... NOTE
-  installed size is  7.7Mb
-  sub-directories of 1Mb or more:
-    R         3.3Mb
-    extdata   3.5Mb
-
-checking dependencies in R code ... NOTE
-Unexported objects imported by ':::' calls:
-  'S4Vectors:::labeledLine' 'VariantAnnotation:::.checkArgs'
-  'VariantAnnotation:::.consolidateHits'
-  'VariantAnnotation:::.returnEmpty'
-  See the note in ?`:::` about the use of this operator.
-
-checking Rd line widths ... NOTE
-Rd file 'MafDb-class.Rd':
-  \examples lines wider than 100 characters:
-       ## founder mutation in a regulatory element located within the HERC2 gene inhibiting OCA2 expression.
-
-Rd file 'MafDb2-class.Rd':
-  \examples lines wider than 100 characters:
-       ## founder mutation in a regulatory element located within the HERC2 gene inhibiting OCA2 expression.
-
-Rd file 'VariantFilteringParam-class.Rd':
-... 17 lines ...
-
-Rd file 'autosomalRecessiveHeterozygous.Rd':
-  \usage lines wider than 90 characters:
-                                                                      BPPARAM=bpparam("SerialParam"))
-
-Rd file 'autosomalRecessiveHomozygous.Rd':
-  \usage lines wider than 90 characters:
-                                                                    use=c("everything", "complete.obs", "all.obs"),
-                                                                    BPPARAM=bpparam("SerialParam"))
-
-These lines will be truncated in the PDF manual.
-```
-
-v1.0.0
-f-revdep

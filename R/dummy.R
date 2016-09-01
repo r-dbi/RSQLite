@@ -7,7 +7,7 @@
 
 
 #' @rdname dummy-methods
-#' @aliases dbGetQuery,NULL-method
+#' @aliases dbGetQuery,NULL,ANY-method
 #' @inheritParams DBI::dbGetQuery
 #' @export
 setMethod("dbGetQuery", "NULL", function(conn, statement, ...) {

@@ -1,9 +1,5 @@
 context("Basic types")
 
-memory_db <- function() {
-  dbConnect(SQLite(), ":memory:")
-}
-
 basicDf <- data.frame(
   name = c("Alice", "Bob", "Carl", "NA", NA),
   fldInt = as.integer(c(as.integer(1:4), NA)),

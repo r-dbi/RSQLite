@@ -78,8 +78,10 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
   }
 )
 
+
 #' @export
 DBI::dbGetQuery
+
 
 #' @rdname sqlite-query
 #' @export

@@ -22,13 +22,12 @@
 
 # Check results
 
-4 packages with problems
+3 packages with problems
 
 |package  |version | errors| warnings| notes|
 |:--------|:-------|------:|--------:|-----:|
 |DECIPHER |2.0.2   |      0|        2|     2|
 |mgsa     |1.20.0  |      0|        1|     4|
-|plethy   |1.10.0  |      2|        0|     3|
 |specL    |1.6.2   |      0|        1|     4|
 
 ## DECIPHER (2.0.2)
@@ -149,98 +148,6 @@ Consider adding
   importFrom("utils", "read.delim", "relist", "str")
 to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
 contains 'methods').
-```
-
-## plethy (1.10.0)
-Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
-
-2 errors | 0 warnings | 3 notes
-
-```
-checking examples ... ERROR
-Running examples in ‘plethy-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: Utility functions
-> ### Title: Utility functions to assist with QA/QC and analysis of
-> ###   plethysmography data
-> ### Aliases: add.labels.by.sample get.err.breaks adjust.labels proc.sanity
-> ### Keywords: Utilities
-... 21 lines ...
-> temp.db.file <- tempfile()
-> write(sim.bux.lines, file=temp.file)
-> test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
-Processing /tmp/RtmplctaVx/file29c962ef9fb1 in chunks of 10000
-Starting chunk 1
-Reached breakpoint change
-Processing breakpoint 1
-Starting sample sample_1
-Error in if (sum(which.gt) > 0) { : missing value where TRUE/FALSE needed
-Calls: parse.buxco ... write.sample.breaks -> write.sample.db -> sanity.check.time
-Execution halted
-
-checking tests ... ERROR
-Running the tests in ‘tests/runTests.R’ failed.
-Last 13 lines of output:
-  
-     test_check_helpers.R 
-       test.add.labels.by.sample 
-       test.dbImport 
-       test.get.err.breaks 
-       test.summaryMeasures 
-  
-  
-  Error in BiocGenerics:::testPackage("plethy") : 
-    unit tests failed for package plethy
-  In addition: Warning message:
-  closing unused connection 3 (/tmp/RtmpR7qGKp/file2ae87dba2ea3) 
-  Execution halted
-
-checking dependencies in R code ... NOTE
-There are ::: calls to the package's namespace in its code. A package
-  almost never needs to use ::: for its own objects:
-  ‘csv.to.table’ ‘find.break.ranges.integer’ ‘fix.time’ ‘multi.grep’
-
-checking R code for possible problems ... NOTE
-generate.sample.buxco : <anonymous> : <anonymous> : <anonymous> :
-  <anonymous>: no visible global function definition for ‘rnorm’
-make.db.package: no visible global function definition for
-  ‘packageDescription’
-mvtsplot.data.frame: no visible global function definition for ‘colors’
-mvtsplot.data.frame: no visible global function definition for ‘par’
-mvtsplot.data.frame: no visible global function definition for ‘layout’
-mvtsplot.data.frame: no visible global function definition for
-  ‘strwidth’
-... 14 lines ...
-tsplot,BuxcoDB: no visible binding for global variable ‘Sample_Name’
-Undefined global functions or variables:
-  Axis Days Sample_Name Value abline bxp colors layout legend lines
-  median mtext packageDescription par plot rnorm strwidth terms
-Consider adding
-  importFrom("grDevices", "colors")
-  importFrom("graphics", "Axis", "abline", "bxp", "layout", "legend",
-             "lines", "mtext", "par", "plot", "strwidth")
-  importFrom("stats", "median", "rnorm", "terms")
-  importFrom("utils", "packageDescription")
-to your NAMESPACE file.
-
-checking Rd line widths ... NOTE
-Rd file 'parsing.Rd':
-  \usage lines wider than 90 characters:
-     parse.buxco(file.name = NULL, table.delim = "Table", burn.in.lines = c("Measurement", "Create measurement", "Waiting for", "Site Acknow ... [TRUNCATED]
-       chunk.size = 500, db.name = "bux_test.db", max.run.time.minutes = 60, overwrite = TRUE, verbose=TRUE, make.package = F, author = NULL ... [TRUNCATED]
-     parse.buxco.basic(file.name=NULL, table.delim="Table", burn.in.lines=c("Measurement", "Create measurement", "Waiting for", "Site Acknow ... [TRUNCATED]
-
-Rd file 'utilities.Rd':
-  \usage lines wider than 90 characters:
-     get.err.breaks(bux.db, max.exp.count=150, max.acc.count=900, vary.perc=.1, label.val="ERR")
-     proc.sanity(bux.db, max.exp.time=300, max.acc.time=1800, max.exp.count=150, max.acc.count=900)
-  \examples lines wider than 100 characters:
-     err.dta <- data.frame(samples=samples, count=count, measure_break=measure_break, table_break=table_break, phase=phase, stringsAsFactors ... [TRUNCATED]
-     sample.labels <- data.frame(samples=c("sample_1","sample_3"), response_type=c("high", "low"),stringsAsFactors=FALSE)
-
-These lines will be truncated in the PDF manual.
 ```
 
 ## specL (1.6.2)

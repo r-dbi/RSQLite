@@ -16,5 +16,6 @@ a.out.dSYM
 ^src/.*\.d$
 ^src/Makevars\.local$
 ^\.metadata^
+^\.settings^
 ^src/[.].*$
 ^.*[.]pro

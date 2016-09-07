@@ -9,5 +9,6 @@ a.out.dSYM
 autom4te.cache
 inst/doc
 /.metadata
+/.settings
 /src/.*
 /*.pro*

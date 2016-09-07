@@ -115,5 +115,5 @@ ignore <- c(
   "vmsbase"
 )
 
-revdep_check(threads = parallel::detectCores(), bioconductor = TRUE, ignore = ignore)
+revdep_check(threads = parallel::detectCores(), bioconductor = TRUE)
 revdep_check_save_summary()

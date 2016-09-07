@@ -1,5 +1,7 @@
 #include "SqliteResult.h"
 
+#include "affinity.h"
+
 
 
 // Construction ////////////////////////////////////////////////////////////////
@@ -438,13 +440,23 @@ SEXPTYPE SqliteResult::decltype_to_sexptype(const char* decl_type) {
   if (decl_type == NULL)
     return LGLSXP;
 
-  // TODO: steal sqlite3AffinityType() from sqlite3.c
-  if (std::string("INTEGER") == decl_type)
-    return INTSXP;
-  if (std::string("REAL") == decl_type)
-    return REALSXP;
-  if (std::string("BLOB") == decl_type)
-    return VECSXP;
+  char affinity = sqlite3AffinityType(decl_type);
 
-  return STRSXP;
+  switch (affinity) {
+  case SQLITE_AFF_INTEGER:
+    return INTSXP;
+
+  case SQLITE_AFF_NUMERIC:
+  case SQLITE_AFF_REAL:
+    return REALSXP;
+
+  case SQLITE_AFF_TEXT:
+    return STRSXP;
+
+  case SQLITE_AFF_BLOB:
+    return VECSXP;
+  }
+
+  // Shouldn't occur
+  return LGLSXP;
 }

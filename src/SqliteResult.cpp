@@ -160,15 +160,15 @@ Rcpp::List SqliteResult::column_info() {
 
 // Privates ////////////////////////////////////////////////////////////////////
 
-void SqliteResult::bind_parameter(const int i, const int j0, const std::string& name, const SEXP value_) {
+void SqliteResult::bind_parameter(const int i, const int j0, const std::string& name, const SEXP values_) {
   if (name != "") {
     int j = find_parameter(name);
     if (j == 0)
       Rcpp::stop("No parameter with name %s.", name);
-    bind_parameter_pos(i, j, value_);
+    bind_parameter_pos(i, j, values_);
   } else {
     // sqlite parameters are 1-indexed
-    bind_parameter_pos(i, j0 + 1, value_);
+    bind_parameter_pos(i, j0 + 1, values_);
   }
 }
 

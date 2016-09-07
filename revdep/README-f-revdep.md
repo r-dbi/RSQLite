@@ -10,7 +10,7 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2016-09-01                   |
+|date     |2016-09-07                   |
 
 ## Packages
 
@@ -22,7 +22,7 @@
 |knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
 |Rcpp      |   |0.12.6     |2016-07-19 |cran (@0.12.6)                     |
 |rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
-|RSQLite   |   |1.0.9008   |2016-09-01 |local (rstats-db/RSQLite@4b16bda)  |
+|RSQLite   |   |1.0.9009   |2016-09-07 |local (rstats-db/RSQLite@069d084)  |
 |testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
@@ -46,12 +46,12 @@ Slowest checks
 
 |   |package       | check_time|
 |:--|:-------------|----------:|
-|1  |AnnotationHub |     2092.8|
-|2  |cummeRbund    |      305.1|
-|4  |GWASTools     |        243|
-|3  |DECIPHER      |      145.4|
-|7  |rangeMapper   |         98|
-|6  |poplite       |       94.8|
+|1  |AnnotationHub |     2541.3|
+|2  |cummeRbund    |      308.4|
+|4  |GWASTools     |        237|
+|3  |DECIPHER      |      132.8|
+|7  |rangeMapper   |       92.1|
+|6  |poplite       |       88.2|
 
 ## AnnotationHub (2.4.2)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
@@ -622,9 +622,9 @@ The error most likely occurred in:
 > 
 > 
 > dbcon = rangeMap.start(file = "test.sqlite", overwrite = TRUE, dir = tempdir() )
-New session 2016-09-01 20:04:14
+New session 2016-09-07 09:27:32
 PROJECT: test.sqlite 
-DIRECTORY: /tmp/RtmpaPeHx6
+DIRECTORY: /tmp/Rtmp7WKMWG
 > global.bbox.save(con = dbcon, bbox = X)
 Error: table bbox has no column named min
 Execution halted
@@ -633,7 +633,7 @@ checking tests ... ERROR
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
   PROJECT: wrens.sqlite 
-  DIRECTORY: /tmp/RtmpFHmzgd
+  DIRECTORY: /tmp/Rtmps5XTlw
   Error: table bbox has no column named min
   testthat results ================================================================
   OK: 9 SKIPPED: 0 FAILED: 5
@@ -675,12 +675,12 @@ Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
   1 Test Suite : 
   specL RUnit Tests - 9 test functions, 1 error, 0 failures
-  ERROR in /tmp/RtmpWceZxP/RLIBS_3e684ee5a1cf/specL/unitTests/test_read.bibliospec.R: Error while sourcing  /tmp/RtmpWceZxP/RLIBS_3e684ee5a1cf/specL/unitTests/test_read.bibliospec.R : Error in msg$errorMsg : $ operator is invalid for atomic vectors
+  ERROR in /tmp/Rtmp1gZVOS/RLIBS_49047d19cfe0/specL/unitTests/test_read.bibliospec.R: Error while sourcing  /tmp/Rtmp1gZVOS/RLIBS_49047d19cfe0/specL/unitTests/test_read.bibliospec.R : Error in msg$errorMsg : $ operator is invalid for atomic vectors
   
   Test files with failing tests
   
      test_read.bibliospec.R 
-       /tmp/RtmpWceZxP/RLIBS_3e684ee5a1cf/specL/unitTests/test_read.bibliospec.R 
+       /tmp/Rtmp1gZVOS/RLIBS_49047d19cfe0/specL/unitTests/test_read.bibliospec.R 
   
   
   Error in BiocGenerics:::testPackage("specL") : 

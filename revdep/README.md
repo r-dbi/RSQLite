@@ -14,11 +14,16 @@
 
 ## Packages
 
-|package  |*  |version    |date       |source                           |
-|:--------|:--|:----------|:----------|:--------------------------------|
-|DBI      |   |0.5        |2016-09-01 |Github (rstats-db/DBI@bc730b9)   |
-|RSQLite  |   |1.0.0      |2016-09-07 |local (rstats-db/RSQLite@NA)     |
-|testthat |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da) |
+|package   |*  |version    |date       |source                             |
+|:---------|:--|:----------|:----------|:----------------------------------|
+|BH        |   |1.60.0-2   |2016-05-07 |cran (@1.60.0-)                    |
+|DBI       |   |0.5        |2016-09-01 |Github (rstats-db/DBI@bc730b9)     |
+|DBItest   |   |1.3-7      |2016-09-01 |Github (rstats-db/DBItest@75c8ebc) |
+|knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
+|Rcpp      |   |0.12.6     |2016-07-19 |cran (@0.12.6)                     |
+|rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
+|RSQLite   |   |1.0.9009   |2016-09-07 |local (rstats-db/RSQLite@069d084)  |
+|testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
 
@@ -26,39 +31,130 @@
 
 |package       |version | errors| warnings| notes|
 |:-------------|:-------|------:|--------:|-----:|
-|AnnotationHub |2.4.2   |      0|        0|     0|
-|cummeRbund    |2.14.0  |      0|        0|     7|
-|DECIPHER      |2.0.2   |      0|        2|     2|
-|GWASTools     |1.18.0  |      0|        0|     2|
-|mgsa          |1.20.0  |      0|        1|     4|
-|poplite       |0.99.16 |      0|        0|     1|
-|rangeMapper   |0.3-0   |      0|        0|     0|
+|AnnotationHub |2.4.2   |      1|        1|     0|
+|cummeRbund    |2.14.0  |      1|        1|     7|
+|DECIPHER      |2.0.2   |      1|        3|     3|
+|GWASTools     |1.18.0  |      2|        0|     2|
+|mgsa          |1.20.0  |      2|        2|     4|
+|poplite       |0.99.16 |      1|        1|     1|
+|rangeMapper   |0.3-0   |      2|        1|     0|
 |RObsDat       |16.03   |      0|        0|     0|
-|specL         |1.6.2   |      0|        1|     4|
-|tcpl          |1.2.2   |      0|        0|     1|
+|specL         |1.6.2   |      1|        1|     4|
+|tcpl          |1.2.2   |      1|        1|     1|
 
 Slowest checks
 
 |   |package       | check_time|
 |:--|:-------------|----------:|
-|2  |cummeRbund    |      498.6|
-|4  |GWASTools     |      248.9|
-|3  |DECIPHER      |      244.5|
-|1  |AnnotationHub |        193|
-|7  |rangeMapper   |      140.1|
-|10 |tcpl          |         64|
+|1  |AnnotationHub |     2541.3|
+|2  |cummeRbund    |      308.4|
+|4  |GWASTools     |        237|
+|3  |DECIPHER      |      132.8|
+|7  |rangeMapper   |       92.1|
+|6  |poplite       |       88.2|
 
 ## AnnotationHub (2.4.2)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-0 errors | 0 warnings | 0 notes
+1 error  | 1 warning  | 0 notes
+
+```
+checking tests ... ERROR
+Running the tests in ‘tests/runTests.R’ failed.
+Last 13 lines of output:
+  FAILURE in test_cache_datapathIds: Error in checkIdentical(result, setNames(integer(), character())) : 
+    FALSE 
+   
+  
+  Test files with failing tests
+  
+     test_cache.R 
+       test_cache_datapathIds 
+  
+  
+  Error in BiocGenerics:::testPackage("AnnotationHub") : 
+    unit tests failed for package AnnotationHub
+  Execution halted
+
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because AnnotationHub-HOWTO.Rmd appears to be an R Markdown v2 document.
+loading from cache '/home/muelleki/.AnnotationHub/57158'
+    '/home/muelleki/.AnnotationHub/57159'
+
+ *** caught segfault ***
+address (nil), cause 'memory not mapped'
+
+Traceback:
+ 1: .Call(rmd_render_markdown, file, output, text, renderer, renderer.options,     extensions)
+ 2: renderMarkdown(file, output = NULL, text, renderer = "HTML",     renderer.options = options, extensions = extensions, encoding = encoding)
+ 3: markdown::markdownToHTML(out, output, encoding = encoding, ...)
+ 4: (if (grepl("\\.[Rr]md$", file)) knit2html else if (grepl("\\.[Rr]rst$",     file)) knit2pdf else knit)(file, encoding = encoding, quiet = quiet,     envir = globalenv())
+ 5: vweave(...)
+ 6: engine$weave(file, quiet = quiet, encoding = enc)
+ 7: doTryCatch(return(expr), name, parentenv, handler)
+ 8: tryCatchOne(expr, names, parentenv, handlers[[1L]])
+ 9: tryCatchList(expr, classes, parentenv, handlers)
+10: tryCatch({    engine$weave(file, quiet = quiet, encoding = enc)    setwd(startdir)    find_vignette_product(name, by = "weave", engine = engine)}, error = function(e) {    stop(gettextf("processing vignette '%s' failed with diagnostics:\n%s",         file, conditionMessage(e)), domain = NA, call. = FALSE)})
+11: buildVignettes(dir = "/home/muelleki/git/R/RSQLite/revdep/checks/AnnotationHub.Rcheck/vign_test/AnnotationHub")
+An irrecoverable exception occurred. R is aborting now ...
+Segmentation fault (core dumped)
+
+```
 
 ## cummeRbund (2.14.0)
 Maintainer: Loyal A. Goff <lgoff@csail.mit.edu>
 
-0 errors | 0 warnings | 7 notes
+1 error  | 1 warning  | 7 notes
 
 ```
+checking examples ... ERROR
+Running examples in ‘cummeRbund-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: MAplot
+> ### Title: MAplot
+> ### Aliases: MAplot MAplot,CuffData-method
+> ### Keywords: heatmap
+> 
+... 28 lines ...
+Reading /home/muelleki/git/R/RSQLite/revdep/checks/cummeRbund.Rcheck/cummeRbund/extdata/genes.fpkm_tracking
+Checking samples table...
+Warning: 'make.db.names' is deprecated.
+Use 'dbQuoteIdentifier' instead.
+See help("Deprecated")
+Populating samples table...
+Warning: 'make.db.names' is deprecated.
+Use 'dbQuoteIdentifier' instead.
+See help("Deprecated")
+Error: table samples has no column named index
+Execution halted
+
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+
+Loading required package: IRanges
+Loading required package: GenomeInfoDb
+Loading required package: Gviz
+Loading required package: grid
+
+Attaching package: 'cummeRbund'
+... 8 lines ...
+    promoters
+
+The following object is masked from 'package:BiocGenerics':
+
+    conditions
+
+
+Error: processing vignette 'cummeRbund-example-workflow.Rnw' failed with diagnostics:
+ chunk 4 (label = model_fit_1) 
+Error in eval(expr, envir, enclos) : near ")": syntax error
+Execution halted
+
 checking package dependencies ... NOTE
 Depends: includes the non-default packages:
   ‘BiocGenerics’ ‘RSQLite’ ‘ggplot2’ ‘reshape2’ ‘fastcluster’
@@ -144,9 +240,28 @@ checking sizes of PDF files under ‘inst/doc’ ... NOTE
 ## DECIPHER (2.0.2)
 Maintainer: Erik Wright <DECIPHER@cae.wisc.edu>
 
-0 errors | 2 warnings | 2 notes
+1 error  | 3 warnings | 3 notes
 
 ```
+checking examples ... ERROR
+Running examples in ‘DECIPHER-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: Add2DB
+> ### Title: Add Data to a Database
+> ### Aliases: Add2DB
+> 
+> ### ** Examples
+> 
+> # Create a sequence database
+> gen <- system.file("extdata", "Bacteria_175seqs.gen", package="DECIPHER")
+> dbConn <- dbConnect(SQLite(), ":memory:")
+> Seqs2DB(gen, "GenBank", dbConn, "Bacteria")
+
+Reading GenBank file chunk 1Error: Unsupported type
+Execution halted
+
 checking foreign function calls ... WARNING
 Registration problems:
   symbol ‘functionCall’ in the local frame:
@@ -167,12 +282,38 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
      compacted ‘ArtOfAlignmentInR.pdf’ from 968Kb to 635Kb
   consider running tools::compactPDF(gs_quality = "ebook") on these files
 
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+
+    Filter, Find, Map, Position, Reduce, anyDuplicated, append,
+    as.data.frame, cbind, colnames, do.call, duplicated, eval, evalq,
+    get, grep, grepl, intersect, is.unsorted, lapply, lengths, mapply,
+    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int, rank,
+    rbind, rownames, sapply, setdiff, sort, table, tapply, union,
+    unique, unsplit
+... 8 lines ...
+
+    colMeans, colSums, expand.grid, rowMeans, rowSums
+
+Loading required package: IRanges
+Loading required package: XVector
+Loading required package: RSQLite
+
+Error: processing vignette 'DECIPHERing.Rnw' failed with diagnostics:
+ chunk 3 (label = expr1) 
+Error : Unsupported type
+Execution halted
+
 checking installed package size ... NOTE
   installed size is  9.2Mb
   sub-directories of 1Mb or more:
     data      2.5Mb
     doc       3.9Mb
     extdata   1.4Mb
+
+checking DESCRIPTION meta-information ... NOTE
+'LinkingTo' for ‘RSQLite’ is unused as it has no 'include' directory
 
 checking R code for possible problems ... NOTE
 .CalculateEfficiencyFISH: no visible global function definition for
@@ -201,9 +342,49 @@ to your NAMESPACE file.
 ## GWASTools (1.18.0)
 Maintainer: Stephanie M. Gogarten <sdmorris@u.washington.edu>, Adrienne Stilp <amstilp@u.washington.edu>
 
-0 errors | 0 warnings | 2 notes
+2 errors | 0 warnings | 2 notes
 
 ```
+checking examples ... ERROR
+Running examples in ‘GWASTools-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: SnpAnnotationSQLite
+> ### Title: Class SnpAnotationSQLite
+> ### Aliases: SnpAnnotationSQLite-class SnpAnnotationSQLite
+> ###   hasVariable,SnpAnnotationSQLite-method
+> ###   getVariable,SnpAnnotationSQLite-method
+... 20 lines ...
+> 
+> ### ** Examples
+> 
+> library(GWASdata)
+> dbpath <- tempfile()
+> snpAnnot <- SnpAnnotationSQLite(dbpath)
+Warning: Closing open result set, pending rows
+Error in validObject(.Object) : 
+  invalid class “SnpAnnotationSQLite” object: snpID must be a unique integer vector
+Calls: SnpAnnotationSQLite -> new -> initialize -> initialize -> validObject
+Execution halted
+
+checking tests ... ERROR
+Running the tests in ‘tests/test.R’ failed.
+Last 13 lines of output:
+  ERROR in test_SnpAnnotationSQLite: Error in validObject(.Object) : 
+    invalid class "SnpAnnotationSQLite" object: snpID must be a unique integer vector
+  
+  Test files with failing tests
+  
+     SnpAnnotationSQLite_test.R 
+       test_SnpAnnotationSQLite 
+  
+  
+  Error in BiocGenerics:::testPackage("GWASTools", pattern = ".*_test\\.R$") : 
+    unit tests failed for package GWASTools
+  In addition: There were 50 or more warnings (use warnings() to see the first 50)
+  Execution halted
+
 checking R code for possible problems ... NOTE
 .CI: no visible global function definition for ‘qnorm’
 .LOHbase: no visible global function definition for ‘mad’
@@ -243,9 +424,49 @@ These lines will be truncated in the PDF manual.
 ## mgsa (1.20.0)
 Maintainer: Sebastian Bauer <mail@sebastianbauer.info>
 
-0 errors | 1 warning  | 4 notes
+2 errors | 2 warnings | 4 notes
 
 ```
+checking examples ... ERROR
+Running examples in ‘mgsa-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: readGAF
+> ### Title: Read a Gene Ontology annotation file
+> ### Aliases: readGAF
+> 
+> ### ** Examples
+... 47 lines ...
+
+The following objects are masked from ‘package:base’:
+
+    colMeans, colSums, expand.grid, rowMeans, rowSums
+
+
+Loading required package: RSQLite
+Loading required package: DBI
+Error in guessRowName(df, row.names) : Unknown input
+Calls: readGAF ... sqlCreateTable -> sqlRownamesToColumn -> guessRowName
+Execution halted
+
+checking tests ... ERROR
+Running the tests in ‘tests/testthat.R’ failed.
+Last 13 lines of output:
+  6: sqlCreateTable(conn, name, value, row.names = row.names) at /home/muelleki/git/R/RSQLite/R/table.R:70
+  7: sqlCreateTable(conn, name, value, row.names = row.names) at /tmp/RtmpFisqKr/devtools13d37bd5f7c7/rstats-db-DBI-bc730b9/R/table-create.R:36
+  8: sqlRownamesToColumn(fields, row.names) at /tmp/RtmpFisqKr/devtools13d37bd5f7c7/rstats-db-DBI-bc730b9/R/table-create.R:46
+  9: guessRowName(df, row.names) at /tmp/RtmpFisqKr/devtools13d37bd5f7c7/rstats-db-DBI-bc730b9/R/rownames.R:38
+  10: stop("Unknown input") at /tmp/RtmpFisqKr/devtools13d37bd5f7c7/rstats-db-DBI-bc730b9/R/rownames.R:84
+  
+  testthat results ================================================================
+  OK: 16 SKIPPED: 0 FAILED: 2
+  1. Error: readGAF() works (@test-readGAF.R#2) 
+  2. Error: readGAF() with aspect works (@test-readGAF.R#7) 
+  
+  Error: testthat unit tests failed
+  Execution halted
+
 checking for GNU extensions in Makefiles ... WARNING
 Found the following file(s) containing GNU extensions:
   src/Makevars
@@ -253,6 +474,29 @@ Found the following file(s) containing GNU extensions:
 Portable Makefiles do not use GNU extensions such as +=, :=, $(shell),
 $(wildcard), ifeq ... endif. See section ‘Writing portable packages’ in
 the ‘Writing R Extensions’ manual.
+
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+Loading required package: IRanges
+Loading required package: S4Vectors
+
+... 8 lines ...
+
+    colMeans, colSums, expand.grid, rowMeans, rowSums
+
+
+Loading required package: RSQLite
+Loading required package: DBI
+
+Error: processing vignette 'mgsa.Rnw' failed with diagnostics:
+ chunk 6 (label = readGAF) 
+Error in guessRowName(df, row.names) : Unknown input
+Execution halted
 
 checking top-level files ... NOTE
 Non-standard files/directories found at top level:
@@ -306,9 +550,37 @@ contains 'methods').
 ## poplite (0.99.16)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
-0 errors | 0 warnings | 1 note 
+1 error  | 1 warning  | 1 note 
 
 ```
+checking tests ... ERROR
+Running the tests in ‘tests/testthat.R’ failed.
+Last 13 lines of output:
+  1. Failure: createTable (@test-poplite.R#252) 
+  2. Failure: createTable (@test-poplite.R#252) 
+  3. Failure: createTable (@test-poplite.R#252) 
+  4. Failure: createTable (@test-poplite.R#252) 
+  5. Failure: insertStatement (@test-poplite.R#330) 
+  6. Failure: insertStatement (@test-poplite.R#350) 
+  7. Failure: insertStatement (@test-poplite.R#330) 
+  8. Failure: insertStatement (@test-poplite.R#350) 
+  9. Failure: insertStatement (@test-poplite.R#330) 
+  1. ...
+  
+  Error: testthat unit tests failed
+  Execution halted
+
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+
 checking R code for possible problems ... NOTE
 filter_.Database: no visible global function definition for ‘stack’
 get.starting.point : <anonymous>: no visible global function definition
@@ -331,7 +603,60 @@ to your NAMESPACE file.
 ## rangeMapper (0.3-0)
 Maintainer: Mihai Valcu <valcu@orn.mpg.de>
 
-0 errors | 0 warnings | 0 notes
+2 errors | 1 warning  | 0 notes
+
+```
+checking examples ... ERROR
+Running examples in ‘rangeMapper-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: WKT2SpatialPolygonsDataFrame
+> ### Title: Convert WKT polygons to SpatialPolygonsDataFrame
+> ### Aliases: WKT2SpatialPolygonsDataFrame vertices
+> ###   vertices,SpatialPolygons-method
+> 
+... 26 lines ...
+> 
+> X = WKT2SpatialPolygonsDataFrame(d, 'range', 'nam')
+> 
+> 
+> dbcon = rangeMap.start(file = "test.sqlite", overwrite = TRUE, dir = tempdir() )
+New session 2016-09-07 09:27:32
+PROJECT: test.sqlite 
+DIRECTORY: /tmp/Rtmp7WKMWG
+> global.bbox.save(con = dbcon, bbox = X)
+Error: table bbox has no column named min
+Execution halted
+
+checking tests ... ERROR
+Running the tests in ‘tests/testthat.R’ failed.
+Last 13 lines of output:
+  PROJECT: wrens.sqlite 
+  DIRECTORY: /tmp/Rtmps5XTlw
+  Error: table bbox has no column named min
+  testthat results ================================================================
+  OK: 9 SKIPPED: 0 FAILED: 5
+  1. Error: Pipeline works forward only (@test-1_projectINI.R#35) 
+  2. Error: Range overlay returns a data.frame (@test-1_projectINI.R#67) 
+  3. Error: reprojecting on the fly (@test-2_processRanges.R#10) 
+  4. Error: ONE SpPolyDF NO metadata (@test-2_processRanges.R#22) 
+  5. Error: ONE SpPolyDF WITH metadata (@test-2_processRanges.R#41) 
+  
+  Error: testthat unit tests failed
+  Execution halted
+
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because Appendix_S2_Valcu_et_al_2012.Rmd appears to be an R Markdown v2 document.
+Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because Appendix_S3_Valcu_et_al_2012.Rmd appears to be an R Markdown v2 document.
+Quitting from lines 27-35 (Appendix_S3_Valcu_et_al_2012.Rmd) 
+Error: processing vignette 'Appendix_S3_Valcu_et_al_2012.Rmd' failed with diagnostics:
+table bbox has no column named min
+Execution halted
+
+```
 
 ## RObsDat (16.03)
 Maintainer: Dominik Reusser <reusser@pik-potsdam.de>
@@ -342,9 +667,26 @@ Maintainer: Dominik Reusser <reusser@pik-potsdam.de>
 Maintainer: Christian Panse <cp@fgcz.ethz.ch>, Witold E. Wolski <wewolski@gmail.com>  
 Bug reports: https://github.com/fgcz/specL/issues
 
-0 errors | 1 warning  | 4 notes
+1 error  | 1 warning  | 4 notes
 
 ```
+checking tests ... ERROR
+Running the tests in ‘tests/runTests.R’ failed.
+Last 13 lines of output:
+  1 Test Suite : 
+  specL RUnit Tests - 9 test functions, 1 error, 0 failures
+  ERROR in /tmp/Rtmp1gZVOS/RLIBS_49047d19cfe0/specL/unitTests/test_read.bibliospec.R: Error while sourcing  /tmp/Rtmp1gZVOS/RLIBS_49047d19cfe0/specL/unitTests/test_read.bibliospec.R : Error in msg$errorMsg : $ operator is invalid for atomic vectors
+  
+  Test files with failing tests
+  
+     test_read.bibliospec.R 
+       /tmp/Rtmp1gZVOS/RLIBS_49047d19cfe0/specL/unitTests/test_read.bibliospec.R 
+  
+  
+  Error in BiocGenerics:::testPackage("specL") : 
+    unit tests failed for package specL
+  Execution halted
+
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
@@ -382,9 +724,57 @@ prepare_Rd: ms1.p2069.Rd:23-26: Dropping empty section \examples
 ## tcpl (1.2.2)
 Maintainer: Dayne L Filer <dayne.filer@gmail.com>
 
-0 errors | 0 warnings | 1 note 
+1 error  | 1 warning  | 1 note 
 
 ```
+checking examples ... ERROR
+Running examples in ‘tcpl-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: tcplPlotM4ID
+> ### Title: Plot fit summary plot by m4id
+> ### Aliases: tcplPlotM4ID
+> 
+> ### ** Examples
+> 
+> ## Store the current config settings, so they can be reloaded at the end 
+> ## of the examples
+> conf_store <- tcplConfList()
+> tcplConfDefault()
+>  
+> tcplPlotM4ID(m4id = 686, lvl = 4) ## Create a level 4 plot
+Error in signif(c(gnls_tp_sd, gnls_ga_sd, gnls_gw_sd, gnls_la_sd, gnls_lw_sd),  : 
+  non-numeric argument to mathematical function
+Calls: tcplPlotM4ID ... tcplPlotFits -> .plotFit -> with -> with.default -> eval -> eval
+Execution halted
+
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+Loading required package: data.table
+tcpl (v1.2.2) loaded with the following settings:
+  TCPL_DB:    /home/muelleki/git/R/RSQLite/revdep/checks/tcpl.Rcheck/tcpl/sql/tcpldb.sqlite
+  TCPL_USER:  NA
+  TCPL_HOST:  NA
+  TCPL_DRVR:  SQLite
+Default settings stored in TCPL.conf. See ?tcplConf for more information.
+Warning: Closing open result set, pending rows
+Warning: Closing open result set, pending rows
+Warning: Closing open result set, pending rows
+Warning: Closing open result set, pending rows
+Warning: Closing open result set, pending rows
+Warning: Closing open result set, pending rows
+Warning: Closing open result set, pending rows
+Warning: Closing open result set, pending rows
+
+Error: processing vignette 'tcpl_Overview.Rnw' failed with diagnostics:
+ chunk 31 (label = l4plt) 
+Error in signif(c(gnls_tp_sd, gnls_ga_sd, gnls_gw_sd, gnls_la_sd, gnls_lw_sd),  : 
+  non-numeric argument to mathematical function
+Execution halted
+
+
 checking installed package size ... NOTE
   installed size is  9.9Mb
   sub-directories of 1Mb or more:

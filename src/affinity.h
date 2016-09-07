@@ -11,7 +11,7 @@ extern "C" {
 #define SQLITE_AFF_INTEGER  'D'
 #define SQLITE_AFF_REAL     'E'
 
-char sqlite3AffinityType(const char *zIn);
+char sqlite3AffinityType(const char* zIn);
 
 #ifdef __cplusplus
 } // extern "C" {

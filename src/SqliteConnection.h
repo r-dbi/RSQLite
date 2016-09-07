@@ -23,7 +23,7 @@ public:
   SqliteConnectionWrapper(std::string path, bool allow_ext,
                           int flags, std::string vfs = "");
   virtual ~SqliteConnectionWrapper();
-  
+
 public:
   // Get access to the underlying sqlite3*
   sqlite3* conn() const {

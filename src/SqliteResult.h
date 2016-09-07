@@ -49,7 +49,7 @@ private:
   Rcpp::List peek_first_row();
 
   void set_col_values(Rcpp::List& out, const int i, const int n);
-  SEXP set_col_value(SEXP col, const int i, const int j, const int n);
+  void set_col_value(SEXP& col, const int i, const int j, const int n);
   SEXP alloc_col(const SEXPTYPE type, const int i, const int n);
   void fill_default_col_value(SEXP col, const int i, const SEXPTYPE type);
   void fill_col_value(const SEXP col, const int i, const int j,

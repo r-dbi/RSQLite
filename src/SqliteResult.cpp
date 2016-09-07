@@ -239,11 +239,13 @@ Rcpp::List SqliteResult::peek_first_row() {
 
 void SqliteResult::set_col_values(Rcpp::List& out, const int i, const int n) {
   for (int j = 0; j < ncols_; ++j) {
-    out[j] = set_col_value(out[j], i, j, n);
+    SEXP col = out[j];
+    set_col_value(col, i, j, n);
+    out[j] = col;
   }
 }
 
-SEXP SqliteResult::set_col_value(SEXP col, const int i, const int j, const int n) {
+void SqliteResult::set_col_value(SEXP& col, const int i, const int j, const int n) {
   SEXPTYPE type = types_[j];
   int column_type = sqlite3_column_type(pStatement_, j);
 
@@ -258,7 +260,7 @@ SEXP SqliteResult::set_col_value(SEXP col, const int i, const int j, const int n
 
   if (Rf_isNull(col)) {
     if (type == NILSXP)
-      return col;
+      return;
     else {
       col = alloc_col(type, i, n);
       types_[j] = type;
@@ -271,7 +273,7 @@ SEXP SqliteResult::set_col_value(SEXP col, const int i, const int j, const int n
   else {
     fill_col_value(col, i, j, type);
   }
-  return col;
+  return;
 }
 
 SEXP SqliteResult::alloc_col(const SEXPTYPE type, const int i, const int n) {

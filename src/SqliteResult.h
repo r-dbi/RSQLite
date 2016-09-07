@@ -18,7 +18,7 @@ class SqliteResult : boost::noncopyable {
   std::vector<std::string> names_;
 
 public:
-  SqliteResult(SqliteConnectionPtr pConn, const std::string& sql);
+  SqliteResult(const SqliteConnectionPtr& pConn, const std::string& sql);
   virtual ~SqliteResult();
 
 public:
@@ -35,8 +35,8 @@ public:
   }
 
 public:
-  void bind(Rcpp::List params);
-  void bind_rows(Rcpp::List params);
+  void bind(const Rcpp::List& params);
+  void bind_rows(const Rcpp::List& params);
   Rcpp::List fetch(int n_max = -1);
   Rcpp::List column_info();
 

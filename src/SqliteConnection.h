@@ -39,7 +39,7 @@ public:
 
 public:
   // Copies a database
-  void copy_to(SqliteConnectionPtr pDest);
+  void copy_to(const SqliteConnectionPtr& pDest);
 
 private:
   sqlite3* pConn_;

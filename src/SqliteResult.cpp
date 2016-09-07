@@ -4,7 +4,7 @@
 
 // Construction ////////////////////////////////////////////////////////////////
 
-SqliteResult::SqliteResult(SqliteConnectionPtr pConn, const std::string& sql)
+SqliteResult::SqliteResult(const SqliteConnectionPtr& pConn, const std::string& sql)
   : pStatement_(NULL), pConn_(pConn), complete_(false), ready_(false),
     nrows_(0), ncols_(0), rows_affected_(0), nparams_(0) {
 
@@ -35,7 +35,7 @@ SqliteResult::~SqliteResult() {
 
 // Publics /////////////////////////////////////////////////////////////////////
 
-void SqliteResult::bind(Rcpp::List params) {
+void SqliteResult::bind(const Rcpp::List& params) {
   if (params.size() != nparams_) {
     Rcpp::stop("Query requires %i params; %i supplied.",
                nparams_, params.size());
@@ -61,7 +61,7 @@ void SqliteResult::bind(Rcpp::List params) {
   init();
 }
 
-void SqliteResult::bind_rows(Rcpp::List params) {
+void SqliteResult::bind_rows(const Rcpp::List& params) {
   if (params.size() != nparams_) {
     Rcpp::stop("Query requires %i params; %i supplied.",
                nparams_, params.size());
@@ -91,7 +91,7 @@ void SqliteResult::bind_rows(Rcpp::List params) {
   }
 }
 
-Rcpp::List SqliteResult::fetch(int n_max) {
+Rcpp::List SqliteResult::fetch(const int n_max) {
   if (!ready_)
     Rcpp::stop("Query needs to be bound before fetching");
 
@@ -196,7 +196,7 @@ void SqliteResult::cache_field_data() {
   }
 }
 
-Rcpp::List SqliteResult::fetch_rows(int n_max, int& n) {
+Rcpp::List SqliteResult::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
   Rcpp::List out = dfCreate(names_, n);
@@ -297,7 +297,7 @@ SEXP SqliteResult::alloc_col(const SEXPTYPE type, const int i, const int n) {
   return col;
 }
 
-void SqliteResult::fill_default_col_value(SEXP col, const int i, const SEXPTYPE type) {
+void SqliteResult::fill_default_col_value(const SEXP col, const int i, const SEXPTYPE type) {
   switch (type) {
   case LGLSXP:
     LOGICAL(col)[i] = NA_LOGICAL;
@@ -317,7 +317,7 @@ void SqliteResult::fill_default_col_value(SEXP col, const int i, const SEXPTYPE 
   }
 }
 
-void SqliteResult::set_raw_value(SEXP col, const int i, const int j) {
+void SqliteResult::set_raw_value(const SEXP col, const int i, const int j) {
   int size = sqlite3_column_bytes(pStatement_, j);
   const void* blob = sqlite3_column_blob(pStatement_, j);
 

@@ -21,7 +21,7 @@ class SqliteConnection : boost::noncopyable {
 public:
   // Create a new connection handle
   SqliteConnection(const std::string& path, bool allow_ext,
-                          int flags, const std::string& vfs = "");
+                   int flags, const std::string& vfs = "");
   virtual ~SqliteConnection();
 
 public:

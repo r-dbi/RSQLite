@@ -43,6 +43,7 @@ public:
 private:
   void bind_parameter(int i, int j, const std::string& name, SEXP value_);
   int find_parameter(const std::string& name);
+  void bind_parameter_pos(int i, int j, SEXP value_);
 
   void init();
   void step();

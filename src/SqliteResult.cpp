@@ -160,14 +160,38 @@ Rcpp::List SqliteResult::column_info() {
 
 // Privates ////////////////////////////////////////////////////////////////////
 
-void SqliteResult::bind_parameter(int i, int j, const std::string& name, SEXP value_) {
+void SqliteResult::bind_parameter(const int i, const int j0, const std::string& name, const SEXP value_) {
   if (name != "") {
-    j = find_parameter(name);
+    int j = find_parameter(name);
     if (j == 0)
       Rcpp::stop("No parameter with name %s.", name);
+    bind_parameter_pos(i, j, value_);
   } else {
-    j++; // sqlite parameters are 1-indexed
+    // sqlite parameters are 1-indexed
+    bind_parameter_pos(i, j0 + 1, value_);
   }
+}
+
+int SqliteResult::find_parameter(const std::string& name) {
+  int i = 0;
+  i = sqlite3_bind_parameter_index(pStatement_, name.c_str());
+  if (i != 0)
+    return i;
+
+  std::string colon = ":" + name;
+  i = sqlite3_bind_parameter_index(pStatement_, colon.c_str());
+  if (i != 0)
+    return i;
+
+  std::string dollar = "$" + name;
+  i = sqlite3_bind_parameter_index(pStatement_, dollar.c_str());
+  if (i != 0)
+    return i;
+
+  return 0;
+}
+
+void SqliteResult::bind_parameter_pos(const int i, const int j, const SEXP value_) {
   // std::cerr << "TYPEOF(value_): " << TYPEOF(value_) << "\n";
   if (TYPEOF(value_) == LGLSXP) {
     Rcpp::LogicalVector value(value_);
@@ -211,25 +235,6 @@ void SqliteResult::bind_parameter(int i, int j, const std::string& name, SEXP va
     Rcpp::stop("Don't know how to handle parameter of type %s.",
                Rf_type2char(TYPEOF(value_)));
   }
-}
-
-int SqliteResult::find_parameter(const std::string& name) {
-  int i = 0;
-  i = sqlite3_bind_parameter_index(pStatement_, name.c_str());
-  if (i != 0)
-    return i;
-
-  std::string colon = ":" + name;
-  i = sqlite3_bind_parameter_index(pStatement_, colon.c_str());
-  if (i != 0)
-    return i;
-
-  std::string dollar = "$" + name;
-  i = sqlite3_bind_parameter_index(pStatement_, dollar.c_str());
-  if (i != 0)
-    return i;
-
-  return 0;
 }
 
 void SqliteResult::init() {

@@ -55,7 +55,7 @@ void SqliteResult::bind(const Rcpp::List& params) {
 
   Rcpp::CharacterVector names = params.attr("names");
   for (int j = 0; j < params.size(); ++j) {
-    bind_parameter(pStatement_, 0, j, std::string(names[j]), params[j]);
+    bind_parameter(0, j, std::string(names[j]), params[j]);
   }
 
   init();
@@ -83,7 +83,7 @@ void SqliteResult::bind_rows(const Rcpp::List& params) {
     sqlite3_clear_bindings(pStatement_);
 
     for (int j = 0; j < params.size(); ++j) {
-      bind_parameter(pStatement_, i, j, names[j], params[j]);
+      bind_parameter(i, j, std::string(names[j]), params[j]);
     }
 
     step();
@@ -159,6 +159,78 @@ Rcpp::List SqliteResult::column_info() {
 
 
 // Privates ////////////////////////////////////////////////////////////////////
+
+void SqliteResult::bind_parameter(int i, int j, const std::string& name, SEXP value_) {
+  if (name != "") {
+    j = find_parameter(name);
+    if (j == 0)
+      Rcpp::stop("No parameter with name %s.", name);
+  } else {
+    j++; // sqlite parameters are 1-indexed
+  }
+  // std::cerr << "TYPEOF(value_): " << TYPEOF(value_) << "\n";
+  if (TYPEOF(value_) == LGLSXP) {
+    Rcpp::LogicalVector value(value_);
+    if (value[i] == NA_LOGICAL) {
+      sqlite3_bind_null(pStatement_, j);
+    } else {
+      sqlite3_bind_int(pStatement_, j, static_cast<int>(value[i]));
+    }
+  } else if (TYPEOF(value_) == INTSXP) {
+    Rcpp::IntegerVector value(value_);
+    if (value[i] == NA_INTEGER) {
+      sqlite3_bind_null(pStatement_, j);
+    } else {
+      sqlite3_bind_int(pStatement_, j, static_cast<int>(value[i]));
+    }
+  } else if (TYPEOF(value_) == REALSXP) {
+    Rcpp::NumericVector value(value_);
+    if (value[i] == NA_REAL) {
+      sqlite3_bind_null(pStatement_, j);
+    } else {
+      sqlite3_bind_double(pStatement_, j, static_cast<double>(value[i]));
+    }
+  } else if (TYPEOF(value_) == STRSXP) {
+    Rcpp::CharacterVector value(value_);
+    if (value[i] == NA_STRING) {
+      sqlite3_bind_null(pStatement_, j);
+    } else {
+      Rcpp::String value2 = value[i];
+      std::string value3(value2);
+      sqlite3_bind_text(pStatement_, j, value3.data(), value3.size(),
+                        SQLITE_TRANSIENT);
+    }
+  } else if (TYPEOF(value_) == VECSXP) {
+    SEXP raw = VECTOR_ELT(value_, i);
+    if (TYPEOF(raw) != RAWSXP) {
+      Rcpp::stop("Can only bind lists of raw vectors");
+    }
+
+    sqlite3_bind_blob(pStatement_, j, RAW(raw), Rf_length(raw), SQLITE_TRANSIENT);
+  } else {
+    Rcpp::stop("Don't know how to handle parameter of type %s.",
+               Rf_type2char(TYPEOF(value_)));
+  }
+}
+
+int SqliteResult::find_parameter(const std::string& name) {
+  int i = 0;
+  i = sqlite3_bind_parameter_index(pStatement_, name.c_str());
+  if (i != 0)
+    return i;
+
+  std::string colon = ":" + name;
+  i = sqlite3_bind_parameter_index(pStatement_, colon.c_str());
+  if (i != 0)
+    return i;
+
+  std::string dollar = "$" + name;
+  i = sqlite3_bind_parameter_index(pStatement_, dollar.c_str());
+  if (i != 0)
+    return i;
+
+  return 0;
+}
 
 void SqliteResult::init() {
   ready_ = true;
@@ -370,77 +442,4 @@ SEXPTYPE SqliteResult::decltype_to_sexptype(const char* decl_type) {
     return VECSXP;
 
   return STRSXP;
-}
-
-int SqliteResult::find_parameter(sqlite3_stmt* stmt, const std::string& name) {
-  int i = 0;
-  i = sqlite3_bind_parameter_index(stmt, name.c_str());
-  if (i != 0)
-    return i;
-
-  std::string colon = ":" + name;
-  i = sqlite3_bind_parameter_index(stmt, colon.c_str());
-  if (i != 0)
-    return i;
-
-  std::string dollar = "$" + name;
-  i = sqlite3_bind_parameter_index(stmt, dollar.c_str());
-  if (i != 0)
-    return i;
-
-  return 0;
-}
-
-void SqliteResult::bind_parameter(sqlite3_stmt* stmt, int i, int j, const std::string& name,
-                                  SEXP value_) {
-  if (name != "") {
-    j = find_parameter(stmt, name);
-    if (j == 0)
-      Rcpp::stop("No parameter with name %s.", name);
-  } else {
-    j++; // sqlite parameters are 1-indexed
-  }
-  // std::cerr << "TYPEOF(value_): " << TYPEOF(value_) << "\n";
-  if (TYPEOF(value_) == LGLSXP) {
-    Rcpp::LogicalVector value(value_);
-    if (value[i] == NA_LOGICAL) {
-      sqlite3_bind_null(stmt, j);
-    } else {
-      sqlite3_bind_int(stmt, j, value[i]);
-    }
-  } else if (TYPEOF(value_) == INTSXP) {
-    Rcpp::IntegerVector value(value_);
-    if (value[i] == NA_INTEGER) {
-      sqlite3_bind_null(stmt, j);
-    } else {
-      sqlite3_bind_int(stmt, j, value[i]);
-    }
-  } else if (TYPEOF(value_) == REALSXP) {
-    Rcpp::NumericVector value(value_);
-    if (value[i] == NA_REAL) {
-      sqlite3_bind_null(stmt, j);
-    } else {
-      sqlite3_bind_double(stmt, j, value[i]);
-    }
-  } else if (TYPEOF(value_) == STRSXP) {
-    Rcpp::CharacterVector value(value_);
-    if (value[i] == NA_STRING) {
-      sqlite3_bind_null(stmt, j);
-    } else {
-      Rcpp::String value2 = value[i];
-      std::string value3(value2);
-      sqlite3_bind_text(stmt, j, value3.data(), value3.size(),
-                        SQLITE_TRANSIENT);
-    }
-  } else if (TYPEOF(value_) == VECSXP) {
-    SEXP raw = VECTOR_ELT(value_, i);
-    if (TYPEOF(raw) != RAWSXP) {
-      Rcpp::stop("Can only bind lists of raw vectors");
-    }
-
-    sqlite3_bind_blob(stmt, j, RAW(raw), Rf_length(raw), SQLITE_TRANSIENT);
-  } else {
-    Rcpp::stop("Don't know how to handle parameter of type %s.",
-               Rf_type2char(TYPEOF(value_)));
-  }
 }

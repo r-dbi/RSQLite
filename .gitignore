@@ -10,5 +10,7 @@ autom4te.cache
 inst/doc
 /revdep/.cache.rds
 /.metadata
+/.settings
 /src/.*
 /*.pro*
+/Debug/

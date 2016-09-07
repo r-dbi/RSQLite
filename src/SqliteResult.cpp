@@ -1,10 +1,12 @@
 #include "SqliteResult.h"
 
+#include "affinity.h"
+
 
 
 // Construction ////////////////////////////////////////////////////////////////
 
-SqliteResult::SqliteResult(SqliteConnectionPtr pConn, std::string sql)
+SqliteResult::SqliteResult(const SqliteConnectionPtr& pConn, const std::string& sql)
   : pStatement_(NULL), pConn_(pConn), complete_(false), ready_(false),
     nrows_(0), ncols_(0), rows_affected_(0), nparams_(0) {
 
@@ -35,7 +37,7 @@ SqliteResult::~SqliteResult() {
 
 // Publics /////////////////////////////////////////////////////////////////////
 
-void SqliteResult::bind(Rcpp::List params) {
+void SqliteResult::bind(const Rcpp::List& params) {
   if (params.size() != nparams_) {
     Rcpp::stop("Query requires %i params; %i supplied.",
                nparams_, params.size());
@@ -55,13 +57,13 @@ void SqliteResult::bind(Rcpp::List params) {
 
   Rcpp::CharacterVector names = params.attr("names");
   for (int j = 0; j < params.size(); ++j) {
-    bind_parameter(pStatement_, 0, j, std::string(names[j]), params[j]);
+    bind_parameter(0, j, std::string(names[j]), static_cast<SEXPREC*>(params[j]));
   }
 
   init();
 }
 
-void SqliteResult::bind_rows(Rcpp::List params) {
+void SqliteResult::bind_rows(const Rcpp::List& params) {
   if (params.size() != nparams_) {
     Rcpp::stop("Query requires %i params; %i supplied.",
                nparams_, params.size());
@@ -83,7 +85,7 @@ void SqliteResult::bind_rows(Rcpp::List params) {
     sqlite3_clear_bindings(pStatement_);
 
     for (int j = 0; j < params.size(); ++j) {
-      bind_parameter(pStatement_, i, j, names[j], params[j]);
+      bind_parameter(i, j, std::string(names[j]), static_cast<SEXPREC*>(params[j]));
     }
 
     step();
@@ -91,7 +93,7 @@ void SqliteResult::bind_rows(Rcpp::List params) {
   }
 }
 
-Rcpp::List SqliteResult::fetch(int n_max) {
+Rcpp::List SqliteResult::fetch(const int n_max) {
   if (!ready_)
     Rcpp::stop("Query needs to be bound before fetching");
 
@@ -160,6 +162,83 @@ Rcpp::List SqliteResult::column_info() {
 
 // Privates ////////////////////////////////////////////////////////////////////
 
+void SqliteResult::bind_parameter(const int i, const int j0, const std::string& name, const SEXP values_) {
+  if (name != "") {
+    int j = find_parameter(name);
+    if (j == 0)
+      Rcpp::stop("No parameter with name %s.", name);
+    bind_parameter_pos(i, j, values_);
+  } else {
+    // sqlite parameters are 1-indexed
+    bind_parameter_pos(i, j0 + 1, values_);
+  }
+}
+
+int SqliteResult::find_parameter(const std::string& name) {
+  int i = 0;
+  i = sqlite3_bind_parameter_index(pStatement_, name.c_str());
+  if (i != 0)
+    return i;
+
+  std::string colon = ":" + name;
+  i = sqlite3_bind_parameter_index(pStatement_, colon.c_str());
+  if (i != 0)
+    return i;
+
+  std::string dollar = "$" + name;
+  i = sqlite3_bind_parameter_index(pStatement_, dollar.c_str());
+  if (i != 0)
+    return i;
+
+  return 0;
+}
+
+void SqliteResult::bind_parameter_pos(const int i, const int j, const SEXP value_) {
+  // std::cerr << "TYPEOF(value_): " << TYPEOF(value_) << "\n";
+  if (TYPEOF(value_) == LGLSXP) {
+    Rcpp::LogicalVector value(value_);
+    if (value[i] == NA_LOGICAL) {
+      sqlite3_bind_null(pStatement_, j);
+    } else {
+      sqlite3_bind_int(pStatement_, j, static_cast<int>(value[i]));
+    }
+  } else if (TYPEOF(value_) == INTSXP) {
+    Rcpp::IntegerVector value(value_);
+    if (value[i] == NA_INTEGER) {
+      sqlite3_bind_null(pStatement_, j);
+    } else {
+      sqlite3_bind_int(pStatement_, j, static_cast<int>(value[i]));
+    }
+  } else if (TYPEOF(value_) == REALSXP) {
+    Rcpp::NumericVector value(value_);
+    if (value[i] == NA_REAL) {
+      sqlite3_bind_null(pStatement_, j);
+    } else {
+      sqlite3_bind_double(pStatement_, j, static_cast<double>(value[i]));
+    }
+  } else if (TYPEOF(value_) == STRSXP) {
+    Rcpp::CharacterVector value(value_);
+    if (value[i] == NA_STRING) {
+      sqlite3_bind_null(pStatement_, j);
+    } else {
+      Rcpp::String value2 = value[i];
+      std::string value3(value2);
+      sqlite3_bind_text(pStatement_, j, value3.data(), value3.size(),
+                        SQLITE_TRANSIENT);
+    }
+  } else if (TYPEOF(value_) == VECSXP) {
+    SEXP raw = VECTOR_ELT(value_, i);
+    if (TYPEOF(raw) != RAWSXP) {
+      Rcpp::stop("Can only bind lists of raw vectors");
+    }
+
+    sqlite3_bind_blob(pStatement_, j, RAW(raw), Rf_length(raw), SQLITE_TRANSIENT);
+  } else {
+    Rcpp::stop("Don't know how to handle parameter of type %s.",
+               Rf_type2char(TYPEOF(value_)));
+  }
+}
+
 void SqliteResult::init() {
   ready_ = true;
   nrows_ = 0;
@@ -196,7 +275,7 @@ void SqliteResult::cache_field_data() {
   }
 }
 
-Rcpp::List SqliteResult::fetch_rows(int n_max, int& n) {
+Rcpp::List SqliteResult::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
   Rcpp::List out = dfCreate(names_, n);
@@ -239,11 +318,13 @@ Rcpp::List SqliteResult::peek_first_row() {
 
 void SqliteResult::set_col_values(Rcpp::List& out, const int i, const int n) {
   for (int j = 0; j < ncols_; ++j) {
-    out[j] = set_col_value(out[j], i, j, n);
+    SEXP col = out[j];
+    set_col_value(col, i, j, n);
+    out[j] = col;
   }
 }
 
-SEXP SqliteResult::set_col_value(SEXP col, const int i, const int j, const int n) {
+void SqliteResult::set_col_value(SEXP& col, const int i, const int j, const int n) {
   SEXPTYPE type = types_[j];
   int column_type = sqlite3_column_type(pStatement_, j);
 
@@ -258,7 +339,7 @@ SEXP SqliteResult::set_col_value(SEXP col, const int i, const int j, const int n
 
   if (Rf_isNull(col)) {
     if (type == NILSXP)
-      return col;
+      return;
     else {
       col = alloc_col(type, i, n);
       types_[j] = type;
@@ -269,22 +350,9 @@ SEXP SqliteResult::set_col_value(SEXP col, const int i, const int j, const int n
     fill_default_col_value(col, i, type);
   }
   else {
-    switch (type) {
-    case INTSXP:
-      INTEGER(col)[i] = sqlite3_column_int(pStatement_, j);
-      break;
-    case REALSXP:
-      REAL(col)[i] = sqlite3_column_double(pStatement_, j);
-      break;
-    case STRSXP:
-      SET_STRING_ELT(col, i, Rf_mkCharCE((const char*) sqlite3_column_text(pStatement_, j), CE_UTF8));
-      break;
-    case VECSXP:
-      set_raw_value(col, i, j);
-      break;
-    }
+    fill_col_value(col, i, j, type);
   }
-  return col;
+  return;
 }
 
 SEXP SqliteResult::alloc_col(const SEXPTYPE type, const int i, const int n) {
@@ -297,7 +365,7 @@ SEXP SqliteResult::alloc_col(const SEXPTYPE type, const int i, const int n) {
   return col;
 }
 
-void SqliteResult::fill_default_col_value(SEXP col, const int i, const SEXPTYPE type) {
+void SqliteResult::fill_default_col_value(const SEXP col, const int i, const SEXPTYPE type) {
   switch (type) {
   case LGLSXP:
     LOGICAL(col)[i] = NA_LOGICAL;
@@ -317,7 +385,27 @@ void SqliteResult::fill_default_col_value(SEXP col, const int i, const SEXPTYPE 
   }
 }
 
-void SqliteResult::set_raw_value(SEXP col, const int i, const int j) {
+void SqliteResult::fill_col_value(const SEXP col, const int i, const int j,
+                                  SEXPTYPE type) {
+  switch (type) {
+  case INTSXP:
+    INTEGER(col)[i] = sqlite3_column_int(pStatement_, j);
+    break;
+  case REALSXP:
+    REAL(col)[i] = sqlite3_column_double(pStatement_, j);
+    break;
+  case STRSXP:
+    SET_STRING_ELT(col, i,
+                   Rf_mkCharCE((const char*) sqlite3_column_text(pStatement_, j),
+                               CE_UTF8));
+    break;
+  case VECSXP:
+    set_raw_value(col, i, j);
+    break;
+  }
+}
+
+void SqliteResult::set_raw_value(const SEXP col, const int i, const int j) {
   int size = sqlite3_column_bytes(pStatement_, j);
   const void* blob = sqlite3_column_blob(pStatement_, j);
 
@@ -352,13 +440,23 @@ SEXPTYPE SqliteResult::decltype_to_sexptype(const char* decl_type) {
   if (decl_type == NULL)
     return LGLSXP;
 
-  // TODO: steal sqlite3AffinityType() from sqlite3.c
-  if (std::string("INTEGER") == decl_type)
-    return INTSXP;
-  if (std::string("REAL") == decl_type)
-    return REALSXP;
-  if (std::string("BLOB") == decl_type)
-    return VECSXP;
+  char affinity = sqlite3AffinityType(decl_type);
 
-  return STRSXP;
+  switch (affinity) {
+  case SQLITE_AFF_INTEGER:
+    return INTSXP;
+
+  case SQLITE_AFF_NUMERIC:
+  case SQLITE_AFF_REAL:
+    return REALSXP;
+
+  case SQLITE_AFF_TEXT:
+    return STRSXP;
+
+  case SQLITE_AFF_BLOB:
+    return VECSXP;
+  }
+
+  // Shouldn't occur
+  return LGLSXP;
 }

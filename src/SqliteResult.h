@@ -18,7 +18,7 @@ class SqliteResult : boost::noncopyable {
   std::vector<std::string> names_;
 
 public:
-  SqliteResult(SqliteConnectionPtr pConn, std::string sql);
+  SqliteResult(const SqliteConnectionPtr& pConn, const std::string& sql);
   virtual ~SqliteResult();
 
 public:
@@ -35,12 +35,16 @@ public:
   }
 
 public:
-  void bind(Rcpp::List params);
-  void bind_rows(Rcpp::List params);
+  void bind(const Rcpp::List& params);
+  void bind_rows(const Rcpp::List& params);
   Rcpp::List fetch(int n_max = -1);
   Rcpp::List column_info();
 
 private:
+  void bind_parameter(int i, int j, const std::string& name, SEXP values_);
+  int find_parameter(const std::string& name);
+  void bind_parameter_pos(int i, int j, SEXP value_);
+
   void init();
   void step();
   void cache_field_data();
@@ -49,11 +53,14 @@ private:
   Rcpp::List peek_first_row();
 
   void set_col_values(Rcpp::List& out, const int i, const int n);
-  SEXP set_col_value(SEXP col, const int i, const int j, const int n);
+  void set_col_value(SEXP& col, const int i, const int j, const int n);
   SEXP alloc_col(const SEXPTYPE type, const int i, const int n);
   void fill_default_col_value(SEXP col, const int i, const SEXPTYPE type);
+  void fill_col_value(const SEXP col, const int i, const int j,
+                      SEXPTYPE type);
   void set_raw_value(SEXP col, const int i, const int j);
 
+private:
   static SEXPTYPE datatype_to_sexptype(const int field_type);
   static SEXPTYPE decltype_to_sexptype(const char* decl_type);
 };

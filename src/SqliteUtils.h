@@ -31,10 +31,4 @@ Rcpp::List inline dfCreate(std::vector<std::string> names, int n) {
   return out;
 }
 
-
-inline int find_parameter(sqlite3_stmt* stmt, const std::string& name);
-
-inline void bind_parameter(sqlite3_stmt* stmt, int i, int j,
-    const std::string& name, SEXP value_);
-
 #endif // __RSQLSITE_SQLITE_UTILS__

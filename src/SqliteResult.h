@@ -56,8 +56,13 @@ private:
                       SEXPTYPE type);
   void set_raw_value(SEXP col, const int i, const int j);
 
+private:
   static SEXPTYPE datatype_to_sexptype(const int field_type);
   static SEXPTYPE decltype_to_sexptype(const char* decl_type);
+
+  static int find_parameter(sqlite3_stmt* stmt, const std::string& name);
+  static void bind_parameter(sqlite3_stmt* stmt, int i, int j,
+      const std::string& name, SEXP value_);
 };
 
 #endif // __RSQLSITE_SQLITE_RESULT__

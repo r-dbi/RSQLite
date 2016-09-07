@@ -92,100 +92,100 @@ BEGIN_RCPP
 END_RCPP
 }
 // rsqlite_clear_result
-void rsqlite_clear_result(XPtr<SqliteResult> res);
+void rsqlite_clear_result(XPtr<SqliteResult>& res);
 RcppExport SEXP RSQLite_rsqlite_clear_result(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP);
+    Rcpp::traits::input_parameter< XPtr<SqliteResult>& >::type res(resSEXP);
     rsqlite_clear_result(res);
     return R_NilValue;
 END_RCPP
 }
 // rsqlite_fetch
-List rsqlite_fetch(XPtr<SqliteResult> res, int n);
+List rsqlite_fetch(const XPtr<SqliteResult>& res, int n);
 RcppExport SEXP RSQLite_rsqlite_fetch(SEXP resSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP);
+    Rcpp::traits::input_parameter< const XPtr<SqliteResult>& >::type res(resSEXP);
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
     rcpp_result_gen = Rcpp::wrap(rsqlite_fetch(res, n));
     return rcpp_result_gen;
 END_RCPP
 }
 // rsqlite_bind_params
-void rsqlite_bind_params(XPtr<SqliteResult> res, List params);
+void rsqlite_bind_params(const XPtr<SqliteResult>& res, List params);
 RcppExport SEXP RSQLite_rsqlite_bind_params(SEXP resSEXP, SEXP paramsSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP);
+    Rcpp::traits::input_parameter< const XPtr<SqliteResult>& >::type res(resSEXP);
     Rcpp::traits::input_parameter< List >::type params(paramsSEXP);
     rsqlite_bind_params(res, params);
     return R_NilValue;
 END_RCPP
 }
 // rsqlite_bind_rows
-void rsqlite_bind_rows(XPtr<SqliteResult> res, List params);
+void rsqlite_bind_rows(const XPtr<SqliteResult>& res, List params);
 RcppExport SEXP RSQLite_rsqlite_bind_rows(SEXP resSEXP, SEXP paramsSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP);
+    Rcpp::traits::input_parameter< const XPtr<SqliteResult>& >::type res(resSEXP);
     Rcpp::traits::input_parameter< List >::type params(paramsSEXP);
     rsqlite_bind_rows(res, params);
     return R_NilValue;
 END_RCPP
 }
 // rsqlite_has_completed
-bool rsqlite_has_completed(XPtr<SqliteResult> res);
+bool rsqlite_has_completed(const XPtr<SqliteResult>& res);
 RcppExport SEXP RSQLite_rsqlite_has_completed(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP);
+    Rcpp::traits::input_parameter< const XPtr<SqliteResult>& >::type res(resSEXP);
     rcpp_result_gen = Rcpp::wrap(rsqlite_has_completed(res));
     return rcpp_result_gen;
 END_RCPP
 }
 // rsqlite_row_count
-int rsqlite_row_count(XPtr<SqliteResult> res);
+int rsqlite_row_count(const XPtr<SqliteResult>& res);
 RcppExport SEXP RSQLite_rsqlite_row_count(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP);
+    Rcpp::traits::input_parameter< const XPtr<SqliteResult>& >::type res(resSEXP);
     rcpp_result_gen = Rcpp::wrap(rsqlite_row_count(res));
     return rcpp_result_gen;
 END_RCPP
 }
 // rsqlite_rows_affected
-int rsqlite_rows_affected(XPtr<SqliteResult> res);
+int rsqlite_rows_affected(const XPtr<SqliteResult>& res);
 RcppExport SEXP RSQLite_rsqlite_rows_affected(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP);
+    Rcpp::traits::input_parameter< const XPtr<SqliteResult>& >::type res(resSEXP);
     rcpp_result_gen = Rcpp::wrap(rsqlite_rows_affected(res));
     return rcpp_result_gen;
 END_RCPP
 }
 // rsqlite_column_info
-List rsqlite_column_info(XPtr<SqliteResult> res);
+List rsqlite_column_info(const XPtr<SqliteResult>& res);
 RcppExport SEXP RSQLite_rsqlite_column_info(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP);
+    Rcpp::traits::input_parameter< const XPtr<SqliteResult>& >::type res(resSEXP);
     rcpp_result_gen = Rcpp::wrap(rsqlite_column_info(res));
     return rcpp_result_gen;
 END_RCPP
 }
 // rsqlite_result_valid
-bool rsqlite_result_valid(XPtr<SqliteResult> res);
+bool rsqlite_result_valid(const XPtr<SqliteResult>& res);
 RcppExport SEXP RSQLite_rsqlite_result_valid(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< XPtr<SqliteResult> >::type res(resSEXP);
+    Rcpp::traits::input_parameter< const XPtr<SqliteResult>& >::type res(resSEXP);
     rcpp_result_gen = Rcpp::wrap(rsqlite_result_valid(res));
     return rcpp_result_gen;
 END_RCPP

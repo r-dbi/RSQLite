@@ -1,7 +1,7 @@
 #include "SqliteConnection.h"
 
 
-SqliteConnection::SqliteConnection(std::string path, bool allow_ext, int flags, std::string vfs)
+SqliteConnection::SqliteConnection(const std::string& path, bool allow_ext, int flags, const std::string& vfs)
   : pConn_(NULL) {
 
   // Get the underlying database connection

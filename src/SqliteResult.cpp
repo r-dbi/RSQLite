@@ -4,7 +4,7 @@
 
 // Construction ////////////////////////////////////////////////////////////////
 
-SqliteResult::SqliteResult(SqliteConnectionPtr pConn, std::string sql)
+SqliteResult::SqliteResult(SqliteConnectionPtr pConn, const std::string& sql)
   : pStatement_(NULL), pConn_(pConn), complete_(false), ready_(false),
     nrows_(0), ncols_(0), rows_affected_(0), nparams_(0) {
 

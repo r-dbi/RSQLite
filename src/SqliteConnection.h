@@ -20,8 +20,8 @@ typedef boost::shared_ptr<SqliteConnection> SqliteConnectionPtr;
 class SqliteConnection : boost::noncopyable {
 public:
   // Create a new connection handle
-  SqliteConnection(std::string path, bool allow_ext,
-                          int flags, std::string vfs = "");
+  SqliteConnection(const std::string& path, bool allow_ext,
+                          int flags, const std::string& vfs = "");
   virtual ~SqliteConnection();
 
 public:

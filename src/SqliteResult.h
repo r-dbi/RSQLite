@@ -18,7 +18,7 @@ class SqliteResult : boost::noncopyable {
   std::vector<std::string> names_;
 
 public:
-  SqliteResult(SqliteConnectionPtr pConn, std::string sql);
+  SqliteResult(SqliteConnectionPtr pConn, const std::string& sql);
   virtual ~SqliteResult();
 
 public:

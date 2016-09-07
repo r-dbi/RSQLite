@@ -3,7 +3,7 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-XPtr<SqliteResult> rsqlite_send_query(XPtr<SqliteConnectionPtr> con, std::string sql) {
+XPtr<SqliteResult> rsqlite_send_query(XPtr<SqliteConnectionPtr> con, const std::string& sql) {
   SqliteResult* res = new SqliteResult((*con), sql);
   return XPtr<SqliteResult>(res, true);
 }

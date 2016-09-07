@@ -15,7 +15,7 @@ extern "C" {
 
 // [[Rcpp::export]]
 XPtr<SqliteConnectionPtr> rsqlite_connect(
-  std::string path, bool allow_ext, int flags, std::string vfs = "")
+  const std::string& path, bool allow_ext, int flags, const std::string& vfs = "")
 {
 
   SqliteConnectionPtr* pConn = new SqliteConnectionPtr(

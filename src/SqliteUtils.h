@@ -32,7 +32,7 @@ Rcpp::List inline dfCreate(std::vector<std::string> names, int n) {
 }
 
 
-int inline find_parameter(sqlite3_stmt* stmt, std::string name) {
+int inline find_parameter(sqlite3_stmt* stmt, const std::string& name) {
   int i = 0;
 
   i = sqlite3_bind_parameter_index(stmt, name.c_str());
@@ -52,7 +52,7 @@ int inline find_parameter(sqlite3_stmt* stmt, std::string name) {
   return 0;
 }
 
-void inline bind_parameter(sqlite3_stmt* stmt, int i, int j, std::string name, SEXP value_) {
+void inline bind_parameter(sqlite3_stmt* stmt, int i, int j, const std::string& name, SEXP value_) {
   if (name != "") {
     j = find_parameter(stmt, name);
     if (j == 0)

@@ -1,3 +1,9 @@
+## RSQLite 1.0.9009 (2016-09-07)
+
+- Move all functions from headers to modules (#162).
+- Use `astyle` for code formatting (#159).
+
+
 ## RSQLite 1.0.9008 (2016-09-01)
 
 - Improve column type inference, especially if the first value is `NULL` (#111).

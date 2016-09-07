@@ -10,14 +10,14 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2016-09-01                   |
+|date     |2016-09-07                   |
 
 ## Packages
 
 |package  |*  |version    |date       |source                           |
 |:--------|:--|:----------|:----------|:--------------------------------|
 |DBI      |   |0.5        |2016-09-01 |Github (rstats-db/DBI@bc730b9)   |
-|RSQLite  |   |1.0.0      |2016-09-01 |local (rstats-db/RSQLite@NA)     |
+|RSQLite  |   |1.0.0      |2016-09-07 |local (rstats-db/RSQLite@NA)     |
 |testthat |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da) |
 
 # Check results
@@ -41,12 +41,12 @@ Slowest checks
 
 |   |package       | check_time|
 |:--|:-------------|----------:|
-|2  |cummeRbund    |      500.8|
-|4  |GWASTools     |      274.1|
-|3  |DECIPHER      |      269.6|
-|1  |AnnotationHub |      200.1|
-|7  |rangeMapper   |      152.8|
-|10 |tcpl          |       67.4|
+|2  |cummeRbund    |      498.6|
+|4  |GWASTools     |      248.9|
+|3  |DECIPHER      |      244.5|
+|1  |AnnotationHub |        193|
+|7  |rangeMapper   |      140.1|
+|10 |tcpl          |         64|
 
 ## AnnotationHub (2.4.2)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>

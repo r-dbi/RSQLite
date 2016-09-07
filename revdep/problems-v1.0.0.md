@@ -10,14 +10,14 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2016-09-01                   |
+|date     |2016-09-07                   |
 
 ## Packages
 
 |package  |*  |version    |date       |source                           |
 |:--------|:--|:----------|:----------|:--------------------------------|
 |DBI      |   |0.5        |2016-09-01 |Github (rstats-db/DBI@bc730b9)   |
-|RSQLite  |   |1.0.0      |2016-09-01 |local (rstats-db/RSQLite@NA)     |
+|RSQLite  |   |1.0.0      |2016-09-07 |local (rstats-db/RSQLite@NA)     |
 |testthat |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da) |
 
 # Check results

@@ -26,7 +26,7 @@ XPtr<SqliteConnectionPtr> rsqlite_connect(
 }
 
 // [[Rcpp::export]]
-void rsqlite_disconnect(XPtr<SqliteConnectionPtr> con) {
+void rsqlite_disconnect(XPtr<SqliteConnectionPtr>& con) {
   int n = con->use_count();
   if (n > 1) {
     warning(
@@ -39,7 +39,7 @@ void rsqlite_disconnect(XPtr<SqliteConnectionPtr> con) {
 }
 
 // [[Rcpp::export]]
-Rcpp::List rsqlite_get_exception(XPtr<SqliteConnectionPtr> con) {
+Rcpp::List rsqlite_get_exception(const XPtr<SqliteConnectionPtr>& con) {
   return
     Rcpp::List::create(
       Rcpp::Named("errorNum") = (*con)->getExceptionCode(),
@@ -47,18 +47,18 @@ Rcpp::List rsqlite_get_exception(XPtr<SqliteConnectionPtr> con) {
 }
 
 // [[Rcpp::export]]
-void rsqlite_copy_database(XPtr<SqliteConnectionPtr> from,
-                           XPtr<SqliteConnectionPtr> to) {
+void rsqlite_copy_database(const XPtr<SqliteConnectionPtr>& from,
+                           const XPtr<SqliteConnectionPtr>& to) {
   (*from)->copy_to((*to));
 }
 
 // [[Rcpp::export]]
-bool rsqlite_connection_valid(XPtr<SqliteConnectionPtr> con) {
+bool rsqlite_connection_valid(const XPtr<SqliteConnectionPtr>& con) {
   return con.get() != NULL;
 }
 
 // [[Rcpp::export]]
-bool rsqlite_import_file(XPtr<SqliteConnectionPtr> con,
+bool rsqlite_import_file(const XPtr<SqliteConnectionPtr>& con,
                          const std::string& name, const std::string& value,
                          const std::string& sep, const std::string& eol,
                          int skip) {

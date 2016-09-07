@@ -15,7 +15,9 @@ a.out.dSYM
 ^revdep$
 ^src/.*\.d$
 ^src/Makevars\.local$
-^\.metadata^
-^\.settings^
+^\.metadata$
+^\.settings$
+^Debug$
+^Release$
 ^src/[.].*$
 ^.*[.]pro

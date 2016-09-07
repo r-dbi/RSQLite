@@ -1,7 +1,7 @@
 #include "SqliteConnection.h"
 
 
-SqliteConnectionWrapper::SqliteConnectionWrapper(std::string path, bool allow_ext, int flags, std::string vfs)
+SqliteConnection::SqliteConnection(std::string path, bool allow_ext, int flags, std::string vfs)
   : pConn_(NULL) {
 
   // Get the underlying database connection
@@ -14,27 +14,27 @@ SqliteConnectionWrapper::SqliteConnectionWrapper(std::string path, bool allow_ex
   }
 }
 
-SqliteConnectionWrapper::~SqliteConnectionWrapper() {
+SqliteConnection::~SqliteConnection() {
   try {
     sqlite3_close_v2(pConn_);
   } catch (...) {}
 }
 
-int SqliteConnectionWrapper::getExceptionCode() const {
+int SqliteConnection::getExceptionCode() const {
   if (pConn_ != NULL)
     return sqlite3_errcode(pConn_);
   else
     return 0;
 }
 
-std::string SqliteConnectionWrapper::getException() const {
+std::string SqliteConnection::getException() const {
   if (pConn_ != NULL)
     return std::string(sqlite3_errmsg(pConn_));
   else
     return std::string();
 }
 
-void SqliteConnectionWrapper::copy_to(SqliteConnectionPtr pDest) {
+void SqliteConnection::copy_to(SqliteConnectionPtr pDest) {
   sqlite3_backup* backup =
     sqlite3_backup_init(pDest->conn(), "main", pConn_, "main");
 

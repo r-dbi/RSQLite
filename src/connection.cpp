@@ -19,7 +19,7 @@ XPtr<SqliteConnectionPtr> rsqlite_connect(
 {
 
   SqliteConnectionPtr* pConn = new SqliteConnectionPtr(
-    new SqliteConnectionWrapper(path, allow_ext, flags, vfs)
+    new SqliteConnection(path, allow_ext, flags, vfs)
   );
 
   return XPtr<SqliteConnectionPtr>(pConn, true);

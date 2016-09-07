@@ -86,7 +86,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
 
     if (nrow(value) > 0) {
       sql <- parameterised_insert(conn, name, value)
-      rs <- dbSendQuery(conn, sql)
+      rs <- dbSendStatement(conn, sql)
 
       names(value) <- rep("", length(value))
       tryCatch(
@@ -207,7 +207,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
       sql <- sqliteBuildTableDefinitionNoWarn(conn, name, d,
                                               field.types = field.types,
                                               row.names = row.names)
-      dbGetQuery(conn, sql)
+      dbExecute(conn, sql)
     }
 
     skip <- skip + as.integer(header)

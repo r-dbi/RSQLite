@@ -269,20 +269,7 @@ SEXP SqliteResult::set_col_value(SEXP col, const int i, const int j, const int n
     fill_default_col_value(col, i, type);
   }
   else {
-    switch (type) {
-    case INTSXP:
-      INTEGER(col)[i] = sqlite3_column_int(pStatement_, j);
-      break;
-    case REALSXP:
-      REAL(col)[i] = sqlite3_column_double(pStatement_, j);
-      break;
-    case STRSXP:
-      SET_STRING_ELT(col, i, Rf_mkCharCE((const char*) sqlite3_column_text(pStatement_, j), CE_UTF8));
-      break;
-    case VECSXP:
-      set_raw_value(col, i, j);
-      break;
-    }
+    fill_col_value(col, i, j, type);
   }
   return col;
 }
@@ -313,6 +300,26 @@ void SqliteResult::fill_default_col_value(const SEXP col, const int i, const SEX
     break;
   case VECSXP:
     SET_VECTOR_ELT(col, i, Rcpp::RawVector(0));
+    break;
+  }
+}
+
+void SqliteResult::fill_col_value(const SEXP col, const int i, const int j,
+                                  SEXPTYPE type) {
+  switch (type) {
+  case INTSXP:
+    INTEGER(col)[i] = sqlite3_column_int(pStatement_, j);
+    break;
+  case REALSXP:
+    REAL(col)[i] = sqlite3_column_double(pStatement_, j);
+    break;
+  case STRSXP:
+    SET_STRING_ELT(col, i,
+                   Rf_mkCharCE((const char*) sqlite3_column_text(pStatement_, j),
+                               CE_UTF8));
+    break;
+  case VECSXP:
+    set_raw_value(col, i, j);
     break;
   }
 }

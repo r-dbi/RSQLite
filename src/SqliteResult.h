@@ -52,6 +52,8 @@ private:
   SEXP set_col_value(SEXP col, const int i, const int j, const int n);
   SEXP alloc_col(const SEXPTYPE type, const int i, const int n);
   void fill_default_col_value(SEXP col, const int i, const SEXPTYPE type);
+  void fill_col_value(const SEXP col, const int i, const int j,
+                      SEXPTYPE type);
   void set_raw_value(SEXP col, const int i, const int j);
 
   static SEXPTYPE datatype_to_sexptype(const int field_type);

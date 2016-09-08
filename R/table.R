@@ -69,6 +69,25 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     if (!found || overwrite) {
       sql <- sqlCreateTable(conn, name, value, row.names = row.names)
       dbGetQuery(conn, sql)
+    } else if (append) {
+      col_names <- dbListFields(conn, name)
+      if (length(col_names) == length(value)) {
+        if (!all(names(value) == col_names)) {
+          if (all(tolower(names(value)) == tolower(col_names))) {
+            warning("Column names will be matched ignoring character case",
+                    call. = FALSE)
+          } else {
+            warning("Column name mismatch, columns will be matched by position. This warning may be converted to an error soon.",
+                    call. = FALSE)
+            names(value) <- col_names
+          }
+        }
+      } else {
+        if (!all(names(value) %in% col_names)) {
+          stop("Columns ", paste0(setdiff(names(value), col_names)),
+               " not found in table ", name, call. = FALSE)
+        }
+      }
     }
 
     if (nrow(value) > 0) {
@@ -163,11 +182,11 @@ setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
   value <- sqlRownamesToColumn(value, row.names)
 
   # Convert factors to strings
-  is_factor <- vapply(value, is.factor, logical(1))
+  is_factor <- vlapply(value, is.factor)
   value[is_factor] <- lapply(value[is_factor], as.character)
 
   # Convert all strings to utf-8
-  is_char <- vapply(value, is.character, logical(1))
+  is_char <- vlapply(value, is.character)
   value[is_char] <- lapply(value[is_char], enc2utf8)
 
   value
@@ -224,18 +243,6 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 )
 
 
-#' Does the table exist?
-#'
-#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
-#' @param name String, name of table. Match is case insensitive.
-#' @export
-setMethod("dbExistsTable", c("SQLiteConnection", "character"),
-  function(conn, name) {
-    tolower(name) %in% tolower(dbListTables(conn))
-  }
-)
-
-
 #' Remove a table from the database.
 #'
 #' Executes the SQL \code{DROP TABLE}.
@@ -250,16 +257,55 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
   }
 )
 
+
+#' Does the table exist?
+#'
+#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
+#' @param name String, name of table. Match is case insensitive.
+#' @export
+setMethod(
+  "dbExistsTable", c("SQLiteConnection", "character"),
+  function(conn, name) {
+    rs <- sqliteListTablesWithName(conn, name)
+    on.exit(dbClearResult(rs), add = TRUE)
+
+    nrow(dbFetch(rs, 1L)) > 0
+  }
+)
+
+
 #' List available SQLite tables.
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @export
 setMethod("dbListTables", "SQLiteConnection", function(conn) {
-  dbGetQuery(conn, "SELECT name FROM
-    (SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master)
-    WHERE type = 'table' OR type = 'view'
-    ORDER BY name")$name
+  rs <- sqliteListTables(conn)
+  on.exit(dbClearResult(rs), add = TRUE)
+
+  dbFetch(rs)$name
 })
+
+sqliteListTables <- function(conn) {
+  sql <- sqliteListTablesQuery(conn)
+  dbSendQuery(conn, sql)
+}
+
+sqliteListTablesWithName <- function(conn, name) {
+  sql <- sqliteListTablesQuery(conn, SQL("$name"))
+  rs <- dbSendQuery(conn, sql)
+  dbBind(rs, list(name = tolower(name)))
+  rs
+}
+
+sqliteListTablesQuery <- function(conn, name = NULL) {
+  SQL(paste(
+    "SELECT name FROM",
+    "(SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master)",
+    "WHERE (type = 'table' OR type = 'view')",
+    if (!is.null(name)) paste0("AND (lower(name) = ", dbQuoteString(conn, name), ")"),
+    "ORDER BY name",
+    sep = "\n"))
+}
 
 #' List fields in specified table.
 #'
@@ -274,7 +320,7 @@ setMethod("dbListTables", "SQLiteConnection", function(conn) {
 setMethod("dbListFields", c("SQLiteConnection", "character"),
   function(conn, name) {
     rs <- dbSendQuery(conn, paste("SELECT * FROM ",
-                                  dbQuoteIdentifier(conn, name), "LIMIT 1"))
+                                  dbQuoteIdentifier(conn, name), "LIMIT 0"))
     on.exit(dbClearResult(rs))
 
     names(fetch(rs, n = 1))
@@ -318,5 +364,3 @@ setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
     stop("Unsupported type", call. = FALSE)
   )
 })
-
-

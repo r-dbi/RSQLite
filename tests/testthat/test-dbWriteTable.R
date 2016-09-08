@@ -156,3 +156,42 @@ test_that("options work", {
   dbWriteTable(con, "dat", "dat-rn.txt", sep="|", eol="\r\n", overwrite = TRUE)
   expect_equal(dbReadTable(con, "dat"), expected)
 })
+
+
+# Append ------------------------------------------------------------------
+
+test_that("appending to table ignores column order and column names", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "a", data.frame(a = 1, b = 2))
+  dbWriteTable(con, "a", data.frame(b = 1, a = 2), append = TRUE)
+  dbWriteTable(con, "a", data.frame(c = 1, d = 2), append = TRUE)
+
+  a <- dbReadTable(con, "a")
+  expect_identical(a, data.frame(a = c(1, 1, 1), b = c(2, 2, 2)))
+})
+
+test_that("appending to table gives error if fewer columns", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "a", data.frame(a = 1, b = 2))
+  expect_error(dbWriteTable(con, "a", data.frame(b = 1), append = TRUE))
+  expect_error(dbWriteTable(con, "a", data.frame(c = 1), append = TRUE))
+
+  a <- dbReadTable(con, "a")
+  expect_identical(a, data.frame(a = 1, b = 2))
+})
+
+test_that("appending to table gives error if more columns", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "a", data.frame(a = 1, b = 2))
+  expect_error(dbWriteTable(con, "a", data.frame(a = 1, b = 2, c = 3), append = TRUE))
+
+  a <- dbReadTable(con, "a")
+  expect_identical(a, data.frame(a = 1, b = 2))
+})
+

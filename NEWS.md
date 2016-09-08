@@ -1,3 +1,12 @@
+## RSQLite 1.0.9010 (2016-09-08)
+
+- Speed up `dbExistsTable()` function (#166).
+- If the number of data frame columns matches the number of existing columns for `dbWriteTable(append = TRUE)`, columns will be matched by position for compatibility, with a warning in case of a name mismatch (#164).
+- Now using `sqlite3` rules for determining column affinity, for compatibility with reverse dependencies (#160).
+- Further refactoring and cleanup of C++ code (#162).
+- Enable JSON1 extension for SQLite (#152, @tigertoes).
+
+
 ## RSQLite 1.0.9009 (2016-09-07)
 
 - Move all functions from headers to modules (#162).

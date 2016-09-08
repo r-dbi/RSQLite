@@ -250,7 +250,11 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 #' @export
 setMethod("dbExistsTable", c("SQLiteConnection", "character"),
   function(conn, name) {
-    tolower(name) %in% tolower(dbListTables(conn))
+    rs <- dbSendQuery(conn, sqliteListTables(conn, SQL("$name")))
+    on.exit(dbClearResult(rs), add = TRUE)
+
+    dbBind(rs, list(name = tolower(name)))
+    nrow(dbFetch(rs, 1L)) > 0
   }
 )
 

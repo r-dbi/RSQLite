@@ -10,7 +10,7 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2016-09-07                   |
+|date     |2016-09-08                   |
 
 ## Packages
 
@@ -22,18 +22,17 @@
 |knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
 |Rcpp      |   |0.12.7     |2016-09-05 |cran (@0.12.7)                     |
 |rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
-|RSQLite   |   |1.0.9009   |2016-09-07 |local (rstats-db/RSQLite@d96defc)  |
+|RSQLite   |   |1.0.9010   |2016-09-08 |local (rstats-db/RSQLite@3eb264c)  |
 |testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
 
-112 packages
+111 packages
 
 |package            |version   | errors| warnings| notes|
 |:------------------|:---------|------:|--------:|-----:|
 |AnnotationDbi      |1.34.4    |      0|        2|     5|
 |AnnotationForge    |1.14.2    |      0|        1|     6|
-|AnnotationHubData  |1.2.2     |      1|        0|     3|
 |AnnotationHub      |2.4.2     |      0|        1|     0|
 |APSIM              |0.9.0     |      0|        0|     0|
 |archivist          |2.1       |      0|        0|     2|
@@ -50,7 +49,7 @@
 |clstutils          |1.20.0    |      0|        2|     5|
 |CNEr               |1.8.3     |      0|        2|     1|
 |CollapsABEL        |0.10.8    |      0|        0|     0|
-|cummeRbund         |2.14.0    |      1|        1|     7|
+|cummeRbund         |2.14.0    |      0|        1|     7|
 |customProDB        |1.12.0    |      1|        1|     3|
 |DBI                |0.5       |      0|        0|     1|
 |DECIPHER           |2.0.2     |      1|        3|     3|
@@ -101,7 +100,7 @@
 |poplite            |0.99.16   |      1|        1|     1|
 |ProjectTemplate    |0.7       |      0|        0|     0|
 |quantmod           |0.4-6     |      0|        0|     1|
-|rangeMapper        |0.3-0     |      2|        1|     0|
+|rangeMapper        |0.3-0     |      0|        1|     0|
 |RecordLinkage      |0.4-10    |      0|        1|     0|
 |recordr            |1.0.3     |      0|        0|     1|
 |recoup             |1.0.2     |      2|        0|     1|
@@ -144,17 +143,6 @@
 |vegdata            |0.9       |      0|        0|     0|
 |vmsbase            |2.1.3     |      1|        0|     0|
 
-Slowest checks
-
-|   |package           | check_time|
-|:--|:-----------------|----------:|
-|3  |AnnotationHubData |     5006.1|
-|36 |GenomicFeatures   |     3785.1|
-|4  |AnnotationHub     |     2659.4|
-|28 |ensembldb         |      643.1|
-|62 |OrganismDbi       |      627.2|
-|42 |lumi              |      488.2|
-
 ## AnnotationDbi (1.34.4)
 Maintainer: Bioconductor Package Maintainer
  <maintainer@bioconductor.org>
@@ -173,8 +161,7 @@ R.
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
                    user system elapsed
-AnnDbPkg-checker 36.024  0.444  36.488
-Bimap-direction   5.076  0.348   5.426
+AnnDbPkg-checker 33.464  0.368  33.865
 
 checking for unstated dependencies in ‘tests’ ... WARNING
 'library' or 'require' call not declared from: ‘org.testing.db’
@@ -227,25 +214,11 @@ Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-  incomplete final line found on 'MakingNewOrganismPackages.Rmd'
-Error in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  : 
-  Running 'texi2dvi' on 'SQLForge.tex' failed.
-LaTeX errors:
-! Dimension too large.
-\fb@put@frame ...p \ifdim \dimen@ >\ht \@tempboxa 
-                                                  \fb@putboxa #1\fb@afterfra...
-... 8 lines ...
-! Dimension too large.
-\fb@put@frame ...p \ifdim \dimen@ >\ht \@tempboxa 
-                                                  \fb@putboxa #1\fb@afterfra...
-l.8589 ...\color{messagecolor}{\#\# }}\end{kframe}
-                                                  
-! Dimension too large.
-\fb@put@frame ...p \ifdim \dimen@ >\ht \@tempboxa 
-                                                  \fb@putboxa #1\fb@afterfra...
-l.8589 ..
-Calls: buildVignettes -> texi2pdf -> texi2dvi
+Quitting from lines 269-272 (MakingNewAnnotationPackages.Rnw) 
+Error: processing vignette 'MakingNewAnnotationPackages.Rnw' failed with diagnostics:
+1: Start tag expected, '<' not found
 Execution halted
+
 
 checking installed package size ... NOTE
   installed size is  6.1Mb
@@ -304,63 +277,6 @@ These lines will be truncated in the PDF manual.
 
 checking for unstated dependencies in vignettes ... NOTE
 'library' or 'require' call not declared from: ‘Biostrings’
-```
-
-## AnnotationHubData (1.2.2)
-Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
-
-1 error  | 0 warnings | 3 notes
-
-```
-checking tests ... ERROR
-Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
-Last 13 lines of output:
-  
-  Test files with failing tests
-  
-     test_recipe.R 
-       test_UCSC2BitPreparer_recipe 
-  
-  
-  Error in BiocGenerics:::testPackage("AnnotationHubData") : 
-    unit tests failed for package AnnotationHubData
-  In addition: Warning message:
-  In value[[3L]](cond) :
-    BioCarta.owl.gz: Failure when receiving data from the peer
-  Execution halted
-
-checking top-level files ... NOTE
-Non-standard file/directory found at top level:
-  ‘appveyor.yml’
-
-checking dependencies in R code ... NOTE
-Missing object imported by a ':::' call: ‘AnnotationHub:::.db_connection’
-Unexported object imported by a ':::' call: ‘OrganismDbi:::.packageTaxIds’
-  See the note in ?`:::` about the use of this operator.
-
-checking R code for possible problems ... NOTE
-.NCBIMetadataFromUrl: no visible binding for global variable ‘results’
-.NCBIMetadataFromUrl: no visible binding for global variable ‘specData’
-.makeComplexGR: no visible binding for global variable ‘seqname’
-jsonPath: no visible binding for global variable ‘SourceFile’
-jsonPath: no visible binding for global variable ‘HubRoot’
-pointer: no visible global function definition for ‘tail’
-print.pointer: no visible global function definition for
-  ‘capture.output’
-print.pointer: no visible global function definition for ‘str’
-ptr: no visible global function definition for ‘tail’
-trackWithAuxiliaryTablesToGRanges: no visible binding for global
-  variable ‘seqname’
-Undefined global functions or variables:
-  HubRoot SourceFile capture.output results seqname specData str tail
-Consider adding
-  importFrom("utils", "capture.output", "str", "tail")
-to your NAMESPACE file.
-
-Found the following calls to data() loading into the global environment:
-File ‘AnnotationHubData/R/makeNCBIToOrgDbs.R’:
-  data(specData, package = "GenomeInfoDb")
-See section ‘Good practice’ in ‘?data’.
 ```
 
 ## AnnotationHub (2.4.2)
@@ -445,8 +361,8 @@ R.
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
                 user system elapsed
-addExperiments 5.552  0.072   5.651
-getResultVars  5.296  0.024   5.327
+getResultVars  5.928  0.032   5.975
+addExperiments 5.888  0.060   5.955
 
 checking dependencies in R code ... NOTE
 Unexported objects imported by ':::' calls:
@@ -508,7 +424,10 @@ Found the following significant warnings:
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
-... 17 lines ...
+... 14 lines ...
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
@@ -517,9 +436,6 @@ Found the following significant warnings:
 Deprecated functions may be defunct as soon as of the next release of
 R.
 See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-                    user system elapsed
-batchReduceResults 5.224  0.052   5.288
 ```
 
 ## bibliospec (0.0.4)
@@ -831,54 +747,31 @@ Bug reports: https://bitbucket.org/kindlychung/collapsabel2/issues
 ## cummeRbund (2.14.0)
 Maintainer: Loyal A. Goff <lgoff@csail.mit.edu>
 
-1 error  | 1 warning  | 7 notes
+0 errors | 1 warning  | 7 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘cummeRbund-Ex.R’ failed
-The error most likely occurred in:
+checking examples ... WARNING
+Found the following significant warnings:
 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: MAplot
-> ### Title: MAplot
-> ### Aliases: MAplot MAplot,CuffData-method
-> ### Keywords: heatmap
-> 
-... 30 lines ...
-Warning: 'make.db.names' is deprecated.
-Use 'dbQuoteIdentifier' instead.
-See help("Deprecated")
-Populating samples table...
-Warning: 'make.db.names' is deprecated.
-Use 'dbQuoteIdentifier' instead.
-See help("Deprecated")
-Error in eval(expr, envir, enclos) : 
-  table samples has no column named index
-Calls: readCufflinks ... initialize -> initialize -> rsqlite_send_query -> .Call
-Execution halted
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-
-Loading required package: IRanges
-Loading required package: GenomeInfoDb
-Loading required package: Gviz
-Loading required package: grid
-
-Attaching package: 'cummeRbund'
-... 8 lines ...
-    promoters
-
-The following object is masked from 'package:BiocGenerics':
-
-    conditions
-
-
-Error: processing vignette 'cummeRbund-example-workflow.Rnw' failed with diagnostics:
- chunk 4 (label = model_fit_1) 
-Error in eval(expr, envir, enclos) : near ")": syntax error
-Execution halted
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+... 40 lines ...
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+Examples with CPU or elapsed time > 5s
+         user system elapsed
+MAplot 45.268   0.82  46.233
 
 checking package dependencies ... NOTE
 Depends: includes the non-default packages:
@@ -1569,15 +1462,15 @@ Found the following significant warnings:
 ... 85 lines ...
 Examples with CPU or elapsed time > 5s
                                user system  elapsed
-makeTxDbFromBiomart        1916.040 68.528 2035.479
-makeFeatureDbFromUCSC       874.004  8.668 1028.242
-makeTxDbFromUCSC             89.084  1.864  205.941
-coordinate-mapping-methods   31.076  0.672   31.880
-coverageByTranscript         29.860  1.280   31.476
-makeTxDbFromGRanges          26.196  0.372   26.586
-makeTxDbFromGFF              15.964  0.388   16.372
-extractTranscriptSeqs        12.984  0.168   13.158
-transcriptLocs2refLocs       10.508  0.076   10.584
+makeTxDbFromBiomart        1490.104 38.488 1582.826
+makeFeatureDbFromUCSC       825.084 22.980  991.302
+makeTxDbFromUCSC             62.168  1.340  178.307
+coordinate-mapping-methods   32.552  0.740   33.920
+coverageByTranscript         31.392  1.428   32.853
+makeTxDbFromGRanges          18.528  0.452   19.005
+extractTranscriptSeqs        13.952  0.376   14.341
+makeTxDbFromGFF              12.812  0.324   13.208
+transcriptLocs2refLocs        8.668  0.196    8.875
 
 checking package dependencies ... NOTE
 Depends: includes the non-default packages:
@@ -2678,11 +2571,11 @@ R.
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
                             user system elapsed
-makeOrganismDbFromBiomart 14.380  0.444  19.742
-rangeBasedAccessors        9.724  0.316  10.044
-OrganismDb                 7.968  0.256   8.232
-makeOrganismDbFromTxDb     6.804  0.304  85.315
-makeOrganismDbFromUCSC     5.452  0.316  90.176
+makeOrganismDbFromBiomart 12.784  0.200  19.500
+rangeBasedAccessors        7.736  0.040   7.775
+OrganismDb                 6.988  0.140   7.131
+makeOrganismDbFromTxDb     6.500  0.076  86.303
+makeOrganismDbFromUCSC     5.276  0.080  83.525
 
 checking dependencies in R code ... NOTE
 Unexported object imported by a ':::' call: ‘BiocGenerics:::testPackage’
@@ -3076,59 +2969,19 @@ See section ‘Good practice’ in ‘?attach’.
 ## rangeMapper (0.3-0)
 Maintainer: Mihai Valcu <valcu@orn.mpg.de>
 
-2 errors | 1 warning  | 0 notes
+0 errors | 1 warning  | 0 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘rangeMapper-Ex.R’ failed
-The error most likely occurred in:
+checking examples ... WARNING
+Found the following significant warnings:
 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: WKT2SpatialPolygonsDataFrame
-> ### Title: Convert WKT polygons to SpatialPolygonsDataFrame
-> ### Aliases: WKT2SpatialPolygonsDataFrame vertices
-> ###   vertices,SpatialPolygons-method
-> 
-... 28 lines ...
-> 
-> 
-> dbcon = rangeMap.start(file = "test.sqlite", overwrite = TRUE, dir = tempdir() )
-New session 2016-09-07 15:22:15
-PROJECT: test.sqlite 
-DIRECTORY: /tmp/RtmpNi0ydg
-> global.bbox.save(con = dbcon, bbox = X)
-Error in eval(substitute(expr), envir, enclos) : 
-  table bbox has no column named min
-Calls: global.bbox.save ... initialize -> initialize -> rsqlite_send_query -> .Call
-Execution halted
-
-checking tests ... ERROR
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-  Error in eval(substitute(expr), envir, enclos) : 
-    table bbox has no column named min
-  Calls: test_check ... initialize -> initialize -> rsqlite_send_query -> .Call
-  testthat results ================================================================
-  OK: 9 SKIPPED: 0 FAILED: 5
-  1. Error: Pipeline works forward only (@test-1_projectINI.R#35) 
-  2. Error: Range overlay returns a data.frame (@test-1_projectINI.R#67) 
-  3. Error: reprojecting on the fly (@test-2_processRanges.R#10) 
-  4. Error: ONE SpPolyDF NO metadata (@test-2_processRanges.R#22) 
-  5. Error: ONE SpPolyDF WITH metadata (@test-2_processRanges.R#41) 
-  
-  Error: testthat unit tests failed
-  Execution halted
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because Appendix_S2_Valcu_et_al_2012.Rmd appears to be an R Markdown v2 document.
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because Appendix_S3_Valcu_et_al_2012.Rmd appears to be an R Markdown v2 document.
-Quitting from lines 27-35 (Appendix_S3_Valcu_et_al_2012.Rmd) 
-Error: processing vignette 'Appendix_S3_Valcu_et_al_2012.Rmd' failed with diagnostics:
-table bbox has no column named min
-Execution halted
-
+  Warning: 'make.db.names' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+Examples with CPU or elapsed time > 5s
+              user system elapsed
+rangeMap.save    5  0.008   5.014
 ```
 
 ## RecordLinkage (0.4-10)
@@ -3485,12 +3338,12 @@ Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
   1 Test Suite : 
   specL RUnit Tests - 9 test functions, 1 error, 0 failures
-  ERROR in /tmp/RtmppA3Sf5/RLIBS_8fc7c1ae142/specL/unitTests/test_read.bibliospec.R: Error while sourcing  /tmp/RtmppA3Sf5/RLIBS_8fc7c1ae142/specL/unitTests/test_read.bibliospec.R : Error in msg$errorMsg : $ operator is invalid for atomic vectors
+  ERROR in /tmp/RtmpUJRSVo/RLIBS_8f8464856f7/specL/unitTests/test_read.bibliospec.R: Error while sourcing  /tmp/RtmpUJRSVo/RLIBS_8f8464856f7/specL/unitTests/test_read.bibliospec.R : Error in msg$errorMsg : $ operator is invalid for atomic vectors
   
   Test files with failing tests
   
      test_read.bibliospec.R 
-       /tmp/RtmppA3Sf5/RLIBS_8fc7c1ae142/specL/unitTests/test_read.bibliospec.R 
+       /tmp/RtmpUJRSVo/RLIBS_8f8464856f7/specL/unitTests/test_read.bibliospec.R 
   
   
   Error in BiocGenerics:::testPackage("specL") : 
@@ -3846,24 +3699,24 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
- options("getSymbols.warning4.0"=FALSE). See ?getSymbols for more details.
-Warning in if (as.character(sc[[1]]) != calling.fun) return() :
-  the condition has length > 1 and only the first element will be used
-trying URL 'http://www.rba.gov.au/statistics/tables/xls/d03hist.xls'
-Content type 'application/vnd.ms-excel' length 272896 bytes (266 KB)
-==================================================
-downloaded 266 KB
+INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
+Sep 08, 2016 12:26:36 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetData/QNA/CAN.B1_GE.CARSA.Q?format=compact_v2
+Sep 08, 2016 12:26:37 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetData/QNA/CAN+USA+MEX.B1_GE.CARSA.Q?format=compact_v2
+Sep 08, 2016 12:26:37 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/dataflow/ESTAT/ei_nama_q/latest
 ... 8 lines ...
-The following objects are masked from ‘package:base’:
-
-    as.Date, as.Date.numeric
-
+SEVERE: Connection failed. HTTP error code : 500, message: Internal Server Error
+SDMX meaning: Error on the provider side.
+Sep 08, 2016 12:28:14 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getDataflow
+SEVERE: Exception caught parsing results from call to provider ECB
 
 Error: processing vignette 'Guide.Stex' failed with diagnostics:
- chunk 41 
-Error in .local(drv, ...) : 
-  Failed to connect to database: Error: Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
-
+ chunk 6 
+Error in .local(serIDs, con, ...) : 
+  EXR.Q.USD.EUR.SP00.A error: it.bancaditalia.oss.sdmx.util.SdmxException: Exception. Class: it.bancaditalia.oss.sdmx.util.SdmxException .Message: Connection failed. HTTP error code : 500, message: Internal Server Error
+SDMX meaning: Error on the provider side.
 Execution halted
 ```
 

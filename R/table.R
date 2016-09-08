@@ -274,11 +274,15 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @export
 setMethod("dbListTables", "SQLiteConnection", function(conn) {
-  dbGetQuery(conn, "SELECT name FROM
+  dbGetQuery(conn, sqliteListTables())$name
+})
+
+sqliteListTables <- function() {
+  "SELECT name FROM
     (SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master)
     WHERE (type = 'table' OR type = 'view')
-    ORDER BY name")$name
-})
+    ORDER BY name"
+}
 
 #' List fields in specified table.
 #'

@@ -95,8 +95,8 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
       )
     }
 
-    on.exit(NULL)
     dbCommit(conn, "dbWriteTable")
+    on.exit(NULL)
     TRUE
   }
 )
@@ -213,8 +213,8 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
     skip <- skip + as.integer(header)
     rsqlite_import_file(conn@ptr, name, value, sep, eol, skip)
 
-    on.exit(NULL)
     dbCommit(conn)
+    on.exit(NULL)
     invisible(TRUE)
   }
 )

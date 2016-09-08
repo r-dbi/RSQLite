@@ -276,7 +276,7 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
 setMethod("dbListTables", "SQLiteConnection", function(conn) {
   dbGetQuery(conn, "SELECT name FROM
     (SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master)
-    WHERE type = 'table' OR type = 'view'
+    WHERE (type = 'table' OR type = 'view')
     ORDER BY name")$name
 })
 

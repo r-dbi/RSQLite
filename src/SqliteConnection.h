@@ -14,15 +14,15 @@
 // connection alive as long as there are references to this object alive.
 
 // convenience typedef for shared_ptr to SqliteConnectionWrapper
-class SqliteConnectionWrapper;
-typedef boost::shared_ptr<SqliteConnectionWrapper> SqliteConnectionPtr;
+class SqliteConnection;
+typedef boost::shared_ptr<SqliteConnection> SqliteConnectionPtr;
 
-class SqliteConnectionWrapper : boost::noncopyable {
+class SqliteConnection : boost::noncopyable {
 public:
   // Create a new connection handle
-  SqliteConnectionWrapper(std::string path, bool allow_ext,
-                          int flags, std::string vfs = "");
-  virtual ~SqliteConnectionWrapper();
+  SqliteConnection(const std::string& path, bool allow_ext,
+                   int flags, const std::string& vfs = "");
+  virtual ~SqliteConnection();
 
 public:
   // Get access to the underlying sqlite3*
@@ -39,7 +39,7 @@ public:
 
 public:
   // Copies a database
-  void copy_to(SqliteConnectionPtr pDest);
+  void copy_to(const SqliteConnectionPtr& pDest);
 
 private:
   sqlite3* pConn_;

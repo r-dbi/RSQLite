@@ -1,9 +1,9 @@
 context("affinity")
 
-check_affinity <- function(affinity, type) {
+check_affinity <- function(affinity, type, integer_type = type) {
   con <- memory_db()
   on.exit(dbDisconnect(con))
-  
+
   dbExecute(con, paste0("CREATE TABLE a (a ", affinity, ")"))
   dbWriteTable(con, "a", data.frame(a = NA_integer_), append = TRUE)
   dbWriteTable(con, "a", data.frame(a = 1L), append = TRUE)
@@ -15,20 +15,22 @@ check_affinity <- function(affinity, type) {
   dbWriteTable(con, "a", data.frame(a = 7L), append = TRUE)
   dbWriteTable(con, "a", list_df(a = list(as.raw(8))), append = TRUE)
   dbWriteTable(con, "a", data.frame(a = 9L), append = TRUE)
-  
+
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 0")$a), type)
   expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 1")$a), type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 2")$a), type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 3")$a), type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 4")$a), type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 5")$a), type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 6")$a), type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 7")$a), type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 8")$a), type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 9")$a), type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 10")$a), type)
-  
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 2")$a), integer_type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 3")$a), integer_type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 4")$a), integer_type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 5")$a), integer_type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 6")$a), integer_type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 7")$a), integer_type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 8")$a), integer_type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 9")$a), integer_type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 10")$a), integer_type)
+
   rs <- dbSendQuery(con, "SELECT * FROM a")
   expect_equal(class(dbFetch(rs, 0)$a), type)
+  expect_equal(class(dbFetch(rs, 1)$a), type)
   expect_equal(class(dbFetch(rs, 1)$a), type)
   expect_equal(class(dbFetch(rs, 1)$a), type)
   expect_equal(class(dbFetch(rs, 1)$a), type)
@@ -45,14 +47,13 @@ test_that("affinity checks", {
   check_affinity("INTEGER", "integer")
   check_affinity("TEXT", "character")
   check_affinity("REAL", "numeric")
-  skip("NYI")
   check_affinity("INT", "integer")
   check_affinity("CHAR", "character")
   check_affinity("CLOB", "character")
-  check_affinity("BLOB", "list")
   check_affinity("FLOA", "numeric")
   check_affinity("DOUB", "numeric")
-  check_affinity("NUMERIC", "numeric")
+  check_affinity("NUMERIC", "numeric", "integer")
+  check_affinity("BLOB", "list", "integer")
 })
 
 test_that("affinity checks for inline queries", {

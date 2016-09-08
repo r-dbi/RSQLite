@@ -7,7 +7,6 @@
 #include "sqlite3/sqlite3.h"
 
 #include "SqliteConnection.h"
-#include "SqliteUtils.h"
 
 class SqliteResult : boost::noncopyable {
   sqlite3_stmt* pStatement_;

@@ -163,11 +163,11 @@ setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
   value <- sqlRownamesToColumn(value, row.names)
 
   # Convert factors to strings
-  is_factor <- vapply(value, is.factor, logical(1))
+  is_factor <- vlapply(value, is.factor)
   value[is_factor] <- lapply(value[is_factor], as.character)
 
   # Convert all strings to utf-8
-  is_char <- vapply(value, is.character, logical(1))
+  is_char <- vlapply(value, is.character)
   value[is_char] <- lapply(value[is_char], enc2utf8)
 
   value

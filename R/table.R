@@ -243,18 +243,6 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 )
 
 
-#' Does the table exist?
-#'
-#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
-#' @param name String, name of table. Match is case insensitive.
-#' @export
-setMethod("dbExistsTable", c("SQLiteConnection", "character"),
-  function(conn, name) {
-    tolower(name) %in% tolower(dbListTables(conn))
-  }
-)
-
-
 #' Remove a table from the database.
 #'
 #' Executes the SQL \code{DROP TABLE}.
@@ -269,16 +257,55 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
   }
 )
 
+
+#' Does the table exist?
+#'
+#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
+#' @param name String, name of table. Match is case insensitive.
+#' @export
+setMethod(
+  "dbExistsTable", c("SQLiteConnection", "character"),
+  function(conn, name) {
+    rs <- sqliteListTablesWithName(conn, name)
+    on.exit(dbClearResult(rs), add = TRUE)
+
+    nrow(dbFetch(rs, 1L)) > 0
+  }
+)
+
+
 #' List available SQLite tables.
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @export
 setMethod("dbListTables", "SQLiteConnection", function(conn) {
-  dbGetQuery(conn, "SELECT name FROM
-    (SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master)
-    WHERE type = 'table' OR type = 'view'
-    ORDER BY name")$name
+  rs <- sqliteListTables(conn)
+  on.exit(dbClearResult(rs), add = TRUE)
+
+  dbFetch(rs)$name
 })
+
+sqliteListTables <- function(conn) {
+  sql <- sqliteListTablesQuery(conn)
+  dbSendQuery(conn, sql)
+}
+
+sqliteListTablesWithName <- function(conn, name) {
+  sql <- sqliteListTablesQuery(conn, SQL("$name"))
+  rs <- dbSendQuery(conn, sql)
+  dbBind(rs, list(name = tolower(name)))
+  rs
+}
+
+sqliteListTablesQuery <- function(conn, name = NULL) {
+  SQL(paste(
+    "SELECT name FROM",
+    "(SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master)",
+    "WHERE (type = 'table' OR type = 'view')",
+    if (!is.null(name)) paste0("AND (lower(name) = ", dbQuoteString(conn, name), ")"),
+    "ORDER BY name",
+    sep = "\n"))
+}
 
 #' List fields in specified table.
 #'
@@ -337,5 +364,3 @@ setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
     stop("Unsupported type", call. = FALSE)
   )
 })
-
-

@@ -190,6 +190,7 @@ test_that("appending to table gives error if more columns", {
 
   dbWriteTable(con, "a", data.frame(a = 1, b = 2))
   expect_error(dbWriteTable(con, "a", data.frame(a = 1, b = 2, c = 3), append = TRUE))
+  expect_error(dbWriteTable(con, "a", data.frame(d = 1, e = 2, f = 3), append = TRUE))
 
   a <- dbReadTable(con, "a")
   expect_identical(a, data.frame(a = 1, b = 2))

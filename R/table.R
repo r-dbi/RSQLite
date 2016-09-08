@@ -274,7 +274,7 @@ setMethod("dbListTables", "SQLiteConnection", function(conn) {
 setMethod("dbListFields", c("SQLiteConnection", "character"),
   function(conn, name) {
     rs <- dbSendQuery(conn, paste("SELECT * FROM ",
-                                  dbQuoteIdentifier(conn, name), "LIMIT 1"))
+                                  dbQuoteIdentifier(conn, name), "LIMIT 0"))
     on.exit(dbClearResult(rs))
 
     names(fetch(rs, n = 1))

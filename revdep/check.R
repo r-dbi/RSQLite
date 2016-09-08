@@ -115,5 +115,9 @@ ignore <- c(
   "vmsbase"
 )
 
-revdep_check(threads = parallel::detectCores(), bioconductor = TRUE)
+ignore2 <- c(
+  "AnnotationHubData" # takes more than one hour
+)
+
+revdep_check(threads = parallel::detectCores(), bioconductor = TRUE, ignore = ignore2)
 revdep_check_save_summary()

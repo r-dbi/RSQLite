@@ -278,10 +278,12 @@ setMethod("dbListTables", "SQLiteConnection", function(conn) {
 })
 
 sqliteListTables <- function() {
-  "SELECT name FROM
-    (SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master)
-    WHERE (type = 'table' OR type = 'view')
-    ORDER BY name"
+  paste(
+    "SELECT name FROM",
+    "(SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master)",
+    "WHERE (type = 'table' OR type = 'view')",
+    "ORDER BY name",
+    sep = "\n")
 }
 
 #' List fields in specified table.

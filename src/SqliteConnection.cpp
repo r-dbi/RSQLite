@@ -20,13 +20,6 @@ SqliteConnection::~SqliteConnection() {
   } catch (...) {}
 }
 
-int SqliteConnection::getExceptionCode() const {
-  if (pConn_ != NULL)
-    return sqlite3_errcode(pConn_);
-  else
-    return 0;
-}
-
 std::string SqliteConnection::getException() const {
   if (pConn_ != NULL)
     return std::string(sqlite3_errmsg(pConn_));

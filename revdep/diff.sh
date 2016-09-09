@@ -6,6 +6,9 @@ old_tag=v1.0.0
 branch=$(git symbolic-ref --short HEAD)
 
 cd $(dirname $0)/..
+
+if [ "$old_tag" != "" ]; then
+
 git checkout -- .
 git clean --force -dx
 
@@ -34,6 +37,8 @@ cp revdep/README.md revdep/README-${old_tag}.md
 cp revdep/problems.md revdep/problems-${old_tag}.md
 git add revdep
 git commit -m "revdep update with $old_tag results"
+
+fi # if [ "$old_tag" != "" ]; then
 
 git clean --force -dx
 rm -rf revdep/install

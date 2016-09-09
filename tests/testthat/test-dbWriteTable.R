@@ -198,3 +198,96 @@ test_that("appending to table gives error if more columns", {
   expect_identical(a, data.frame(a = 1, b = 2))
 })
 
+
+# Row names ---------------------------------------------------------------
+
+test_that("dbWriteTable(row.names = 0)", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "mtcars", mtcars, row.names = 0)
+  res <- dbReadTable(con, "mtcars")
+
+  expect_equal(rownames(res), as.character(seq_len(nrow(mtcars))))
+  rownames(res) <- rownames(mtcars)
+  expect_identical(res, mtcars)
+})
+
+test_that("dbWriteTable(row.names = 1)", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "mtcars", mtcars, row.names = 1)
+  res <- dbReadTable(con, "mtcars")
+
+  expect_identical(res, mtcars)
+})
+
+test_that("dbWriteTable(row.names = FALSE)", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "mtcars", mtcars, row.names = FALSE)
+  res <- dbReadTable(con, "mtcars")
+
+  expect_equal(rownames(res), as.character(seq_len(nrow(mtcars))))
+  rownames(res) <- rownames(mtcars)
+  expect_identical(res, mtcars)
+})
+
+test_that("dbWriteTable(row.names = TRUE)", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "mtcars", mtcars, row.names = TRUE)
+  res <- dbReadTable(con, "mtcars")
+
+  expect_identical(res, mtcars)
+})
+
+test_that("dbWriteTable(iris, row.names = NA)", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "iris", iris, row.names = NA)
+  res <- dbReadTable(con, "iris")
+
+  expect_equal(rownames(res), as.character(seq_len(nrow(iris))))
+  res$Species = factor(res$Species)
+  expect_identical(res, iris)
+})
+
+test_that("dbWriteTable(mtcars, row.names = NA)", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "mtcars", mtcars, row.names = NA)
+  res <- dbReadTable(con, "mtcars")
+
+  expect_identical(res, mtcars)
+})
+
+test_that("dbWriteTable(iris, row.names = 'rn')", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  expect_error(dbWriteTable(con, "iris", iris, row.names = "rn"))
+  skip("Doesn't work here")
+  res <- dbReadTable(con, "iris")
+
+  expect_equal(rownames(res), as.character(seq_len(nrow(iris))))
+  res$Species = factor(res$Species)
+  expect_identical(res, iris)
+})
+
+test_that("dbWriteTable(mtcars, row.names = 'rn')", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  expect_error(dbWriteTable(con, "mtcars", mtcars, row.names = "rn"))
+  skip("Doesn't work here")
+  res <- dbReadTable(con, "mtcars")
+
+  expect_identical(res, mtcars)
+})
+

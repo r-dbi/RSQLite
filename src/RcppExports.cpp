@@ -31,7 +31,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // rsqlite_get_exception
-Rcpp::List rsqlite_get_exception(const XPtr<SqliteConnectionPtr>& con);
+List rsqlite_get_exception(const XPtr<SqliteConnectionPtr>& con);
 RcppExport SEXP RSQLite_rsqlite_get_exception(SEXP conSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

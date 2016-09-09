@@ -1,4 +1,5 @@
 #include "SqliteResult.h"
+#include "SqliteUtils.h"
 
 #include "affinity.h"
 

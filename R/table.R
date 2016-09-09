@@ -73,23 +73,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
       dbGetQuery(conn, sql)
     } else if (append) {
       col_names <- dbListFields(conn, name)
-      if (length(col_names) == length(value)) {
-        if (!all(names(value) == col_names)) {
-          if (all(tolower(names(value)) == tolower(col_names))) {
-            warning("Column names will be matched ignoring character case",
-                    call. = FALSE)
-          } else {
-            warning("Column name mismatch, columns will be matched by position. This warning may be converted to an error soon.",
-                    call. = FALSE)
-            names(value) <- col_names
-          }
-        }
-      } else {
-        if (!all(names(value) %in% col_names)) {
-          stop("Columns ", paste0(setdiff(names(value), col_names)),
-               " not found in table ", name, call. = FALSE)
-        }
-      }
+      value <- match_col(value, col_names)
     }
 
     if (nrow(value) > 0) {
@@ -109,6 +93,29 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     TRUE
   }
 )
+
+match_col <- function(value, col_names) {
+  if (length(col_names) == length(value)) {
+    if (!all(names(value) == col_names)) {
+      if (all(tolower(names(value)) == tolower(col_names))) {
+        warning("Column names will be matched ignoring character case",
+                call. = FALSE)
+        names(value) <- col_names
+      } else {
+        warning("Column name mismatch, columns will be matched by position. This warning may be converted to an error soon.",
+                call. = FALSE)
+        names(value) <- col_names
+      }
+    }
+  } else {
+    if (!all(names(value) %in% col_names)) {
+      stop("Columns ", paste0(setdiff(names(value), col_names)),
+           " not found", call. = FALSE)
+    }
+  }
+
+  value
+}
 
 parameterised_insert <- function(con, name, values) {
   table <- dbQuoteIdentifier(con, name)

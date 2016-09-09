@@ -194,6 +194,10 @@ setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
   is_char <- vlapply(value, is.character)
   value[is_char] <- lapply(value[is_char], enc2utf8)
 
+  # Convert raw to lists of raw, with warning
+  is_raw <- vlapply(value, is.raw)
+  value[is_raw] <- lapply(value[is_raw], as.character)
+
   value
 })
 
@@ -368,6 +372,10 @@ setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
     character = "TEXT",
     logical = "INTEGER",
     list = "BLOB",
+    raw = {
+      warning("Creating a TEXT column from raw, use lists of raw to create BLOB columns", call. = FALSE)
+      "TEXT"
+    },
     stop("Unsupported type", call. = FALSE)
   )
 })

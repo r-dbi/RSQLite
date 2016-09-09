@@ -146,7 +146,7 @@ setMethod("dbSendPreparedQuery",
       bind_data_rows,
       function(row) {
         tryCatch(
-          dbBind(res, unclass(row)),
+          db_bind(res, unclass(row), allow_named_superset = TRUE),
           error = function(e) {
             dbBind(res, unclass(unname(row)))
           }
@@ -176,7 +176,7 @@ setMethod("dbGetPreparedQuery",
       bind_data_rows,
       function(row) {
         tryCatch(
-          dbBind(res, unclass(row)),
+          db_bind(res, unclass(row), allow_named_superset = TRUE),
           error = function(e) {
             dbBind(res, unclass(unname(row)))
           }
@@ -251,8 +251,7 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
 #'
 #' @keywords internal
 #' @export
-setMethod("fetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
-  row.names <- compatRowNames(row.names)
-  sqlColumnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
+setMethod("fetch", "SQLiteResult", function(res, n = -1) {
+  .Deprecated("dbFetch(..., row.names = FALSE)", old = "fetch")
+  sqlColumnToRownames(rsqlite_fetch(res@ptr, n = n), row.names = FALSE)
 })
-

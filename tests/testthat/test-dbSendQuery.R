@@ -8,7 +8,7 @@ test_that("attempting to change schema with pending rows generates warning", {
   dbWriteTable(con, "t1", df)
 
   rs <- dbSendQuery(con, "SELECT * FROM t1")
-  row1 <- fetch(rs, n = 1)
+  row1 <- dbFetch(rs, n = 1)
   expect_equal(row1, df[1, ])
 
   expect_warning(rs <- dbSendQuery(con, "CREATE TABLE t2 (x text, y integer)"),
@@ -73,7 +73,7 @@ test_that("one row per bound select, with factor", {
 
   expect_warning(
     got <- dbGetPreparedQuery(con, "select * from t1 where id = ?", id_frame),
-    "factor")
+    "deprecated")
 
   expect_equal(got$id, c("e", "a", "c"))
 })

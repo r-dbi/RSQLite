@@ -3,7 +3,7 @@ library("devtools")
 ignore <- c(
   "AnnotationDbi", # deprecation warnings
   "AnnotationForge",
-  # "AnnotationHub",
+  "AnnotationHub",
   "AnnotationHubData",
   "APSIM",
   "archivist",
@@ -20,7 +20,7 @@ ignore <- c(
   "clstutils",
   "CNEr",
   "CollapsABEL",
-  # "cummeRbund",
+  "cummeRbund",
   "customProDB",
   "DBI",
   # "DECIPHER",
@@ -39,7 +39,7 @@ ignore <- c(
   "GenomicFeatures",
   "Genominator", # one fewer warning (Rcpp)
   "GEOmetadb",
-  # "GWASTools",
+  "GWASTools",
   "imputeMulti",
   "iontree",
   "lumi",
@@ -71,14 +71,14 @@ ignore <- c(
   # "poplite",
   "ProjectTemplate",
   "quantmod",
-  # "rangeMapper",
+  "rangeMapper",
   "RecordLinkage", # deprecation warnings
   "recordr",
   "recoup",
   "refGenome",
   "rgrass7",
   "RImmPort",
-  # "RObsDat",
+  "RObsDat",
   "rplexos", # deprecation warnings
   "RQDA",
   "rTRM",
@@ -98,7 +98,7 @@ ignore <- c(
   "stream",
   "survey",
   "taRifx",
-  # "tcpl",
+  "tcpl",
   "TFBSTools",
   "tigre", # one fewer warning (Rcpp)
   "trackeR",
@@ -119,5 +119,5 @@ ignore2 <- c(
   "AnnotationHubData" # takes more than one hour
 )
 
-revdep_check(threads = parallel::detectCores(), bioconductor = TRUE, ignore = ignore2)
+revdep_check(threads = parallel::detectCores(), bioconductor = TRUE, ignore = ignore)
 revdep_check_save_summary()

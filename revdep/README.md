@@ -14,64 +14,60 @@
 
 ## Packages
 
-|package   |*  |version    |date       |source                             |
-|:---------|:--|:----------|:----------|:----------------------------------|
-|BH        |   |1.60.0-2   |2016-05-07 |cran (@1.60.0-)                    |
-|DBI       |   |0.5        |2016-09-01 |Github (rstats-db/DBI@bc730b9)     |
-|DBItest   |   |1.3-7      |2016-09-01 |Github (rstats-db/DBItest@75c8ebc) |
-|knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
-|Rcpp      |   |0.12.7     |2016-09-05 |cran (@0.12.7)                     |
-|rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
-|RSQLite   |   |1.0.9010   |2016-09-09 |local (rstats-db/RSQLite@870277e)  |
-|testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
+|package  |*  |version    |date       |source                           |
+|:--------|:--|:----------|:----------|:--------------------------------|
+|DBI      |   |0.5        |2016-09-09 |Github (rstats-db/DBI@2d7c39a)   |
+|RSQLite  |   |1.0.0      |2016-09-09 |local (rstats-db/RSQLite@NA)     |
+|testthat |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da) |
 
 # Check results
 
-111 packages
+112 packages
 
 |package            |version   | errors| warnings| notes|
 |:------------------|:---------|------:|--------:|-----:|
-|AnnotationDbi      |1.34.4    |      0|        2|     5|
+|AnnotationDbi      |1.34.4    |      0|        1|     5|
 |AnnotationForge    |1.14.2    |      0|        1|     6|
-|AnnotationHub      |2.4.2     |      0|        1|     0|
+|AnnotationHubData  |1.2.2     |      1|        0|     3|
+|AnnotationHub      |2.4.2     |      0|        0|     0|
 |APSIM              |0.9.0     |      0|        0|     0|
 |archivist          |2.1       |      0|        0|     2|
-|BatchExperiments   |1.4.1     |      0|        1|     2|
-|BatchJobs          |1.6       |      0|        1|     0|
+|BatchExperiments   |1.4.1     |      0|        0|     2|
+|BatchJobs          |1.6       |      0|        0|     0|
 |bibliospec         |0.0.4     |      0|        0|     0|
 |biglm              |0.9-1     |      0|        0|     5|
-|bioassayR          |1.10.15   |      0|        1|     1|
+|bioassayR          |1.10.15   |      0|        0|     1|
 |caroline           |0.7.6     |      0|        0|     2|
-|Category           |2.38.0    |      0|        0|     1|
+|Category           |2.38.0    |      0|        1|     1|
 |ChemmineR          |2.24.2    |      1|        0|     0|
 |chunked            |0.3       |      0|        0|     0|
 |CITAN              |2015.12-2 |      0|        0|     0|
 |clstutils          |1.20.0    |      0|        2|     5|
 |CNEr               |1.8.3     |      0|        2|     1|
 |CollapsABEL        |0.10.8    |      0|        0|     0|
-|cummeRbund         |2.14.0    |      0|        1|     7|
+|cummeRbund         |2.14.0    |      0|        0|     7|
 |customProDB        |1.12.0    |      1|        1|     3|
-|DBI                |0.5       |      0|        1|     1|
-|DECIPHER           |2.0.2     |      0|        3|     3|
-|dplyr              |0.5.0     |      0|        1|     1|
-|ecd                |0.8.2     |      1|        0|     0|
+|DBI                |0.5       |      0|        0|     1|
+|DECIPHER           |2.0.2     |      0|        2|     2|
+|dplyr              |0.5.0     |      0|        0|     2|
+|ecd                |0.8.2     |      0|        0|     0|
 |emuR               |0.1.9     |      0|        0|     0|
 |ENCODExplorer      |1.4.3     |      0|        0|     2|
 |ensembldb          |1.4.7     |      0|        1|     1|
-|etl                |0.3.3     |      0|        1|     0|
-|ETLUtils           |1.3       |      0|        1|     0|
+|etl                |0.3.3     |      0|        0|     0|
+|ETLUtils           |1.3       |      0|        0|     0|
 |filehashSQLite     |0.2-4     |      0|        0|     3|
 |filematrix         |1.1.0     |      0|        1|     0|
 |freqweights        |1.0.2     |      0|        0|     1|
 |gcbd               |0.2.5     |      0|        1|     3|
 |GeneAnswers        |2.14.0    |      1|        3|     6|
 |GenomicFeatures    |1.24.5    |      0|        1|     2|
-|Genominator        |1.26.0    |      0|        0|     4|
+|Genominator        |1.26.0    |      0|        1|     4|
 |GEOmetadb          |1.32.2    |      0|        0|     3|
-|GWASTools          |1.18.0    |      1|        1|     2|
+|GWASTools          |1.18.0    |      0|        0|     2|
 |imputeMulti        |0.6.3     |      0|        0|     1|
 |iontree            |1.18.0    |      0|        0|     5|
-|lumi               |2.24.0    |      0|        6|     5|
+|lumi               |2.24.0    |      0|        5|     5|
 |macleish           |0.3.0     |      0|        0|     0|
 |maGUI              |1.0       |      1|        0|     0|
 |manta              |1.18.0    |      0|        0|     7|
@@ -90,55 +86,55 @@
 |oai                |0.2.0     |      0|        0|     0|
 |oce                |0.9-19    |      1|        0|     1|
 |oligoClasses       |1.34.0    |      0|        0|     4|
-|oligo              |1.36.1    |      1|        0|     8|
+|oligo              |1.36.1    |      1|        1|     8|
 |OrganismDbi        |1.14.1    |      0|        1|     2|
-|PAnnBuilder        |1.36.0    |      0|        3|     1|
-|pdInfoBuilder      |1.36.0    |      0|        0|     1|
+|PAnnBuilder        |1.36.0    |      0|        4|     1|
+|pdInfoBuilder      |1.36.0    |      0|        1|     1|
 |PGA                |1.2.2     |      1|        1|     3|
 |pitchRx            |1.8.2     |      0|        0|     1|
-|plethy             |1.10.0    |      2|        1|     3|
-|poplite            |0.99.16   |      1|        1|     1|
+|plethy             |1.10.0    |      2|        0|     3|
+|poplite            |0.99.16   |      0|        0|     1|
 |ProjectTemplate    |0.7       |      0|        0|     0|
 |quantmod           |0.4-6     |      0|        0|     1|
-|rangeMapper        |0.3-0     |      0|        1|     0|
-|RecordLinkage      |0.4-10    |      0|        1|     0|
+|rangeMapper        |0.3-0     |      0|        0|     0|
+|RecordLinkage      |0.4-10    |      0|        0|     0|
 |recordr            |1.0.3     |      0|        0|     1|
 |recoup             |1.0.2     |      2|        0|     1|
 |refGenome          |1.7.0     |      0|        0|     0|
 |rgrass7            |0.1-8     |      0|        0|     0|
 |RImmPort           |1.0.2     |      0|        1|     1|
 |RObsDat            |16.03     |      0|        0|     0|
-|rplexos            |1.1.8     |      0|        1|     0|
+|rplexos            |1.1.8     |      0|        0|     0|
 |RQDA               |0.2-7     |      1|        0|     1|
-|rTRM               |1.10.2    |      0|        1|     1|
+|rTRM               |1.10.2    |      0|        0|     1|
 |rvertnet           |0.4.4     |      0|        0|     0|
 |scrime             |1.3.3     |      0|        0|     2|
 |SEERaBomb          |2016.1    |      0|        0|     0|
 |seqplots           |1.10.2    |      0|        0|     3|
 |SGP                |1.5-0.0   |      0|        0|     0|
 |smnet              |2.1       |      0|        0|     0|
-|snplist            |0.15      |      0|        1|     0|
+|snplist            |0.15      |      0|        0|     0|
 |specL              |1.6.2     |      0|        1|     4|
-|sqldf              |0.4-10    |      1|        1|     2|
+|sqldf              |0.4-10    |      0|        1|     2|
 |sqliter            |0.1.0     |      0|        0|     0|
 |SRAdb              |1.30.0    |      0|        0|     6|
 |SSN                |1.1.7     |      0|        0|     1|
 |storr              |1.0.1     |      0|        0|     0|
-|stream             |1.2-3     |      0|        1|     1|
+|stream             |1.2-3     |      0|        0|     1|
 |survey             |3.31      |      0|        0|     0|
 |taRifx             |1.0.6     |      0|        0|     4|
 |tcpl               |1.2.2     |      0|        0|     1|
 |TFBSTools          |1.10.4    |      0|        1|     1|
-|tigre              |1.26.0    |      0|        0|     2|
+|tigre              |1.26.0    |      0|        1|     2|
 |trackeR            |0.0.3     |      0|        1|     0|
 |TSdata             |2016.8-1  |      0|        1|     0|
 |TSSQLite           |2015.4-1  |      0|        0|     0|
 |TSsql              |2015.1-2  |      0|        0|     1|
 |tweet2r            |1.0       |      0|        0|     0|
 |twitteR            |1.1.9     |      0|        0|     0|
-|UniProt.ws         |2.12.0    |      0|        0|     1|
+|UniProt.ws         |2.12.0    |      0|        1|     1|
 |Uniquorn           |1.0.8     |      0|        0|     1|
-|UPMASK             |1.0       |      0|        1|     1|
+|UPMASK             |1.0       |      0|        0|     1|
 |VariantFiltering   |1.8.6     |      0|        3|     3|
 |vegdata            |0.9       |      0|        0|     0|
 |vmsbase            |2.1.3     |      1|        0|     0|
@@ -147,26 +143,9 @@
 Maintainer: Bioconductor Package Maintainer
  <maintainer@bioconductor.org>
 
-0 errors | 2 warnings | 5 notes
+0 errors | 1 warning  | 5 notes
 
 ```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'dbSendPreparedQuery' is deprecated.
-  Warning: 'dbSendPreparedQuery' is deprecated.
-  Warning: 'dbSendPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-                            user system elapsed
-AnnDbPkg-checker          35.728  0.712  48.235
-Bimap-direction            5.012  0.464   9.989
-InparanoidColsAndKeytypes  5.088  0.256  11.707
-
 checking for unstated dependencies in ‘tests’ ... WARNING
 'library' or 'require' call not declared from: ‘org.testing.db’
 
@@ -215,28 +194,10 @@ Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 0 errors | 1 warning  | 6 notes
 
 ```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-  incomplete final line found on 'MakingNewOrganismPackages.Rmd'
-Error in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  : 
-  Running 'texi2dvi' on 'SQLForge.tex' failed.
-LaTeX errors:
-! Dimension too large.
-\fb@put@frame ...p \ifdim \dimen@ >\ht \@tempboxa 
-                                                  \fb@putboxa #1\fb@afterfra...
-... 8 lines ...
-! Dimension too large.
-\fb@put@frame ...p \ifdim \dimen@ >\ht \@tempboxa 
-                                                  \fb@putboxa #1\fb@afterfra...
-l.8589 ...\color{messagecolor}{\#\# }}\end{kframe}
-                                                  
-! Dimension too large.
-\fb@put@frame ...p \ifdim \dimen@ >\ht \@tempboxa 
-                                                  \fb@putboxa #1\fb@afterfra...
-l.8589 ..
-Calls: buildVignettes -> texi2pdf -> texi2dvi
-Execution halted
+checking whether package ‘AnnotationForge’ can be installed ... WARNING
+Found the following significant warnings:
+  Warning: namespace ‘Rcpp’ is not available and has been replaced
+See ‘/home/muelleki/git/R/RSQLite/revdep/checks/AnnotationForge.Rcheck/00install.out’ for details.
 
 checking installed package size ... NOTE
   installed size is  6.1Mb
@@ -297,38 +258,67 @@ checking for unstated dependencies in vignettes ... NOTE
 'library' or 'require' call not declared from: ‘Biostrings’
 ```
 
+## AnnotationHubData (1.2.2)
+Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
+
+1 error  | 0 warnings | 3 notes
+
+```
+checking tests ... ERROR
+Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
+Last 13 lines of output:
+  
+  Test files with failing tests
+  
+     test_recipe.R 
+       test_UCSC2BitPreparer_recipe 
+  
+  
+  Error in BiocGenerics:::testPackage("AnnotationHubData") : 
+    unit tests failed for package AnnotationHubData
+  In addition: Warning message:
+  In value[[3L]](cond) :
+    BioCarta.owl.gz: Failure when receiving data from the peer
+  Execution halted
+
+checking top-level files ... NOTE
+Non-standard file/directory found at top level:
+  ‘appveyor.yml’
+
+checking dependencies in R code ... NOTE
+Missing object imported by a ':::' call: ‘AnnotationHub:::.db_connection’
+Unexported object imported by a ':::' call: ‘OrganismDbi:::.packageTaxIds’
+  See the note in ?`:::` about the use of this operator.
+
+checking R code for possible problems ... NOTE
+.NCBIMetadataFromUrl: no visible binding for global variable ‘results’
+.NCBIMetadataFromUrl: no visible binding for global variable ‘specData’
+.makeComplexGR: no visible binding for global variable ‘seqname’
+jsonPath: no visible binding for global variable ‘SourceFile’
+jsonPath: no visible binding for global variable ‘HubRoot’
+pointer: no visible global function definition for ‘tail’
+print.pointer: no visible global function definition for
+  ‘capture.output’
+print.pointer: no visible global function definition for ‘str’
+ptr: no visible global function definition for ‘tail’
+trackWithAuxiliaryTablesToGRanges: no visible binding for global
+  variable ‘seqname’
+Undefined global functions or variables:
+  HubRoot SourceFile capture.output results seqname specData str tail
+Consider adding
+  importFrom("utils", "capture.output", "str", "tail")
+to your NAMESPACE file.
+
+Found the following calls to data() loading into the global environment:
+File ‘AnnotationHubData/R/makeNCBIToOrgDbs.R’:
+  data(specData, package = "GenomeInfoDb")
+See section ‘Good practice’ in ‘?data’.
+```
+
 ## AnnotationHub (2.4.2)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-0 errors | 1 warning  | 0 notes
-
-```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because AnnotationHub-HOWTO.Rmd appears to be an R Markdown v2 document.
-loading from cache '/home/muelleki/.AnnotationHub/57158'
-    '/home/muelleki/.AnnotationHub/57159'
-
- *** caught segfault ***
-address (nil), cause 'memory not mapped'
-
-Traceback:
- 1: .Call(rmd_render_markdown, file, output, text, renderer, renderer.options,     extensions)
- 2: renderMarkdown(file, output = NULL, text, renderer = "HTML",     renderer.options = options, extensions = extensions, encoding = encoding)
- 3: markdown::markdownToHTML(out, output, encoding = encoding, ...)
- 4: (if (grepl("\\.[Rr]md$", file)) knit2html else if (grepl("\\.[Rr]rst$",     file)) knit2pdf else knit)(file, encoding = encoding, quiet = quiet,     envir = globalenv())
- 5: vweave(...)
- 6: engine$weave(file, quiet = quiet, encoding = enc)
- 7: doTryCatch(return(expr), name, parentenv, handler)
- 8: tryCatchOne(expr, names, parentenv, handlers[[1L]])
- 9: tryCatchList(expr, classes, parentenv, handlers)
-10: tryCatch({    engine$weave(file, quiet = quiet, encoding = enc)    setwd(startdir)    find_vignette_product(name, by = "weave", engine = engine)}, error = function(e) {    stop(gettextf("processing vignette '%s' failed with diagnostics:\n%s",         file, conditionMessage(e)), domain = NA, call. = FALSE)})
-11: buildVignettes(dir = "/home/muelleki/git/R/RSQLite/revdep/checks/AnnotationHub.Rcheck/vign_test/AnnotationHub")
-An irrecoverable exception occurred. R is aborting now ...
-Segmentation fault (core dumped)
-
-```
+0 errors | 0 warnings | 0 notes
 
 ## APSIM (0.9.0)
 Maintainer: Justin Fainges <Justin.Fainges@csiro.au>
@@ -353,35 +343,9 @@ Package unavailable to check Rd xrefs: ‘archivist.github’
 Maintainer: Michel Lang <michellang@gmail.com>  
 Bug reports: https://github.com/tudo-r/BatchExperiments/issues
 
-0 errors | 1 warning  | 2 notes
+0 errors | 0 warnings | 2 notes
 
 ```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-                user system elapsed
-addExperiments 6.676  0.092   6.919
-getResultVars  6.108  0.036   6.126
-
 checking dependencies in R code ... NOTE
 Unexported objects imported by ':::' calls:
   ‘BatchJobs:::addIntModulo’ ‘BatchJobs:::buffer’
@@ -429,32 +393,7 @@ contains 'methods').
 Maintainer: Bernd Bischl <bernd_bischl@gmx.net>  
 Bug reports: https://github.com/tudo-r/BatchJobs/issues
 
-0 errors | 1 warning  | 0 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-... 18 lines ...
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-                    user system elapsed
-batchReduceResults 5.992  0.028   6.158
-batchMapResults    4.912  0.068   5.007
-```
+0 errors | 0 warnings | 0 notes
 
 ## bibliospec (0.0.4)
 Maintainer: Witold E. Wolski <wew@fgcz.ethz.ch>  
@@ -518,32 +457,9 @@ See section ‘Good practice’ in ‘?data’.
 Maintainer: Tyler Backman <tbackman@ucr.edu>  
 Bug reports: https://github.com/TylerBackman/bioassayR/issues
 
-0 errors | 1 warning  | 1 note 
+0 errors | 0 warnings | 1 note 
 
 ```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-... 34 lines ...
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-
 checking R code for possible problems ... NOTE
 crossReactivityPrior: no visible global function definition for ‘sd’
 crossReactivityProbability : <anonymous>: no visible global function
@@ -594,9 +510,14 @@ contains 'methods').
 ## Category (2.38.0)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-0 errors | 0 warnings | 1 note 
+0 errors | 1 warning  | 1 note 
 
 ```
+checking whether package ‘Category’ can be installed ... WARNING
+Found the following significant warnings:
+  Warning: namespace ‘Rcpp’ is not available and has been replaced
+See ‘/home/muelleki/git/R/RSQLite/revdep/checks/Category.Rcheck/00install.out’ for details.
+
 checking R code for possible problems ... NOTE
 .linearMTestInternal: no visible global function definition for
   ‘setNames’
@@ -765,32 +686,9 @@ Bug reports: https://bitbucket.org/kindlychung/collapsabel2/issues
 ## cummeRbund (2.14.0)
 Maintainer: Loyal A. Goff <lgoff@csail.mit.edu>
 
-0 errors | 1 warning  | 7 notes
+0 errors | 0 warnings | 7 notes
 
 ```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-... 41 lines ...
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-         user system elapsed
-MAplot 38.884  0.544  40.043
-
 checking package dependencies ... NOTE
 Depends: includes the non-default packages:
   ‘BiocGenerics’ ‘RSQLite’ ‘ggplot2’ ‘reshape2’ ‘fastcluster’
@@ -801,7 +699,7 @@ selectively is preferable.
 checking installed package size ... NOTE
   installed size is 11.5Mb
   sub-directories of 1Mb or more:
-    R         3.9Mb
+    R         3.8Mb
     doc       1.8Mb
     extdata   5.6Mb
 
@@ -905,19 +803,19 @@ Execution halted
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
+
+Loading required package: AnnotationDbi
+Loading required package: Biobase
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
 ... 8 lines ...
-Warning: Named parameters not used in query: gene_id, internal_tx_id
-Warning: Named parameters not used in query: gene_id, internal_tx_id
-Warning: Named parameters not used in query: gene_id, internal_tx_id
-Warning: Named parameters not used in query: gene_id, internal_tx_id
-OK
+Extract the 'transcripts' data frame ... OK
+Extract the 'splicings' data frame ... OK
+Download and preprocess the 'chrominfo' data frame ... OK
+Prepare the 'metadata' data frame ... OK
+Make the TxDb object ... OK
  done
 Prepare gene/transcript/protein id mapping information (ids.RData) ... 
 Error: processing vignette 'customProDB.Rnw' failed with diagnostics:
@@ -965,21 +863,9 @@ to your NAMESPACE file.
 Maintainer: Kirill Müller <krlmlr+r@mailbox.org>  
 Bug reports: https://github.com/rstats-db/DBI/issues
 
-0 errors | 1 warning  | 1 note 
+0 errors | 0 warnings | 1 note 
 
 ```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-
 checking S3 generic/method consistency ... NOTE
 Found the following apparent S3 methods exported but not registered:
   print.list.pairs
@@ -990,7 +876,7 @@ manual.
 ## DECIPHER (2.0.2)
 Maintainer: Erik Wright <DECIPHER@cae.wisc.edu>
 
-0 errors | 3 warnings | 3 notes
+0 errors | 2 warnings | 2 notes
 
 ```
 checking foreign function calls ... WARNING
@@ -1013,38 +899,12 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
      compacted ‘ArtOfAlignmentInR.pdf’ from 968Kb to 635Kb
   consider running tools::compactPDF(gs_quality = "ebook") on these files
 
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'fetch' is deprecated.
-... 160 lines ...
-See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-                     user system elapsed
-CorrectFrameshifts 25.960  0.056  28.406
-StaggerAlignment   21.480  0.104  22.085
-AlignTranslation   15.792  0.056  16.795
-AlignSeqs          10.176  0.188  10.366
-Array2Matrix        9.516  0.012   9.541
-TileSeqs            9.180  0.004   9.186
-BrowseSeqs          5.912  0.008   5.923
-DesignArray         5.704  0.040   6.133
-
 checking installed package size ... NOTE
   installed size is  9.2Mb
   sub-directories of 1Mb or more:
     data      2.5Mb
     doc       3.9Mb
     extdata   1.4Mb
-
-checking DESCRIPTION meta-information ... NOTE
-'LinkingTo' for ‘RSQLite’ is unused as it has no 'include' directory
 
 checking R code for possible problems ... NOTE
 .CalculateEfficiencyFISH: no visible global function definition for
@@ -1074,38 +934,22 @@ to your NAMESPACE file.
 Maintainer: Hadley Wickham <hadley@rstudio.com>  
 Bug reports: https://github.com/hadley/dplyr/issues
 
-0 errors | 1 warning  | 1 note 
+0 errors | 0 warnings | 2 notes
 
 ```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-** found \donttest examples: check also with --run-donttest
-
 checking installed package size ... NOTE
   installed size is 23.3Mb
   sub-directories of 1Mb or more:
     libs  21.2Mb
+
+checking dependencies in R code ... NOTE
+Missing or unexported object: ‘RSQLite::rsqliteVersion’
 ```
 
 ## ecd (0.8.2)
 Maintainer: Stephen H-T. Lihn <stevelihn@gmail.com>
 
-1 error  | 0 warnings | 0 notes
-
-```
-checking package dependencies ... ERROR
-Package required and available but unsuitable version: ‘RSQLite’
-
-See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
-manual.
-```
+0 errors | 0 warnings | 0 notes
 
 ## emuR (0.1.9)
 Maintainer: Raphael Winkelmann <raphael@phonetik.uni-muenchen.de>  
@@ -1175,37 +1019,12 @@ Unexported objects imported by ':::' calls:
 Maintainer: Ben Baumer <ben.baumer@gmail.com>  
 Bug reports: https://github.com/beanumber/etl/issues
 
-0 errors | 1 warning  | 0 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-```
+0 errors | 0 warnings | 0 notes
 
 ## ETLUtils (1.3)
 Maintainer: Jan Wijffels <jwijffels@bnosac.be>
 
-0 errors | 1 warning  | 0 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-```
+0 errors | 0 warnings | 0 notes
 
 ## filehashSQLite (0.2-4)
 Maintainer: Roger D. Peng <rpeng@jhsph.edu>
@@ -1305,6 +1124,7 @@ checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
 Loading required package: RSQLite
+Loading required package: DBI
 Loading required package: plyr
 Loading required package: reshape
 
@@ -1496,28 +1316,10 @@ Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 0 errors | 1 warning  | 2 notes
 
 ```
-checking examples ... WARNING
+checking whether package ‘GenomicFeatures’ can be installed ... WARNING
 Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'fetch' is deprecated.
-... 688 lines ...
-Examples with CPU or elapsed time > 5s
-                               user system  elapsed
-makeTxDbFromBiomart        1246.752 43.336 1342.749
-makeFeatureDbFromUCSC       779.756 23.752  951.166
-makeTxDbFromUCSC             57.316  1.436  170.124
-coordinate-mapping-methods   32.400  0.940   45.910
-coverageByTranscript         31.832  1.228   34.222
-makeTxDbFromGRanges          18.320  0.524   18.866
-extractTranscriptSeqs        14.796  0.048   16.793
-makeTxDbFromGFF              12.568  0.420   13.048
-transcriptLocs2refLocs        8.880  0.296    9.476
+  Warning: namespace ‘Rcpp’ is not available and has been replaced
+See ‘/home/muelleki/git/R/RSQLite/revdep/checks/GenomicFeatures.Rcheck/00install.out’ for details.
 
 checking package dependencies ... NOTE
 Depends: includes the non-default packages:
@@ -1540,9 +1342,14 @@ Unexported objects imported by ':::' calls:
 ## Genominator (1.26.0)
 Maintainer: James Bullard <bullard@stat.berkeley.edu>
 
-0 errors | 0 warnings | 4 notes
+0 errors | 1 warning  | 4 notes
 
 ```
+checking whether package ‘Genominator’ can be installed ... WARNING
+Found the following significant warnings:
+  Warning: namespace ‘Rcpp’ is not available and has been replaced
+See ‘/home/muelleki/git/R/RSQLite/revdep/checks/Genominator.Rcheck/00install.out’ for details.
+
 checking dependencies in R code ... NOTE
 'library' or 'require' calls to packages already attached by Depends:
   ‘GenomeGraphs’ ‘IRanges’
@@ -1605,10 +1412,11 @@ These were most likely included in error. See section ‘Package
 structure’ in the ‘Writing R Extensions’ manual.
 
 checking R code for possible problems ... NOTE
+geoConvert: no visible global function definition for ‘dbDriver’
 getSQLiteFile: no visible global function definition for
   ‘download.file’
 Undefined global functions or variables:
-  download.file
+  dbDriver download.file
 Consider adding
   importFrom("utils", "download.file")
 to your NAMESPACE file.
@@ -1624,49 +1432,9 @@ These lines will be truncated in the PDF manual.
 ## GWASTools (1.18.0)
 Maintainer: Stephanie M. Gogarten <sdmorris@u.washington.edu>, Adrienne Stilp <amstilp@u.washington.edu>
 
-1 error  | 1 warning  | 2 notes
+0 errors | 0 warnings | 2 notes
 
 ```
-checking tests ... ERROR
-Running the tests in ‘tests/test.R’ failed.
-Last 13 lines of output:
-  FAILURE in test_CPH: Error in checkTrue(!all(is.na(assoc$Est))) : Test not TRUE
-  
-  
-  Test files with failing tests
-  
-     assocCoxPH_test.R 
-       test_CPH 
-  
-  
-  Error in BiocGenerics:::testPackage("GWASTools", pattern = ".*_test\\.R$") : 
-    unit tests failed for package GWASTools
-  In addition: There were 50 or more warnings (use warnings() to see the first 50)
-  Execution halted
-
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-... 10 lines ...
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-           user system elapsed
-vcfWrite 10.788  0.224    11.1
-
 checking R code for possible problems ... NOTE
 .CI: no visible global function definition for ‘qnorm’
 .LOHbase: no visible global function definition for ‘mad’
@@ -1734,17 +1502,24 @@ is not mentioned in the DESCRIPTION file.
 
 checking R code for possible problems ... NOTE
 buildIonTree: no visible binding for global variable ‘median’
+createDB: no visible global function definition for ‘dbDriver’
+metaDataImport: no visible global function definition for ‘dbDriver’
+metaDataImport: no visible global function definition for ‘fetch’
 metaDataImport: no visible global function definition for
   ‘flush.console’
 metaDataImport: no visible global function definition for ‘fix’
+mzImport: no visible global function definition for ‘dbDriver’
+mzImport: no visible global function definition for ‘fetch’
 plotSpectrum: no visible global function definition for ‘text’
 plotSpectrum: no visible global function definition for ‘identify’
 saveMSnRaw: no visible global function definition for ‘flush.console’
+searchMS2: no visible global function definition for ‘dbDriver’
+searchMS2: no visible global function definition for ‘fetch’
 searchMS2: no visible global function definition for ‘par’
 plot,iontree: no visible global function definition for ‘par’
 plot,iontree: no visible global function definition for ‘layout’
 Undefined global functions or variables:
-  fix flush.console identify layout median par text
+  dbDriver fetch fix flush.console identify layout median par text
 Consider adding
   importFrom("graphics", "identify", "layout", "par", "text")
   importFrom("stats", "median")
@@ -1785,7 +1560,7 @@ These lines will be truncated in the PDF manual.
 ## lumi (2.24.0)
 Maintainer: Pan Du <dupan.mail@gmail.com>
 
-0 errors | 6 warnings | 5 notes
+0 errors | 5 warnings | 5 notes
 
 ```
 checking whether package ‘lumi’ can be installed ... WARNING
@@ -1816,32 +1591,16 @@ Argument items with no description in Rd object 'lumiMethyR':
   ‘qcfile’ ‘sampleDescriptions’ ‘sep’
 
 
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-                  user system elapsed
-lumiMethyStatus 75.480  0.472  76.145
-plotGammaFit     6.540  0.004   6.556
-nuID2probeID     5.128  0.020   5.148
-getChipInfo      4.060  0.148   5.944
-
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Use 'dbFetch(..., row.names = FALSE)' instead.
-See help("Deprecated")
-Warning: 'fetch' is deprecated.
-Use 'dbFetch(..., row.names = FALSE)' instead.
-See help("Deprecated")
-Warning: 'fetch' is deprecated.
-Use 'dbFetch(..., row.names = FALSE)' instead.
+
+Attaching package: ‘XML’
+
+The following object is masked from ‘package:tools’:
+
+    toHTML
+
 ... 8 lines ...
   documentation provided with the lumi package.
 
@@ -2036,14 +1795,10 @@ Maintainer: Koki Tsuyuzaki <k.t.the-answer@hotmail.co.jp>
 0 errors | 1 warning  | 2 notes
 
 ```
-checking examples ... WARNING
+checking whether package ‘MeSHDbi’ can be installed ... WARNING
 Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
+  Warning: namespace ‘Rcpp’ is not available and has been replaced
+See ‘/home/muelleki/git/R/RSQLite/revdep/checks/MeSHDbi.Rcheck/00install.out’ for details.
 
 checking R code for possible problems ... NOTE
 .div: no visible global function definition for ‘na.omit’
@@ -2487,7 +2242,7 @@ These lines will be truncated in the PDF manual.
 ## oligo (1.36.1)
 Maintainer: Benilton Carvalho <benilton@unicamp.br>
 
-1 error  | 0 warnings | 8 notes
+1 error  | 1 warning  | 8 notes
 
 ```
 checking examples ... ERROR
@@ -2512,6 +2267,11 @@ Loading required package: DBI
 Error in loadNamespace(name) : there is no package called ‘KernSmooth’
 Calls: MAplot ... tryCatch -> tryCatchList -> tryCatchOne -> <Anonymous>
 Execution halted
+
+checking whether package ‘oligo’ can be installed ... WARNING
+Found the following significant warnings:
+  Warning: namespace ‘Rcpp’ is not available and has been replaced
+See ‘/home/muelleki/git/R/RSQLite/revdep/checks/oligo.Rcheck/00install.out’ for details.
 
 checking package dependencies ... NOTE
 Packages which this enhances but not available for checking: ‘doMC’ ‘doMPI’
@@ -2594,28 +2354,10 @@ Maintainer: Biocore Data Team <maintainer@bioconductor.org>
 0 errors | 1 warning  | 2 notes
 
 ```
-checking examples ... WARNING
+checking whether package ‘OrganismDbi’ can be installed ... WARNING
 Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-... 902 lines ...
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-                            user system elapsed
-makeOrganismDbFromBiomart 13.740  0.300  20.240
-rangeBasedAccessors        8.548  0.080   9.668
-OrganismDb                 7.820  0.232   9.568
-makeOrganismDbFromTxDb     7.112  0.080  92.684
-makeOrganismDbFromUCSC     5.824  0.080  83.384
+  Warning: namespace ‘Rcpp’ is not available and has been replaced
+See ‘/home/muelleki/git/R/RSQLite/revdep/checks/OrganismDbi.Rcheck/00install.out’ for details.
 
 checking dependencies in R code ... NOTE
 Unexported object imported by a ':::' call: ‘BiocGenerics:::testPackage’
@@ -2637,9 +2379,14 @@ File ‘OrganismDbi/R/createOrganismPackage.R’:
 ## PAnnBuilder (1.36.0)
 Maintainer: Li Hong <sysptm@gmail.com>
 
-0 errors | 3 warnings | 1 note 
+0 errors | 4 warnings | 1 note 
 
 ```
+checking whether package ‘PAnnBuilder’ can be installed ... WARNING
+Found the following significant warnings:
+  Warning: namespace ‘Rcpp’ is not available and has been replaced
+See ‘/home/muelleki/git/R/RSQLite/revdep/checks/PAnnBuilder.Rcheck/00install.out’ for details.
+
 checking dependencies in R code ... WARNING
 'library' or 'require' call to ‘Biobase’ which was already attached by Depends.
   Please remove these calls from your code.
@@ -2680,16 +2427,16 @@ See section ‘Good practice’ in ‘?data’.
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-             }
-     
-
-trying URL 'http://gpcr2.biocomp.unibo.it/bacello/dataset.htm'
-Content type 'text/html; charset=iso-8859-1' length 5062 bytes
-==================================================
-downloaded 5062 bytes
+             if(length(xx) > 0){
+                     # Get the value of the first key
+                     xx[[1]]
+                     # Get the values for a few keys
+                     if(length(xx) >= 3){
+                             xx[1:3]
+                     }
 ... 8 lines ...
-Warning in rsqlite_disconnect(conn@ptr) :
-  There are 1 result in use. The connection will be released when they are closed
+
+Warning in .local(conn, ...) : Closing open result set
 Error in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  : 
   Running 'texi2dvi' on 'PAnnBuilder.tex' failed.
 LaTeX errors:
@@ -2709,9 +2456,14 @@ A package should be listed in only one of these fields.
 ## pdInfoBuilder (1.36.0)
 Maintainer: Benilton Carvalho <beniltoncarvalho@gmail.com>
 
-0 errors | 0 warnings | 1 note 
+0 errors | 1 warning  | 1 note 
 
 ```
+checking whether package ‘pdInfoBuilder’ can be installed ... WARNING
+Found the following significant warnings:
+  Warning: namespace ‘Rcpp’ is not available and has been replaced
+See ‘/home/muelleki/git/R/RSQLite/revdep/checks/pdInfoBuilder.Rcheck/00install.out’ for details.
+
 checking R code for possible problems ... NOTE
 cdf2table: no visible global function definition for ‘getDoParWorkers’
 cdf2table: no visible global function definition for ‘%dopar%’
@@ -2820,7 +2572,7 @@ Package suggested but not available for checking: ‘ggsubplot’
 ## plethy (1.10.0)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
-2 errors | 1 warning  | 3 notes
+2 errors | 0 warnings | 3 notes
 
 ```
 checking examples ... ERROR
@@ -2828,63 +2580,40 @@ Running examples in ‘plethy-Ex.R’ failed
 The error most likely occurred in:
 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: BuxcoDB-class
-> ### Title: Class '"BuxcoDB"'
-> ### Aliases: BuxcoDB-class BuxcoDB addAnnotation,BuxcoDB-method
-> ###   addAnnotation annoTable,BuxcoDB-method annoTable
-> ###   annoCols,BuxcoDB-method annoCols annoLevels,BuxcoDB-method annoLevels
-... 53 lines ...
-> 
-> tables(bux.db)
-[1] "WBPth"
-> 
-> variables(bux.db)
- [1] "f"     "TVb"   "MVb"   "Penh"  "PAU"   "Rpef"  "Comp"  "PIFb"  "PEFb" 
-[10] "Ti"    "Te"    "EF50"  "Tr"    "Tbody" "Tc"    "RH"    "Rinx" 
-> 
-> addAnnotation(bux.db, query=day.infer.query, index=FALSE)
-Error: is.null(dbGetQuery(db.con, i)) is not TRUE
+> ### Name: Utility functions
+> ### Title: Utility functions to assist with QA/QC and analysis of
+> ###   plethysmography data
+> ### Aliases: add.labels.by.sample get.err.breaks adjust.labels proc.sanity
+> ### Keywords: Utilities
+... 21 lines ...
+> temp.db.file <- tempfile()
+> write(sim.bux.lines, file=temp.file)
+> test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
+Processing /tmp/RtmpWIPK7Z/filedb5b32a3a931 in chunks of 10000
+Starting chunk 1
+Reached breakpoint change
+Processing breakpoint 1
+Starting sample sample_1
+Error in if (sum(which.gt) > 0) { : missing value where TRUE/FALSE needed
+Calls: parse.buxco ... write.sample.breaks -> write.sample.db -> sanity.check.time
 Execution halted
 
 checking tests ... ERROR
 Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
-       test.db.insert.autoincrement 
+  
+     test_check_helpers.R 
+       test.add.labels.by.sample 
        test.dbImport 
-       test.examine.table.lines 
        test.get.err.breaks 
-       test.parse.buxco 
-       test.retrieveData 
        test.summaryMeasures 
-       test.write.sample.db 
   
   
   Error in BiocGenerics:::testPackage("plethy") : 
     unit tests failed for package plethy
+  In addition: Warning message:
+  closing unused connection 3 (/tmp/RtmpooGJiX/filedcdf6555f40a) 
   Execution halted
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-
-    IQR, mad, xtabs
-
-The following objects are masked from ‘package:base’:
-
-    Filter, Find, Map, Position, Reduce, anyDuplicated, append, as.data.frame,
-    cbind, colnames, do.call, duplicated, eval, evalq, get, grep, grepl,
-... 8 lines ...
-Attaching package: ‘S4Vectors’
-
-The following objects are masked from ‘package:base’:
-
-    colMeans, colSums, expand.grid, rowMeans, rowSums
-
-
-Error: processing vignette 'plethy.Rnw' failed with diagnostics:
- chunk 3 
-Error : is.null(dbGetQuery(db.con, query.list[[i]])) is not TRUE
-Execution halted
 
 checking dependencies in R code ... NOTE
 There are ::: calls to the package's namespace in its code. A package
@@ -2935,37 +2664,9 @@ These lines will be truncated in the PDF manual.
 ## poplite (0.99.16)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
-1 error  | 1 warning  | 1 note 
+0 errors | 0 warnings | 1 note 
 
 ```
-checking tests ... ERROR
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-  1. Failure: createTable (@test-poplite.R#252) 
-  2. Failure: createTable (@test-poplite.R#252) 
-  3. Failure: createTable (@test-poplite.R#252) 
-  4. Failure: createTable (@test-poplite.R#252) 
-  5. Failure: insertStatement (@test-poplite.R#330) 
-  6. Failure: insertStatement (@test-poplite.R#350) 
-  7. Failure: insertStatement (@test-poplite.R#330) 
-  8. Failure: insertStatement (@test-poplite.R#350) 
-  9. Failure: insertStatement (@test-poplite.R#330) 
-  1. ...
-  
-  Error: testthat unit tests failed
-  Execution halted
-
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-
 checking R code for possible problems ... NOTE
 filter_.Database: no visible global function definition for ‘stack’
 get.starting.point : <anonymous>: no visible global function definition
@@ -3009,62 +2710,12 @@ See section ‘Good practice’ in ‘?attach’.
 ## rangeMapper (0.3-0)
 Maintainer: Mihai Valcu <valcu@orn.mpg.de>
 
-0 errors | 1 warning  | 0 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-... 57 lines ...
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-               user system elapsed
-rangeMap.save 6.496  0.044   6.541
-```
+0 errors | 0 warnings | 0 notes
 
 ## RecordLinkage (0.4-10)
 Maintainer: Andreas Borg <borga@uni-mainz.de>
 
-0 errors | 1 warning  | 0 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-... 19 lines ...
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-```
+0 errors | 0 warnings | 0 notes
 
 ## recordr (1.0.3)
 Maintainer: Peter Slaughter <slaughter@nceas.ucsb.edu>  
@@ -3199,32 +2850,7 @@ Maintainer: Dominik Reusser <reusser@pik-potsdam.de>
 Maintainer: Clayton Barrows <clayton.barrows@nrel.gov>  
 Bug reports: https://github.com/NREL/rplexos/issues
 
-0 errors | 1 warning  | 0 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-... 256 lines ...
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-```
+0 errors | 0 warnings | 0 notes
 
 ## RQDA (0.2-7)
 Maintainer: HUANG Ronggui <ronggui.huang@gmail.com>
@@ -3245,31 +2871,9 @@ Packages which this enhances but not available for checking:
 Maintainer: Diego Diez <diego10ruiz@gmail.com>  
 Bug reports: https://github.com/ddiez/rTRM/issues
 
-0 errors | 1 warning  | 1 note 
+0 errors | 0 warnings | 1 note 
 
 ```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-
 checking Rd line widths ... NOTE
 Rd file 'findTRM.Rd':
   \usage lines wider than 90 characters:
@@ -3395,19 +2999,7 @@ Maintainer: Alastair Rushworth <alastair.rushworth@strath.ac.uk>
 ## snplist (0.15)
 Maintainer: Alexander Sibley <alexander.sibley@dm.duke.edu>
 
-0 errors | 1 warning  | 0 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-```
+0 errors | 0 warnings | 0 notes
 
 ## specL (1.6.2)
 Maintainer: Christian Panse <cp@fgcz.ethz.ch>, Witold E. Wolski <wewolski@gmail.com>  
@@ -3454,32 +3046,9 @@ prepare_Rd: ms1.p2069.Rd:23-26: Dropping empty section \examples
 Maintainer: G. Grothendieck <ggrothendieck@gmail.com>  
 Bug reports: http://groups.google.com/group/sqldf
 
-1 error  | 1 warning  | 2 notes
+0 errors | 1 warning  | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘sqldf-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: sqldf
-> ### Title: SQL select on data frames
-> ### Aliases: sqldf
-> ### Keywords: manip
-> 
-... 6 lines ...
-> # in R without SQL and then again with SQL
-> #
-> 
-> # head
-> a1r <- head(warpbreaks)
-> a1s <- sqldf("select * from warpbreaks limit 6")
-Loading required package: tcltk
-Error in eval(substitute(expr), envir, enclos) : 
-  no such table: warpbreaks
-Calls: sqldf ... initialize -> initialize -> rsqlite_send_query -> .Call
-Execution halted
-
 checking whether package ‘sqldf’ can be installed ... WARNING
 Found the following significant warnings:
   Warning: no DISPLAY variable so Tk is not available
@@ -3605,18 +3174,9 @@ Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
 Maintainer: Michael Hahsler <mhahsler@lyle.smu.edu>  
 Bug reports: https://github.com/mhahsler/stream/issues
 
-0 errors | 1 warning  | 1 note 
+0 errors | 0 warnings | 1 note 
 
 ```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-
 checking installed package size ... NOTE
   installed size is  5.7Mb
   sub-directories of 1Mb or more:
@@ -3713,9 +3273,14 @@ Unexported objects imported by ':::' calls:
 Maintainer: Antti Honkela <antti.honkela@hiit.fi>  
 Bug reports: https://github.com/ahonkela/tigre/issues
 
-0 errors | 0 warnings | 2 notes
+0 errors | 1 warning  | 2 notes
 
 ```
+checking whether package ‘tigre’ can be installed ... WARNING
+Found the following significant warnings:
+  Warning: namespace ‘Rcpp’ is not available and has been replaced
+See ‘/home/muelleki/git/R/RSQLite/revdep/checks/tigre.Rcheck/00install.out’ for details.
+
 checking top-level files ... NOTE
 Non-standard file/directory found at top level:
   ‘demos’
@@ -3832,9 +3397,14 @@ Maintainer: Jeff Gentry <geoffjentry@gmail.com>
 ## UniProt.ws (2.12.0)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-0 errors | 0 warnings | 1 note 
+0 errors | 1 warning  | 1 note 
 
 ```
+checking whether package ‘UniProt.ws’ can be installed ... WARNING
+Found the following significant warnings:
+  Warning: namespace ‘Rcpp’ is not available and has been replaced
+See ‘/home/muelleki/git/R/RSQLite/revdep/checks/UniProt.ws.Rcheck/00install.out’ for details.
+
 checking R code for possible problems ... NOTE
 .getSomeUniprotGoodies: no visible global function definition for
   ‘head’
@@ -3867,17 +3437,9 @@ Non-standard file/directory found at top level:
 ## UPMASK (1.0)
 Maintainer: Alberto Krone-Martins <algol@sim.ul.pt>
 
-0 errors | 1 warning  | 1 note 
+0 errors | 0 warnings | 1 note 
 
 ```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-
 checking R code for possible problems ... NOTE
 UPMASKfile: no visible global function definition for ‘read.table’
 UPMASKfile: no visible global function definition for ‘write.table’
@@ -3921,19 +3483,19 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Loading required package: Biostrings
-Loading required package: XVector
 
 Attaching package: ‘VariantAnnotation’
 
 The following object is masked from ‘package:base’:
 
+    tabulate
+
 ... 8 lines ...
-Error in eval(expr, envir, enclos) : database disk image is malformed
-Error in eval(expr, envir, enclos) : database disk image is malformed
+Error in sqliteSendQuery(con, statement, bind.data) : 
+  error in statement: database disk image is malformed
 Error : .onLoad failed in loadNamespace() for 'MafDb.1Kgenomes.phase3.hs37d5', details:
-  call: eval(expr, envir, enclos)
-  error: database disk image is malformed
+  call: sqliteSendQuery(con, statement, bind.data)
+  error: error in statement: database disk image is malformed
 
 Error: processing vignette 'usingVariantFiltering.Rnw' failed with diagnostics:
  chunk 3 
@@ -3942,7 +3504,7 @@ Error in VariantFilteringParam(vcfFilenames = CEUvcf) :
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  7.8Mb
+  installed size is  7.9Mb
   sub-directories of 1Mb or more:
     R         3.5Mb
     extdata   3.5Mb

@@ -35,6 +35,7 @@ public:
 
 public:
   void bind(const Rcpp::List& params);
+  Rcpp::IntegerVector find_params(const Rcpp::CharacterVector& param_names);
   void bind_rows(const Rcpp::List& params);
   Rcpp::List fetch(int n_max = -1);
   Rcpp::List column_info();

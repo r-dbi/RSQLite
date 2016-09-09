@@ -27,8 +27,8 @@ test_that("exception after bad query", {
   expect_error(dbGetQuery(con, "RAISE"))
 
   expect_warning(ex <- dbGetException(con), "deprecated")
-  expect_equal(ex$errorNum, 1)
-  expect_match(ex$errorMsg, "syntax error")
+  expect_equal(ex$errorNum, 0)
+  expect_match(ex$errorMsg, "OK")
 })
 
 test_that("no exception after good statement sent", {
@@ -63,6 +63,6 @@ test_that("exception after bad statement sent", {
   expect_error(dbSendQuery(con, "RAISE"), "syntax error")
   expect_warning(ex <- dbGetException(con), "deprecated")
 
-  expect_equal(ex$errorNum, 1)
-  expect_match(ex$errorMsg, "syntax error")
+  expect_equal(ex$errorNum, 0)
+  expect_match(ex$errorMsg, "OK")
 })

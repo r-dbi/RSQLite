@@ -51,6 +51,8 @@ sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL,
   row.names = NA) {
 
   warning("Deprecated: please use DBI::sqlCreateTable instead")
+  row.names <- compatRowNames(row.names)
+
   sqliteBuildTableDefinitionNoWarn(con, name, value, field.types, row.names)
 }
 
@@ -250,6 +252,7 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
 #' @keywords internal
 #' @export
 setMethod("fetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
+  row.names <- compatRowNames(row.names)
   sqlColumnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
 })
 

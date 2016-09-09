@@ -39,51 +39,51 @@ config.status: creating src/Makefile
 /usr/bin/nvcc -c -Xcompiler "-fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g" -I. -I"/usr/include" -I"/usr/lib/R/include" lsfit.cu -o lsfit.o
 /usr/bin/nvcc -c -Xcompiler "-fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g" -I. -I"/usr/include" -I"/usr/lib/R/include" kendall.cu -o kendall.o
 /usr/bin/nvcc -c -Xcompiler "-fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g" -I. -I"/usr/include" -I"/usr/lib/R/include" cuseful.cu -o cuseful.o
-distance.cu:1:14: fatal error: R.h: No such file or directory
-rinterface.cu:1:14: fatal error: R.h: No such file or directory
-compilation terminated.
-compilation terminated.
+cuseful.cu:6:14: fatal error: R.h: No such file or directory
+matmult.cu:10:14: fatal error: R.h: No such file or directory
+qrdecomp.cu:5:14: fatal error: R.h: No such file or directory
 sort.cu:2:14: fatal error: R.h: No such file or directory
-granger.cu:1:18: fatal error: Rmath.h: No such file or directory
+rinterface.cu:1:14: fatal error: R.h: No such file or directory
+distance.cu:1:14: fatal error: R.h: No such file or directory
+compilation terminated.
+compilation terminated.
+compilation terminated.
+compilation terminated.
+compilation terminated.
 mi.cu:5:14: fatal error: R.h: No such file or directory
-compilation terminated.
-compilation terminated.
-compilation terminated.
-Makefile:32: recipe for target 'mi.o' failed
-make: *** [mi.o] Error 1
-make: *** Waiting for unfinished jobs....
-Makefile:32: recipe for target 'distance.o' failed
-make: *** [distance.o] Error 1
-Makefile:32: recipe for target 'granger.o' failed
-make: *** [granger.o] Error 1
-Makefile:32: recipe for target 'rinterface.o' failed
-make: *** [rinterface.o] Error 1
-Makefile:32: recipe for target 'sort.o' failed
-make: *** [sort.o] Error 1
+granger.cu:1:18: fatal error: Rmath.h: No such file or directory
 hcluster.cu:5:14: fatal error: R.h: No such file or directory
 compilation terminated.
-Makefile:32: recipe for target 'hcluster.o' failed
-make: *** [hcluster.o] Error 1
+compilation terminated.
+compilation terminated.
+compilation terminated.
 correlation.cu:6:14: fatal error: R.h: No such file or directory
-compilation terminated.
-qrdecomp.cu:5:14: fatal error: R.h: No such file or directory
-compilation terminated.
-cuseful.cu:6:14: fatal error: R.h: No such file or directory
-compilation terminated.
-matmult.cu:10:14: fatal error: R.h: No such file or directory
 compilation terminated.
 lsfit.cu:5:14: fatal error: R.h: No such file or directory
 compilation terminated.
-Makefile:32: recipe for target 'correlation.o' failed
-make: *** [correlation.o] Error 1
-Makefile:32: recipe for target 'qrdecomp.o' failed
-make: *** [qrdecomp.o] Error 1
 Makefile:32: recipe for target 'cuseful.o' failed
 make: *** [cuseful.o] Error 1
+make: *** Waiting for unfinished jobs....
+Makefile:32: recipe for target 'hcluster.o' failed
+make: *** [hcluster.o] Error 1
 Makefile:32: recipe for target 'matmult.o' failed
 make: *** [matmult.o] Error 1
+Makefile:32: recipe for target 'rinterface.o' failed
+make: *** [rinterface.o] Error 1
+Makefile:32: recipe for target 'distance.o' failed
+make: *** [distance.o] Error 1
+Makefile:32: recipe for target 'mi.o' failed
+make: *** [mi.o] Error 1
+Makefile:32: recipe for target 'qrdecomp.o' failed
+make: *** [qrdecomp.o] Error 1
+Makefile:32: recipe for target 'granger.o' failed
+make: *** [granger.o] Error 1
+Makefile:32: recipe for target 'sort.o' failed
+make: *** [sort.o] Error 1
 Makefile:32: recipe for target 'lsfit.o' failed
 make: *** [lsfit.o] Error 1
+Makefile:32: recipe for target 'correlation.o' failed
+make: *** [correlation.o] Error 1
 /usr/include/string.h: In function ‘void* __mempcpy_inline(void*, const void*, size_t)’:
 /usr/include/string.h:652:42: error: ‘memcpy’ was not declared in this scope
    return (char *) memcpy (__dest, __src, __n) + __n;

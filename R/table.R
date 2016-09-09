@@ -186,20 +186,32 @@ setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
   row.names <- compatRowNames(row.names)
   value <- sqlRownamesToColumn(value, row.names)
 
-  # Convert factors to strings
-  is_factor <- vlapply(value, is.factor)
-  value[is_factor] <- lapply(value[is_factor], as.character)
-
-  # Convert all strings to utf-8
-  is_char <- vlapply(value, is.character)
-  value[is_char] <- lapply(value[is_char], enc2utf8)
-
-  # Convert raw to lists of raw, with warning
-  is_raw <- vlapply(value, is.raw)
-  value[is_raw] <- lapply(value[is_raw], as.character)
+  value <- factor_to_string(value)
+  value <- raw_to_string(value)
+  value <- string_to_utf8(value)
 
   value
 })
+
+
+factor_to_string <- function(value) {
+  is_factor <- vlapply(value, is.factor)
+  value[is_factor] <- lapply(value[is_factor], as.character)
+  value
+}
+
+raw_to_string <- function(value) {
+  is_raw <- vlapply(value, is.raw)
+  value[is_raw] <- lapply(value[is_raw], as.character)
+  value
+}
+
+string_to_utf8 <- function(value) {
+  is_char <- vlapply(value, is.character)
+  value[is_char] <- lapply(value[is_char], enc2utf8)
+  value
+}
+
 
 #' Convenience functions for importing/exporting DBMS tables
 #'

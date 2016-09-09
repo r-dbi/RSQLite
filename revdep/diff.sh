@@ -3,7 +3,7 @@
 set -e
 
 old_tag=v1.0.0
-branch=f-revdep
+branch=$(git symbolic-ref --short HEAD)
 
 cd $(dirname $0)/..
 git checkout -- .

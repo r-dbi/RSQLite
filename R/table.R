@@ -54,6 +54,8 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     if (overwrite && append)
       stop("overwrite and append cannot both be TRUE", call. = FALSE)
 
+    row.names <- compatRowNames(row.names)
+
     dbBegin(conn, "dbWriteTable")
     on.exit(dbRollback(conn, "dbWriteTable"))
 
@@ -143,6 +145,8 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
       stop("overwrite and append cannot both be TRUE")
     value <- path.expand(value)
 
+    row.names <- compatRowNames(row.names)
+
     dbBegin(conn)
     on.exit(dbRollback(conn))
 
@@ -179,6 +183,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 #' @export
 #' @rdname dbWriteTable
 setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
+  row.names <- compatRowNames(row.names)
   value <- sqlRownamesToColumn(value, row.names)
 
   # Convert factors to strings
@@ -229,6 +234,8 @@ setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
 #' dbDisconnect(con)
 setMethod("dbReadTable", c("SQLiteConnection", "character"),
   function(conn, name, row.names = NA, check.names = TRUE, select.cols = "*") {
+    row.names <- compatRowNames(row.names)
+
     name <- dbQuoteIdentifier(conn, name)
     out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM",
                                   dbQuoteIdentifier(conn, name)),

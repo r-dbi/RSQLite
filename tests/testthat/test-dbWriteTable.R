@@ -205,7 +205,7 @@ test_that("dbWriteTable(row.names = 0)", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 
-  dbWriteTable(con, "mtcars", mtcars, row.names = 0)
+  expect_warning(dbWriteTable(con, "mtcars", mtcars, row.names = 0))
   res <- dbReadTable(con, "mtcars")
 
   expect_equal(rownames(res), as.character(seq_len(nrow(mtcars))))
@@ -217,7 +217,7 @@ test_that("dbWriteTable(row.names = 1)", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 
-  dbWriteTable(con, "mtcars", mtcars, row.names = 1)
+  expect_warning(dbWriteTable(con, "mtcars", mtcars, row.names = 1))
   res <- dbReadTable(con, "mtcars")
 
   expect_identical(res, mtcars)
@@ -271,22 +271,24 @@ test_that("dbWriteTable(iris, row.names = 'rn')", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 
-  expect_error(dbWriteTable(con, "iris", iris, row.names = "rn"))
-  skip("Doesn't work here")
-  res <- dbReadTable(con, "iris")
+  dbWriteTable(con, "iris", iris, row.names = "rn")
+  res <- dbReadTable(con, "iris", row.names = "rn")
 
   expect_equal(rownames(res), as.character(seq_len(nrow(iris))))
   res$Species = factor(res$Species)
+
+  attr(res, "row.names") <- attr(iris, "row.names")
   expect_identical(res, iris)
+
+  skip("Why do we need to fix row names here?")
 })
 
 test_that("dbWriteTable(mtcars, row.names = 'rn')", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 
-  expect_error(dbWriteTable(con, "mtcars", mtcars, row.names = "rn"))
-  skip("Doesn't work here")
-  res <- dbReadTable(con, "mtcars")
+  dbWriteTable(con, "mtcars", mtcars, row.names = "rn")
+  res <- dbReadTable(con, "mtcars", row.names = "rn")
 
   expect_identical(res, mtcars)
 })

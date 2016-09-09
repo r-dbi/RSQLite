@@ -29,9 +29,6 @@ public:
   }
 
 public:
-  // Get the last exception code
-  int getExceptionCode() const;
-
   // Get the last exception as a string
   std::string getException() const;
 

@@ -23,7 +23,7 @@ ignore <- c(
   "cummeRbund",
   "customProDB",
   "DBI",
-  # "DECIPHER",
+  "DECIPHER",
   "dplyr",
   "ecd",
   "emuR",

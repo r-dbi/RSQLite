@@ -71,7 +71,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     value <- sqlData(conn, value, row.names = row.names)
 
     if (!found || overwrite) {
-      sql <- sqlCreateTable(conn, name, fields, row.names = FALSE)
+      sql <- sqlCreateTable(conn, name, value, row.names = FALSE)
       dbGetQuery(conn, sql)
     } else if (append) {
       col_names <- dbListFields(conn, name)

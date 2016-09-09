@@ -39,14 +39,6 @@ void rsqlite_disconnect(XPtr<SqliteConnectionPtr>& con) {
 }
 
 // [[Rcpp::export]]
-List rsqlite_get_exception(const XPtr<SqliteConnectionPtr>& con) {
-  return
-    List::create(
-      _["errorNum"] = (*con)->getExceptionCode(),
-      _["errorMsg"] = (*con)->getException());
-}
-
-// [[Rcpp::export]]
 void rsqlite_copy_database(const XPtr<SqliteConnectionPtr>& from,
                            const XPtr<SqliteConnectionPtr>& to) {
   (*from)->copy_to((*to));

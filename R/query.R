@@ -90,11 +90,8 @@ setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
     names(params) <- rep("", length(params))
   }
 
-  is_factor <- vlapply(params, is.factor)
-  if (any(is_factor)) {
-    warning("Converting factor to character for binding", call. = FALSE)
-    params[is_factor] <- lapply(params[is_factor], as.character)
-  }
+  params <- factor_to_string(params)
+  params <- string_to_utf8(params)
 
   rsqlite_bind_params(res@ptr, params)
   invisible(res)

@@ -30,17 +30,6 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// rsqlite_get_exception
-List rsqlite_get_exception(const XPtr<SqliteConnectionPtr>& con);
-RcppExport SEXP RSQLite_rsqlite_get_exception(SEXP conSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const XPtr<SqliteConnectionPtr>& >::type con(conSEXP);
-    rcpp_result_gen = Rcpp::wrap(rsqlite_get_exception(con));
-    return rcpp_result_gen;
-END_RCPP
-}
 // rsqlite_copy_database
 void rsqlite_copy_database(const XPtr<SqliteConnectionPtr>& from, const XPtr<SqliteConnectionPtr>& to);
 RcppExport SEXP RSQLite_rsqlite_copy_database(SEXP fromSEXP, SEXP toSEXP) {

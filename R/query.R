@@ -86,8 +86,21 @@ DBI::dbGetQuery
 #' @rdname sqlite-query
 #' @export
 setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
+  db_bind(res, params, ..., allow_named_superset = FALSE)
+})
+
+
+db_bind <- function(res, params, ..., allow_named_superset) {
   if (is.null(names(params))) {
     names(params) <- rep("", length(params))
+  } else if (allow_named_superset) {
+    param_pos <- rsqlite_find_params(res@ptr, names(params))
+    if (any(is.na(param_pos))) {
+      warning("Named parameters not used in query: ",
+              paste0(names(params)[is.na(param_pos)], collapse = ", "),
+              call. = FALSE)
+      params <- params[!is.na(param_pos)]
+    }
   }
 
   params <- factor_to_string(params)
@@ -95,7 +108,7 @@ setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
 
   rsqlite_bind_params(res@ptr, params)
   invisible(res)
-})
+}
 
 
 #' @param res an \code{\linkS4class{SQLiteResult}} object.

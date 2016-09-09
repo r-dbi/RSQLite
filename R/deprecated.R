@@ -146,7 +146,7 @@ setMethod("dbSendPreparedQuery",
       bind_data_rows,
       function(row) {
         tryCatch(
-          dbBind(res, unclass(row)),
+          db_bind(res, unclass(row), allow_named_superset = TRUE),
           error = function(e) {
             dbBind(res, unclass(unname(row)))
           }
@@ -176,7 +176,7 @@ setMethod("dbGetPreparedQuery",
       bind_data_rows,
       function(row) {
         tryCatch(
-          dbBind(res, unclass(row)),
+          db_bind(res, unclass(row), allow_named_superset = TRUE),
           error = function(e) {
             dbBind(res, unclass(unname(row)))
           }

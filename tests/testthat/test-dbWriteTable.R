@@ -271,8 +271,7 @@ test_that("dbWriteTable(iris, row.names = 'rn')", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 
-  expect_error(dbWriteTable(con, "iris", iris, row.names = "rn"))
-  skip("Doesn't work here")
+  dbWriteTable(con, "iris", iris, row.names = "rn")
   res <- dbReadTable(con, "iris")
 
   expect_equal(rownames(res), as.character(seq_len(nrow(iris))))
@@ -284,8 +283,7 @@ test_that("dbWriteTable(mtcars, row.names = 'rn')", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 
-  expect_error(dbWriteTable(con, "mtcars", mtcars, row.names = "rn"))
-  skip("Doesn't work here")
+  dbWriteTable(con, "mtcars", mtcars, row.names = "rn")
   res <- dbReadTable(con, "mtcars")
 
   expect_identical(res, mtcars)

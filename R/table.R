@@ -71,7 +71,13 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     value <- sqlData(conn, value, row.names = row.names)
 
     if (!found || overwrite) {
-      sql <- sqlCreateTable(conn, name, value, row.names = FALSE)
+      fields <- field_def(conn, value, field.types)
+
+      # Names from field type definition win, a warning has been issued in
+      # field_def()
+      names(value) <- names(fields)
+
+      sql <- sqlCreateTable(conn, name, fields, row.names = FALSE)
       dbGetQuery(conn, sql)
     } else if (append) {
       col_names <- dbListFields(conn, name)
@@ -116,6 +122,31 @@ match_col <- function(value, col_names) {
   }
 
   value
+}
+
+field_def <- function(conn, data, field_types) {
+  # Match column names with compatibility rules
+  new_field_types <- match_col(field_types, names(data))
+
+  if (any(names(new_field_types) != names(field_types))) {
+    # The names in field_types win (compatibility!), update names in data
+    column_names_map <- names(field_types)
+    names(column_names_map) <- names(new_field_types)
+    names(data) <- column_names_map[names(data)]
+  }
+
+  # Automatic types for all other fields
+  auto_field_types <- db_data_types(conn, data[setdiff(names(data), names(field_types))])
+  field_types[names(auto_field_types)] <- auto_field_types
+
+  # Reorder
+  field_types[] <- field_types[names(data)]
+
+  field_types
+}
+
+db_data_types <- function(conn, data) {
+  vcapply(data, function(x) dbDataType(conn, x))
 }
 
 parameterised_insert <- function(con, name, values) {

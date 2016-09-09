@@ -175,6 +175,20 @@ void SqliteResult::bind_parameter(const int i, const int j0, const std::string& 
   }
 }
 
+Rcpp::IntegerVector SqliteResult::find_params(const Rcpp::CharacterVector& param_names) {
+  int p = param_names.length();
+  Rcpp::IntegerVector res(p);
+
+  for (int j = 0; j < p; ++j) {
+    int pos = find_parameter(std::string(param_names[j]));
+    if (pos == 0)
+      pos = NA_INTEGER;
+    res[j] = pos;
+  }
+
+  return res;
+}
+
 int SqliteResult::find_parameter(const std::string& name) {
   int i = 0;
   i = sqlite3_bind_parameter_index(pStatement_, name.c_str());

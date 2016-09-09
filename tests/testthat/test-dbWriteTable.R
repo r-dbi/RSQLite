@@ -335,5 +335,7 @@ test_that("dbWriteTable with AsIs raw fields", {
   dbWriteTable(con, "a", data.frame(a = I(as.raw(1:3))))
   res <- dbReadTable(con, "a")
 
-  expect_identical(res, data.frame(a = as.list(as.raw(1:3))))
+  expected <- data.frame(a = 1:3)
+  expected$a <- as.character(as.raw(1:3))
+  expect_identical(res, expected)
 })

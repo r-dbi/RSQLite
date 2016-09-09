@@ -332,7 +332,8 @@ test_that("dbWriteTable with AsIs raw fields", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con))
 
-  dbWriteTable(con, "a", data.frame(a = I(as.raw(1:3))))
+  expect_warning(dbWriteTable(con, "a", data.frame(a = I(as.raw(1:3)))),
+                 " raw ")
   res <- dbReadTable(con, "a")
 
   expected <- data.frame(a = 1:3)

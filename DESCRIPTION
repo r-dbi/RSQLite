@@ -36,6 +36,7 @@ Collate:
     'dummy.R'
     'extensions.R'
     'query.R'
+    'rownames.R'
     'table.R'
     'transactions.R'
     'utils.R'

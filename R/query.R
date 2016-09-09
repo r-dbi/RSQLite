@@ -109,6 +109,7 @@ setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
 #' @export
 #' @rdname sqlite-query
 setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
+  row.names <- compatRowNames(row.names)
   sqlColumnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
 })
 

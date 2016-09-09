@@ -293,3 +293,50 @@ test_that("dbWriteTable(mtcars, row.names = 'rn')", {
   expect_identical(res, mtcars)
 })
 
+
+# AsIs --------------------------------------------------------------------
+
+test_that("dbWriteTable with AsIs character fields", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con))
+
+  dbWriteTable(con, "a", data.frame(a = I(letters)))
+  res <- dbReadTable(con, "a")
+
+  expect_identical(res, data.frame(a = letters, stringsAsFactors = FALSE))
+})
+
+test_that("dbWriteTable with AsIs numeric fields", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con))
+
+  dbWriteTable(con, "a", data.frame(a = I(1:3)))
+  res <- dbReadTable(con, "a")
+
+  expect_identical(res, data.frame(a = 1:3))
+})
+
+test_that("dbWriteTable with AsIs list fields", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con))
+
+  dbWriteTable(con, "a", data.frame(a = I(list(as.raw(1:3), as.raw(4:5)))))
+  res <- dbReadTable(con, "a")
+
+  expected <- data.frame(a = 1:2)
+  expected$a <- list(as.raw(1:3), as.raw(4:5))
+  expect_identical(res, expected)
+})
+
+test_that("dbWriteTable with AsIs raw fields", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con))
+
+  expect_warning(dbWriteTable(con, "a", data.frame(a = I(as.raw(1:3)))),
+                 " raw ")
+  res <- dbReadTable(con, "a")
+
+  expected <- data.frame(a = 1:3)
+  expected$a <- as.character(as.raw(1:3))
+  expect_identical(res, expected)
+})

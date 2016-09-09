@@ -51,7 +51,7 @@ ignore <- c(
   "metagenomeFeatures",
   "MetaIntegrator",
   "metaseqR",
-  # "mgsa",
+  "mgsa",
   "miRNAtap",
   "MmPalateMiRNA",
   "MonetDBLite",
@@ -68,7 +68,7 @@ ignore <- c(
   "PGA",
   "pitchRx",
   "plethy", # doesn't work with stable version
-  # "poplite",
+  "poplite",
   "ProjectTemplate",
   "quantmod",
   "rangeMapper",
@@ -89,7 +89,7 @@ ignore <- c(
   "SGP",
   "smnet",
   "snplist",
-  # "specL",
+  "specL",
   "sqldf", # bug fixed downstream
   "sqliter",
   "SRAdb",

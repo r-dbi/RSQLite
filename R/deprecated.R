@@ -251,8 +251,7 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
 #'
 #' @keywords internal
 #' @export
-setMethod("fetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
-  row.names <- compatRowNames(row.names)
-  sqlColumnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
+setMethod("fetch", "SQLiteResult", function(res, n = -1) {
+  .Deprecated("dbFetch(..., row.names = FALSE)", old = "fetch")
+  sqlColumnToRownames(rsqlite_fetch(res@ptr, n = n), row.names = FALSE)
 })
-

@@ -68,8 +68,10 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
       dbRemoveTable(conn, name)
     }
 
+    value <- sqlData(conn, value, row.names = row.names)
+
     if (!found || overwrite) {
-      sql <- sqlCreateTable(conn, name, value, row.names = row.names)
+      sql <- sqlCreateTable(conn, name, fields, row.names = FALSE)
       dbGetQuery(conn, sql)
     } else if (append) {
       col_names <- dbListFields(conn, name)
@@ -77,7 +79,6 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     }
 
     if (nrow(value) > 0) {
-      value <- sqlData(conn, value, row.names = row.names)
       sql <- parameterised_insert(conn, name, value)
       rs <- dbSendQuery(conn, sql)
 
@@ -209,7 +210,12 @@ factor_to_string <- function(value) {
 
 raw_to_string <- function(value) {
   is_raw <- vlapply(value, is.raw)
-  value[is_raw] <- lapply(value[is_raw], as.character)
+
+  if (any(is_raw)) {
+    warning("Creating a TEXT column from raw, use lists of raw to create BLOB columns", call. = FALSE)
+    value[is_raw] <- lapply(value[is_raw], as.character)
+  }
+
   value
 }
 
@@ -391,10 +397,7 @@ setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
     character = "TEXT",
     logical = "INTEGER",
     list = "BLOB",
-    raw = {
-      warning("Creating a TEXT column from raw, use lists of raw to create BLOB columns", call. = FALSE)
-      "TEXT"
-    },
+    raw = "TEXT",
     stop("Unsupported type", call. = FALSE)
   )
 })

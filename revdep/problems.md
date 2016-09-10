@@ -22,12 +22,12 @@
 |knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
 |Rcpp      |   |0.12.7     |2016-09-05 |cran (@0.12.7)                     |
 |rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
-|RSQLite   |   |1.0.9010   |2016-09-09 |local (rstats-db/RSQLite@4c27255)  |
+|RSQLite   |   |1.0.9010   |2016-09-10 |local (rstats-db/RSQLite@75f10ad)  |
 |testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
 
-49 packages with problems
+48 packages with problems
 
 |package           |version  | errors| warnings| notes|
 |:-----------------|:--------|------:|--------:|-----:|
@@ -43,16 +43,14 @@
 |CNEr              |1.8.3    |      0|        2|     1|
 |cummeRbund        |2.14.0   |      0|        1|     7|
 |customProDB       |1.12.0   |      1|        1|     3|
-|DBI               |0.5      |      0|        1|     1|
-|DECIPHER          |2.0.2    |      1|        2|     3|
+|DECIPHER          |2.0.2    |      0|        3|     3|
 |ecd               |0.8.2    |      1|        0|     0|
 |ensembldb         |1.4.7    |      0|        1|     1|
 |ETLUtils          |1.3      |      0|        1|     0|
 |filematrix        |1.1.0    |      0|        1|     0|
 |gcbd              |0.2.5    |      0|        1|     3|
 |GeneAnswers       |2.14.0   |      1|        3|     6|
-|GenomicFeatures   |1.24.5   |      0|        1|     2|
-|Genominator       |1.26.0   |      0|        1|     4|
+|GenomicFeatures   |1.24.5   |      1|        0|     2|
 |lumi              |2.24.0   |      0|        5|     5|
 |maGUI             |1.0      |      1|        0|     0|
 |MeSHDbi           |1.8.0    |      0|        1|     2|
@@ -74,6 +72,7 @@
 |rTRM              |1.10.2   |      0|        1|     1|
 |specL             |1.6.2    |      0|        1|     4|
 |sqldf             |0.4-10   |      1|        1|     2|
+|storr             |1.0.1    |      0|        1|     0|
 |stream            |1.2-3    |      0|        1|     1|
 |TFBSTools         |1.10.4   |      0|        1|     1|
 |trackeR           |0.0.3    |      0|        1|     0|
@@ -99,10 +98,9 @@ R.
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
                             user system elapsed
-AnnDbPkg-checker          46.848  0.568  47.440
-Bimap-direction            6.960  0.608   7.577
-InparanoidColsAndKeytypes  6.852  0.324   7.214
-print.probetable           5.232  0.180   5.414
+AnnDbPkg-checker          31.628  0.572  43.994
+Bimap-direction            4.532  0.396   8.887
+InparanoidColsAndKeytypes  4.460  0.140   9.262
 
 checking for unstated dependencies in ‘tests’ ... WARNING
 'library' or 'require' call not declared from: ‘org.testing.db’
@@ -341,7 +339,11 @@ Found the following significant warnings:
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
-... 6 lines ...
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
@@ -350,9 +352,8 @@ R.
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
                 user system elapsed
-addExperiments 9.888  0.148  10.093
-getResultVars  9.800  0.068   9.927
-getIndex       6.800  0.052   6.869
+addExperiments 5.532  0.056   5.838
+getResultVars  5.228  0.040   5.273
 
 checking dependencies in R code ... NOTE
 Unexported objects imported by ':::' calls:
@@ -414,18 +415,18 @@ Found the following significant warnings:
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
-... 20 lines ...
+... 14 lines ...
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
 Deprecated functions may be defunct as soon as of the next release of
 R.
 See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-                    user system elapsed
-batchReduceResults 8.144  0.080   8.261
-batchMapResults    6.752  0.100   6.895
-batchReduce        6.696  0.056   6.942
-submitJobs         5.816  0.060   5.892
 ```
 
 ## bioassayR (1.10.15)
@@ -633,7 +634,7 @@ R.
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
          user system elapsed
-MAplot 47.628  0.872  48.922
+MAplot 34.836  0.396   35.29
 
 checking package dependencies ... NOTE
 Depends: includes the non-default packages:
@@ -805,60 +806,12 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## DBI (0.5)
-Maintainer: Kirill Müller <krlmlr+r@mailbox.org>  
-Bug reports: https://github.com/rstats-db/DBI/issues
-
-0 errors | 1 warning  | 1 note 
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-
-checking S3 generic/method consistency ... NOTE
-Found the following apparent S3 methods exported but not registered:
-  print.list.pairs
-See section ‘Registering S3 methods’ in the ‘Writing R Extensions’
-manual.
-```
-
 ## DECIPHER (2.0.2)
 Maintainer: Erik Wright <DECIPHER@cae.wisc.edu>
 
-1 error  | 2 warnings | 3 notes
+0 errors | 3 warnings | 3 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘DECIPHER-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: AlignDB
-> ### Title: Align Two Sets of Aligned Sequences in a Sequence Database
-> ### Aliases: AlignDB
-> 
-> ### ** Examples
-... 43 lines ...
-Use 'dbFetch(..., row.names = FALSE)' instead.
-See help("Deprecated")
-Warning: Creating a TEXT column from raw, use lists of raw to create BLOB columns
-
-  |                                                                            
-  |====================================================                  |  75%Warning: 'fetch' is deprecated.
-Use 'dbFetch(..., row.names = FALSE)' instead.
-See help("Deprecated")
-Error in eval(expr, envir, enclos) : duplicate column name: row_names
-Calls: AlignDB ... initialize -> initialize -> rsqlite_send_query -> .Call
-Execution halted
-
 checking foreign function calls ... WARNING
 Registration problems:
   symbol ‘functionCall’ in the local frame:
@@ -878,6 +831,29 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
   ‘gs+qpdf’ made some significant size reductions:
      compacted ‘ArtOfAlignmentInR.pdf’ from 968Kb to 635Kb
   consider running tools::compactPDF(gs_quality = "ebook") on these files
+
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+... 132 lines ...
+See ?Deprecated.
+Examples with CPU or elapsed time > 5s
+                     user system elapsed
+CorrectFrameshifts 23.244  0.068  26.174
+StaggerAlignment   19.892  0.136  20.044
+AlignTranslation   14.124  0.096  14.264
+AlignSeqs           9.312  0.188   9.954
+Array2Matrix        8.872  0.028   8.903
+TileSeqs            7.932  0.000   7.934
+DesignArray         5.504  0.024   5.829
+BrowseSeqs          5.380  0.040   5.931
 
 checking installed package size ... NOTE
   installed size is  9.2Mb
@@ -1182,31 +1158,31 @@ These lines will be truncated in the PDF manual.
 ## GenomicFeatures (1.24.5)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-0 errors | 1 warning  | 2 notes
+1 error  | 0 warnings | 2 notes
 
 ```
-checking examples ... WARNING
-Found the following significant warnings:
+checking examples ... ERROR
+Running examples in ‘GenomicFeatures-Ex.R’ failed
+The error most likely occurred in:
 
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-... 85 lines ...
-Examples with CPU or elapsed time > 5s
-                               user system  elapsed
-makeFeatureDbFromUCSC      1229.740 39.672 1409.423
-makeTxDbFromBiomart        1163.312 46.220 5142.041
-makeTxDbFromUCSC             63.656  0.448  173.097
-coverageByTranscript         53.352  2.300   56.465
-coordinate-mapping-methods   54.236  1.372   55.661
-extractTranscriptSeqs        24.752  0.080   24.837
-makeTxDbFromGRanges          20.480  0.136   20.636
-makeTxDbFromGFF              14.120  0.112 2843.695
-transcriptLocs2refLocs       10.148  0.032   10.178
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: makeTxDbFromBiomart
+> ### Title: Make a TxDb object from annotations available on a BioMart
+> ###   database
+> ### Aliases: makeTxDbFromBiomart getChromInfoFromBiomart
+> 
+... 676627 lines ...
+2     ENSEMBL_MART_SNP  Ensembl Variation 85
+3 ENSEMBL_MART_FUNCGEN Ensembl Regulation 85
+4    ENSEMBL_MART_VEGA               Vega 65
+> 
+> ## Therefore in addition to setting 'host' to "uswest.ensembl.org" we
+> ## might also need to specify the 'biomart' argument:
+> txdb3 <- makeTxDbFromBiomart(biomart="ENSEMBL_MART_ENSEMBL",
++                              dataset="hsapiens_gene_ensembl",
++                              transcript_ids=transcript_ids,
++                              host="useast.ensembl.org")
+Terminated
 
 checking package dependencies ... NOTE
 Depends: includes the non-default packages:
@@ -1224,84 +1200,6 @@ Unexported objects imported by ':::' calls:
   ‘biomaRt:::martBM’ ‘biomaRt:::martDataset’ ‘biomaRt:::martHost’
   ‘rtracklayer:::resourceDescription’ ‘rtracklayer:::ucscTableOutputs’
   See the note in ?`:::` about the use of this operator.
-```
-
-## Genominator (1.26.0)
-Maintainer: James Bullard <bullard@stat.berkeley.edu>
-
-0 errors | 1 warning  | 4 notes
-
-```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int, rank,
-    rbind, rownames, sapply, setdiff, sort, table, tapply, union,
-    unique, unsplit
-
-Loading required package: IRanges
-Loading required package: S4Vectors
-Loading required package: stats4
-... 8 lines ...
-Loading required package: GenomeGraphs
-Loading required package: biomaRt
-Loading required package: grid
-matplot: doing 1 plots with  col= ("1") pch= ("1" "2" "3" "4" "5" "6" "7" "8" "9" "0" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z") ...
-
-
-Error: processing vignette 'plotting.Rnw' failed with diagnostics:
- chunk 7 
-Error in value[[3L]](cond) : 
-  Request to BioMart web service failed. Verify if you are still connected to the internet.  Alternatively the BioMart web service is temporarily down.
-Execution halted
-
-checking dependencies in R code ... NOTE
-'library' or 'require' calls to packages already attached by Depends:
-  ‘GenomeGraphs’ ‘IRanges’
-  Please remove these calls from your code.
-'library' or 'require' call to ‘ShortRead’ in package code.
-  Please use :: or requireNamespace() instead.
-  See section 'Suggested packages' in the 'Writing R Extensions' manual.
-Packages in Depends field not imported from:
-  ‘GenomeGraphs’ ‘RSQLite’
-  These packages need to be imported from (in the NAMESPACE file)
-  for when this namespace is loaded but not attached.
-
-checking S3 generic/method consistency ... NOTE
-Found the following apparent S3 methods exported but not registered:
-  plot.genominator.coverage plot.genominator.goodness.of.fit
-See section ‘Registering S3 methods’ in the ‘Writing R Extensions’
-manual.
-
-checking R code for possible problems ... NOTE
-addPrimingWeights: no visible global function definition for
-  ‘varLabels’
-addPrimingWeights: no visible global function definition for
-  ‘alignData’
-addPrimingWeights: no visible global function definition for ‘subseq’
-addPrimingWeights: no visible global function definition for ‘sread’
-addPrimingWeights: no visible global function definition for
-  ‘AlignedDataFrame’
-addPrimingWeights: no visible global function definition for ‘pData’
-... 46 lines ...
-  function definition for ‘qunif’
-plot.genominator.goodness.of.fit : <anonymous>: no visible global
-  function definition for ‘qqplot’
-Undefined global functions or variables:
-  AlignedDataFrame DisplayPars alignData chromosome gdPlot
-  geneRegionBiomart makeAnnotationTrack makeBaseTrack makeGenericArray
-  makeGenomeAxis mkAllStrings pData position ppoints qchisq qqplot
-  qunif readAligned sread subseq tables varLabels varMetadata
-Consider adding
-  importFrom("stats", "ppoints", "qchisq", "qqplot", "qunif")
-to your NAMESPACE file.
-
-checking Rd line widths ... NOTE
-Rd file 'makeGeneRepresentation.Rd':
-  \usage lines wider than 90 characters:
-     "background"), gene.id = "ensembl_gene_id", transcript.id = "ensembl_transcript_id", bind.columns, ignoreStrand = TRUE, verbose = getOp ... [TRUNCATED]
-
-These lines will be truncated in the PDF manual.
 ```
 
 ## lumi (2.24.0)
@@ -1772,11 +1670,11 @@ R.
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
                             user system elapsed
-makeOrganismDbFromBiomart 21.396  0.532 662.147
-OrganismDb                12.908  0.324  13.281
-rangeBasedAccessors       12.092  0.032  12.125
-makeOrganismDbFromTxDb    10.616  0.204  86.909
-makeOrganismDbFromUCSC     8.060  0.124  85.946
+makeOrganismDbFromBiomart 12.092  0.220  17.918
+rangeBasedAccessors        8.380  0.060   8.611
+OrganismDb                 6.852  0.164   8.499
+makeOrganismDbFromTxDb     6.288  0.092  82.585
+makeOrganismDbFromUCSC     4.952  0.068  81.737
 
 checking dependencies in R code ... NOTE
 Unexported object imported by a ':::' call: ‘BiocGenerics:::testPackage’
@@ -2084,9 +1982,6 @@ Found the following significant warnings:
 Deprecated functions may be defunct as soon as of the next release of
 R.
 See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-                user system elapsed
-external_funcs 5.264   0.06   5.341
 
 checking R code for possible problems ... NOTE
 filter_.Database: no visible global function definition for ‘stack’
@@ -2120,13 +2015,6 @@ Found the following significant warnings:
 Deprecated functions may be defunct as soon as of the next release of
 R.
 See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-                                user system elapsed
-rangeMap.save                  9.864  0.052   9.932
-ramp                           7.776  0.012   7.791
-processRanges                  7.744  0.040   7.790
-plot-rmap.frame-missing-method 7.508  0.040   7.554
-metadata.update                6.984  0.128   7.142
 ```
 
 ## RecordLinkage (0.4-10)
@@ -2444,6 +2332,23 @@ Undefined global functions or variables:
 Consider adding
   importFrom("utils", "download.file", "head", "modifyList")
 to your NAMESPACE file.
+```
+
+## storr (1.0.1)
+Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
+
+0 errors | 1 warning  | 0 notes
+
+```
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because drivers.Rmd appears to be an R Markdown v2 document.
+Quitting from lines 480-491 (drivers.Rmd) 
+Error: processing vignette 'drivers.Rmd' failed with diagnostics:
+'connection' must be a connection
+Execution halted
+
 ```
 
 ## stream (1.2-3)

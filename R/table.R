@@ -390,7 +390,7 @@ setMethod("dbListFields", c("SQLiteConnection", "character"),
                                   dbQuoteIdentifier(conn, name), "LIMIT 0"))
     on.exit(dbClearResult(rs))
 
-    names(dbFetch(rs, n = 1))
+    names(dbFetch(rs, n = 1, row.names = FALSE))
   }
 )
 

@@ -51,6 +51,8 @@ sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL,
   row.names = NA) {
 
   warning("Deprecated: please use DBI::sqlCreateTable instead")
+  row.names <- compatRowNames(row.names)
+
   sqliteBuildTableDefinitionNoWarn(con, name, value, field.types, row.names)
 }
 
@@ -144,7 +146,7 @@ setMethod("dbSendPreparedQuery",
       bind_data_rows,
       function(row) {
         tryCatch(
-          dbBind(res, unclass(row)),
+          db_bind(res, unclass(row), allow_named_superset = TRUE),
           error = function(e) {
             dbBind(res, unclass(unname(row)))
           }
@@ -174,7 +176,7 @@ setMethod("dbGetPreparedQuery",
       bind_data_rows,
       function(row) {
         tryCatch(
-          dbBind(res, unclass(row)),
+          db_bind(res, unclass(row), allow_named_superset = TRUE),
           error = function(e) {
             dbBind(res, unclass(unname(row)))
           }
@@ -249,7 +251,7 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
 #'
 #' @keywords internal
 #' @export
-setMethod("fetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
-  sqlColumnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
+setMethod("fetch", "SQLiteResult", function(res, n = -1) {
+  .Deprecated("dbFetch(..., row.names = FALSE)", old = "fetch")
+  sqlColumnToRownames(rsqlite_fetch(res@ptr, n = n), row.names = FALSE)
 })
-

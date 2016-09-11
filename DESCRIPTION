@@ -1,6 +1,6 @@
 Package: RSQLite
-Version: 1.0.9010
-Date: 2016-09-08
+Version: 1.0.9011
+Date: 2016-09-11
 Title: SQLite Interface for R
 Authors@R: as.person(c( "Hadley Wickham <hadley@rstudio.com> [aut,
         cre]", "David A. James [aut]", "Seth Falcon [aut]", "SQLite
@@ -36,6 +36,7 @@ Collate:
     'dummy.R'
     'extensions.R'
     'query.R'
+    'rownames.R'
     'table.R'
     'transactions.R'
     'utils.R'

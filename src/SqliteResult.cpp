@@ -1,4 +1,5 @@
 #include "SqliteResult.h"
+#include "SqliteUtils.h"
 
 #include "affinity.h"
 
@@ -172,6 +173,20 @@ void SqliteResult::bind_parameter(const int i, const int j0, const std::string& 
     // sqlite parameters are 1-indexed
     bind_parameter_pos(i, j0 + 1, values_);
   }
+}
+
+Rcpp::IntegerVector SqliteResult::find_params(const Rcpp::CharacterVector& param_names) {
+  int p = param_names.length();
+  Rcpp::IntegerVector res(p);
+
+  for (int j = 0; j < p; ++j) {
+    int pos = find_parameter(std::string(param_names[j]));
+    if (pos == 0)
+      pos = NA_INTEGER;
+    res[j] = pos;
+  }
+
+  return res;
 }
 
 int SqliteResult::find_parameter(const std::string& name) {

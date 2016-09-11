@@ -54,6 +54,8 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     if (overwrite && append)
       stop("overwrite and append cannot both be TRUE", call. = FALSE)
 
+    row.names <- compatRowNames(row.names)
+
     dbBegin(conn, "dbWriteTable")
     on.exit(dbRollback(conn, "dbWriteTable"))
 
@@ -66,32 +68,23 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
       dbRemoveTable(conn, name)
     }
 
+    value <- sqlData(conn, value, row.names = row.names)
+
     if (!found || overwrite) {
-      sql <- sqlCreateTable(conn, name, value, row.names = row.names)
+      fields <- field_def(conn, value, field.types)
+
+      # Names from field type definition win, a warning has been issued in
+      # field_def()
+      names(value) <- names(fields)
+
+      sql <- sqlCreateTable(conn, name, fields, row.names = FALSE)
       dbGetQuery(conn, sql)
     } else if (append) {
       col_names <- dbListFields(conn, name)
-      if (length(col_names) == length(value)) {
-        if (!all(names(value) == col_names)) {
-          if (all(tolower(names(value)) == tolower(col_names))) {
-            warning("Column names will be matched ignoring character case",
-                    call. = FALSE)
-          } else {
-            warning("Column name mismatch, columns will be matched by position. This warning may be converted to an error soon.",
-                    call. = FALSE)
-            names(value) <- col_names
-          }
-        }
-      } else {
-        if (!all(names(value) %in% col_names)) {
-          stop("Columns ", paste0(setdiff(names(value), col_names)),
-               " not found in table ", name, call. = FALSE)
-        }
-      }
+      value <- match_col(value, col_names)
     }
 
     if (nrow(value) > 0) {
-      value <- sqlData(conn, value, row.names = row.names)
       sql <- parameterised_insert(conn, name, value)
       rs <- dbSendQuery(conn, sql)
 
@@ -107,6 +100,54 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     TRUE
   }
 )
+
+match_col <- function(value, col_names) {
+  if (length(col_names) == length(value)) {
+    if (!all(names(value) == col_names)) {
+      if (all(tolower(names(value)) == tolower(col_names))) {
+        warning("Column names will be matched ignoring character case",
+                call. = FALSE)
+        names(value) <- col_names
+      } else {
+        warning("Column name mismatch, columns will be matched by position. This warning may be converted to an error soon.",
+                call. = FALSE)
+        names(value) <- col_names
+      }
+    }
+  } else {
+    if (!all(names(value) %in% col_names)) {
+      stop("Columns ", paste0(setdiff(names(value), col_names)),
+           " not found", call. = FALSE)
+    }
+  }
+
+  value
+}
+
+field_def <- function(conn, data, field_types) {
+  # Match column names with compatibility rules
+  new_field_types <- match_col(field_types, names(data))
+
+  if (any(names(new_field_types) != names(field_types))) {
+    # The names in field_types win (compatibility!), update names in data
+    column_names_map <- names(field_types)
+    names(column_names_map) <- names(new_field_types)
+    names(data) <- column_names_map[names(data)]
+  }
+
+  # Automatic types for all other fields
+  auto_field_types <- db_data_types(conn, data[setdiff(names(data), names(field_types))])
+  field_types[names(auto_field_types)] <- auto_field_types
+
+  # Reorder
+  field_types[] <- field_types[names(data)]
+
+  field_types
+}
+
+db_data_types <- function(conn, data) {
+  vcapply(data, function(x) dbDataType(conn, x))
+}
 
 parameterised_insert <- function(con, name, values) {
   table <- dbQuoteIdentifier(con, name)
@@ -142,6 +183,8 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
     if(overwrite && append)
       stop("overwrite and append cannot both be TRUE")
     value <- path.expand(value)
+
+    row.names <- compatRowNames(row.names)
 
     dbBegin(conn)
     on.exit(dbRollback(conn))
@@ -179,18 +222,40 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 #' @export
 #' @rdname dbWriteTable
 setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
+  row.names <- compatRowNames(row.names)
   value <- sqlRownamesToColumn(value, row.names)
 
-  # Convert factors to strings
-  is_factor <- vlapply(value, is.factor)
-  value[is_factor] <- lapply(value[is_factor], as.character)
-
-  # Convert all strings to utf-8
-  is_char <- vlapply(value, is.character)
-  value[is_char] <- lapply(value[is_char], enc2utf8)
+  value <- factor_to_string(value)
+  value <- raw_to_string(value)
+  value <- string_to_utf8(value)
 
   value
 })
+
+
+factor_to_string <- function(value) {
+  is_factor <- vlapply(value, is.factor)
+  value[is_factor] <- lapply(value[is_factor], as.character)
+  value
+}
+
+raw_to_string <- function(value) {
+  is_raw <- vlapply(value, is.raw)
+
+  if (any(is_raw)) {
+    warning("Creating a TEXT column from raw, use lists of raw to create BLOB columns", call. = FALSE)
+    value[is_raw] <- lapply(value[is_raw], as.character)
+  }
+
+  value
+}
+
+string_to_utf8 <- function(value) {
+  is_char <- vlapply(value, is.character)
+  value[is_char] <- lapply(value[is_char], enc2utf8)
+  value
+}
+
 
 #' Convenience functions for importing/exporting DBMS tables
 #'
@@ -229,6 +294,8 @@ setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
 #' dbDisconnect(con)
 setMethod("dbReadTable", c("SQLiteConnection", "character"),
   function(conn, name, row.names = NA, check.names = TRUE, select.cols = "*") {
+    row.names <- compatRowNames(row.names)
+
     name <- dbQuoteIdentifier(conn, name)
     out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM",
                                   dbQuoteIdentifier(conn, name)),
@@ -323,7 +390,7 @@ setMethod("dbListFields", c("SQLiteConnection", "character"),
                                   dbQuoteIdentifier(conn, name), "LIMIT 0"))
     on.exit(dbClearResult(rs))
 
-    names(fetch(rs, n = 1))
+    names(dbFetch(rs, n = 1, row.names = FALSE))
   }
 )
 
@@ -361,6 +428,7 @@ setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
     character = "TEXT",
     logical = "INTEGER",
     list = "BLOB",
+    raw = "TEXT",
     stop("Unsupported type", call. = FALSE)
   )
 })

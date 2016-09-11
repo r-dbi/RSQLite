@@ -198,3 +198,145 @@ test_that("appending to table gives error if more columns", {
   expect_identical(a, data.frame(a = 1, b = 2))
 })
 
+
+# Row names ---------------------------------------------------------------
+
+test_that("dbWriteTable(row.names = 0)", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  expect_warning(dbWriteTable(con, "mtcars", mtcars, row.names = 0))
+  res <- dbReadTable(con, "mtcars")
+
+  expect_equal(rownames(res), as.character(seq_len(nrow(mtcars))))
+  rownames(res) <- rownames(mtcars)
+  expect_identical(res, mtcars)
+})
+
+test_that("dbWriteTable(row.names = 1)", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  expect_warning(dbWriteTable(con, "mtcars", mtcars, row.names = 1))
+  res <- dbReadTable(con, "mtcars")
+
+  expect_identical(res, mtcars)
+})
+
+test_that("dbWriteTable(row.names = FALSE)", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "mtcars", mtcars, row.names = FALSE)
+  res <- dbReadTable(con, "mtcars")
+
+  expect_equal(rownames(res), as.character(seq_len(nrow(mtcars))))
+  rownames(res) <- rownames(mtcars)
+  expect_identical(res, mtcars)
+})
+
+test_that("dbWriteTable(row.names = TRUE)", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "mtcars", mtcars, row.names = TRUE)
+  res <- dbReadTable(con, "mtcars")
+
+  expect_identical(res, mtcars)
+})
+
+test_that("dbWriteTable(iris, row.names = NA)", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "iris", iris, row.names = NA)
+  res <- dbReadTable(con, "iris")
+
+  expect_equal(rownames(res), as.character(seq_len(nrow(iris))))
+  res$Species = factor(res$Species)
+  expect_identical(res, iris)
+})
+
+test_that("dbWriteTable(mtcars, row.names = NA)", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "mtcars", mtcars, row.names = NA)
+  res <- dbReadTable(con, "mtcars")
+
+  expect_identical(res, mtcars)
+})
+
+test_that("dbWriteTable(iris, row.names = 'rn')", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "iris", iris, row.names = "rn")
+  res <- dbReadTable(con, "iris", row.names = "rn")
+
+  expect_equal(rownames(res), as.character(seq_len(nrow(iris))))
+  res$Species = factor(res$Species)
+
+  attr(res, "row.names") <- attr(iris, "row.names")
+  expect_identical(res, iris)
+
+  skip("Why do we need to fix row names here?")
+})
+
+test_that("dbWriteTable(mtcars, row.names = 'rn')", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "mtcars", mtcars, row.names = "rn")
+  res <- dbReadTable(con, "mtcars", row.names = "rn")
+
+  expect_identical(res, mtcars)
+})
+
+
+# AsIs --------------------------------------------------------------------
+
+test_that("dbWriteTable with AsIs character fields", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con))
+
+  dbWriteTable(con, "a", data.frame(a = I(letters)))
+  res <- dbReadTable(con, "a")
+
+  expect_identical(res, data.frame(a = letters, stringsAsFactors = FALSE))
+})
+
+test_that("dbWriteTable with AsIs numeric fields", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con))
+
+  dbWriteTable(con, "a", data.frame(a = I(1:3)))
+  res <- dbReadTable(con, "a")
+
+  expect_identical(res, data.frame(a = 1:3))
+})
+
+test_that("dbWriteTable with AsIs list fields", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con))
+
+  dbWriteTable(con, "a", data.frame(a = I(list(as.raw(1:3), as.raw(4:5)))))
+  res <- dbReadTable(con, "a")
+
+  expected <- data.frame(a = 1:2)
+  expected$a <- list(as.raw(1:3), as.raw(4:5))
+  expect_identical(res, expected)
+})
+
+test_that("dbWriteTable with AsIs raw fields", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con))
+
+  expect_warning(dbWriteTable(con, "a", data.frame(a = I(as.raw(1:3)))),
+                 " raw ")
+  res <- dbReadTable(con, "a")
+
+  expected <- data.frame(a = 1:3)
+  expected$a <- as.character(as.raw(1:3))
+  expect_identical(res, expected)
+})

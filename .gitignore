@@ -13,3 +13,4 @@ inst/doc
 /src/.*
 /*.pro*
 /Debug/
+/.idea

@@ -21,3 +21,5 @@ a.out.dSYM
 ^Release$
 ^src/[.].*$
 ^.*[.]pro
+^\.idea$
+^CMakeLists\.txt$

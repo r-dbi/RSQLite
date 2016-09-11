@@ -6,8 +6,6 @@
 #include <boost/shared_ptr.hpp>
 #include "sqlite3/sqlite3.h"
 
-#include "SqliteUtils.h"
-
 // Connection ------------------------------------------------------------------
 
 // Reference counted wrapper for a sqlite3* connnection which will keep the
@@ -31,9 +29,6 @@ public:
   }
 
 public:
-  // Get the last exception code
-  int getExceptionCode() const;
-
   // Get the last exception as a string
   std::string getException() const;
 

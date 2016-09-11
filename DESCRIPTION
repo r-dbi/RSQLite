@@ -2,10 +2,14 @@ Package: RSQLite
 Version: 1.0.9011
 Date: 2016-09-11
 Title: SQLite Interface for R
-Authors@R: as.person(c( "Hadley Wickham <hadley@rstudio.com> [aut,
-        cre]", "David A. James [aut]", "Seth Falcon [aut]", "SQLite
-        Authors (for the included SQLite sources) [ctb]", "Liam Healy
-        (for the include SQLite extensions) [ctb]", "RStudio [cph]" ))
+Authors@R: c(
+    person("Hadley", "Wickham", role = c("aut", "cre")),
+    person(c("David", "A."), "James", role = "aut"),
+    person("Seth", "Falcon", role = "aut"),
+    person(family = "SQLite Authors", role = "ctb", comment = "for the included SQLite sources"),
+    person("Liam", "Healy", role = "ctb", comment = "for the included SQLite sources"),
+    person(family = "RStudio", role = "cph")
+    )
 Description: This package embeds the SQLite database engine in R and
     provides an interface compliant with the DBI package. The
     source for the SQLite engine (version 3.8.8.2) is included.

@@ -3,6 +3,10 @@
 language: r
 cache: packages
 sudo: false
+r:
+  - oldrel
+  - release
+  - devel
 
 # Seems to be necessary with devtools 1.10.0, check again when the next version is on CRAN
 r_github_packages:

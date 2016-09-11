@@ -1,3 +1,14 @@
+## RSQLite 1.0.9011 (2016-09-11)
+
+- `dbWriteTable()` supports `field.types` argument when creating a new table (#171).
+- `fetch()` now raises deprecation warning and ignores the `row.names` argument -- it never converts a column to row names (#174).
+- `dbSendPreparedQuery()` and `dbGetPreparedQuery()` ignore parameters not found in the query, with a warning (#174).
+- `dbBind()` doesn't warn anymore when converting `factor` to `character`.
+- The `raw` data type is supported in `dbWriteTable()` for compatibility reasons, creates a `TEXT` column with a warning (#173).
+- Numeric values for `row.names` are supported, with a warning (#170).
+- `dbGetException()` now always returns `list(errorNum = 0L, errorMsg = "OK")` (with a warning), because querying the last SQLite error only works if an error actually happened (#129).
+
+
 ## RSQLite 1.0.9010 (2016-09-08)
 
 - Speed up `dbExistsTable()` function (#166).

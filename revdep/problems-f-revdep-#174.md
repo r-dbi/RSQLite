@@ -10,75 +10,79 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2016-09-10                   |
+|date     |2016-09-09                   |
 
 ## Packages
 
 |package   |*  |version    |date       |source                             |
 |:---------|:--|:----------|:----------|:----------------------------------|
 |BH        |   |1.60.0-2   |2016-05-07 |cran (@1.60.0-)                    |
-|DBI       |   |0.5        |2016-09-09 |Github (rstats-db/DBI@2d7c39a)     |
+|DBI       |   |0.5        |2016-09-01 |Github (rstats-db/DBI@bc730b9)     |
 |DBItest   |   |1.3-7      |2016-09-01 |Github (rstats-db/DBItest@75c8ebc) |
 |knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
 |Rcpp      |   |0.12.7     |2016-09-05 |cran (@0.12.7)                     |
 |rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
-|RSQLite   |   |1.0.9010   |2016-09-10 |local (rstats-db/RSQLite@75f10ad)  |
+|RSQLite   |   |1.0.9010   |2016-09-09 |local (rstats-db/RSQLite@870277e)  |
 |testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
 
-48 packages with problems
+52 packages with problems
 
-|package           |version  | errors| warnings| notes|
-|:-----------------|:--------|------:|--------:|-----:|
-|AnnotationDbi     |1.34.4   |      0|        2|     5|
-|AnnotationForge   |1.14.2   |      0|        1|     6|
-|AnnotationHubData |1.2.2    |      1|        0|     3|
-|AnnotationHub     |2.4.2    |      0|        1|     0|
-|BatchExperiments  |1.4.1    |      0|        1|     2|
-|BatchJobs         |1.6      |      0|        1|     0|
-|bioassayR         |1.10.15  |      0|        1|     1|
-|ChemmineR         |2.24.2   |      1|        0|     0|
-|clstutils         |1.20.0   |      0|        2|     5|
-|CNEr              |1.8.3    |      0|        2|     1|
-|cummeRbund        |2.14.0   |      0|        1|     7|
-|customProDB       |1.12.0   |      1|        1|     3|
-|DECIPHER          |2.0.2    |      0|        3|     3|
-|ecd               |0.8.2    |      1|        0|     0|
-|ensembldb         |1.4.7    |      0|        1|     1|
-|ETLUtils          |1.3      |      0|        1|     0|
-|filematrix        |1.1.0    |      0|        1|     0|
-|gcbd              |0.2.5    |      0|        1|     3|
-|GeneAnswers       |2.14.0   |      1|        3|     6|
-|GenomicFeatures   |1.24.5   |      1|        0|     2|
-|lumi              |2.24.0   |      0|        5|     5|
-|maGUI             |1.0      |      1|        0|     0|
-|MeSHDbi           |1.8.0    |      0|        1|     2|
-|metaseqR          |1.12.2   |      1|        1|     4|
-|mgsa              |1.20.0   |      0|        1|     4|
-|oce               |0.9-19   |      1|        0|     1|
-|oligo             |1.36.1   |      1|        0|     8|
-|OrganismDbi       |1.14.1   |      0|        1|     2|
-|PAnnBuilder       |1.36.0   |      0|        3|     1|
-|PGA               |1.2.2    |      1|        1|     3|
-|plethy            |1.10.0   |      2|        1|     3|
-|poplite           |0.99.16  |      1|        1|     1|
-|rangeMapper       |0.3-0    |      0|        1|     0|
-|RecordLinkage     |0.4-10   |      0|        1|     0|
-|recoup            |1.0.2    |      2|        0|     1|
-|RImmPort          |1.0.2    |      0|        1|     1|
-|rplexos           |1.1.8    |      0|        1|     0|
-|RQDA              |0.2-7    |      1|        0|     1|
-|rTRM              |1.10.2   |      0|        1|     1|
-|specL             |1.6.2    |      0|        1|     4|
-|sqldf             |0.4-10   |      1|        1|     2|
-|storr             |1.0.1    |      0|        1|     0|
-|stream            |1.2-3    |      0|        1|     1|
-|TFBSTools         |1.10.4   |      0|        1|     1|
-|trackeR           |0.0.3    |      0|        1|     0|
-|TSdata            |2016.8-1 |      0|        1|     0|
-|VariantFiltering  |1.8.6    |      0|        3|     3|
-|vmsbase           |2.1.3    |      1|        0|     0|
+|package          |version  | errors| warnings| notes|
+|:----------------|:--------|------:|--------:|-----:|
+|AnnotationDbi    |1.34.4   |      0|        2|     5|
+|AnnotationForge  |1.14.2   |      0|        1|     6|
+|AnnotationHub    |2.4.2    |      0|        1|     0|
+|BatchExperiments |1.4.1    |      0|        1|     2|
+|BatchJobs        |1.6      |      0|        1|     0|
+|bioassayR        |1.10.15  |      0|        1|     1|
+|ChemmineR        |2.24.2   |      1|        0|     0|
+|clstutils        |1.20.0   |      0|        2|     5|
+|CNEr             |1.8.3    |      0|        2|     1|
+|cummeRbund       |2.14.0   |      0|        1|     7|
+|customProDB      |1.12.0   |      1|        1|     3|
+|DBI              |0.5      |      0|        1|     1|
+|DECIPHER         |2.0.2    |      0|        3|     3|
+|dplyr            |0.5.0    |      0|        1|     1|
+|ecd              |0.8.2    |      1|        0|     0|
+|ensembldb        |1.4.7    |      0|        1|     1|
+|etl              |0.3.3    |      0|        1|     0|
+|ETLUtils         |1.3      |      0|        1|     0|
+|filematrix       |1.1.0    |      0|        1|     0|
+|gcbd             |0.2.5    |      0|        1|     3|
+|GeneAnswers      |2.14.0   |      1|        3|     6|
+|GenomicFeatures  |1.24.5   |      0|        1|     2|
+|GWASTools        |1.18.0   |      1|        1|     2|
+|lumi             |2.24.0   |      0|        6|     5|
+|maGUI            |1.0      |      1|        0|     0|
+|MeSHDbi          |1.8.0    |      0|        1|     2|
+|metaseqR         |1.12.2   |      1|        1|     4|
+|mgsa             |1.20.0   |      0|        1|     4|
+|oce              |0.9-19   |      1|        0|     1|
+|oligo            |1.36.1   |      1|        0|     8|
+|OrganismDbi      |1.14.1   |      0|        1|     2|
+|PAnnBuilder      |1.36.0   |      0|        3|     1|
+|PGA              |1.2.2    |      1|        1|     3|
+|plethy           |1.10.0   |      2|        1|     3|
+|poplite          |0.99.16  |      1|        1|     1|
+|rangeMapper      |0.3-0    |      0|        1|     0|
+|RecordLinkage    |0.4-10   |      0|        1|     0|
+|recoup           |1.0.2    |      2|        0|     1|
+|RImmPort         |1.0.2    |      0|        1|     1|
+|rplexos          |1.1.8    |      0|        1|     0|
+|RQDA             |0.2-7    |      1|        0|     1|
+|rTRM             |1.10.2   |      0|        1|     1|
+|snplist          |0.15     |      0|        1|     0|
+|specL            |1.6.2    |      0|        1|     4|
+|sqldf            |0.4-10   |      1|        1|     2|
+|stream           |1.2-3    |      0|        1|     1|
+|TFBSTools        |1.10.4   |      0|        1|     1|
+|trackeR          |0.0.3    |      0|        1|     0|
+|TSdata           |2016.8-1 |      0|        1|     0|
+|UPMASK           |1.0      |      0|        1|     1|
+|VariantFiltering |1.8.6    |      0|        3|     3|
+|vmsbase          |2.1.3    |      1|        0|     0|
 
 ## AnnotationDbi (1.34.4)
 Maintainer: Bioconductor Package Maintainer
@@ -90,6 +94,8 @@ Maintainer: Bioconductor Package Maintainer
 checking examples ... WARNING
 Found the following significant warnings:
 
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
   Warning: 'dbSendPreparedQuery' is deprecated.
   Warning: 'dbSendPreparedQuery' is deprecated.
   Warning: 'dbSendPreparedQuery' is deprecated.
@@ -98,9 +104,9 @@ R.
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
                             user system elapsed
-AnnDbPkg-checker          31.628  0.572  43.994
-Bimap-direction            4.532  0.396   8.887
-InparanoidColsAndKeytypes  4.460  0.140   9.262
+AnnDbPkg-checker          35.728  0.712  48.235
+Bimap-direction            5.012  0.464   9.989
+InparanoidColsAndKeytypes  5.088  0.256  11.707
 
 checking for unstated dependencies in ‘tests’ ... WARNING
 'library' or 'require' call not declared from: ‘org.testing.db’
@@ -232,63 +238,6 @@ checking for unstated dependencies in vignettes ... NOTE
 'library' or 'require' call not declared from: ‘Biostrings’
 ```
 
-## AnnotationHubData (1.2.2)
-Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
-
-1 error  | 0 warnings | 3 notes
-
-```
-checking tests ... ERROR
-Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
-Last 13 lines of output:
-  
-  Test files with failing tests
-  
-     test_recipe.R 
-       test_UCSC2BitPreparer_recipe 
-  
-  
-  Error in BiocGenerics:::testPackage("AnnotationHubData") : 
-    unit tests failed for package AnnotationHubData
-  In addition: Warning message:
-  In value[[3L]](cond) :
-    BioCarta.owl.gz: Failure when receiving data from the peer
-  Execution halted
-
-checking top-level files ... NOTE
-Non-standard file/directory found at top level:
-  ‘appveyor.yml’
-
-checking dependencies in R code ... NOTE
-Missing object imported by a ':::' call: ‘AnnotationHub:::.db_connection’
-Unexported object imported by a ':::' call: ‘OrganismDbi:::.packageTaxIds’
-  See the note in ?`:::` about the use of this operator.
-
-checking R code for possible problems ... NOTE
-.NCBIMetadataFromUrl: no visible binding for global variable ‘results’
-.NCBIMetadataFromUrl: no visible binding for global variable ‘specData’
-.makeComplexGR: no visible binding for global variable ‘seqname’
-jsonPath: no visible binding for global variable ‘SourceFile’
-jsonPath: no visible binding for global variable ‘HubRoot’
-pointer: no visible global function definition for ‘tail’
-print.pointer: no visible global function definition for
-  ‘capture.output’
-print.pointer: no visible global function definition for ‘str’
-ptr: no visible global function definition for ‘tail’
-trackWithAuxiliaryTablesToGRanges: no visible binding for global
-  variable ‘seqname’
-Undefined global functions or variables:
-  HubRoot SourceFile capture.output results seqname specData str tail
-Consider adding
-  importFrom("utils", "capture.output", "str", "tail")
-to your NAMESPACE file.
-
-Found the following calls to data() loading into the global environment:
-File ‘AnnotationHubData/R/makeNCBIToOrgDbs.R’:
-  data(specData, package = "GenomeInfoDb")
-See section ‘Good practice’ in ‘?data’.
-```
-
 ## AnnotationHub (2.4.2)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
@@ -352,8 +301,8 @@ R.
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
                 user system elapsed
-addExperiments 5.532  0.056   5.838
-getResultVars  5.228  0.040   5.273
+addExperiments 6.676  0.092   6.919
+getResultVars  6.108  0.036   6.126
 
 checking dependencies in R code ... NOTE
 Unexported objects imported by ':::' calls:
@@ -415,11 +364,7 @@ Found the following significant warnings:
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
-... 14 lines ...
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
+... 18 lines ...
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
@@ -427,6 +372,10 @@ Found the following significant warnings:
 Deprecated functions may be defunct as soon as of the next release of
 R.
 See ?Deprecated.
+Examples with CPU or elapsed time > 5s
+                    user system elapsed
+batchReduceResults 5.992  0.028   6.158
+batchMapResults    4.912  0.068   5.007
 ```
 
 ## bioassayR (1.10.15)
@@ -621,9 +570,9 @@ Found the following significant warnings:
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'make.db.names' is deprecated.
   Warning: 'make.db.names' is deprecated.
+  Warning: 'fetch' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-... 40 lines ...
+... 41 lines ...
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'make.db.names' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
@@ -634,7 +583,7 @@ R.
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
          user system elapsed
-MAplot 34.836  0.396   35.29
+MAplot 38.884  0.544  40.043
 
 checking package dependencies ... NOTE
 Depends: includes the non-default packages:
@@ -806,6 +755,32 @@ Consider adding
 to your NAMESPACE file.
 ```
 
+## DBI (0.5)
+Maintainer: Kirill Müller <krlmlr+r@mailbox.org>  
+Bug reports: https://github.com/rstats-db/DBI/issues
+
+0 errors | 1 warning  | 1 note 
+
+```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+
+checking S3 generic/method consistency ... NOTE
+Found the following apparent S3 methods exported but not registered:
+  print.list.pairs
+See section ‘Registering S3 methods’ in the ‘Writing R Extensions’
+manual.
+```
+
 ## DECIPHER (2.0.2)
 Maintainer: Erik Wright <DECIPHER@cae.wisc.edu>
 
@@ -837,23 +812,23 @@ Found the following significant warnings:
 
   Warning: 'fetch' is deprecated.
   Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-... 132 lines ...
+... 160 lines ...
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
                      user system elapsed
-CorrectFrameshifts 23.244  0.068  26.174
-StaggerAlignment   19.892  0.136  20.044
-AlignTranslation   14.124  0.096  14.264
-AlignSeqs           9.312  0.188   9.954
-Array2Matrix        8.872  0.028   8.903
-TileSeqs            7.932  0.000   7.934
-DesignArray         5.504  0.024   5.829
-BrowseSeqs          5.380  0.040   5.931
+CorrectFrameshifts 25.960  0.056  28.406
+StaggerAlignment   21.480  0.104  22.085
+AlignTranslation   15.792  0.056  16.795
+AlignSeqs          10.176  0.188  10.366
+Array2Matrix        9.516  0.012   9.541
+TileSeqs            9.180  0.004   9.186
+BrowseSeqs          5.912  0.008   5.923
+DesignArray         5.704  0.040   6.133
 
 checking installed package size ... NOTE
   installed size is  9.2Mb
@@ -887,6 +862,30 @@ checking R code for possible problems ... NOTE
   importFrom("utils", "browseURL", "data", "flush.console",
              "object.size", "setTxtProgressBar", "txtProgressBar")
 to your NAMESPACE file.
+```
+
+## dplyr (0.5.0)
+Maintainer: Hadley Wickham <hadley@rstudio.com>  
+Bug reports: https://github.com/hadley/dplyr/issues
+
+0 errors | 1 warning  | 1 note 
+
+```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+** found \donttest examples: check also with --run-donttest
+
+checking installed package size ... NOTE
+  installed size is 23.3Mb
+  sub-directories of 1Mb or more:
+    libs  21.2Mb
 ```
 
 ## ecd (0.8.2)
@@ -926,6 +925,24 @@ Unexported objects imported by ':::' calls:
   See the note in ?`:::` about the use of this operator.
 ```
 
+## etl (0.3.3)
+Maintainer: Ben Baumer <ben.baumer@gmail.com>  
+Bug reports: https://github.com/beanumber/etl/issues
+
+0 errors | 1 warning  | 0 notes
+
+```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+```
+
 ## ETLUtils (1.3)
 Maintainer: Jan Wijffels <jwijffels@bnosac.be>
 
@@ -935,6 +952,8 @@ Maintainer: Jan Wijffels <jwijffels@bnosac.be>
 checking examples ... WARNING
 Found the following significant warnings:
 
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
   Warning: 'fetch' is deprecated.
   Warning: 'fetch' is deprecated.
 Deprecated functions may be defunct as soon as of the next release of
@@ -1158,31 +1177,31 @@ These lines will be truncated in the PDF manual.
 ## GenomicFeatures (1.24.5)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-1 error  | 0 warnings | 2 notes
+0 errors | 1 warning  | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘GenomicFeatures-Ex.R’ failed
-The error most likely occurred in:
+checking examples ... WARNING
+Found the following significant warnings:
 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: makeTxDbFromBiomart
-> ### Title: Make a TxDb object from annotations available on a BioMart
-> ###   database
-> ### Aliases: makeTxDbFromBiomart getChromInfoFromBiomart
-> 
-... 676627 lines ...
-2     ENSEMBL_MART_SNP  Ensembl Variation 85
-3 ENSEMBL_MART_FUNCGEN Ensembl Regulation 85
-4    ENSEMBL_MART_VEGA               Vega 65
-> 
-> ## Therefore in addition to setting 'host' to "uswest.ensembl.org" we
-> ## might also need to specify the 'biomart' argument:
-> txdb3 <- makeTxDbFromBiomart(biomart="ENSEMBL_MART_ENSEMBL",
-+                              dataset="hsapiens_gene_ensembl",
-+                              transcript_ids=transcript_ids,
-+                              host="useast.ensembl.org")
-Terminated
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'fetch' is deprecated.
+... 688 lines ...
+Examples with CPU or elapsed time > 5s
+                               user system  elapsed
+makeTxDbFromBiomart        1246.752 43.336 1342.749
+makeFeatureDbFromUCSC       779.756 23.752  951.166
+makeTxDbFromUCSC             57.316  1.436  170.124
+coordinate-mapping-methods   32.400  0.940   45.910
+coverageByTranscript         31.832  1.228   34.222
+makeTxDbFromGRanges          18.320  0.524   18.866
+extractTranscriptSeqs        14.796  0.048   16.793
+makeTxDbFromGFF              12.568  0.420   13.048
+transcriptLocs2refLocs        8.880  0.296    9.476
 
 checking package dependencies ... NOTE
 Depends: includes the non-default packages:
@@ -1202,10 +1221,92 @@ Unexported objects imported by ':::' calls:
   See the note in ?`:::` about the use of this operator.
 ```
 
+## GWASTools (1.18.0)
+Maintainer: Stephanie M. Gogarten <sdmorris@u.washington.edu>, Adrienne Stilp <amstilp@u.washington.edu>
+
+1 error  | 1 warning  | 2 notes
+
+```
+checking tests ... ERROR
+Running the tests in ‘tests/test.R’ failed.
+Last 13 lines of output:
+  FAILURE in test_CPH: Error in checkTrue(!all(is.na(assoc$Est))) : Test not TRUE
+  
+  
+  Test files with failing tests
+  
+     assocCoxPH_test.R 
+       test_CPH 
+  
+  
+  Error in BiocGenerics:::testPackage("GWASTools", pattern = ".*_test\\.R$") : 
+    unit tests failed for package GWASTools
+  In addition: There were 50 or more warnings (use warnings() to see the first 50)
+  Execution halted
+
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+... 10 lines ...
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+Examples with CPU or elapsed time > 5s
+           user system elapsed
+vcfWrite 10.788  0.224    11.1
+
+checking R code for possible problems ... NOTE
+.CI: no visible global function definition for ‘qnorm’
+.LOHbase: no visible global function definition for ‘mad’
+.LOHbase: no visible global function definition for ‘median’
+.LOHbase: no visible global function definition for ‘sd’
+.LOHlocalMad: no visible global function definition for ‘median’
+.LOHlocalMad: no visible global function definition for ‘mad’
+.LOHselectAnoms: no visible global function definition for ‘median’
+.orderBySelection: no visible global function definition for ‘na.omit’
+.permuteGenotypes: no visible global function definition for ‘runif’
+... 161 lines ...
+Consider adding
+  importFrom("graphics", "abline", "axis", "layout", "legend", "lines",
+             "par", "plot", "points", "polygon", "rect", "segments")
+  importFrom("stats", "as.formula", "binomial", "coef", "complete.cases",
+             "cor", "dbinom", "fisher.test", "glm", "lm", "mad",
+             "median", "model.matrix", "na.omit", "pchisq", "poisson",
+             "qbeta", "qchisq", "qnorm", "rbinom", "rnorm", "runif",
+             "sd", "setNames", "vcov")
+  importFrom("utils", "combn", "count.fields", "data", "head",
+             "read.table", "write.table")
+to your NAMESPACE file.
+
+checking Rd line widths ... NOTE
+Rd file 'assocRegression.Rd':
+  \examples lines wider than 100 characters:
+     scanAnnot$blood.pressure[scanAnnot$case.cntl.status==1] <- rnorm(sum(scanAnnot$case.cntl.status==1), mean=100, sd=10)
+     scanAnnot$blood.pressure[scanAnnot$case.cntl.status==0] <- rnorm(sum(scanAnnot$case.cntl.status==0), mean=90, sd=5)
+
+Rd file 'createDataFile.Rd':
+  \usage lines wider than 90 characters:
+                    precision="single", compress="ZIP_RA:8M", compress.geno="ZIP_RA", compress.annot="ZIP_RA",
+
+These lines will be truncated in the PDF manual.
+```
+
 ## lumi (2.24.0)
 Maintainer: Pan Du <dupan.mail@gmail.com>
 
-0 errors | 5 warnings | 5 notes
+0 errors | 6 warnings | 5 notes
 
 ```
 checking whether package ‘lumi’ can be installed ... WARNING
@@ -1236,16 +1337,32 @@ Argument items with no description in Rd object 'lumiMethyR':
   ‘qcfile’ ‘sampleDescriptions’ ‘sep’
 
 
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+Examples with CPU or elapsed time > 5s
+                  user system elapsed
+lumiMethyStatus 75.480  0.472  76.145
+plotGammaFit     6.540  0.004   6.556
+nuID2probeID     5.128  0.020   5.148
+getChipInfo      4.060  0.148   5.944
+
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-
-Attaching package: ‘XML’
-
-The following object is masked from ‘package:tools’:
-
-    toHTML
-
+Use 'dbFetch(..., row.names = FALSE)' instead.
+See help("Deprecated")
+Warning: 'fetch' is deprecated.
+Use 'dbFetch(..., row.names = FALSE)' instead.
+See help("Deprecated")
+Warning: 'fetch' is deprecated.
+Use 'dbFetch(..., row.names = FALSE)' instead.
 ... 8 lines ...
   documentation provided with the lumi package.
 
@@ -1656,25 +1773,25 @@ Maintainer: Biocore Data Team <maintainer@bioconductor.org>
 checking examples ... WARNING
 Found the following significant warnings:
 
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-... 13 lines ...
-  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+... 902 lines ...
+  Warning: 'fetch' is deprecated.
 Deprecated functions may be defunct as soon as of the next release of
 R.
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
                             user system elapsed
-makeOrganismDbFromBiomart 12.092  0.220  17.918
-rangeBasedAccessors        8.380  0.060   8.611
-OrganismDb                 6.852  0.164   8.499
-makeOrganismDbFromTxDb     6.288  0.092  82.585
-makeOrganismDbFromUCSC     4.952  0.068  81.737
+makeOrganismDbFromBiomart 13.740  0.300  20.240
+rangeBasedAccessors        8.548  0.080   9.668
+OrganismDb                 7.820  0.232   9.568
+makeOrganismDbFromTxDb     7.112  0.080  92.684
+makeOrganismDbFromUCSC     5.824  0.080  83.384
 
 checking dependencies in R code ... NOTE
 Unexported object imported by a ':::' call: ‘BiocGenerics:::testPackage’
@@ -2011,10 +2128,25 @@ Maintainer: Mihai Valcu <valcu@orn.mpg.de>
 checking examples ... WARNING
 Found the following significant warnings:
 
-  Warning: 'make.db.names' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+... 57 lines ...
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
 Deprecated functions may be defunct as soon as of the next release of
 R.
 See ?Deprecated.
+Examples with CPU or elapsed time > 5s
+               user system elapsed
+rangeMap.save 6.496  0.044   6.541
 ```
 
 ## RecordLinkage (0.4-10)
@@ -2157,14 +2289,14 @@ Bug reports: https://github.com/NREL/rplexos/issues
 checking examples ... WARNING
 Found the following significant warnings:
 
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-... 244 lines ...
+... 256 lines ...
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
   Warning: 'dbGetPreparedQuery' is deprecated.
@@ -2240,6 +2372,23 @@ Rd file 'processBiogrid.Rd':
      processBiogrid(dblist, org = "human", simplify = TRUE, type = "physical", mimic.old = FALSE)
 
 These lines will be truncated in the PDF manual.
+```
+
+## snplist (0.15)
+Maintainer: Alexander Sibley <alexander.sibley@dm.duke.edu>
+
+0 errors | 1 warning  | 0 notes
+
+```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
 ```
 
 ## specL (1.6.2)
@@ -2332,23 +2481,6 @@ Undefined global functions or variables:
 Consider adding
   importFrom("utils", "download.file", "head", "modifyList")
 to your NAMESPACE file.
-```
-
-## storr (1.0.1)
-Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
-
-0 errors | 1 warning  | 0 notes
-
-```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because drivers.Rmd appears to be an R Markdown v2 document.
-Quitting from lines 480-491 (drivers.Rmd) 
-Error: processing vignette 'drivers.Rmd' failed with diagnostics:
-'connection' must be a connection
-Execution halted
-
 ```
 
 ## stream (1.2-3)
@@ -2455,6 +2587,44 @@ Error in .local(drv, ...) :
   Failed to connect to database: Error: Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
 
 Execution halted
+```
+
+## UPMASK (1.0)
+Maintainer: Alberto Krone-Martins <algol@sim.ul.pt>
+
+0 errors | 1 warning  | 1 note 
+
+```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'fetch' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+
+checking R code for possible problems ... NOTE
+UPMASKfile: no visible global function definition for ‘read.table’
+UPMASKfile: no visible global function definition for ‘write.table’
+analyse_randomKde2d: no visible global function definition for ‘hist’
+analyse_randomKde2d: no visible global function definition for ‘lines’
+analyse_randomKde2d_AutoCalibrated: no visible global function
+  definition for ‘hist’
+analyse_randomKde2d_AutoCalibrated: no visible global function
+  definition for ‘lines’
+create_randomKde2d: no visible global function definition for ‘image’
+... 18 lines ...
+kde2dForSubset: no visible global function definition for ‘image’
+kde2dForSubset: no visible global function definition for ‘points’
+Undefined global functions or variables:
+  contour dev.new hist image lines pairs par plot points rainbow
+  read.table rgb write.table
+Consider adding
+  importFrom("grDevices", "dev.new", "rainbow", "rgb")
+  importFrom("graphics", "contour", "hist", "image", "lines", "pairs",
+             "par", "plot", "points")
+  importFrom("utils", "read.table", "write.table")
+to your NAMESPACE file.
 ```
 
 ## VariantFiltering (1.8.6)

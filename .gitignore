@@ -8,6 +8,7 @@ config.status
 a.out.dSYM
 autom4te.cache
 inst/doc
+/revdep/.cache.rds
 /.metadata
 /.settings
 /src/.*

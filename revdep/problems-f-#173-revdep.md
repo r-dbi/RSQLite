@@ -10,75 +10,72 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2016-09-10                   |
+|date     |2016-09-09                   |
 
 ## Packages
 
 |package   |*  |version    |date       |source                             |
 |:---------|:--|:----------|:----------|:----------------------------------|
 |BH        |   |1.60.0-2   |2016-05-07 |cran (@1.60.0-)                    |
-|DBI       |   |0.5        |2016-09-09 |Github (rstats-db/DBI@2d7c39a)     |
+|DBI       |   |0.5        |2016-09-01 |Github (rstats-db/DBI@bc730b9)     |
 |DBItest   |   |1.3-7      |2016-09-01 |Github (rstats-db/DBItest@75c8ebc) |
 |knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
 |Rcpp      |   |0.12.7     |2016-09-05 |cran (@0.12.7)                     |
 |rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
-|RSQLite   |   |1.0.9010   |2016-09-10 |local (rstats-db/RSQLite@75f10ad)  |
+|RSQLite   |   |1.0.9010   |2016-09-09 |local (rstats-db/RSQLite@4026b71)  |
 |testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
 
-48 packages with problems
+45 packages with problems
 
-|package           |version  | errors| warnings| notes|
-|:-----------------|:--------|------:|--------:|-----:|
-|AnnotationDbi     |1.34.4   |      0|        2|     5|
-|AnnotationForge   |1.14.2   |      0|        1|     6|
-|AnnotationHubData |1.2.2    |      1|        0|     3|
-|AnnotationHub     |2.4.2    |      0|        1|     0|
-|BatchExperiments  |1.4.1    |      0|        1|     2|
-|BatchJobs         |1.6      |      0|        1|     0|
-|bioassayR         |1.10.15  |      0|        1|     1|
-|ChemmineR         |2.24.2   |      1|        0|     0|
-|clstutils         |1.20.0   |      0|        2|     5|
-|CNEr              |1.8.3    |      0|        2|     1|
-|cummeRbund        |2.14.0   |      0|        1|     7|
-|customProDB       |1.12.0   |      1|        1|     3|
-|DECIPHER          |2.0.2    |      0|        3|     3|
-|ecd               |0.8.2    |      1|        0|     0|
-|ensembldb         |1.4.7    |      0|        1|     1|
-|ETLUtils          |1.3      |      0|        1|     0|
-|filematrix        |1.1.0    |      0|        1|     0|
-|gcbd              |0.2.5    |      0|        1|     3|
-|GeneAnswers       |2.14.0   |      1|        3|     6|
-|GenomicFeatures   |1.24.5   |      1|        0|     2|
-|lumi              |2.24.0   |      0|        5|     5|
-|maGUI             |1.0      |      1|        0|     0|
-|MeSHDbi           |1.8.0    |      0|        1|     2|
-|metaseqR          |1.12.2   |      1|        1|     4|
-|mgsa              |1.20.0   |      0|        1|     4|
-|oce               |0.9-19   |      1|        0|     1|
-|oligo             |1.36.1   |      1|        0|     8|
-|OrganismDbi       |1.14.1   |      0|        1|     2|
-|PAnnBuilder       |1.36.0   |      0|        3|     1|
-|PGA               |1.2.2    |      1|        1|     3|
-|plethy            |1.10.0   |      2|        1|     3|
-|poplite           |0.99.16  |      1|        1|     1|
-|rangeMapper       |0.3-0    |      0|        1|     0|
-|RecordLinkage     |0.4-10   |      0|        1|     0|
-|recoup            |1.0.2    |      2|        0|     1|
-|RImmPort          |1.0.2    |      0|        1|     1|
-|rplexos           |1.1.8    |      0|        1|     0|
-|RQDA              |0.2-7    |      1|        0|     1|
-|rTRM              |1.10.2   |      0|        1|     1|
-|specL             |1.6.2    |      0|        1|     4|
-|sqldf             |0.4-10   |      1|        1|     2|
-|storr             |1.0.1    |      0|        1|     0|
-|stream            |1.2-3    |      0|        1|     1|
-|TFBSTools         |1.10.4   |      0|        1|     1|
-|trackeR           |0.0.3    |      0|        1|     0|
-|TSdata            |2016.8-1 |      0|        1|     0|
-|VariantFiltering  |1.8.6    |      0|        3|     3|
-|vmsbase           |2.1.3    |      1|        0|     0|
+|package          |version  | errors| warnings| notes|
+|:----------------|:--------|------:|--------:|-----:|
+|AnnotationDbi    |1.34.4   |      0|        2|     5|
+|AnnotationForge  |1.14.2   |      0|        1|     6|
+|AnnotationHub    |2.4.2    |      0|        1|     0|
+|archivist        |2.1      |      2|        0|     2|
+|BatchExperiments |1.4.1    |      0|        1|     2|
+|BatchJobs        |1.6      |      0|        1|     0|
+|bioassayR        |1.10.15  |      0|        1|     1|
+|ChemmineR        |2.24.2   |      1|        0|     0|
+|clstutils        |1.20.0   |      0|        2|     5|
+|CNEr             |1.8.3    |      0|        2|     1|
+|cummeRbund       |2.14.0   |      0|        1|     7|
+|customProDB      |1.12.0   |      1|        1|     3|
+|DECIPHER         |2.0.2    |      1|        3|     3|
+|ecd              |0.8.2    |      1|        0|     0|
+|ensembldb        |1.4.7    |      0|        1|     1|
+|filematrix       |1.1.0    |      0|        1|     0|
+|gcbd             |0.2.5    |      0|        1|     3|
+|GeneAnswers      |2.14.0   |      1|        3|     6|
+|GenomicFeatures  |1.24.5   |      0|        1|     2|
+|GEOmetadb        |1.32.2   |      0|        1|     3|
+|lumi             |2.24.0   |      0|        5|     5|
+|maGUI            |1.0      |      1|        0|     0|
+|MeSHDbi          |1.8.0    |      0|        1|     2|
+|metaseqR         |1.12.2   |      1|        1|     4|
+|mgsa             |1.20.0   |      0|        1|     4|
+|oce              |0.9-19   |      1|        0|     1|
+|oligo            |1.36.1   |      1|        0|     8|
+|OrganismDbi      |1.14.1   |      0|        1|     2|
+|PAnnBuilder      |1.36.0   |      0|        3|     1|
+|PGA              |1.2.2    |      1|        1|     3|
+|plethy           |1.10.0   |      2|        1|     3|
+|poplite          |0.99.16  |      1|        1|     1|
+|rangeMapper      |0.3-0    |      0|        1|     0|
+|RecordLinkage    |0.4-10   |      0|        1|     0|
+|recoup           |1.0.2    |      2|        0|     1|
+|RImmPort         |1.0.2    |      0|        1|     1|
+|rplexos          |1.1.8    |      0|        1|     0|
+|RQDA             |0.2-7    |      1|        0|     1|
+|specL            |1.6.2    |      0|        1|     4|
+|sqldf            |0.4-10   |      1|        1|     2|
+|TFBSTools        |1.10.4   |      0|        1|     1|
+|trackeR          |0.0.3    |      0|        1|     0|
+|TSdata           |2016.8-1 |      0|        1|     0|
+|VariantFiltering |1.8.6    |      0|        3|     3|
+|vmsbase          |2.1.3    |      1|        0|     0|
 
 ## AnnotationDbi (1.34.4)
 Maintainer: Bioconductor Package Maintainer
@@ -98,9 +95,9 @@ R.
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
                             user system elapsed
-AnnDbPkg-checker          31.628  0.572  43.994
-Bimap-direction            4.532  0.396   8.887
-InparanoidColsAndKeytypes  4.460  0.140   9.262
+AnnDbPkg-checker          32.580  0.528  43.875
+Bimap-direction            4.372  0.380   8.186
+InparanoidColsAndKeytypes  4.292  0.120  10.966
 
 checking for unstated dependencies in ‘tests’ ... WARNING
 'library' or 'require' call not declared from: ‘org.testing.db’
@@ -232,63 +229,6 @@ checking for unstated dependencies in vignettes ... NOTE
 'library' or 'require' call not declared from: ‘Biostrings’
 ```
 
-## AnnotationHubData (1.2.2)
-Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
-
-1 error  | 0 warnings | 3 notes
-
-```
-checking tests ... ERROR
-Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
-Last 13 lines of output:
-  
-  Test files with failing tests
-  
-     test_recipe.R 
-       test_UCSC2BitPreparer_recipe 
-  
-  
-  Error in BiocGenerics:::testPackage("AnnotationHubData") : 
-    unit tests failed for package AnnotationHubData
-  In addition: Warning message:
-  In value[[3L]](cond) :
-    BioCarta.owl.gz: Failure when receiving data from the peer
-  Execution halted
-
-checking top-level files ... NOTE
-Non-standard file/directory found at top level:
-  ‘appveyor.yml’
-
-checking dependencies in R code ... NOTE
-Missing object imported by a ':::' call: ‘AnnotationHub:::.db_connection’
-Unexported object imported by a ':::' call: ‘OrganismDbi:::.packageTaxIds’
-  See the note in ?`:::` about the use of this operator.
-
-checking R code for possible problems ... NOTE
-.NCBIMetadataFromUrl: no visible binding for global variable ‘results’
-.NCBIMetadataFromUrl: no visible binding for global variable ‘specData’
-.makeComplexGR: no visible binding for global variable ‘seqname’
-jsonPath: no visible binding for global variable ‘SourceFile’
-jsonPath: no visible binding for global variable ‘HubRoot’
-pointer: no visible global function definition for ‘tail’
-print.pointer: no visible global function definition for
-  ‘capture.output’
-print.pointer: no visible global function definition for ‘str’
-ptr: no visible global function definition for ‘tail’
-trackWithAuxiliaryTablesToGRanges: no visible binding for global
-  variable ‘seqname’
-Undefined global functions or variables:
-  HubRoot SourceFile capture.output results seqname specData str tail
-Consider adding
-  importFrom("utils", "capture.output", "str", "tail")
-to your NAMESPACE file.
-
-Found the following calls to data() loading into the global environment:
-File ‘AnnotationHubData/R/makeNCBIToOrgDbs.R’:
-  data(specData, package = "GenomeInfoDb")
-See section ‘Good practice’ in ‘?data’.
-```
-
 ## AnnotationHub (2.4.2)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
@@ -322,6 +262,60 @@ Segmentation fault (core dumped)
 
 ```
 
+## archivist (2.1)
+Maintainer: Przemyslaw Biecek <przemyslaw.biecek@gmail.com>  
+Bug reports: https://github.com/pbiecek/archivist/issues
+
+2 errors | 0 warnings | 2 notes
+
+```
+checking examples ... ERROR
+Running examples in ‘archivist-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: setLocalRepo
+> ### Title: Set Repository's Global Path
+> ### Aliases: setLocalRepo setRemoteRepo
+> 
+> ### ** Examples
+... 114 lines ...
+                           md5hash                             name
+1 ff575c261c949d073b2895b05d1097c3 ff575c261c949d073b2895b05d1097c3
+          createdDate
+1 2014-09-08 11:42:24
+> loadFromRemoteRepo( "ff575c261c949d073b2895b05d1097c3")
+> this <- loadFromRemoteRepo( "ff", value = TRUE)
+> zipRemoteRepo()
+Directory repository did not exist. Forced to create a new directory.Error in function (type, msg, asError = TRUE)  : 
+  Failed to connect to raw.githubusercontent.com port 443: Connection timed out
+Calls: zipRemoteRepo ... getURL -> curlPerform -> .Call -> <Anonymous> -> fun
+Execution halted
+
+checking tests ... ERROR
+Running the tests in ‘tests/testthat.R’ failed.
+Last 13 lines of output:
+         else warning)
+         fun(structure(list(message = msg, call = sys.call()), class = c(typeName, "GenericCurlError", 
+             "error", "condition")))
+     }(7L, "Failed to connect to raw.githubusercontent.com port 443: Connection timed out", 
+         TRUE)
+  
+  testthat results ================================================================
+  OK: 41 SKIPPED: 0 FAILED: 2
+  1. Error: copying from other repositories and showRepo (@test_jss_artilce.R#46) 
+  2. Error: zip*Repo reacts properly on proper arguments  (@test_zip.R#15) 
+  
+  Error: testthat unit tests failed
+  Execution halted
+
+checking package dependencies ... NOTE
+Package which this enhances but not available for checking: ‘archivist.github’
+
+checking Rd cross-references ... NOTE
+Package unavailable to check Rd xrefs: ‘archivist.github’
+```
+
 ## BatchExperiments (1.4.1)
 Maintainer: Michel Lang <michellang@gmail.com>  
 Bug reports: https://github.com/tudo-r/BatchExperiments/issues
@@ -352,8 +346,8 @@ R.
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
                 user system elapsed
-addExperiments 5.532  0.056   5.838
-getResultVars  5.228  0.040   5.273
+addExperiments 5.532  0.052   5.695
+getResultVars  4.988  0.032   5.052
 
 checking dependencies in R code ... NOTE
 Unexported objects imported by ':::' calls:
@@ -634,7 +628,7 @@ R.
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
          user system elapsed
-MAplot 34.836  0.396   35.29
+MAplot 44.664  0.748  45.631
 
 checking package dependencies ... NOTE
 Depends: includes the non-default packages:
@@ -750,18 +744,18 @@ Execution halted
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
+Warning: Converting factor to character for binding
+Warning: Converting factor to character for binding
+Warning: Converting factor to character for binding
+Warning: Converting factor to character for binding
+Warning: Converting factor to character for binding
+Warning: Converting factor to character for binding
+Warning: Converting factor to character for binding
 ... 8 lines ...
-Warning: Named parameters not used in query: gene_id, internal_tx_id
-Warning: Named parameters not used in query: gene_id, internal_tx_id
-Warning: Named parameters not used in query: gene_id, internal_tx_id
-Warning: Named parameters not used in query: gene_id, internal_tx_id
+See help("Deprecated")
+Warning: 'dbGetPreparedQuery' is deprecated.
+Use 'dbBind' instead.
+See help("Deprecated")
 OK
  done
 Prepare gene/transcript/protein id mapping information (ids.RData) ... 
@@ -809,9 +803,32 @@ to your NAMESPACE file.
 ## DECIPHER (2.0.2)
 Maintainer: Erik Wright <DECIPHER@cae.wisc.edu>
 
-0 errors | 3 warnings | 3 notes
+1 error  | 3 warnings | 3 notes
 
 ```
+checking examples ... ERROR
+Running examples in ‘DECIPHER-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: Add2DB
+> ### Title: Add Data to a Database
+> ### Aliases: Add2DB
+> 
+> ### ** Examples
+... 17 lines ...
+Lengths counted for 175 sequences.
+
+Time difference of 0.01 secs
+
+> 
+> # Add lengths to the database
+> Add2DB(l, dbConn)
+Warning in sqliteQuickColumn(dbConn, tblName, "row_names") :
+  Deprecated. Please use dbReadTable instead.
+Error in Add2DB(l, dbConn) : row.names of myData are missing from 'Seqs'.
+Execution halted
+
 checking foreign function calls ... WARNING
 Registration problems:
   symbol ‘functionCall’ in the local frame:
@@ -832,28 +849,28 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
      compacted ‘ArtOfAlignmentInR.pdf’ from 968Kb to 635Kb
   consider running tools::compactPDF(gs_quality = "ebook") on these files
 
-checking examples ... WARNING
-Found the following significant warnings:
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int, rank,
+    rbind, rownames, sapply, setdiff, sort, table, tapply, union,
+    unique, unsplit
 
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-... 132 lines ...
-See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-                     user system elapsed
-CorrectFrameshifts 23.244  0.068  26.174
-StaggerAlignment   19.892  0.136  20.044
-AlignTranslation   14.124  0.096  14.264
-AlignSeqs           9.312  0.188   9.954
-Array2Matrix        8.872  0.028   8.903
-TileSeqs            7.932  0.000   7.934
-DesignArray         5.504  0.024   5.829
-BrowseSeqs          5.380  0.040   5.931
+Loading required package: S4Vectors
+Loading required package: stats4
+
+... 8 lines ...
+Loading required package: XVector
+Loading required package: RSQLite
+Warning: Creating a TEXT column from raw, use lists of raw to create BLOB columns
+Warning in sqliteQuickColumn(dbConn, tblName, "row_names") :
+  Deprecated. Please use dbReadTable instead.
+
+Error: processing vignette 'DECIPHERing.Rnw' failed with diagnostics:
+ chunk 5 (label = expr3) 
+Error in Add2DB(l, dbConn, verbose = FALSE) : 
+  row.names of myData are missing from 'Seqs'.
+Execution halted
 
 checking installed package size ... NOTE
   installed size is  9.2Mb
@@ -924,22 +941,6 @@ Unexported objects imported by ':::' calls:
   'GenomicFeatures:::fetchChromLengthsFromEnsembl'
   'GenomicFeatures:::fetchChromLengthsFromEnsemblPlants'
   See the note in ?`:::` about the use of this operator.
-```
-
-## ETLUtils (1.3)
-Maintainer: Jan Wijffels <jwijffels@bnosac.be>
-
-0 errors | 1 warning  | 0 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
 ```
 
 ## filematrix (1.1.0)
@@ -1158,31 +1159,31 @@ These lines will be truncated in the PDF manual.
 ## GenomicFeatures (1.24.5)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-1 error  | 0 warnings | 2 notes
+0 errors | 1 warning  | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘GenomicFeatures-Ex.R’ failed
-The error most likely occurred in:
+checking examples ... WARNING
+Found the following significant warnings:
 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: makeTxDbFromBiomart
-> ### Title: Make a TxDb object from annotations available on a BioMart
-> ###   database
-> ### Aliases: makeTxDbFromBiomart getChromInfoFromBiomart
-> 
-... 676627 lines ...
-2     ENSEMBL_MART_SNP  Ensembl Variation 85
-3 ENSEMBL_MART_FUNCGEN Ensembl Regulation 85
-4    ENSEMBL_MART_VEGA               Vega 65
-> 
-> ## Therefore in addition to setting 'host' to "uswest.ensembl.org" we
-> ## might also need to specify the 'biomart' argument:
-> txdb3 <- makeTxDbFromBiomart(biomart="ENSEMBL_MART_ENSEMBL",
-+                              dataset="hsapiens_gene_ensembl",
-+                              transcript_ids=transcript_ids,
-+                              host="useast.ensembl.org")
-Terminated
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+... 85 lines ...
+Examples with CPU or elapsed time > 5s
+                              user system  elapsed
+makeTxDbFromBiomart        998.056 37.512 1191.905
+makeFeatureDbFromUCSC      720.580 17.316 1606.928
+makeTxDbFromUCSC            57.872  0.484  170.168
+coordinate-mapping-methods  30.768  1.020   36.553
+coverageByTranscript        29.596  1.044   31.621
+makeTxDbFromGRanges         17.056  0.080   17.222
+extractTranscriptSeqs       12.944  0.048   13.921
+makeTxDbFromGFF             11.472  0.040   11.755
+transcriptLocs2refLocs       7.924  0.004    8.307
 
 checking package dependencies ... NOTE
 Depends: includes the non-default packages:
@@ -1200,6 +1201,58 @@ Unexported objects imported by ':::' calls:
   ‘biomaRt:::martBM’ ‘biomaRt:::martDataset’ ‘biomaRt:::martHost’
   ‘rtracklayer:::resourceDescription’ ‘rtracklayer:::ucscTableOutputs’
   See the note in ?`:::` about the use of this operator.
+```
+
+## GEOmetadb (1.32.2)
+Maintainer: Jack Zhu <zhujack@mail.nih.gov>
+
+0 errors | 1 warning  | 3 notes
+
+```
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+    paste, pmax, pmax.int, pmin, pmin.int, rank,
+    rbind, rownames, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit
+
+Welcome to Bioconductor
+
+    Vignettes contain introductory material;
+... 8 lines ...
+Warning in url(url_geo_2, open = "rb") :
+  cannot open URL 'http://watson.nci.nih.gov/~zhujack/GEOmetadb.sqlite.gz': HTTP status was '403 Forbidden'
+trying URL 'https://dl.dropboxusercontent.com/u/51653511/GEOmetadb.sqlite.gz'
+downloaded 0 bytes
+
+Warning in download.file(url_geo, destfile = localfile, mode = "wb") :
+  URL 'https://dl.dropboxusercontent.com/u/51653511/GEOmetadb.sqlite.gz': status was 'Couldn't connect to server'
+Quitting from lines 87-88 (GEOmetadb.Rmd) 
+Error: processing vignette 'GEOmetadb.Rmd' failed with diagnostics:
+cannot download all files
+Execution halted
+
+checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  .travis.yml
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+
+checking R code for possible problems ... NOTE
+getSQLiteFile: no visible global function definition for
+  ‘download.file’
+Undefined global functions or variables:
+  download.file
+Consider adding
+  importFrom("utils", "download.file")
+to your NAMESPACE file.
+
+checking Rd line widths ... NOTE
+Rd file 'geoConvert.Rd':
+  \usage lines wider than 90 characters:
+     geoConvert(in_list, out_type = c("gse", "gpl", "gsm", "gds", "smatrix"), sqlite_db_name = "GEOmetadb.sqlite")
+
+These lines will be truncated in the PDF manual.
 ```
 
 ## lumi (2.24.0)
@@ -1670,11 +1723,11 @@ R.
 See ?Deprecated.
 Examples with CPU or elapsed time > 5s
                             user system elapsed
-makeOrganismDbFromBiomart 12.092  0.220  17.918
-rangeBasedAccessors        8.380  0.060   8.611
-OrganismDb                 6.852  0.164   8.499
-makeOrganismDbFromTxDb     6.288  0.092  82.585
-makeOrganismDbFromUCSC     4.952  0.068  81.737
+makeOrganismDbFromBiomart 12.756  0.280 124.138
+rangeBasedAccessors       10.104  0.072  10.176
+OrganismDb                 7.476  0.224  39.296
+makeOrganismDbFromTxDb     7.036  0.120  87.443
+makeOrganismDbFromUCSC     5.456  0.096  83.353
 
 checking dependencies in R code ... NOTE
 Unexported object imported by a ':::' call: ‘BiocGenerics:::testPackage’
@@ -2015,6 +2068,9 @@ Found the following significant warnings:
 Deprecated functions may be defunct as soon as of the next release of
 R.
 See ?Deprecated.
+Examples with CPU or elapsed time > 5s
+               user system elapsed
+rangeMap.save 5.272  0.032    5.31
 ```
 
 ## RecordLinkage (0.4-10)
@@ -2028,20 +2084,23 @@ Found the following significant warnings:
 
   Warning: 'make.db.names' is deprecated.
   Warning: 'make.db.names' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
   Warning: 'make.db.names' is deprecated.
   Warning: 'make.db.names' is deprecated.
   Warning: 'make.db.names' is deprecated.
-... 19 lines ...
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
   Warning: 'make.db.names' is deprecated.
   Warning: 'make.db.names' is deprecated.
   Warning: 'make.db.names' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
 Deprecated functions may be defunct as soon as of the next release of
 R.
 See ?Deprecated.
@@ -2193,55 +2252,6 @@ Packages which this enhances but not available for checking:
   ‘rjpod’ ‘d3Network’
 ```
 
-## rTRM (1.10.2)
-Maintainer: Diego Diez <diego10ruiz@gmail.com>  
-Bug reports: https://github.com/ddiez/rTRM/issues
-
-0 errors | 1 warning  | 1 note 
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-
-checking Rd line widths ... NOTE
-Rd file 'findTRM.Rd':
-  \usage lines wider than 90 characters:
-     findTRM(g, target, query, method = "nsa", max.bridge = 1, extended = FALSE, strict = FALSE, type = "igraph")
-
-Rd file 'plotGraph.Rd':
-  \usage lines wider than 90 characters:
-     plotGraph(g, layout = layout.fruchterman.reingold, mar = .5, vertex.pch = 21, vertex.cex, vertex.col, vertex.bg, vertex.lwd, edge.col,  ... [TRUNCATED]
-
-Rd file 'plotTRM.Rd':
-  \usage lines wider than 90 characters:
-     plotTRM(g, layout = layout.fruchterman.reingold, mar = .5, vertex.col, vertex.cex, vertex.lwd, edge.col, edge.lwd, edge.lty, label = TR ... [TRUNCATED]
-
-Rd file 'processBiogrid.Rd':
-  \usage lines wider than 90 characters:
-     processBiogrid(dblist, org = "human", simplify = TRUE, type = "physical", mimic.old = FALSE)
-
-These lines will be truncated in the PDF manual.
-```
-
 ## specL (1.6.2)
 Maintainer: Christian Panse <cp@fgcz.ethz.ch>, Witold E. Wolski <wewolski@gmail.com>  
 Bug reports: https://github.com/fgcz/specL/issues
@@ -2332,46 +2342,6 @@ Undefined global functions or variables:
 Consider adding
   importFrom("utils", "download.file", "head", "modifyList")
 to your NAMESPACE file.
-```
-
-## storr (1.0.1)
-Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
-
-0 errors | 1 warning  | 0 notes
-
-```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because drivers.Rmd appears to be an R Markdown v2 document.
-Quitting from lines 480-491 (drivers.Rmd) 
-Error: processing vignette 'drivers.Rmd' failed with diagnostics:
-'connection' must be a connection
-Execution halted
-
-```
-
-## stream (1.2-3)
-Maintainer: Michael Hahsler <mhahsler@lyle.smu.edu>  
-Bug reports: https://github.com/mhahsler/stream/issues
-
-0 errors | 1 warning  | 1 note 
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'fetch' is deprecated.
-  Warning: 'fetch' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-
-checking installed package size ... NOTE
-  installed size is  5.7Mb
-  sub-directories of 1Mb or more:
-    doc    1.6Mb
-    libs   3.6Mb
 ```
 
 ## TFBSTools (1.10.4)

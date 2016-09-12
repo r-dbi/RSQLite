@@ -32,7 +32,7 @@
   create [shared in-memory](https://www.sqlite.org/inmemorydb.html) databases
   (#70).
 
-- Queries (#69), query parameters and table data are always converted to UTF-8 before being sent to database.
+- Queries (#69), query parameters and table data are always converted to UTF-8 before being sent to the database.
 
 - Adapted to DBI 0.5, new code should use `dbExecute()` instead of `dbGetQuery()`, and `dbSendStatement()` instead of `dbSendQuery()` where appropriate.
 
@@ -43,7 +43,7 @@
   params = list(cyl = 4))`. This has no performance benefits but protects you
   from SQL injection attacks.
 
-- Improve column type inference: the first non-`NULL` value decides the type of a column (#111). If there are no non-`NULL` values, the column affinity is used, determined according sqlite3 rules (#160).
+- Improve column type inference: the first non-`NULL` value decides the type of a column (#111). If there are no non-`NULL` values, the column affinity is used, determined according to sqlite3 rules (#160).
 
 - `dbFetch()` uses the same row name strategy as `dbReadTable()` (#53).
 
@@ -68,20 +68,20 @@
 
 - `fetch()` now raises deprecation warning and ignores the `row.names` argument -- it never converts a column to row names (#174).
 
-- `dbGetException()` now raises a deprecation warning and always returns `list(errorNum = 0L, errorMsg = "OK")`, because querying the last SQLite error only works if an error actually happened (#129).
+- `dbGetException()` now raises a deprecation warning and always returns `list(errorNum = 0L, errorMsg = "OK")`, because querying the last SQLite error only works if an error actually occurred (#129).
 
-- `dbSendPreparedQuery()` and `dbGetPreparedQuery()` have been reimplemented (with deprecation warning) using `dbSendQuery()`, `dbBind()` and `dbFetch()` for compatibility with existing packages (#100, #153). Please convert to the new API, because the old function may be removed completely very soon: They were never part of the official API, and are dangerous because they issue multiple queries. `dbSendPreparedQuery()` and `dbGetPreparedQuery()` ignore parameters not found in the query, with a warning (#174).
+- `dbSendPreparedQuery()` and `dbGetPreparedQuery()` have been reimplemented (with deprecation warning) using `dbSendQuery()`, `dbBind()` and `dbFetch()` for compatibility with existing packages (#100, #153). Please convert to the new API, because the old function may be removed completely very soon: They were never part of the official API, and are dangerous because they issue multiple queries. Both `dbSendPreparedQuery()` and `dbGetPreparedQuery()` ignore parameters not found in the query, with a warning (#174).
 
 - Reimplemented `dbListResults()` (with deprecation warning) for compatibility with existing packages (#154).
 
 - Soft-deprecated `dbGetInfo()`: The "Result" method is implemented by DBI, the methods for the other classes raise a warning (#137). It's now better to access the metadata with individual functions `dbHasCompleted()`, `dbGetRowCount()` and `dbGetRowsAffected()`.
 
-- All summary methods have been removed: the same information is now displayed in the show methods, which were previously pretty useless.
+- All `summary()` methods have been removed: the same information is now displayed in the `show()` methods, which were previously pretty useless.
 
 
 ## Compatibility fixes
 
-- The `raw` data type is supported in `dbWriteTable()` for compatibility reasons, creates a `TEXT` column with a warning (#173).
+- The `raw` data type is supported in `dbWriteTable()`, creates a `TEXT` column with a warning (#173).
 
 - Numeric values for the `row.names` argument are converted to logical, with a warning (#170).
 
@@ -89,67 +89,63 @@
 
 - `dbWriteTable()` supports `field.types` argument when creating a new table (#171).
 
-- Define a dummy `dbGetQuery()` method (with signature `"NULL", "ANY"`) so that dependent packages can have `importMethodsFrom(RSQLite, dbGetQuery)` in their `NAMESPACE`. Also reexport `dbGetQuery()` (#148).
+- Defined a dummy `dbGetQuery()` method (with signature `"NULL", "ANY"`) so that dependent packages can have `importMethodsFrom(RSQLite, dbGetQuery)` in their `NAMESPACE`. Also reexporting `dbGetQuery()` (#148) and `dbDriver()` (#147).
 
 - `sqliteCopyDatabase()` accepts character as `to` argument again, in this case a temporary connection is opened.
-
-- Reexport `dbDriver()` (#147).
-
-- The `dbGetQuery()` function is reexported again from DBI to avoid revdep check errors (#148).
 
 - Reimplemented `dbWriteTable("SQLiteConnection", "character", "character")` for import of CSV files, using a function from the old codebase (#151).
 
 
 ## Bug fixes
 
-- Fix one-off glitch in error message issued by `dbBind()`.
-- Release opened result set if binding fails in `dbSendQuery()` (#89).
+- Fixed one-off glitch in error message issued by `dbBind()`.
+- Releasing opened result set if binding fails in `dbSendQuery()` (#89).
 
 
 ## Performance
 
-- Speed up `dbExistsTable()` function (#166).
+- The `dbExistsTable()` function now works faster by filtering the list of tables using SQL (#166).
 
 
 ## Documentation
 
 - Start on a basic vignette: `vignette("RSQLite")` (#50).
 
-- Fix `dbExecute()` usage in examples.
+- Fixed `dbExecute()` usage in examples.
 
-- Use both `":memory:"` and `":file::memory:"` in documentation.
+- Using both `":memory:"` and `":file::memory:"` in documentation.
 
-- Additional documentation and unit tests for
+- Added additional documentation and unit tests for
   [autoincrement keys](https://www.sqlite.org/autoinc.html) (#119).
 
-- Remove old documentation (#121).
+- Removed old documentation (#121).
 
 
 ## Internal
 
-- Use the `DBItest` package for testing (#105), with the new `constructor_relax_args` tweak.
+- Using the `DBItest` package for testing (#105), with the new `constructor_relax_args` tweak.
 
 - Using new `sqlRownamesToColumn()` and `sqlColumnToRownames()` (rstats-db/DBI#91).
 
-- Use `astyle` for code formatting (#159), strip space at end of line in all source files.
+- Using `astyle` for code formatting (#159), stripped space at end of line in all source files.
 
-- Track dependencies between source and header files (#138).
+- Tracking dependencies between source and header files (#138).
 
-- Move all functions from headers to modules (#162).
+- Moved all functions from headers to modules (#162).
 
 - Further refactoring and cleanup of C++ code (#162).
 
-- Fix all warnings in tests (#157).
+- Fixed all warnings in tests (#157).
 
-- Also check message for deprecation warnings (#157).
+- Also checking message wording for deprecation warnings (#157).
 
-- Use container-based builds on Travis.
+- Using container-based builds on Travis.
 
-- Enable AppVeyor testing.
+- Enabled AppVeyor testing.
 
-- Use development version of `testthat`.
+- Using development version of `testthat`.
 
-- Upgrade script for sqlite3 sources located in the `src-raw` directory.
+- Added upgrade script for sqlite3 sources to the `src-raw` directory.
 
 
 # Version 1.0.0

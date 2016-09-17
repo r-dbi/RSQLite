@@ -39,9 +39,9 @@ DBItest::test_all(c(
 
   # result_meta
   "get_info_result",                            # rstats-db/DBI#55
-  "bind_logical_.*",                            # not an error, no logical data type
-  "bind_date_.*",                               # #114
-  "bind_timestamp_.*",                          # #114
+  "bind_logical.*",                             # not an error, no logical data type
+  "bind_date.*",                                # #114
+  "bind_timestamp.*",                           # #114
   "read_only",                                  # default connection is read-write
 
   # compliance

@@ -2,6 +2,8 @@
 #define RSQLite_workarounds_XPtr_h
 
 
+#ifdef __CLION__
+
 namespace Rcpp{
 
   template <
@@ -36,5 +38,6 @@ namespace Rcpp{
 
 } // namespace Rcpp
 
+#endif // #ifdef __CLION__
 
 #endif // #ifndef RSQLite_workarounds_XPtr_h

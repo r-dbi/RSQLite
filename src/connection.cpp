@@ -2,8 +2,6 @@
 #include <workarounds/XPtr.h>
 #include "SqliteConnection.h"
 
-using namespace Rcpp;
-
 extern "C" {
   int RS_sqlite_import(
     sqlite3* db,

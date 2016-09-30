@@ -36,7 +36,7 @@ void SqliteResult::prepare(const std::string& sql) {
   int rc = sqlite3_prepare_v2(pConn_->conn(), sql.c_str(), sql.size() + 1,
                               &pStatement_, NULL);
   if (rc != SQLITE_OK) {
-    Rcpp::stop(pConn_->getException());
+    stop(pConn_->getException());
   }
 }
 
@@ -87,9 +87,9 @@ int SqliteResult::rows_affected() {
   return rows_affected_;
 }
 
-Rcpp::IntegerVector SqliteResult::find_params(const Rcpp::CharacterVector& param_names) {
+IntegerVector SqliteResult::find_params(const CharacterVector& param_names) {
   int p = param_names.length();
-  Rcpp::IntegerVector res(p);
+  IntegerVector res(p);
 
   for (int j = 0; j < p; ++j) {
     int pos = find_parameter(std::string(param_names[j]));
@@ -101,32 +101,32 @@ Rcpp::IntegerVector SqliteResult::find_params(const Rcpp::CharacterVector& param
   return res;
 }
 
-void SqliteResult::bind(const Rcpp::List& params) {
+void SqliteResult::bind(const List& params) {
   if (params.size() != nparams_) {
-    Rcpp::stop("Query requires %i params; %i supplied.",
+    stop("Query requires %i params; %i supplied.",
                nparams_, params.size());
   }
   if (params.attr("names") == R_NilValue) {
-    Rcpp::stop("Parameters must be a named list.");
+    stop("Parameters must be a named list.");
   }
 
   for (int j = 0; j < params.size(); ++j) {
     SEXP col = params[j];
     if (Rf_length(col) != 1)
-      Rcpp::stop("Parameter %i does not have length 1.", j + 1);
+      stop("Parameter %i does not have length 1.", j + 1);
   }
 
   bind_impl(params);
   init();
 }
 
-void SqliteResult::bind_rows(const Rcpp::List& params) {
+void SqliteResult::bind_rows(const List& params) {
   if (params.size() != nparams_) {
-    Rcpp::stop("Query requires %i params; %i supplied.",
+    stop("Query requires %i params; %i supplied.",
                nparams_, params.size());
   }
   if (params.size() == 0) {
-    Rcpp::stop("Need at least one column");
+    stop("Need at least one column");
   }
 
   SEXP first_col = params[0];
@@ -134,7 +134,7 @@ void SqliteResult::bind_rows(const Rcpp::List& params) {
 
   rows_affected_ = 0;
 
-  Rcpp::CharacterVector names_ = params.attr("names");
+  CharacterVector names_ = params.attr("names");
   std::vector<std::string> names(names_.begin(), names_.end());
 
   for (int i = 0; i < n; ++i) {
@@ -150,31 +150,31 @@ void SqliteResult::bind_rows(const Rcpp::List& params) {
   }
 }
 
-Rcpp::List SqliteResult::fetch(const int n_max) {
+List SqliteResult::fetch(const int n_max) {
   if (!ready_)
-    Rcpp::stop("Query needs to be bound before fetching");
+    stop("Query needs to be bound before fetching");
 
   return fetch_impl(n_max);
 
 }
 
-Rcpp::List SqliteResult::get_column_info() {
+List SqliteResult::get_column_info() {
   peek_first_row();
 
-  Rcpp::CharacterVector names(ncols_);
+  CharacterVector names(ncols_);
   for (int i = 0; i < ncols_; i++) {
     names[i] = names_[i];
   }
 
-  Rcpp::CharacterVector types(ncols_);
+  CharacterVector types(ncols_);
   for (int i = 0; i < ncols_; i++) {
     types[i] = Rf_type2char(types_[i]);
   }
 
-  Rcpp::List out = Rcpp::List::create(names, types);
-  out.attr("row.names") = Rcpp::IntegerVector::create(NA_INTEGER, -ncols_);
+  List out = List::create(names, types);
+  out.attr("row.names") = IntegerVector::create(NA_INTEGER, -ncols_);
   out.attr("class") = "data.frame";
-  out.attr("names") = Rcpp::CharacterVector::create("name", "type");
+  out.attr("names") = CharacterVector::create("name", "type");
 
   return out;
 }
@@ -182,11 +182,11 @@ Rcpp::List SqliteResult::get_column_info() {
 
 // Privates ////////////////////////////////////////////////////////////////////
 
-void SqliteResult::bind_impl(const Rcpp::List& params) {
+void SqliteResult::bind_impl(const List& params) {
   sqlite3_reset(pStatement_);
   sqlite3_clear_bindings(pStatement_);
 
-  Rcpp::CharacterVector names = params.attr("names");
+  CharacterVector names = params.attr("names");
   for (int j = 0; j < params.size(); ++j) {
     bind_parameter(0, j, std::__cxx11::string(names[j]), static_cast<SEXPREC*>(params[j]));
   }
@@ -196,7 +196,7 @@ void SqliteResult::bind_parameter(const int i, const int j0, const std::string& 
   if (name != "") {
     int j = find_parameter(name);
     if (j == 0)
-      Rcpp::stop("No parameter with name %s.", name);
+      stop("No parameter with name %s.", name);
     bind_parameter_pos(i, j, values_);
   } else {
     // sqlite parameters are 1-indexed
@@ -226,32 +226,32 @@ int SqliteResult::find_parameter(const std::string& name) {
 void SqliteResult::bind_parameter_pos(const int i, const int j, const SEXP value_) {
   // std::cerr << "TYPEOF(value_): " << TYPEOF(value_) << "\n";
   if (TYPEOF(value_) == LGLSXP) {
-    Rcpp::LogicalVector value(value_);
+    LogicalVector value(value_);
     if (value[i] == NA_LOGICAL) {
       sqlite3_bind_null(pStatement_, j);
     } else {
       sqlite3_bind_int(pStatement_, j, static_cast<int>(value[i]));
     }
   } else if (TYPEOF(value_) == INTSXP) {
-    Rcpp::IntegerVector value(value_);
+    IntegerVector value(value_);
     if (value[i] == NA_INTEGER) {
       sqlite3_bind_null(pStatement_, j);
     } else {
       sqlite3_bind_int(pStatement_, j, static_cast<int>(value[i]));
     }
   } else if (TYPEOF(value_) == REALSXP) {
-    Rcpp::NumericVector value(value_);
+    NumericVector value(value_);
     if (value[i] == NA_REAL) {
       sqlite3_bind_null(pStatement_, j);
     } else {
       sqlite3_bind_double(pStatement_, j, static_cast<double>(value[i]));
     }
   } else if (TYPEOF(value_) == STRSXP) {
-    Rcpp::CharacterVector value(value_);
+    CharacterVector value(value_);
     if (value[i] == NA_STRING) {
       sqlite3_bind_null(pStatement_, j);
     } else {
-      Rcpp::String value2 = value[i];
+      String value2 = value[i];
       std::string value3(value2);
       sqlite3_bind_text(pStatement_, j, value3.data(), value3.size(),
                         SQLITE_TRANSIENT);
@@ -259,19 +259,19 @@ void SqliteResult::bind_parameter_pos(const int i, const int j, const SEXP value
   } else if (TYPEOF(value_) == VECSXP) {
     SEXP raw = VECTOR_ELT(value_, i);
     if (TYPEOF(raw) != RAWSXP) {
-      Rcpp::stop("Can only bind lists of raw vectors");
+      stop("Can only bind lists of raw vectors");
     }
 
     sqlite3_bind_blob(pStatement_, j, RAW(raw), Rf_length(raw), SQLITE_TRANSIENT);
   } else {
-    Rcpp::stop("Don't know how to handle parameter of type %s.",
+    stop("Don't know how to handle parameter of type %s.",
                Rf_type2char(TYPEOF(value_)));
   }
 }
 
-Rcpp::List SqliteResult::fetch_impl(const int n_max) {
+List SqliteResult::fetch_impl(const int n_max) {
   int n = 0;
-  Rcpp::List out;
+  List out;
 
   if (n_max != 0)
     out = fetch_rows(n_max, n);
@@ -283,10 +283,10 @@ Rcpp::List SqliteResult::fetch_impl(const int n_max) {
   return out;
 }
 
-Rcpp::List SqliteResult::fetch_rows(const int n_max, int& n) {
+List SqliteResult::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
-  Rcpp::List out = dfCreate(names_, n);
+  List out = dfCreate(names_, n);
 
   int i = 0;
   while (!complete_) {
@@ -304,7 +304,7 @@ Rcpp::List SqliteResult::fetch_rows(const int n_max, int& n) {
     ++i;
 
     if (i % 1000 == 0)
-      Rcpp::checkUserInterrupt();
+      checkUserInterrupt();
   }
 
   // Trim back to what we actually used
@@ -323,19 +323,19 @@ void SqliteResult::step() {
   if (rc == SQLITE_DONE) {
     complete_ = true;
   } else if (rc != SQLITE_ROW) {
-    Rcpp::stop(pConn_->getException());
+    stop(pConn_->getException());
   }
 }
 
-Rcpp::List SqliteResult::peek_first_row() {
-  Rcpp::List out = dfCreate(names_, 1);
+List SqliteResult::peek_first_row() {
+  List out = dfCreate(names_, 1);
   set_col_values(out, 0, 1);
   out = dfResize(out, 0);
 
   return out;
 }
 
-Rcpp::List SqliteResult::alloc_missing_cols(Rcpp::List data, int n) {
+List SqliteResult::alloc_missing_cols(List data, int n) {
   // Create data for columns where all values were NULL (or for all columns
   // in the case of a 0-row data frame)
   for (int j = 0; j < ncols_; ++j) {
@@ -349,7 +349,7 @@ Rcpp::List SqliteResult::alloc_missing_cols(Rcpp::List data, int n) {
   return data;
 }
 
-void SqliteResult::set_col_values(Rcpp::List& out, const int i, const int n) {
+void SqliteResult::set_col_values(List& out, const int i, const int n) {
   for (int j = 0; j < ncols_; ++j) {
     SEXP col = out[j];
     set_col_value(col, i, j, n);
@@ -413,7 +413,7 @@ void SqliteResult::fill_default_col_value(const SEXP col, const int i, const SEX
     SET_STRING_ELT(col, i, NA_STRING);
     break;
   case VECSXP:
-    SET_VECTOR_ELT(col, i, Rcpp::RawVector(0));
+    SET_VECTOR_ELT(col, i, RawVector(0));
     break;
   }
 }

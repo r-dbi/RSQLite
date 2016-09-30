@@ -2,8 +2,6 @@
 #include <workarounds/XPtr.h>
 #include "SqliteResult.h"
 
-using namespace Rcpp;
-
 // [[Rcpp::export]]
 XPtr<SqliteResult> rsqlite_send_query(const XPtr<SqliteConnectionPtr>& con, const std::string& sql) {
   SqliteResult* res = new SqliteResult((*con), sql);

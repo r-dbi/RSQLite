@@ -29,25 +29,25 @@ public:
   bool complete();
   int nrows();
   int rows_affected();
-  Rcpp::IntegerVector find_params(const Rcpp::CharacterVector& param_names);
-  void bind(const Rcpp::List& params);
-  void bind_rows(const Rcpp::List& params);
-  Rcpp::List fetch(int n_max = -1);
-  Rcpp::List get_column_info();
+  IntegerVector find_params(const CharacterVector& param_names);
+  void bind(const List& params);
+  void bind_rows(const List& params);
+  List fetch(int n_max = -1);
+  List get_column_info();
 
 private:
-  void bind_impl(const Rcpp::List& params);
+  void bind_impl(const List& params);
   void bind_parameter(int i, int j, const std::string& name, SEXP values_);
   int find_parameter(const std::string& name);
   void bind_parameter_pos(int i, int j, SEXP value_);
 
-  Rcpp::List fetch_impl(const int n_max);
-  Rcpp::List fetch_rows(int n_max, int& n);
+  List fetch_impl(const int n_max);
+  List fetch_rows(int n_max, int& n);
   void step();
-  Rcpp::List peek_first_row();
-  Rcpp::List alloc_missing_cols(Rcpp::List data, int n);
+  List peek_first_row();
+  List alloc_missing_cols(List data, int n);
 
-  void set_col_values(Rcpp::List& out, const int i, const int n);
+  void set_col_values(List& out, const int i, const int n);
   void set_col_value(SEXP& col, const int i, const int j, const int n);
   SEXP alloc_col(const SEXPTYPE type, const int i, const int n);
   void fill_default_col_value(SEXP col, const int i, const SEXPTYPE type);

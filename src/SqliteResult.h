@@ -55,9 +55,12 @@ private:
                       SEXPTYPE type);
   void set_raw_value(SEXP col, const int i, const int j);
 
+  List get_column_info_impl();
+  
 private:
   static SEXPTYPE datatype_to_sexptype(const int field_type);
   static SEXPTYPE decltype_to_sexptype(const char* decl_type);
+
 };
 
 #endif // __RSQLSITE_SQLITE_RESULT__

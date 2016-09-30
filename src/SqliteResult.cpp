@@ -159,19 +159,8 @@ List SqliteResult::fetch(const int n_max) {
 }
 
 List SqliteResult::get_column_info() {
-  peek_first_row();
+  List out = get_column_info_impl();
 
-  CharacterVector names(ncols_);
-  for (int i = 0; i < ncols_; i++) {
-    names[i] = names_[i];
-  }
-
-  CharacterVector types(ncols_);
-  for (int i = 0; i < ncols_; i++) {
-    types[i] = Rf_type2char(types_[i]);
-  }
-
-  List out = List::create(names, types);
   out.attr("row.names") = IntegerVector::create(NA_INTEGER, -ncols_);
   out.attr("class") = "data.frame";
   out.attr("names") = CharacterVector::create("name", "type");
@@ -446,6 +435,22 @@ void SqliteResult::set_raw_value(const SEXP col, const int i, const int j) {
   memcpy(RAW(bytes), blob, size);
 
   SET_VECTOR_ELT(col, i, bytes);
+}
+
+List SqliteResult::get_column_info_impl() {
+  peek_first_row();
+
+  CharacterVector names(ncols_);
+  for (int i = 0; i < ncols_; i++) {
+    names[i] = names_[i];
+  }
+
+  CharacterVector types(ncols_);
+  for (int i = 0; i < ncols_; i++) {
+    types[i] = Rf_type2char(types_[i]);
+  }
+
+  return List::create(names, types);
 }
 
 SEXPTYPE SqliteResult::datatype_to_sexptype(const int field_type) {

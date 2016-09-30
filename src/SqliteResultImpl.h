@@ -51,9 +51,8 @@ private:
   void set_col_values(List& out, const int i, const int n);
   void set_col_value(SEXP& col, const int i, const int j, const int n);
   SEXP alloc_col(const unsigned int type, const int i, const int n);
-  void fill_default_col_value(SEXP col, const int i, const unsigned int type);
-  void fill_col_value(const SEXP col, const int i, const int j,
-                      unsigned int type);
+  void fill_default_col_value(SEXP col, const int i);
+  void fill_col_value(const SEXP col, const int i, const int j);
   void set_raw_value(SEXP col, const int i, const int j);
 
   static unsigned int datatype_to_sexptype(const int field_type);

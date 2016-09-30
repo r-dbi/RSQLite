@@ -352,10 +352,10 @@ void SqliteResultImpl::set_col_value(SEXP& col, const int i, const int j, const 
   }
 
   if (column_type == SQLITE_NULL) {
-    fill_default_col_value(col, i, type);
+    fill_default_col_value(col, i);
   }
   else {
-    fill_col_value(col, i, j, type);
+    fill_col_value(col, i, j);
   }
   return;
 }
@@ -364,14 +364,14 @@ SEXP SqliteResultImpl::alloc_col(const SEXPTYPE type, const int i, const int n) 
   SEXP col = Rf_allocVector(type, n);
   PROTECT(col);
   for (int i_ = 0; i_ < i; i_++) {
-    fill_default_col_value(col, i_, type);
+    fill_default_col_value(col, i_);
   }
   UNPROTECT(1);
   return col;
 }
 
-void SqliteResultImpl::fill_default_col_value(const SEXP col, const int i, const SEXPTYPE type) {
-  switch (type) {
+void SqliteResultImpl::fill_default_col_value(const SEXP col, const int i) {
+  switch (TYPEOF(col)) {
   case LGLSXP:
     LOGICAL(col)[i] = NA_LOGICAL;
     break;
@@ -390,9 +390,8 @@ void SqliteResultImpl::fill_default_col_value(const SEXP col, const int i, const
   }
 }
 
-void SqliteResultImpl::fill_col_value(const SEXP col, const int i, const int j,
-                                      SEXPTYPE type) {
-  switch (type) {
+void SqliteResultImpl::fill_col_value(const SEXP col, const int i, const int j) {
+  switch (TYPEOF(col)) {
   case INTSXP:
     INTEGER(col)[i] = sqlite3_column_int(stmt, j);
     break;

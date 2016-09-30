@@ -141,9 +141,9 @@ setMethod("dbSendPreparedQuery",
     res <- dbSendQuery(conn, statement)
 
     tryCatch(
-      db_bind(res, unclass(row), allow_named_superset = TRUE, allow_rows = TRUE),
+      db_bind(res, unclass(bind.data), allow_named_superset = TRUE, allow_rows = TRUE),
       error = function(e) {
-        db_bind(res, unclass(unname(row)), allow_named_superset = FALSE, allow_rows = TRUE)
+        db_bind(res, unclass(unname(bind.data)), allow_named_superset = FALSE, allow_rows = TRUE)
       }
     )
     res
@@ -166,7 +166,7 @@ setMethod("dbGetPreparedQuery",
       bind_data_rows,
       function(row) {
         tryCatch(
-          db_bind(res, unclass(row), allow_named_superset = TRUE),
+          db_bind(res, unclass(row), allow_named_superset = TRUE, allow_rows = FALSE),
           error = function(e) {
             dbBind(res, unclass(unname(row)))
           }

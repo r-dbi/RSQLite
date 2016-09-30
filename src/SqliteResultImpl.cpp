@@ -19,7 +19,9 @@ SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
 {
 
   try {
-    init_if_bound();
+    if (cache.nparams_ == 0) {
+      after_bind();
+    }
   } catch (...) {
     sqlite3_finalize(stmt);
     stmt = NULL;
@@ -75,19 +77,15 @@ std::vector<SEXPTYPE> SqliteResultImpl::get_initial_field_types(const int ncols)
   return types;
 }
 
-void SqliteResultImpl::init_if_bound() {
-  if (cache.nparams_ == 0) {
-    init();
-  }
+void SqliteResultImpl::after_bind() {
+  init();
+  step();
 }
 
 void SqliteResultImpl::init() {
   ready_ = true;
   nrows_ = 0;
   complete_ = false;
-
-  step();
-  rows_affected_ = sqlite3_changes(conn);
 }
 
 
@@ -121,20 +119,7 @@ IntegerVector SqliteResultImpl::find_params_impl(const CharacterVector& param_na
 }
 
 void SqliteResultImpl::bind_impl(const List& params) {
-  if (params.size() != cache.nparams_) {
-    stop("Query requires %i params; %i supplied.",
-         cache.nparams_, params.size());
-  }
-
-  sqlite3_reset(stmt);
-  sqlite3_clear_bindings(stmt);
-
-  CharacterVector names = params.attr("names");
-  for (int j = 0; j < params.size(); ++j) {
-    bind_parameter(0, j, CHAR(names[j]), static_cast<SEXPREC*>(params[j]));
-  }
-
-  init();
+  bind_rows_impl(params);
 }
 
 void SqliteResultImpl::bind_rows_impl(const List& params) {
@@ -142,6 +127,9 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
     stop("Query requires %i params; %i supplied.",
          cache.nparams_, params.size());
   }
+
+  if (cache.nparams_ == 0)
+    return;
 
   SEXP first_col = params[0];
   int n = Rf_length(first_col);
@@ -158,8 +146,7 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
       bind_parameter(i, j, CHAR(names[j]), static_cast<SEXPREC*>(params[j]));
     }
 
-    step();
-    rows_affected_ += sqlite3_changes(conn);
+    after_bind();
   }
 }
 
@@ -316,6 +303,8 @@ void SqliteResultImpl::step() {
   } else if (rc != SQLITE_ROW) {
     raise_sqlite_exception();
   }
+
+  rows_affected_ += sqlite3_changes(conn);
 }
 
 List SqliteResultImpl::peek_first_row() {

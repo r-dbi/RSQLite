@@ -42,9 +42,8 @@ private:
   void bind_parameter_pos(int i, int j, SEXP value_);
 
   Rcpp::List fetch_impl(const int n_max);
-  void step();
-
   Rcpp::List fetch_rows(int n_max, int& n);
+  void step();
   Rcpp::List peek_first_row();
   Rcpp::List alloc_missing_cols(Rcpp::List data, int n);
 

@@ -302,17 +302,6 @@ Rcpp::List SqliteResult::fetch_impl(const int n_max) {
   return out;
 }
 
-void SqliteResult::step() {
-  nrows_++;
-  int rc = sqlite3_step(pStatement_);
-
-  if (rc == SQLITE_DONE) {
-    complete_ = true;
-  } else if (rc != SQLITE_ROW) {
-    Rcpp::stop(pConn_->getException());
-  }
-}
-
 Rcpp::List SqliteResult::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
@@ -344,6 +333,17 @@ Rcpp::List SqliteResult::fetch_rows(const int n_max, int& n) {
   }
 
   return out;
+}
+
+void SqliteResult::step() {
+  nrows_++;
+  int rc = sqlite3_step(pStatement_);
+
+  if (rc == SQLITE_DONE) {
+    complete_ = true;
+  } else if (rc != SQLITE_ROW) {
+    Rcpp::stop(pConn_->getException());
+  }
 }
 
 Rcpp::List SqliteResult::peek_first_row() {

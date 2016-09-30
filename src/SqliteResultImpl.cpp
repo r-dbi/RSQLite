@@ -87,7 +87,6 @@ void SqliteResultImpl::init() {
   complete_ = false;
 
   step();
-  rows_affected_ = sqlite3_changes(conn);
 }
 
 
@@ -159,7 +158,6 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
     }
 
     step();
-    rows_affected_ += sqlite3_changes(conn);
   }
 }
 
@@ -316,6 +314,8 @@ void SqliteResultImpl::step() {
   } else if (rc != SQLITE_ROW) {
     raise_sqlite_exception();
   }
+
+  rows_affected_ += sqlite3_changes(conn);
 }
 
 List SqliteResultImpl::peek_first_row() {

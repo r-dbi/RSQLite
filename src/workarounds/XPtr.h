@@ -19,7 +19,7 @@ namespace Rcpp{
     inline T* get() const;
 
     typedef void (*unspecified_bool_type)();
-    static void unspecified_bool_true() {}
+    static void unspecified_bool_true();
     operator unspecified_bool_type() const;
     bool operator!() const;
 

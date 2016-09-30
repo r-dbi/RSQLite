@@ -412,15 +412,13 @@ void SqliteResultImpl::fill_default_col_value(const SEXP col, const int i) {
 void SqliteResultImpl::fill_col_value(const SEXP col, const int i, const int j) {
   switch (TYPEOF(col)) {
   case INTSXP:
-    INTEGER(col)[i] = sqlite3_column_int(stmt, j);
+    set_int_value(col, i, j);
     break;
   case REALSXP:
-    REAL(col)[i] = sqlite3_column_double(stmt, j);
+    set_real_value(col, i, j);
     break;
   case STRSXP:
-    SET_STRING_ELT(col, i,
-                   Rf_mkCharCE((const char*) sqlite3_column_text(stmt, j),
-                               CE_UTF8));
+    set_string_value(col, i, j);
     break;
   case VECSXP:
     set_raw_value(col, i, j);
@@ -428,7 +426,20 @@ void SqliteResultImpl::fill_col_value(const SEXP col, const int i, const int j) 
   }
 }
 
-void SqliteResultImpl::set_raw_value(const SEXP col, const int i, const int j) {
+void SqliteResultImpl::set_int_value(const SEXP col, const int i, const int j) const {
+  INTEGER(col)[i] = sqlite3_column_int(stmt, j);
+}
+
+void SqliteResultImpl::set_real_value(const SEXP col, const int i, const int j) const {
+  REAL(col)[i] = sqlite3_column_double(stmt, j);
+}
+
+void SqliteResultImpl::set_string_value(const SEXP col, const int i, const int j) const {
+  const char* const text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, j));
+  SET_STRING_ELT(col, i, Rf_mkCharCE(text, CE_UTF8));
+}
+
+void SqliteResultImpl::set_raw_value(const SEXP col, const int i, const int j) const {
   int size = sqlite3_column_bytes(stmt, j);
   const void* blob = sqlite3_column_blob(stmt, j);
 

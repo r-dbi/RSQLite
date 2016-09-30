@@ -64,7 +64,11 @@ private:
   SEXP alloc_col(const unsigned int type, const int i, const int n);
   void fill_default_col_value(SEXP col, const int i);
   void fill_col_value(const SEXP col, const int i, const int j);
-  void set_raw_value(SEXP col, const int i, const int j);
+
+  void set_int_value(const SEXP col, const int i, const int j) const;
+  void set_real_value(const SEXP col, const int i, const int j) const;
+  void set_string_value(const SEXP col, const int i, const int j) const;
+  void set_raw_value(SEXP col, const int i, const int j) const ;
 
   static unsigned int datatype_to_sexptype(const int field_type);
   static unsigned int decltype_to_sexptype(const char* decl_type);

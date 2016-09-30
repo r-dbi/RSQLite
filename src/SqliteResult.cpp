@@ -168,26 +168,30 @@ Rcpp::List SqliteResult::column_info() {
 
   Rcpp::CharacterVector types(ncols_);
   for (int i = 0; i < ncols_; i++) {
+    const char* type = NULL;
+
     switch (types_[i]) {
     case NILSXP:
     case LGLSXP:
-      types[i] = "logical";
+      type = "logical";
       break;
     case STRSXP:
-      types[i] = "character";
+      type = "character";
       break;
     case INTSXP:
-      types[i] = "integer";
+      type = "integer";
       break;
     case REALSXP:
-      types[i] = "double";
+      type = "double";
       break;
     case VECSXP:
-      types[i] = "list";
+      type = "list";
       break;
     default:
       Rcpp::stop("Unknown variable type");
     }
+
+    types[i] = type;
   }
 
   Rcpp::List out = Rcpp::List::create(names, types);

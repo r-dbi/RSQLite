@@ -6,6 +6,8 @@ PKG_CPPFLAGS=-DRSQLITE_USE_BUNDLED_SQLITE \
              -DSQLITE_ENABLE_JSON1 \
              -DSQLITE_SOUNDEX
 
+PKG_CXXFLAGS=-I.
+
 PKG_LIBS = sqlite3/extension-functions.o sqlite3/sqlite3.o
 
 $(SHLIB): ${PKG_LIBS}

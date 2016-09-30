@@ -1,4 +1,4 @@
-#include <Rcpp.h>
+#include <RSQLite.h>
 #include "sqlite3/sqlite3.h"
 using namespace Rcpp;
 

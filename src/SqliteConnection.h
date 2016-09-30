@@ -1,7 +1,6 @@
 #ifndef __RSQLSITE_SQLITE_CONNECTION__
 #define __RSQLSITE_SQLITE_CONNECTION__
 
-#include <Rcpp.h>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include "sqlite3/sqlite3.h"

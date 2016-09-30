@@ -8,7 +8,7 @@
 class SqliteResultImpl : public boost::noncopyable {
 private:
   sqlite3* conn;
-  sqlite3_stmt* pStatement_;
+  sqlite3_stmt* stmt;
   bool complete_;
   bool ready_;
   int nrows_;

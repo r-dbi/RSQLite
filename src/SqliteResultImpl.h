@@ -60,6 +60,8 @@ private:
   List alloc_missing_cols(List data, int n);
 
   bool set_col_values(List& out, const int i, int& n, const int n_max);
+  List finalize_cols(List out, int i, int& n) const;
+
   void set_col_value(SEXP& col, const int i, const int j, const int n);
   SEXP alloc_col(const unsigned int type, const int i, const int n);
   void fill_default_col_value(SEXP col, const int i);

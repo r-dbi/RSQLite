@@ -279,10 +279,7 @@ List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   }
 
   // Trim back to what we actually used
-  if (i < n) {
-    out = dfResize(out, i);
-    n = i;
-  }
+  out = finalize_cols(out, i, n);
 
   return out;
 }
@@ -304,23 +301,9 @@ List SqliteResultImpl::peek_first_row() {
   int n = 1;
   List out = dfCreate(cache.names_, n);
   set_col_values(out, 0, n, n);
-  out = dfResize(out, 0);
+  out = finalize_cols(out, 0, n);
 
   return out;
-}
-
-List SqliteResultImpl::alloc_missing_cols(List data, int n) {
-  // Create data for columns where all values were NULL (or for all columns
-  // in the case of a 0-row data frame)
-  for (int j = 0; j < cache.ncols_; ++j) {
-    if (types_[j] == NILSXP) {
-      types_[j] =
-      decltype_to_sexptype(sqlite3_column_decltype(stmt, j));
-      // std::cerr << j << ": " << types_[j] << "\n";
-      data[j] = alloc_col(types_[j], n, n);
-    }
-  }
-  return data;
 }
 
 bool SqliteResultImpl::set_col_values(List& out, const int i, int& n, const int n_max) {
@@ -339,6 +322,28 @@ bool SqliteResultImpl::set_col_values(List& out, const int i, int& n, const int 
   }
 
   return true;
+}
+
+List SqliteResultImpl::finalize_cols(List out, int i, int& n) const {
+  if (i < n) {
+    out = dfResize(out, i);
+    n = i;
+  }
+  return out;
+}
+
+List SqliteResultImpl::alloc_missing_cols(List data, int n) {
+  // Create data for columns where all values were NULL (or for all columns
+  // in the case of a 0-row data frame)
+  for (int j = 0; j < cache.ncols_; ++j) {
+    if (types_[j] == NILSXP) {
+      types_[j] =
+      decltype_to_sexptype(sqlite3_column_decltype(stmt, j));
+      // std::cerr << j << ": " << types_[j] << "\n";
+      data[j] = alloc_col(types_[j], n, n);
+    }
+  }
+  return data;
 }
 
 void SqliteResultImpl::set_col_value(SEXP& col, const int i, const int j, const int n) {

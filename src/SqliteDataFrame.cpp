@@ -6,12 +6,12 @@
 
 SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt_, std::vector<std::string> names_, const int n_max_,
                                  const std::vector<SEXPTYPE>& types_)
-: stmt(stmt_),
-  n_max(n_max_),
-  i(0),
-  n(init_n()),
-  out(dfCreate(names_, n)),
-  types(types_)
+  : stmt(stmt_),
+    n_max(n_max_),
+    i(0),
+    n(init_n()),
+    out(dfCreate(names_, n)),
+    types(types_)
 {
 }
 
@@ -70,7 +70,7 @@ void SqliteDataFrame::alloc_missing_cols() {
   for (int j = 0; j < out.length(); ++j) {
     if (types[j] == NILSXP) {
       types[j] =
-      decltype_to_sexptype(sqlite3_column_decltype(stmt, j));
+        decltype_to_sexptype(sqlite3_column_decltype(stmt, j));
       LOG_VERBOSE << j << ": " << types[j] << "\n";
       out[j] = alloc_col(types[j]);
     }

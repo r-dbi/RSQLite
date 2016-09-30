@@ -140,22 +140,12 @@ setMethod("dbSendPreparedQuery",
 
     res <- dbSendQuery(conn, statement)
 
-    bind_data_rows <- by(bind.data, seq_len(nrow(bind.data)), identity, simplify = FALSE)
-
-    lapply(
-      bind_data_rows,
-      function(row) {
-        tryCatch(
-          db_bind(res, unclass(row), allow_named_superset = TRUE),
-          error = function(e) {
-            dbBind(res, unclass(unname(row)))
-          }
-        )
-        dbFetch(res)
-        NULL
+    tryCatch(
+      db_bind(res, unclass(row), allow_named_superset = TRUE, allow_rows = TRUE),
+      error = function(e) {
+        db_bind(res, unclass(unname(row)), allow_named_superset = FALSE, allow_rows = TRUE)
       }
     )
-
     res
   }
 )

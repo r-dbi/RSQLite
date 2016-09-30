@@ -58,45 +58,6 @@ private:
   void step();
   List peek_first_row();
 
-  class chunk {
-    sqlite3_stmt* stmt;
-    const int n_max;
-    int i, n;
-    List out;
-    std::vector<SEXPTYPE> types;
-
-  public:
-    chunk(sqlite3_stmt* stmt, std::vector<std::string> names, const int n_max, const std::vector<SEXPTYPE>& types);
-
-  private:
-    int init_n() const;
-
-  public:
-    bool set_col_values();
-    void advance();
-
-    List get_data();
-    std::vector<SEXPTYPE> get_types();
-
-  private:
-    void set_col_value(SEXP& col, const int j);
-    void finalize_cols();
-
-    void alloc_missing_cols();
-    SEXP alloc_col(const unsigned int type);
-    void fill_default_col_value(SEXP col);
-    static void fill_default_col_value(SEXP col, const int i_);
-    void fill_col_value(const SEXP col, const int j);
-
-    void set_int_value(const SEXP col, const int j) const;
-    void set_real_value(const SEXP col, const int j) const;
-    void set_string_value(const SEXP col, const int j) const;
-    void set_raw_value(SEXP col, const int j) const ;
-
-    static unsigned int datatype_to_sexptype(const int field_type);
-    static unsigned int decltype_to_sexptype(const char* decl_type);
-  };
-
   void raise_sqlite_exception() const;
   static void raise_sqlite_exception(sqlite3* conn);
 };

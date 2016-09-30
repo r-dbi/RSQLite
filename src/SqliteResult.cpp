@@ -9,7 +9,7 @@
 // Construction ////////////////////////////////////////////////////////////////
 
 SqliteResult::SqliteResult(const SqliteConnectionPtr& pConn, const std::string& sql)
-  : pStatement_(NULL), pConn_(pConn), complete_(false), ready_(false),
+  : pConn_(pConn), pStatement_(NULL), complete_(false), ready_(false),
     nrows_(0), ncols_(0), rows_affected_(0), nparams_(0) {
 
   int rc = sqlite3_prepare_v2(pConn_->conn(), sql.c_str(), sql.size() + 1,

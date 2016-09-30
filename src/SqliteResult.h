@@ -8,8 +8,8 @@
 #include "SqliteConnection.h"
 
 class SqliteResult : boost::noncopyable {
-  sqlite3_stmt* pStatement_;
   SqliteConnectionPtr pConn_;
+  sqlite3_stmt* pStatement_;
   bool complete_, ready_;
   int nrows_, ncols_, rows_affected_, nparams_;
   std::vector<SEXPTYPE> types_;

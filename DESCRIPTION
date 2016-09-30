@@ -1,30 +1,36 @@
 Package: RSQLite
-Version: 1.0.9011
-Date: 2016-09-11
+Version: 1.0.9012
+Date: 2016-09-30
 Title: SQLite Interface for R
-Authors@R: as.person(c( "Hadley Wickham <hadley@rstudio.com> [aut,
-        cre]", "David A. James [aut]", "Seth Falcon [aut]", "SQLite
-        Authors (for the included SQLite sources) [ctb]", "Liam Healy
-        (for the include SQLite extensions) [ctb]", "RStudio [cph]" ))
+Authors@R: c(
+    person("Kirill", "Müller", role = c("aut", "cre"), email = "krlmlr+r@mailbox.org"),
+    person("Hadley", "Wickham", role = c("aut")),
+    person(c("David", "A."), "James", role = "aut"),
+    person("Seth", "Falcon", role = "aut"),
+    person(family = "SQLite Authors", role = "ctb", comment = "for the included SQLite sources"),
+    person("Liam", "Healy", role = "ctb", comment = "for the included SQLite sources"),
+    person(family = "RStudio", role = "cph")
+    )
 Description: This package embeds the SQLite database engine in R and
     provides an interface compliant with the DBI package. The
     source for the SQLite engine (version 3.8.8.2) is included.
-Depends: 
+Depends:
     R (>= 3.1.0)
-Suggests: 
+Suggests:
     testthat,
     knitr,
     rmarkdown,
     DBItest
-Imports: 
+Imports:
     methods,
     DBI (>= 0.4-9),
     Rcpp (>= 0.11.4.2)
 Remotes: rstats-db/DBI, rstats-db/DBItest@production, hadley/testthat
+Encoding: UTF-8
 License: LGPL (>= 2)
 URL: https://github.com/rstats-db/RSQLite
 BugReports: https://github.com/rstats-db/RSQLite/issues
-Collate: 
+Collate:
     'RcppExports.R'
     'SQLiteConnection.R'
     'SQLiteDriver.R'

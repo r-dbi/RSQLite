@@ -1,184 +1,157 @@
-## RSQLite 1.0.9011 (2016-09-11)
+## RSQLite 1.0.9012 (2016-09-30)
 
-- `dbWriteTable()` supports `field.types` argument when creating a new table (#171).
-- `fetch()` now raises deprecation warning and ignores the `row.names` argument -- it never converts a column to row names (#174).
-- `dbSendPreparedQuery()` and `dbGetPreparedQuery()` ignore parameters not found in the query, with a warning (#174).
-- `dbBind()` doesn't warn anymore when converting `factor` to `character`.
-- The `raw` data type is supported in `dbWriteTable()` for compatibility reasons, creates a `TEXT` column with a warning (#173).
-- Numeric values for `row.names` are supported, with a warning (#170).
-- `dbGetException()` now always returns `list(errorNum = 0L, errorMsg = "OK")` (with a warning), because querying the last SQLite error only works if an error actually happened (#129).
+- New maintainer: Kirill Müller. @hadley: please confirm.
+- Current revdep checks (#158).
 
 
-## RSQLite 1.0.9010 (2016-09-08)
+# RSQLite 1.1 release candidate
 
-- Speed up `dbExistsTable()` function (#166).
-- If the number of data frame columns matches the number of existing columns for `dbWriteTable(append = TRUE)`, columns will be matched by position for compatibility, with a warning in case of a name mismatch (#164).
-- Now using `sqlite3` rules for determining column affinity, for compatibility with reverse dependencies (#160).
-- Further refactoring and cleanup of C++ code (#162).
-- Enable JSON1 extension for SQLite (#152, @tigertoes).
+- New maintainer: Kirill Müller.
 
+## Bundled SQLite
 
-## RSQLite 1.0.9009 (2016-09-07)
+- RSQLite always builds with the included source, which is located in `src/sqlite3`. This prevents bugs due to API mismatches and considerably simplifies the build process.
 
-- Move all functions from headers to modules (#162).
-- Use `astyle` for code formatting (#159).
+- Current version: 3.11.1.
 
+- Enable JSON1 extension (#152, @tigertoes).
 
-## RSQLite 1.0.9008 (2016-09-01)
+- Include support for FTS5 (@mkuhn).
 
-- Improve column type inference, especially if the first value is `NULL` (#111).
-- Track dependencies between source and header files (#138).
-- Define a dummy `dbGetQuery()` method (with signature `"NULL", "ANY"`) so that dependent packages can have `importMethodsFrom(RSQLite, dbGetQuery)` in their `NAMESPACE`. Also reexport `dbGetQuery()` (#148).
-- `dbGetException()` now returns a named list again (#129).
+- Compilation limits `SQLITE_MAX_VARIABLE_NUMBER` and `SQLITE_MAX_COLUMN` have been reset to the defaults. The documentation suggests setting to such high values is a bad idea.
+
+- Header files for `sqlite3` are no longer installed, linking to the package is not possible anymore. Packages that require access to the low-level sqlite3 API should bundle their own copy.
 
 
-## RSQLite 1.0.9007 (2016-08-23)
+## New features
 
-- Deprecate `dbGetException()` (#129).
-- Fix all warnings in tests (#157).
-- Clarify message for deprecation warnings (#157).
-
-
-## RSQLite 1.0.9006 (2016-08-22)
-
-- Reimplement `dbSendPreparedQuery()` (with warning) for compatibility with existing packages (#153).
-- Reimplement `dbWriteTable("SQLiteConnection", "character", "character")` for import of CSV files (#151).
-- Reimplement `dbListResults()` (with warning) for compatibility with existing packages (#154).
-- Soft-deprecate `dbGetInfo()`: The "Result" method is implemented by DBI, the methods for the other classes raise a warning (#137).
-- Reimplement `dbGetPreparedQuery()` (with warning) using `dbSendQuery()`, `dbBind()` and `dbFetch()` (#100).
-- Binding a factor with `dbBind()` converts to character, with warning.
-- `sqliteCopyDatabase()` accepts character as `to` argument again, in this case a temporary connection is opened.
-- Allow only one open result set (#150).
-- Fix `dbExecute()` usage in examples.
-- Reexport `dbDriver()` (#147).
-- The `dbGetQuery()` function is reexported again from DBI to avoid revdep check errors (#148).
-
-
-## RSQLite 1.0.9005 (2016-08-19)
-
-- Adapt to DBI 0.4-9, use `dbExecute()` instead of `dbGetQuery()`, and `dbSendStatement()` instead of `dbSendQuery()` where appropriate.
-- Use new `constructor_relax_args` tweak.
-
-
-# RSQLite 1.0.9004 (2016-06-21)
-
-- Simplify compilation of SQLite library.
-- Use both `":memory:"` and `":file::memory:"` in documentation.
-- Support `":memory:"` file again on Windows, regression introduced after 1.0.0 (#140).
-
-
-# RSQLite 1.0.9003 (2016-06-08)
-
-- Fix one-off glitch in error message issued by `dbBind()`.
-- Release opened result set if binding fails in `dbSendQuery()` (#89).
-- Use `"file::memory:"` instead of `":memory:"` for memory-only databases, the latter doesn't seem to work well on Windows for unknown reasons.
-- Enable AppVeyor testing.
-- Strip space at end of line in all source files.
-- Use new `sqlRownamesToColumn()` and `sqlColumnToRownames()` (rstats-db/DBI#91).
-- Use container-based builds on Travis.
-- Remove old documentation (#121).
-
-
-# Version 1.0.9002 (2016-03-15)
-
-- Use the `DBItest` package for testing (#105).
-- Compile SQLite independently of main modules (#134).
-
-
-# Version 1.0.9001 (2016-03-15)
-
-- Upgrade SQLite to 3.11.1.
-- Include support for FTS5 (krlmlr#1, @mkuhn).
-- Upgrade script now located in `src-raw` directory.
-
-
-# Version 1.0.9000 (2016-03-15)
-
-- `make.db.names()` has been formally deprecated. Please use 
-  `dbQuoteIdentifier()` instead.  This function is also used in `dbReadTable()`,
-  `dbRemoveTable()`, and `dbListFields()` (#106, #132. @krlmlr).
+- RSQLite has been rewritten (essentially from scratch) in C++ with
+  Rcpp. This has considerably reduced the amount of code, and allow us to
+  take advantage of the more sophisticated memory management tools available in
+  Rcpp. This rewrite should yield some minor performance improvements, but
+  most importantly protect against memory leaks and crashes. It also provides
+  a better base for future development. In particular, it is now technically
+  possible to have multiple result sets per connection, although this feature
+  is currently disabled (#150).
 
 - You can now use SQLite's url specification for databases. This allows you to
   create [shared in-memory](https://www.sqlite.org/inmemorydb.html) databases
   (#70).
 
-- Queries are always converted to UTF-8 before being sent to database (#69).
+- Queries (#69), query parameters and table data are always converted to UTF-8 before being sent to the database.
 
-- Start on a basic vignette: `vignette("RSQLite")` (#50).
+- Adapted to DBI 0.5, new code should use `dbExecute()` instead of `dbGetQuery()`, and `dbSendStatement()` instead of `dbSendQuery()` where appropriate.
+
+- New strategy for prepared queries. Create a prepared query with `dbSendQuery()` and bind values with `dbBind()`.
+
+- `dbSendQuery()` and `dbGetQuery()` also support inline parameterised queries,
+  like `dbGetQuery(datasetsDb(), "SELECT * FROM mtcars WHERE cyl = :cyl",
+  params = list(cyl = 4))`. This has no performance benefits but protects you
+  from SQL injection attacks.
+
+- Improve column type inference: the first non-`NULL` value decides the type of a column (#111). If there are no non-`NULL` values, the column affinity is used, determined according to sqlite3 rules (#160).
 
 - `dbFetch()` uses the same row name strategy as `dbReadTable()` (#53).
 
-- Updated to SQLite 3.8.8.2
-
-- RSQLite always builds with the included source. This prevent bugs due to 
-  API mismatches and considerably simplifies the build process.
-
-- Compilation limits `SQLITE_MAX_VARIABLE_NUMBER` and `SQLITE_MAX_COLUMN`
-  have been reset to the defaults. The documentation suggests setting to
-  such high values is a bad idea.
-
-- RSQLite has been rewritten (essentially from scratch) in C++ with
-  Rcpp. This has considerably reduced the amount of code, and allow us to
-  take advantage of the more sophisticated memory management tools available in
-  Rcpp. This rewrite should yield some minor performance improvements, but 
-  most importantly protect against memory leaks and crashes. It also provides
-  a better base for future development.
-  
-- You can now have multiple result sets per connection. The database connection
-  will be terminated when all connection and result objects are closed 
-  explicitly with `dbDisconnect()` and `dbClearResult()`, or implicitly when
-  they are deleted and garbage collected. This protects against both memory
-  leaks and null pointers.
-
-- `sqliteBuildTableDefinition()` has been deprecated. Use `DBI::sqlCreateTable()`
-  instead.
-
-- `dbWriteTable()` with a file path has been deprecated due to the high
-  maintenance burden of the existing code. It will eventually come back when
-  we have a good API for parsing files from disk.
-
-- `sqliteQuickColumn()` has been deprecated. Use regular querying functions
-  instead.
-
-- New strategy for prepared queries. Create a prepared query with 
-  `dbSendQuery()` and bind values with `dbBind()`. `dbSendPreparedQuery()` and 
-  `dbGetPreparedQuery()` have been removed: they were never part of the official 
-  API, were dangerous because they issued multiple queries, and always matched 
-  on position, even if you used names.
-
-- `dbSendQuery()` and `dbGetQuery()` also support inline parameterised queries,
-  like `dbGetQuery(datasetsDb(), "SELECT * FROM mtcars WHERE cyl = :cyl", 
-  params = list(cyl = 4))`. This has no performance benefits but protects you 
-  from SQL injection attacks.
-
-- All summary methods have been removed: the same information is now displayed
-  in the show methods, which were previously pretty useless.
+- `dbColumnInfo()` will now return information even before you've retrieved any data.
 
 - New `sqliteVersion()` prints the header and library versions of RSQLite.
 
-- All `dbGetInfo()` methods have been deprecated: it's now better to access the 
-  metadata with individual functions. `dbColumnInfo()` will now return 
-  information even before you've retrieved any data.
 
-- `dbListResults()` is no longer supported. Adding a result registry in the
-  connection would add significant work, especially when trying to avoid
-  memory leaks. You shouldn't need this function anyway, as RSQLite will
-  lazily cleanup results when they go out of scope.
+## Breaking changes
 
-- All arguments to `SQLite()` are now ignored. Most of them didn't work anyway,
-  and rather than using global variables, it's better set specific values
-  when creating a connection. The `summary()` for `SQLiteDriver()` has
-  been removed since it no longer does anything useful.
-
-- `RSQLite()` no longer automatically attached DBI when loaded. This is to 
+- `RSQLite()` no longer automatically attaches DBI when loaded. This is to
   encourage you to use `library(DBI); dbConnect(RSQLite::SQLite())`.
 
-- Additional documentation and unit tests for
+
+## Deprecated functions
+
+- `make.db.names()` has been formally deprecated. Please use `dbQuoteIdentifier()` instead. This function is also used in `dbReadTable()`, `dbRemoveTable()`, and `dbListFields()` (#106, #132).
+
+- `sqliteBuildTableDefinition()` has been deprecated. Use `DBI::sqlCreateTable()` instead.
+
+- `sqliteQuickColumn()` has been deprecated. Use regular querying functions instead.
+
+- `fetch()` now raises deprecation warning and ignores the `row.names` argument -- it never converts a column to row names (#174).
+
+- `dbGetException()` now raises a deprecation warning and always returns `list(errorNum = 0L, errorMsg = "OK")`, because querying the last SQLite error only works if an error actually occurred (#129).
+
+- `dbSendPreparedQuery()` and `dbGetPreparedQuery()` have been reimplemented (with deprecation warning) using `dbSendQuery()`, `dbBind()` and `dbFetch()` for compatibility with existing packages (#100, #153). Please convert to the new API, because the old function may be removed completely very soon: They were never part of the official API, and are dangerous because they issue multiple queries. Both `dbSendPreparedQuery()` and `dbGetPreparedQuery()` ignore parameters not found in the query, with a warning (#174).
+
+- Reimplemented `dbListResults()` (with deprecation warning) for compatibility with existing packages (#154).
+
+- Soft-deprecated `dbGetInfo()`: The "Result" method is implemented by DBI, the methods for the other classes raise a warning (#137). It's now better to access the metadata with individual functions `dbHasCompleted()`, `dbGetRowCount()` and `dbGetRowsAffected()`.
+
+- All `summary()` methods have been removed: the same information is now displayed in the `show()` methods, which were previously pretty useless.
+
+
+## Compatibility fixes
+
+- The `raw` data type is supported in `dbWriteTable()`, creates a `TEXT` column with a warning (#173).
+
+- Numeric values for the `row.names` argument are converted to logical, with a warning (#170).
+
+- If the number of data frame columns matches the number of existing columns for `dbWriteTable(append = TRUE)`, columns will be matched by position for compatibility, with a warning in case of a name mismatch (#164).
+
+- `dbWriteTable()` supports `field.types` argument when creating a new table (#171).
+
+- Defined a dummy `dbGetQuery()` method (with signature `"NULL", "ANY"`) so that dependent packages can have `importMethodsFrom(RSQLite, dbGetQuery)` in their `NAMESPACE`. Also reexporting `dbGetQuery()` (#148) and `dbDriver()` (#147).
+
+- `sqliteCopyDatabase()` accepts character as `to` argument again, in this case a temporary connection is opened.
+
+- Reimplemented `dbWriteTable("SQLiteConnection", "character", "character")` for import of CSV files, using a function from the old codebase (#151).
+
+
+## Bug fixes
+
+- Fixed one-off glitch in error message issued by `dbBind()`.
+- Releasing opened result set if binding fails in `dbSendQuery()` (#89).
+
+
+## Performance
+
+- The `dbExistsTable()` function now works faster by filtering the list of tables using SQL (#166).
+
+
+## Documentation
+
+- Start on a basic vignette: `vignette("RSQLite")` (#50).
+
+- Fixed `dbExecute()` usage in examples.
+
+- Using both `":memory:"` and `":file::memory:"` in documentation.
+
+- Added additional documentation and unit tests for
   [autoincrement keys](https://www.sqlite.org/autoinc.html) (#119).
 
-- Use new-style Travis.
+- Removed old documentation (#121).
 
-- Use development version of `testthat`.
+
+## Internal
+
+- Using the `DBItest` package for testing (#105), with the new `constructor_relax_args` tweak.
+
+- Using new `sqlRownamesToColumn()` and `sqlColumnToRownames()` (rstats-db/DBI#91).
+
+- Using `astyle` for code formatting (#159), stripped space at end of line in all source files.
+
+- Tracking dependencies between source and header files (#138).
+
+- Moved all functions from headers to modules (#162).
+
+- Further refactoring and cleanup of C++ code (#162).
+
+- Fixed all warnings in tests (#157).
+
+- Also checking message wording for deprecation warnings (#157).
+
+- Using container-based builds on Travis.
+
+- Enabled AppVeyor testing.
+
+- Using development version of `testthat`.
+
+- Added upgrade script for sqlite3 sources to the `src-raw` directory.
 
 
 # Version 1.0.0

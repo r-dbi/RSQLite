@@ -19,6 +19,12 @@ public:
   SqliteResult(const SqliteConnectionPtr& pConn, const std::string& sql);
   ~SqliteResult();
 
+private:
+  void prepare(const std::string& sql);
+  void init_if_bound();
+  void init();
+  void cache_field_data();
+
 public:
   bool complete();
   int nrows();
@@ -34,9 +40,7 @@ private:
   int find_parameter(const std::string& name);
   void bind_parameter_pos(int i, int j, SEXP value_);
 
-  void init();
   void step();
-  void cache_field_data();
 
   Rcpp::List fetch_rows(int n_max, int& n);
   Rcpp::List peek_first_row();
@@ -53,6 +57,7 @@ private:
 private:
   static SEXPTYPE datatype_to_sexptype(const int field_type);
   static SEXPTYPE decltype_to_sexptype(const char* decl_type);
+
 };
 
 #endif // __RSQLSITE_SQLITE_RESULT__

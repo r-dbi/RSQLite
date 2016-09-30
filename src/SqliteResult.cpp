@@ -12,18 +12,10 @@ SqliteResult::SqliteResult(const SqliteConnectionPtr& pConn, const std::string& 
   : pConn_(pConn), pStatement_(NULL), complete_(false), ready_(false),
     nrows_(0), ncols_(0), rows_affected_(0), nparams_(0) {
 
-  int rc = sqlite3_prepare_v2(pConn_->conn(), sql.c_str(), sql.size() + 1,
-                              &pStatement_, NULL);
-
-  if (rc != SQLITE_OK) {
-    Rcpp::stop(pConn_->getException());
-  }
+  prepare(sql);
 
   try {
-    nparams_ = sqlite3_bind_parameter_count(pStatement_);
-    if (nparams_ == 0) {
-      init();
-    }
+    init_if_bound();
   } catch (...) {
     sqlite3_finalize(pStatement_);
     pStatement_ = NULL;
@@ -35,6 +27,49 @@ SqliteResult::~SqliteResult() {
   try {
     sqlite3_finalize(pStatement_);
   } catch (...) {}
+}
+
+
+// Initialization //////////////////////////////////////////////////////////////
+
+void SqliteResult::prepare(const std::string& sql) {
+  int rc = sqlite3_prepare_v2(pConn_->conn(), sql.c_str(), sql.size() + 1,
+                              &pStatement_, NULL);
+  if (rc != SQLITE_OK) {
+    Rcpp::stop(pConn_->getException());
+  }
+}
+
+void SqliteResult::init_if_bound() {
+  nparams_ = sqlite3_bind_parameter_count(pStatement_);
+  if (nparams_ == 0) {
+    init();
+  }
+}
+
+void SqliteResult::init() {
+  ready_ = true;
+  nrows_ = 0;
+  ncols_ = sqlite3_column_count(pStatement_);
+  complete_ = false;
+
+  step();
+  rows_affected_ = sqlite3_changes(pConn_->conn());
+  cache_field_data();
+}
+
+// We guess the correct R type for each column from the declared column type,
+// if possible.  The type of the column can be amended as new values come in,
+// but will be fixed after the first call to fetch().
+void SqliteResult::cache_field_data() {
+  types_.clear();
+  names_.clear();
+
+  int p = ncols_;
+  for (int j = 0; j < p; ++j) {
+    names_.push_back(sqlite3_column_name(pStatement_, j));
+    types_.push_back(NILSXP);
+  }
 }
 
 
@@ -259,17 +294,6 @@ void SqliteResult::bind_parameter_pos(const int i, const int j, const SEXP value
   }
 }
 
-void SqliteResult::init() {
-  ready_ = true;
-  nrows_ = 0;
-  ncols_ = sqlite3_column_count(pStatement_);
-  complete_ = false;
-
-  step();
-  rows_affected_ = sqlite3_changes(pConn_->conn());
-  cache_field_data();
-}
-
 void SqliteResult::step() {
   nrows_++;
   int rc = sqlite3_step(pStatement_);
@@ -278,20 +302,6 @@ void SqliteResult::step() {
     complete_ = true;
   } else if (rc != SQLITE_ROW) {
     Rcpp::stop(pConn_->getException());
-  }
-}
-
-// We guess the correct R type for each column from the declared column type,
-// if possible.  The type of the column can be amended as new values come in,
-// but will be fixed after the first call to fetch().
-void SqliteResult::cache_field_data() {
-  types_.clear();
-  names_.clear();
-
-  int p = ncols_;
-  for (int j = 0; j < p; ++j) {
-    names_.push_back(sqlite3_column_name(pStatement_, j));
-    types_.push_back(NILSXP);
   }
 }
 

@@ -78,11 +78,14 @@ std::vector<SEXPTYPE> SqliteResultImpl::get_initial_field_types(const int ncols)
 }
 
 void SqliteResultImpl::after_bind() {
+  init();
+  step();
+}
+
+void SqliteResultImpl::init() {
   ready_ = true;
   nrows_ = 0;
   complete_ = false;
-
-  step();
 }
 
 

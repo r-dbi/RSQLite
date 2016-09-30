@@ -7,16 +7,21 @@
 
 class SqliteResultImpl : public boost::noncopyable {
 private:
+  // Wrapped pointer
   sqlite3* conn;
   sqlite3_stmt* stmt;
+
+  // State
   bool complete_;
   bool ready_;
   int nrows_;
-  int ncols_;
   int rows_affected_;
-  int nparams_;
   std::vector<SEXPTYPE> types_;
+
+  // Cache
   std::vector<std::string> names_;
+  int ncols_;
+  int nparams_;
 
 public:
   SqliteResultImpl(sqlite3* conn_, const std::string& sql);

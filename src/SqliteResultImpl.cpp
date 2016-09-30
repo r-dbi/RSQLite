@@ -9,7 +9,7 @@
 
 SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
 : conn(conn_), stmt(NULL), complete_(false), ready_(false),
-  nrows_(0), ncols_(0), rows_affected_(0), nparams_(0) {
+  nrows_(0), rows_affected_(0), ncols_(0), nparams_(0) {
 
   prepare(sql);
 

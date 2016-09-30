@@ -4,6 +4,9 @@
 #include "affinity.h"
 
 
+
+// Construction ////////////////////////////////////////////////////////////////
+
 SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
 : conn(conn_), pStatement_(NULL), complete_(false), ready_(false),
   nrows_(0), ncols_(0), rows_affected_(0), nparams_(0) {
@@ -63,6 +66,21 @@ void SqliteResultImpl::cache_field_data() {
     names_.push_back(sqlite3_column_name(pStatement_, j));
     types_.push_back(NILSXP);
   }
+}
+
+
+// Publics /////////////////////////////////////////////////////////////////////
+
+bool SqliteResultImpl::complete() {
+  return complete_;
+}
+
+int SqliteResultImpl::nrows() {
+  return nrows_;
+}
+
+int SqliteResultImpl::rows_affected() {
+  return rows_affected_;
 }
 
 void SqliteResultImpl::bind_impl(const List& params) {

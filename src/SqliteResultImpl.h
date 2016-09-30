@@ -29,19 +29,9 @@ private:
   void cache_field_data();
 
 public:
-  bool complete() {
-    return complete_;
-  }
-
-  int nrows() {
-    return nrows_;
-  }
-
-  int rows_affected() {
-    return rows_affected_;
-  }
-
-public:
+  bool complete();
+  int nrows();
+  int rows_affected();
   IntegerVector find_params_impl(const CharacterVector& param_names);
   void bind_impl(const List& params);
   void bind_rows_impl(const List& params);

@@ -20,19 +20,9 @@ public:
   ~SqliteResult();
 
 public:
-  bool complete() {
-    return complete_;
-  }
-
-  int nrows() {
-    return nrows_;
-  }
-
-  int rows_affected() {
-    return rows_affected_;
-  }
-
-public:
+  bool complete();
+  int nrows();
+  int rows_affected();
   void bind(const Rcpp::List& params);
   Rcpp::IntegerVector find_params(const Rcpp::CharacterVector& param_names);
   void bind_rows(const Rcpp::List& params);

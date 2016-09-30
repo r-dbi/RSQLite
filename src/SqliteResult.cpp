@@ -39,6 +39,18 @@ SqliteResult::~SqliteResult() {
 
 // Publics /////////////////////////////////////////////////////////////////////
 
+bool SqliteResult::complete() {
+  return complete_;
+}
+
+int SqliteResult::nrows() {
+  return nrows_;
+}
+
+int SqliteResult::rows_affected() {
+  return rows_affected_;
+}
+
 void SqliteResult::bind(const Rcpp::List& params) {
   if (params.size() != nparams_) {
     Rcpp::stop("Query requires %i params; %i supplied.",

@@ -142,7 +142,7 @@ void SqliteResult::bind_rows(const List& params) {
     sqlite3_clear_bindings(pStatement_);
 
     for (int j = 0; j < params.size(); ++j) {
-      bind_parameter(i, j, std::string(names[j]), static_cast<SEXPREC*>(params[j]));
+      bind_parameter(i, j, names[j], static_cast<SEXPREC*>(params[j]));
     }
 
     step();

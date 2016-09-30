@@ -57,23 +57,45 @@ private:
   List fetch_rows(int n_max, int& n);
   void step();
   List peek_first_row();
-  List alloc_missing_cols(List data, int n);
 
-  bool set_col_values(List& out, const int i, int& n, const int n_max);
-  List finalize_cols(List out, int i, int& n);
+  class chunk {
+    sqlite3_stmt* stmt;
+    const int n_max;
+    int i, n;
+    List out;
+    std::vector<SEXPTYPE> types;
 
-  void set_col_value(SEXP& col, const int i, const int j, const int n);
-  SEXP alloc_col(const unsigned int type, const int i, const int n);
-  void fill_default_col_value(SEXP col, const int i);
-  void fill_col_value(const SEXP col, const int i, const int j);
+  public:
+    chunk(sqlite3_stmt* stmt, std::vector<std::string> names, const int n_max, const std::vector<SEXPTYPE>& types);
 
-  void set_int_value(const SEXP col, const int i, const int j) const;
-  void set_real_value(const SEXP col, const int i, const int j) const;
-  void set_string_value(const SEXP col, const int i, const int j) const;
-  void set_raw_value(SEXP col, const int i, const int j) const ;
+  private:
+    int init_n() const;
 
-  static unsigned int datatype_to_sexptype(const int field_type);
-  static unsigned int decltype_to_sexptype(const char* decl_type);
+  public:
+    bool set_col_values();
+    void advance();
+
+    List get_data();
+    std::vector<SEXPTYPE> get_types();
+
+  private:
+    void set_col_value(SEXP& col, const int j);
+    void finalize_cols();
+
+    void alloc_missing_cols();
+    SEXP alloc_col(const unsigned int type);
+    void fill_default_col_value(SEXP col);
+    static void fill_default_col_value(SEXP col, const int i_);
+    void fill_col_value(const SEXP col, const int j);
+
+    void set_int_value(const SEXP col, const int j) const;
+    void set_real_value(const SEXP col, const int j) const;
+    void set_string_value(const SEXP col, const int j) const;
+    void set_raw_value(SEXP col, const int j) const ;
+
+    static unsigned int datatype_to_sexptype(const int field_type);
+    static unsigned int decltype_to_sexptype(const char* decl_type);
+  };
 
   void raise_sqlite_exception() const;
   static void raise_sqlite_exception(sqlite3* conn);

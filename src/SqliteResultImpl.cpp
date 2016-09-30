@@ -262,24 +262,18 @@ void SqliteResultImpl::bind_parameter_pos(const int i, const int j, const SEXP v
 List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
-  List out = dfCreate(cache.names_, n);
+  chunk data(stmt, cache.names_, n_max, types_);
 
-  int i = 0;
   while (!complete_) {
-    if (!set_col_values(out, i, n, n_max))
+    if (!data.set_col_values())
       break;
 
     step();
-    ++i;
-
-    if (i % 1000 == 0)
-      checkUserInterrupt();
+    data.advance();
   }
 
-  // Trim back to what we actually used
-  out = finalize_cols(out, i, n);
-
-  return out;
+  types_ = data.get_types();
+  return data.get_data();
 }
 
 void SqliteResultImpl::step() {
@@ -296,15 +290,34 @@ void SqliteResultImpl::step() {
 }
 
 List SqliteResultImpl::peek_first_row() {
-  int n = 1;
-  List out = dfCreate(cache.names_, n);
-  set_col_values(out, 0, n, n);
-  out = finalize_cols(out, 0, n);
+  chunk data(stmt, cache.names_, 1, types_);
 
-  return out;
+  data.set_col_values();
+  // Not calling data.advance(), remains a zero-row data frame
+
+  types_ = data.get_types();
+  return data.get_data();
 }
 
-bool SqliteResultImpl::set_col_values(List& out, const int i, int& n, const int n_max) {
+SqliteResultImpl::chunk::chunk(sqlite3_stmt* stmt_, std::vector<std::string> names_, const int n_max_,
+                               const std::vector<SEXPTYPE>& types_)
+: stmt(stmt_),
+  n_max(n_max_),
+  i(0),
+  n(init_n()),
+  out(dfCreate(names_, n)),
+  types(types_)
+{
+}
+
+int SqliteResultImpl::chunk::init_n() const {
+  if (n_max >= 0)
+    return n_max;
+
+  return 100;
+}
+
+bool SqliteResultImpl::chunk::set_col_values() {
   if (i >= n) {
     if (n_max >= 0)
       return false;
@@ -313,42 +326,56 @@ bool SqliteResultImpl::set_col_values(List& out, const int i, int& n, const int 
     out = dfResize(out, n);
   }
 
-  for (int j = 0; j < cache.ncols_; ++j) {
+  for (int j = 0; j < out.length(); ++j) {
     SEXP col = out[j];
-    set_col_value(col, i, j, n);
+    set_col_value(col, j);
     out[j] = col;
   }
 
   return true;
 }
 
-List SqliteResultImpl::finalize_cols(List out, int i, int& n) {
+void SqliteResultImpl::chunk::advance() {
+  ++i;
+
+  if (i % 1000 == 0)
+    checkUserInterrupt();
+}
+
+List SqliteResultImpl::chunk::get_data() {
+  // Trim back to what we actually used
+  finalize_cols();
+  return out;
+}
+
+std::vector<SEXPTYPE> SqliteResultImpl::chunk::get_types() {
+  return types;
+}
+
+void SqliteResultImpl::chunk::finalize_cols() {
   if (i < n) {
     out = dfResize(out, i);
     n = i;
   }
 
-  out = alloc_missing_cols(out, n);
-
-  return out;
+  alloc_missing_cols();
 }
 
-List SqliteResultImpl::alloc_missing_cols(List data, int n) {
+void SqliteResultImpl::chunk::alloc_missing_cols() {
   // Create data for columns where all values were NULL (or for all columns
   // in the case of a 0-row data frame)
-  for (int j = 0; j < cache.ncols_; ++j) {
-    if (types_[j] == NILSXP) {
-      types_[j] =
+  for (int j = 0; j < out.length(); ++j) {
+    if (types[j] == NILSXP) {
+      types[j] =
       decltype_to_sexptype(sqlite3_column_decltype(stmt, j));
       // std::cerr << j << ": " << types_[j] << "\n";
-      data[j] = alloc_col(types_[j], n, n);
+      out[j] = alloc_col(types[j]);
     }
   }
-  return data;
 }
 
-void SqliteResultImpl::set_col_value(SEXP& col, const int i, const int j, const int n) {
-  SEXPTYPE type = types_[j];
+void SqliteResultImpl::chunk::set_col_value(SEXP& col, const int j) {
+  SEXPTYPE type = types[j];
   int column_type = sqlite3_column_type(stmt, j);
 
   // std::cerr << "column_type: " << column_type << "\n";
@@ -364,21 +391,21 @@ void SqliteResultImpl::set_col_value(SEXP& col, const int i, const int j, const 
     if (type == NILSXP)
       return;
     else {
-      col = alloc_col(type, i, n);
-      types_[j] = type;
+      col = alloc_col(type);
+      types[j] = type;
     }
   }
 
   if (column_type == SQLITE_NULL) {
-    fill_default_col_value(col, i);
+    fill_default_col_value(col);
   }
   else {
-    fill_col_value(col, i, j);
+    fill_col_value(col, j);
   }
   return;
 }
 
-SEXP SqliteResultImpl::alloc_col(const SEXPTYPE type, const int i, const int n) {
+SEXP SqliteResultImpl::chunk::alloc_col(const SEXPTYPE type) {
   SEXP col = Rf_allocVector(type, n);
   PROTECT(col);
   for (int i_ = 0; i_ < i; i_++) {
@@ -388,57 +415,61 @@ SEXP SqliteResultImpl::alloc_col(const SEXPTYPE type, const int i, const int n) 
   return col;
 }
 
-void SqliteResultImpl::fill_default_col_value(const SEXP col, const int i) {
+void SqliteResultImpl::chunk::fill_default_col_value(const SEXP col) {
+  fill_default_col_value(col, i);
+}
+
+void SqliteResultImpl::chunk::fill_default_col_value(const SEXP col, const int i_) {
   switch (TYPEOF(col)) {
   case LGLSXP:
-    LOGICAL(col)[i] = NA_LOGICAL;
+    LOGICAL(col)[i_] = NA_LOGICAL;
     break;
   case INTSXP:
-    INTEGER(col)[i] = NA_INTEGER;
+    INTEGER(col)[i_] = NA_INTEGER;
     break;
   case REALSXP:
-    REAL(col)[i] = NA_REAL;
+    REAL(col)[i_] = NA_REAL;
     break;
   case STRSXP:
-    SET_STRING_ELT(col, i, NA_STRING);
+    SET_STRING_ELT(col, i_, NA_STRING);
     break;
   case VECSXP:
-    SET_VECTOR_ELT(col, i, RawVector(0));
+    SET_VECTOR_ELT(col, i_, RawVector(0));
     break;
   }
 }
 
-void SqliteResultImpl::fill_col_value(const SEXP col, const int i, const int j) {
+void SqliteResultImpl::chunk::fill_col_value(const SEXP col, const int j) {
   switch (TYPEOF(col)) {
   case INTSXP:
-    set_int_value(col, i, j);
+    set_int_value(col, j);
     break;
   case REALSXP:
-    set_real_value(col, i, j);
+    set_real_value(col, j);
     break;
   case STRSXP:
-    set_string_value(col, i, j);
+    set_string_value(col, j);
     break;
   case VECSXP:
-    set_raw_value(col, i, j);
+    set_raw_value(col, j);
     break;
   }
 }
 
-void SqliteResultImpl::set_int_value(const SEXP col, const int i, const int j) const {
+void SqliteResultImpl::chunk::set_int_value(const SEXP col, const int j) const {
   INTEGER(col)[i] = sqlite3_column_int(stmt, j);
 }
 
-void SqliteResultImpl::set_real_value(const SEXP col, const int i, const int j) const {
+void SqliteResultImpl::chunk::set_real_value(const SEXP col, const int j) const {
   REAL(col)[i] = sqlite3_column_double(stmt, j);
 }
 
-void SqliteResultImpl::set_string_value(const SEXP col, const int i, const int j) const {
+void SqliteResultImpl::chunk::set_string_value(const SEXP col, const int j) const {
   const char* const text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, j));
   SET_STRING_ELT(col, i, Rf_mkCharCE(text, CE_UTF8));
 }
 
-void SqliteResultImpl::set_raw_value(const SEXP col, const int i, const int j) const {
+void SqliteResultImpl::chunk::set_raw_value(const SEXP col, const int j) const {
   int size = sqlite3_column_bytes(stmt, j);
   const void* blob = sqlite3_column_blob(stmt, j);
 
@@ -448,7 +479,7 @@ void SqliteResultImpl::set_raw_value(const SEXP col, const int i, const int j) c
   SET_VECTOR_ELT(col, i, bytes);
 }
 
-SEXPTYPE SqliteResultImpl::datatype_to_sexptype(const int field_type) {
+SEXPTYPE SqliteResultImpl::chunk::datatype_to_sexptype(const int field_type) {
   switch (field_type) {
   case SQLITE_INTEGER:
     return INTSXP;
@@ -469,7 +500,7 @@ SEXPTYPE SqliteResultImpl::datatype_to_sexptype(const int field_type) {
   }
 }
 
-SEXPTYPE SqliteResultImpl::decltype_to_sexptype(const char* decl_type) {
+SEXPTYPE SqliteResultImpl::chunk::decltype_to_sexptype(const char* decl_type) {
   if (decl_type == NULL)
     return LGLSXP;
 

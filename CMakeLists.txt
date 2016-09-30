@@ -11,6 +11,8 @@ include_directories(${R_LIBRARY}/plogr/include)
 include_directories(${R_INCLUDE})
 include_directories(src)
 
+add_definitions(-D__CLION__)
+
 
 file(GLOB SOURCE_FILES src/*.cpp src/*.c)
 add_library(RSQLite ${SOURCE_FILES})

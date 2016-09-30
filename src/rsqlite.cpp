@@ -14,3 +14,8 @@ CharacterVector rsqliteVersion() {
       _["library"] = sqlite3_libversion()
     );
 }
+
+// [[Rcpp::export]]
+void init_logging(const std::string& log_level) {
+  plog::init_r(log_level);
+}

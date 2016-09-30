@@ -25,6 +25,7 @@ Imports:
     methods,
     DBI (>= 0.4-9),
     Rcpp (>= 0.11.4.2)
+LinkingTo: Rcpp, BH, plogr
 Remotes: rstats-db/DBI, rstats-db/DBItest@production, hadley/testthat
 Encoding: UTF-8
 License: LGPL (>= 2)
@@ -47,6 +48,5 @@ Collate:
     'transactions.R'
     'utils.R'
     'zzz.R'
-LinkingTo: Rcpp, BH
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1.9000

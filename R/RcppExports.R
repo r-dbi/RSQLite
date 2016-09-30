@@ -74,3 +74,7 @@ rsqliteVersion <- function() {
     .Call('RSQLite_rsqliteVersion', PACKAGE = 'RSQLite')
 }
 
+init_logging <- function(log_level) {
+    invisible(.Call('RSQLite_init_logging', PACKAGE = 'RSQLite', log_level))
+}
+

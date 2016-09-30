@@ -7,6 +7,7 @@
 #endif
 
 #include <Rcpp.h>
+#include <plogr.h>
 
 using namespace Rcpp;
 

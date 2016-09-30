@@ -128,6 +128,9 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
          cache.nparams_, params.size());
   }
 
+  if (cache.nparams_ == 0)
+    return;
+
   SEXP first_col = params[0];
   int n = Rf_length(first_col);
 

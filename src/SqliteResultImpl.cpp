@@ -69,6 +69,7 @@ void SqliteResultImpl::cache_field_data() {
 }
 
 
+
 // Publics /////////////////////////////////////////////////////////////////////
 
 bool SqliteResultImpl::complete() {
@@ -81,6 +82,20 @@ int SqliteResultImpl::nrows() {
 
 int SqliteResultImpl::rows_affected() {
   return rows_affected_;
+}
+
+IntegerVector SqliteResultImpl::find_params_impl(const CharacterVector& param_names) {
+  int p = param_names.length();
+  IntegerVector res(p);
+
+  for (int j = 0; j < p; ++j) {
+    int pos = find_parameter(CHAR(param_names[j]));
+    if (pos == 0)
+      pos = NA_INTEGER;
+    res[j] = pos;
+  }
+
+  return res;
 }
 
 void SqliteResultImpl::bind_impl(const List& params) {
@@ -126,6 +141,43 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
   }
 }
 
+List SqliteResultImpl::fetch_impl(const int n_max) {
+  if (!ready_)
+    stop("Query needs to be bound before fetching");
+
+  int n = 0;
+  List out;
+
+  if (n_max != 0)
+    out = fetch_rows(n_max, n);
+  else
+    out = peek_first_row();
+
+  out = alloc_missing_cols(out, n);
+
+  return out;
+}
+
+List SqliteResultImpl::get_column_info_impl() {
+  peek_first_row();
+
+  CharacterVector names(ncols_);
+  for (int i = 0; i < ncols_; i++) {
+    names[i] = names_[i];
+  }
+
+  CharacterVector types(ncols_);
+  for (int i = 0; i < ncols_; i++) {
+    types[i] = Rf_type2char(types_[i]);
+  }
+
+  return List::create(names, types);
+}
+
+
+
+// Privates ////////////////////////////////////////////////////////////////////
+
 void SqliteResultImpl::bind_parameter(const int i, const int j0, const std::string& name, const SEXP values_) {
   if (name != "") {
     int j = find_parameter(name);
@@ -136,20 +188,6 @@ void SqliteResultImpl::bind_parameter(const int i, const int j0, const std::stri
     // sqlite parameters are 1-indexed
     bind_parameter_pos(i, j0 + 1, values_);
   }
-}
-
-IntegerVector SqliteResultImpl::find_params_impl(const CharacterVector& param_names) {
-  int p = param_names.length();
-  IntegerVector res(p);
-
-  for (int j = 0; j < p; ++j) {
-    int pos = find_parameter(CHAR(param_names[j]));
-    if (pos == 0)
-      pos = NA_INTEGER;
-    res[j] = pos;
-  }
-
-  return res;
 }
 
 int SqliteResultImpl::find_parameter(const std::string& name) {
@@ -215,23 +253,6 @@ void SqliteResultImpl::bind_parameter_pos(const int i, const int j, const SEXP v
     stop("Don't know how to handle parameter of type %s.",
                Rf_type2char(TYPEOF(value_)));
   }
-}
-
-List SqliteResultImpl::fetch_impl(const int n_max) {
-  if (!ready_)
-    stop("Query needs to be bound before fetching");
-
-  int n = 0;
-  List out;
-
-  if (n_max != 0)
-    out = fetch_rows(n_max, n);
-  else
-    out = peek_first_row();
-
-  out = alloc_missing_cols(out, n);
-
-  return out;
 }
 
 List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
@@ -397,22 +418,6 @@ void SqliteResultImpl::set_raw_value(const SEXP col, const int i, const int j) {
   memcpy(RAW(bytes), blob, size);
 
   SET_VECTOR_ELT(col, i, bytes);
-}
-
-List SqliteResultImpl::get_column_info_impl() {
-  peek_first_row();
-
-  CharacterVector names(ncols_);
-  for (int i = 0; i < ncols_; i++) {
-    names[i] = names_[i];
-  }
-
-  CharacterVector types(ncols_);
-  for (int i = 0; i < ncols_; i++) {
-    types[i] = Rf_type2char(types_[i]);
-  }
-
-  return List::create(names, types);
 }
 
 SEXPTYPE SqliteResultImpl::datatype_to_sexptype(const int field_type) {

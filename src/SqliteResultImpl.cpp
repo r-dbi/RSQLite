@@ -156,7 +156,7 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
       bind_parameter(i, j, CHAR(names[j]), static_cast<SEXPREC*>(params[j]));
     }
 
-    step();
+    after_bind();
   }
 }
 

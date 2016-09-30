@@ -213,7 +213,7 @@ int SqliteResultImpl::find_parameter(const std::string& name) {
 }
 
 void SqliteResultImpl::bind_parameter_pos(const int i, const int j, const SEXP value_) {
-  // std::cerr << "TYPEOF(value_): " << TYPEOF(value_) << "\n";
+  LOG_VERBOSE << "TYPEOF(value_): " << TYPEOF(value_) << "\n";
   if (TYPEOF(value_) == LGLSXP) {
     LogicalVector value(value_);
     if (value[i] == NA_LOGICAL) {

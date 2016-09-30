@@ -71,7 +71,7 @@ void SqliteDataFrame::alloc_missing_cols() {
     if (types[j] == NILSXP) {
       types[j] =
       decltype_to_sexptype(sqlite3_column_decltype(stmt, j));
-      // std::cerr << j << ": " << types_[j] << "\n";
+      LOG_VERBOSE << j << ": " << types[j] << "\n";
       out[j] = alloc_col(types[j]);
     }
   }
@@ -81,13 +81,13 @@ void SqliteDataFrame::set_col_value(SEXP& col, const int j) {
   SEXPTYPE type = types[j];
   int column_type = sqlite3_column_type(stmt, j);
 
-  // std::cerr << "column_type: " << column_type << "\n";
-  // std::cerr << "type: " << type << "\n";
+  LOG_VERBOSE << "column_type: " << column_type << "\n";
+  LOG_VERBOSE << "type: " << type << "\n";
 
   if (type == NILSXP) {
-    // std::cerr << "datatype_to_sexptype\n";
+    LOG_VERBOSE << "datatype_to_sexptype\n";
     type = datatype_to_sexptype(column_type);
-    // std::cerr << "type: " << type << "\n";
+    LOG_VERBOSE << "type: " << type << "\n";
   }
 
   if (Rf_isNull(col)) {

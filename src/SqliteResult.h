@@ -61,6 +61,8 @@ private:
 private:
   static SEXPTYPE datatype_to_sexptype(const int field_type);
   static SEXPTYPE decltype_to_sexptype(const char* decl_type);
+
+  IntegerVector find_params_impl(const CharacterVector& param_names);
 };
 
 #endif // __RSQLSITE_SQLITE_RESULT__

@@ -145,7 +145,7 @@ IntegerVector SqliteResult::find_params_impl(const CharacterVector& param_names)
   IntegerVector res(p);
 
   for (int j = 0; j < p; ++j) {
-    int pos = find_parameter(std::string(param_names[j]));
+    int pos = find_parameter(CHAR(param_names[j]));
     if (pos == 0)
       pos = NA_INTEGER;
     res[j] = pos;
@@ -160,7 +160,7 @@ void SqliteResult::bind_impl(const List& params) {
 
   CharacterVector names = params.attr("names");
   for (int j = 0; j < params.size(); ++j) {
-    bind_parameter(0, j, std::string(names[j]), static_cast<SEXPREC*>(params[j]));
+    bind_parameter(0, j, CHAR(names[j]), static_cast<SEXPREC*>(params[j]));
   }
 }
 
@@ -170,15 +170,14 @@ void SqliteResult::bind_rows_impl(const List& params) {
 
   rows_affected_ = 0;
 
-  CharacterVector names_ = params.attr("names");
-  std::vector<std::string> names(names_.begin(), names_.end());
+  CharacterVector names = params.attr("names");
 
   for (int i = 0; i < n; ++i) {
     sqlite3_reset(pStatement_);
     sqlite3_clear_bindings(pStatement_);
 
     for (int j = 0; j < params.size(); ++j) {
-      bind_parameter(i, j, names[j], static_cast<SEXPREC*>(params[j]));
+      bind_parameter(i, j, CHAR(names[j]), static_cast<SEXPREC*>(params[j]));
     }
 
     step();

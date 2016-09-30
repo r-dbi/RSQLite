@@ -72,7 +72,7 @@ void SqliteDataFrame::alloc_missing_cols() {
   for (int j = 0; j < out.length(); ++j) {
     if (types[j] == NILSXP) {
       types[j] =
-      decltype_to_sexptype(sqlite3_column_decltype(SqliteDataFrame::stmt, j));
+      decltype_to_sexptype(sqlite3_column_decltype(stmt, j));
       // std::cerr << j << ": " << types_[j] << "\n";
       out[j] = alloc_col(types[j]);
     }
@@ -81,7 +81,7 @@ void SqliteDataFrame::alloc_missing_cols() {
 
 void SqliteDataFrame::set_col_value(SEXP& col, const int j) {
   SEXPTYPE type = types[j];
-  int column_type = sqlite3_column_type(SqliteDataFrame::stmt, j);
+  int column_type = sqlite3_column_type(stmt, j);
 
   // std::cerr << "column_type: " << column_type << "\n";
   // std::cerr << "type: " << type << "\n";
@@ -162,21 +162,21 @@ void SqliteDataFrame::fill_col_value(const SEXP col, const int j) {
 }
 
 void SqliteDataFrame::set_int_value(const SEXP col, const int j) const {
-  INTEGER(col)[i] = sqlite3_column_int(SqliteDataFrame::stmt, j);
+  INTEGER(col)[i] = sqlite3_column_int(stmt, j);
 }
 
 void SqliteDataFrame::set_real_value(const SEXP col, const int j) const {
-  REAL(col)[i] = sqlite3_column_double(SqliteDataFrame::stmt, j);
+  REAL(col)[i] = sqlite3_column_double(stmt, j);
 }
 
 void SqliteDataFrame::set_string_value(const SEXP col, const int j) const {
-  const char* const text = reinterpret_cast<const char*>(sqlite3_column_text(SqliteDataFrame::stmt, j));
+  const char* const text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, j));
   SET_STRING_ELT(col, i, Rf_mkCharCE(text, CE_UTF8));
 }
 
 void SqliteDataFrame::set_raw_value(const SEXP col, const int j) const {
-  int size = sqlite3_column_bytes(SqliteDataFrame::stmt, j);
-  const void* blob = sqlite3_column_blob(SqliteDataFrame::stmt, j);
+  int size = sqlite3_column_bytes(stmt, j);
+  const void* blob = sqlite3_column_blob(stmt, j);
 
   SEXP bytes = Rf_allocVector(RAWSXP, size);
   memcpy(RAW(bytes), blob, size);

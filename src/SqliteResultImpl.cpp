@@ -257,7 +257,7 @@ void SqliteResultImpl::bind_parameter_pos(const int i, const int j, const SEXP v
       sqlite3_bind_null(stmt, j);
     } else {
       String value2 = value[i];
-      std::__cxx11::string value3(value2);
+      std::string value3(value2);
       sqlite3_bind_text(stmt, j, value3.data(), value3.size(),
                         SQLITE_TRANSIENT);
     }

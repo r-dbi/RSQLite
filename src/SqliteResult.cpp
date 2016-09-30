@@ -102,14 +102,7 @@ void SqliteResult::bind(const Rcpp::List& params) {
       Rcpp::stop("Parameter %i does not have length 1.", j + 1);
   }
 
-  sqlite3_reset(pStatement_);
-  sqlite3_clear_bindings(pStatement_);
-
-  Rcpp::CharacterVector names = params.attr("names");
-  for (int j = 0; j < params.size(); ++j) {
-    bind_parameter(0, j, std::string(names[j]), static_cast<SEXPREC*>(params[j]));
-  }
-
+  bind_impl(params);
   init();
 }
 
@@ -202,6 +195,16 @@ Rcpp::List SqliteResult::column_info() {
 
 
 // Privates ////////////////////////////////////////////////////////////////////
+
+void SqliteResult::bind_impl(const Rcpp::List& params) {
+  sqlite3_reset(pStatement_);
+  sqlite3_clear_bindings(pStatement_);
+
+  Rcpp::CharacterVector names = params.attr("names");
+  for (int j = 0; j < params.size(); ++j) {
+    bind_parameter(0, j, std::__cxx11::string(names[j]), static_cast<SEXPREC*>(params[j]));
+  }
+}
 
 void SqliteResult::bind_parameter(const int i, const int j0, const std::string& name, const SEXP values_) {
   if (name != "") {

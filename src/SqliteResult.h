@@ -36,6 +36,7 @@ public:
   Rcpp::List column_info();
 
 private:
+  void bind_impl(const Rcpp::List& params);
   void bind_parameter(int i, int j, const std::string& name, SEXP values_);
   int find_parameter(const std::string& name);
   void bind_parameter_pos(int i, int j, SEXP value_);

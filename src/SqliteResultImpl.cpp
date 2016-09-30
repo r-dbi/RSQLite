@@ -1,10 +1,23 @@
-//
-// Created by muelleki on 30.09.16.
-//
-
-#include "SqliteResult.h"
 #include <RSQLite.h>
 #include "SqliteResultImpl.h"
+#include "SqliteUtils.h"
+#include "affinity.h"
+
+
+SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
+: conn(conn_), pStatement_(NULL), complete_(false), ready_(false),
+  nrows_(0), ncols_(0), rows_affected_(0), nparams_(0) {
+
+  prepare(sql);
+
+  try {
+    init_if_bound();
+  } catch (...) {
+    sqlite3_finalize(pStatement_);
+    pStatement_ = NULL;
+    throw;
+  }
+}
 
 SqliteResultImpl::~SqliteResultImpl() {
   try {
@@ -12,11 +25,11 @@ SqliteResultImpl::~SqliteResultImpl() {
   } catch (...) {}
 }
 
-void SqliteResultImpl::prepare(const std::__cxx11::string& sql) {
-  int rc = sqlite3_prepare_v2(SqliteResult::pConn_->conn(), sql.c_str(), sql.size() + 1,
+void SqliteResultImpl::prepare(const std::string& sql) {
+  int rc = sqlite3_prepare_v2(conn, sql.c_str(), sql.size() + 1,
                               &pStatement_, NULL);
   if (rc != SQLITE_OK) {
-    stop(SqliteResult::pConn_->getException());
+    raise_sqlite_exception();
   }
 }
 
@@ -34,7 +47,7 @@ void SqliteResultImpl::init() {
   complete_ = false;
 
   step();
-  rows_affected_ = sqlite3_changes(SqliteResult::pConn_->conn());
+  rows_affected_ = sqlite3_changes(conn);
   cache_field_data();
 }
 
@@ -53,6 +66,11 @@ void SqliteResultImpl::cache_field_data() {
 }
 
 void SqliteResultImpl::bind_impl(const List& params) {
+  if (params.size() != nparams_) {
+    stop("Query requires %i params; %i supplied.",
+         nparams_, params.size());
+  }
+
   sqlite3_reset(pStatement_);
   sqlite3_clear_bindings(pStatement_);
 
@@ -63,6 +81,11 @@ void SqliteResultImpl::bind_impl(const List& params) {
 }
 
 void SqliteResultImpl::bind_rows_impl(const List& params) {
+  if (params.size() != nparams_) {
+    stop("Query requires %i params; %i supplied.",
+         nparams_, params.size());
+  }
+
   SEXP first_col = params[0];
   int n = Rf_length(first_col);
 
@@ -79,7 +102,7 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
     }
 
     step();
-    rows_affected_ += sqlite3_changes(SqliteResult::pConn_->conn());
+    rows_affected_ += sqlite3_changes(conn);
   }
 }
 
@@ -231,7 +254,7 @@ void SqliteResultImpl::step() {
   if (rc == SQLITE_DONE) {
     complete_ = true;
   } else if (rc != SQLITE_ROW) {
-    stop(SqliteResult::pConn_->getException());
+    raise_sqlite_exception();
   }
 }
 
@@ -369,7 +392,7 @@ List SqliteResultImpl::get_column_info_impl() {
     types[i] = Rf_type2char(types_[i]);
   }
 
-  return ::Rcpp::Vector<19>::create(names, types);
+  return List::create(names, types);
 }
 
 SEXPTYPE SqliteResultImpl::datatype_to_sexptype(const int field_type) {
@@ -416,4 +439,8 @@ SEXPTYPE SqliteResultImpl::decltype_to_sexptype(const char* decl_type) {
 
   // Shouldn't occur
   return LGLSXP;
+}
+
+void SqliteResultImpl::raise_sqlite_exception() const {
+  stop(sqlite3_errmsg(conn));
 }

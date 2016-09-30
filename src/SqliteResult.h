@@ -2,15 +2,19 @@
 #define __RSQLSITE_SQLITE_RESULT__
 
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include "SqliteConnection.h"
 
+class SqliteResultImpl;
+
 class SqliteResult : boost::noncopyable {
   SqliteConnectionPtr pConn_;
+  boost::scoped_ptr<SqliteResultImpl> impl;
 
 public:
   SqliteResult(const SqliteConnectionPtr& pConn, const std::string& sql);
+  ~SqliteResult();
 
 public:
   bool complete();

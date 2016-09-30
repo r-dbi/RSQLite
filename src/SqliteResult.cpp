@@ -151,9 +151,6 @@ void SqliteResult::bind_rows(const List& params) {
 }
 
 List SqliteResult::fetch(const int n_max) {
-  if (!ready_)
-    stop("Query needs to be bound before fetching");
-
   return fetch_impl(n_max);
 
 }
@@ -259,6 +256,9 @@ void SqliteResult::bind_parameter_pos(const int i, const int j, const SEXP value
 }
 
 List SqliteResult::fetch_impl(const int n_max) {
+  if (!ready_)
+    stop("Query needs to be bound before fetching");
+
   int n = 0;
   List out;
 

@@ -154,17 +154,8 @@ Rcpp::List SqliteResult::fetch(const int n_max) {
   if (!ready_)
     Rcpp::stop("Query needs to be bound before fetching");
 
-  int n = 0;
-  Rcpp::List out;
+  return fetch_impl(n_max);
 
-  if (n_max != 0)
-    out = fetch_rows(n_max, n);
-  else
-    out = peek_first_row();
-
-  out = alloc_missing_cols(out, n);
-
-  return out;
 }
 
 Rcpp::List SqliteResult::column_info() {
@@ -295,6 +286,20 @@ void SqliteResult::bind_parameter_pos(const int i, const int j, const SEXP value
     Rcpp::stop("Don't know how to handle parameter of type %s.",
                Rf_type2char(TYPEOF(value_)));
   }
+}
+
+Rcpp::List SqliteResult::fetch_impl(const int n_max) {
+  int n = 0;
+  Rcpp::List out;
+
+  if (n_max != 0)
+    out = fetch_rows(n_max, n);
+  else
+    out = peek_first_row();
+
+  out = alloc_missing_cols(out, n);
+
+  return out;
 }
 
 void SqliteResult::step() {

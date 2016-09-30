@@ -41,6 +41,7 @@ private:
   int find_parameter(const std::string& name);
   void bind_parameter_pos(int i, int j, SEXP value_);
 
+  Rcpp::List fetch_impl(const int n_max);
   void step();
 
   Rcpp::List fetch_rows(int n_max, int& n);
@@ -58,7 +59,6 @@ private:
 private:
   static SEXPTYPE datatype_to_sexptype(const int field_type);
   static SEXPTYPE decltype_to_sexptype(const char* decl_type);
-
 };
 
 #endif // __RSQLSITE_SQLITE_RESULT__

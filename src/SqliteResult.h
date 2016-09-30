@@ -33,7 +33,7 @@ public:
   void bind(const Rcpp::List& params);
   void bind_rows(const Rcpp::List& params);
   Rcpp::List fetch(int n_max = -1);
-  Rcpp::List column_info();
+  Rcpp::List get_column_info();
 
 private:
   void bind_impl(const Rcpp::List& params);

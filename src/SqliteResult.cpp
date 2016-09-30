@@ -158,7 +158,7 @@ Rcpp::List SqliteResult::fetch(const int n_max) {
 
 }
 
-Rcpp::List SqliteResult::column_info() {
+Rcpp::List SqliteResult::get_column_info() {
   peek_first_row();
 
   Rcpp::CharacterVector names(ncols_);

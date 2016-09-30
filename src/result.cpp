@@ -53,7 +53,7 @@ int rsqlite_rows_affected(const XPtr<SqliteResult>& res) {
 
 // [[Rcpp::export]]
 List rsqlite_column_info(const XPtr<SqliteResult>& res) {
-  return res->column_info();
+  return res->get_column_info();
 }
 
 // [[Rcpp::export]]

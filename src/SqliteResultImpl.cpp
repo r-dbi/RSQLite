@@ -10,12 +10,13 @@
 SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
 : conn(conn_),
   stmt(prepare(conn_, sql)),
+  cache(stmt),
   complete_(false),
   ready_(false),
   nrows_(0),
   rows_affected_(0),
-  ncols_(sqlite3_column_count(stmt)),
-  nparams_(sqlite3_bind_parameter_count(stmt)) {
+  types_(get_initial_field_types(cache.ncols_))
+{
 
   try {
     init_if_bound();
@@ -24,6 +25,24 @@ SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
     stmt = NULL;
     throw;
   }
+}
+
+SqliteResultImpl::_cache::_cache(sqlite3_stmt* stmt)
+: names_(get_column_names(stmt)),
+  ncols_(names_.size()),
+  nparams_(sqlite3_bind_parameter_count(stmt))
+{
+}
+
+std::vector<std::string> SqliteResultImpl::_cache::get_column_names(sqlite3_stmt* stmt) {
+  int ncols = sqlite3_column_count(stmt);
+
+  std::vector<std::string> names;
+  for (int j = 0; j < ncols; ++j) {
+    names.push_back(sqlite3_column_name(stmt, j));
+  }
+
+  return names;
 }
 
 SqliteResultImpl::~SqliteResultImpl() {
@@ -44,8 +63,20 @@ sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
   return stmt;
 }
 
+// We guess the correct R type for each column from the declared column type,
+// if possible.  The type of the column can be amended as new values come in,
+// but will be fixed after the first call to fetch().
+std::vector<SEXPTYPE> SqliteResultImpl::get_initial_field_types(const int ncols) {
+  std::vector<SEXPTYPE> types;
+  for (int j = 0; j < ncols; ++j) {
+    types.push_back(NILSXP);
+  }
+
+  return types;
+}
+
 void SqliteResultImpl::init_if_bound() {
-  if (nparams_ == 0) {
+  if (cache.nparams_ == 0) {
     init();
   }
 }
@@ -57,21 +88,6 @@ void SqliteResultImpl::init() {
 
   step();
   rows_affected_ = sqlite3_changes(conn);
-  cache_field_data();
-}
-
-// We guess the correct R type for each column from the declared column type,
-// if possible.  The type of the column can be amended as new values come in,
-// but will be fixed after the first call to fetch().
-void SqliteResultImpl::cache_field_data() {
-  types_.clear();
-  names_.clear();
-
-  int p = ncols_;
-  for (int j = 0; j < p; ++j) {
-    names_.push_back(sqlite3_column_name(stmt, j));
-    types_.push_back(NILSXP);
-  }
 }
 
 
@@ -105,9 +121,9 @@ IntegerVector SqliteResultImpl::find_params_impl(const CharacterVector& param_na
 }
 
 void SqliteResultImpl::bind_impl(const List& params) {
-  if (params.size() != nparams_) {
+  if (params.size() != cache.nparams_) {
     stop("Query requires %i params; %i supplied.",
-         nparams_, params.size());
+         cache.nparams_, params.size());
   }
 
   sqlite3_reset(stmt);
@@ -122,9 +138,9 @@ void SqliteResultImpl::bind_impl(const List& params) {
 }
 
 void SqliteResultImpl::bind_rows_impl(const List& params) {
-  if (params.size() != nparams_) {
+  if (params.size() != cache.nparams_) {
     stop("Query requires %i params; %i supplied.",
-         nparams_, params.size());
+         cache.nparams_, params.size());
   }
 
   SEXP first_col = params[0];
@@ -167,13 +183,10 @@ List SqliteResultImpl::fetch_impl(const int n_max) {
 List SqliteResultImpl::get_column_info_impl() {
   peek_first_row();
 
-  CharacterVector names(ncols_);
-  for (int i = 0; i < ncols_; i++) {
-    names[i] = names_[i];
-  }
+  CharacterVector names(cache.names_.begin(), cache.names_.end());
 
-  CharacterVector types(ncols_);
-  for (int i = 0; i < ncols_; i++) {
+  CharacterVector types(cache.ncols_);
+  for (int i = 0; i < cache.ncols_; i++) {
     types[i] = Rf_type2char(types_[i]);
   }
 
@@ -264,7 +277,7 @@ void SqliteResultImpl::bind_parameter_pos(const int i, const int j, const SEXP v
 List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
-  List out = dfCreate(names_, n);
+  List out = dfCreate(cache.names_, n);
 
   int i = 0;
   while (!complete_) {
@@ -306,7 +319,7 @@ void SqliteResultImpl::step() {
 }
 
 List SqliteResultImpl::peek_first_row() {
-  List out = dfCreate(names_, 1);
+  List out = dfCreate(cache.names_, 1);
   set_col_values(out, 0, 1);
   out = dfResize(out, 0);
 
@@ -316,7 +329,7 @@ List SqliteResultImpl::peek_first_row() {
 List SqliteResultImpl::alloc_missing_cols(List data, int n) {
   // Create data for columns where all values were NULL (or for all columns
   // in the case of a 0-row data frame)
-  for (int j = 0; j < ncols_; ++j) {
+  for (int j = 0; j < cache.ncols_; ++j) {
     if (types_[j] == NILSXP) {
       types_[j] =
       decltype_to_sexptype(sqlite3_column_decltype(stmt, j));
@@ -328,7 +341,7 @@ List SqliteResultImpl::alloc_missing_cols(List data, int n) {
 }
 
 void SqliteResultImpl::set_col_values(List& out, const int i, const int n) {
-  for (int j = 0; j < ncols_; ++j) {
+  for (int j = 0; j < cache.ncols_; ++j) {
     SEXP col = out[j];
     set_col_value(col, i, j, n);
     out[j] = col;

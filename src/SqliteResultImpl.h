@@ -11,6 +11,17 @@ private:
   sqlite3* conn;
   sqlite3_stmt* stmt;
 
+  // Cache
+  struct _cache {
+    const std::vector<std::string> names_;
+    const int ncols_;
+    const int nparams_;
+
+    _cache(sqlite3_stmt* stmt);
+
+    static std::vector<std::string> get_column_names(sqlite3_stmt* stmt);
+  } cache;
+
   // State
   bool complete_;
   bool ready_;
@@ -18,20 +29,15 @@ private:
   int rows_affected_;
   std::vector<SEXPTYPE> types_;
 
-  // Cache
-  const int ncols_;
-  const int nparams_;
-  std::vector<std::string> names_;
-
 public:
   SqliteResultImpl(sqlite3* conn_, const std::string& sql);
   ~SqliteResultImpl();
 
 private:
   static sqlite3_stmt* prepare(sqlite3* conn, const std::string& sql);
+  static std::vector<SEXPTYPE> get_initial_field_types(const int ncols);
   void init_if_bound();
   void init();
-  void cache_field_data();
 
 public:
   bool complete();

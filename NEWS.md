@@ -1,3 +1,9 @@
+## RSQLite 1.0.9012 (2016-09-30)
+
+- New maintainer: Kirill Müller. @hadley: please confirm.
+- Current revdep checks (#158).
+
+
 # RSQLite 1.1 release candidate
 
 - New maintainer: Kirill Müller.

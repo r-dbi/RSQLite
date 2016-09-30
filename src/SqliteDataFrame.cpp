@@ -47,14 +47,12 @@ void SqliteDataFrame::advance() {
     checkUserInterrupt();
 }
 
-List SqliteDataFrame::get_data() {
+List SqliteDataFrame::get_data(std::vector<SEXPTYPE>& types_) {
   // Trim back to what we actually used
   finalize_cols();
-  return out;
-}
 
-std::vector<SEXPTYPE> SqliteDataFrame::get_types() {
-  return types;
+  types_ = this->types;
+  return out;
 }
 
 void SqliteDataFrame::finalize_cols() {

@@ -271,8 +271,7 @@ List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
     data.advance();
   }
 
-  types_ = data.get_types();
-  return data.get_data();
+  return data.get_data(types_);
 }
 
 void SqliteResultImpl::step() {
@@ -294,8 +293,7 @@ List SqliteResultImpl::peek_first_row() {
   data.set_col_values();
   // Not calling data.advance(), remains a zero-row data frame
 
-  types_ = data.get_types();
-  return data.get_data();
+  return data.get_data(types_);
 }
 
 void SqliteResultImpl::raise_sqlite_exception() const {

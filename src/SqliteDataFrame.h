@@ -21,8 +21,7 @@ public:
   bool set_col_values();
   void advance();
 
-  List get_data();
-  std::vector<SEXPTYPE> get_types();
+  List get_data(std::vector<SEXPTYPE>& types);
 
 private:
   void set_col_value(SEXP& col, const int j);

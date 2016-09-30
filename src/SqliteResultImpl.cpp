@@ -119,20 +119,7 @@ IntegerVector SqliteResultImpl::find_params_impl(const CharacterVector& param_na
 }
 
 void SqliteResultImpl::bind_impl(const List& params) {
-  if (params.size() != cache.nparams_) {
-    stop("Query requires %i params; %i supplied.",
-         cache.nparams_, params.size());
-  }
-
-  sqlite3_reset(stmt);
-  sqlite3_clear_bindings(stmt);
-
-  CharacterVector names = params.attr("names");
-  for (int j = 0; j < params.size(); ++j) {
-    bind_parameter(0, j, CHAR(names[j]), static_cast<SEXPREC*>(params[j]));
-  }
-
-  after_bind();
+  bind_rows_impl(params);
 }
 
 void SqliteResultImpl::bind_rows_impl(const List& params) {

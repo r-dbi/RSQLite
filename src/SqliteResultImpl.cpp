@@ -78,6 +78,8 @@ void SqliteResultImpl::bind_impl(const List& params) {
   for (int j = 0; j < params.size(); ++j) {
     bind_parameter(0, j, CHAR(names[j]), static_cast<SEXPREC*>(params[j]));
   }
+
+  init();
 }
 
 void SqliteResultImpl::bind_rows_impl(const List& params) {

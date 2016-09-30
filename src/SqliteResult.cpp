@@ -42,7 +42,6 @@ void SqliteResult::bind(const List& params) {
   }
 
   impl->bind_impl(params);
-  impl->init();
 }
 
 void SqliteResult::bind_rows(const List& params) {

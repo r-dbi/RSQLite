@@ -39,6 +39,7 @@ private:
   void bind_impl(const List& params);
   void bind_rows_impl(const List& params);
   void bind_parameter(int i, int j, const std::string& name, SEXP values_);
+  IntegerVector find_params_impl(const CharacterVector& param_names);
   int find_parameter(const std::string& name);
   void bind_parameter_pos(int i, int j, SEXP value_);
 
@@ -61,8 +62,6 @@ private:
 private:
   static SEXPTYPE datatype_to_sexptype(const int field_type);
   static SEXPTYPE decltype_to_sexptype(const char* decl_type);
-
-  IntegerVector find_params_impl(const CharacterVector& param_names);
 };
 
 #endif // __RSQLSITE_SQLITE_RESULT__

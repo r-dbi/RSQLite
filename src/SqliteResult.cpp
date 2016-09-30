@@ -140,20 +140,6 @@ List SqliteResult::get_column_info() {
 
 // Privates ////////////////////////////////////////////////////////////////////
 
-IntegerVector SqliteResult::find_params_impl(const CharacterVector& param_names) {
-  int p = param_names.length();
-  IntegerVector res(p);
-
-  for (int j = 0; j < p; ++j) {
-    int pos = find_parameter(CHAR(param_names[j]));
-    if (pos == 0)
-      pos = NA_INTEGER;
-    res[j] = pos;
-  }
-
-  return res;
-}
-
 void SqliteResult::bind_impl(const List& params) {
   sqlite3_reset(pStatement_);
   sqlite3_clear_bindings(pStatement_);
@@ -195,6 +181,20 @@ void SqliteResult::bind_parameter(const int i, const int j0, const std::string& 
     // sqlite parameters are 1-indexed
     bind_parameter_pos(i, j0 + 1, values_);
   }
+}
+
+IntegerVector SqliteResult::find_params_impl(const CharacterVector& param_names) {
+  int p = param_names.length();
+  IntegerVector res(p);
+
+  for (int j = 0; j < p; ++j) {
+    int pos = find_parameter(CHAR(param_names[j]));
+    if (pos == 0)
+      pos = NA_INTEGER;
+    res[j] = pos;
+  }
+
+  return res;
 }
 
 int SqliteResult::find_parameter(const std::string& name) {

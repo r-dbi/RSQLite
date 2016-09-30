@@ -108,7 +108,7 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
   }
 }
 
-void SqliteResultImpl::bind_parameter(const int i, const int j0, const std::__cxx11::string& name, const SEXP values_) {
+void SqliteResultImpl::bind_parameter(const int i, const int j0, const std::string& name, const SEXP values_) {
   if (name != "") {
     int j = find_parameter(name);
     if (j == 0)
@@ -134,18 +134,18 @@ IntegerVector SqliteResultImpl::find_params_impl(const CharacterVector& param_na
   return res;
 }
 
-int SqliteResultImpl::find_parameter(const std::__cxx11::string& name) {
+int SqliteResultImpl::find_parameter(const std::string& name) {
   int i = 0;
   i = sqlite3_bind_parameter_index(pStatement_, name.c_str());
   if (i != 0)
     return i;
 
-  std::__cxx11::string colon = ":" + name;
+  std::string colon = ":" + name;
   i = sqlite3_bind_parameter_index(pStatement_, colon.c_str());
   if (i != 0)
     return i;
 
-  std::__cxx11::string dollar = "$" + name;
+  std::string dollar = "$" + name;
   i = sqlite3_bind_parameter_index(pStatement_, dollar.c_str());
   if (i != 0)
     return i;

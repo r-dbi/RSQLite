@@ -19,14 +19,15 @@ SqliteResult::SqliteResult(const SqliteConnectionPtr& pConn, const std::string& 
     Rcpp::stop(pConn_->getException());
   }
 
-  nparams_ = sqlite3_bind_parameter_count(pStatement_);
-  if (nparams_ == 0) {
-    try {
+  try {
+    nparams_ = sqlite3_bind_parameter_count(pStatement_);
+    if (nparams_ == 0) {
       init();
-    } catch (...) {
-      sqlite3_finalize(pStatement_);
-      throw;
     }
+  } catch (...) {
+    sqlite3_finalize(pStatement_);
+    pStatement_ = NULL;
+    throw;
   }
 }
 

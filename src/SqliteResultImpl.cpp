@@ -268,16 +268,9 @@ List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
 
   int i = 0;
   while (!complete_) {
-    if (i >= n) {
-      if (n_max < 0) {
-        n *= 2;
-        out = dfResize(out, n);
-      } else {
-        break;
-      }
-    }
+    if (!set_col_values(out, i, n, n_max))
+      break;
 
-    set_col_values(out, i, n);
     step();
     ++i;
 
@@ -308,8 +301,9 @@ void SqliteResultImpl::step() {
 }
 
 List SqliteResultImpl::peek_first_row() {
-  List out = dfCreate(cache.names_, 1);
-  set_col_values(out, 0, 1);
+  int n = 1;
+  List out = dfCreate(cache.names_, n);
+  set_col_values(out, 0, n, n);
   out = dfResize(out, 0);
 
   return out;
@@ -329,12 +323,22 @@ List SqliteResultImpl::alloc_missing_cols(List data, int n) {
   return data;
 }
 
-void SqliteResultImpl::set_col_values(List& out, const int i, const int n) {
+bool SqliteResultImpl::set_col_values(List& out, const int i, int& n, const int n_max) {
+  if (i >= n) {
+    if (n_max >= 0)
+      return false;
+
+    n *= 2;
+    out = dfResize(out, n);
+  }
+
   for (int j = 0; j < cache.ncols_; ++j) {
     SEXP col = out[j];
     set_col_value(col, i, j, n);
     out[j] = col;
   }
+
+  return true;
 }
 
 void SqliteResultImpl::set_col_value(SEXP& col, const int i, const int j, const int n) {

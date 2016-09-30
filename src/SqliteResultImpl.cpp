@@ -1,7 +1,6 @@
 #include <RSQLite.h>
 #include "SqliteResultImpl.h"
-#include "SqliteUtils.h"
-#include "affinity.h"
+#include "SqliteDataFrame.h"
 
 
 
@@ -162,8 +161,6 @@ List SqliteResultImpl::fetch_impl(const int n_max) {
   else
     out = peek_first_row();
 
-  out = alloc_missing_cols(out, n);
-
   return out;
 }
 
@@ -264,34 +261,17 @@ void SqliteResultImpl::bind_parameter_pos(const int i, const int j, const SEXP v
 List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
-  List out = dfCreate(cache.names_, n);
+  SqliteDataFrame data(stmt, cache.names_, n_max, types_);
 
-  int i = 0;
   while (!complete_) {
-    if (i >= n) {
-      if (n_max < 0) {
-        n *= 2;
-        out = dfResize(out, n);
-      } else {
-        break;
-      }
-    }
+    if (!data.set_col_values())
+      break;
 
-    set_col_values(out, i, n);
     step();
-    ++i;
-
-    if (i % 1000 == 0)
-      checkUserInterrupt();
+    data.advance();
   }
 
-  // Trim back to what we actually used
-  if (i < n) {
-    out = dfResize(out, i);
-    n = i;
-  }
-
-  return out;
+  return data.get_data(types_);
 }
 
 void SqliteResultImpl::step() {
@@ -308,180 +288,12 @@ void SqliteResultImpl::step() {
 }
 
 List SqliteResultImpl::peek_first_row() {
-  List out = dfCreate(cache.names_, 1);
-  set_col_values(out, 0, 1);
-  out = dfResize(out, 0);
+  SqliteDataFrame data(stmt, cache.names_, 1, types_);
 
-  return out;
-}
+  data.set_col_values();
+  // Not calling data.advance(), remains a zero-row data frame
 
-List SqliteResultImpl::alloc_missing_cols(List data, int n) {
-  // Create data for columns where all values were NULL (or for all columns
-  // in the case of a 0-row data frame)
-  for (int j = 0; j < cache.ncols_; ++j) {
-    if (types_[j] == NILSXP) {
-      types_[j] =
-      decltype_to_sexptype(sqlite3_column_decltype(stmt, j));
-      // std::cerr << j << ": " << types_[j] << "\n";
-      data[j] = alloc_col(types_[j], n, n);
-    }
-  }
-  return data;
-}
-
-void SqliteResultImpl::set_col_values(List& out, const int i, const int n) {
-  for (int j = 0; j < cache.ncols_; ++j) {
-    SEXP col = out[j];
-    set_col_value(col, i, j, n);
-    out[j] = col;
-  }
-}
-
-void SqliteResultImpl::set_col_value(SEXP& col, const int i, const int j, const int n) {
-  SEXPTYPE type = types_[j];
-  int column_type = sqlite3_column_type(stmt, j);
-
-  // std::cerr << "column_type: " << column_type << "\n";
-  // std::cerr << "type: " << type << "\n";
-
-  if (type == NILSXP) {
-    // std::cerr << "datatype_to_sexptype\n";
-    type = datatype_to_sexptype(column_type);
-    // std::cerr << "type: " << type << "\n";
-  }
-
-  if (Rf_isNull(col)) {
-    if (type == NILSXP)
-      return;
-    else {
-      col = alloc_col(type, i, n);
-      types_[j] = type;
-    }
-  }
-
-  if (column_type == SQLITE_NULL) {
-    fill_default_col_value(col, i);
-  }
-  else {
-    fill_col_value(col, i, j);
-  }
-  return;
-}
-
-SEXP SqliteResultImpl::alloc_col(const SEXPTYPE type, const int i, const int n) {
-  SEXP col = Rf_allocVector(type, n);
-  PROTECT(col);
-  for (int i_ = 0; i_ < i; i_++) {
-    fill_default_col_value(col, i_);
-  }
-  UNPROTECT(1);
-  return col;
-}
-
-void SqliteResultImpl::fill_default_col_value(const SEXP col, const int i) {
-  switch (TYPEOF(col)) {
-  case LGLSXP:
-    LOGICAL(col)[i] = NA_LOGICAL;
-    break;
-  case INTSXP:
-    INTEGER(col)[i] = NA_INTEGER;
-    break;
-  case REALSXP:
-    REAL(col)[i] = NA_REAL;
-    break;
-  case STRSXP:
-    SET_STRING_ELT(col, i, NA_STRING);
-    break;
-  case VECSXP:
-    SET_VECTOR_ELT(col, i, RawVector(0));
-    break;
-  }
-}
-
-void SqliteResultImpl::fill_col_value(const SEXP col, const int i, const int j) {
-  switch (TYPEOF(col)) {
-  case INTSXP:
-    set_int_value(col, i, j);
-    break;
-  case REALSXP:
-    set_real_value(col, i, j);
-    break;
-  case STRSXP:
-    set_string_value(col, i, j);
-    break;
-  case VECSXP:
-    set_raw_value(col, i, j);
-    break;
-  }
-}
-
-void SqliteResultImpl::set_int_value(const SEXP col, const int i, const int j) const {
-  INTEGER(col)[i] = sqlite3_column_int(stmt, j);
-}
-
-void SqliteResultImpl::set_real_value(const SEXP col, const int i, const int j) const {
-  REAL(col)[i] = sqlite3_column_double(stmt, j);
-}
-
-void SqliteResultImpl::set_string_value(const SEXP col, const int i, const int j) const {
-  const char* const text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, j));
-  SET_STRING_ELT(col, i, Rf_mkCharCE(text, CE_UTF8));
-}
-
-void SqliteResultImpl::set_raw_value(const SEXP col, const int i, const int j) const {
-  int size = sqlite3_column_bytes(stmt, j);
-  const void* blob = sqlite3_column_blob(stmt, j);
-
-  SEXP bytes = Rf_allocVector(RAWSXP, size);
-  memcpy(RAW(bytes), blob, size);
-
-  SET_VECTOR_ELT(col, i, bytes);
-}
-
-SEXPTYPE SqliteResultImpl::datatype_to_sexptype(const int field_type) {
-  switch (field_type) {
-  case SQLITE_INTEGER:
-    return INTSXP;
-
-  case SQLITE_FLOAT:
-    return REALSXP;
-
-  case SQLITE_TEXT:
-    return STRSXP;
-
-  case SQLITE_BLOB:
-    // List of raw vectors
-    return VECSXP;
-
-  case SQLITE_NULL:
-  default:
-    return NILSXP;
-  }
-}
-
-SEXPTYPE SqliteResultImpl::decltype_to_sexptype(const char* decl_type) {
-  if (decl_type == NULL)
-    return LGLSXP;
-
-  char affinity = sqlite3AffinityType(decl_type);
-
-  switch (affinity) {
-  case SQLITE_AFF_INTEGER:
-    return INTSXP;
-
-  case SQLITE_AFF_NUMERIC:
-  case SQLITE_AFF_REAL:
-    return REALSXP;
-
-  case SQLITE_AFF_TEXT:
-    return STRSXP;
-
-  case SQLITE_AFF_BLOB:
-    return VECSXP;
-  }
-
-  // Shouldn't occur
-  return LGLSXP;
+  return data.get_data(types_);
 }
 
 void SqliteResultImpl::raise_sqlite_exception() const {

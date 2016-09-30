@@ -57,21 +57,6 @@ private:
   List fetch_rows(int n_max, int& n);
   void step();
   List peek_first_row();
-  List alloc_missing_cols(List data, int n);
-
-  void set_col_values(List& out, const int i, const int n);
-  void set_col_value(SEXP& col, const int i, const int j, const int n);
-  SEXP alloc_col(const unsigned int type, const int i, const int n);
-  void fill_default_col_value(SEXP col, const int i);
-  void fill_col_value(const SEXP col, const int i, const int j);
-
-  void set_int_value(const SEXP col, const int i, const int j) const;
-  void set_real_value(const SEXP col, const int i, const int j) const;
-  void set_string_value(const SEXP col, const int i, const int j) const;
-  void set_raw_value(SEXP col, const int i, const int j) const ;
-
-  static unsigned int datatype_to_sexptype(const int field_type);
-  static unsigned int decltype_to_sexptype(const char* decl_type);
 
   void raise_sqlite_exception() const;
   static void raise_sqlite_exception(sqlite3* conn);

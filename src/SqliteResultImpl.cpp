@@ -8,10 +8,14 @@
 // Construction ////////////////////////////////////////////////////////////////
 
 SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
-: conn(conn_), stmt(NULL), complete_(false), ready_(false),
-  nrows_(0), rows_affected_(0), ncols_(0), nparams_(0) {
-
-  prepare(sql);
+: conn(conn_),
+  stmt(prepare(conn_, sql)),
+  complete_(false),
+  ready_(false),
+  nrows_(0),
+  rows_affected_(0),
+  ncols_(sqlite3_column_count(stmt)),
+  nparams_(sqlite3_bind_parameter_count(stmt)) {
 
   try {
     init_if_bound();
@@ -28,16 +32,19 @@ SqliteResultImpl::~SqliteResultImpl() {
   } catch (...) {}
 }
 
-void SqliteResultImpl::prepare(const std::string& sql) {
+sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
+  sqlite3_stmt* stmt = NULL;
+
   int rc = sqlite3_prepare_v2(conn, sql.c_str(), sql.size() + 1,
                               &stmt, NULL);
   if (rc != SQLITE_OK) {
-    raise_sqlite_exception();
+    raise_sqlite_exception(conn);
   }
+
+  return stmt;
 }
 
 void SqliteResultImpl::init_if_bound() {
-  nparams_ = sqlite3_bind_parameter_count(stmt);
   if (nparams_ == 0) {
     init();
   }
@@ -46,7 +53,6 @@ void SqliteResultImpl::init_if_bound() {
 void SqliteResultImpl::init() {
   ready_ = true;
   nrows_ = 0;
-  ncols_ = sqlite3_column_count(stmt);
   complete_ = false;
 
   step();
@@ -466,5 +472,9 @@ SEXPTYPE SqliteResultImpl::decltype_to_sexptype(const char* decl_type) {
 }
 
 void SqliteResultImpl::raise_sqlite_exception() const {
+  raise_sqlite_exception(conn);
+}
+
+void SqliteResultImpl::raise_sqlite_exception(sqlite3* conn) {
   stop(sqlite3_errmsg(conn));
 }

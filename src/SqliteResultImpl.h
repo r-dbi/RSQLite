@@ -19,16 +19,16 @@ private:
   std::vector<SEXPTYPE> types_;
 
   // Cache
+  const int ncols_;
+  const int nparams_;
   std::vector<std::string> names_;
-  int ncols_;
-  int nparams_;
 
 public:
   SqliteResultImpl(sqlite3* conn_, const std::string& sql);
   ~SqliteResultImpl();
 
 private:
-  void prepare(const std::string& sql);
+  static sqlite3_stmt* prepare(sqlite3* conn, const std::string& sql);
   void init_if_bound();
   void init();
   void cache_field_data();
@@ -64,6 +64,7 @@ private:
   static unsigned int decltype_to_sexptype(const char* decl_type);
 
   void raise_sqlite_exception() const;
+  static void raise_sqlite_exception(sqlite3* conn);
 };
 
 

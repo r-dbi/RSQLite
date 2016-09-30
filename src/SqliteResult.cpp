@@ -129,25 +129,7 @@ void SqliteResult::bind_rows(const List& params) {
     stop("Need at least one column");
   }
 
-  SEXP first_col = params[0];
-  int n = Rf_length(first_col);
-
-  rows_affected_ = 0;
-
-  CharacterVector names_ = params.attr("names");
-  std::vector<std::string> names(names_.begin(), names_.end());
-
-  for (int i = 0; i < n; ++i) {
-    sqlite3_reset(pStatement_);
-    sqlite3_clear_bindings(pStatement_);
-
-    for (int j = 0; j < params.size(); ++j) {
-      bind_parameter(i, j, names[j], static_cast<SEXPREC*>(params[j]));
-    }
-
-    step();
-    rows_affected_ += sqlite3_changes(pConn_->conn());
-  }
+  bind_rows_impl(params);
 }
 
 List SqliteResult::fetch(const int n_max) {
@@ -175,6 +157,28 @@ void SqliteResult::bind_impl(const List& params) {
   CharacterVector names = params.attr("names");
   for (int j = 0; j < params.size(); ++j) {
     bind_parameter(0, j, std::__cxx11::string(names[j]), static_cast<SEXPREC*>(params[j]));
+  }
+}
+
+void SqliteResult::bind_rows_impl(const List& params) {
+  SEXP first_col = params[0];
+  int n = Rf_length(first_col);
+
+  rows_affected_ = 0;
+
+  CharacterVector names_ = params.attr("names");
+  std::vector<std::string> names(names_.begin(), names_.end());
+
+  for (int i = 0; i < n; ++i) {
+    sqlite3_reset(pStatement_);
+    sqlite3_clear_bindings(pStatement_);
+
+    for (int j = 0; j < params.size(); ++j) {
+      bind_parameter(i, j, names[j], static_cast<SEXPREC*>(params[j]));
+    }
+
+    step();
+    rows_affected_ += sqlite3_changes(pConn_->conn());
   }
 }
 

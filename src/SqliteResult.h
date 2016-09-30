@@ -50,6 +50,7 @@ private:
 
   Rcpp::List fetch_rows(int n_max, int& n);
   Rcpp::List peek_first_row();
+  Rcpp::List alloc_missing_cols(Rcpp::List data, int n);
 
   void set_col_values(Rcpp::List& out, const int i, const int n);
   void set_col_value(SEXP& col, const int i, const int j, const int n);

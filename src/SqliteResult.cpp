@@ -107,16 +107,7 @@ Rcpp::List SqliteResult::fetch(const int n_max) {
   else
     out = peek_first_row();
 
-  // Create data for columns where all values were NULL (or for all columns
-  // in the case of a 0-row data frame)
-  for (int j = 0; j < ncols_; ++j) {
-    if (types_[j] == NILSXP) {
-      types_[j] =
-        decltype_to_sexptype(sqlite3_column_decltype(pStatement_, j));
-      // std::cerr << j << ": " << types_[j] << "\n";
-      out[j] = alloc_col(types_[j], n, n);
-    }
-  }
+  out = alloc_missing_cols(out, n);
 
   return out;
 }
@@ -330,6 +321,20 @@ Rcpp::List SqliteResult::peek_first_row() {
   out = dfResize(out, 0);
 
   return out;
+}
+
+Rcpp::List SqliteResult::alloc_missing_cols(Rcpp::List data, int n) {
+  // Create data for columns where all values were NULL (or for all columns
+  // in the case of a 0-row data frame)
+  for (int j = 0; j < ncols_; ++j) {
+    if (types_[j] == NILSXP) {
+      types_[j] =
+      decltype_to_sexptype(sqlite3_column_decltype(pStatement_, j));
+      // std::cerr << j << ": " << types_[j] << "\n";
+      data[j] = alloc_col(types_[j], n, n);
+    }
+  }
+  return data;
 }
 
 void SqliteResult::set_col_values(Rcpp::List& out, const int i, const int n) {

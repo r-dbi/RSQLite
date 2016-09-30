@@ -1,3 +1,4 @@
+#include <RSQLite.h>
 #include "SqliteResult.h"
 #include "SqliteUtils.h"
 

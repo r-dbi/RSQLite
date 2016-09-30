@@ -1,7 +1,7 @@
 #ifndef __RSQLSITE_SQLITE_UTILS__
 #define __RSQLSITE_SQLITE_UTILS__
 
-#include <Rcpp.h>
+#include <RSQLite.h>
 #include "sqlite3/sqlite3.h"
 
 

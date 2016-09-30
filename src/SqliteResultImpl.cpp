@@ -19,7 +19,9 @@ SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
 {
 
   try {
-    init_if_bound();
+    if (cache.nparams_ == 0) {
+      after_bind();
+    }
   } catch (...) {
     sqlite3_finalize(stmt);
     stmt = NULL;
@@ -75,13 +77,7 @@ std::vector<SEXPTYPE> SqliteResultImpl::get_initial_field_types(const int ncols)
   return types;
 }
 
-void SqliteResultImpl::init_if_bound() {
-  if (cache.nparams_ == 0) {
-    init();
-  }
-}
-
-void SqliteResultImpl::init() {
+void SqliteResultImpl::after_bind() {
   ready_ = true;
   nrows_ = 0;
   complete_ = false;
@@ -133,7 +129,7 @@ void SqliteResultImpl::bind_impl(const List& params) {
     bind_parameter(0, j, CHAR(names[j]), static_cast<SEXPREC*>(params[j]));
   }
 
-  init();
+  after_bind();
 }
 
 void SqliteResultImpl::bind_rows_impl(const List& params) {

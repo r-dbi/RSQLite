@@ -162,8 +162,6 @@ List SqliteResultImpl::fetch_impl(const int n_max) {
   else
     out = peek_first_row();
 
-  out = alloc_missing_cols(out, n);
-
   return out;
 }
 
@@ -324,11 +322,14 @@ bool SqliteResultImpl::set_col_values(List& out, const int i, int& n, const int 
   return true;
 }
 
-List SqliteResultImpl::finalize_cols(List out, int i, int& n) const {
+List SqliteResultImpl::finalize_cols(List out, int i, int& n) {
   if (i < n) {
     out = dfResize(out, i);
     n = i;
   }
+
+  out = alloc_missing_cols(out, n);
+
   return out;
 }
 

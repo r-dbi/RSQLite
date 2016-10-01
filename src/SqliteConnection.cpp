@@ -1,3 +1,4 @@
+#include <RSQLite.h>
 #include "SqliteConnection.h"
 
 
@@ -7,7 +8,7 @@ SqliteConnection::SqliteConnection(const std::string& path, const bool allow_ext
   // Get the underlying database connection
   int rc = sqlite3_open_v2(path.c_str(), &pConn_, flags, vfs.size() ? vfs.c_str() : NULL);
   if (rc != SQLITE_OK) {
-    Rcpp::stop("Could not connect to database:\n%s", getException());
+    stop("Could not connect to database:\n%s", getException());
   }
   if (allow_ext) {
     sqlite3_enable_load_extension(pConn_, 1);
@@ -33,10 +34,10 @@ void SqliteConnection::copy_to(const SqliteConnectionPtr& pDest) {
 
   int rc = sqlite3_backup_step(backup, -1);
   if (rc != SQLITE_DONE) {
-    Rcpp::stop("Failed to copy all data:\n%s", getException());
+    stop("Failed to copy all data:\n%s", getException());
   }
   rc = sqlite3_backup_finish(backup);
   if (rc != SQLITE_OK) {
-    Rcpp::stop("Could not finish copy:\n%s", getException());
+    stop("Could not finish copy:\n%s", getException());
   }
 }

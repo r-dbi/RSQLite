@@ -1,3 +1,15 @@
+## RSQLite 1.0.9013 (2016-10-01)
+
+- Use `plogr` for logging.
+- Extract class `SqliteDataFrame`.
+- Implement `dbSendPreparedQuery()` in C++ (#168).
+- New `SqliteResultImpl` class.
+- Universal include file.
+- `XPtr` workaround for CLion.
+- More generic `CMakeLists.txt`.
+- Support for test script `clion-test.R`.
+
+
 ## RSQLite 1.0.9012 (2016-09-30)
 
 - New maintainer: Kirill Müller. @hadley: please confirm.

@@ -1,6 +1,6 @@
-#include <Rcpp.h>
+#include <RSQLite.h>
+#include <workarounds/XPtr.h>
 #include "SqliteResult.h"
-using namespace Rcpp;
 
 // [[Rcpp::export]]
 XPtr<SqliteResult> rsqlite_send_query(const XPtr<SqliteConnectionPtr>& con, const std::string& sql) {
@@ -14,7 +14,7 @@ void rsqlite_clear_result(XPtr<SqliteResult>& res) {
 }
 
 // [[Rcpp::export]]
-List rsqlite_fetch(const XPtr<SqliteResult>& res, int n = 10) {
+List rsqlite_fetch(const XPtr<SqliteResult>& res, const int n = 10) {
   return res->fetch(n);
 }
 
@@ -51,7 +51,7 @@ int rsqlite_rows_affected(const XPtr<SqliteResult>& res) {
 
 // [[Rcpp::export]]
 List rsqlite_column_info(const XPtr<SqliteResult>& res) {
-  return res->column_info();
+  return res->get_column_info();
 }
 
 // [[Rcpp::export]]

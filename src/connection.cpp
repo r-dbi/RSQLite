@@ -1,6 +1,6 @@
-#include <Rcpp.h>
+#include <RSQLite.h>
+#include <workarounds/XPtr.h>
 #include "SqliteConnection.h"
-using namespace Rcpp;
 
 extern "C" {
   int RS_sqlite_import(
@@ -15,7 +15,7 @@ extern "C" {
 
 // [[Rcpp::export]]
 XPtr<SqliteConnectionPtr> rsqlite_connect(
-  const std::string& path, bool allow_ext, int flags, const std::string& vfs = "")
+  const std::string& path, const bool allow_ext, const int flags, const std::string& vfs = "")
 {
 
   SqliteConnectionPtr* pConn = new SqliteConnectionPtr(
@@ -53,7 +53,7 @@ bool rsqlite_connection_valid(const XPtr<SqliteConnectionPtr>& con) {
 bool rsqlite_import_file(const XPtr<SqliteConnectionPtr>& con,
                          const std::string& name, const std::string& value,
                          const std::string& sep, const std::string& eol,
-                         int skip) {
+                         const int skip) {
   return !!RS_sqlite_import(con->get()->conn(), name.c_str(), value.c_str(),
                             sep.c_str(), eol.c_str(), skip);
 }

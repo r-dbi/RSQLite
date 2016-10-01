@@ -1,7 +1,6 @@
 #ifndef __RSQLSITE_SQLITE_CONNECTION__
 #define __RSQLSITE_SQLITE_CONNECTION__
 
-#include <Rcpp.h>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include "sqlite3/sqlite3.h"
@@ -20,7 +19,7 @@ public:
   // Create a new connection handle
   SqliteConnection(const std::string& path, bool allow_ext,
                    int flags, const std::string& vfs = "");
-  virtual ~SqliteConnection();
+  ~SqliteConnection();
 
 public:
   // Get access to the underlying sqlite3*

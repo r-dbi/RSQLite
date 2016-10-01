@@ -1,6 +1,5 @@
-#include <Rcpp.h>
+#include <RSQLite.h>
 #include "sqlite3/sqlite3.h"
-using namespace Rcpp;
 
 //' RSQLite version
 //'
@@ -14,4 +13,9 @@ CharacterVector rsqliteVersion() {
       _["header"] = SQLITE_VERSION,
       _["library"] = sqlite3_libversion()
     );
+}
+
+// [[Rcpp::export]]
+void init_logging(const std::string& log_level) {
+  plog::init_r(log_level);
 }

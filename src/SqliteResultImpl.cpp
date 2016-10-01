@@ -7,14 +7,14 @@
 // Construction ////////////////////////////////////////////////////////////////
 
 SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
-: conn(conn_),
-  stmt(prepare(conn_, sql)),
-  cache(stmt),
-  complete_(false),
-  ready_(false),
-  nrows_(0),
-  rows_affected_(0),
-  types_(get_initial_field_types(cache.ncols_))
+  : conn(conn_),
+    stmt(prepare(conn_, sql)),
+    cache(stmt),
+    complete_(false),
+    ready_(false),
+    nrows_(0),
+    rows_affected_(0),
+    types_(get_initial_field_types(cache.ncols_))
 {
 
   try {
@@ -29,9 +29,9 @@ SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
 }
 
 SqliteResultImpl::_cache::_cache(sqlite3_stmt* stmt)
-: names_(get_column_names(stmt)),
-  ncols_(names_.size()),
-  nparams_(sqlite3_bind_parameter_count(stmt))
+  : names_(get_column_names(stmt)),
+    ncols_(names_.size()),
+    nparams_(sqlite3_bind_parameter_count(stmt))
 {
 }
 
@@ -213,7 +213,7 @@ int SqliteResultImpl::find_parameter(const std::string& name) {
 }
 
 void SqliteResultImpl::bind_parameter_pos(const int i, const int j, const SEXP value_) {
-  // std::cerr << "TYPEOF(value_): " << TYPEOF(value_) << "\n";
+  LOG_VERBOSE << "TYPEOF(value_): " << TYPEOF(value_) << "\n";
   if (TYPEOF(value_) == LGLSXP) {
     LogicalVector value(value_);
     if (value[i] == NA_LOGICAL) {
@@ -254,7 +254,7 @@ void SqliteResultImpl::bind_parameter_pos(const int i, const int j, const SEXP v
     sqlite3_bind_blob(stmt, j, RAW(raw), Rf_length(raw), SQLITE_TRANSIENT);
   } else {
     stop("Don't know how to handle parameter of type %s.",
-               Rf_type2char(TYPEOF(value_)));
+         Rf_type2char(TYPEOF(value_)));
   }
 }
 

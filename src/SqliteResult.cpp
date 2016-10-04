@@ -45,17 +45,15 @@ void SqliteResult::bind(const List& params) {
 }
 
 void SqliteResult::bind_rows(const List& params) {
-  if (params.size() == 0) {
-    stop("Need at least one column");
-  }
+  if (params.size() != 0) {
+    SEXP first_col = params[0];
+    int n = Rf_length(first_col);
 
-  SEXP first_col = params[0];
-  int n = Rf_length(first_col);
-
-  for (int j = 1; j < params.size(); ++j) {
-    SEXP col = params[j];
-    if (Rf_length(col) != n)
-      stop("Parameter %i does not have length %d.", j + 1, n);
+    for (int j = 1; j < params.size(); ++j) {
+      SEXP col = params[j];
+      if (Rf_length(col) != n)
+        stop("Parameter %i does not have length %d.", j + 1, n);
+    }
   }
 
   impl->bind_rows_impl(params);

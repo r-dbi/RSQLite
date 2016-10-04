@@ -141,10 +141,8 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
 
   rows_affected_ = 0;
 
-  for (group_ = 0; group_ < groups_; ++group_) {
-    bind_row();
-    after_bind();
-  }
+  bind_row();
+  after_bind();
 }
 
 List SqliteResultImpl::fetch_impl(const int n_max) {
@@ -296,14 +294,35 @@ List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
 }
 
 void SqliteResultImpl::step() {
+  while (step_run())
+    ;
+}
+
+bool SqliteResultImpl::step_run() {
+  LOG_VERBOSE;
+
   int rc = sqlite3_step(stmt);
 
   if (rc == SQLITE_DONE) {
-    complete_ = true;
-    rows_affected_ += sqlite3_changes(conn);
-  } else if (rc != SQLITE_ROW) {
+    return step_done();
+  } else if (rc == SQLITE_ROW) {
+    return false;
+  } else {
     raise_sqlite_exception();
   }
+}
+
+bool SqliteResultImpl::step_done() {
+  rows_affected_ += sqlite3_changes(conn);
+
+  ++group_;
+  bool more_params = bind_row();
+
+  if (!more_params)
+      complete_ = true;
+
+  LOG_VERBOSE << "group: " << group_ << ", more_params: " << more_params;
+  return more_params;
 }
 
 List SqliteResultImpl::peek_first_row() {

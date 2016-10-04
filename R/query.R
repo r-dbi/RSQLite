@@ -106,11 +106,7 @@ db_bind <- function(res, params, ..., allow_named_superset, allow_rows) {
   params <- factor_to_string(params)
   params <- string_to_utf8(params)
 
-  if (allow_rows) {
-    rsqlite_bind_rows(res@ptr, params)
-  } else {
-    rsqlite_bind_params(res@ptr, params)
-  }
+  rsqlite_bind_rows(res@ptr, params)
   invisible(res)
 }
 

@@ -59,6 +59,8 @@ private:
 
   List fetch_rows(int n_max, int& n);
   void step();
+  bool step_run();
+  bool step_done();
   List peek_first_row();
 
   void raise_sqlite_exception() const;

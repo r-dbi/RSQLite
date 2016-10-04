@@ -50,9 +50,9 @@ public:
   List get_column_info_impl();
 
 private:
-  void bind_parameter(int i, int j, const std::string& name, SEXP values_);
+  void bind_parameter(int group, int j, const std::string& name, SEXP values_);
   int find_parameter(const std::string& name);
-  void bind_parameter_pos(int i, int j, SEXP value_);
+  void bind_parameter_pos(int group, int j, SEXP value_);
 
   List fetch_rows(int n_max, int& n);
   void step();

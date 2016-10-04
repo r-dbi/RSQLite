@@ -181,15 +181,15 @@ List SqliteResultImpl::get_column_info_impl() {
 
 // Privates ////////////////////////////////////////////////////////////////////
 
-void SqliteResultImpl::bind_parameter(const int i, const int j0, const std::string& name, const SEXP values_) {
+void SqliteResultImpl::bind_parameter(const int group, const int j0, const std::string& name, const SEXP values_) {
   if (name != "") {
     int j = find_parameter(name);
     if (j == 0)
       stop("No parameter with name %s.", name);
-    bind_parameter_pos(i, j, values_);
+    bind_parameter_pos(group, j, values_);
   } else {
     // sqlite parameters are 1-indexed
-    bind_parameter_pos(i, j0 + 1, values_);
+    bind_parameter_pos(group, j0 + 1, values_);
   }
 }
 

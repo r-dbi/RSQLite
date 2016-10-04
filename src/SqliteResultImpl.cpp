@@ -135,13 +135,14 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
   if (cache.nparams_ == 0)
     return;
 
+  params_ = params;
   SEXP first_col = params[0];
   groups_ = Rf_length(first_col);
 
   rows_affected_ = 0;
 
   for (group_ = 0; group_ < groups_; ++group_) {
-    bind_row(params);
+    bind_row();
     after_bind();
   }
 }
@@ -178,16 +179,16 @@ List SqliteResultImpl::get_column_info_impl() {
 
 // Privates ////////////////////////////////////////////////////////////////////
 
-bool SqliteResultImpl::bind_row(const List& params) {
+bool SqliteResultImpl::bind_row() {
   if (group_ >= groups_)
     return false;
 
-  CharacterVector names = params.attr("names");
+  CharacterVector names = params_.attr("names");
   sqlite3_reset(stmt);
   sqlite3_clear_bindings(stmt);
 
-  for (int j = 0; j < params.size(); ++j) {
-    bind_parameter(j, CHAR(names[j]), static_cast<SEXPREC*>(params[j]));
+  for (int j = 0; j < params_.size(); ++j) {
+    bind_parameter(j, CHAR(names[j]), params_[j]);
   }
 
   return true;

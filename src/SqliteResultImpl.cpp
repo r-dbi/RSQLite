@@ -139,6 +139,7 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
   params_ = params;
   SEXP first_col = params[0];
   groups_ = Rf_length(first_col);
+  group_ = 0;
 
   rows_affected_ = 0;
 

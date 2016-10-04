@@ -22,7 +22,7 @@ SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
 
   try {
     if (cache.nparams_ == 0) {
-      after_bind();
+      after_bind(true);
     }
   } catch (...) {
     sqlite3_finalize(stmt);
@@ -81,15 +81,16 @@ std::vector<SEXPTYPE> SqliteResultImpl::get_initial_field_types(const int ncols)
   return types;
 }
 
-void SqliteResultImpl::after_bind() {
-  init();
-  step();
+void SqliteResultImpl::after_bind(bool has_params) {
+  init(has_params);
+  if (has_params)
+    step();
 }
 
-void SqliteResultImpl::init() {
+void SqliteResultImpl::init(bool has_params) {
   ready_ = true;
   nrows_ = 0;
-  complete_ = false;
+  complete_ = !has_params;
 }
 
 
@@ -141,8 +142,8 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
 
   rows_affected_ = 0;
 
-  bind_row();
-  after_bind();
+  bool has_params = bind_row();
+  after_bind(has_params);
 }
 
 List SqliteResultImpl::fetch_impl(const int n_max) {
@@ -328,7 +329,8 @@ bool SqliteResultImpl::step_done() {
 List SqliteResultImpl::peek_first_row() {
   SqliteDataFrame data(stmt, cache.names_, 1, types_);
 
-  data.set_col_values();
+  if (!complete_)
+    data.set_col_values();
   // Not calling data.advance(), remains a zero-row data frame
 
   return data.get_data(types_);

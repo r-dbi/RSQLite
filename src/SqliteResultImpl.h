@@ -38,8 +38,8 @@ public:
 private:
   static sqlite3_stmt* prepare(sqlite3* conn, const std::string& sql);
   static std::vector<SEXPTYPE> get_initial_field_types(const int ncols);
-  void after_bind();
-  void init();
+  void after_bind(bool has_params);
+  void init(bool has_params);
 
 public:
   bool complete();

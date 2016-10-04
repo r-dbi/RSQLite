@@ -16,6 +16,7 @@ SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
     rows_affected_(0),
     types_(get_initial_field_types(cache.ncols_))
 {
+  LOG_VERBOSE << sql;
 
   try {
     if (cache.nparams_ == 0) {
@@ -47,6 +48,8 @@ std::vector<std::string> SqliteResultImpl::_cache::get_column_names(sqlite3_stmt
 }
 
 SqliteResultImpl::~SqliteResultImpl() {
+  LOG_VERBOSE;
+
   try {
     sqlite3_finalize(stmt);
   } catch (...) {}

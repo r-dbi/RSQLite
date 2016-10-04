@@ -27,6 +27,7 @@ private:
   bool ready_;
   int nrows_;
   int rows_affected_;
+  int group_, groups_;
   std::vector<SEXPTYPE> types_;
 
 public:
@@ -50,10 +51,10 @@ public:
   List get_column_info_impl();
 
 private:
-  void bind_row(int group, const List& params);
-  void bind_parameter(int group, int j, const std::string& name, SEXP values_);
+  void bind_row(const List& params);
+  void bind_parameter(int j, const std::string& name, SEXP values_);
   int find_parameter(const std::string& name);
-  void bind_parameter_pos(int group, int j, SEXP value_);
+  void bind_parameter_pos(int j, SEXP value_);
 
   List fetch_rows(int n_max, int& n);
   void step();

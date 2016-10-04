@@ -14,6 +14,8 @@ SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
     ready_(false),
     nrows_(0),
     rows_affected_(0),
+    group_(0),
+    groups_(0),
     types_(get_initial_field_types(cache.ncols_))
 {
   LOG_VERBOSE << sql;
@@ -134,12 +136,12 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
     return;
 
   SEXP first_col = params[0];
-  int n = Rf_length(first_col);
+  groups_ = Rf_length(first_col);
 
   rows_affected_ = 0;
 
-  for (int i = 0; i < n; ++i) {
-    bind_row(i, params);
+  for (group_ = 0; group_ < groups_; ++group_) {
+    bind_row(params);
     after_bind();
   }
 }
@@ -176,25 +178,25 @@ List SqliteResultImpl::get_column_info_impl() {
 
 // Privates ////////////////////////////////////////////////////////////////////
 
-void SqliteResultImpl::bind_row(int group, const List& params) {
+void SqliteResultImpl::bind_row(const List& params) {
   CharacterVector names = params.attr("names");
   sqlite3_reset(stmt);
   sqlite3_clear_bindings(stmt);
 
   for (int j = 0; j < params.size(); ++j) {
-    bind_parameter(group, j, CHAR(names[j]), static_cast<SEXPREC*>(params[j]));
+    bind_parameter(j, CHAR(names[j]), static_cast<SEXPREC*>(params[j]));
   }
 }
 
-void SqliteResultImpl::bind_parameter(const int group, const int j0, const std::string& name, const SEXP values_) {
+void SqliteResultImpl::bind_parameter(int j0, const std::string& name, SEXP values_) {
   if (name != "") {
     int j = find_parameter(name);
     if (j == 0)
       stop("No parameter with name %s.", name);
-    bind_parameter_pos(group, j, values_);
+    bind_parameter_pos(j, values_);
   } else {
     // sqlite parameters are 1-indexed
-    bind_parameter_pos(group, j0 + 1, values_);
+    bind_parameter_pos(j0 + 1, values_);
   }
 }
 
@@ -217,41 +219,42 @@ int SqliteResultImpl::find_parameter(const std::string& name) {
   return 0;
 }
 
-void SqliteResultImpl::bind_parameter_pos(const int i, const int j, const SEXP value_) {
+void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
   LOG_VERBOSE << "TYPEOF(value_): " << TYPEOF(value_) << "\n";
+
   if (TYPEOF(value_) == LGLSXP) {
     LogicalVector value(value_);
-    if (value[i] == NA_LOGICAL) {
+    if (value[group_] == NA_LOGICAL) {
       sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_int(stmt, j, static_cast<int>(value[i]));
+      sqlite3_bind_int(stmt, j, static_cast<int>(value[group_]));
     }
   } else if (TYPEOF(value_) == INTSXP) {
     IntegerVector value(value_);
-    if (value[i] == NA_INTEGER) {
+    if (value[group_] == NA_INTEGER) {
       sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_int(stmt, j, static_cast<int>(value[i]));
+      sqlite3_bind_int(stmt, j, static_cast<int>(value[group_]));
     }
   } else if (TYPEOF(value_) == REALSXP) {
     NumericVector value(value_);
-    if (value[i] == NA_REAL) {
+    if (value[group_] == NA_REAL) {
       sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_double(stmt, j, static_cast<double>(value[i]));
+      sqlite3_bind_double(stmt, j, static_cast<double>(value[group_]));
     }
   } else if (TYPEOF(value_) == STRSXP) {
     CharacterVector value(value_);
-    if (value[i] == NA_STRING) {
+    if (value[group_] == NA_STRING) {
       sqlite3_bind_null(stmt, j);
     } else {
-      String value2 = value[i];
+      String value2 = value[group_];
       std::string value3(value2);
       sqlite3_bind_text(stmt, j, value3.data(), value3.size(),
                         SQLITE_TRANSIENT);
     }
   } else if (TYPEOF(value_) == VECSXP) {
-    SEXP raw = VECTOR_ELT(value_, i);
+    SEXP raw = VECTOR_ELT(value_, group_);
     if (TYPEOF(raw) != RAWSXP) {
       stop("Can only bind lists of raw vectors");
     }

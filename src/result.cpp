@@ -41,7 +41,7 @@ bool rsqlite_has_completed(const XPtr<SqliteResult>& res) {
 
 // [[Rcpp::export]]
 int rsqlite_row_count(const XPtr<SqliteResult>& res) {
-  return res->nrows() - 1;
+  return res->nrows();
 }
 
 // [[Rcpp::export]]

@@ -277,22 +277,21 @@ List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
 
     step();
     data.advance();
+    nrows_++;
   }
 
   return data.get_data(types_);
 }
 
 void SqliteResultImpl::step() {
-  nrows_++;
   int rc = sqlite3_step(stmt);
 
   if (rc == SQLITE_DONE) {
     complete_ = true;
+    rows_affected_ += sqlite3_changes(conn);
   } else if (rc != SQLITE_ROW) {
     raise_sqlite_exception();
   }
-
-  rows_affected_ += sqlite3_changes(conn);
 }
 
 List SqliteResultImpl::peek_first_row() {

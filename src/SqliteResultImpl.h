@@ -50,6 +50,7 @@ public:
   List get_column_info_impl();
 
 private:
+  void bind_row(int group, const List& params);
   void bind_parameter(int group, int j, const std::string& name, SEXP values_);
   int find_parameter(const std::string& name);
   void bind_parameter_pos(int group, int j, SEXP value_);

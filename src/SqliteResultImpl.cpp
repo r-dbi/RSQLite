@@ -135,16 +135,8 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
 
   rows_affected_ = 0;
 
-  CharacterVector names = params.attr("names");
-
   for (int i = 0; i < n; ++i) {
-    sqlite3_reset(stmt);
-    sqlite3_clear_bindings(stmt);
-
-    for (int j = 0; j < params.size(); ++j) {
-      bind_parameter(i, j, CHAR(names[j]), static_cast<SEXPREC*>(params[j]));
-    }
-
+    bind_row(i, params);
     after_bind();
   }
 }
@@ -180,6 +172,16 @@ List SqliteResultImpl::get_column_info_impl() {
 
 
 // Privates ////////////////////////////////////////////////////////////////////
+
+void SqliteResultImpl::bind_row(int group, const List& params) {
+  CharacterVector names = params.attr("names");
+  sqlite3_reset(stmt);
+  sqlite3_clear_bindings(stmt);
+
+  for (int j = 0; j < params.size(); ++j) {
+    bind_parameter(group, j, CHAR(names[j]), static_cast<SEXPREC*>(params[j]));
+  }
+}
 
 void SqliteResultImpl::bind_parameter(const int group, const int j0, const std::string& name, const SEXP values_) {
   if (name != "") {

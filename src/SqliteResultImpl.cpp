@@ -180,6 +180,8 @@ List SqliteResultImpl::get_column_info_impl() {
 // Privates ////////////////////////////////////////////////////////////////////
 
 bool SqliteResultImpl::bind_row() {
+  LOG_VERBOSE << "groups: " << group_ << "/" << groups_;
+
   if (group_ >= groups_)
     return false;
 
@@ -226,7 +228,7 @@ int SqliteResultImpl::find_parameter(const std::string& name) {
 }
 
 void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
-  LOG_VERBOSE << "TYPEOF(value_): " << TYPEOF(value_) << "\n";
+  LOG_VERBOSE << "TYPEOF(value_): " << TYPEOF(value_);
 
   if (TYPEOF(value_) == LGLSXP) {
     LogicalVector value(value_);
@@ -278,6 +280,8 @@ List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   SqliteDataFrame data(stmt, cache.names_, n_max, types_);
 
   while (!complete_) {
+    LOG_VERBOSE << nrows_ << "/" << n;
+
     if (!data.set_col_values())
       break;
 
@@ -285,6 +289,8 @@ List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
     data.advance();
     nrows_++;
   }
+
+  LOG_VERBOSE << nrows_;
 
   return data.get_data(types_);
 }

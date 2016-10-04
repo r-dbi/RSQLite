@@ -178,7 +178,10 @@ List SqliteResultImpl::get_column_info_impl() {
 
 // Privates ////////////////////////////////////////////////////////////////////
 
-void SqliteResultImpl::bind_row(const List& params) {
+bool SqliteResultImpl::bind_row(const List& params) {
+  if (group_ >= groups_)
+    return false;
+
   CharacterVector names = params.attr("names");
   sqlite3_reset(stmt);
   sqlite3_clear_bindings(stmt);
@@ -186,6 +189,8 @@ void SqliteResultImpl::bind_row(const List& params) {
   for (int j = 0; j < params.size(); ++j) {
     bind_parameter(j, CHAR(names[j]), static_cast<SEXPREC*>(params[j]));
   }
+
+  return true;
 }
 
 void SqliteResultImpl::bind_parameter(int j0, const std::string& name, SEXP values_) {

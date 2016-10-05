@@ -172,12 +172,13 @@ setMethod("dbGetPreparedQuery",
 
 #' Return an entire column from a SQLite database
 #'
-#' DEPRECATED. Please use dbReadTable instead.
+#' A shortcut for
+#' \code{\link[DBI]{dbReadTable}(con, table, select.cols = column, row.names = FALSE)[[1]]},
+#' kept for compatibility reasons.
 #'
 #' @keywords internal
 #' @export
 sqliteQuickColumn <- function(con, table, column) {
-  warning("Deprecated. Please use dbReadTable instead.")
   dbReadTable(con, table, select.cols = column, row.names = FALSE)[[1]]
 }
 

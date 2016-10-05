@@ -86,11 +86,11 @@ DBI::dbGetQuery
 #' @rdname sqlite-query
 #' @export
 setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
-  db_bind(res, params, ..., allow_named_superset = FALSE, allow_rows = FALSE)
+  db_bind(res, params, ..., allow_named_superset = FALSE)
 })
 
 
-db_bind <- function(res, params, ..., allow_named_superset, allow_rows) {
+db_bind <- function(res, params, ..., allow_named_superset) {
   if (is.null(names(params))) {
     names(params) <- rep("", length(params))
   } else if (allow_named_superset) {

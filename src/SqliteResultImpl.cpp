@@ -321,7 +321,7 @@ bool SqliteResultImpl::step_done() {
   bool more_params = bind_row();
 
   if (!more_params)
-      complete_ = true;
+    complete_ = true;
 
   LOG_VERBOSE << "group: " << group_ << ", more_params: " << more_params;
   return more_params;

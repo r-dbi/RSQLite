@@ -305,11 +305,12 @@ bool SqliteResultImpl::step_run() {
 
   int rc = sqlite3_step(stmt);
 
-  if (rc == SQLITE_DONE) {
+  switch(rc) {
+  case SQLITE_DONE:
     return step_done();
-  } else if (rc == SQLITE_ROW) {
+  case SQLITE_ROW:
     return false;
-  } else {
+  default:
     raise_sqlite_exception();
   }
 }

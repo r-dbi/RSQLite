@@ -305,7 +305,7 @@ bool SqliteResultImpl::step_run() {
 
   int rc = sqlite3_step(stmt);
 
-  switch(rc) {
+  switch (rc) {
   case SQLITE_DONE:
     return step_done();
   case SQLITE_ROW:

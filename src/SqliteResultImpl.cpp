@@ -310,9 +310,9 @@ bool SqliteResultImpl::step_run() {
     return step_done();
   case SQLITE_ROW:
     return false;
-  default:
-    raise_sqlite_exception();
   }
+
+  raise_sqlite_exception();
 }
 
 bool SqliteResultImpl::step_done() {

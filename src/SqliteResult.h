@@ -21,7 +21,7 @@ public:
   int nrows();
   int rows_affected();
   IntegerVector find_params(const CharacterVector& param_names);
-  void bind(const List& params);
+
   void bind_rows(const List& params);
   List fetch(int n_max = -1);
   List get_column_info();

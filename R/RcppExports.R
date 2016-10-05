@@ -33,10 +33,6 @@ rsqlite_fetch <- function(res, n = 10L) {
     .Call('RSQLite_rsqlite_fetch', PACKAGE = 'RSQLite', res, n)
 }
 
-rsqlite_bind_params <- function(res, params) {
-    invisible(.Call('RSQLite_rsqlite_bind_params', PACKAGE = 'RSQLite', res, params))
-}
-
 rsqlite_find_params <- function(res, param_names) {
     .Call('RSQLite_rsqlite_find_params', PACKAGE = 'RSQLite', res, param_names)
 }

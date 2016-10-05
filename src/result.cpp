@@ -19,11 +19,6 @@ List rsqlite_fetch(const XPtr<SqliteResult>& res, const int n = 10) {
 }
 
 // [[Rcpp::export]]
-void rsqlite_bind_params(const XPtr<SqliteResult>& res, List params) {
-  res->bind(params);
-}
-
-// [[Rcpp::export]]
 IntegerVector rsqlite_find_params(const XPtr<SqliteResult>& res, CharacterVector param_names) {
   return res->find_params(param_names);
 }

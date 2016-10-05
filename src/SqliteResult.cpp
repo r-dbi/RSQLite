@@ -30,20 +30,6 @@ IntegerVector SqliteResult::find_params(const CharacterVector& param_names) {
   return impl->find_params_impl(param_names);
 }
 
-void SqliteResult::bind(const List& params) {
-  if (params.attr("names") == R_NilValue) {
-    stop("Parameters must be a named list.");
-  }
-
-  for (int j = 0; j < params.size(); ++j) {
-    SEXP col = params[j];
-    if (Rf_length(col) != 1)
-      stop("Parameter %i does not have length 1.", j + 1);
-  }
-
-  impl->bind_impl(params);
-}
-
 void SqliteResult::bind_rows(const List& params) {
   validate_params(params);
   impl->bind_rows_impl(params);

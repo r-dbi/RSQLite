@@ -229,11 +229,11 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
 
 #' Fetch.
 #'
-#' Deprecated. Please use \code{dbFetch} instead.
+#' A shortcut for \code{\link[DBI]{dbFetch}(res, n = n, row.names = FALSE)},
+#' kept for compatibility reasons.
 #'
 #' @keywords internal
 #' @export
 setMethod("fetch", "SQLiteResult", function(res, n = -1) {
-  .Deprecated("dbFetch(..., row.names = FALSE)", old = "fetch")
-  sqlColumnToRownames(rsqlite_fetch(res@ptr, n = n), row.names = FALSE)
+  dbFetch(res, n = n, row.names = FALSE)
 })

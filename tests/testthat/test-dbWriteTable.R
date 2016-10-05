@@ -214,6 +214,7 @@ test_that("dbWriteTable(row.names = 0)", {
 })
 
 test_that("dbWriteTable(row.names = 1)", {
+  memoise::forget(warning_once)
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 

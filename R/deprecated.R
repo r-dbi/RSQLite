@@ -50,7 +50,7 @@ setGeneric("dbBeginTransaction", function(conn, ...) {
 sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL,
   row.names = NA) {
 
-  warning("Deprecated: please use DBI::sqlCreateTable instead")
+  warning_once("RSQLite::sqliteBuildTableDefinition() is deprecated, please switch to DBI::sqlCreateTable().")
   row.names <- compatRowNames(row.names)
 
   sqliteBuildTableDefinitionNoWarn(con, name, value, field.types, row.names)
@@ -76,7 +76,7 @@ sqliteBuildTableDefinitionNoWarn <- function(con, name, value, field.types = NUL
 
 #' @export
 dbBuildTableDefinition <- function(...) {
-  .Deprecated("sqliteBuildTableDefinition")
+  warning_once("RSQLite::dbBuildTableDefinition() is deprecated, please switch to DBI::sqlCreateTable().")
   sqliteBuildTableDefinition(...)
 }
 
@@ -100,7 +100,7 @@ isIdCurrent <- function(obj) {
 setMethod("make.db.names",
   signature(dbObj="SQLiteConnection", snames = "character"),
   function(dbObj, snames, keywords, unique, allow.keywords, ...) {
-    .Deprecated("dbQuoteIdentifier", old = "make.db.names")
+    warning_once("RSQLite::make.db.names() is deprecated, please switch to DBI::dbQuoteIdentifier().")
     make.db.names.default(snames, keywords, unique, allow.keywords)
   }
 )
@@ -116,7 +116,7 @@ setMethod("SQLKeywords", "SQLiteConnection", function(dbObj, ...) {
 setMethod("isSQLKeyword",
   signature(dbObj="SQLiteConnection", name="character"),
   function(dbObj, name, keywords, case, ...) {
-    .Deprecated("dbQuoteIdentifier", old = "isSQLKeyword")
+    warning_once("RSQLite::isSQLKeyword() is deprecated, please switch to DBI::dbQuoteIdentifier().")
     isSQLKeyword.default(name, keywords = .SQL92Keywords, case)
   }
 )
@@ -124,7 +124,8 @@ setMethod("isSQLKeyword",
 #' Deprecated querying tools
 #'
 #' These functions have been deprecated. Please switch to using
-#' \code{dbSendQuery}/\code{dbGetQuery} + \code{dbBind} instead.
+#' \code{dbSendQuery}/\code{dbGetQuery} with the \code{params} argument
+#' or with calling \code{dbBind} instead.
 #'
 #' @keywords internal
 #' @name query-dep
@@ -136,7 +137,7 @@ NULL
 setMethod("dbSendPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
   function(conn, statement, bind.data) {
-    .Deprecated("dbBind", old = "dbSendPreparedQuery")
+    warning_once("RSQLite::dbSendPreparedQuery() is deprecated, please switch to DBI::dbSendQuery(params = bind.data).")
 
     res <- dbSendQuery(conn, statement)
 
@@ -155,7 +156,7 @@ setMethod("dbSendPreparedQuery",
 setMethod("dbGetPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
   function(conn, statement, bind.data) {
-    .Deprecated("dbBind", old = "dbGetPreparedQuery")
+    warning_once("RSQLite::dbGetPreparedQuery() is deprecated, please switch to DBI::dbGetQuery(params = bind.data).")
 
     res <- dbSendQuery(conn, statement)
     on.exit(dbClearResult(res), add = TRUE)
@@ -196,18 +197,14 @@ NULL
 #' @rdname dbGetInfo
 #' @export
 setMethod("dbGetInfo", "SQLiteDriver", function(dbObj) {
-  warning("dbGetInfo is deprecated: please use individual metadata functions instead",
-    call. = FALSE)
-
+  warning_once("RSQLite::dbGetInfo() is deprecated: please use individual metadata functions instead")
   list()
 })
 
 #' @rdname dbGetInfo
 #' @export
 setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
-  warning("dbGetInfo is deprecated: please use individual metadata functions instead",
-    call. = FALSE)
-
+  warning_once("RSQLite::dbGetInfo() is deprecated: please use individual metadata functions instead")
   list()
 })
 

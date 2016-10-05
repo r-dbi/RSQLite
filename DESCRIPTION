@@ -24,7 +24,8 @@ Suggests:
 Imports:
     methods,
     DBI (>= 0.4-9),
-    Rcpp (>= 0.11.4.2)
+    Rcpp (>= 0.11.4.2),
+    memoise
 LinkingTo: Rcpp, BH, plogr
 Remotes: rstats-db/DBI, rstats-db/DBItest@production, hadley/testthat
 Encoding: UTF-8

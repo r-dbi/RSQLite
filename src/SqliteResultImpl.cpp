@@ -81,16 +81,16 @@ std::vector<SEXPTYPE> SqliteResultImpl::get_initial_field_types(const int ncols)
   return types;
 }
 
-void SqliteResultImpl::after_bind(bool has_params) {
-  init(has_params);
-  if (has_params)
+void SqliteResultImpl::after_bind(bool params_have_rows) {
+  init(params_have_rows);
+  if (params_have_rows)
     step();
 }
 
-void SqliteResultImpl::init(bool has_params) {
+void SqliteResultImpl::init(bool params_have_rows) {
   ready_ = true;
   nrows_ = 0;
-  complete_ = !has_params;
+  complete_ = !params_have_rows;
 }
 
 

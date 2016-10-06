@@ -29,6 +29,8 @@ written to a temporary file and then imported to SQLite; when \code{value}
 is a character, it is interpreted as a file name and its contents imported
 to SQLite.}
 
+\item{...}{Needed for compatibility with generic. Otherwise ignored.}
+
 \item{row.names}{A logical specifying whether the \code{row.names} should be
 output to the output DBMS table; if \code{TRUE}, an extra field whose name
 will be whatever the R identifier \code{"row.names"} maps to the DBMS (see

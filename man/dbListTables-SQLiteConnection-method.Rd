@@ -9,6 +9,8 @@
 }
 \arguments{
 \item{conn}{An existing \code{\linkS4class{SQLiteConnection}}}
+
+\item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \description{
 List available SQLite tables.

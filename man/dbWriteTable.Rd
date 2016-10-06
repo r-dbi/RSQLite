@@ -14,7 +14,7 @@
 \S4method{dbWriteTable}{SQLiteConnection,character,character}(conn, name, value,
   ..., field.types = NULL, overwrite = FALSE, append = FALSE,
   header = TRUE, colClasses = NA, row.names = FALSE, nrows = 50,
-  sep = ",", eol = "\\n", skip = 0)
+  sep = ",", eol = "\\n", skip = 0, temporary = FALSE)
 
 \S4method{sqlData}{SQLiteConnection}(con, value, row.names = NA, ...)
 }

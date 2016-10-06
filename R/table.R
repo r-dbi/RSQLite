@@ -49,7 +49,7 @@ NULL
 #' dbDisconnect(con)
 setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
   function(conn, name, value, ..., row.names = NA, overwrite = FALSE, append = FALSE,
-    field.types = NULL) {
+           field.types = NULL, temporary = FALSE) {
 
     if (overwrite && append)
       stop("overwrite and append cannot both be TRUE", call. = FALSE)
@@ -77,7 +77,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
       # field_def()
       names(value) <- names(fields)
 
-      sql <- sqlCreateTable(conn, name, fields, row.names = FALSE)
+      sql <- sqlCreateTable(conn, name, fields, row.names = FALSE, temporary = temporary)
       dbGetQuery(conn, sql)
     } else if (append) {
       col_names <- dbListFields(conn, name)

@@ -53,11 +53,6 @@ sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL,
   warning_once("RSQLite::sqliteBuildTableDefinition() is deprecated, please switch to DBI::sqlCreateTable().")
   row.names <- compatRowNames(row.names)
 
-  sqliteBuildTableDefinitionNoWarn(con, name, value, field.types, row.names)
-}
-
-sqliteBuildTableDefinitionNoWarn <- function(con, name, value, field.types = NULL,
-                                             row.names = NA) {
   if (!is.data.frame(value)) {
     value <- as.data.frame(value)
   }

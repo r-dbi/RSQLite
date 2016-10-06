@@ -17,7 +17,7 @@
 |package  |*  |version    |date       |source                           |
 |:--------|:--|:----------|:----------|:--------------------------------|
 |DBI      |   |0.5-11     |2016-10-04 |Github (rstats-db/DBI@636bfc2)   |
-|RSQLite  |   |1.0.9011   |2016-09-12 |local                            |
+|RSQLite  |   |1.0.0      |2016-10-05 |local (rstats-db/RSQLite@NA)     |
 |testthat |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da) |
 
 # Check results
@@ -117,7 +117,7 @@
 |specL              |1.6.2     |      0|        1|     4|
 |sqldf              |0.4-10    |      0|        1|     2|
 |sqliter            |0.1.0     |      0|        0|     0|
-|SRAdb              |1.30.0    |      0|        1|     6|
+|SRAdb              |1.30.0    |      0|        0|     6|
 |srvyr              |0.2.0     |      0|        0|     0|
 |SSN                |1.1.7     |      0|        0|     1|
 |storr              |1.0.1     |      0|        0|     0|
@@ -2561,7 +2561,7 @@ The error most likely occurred in:
 > temp.db.file <- tempfile()
 > write(sim.bux.lines, file=temp.file)
 > test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
-Processing /tmp/RtmpF3Be7d/fileeea4561c5ba4 in chunks of 10000
+Processing /tmp/RtmpoXqTkt/filecddb1aab8728 in chunks of 10000
 Starting chunk 1
 Reached breakpoint change
 Processing breakpoint 1
@@ -2584,7 +2584,7 @@ Last 13 lines of output:
   Error in BiocGenerics:::testPackage("plethy") : 
     unit tests failed for package plethy
   In addition: Warning message:
-  closing unused connection 3 (/tmp/RtmpdBZVz5/filef00a173b0f7f) 
+  closing unused connection 3 (/tmp/RtmpTcKEco/filed01b72ac0b4) 
   Execution halted
 
 checking dependencies in R code ... NOTE
@@ -3051,32 +3051,9 @@ Maintainer: Wilson Freitas <wilson.freitas@gmail.com>
 Maintainer: Jack Zhu <zhujack@mail.nih.gov>  
 Bug reports: https://github.com/seandavi/SRAdb/issues/new
 
-0 errors | 1 warning  | 6 notes
+0 errors | 0 warnings | 6 notes
 
 ```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-    Filter, Find, Map, Position, Reduce,
-    anyDuplicated, append, as.data.frame,
-    cbind, colnames, do.call, duplicated,
-    eval, evalq, get, grep, grepl,
-    intersect, is.unsorted, lapply, lengths,
-    mapply, match, mget, order, paste, pmax,
-    pmax.int, pmin, pmin.int, rank, rbind,
-... 8 lines ...
-trying URL 'https://dl.dropboxusercontent.com/u/51653511/SRAmetadb.sqlite.gz'
-Content type 'application/octet-stream' length 1739781929 bytes (1659.2 MB)
-============
-downloaded 422.4 MB
-
-
-Error: processing vignette 'SRAdb.Rnw' failed with diagnostics:
- chunk 2 
-Error in download.file(url_sra, destfile = localfile, mode = "wb", method = method) : 
-  cannot download all files
-Execution halted
-
 checking for hidden files and directories ... NOTE
 Found the following hidden files and directories:
   .BBSoptions
@@ -3340,20 +3317,25 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Loading required package: TSdbi
-Oct 04, 2016 11:42:04 PM it.bancaditalia.oss.sdmx.util.Configuration init
-INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
-Oct 04, 2016 11:42:05 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
-INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Oct 04, 2016 11:44:12 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
-SEVERE: Exception. Class: java.net.ConnectException .Message: Connection timed out
+ options("getSymbols.warning4.0"=FALSE). See ?getSymbols for more details.
+Warning in if (as.character(sc[[1]]) != calling.fun) return() :
+  the condition has length > 1 and only the first element will be used
+trying URL 'http://www.rba.gov.au/statistics/tables/xls/d03hist.xls'
+Content type 'application/vnd.ms-excel' length 273408 bytes (267 KB)
+==================================================
+downloaded 267 KB
+... 8 lines ...
+The following objects are masked from ‘package:base’:
+
+    as.Date, as.Date.numeric
+
 
 Error: processing vignette 'Guide.Stex' failed with diagnostics:
- chunk 3 
-Error in .local(serIDs, con, ...) : 
-  QNA.CAN.B1_GE.CARSA.Q error: it.bancaditalia.oss.sdmx.util.SdmxException: Exception. Class: java.net.ConnectException .Message: Connection timed out
-Execution halted
+ chunk 41 
+Error in .local(drv, ...) : 
+  Failed to connect to database: Error: Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
 
+Execution halted
 ```
 
 ## TSSQLite (2015.4-1)

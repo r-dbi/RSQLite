@@ -38,7 +38,7 @@ setMethod("dbIsValid", "SQLiteConnection", function(dbObj, ...) {
 #' @rdname SQLiteConnection-class
 #' @export
 setMethod("dbGetException", "SQLiteConnection", function(conn, ...) {
-  .Deprecated("tryCatch", old = "dbGetException")
+  warning_once("RSQLite::dbGetException() is deprecated, please switch to using standard error handling via tryCatch().")
   list(
     errorNum = 0L,
     errorMsg = "OK"

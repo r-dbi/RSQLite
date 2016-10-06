@@ -7,7 +7,9 @@
 sqliteQuickColumn(con, table, column)
 }
 \description{
-DEPRECATED. Please use dbReadTable instead.
+A shortcut for
+\code{\link[DBI]{dbReadTable}(con, table, select.cols = column, row.names = FALSE)[[1]]},
+kept for compatibility reasons.
 }
 \keyword{internal}
 

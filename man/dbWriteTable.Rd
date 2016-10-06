@@ -8,15 +8,15 @@
 \title{Write a local data frame or file to the database.}
 \usage{
 \S4method{dbWriteTable}{SQLiteConnection,character,data.frame}(conn, name,
-  value, row.names = NA, overwrite = FALSE, append = FALSE,
-  field.types = NULL)
+  value, ..., row.names = NA, overwrite = FALSE, append = FALSE,
+  field.types = NULL, temporary = FALSE)
 
 \S4method{dbWriteTable}{SQLiteConnection,character,character}(conn, name, value,
-  field.types = NULL, overwrite = FALSE, append = FALSE, header = TRUE,
-  colClasses = NA, row.names = FALSE, nrows = 50, sep = ",",
-  eol = "\\n", skip = 0)
+  ..., field.types = NULL, overwrite = FALSE, append = FALSE,
+  header = TRUE, colClasses = NA, row.names = FALSE, nrows = 50,
+  sep = ",", eol = "\\n", skip = 0, temporary = FALSE)
 
-\S4method{sqlData}{SQLiteConnection}(con, value, row.names = NA)
+\S4method{sqlData}{SQLiteConnection}(con, value, row.names = NA, ...)
 }
 \arguments{
 \item{name}{a character string specifying a table name. SQLite table names
@@ -28,6 +28,8 @@ file name (character).  In the first case, the data.frame is
 written to a temporary file and then imported to SQLite; when \code{value}
 is a character, it is interpreted as a file name and its contents imported
 to SQLite.}
+
+\item{...}{Needed for compatibility with generic. Otherwise ignored.}
 
 \item{row.names}{A logical specifying whether the \code{row.names} should be
 output to the output DBMS table; if \code{TRUE}, an extra field whose name
@@ -44,6 +46,9 @@ in the DBMS.  Its default is \code{FALSE}.}
 \item{field.types}{character vector of named  SQL field types where
 the names are the names of new table's columns. If missing, types inferred
 with \code{\link[DBI]{dbDataType}}).}
+
+\item{temporary}{a logical specifying whether the new table should be
+temporary. Its default is \code{FALSE}.}
 
 \item{header}{is a logical indicating whether the first data line (but see
 \code{skip}) has a header or not.  If missing, it value is determined

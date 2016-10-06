@@ -5,10 +5,11 @@
 \alias{fetch,SQLiteResult-method}
 \title{Fetch.}
 \usage{
-\S4method{fetch}{SQLiteResult}(res, n = -1)
+\S4method{fetch}{SQLiteResult}(res, n = -1, ...)
 }
 \description{
-Deprecated. Please use \code{dbFetch} instead.
+A shortcut for \code{\link[DBI]{dbFetch}(res, n = n, row.names = FALSE)},
+kept for compatibility reasons.
 }
 \keyword{internal}
 

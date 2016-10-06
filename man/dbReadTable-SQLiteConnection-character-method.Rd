@@ -5,8 +5,8 @@
 \alias{dbReadTable,SQLiteConnection,character-method}
 \title{Convenience functions for importing/exporting DBMS tables}
 \usage{
-\S4method{dbReadTable}{SQLiteConnection,character}(conn, name, row.names = NA,
-  check.names = TRUE, select.cols = "*")
+\S4method{dbReadTable}{SQLiteConnection,character}(conn, name, ...,
+  row.names = NA, check.names = TRUE, select.cols = "*")
 }
 \arguments{
 \item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
@@ -16,16 +16,18 @@
 are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc}
 are considered equal.}
 
+\item{...}{Needed for compatibility with generic. Otherwise ignored.}
+
 \item{row.names}{Either \code{TRUE}, \code{FALSE}, \code{NA} or a string.
 
-  If \code{TRUE}, always translate row names to a column called "row_names".
-  If \code{FALSE}, never translate row names. If \code{NA}, translate
-  rownames only if they're a character vector.
+If \code{TRUE}, always translate row names to a column called "row_names".
+If \code{FALSE}, never translate row names. If \code{NA}, translate
+rownames only if they're a character vector.
 
-  A string is equivalent to \code{TRUE}, but allows you to override the
-  default name.
+A string is equivalent to \code{TRUE}, but allows you to override the
+default name.
 
-  For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
+For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
 
 \item{check.names}{If \code{TRUE}, the default, column names will be
 converted to valid R identifiers.}

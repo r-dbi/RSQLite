@@ -27,6 +27,9 @@ NULL
 #' @param field.types character vector of named  SQL field types where
 #'   the names are the names of new table's columns. If missing, types inferred
 #'   with \code{\link[DBI]{dbDataType}}).
+#' @param temporary a logical specifying whether the new table should be
+#'   temporary. Its default is \code{FALSE}.
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @details In a primary key column qualified with
 #' \href{https://www.sqlite.org/autoinc.html}{\code{AUTOINCREMENT}}, missing
 #' values will be assigned the next largest positive integer,
@@ -48,8 +51,8 @@ NULL
 #'
 #' dbDisconnect(con)
 setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
-  function(conn, name, value, row.names = NA, overwrite = FALSE, append = FALSE,
-    field.types = NULL) {
+  function(conn, name, value, ..., row.names = NA, overwrite = FALSE, append = FALSE,
+           field.types = NULL, temporary = FALSE) {
 
     if (overwrite && append)
       stop("overwrite and append cannot both be TRUE", call. = FALSE)
@@ -77,8 +80,8 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
       # field_def()
       names(value) <- names(fields)
 
-      sql <- sqlCreateTable(conn, name, fields, row.names = FALSE)
-      dbGetQuery(conn, sql)
+      sql <- sqlCreateTable(conn, name, fields, row.names = FALSE, temporary = temporary)
+      dbExecute(conn, sql)
     } else if (append) {
       col_names <- dbListFields(conn, name)
       value <- match_col(value, col_names)
@@ -86,7 +89,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
 
     if (nrow(value) > 0) {
       sql <- parameterised_insert(conn, name, value)
-      rs <- dbSendQuery(conn, sql)
+      rs <- dbSendStatement(conn, sql)
 
       names(value) <- rep("", length(value))
       tryCatch(
@@ -95,8 +98,8 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
       )
     }
 
-    on.exit(NULL)
     dbCommit(conn, "dbWriteTable")
+    on.exit(NULL)
     TRUE
   }
 )
@@ -177,9 +180,9 @@ parameterised_insert <- function(con, name, values) {
 #' @export
 #' @rdname dbWriteTable
 setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
-  function(conn, name, value, field.types = NULL, overwrite = FALSE,
+  function(conn, name, value, ..., field.types = NULL, overwrite = FALSE,
            append = FALSE, header = TRUE, colClasses = NA, row.names = FALSE,
-           nrows = 50, sep = ",", eol="\n", skip = 0) {
+           nrows = 50, sep = ",", eol="\n", skip = 0, temporary = FALSE) {
     if(overwrite && append)
       stop("overwrite and append cannot both be TRUE")
     value <- path.expand(value)
@@ -200,28 +203,31 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 
     if (!found || overwrite) {
       # Initialise table with first `nrows` lines
-      d <- utils::read.table(
-        value, sep = sep, header = header, skip = skip, nrows = nrows,
-        na.strings = "\\N", comment.char = "", colClasses = colClasses,
-        stringsAsFactors = FALSE)
-      sql <- sqliteBuildTableDefinitionNoWarn(conn, name, d,
-                                              field.types = field.types,
-                                              row.names = row.names)
-      dbGetQuery(conn, sql)
+      if (is.null(field.types)) {
+        fields <- utils::read.table(
+          value, sep = sep, header = header, skip = skip, nrows = nrows,
+          na.strings = "\\N", comment.char = "", colClasses = colClasses,
+          stringsAsFactors = FALSE)
+      } else {
+        fields <- field.types
+      }
+      sql <- sqlCreateTable(conn, name, fields, row.names = FALSE,
+                            temporary = temporary)
+      dbExecute(conn, sql)
     }
 
     skip <- skip + as.integer(header)
     rsqlite_import_file(conn@ptr, name, value, sep, eol, skip)
 
-    on.exit(NULL)
     dbCommit(conn)
+    on.exit(NULL)
     invisible(TRUE)
   }
 )
 
 #' @export
 #' @rdname dbWriteTable
-setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
+setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA, ...) {
   row.names <- compatRowNames(row.names)
   value <- sqlRownamesToColumn(value, row.names)
 
@@ -278,6 +284,7 @@ string_to_utf8 <- function(value) {
 #' @param select.cols  A SQL statement (in the form of a character vector of
 #'    length 1) giving the columns to select. E.g. "*" selects all columns,
 #'    "x,y,z" selects three columns named as listed.
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @inheritParams DBI::sqlRownamesToColumn
 #' @export
 #' @examples
@@ -293,7 +300,7 @@ string_to_utf8 <- function(value) {
 #'
 #' dbDisconnect(con)
 setMethod("dbReadTable", c("SQLiteConnection", "character"),
-  function(conn, name, row.names = NA, check.names = TRUE, select.cols = "*") {
+  function(conn, name, ..., row.names = NA, check.names = TRUE, select.cols = "*") {
     row.names <- compatRowNames(row.names)
 
     name <- dbQuoteIdentifier(conn, name)
@@ -316,10 +323,11 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name character vector of length 1 giving name of table to remove
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @export
 setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
-  function(conn, name) {
-    dbGetQuery(conn, paste("DROP TABLE ", dbQuoteIdentifier(conn, name)))
+  function(conn, name, ...) {
+    dbExecute(conn, paste("DROP TABLE ", dbQuoteIdentifier(conn, name)))
     invisible(TRUE)
   }
 )
@@ -329,10 +337,11 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name String, name of table. Match is case insensitive.
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @export
 setMethod(
   "dbExistsTable", c("SQLiteConnection", "character"),
-  function(conn, name) {
+  function(conn, name, ...) {
     rs <- sqliteListTablesWithName(conn, name)
     on.exit(dbClearResult(rs), add = TRUE)
 
@@ -344,8 +353,9 @@ setMethod(
 #' List available SQLite tables.
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @export
-setMethod("dbListTables", "SQLiteConnection", function(conn) {
+setMethod("dbListTables", "SQLiteConnection", function(conn, ...) {
   rs <- sqliteListTables(conn)
   on.exit(dbClearResult(rs), add = TRUE)
 
@@ -378,6 +388,7 @@ sqliteListTablesQuery <- function(conn, name = NULL) {
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name a length 1 character vector giving the name of a table.
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @export
 #' @examples
 #' con <- dbConnect(SQLite())
@@ -385,7 +396,7 @@ sqliteListTablesQuery <- function(conn, name = NULL) {
 #' dbListFields(con, "iris")
 #' dbDisconnect(con)
 setMethod("dbListFields", c("SQLiteConnection", "character"),
-  function(conn, name) {
+  function(conn, name, ...) {
     rs <- dbSendQuery(conn, paste("SELECT * FROM ",
                                   dbQuoteIdentifier(conn, name), "LIMIT 0"))
     on.exit(dbClearResult(rs))

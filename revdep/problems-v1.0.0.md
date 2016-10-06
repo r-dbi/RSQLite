@@ -10,14 +10,14 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2016-09-09                   |
+|date     |2016-10-05                   |
 
 ## Packages
 
 |package  |*  |version    |date       |source                           |
 |:--------|:--|:----------|:----------|:--------------------------------|
-|DBI      |   |0.5        |2016-09-09 |Github (rstats-db/DBI@2d7c39a)   |
-|RSQLite  |   |1.0.0      |2016-09-09 |local (rstats-db/RSQLite@NA)     |
+|DBI      |   |0.5-11     |2016-10-04 |Github (rstats-db/DBI@636bfc2)   |
+|RSQLite  |   |1.0.0      |2016-10-05 |local (rstats-db/RSQLite@NA)     |
 |testthat |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da) |
 
 # Check results
@@ -37,7 +37,7 @@
 |DECIPHER          |2.0.2    |      0|        2|     2|
 |ensembldb         |1.4.7    |      0|        1|     1|
 |filematrix        |1.1.0    |      0|        1|     0|
-|gcbd              |0.2.5    |      0|        1|     3|
+|gcbd              |0.2.6    |      0|        1|     1|
 |GeneAnswers       |2.14.0   |      1|        3|     6|
 |GenomicFeatures   |1.24.5   |      0|        1|     2|
 |Genominator       |1.26.0   |      0|        1|     4|
@@ -45,7 +45,7 @@
 |maGUI             |1.0      |      1|        0|     0|
 |MeSHDbi           |1.8.0    |      0|        1|     2|
 |metaseqR          |1.12.2   |      1|        1|     4|
-|mgsa              |1.20.0   |      0|        1|     4|
+|mgsa              |1.20.0   |      0|        1|     5|
 |oce               |0.9-19   |      1|        0|     1|
 |oligo             |1.36.1   |      1|        1|     8|
 |OrganismDbi       |1.14.1   |      0|        1|     2|
@@ -365,6 +365,8 @@ File ‘CNEr/libs/CNEr.so’:
     Object: ‘ucsc/errabort.o’
   Found ‘exit’, possibly from ‘exit’ (C)
     Objects: ‘ucsc/errabort.o’, ‘ucsc/pipeline.o’
+  Found ‘printf’, possibly from ‘printf’ (C)
+    Objects: ‘ceScan.o’, ‘ucsc/pipeline.o’
   Found ‘puts’, possibly from ‘printf’ (C), ‘puts’ (C)
     Object: ‘ucsc/pipeline.o’
   Found ‘rand’, possibly from ‘rand’ (C)
@@ -515,7 +517,7 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
   consider running tools::compactPDF(gs_quality = "ebook") on these files
 
 checking installed package size ... NOTE
-  installed size is  9.2Mb
+  installed size is  8.9Mb
   sub-directories of 1Mb or more:
     data      2.5Mb
     doc       3.9Mb
@@ -587,27 +589,15 @@ Execution halted
 
 ```
 
-## gcbd (0.2.5)
+## gcbd (0.2.6)
 Maintainer: Dirk Eddelbuettel <edd@debian.org>
 
-0 errors | 1 warning  | 3 notes
+0 errors | 1 warning  | 1 note 
 
 ```
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Loading required package: RSQLite
-Loading required package: DBI
-Loading required package: plyr
-Loading required package: reshape
-
-Attaching package: ‘reshape’
-
-The following objects are masked from ‘package:plyr’:
-
-    rename, round_any
-
-Loading required package: lattice
 Warning in packageDescription("gputools") :
   no package 'gputools' was found
 Error: processing vignette 'gcbd.Rnw' failed with diagnostics:
@@ -617,35 +607,6 @@ Execution halted
 
 checking package dependencies ... NOTE
 Package suggested but not available for checking: ‘gputools’
-
-checking dependencies in R code ... NOTE
-Packages in Depends field not imported from:
-  ‘RSQLite’ ‘lattice’ ‘plyr’ ‘reshape’
-  These packages need to be imported from (in the NAMESPACE file)
-  for when this namespace is loaded but not attached.
-
-checking R code for possible problems ... NOTE
-createDatabase: no visible global function definition for ‘dbDriver’
-createDatabase: no visible global function definition for
-  ‘dbBuildTableDefinition’
-createDatabase: no visible global function definition for ‘dbConnect’
-createDatabase: no visible global function definition for ‘dbGetQuery’
-createDatabase: no visible global function definition for
-  ‘dbDisconnect’
-databaseResult: no visible global function definition for ‘dbConnect’
-databaseResult: no visible global function definition for ‘dbDriver’
-... 74 lines ...
-qrBenchmarkgputools: no visible global function definition for ‘gpuQr’
-svdBenchmarkgputools: no visible global function definition for
-  ‘gpuSvd’
-Undefined global functions or variables:
-  coef dbBuildTableDefinition dbConnect dbDisconnect dbDriver
-  dbGetQuery dbWriteTable ddply gpuMatMult gpuQr gpuSvd legend lm lu
-  matplot melt par rnorm trellis.par.get trellis.par.set
-Consider adding
-  importFrom("graphics", "legend", "matplot", "par")
-  importFrom("stats", "coef", "lm", "rnorm")
-to your NAMESPACE file.
 ```
 
 ## GeneAnswers (2.14.0)
@@ -1116,7 +1077,7 @@ to your NAMESPACE file.
 ## mgsa (1.20.0)
 Maintainer: Sebastian Bauer <mail@sebastianbauer.info>
 
-0 errors | 1 warning  | 4 notes
+0 errors | 1 warning  | 5 notes
 
 ```
 checking for GNU extensions in Makefiles ... WARNING
@@ -1174,6 +1135,16 @@ Consider adding
   importFrom("utils", "read.delim", "relist", "str")
 to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
 contains 'methods').
+
+checking compiled code ... NOTE
+File ‘mgsa/libs/mgsa.so’:
+  Found ‘printf’, possibly from ‘printf’ (C)
+    Object: ‘mgsa.o’
+
+Compiled code should not call entry points which might terminate R nor
+write to stdout/stderr instead of to the console, nor the system RNG.
+
+See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
 
 ## oce (0.9-19)
@@ -1204,7 +1175,7 @@ Calls: plot -> plot -> .local
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  5.3Mb
+  installed size is  5.1Mb
   sub-directories of 1Mb or more:
     help   2.0Mb
 ```
@@ -1247,7 +1218,7 @@ checking package dependencies ... NOTE
 Packages which this enhances but not available for checking: ‘doMC’ ‘doMPI’
 
 checking installed package size ... NOTE
-  installed size is 30.1Mb
+  installed size is 30.0Mb
   sub-directories of 1Mb or more:
     doc      12.9Mb
     scripts  15.7Mb
@@ -1548,7 +1519,7 @@ The error most likely occurred in:
 > temp.db.file <- tempfile()
 > write(sim.bux.lines, file=temp.file)
 > test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
-Processing /tmp/RtmpWIPK7Z/filedb5b32a3a931 in chunks of 10000
+Processing /tmp/RtmpoXqTkt/filecddb1aab8728 in chunks of 10000
 Starting chunk 1
 Reached breakpoint change
 Processing breakpoint 1
@@ -1571,7 +1542,7 @@ Last 13 lines of output:
   Error in BiocGenerics:::testPackage("plethy") : 
     unit tests failed for package plethy
   In addition: Warning message:
-  closing unused connection 3 (/tmp/RtmpooGJiX/filedcdf6555f40a) 
+  closing unused connection 3 (/tmp/RtmpTcKEco/filed01b72ac0b4) 
   Execution halted
 
 checking dependencies in R code ... NOTE
@@ -1901,9 +1872,9 @@ Error in re-building vignettes:
 Warning in if (as.character(sc[[1]]) != calling.fun) return() :
   the condition has length > 1 and only the first element will be used
 trying URL 'http://www.rba.gov.au/statistics/tables/xls/d03hist.xls'
-Content type 'application/vnd.ms-excel' length 272896 bytes (266 KB)
+Content type 'application/vnd.ms-excel' length 273408 bytes (267 KB)
 ==================================================
-downloaded 266 KB
+downloaded 267 KB
 ... 8 lines ...
 The following objects are masked from ‘package:base’:
 
@@ -1987,7 +1958,7 @@ Error in VariantFilteringParam(vcfFilenames = CEUvcf) :
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  7.9Mb
+  installed size is  7.8Mb
   sub-directories of 1Mb or more:
     R         3.5Mb
     extdata   3.5Mb

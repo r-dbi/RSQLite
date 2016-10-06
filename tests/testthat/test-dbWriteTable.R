@@ -7,7 +7,7 @@ test_that("throws error if constraint violated", {
   x <- data.frame(col1 = 1:10, col2 = letters[1:10])
 
   dbWriteTable(con, "t1", x)
-  dbGetQuery(con, "CREATE UNIQUE INDEX t1_c1_c2_idx ON t1(col1, col2)")
+  dbExecute(con, "CREATE UNIQUE INDEX t1_c1_c2_idx ON t1(col1, col2)")
   expect_error(dbWriteTable(con, "t1", x, append = TRUE),
     "UNIQUE constraint failed")
 })
@@ -31,7 +31,7 @@ test_that("throws error if constrainted violated", {
   x <- data.frame(col1 = 1:10, col2 = letters[1:10])
 
   dbWriteTable(con, "t1", x)
-  dbGetQuery(con, "CREATE UNIQUE INDEX t1_c1_c2_idx ON t1(col1, col2)")
+  dbExecute(con, "CREATE UNIQUE INDEX t1_c1_c2_idx ON t1(col1, col2)")
   expect_error(dbWriteTable(con, "t1", x, append = TRUE),
     "UNIQUE constraint failed")
 })

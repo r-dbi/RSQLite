@@ -80,7 +80,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
       names(value) <- names(fields)
 
       sql <- sqlCreateTable(conn, name, fields, row.names = FALSE, temporary = temporary)
-      dbGetQuery(conn, sql)
+      dbExecute(conn, sql)
     } else if (append) {
       col_names <- dbListFields(conn, name)
       value <- match_col(value, col_names)
@@ -321,7 +321,7 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 #' @export
 setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
   function(conn, name, ...) {
-    dbGetQuery(conn, paste("DROP TABLE ", dbQuoteIdentifier(conn, name)))
+    dbExecute(conn, paste("DROP TABLE ", dbQuoteIdentifier(conn, name)))
     invisible(TRUE)
   }
 )

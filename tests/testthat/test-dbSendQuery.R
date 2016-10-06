@@ -11,7 +11,7 @@ test_that("attempting to change schema with pending rows generates warning", {
   row1 <- dbFetch(rs, n = 1)
   expect_equal(row1, df[1, ])
 
-  expect_warning(rs <- dbSendQuery(con, "CREATE TABLE t2 (x text, y integer)"),
+  expect_warning(rs <- dbSendStatement(con, "CREATE TABLE t2 (x text, y integer)"),
     "pending rows")
   dbClearResult(rs)
 })
@@ -124,7 +124,7 @@ test_that("failed matches are silently dropped", {
 test_that("NA matches NULL", {
   memoise::forget(warning_once)
   con <- bind_select_setup()
-  dbGetQuery(con, "INSERT INTO t1 VALUES ('x', NULL, NULL)")
+  dbExecute(con, "INSERT INTO t1 VALUES ('x', NULL, NULL)")
 
   expect_warning(
     got <- dbGetPreparedQuery(con, "SELECT id FROM t1 WHERE y IS :y",

@@ -27,6 +27,8 @@ private:
   bool ready_;
   int nrows_;
   int rows_affected_;
+  List params_;
+  int group_, groups_;
   std::vector<SEXPTYPE> types_;
 
 public:
@@ -36,8 +38,8 @@ public:
 private:
   static sqlite3_stmt* prepare(sqlite3* conn, const std::string& sql);
   static std::vector<SEXPTYPE> get_initial_field_types(const int ncols);
-  void after_bind();
-  void init();
+  void after_bind(bool params_have_rows);
+  void init(bool params_have_rows);
 
 public:
   bool complete();
@@ -50,16 +52,19 @@ public:
   List get_column_info_impl();
 
 private:
-  void bind_parameter(int i, int j, const std::string& name, SEXP values_);
+  bool bind_row();
+  void bind_parameter(int j, const std::string& name, SEXP values_);
   int find_parameter(const std::string& name);
-  void bind_parameter_pos(int i, int j, SEXP value_);
+  void bind_parameter_pos(int j, SEXP value_);
 
   List fetch_rows(int n_max, int& n);
   void step();
+  bool step_run();
+  bool step_done();
   List peek_first_row();
 
-  void raise_sqlite_exception() const;
-  static void raise_sqlite_exception(sqlite3* conn);
+  void NORET raise_sqlite_exception() const;
+  static void NORET raise_sqlite_exception(sqlite3* conn);
 };
 
 

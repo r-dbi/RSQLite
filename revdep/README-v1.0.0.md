@@ -10,19 +10,19 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2016-09-09                   |
+|date     |2016-10-05                   |
 
 ## Packages
 
 |package  |*  |version    |date       |source                           |
 |:--------|:--|:----------|:----------|:--------------------------------|
-|DBI      |   |0.5        |2016-09-09 |Github (rstats-db/DBI@2d7c39a)   |
-|RSQLite  |   |1.0.0      |2016-09-09 |local (rstats-db/RSQLite@NA)     |
+|DBI      |   |0.5-11     |2016-10-04 |Github (rstats-db/DBI@636bfc2)   |
+|RSQLite  |   |1.0.9011   |2016-09-12 |local                            |
 |testthat |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da) |
 
 # Check results
 
-112 packages
+113 packages
 
 |package            |version   | errors| warnings| notes|
 |:------------------|:---------|------:|--------:|-----:|
@@ -47,19 +47,19 @@
 |CollapsABEL        |0.10.8    |      0|        0|     0|
 |cummeRbund         |2.14.0    |      0|        0|     7|
 |customProDB        |1.12.0    |      1|        1|     3|
-|DBI                |0.5       |      0|        0|     1|
+|DBI                |0.5-1     |      0|        0|     1|
 |DECIPHER           |2.0.2     |      0|        2|     2|
 |dplyr              |0.5.0     |      0|        0|     2|
 |ecd                |0.8.2     |      0|        0|     0|
 |emuR               |0.1.9     |      0|        0|     0|
 |ENCODExplorer      |1.4.3     |      0|        0|     2|
 |ensembldb          |1.4.7     |      0|        1|     1|
-|etl                |0.3.3     |      0|        0|     0|
+|etl                |0.3.3.1   |      0|        0|     0|
 |ETLUtils           |1.3       |      0|        0|     0|
 |filehashSQLite     |0.2-4     |      0|        0|     3|
 |filematrix         |1.1.0     |      0|        1|     0|
 |freqweights        |1.0.2     |      0|        0|     1|
-|gcbd               |0.2.5     |      0|        1|     3|
+|gcbd               |0.2.6     |      0|        1|     1|
 |GeneAnswers        |2.14.0    |      1|        3|     6|
 |GenomicFeatures    |1.24.5    |      0|        1|     2|
 |Genominator        |1.26.0    |      0|        1|     4|
@@ -74,9 +74,9 @@
 |marmap             |0.9.5     |      0|        0|     0|
 |MeSHDbi            |1.8.0     |      0|        1|     2|
 |metagenomeFeatures |1.1.0     |      0|        0|     1|
-|MetaIntegrator     |1.0.1     |      0|        0|     0|
+|MetaIntegrator     |1.0.3     |      0|        0|     0|
 |metaseqR           |1.12.2    |      1|        1|     4|
-|mgsa               |1.20.0    |      0|        1|     4|
+|mgsa               |1.20.0    |      0|        1|     5|
 |miRNAtap           |1.6.0     |      0|        0|     2|
 |MmPalateMiRNA      |1.22.0    |      0|        0|     4|
 |MonetDBLite        |0.3.1     |      0|        0|     1|
@@ -107,7 +107,7 @@
 |rplexos            |1.1.8     |      0|        0|     0|
 |RQDA               |0.2-7     |      1|        0|     1|
 |rTRM               |1.10.2    |      0|        0|     1|
-|rvertnet           |0.4.4     |      0|        0|     0|
+|rvertnet           |0.5.0     |      0|        0|     0|
 |scrime             |1.3.3     |      0|        0|     2|
 |SEERaBomb          |2016.1    |      0|        0|     0|
 |seqplots           |1.10.2    |      0|        0|     3|
@@ -117,11 +117,12 @@
 |specL              |1.6.2     |      0|        1|     4|
 |sqldf              |0.4-10    |      0|        1|     2|
 |sqliter            |0.1.0     |      0|        0|     0|
-|SRAdb              |1.30.0    |      0|        0|     6|
+|SRAdb              |1.30.0    |      0|        1|     6|
+|srvyr              |0.2.0     |      0|        0|     0|
 |SSN                |1.1.7     |      0|        0|     1|
 |storr              |1.0.1     |      0|        0|     0|
 |stream             |1.2-3     |      0|        0|     1|
-|survey             |3.31      |      0|        0|     0|
+|survey             |3.31-2    |      0|        0|     0|
 |taRifx             |1.0.6     |      0|        0|     4|
 |tcpl               |1.2.2     |      0|        0|     1|
 |TFBSTools          |1.10.4    |      0|        1|     1|
@@ -642,6 +643,8 @@ File ‘CNEr/libs/CNEr.so’:
     Object: ‘ucsc/errabort.o’
   Found ‘exit’, possibly from ‘exit’ (C)
     Objects: ‘ucsc/errabort.o’, ‘ucsc/pipeline.o’
+  Found ‘printf’, possibly from ‘printf’ (C)
+    Objects: ‘ceScan.o’, ‘ucsc/pipeline.o’
   Found ‘puts’, possibly from ‘printf’ (C), ‘puts’ (C)
     Object: ‘ucsc/pipeline.o’
   Found ‘rand’, possibly from ‘rand’ (C)
@@ -859,7 +862,7 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## DBI (0.5)
+## DBI (0.5-1)
 Maintainer: Kirill Müller <krlmlr+r@mailbox.org>  
 Bug reports: https://github.com/rstats-db/DBI/issues
 
@@ -900,7 +903,7 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
   consider running tools::compactPDF(gs_quality = "ebook") on these files
 
 checking installed package size ... NOTE
-  installed size is  9.2Mb
+  installed size is  8.9Mb
   sub-directories of 1Mb or more:
     data      2.5Mb
     doc       3.9Mb
@@ -938,9 +941,9 @@ Bug reports: https://github.com/hadley/dplyr/issues
 
 ```
 checking installed package size ... NOTE
-  installed size is 23.3Mb
+  installed size is 16.0Mb
   sub-directories of 1Mb or more:
-    libs  21.2Mb
+    libs  13.9Mb
 
 checking dependencies in R code ... NOTE
 Missing or unexported object: ‘RSQLite::rsqliteVersion’
@@ -1015,7 +1018,7 @@ Unexported objects imported by ':::' calls:
   See the note in ?`:::` about the use of this operator.
 ```
 
-## etl (0.3.3)
+## etl (0.3.3.1)
 Maintainer: Ben Baumer <ben.baumer@gmail.com>  
 Bug reports: https://github.com/beanumber/etl/issues
 
@@ -1114,27 +1117,15 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## gcbd (0.2.5)
+## gcbd (0.2.6)
 Maintainer: Dirk Eddelbuettel <edd@debian.org>
 
-0 errors | 1 warning  | 3 notes
+0 errors | 1 warning  | 1 note 
 
 ```
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Loading required package: RSQLite
-Loading required package: DBI
-Loading required package: plyr
-Loading required package: reshape
-
-Attaching package: ‘reshape’
-
-The following objects are masked from ‘package:plyr’:
-
-    rename, round_any
-
-Loading required package: lattice
 Warning in packageDescription("gputools") :
   no package 'gputools' was found
 Error: processing vignette 'gcbd.Rnw' failed with diagnostics:
@@ -1144,35 +1135,6 @@ Execution halted
 
 checking package dependencies ... NOTE
 Package suggested but not available for checking: ‘gputools’
-
-checking dependencies in R code ... NOTE
-Packages in Depends field not imported from:
-  ‘RSQLite’ ‘lattice’ ‘plyr’ ‘reshape’
-  These packages need to be imported from (in the NAMESPACE file)
-  for when this namespace is loaded but not attached.
-
-checking R code for possible problems ... NOTE
-createDatabase: no visible global function definition for ‘dbDriver’
-createDatabase: no visible global function definition for
-  ‘dbBuildTableDefinition’
-createDatabase: no visible global function definition for ‘dbConnect’
-createDatabase: no visible global function definition for ‘dbGetQuery’
-createDatabase: no visible global function definition for
-  ‘dbDisconnect’
-databaseResult: no visible global function definition for ‘dbConnect’
-databaseResult: no visible global function definition for ‘dbDriver’
-... 74 lines ...
-qrBenchmarkgputools: no visible global function definition for ‘gpuQr’
-svdBenchmarkgputools: no visible global function definition for
-  ‘gpuSvd’
-Undefined global functions or variables:
-  coef dbBuildTableDefinition dbConnect dbDisconnect dbDriver
-  dbGetQuery dbWriteTable ddply gpuMatMult gpuQr gpuSvd legend lm lu
-  matplot melt par rnorm trellis.par.get trellis.par.set
-Consider adding
-  importFrom("graphics", "legend", "matplot", "par")
-  importFrom("stats", "coef", "lm", "rnorm")
-to your NAMESPACE file.
 ```
 
 ## GeneAnswers (2.14.0)
@@ -1830,7 +1792,7 @@ checking installed package size ... NOTE
     extdata  30.9Mb
 ```
 
-## MetaIntegrator (1.0.1)
+## MetaIntegrator (1.0.3)
 Maintainer: Winston A. Haynes <hayneswa@stanford.edu>
 
 0 errors | 0 warnings | 0 notes
@@ -1922,7 +1884,7 @@ to your NAMESPACE file.
 ## mgsa (1.20.0)
 Maintainer: Sebastian Bauer <mail@sebastianbauer.info>
 
-0 errors | 1 warning  | 4 notes
+0 errors | 1 warning  | 5 notes
 
 ```
 checking for GNU extensions in Makefiles ... WARNING
@@ -1980,6 +1942,16 @@ Consider adding
   importFrom("utils", "read.delim", "relist", "str")
 to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
 contains 'methods').
+
+checking compiled code ... NOTE
+File ‘mgsa/libs/mgsa.so’:
+  Found ‘printf’, possibly from ‘printf’ (C)
+    Object: ‘mgsa.o’
+
+Compiled code should not call entry points which might terminate R nor
+write to stdout/stderr instead of to the console, nor the system RNG.
+
+See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
 
 ## miRNAtap (1.6.0)
@@ -2058,9 +2030,9 @@ Bug reports: https://github.com/hannesmuehleisen/MonetDBLite/issues
 
 ```
 checking installed package size ... NOTE
-  installed size is  6.9Mb
+  installed size is  8.4Mb
   sub-directories of 1Mb or more:
-    libs   6.6Mb
+    libs   8.1Mb
 ```
 
 ## MUCflights (0.0-3)
@@ -2180,7 +2152,7 @@ Calls: plot -> plot -> .local
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  5.3Mb
+  installed size is  5.1Mb
   sub-directories of 1Mb or more:
     help   2.0Mb
 ```
@@ -2277,7 +2249,7 @@ checking package dependencies ... NOTE
 Packages which this enhances but not available for checking: ‘doMC’ ‘doMPI’
 
 checking installed package size ... NOTE
-  installed size is 30.1Mb
+  installed size is 30.0Mb
   sub-directories of 1Mb or more:
     doc      12.9Mb
     scripts  15.7Mb
@@ -2589,7 +2561,7 @@ The error most likely occurred in:
 > temp.db.file <- tempfile()
 > write(sim.bux.lines, file=temp.file)
 > test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
-Processing /tmp/RtmpWIPK7Z/filedb5b32a3a931 in chunks of 10000
+Processing /tmp/RtmpF3Be7d/fileeea4561c5ba4 in chunks of 10000
 Starting chunk 1
 Reached breakpoint change
 Processing breakpoint 1
@@ -2612,7 +2584,7 @@ Last 13 lines of output:
   Error in BiocGenerics:::testPackage("plethy") : 
     unit tests failed for package plethy
   In addition: Warning message:
-  closing unused connection 3 (/tmp/RtmpooGJiX/filedcdf6555f40a) 
+  closing unused connection 3 (/tmp/RtmpdBZVz5/filef00a173b0f7f) 
   Execution halted
 
 checking dependencies in R code ... NOTE
@@ -2894,7 +2866,7 @@ Rd file 'processBiogrid.Rd':
 These lines will be truncated in the PDF manual.
 ```
 
-## rvertnet (0.4.4)
+## rvertnet (0.5.0)
 Maintainer: Scott Chamberlain <myrmecocystus@gmail.com>  
 Bug reports: https://github.com/ropensci/rvertnet/issues
 
@@ -3079,9 +3051,32 @@ Maintainer: Wilson Freitas <wilson.freitas@gmail.com>
 Maintainer: Jack Zhu <zhujack@mail.nih.gov>  
 Bug reports: https://github.com/seandavi/SRAdb/issues/new
 
-0 errors | 0 warnings | 6 notes
+0 errors | 1 warning  | 6 notes
 
 ```
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+    Filter, Find, Map, Position, Reduce,
+    anyDuplicated, append, as.data.frame,
+    cbind, colnames, do.call, duplicated,
+    eval, evalq, get, grep, grepl,
+    intersect, is.unsorted, lapply, lengths,
+    mapply, match, mget, order, paste, pmax,
+    pmax.int, pmin, pmin.int, rank, rbind,
+... 8 lines ...
+trying URL 'https://dl.dropboxusercontent.com/u/51653511/SRAmetadb.sqlite.gz'
+Content type 'application/octet-stream' length 1739781929 bytes (1659.2 MB)
+============
+downloaded 422.4 MB
+
+
+Error: processing vignette 'SRAdb.Rnw' failed with diagnostics:
+ chunk 2 
+Error in download.file(url_sra, destfile = localfile, mode = "wb", method = method) : 
+  cannot download all files
+Execution halted
+
 checking for hidden files and directories ... NOTE
 Found the following hidden files and directories:
   .BBSoptions
@@ -3152,6 +3147,12 @@ Rd file 'sraGraph.Rd':
 These lines will be truncated in the PDF manual.
 ```
 
+## srvyr (0.2.0)
+Maintainer: Greg Freedman Ellis <greg.freedman@gmail.com>  
+Bug reports: https://github.com/gergness/srvyr/issues
+
+0 errors | 0 warnings | 0 notes
+
 ## SSN (1.1.7)
 Maintainer: Jay Ver Hoef <ver.hoef@SpatialStreamNetworks.com>
 
@@ -3178,13 +3179,13 @@ Bug reports: https://github.com/mhahsler/stream/issues
 
 ```
 checking installed package size ... NOTE
-  installed size is  5.7Mb
+  installed size is  5.6Mb
   sub-directories of 1Mb or more:
     doc    1.6Mb
     libs   3.6Mb
 ```
 
-## survey (3.31)
+## survey (3.31-2)
 Maintainer: "Thomas Lumley" <t.lumley@auckland.ac.nz>
 
 0 errors | 0 warnings | 0 notes
@@ -3339,25 +3340,20 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
- options("getSymbols.warning4.0"=FALSE). See ?getSymbols for more details.
-Warning in if (as.character(sc[[1]]) != calling.fun) return() :
-  the condition has length > 1 and only the first element will be used
-trying URL 'http://www.rba.gov.au/statistics/tables/xls/d03hist.xls'
-Content type 'application/vnd.ms-excel' length 272896 bytes (266 KB)
-==================================================
-downloaded 266 KB
-... 8 lines ...
-The following objects are masked from ‘package:base’:
-
-    as.Date, as.Date.numeric
-
+Loading required package: TSdbi
+Oct 04, 2016 11:42:04 PM it.bancaditalia.oss.sdmx.util.Configuration init
+INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
+Oct 04, 2016 11:42:05 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
+Oct 04, 2016 11:44:12 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+SEVERE: Exception. Class: java.net.ConnectException .Message: Connection timed out
 
 Error: processing vignette 'Guide.Stex' failed with diagnostics:
- chunk 41 
-Error in .local(drv, ...) : 
-  Failed to connect to database: Error: Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
-
+ chunk 3 
+Error in .local(serIDs, con, ...) : 
+  QNA.CAN.B1_GE.CARSA.Q error: it.bancaditalia.oss.sdmx.util.SdmxException: Exception. Class: java.net.ConnectException .Message: Connection timed out
 Execution halted
+
 ```
 
 ## TSSQLite (2015.4-1)
@@ -3504,7 +3500,7 @@ Error in VariantFilteringParam(vcfFilenames = CEUvcf) :
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  7.9Mb
+  installed size is  7.8Mb
   sub-directories of 1Mb or more:
     R         3.5Mb
     extdata   3.5Mb

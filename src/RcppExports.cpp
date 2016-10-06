@@ -102,17 +102,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rsqlite_bind_params
-void rsqlite_bind_params(const XPtr<SqliteResult>& res, List params);
-RcppExport SEXP RSQLite_rsqlite_bind_params(SEXP resSEXP, SEXP paramsSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const XPtr<SqliteResult>& >::type res(resSEXP);
-    Rcpp::traits::input_parameter< List >::type params(paramsSEXP);
-    rsqlite_bind_params(res, params);
-    return R_NilValue;
-END_RCPP
-}
 // rsqlite_find_params
 IntegerVector rsqlite_find_params(const XPtr<SqliteResult>& res, CharacterVector param_names);
 RcppExport SEXP RSQLite_rsqlite_find_params(SEXP resSEXP, SEXP param_namesSEXP) {

@@ -10,19 +10,19 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2016-09-09                   |
+|date     |2016-10-05                   |
 
 ## Packages
 
 |package  |*  |version    |date       |source                           |
 |:--------|:--|:----------|:----------|:--------------------------------|
-|DBI      |   |0.5        |2016-09-09 |Github (rstats-db/DBI@2d7c39a)   |
-|RSQLite  |   |1.0.0      |2016-09-09 |local (rstats-db/RSQLite@NA)     |
+|DBI      |   |0.5-11     |2016-10-04 |Github (rstats-db/DBI@636bfc2)   |
+|RSQLite  |   |1.0.9011   |2016-09-12 |local                            |
 |testthat |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da) |
 
 # Check results
 
-39 packages with problems
+40 packages with problems
 
 |package           |version  | errors| warnings| notes|
 |:-----------------|:--------|------:|--------:|-----:|
@@ -37,7 +37,7 @@
 |DECIPHER          |2.0.2    |      0|        2|     2|
 |ensembldb         |1.4.7    |      0|        1|     1|
 |filematrix        |1.1.0    |      0|        1|     0|
-|gcbd              |0.2.5    |      0|        1|     3|
+|gcbd              |0.2.6    |      0|        1|     1|
 |GeneAnswers       |2.14.0   |      1|        3|     6|
 |GenomicFeatures   |1.24.5   |      0|        1|     2|
 |Genominator       |1.26.0   |      0|        1|     4|
@@ -45,7 +45,7 @@
 |maGUI             |1.0      |      1|        0|     0|
 |MeSHDbi           |1.8.0    |      0|        1|     2|
 |metaseqR          |1.12.2   |      1|        1|     4|
-|mgsa              |1.20.0   |      0|        1|     4|
+|mgsa              |1.20.0   |      0|        1|     5|
 |oce               |0.9-19   |      1|        0|     1|
 |oligo             |1.36.1   |      1|        1|     8|
 |OrganismDbi       |1.14.1   |      0|        1|     2|
@@ -58,6 +58,7 @@
 |RQDA              |0.2-7    |      1|        0|     1|
 |specL             |1.6.2    |      0|        1|     4|
 |sqldf             |0.4-10   |      0|        1|     2|
+|SRAdb             |1.30.0   |      0|        1|     6|
 |TFBSTools         |1.10.4   |      0|        1|     1|
 |tigre             |1.26.0   |      0|        1|     2|
 |trackeR           |0.0.3    |      0|        1|     0|
@@ -365,6 +366,8 @@ File ‘CNEr/libs/CNEr.so’:
     Object: ‘ucsc/errabort.o’
   Found ‘exit’, possibly from ‘exit’ (C)
     Objects: ‘ucsc/errabort.o’, ‘ucsc/pipeline.o’
+  Found ‘printf’, possibly from ‘printf’ (C)
+    Objects: ‘ceScan.o’, ‘ucsc/pipeline.o’
   Found ‘puts’, possibly from ‘printf’ (C), ‘puts’ (C)
     Object: ‘ucsc/pipeline.o’
   Found ‘rand’, possibly from ‘rand’ (C)
@@ -515,7 +518,7 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
   consider running tools::compactPDF(gs_quality = "ebook") on these files
 
 checking installed package size ... NOTE
-  installed size is  9.2Mb
+  installed size is  8.9Mb
   sub-directories of 1Mb or more:
     data      2.5Mb
     doc       3.9Mb
@@ -587,27 +590,15 @@ Execution halted
 
 ```
 
-## gcbd (0.2.5)
+## gcbd (0.2.6)
 Maintainer: Dirk Eddelbuettel <edd@debian.org>
 
-0 errors | 1 warning  | 3 notes
+0 errors | 1 warning  | 1 note 
 
 ```
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Loading required package: RSQLite
-Loading required package: DBI
-Loading required package: plyr
-Loading required package: reshape
-
-Attaching package: ‘reshape’
-
-The following objects are masked from ‘package:plyr’:
-
-    rename, round_any
-
-Loading required package: lattice
 Warning in packageDescription("gputools") :
   no package 'gputools' was found
 Error: processing vignette 'gcbd.Rnw' failed with diagnostics:
@@ -617,35 +608,6 @@ Execution halted
 
 checking package dependencies ... NOTE
 Package suggested but not available for checking: ‘gputools’
-
-checking dependencies in R code ... NOTE
-Packages in Depends field not imported from:
-  ‘RSQLite’ ‘lattice’ ‘plyr’ ‘reshape’
-  These packages need to be imported from (in the NAMESPACE file)
-  for when this namespace is loaded but not attached.
-
-checking R code for possible problems ... NOTE
-createDatabase: no visible global function definition for ‘dbDriver’
-createDatabase: no visible global function definition for
-  ‘dbBuildTableDefinition’
-createDatabase: no visible global function definition for ‘dbConnect’
-createDatabase: no visible global function definition for ‘dbGetQuery’
-createDatabase: no visible global function definition for
-  ‘dbDisconnect’
-databaseResult: no visible global function definition for ‘dbConnect’
-databaseResult: no visible global function definition for ‘dbDriver’
-... 74 lines ...
-qrBenchmarkgputools: no visible global function definition for ‘gpuQr’
-svdBenchmarkgputools: no visible global function definition for
-  ‘gpuSvd’
-Undefined global functions or variables:
-  coef dbBuildTableDefinition dbConnect dbDisconnect dbDriver
-  dbGetQuery dbWriteTable ddply gpuMatMult gpuQr gpuSvd legend lm lu
-  matplot melt par rnorm trellis.par.get trellis.par.set
-Consider adding
-  importFrom("graphics", "legend", "matplot", "par")
-  importFrom("stats", "coef", "lm", "rnorm")
-to your NAMESPACE file.
 ```
 
 ## GeneAnswers (2.14.0)
@@ -1116,7 +1078,7 @@ to your NAMESPACE file.
 ## mgsa (1.20.0)
 Maintainer: Sebastian Bauer <mail@sebastianbauer.info>
 
-0 errors | 1 warning  | 4 notes
+0 errors | 1 warning  | 5 notes
 
 ```
 checking for GNU extensions in Makefiles ... WARNING
@@ -1174,6 +1136,16 @@ Consider adding
   importFrom("utils", "read.delim", "relist", "str")
 to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
 contains 'methods').
+
+checking compiled code ... NOTE
+File ‘mgsa/libs/mgsa.so’:
+  Found ‘printf’, possibly from ‘printf’ (C)
+    Object: ‘mgsa.o’
+
+Compiled code should not call entry points which might terminate R nor
+write to stdout/stderr instead of to the console, nor the system RNG.
+
+See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
 
 ## oce (0.9-19)
@@ -1204,7 +1176,7 @@ Calls: plot -> plot -> .local
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  5.3Mb
+  installed size is  5.1Mb
   sub-directories of 1Mb or more:
     help   2.0Mb
 ```
@@ -1247,7 +1219,7 @@ checking package dependencies ... NOTE
 Packages which this enhances but not available for checking: ‘doMC’ ‘doMPI’
 
 checking installed package size ... NOTE
-  installed size is 30.1Mb
+  installed size is 30.0Mb
   sub-directories of 1Mb or more:
     doc      12.9Mb
     scripts  15.7Mb
@@ -1548,7 +1520,7 @@ The error most likely occurred in:
 > temp.db.file <- tempfile()
 > write(sim.bux.lines, file=temp.file)
 > test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
-Processing /tmp/RtmpWIPK7Z/filedb5b32a3a931 in chunks of 10000
+Processing /tmp/RtmpF3Be7d/fileeea4561c5ba4 in chunks of 10000
 Starting chunk 1
 Reached breakpoint change
 Processing breakpoint 1
@@ -1571,7 +1543,7 @@ Last 13 lines of output:
   Error in BiocGenerics:::testPackage("plethy") : 
     unit tests failed for package plethy
   In addition: Warning message:
-  closing unused connection 3 (/tmp/RtmpooGJiX/filedcdf6555f40a) 
+  closing unused connection 3 (/tmp/RtmpdBZVz5/filef00a173b0f7f) 
   Execution halted
 
 checking dependencies in R code ... NOTE
@@ -1804,6 +1776,106 @@ Consider adding
 to your NAMESPACE file.
 ```
 
+## SRAdb (1.30.0)
+Maintainer: Jack Zhu <zhujack@mail.nih.gov>  
+Bug reports: https://github.com/seandavi/SRAdb/issues/new
+
+0 errors | 1 warning  | 6 notes
+
+```
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+    Filter, Find, Map, Position, Reduce,
+    anyDuplicated, append, as.data.frame,
+    cbind, colnames, do.call, duplicated,
+    eval, evalq, get, grep, grepl,
+    intersect, is.unsorted, lapply, lengths,
+    mapply, match, mget, order, paste, pmax,
+    pmax.int, pmin, pmin.int, rank, rbind,
+... 8 lines ...
+trying URL 'https://dl.dropboxusercontent.com/u/51653511/SRAmetadb.sqlite.gz'
+Content type 'application/octet-stream' length 1739781929 bytes (1659.2 MB)
+============
+downloaded 422.4 MB
+
+
+Error: processing vignette 'SRAdb.Rnw' failed with diagnostics:
+ chunk 2 
+Error in download.file(url_sra, destfile = localfile, mode = "wb", method = method) : 
+  cannot download all files
+Execution halted
+
+checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  .BBSoptions
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+
+checking top-level files ... NOTE
+Non-standard file/directory found at top level:
+  ‘SRAdb-package.Rd’
+
+checking for left-over files ... NOTE
+The following files look like leftovers:
+  ‘SRAdb/SRAdb-package.Rd’
+Please remove them from your package.
+
+checking dependencies in R code ... NOTE
+'library' or 'require' call to ‘RCurl’ which was already attached by Depends.
+  Please remove these calls from your code.
+Packages in Depends field not imported from:
+  ‘RSQLite’ ‘graph’
+  These packages need to be imported from (in the NAMESPACE file)
+  for when this namespace is loaded but not attached.
+
+checking R code for possible problems ... NOTE
+.socketWrite: no visible global function definition for ‘write.socket’
+.socketWrite: no visible global function definition for ‘read.socket’
+IGVsocket: no visible global function definition for ‘make.socket’
+colDescriptions: no visible global function definition for ‘dbGetQuery’
+entityGraph: no visible global function definition for ‘na.omit’
+entityGraph: no visible global function definition for ‘new’
+entityGraph : <anonymous>: no visible global function definition for
+  ‘addEdge’
+getFASTQfile: no visible global function definition for ‘download.file’
+... 11 lines ...
+startIGV: no visible global function definition for ‘browseURL’
+Undefined global functions or variables:
+  SQLite addEdge browseURL dbConnect dbDisconnect dbGetQuery
+  download.file make.socket na.omit new read.socket write.socket
+Consider adding
+  importFrom("methods", "new")
+  importFrom("stats", "na.omit")
+  importFrom("utils", "browseURL", "download.file", "make.socket",
+             "read.socket", "write.socket")
+to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
+contains 'methods').
+
+checking Rd line widths ... NOTE
+Rd file 'IGVsession.Rd':
+  \examples lines wider than 100 characters:
+             ## Wait until IGV fully launched and make sure the listen port for IGV is open (If not configured in IGV, follow these steops:  ... [TRUNCATED]
+
+Rd file 'IGVsnapshot.Rd':
+  \examples lines wider than 100 characters:
+       ## Create a snapshot of the current IGV window, which is usually the first launched IGV with listen port 60151 open
+
+Rd file 'SRAdb-package.Rd':
+... 68 lines ...
+Rd file 'sraConvert.Rd':
+  \usage lines wider than 90 characters:
+     sraConvert(in_acc, out_type = c("sra", "submission", "study", "sample", "experiment", "run"), sra_con)
+  \examples lines wider than 100 characters:
+             a <- sraConvert( in_acc=c(" SRR000137", "SRR000138 "), out_type=c('sample'), sra_con=sra_con )
+
+Rd file 'sraGraph.Rd':
+  \examples lines wider than 100 characters:
+             ## create a graphNEL object from SRA accessions, which are full text search results of terms 'primary thyroid cell line'
+
+These lines will be truncated in the PDF manual.
+```
+
 ## TFBSTools (1.10.4)
 Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>  
 Bug reports: https://github.com/ge11232002/TFBSTools/issues
@@ -1897,25 +1969,20 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
- options("getSymbols.warning4.0"=FALSE). See ?getSymbols for more details.
-Warning in if (as.character(sc[[1]]) != calling.fun) return() :
-  the condition has length > 1 and only the first element will be used
-trying URL 'http://www.rba.gov.au/statistics/tables/xls/d03hist.xls'
-Content type 'application/vnd.ms-excel' length 272896 bytes (266 KB)
-==================================================
-downloaded 266 KB
-... 8 lines ...
-The following objects are masked from ‘package:base’:
-
-    as.Date, as.Date.numeric
-
+Loading required package: TSdbi
+Oct 04, 2016 11:42:04 PM it.bancaditalia.oss.sdmx.util.Configuration init
+INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
+Oct 04, 2016 11:42:05 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
+Oct 04, 2016 11:44:12 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+SEVERE: Exception. Class: java.net.ConnectException .Message: Connection timed out
 
 Error: processing vignette 'Guide.Stex' failed with diagnostics:
- chunk 41 
-Error in .local(drv, ...) : 
-  Failed to connect to database: Error: Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
-
+ chunk 3 
+Error in .local(serIDs, con, ...) : 
+  QNA.CAN.B1_GE.CARSA.Q error: it.bancaditalia.oss.sdmx.util.SdmxException: Exception. Class: java.net.ConnectException .Message: Connection timed out
 Execution halted
+
 ```
 
 ## UniProt.ws (2.12.0)
@@ -1987,7 +2054,7 @@ Error in VariantFilteringParam(vcfFilenames = CEUvcf) :
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  7.9Mb
+  installed size is  7.8Mb
   sub-directories of 1Mb or more:
     R         3.5Mb
     extdata   3.5Mb

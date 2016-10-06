@@ -20,6 +20,8 @@
 
 \item{name}{Supply a name to use a named savepoint. This allows you to
 nest multiple transaction}
+
+\item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \value{
 A boolean, indicating success or failure.

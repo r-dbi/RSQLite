@@ -11,6 +11,8 @@
 \item{conn}{An existing \code{\linkS4class{SQLiteConnection}}}
 
 \item{name}{character vector of length 1 giving name of table to remove}
+
+\item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \description{
 Executes the SQL \code{DROP TABLE}.

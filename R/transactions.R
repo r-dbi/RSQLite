@@ -12,6 +12,7 @@ NULL
 #'   \code{\link[DBI]{dbConnect}}
 #' @param name Supply a name to use a named savepoint. This allows you to
 #'   nest multiple transaction
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @return A boolean, indicating success or failure.
 #' @examples
 #' library(DBI)

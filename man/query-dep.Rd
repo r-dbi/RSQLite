@@ -8,10 +8,10 @@
 \title{Deprecated querying tools}
 \usage{
 \S4method{dbSendPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
-  statement, bind.data)
+  statement, bind.data, ...)
 
 \S4method{dbGetPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
-  statement, bind.data)
+  statement, bind.data, ...)
 }
 \arguments{
 \item{bind.data}{A data frame of data to be bound.}

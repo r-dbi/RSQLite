@@ -7,9 +7,9 @@
 \alias{dbGetInfo,SQLiteDriver-method}
 \title{Get metadata about a database object.}
 \usage{
-\S4method{dbGetInfo}{SQLiteDriver}(dbObj)
+\S4method{dbGetInfo}{SQLiteDriver}(dbObj, ...)
 
-\S4method{dbGetInfo}{SQLiteConnection}(dbObj)
+\S4method{dbGetInfo}{SQLiteConnection}(dbObj, ...)
 }
 \arguments{
 \item{dbObj}{An object of class \code{\linkS4class{SQLiteDriver}},

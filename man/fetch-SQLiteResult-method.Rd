@@ -5,7 +5,7 @@
 \alias{fetch,SQLiteResult-method}
 \title{Fetch.}
 \usage{
-\S4method{fetch}{SQLiteResult}(res, n = -1)
+\S4method{fetch}{SQLiteResult}(res, n = -1, ...)
 }
 \description{
 A shortcut for \code{\link[DBI]{dbFetch}(res, n = n, row.names = FALSE)},

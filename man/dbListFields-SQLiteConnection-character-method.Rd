@@ -5,7 +5,7 @@
 \alias{dbListFields,SQLiteConnection,character-method}
 \title{List fields in specified table.}
 \usage{
-\S4method{dbListFields}{SQLiteConnection,character}(conn, name)
+\S4method{dbListFields}{SQLiteConnection,character}(conn, name, ...)
 }
 \arguments{
 \item{conn}{An existing \code{\linkS4class{SQLiteConnection}}}

@@ -8,11 +8,11 @@
 \alias{sqlite-transaction}
 \title{SQLite transaction management.}
 \usage{
-\S4method{dbBegin}{SQLiteConnection}(conn, name = NULL)
+\S4method{dbBegin}{SQLiteConnection}(conn, ..., name = NULL)
 
-\S4method{dbCommit}{SQLiteConnection}(conn, name = NULL)
+\S4method{dbCommit}{SQLiteConnection}(conn, ..., name = NULL)
 
-\S4method{dbRollback}{SQLiteConnection}(conn, name = NULL)
+\S4method{dbRollback}{SQLiteConnection}(conn, ..., name = NULL)
 }
 \arguments{
 \item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by

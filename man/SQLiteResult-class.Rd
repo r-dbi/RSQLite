@@ -6,7 +6,7 @@
 \alias{dbIsValid,SQLiteResult-method}
 \title{Class SQLiteResult}
 \usage{
-\S4method{dbIsValid}{SQLiteResult}(dbObj)
+\S4method{dbIsValid}{SQLiteResult}(dbObj, ...)
 }
 \description{
 SQLite's query results class.  This classes encapsulates the result of an

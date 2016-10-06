@@ -5,7 +5,7 @@
 \alias{dbRemoveTable,SQLiteConnection,character-method}
 \title{Remove a table from the database.}
 \usage{
-\S4method{dbRemoveTable}{SQLiteConnection,character}(conn, name)
+\S4method{dbRemoveTable}{SQLiteConnection,character}(conn, name, ...)
 }
 \arguments{
 \item{conn}{An existing \code{\linkS4class{SQLiteConnection}}}

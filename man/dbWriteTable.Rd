@@ -8,15 +8,15 @@
 \title{Write a local data frame or file to the database.}
 \usage{
 \S4method{dbWriteTable}{SQLiteConnection,character,data.frame}(conn, name,
-  value, row.names = NA, overwrite = FALSE, append = FALSE,
+  value, ..., row.names = NA, overwrite = FALSE, append = FALSE,
   field.types = NULL)
 
 \S4method{dbWriteTable}{SQLiteConnection,character,character}(conn, name, value,
-  field.types = NULL, overwrite = FALSE, append = FALSE, header = TRUE,
-  colClasses = NA, row.names = FALSE, nrows = 50, sep = ",",
-  eol = "\\n", skip = 0)
+  ..., field.types = NULL, overwrite = FALSE, append = FALSE,
+  header = TRUE, colClasses = NA, row.names = FALSE, nrows = 50,
+  sep = ",", eol = "\\n", skip = 0)
 
-\S4method{sqlData}{SQLiteConnection}(con, value, row.names = NA)
+\S4method{sqlData}{SQLiteConnection}(con, value, row.names = NA, ...)
 }
 \arguments{
 \item{name}{a character string specifying a table name. SQLite table names

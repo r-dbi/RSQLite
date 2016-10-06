@@ -28,7 +28,6 @@ DBItest::test_all(c(
 
   # sql
   "append_table_error",                         # #112
-  "temporary_table",                            # #113
   "quote_identifier_not_vectorized",            # rstats-db/DBI#24
   "roundtrip_quotes",                           # #107
   "roundtrip_logical",                          # not an error, no logical data type

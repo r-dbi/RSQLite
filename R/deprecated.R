@@ -135,7 +135,7 @@ NULL
 #' @export
 setMethod("dbSendPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
-  function(conn, statement, bind.data) {
+  function(conn, statement, bind.data, ...) {
     .Deprecated("dbBind", old = "dbSendPreparedQuery")
 
     res <- dbSendQuery(conn, statement)
@@ -154,7 +154,7 @@ setMethod("dbSendPreparedQuery",
 #' @export
 setMethod("dbGetPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
-  function(conn, statement, bind.data) {
+  function(conn, statement, bind.data, ...) {
     .Deprecated("dbBind", old = "dbGetPreparedQuery")
 
     res <- dbSendQuery(conn, statement)
@@ -203,7 +203,7 @@ NULL
 
 #' @rdname dbGetInfo
 #' @export
-setMethod("dbGetInfo", "SQLiteDriver", function(dbObj) {
+setMethod("dbGetInfo", "SQLiteDriver", function(dbObj, ...) {
   warning("dbGetInfo is deprecated: please use individual metadata functions instead",
     call. = FALSE)
 
@@ -212,7 +212,7 @@ setMethod("dbGetInfo", "SQLiteDriver", function(dbObj) {
 
 #' @rdname dbGetInfo
 #' @export
-setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
+setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
   warning("dbGetInfo is deprecated: please use individual metadata functions instead",
     call. = FALSE)
 
@@ -241,7 +241,7 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
 #'
 #' @keywords internal
 #' @export
-setMethod("fetch", "SQLiteResult", function(res, n = -1) {
+setMethod("fetch", "SQLiteResult", function(res, n = -1, ...) {
   .Deprecated("dbFetch(..., row.names = FALSE)", old = "fetch")
   sqlColumnToRownames(rsqlite_fetch(res@ptr, n = n), row.names = FALSE)
 })

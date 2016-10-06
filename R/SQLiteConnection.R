@@ -31,13 +31,13 @@ setMethod("show", "SQLiteConnection", function(object) {
 
 #' @rdname SQLiteConnection-class
 #' @export
-setMethod("dbIsValid", "SQLiteConnection", function(dbObj) {
+setMethod("dbIsValid", "SQLiteConnection", function(dbObj, ...) {
   rsqlite_connection_valid(dbObj@ptr)
 })
 
 #' @rdname SQLiteConnection-class
 #' @export
-setMethod("dbGetException", "SQLiteConnection", function(conn) {
+setMethod("dbGetException", "SQLiteConnection", function(conn, ...) {
   .Deprecated("tryCatch", old = "dbGetException")
   list(
     errorNum = 0L,

@@ -157,6 +157,20 @@ test_that("options work", {
   expect_equal(dbReadTable(con, "dat"), expected)
 })
 
+test_that("temporary works", {
+  db_file <- tempfile(fileext = ".sqlite")
+  con <- dbConnect(SQLite(), db_file)
+  on.exit(dbDisconnect(con))
+
+  dbWriteTable(con, "dat", "dat-n.txt", sep="|", eol="\n", overwrite = TRUE)
+  expect_true(dbExistsTable(con, "dat"))
+
+  con2 <- dbConnect(SQLite(), db_file)
+  on.exit(dbDisconnect(con2))
+
+  expect_false(dbExistsTable(con2, "dat"))
+})
+
 
 # Append ------------------------------------------------------------------
 

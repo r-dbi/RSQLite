@@ -26,7 +26,7 @@ test_that("exception after bad query", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 
-  expect_error(dbGetQuery(con, "RAISE"))
+  expect_error(dbExecute(con, "RAISE"))
 
   expect_warning(ex <- dbGetException(con), "deprecated")
   expect_equal(ex$errorNum, 0)

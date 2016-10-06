@@ -17,14 +17,14 @@
 |package   |*  |version    |date       |source                             |
 |:---------|:--|:----------|:----------|:----------------------------------|
 |BH        |   |1.60.0-2   |2016-05-07 |cran (@1.60.0-)                    |
-|DBI       |   |0.5-11     |2016-10-06 |Github (rstats-db/DBI@3173145)     |
+|DBI       |   |0.5-12     |2016-10-06 |Github (rstats-db/DBI@4f00863)     |
 |DBItest   |   |1.3-10     |2016-10-06 |Github (rstats-db/DBItest@9e87611) |
 |knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
 |memoise   |   |1.0.0      |2016-01-29 |CRAN (R 3.3.1)                     |
 |plogr     |   |0.1-1      |2016-09-24 |cran (@0.1-1)                      |
 |Rcpp      |   |0.12.7     |2016-09-05 |cran (@0.12.7)                     |
 |rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
-|RSQLite   |   |1.0.9014   |2016-10-06 |local (rstats-db/RSQLite@52acdb8)  |
+|RSQLite   |   |1.0.9014   |2016-10-06 |local (rstats-db/RSQLite@e479dae)  |
 |testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
@@ -138,7 +138,7 @@
 |TSsql              |2015.1-2  |      0|        0|     1|
 |tweet2r            |1.0       |      0|        0|     0|
 |twitteR            |1.1.9     |      0|        0|     0|
-|UniProt.ws         |2.12.0    |      0|        0|     1|
+|UniProt.ws         |2.12.0    |      0|        1|     1|
 |Uniquorn           |1.0.8     |      0|        0|     1|
 |UPMASK             |1.0       |      0|        0|     1|
 |VariantFiltering   |1.8.6     |      0|        3|     3|
@@ -3264,24 +3264,24 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
- options("getSymbols.warning4.0"=FALSE). See ?getSymbols for more details.
-Warning in if (as.character(sc[[1]]) != calling.fun) return() :
-  the condition has length > 1 and only the first element will be used
-trying URL 'http://www.rba.gov.au/statistics/tables/xls/d03hist.xls'
-Content type 'application/vnd.ms-excel' length 273408 bytes (267 KB)
-==================================================
-downloaded 267 KB
+Oct 06, 2016 9:57:32 PM it.bancaditalia.oss.sdmx.util.Configuration init
+INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
+Oct 06, 2016 9:57:32 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
+Oct 06, 2016 9:57:32 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
+Oct 06, 2016 9:57:32 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 ... 8 lines ...
-The following objects are masked from ‘package:base’:
-
-    as.Date, as.Date.numeric
-
+Oct 06, 2016 9:57:34 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/data/ESTAT,ei_nama_q,1.0/Q.MIO-EUR.NSA.CP.NA-P72.IT
+Oct 06, 2016 9:57:34 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
+INFO: The sdmx call returned messages in the footer:
+ Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
 
 Error: processing vignette 'Guide.Stex' failed with diagnostics:
- chunk 41 
-Error in .local(drv, ...) : 
-  Failed to connect to database: Error: Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
-
+ chunk 5 
+Error in .local(serIDs, con, ...) : 
+  ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT error: it.bancaditalia.oss.sdmx.util.SdmxException: The query: ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT did not match any time series on the provider.
 Execution halted
 ```
 
@@ -3322,9 +3322,32 @@ Maintainer: Jeff Gentry <geoffjentry@gmail.com>
 ## UniProt.ws (2.12.0)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-0 errors | 0 warnings | 1 note 
+0 errors | 1 warning  | 1 note 
 
 ```
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB
+
+The following objects are masked from ‘package:stats’:
+
+... 8 lines ...
+    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int, rank,
+    rbind, rownames, sapply, setdiff, sort, table, tapply, union,
+    unique, unsplit
+
+Warning in file(con, "r") :
+  cannot open URL 'http://www.uniprot.org/uniprot/?query=organism:9606&format=tab&columns=id': HTTP status was '503 Service Unavailable'
+
+Error: processing vignette 'UniProt.ws.Rnw' failed with diagnostics:
+ chunk 1 (label = loadPkg) 
+Error in file(con, "r") : cannot open the connection
+Execution halted
+
 checking R code for possible problems ... NOTE
 .getSomeUniprotGoodies: no visible global function definition for
   ‘head’

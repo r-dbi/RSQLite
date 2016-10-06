@@ -1,0 +1,80 @@
+* installing *source* package ‘arules’ ...
+** package ‘arules’ successfully unpacked and MD5 sums checked
+** libs
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g -O0 -c arrayIndex.c -o arrayIndex.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g -O0 -c bitmat.c -o bitmat.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g -O0 -c istree.c -o istree.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g -O0 -c matrix.c -o matrix.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g -O0 -c ptree.c -o ptree.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g -O0 -c rapriori.c -o rapriori.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g -O0 -c reclat.c -o reclat.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g -O0 -c similarity.c -o similarity.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g -O0 -c symtab.c -o symtab.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g -O0 -c tfscan.c -o tfscan.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g -O0 -c tid_count.c -o tid_count.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g -O0 -c tract.c -o tract.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g -O0 -c vecops.c -o vecops.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g -O0 -c warm.c -o warm.o
+# cc1 0.00 0.00
+# cc1 0.04 0.00
+# as 0.00 0.01
+# cc1 0.00 0.01
+# cc1 0.03 0.00
+# as 0.00 0.00
+# cc1 0.01 0.01
+# cc1 0.08 0.00
+# as 0.01 0.00
+# cc1 0.00 0.00
+# cc1 0.03 0.00
+# as 0.00 0.00
+# cc1 0.01 0.00
+# cc1 0.06 0.01
+# as 0.00 0.00
+# cc1 0.00 0.00
+# cc1 0.02 0.00
+# as 0.01 0.00
+# cc1 0.02 0.00
+# cc1 0.03 0.01
+# as 0.00 0.00
+# cc1 0.02 0.00
+# cc1 0.06 0.02
+# as 0.01 0.00
+# cc1 0.02 0.00
+# cc1 0.07 0.00
+# as 0.01 0.00
+# cc1 0.02 0.01
+# as 0.00 0.00
+# cc1 0.01 0.00
+# cc1 0.05 0.01
+# as 0.00 0.00
+# cc1 0.02 0.00
+# cc1 0.02 0.00
+# as 0.00 0.00
+# cc1 0.00 0.00
+# cc1 0.04 0.01
+# as 0.01 0.00
+# cc1 0.02 0.00
+# cc1 0.02 0.00
+# as 0.00 0.00
+gcc -std=gnu99 -shared -L/usr/lib/R/lib -fuse-ld=gold -o arules.so arrayIndex.o bitmat.o istree.o matrix.o ptree.o rapriori.o reclat.o similarity.o symtab.o tfscan.o tid_count.o tract.o vecops.o warm.o -L/usr/lib/R/lib -lR
+installing to /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/arules/libs
+** R
+** data
+** inst
+** tests
+** preparing package for lazy loading
+Creating a new generic function for ‘abbreviate’ in package ‘arules’
+Creating a new generic function for ‘write’ in package ‘arules’
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded
+Error in dyn.load(file, DLLpath = DLLpath, ...) : 
+  unable to load shared object '/home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/arules/libs/arules.so':
+  /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/arules/libs/arules.so: undefined symbol: nim_create
+Error: loading failed
+Execution halted
+ERROR: loading failed
+* removing ‘/home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/arules’
+* restoring previous ‘/home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/arules’

@@ -48,7 +48,7 @@ NULL
 #'
 #' dbDisconnect(con)
 setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
-  function(conn, name, value, row.names = NA, overwrite = FALSE, append = FALSE,
+  function(conn, name, value, ..., row.names = NA, overwrite = FALSE, append = FALSE,
     field.types = NULL) {
 
     if (overwrite && append)
@@ -177,7 +177,7 @@ parameterised_insert <- function(con, name, values) {
 #' @export
 #' @rdname dbWriteTable
 setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
-  function(conn, name, value, field.types = NULL, overwrite = FALSE,
+  function(conn, name, value, ..., field.types = NULL, overwrite = FALSE,
            append = FALSE, header = TRUE, colClasses = NA, row.names = FALSE,
            nrows = 50, sep = ",", eol="\n", skip = 0) {
     if(overwrite && append)
@@ -221,7 +221,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 
 #' @export
 #' @rdname dbWriteTable
-setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA) {
+setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA, ...) {
   row.names <- compatRowNames(row.names)
   value <- sqlRownamesToColumn(value, row.names)
 
@@ -293,7 +293,7 @@ string_to_utf8 <- function(value) {
 #'
 #' dbDisconnect(con)
 setMethod("dbReadTable", c("SQLiteConnection", "character"),
-  function(conn, name, row.names = NA, check.names = TRUE, select.cols = "*") {
+  function(conn, name, ..., row.names = NA, check.names = TRUE, select.cols = "*") {
     row.names <- compatRowNames(row.names)
 
     name <- dbQuoteIdentifier(conn, name)
@@ -318,7 +318,7 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 #' @param name character vector of length 1 giving name of table to remove
 #' @export
 setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
-  function(conn, name) {
+  function(conn, name, ...) {
     dbGetQuery(conn, paste("DROP TABLE ", dbQuoteIdentifier(conn, name)))
     invisible(TRUE)
   }
@@ -332,7 +332,7 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
 #' @export
 setMethod(
   "dbExistsTable", c("SQLiteConnection", "character"),
-  function(conn, name) {
+  function(conn, name, ...) {
     rs <- sqliteListTablesWithName(conn, name)
     on.exit(dbClearResult(rs), add = TRUE)
 
@@ -345,7 +345,7 @@ setMethod(
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @export
-setMethod("dbListTables", "SQLiteConnection", function(conn) {
+setMethod("dbListTables", "SQLiteConnection", function(conn, ...) {
   rs <- sqliteListTables(conn)
   on.exit(dbClearResult(rs), add = TRUE)
 
@@ -385,7 +385,7 @@ sqliteListTablesQuery <- function(conn, name = NULL) {
 #' dbListFields(con, "iris")
 #' dbDisconnect(con)
 setMethod("dbListFields", c("SQLiteConnection", "character"),
-  function(conn, name) {
+  function(conn, name, ...) {
     rs <- dbSendQuery(conn, paste("SELECT * FROM ",
                                   dbQuoteIdentifier(conn, name), "LIMIT 0"))
     on.exit(dbClearResult(rs))

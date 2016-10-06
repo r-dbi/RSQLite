@@ -181,7 +181,7 @@ parameterised_insert <- function(con, name, values) {
 setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
   function(conn, name, value, ..., field.types = NULL, overwrite = FALSE,
            append = FALSE, header = TRUE, colClasses = NA, row.names = FALSE,
-           nrows = 50, sep = ",", eol="\n", skip = 0) {
+           nrows = 50, sep = ",", eol="\n", skip = 0, temporary = FALSE) {
     if(overwrite && append)
       stop("overwrite and append cannot both be TRUE")
     value <- path.expand(value)
@@ -202,13 +202,16 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 
     if (!found || overwrite) {
       # Initialise table with first `nrows` lines
-      d <- utils::read.table(
-        value, sep = sep, header = header, skip = skip, nrows = nrows,
-        na.strings = "\\N", comment.char = "", colClasses = colClasses,
-        stringsAsFactors = FALSE)
-      sql <- sqliteBuildTableDefinitionNoWarn(conn, name, d,
-                                              field.types = field.types,
-                                              row.names = row.names)
+      if (is.null(field.types)) {
+        fields <- utils::read.table(
+          value, sep = sep, header = header, skip = skip, nrows = nrows,
+          na.strings = "\\N", comment.char = "", colClasses = colClasses,
+          stringsAsFactors = FALSE)
+      } else {
+        fields <- field.types
+      }
+      sql <- sqlCreateTable(conn, name, fields, row.names = FALSE,
+                            temporary = temporary)
       dbExecute(conn, sql)
     }
 

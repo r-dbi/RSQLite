@@ -27,6 +27,8 @@ NULL
 #' @param field.types character vector of named  SQL field types where
 #'   the names are the names of new table's columns. If missing, types inferred
 #'   with \code{\link[DBI]{dbDataType}}).
+#' @param temporary a logical specifying whether the new table should be
+#'   temporary. Its default is \code{FALSE}.
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @details In a primary key column qualified with
 #' \href{https://www.sqlite.org/autoinc.html}{\code{AUTOINCREMENT}}, missing
@@ -50,7 +52,7 @@ NULL
 #' dbDisconnect(con)
 setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
   function(conn, name, value, ..., row.names = NA, overwrite = FALSE, append = FALSE,
-    field.types = NULL) {
+           field.types = NULL, temporary = FALSE) {
 
     if (overwrite && append)
       stop("overwrite and append cannot both be TRUE", call. = FALSE)
@@ -78,7 +80,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
       # field_def()
       names(value) <- names(fields)
 
-      sql <- sqlCreateTable(conn, name, fields, row.names = FALSE)
+      sql <- sqlCreateTable(conn, name, fields, row.names = FALSE, temporary = temporary)
       dbExecute(conn, sql)
     } else if (append) {
       col_names <- dbListFields(conn, name)
@@ -180,7 +182,7 @@ parameterised_insert <- function(con, name, values) {
 setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
   function(conn, name, value, ..., field.types = NULL, overwrite = FALSE,
            append = FALSE, header = TRUE, colClasses = NA, row.names = FALSE,
-           nrows = 50, sep = ",", eol="\n", skip = 0) {
+           nrows = 50, sep = ",", eol="\n", skip = 0, temporary = FALSE) {
     if(overwrite && append)
       stop("overwrite and append cannot both be TRUE")
     value <- path.expand(value)
@@ -201,13 +203,16 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 
     if (!found || overwrite) {
       # Initialise table with first `nrows` lines
-      d <- utils::read.table(
-        value, sep = sep, header = header, skip = skip, nrows = nrows,
-        na.strings = "\\N", comment.char = "", colClasses = colClasses,
-        stringsAsFactors = FALSE)
-      sql <- sqliteBuildTableDefinitionNoWarn(conn, name, d,
-                                              field.types = field.types,
-                                              row.names = row.names)
+      if (is.null(field.types)) {
+        fields <- utils::read.table(
+          value, sep = sep, header = header, skip = skip, nrows = nrows,
+          na.strings = "\\N", comment.char = "", colClasses = colClasses,
+          stringsAsFactors = FALSE)
+      } else {
+        fields <- field.types
+      }
+      sql <- sqlCreateTable(conn, name, fields, row.names = FALSE,
+                            temporary = temporary)
       dbExecute(conn, sql)
     }
 

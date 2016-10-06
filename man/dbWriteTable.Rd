@@ -9,12 +9,12 @@
 \usage{
 \S4method{dbWriteTable}{SQLiteConnection,character,data.frame}(conn, name,
   value, ..., row.names = NA, overwrite = FALSE, append = FALSE,
-  field.types = NULL)
+  field.types = NULL, temporary = FALSE)
 
 \S4method{dbWriteTable}{SQLiteConnection,character,character}(conn, name, value,
   ..., field.types = NULL, overwrite = FALSE, append = FALSE,
   header = TRUE, colClasses = NA, row.names = FALSE, nrows = 50,
-  sep = ",", eol = "\\n", skip = 0)
+  sep = ",", eol = "\\n", skip = 0, temporary = FALSE)
 
 \S4method{sqlData}{SQLiteConnection}(con, value, row.names = NA, ...)
 }
@@ -46,6 +46,9 @@ in the DBMS.  Its default is \code{FALSE}.}
 \item{field.types}{character vector of named  SQL field types where
 the names are the names of new table's columns. If missing, types inferred
 with \code{\link[DBI]{dbDataType}}).}
+
+\item{temporary}{a logical specifying whether the new table should be
+temporary. Its default is \code{FALSE}.}
 
 \item{header}{is a logical indicating whether the first data line (but see
 \code{skip}) has a header or not.  If missing, it value is determined

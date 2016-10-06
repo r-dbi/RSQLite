@@ -10,61 +10,60 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2016-10-05                   |
+|date     |2016-10-06                   |
 
 ## Packages
 
 |package  |*  |version    |date       |source                           |
 |:--------|:--|:----------|:----------|:--------------------------------|
-|DBI      |   |0.5-11     |2016-10-04 |Github (rstats-db/DBI@636bfc2)   |
-|RSQLite  |   |1.0.0      |2016-10-05 |local (rstats-db/RSQLite@NA)     |
+|DBI      |   |0.5-12     |2016-10-06 |Github (rstats-db/DBI@4f00863)   |
+|RSQLite  |   |1.0.0      |2016-10-06 |local (rstats-db/RSQLite@NA)     |
 |testthat |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da) |
 
 # Check results
 
-39 packages with problems
+38 packages with problems
 
-|package           |version  | errors| warnings| notes|
-|:-----------------|:--------|------:|--------:|-----:|
-|AnnotationDbi     |1.34.4   |      0|        1|     5|
-|AnnotationForge   |1.14.2   |      0|        1|     6|
-|AnnotationHubData |1.2.2    |      1|        0|     3|
-|Category          |2.38.0   |      0|        1|     1|
-|ChemmineR         |2.24.2   |      1|        0|     0|
-|clstutils         |1.20.0   |      0|        2|     5|
-|CNEr              |1.8.3    |      0|        2|     1|
-|customProDB       |1.12.0   |      1|        1|     3|
-|DECIPHER          |2.0.2    |      0|        2|     2|
-|ensembldb         |1.4.7    |      0|        1|     1|
-|filematrix        |1.1.0    |      0|        1|     0|
-|gcbd              |0.2.6    |      0|        1|     1|
-|GeneAnswers       |2.14.0   |      1|        3|     6|
-|GenomicFeatures   |1.24.5   |      0|        1|     2|
-|Genominator       |1.26.0   |      0|        1|     4|
-|lumi              |2.24.0   |      0|        5|     5|
-|maGUI             |1.0      |      1|        0|     0|
-|MeSHDbi           |1.8.0    |      0|        1|     2|
-|metaseqR          |1.12.2   |      1|        1|     4|
-|mgsa              |1.20.0   |      0|        1|     5|
-|oce               |0.9-19   |      1|        0|     1|
-|oligo             |1.36.1   |      1|        1|     8|
-|OrganismDbi       |1.14.1   |      0|        1|     2|
-|PAnnBuilder       |1.36.0   |      0|        4|     1|
-|pdInfoBuilder     |1.36.0   |      0|        1|     1|
-|PGA               |1.2.2    |      1|        1|     3|
-|plethy            |1.10.0   |      2|        0|     3|
-|recoup            |1.0.2    |      2|        0|     1|
-|RImmPort          |1.0.2    |      0|        1|     1|
-|RQDA              |0.2-7    |      1|        0|     1|
-|specL             |1.6.2    |      0|        1|     4|
-|sqldf             |0.4-10   |      0|        1|     2|
-|TFBSTools         |1.10.4   |      0|        1|     1|
-|tigre             |1.26.0   |      0|        1|     2|
-|trackeR           |0.0.3    |      0|        1|     0|
-|TSdata            |2016.8-1 |      0|        1|     0|
-|UniProt.ws        |2.12.0   |      0|        1|     1|
-|VariantFiltering  |1.8.6    |      0|        3|     3|
-|vmsbase           |2.1.3    |      1|        0|     0|
+|package          |version  | errors| warnings| notes|
+|:----------------|:--------|------:|--------:|-----:|
+|AnnotationDbi    |1.34.4   |      0|        1|     5|
+|AnnotationForge  |1.14.2   |      0|        1|     6|
+|Category         |2.38.0   |      0|        1|     1|
+|ChemmineR        |2.24.2   |      1|        0|     0|
+|clstutils        |1.20.0   |      0|        2|     5|
+|CNEr             |1.8.3    |      0|        2|     1|
+|customProDB      |1.12.0   |      1|        1|     3|
+|DECIPHER         |2.0.2    |      0|        2|     2|
+|ensembldb        |1.4.7    |      0|        1|     1|
+|filematrix       |1.1.0    |      0|        1|     0|
+|gcbd             |0.2.6    |      0|        1|     1|
+|GeneAnswers      |2.14.0   |      1|        3|     6|
+|GenomicFeatures  |1.24.5   |      0|        1|     2|
+|Genominator      |1.26.0   |      0|        1|     4|
+|lumi             |2.24.0   |      0|        5|     5|
+|maGUI            |1.0      |      1|        0|     0|
+|MeSHDbi          |1.8.0    |      0|        1|     2|
+|metaseqR         |1.12.2   |      1|        1|     4|
+|mgsa             |1.20.0   |      0|        1|     5|
+|oce              |0.9-19   |      1|        0|     1|
+|oligo            |1.36.1   |      1|        1|     8|
+|OrganismDbi      |1.14.1   |      0|        1|     2|
+|PAnnBuilder      |1.36.0   |      0|        4|     1|
+|pdInfoBuilder    |1.36.0   |      0|        1|     1|
+|PGA              |1.2.2    |      1|        1|     3|
+|plethy           |1.10.0   |      2|        0|     3|
+|recoup           |1.0.2    |      2|        0|     1|
+|RImmPort         |1.0.2    |      0|        1|     1|
+|RQDA             |0.2-7    |      1|        0|     1|
+|specL            |1.6.2    |      0|        1|     4|
+|sqldf            |0.4-10   |      0|        1|     2|
+|TFBSTools        |1.10.4   |      0|        1|     1|
+|tigre            |1.26.0   |      0|        1|     2|
+|trackeR          |0.0.3    |      0|        1|     0|
+|TSdata           |2016.8-1 |      0|        1|     0|
+|UniProt.ws       |2.12.0   |      0|        1|     1|
+|VariantFiltering |1.8.6    |      0|        3|     3|
+|vmsbase          |2.1.3    |      1|        0|     0|
 
 ## AnnotationDbi (1.34.4)
 Maintainer: Bioconductor Package Maintainer
@@ -183,63 +182,6 @@ These lines will be truncated in the PDF manual.
 
 checking for unstated dependencies in vignettes ... NOTE
 'library' or 'require' call not declared from: ‘Biostrings’
-```
-
-## AnnotationHubData (1.2.2)
-Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
-
-1 error  | 0 warnings | 3 notes
-
-```
-checking tests ... ERROR
-Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
-Last 13 lines of output:
-  
-  Test files with failing tests
-  
-     test_recipe.R 
-       test_UCSC2BitPreparer_recipe 
-  
-  
-  Error in BiocGenerics:::testPackage("AnnotationHubData") : 
-    unit tests failed for package AnnotationHubData
-  In addition: Warning message:
-  In value[[3L]](cond) :
-    BioCarta.owl.gz: Failure when receiving data from the peer
-  Execution halted
-
-checking top-level files ... NOTE
-Non-standard file/directory found at top level:
-  ‘appveyor.yml’
-
-checking dependencies in R code ... NOTE
-Missing object imported by a ':::' call: ‘AnnotationHub:::.db_connection’
-Unexported object imported by a ':::' call: ‘OrganismDbi:::.packageTaxIds’
-  See the note in ?`:::` about the use of this operator.
-
-checking R code for possible problems ... NOTE
-.NCBIMetadataFromUrl: no visible binding for global variable ‘results’
-.NCBIMetadataFromUrl: no visible binding for global variable ‘specData’
-.makeComplexGR: no visible binding for global variable ‘seqname’
-jsonPath: no visible binding for global variable ‘SourceFile’
-jsonPath: no visible binding for global variable ‘HubRoot’
-pointer: no visible global function definition for ‘tail’
-print.pointer: no visible global function definition for
-  ‘capture.output’
-print.pointer: no visible global function definition for ‘str’
-ptr: no visible global function definition for ‘tail’
-trackWithAuxiliaryTablesToGRanges: no visible binding for global
-  variable ‘seqname’
-Undefined global functions or variables:
-  HubRoot SourceFile capture.output results seqname specData str tail
-Consider adding
-  importFrom("utils", "capture.output", "str", "tail")
-to your NAMESPACE file.
-
-Found the following calls to data() loading into the global environment:
-File ‘AnnotationHubData/R/makeNCBIToOrgDbs.R’:
-  data(specData, package = "GenomeInfoDb")
-See section ‘Good practice’ in ‘?data’.
 ```
 
 ## Category (2.38.0)
@@ -1519,7 +1461,7 @@ The error most likely occurred in:
 > temp.db.file <- tempfile()
 > write(sim.bux.lines, file=temp.file)
 > test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
-Processing /tmp/RtmpoXqTkt/filecddb1aab8728 in chunks of 10000
+Processing /tmp/RtmpgsEUyw/filec7ee56f2026d in chunks of 10000
 Starting chunk 1
 Reached breakpoint change
 Processing breakpoint 1
@@ -1542,7 +1484,7 @@ Last 13 lines of output:
   Error in BiocGenerics:::testPackage("plethy") : 
     unit tests failed for package plethy
   In addition: Warning message:
-  closing unused connection 3 (/tmp/RtmpTcKEco/filed01b72ac0b4) 
+  closing unused connection 3 (/tmp/RtmpXii8VL/filec8ef239dede8) 
   Execution halted
 
 checking dependencies in R code ... NOTE
@@ -1868,24 +1810,24 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
- options("getSymbols.warning4.0"=FALSE). See ?getSymbols for more details.
-Warning in if (as.character(sc[[1]]) != calling.fun) return() :
-  the condition has length > 1 and only the first element will be used
-trying URL 'http://www.rba.gov.au/statistics/tables/xls/d03hist.xls'
-Content type 'application/vnd.ms-excel' length 273408 bytes (267 KB)
-==================================================
-downloaded 267 KB
+Oct 06, 2016 9:34:26 PM it.bancaditalia.oss.sdmx.util.Configuration init
+INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
+Oct 06, 2016 9:34:26 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
+Oct 06, 2016 9:34:26 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
+Oct 06, 2016 9:34:27 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 ... 8 lines ...
-The following objects are masked from ‘package:base’:
-
-    as.Date, as.Date.numeric
-
+Oct 06, 2016 9:34:28 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/data/ESTAT,ei_nama_q,1.0/Q.MIO-EUR.NSA.CP.NA-P72.IT
+Oct 06, 2016 9:34:28 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
+INFO: The sdmx call returned messages in the footer:
+ Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
 
 Error: processing vignette 'Guide.Stex' failed with diagnostics:
- chunk 41 
-Error in .local(drv, ...) : 
-  Failed to connect to database: Error: Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
-
+ chunk 5 
+Error in .local(serIDs, con, ...) : 
+  ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT error: it.bancaditalia.oss.sdmx.util.SdmxException: The query: ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT did not match any time series on the provider.
 Execution halted
 ```
 

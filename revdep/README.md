@@ -10,32 +10,31 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2016-10-05                   |
+|date     |2016-10-06                   |
 
 ## Packages
 
 |package   |*  |version    |date       |source                             |
 |:---------|:--|:----------|:----------|:----------------------------------|
 |BH        |   |1.60.0-2   |2016-05-07 |cran (@1.60.0-)                    |
-|DBI       |   |0.5-11     |2016-10-04 |Github (rstats-db/DBI@636bfc2)     |
-|DBItest   |   |1.3-9      |2016-10-05 |Github (rstats-db/DBItest@25c558d) |
+|DBI       |   |0.5-11     |2016-10-06 |Github (rstats-db/DBI@3173145)     |
+|DBItest   |   |1.3-10     |2016-10-06 |Github (rstats-db/DBItest@9e87611) |
 |knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
 |memoise   |   |1.0.0      |2016-01-29 |CRAN (R 3.3.1)                     |
 |plogr     |   |0.1-1      |2016-09-24 |cran (@0.1-1)                      |
 |Rcpp      |   |0.12.7     |2016-09-05 |cran (@0.12.7)                     |
 |rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
-|RSQLite   |   |1.0.9013   |2016-10-05 |local (rstats-db/RSQLite@1ace3be)  |
+|RSQLite   |   |1.0.9014   |2016-10-06 |local (rstats-db/RSQLite@52acdb8)  |
 |testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
 
-113 packages
+111 packages
 
 |package            |version   | errors| warnings| notes|
 |:------------------|:---------|------:|--------:|-----:|
 |AnnotationDbi      |1.34.4    |      0|        1|     5|
 |AnnotationForge    |1.14.2    |      0|        0|     6|
-|AnnotationHubData  |1.2.2     |      1|        0|     3|
 |AnnotationHub      |2.4.2     |      0|        0|     0|
 |APSIM              |0.9.0     |      0|        0|     0|
 |archivist          |2.1       |      0|        0|     2|
@@ -105,7 +104,6 @@
 |quantmod           |0.4-6     |      0|        0|     1|
 |rangeMapper        |0.3-0     |      0|        0|     0|
 |RecordLinkage      |0.4-10    |      0|        0|     0|
-|recordr            |1.0.3     |      0|        0|     1|
 |recoup             |1.0.2     |      2|        0|     1|
 |refGenome          |1.7.0     |      0|        0|     0|
 |rgrass7            |0.1-8     |      0|        0|     0|
@@ -259,63 +257,6 @@ These lines will be truncated in the PDF manual.
 
 checking for unstated dependencies in vignettes ... NOTE
 'library' or 'require' call not declared from: ‘Biostrings’
-```
-
-## AnnotationHubData (1.2.2)
-Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
-
-1 error  | 0 warnings | 3 notes
-
-```
-checking tests ... ERROR
-Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
-Last 13 lines of output:
-  
-  Test files with failing tests
-  
-     test_recipe.R 
-       test_UCSC2BitPreparer_recipe 
-  
-  
-  Error in BiocGenerics:::testPackage("AnnotationHubData") : 
-    unit tests failed for package AnnotationHubData
-  In addition: Warning message:
-  In value[[3L]](cond) :
-    BioCarta.owl.gz: Failure when receiving data from the peer
-  Execution halted
-
-checking top-level files ... NOTE
-Non-standard file/directory found at top level:
-  ‘appveyor.yml’
-
-checking dependencies in R code ... NOTE
-Missing object imported by a ':::' call: ‘AnnotationHub:::.db_connection’
-Unexported object imported by a ':::' call: ‘OrganismDbi:::.packageTaxIds’
-  See the note in ?`:::` about the use of this operator.
-
-checking R code for possible problems ... NOTE
-.NCBIMetadataFromUrl: no visible binding for global variable ‘results’
-.NCBIMetadataFromUrl: no visible binding for global variable ‘specData’
-.makeComplexGR: no visible binding for global variable ‘seqname’
-jsonPath: no visible binding for global variable ‘SourceFile’
-jsonPath: no visible binding for global variable ‘HubRoot’
-pointer: no visible global function definition for ‘tail’
-print.pointer: no visible global function definition for
-  ‘capture.output’
-print.pointer: no visible global function definition for ‘str’
-ptr: no visible global function definition for ‘tail’
-trackWithAuxiliaryTablesToGRanges: no visible binding for global
-  variable ‘seqname’
-Undefined global functions or variables:
-  HubRoot SourceFile capture.output results seqname specData str tail
-Consider adding
-  importFrom("utils", "capture.output", "str", "tail")
-to your NAMESPACE file.
-
-Found the following calls to data() loading into the global environment:
-File ‘AnnotationHubData/R/makeNCBIToOrgDbs.R’:
-  data(specData, package = "GenomeInfoDb")
-See section ‘Good practice’ in ‘?data’.
 ```
 
 ## AnnotationHub (2.4.2)
@@ -2690,20 +2631,6 @@ Maintainer: Mihai Valcu <valcu@orn.mpg.de>
 Maintainer: Andreas Borg <borga@uni-mainz.de>
 
 0 errors | 0 warnings | 0 notes
-
-## recordr (1.0.3)
-Maintainer: Peter Slaughter <slaughter@nceas.ucsb.edu>  
-Bug reports: https://github.com/NCEAS/recordr/issues
-
-0 errors | 0 warnings | 1 note 
-
-```
-checking R code for possible problems ... NOTE
-Found the following calls to attach():
-File ‘recordr/R/Recordr.R’:
-  attach(NULL, name = ".recordr")
-See section ‘Good practice’ in ‘?attach’.
-```
 
 ## recoup (1.0.2)
 Maintainer: Panagiotis Moulos <moulos@fleming.gr>

@@ -10,64 +10,54 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2016-09-08                   |
+|date     |2016-10-06                   |
 
 ## Packages
 
 |package   |*  |version    |date       |source                             |
 |:---------|:--|:----------|:----------|:----------------------------------|
 |BH        |   |1.60.0-2   |2016-05-07 |cran (@1.60.0-)                    |
-|DBI       |   |0.5        |2016-09-01 |Github (rstats-db/DBI@bc730b9)     |
-|DBItest   |   |1.3-7      |2016-09-01 |Github (rstats-db/DBItest@75c8ebc) |
+|DBI       |   |0.5-11     |2016-10-06 |Github (rstats-db/DBI@3173145)     |
+|DBItest   |   |1.3-10     |2016-10-06 |Github (rstats-db/DBItest@9e87611) |
 |knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
+|memoise   |   |1.0.0      |2016-01-29 |CRAN (R 3.3.1)                     |
+|plogr     |   |0.1-1      |2016-09-24 |cran (@0.1-1)                      |
 |Rcpp      |   |0.12.7     |2016-09-05 |cran (@0.12.7)                     |
 |rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
-|RSQLite   |   |1.0.9010   |2016-09-08 |local (rstats-db/RSQLite@3eb264c)  |
+|RSQLite   |   |1.0.9014   |2016-10-06 |local (rstats-db/RSQLite@52acdb8)  |
 |testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
 
-43 packages with problems
+31 packages with problems
 
 |package          |version  | errors| warnings| notes|
 |:----------------|:--------|------:|--------:|-----:|
-|AnnotationDbi    |1.34.4   |      0|        2|     5|
-|AnnotationForge  |1.14.2   |      0|        1|     6|
-|AnnotationHub    |2.4.2    |      0|        1|     0|
-|BatchExperiments |1.4.1    |      0|        1|     2|
-|BatchJobs        |1.6      |      0|        1|     0|
-|bioassayR        |1.10.15  |      0|        1|     1|
+|AnnotationDbi    |1.34.4   |      0|        1|     5|
 |ChemmineR        |2.24.2   |      1|        0|     0|
 |clstutils        |1.20.0   |      0|        2|     5|
 |CNEr             |1.8.3    |      0|        2|     1|
-|cummeRbund       |2.14.0   |      0|        1|     7|
 |customProDB      |1.12.0   |      1|        1|     3|
-|DECIPHER         |2.0.2    |      1|        3|     3|
+|DECIPHER         |2.0.2    |      0|        2|     3|
 |ecd              |0.8.2    |      1|        0|     0|
 |ensembldb        |1.4.7    |      0|        1|     1|
 |filematrix       |1.1.0    |      0|        1|     0|
-|gcbd             |0.2.5    |      0|        1|     3|
+|gcbd             |0.2.6    |      0|        1|     1|
 |GeneAnswers      |2.14.0   |      1|        3|     6|
-|GenomicFeatures  |1.24.5   |      0|        1|     2|
 |lumi             |2.24.0   |      0|        5|     5|
 |maGUI            |1.0      |      1|        0|     0|
-|MeSHDbi          |1.8.0    |      0|        1|     2|
 |metaseqR         |1.12.2   |      1|        1|     4|
-|mgsa             |1.20.0   |      2|        2|     4|
+|mgsa             |1.20.0   |      0|        1|     5|
 |oce              |0.9-19   |      1|        0|     1|
 |oligo            |1.36.1   |      1|        0|     8|
-|OrganismDbi      |1.14.1   |      0|        1|     2|
 |PAnnBuilder      |1.36.0   |      0|        3|     1|
 |PGA              |1.2.2    |      1|        1|     3|
 |plethy           |1.10.0   |      2|        1|     3|
-|poplite          |0.99.16  |      1|        1|     1|
-|rangeMapper      |0.3-0    |      0|        1|     0|
-|RecordLinkage    |0.4-10   |      0|        1|     0|
+|poplite          |0.99.16  |      1|        0|     1|
 |recoup           |1.0.2    |      2|        0|     1|
 |RImmPort         |1.0.2    |      0|        1|     1|
-|rplexos          |1.1.8    |      0|        1|     0|
 |RQDA             |0.2-7    |      1|        0|     1|
-|specL            |1.6.2    |      1|        1|     4|
+|specL            |1.6.2    |      0|        1|     4|
 |sqldf            |0.4-10   |      1|        1|     2|
 |TFBSTools        |1.10.4   |      0|        1|     1|
 |trackeR          |0.0.3    |      0|        1|     0|
@@ -79,22 +69,9 @@
 Maintainer: Bioconductor Package Maintainer
  <maintainer@bioconductor.org>
 
-0 errors | 2 warnings | 5 notes
+0 errors | 1 warning  | 5 notes
 
 ```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'dbSendPreparedQuery' is deprecated.
-  Warning: 'dbSendPreparedQuery' is deprecated.
-  Warning: 'dbSendPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-                   user system elapsed
-AnnDbPkg-checker 33.464  0.368  33.865
-
 checking for unstated dependencies in ‘tests’ ... WARNING
 'library' or 'require' call not declared from: ‘org.testing.db’
 
@@ -135,261 +112,6 @@ Rd file 'inpIDMapper.Rd':
        YeastUPSingles = inpIDMapper(ids, "HOMSA", "SACCE", destIDType="UNIPROT", keepMultDestIDMatches = FALSE)
 
 These lines will be truncated in the PDF manual.
-```
-
-## AnnotationForge (1.14.2)
-Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
-
-0 errors | 1 warning  | 6 notes
-
-```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Quitting from lines 269-272 (MakingNewAnnotationPackages.Rnw) 
-Error: processing vignette 'MakingNewAnnotationPackages.Rnw' failed with diagnostics:
-1: Start tag expected, '<' not found
-Execution halted
-
-
-checking installed package size ... NOTE
-  installed size is  6.1Mb
-  sub-directories of 1Mb or more:
-    AnnDbPkg-templates   1.8Mb
-    extdata              3.3Mb
-
-checking DESCRIPTION meta-information ... NOTE
-Packages listed in more than one of Depends, Imports, Suggests, Enhances:
-  ‘RSQLite’ ‘XML’
-A package should be listed in only one of these fields.
-
-checking dependencies in R code ... NOTE
-'library' or 'require' calls in package code:
-  ‘GO.db’ ‘RCurl’ ‘RSQLite’ ‘XML’ ‘affy’ ‘biomaRt’ ‘httr’
-  Please use :: or requireNamespace() instead.
-  See section 'Suggested packages' in the 'Writing R Extensions' manual.
-
-checking R code for possible problems ... NOTE
-.addOntologyData: no visible binding for global variable ‘GO.db’
-.downloadAndPopulateAltGOData: no visible global function definition
-  for ‘CFILE’
-.downloadAndPopulateAltGOData: no visible global function definition
-  for ‘curlPerform’
-.downloadAndSaveToTemp: no visible global function definition for
-  ‘url.exists’
-.downloadAndSaveToTemp: no visible global function definition for
-  ‘getBinaryURL’
-... 33 lines ...
-getProbeDataAffy: no visible global function definition for
-  ‘cleancdfname’
-listMappings: no visible global function definition for
-  ‘NCBIORG_DB_SeedGenerator’
-writeTable: no visible global function definition for
-  ‘sqliteWriteTable’
-Undefined global functions or variables:
-  CFILE GO.db GOBPANCESTOR GOCCANCESTOR GOMFANCESTOR GOTERM GO_dbconn
-  NCBIORG_DB_SeedGenerator Stop cleancdfname curlPerform getBM
-  getBinaryURL getCurlHandle getURL listAttributes listDatasets
-  sqliteWriteTable url.exists useMart
-
-checking Rd line widths ... NOTE
-Rd file 'sqlForge-makeCHIPDB.Rd':
-  \examples lines wider than 100 characters:
-                   fileName = "/mnt/cpb_anno/mcarlson/proj/mcarlson/sqliteGen/srcFiles/hgu95av2/HG_U95Av2_annot.csv.070824",
-                     EA="/mnt/cpb_anno/mcarlson/proj/mcarlson/sqliteGen/srcFiles/hgu95av2/hgu95av2.EA.txt",
-                     UMICH="/mnt/cpb_anno/mcarlson/proj/mcarlson/sqliteGen/srcFiles/hgu95av2/hgu95av2_UMICH.txt"),
-
-Rd file 'sqlForge-popDB.Rd':
-  \examples lines wider than 100 characters:
-                  chipSrc = "/mnt/cpb_anno/mcarlson/proj/mcarlson/sqliteGen/annosrc/db/chipsrc_human.sqlite",
-                  fileName="/mnt/cpb_anno/mcarlson/proj/mcarlson/sqliteGen/srcFiles/hgu95av2/HG_U95Av2.na27.annot.csv",
-                   fileName="/mnt/cpb_anno/mcarlson/proj/mcarlson/sqliteGen/srcFiles/yeast2/Yeast_2.na27.annot.csv",
-
-These lines will be truncated in the PDF manual.
-
-checking for unstated dependencies in vignettes ... NOTE
-'library' or 'require' call not declared from: ‘Biostrings’
-```
-
-## AnnotationHub (2.4.2)
-Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
-
-0 errors | 1 warning  | 0 notes
-
-```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because AnnotationHub-HOWTO.Rmd appears to be an R Markdown v2 document.
-loading from cache '/home/muelleki/.AnnotationHub/57158'
-    '/home/muelleki/.AnnotationHub/57159'
-
- *** caught segfault ***
-address (nil), cause 'memory not mapped'
-
-Traceback:
- 1: .Call(rmd_render_markdown, file, output, text, renderer, renderer.options,     extensions)
- 2: renderMarkdown(file, output = NULL, text, renderer = "HTML",     renderer.options = options, extensions = extensions, encoding = encoding)
- 3: markdown::markdownToHTML(out, output, encoding = encoding, ...)
- 4: (if (grepl("\\.[Rr]md$", file)) knit2html else if (grepl("\\.[Rr]rst$",     file)) knit2pdf else knit)(file, encoding = encoding, quiet = quiet,     envir = globalenv())
- 5: vweave(...)
- 6: engine$weave(file, quiet = quiet, encoding = enc)
- 7: doTryCatch(return(expr), name, parentenv, handler)
- 8: tryCatchOne(expr, names, parentenv, handlers[[1L]])
- 9: tryCatchList(expr, classes, parentenv, handlers)
-10: tryCatch({    engine$weave(file, quiet = quiet, encoding = enc)    setwd(startdir)    find_vignette_product(name, by = "weave", engine = engine)}, error = function(e) {    stop(gettextf("processing vignette '%s' failed with diagnostics:\n%s",         file, conditionMessage(e)), domain = NA, call. = FALSE)})
-11: buildVignettes(dir = "/home/muelleki/git/R/RSQLite/revdep/checks/AnnotationHub.Rcheck/vign_test/AnnotationHub")
-An irrecoverable exception occurred. R is aborting now ...
-Segmentation fault (core dumped)
-
-```
-
-## BatchExperiments (1.4.1)
-Maintainer: Michel Lang <michellang@gmail.com>  
-Bug reports: https://github.com/tudo-r/BatchExperiments/issues
-
-0 errors | 1 warning  | 2 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-                user system elapsed
-getResultVars  5.928  0.032   5.975
-addExperiments 5.888  0.060   5.955
-
-checking dependencies in R code ... NOTE
-Unexported objects imported by ':::' calls:
-  ‘BatchJobs:::addIntModulo’ ‘BatchJobs:::buffer’
-  ‘BatchJobs:::checkDir’ ‘BatchJobs:::checkId’ ‘BatchJobs:::checkIds’
-  ‘BatchJobs:::checkPart’ ‘BatchJobs:::createShardedDirs’
-  ‘BatchJobs:::dbConnectToJobsDB’ ‘BatchJobs:::dbCreateJobStatusTable’
-  ‘BatchJobs:::dbDoQuery’ ‘BatchJobs:::dbFindDone’
-  ‘BatchJobs:::dbFindRunning’ ‘BatchJobs:::dbRemoveJobs’
-  ‘BatchJobs:::dbSelectWithIds’ ‘BatchJobs:::getJobDirs’
-  ‘BatchJobs:::getJobInfoInternal’ ‘BatchJobs:::getKillJob’
-  ‘BatchJobs:::getListJobs’ ‘BatchJobs:::getRandomSeed’
-  ‘BatchJobs:::getResult’ ‘BatchJobs:::isRegistryDir’
-  ‘BatchJobs:::makeRegistryInternal’ ‘BatchJobs:::saveRegistry’
-  ‘BatchJobs:::seeder’ ‘BatchJobs:::syncRegistry’
-  See the note in ?`:::` about the use of this operator.
-
-checking R code for possible problems ... NOTE
-addExperiments.ExperimentRegistry: no visible global function
-  definition for ‘is’
-applyJobFunction.ExperimentRegistry: no visible global function
-  definition for ‘setNames’
-calcDynamic: no visible global function definition for ‘setNames’
-checkExperimentRegistry: no visible global function definition for
-  ‘head’
-dbSummarizeExperiments: no visible global function definition for
-  ‘setNames’
-designIterator: no visible global function definition for ‘setNames’
-getIndex : exprToIndex: no visible global function definition for
-  ‘capture.output’
-getProblemFilePaths: no visible global function definition for
-  ‘setNames’
-updateRegistry.ExperimentRegistry: no visible global function
-  definition for ‘packageVersion’
-Undefined global functions or variables:
-  capture.output head is packageVersion setNames
-Consider adding
-  importFrom("methods", "is")
-  importFrom("stats", "setNames")
-  importFrom("utils", "capture.output", "head", "packageVersion")
-to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
-contains 'methods').
-```
-
-## BatchJobs (1.6)
-Maintainer: Bernd Bischl <bernd_bischl@gmx.net>  
-Bug reports: https://github.com/tudo-r/BatchJobs/issues
-
-0 errors | 1 warning  | 0 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-... 14 lines ...
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-```
-
-## bioassayR (1.10.15)
-Maintainer: Tyler Backman <tbackman@ucr.edu>  
-Bug reports: https://github.com/TylerBackman/bioassayR/issues
-
-0 errors | 1 warning  | 1 note 
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-... 34 lines ...
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-
-checking R code for possible problems ... NOTE
-crossReactivityPrior: no visible global function definition for ‘sd’
-crossReactivityProbability : <anonymous>: no visible global function
-  definition for ‘pbeta’
-Undefined global functions or variables:
-  pbeta sd
-Consider adding
-  importFrom("stats", "pbeta", "sd")
-to your NAMESPACE file.
 ```
 
 ## ChemmineR (2.24.2)
@@ -494,6 +216,8 @@ File ‘CNEr/libs/CNEr.so’:
     Object: ‘ucsc/errabort.o’
   Found ‘exit’, possibly from ‘exit’ (C)
     Objects: ‘ucsc/errabort.o’, ‘ucsc/pipeline.o’
+  Found ‘printf’, possibly from ‘printf’ (C)
+    Objects: ‘ceScan.o’, ‘ucsc/pipeline.o’
   Found ‘puts’, possibly from ‘printf’ (C), ‘puts’ (C)
     Object: ‘ucsc/pipeline.o’
   Found ‘rand’, possibly from ‘rand’ (C)
@@ -529,117 +253,6 @@ Unexported objects imported by ':::' calls:
   See the note in ?`:::` about the use of this operator.
 ```
 
-## cummeRbund (2.14.0)
-Maintainer: Loyal A. Goff <lgoff@csail.mit.edu>
-
-0 errors | 1 warning  | 7 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-... 40 lines ...
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-         user system elapsed
-MAplot 45.268   0.82  46.233
-
-checking package dependencies ... NOTE
-Depends: includes the non-default packages:
-  ‘BiocGenerics’ ‘RSQLite’ ‘ggplot2’ ‘reshape2’ ‘fastcluster’
-  ‘rtracklayer’ ‘Gviz’
-Adding so many packages to the search path is excessive and importing
-selectively is preferable.
-
-checking installed package size ... NOTE
-  installed size is 11.3Mb
-  sub-directories of 1Mb or more:
-    R         3.7Mb
-    doc       1.8Mb
-    extdata   5.6Mb
-
-checking DESCRIPTION meta-information ... NOTE
-Malformed Title field: should not end in a period.
-Packages listed in more than one of Depends, Imports, Suggests, Enhances:
-  ‘BiocGenerics’ ‘plyr’
-A package should be listed in only one of these fields.
-
-checking dependencies in R code ... NOTE
-'library' or 'require' calls in package code:
-  'NMFN' 'cluster' 'rjson' 'stringr'
-  Please use :: or requireNamespace() instead.
-  See section 'Suggested packages' in the 'Writing R Extensions' manual.
-Packages in Depends field not imported from:
-  'Gviz' 'RSQLite' 'fastcluster' 'ggplot2' 'reshape2' 'rtracklayer'
-  These packages need to be imported from (in the NAMESPACE file)
-  for when this namespace is loaded but not attached.
-
-checking R code for possible problems ... NOTE
-.CVdensity: no visible global function definition for 'ggplot'
-.CVdensity: no visible global function definition for 'geom_density'
-.CVdensity: no visible global function definition for 'aes'
-.CVdensity: no visible binding for global variable 'CV'
-.CVdensity: no visible binding for global variable 'sample_name'
-.CVdensity: no visible global function definition for 'scale_x_log10'
-.MAplot: no visible global function definition for 'ggplot'
-.MAplot: no visible global function definition for 'geom_point'
-.MAplot: no visible global function definition for 'aes'
-... 1188 lines ...
-  scale_y_log10 seqnames significant stat_density stat_smooth stat_sum
-  stat_summary stdev str_split_fixed strand theme theme_bw toJSON
-  tracking_id tracks unit v1 v2 value variable varnames write.table x
-  xlab xlim y ylab
-Consider adding
-  importFrom("graphics", "plot")
-  importFrom("stats", "as.dendrogram", "as.dist", "as.formula",
-             "cmdscale", "dist", "hclust", "order.dendrogram",
-             "p.adjust", "prcomp")
-  importFrom("utils", "read.delim", "read.table", "write.table")
-to your NAMESPACE file.
-
-checking Rd line widths ... NOTE
-Rd file 'MAplot.Rd':
-  \examples lines wider than 100 characters:
-             a<-readCufflinks(system.file("extdata", package="cummeRbund")) #Create CuffSet object from sample data
-
-Rd file 'QCplots.Rd':
-  \examples lines wider than 100 characters:
-             a<-readCufflinks(system.file("extdata", package="cummeRbund")) #Read cufflinks data and create CuffSet object
-
-Rd file 'csBoxplot.Rd':
-... 96 lines ...
-                                     isoformFPKM = "isoforms.fpkm_tracking", isoformDiff = "isoform_exp.diff", isoformCount="isoforms.count_ ... [TRUNCATED]
-                                     TSSFPKM = "tss_groups.fpkm_tracking", TSSDiff = "tss_group_exp.diff", TSSCount="tss_groups.count_tracki ... [TRUNCATED]
-                                     CDSFPKM = "cds.fpkm_tracking", CDSExpDiff = "cds_exp.diff", CDSCount="cds.count_tracking", CDSRep="cds. ... [TRUNCATED]
-  \examples lines wider than 100 characters:
-             a<-readCufflinks(system.file("extdata", package="cummeRbund")) #Read cufflinks data in sample directory and creates CuffSet obj ... [TRUNCATED]
-
-Rd file 'sigMatrix.Rd':
-  \examples lines wider than 100 characters:
-             a<-readCufflinks(system.file("extdata", package="cummeRbund")) #Create CuffSet object from sample data
-
-These lines will be truncated in the PDF manual.
-
-checking sizes of PDF files under ‘inst/doc’ ... NOTE
-  ‘qpdf’ made some significant size reductions:
-     compacted ‘cummeRbund-manual.pdf’ from 1.5Mb to 1.3Mb
-  consider running tools::compactPDF() on these files
-```
-
 ## customProDB (1.12.0)
 Maintainer: xiaojing wang <xiaojing.wang@vanderbilt.edu>
 
@@ -672,18 +285,18 @@ Execution halted
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning: Converting factor to character for binding
-Warning: Converting factor to character for binding
-Warning: Converting factor to character for binding
-Warning: Converting factor to character for binding
-Warning: Converting factor to character for binding
-Warning: Converting factor to character for binding
-Warning: Converting factor to character for binding
+    'citation("Biobase")', and for packages
+    'citation("pkgname")'.
+
+Loading required package: biomaRt
+Build TranscriptDB object (txdb.sqlite) ... 
+Download the refGene table ... OK
+Download the hgFixed.refLink table ... OK
 ... 8 lines ...
-See help("Deprecated")
-Warning: 'dbGetPreparedQuery' is deprecated.
-Use 'dbBind' instead.
-See help("Deprecated")
+Warning: Named parameters not used in query: internal_id, name, chrom, strand, start, end
+Warning: Named parameters not used in query: internal_id, name, chrom, strand, start, end
+Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
+Warning: Named parameters not used in query: gene_id, internal_tx_id
 OK
  done
 Prepare gene/transcript/protein id mapping information (ids.RData) ... 
@@ -731,28 +344,9 @@ to your NAMESPACE file.
 ## DECIPHER (2.0.2)
 Maintainer: Erik Wright <DECIPHER@cae.wisc.edu>
 
-1 error  | 3 warnings | 3 notes
+0 errors | 2 warnings | 3 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘DECIPHER-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: Add2DB
-> ### Title: Add Data to a Database
-> ### Aliases: Add2DB
-> 
-> ### ** Examples
-> 
-> # Create a sequence database
-> gen <- system.file("extdata", "Bacteria_175seqs.gen", package="DECIPHER")
-> dbConn <- dbConnect(SQLite(), ":memory:")
-> Seqs2DB(gen, "GenBank", dbConn, "Bacteria")
-
-Reading GenBank file chunk 1Error: Unsupported type
-Execution halted
-
 checking foreign function calls ... WARNING
 Registration problems:
   symbol ‘functionCall’ in the local frame:
@@ -773,31 +367,8 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
      compacted ‘ArtOfAlignmentInR.pdf’ from 968Kb to 635Kb
   consider running tools::compactPDF(gs_quality = "ebook") on these files
 
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-
-    Filter, Find, Map, Position, Reduce, anyDuplicated, append,
-    as.data.frame, cbind, colnames, do.call, duplicated, eval, evalq,
-    get, grep, grepl, intersect, is.unsorted, lapply, lengths, mapply,
-    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int, rank,
-    rbind, rownames, sapply, setdiff, sort, table, tapply, union,
-    unique, unsplit
-... 8 lines ...
-
-    colMeans, colSums, expand.grid, rowMeans, rowSums
-
-Loading required package: IRanges
-Loading required package: XVector
-Loading required package: RSQLite
-
-Error: processing vignette 'DECIPHERing.Rnw' failed with diagnostics:
- chunk 3 (label = expr1) 
-Error : Unsupported type
-Execution halted
-
 checking installed package size ... NOTE
-  installed size is  9.2Mb
+  installed size is  8.9Mb
   sub-directories of 1Mb or more:
     data      2.5Mb
     doc       3.9Mb
@@ -885,26 +456,15 @@ Execution halted
 
 ```
 
-## gcbd (0.2.5)
+## gcbd (0.2.6)
 Maintainer: Dirk Eddelbuettel <edd@debian.org>
 
-0 errors | 1 warning  | 3 notes
+0 errors | 1 warning  | 1 note 
 
 ```
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Loading required package: RSQLite
-Loading required package: plyr
-Loading required package: reshape
-
-Attaching package: ‘reshape’
-
-The following objects are masked from ‘package:plyr’:
-
-    rename, round_any
-
-Loading required package: lattice
 Warning in packageDescription("gputools") :
   no package 'gputools' was found
 Error: processing vignette 'gcbd.Rnw' failed with diagnostics:
@@ -914,35 +474,6 @@ Execution halted
 
 checking package dependencies ... NOTE
 Package suggested but not available for checking: ‘gputools’
-
-checking dependencies in R code ... NOTE
-Packages in Depends field not imported from:
-  ‘RSQLite’ ‘lattice’ ‘plyr’ ‘reshape’
-  These packages need to be imported from (in the NAMESPACE file)
-  for when this namespace is loaded but not attached.
-
-checking R code for possible problems ... NOTE
-createDatabase: no visible global function definition for ‘dbDriver’
-createDatabase: no visible global function definition for
-  ‘dbBuildTableDefinition’
-createDatabase: no visible global function definition for ‘dbConnect’
-createDatabase: no visible global function definition for ‘dbGetQuery’
-createDatabase: no visible global function definition for
-  ‘dbDisconnect’
-databaseResult: no visible global function definition for ‘dbConnect’
-databaseResult: no visible global function definition for ‘dbDriver’
-... 74 lines ...
-qrBenchmarkgputools: no visible global function definition for ‘gpuQr’
-svdBenchmarkgputools: no visible global function definition for
-  ‘gpuSvd’
-Undefined global functions or variables:
-  coef dbBuildTableDefinition dbConnect dbDisconnect dbDriver
-  dbGetQuery dbWriteTable ddply gpuMatMult gpuQr gpuSvd legend lm lu
-  matplot melt par rnorm trellis.par.get trellis.par.set
-Consider adding
-  importFrom("graphics", "legend", "matplot", "par")
-  importFrom("stats", "coef", "lm", "rnorm")
-to your NAMESPACE file.
 ```
 
 ## GeneAnswers (2.14.0)
@@ -1080,53 +611,6 @@ Rd file 'topREACTOME.PATHGenes.Rd':
 These lines will be truncated in the PDF manual.
 ```
 
-## GenomicFeatures (1.24.5)
-Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
-
-0 errors | 1 warning  | 2 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-... 85 lines ...
-Examples with CPU or elapsed time > 5s
-                               user system  elapsed
-makeTxDbFromBiomart        1490.104 38.488 1582.826
-makeFeatureDbFromUCSC       825.084 22.980  991.302
-makeTxDbFromUCSC             62.168  1.340  178.307
-coordinate-mapping-methods   32.552  0.740   33.920
-coverageByTranscript         31.392  1.428   32.853
-makeTxDbFromGRanges          18.528  0.452   19.005
-extractTranscriptSeqs        13.952  0.376   14.341
-makeTxDbFromGFF              12.812  0.324   13.208
-transcriptLocs2refLocs        8.668  0.196    8.875
-
-checking package dependencies ... NOTE
-Depends: includes the non-default packages:
-  ‘BiocGenerics’ ‘S4Vectors’ ‘IRanges’ ‘GenomeInfoDb’ ‘GenomicRanges’
-  ‘AnnotationDbi’
-Adding so many packages to the search path is excessive and importing
-selectively is preferable.
-
-checking dependencies in R code ... NOTE
-Unexported objects imported by ':::' calls:
-  ‘AnnotationDbi:::.getMetaValue’ ‘AnnotationDbi:::.valid.colnames’
-  ‘AnnotationDbi:::.valid.metadata.table’
-  ‘AnnotationDbi:::.valid.table.colnames’ ‘AnnotationDbi:::dbEasyQuery’
-  ‘AnnotationDbi:::dbQuery’ ‘AnnotationDbi:::smartKeys’
-  ‘biomaRt:::martBM’ ‘biomaRt:::martDataset’ ‘biomaRt:::martHost’
-  ‘rtracklayer:::resourceDescription’ ‘rtracklayer:::ucscTableOutputs’
-  See the note in ?`:::` about the use of this operator.
-```
-
 ## lumi (2.24.0)
 Maintainer: Pan Du <dupan.mail@gmail.com>
 
@@ -1185,9 +669,9 @@ Calls: buildVignettes -> texi2pdf -> texi2dvi
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is 11.6Mb
+  installed size is 11.8Mb
   sub-directories of 1Mb or more:
-    R      2.6Mb
+    R      2.8Mb
     data   3.6Mb
     doc    5.0Mb
 
@@ -1255,37 +739,6 @@ Maintainer: Dhammapal Bharne <dhammapalb@uohyd.ac.in>
 checking whether package ‘maGUI’ can be installed ... ERROR
 Installation failed.
 See ‘/home/muelleki/git/R/RSQLite/revdep/checks/maGUI.Rcheck/00install.out’ for details.
-```
-
-## MeSHDbi (1.8.0)
-Maintainer: Koki Tsuyuzaki <k.t.the-answer@hotmail.co.jp>
-
-0 errors | 1 warning  | 2 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-
-checking R code for possible problems ... NOTE
-.div: no visible global function definition for ‘na.omit’
-Undefined global functions or variables:
-  na.omit
-Consider adding
-  importFrom("stats", "na.omit")
-to your NAMESPACE file.
-
-checking Rd line widths ... NOTE
-Rd file 'makeMeSHPackage.Rd':
-  \examples lines wider than 100 characters:
-                                             maintainer = "Koki Tsuyuzaki <k.t.the-answer@hotmail.co.jp>",
-
-These lines will be truncated in the PDF manual.
 ```
 
 ## metaseqR (1.12.2)
@@ -1375,49 +828,9 @@ to your NAMESPACE file.
 ## mgsa (1.20.0)
 Maintainer: Sebastian Bauer <mail@sebastianbauer.info>
 
-2 errors | 2 warnings | 4 notes
+0 errors | 1 warning  | 5 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘mgsa-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: readGAF
-> ### Title: Read a Gene Ontology annotation file
-> ### Aliases: readGAF
-> 
-> ### ** Examples
-... 47 lines ...
-
-The following objects are masked from ‘package:base’:
-
-    colMeans, colSums, expand.grid, rowMeans, rowSums
-
-
-Loading required package: RSQLite
-Loading required package: DBI
-Error in guessRowName(df, row.names) : Unknown input
-Calls: readGAF ... sqlCreateTable -> sqlRownamesToColumn -> guessRowName
-Execution halted
-
-checking tests ... ERROR
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-  6: sqlCreateTable(conn, name, value, row.names = row.names) at /home/muelleki/git/R/RSQLite/R/table.R:70
-  7: sqlCreateTable(conn, name, value, row.names = row.names) at /tmp/RtmpFisqKr/devtools13d37bd5f7c7/rstats-db-DBI-bc730b9/R/table-create.R:36
-  8: sqlRownamesToColumn(fields, row.names) at /tmp/RtmpFisqKr/devtools13d37bd5f7c7/rstats-db-DBI-bc730b9/R/table-create.R:46
-  9: guessRowName(df, row.names) at /tmp/RtmpFisqKr/devtools13d37bd5f7c7/rstats-db-DBI-bc730b9/R/rownames.R:38
-  10: stop("Unknown input") at /tmp/RtmpFisqKr/devtools13d37bd5f7c7/rstats-db-DBI-bc730b9/R/rownames.R:84
-  
-  testthat results ================================================================
-  OK: 16 SKIPPED: 0 FAILED: 2
-  1. Error: readGAF() works (@test-readGAF.R#2) 
-  2. Error: readGAF() with aspect works (@test-readGAF.R#7) 
-  
-  Error: testthat unit tests failed
-  Execution halted
-
 checking for GNU extensions in Makefiles ... WARNING
 Found the following file(s) containing GNU extensions:
   src/Makevars
@@ -1425,29 +838,6 @@ Found the following file(s) containing GNU extensions:
 Portable Makefiles do not use GNU extensions such as +=, :=, $(shell),
 $(wildcard), ifeq ... endif. See section ‘Writing portable packages’ in
 the ‘Writing R Extensions’ manual.
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-    Vignettes contain introductory material; view with
-    'browseVignettes()'. To cite Bioconductor, see
-    'citation("Biobase")', and for packages 'citation("pkgname")'.
-
-Loading required package: IRanges
-Loading required package: S4Vectors
-
-... 8 lines ...
-
-    colMeans, colSums, expand.grid, rowMeans, rowSums
-
-
-Loading required package: RSQLite
-Loading required package: DBI
-
-Error: processing vignette 'mgsa.Rnw' failed with diagnostics:
- chunk 6 (label = readGAF) 
-Error in guessRowName(df, row.names) : Unknown input
-Execution halted
 
 checking top-level files ... NOTE
 Non-standard files/directories found at top level:
@@ -1496,6 +886,16 @@ Consider adding
   importFrom("utils", "read.delim", "relist", "str")
 to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
 contains 'methods').
+
+checking compiled code ... NOTE
+File ‘mgsa/libs/mgsa.so’:
+  Found ‘printf’, possibly from ‘printf’ (C)
+    Object: ‘mgsa.o’
+
+Compiled code should not call entry points which might terminate R nor
+write to stdout/stderr instead of to the console, nor the system RNG.
+
+See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
 
 ## oce (0.9-19)
@@ -1526,7 +926,7 @@ Calls: plot -> plot -> .local
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  5.3Mb
+  installed size is  5.1Mb
   sub-directories of 1Mb or more:
     help   2.0Mb
 ```
@@ -1564,7 +964,7 @@ checking package dependencies ... NOTE
 Packages which this enhances but not available for checking: ‘doMC’ ‘doMPI’
 
 checking installed package size ... NOTE
-  installed size is 30.1Mb
+  installed size is 30.0Mb
   sub-directories of 1Mb or more:
     doc      12.9Mb
     scripts  15.7Mb
@@ -1633,52 +1033,6 @@ Rd file 'preprocessTools.Rd':
      normalize(object, method=normalizationMethods(), copy=TRUE, subset=NULL,target='core', verbose=TRUE, ...)
 
 These lines will be truncated in the PDF manual.
-```
-
-## OrganismDbi (1.14.1)
-Maintainer: Biocore Data Team <maintainer@bioconductor.org>
-
-0 errors | 1 warning  | 2 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-... 13 lines ...
-  Warning: 'dbGetPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-                            user system elapsed
-makeOrganismDbFromBiomart 12.784  0.200  19.500
-rangeBasedAccessors        7.736  0.040   7.775
-OrganismDb                 6.988  0.140   7.131
-makeOrganismDbFromTxDb     6.500  0.076  86.303
-makeOrganismDbFromUCSC     5.276  0.080  83.525
-
-checking dependencies in R code ... NOTE
-Unexported object imported by a ':::' call: ‘BiocGenerics:::testPackage’
-  See the note in ?`:::` about the use of this operator.
-There are ::: calls to the package's namespace in its code. A package
-  almost never needs to use ::: for its own objects:
-  ‘.biocAnnPackages’ ‘.extractPkgsAndCols’ ‘.gentlyExtractDbFiles’
-  ‘.lookupDbNameFromKeytype’ ‘.mungeGraphData’ ‘.taxIdToOrgDb’
-  ‘.taxIdToOrgDbName’ ‘.testGraphData’ ‘.testKeys’ ‘OrganismDb’
-
-checking R code for possible problems ... NOTE
-Found the following assignments to the global environment:
-File ‘OrganismDbi/R/createOrganismPackage.R’:
-  assign(txdbName, txdb, .GlobalEnv)
-  assign(orgdbName, orgdb, .GlobalEnv)
-  assign(orgdbName, orgdb, .GlobalEnv)
 ```
 
 ## PAnnBuilder (1.36.0)
@@ -1940,7 +1294,7 @@ These lines will be truncated in the PDF manual.
 ## poplite (0.99.16)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
-1 error  | 1 warning  | 1 note 
+1 error  | 0 warnings | 1 note 
 
 ```
 checking tests ... ERROR
@@ -1960,17 +1314,6 @@ Last 13 lines of output:
   Error: testthat unit tests failed
   Execution halted
 
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-
 checking R code for possible problems ... NOTE
 filter_.Database: no visible global function definition for ‘stack’
 get.starting.point : <anonymous>: no visible global function definition
@@ -1988,57 +1331,6 @@ Consider adding
   importFrom("stats", "na.omit", "setNames")
   importFrom("utils", "stack")
 to your NAMESPACE file.
-```
-
-## rangeMapper (0.3-0)
-Maintainer: Mihai Valcu <valcu@orn.mpg.de>
-
-0 errors | 1 warning  | 0 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'make.db.names' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-Examples with CPU or elapsed time > 5s
-              user system elapsed
-rangeMap.save    5  0.008   5.014
-```
-
-## RecordLinkage (0.4-10)
-Maintainer: Andreas Borg <borga@uni-mainz.de>
-
-0 errors | 1 warning  | 0 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-  Warning: 'make.db.names' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
 ```
 
 ## recoup (1.0.2)
@@ -2141,37 +1433,6 @@ Undefined global functions or variables:
   ZBREFIDP control_files_names experiment_sample_accession
 ```
 
-## rplexos (1.1.8)
-Maintainer: Clayton Barrows <clayton.barrows@nrel.gov>  
-Bug reports: https://github.com/NREL/rplexos/issues
-
-0 errors | 1 warning  | 0 notes
-
-```
-checking examples ... WARNING
-Found the following significant warnings:
-
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-... 244 lines ...
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-  Warning: 'dbGetPreparedQuery' is deprecated.
-Deprecated functions may be defunct as soon as of the next release of
-R.
-See ?Deprecated.
-```
-
 ## RQDA (0.2-7)
 Maintainer: HUANG Ronggui <ronggui.huang@gmail.com>
 
@@ -2191,26 +1452,9 @@ Packages which this enhances but not available for checking:
 Maintainer: Christian Panse <cp@fgcz.ethz.ch>, Witold E. Wolski <wewolski@gmail.com>  
 Bug reports: https://github.com/fgcz/specL/issues
 
-1 error  | 1 warning  | 4 notes
+0 errors | 1 warning  | 4 notes
 
 ```
-checking tests ... ERROR
-Running the tests in ‘tests/runTests.R’ failed.
-Last 13 lines of output:
-  1 Test Suite : 
-  specL RUnit Tests - 9 test functions, 1 error, 0 failures
-  ERROR in /tmp/RtmpUJRSVo/RLIBS_8f8464856f7/specL/unitTests/test_read.bibliospec.R: Error while sourcing  /tmp/RtmpUJRSVo/RLIBS_8f8464856f7/specL/unitTests/test_read.bibliospec.R : Error in msg$errorMsg : $ operator is invalid for atomic vectors
-  
-  Test files with failing tests
-  
-     test_read.bibliospec.R 
-       /tmp/RtmpUJRSVo/RLIBS_8f8464856f7/specL/unitTests/test_read.bibliospec.R 
-  
-  
-  Error in BiocGenerics:::testPackage("specL") : 
-    unit tests failed for package specL
-  Execution halted
-
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
@@ -2358,24 +1602,24 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Sep 08, 2016 12:26:36 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
-INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetData/QNA/CAN.B1_GE.CARSA.Q?format=compact_v2
-Sep 08, 2016 12:26:37 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
-INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetData/QNA/CAN+USA+MEX.B1_GE.CARSA.Q?format=compact_v2
-Sep 08, 2016 12:26:37 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
-INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/dataflow/ESTAT/ei_nama_q/latest
+ options("getSymbols.warning4.0"=FALSE). See ?getSymbols for more details.
+Warning in if (as.character(sc[[1]]) != calling.fun) return() :
+  the condition has length > 1 and only the first element will be used
+trying URL 'http://www.rba.gov.au/statistics/tables/xls/d03hist.xls'
+Content type 'application/vnd.ms-excel' length 273408 bytes (267 KB)
+==================================================
+downloaded 267 KB
 ... 8 lines ...
-SEVERE: Connection failed. HTTP error code : 500, message: Internal Server Error
-SDMX meaning: Error on the provider side.
-Sep 08, 2016 12:28:14 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getDataflow
-SEVERE: Exception caught parsing results from call to provider ECB
+The following objects are masked from ‘package:base’:
+
+    as.Date, as.Date.numeric
+
 
 Error: processing vignette 'Guide.Stex' failed with diagnostics:
- chunk 6 
-Error in .local(serIDs, con, ...) : 
-  EXR.Q.USD.EUR.SP00.A error: it.bancaditalia.oss.sdmx.util.SdmxException: Exception. Class: it.bancaditalia.oss.sdmx.util.SdmxException .Message: Connection failed. HTTP error code : 500, message: Internal Server Error
-SDMX meaning: Error on the provider side.
+ chunk 41 
+Error in .local(drv, ...) : 
+  Failed to connect to database: Error: Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
+
 Execution halted
 ```
 
@@ -2419,9 +1663,9 @@ Error in VariantFilteringParam(vcfFilenames = CEUvcf) :
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  7.7Mb
+  installed size is  7.8Mb
   sub-directories of 1Mb or more:
-    R         3.3Mb
+    R         3.5Mb
     extdata   3.5Mb
 
 checking dependencies in R code ... NOTE

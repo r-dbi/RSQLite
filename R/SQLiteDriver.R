@@ -17,7 +17,7 @@ setClass("SQLiteDriver",
 
 #' @rdname SQLiteDriver-class
 #' @export
-setMethod("dbIsValid", "SQLiteDriver", function(dbObj) {
+setMethod("dbIsValid", "SQLiteDriver", function(dbObj, ...) {
   TRUE
 })
 

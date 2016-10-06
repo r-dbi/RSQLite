@@ -136,7 +136,7 @@ NULL
 #' @export
 setMethod("dbSendPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
-  function(conn, statement, bind.data) {
+  function(conn, statement, bind.data, ...) {
     warning_once("RSQLite::dbSendPreparedQuery() is deprecated, please switch to DBI::dbSendQuery(params = bind.data).")
 
     res <- dbSendQuery(conn, statement)
@@ -155,7 +155,7 @@ setMethod("dbSendPreparedQuery",
 #' @export
 setMethod("dbGetPreparedQuery",
   c("SQLiteConnection", "character", "data.frame"),
-  function(conn, statement, bind.data) {
+  function(conn, statement, bind.data, ...) {
     warning_once("RSQLite::dbGetPreparedQuery() is deprecated, please switch to DBI::dbGetQuery(params = bind.data).")
 
     res <- dbSendQuery(conn, statement)
@@ -196,14 +196,14 @@ NULL
 
 #' @rdname dbGetInfo
 #' @export
-setMethod("dbGetInfo", "SQLiteDriver", function(dbObj) {
+setMethod("dbGetInfo", "SQLiteDriver", function(dbObj, ...) {
   warning_once("RSQLite::dbGetInfo() is deprecated: please use individual metadata functions instead")
   list()
 })
 
 #' @rdname dbGetInfo
 #' @export
-setMethod("dbGetInfo", "SQLiteConnection", function(dbObj) {
+setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
   warning_once("RSQLite::dbGetInfo() is deprecated: please use individual metadata functions instead")
   list()
 })
@@ -231,6 +231,6 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
 #'
 #' @keywords internal
 #' @export
-setMethod("fetch", "SQLiteResult", function(res, n = -1) {
+setMethod("fetch", "SQLiteResult", function(res, n = -1, ...) {
   dbFetch(res, n = n, row.names = FALSE)
 })

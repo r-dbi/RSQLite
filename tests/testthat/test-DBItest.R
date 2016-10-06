@@ -56,6 +56,7 @@ DBItest::test_compliance(
   ctx = DBItest::make_context(
     SQLite(), list(flags = SQLITE_RO), set_as_default = FALSE, name = "RSQLite-RO"),
   skip = c(
-    "compliance"                                # skipping for now because of dbGetInfo()
+    "compliance",                               # skipping for now because of dbGetInfo()
+    "ellipsis"                                  # redundant
   )
 )

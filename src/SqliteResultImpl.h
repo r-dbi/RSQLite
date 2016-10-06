@@ -63,8 +63,8 @@ private:
   bool step_done();
   List peek_first_row();
 
-  void raise_sqlite_exception() const;
-  static void raise_sqlite_exception(sqlite3* conn);
+  void NORET raise_sqlite_exception() const;
+  static void NORET raise_sqlite_exception(sqlite3* conn);
 };
 
 

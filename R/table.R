@@ -27,6 +27,8 @@ NULL
 #' @param field.types character vector of named  SQL field types where
 #'   the names are the names of new table's columns. If missing, types inferred
 #'   with \code{\link[DBI]{dbDataType}}).
+#' @param temporary a logical specifying whether the new table should be
+#'   temporary. Its default is \code{FALSE}.
 #' @details In a primary key column qualified with
 #' \href{https://www.sqlite.org/autoinc.html}{\code{AUTOINCREMENT}}, missing
 #' values will be assigned the next largest positive integer,

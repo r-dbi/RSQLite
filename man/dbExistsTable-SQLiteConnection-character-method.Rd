@@ -5,12 +5,14 @@
 \alias{dbExistsTable,SQLiteConnection,character-method}
 \title{Does the table exist?}
 \usage{
-\S4method{dbExistsTable}{SQLiteConnection,character}(conn, name)
+\S4method{dbExistsTable}{SQLiteConnection,character}(conn, name, ...)
 }
 \arguments{
 \item{conn}{An existing \code{\linkS4class{SQLiteConnection}}}
 
 \item{name}{String, name of table. Match is case insensitive.}
+
+\item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \description{
 Does the table exist?

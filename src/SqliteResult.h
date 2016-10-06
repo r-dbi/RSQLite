@@ -21,11 +21,13 @@ public:
   int nrows();
   int rows_affected();
   IntegerVector find_params(const CharacterVector& param_names);
-  void bind(const List& params);
+
   void bind_rows(const List& params);
   List fetch(int n_max = -1);
   List get_column_info();
 
+private:
+  void validate_params(const List& params) const;
 };
 
 #endif // __RSQLSITE_SQLITE_RESULT__

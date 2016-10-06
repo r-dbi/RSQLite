@@ -5,12 +5,14 @@
 \alias{dbListFields,SQLiteConnection,character-method}
 \title{List fields in specified table.}
 \usage{
-\S4method{dbListFields}{SQLiteConnection,character}(conn, name)
+\S4method{dbListFields}{SQLiteConnection,character}(conn, name, ...)
 }
 \arguments{
 \item{conn}{An existing \code{\linkS4class{SQLiteConnection}}}
 
 \item{name}{a length 1 character vector giving the name of a table.}
+
+\item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \description{
 List fields in specified table.

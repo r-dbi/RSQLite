@@ -7,7 +7,7 @@ test_that("throws error if constraint violated", {
   x <- data.frame(col1 = 1:10, col2 = letters[1:10])
 
   dbWriteTable(con, "t1", x)
-  dbGetQuery(con, "CREATE UNIQUE INDEX t1_c1_c2_idx ON t1(col1, col2)")
+  dbExecute(con, "CREATE UNIQUE INDEX t1_c1_c2_idx ON t1(col1, col2)")
   expect_error(dbWriteTable(con, "t1", x, append = TRUE),
     "UNIQUE constraint failed")
 })
@@ -31,7 +31,7 @@ test_that("throws error if constrainted violated", {
   x <- data.frame(col1 = 1:10, col2 = letters[1:10])
 
   dbWriteTable(con, "t1", x)
-  dbGetQuery(con, "CREATE UNIQUE INDEX t1_c1_c2_idx ON t1(col1, col2)")
+  dbExecute(con, "CREATE UNIQUE INDEX t1_c1_c2_idx ON t1(col1, col2)")
   expect_error(dbWriteTable(con, "t1", x, append = TRUE),
     "UNIQUE constraint failed")
 })
@@ -157,6 +157,23 @@ test_that("options work", {
   expect_equal(dbReadTable(con, "dat"), expected)
 })
 
+test_that("temporary works", {
+  db_file <- tempfile(fileext = ".sqlite")
+  con <- dbConnect(SQLite(), db_file)
+  on.exit(dbDisconnect(con))
+
+  dbWriteTable(con, "prm", "dat-n.txt", sep="|", eol="\n", overwrite = TRUE)
+  dbWriteTable(con, "tmp", "dat-n.txt", sep="|", eol="\n", overwrite = TRUE, temporary = TRUE)
+  expect_true(dbExistsTable(con, "prm"))
+  expect_true(dbExistsTable(con, "tmp"))
+
+  con2 <- dbConnect(SQLite(), db_file)
+  on.exit(dbDisconnect(con2))
+
+  expect_true(dbExistsTable(con2, "prm"))
+  expect_false(dbExistsTable(con2, "tmp"))
+})
+
 
 # Append ------------------------------------------------------------------
 
@@ -214,6 +231,7 @@ test_that("dbWriteTable(row.names = 0)", {
 })
 
 test_that("dbWriteTable(row.names = 1)", {
+  memoise::forget(warning_once)
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 

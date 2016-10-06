@@ -5,10 +5,12 @@
 \alias{dbListTables,SQLiteConnection-method}
 \title{List available SQLite tables.}
 \usage{
-\S4method{dbListTables}{SQLiteConnection}(conn)
+\S4method{dbListTables}{SQLiteConnection}(conn, ...)
 }
 \arguments{
 \item{conn}{An existing \code{\linkS4class{SQLiteConnection}}}
+
+\item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \description{
 List available SQLite tables.

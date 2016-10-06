@@ -13,13 +13,13 @@
 \usage{
 SQLite(...)
 
-\S4method{dbConnect}{SQLiteDriver}(drv, dbname = "",
+\S4method{dbConnect}{SQLiteDriver}(drv, dbname = "", ...,
   loadable.extensions = TRUE, cache_size = NULL, synchronous = "off",
   flags = SQLITE_RWC, vfs = NULL)
 
-\S4method{dbConnect}{SQLiteConnection}(drv)
+\S4method{dbConnect}{SQLiteConnection}(drv, ...)
 
-\S4method{dbDisconnect}{SQLiteConnection}(conn)
+\S4method{dbDisconnect}{SQLiteConnection}(conn, ...)
 }
 \arguments{
 \item{...}{In previous versions, \code{SQLite()} took arguments. These

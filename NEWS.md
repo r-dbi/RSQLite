@@ -1,3 +1,14 @@
+## RSQLite 1.0.9014 (2016-10-06)
+
+- `dbWriteTable()` supports `temporary` argument, default `FALSE` (#113).
+- The `name` argument to the transaction methods appears before the ellipsis for compatibility reasons.
+- Use new `dbSendStatement()` and `dbExecute()` internally.
+- Deprecation warnings are given only once, with a clear reference to the source.
+- Undeprecate `sqliteQuickColumn()` and `fetch()`.
+- Multi-row binding implemented in C++ (#168, #178).
+- All DBI methods contain an ellipsis `...` in their signature.
+
+
 ## RSQLite 1.0.9013 (2016-10-01)
 
 - Use `plogr` for logging.

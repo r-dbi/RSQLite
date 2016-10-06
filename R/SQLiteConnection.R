@@ -31,14 +31,14 @@ setMethod("show", "SQLiteConnection", function(object) {
 
 #' @rdname SQLiteConnection-class
 #' @export
-setMethod("dbIsValid", "SQLiteConnection", function(dbObj) {
+setMethod("dbIsValid", "SQLiteConnection", function(dbObj, ...) {
   rsqlite_connection_valid(dbObj@ptr)
 })
 
 #' @rdname SQLiteConnection-class
 #' @export
-setMethod("dbGetException", "SQLiteConnection", function(conn) {
-  .Deprecated("tryCatch", old = "dbGetException")
+setMethod("dbGetException", "SQLiteConnection", function(conn, ...) {
+  warning_once("RSQLite::dbGetException() is deprecated, please switch to using standard error handling via tryCatch().")
   list(
     errorNum = 0L,
     errorMsg = "OK"

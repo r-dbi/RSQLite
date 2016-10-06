@@ -20,11 +20,10 @@
 |DBI       |   |0.5-11     |2016-10-04 |Github (rstats-db/DBI@636bfc2)     |
 |DBItest   |   |1.3-9      |2016-10-05 |Github (rstats-db/DBItest@25c558d) |
 |knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
-|memoise   |   |1.0.0      |2016-01-29 |CRAN (R 3.3.1)                     |
 |plogr     |   |0.1-1      |2016-09-24 |cran (@0.1-1)                      |
 |Rcpp      |   |0.12.7     |2016-09-05 |cran (@0.12.7)                     |
 |rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
-|RSQLite   |   |1.0.9013   |2016-10-05 |local (rstats-db/RSQLite@1ace3be)  |
+|RSQLite   |   |1.0.9011   |2016-09-12 |local                              |
 |testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
@@ -33,17 +32,17 @@
 
 |package            |version   | errors| warnings| notes|
 |:------------------|:---------|------:|--------:|-----:|
-|AnnotationDbi      |1.34.4    |      0|        1|     5|
+|AnnotationDbi      |1.34.4    |      0|        2|     5|
 |AnnotationForge    |1.14.2    |      0|        0|     6|
 |AnnotationHubData  |1.2.2     |      1|        0|     3|
 |AnnotationHub      |2.4.2     |      0|        0|     0|
 |APSIM              |0.9.0     |      0|        0|     0|
 |archivist          |2.1       |      0|        0|     2|
-|BatchExperiments   |1.4.1     |      0|        0|     2|
-|BatchJobs          |1.6       |      0|        0|     0|
+|BatchExperiments   |1.4.1     |      0|        1|     2|
+|BatchJobs          |1.6       |      0|        1|     0|
 |bibliospec         |0.0.4     |      0|        0|     0|
 |biglm              |0.9-1     |      0|        0|     5|
-|bioassayR          |1.10.15   |      0|        0|     1|
+|bioassayR          |1.10.15   |      0|        1|     1|
 |caroline           |0.7.6     |      0|        0|     2|
 |Category           |2.38.0    |      0|        0|     1|
 |ChemmineR          |2.24.2    |      1|        0|     0|
@@ -52,23 +51,23 @@
 |clstutils          |1.20.0    |      0|        2|     5|
 |CNEr               |1.8.3     |      0|        2|     1|
 |CollapsABEL        |0.10.8    |      0|        0|     0|
-|cummeRbund         |2.14.0    |      0|        0|     7|
+|cummeRbund         |2.14.0    |      0|        1|     7|
 |customProDB        |1.12.0    |      1|        1|     3|
 |DBI                |0.5-1     |      0|        0|     1|
-|DECIPHER           |2.0.2     |      0|        2|     3|
+|DECIPHER           |2.0.2     |      0|        3|     3|
 |dplyr              |0.5.0     |      0|        0|     1|
 |ecd                |0.8.2     |      1|        0|     0|
 |emuR               |0.1.9     |      0|        0|     0|
 |ENCODExplorer      |1.4.3     |      0|        0|     2|
 |ensembldb          |1.4.7     |      0|        1|     1|
 |etl                |0.3.3.1   |      0|        0|     0|
-|ETLUtils           |1.3       |      0|        0|     0|
+|ETLUtils           |1.3       |      0|        1|     0|
 |filehashSQLite     |0.2-4     |      0|        0|     3|
 |filematrix         |1.1.0     |      0|        1|     0|
 |freqweights        |1.0.2     |      0|        0|     1|
 |gcbd               |0.2.6     |      0|        1|     1|
 |GeneAnswers        |2.14.0    |      1|        3|     6|
-|GenomicFeatures    |1.24.5    |      0|        0|     2|
+|GenomicFeatures    |1.24.5    |      0|        1|     2|
 |Genominator        |1.26.0    |      0|        0|     4|
 |GEOmetadb          |1.32.2    |      0|        0|     3|
 |GWASTools          |1.18.0    |      0|        0|     2|
@@ -79,7 +78,7 @@
 |maGUI              |1.0       |      1|        0|     0|
 |manta              |1.18.0    |      0|        0|     7|
 |marmap             |0.9.5     |      0|        0|     0|
-|MeSHDbi            |1.8.0     |      0|        0|     2|
+|MeSHDbi            |1.8.0     |      0|        1|     2|
 |metagenomeFeatures |1.1.0     |      0|        0|     1|
 |MetaIntegrator     |1.0.3     |      0|        0|     0|
 |metaseqR           |1.12.2    |      1|        1|     4|
@@ -94,26 +93,26 @@
 |oce                |0.9-19    |      1|        0|     1|
 |oligoClasses       |1.34.0    |      0|        0|     4|
 |oligo              |1.36.1    |      1|        0|     8|
-|OrganismDbi        |1.14.1    |      0|        0|     2|
+|OrganismDbi        |1.14.1    |      0|        1|     2|
 |PAnnBuilder        |1.36.0    |      0|        3|     1|
 |pdInfoBuilder      |1.36.0    |      0|        0|     1|
 |PGA                |1.2.2     |      1|        1|     3|
 |pitchRx            |1.8.2     |      0|        0|     1|
 |plethy             |1.10.0    |      2|        1|     3|
-|poplite            |0.99.16   |      1|        0|     1|
+|poplite            |0.99.16   |      1|        1|     1|
 |ProjectTemplate    |0.7       |      0|        0|     0|
 |quantmod           |0.4-6     |      0|        0|     1|
-|rangeMapper        |0.3-0     |      0|        0|     0|
-|RecordLinkage      |0.4-10    |      0|        0|     0|
+|rangeMapper        |0.3-0     |      0|        1|     0|
+|RecordLinkage      |0.4-10    |      0|        1|     0|
 |recordr            |1.0.3     |      0|        0|     1|
 |recoup             |1.0.2     |      2|        0|     1|
 |refGenome          |1.7.0     |      0|        0|     0|
 |rgrass7            |0.1-8     |      0|        0|     0|
 |RImmPort           |1.0.2     |      0|        1|     1|
 |RObsDat            |16.03     |      0|        0|     0|
-|rplexos            |1.1.8     |      0|        0|     0|
+|rplexos            |1.1.8     |      0|        1|     0|
 |RQDA               |0.2-7     |      1|        0|     1|
-|rTRM               |1.10.2    |      0|        0|     1|
+|rTRM               |1.10.2    |      0|        1|     1|
 |rvertnet           |0.5.0     |      0|        0|     0|
 |scrime             |1.3.3     |      0|        0|     2|
 |SEERaBomb          |2016.1    |      0|        0|     0|
@@ -128,7 +127,7 @@
 |srvyr              |0.2.0     |      0|        0|     0|
 |SSN                |1.1.7     |      0|        0|     1|
 |storr              |1.0.1     |      0|        0|     0|
-|stream             |1.2-3     |      0|        0|     1|
+|stream             |1.2-3     |      0|        1|     1|
 |survey             |3.31-2    |      0|        0|     0|
 |taRifx             |1.0.6     |      0|        0|     4|
 |tcpl               |1.2.2     |      0|        0|     1|
@@ -151,9 +150,25 @@
 Maintainer: Bioconductor Package Maintainer
  <maintainer@bioconductor.org>
 
-0 errors | 1 warning  | 5 notes
+0 errors | 2 warnings | 5 notes
 
 ```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'dbSendPreparedQuery' is deprecated.
+  Warning: 'dbSendPreparedQuery' is deprecated.
+  Warning: 'dbSendPreparedQuery' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+Examples with CPU or elapsed time > 5s
+                            user system elapsed
+AnnDbPkg-checker          44.608  0.428  45.078
+Bimap-direction            9.948  0.496  10.444
+InparanoidColsAndKeytypes  7.192  0.096   7.289
+Bimap                      5.016  0.208   5.228
+
 checking for unstated dependencies in ‘tests’ ... WARNING
 'library' or 'require' call not declared from: ‘org.testing.db’
 
@@ -346,9 +361,35 @@ Package unavailable to check Rd xrefs: ‘archivist.github’
 Maintainer: Michel Lang <michellang@gmail.com>  
 Bug reports: https://github.com/tudo-r/BatchExperiments/issues
 
-0 errors | 0 warnings | 2 notes
+0 errors | 1 warning  | 2 notes
 
 ```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+Examples with CPU or elapsed time > 5s
+                user system elapsed
+addExperiments 5.828  0.064   5.908
+getResultVars  5.720  0.044   5.776
+
 checking dependencies in R code ... NOTE
 Unexported objects imported by ':::' calls:
   ‘BatchJobs:::addIntModulo’ ‘BatchJobs:::buffer’
@@ -396,7 +437,32 @@ contains 'methods').
 Maintainer: Bernd Bischl <bernd_bischl@gmx.net>  
 Bug reports: https://github.com/tudo-r/BatchJobs/issues
 
-0 errors | 0 warnings | 0 notes
+0 errors | 1 warning  | 0 notes
+
+```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+... 17 lines ...
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+Examples with CPU or elapsed time > 5s
+                    user system elapsed
+batchReduceResults 5.356  0.048   5.411
+```
 
 ## bibliospec (0.0.4)
 Maintainer: Witold E. Wolski <wew@fgcz.ethz.ch>  
@@ -460,9 +526,32 @@ See section ‘Good practice’ in ‘?data’.
 Maintainer: Tyler Backman <tbackman@ucr.edu>  
 Bug reports: https://github.com/TylerBackman/bioassayR/issues
 
-0 errors | 0 warnings | 1 note 
+0 errors | 1 warning  | 1 note 
 
 ```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+... 34 lines ...
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+
 checking R code for possible problems ... NOTE
 crossReactivityPrior: no visible global function definition for ‘sd’
 crossReactivityProbability : <anonymous>: no visible global function
@@ -686,9 +775,32 @@ Bug reports: https://bitbucket.org/kindlychung/collapsabel2/issues
 ## cummeRbund (2.14.0)
 Maintainer: Loyal A. Goff <lgoff@csail.mit.edu>
 
-0 errors | 0 warnings | 7 notes
+0 errors | 1 warning  | 7 notes
 
 ```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+... 37 lines ...
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+
 checking package dependencies ... NOTE
 Depends: includes the non-default packages:
   ‘BiocGenerics’ ‘RSQLite’ ‘ggplot2’ ‘reshape2’ ‘fastcluster’
@@ -803,17 +915,17 @@ Execution halted
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-    'citation("Biobase")', and for packages
-    'citation("pkgname")'.
-
-Loading required package: biomaRt
-Build TranscriptDB object (txdb.sqlite) ... 
-Download the refGene table ... OK
-Download the hgFixed.refLink table ... OK
+See help("Deprecated")
+Warning: Named parameters not used in query: internal_id, name, type, chrom, strand, start, end
+Warning: 'dbGetPreparedQuery' is deprecated.
+Use 'dbBind' instead.
+See help("Deprecated")
+Warning: Named parameters not used in query: internal_id, name, chrom, strand, start, end
+Warning: 'dbGetPreparedQuery' is deprecated.
 ... 8 lines ...
-Warning: Named parameters not used in query: internal_id, name, chrom, strand, start, end
-Warning: Named parameters not used in query: internal_id, name, chrom, strand, start, end
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
+Warning: 'dbGetPreparedQuery' is deprecated.
+Use 'dbBind' instead.
+See help("Deprecated")
 Warning: Named parameters not used in query: gene_id, internal_tx_id
 OK
  done
@@ -876,7 +988,7 @@ manual.
 ## DECIPHER (2.0.2)
 Maintainer: Erik Wright <DECIPHER@cae.wisc.edu>
 
-0 errors | 2 warnings | 3 notes
+0 errors | 3 warnings | 3 notes
 
 ```
 checking foreign function calls ... WARNING
@@ -898,6 +1010,29 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
   ‘gs+qpdf’ made some significant size reductions:
      compacted ‘ArtOfAlignmentInR.pdf’ from 968Kb to 635Kb
   consider running tools::compactPDF(gs_quality = "ebook") on these files
+
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+... 133 lines ...
+Examples with CPU or elapsed time > 5s
+                     user system elapsed
+CorrectFrameshifts 37.732  0.068  37.803
+StaggerAlignment   24.668  0.024  26.231
+AlignTranslation   16.748  0.068  16.818
+Array2Matrix       12.828  0.028  12.857
+AlignSeqs          12.516  0.068  12.647
+TileSeqs            9.572  0.020   9.594
+DesignArray         9.444  0.036   9.500
+IdClusters          6.848  0.008   6.855
+BrowseSeqs          5.364  0.012   5.379
 
 checking installed package size ... NOTE
   installed size is  8.9Mb
@@ -1032,7 +1167,18 @@ Bug reports: https://github.com/beanumber/etl/issues
 ## ETLUtils (1.3)
 Maintainer: Jan Wijffels <jwijffels@bnosac.be>
 
-0 errors | 0 warnings | 0 notes
+0 errors | 1 warning  | 0 notes
+
+```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+```
 
 ## filehashSQLite (0.2-4)
 Maintainer: Roger D. Peng <rpeng@jhsph.edu>
@@ -1280,9 +1426,32 @@ These lines will be truncated in the PDF manual.
 ## GenomicFeatures (1.24.5)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-0 errors | 0 warnings | 2 notes
+0 errors | 1 warning  | 2 notes
 
 ```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+... 83 lines ...
+R.
+See ?Deprecated.
+Examples with CPU or elapsed time > 5s
+                             user system elapsed
+makeFeatureDbFromUCSC      36.760  0.768 180.294
+coordinate-mapping-methods 34.348  0.720  35.660
+coverageByTranscript       32.048  1.196  33.523
+makeTxDbFromBiomart        20.500  0.648  68.976
+extractTranscriptSeqs      13.716  0.044  14.271
+makeTxDbFromUCSC            7.416  0.192 123.320
+transcriptLengths           5.300  0.068   5.372
+
 checking package dependencies ... NOTE
 Depends: includes the non-default packages:
   ‘BiocGenerics’ ‘S4Vectors’ ‘IRanges’ ‘GenomeInfoDb’ ‘GenomicRanges’
@@ -1741,9 +1910,18 @@ Maintainer: Eric Pante <pante.eric@gmail.com>
 ## MeSHDbi (1.8.0)
 Maintainer: Koki Tsuyuzaki <k.t.the-answer@hotmail.co.jp>
 
-0 errors | 0 warnings | 2 notes
+0 errors | 1 warning  | 2 notes
 
 ```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+
 checking R code for possible problems ... NOTE
 .div: no visible global function definition for ‘na.omit’
 Undefined global functions or variables:
@@ -2300,9 +2478,32 @@ These lines will be truncated in the PDF manual.
 ## OrganismDbi (1.14.1)
 Maintainer: Biocore Data Team <maintainer@bioconductor.org>
 
-0 errors | 0 warnings | 2 notes
+0 errors | 1 warning  | 2 notes
 
 ```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+... 13 lines ...
+  Warning: 'dbGetPreparedQuery' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+Examples with CPU or elapsed time > 5s
+                            user system elapsed
+makeOrganismDbFromBiomart 14.780  0.244  19.891
+rangeBasedAccessors       12.996  0.292  13.296
+OrganismDb                10.164  0.188  10.365
+makeOrganismDbFromUCSC     6.388  0.088  87.231
+makeOrganismDbFromTxDb     6.128  0.100  94.611
+
 checking dependencies in R code ... NOTE
 Unexported object imported by a ':::' call: ‘BiocGenerics:::testPackage’
   See the note in ?`:::` about the use of this operator.
@@ -2621,7 +2822,7 @@ These lines will be truncated in the PDF manual.
 ## poplite (0.99.16)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
-1 error  | 0 warnings | 1 note 
+1 error  | 1 warning  | 1 note 
 
 ```
 checking tests ... ERROR
@@ -2640,6 +2841,17 @@ Last 13 lines of output:
   
   Error: testthat unit tests failed
   Execution halted
+
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
 
 checking R code for possible problems ... NOTE
 filter_.Database: no visible global function definition for ‘stack’
@@ -2684,12 +2896,47 @@ See section ‘Good practice’ in ‘?attach’.
 ## rangeMapper (0.3-0)
 Maintainer: Mihai Valcu <valcu@orn.mpg.de>
 
-0 errors | 0 warnings | 0 notes
+0 errors | 1 warning  | 0 notes
+
+```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'make.db.names' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+```
 
 ## RecordLinkage (0.4-10)
 Maintainer: Andreas Borg <borga@uni-mainz.de>
 
-0 errors | 0 warnings | 0 notes
+0 errors | 1 warning  | 0 notes
+
+```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+... 19 lines ...
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'make.db.names' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+```
 
 ## recordr (1.0.3)
 Maintainer: Peter Slaughter <slaughter@nceas.ucsb.edu>  
@@ -2824,7 +3071,32 @@ Maintainer: Dominik Reusser <reusser@pik-potsdam.de>
 Maintainer: Clayton Barrows <clayton.barrows@nrel.gov>  
 Bug reports: https://github.com/NREL/rplexos/issues
 
-0 errors | 0 warnings | 0 notes
+0 errors | 1 warning  | 0 notes
+
+```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+... 244 lines ...
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+  Warning: 'dbGetPreparedQuery' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+```
 
 ## RQDA (0.2-7)
 Maintainer: HUANG Ronggui <ronggui.huang@gmail.com>
@@ -2845,9 +3117,31 @@ Packages which this enhances but not available for checking:
 Maintainer: Diego Diez <diego10ruiz@gmail.com>  
 Bug reports: https://github.com/ddiez/rTRM/issues
 
-0 errors | 0 warnings | 1 note 
+0 errors | 1 warning  | 1 note 
 
 ```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+
 checking Rd line widths ... NOTE
 Rd file 'findTRM.Rd':
   \usage lines wider than 90 characters:
@@ -3177,9 +3471,18 @@ Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
 Maintainer: Michael Hahsler <mhahsler@lyle.smu.edu>  
 Bug reports: https://github.com/mhahsler/stream/issues
 
-0 errors | 0 warnings | 1 note 
+0 errors | 1 warning  | 1 note 
 
 ```
+checking examples ... WARNING
+Found the following significant warnings:
+
+  Warning: 'fetch' is deprecated.
+  Warning: 'fetch' is deprecated.
+Deprecated functions may be defunct as soon as of the next release of
+R.
+See ?Deprecated.
+
 checking installed package size ... NOTE
   installed size is  5.6Mb
   sub-directories of 1Mb or more:

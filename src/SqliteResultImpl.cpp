@@ -14,12 +14,15 @@ SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
     ready_(false),
     nrows_(0),
     rows_affected_(0),
+    group_(0),
+    groups_(0),
     types_(get_initial_field_types(cache.ncols_))
 {
+  LOG_VERBOSE << sql;
 
   try {
     if (cache.nparams_ == 0) {
-      after_bind();
+      after_bind(true);
     }
   } catch (...) {
     sqlite3_finalize(stmt);
@@ -47,6 +50,8 @@ std::vector<std::string> SqliteResultImpl::_cache::get_column_names(sqlite3_stmt
 }
 
 SqliteResultImpl::~SqliteResultImpl() {
+  LOG_VERBOSE;
+
   try {
     sqlite3_finalize(stmt);
   } catch (...) {}
@@ -76,15 +81,16 @@ std::vector<SEXPTYPE> SqliteResultImpl::get_initial_field_types(const int ncols)
   return types;
 }
 
-void SqliteResultImpl::after_bind() {
-  init();
-  step();
+void SqliteResultImpl::after_bind(bool params_have_rows) {
+  init(params_have_rows);
+  if (params_have_rows)
+    step();
 }
 
-void SqliteResultImpl::init() {
+void SqliteResultImpl::init(bool params_have_rows) {
   ready_ = true;
   nrows_ = 0;
-  complete_ = false;
+  complete_ = !params_have_rows;
 }
 
 
@@ -130,23 +136,15 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
   if (cache.nparams_ == 0)
     return;
 
+  params_ = params;
   SEXP first_col = params[0];
-  int n = Rf_length(first_col);
+  groups_ = Rf_length(first_col);
+  group_ = 0;
 
   rows_affected_ = 0;
 
-  CharacterVector names = params.attr("names");
-
-  for (int i = 0; i < n; ++i) {
-    sqlite3_reset(stmt);
-    sqlite3_clear_bindings(stmt);
-
-    for (int j = 0; j < params.size(); ++j) {
-      bind_parameter(i, j, CHAR(names[j]), static_cast<SEXPREC*>(params[j]));
-    }
-
-    after_bind();
-  }
+  bool has_params = bind_row();
+  after_bind(has_params);
 }
 
 List SqliteResultImpl::fetch_impl(const int n_max) {
@@ -181,15 +179,32 @@ List SqliteResultImpl::get_column_info_impl() {
 
 // Privates ////////////////////////////////////////////////////////////////////
 
-void SqliteResultImpl::bind_parameter(const int i, const int j0, const std::string& name, const SEXP values_) {
+bool SqliteResultImpl::bind_row() {
+  LOG_VERBOSE << "groups: " << group_ << "/" << groups_;
+
+  if (group_ >= groups_)
+    return false;
+
+  CharacterVector names = params_.attr("names");
+  sqlite3_reset(stmt);
+  sqlite3_clear_bindings(stmt);
+
+  for (int j = 0; j < params_.size(); ++j) {
+    bind_parameter(j, CHAR(names[j]), params_[j]);
+  }
+
+  return true;
+}
+
+void SqliteResultImpl::bind_parameter(int j0, const std::string& name, SEXP values_) {
   if (name != "") {
     int j = find_parameter(name);
     if (j == 0)
       stop("No parameter with name %s.", name);
-    bind_parameter_pos(i, j, values_);
+    bind_parameter_pos(j, values_);
   } else {
     // sqlite parameters are 1-indexed
-    bind_parameter_pos(i, j0 + 1, values_);
+    bind_parameter_pos(j0 + 1, values_);
   }
 }
 
@@ -212,41 +227,42 @@ int SqliteResultImpl::find_parameter(const std::string& name) {
   return 0;
 }
 
-void SqliteResultImpl::bind_parameter_pos(const int i, const int j, const SEXP value_) {
-  LOG_VERBOSE << "TYPEOF(value_): " << TYPEOF(value_) << "\n";
+void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
+  LOG_VERBOSE << "TYPEOF(value_): " << TYPEOF(value_);
+
   if (TYPEOF(value_) == LGLSXP) {
     LogicalVector value(value_);
-    if (value[i] == NA_LOGICAL) {
+    if (value[group_] == NA_LOGICAL) {
       sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_int(stmt, j, static_cast<int>(value[i]));
+      sqlite3_bind_int(stmt, j, static_cast<int>(value[group_]));
     }
   } else if (TYPEOF(value_) == INTSXP) {
     IntegerVector value(value_);
-    if (value[i] == NA_INTEGER) {
+    if (value[group_] == NA_INTEGER) {
       sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_int(stmt, j, static_cast<int>(value[i]));
+      sqlite3_bind_int(stmt, j, static_cast<int>(value[group_]));
     }
   } else if (TYPEOF(value_) == REALSXP) {
     NumericVector value(value_);
-    if (value[i] == NA_REAL) {
+    if (value[group_] == NA_REAL) {
       sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_double(stmt, j, static_cast<double>(value[i]));
+      sqlite3_bind_double(stmt, j, static_cast<double>(value[group_]));
     }
   } else if (TYPEOF(value_) == STRSXP) {
     CharacterVector value(value_);
-    if (value[i] == NA_STRING) {
+    if (value[group_] == NA_STRING) {
       sqlite3_bind_null(stmt, j);
     } else {
-      String value2 = value[i];
+      String value2 = value[group_];
       std::string value3(value2);
       sqlite3_bind_text(stmt, j, value3.data(), value3.size(),
                         SQLITE_TRANSIENT);
     }
   } else if (TYPEOF(value_) == VECSXP) {
-    SEXP raw = VECTOR_ELT(value_, i);
+    SEXP raw = VECTOR_ELT(value_, group_);
     if (TYPEOF(raw) != RAWSXP) {
       stop("Can only bind lists of raw vectors");
     }
@@ -264,33 +280,59 @@ List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   SqliteDataFrame data(stmt, cache.names_, n_max, types_);
 
   while (!complete_) {
+    LOG_VERBOSE << nrows_ << "/" << n;
+
     if (!data.set_col_values())
       break;
 
     step();
     data.advance();
+    nrows_++;
   }
+
+  LOG_VERBOSE << nrows_;
 
   return data.get_data(types_);
 }
 
 void SqliteResultImpl::step() {
-  nrows_++;
+  while (step_run())
+    ;
+}
+
+bool SqliteResultImpl::step_run() {
+  LOG_VERBOSE;
+
   int rc = sqlite3_step(stmt);
 
-  if (rc == SQLITE_DONE) {
-    complete_ = true;
-  } else if (rc != SQLITE_ROW) {
+  switch (rc) {
+  case SQLITE_DONE:
+    return step_done();
+  case SQLITE_ROW:
+    return false;
+  default:
     raise_sqlite_exception();
   }
+}
 
+bool SqliteResultImpl::step_done() {
   rows_affected_ += sqlite3_changes(conn);
+
+  ++group_;
+  bool more_params = bind_row();
+
+  if (!more_params)
+    complete_ = true;
+
+  LOG_VERBOSE << "group: " << group_ << ", more_params: " << more_params;
+  return more_params;
 }
 
 List SqliteResultImpl::peek_first_row() {
   SqliteDataFrame data(stmt, cache.names_, 1, types_);
 
-  data.set_col_values();
+  if (!complete_)
+    data.set_col_values();
   // Not calling data.advance(), remains a zero-row data frame
 
   return data.get_data(types_);

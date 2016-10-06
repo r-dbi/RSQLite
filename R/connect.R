@@ -100,7 +100,7 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #' # clean up
 #' dbDisconnect(con)
 setMethod("dbConnect", "SQLiteDriver",
-  function(drv, dbname = "", loadable.extensions = TRUE, cache_size = NULL,
+  function(drv, dbname = "", ..., loadable.extensions = TRUE, cache_size = NULL,
            synchronous = "off", flags = SQLITE_RWC, vfs = NULL) {
     stopifnot(length(dbname) == 1, !is.na(dbname))
 
@@ -161,7 +161,7 @@ is_url_or_special_filename <- function(x) grepl("^(?:file|http|ftp|https|):", x)
 
 #' @export
 #' @rdname SQLite
-setMethod("dbConnect", "SQLiteConnection", function(drv){
+setMethod("dbConnect", "SQLiteConnection", function(drv, ...){
   if (drv@dbname %in% c("", ":memory:", "file::memory:")) {
     stop("Can't clone a temporary database", call. = FALSE)
   }
@@ -173,7 +173,7 @@ setMethod("dbConnect", "SQLiteConnection", function(drv){
 
 #' @export
 #' @rdname SQLite
-setMethod("dbDisconnect", "SQLiteConnection", function(conn) {
+setMethod("dbDisconnect", "SQLiteConnection", function(conn, ...) {
   rsqlite_disconnect(conn@ptr)
   invisible(TRUE)
 })

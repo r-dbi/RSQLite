@@ -30,34 +30,8 @@ IntegerVector SqliteResult::find_params(const CharacterVector& param_names) {
   return impl->find_params_impl(param_names);
 }
 
-void SqliteResult::bind(const List& params) {
-  if (params.attr("names") == R_NilValue) {
-    stop("Parameters must be a named list.");
-  }
-
-  for (int j = 0; j < params.size(); ++j) {
-    SEXP col = params[j];
-    if (Rf_length(col) != 1)
-      stop("Parameter %i does not have length 1.", j + 1);
-  }
-
-  impl->bind_impl(params);
-}
-
 void SqliteResult::bind_rows(const List& params) {
-  if (params.size() == 0) {
-    stop("Need at least one column");
-  }
-
-  SEXP first_col = params[0];
-  int n = Rf_length(first_col);
-
-  for (int j = 1; j < params.size(); ++j) {
-    SEXP col = params[j];
-    if (Rf_length(col) != n)
-      stop("Parameter %i does not have length %d.", j + 1, n);
-  }
-
+  validate_params(params);
   impl->bind_rows_impl(params);
 }
 
@@ -74,4 +48,20 @@ List SqliteResult::get_column_info() {
   out.attr("names") = CharacterVector::create("name", "type");
 
   return out;
+}
+
+
+// Privates ///////////////////////////////////////////////////////////////////
+
+void SqliteResult::validate_params(const List& params) const {
+  if (params.size() != 0) {
+    SEXP first_col = params[0];
+    int n = Rf_length(first_col);
+
+    for (int j = 1; j < params.size(); ++j) {
+      SEXP col = params[j];
+      if (Rf_length(col) != n)
+        stop("Parameter %i does not have length %d.", j + 1, n);
+    }
+  }
 }

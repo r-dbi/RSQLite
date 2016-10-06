@@ -10,6 +10,7 @@ test_that("no exception upon start", {
 })
 
 test_that("no exception after good query", {
+  memoise::forget(warning_once)
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 
@@ -21,10 +22,11 @@ test_that("no exception after good query", {
 })
 
 test_that("exception after bad query", {
+  memoise::forget(warning_once)
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 
-  expect_error(dbGetQuery(con, "RAISE"))
+  expect_error(dbExecute(con, "RAISE"))
 
   expect_warning(ex <- dbGetException(con), "deprecated")
   expect_equal(ex$errorNum, 0)
@@ -32,6 +34,7 @@ test_that("exception after bad query", {
 })
 
 test_that("no exception after good statement sent", {
+  memoise::forget(warning_once)
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 
@@ -44,6 +47,7 @@ test_that("no exception after good statement sent", {
 })
 
 test_that("no exception after good statement sent and partially collected", {
+  memoise::forget(warning_once)
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 
@@ -57,6 +61,7 @@ test_that("no exception after good statement sent and partially collected", {
 })
 
 test_that("exception after bad statement sent", {
+  memoise::forget(warning_once)
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 

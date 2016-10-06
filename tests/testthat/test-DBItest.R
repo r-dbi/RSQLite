@@ -28,7 +28,6 @@ DBItest::test_all(c(
 
   # sql
   "append_table_error",                         # #112
-  "temporary_table",                            # #113
   "quote_identifier_not_vectorized",            # rstats-db/DBI#24
   "roundtrip_quotes",                           # #107
   "roundtrip_logical",                          # not an error, no logical data type
@@ -56,6 +55,7 @@ DBItest::test_compliance(
   ctx = DBItest::make_context(
     SQLite(), list(flags = SQLITE_RO), set_as_default = FALSE, name = "RSQLite-RO"),
   skip = c(
-    "compliance"                                # skipping for now because of dbGetInfo()
+    "compliance",                               # skipping for now because of dbGetInfo()
+    "ellipsis"                                  # redundant
   )
 )

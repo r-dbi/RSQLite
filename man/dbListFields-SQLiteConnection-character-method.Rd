@@ -11,6 +11,8 @@
 \item{conn}{An existing \code{\linkS4class{SQLiteConnection}}}
 
 \item{name}{a length 1 character vector giving the name of a table.}
+
+\item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \description{
 List fields in specified table.

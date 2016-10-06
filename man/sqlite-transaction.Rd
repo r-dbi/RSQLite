@@ -8,11 +8,11 @@
 \alias{sqlite-transaction}
 \title{SQLite transaction management.}
 \usage{
-\S4method{dbBegin}{SQLiteConnection}(conn, ..., name = NULL)
+\S4method{dbBegin}{SQLiteConnection}(conn, name = NULL, ...)
 
-\S4method{dbCommit}{SQLiteConnection}(conn, ..., name = NULL)
+\S4method{dbCommit}{SQLiteConnection}(conn, name = NULL, ...)
 
-\S4method{dbRollback}{SQLiteConnection}(conn, ..., name = NULL)
+\S4method{dbRollback}{SQLiteConnection}(conn, name = NULL, ...)
 }
 \arguments{
 \item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
@@ -20,6 +20,8 @@
 
 \item{name}{Supply a name to use a named savepoint. This allows you to
 nest multiple transaction}
+
+\item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \value{
 A boolean, indicating success or failure.

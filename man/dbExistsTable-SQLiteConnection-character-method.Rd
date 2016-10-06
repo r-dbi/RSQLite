@@ -11,6 +11,8 @@
 \item{conn}{An existing \code{\linkS4class{SQLiteConnection}}}
 
 \item{name}{String, name of table. Match is case insensitive.}
+
+\item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \description{
 Does the table exist?

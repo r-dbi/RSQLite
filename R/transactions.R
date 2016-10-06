@@ -12,6 +12,7 @@ NULL
 #'   \code{\link[DBI]{dbConnect}}
 #' @param name Supply a name to use a named savepoint. This allows you to
 #'   nest multiple transaction
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @return A boolean, indicating success or failure.
 #' @examples
 #' library(DBI)
@@ -47,7 +48,7 @@ NULL
 
 #' @export
 #' @rdname sqlite-transaction
-setMethod("dbBegin", "SQLiteConnection", function(conn, ..., name = NULL) {
+setMethod("dbBegin", "SQLiteConnection", function(conn, name = NULL, ...) {
   if (is.null(name)) {
     dbExecute(conn, "BEGIN")
   } else {
@@ -59,7 +60,7 @@ setMethod("dbBegin", "SQLiteConnection", function(conn, ..., name = NULL) {
 
 #' @export
 #' @rdname sqlite-transaction
-setMethod("dbCommit", "SQLiteConnection", function(conn, ..., name = NULL) {
+setMethod("dbCommit", "SQLiteConnection", function(conn, name = NULL, ...) {
   if (is.null(name)) {
     dbExecute(conn, "COMMIT")
   } else {
@@ -71,7 +72,7 @@ setMethod("dbCommit", "SQLiteConnection", function(conn, ..., name = NULL) {
 
 #' @export
 #' @rdname sqlite-transaction
-setMethod("dbRollback", "SQLiteConnection", function(conn, ..., name = NULL) {
+setMethod("dbRollback", "SQLiteConnection", function(conn, name = NULL, ...) {
   if (is.null(name)) {
     dbExecute(conn, "ROLLBACK")
   } else {

@@ -27,6 +27,7 @@ NULL
 #' @param field.types character vector of named  SQL field types where
 #'   the names are the names of new table's columns. If missing, types inferred
 #'   with \code{\link[DBI]{dbDataType}}).
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @details In a primary key column qualified with
 #' \href{https://www.sqlite.org/autoinc.html}{\code{AUTOINCREMENT}}, missing
 #' values will be assigned the next largest positive integer,
@@ -278,6 +279,7 @@ string_to_utf8 <- function(value) {
 #' @param select.cols  A SQL statement (in the form of a character vector of
 #'    length 1) giving the columns to select. E.g. "*" selects all columns,
 #'    "x,y,z" selects three columns named as listed.
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @inheritParams DBI::sqlRownamesToColumn
 #' @export
 #' @examples
@@ -316,6 +318,7 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name character vector of length 1 giving name of table to remove
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @export
 setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
   function(conn, name, ...) {
@@ -329,6 +332,7 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name String, name of table. Match is case insensitive.
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @export
 setMethod(
   "dbExistsTable", c("SQLiteConnection", "character"),
@@ -344,6 +348,7 @@ setMethod(
 #' List available SQLite tables.
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @export
 setMethod("dbListTables", "SQLiteConnection", function(conn, ...) {
   rs <- sqliteListTables(conn)
@@ -378,6 +383,7 @@ sqliteListTablesQuery <- function(conn, name = NULL) {
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name a length 1 character vector giving the name of a table.
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @export
 #' @examples
 #' con <- dbConnect(SQLite())

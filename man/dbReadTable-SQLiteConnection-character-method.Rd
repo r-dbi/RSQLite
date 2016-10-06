@@ -16,6 +16,8 @@
 are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc}
 are considered equal.}
 
+\item{...}{Needed for compatibility with generic. Otherwise ignored.}
+
 \item{row.names}{Either \code{TRUE}, \code{FALSE}, \code{NA} or a string.
 
 If \code{TRUE}, always translate row names to a column called "row_names".

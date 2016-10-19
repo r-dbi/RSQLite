@@ -1447,23 +1447,6 @@ Error: processing vignette 'Guide.Stex' failed with diagnostics:
 Error in .local(serIDs, con, ...) : 
   ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT error: it.bancaditalia.oss.sdmx.util.SdmxException: The query: ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT did not match any time series on the provider.
 Execution halted
-
-checking R code for possible problems ... NOTE
-.getSomeUniprotGoodies: no visible global function definition for
-  ‘head’
-.tryReadResult: no visible global function definition for ‘read.delim’
-.tryReadResult: no visible global function definition for ‘URLencode’
-availableUniprotSpecies: no visible global function definition for
-  ‘read.delim’
-availableUniprotSpecies: no visible global function definition for
-  ‘head’
-lookupUniprotSpeciesFromTaxId: no visible global function definition
-  for ‘read.delim’
-Undefined global functions or variables:
-  URLencode head read.delim
-Consider adding
-  importFrom("utils", "URLencode", "head", "read.delim")
-to your NAMESPACE file.
 ```
 
 ## VariantFiltering (1.10.0)

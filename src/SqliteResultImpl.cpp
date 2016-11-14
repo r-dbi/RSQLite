@@ -266,10 +266,10 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
     }
   } else if (TYPEOF(value_) == STRSXP) {
     CharacterVector value(value_);
-    if (value[group_] == NA_STRING) {
+    String value2 = value[group_];
+    if (value2.get_sexp() == NA_STRING) {
       sqlite3_bind_null(stmt, j);
     } else {
-      String value2 = value[group_];
       std::string value3(value2);
       sqlite3_bind_text(stmt, j, value3.data(), value3.size(),
                         SQLITE_TRANSIENT);

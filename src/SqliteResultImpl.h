@@ -22,6 +22,10 @@ private:
     static std::vector<std::string> get_column_names(sqlite3_stmt* stmt);
   } cache;
 
+  struct _param_cache {
+    std::vector<std::string> names_;
+  } param_cache;
+
   // State
   bool complete_;
   bool ready_;

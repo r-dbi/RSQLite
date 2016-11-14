@@ -182,6 +182,15 @@ List SqliteResultImpl::get_column_info_impl() {
 
 void SqliteResultImpl::set_params(const List& params) {
   params_ = params;
+  CharacterVector names = params.names();
+
+  param_cache.names_.clear();
+  if (names.length() == 0) {
+    param_cache.names_.resize(params.length());
+  }
+  else {
+    param_cache.names_ = as<std::vector<std::string> >(names);
+  }
 }
 
 bool SqliteResultImpl::bind_row() {
@@ -190,12 +199,11 @@ bool SqliteResultImpl::bind_row() {
   if (group_ >= groups_)
     return false;
 
-  CharacterVector names = params_.attr("names");
   sqlite3_reset(stmt);
   sqlite3_clear_bindings(stmt);
 
-  for (int j = 0; j < params_.size(); ++j) {
-    bind_parameter(j, CHAR(names[j]), params_[j]);
+  for (int j = 0; j < param_cache.names_.size(); ++j) {
+    bind_parameter(j, param_cache.names_[j], params_[j]);
   }
 
   return true;

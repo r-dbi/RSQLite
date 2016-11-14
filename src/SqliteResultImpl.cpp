@@ -136,7 +136,8 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
   if (cache.nparams_ == 0)
     return;
 
-  params_ = params;
+  set_params(params);
+
   SEXP first_col = params[0];
   groups_ = Rf_length(first_col);
   group_ = 0;
@@ -178,6 +179,10 @@ List SqliteResultImpl::get_column_info_impl() {
 
 
 // Privates ////////////////////////////////////////////////////////////////////
+
+void SqliteResultImpl::set_params(const List& params) {
+  params_ = params;
+}
 
 bool SqliteResultImpl::bind_row() {
   LOG_VERBOSE << "groups: " << group_ << "/" << groups_;

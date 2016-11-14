@@ -52,6 +52,7 @@ public:
   List get_column_info_impl();
 
 private:
+  void set_params(const List& params);
   bool bind_row();
   void bind_parameter(int j, const std::string& name, SEXP values_);
   int find_parameter(const std::string& name);

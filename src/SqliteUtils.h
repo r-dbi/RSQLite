@@ -13,7 +13,7 @@ List inline dfResize(const List& df, const int n) {
     out[j] = Rf_lengthgets(df[j], n);
   }
 
-  out.attr("names") = df.attr("names");
+  out.names() = df.names();
   out.attr("class") = df.attr("class");
   out.attr("row.names") = IntegerVector::create(NA_INTEGER, -n);
 

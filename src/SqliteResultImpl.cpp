@@ -244,21 +244,21 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
   LOG_VERBOSE << "TYPEOF(value_): " << TYPEOF(value_);
 
   if (TYPEOF(value_) == LGLSXP) {
-    LogicalVector value(value_);
+    Vector<LGLSXP, NoProtectStorage> value(value_);
     if (value[group_] == NA_LOGICAL) {
       sqlite3_bind_null(stmt, j);
     } else {
       sqlite3_bind_int(stmt, j, static_cast<int>(value[group_]));
     }
   } else if (TYPEOF(value_) == INTSXP) {
-    IntegerVector value(value_);
+    Vector<INTSXP, NoProtectStorage> value(value_);
     if (value[group_] == NA_INTEGER) {
       sqlite3_bind_null(stmt, j);
     } else {
       sqlite3_bind_int(stmt, j, static_cast<int>(value[group_]));
     }
   } else if (TYPEOF(value_) == REALSXP) {
-    NumericVector value(value_);
+    Vector<REALSXP, NoProtectStorage> value(value_);
     if (value[group_] == NA_REAL) {
       sqlite3_bind_null(stmt, j);
     } else {

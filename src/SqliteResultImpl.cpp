@@ -244,40 +244,40 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
   LOG_VERBOSE << "TYPEOF(value_): " << TYPEOF(value_);
 
   if (TYPEOF(value_) == LGLSXP) {
-    Vector<LGLSXP, NoProtectStorage> value(value_);
-    if (value[group_] == NA_LOGICAL) {
+    int value = LOGICAL(value_)[group_];
+    if (value == NA_LOGICAL) {
       sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_int(stmt, j, static_cast<int>(value[group_]));
+      sqlite3_bind_int(stmt, j, value);
     }
   } else if (TYPEOF(value_) == INTSXP) {
-    Vector<INTSXP, NoProtectStorage> value(value_);
-    if (value[group_] == NA_INTEGER) {
+    int value = INTEGER(value_)[group_];
+    if (value == NA_INTEGER) {
       sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_int(stmt, j, static_cast<int>(value[group_]));
+      sqlite3_bind_int(stmt, j, value);
     }
   } else if (TYPEOF(value_) == REALSXP) {
-    Vector<REALSXP, NoProtectStorage> value(value_);
-    if (value[group_] == NA_REAL) {
+    double value = REAL(value_)[group_];
+    if (value == NA_REAL) {
       sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_double(stmt, j, static_cast<double>(value[group_]));
+      sqlite3_bind_double(stmt, j, value);
     }
   } else if (TYPEOF(value_) == STRSXP) {
-    SEXP value2 = STRING_ELT(value_, group_);
-    if (value2 == NA_STRING) {
+    SEXP value = STRING_ELT(value_, group_);
+    if (value == NA_STRING) {
       sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_text(stmt, j, CHAR(value2), -1, SQLITE_TRANSIENT);
+      sqlite3_bind_text(stmt, j, CHAR(value), -1, SQLITE_TRANSIENT);
     }
   } else if (TYPEOF(value_) == VECSXP) {
-    SEXP raw = VECTOR_ELT(value_, group_);
-    if (TYPEOF(raw) != RAWSXP) {
+    SEXP value = VECTOR_ELT(value_, group_);
+    if (TYPEOF(value) != RAWSXP) {
       stop("Can only bind lists of raw vectors");
     }
 
-    sqlite3_bind_blob(stmt, j, RAW(raw), Rf_length(raw), SQLITE_TRANSIENT);
+    sqlite3_bind_blob(stmt, j, RAW(value), Rf_length(value), SQLITE_TRANSIENT);
   } else {
     stop("Don't know how to handle parameter of type %s.",
          Rf_type2char(TYPEOF(value_)));

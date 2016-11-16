@@ -156,10 +156,12 @@ setMethod("dbGetPreparedQuery",
     res <- dbSendQuery(conn, statement)
     on.exit(dbClearResult(res), add = TRUE)
 
+    bind.data <- as.list(bind.data)
+
     tryCatch(
-      db_bind(res, unclass(bind.data), allow_named_superset = TRUE),
+      db_bind(res, bind.data, allow_named_superset = TRUE),
       error = function(e) {
-        db_bind(res, unclass(unname(bind.data)), allow_named_superset = FALSE)
+        db_bind(res, unname(bind.data), allow_named_superset = FALSE)
       }
     )
     dbFetch(res)

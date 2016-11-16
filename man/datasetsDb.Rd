@@ -2,7 +2,7 @@
 % Please edit documentation in R/datasetsDb.R
 \name{datasetsDb}
 \alias{datasetsDb}
-\title{A sample sqlite database.}
+\title{A sample sqlite database}
 \usage{
 datasetsDb()
 }

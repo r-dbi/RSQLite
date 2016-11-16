@@ -4,7 +4,7 @@
 \name{dbDataType,SQLiteConnection-method}
 \alias{dbDataType,SQLiteConnection-method}
 \alias{dbDataType,SQLiteDriver-method}
-\title{Determine the SQL Data Type of an R object.}
+\title{Determine the SQL Data Type of an R object}
 \usage{
 \S4method{dbDataType}{SQLiteConnection}(dbObj, obj, ...)
 

@@ -5,7 +5,7 @@
 \alias{dbGetInfo}
 \alias{dbGetInfo,SQLiteDriver-method}
 \alias{dbGetInfo,SQLiteConnection-method}
-\title{Get metadata about a database object.}
+\title{Get metadata about a database object}
 \usage{
 \S4method{dbGetInfo}{SQLiteDriver}(dbObj, ...)
 

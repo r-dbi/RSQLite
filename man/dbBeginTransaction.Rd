@@ -2,7 +2,7 @@
 % Please edit documentation in R/deprecated.R
 \name{dbBeginTransaction}
 \alias{dbBeginTransaction}
-\title{Generic for creating a new transaction.}
+\title{Generic for creating a new transaction}
 \usage{
 dbBeginTransaction(conn, ...)
 }

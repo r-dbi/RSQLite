@@ -8,7 +8,7 @@
 \alias{dbGetRowCount,SQLiteResult-method}
 \alias{dbHasCompleted,SQLiteResult-method}
 \alias{dbGetStatement,SQLiteResult-method}
-\title{Database interface meta-data.}
+\title{Database interface meta-data}
 \usage{
 \S4method{dbColumnInfo}{SQLiteResult}(res, ...)
 

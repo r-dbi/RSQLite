@@ -134,7 +134,7 @@ setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
   invisible(TRUE)
 })
 
-#' Database interface meta-data.
+#' Database interface meta-data
 #'
 #' See documentation of generics for more details.
 #'

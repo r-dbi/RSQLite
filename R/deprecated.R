@@ -1,7 +1,7 @@
 #' @include SQLiteConnection.R
 NULL
 
-#' Generics for getting and sending prepared queries.
+#' Generics for getting and sending prepared queries
 #'
 #' @param conn A `DBIConnection` object.
 #' @param statement A SQL string
@@ -18,7 +18,7 @@ setGeneric("dbGetPreparedQuery", function(conn, statement, bind.data, ...) {
   standardGeneric("dbGetPreparedQuery")
 })
 
-#' Generic for creating a new transaction.
+#' Generic for creating a new transaction
 #'
 #' See method documentation for details.
 #'
@@ -75,7 +75,7 @@ dbBuildTableDefinition <- function(...) {
   sqliteBuildTableDefinition(...)
 }
 
-#' isIdCurrent.
+#' isIdCurrent
 #'
 #' Deprecated. Please use dbIsValid instead.
 #'
@@ -180,7 +180,7 @@ sqliteQuickColumn <- function(con, table, column) {
   dbReadTable(con, table, select.cols = column, row.names = FALSE)[[1]]
 }
 
-#' Get metadata about a database object.
+#' Get metadata about a database object
 #'
 #' Deprecated. Please use individual functions.
 #'
@@ -221,7 +221,7 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
 })
 
 
-#' Fetch.
+#' Fetch
 #'
 #' A shortcut for \code{\link[DBI]{dbFetch}(res, n = n, row.names = FALSE)},
 #' kept for compatibility reasons.

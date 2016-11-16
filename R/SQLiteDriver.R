@@ -2,7 +2,7 @@
 #' @importFrom Rcpp sourceCpp
 NULL
 
-#' Class SQLiteDriver (and methods).
+#' Class SQLiteDriver (and methods)
 #'
 #' The SQLiteDriver, which is used to select the correct method in
 #' [dbConnect()]. See more details in [SQLite()].

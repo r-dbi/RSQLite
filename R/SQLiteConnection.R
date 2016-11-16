@@ -1,4 +1,4 @@
-#' Class SQLiteConnection.
+#' Class SQLiteConnection
 #'
 #' `SQLiteConnection` objects are usually created by
 #' [DBI::dbConnect()].

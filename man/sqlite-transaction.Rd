@@ -6,7 +6,7 @@
 \alias{dbBegin,SQLiteConnection-method}
 \alias{dbCommit,SQLiteConnection-method}
 \alias{dbRollback,SQLiteConnection-method}
-\title{SQLite transaction management.}
+\title{SQLite transaction management}
 \usage{
 \S4method{dbBegin}{SQLiteConnection}(conn, name = NULL, ...)
 

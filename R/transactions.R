@@ -1,7 +1,7 @@
 #' @include SQLiteConnection.R
 NULL
 
-#' SQLite transaction management.
+#' SQLite transaction management
 #'
 #' By default, SQLite is in auto-commit mode. `dbBegin()` starts
 #' a SQLite transaction and turns auto-commit off. `dbCommit()` and

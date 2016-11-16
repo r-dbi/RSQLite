@@ -6,7 +6,7 @@
 \alias{show,SQLiteConnection-method}
 \alias{dbIsValid,SQLiteConnection-method}
 \alias{dbGetException,SQLiteConnection-method}
-\title{Class SQLiteConnection.}
+\title{Class SQLiteConnection}
 \usage{
 \S4method{show}{SQLiteConnection}(object)
 

@@ -5,7 +5,7 @@
 \alias{dbWriteTable,SQLiteConnection,character,data.frame-method}
 \alias{dbWriteTable,SQLiteConnection,character,character-method}
 \alias{sqlData,SQLiteConnection-method}
-\title{Write a local data frame or file to the database.}
+\title{Write a local data frame or file to the database}
 \usage{
 \S4method{dbWriteTable}{SQLiteConnection,character,data.frame}(conn, name,
   value, ..., row.names = NA, overwrite = FALSE, append = FALSE,
@@ -70,7 +70,7 @@ defaults when imputing classes from on-disk file.}
 \code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
 }
 \description{
-Write a local data frame or file to the database.
+Write a local data frame or file to the database
 }
 \details{
 In a primary key column qualified with

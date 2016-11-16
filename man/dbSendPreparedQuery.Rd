@@ -3,7 +3,7 @@
 \name{dbSendPreparedQuery}
 \alias{dbSendPreparedQuery}
 \alias{dbGetPreparedQuery}
-\title{Generics for getting and sending prepared queries.}
+\title{Generics for getting and sending prepared queries}
 \usage{
 dbSendPreparedQuery(conn, statement, bind.data, ...)
 
@@ -19,6 +19,6 @@ dbGetPreparedQuery(conn, statement, bind.data, ...)
 \item{...}{Other arguments used by methods}
 }
 \description{
-Generics for getting and sending prepared queries.
+Generics for getting and sending prepared queries
 }
 

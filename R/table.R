@@ -1,7 +1,7 @@
 #' @include SQLiteConnection.R
 NULL
 
-#' Write a local data frame or file to the database.
+#' Write a local data frame or file to the database
 #'
 #' @export
 #' @rdname dbWriteTable
@@ -317,7 +317,7 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 )
 
 
-#' Remove a table from the database.
+#' Remove a table from the database
 #'
 #' Executes the SQL `DROP TABLE`.
 #'
@@ -350,7 +350,7 @@ setMethod(
 )
 
 
-#' List available SQLite tables.
+#' List available SQLite tables
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
@@ -384,7 +384,7 @@ sqliteListTablesQuery <- function(conn, name = NULL) {
     sep = "\n"))
 }
 
-#' List fields in specified table.
+#' List fields in specified table
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name a length 1 character vector giving the name of a table.
@@ -406,7 +406,7 @@ setMethod("dbListFields", c("SQLiteConnection", "character"),
 )
 
 
-#' Determine the SQL Data Type of an R object.
+#' Determine the SQL Data Type of an R object
 #'
 #' This method is a straight-forward implementation of the corresponding
 #' generic function.

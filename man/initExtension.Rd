@@ -2,7 +2,7 @@
 % Please edit documentation in R/extensions.R
 \name{initExtension}
 \alias{initExtension}
-\title{Add useful extension functions.}
+\title{Add useful extension functions}
 \usage{
 initExtension(db)
 }

@@ -1,0 +1,35 @@
+templates:
+  params:
+    bootswatch: flatly # https://bootswatch.com/flatly/
+
+reference:
+  - title: Classes
+    contents:
+    - matches("-class$")
+
+  - title: Driver methods
+    contents:
+    - matches("^[^,]+,SQLiteDriver")
+
+  - title: Connection methods
+    contents:
+    - matches("^[^,]+,SQLiteConnection")
+    exclude:
+    - query-dep
+
+  - title: Result methods
+    contents:
+    - matches("[^,]+,SQLiteResult")
+    exclude:
+    - starts_with("fetch")
+    - query-dep
+
+navbar:
+  type: default
+  left:
+  - text: Intro
+    href: articles/RSQLite.html
+  - text: Reference
+    href: reference/index.html
+  - text: News
+    href: news/index.html

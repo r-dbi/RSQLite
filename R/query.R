@@ -86,7 +86,7 @@ DBI::dbGetQuery
 #' @rdname sqlite-query
 #' @export
 setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
-  db_bind(res, params, ..., allow_named_superset = FALSE)
+  db_bind(res, as.list(params), ..., allow_named_superset = FALSE)
 })
 
 

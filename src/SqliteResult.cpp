@@ -45,7 +45,7 @@ List SqliteResult::get_column_info() {
 
   out.attr("row.names") = IntegerVector::create(NA_INTEGER, -Rf_length(out[0]));
   out.attr("class") = "data.frame";
-  out.attr("names") = CharacterVector::create("name", "type");
+  out.names() = CharacterVector::create("name", "type");
 
   return out;
 }

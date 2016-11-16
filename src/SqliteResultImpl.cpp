@@ -265,14 +265,11 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
       sqlite3_bind_double(stmt, j, static_cast<double>(value[group_]));
     }
   } else if (TYPEOF(value_) == STRSXP) {
-    CharacterVector value(value_);
-    String value2 = value[group_];
-    if (value2.get_sexp() == NA_STRING) {
+    SEXP value2 = STRING_ELT(value_, group_);
+    if (value2 == NA_STRING) {
       sqlite3_bind_null(stmt, j);
     } else {
-      std::string value3(value2);
-      sqlite3_bind_text(stmt, j, value3.data(), value3.size(),
-                        SQLITE_TRANSIENT);
+      sqlite3_bind_text(stmt, j, CHAR(value2), -1, SQLITE_TRANSIENT);
     }
   } else if (TYPEOF(value_) == VECSXP) {
     SEXP raw = VECTOR_ELT(value_, group_);

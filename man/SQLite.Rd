@@ -2,12 +2,12 @@
 % Please edit documentation in R/connect.R
 \docType{methods}
 \name{SQLite}
-\alias{SQLITE_RO}
-\alias{SQLITE_RW}
-\alias{SQLITE_RWC}
 \alias{SQLite}
-\alias{dbConnect,SQLiteConnection-method}
 \alias{dbConnect,SQLiteDriver-method}
+\alias{SQLITE_RWC}
+\alias{SQLITE_RW}
+\alias{SQLITE_RO}
+\alias{dbConnect,SQLiteConnection-method}
 \alias{dbDisconnect,SQLiteConnection-method}
 \title{Connect to an SQLite datbase}
 \usage{

@@ -2,8 +2,8 @@
 % Please edit documentation in R/table.R
 \docType{methods}
 \name{dbWriteTable,SQLiteConnection,character,data.frame-method}
-\alias{dbWriteTable,SQLiteConnection,character,character-method}
 \alias{dbWriteTable,SQLiteConnection,character,data.frame-method}
+\alias{dbWriteTable,SQLiteConnection,character,character-method}
 \alias{sqlData,SQLiteConnection-method}
 \title{Write a local data frame or file to the database.}
 \usage{

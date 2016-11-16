@@ -2,8 +2,8 @@
 % Please edit documentation in R/dummy.R
 \docType{methods}
 \name{dummy-methods}
-\alias{dbGetQuery,NULL,ANY-method}
 \alias{dummy-methods}
+\alias{dbGetQuery,NULL,ANY-method}
 \title{Dummy methods}
 \usage{
 \S4method{dbGetQuery}{`NULL`,ANY}(conn, statement, ...)

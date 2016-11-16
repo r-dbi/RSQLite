@@ -2,9 +2,9 @@
 % Please edit documentation in R/deprecated.R
 \docType{methods}
 \name{make.db.names,SQLiteConnection,character-method}
+\alias{make.db.names,SQLiteConnection,character-method}
 \alias{SQLKeywords,SQLiteConnection-method}
 \alias{isSQLKeyword,SQLiteConnection,character-method}
-\alias{make.db.names,SQLiteConnection,character-method}
 \title{Make R/S-Plus identifiers into legal SQL identifiers}
 \usage{
 \S4method{make.db.names}{SQLiteConnection,character}(dbObj, snames,

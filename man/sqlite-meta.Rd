@@ -2,12 +2,12 @@
 % Please edit documentation in R/query.R
 \docType{methods}
 \name{sqlite-meta}
-\alias{dbColumnInfo,SQLiteResult-method}
-\alias{dbGetRowCount,SQLiteResult-method}
-\alias{dbGetRowsAffected,SQLiteResult-method}
-\alias{dbGetStatement,SQLiteResult-method}
-\alias{dbHasCompleted,SQLiteResult-method}
 \alias{sqlite-meta}
+\alias{dbColumnInfo,SQLiteResult-method}
+\alias{dbGetRowsAffected,SQLiteResult-method}
+\alias{dbGetRowCount,SQLiteResult-method}
+\alias{dbHasCompleted,SQLiteResult-method}
+\alias{dbGetStatement,SQLiteResult-method}
 \title{Database interface meta-data.}
 \usage{
 \S4method{dbColumnInfo}{SQLiteResult}(res, ...)

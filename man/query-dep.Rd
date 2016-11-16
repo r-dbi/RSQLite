@@ -2,9 +2,9 @@
 % Please edit documentation in R/deprecated.R
 \docType{methods}
 \name{query-dep}
-\alias{dbGetPreparedQuery,SQLiteConnection,character,data.frame-method}
-\alias{dbSendPreparedQuery,SQLiteConnection,character,data.frame-method}
 \alias{query-dep}
+\alias{dbSendPreparedQuery,SQLiteConnection,character,data.frame-method}
+\alias{dbGetPreparedQuery,SQLiteConnection,character,data.frame-method}
 \title{Deprecated querying tools}
 \usage{
 \S4method{dbSendPreparedQuery}{SQLiteConnection,character,data.frame}(conn,

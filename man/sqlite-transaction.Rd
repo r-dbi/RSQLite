@@ -2,10 +2,10 @@
 % Please edit documentation in R/transactions.R
 \docType{methods}
 \name{sqlite-transaction}
+\alias{sqlite-transaction}
 \alias{dbBegin,SQLiteConnection-method}
 \alias{dbCommit,SQLiteConnection-method}
 \alias{dbRollback,SQLiteConnection-method}
-\alias{sqlite-transaction}
 \title{SQLite transaction management.}
 \usage{
 \S4method{dbBegin}{SQLiteConnection}(conn, name = NULL, ...)

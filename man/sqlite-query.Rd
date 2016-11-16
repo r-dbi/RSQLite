@@ -2,11 +2,11 @@
 % Please edit documentation in R/query.R
 \docType{methods}
 \name{sqlite-query}
-\alias{dbBind,SQLiteResult-method}
-\alias{dbClearResult,SQLiteResult-method}
-\alias{dbFetch,SQLiteResult-method}
-\alias{dbSendQuery,SQLiteConnection,character-method}
 \alias{sqlite-query}
+\alias{dbSendQuery,SQLiteConnection,character-method}
+\alias{dbBind,SQLiteResult-method}
+\alias{dbFetch,SQLiteResult-method}
+\alias{dbClearResult,SQLiteResult-method}
 \title{Execute a SQL statement on a database connection}
 \usage{
 \S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement,

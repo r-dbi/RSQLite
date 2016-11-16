@@ -16,7 +16,7 @@
   keywords = .SQL92Keywords, case = c("lower", "upper", "any")[3], ...)
 }
 \description{
-Deprecated. Please use \code{dbQuoteIdentifier} instead.
+Deprecated. Please use \code{\link[=dbQuoteIdentifier]{dbQuoteIdentifier()}} instead.
 }
 \keyword{internal}
 

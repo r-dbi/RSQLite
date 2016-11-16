@@ -10,7 +10,7 @@
 }
 \arguments{
 \item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
-\code{\link[DBI]{dbConnect}}}
+\code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
 
 \item{name}{a character string specifying a table name. SQLite table names
 are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc}
@@ -37,7 +37,7 @@ length 1) giving the columns to select. E.g. "*" selects all columns,
 "x,y,z" selects three columns named as listed.}
 }
 \value{
-A data.frame in the case of \code{dbReadTable}; otherwise a logical
+A data.frame in the case of \code{\link[=dbReadTable]{dbReadTable()}}; otherwise a logical
 indicating whether the operation was successful.
 }
 \description{

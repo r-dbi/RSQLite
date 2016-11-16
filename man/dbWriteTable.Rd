@@ -34,7 +34,7 @@ to SQLite.}
 \item{row.names}{A logical specifying whether the \code{row.names} should be
 output to the output DBMS table; if \code{TRUE}, an extra field whose name
 will be whatever the R identifier \code{"row.names"} maps to the DBMS (see
-\code{\link[DBI]{make.db.names}}). If \code{NA} will add rows names if
+\code{\link[DBI:make.db.names]{DBI::make.db.names()}}). If \code{NA} will add rows names if
 they are characters, otherwise will ignore.}
 
 \item{overwrite}{a logical specifying whether to overwrite an existing table
@@ -45,14 +45,14 @@ in the DBMS.  Its default is \code{FALSE}.}
 
 \item{field.types}{character vector of named  SQL field types where
 the names are the names of new table's columns. If missing, types inferred
-with \code{\link[DBI]{dbDataType}}).}
+with \code{\link[DBI:dbDataType]{DBI::dbDataType()}}).}
 
 \item{temporary}{a logical specifying whether the new table should be
 temporary. Its default is \code{FALSE}.}
 
 \item{header}{is a logical indicating whether the first data line (but see
 \code{skip}) has a header or not.  If missing, it value is determined
-following \code{\link{read.table}} convention, namely, it is set to TRUE if
+following \code{\link[=read.table]{read.table()}} convention, namely, it is set to TRUE if
 and only if the first row has one fewer field that the number of columns.}
 
 \item{colClasses}{Character vector of R type names, used to override
@@ -67,7 +67,7 @@ defaults when imputing classes from on-disk file.}
 \item{skip}{number of lines to skip before reading the data. Defaults to 0.}
 
 \item{con, conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
-\code{\link[DBI]{dbConnect}}}
+\code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
 }
 \description{
 Write a local data frame or file to the database.

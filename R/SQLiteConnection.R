@@ -1,7 +1,7 @@
 #' Class SQLiteConnection.
 #'
-#' \code{SQLiteConnection} objects are usually created by
-#' \code{\link[DBI]{dbConnect}}.
+#' `SQLiteConnection` objects are usually created by
+#' [DBI::dbConnect()].
 #'
 #' @keywords internal
 #' @export

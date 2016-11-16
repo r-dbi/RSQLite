@@ -10,7 +10,7 @@ dbSendPreparedQuery(conn, statement, bind.data, ...)
 dbGetPreparedQuery(conn, statement, bind.data, ...)
 }
 \arguments{
-\item{conn}{An \code{DBIConnection} object.}
+\item{conn}{A \code{DBIConnection} object.}
 
 \item{statement}{A SQL string}
 

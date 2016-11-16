@@ -7,7 +7,7 @@
 dbBeginTransaction(conn, ...)
 }
 \arguments{
-\item{conn}{An \code{DBIConnection} object.}
+\item{conn}{A \code{DBIConnection} object.}
 
 \item{...}{Other arguments used by methods}
 }

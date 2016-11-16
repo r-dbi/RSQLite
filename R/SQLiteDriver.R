@@ -5,9 +5,8 @@ NULL
 #' Class SQLiteDriver (and methods).
 #'
 #' The SQLiteDriver, which is used to select the correct method in
-#' \code{dbConnect()}. See more details in \code{\link{SQLite}}.
-#' It is used purely for dispatch and \code{dbUnloadDriver} is unnecessary
-#' (and a null-op).
+#' [dbConnect()]. See more details in [SQLite()].
+#' It is used purely for dispatch and [dbUnloadDriver()] is a null-op.
 #'
 #' @keywords internal
 #' @export

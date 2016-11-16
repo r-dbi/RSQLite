@@ -3,13 +3,13 @@ NULL
 
 #' SQLite transaction management.
 #'
-#' By default, SQLite is in auto-commit mode. \code{dbBegin} starts
-#' a SQLite transaction and turns auto-commit off. \code{dbCommit} and
-#' \code{dbRollback} commit and rollback the transaction, respectively and turn
+#' By default, SQLite is in auto-commit mode. `dbBegin()` starts
+#' a SQLite transaction and turns auto-commit off. `dbCommit()` and
+#' `dbRollback()` commit and rollback the transaction, respectively and turn
 #' auto-commit on.
 #'
 #' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
-#'   \code{\link[DBI]{dbConnect}}
+#'   [DBI::dbConnect()]
 #' @param name Supply a name to use a named savepoint. This allows you to
 #'   nest multiple transaction
 #' @param ... Needed for compatibility with generic. Otherwise ignored.

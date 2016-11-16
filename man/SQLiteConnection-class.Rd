@@ -16,7 +16,7 @@
 }
 \description{
 \code{SQLiteConnection} objects are usually created by
-\code{\link[DBI]{dbConnect}}.
+\code{\link[DBI:dbConnect]{DBI::dbConnect()}}.
 }
 \keyword{internal}
 

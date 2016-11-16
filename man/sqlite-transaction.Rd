@@ -16,7 +16,7 @@
 }
 \arguments{
 \item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
-\code{\link[DBI]{dbConnect}}}
+\code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
 
 \item{name}{Supply a name to use a named savepoint. This allows you to
 nest multiple transaction}
@@ -27,9 +27,9 @@ nest multiple transaction}
 A boolean, indicating success or failure.
 }
 \description{
-By default, SQLite is in auto-commit mode. \code{dbBegin} starts
-a SQLite transaction and turns auto-commit off. \code{dbCommit} and
-\code{dbRollback} commit and rollback the transaction, respectively and turn
+By default, SQLite is in auto-commit mode. \code{dbBegin()} starts
+a SQLite transaction and turns auto-commit off. \code{dbCommit()} and
+\code{dbRollback()} commit and rollback the transaction, respectively and turn
 auto-commit on.
 }
 \examples{

@@ -18,8 +18,8 @@
 }
 \description{
 These functions have been deprecated. Please switch to using
-\code{dbSendQuery}/\code{dbGetQuery} with the \code{params} argument
-or with calling \code{dbBind} instead.
+\code{\link[=dbSendQuery]{dbSendQuery()}}/\code{\link[=dbGetQuery]{dbGetQuery()}} with the \code{params} argument
+or with calling \code{\link[=dbBind]{dbBind()}} instead.
 }
 \keyword{internal}
 

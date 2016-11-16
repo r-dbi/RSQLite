@@ -6,38 +6,38 @@ NULL
 #' @export
 #' @rdname dbWriteTable
 #' @param con,conn a \code{\linkS4class{SQLiteConnection}} object, produced by
-#'   \code{\link[DBI]{dbConnect}}
+#'   [DBI::dbConnect()]
 #' @param name a character string specifying a table name. SQLite table names
-#'   are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc}
+#'   are \emph{not} case sensitive, e.g., table names `ABC` and `abc`
 #'   are considered equal.
 #' @param value a data.frame (or coercible to data.frame) object or a
 #'   file name (character).  In the first case, the data.frame is
-#'   written to a temporary file and then imported to SQLite; when \code{value}
+#'   written to a temporary file and then imported to SQLite; when `value`
 #'   is a character, it is interpreted as a file name and its contents imported
 #'   to SQLite.
-#' @param row.names A logical specifying whether the \code{row.names} should be
-#'   output to the output DBMS table; if \code{TRUE}, an extra field whose name
-#'   will be whatever the R identifier \code{"row.names"} maps to the DBMS (see
-#'   \code{\link[DBI]{make.db.names}}). If \code{NA} will add rows names if
+#' @param row.names A logical specifying whether the `row.names` should be
+#'   output to the output DBMS table; if `TRUE`, an extra field whose name
+#'   will be whatever the R identifier `"row.names"` maps to the DBMS (see
+#'   [DBI::make.db.names()]). If `NA` will add rows names if
 #'   they are characters, otherwise will ignore.
 #' @param overwrite a logical specifying whether to overwrite an existing table
-#'   or not. Its default is \code{FALSE}.
+#'   or not. Its default is `FALSE`.
 #' @param append a logical specifying whether to append to an existing table
-#'   in the DBMS.  Its default is \code{FALSE}.
+#'   in the DBMS.  Its default is `FALSE`.
 #' @param field.types character vector of named  SQL field types where
 #'   the names are the names of new table's columns. If missing, types inferred
-#'   with \code{\link[DBI]{dbDataType}}).
+#'   with [DBI::dbDataType()]).
 #' @param temporary a logical specifying whether the new table should be
-#'   temporary. Its default is \code{FALSE}.
+#'   temporary. Its default is `FALSE`.
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @details In a primary key column qualified with
-#' \href{https://www.sqlite.org/autoinc.html}{\code{AUTOINCREMENT}}, missing
+#' \href{https://www.sqlite.org/autoinc.html}{`AUTOINCREMENT`}, missing
 #' values will be assigned the next largest positive integer,
 #' while nonmissing elements/cells retain their value.  If the
-#' autoincrement column exists in the \code{data.frame}
-#' (passed to \code{dbWriteTable}'s \code{value} parameter), the \code{NA}
+#' autoincrement column exists in the `data.frame`
+#' (passed to `dbWriteTable`'s `value` parameter), the `NA`
 #' elements are overwritten.
-#' Similarly, if the key column is not present in the \code{data.frame}, all
+#' Similarly, if the key column is not present in the `data.frame`, all
 #' elements are automatically assigned a value.
 #' @export
 #' @examples
@@ -168,11 +168,11 @@ parameterised_insert <- function(con, name, values) {
 
 
 #' @param header is a logical indicating whether the first data line (but see
-#'   \code{skip}) has a header or not.  If missing, it value is determined
-#'   following \code{\link{read.table}} convention, namely, it is set to TRUE if
+#'   `skip`) has a header or not.  If missing, it value is determined
+#'   following [read.table()] convention, namely, it is set to TRUE if
 #'   and only if the first row has one fewer field that the number of columns.
-#' @param sep The field separator, defaults to \code{','}.
-#' @param eol The end-of-line delimiter, defaults to \code{'\n'}.
+#' @param sep The field separator, defaults to `','`.
+#' @param eol The end-of-line delimiter, defaults to `'\n'`.
 #' @param skip number of lines to skip before reading the data. Defaults to 0.
 #' @param nrows Number of rows to read to determine types.
 #' @param colClasses Character vector of R type names, used to override
@@ -265,21 +265,21 @@ string_to_utf8 <- function(value) {
 
 #' Convenience functions for importing/exporting DBMS tables
 #'
-#' These functions mimic their R/S-Plus counterpart \code{get}, \code{assign},
-#' \code{exists}, \code{remove}, and \code{objects}, except that they generate
+#' These functions mimic their R/S-Plus counterpart `get`, `assign`,
+#' `exists`, `remove`, and `objects`, except that they generate
 #' code that gets remotely executed in a database engine.
 #'
-#' @return A data.frame in the case of \code{dbReadTable}; otherwise a logical
+#' @return A data.frame in the case of [dbReadTable()]; otherwise a logical
 #' indicating whether the operation was successful.
-#' @note Note that the data.frame returned by \code{dbReadTable} only has
+#' @note Note that the data.frame returned by `dbReadTable` only has
 #' primitive data, e.g., it does not coerce character data to factors.
 #'
 #' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
-#'   \code{\link[DBI]{dbConnect}}
+#'   [DBI::dbConnect()]
 #' @param name a character string specifying a table name. SQLite table names
-#'   are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc}
+#'   are \emph{not} case sensitive, e.g., table names `ABC` and `abc`
 #'   are considered equal.
-#' @param check.names If \code{TRUE}, the default, column names will be
+#' @param check.names If `TRUE`, the default, column names will be
 #'   converted to valid R identifiers.
 #' @param select.cols  A SQL statement (in the form of a character vector of
 #'    length 1) giving the columns to select. E.g. "*" selects all columns,
@@ -319,7 +319,7 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 
 #' Remove a table from the database.
 #'
-#' Executes the SQL \code{DROP TABLE}.
+#' Executes the SQL `DROP TABLE`.
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name character vector of length 1 giving name of table to remove
@@ -411,7 +411,7 @@ setMethod("dbListFields", c("SQLiteConnection", "character"),
 #' This method is a straight-forward implementation of the corresponding
 #' generic function.
 #'
-#' @param dbObj a \code{SQLiteConnection} or \code{SQLiteDriver} object
+#' @param dbObj a `SQLiteConnection` or `SQLiteDriver` object
 #' @param obj an R object whose SQL type we want to determine.
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @examples

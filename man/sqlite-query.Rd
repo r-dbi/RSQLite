@@ -34,7 +34,7 @@ a parameterised query.}
 
 \item{n}{maximum number of records to retrieve per fetch. Use \code{-1} to
 retrieve all pending records; use \code{0} for to fetch the default
-number of rows as defined in \code{\link{SQLite}}}
+number of rows as defined in \code{\link[=SQLite]{SQLite()}}}
 
 \item{row.names}{Either \code{TRUE}, \code{FALSE}, \code{NA} or a string.
 
@@ -48,11 +48,11 @@ default name.
 For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
 }
 \description{
-To retrieve results a chunk at a time, use \code{dbSendQuery},
-\code{dbFetch}, then \code{dbClearResult}. Alternatively, if you want all the
-results (and they'll fit in memory) use \code{dbGetQuery} which sends,
+To retrieve results a chunk at a time, use \code{\link[=dbSendQuery]{dbSendQuery()}},
+\code{\link[=dbFetch]{dbFetch()}}, then \code{\link[=dbClearResult]{dbClearResult()}}. Alternatively, if you want all the
+results (and they'll fit in memory) use \code{\link[=dbGetQuery]{dbGetQuery()}} which sends,
 fetches and clears for you. To run the same prepared query with multiple
-inputs, use \code{dbBind}.
+inputs, use \code{\link[=dbBind]{dbBind()}}.
 }
 \details{
 See \link{sqlite-meta} for how to extract other metadata from the result set.

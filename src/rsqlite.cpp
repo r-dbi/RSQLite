@@ -1,5 +1,5 @@
 #include <RSQLite.h>
-#include "sqlite3/sqlite3.h"
+#include "sqlite3.h"
 
 //' RSQLite version
 //'

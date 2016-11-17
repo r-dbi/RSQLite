@@ -97,5 +97,7 @@ char sqlite3AffinityType(const char *zIn){
     }
   }
 
+  (void)zChar;
+
   return aff;
 }

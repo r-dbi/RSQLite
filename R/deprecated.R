@@ -1,9 +1,9 @@
 #' @include SQLiteConnection.R
 NULL
 
-#' Generics for getting and sending prepared queries.
+#' @rdname query-dep
 #'
-#' @param conn An \code{DBIConnection} object.
+#' @param conn A `DBIConnection` object.
 #' @param statement A SQL string
 #' @param bind.data A data frame
 #' @param ... Other arguments used by methods
@@ -12,18 +12,18 @@ setGeneric("dbSendPreparedQuery", function(conn, statement, bind.data, ...) {
   standardGeneric("dbSendPreparedQuery")
 })
 
-#' @rdname dbSendPreparedQuery
+#' @rdname query-dep
 #' @export
 setGeneric("dbGetPreparedQuery", function(conn, statement, bind.data, ...) {
   standardGeneric("dbGetPreparedQuery")
 })
 
-#' Generic for creating a new transaction.
+#' Generic for creating a new transaction
 #'
 #' See method documentation for details.
 #'
 #' @export
-#' @param conn An \code{DBIConnection} object.
+#' @param conn A `DBIConnection` object.
 #' @param ... Other arguments used by methods
 #' @keywords internal
 setGeneric("dbBeginTransaction", function(conn, ...) {
@@ -33,16 +33,16 @@ setGeneric("dbBeginTransaction", function(conn, ...) {
 
 #' Build the SQL CREATE TABLE definition as a string
 #'
-#' The output SQL statement is a simple \code{CREATE TABLE} with suitable for
-#' \code{dbGetQuery}
+#' The output SQL statement is a simple `CREATE TABLE` suitable for
+#' `dbGetQuery`
 #'
 #' @param conn A database connection.
 #' @param name Name of the new SQL table
 #' @param value A data.frame, for which we want to create a table.
 #' @param field.types Optional, named character vector of the types for each
-#'   field in \code{value}
-#' @param row.names Logical. Should row.name of \code{value} be exported as a
-#'   \code{row\_names} field? Default is \code{TRUE}
+#'   field in `value`
+#' @param row.names Logical. Should row.name of `value` be exported as a
+#'   `row_names` field? Default is `TRUE`
 #' @return An SQL string
 #' @keywords internal
 #' @aliases dbBuildTableDefinition
@@ -75,7 +75,7 @@ dbBuildTableDefinition <- function(...) {
   sqliteBuildTableDefinition(...)
 }
 
-#' isIdCurrent.
+#' isIdCurrent
 #'
 #' Deprecated. Please use dbIsValid instead.
 #'
@@ -88,7 +88,7 @@ isIdCurrent <- function(obj) {
 
 #' Make R/S-Plus identifiers into legal SQL identifiers
 #'
-#' Deprecated. Please use \code{dbQuoteIdentifier} instead.
+#' Deprecated. Please use [dbQuoteIdentifier()] instead.
 #'
 #' @keywords internal
 #' @export
@@ -119,8 +119,8 @@ setMethod("isSQLKeyword",
 #' Deprecated querying tools
 #'
 #' These functions have been deprecated. Please switch to using
-#' \code{dbSendQuery}/\code{dbGetQuery} with the \code{params} argument
-#' or with calling \code{dbBind} instead.
+#' [dbSendQuery()]/[dbGetQuery()] with the `params` argument
+#' or with calling [dbBind()] instead.
 #'
 #' @keywords internal
 #' @name query-dep
@@ -180,7 +180,7 @@ sqliteQuickColumn <- function(con, table, column) {
   dbReadTable(con, table, select.cols = column, row.names = FALSE)[[1]]
 }
 
-#' Get metadata about a database object.
+#' Get metadata about a database object
 #'
 #' Deprecated. Please use individual functions.
 #'
@@ -221,7 +221,7 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
 })
 
 
-#' Fetch.
+#' Fetch
 #'
 #' A shortcut for \code{\link[DBI]{dbFetch}(res, n = n, row.names = FALSE)},
 #' kept for compatibility reasons.

@@ -2,12 +2,12 @@
 % Please edit documentation in R/deprecated.R
 \name{dbBeginTransaction}
 \alias{dbBeginTransaction}
-\title{Generic for creating a new transaction.}
+\title{Generic for creating a new transaction}
 \usage{
 dbBeginTransaction(conn, ...)
 }
 \arguments{
-\item{conn}{An \code{DBIConnection} object.}
+\item{conn}{A \code{DBIConnection} object.}
 
 \item{...}{Other arguments used by methods}
 }

@@ -50,4 +50,5 @@ Collate:
     'utils.R'
     'zzz.R'
 VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 5.0.1.9000

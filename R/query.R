@@ -3,11 +3,11 @@ NULL
 
 #' Execute a SQL statement on a database connection
 #'
-#' To retrieve results a chunk at a time, use \code{dbSendQuery},
-#' \code{dbFetch}, then \code{dbClearResult}. Alternatively, if you want all the
-#' results (and they'll fit in memory) use \code{dbGetQuery} which sends,
+#' To retrieve results a chunk at a time, use [dbSendQuery()],
+#' [dbFetch()], then [dbClearResult()]. Alternatively, if you want all the
+#' results (and they'll fit in memory) use [dbGetQuery()] which sends,
 #' fetches and clears for you. To run the same prepared query with multiple
-#' inputs, use \code{dbBind}.
+#' inputs, use [dbBind()].
 #'
 #' See \link{sqlite-meta} for how to extract other metadata from the result set.
 #'
@@ -112,9 +112,9 @@ db_bind <- function(res, params, ..., allow_named_superset) {
 
 
 #' @param res an \code{\linkS4class{SQLiteResult}} object.
-#' @param n maximum number of records to retrieve per fetch. Use \code{-1} to
-#'    retrieve all pending records; use \code{0} for to fetch the default
-#'    number of rows as defined in \code{\link{SQLite}}
+#' @param n maximum number of records to retrieve per fetch. Use `-1` to
+#'    retrieve all pending records; use `0` for to fetch the default
+#'    number of rows as defined in [SQLite()]
 #' @inheritParams DBI::sqlColumnToRownames
 #' @export
 #' @rdname sqlite-query
@@ -134,7 +134,7 @@ setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
   invisible(TRUE)
 })
 
-#' Database interface meta-data.
+#' Database interface meta-data
 #'
 #' See documentation of generics for more details.
 #'

@@ -3,7 +3,7 @@
 \docType{methods}
 \name{fetch,SQLiteResult-method}
 \alias{fetch,SQLiteResult-method}
-\title{Fetch.}
+\title{Fetch}
 \usage{
 \S4method{fetch}{SQLiteResult}(res, n = -1, ...)
 }

@@ -3,10 +3,10 @@
 \docType{class}
 \name{SQLiteConnection-class}
 \alias{SQLiteConnection-class}
-\alias{dbGetException,SQLiteConnection-method}
-\alias{dbIsValid,SQLiteConnection-method}
 \alias{show,SQLiteConnection-method}
-\title{Class SQLiteConnection.}
+\alias{dbIsValid,SQLiteConnection-method}
+\alias{dbGetException,SQLiteConnection-method}
+\title{Class SQLiteConnection}
 \usage{
 \S4method{show}{SQLiteConnection}(object)
 
@@ -16,7 +16,7 @@
 }
 \description{
 \code{SQLiteConnection} objects are usually created by
-\code{\link[DBI]{dbConnect}}.
+\code{\link[DBI:dbConnect]{DBI::dbConnect()}}.
 }
 \keyword{internal}
 

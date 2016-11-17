@@ -2,7 +2,7 @@
 % Please edit documentation in R/deprecated.R
 \name{isIdCurrent}
 \alias{isIdCurrent}
-\title{isIdCurrent.}
+\title{isIdCurrent}
 \usage{
 isIdCurrent(obj)
 }

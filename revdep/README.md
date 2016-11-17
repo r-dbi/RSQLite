@@ -9,42 +9,35 @@
 |ui       |X11                          |
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
-|tz       |Zulu                         |
-|date     |2016-10-19                   |
+|tz       |Universal                    |
+|date     |2016-11-17                   |
 
 ## Packages
 
-|package   |*  |version    |date       |source                             |
-|:---------|:--|:----------|:----------|:----------------------------------|
-|BH        |   |1.60.0-2   |2016-05-07 |cran (@1.60.0-)                    |
-|DBI       |   |0.5-12     |2016-10-06 |Github (rstats-db/DBI@4f00863)     |
-|DBItest   |   |1.3-10     |2016-10-06 |Github (rstats-db/DBItest@9e87611) |
-|knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
-|memoise   |   |1.0.0      |2016-01-29 |CRAN (R 3.3.1)                     |
-|plogr     |   |0.1-1      |2016-09-24 |cran (@0.1-1)                      |
-|Rcpp      |   |0.12.7     |2016-09-05 |cran (@0.12.7)                     |
-|rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
-|RSQLite   |   |1.0.0      |2014-10-25 |CRAN (R 3.3.1)                     |
-|testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
+|package  |*  |version    |date       |source                           |
+|:--------|:--|:----------|:----------|:--------------------------------|
+|DBI      |   |0.5-12     |2016-10-06 |Github (rstats-db/DBI@4f00863)   |
+|RSQLite  |   |1.0.0      |2014-10-25 |CRAN (R 3.3.1)                   |
+|testthat |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da) |
 
 # Check results
 
-112 packages
+116 packages
 
 |package            |version   | errors| warnings| notes|
 |:------------------|:---------|------:|--------:|-----:|
-|affycoretools      |1.46.0    |      0|        0|     0|
+|affycoretools      |1.46.1    |      0|        0|     0|
 |AnnotationDbi      |1.36.0    |      0|        1|     5|
 |AnnotationForge    |1.16.0    |      0|        0|     2|
 |AnnotationHubData  |1.4.0     |      1|        0|     3|
-|AnnotationHub      |2.6.0     |      0|        0|     2|
+|AnnotationHub      |2.6.1     |      1|        1|     1|
 |APSIM              |0.9.1     |      0|        0|     0|
-|archivist          |2.1       |      0|        0|     2|
+|archivist          |2.1       |      1|        0|     2|
 |BatchExperiments   |1.4.1     |      0|        0|     2|
 |BatchJobs          |1.6       |      0|        0|     0|
 |bibliospec         |0.0.4     |      0|        0|     0|
 |biglm              |0.9-1     |      0|        0|     5|
-|bioassayR          |1.12.0    |      0|        0|     1|
+|bioassayR          |1.12.1    |      0|        0|     1|
 |BoSSA              |2.0       |      0|        0|     0|
 |caroline           |0.7.6     |      0|        0|     2|
 |Category           |2.40.0    |      0|        0|     1|
@@ -52,17 +45,18 @@
 |chunked            |0.3       |      0|        0|     0|
 |CITAN              |2015.12-2 |      0|        0|     0|
 |clstutils          |1.22.0    |      0|        2|     5|
-|CNEr               |1.10.0    |      0|        2|     2|
+|CNEr               |1.10.1    |      1|        2|     2|
 |CollapsABEL        |0.10.8    |      0|        0|     0|
 |cummeRbund         |2.16.0    |      0|        0|     6|
 |customProDB        |1.14.0    |      0|        0|     3|
 |DBI                |0.5-1     |      0|        0|     1|
 |DECIPHER           |2.2.0     |      0|        0|     3|
-|dplyr              |0.5.0     |      0|        0|     1|
-|ecd                |0.8.2     |      1|        0|     0|
-|emuR               |0.1.9     |      0|        0|     0|
-|ensembldb          |1.6.0     |      0|        0|     2|
-|etl                |0.3.3.1   |      0|        0|     0|
+|diffrprojects      |0.1.14    |      0|        0|     0|
+|dplyr              |0.5.0     |      0|        0|     2|
+|ecd                |0.8.2     |      0|        0|     0|
+|emuR               |0.2.0     |      0|        0|     0|
+|ensembldb          |1.6.1     |      0|        0|     2|
+|etl                |0.3.4     |      0|        0|     0|
 |ETLUtils           |1.3       |      0|        0|     0|
 |filehashSQLite     |0.2-4     |      0|        0|     3|
 |filematrix         |1.1.0     |      0|        1|     0|
@@ -75,6 +69,7 @@
 |GWASTools          |1.20.0    |      0|        0|     1|
 |imputeMulti        |0.6.3     |      0|        0|     1|
 |iontree            |1.20.0    |      0|        0|     5|
+|lumi               |2.26.3    |      0|        1|     3|
 |macleish           |0.3.0     |      0|        0|     0|
 |maGUI              |1.0       |      1|        0|     0|
 |manta              |1.20.0    |      0|        0|     7|
@@ -83,7 +78,7 @@
 |metagenomeFeatures |1.4.0     |      0|        2|     2|
 |MetaIntegrator     |1.0.3     |      0|        0|     0|
 |metaseqR           |1.14.0    |      1|        1|     4|
-|mgsa               |1.22.0    |      0|        1|     5|
+|mgsa               |1.22.0    |      0|        1|     4|
 |miRNAtap           |1.8.0     |      0|        0|     2|
 |MmPalateMiRNA      |1.24.0    |      0|        0|     4|
 |MonetDBLite        |0.3.1     |      0|        0|     1|
@@ -99,10 +94,10 @@
 |pdInfoBuilder      |1.38.0    |      0|        0|     1|
 |PGA                |1.4.0     |      0|        0|     3|
 |pitchRx            |1.8.2     |      0|        0|     1|
-|plethy             |1.12.0    |      2|        1|     3|
-|poplite            |0.99.16   |      1|        0|     1|
+|plethy             |1.12.0    |      2|        0|     3|
+|poplite            |0.99.16   |      0|        0|     1|
 |ProjectTemplate    |0.7       |      0|        0|     0|
-|quantmod           |0.4-6     |      0|        0|     1|
+|quantmod           |0.4-7     |      0|        0|     1|
 |rangeMapper        |0.3-0     |      0|        0|     0|
 |RecordLinkage      |0.4-10    |      0|        0|     0|
 |recoup             |1.2.0     |      2|        0|     1|
@@ -112,18 +107,19 @@
 |RObsDat            |16.03     |      0|        0|     0|
 |rplexos            |1.1.8     |      0|        0|     0|
 |RQDA               |0.2-7     |      1|        0|     1|
+|rtext              |0.1.20    |      0|        0|     0|
 |rTRM               |1.12.0    |      0|        0|     1|
 |rvertnet           |0.5.0     |      0|        0|     0|
 |scrime             |1.3.3     |      0|        0|     2|
-|SEERaBomb          |2016.1    |      0|        0|     0|
+|SEERaBomb          |2016.2    |      0|        0|     0|
 |seqplots           |1.12.0    |      0|        0|     3|
 |SGP                |1.5-0.0   |      0|        0|     0|
 |smnet              |2.1       |      0|        0|     0|
-|snplist            |0.15      |      0|        0|     0|
+|snplist            |0.16      |      0|        0|     0|
 |specL              |1.8.0     |      0|        1|     3|
-|sqldf              |0.4-10    |      1|        1|     2|
+|sqldf              |0.4-10    |      0|        1|     2|
 |sqliter            |0.1.0     |      0|        0|     0|
-|SRAdb              |1.31.0    |      0|        0|     6|
+|SRAdb              |1.32.0    |      0|        0|     6|
 |srvyr              |0.2.0     |      0|        0|     0|
 |SSN                |1.1.8     |      0|        0|     0|
 |storr              |1.0.1     |      0|        0|     0|
@@ -131,22 +127,23 @@
 |survey             |3.31-2    |      0|        0|     0|
 |taRifx             |1.0.6     |      0|        0|     4|
 |tcpl               |1.2.2     |      0|        0|     1|
-|TFBSTools          |1.12.0    |      0|        1|     2|
+|TFBSTools          |1.12.1    |      0|        1|     2|
+|tigreBrowserWriter |0.1.2     |      0|        0|     0|
 |tigre              |1.28.0    |      0|        0|     2|
-|trackeR            |0.0.3     |      0|        1|     0|
+|trackeR            |0.0.4     |      0|        1|     0|
 |TSdata             |2016.8-1  |      0|        1|     0|
 |TSSQLite           |2015.4-1  |      0|        0|     0|
 |TSsql              |2015.1-2  |      0|        0|     1|
 |tweet2r            |1.0       |      0|        0|     0|
 |twitteR            |1.1.9     |      0|        0|     0|
-|UniProt.ws         |2.14.0    |      0|        0|     1|
+|UniProt.ws         |2.14.0    |      2|        0|     1|
 |Uniquorn           |1.2.0     |      0|        0|     2|
 |UPMASK             |1.0       |      0|        0|     1|
 |VariantFiltering   |1.10.0    |      0|        2|     4|
 |vegdata            |0.9       |      0|        0|     0|
 |vmsbase            |2.1.3     |      1|        0|     0|
 
-## affycoretools (1.46.0)
+## affycoretools (1.46.1)
 Maintainer: James W. MacDonald <jmacdon@u.washington.edu>
 
 0 errors | 0 warnings | 0 notes
@@ -226,12 +223,12 @@ Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 checking tests ... ERROR
 Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
 Last 13 lines of output:
-  ERROR in test_UCSC2BitPreparer_recipe: Error in ahms[[1]] : subscript out of bounds
-  ERROR in test_UCSCChainPreparer_recipe: Error in ahms[[1]] : subscript out of bounds
+  
   
   Test files with failing tests
   
      test_recipe.R 
+       test_EncodeImportPreparer_recipe 
        test_UCSC2BitPreparer_recipe 
        test_UCSCChainPreparer_recipe 
   
@@ -273,20 +270,39 @@ File ‘AnnotationHubData/R/makeNCBIToOrgDbs.R’:
 See section ‘Good practice’ in ‘?data’.
 ```
 
-## AnnotationHub (2.6.0)
+## AnnotationHub (2.6.1)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-0 errors | 0 warnings | 2 notes
+1 error  | 1 warning  | 1 note 
 
 ```
-checking R code for possible problems ... NOTE
-.get1,EpiExpressionTextResource: no visible global function definition
-  for ‘read.table’
-Undefined global functions or variables:
-  read.table
-Consider adding
-  importFrom("utils", "read.table")
-to your NAMESPACE file.
+checking tests ... ERROR
+Running the tests in ‘tests/runTests.R’ failed.
+Last 13 lines of output:
+  FAILURE in test_tidyGRanges: Error in checkIdentical(setNames(rep(c(FALSE, TRUE), c(4, 1)), chr), GenomeInfoDb::isCircular(gr1)) : 
+    FALSE 
+   
+  
+  Test files with failing tests
+  
+     test_tidyGRanges.R 
+       test_tidyGRanges 
+  
+  
+  Error in BiocGenerics:::testPackage("AnnotationHub") : 
+    unit tests failed for package AnnotationHub
+  Execution halted
+
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
+Quitting from lines 41-45 (AnnotationHub-HOWTO.Rmd) 
+Error: processing vignette 'AnnotationHub-HOWTO.Rmd' failed with diagnostics:
+'AH52107' not available in this version of the package; use biocLite() to update?
+Execution halted
+
 
 checking Rd files ... NOTE
 prepare_Rd: listResources.Rd:44-45: Dropping empty section \seealso
@@ -301,9 +317,29 @@ Maintainer: Justin Fainges <Justin.Fainges@csiro.au>
 Maintainer: Przemyslaw Biecek <przemyslaw.biecek@gmail.com>  
 Bug reports: https://github.com/pbiecek/archivist/issues
 
-0 errors | 0 warnings | 2 notes
+1 error  | 0 warnings | 2 notes
 
 ```
+checking examples ... ERROR
+Running examples in ‘archivist-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: aread
+> ### Title: Read Artifacts Given as md5hashes from the Repository
+> ### Aliases: aread
+> 
+> ### ** Examples
+> 
+> # read the object from local directory
+> setLocalRepo(system.file("graphGallery", package = "archivist"))
+> pl <- aread("f05f0ed0662fe01850ec1b928830ef32")
+> # plot it
+> pl
+Error: ScalesList was built with an incompatible version of ggproto.
+Please reinstall the package that provides this extension.
+Execution halted
+
 checking package dependencies ... NOTE
 Package which this enhances but not available for checking: ‘archivist.github’
 
@@ -425,8 +461,8 @@ File ‘biglm/R/bigglm.R’:
 See section ‘Good practice’ in ‘?data’.
 ```
 
-## bioassayR (1.12.0)
-Maintainer: Tyler Backman <tbackman@ucr.edu>  
+## bioassayR (1.12.1)
+Maintainer: Tyler Backman <tbackman@lbl.gov>  
 Bug reports: https://github.com/TylerBackman/bioassayR/issues
 
 0 errors | 0 warnings | 1 note 
@@ -601,21 +637,42 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## CNEr (1.10.0)
+## CNEr (1.10.1)
 Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>  
 Bug reports: https://github.com/ge11232002/CNEr/issues
 
-0 errors | 2 warnings | 2 notes
+1 error  | 2 warnings | 2 notes
 
 ```
+checking examples ... ERROR
+Running examples in ‘CNEr-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: syntenicDotplot-methods
+> ### Title: Syntenic dotplot
+> ### Aliases: syntenicDotplot syntenicDotplot,Axt-method
+> ###   syntenicDotplot,GRangePairs-method
+> 
+... 35 lines ...
+    colMeans, colSums, expand.grid, rowMeans, rowSums
+
+Loading required package: IRanges
+>   
+>   ## dotplot for Axt object
+>   fn <- file.path(system.file("extdata", package="CNEr"),
++                   "chr4.hg19.galGal3.net.axt.gz")
+>   axt <- readAxt(fn)
+The number of axt files 1
+Unexpected end of file in /home/muelleki/git/R/RSQLite/revdep/checks/CNEr.Rcheck/CNEr/extdata/chr4.hg19.galGal3.net.axt.gz
+** found \donttest examples: check also with --run-donttest
+
 checking compiled code ... WARNING
 File ‘CNEr/libs/CNEr.so’:
   Found ‘abort’, possibly from ‘abort’ (C)
     Object: ‘ucsc/errabort.o’
   Found ‘exit’, possibly from ‘exit’ (C)
     Objects: ‘ucsc/errabort.o’, ‘ucsc/pipeline.o’
-  Found ‘printf’, possibly from ‘printf’ (C)
-    Objects: ‘ceScan.o’, ‘ucsc/pipeline.o’
   Found ‘puts’, possibly from ‘printf’ (C), ‘puts’ (C)
     Object: ‘ucsc/pipeline.o’
   Found ‘rand’, possibly from ‘rand’ (C)
@@ -635,7 +692,8 @@ See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because CNEr.Rmd appears to be an R Markdown v2 document.
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
 Quitting from lines 2-15 (CNEr.Rmd) 
 Error: processing vignette 'CNEr.Rmd' failed with diagnostics:
 could not find function "doc_date"
@@ -643,10 +701,11 @@ Execution halted
 
 
 checking installed package size ... NOTE
-  installed size is 28.4Mb
+  installed size is 28.9Mb
   sub-directories of 1Mb or more:
     R        11.0Mb
     extdata  15.9Mb
+    libs      1.1Mb
 
 checking dependencies in R code ... NOTE
 Unexported objects imported by ':::' calls:
@@ -806,7 +865,7 @@ Maintainer: Erik Wright <DECIPHER@cae.wisc.edu>
 
 ```
 checking installed package size ... NOTE
-  installed size is  8.8Mb
+  installed size is  9.1Mb
   sub-directories of 1Mb or more:
     data      2.5Mb
     doc       3.8Mb
@@ -841,39 +900,40 @@ Undefined global functions or variables:
   deltaHrules
 ```
 
+## diffrprojects (0.1.14)
+Maintainer: Peter Meissner <retep.meissner@gmail.com>  
+Bug reports: https://github.com/petermeissner/diffrprojects/issues
+
+0 errors | 0 warnings | 0 notes
+
 ## dplyr (0.5.0)
 Maintainer: Hadley Wickham <hadley@rstudio.com>  
 Bug reports: https://github.com/hadley/dplyr/issues
 
-0 errors | 0 warnings | 1 note 
+0 errors | 0 warnings | 2 notes
 
 ```
 checking installed package size ... NOTE
-  installed size is 16.0Mb
+  installed size is 23.4Mb
   sub-directories of 1Mb or more:
-    libs  13.9Mb
+    libs  21.3Mb
+
+checking dependencies in R code ... NOTE
+Missing or unexported object: ‘RSQLite::rsqliteVersion’
 ```
 
 ## ecd (0.8.2)
 Maintainer: Stephen H-T. Lihn <stevelihn@gmail.com>
 
-1 error  | 0 warnings | 0 notes
+0 errors | 0 warnings | 0 notes
 
-```
-checking package dependencies ... ERROR
-Package required and available but unsuitable version: ‘RSQLite’
-
-See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
-manual.
-```
-
-## emuR (0.1.9)
+## emuR (0.2.0)
 Maintainer: Raphael Winkelmann <raphael@phonetik.uni-muenchen.de>  
 Bug reports: https://github.com/IPS-LMU/emuR/issues
 
 0 errors | 0 warnings | 0 notes
 
-## ensembldb (1.6.0)
+## ensembldb (1.6.1)
 Maintainer: Johannes Rainer <johannes.rainer@eurac.edu>  
 Bug reports: https://github.com/jotsetung/ensembldb/issues
 
@@ -894,7 +954,7 @@ Rd file 'EnsDb.Rd':
 These lines will be truncated in the PDF manual.
 ```
 
-## etl (0.3.3.1)
+## etl (0.3.4)
 Maintainer: Ben Baumer <ben.baumer@gmail.com>  
 Bug reports: https://github.com/beanumber/etl/issues
 
@@ -957,7 +1017,8 @@ Bug reports: https://github.com/andreyshabalin/filematrix/issues
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because Best_Prectices.Rmd appears to be an R Markdown v2 document.
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
 Quitting from lines 2-23 (Best_Prectices.Rmd) 
 Error: processing vignette 'Best_Prectices.Rmd' failed with diagnostics:
 could not find function "doc_date"
@@ -1240,10 +1301,11 @@ These were most likely included in error. See section ‘Package
 structure’ in the ‘Writing R Extensions’ manual.
 
 checking R code for possible problems ... NOTE
+geoConvert: no visible global function definition for ‘dbDriver’
 getSQLiteFile: no visible global function definition for
   ‘download.file’
 Undefined global functions or variables:
-  download.file
+  dbDriver download.file
 Consider adding
   importFrom("utils", "download.file")
 to your NAMESPACE file.
@@ -1306,17 +1368,24 @@ is not mentioned in the DESCRIPTION file.
 
 checking R code for possible problems ... NOTE
 buildIonTree: no visible binding for global variable ‘median’
+createDB: no visible global function definition for ‘dbDriver’
+metaDataImport: no visible global function definition for ‘dbDriver’
+metaDataImport: no visible global function definition for ‘fetch’
 metaDataImport: no visible global function definition for
   ‘flush.console’
 metaDataImport: no visible global function definition for ‘fix’
+mzImport: no visible global function definition for ‘dbDriver’
+mzImport: no visible global function definition for ‘fetch’
 plotSpectrum: no visible global function definition for ‘text’
 plotSpectrum: no visible global function definition for ‘identify’
 saveMSnRaw: no visible global function definition for ‘flush.console’
+searchMS2: no visible global function definition for ‘dbDriver’
+searchMS2: no visible global function definition for ‘fetch’
 searchMS2: no visible global function definition for ‘par’
 plot,iontree: no visible global function definition for ‘par’
 plot,iontree: no visible global function definition for ‘layout’
 Undefined global functions or variables:
-  fix flush.console identify layout median par text
+  dbDriver fetch fix flush.console identify layout median par text
 Consider adding
   importFrom("graphics", "identify", "layout", "par", "text")
   importFrom("stats", "median")
@@ -1352,6 +1421,48 @@ Rd file 'searchMS2.Rd':
      searchMS2(querySpec, premz, dbname = "mzDB.db", scoreFun = "distMS2", output.record = 5, plot.top = TRUE)
 
 These lines will be truncated in the PDF manual.
+```
+
+## lumi (2.26.3)
+Maintainer: Pan Du <dupan.mail@gmail.com>
+
+0 errors | 1 warning  | 3 notes
+
+```
+checking dependencies in R code ... WARNING
+'::' or ':::' import not declared from: ‘bigmemoryExtras’
+
+checking installed package size ... NOTE
+  installed size is  6.8Mb
+  sub-directories of 1Mb or more:
+    R      2.9Mb
+    data   3.6Mb
+
+checking Rd line widths ... NOTE
+Rd file 'IlluminaID2nuID.Rd':
+  \usage lines wider than 90 characters:
+     IlluminaID2nuID(IlluminaID, lib.mapping=NULL, species = c("Human", "Mouse", "Rat", "Unknown"), chipVersion = NULL, ...)
+
+Rd file 'addAnnotationInfo.Rd':
+  \usage lines wider than 90 characters:
+     addAnnotationInfo(methyLumiM, lib = 'FDb.InfiniumMethylation.hg19', annotationColumn=c('COLOR_CHANNEL', 'CHROMOSOME', 'POSITION'))
+
+Rd file 'addNuID2lumi.Rd':
+... 177 lines ...
+     smoothQuantileNormalization(dataMatrix, ref = NULL, adjData=NULL, logMode = TRUE, bandwidth = NULL, degree = 1, verbose = FALSE, ...)
+
+Rd file 'ssn.Rd':
+  \usage lines wider than 90 characters:
+     ssn(x.lumi, targetArray = NULL, scaling = TRUE, bgMethod=c('density', 'mean', 'median', 'none'), fgMethod=c('mean', 'density', 'median' ... [TRUNCATED]
+
+Rd file 'vst.Rd':
+  \usage lines wider than 90 characters:
+     vst(u, std, nSupport = min(length(u), 500), backgroundStd=NULL, fitMethod = c('linear', 'quadratic'), lowCutoff = 1/3, ifPlot = FALSE)
+
+These lines will be truncated in the PDF manual.
+
+checking Rd cross-references ... NOTE
+Package unavailable to check Rd xrefs: ‘bigmemoryExtras’
 ```
 
 ## macleish (0.3.0)
@@ -1634,7 +1745,7 @@ contains 'methods').
 ## mgsa (1.22.0)
 Maintainer: Sebastian Bauer <mail@sebastianbauer.info>
 
-0 errors | 1 warning  | 5 notes
+0 errors | 1 warning  | 4 notes
 
 ```
 checking for GNU extensions in Makefiles ... WARNING
@@ -1692,16 +1803,6 @@ Consider adding
   importFrom("utils", "read.delim", "relist", "str")
 to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
 contains 'methods').
-
-checking compiled code ... NOTE
-File ‘mgsa/libs/mgsa.so’:
-  Found ‘printf’, possibly from ‘printf’ (C)
-    Object: ‘mgsa.o’
-
-Compiled code should not call entry points which might terminate R nor
-write to stdout/stderr instead of to the console, nor the system RNG.
-
-See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
 
 ## miRNAtap (1.8.0)
@@ -1780,9 +1881,9 @@ Bug reports: https://github.com/hannesmuehleisen/MonetDBLite/issues
 
 ```
 checking installed package size ... NOTE
-  installed size is  8.4Mb
+  installed size is  7.0Mb
   sub-directories of 1Mb or more:
-    libs   8.1Mb
+    libs   6.7Mb
 ```
 
 ## MUCflights (0.0-3)
@@ -1902,7 +2003,7 @@ Calls: plot -> plot -> .local
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  5.1Mb
+  installed size is  5.3Mb
   sub-directories of 1Mb or more:
     help   2.0Mb
 ```
@@ -2003,9 +2104,9 @@ checking package dependencies ... NOTE
 Packages which this enhances but not available for checking: ‘doMC’ ‘doMPI’
 
 checking installed package size ... NOTE
-  installed size is 30.2Mb
+  installed size is 30.3Mb
   sub-directories of 1Mb or more:
-    R         1.2Mb
+    R         1.1Mb
     doc      12.9Mb
     scripts  15.7Mb
 
@@ -2153,16 +2254,16 @@ See section ‘Good practice’ in ‘?data’.
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-             }
-     
-
-trying URL 'http://gpcr2.biocomp.unibo.it/bacello/dataset.htm'
-Content type 'text/html; charset=iso-8859-1' length 5062 bytes
-==================================================
-downloaded 5062 bytes
+             if(length(xx) > 0){
+                     # Get the value of the first key
+                     xx[[1]]
+                     # Get the values for a few keys
+                     if(length(xx) >= 3){
+                             xx[1:3]
+                     }
 ... 8 lines ...
-Warning in rsqlite_disconnect(conn@ptr) :
-  There are 1 result in use. The connection will be released when they are closed
+
+Warning in .local(conn, ...) : Closing open result set
 Error in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  : 
   Running 'texi2dvi' on 'PAnnBuilder.tex' failed.
 LaTeX errors:
@@ -2265,7 +2366,7 @@ Package suggested but not available for checking: ‘ggsubplot’
 ## plethy (1.12.0)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
-2 errors | 1 warning  | 3 notes
+2 errors | 0 warnings | 3 notes
 
 ```
 checking examples ... ERROR
@@ -2273,63 +2374,40 @@ Running examples in ‘plethy-Ex.R’ failed
 The error most likely occurred in:
 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: BuxcoDB-class
-> ### Title: Class '"BuxcoDB"'
-> ### Aliases: BuxcoDB-class BuxcoDB addAnnotation,BuxcoDB-method
-> ###   addAnnotation annoTable,BuxcoDB-method annoTable
-> ###   annoCols,BuxcoDB-method annoCols annoLevels,BuxcoDB-method annoLevels
-... 53 lines ...
-> 
-> tables(bux.db)
-[1] "WBPth"
-> 
-> variables(bux.db)
- [1] "f"     "TVb"   "MVb"   "Penh"  "PAU"   "Rpef"  "Comp"  "PIFb"  "PEFb" 
-[10] "Ti"    "Te"    "EF50"  "Tr"    "Tbody" "Tc"    "RH"    "Rinx" 
-> 
-> addAnnotation(bux.db, query=day.infer.query, index=FALSE)
-Error: is.null(dbGetQuery(db.con, i)) is not TRUE
+> ### Name: Utility functions
+> ### Title: Utility functions to assist with QA/QC and analysis of
+> ###   plethysmography data
+> ### Aliases: add.labels.by.sample get.err.breaks adjust.labels proc.sanity
+> ### Keywords: Utilities
+... 21 lines ...
+> temp.db.file <- tempfile()
+> write(sim.bux.lines, file=temp.file)
+> test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
+Processing /tmp/Rtmpf2YN2e/filef8d73fc62d52 in chunks of 10000
+Starting chunk 1
+Reached breakpoint change
+Processing breakpoint 1
+Starting sample sample_1
+Error in if (sum(which.gt) > 0) { : missing value where TRUE/FALSE needed
+Calls: parse.buxco ... write.sample.breaks -> write.sample.db -> sanity.check.time
 Execution halted
 
 checking tests ... ERROR
 Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
-       test.db.insert.autoincrement 
+  
+     test_check_helpers.R 
+       test.add.labels.by.sample 
        test.dbImport 
-       test.examine.table.lines 
        test.get.err.breaks 
-       test.parse.buxco 
-       test.retrieveData 
        test.summaryMeasures 
-       test.write.sample.db 
   
   
   Error in BiocGenerics:::testPackage("plethy") : 
     unit tests failed for package plethy
+  In addition: Warning message:
+  closing unused connection 3 (/tmp/RtmpLi3x4U/filef9754bd648c8) 
   Execution halted
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-
-    IQR, mad, xtabs
-
-The following objects are masked from ‘package:base’:
-
-    Filter, Find, Map, Position, Reduce, anyDuplicated, append, as.data.frame,
-    cbind, colnames, do.call, duplicated, eval, evalq, get, grep, grepl,
-... 8 lines ...
-Attaching package: ‘S4Vectors’
-
-The following objects are masked from ‘package:base’:
-
-    colMeans, colSums, expand.grid, rowMeans, rowSums
-
-
-Error: processing vignette 'plethy.Rnw' failed with diagnostics:
- chunk 3 
-Error : is.null(dbGetQuery(db.con, query.list[[i]])) is not TRUE
-Execution halted
 
 checking dependencies in R code ... NOTE
 There are ::: calls to the package's namespace in its code. A package
@@ -2380,26 +2458,9 @@ These lines will be truncated in the PDF manual.
 ## poplite (0.99.16)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
-1 error  | 0 warnings | 1 note 
+0 errors | 0 warnings | 1 note 
 
 ```
-checking tests ... ERROR
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-  1. Failure: createTable (@test-poplite.R#252) 
-  2. Failure: createTable (@test-poplite.R#252) 
-  3. Failure: createTable (@test-poplite.R#252) 
-  4. Failure: createTable (@test-poplite.R#252) 
-  5. Failure: insertStatement (@test-poplite.R#330) 
-  6. Failure: insertStatement (@test-poplite.R#350) 
-  7. Failure: insertStatement (@test-poplite.R#330) 
-  8. Failure: insertStatement (@test-poplite.R#350) 
-  9. Failure: insertStatement (@test-poplite.R#330) 
-  1. ...
-  
-  Error: testthat unit tests failed
-  Execution halted
-
 checking R code for possible problems ... NOTE
 filter_.Database: no visible global function definition for ‘stack’
 get.starting.point : <anonymous>: no visible global function definition
@@ -2425,7 +2486,7 @@ Bug reports: https://github.com/johnmyleswhite/ProjectTemplate/issues
 
 0 errors | 0 warnings | 0 notes
 
-## quantmod (0.4-6)
+## quantmod (0.4-7)
 Maintainer: Joshua M. Ulrich <josh.m.ulrich@gmail.com>  
 Bug reports: https://github.com/joshuaulrich/quantmod/issues
 
@@ -2586,6 +2647,12 @@ Packages which this enhances but not available for checking:
   ‘rjpod’ ‘d3Network’
 ```
 
+## rtext (0.1.20)
+Maintainer: Peter Meissner <retep.meissner@gmail.com>  
+Bug reports: https://github.com/petermeissner/rtext/issues
+
+0 errors | 0 warnings | 0 notes
+
 ## rTRM (1.12.0)
 Maintainer: Diego Diez <diego10ruiz@gmail.com>  
 Bug reports: https://github.com/ddiez/rTRM/issues
@@ -2655,7 +2722,7 @@ to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
 contains 'methods').
 ```
 
-## SEERaBomb (2016.1)
+## SEERaBomb (2016.2)
 Maintainer: Tomas Radivoyevitch <radivot@ccf.org>
 
 0 errors | 0 warnings | 0 notes
@@ -2715,7 +2782,7 @@ Maintainer: Alastair Rushworth <alastair.rushworth@strath.ac.uk>
 
 0 errors | 0 warnings | 0 notes
 
-## snplist (0.15)
+## snplist (0.16)
 Maintainer: Alexander Sibley <alexander.sibley@dm.duke.edu>
 
 0 errors | 0 warnings | 0 notes
@@ -2730,7 +2797,8 @@ Bug reports: https://github.com/fgcz/specL/issues
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because cdsw.Rmd appears to be an R Markdown v2 document.
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
 Quitting from lines 2-25 (cdsw.Rmd) 
 Error: processing vignette 'cdsw.Rmd' failed with diagnostics:
 could not find function "doc_date"
@@ -2763,32 +2831,9 @@ prepare_Rd: ms1.p2069.Rd:23-26: Dropping empty section \examples
 Maintainer: G. Grothendieck <ggrothendieck@gmail.com>  
 Bug reports: http://groups.google.com/group/sqldf
 
-1 error  | 1 warning  | 2 notes
+0 errors | 1 warning  | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘sqldf-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: sqldf
-> ### Title: SQL select on data frames
-> ### Aliases: sqldf
-> ### Keywords: manip
-> 
-... 6 lines ...
-> # in R without SQL and then again with SQL
-> #
-> 
-> # head
-> a1r <- head(warpbreaks)
-> a1s <- sqldf("select * from warpbreaks limit 6")
-Loading required package: tcltk
-Error in eval(substitute(expr), envir, enclos) : 
-  no such table: warpbreaks
-Calls: sqldf ... initialize -> initialize -> rsqlite_send_query -> .Call
-Execution halted
-
 checking whether package ‘sqldf’ can be installed ... WARNING
 Found the following significant warnings:
   Warning: no DISPLAY variable so Tk is not available
@@ -2815,7 +2860,7 @@ Maintainer: Wilson Freitas <wilson.freitas@gmail.com>
 
 0 errors | 0 warnings | 0 notes
 
-## SRAdb (1.31.0)
+## SRAdb (1.32.0)
 Maintainer: Jack Zhu <zhujack@mail.nih.gov>  
 Bug reports: https://github.com/seandavi/SRAdb/issues/new
 
@@ -2916,7 +2961,7 @@ Bug reports: https://github.com/mhahsler/stream/issues
 
 ```
 checking installed package size ... NOTE
-  installed size is  5.6Mb
+  installed size is  5.7Mb
   sub-directories of 1Mb or more:
     doc    1.6Mb
     libs   3.6Mb
@@ -2984,7 +3029,7 @@ checking installed package size ... NOTE
     sql   8.7Mb
 ```
 
-## TFBSTools (1.12.0)
+## TFBSTools (1.12.1)
 Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>  
 Bug reports: https://github.com/ge11232002/TFBSTools/issues
 
@@ -2994,7 +3039,8 @@ Bug reports: https://github.com/ge11232002/TFBSTools/issues
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because TFBSTools.Rmd appears to be an R Markdown v2 document.
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
 Quitting from lines 2-16 (TFBSTools.Rmd) 
 Error: processing vignette 'TFBSTools.Rmd' failed with diagnostics:
 could not find function "doc_date"
@@ -3011,6 +3057,12 @@ Unexported objects imported by ':::' calls:
   ‘S4Vectors:::new_SimpleList_from_list’ ‘seqLogo:::pwm2ic’
   See the note in ?`:::` about the use of this operator.
 ```
+
+## tigreBrowserWriter (0.1.2)
+Maintainer: Antti Honkela <antti.honkela@helsinki.fi>  
+Bug reports: https://github.com/PROBIC/tigreBrowserWriter/issues
+
+0 errors | 0 warnings | 0 notes
 
 ## tigre (1.28.0)
 Maintainer: Antti Honkela <antti.honkela@hiit.fi>  
@@ -3042,8 +3094,9 @@ to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
 contains 'methods').
 ```
 
-## trackeR (0.0.3)
-Maintainer: Hannah Frick <h.frick@ucl.ac.uk>
+## trackeR (0.0.4)
+Maintainer: Hannah Frick <h.frick@ucl.ac.uk>  
+Bug reports: https://github.com/hfrick/trackeR/issues
 
 0 errors | 1 warning  | 0 notes
 
@@ -3051,24 +3104,24 @@ Maintainer: Hannah Frick <h.frick@ucl.ac.uk>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning in readLines(con) :
-  incomplete final line found on 'TourDetrackeR.Rmd'
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because TourDetrackeR.Rmd appears to be an R Markdown v2 document.
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
 Loading required package: zoo
 
 Attaching package: 'zoo'
 
+The following objects are masked from 'package:base':
 ... 7 lines ...
-Attaching package: 'trackeR'
 
 The following object is masked from 'package:base':
 
     append
 
 Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=57.157231,-2.104296&zoom=13&size=640x640&scale=2&maptype=terrain&sensor=false
-Quitting from lines 96-97 (TourDetrackeR.Rmd) 
+Quitting from lines 90-91 (TourDetrackeR.Rmd) 
 Error: processing vignette 'TourDetrackeR.Rmd' failed with diagnostics:
-there is no package called 'webshot'
+GeomRasterAnn was built with an incompatible version of ggproto.
+Please reinstall the package that provides this extension.
 Execution halted
 ```
 
@@ -3081,17 +3134,17 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Oct 19, 2016 3:29:25 PM it.bancaditalia.oss.sdmx.util.Configuration init
+Nov 17, 2016 8:48:57 AM it.bancaditalia.oss.sdmx.util.Configuration init
 INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
-Oct 19, 2016 3:29:25 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 17, 2016 8:48:57 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Oct 19, 2016 3:29:25 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 17, 2016 8:48:58 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Oct 19, 2016 3:29:26 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 17, 2016 8:48:58 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 ... 8 lines ...
-Oct 19, 2016 3:29:27 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 17, 2016 8:49:00 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/data/ESTAT,ei_nama_q,1.0/Q.MIO-EUR.NSA.CP.NA-P72.IT
-Oct 19, 2016 3:29:27 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
+Nov 17, 2016 8:49:00 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
 
@@ -3139,31 +3192,48 @@ Maintainer: Jeff Gentry <geoffjentry@gmail.com>
 ## UniProt.ws (2.14.0)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-0 errors | 1 warning  | 1 note 
+2 errors | 0 warnings | 1 note 
 
 ```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
+checking examples ... ERROR
+Running examples in ‘UniProt.ws-Ex.R’ failed
+The error most likely occurred in:
 
-    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
-    clusterExport, clusterMap, parApply, parCapply, parLapply,
-    parLapplyLB, parRapply, parSapply, parSapplyLB
-
-The following objects are masked from ‘package:stats’:
-
-... 8 lines ...
-    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int, rank,
-    rbind, rownames, sapply, setdiff, sort, table, tapply, union,
-    unique, unsplit
-
-Warning in file(con, "r") :
-  cannot open URL 'http://www.uniprot.org/uniprot/?query=organism:9606&format=tab&columns=id': HTTP status was '503 Service Unavailable'
-
-Error: processing vignette 'UniProt.ws.Rnw' failed with diagnostics:
- chunk 1 (label = loadPkg) 
-Error in file(con, "r") : cannot open the connection
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: UniProt.ws-objects
+> ### Title: UniProt.ws objects and their related methods and functions
+> ### Aliases: UniProt.ws class:UniProt.ws UniProt.ws-class
+> ###   show,UniProt.ws-method species species,UniProt.ws-method taxId
+> ###   taxId,UniProt.ws-method taxId<- taxId<-,UniProt.ws-method cols
+... 72 lines ...
+> 
+> ## use select to extract some data
+> res <- select(up, 
++               keys = c("22627","22629"), 
++               columns = c("PDB","UNIGENE","SEQUENCE"),
++               keytype = "ENTREZ_GENE")
+Getting mapping data for 22627 ... and ACC
+Error in .select(x, keys, columns, keytype) : 
+  No data is available for the keys provided.
+Calls: select -> select -> .select
 Execution halted
+
+checking tests ... ERROR
+Running the tests in ‘tests/UniProt.ws_unit_tests.R’ failed.
+Last 13 lines of output:
+  UniProt.ws RUnit Tests - 14 test functions, 0 errors, 1 failure
+  FAILURE in test_mapUniprot: Error in checkTrue(res[1, 1] == "P13368") : Test not TRUE
+  
+  
+  Test files with failing tests
+  
+     test_serviceAccessors.R 
+       test_mapUniprot 
+  
+  
+  Error in BiocGenerics:::testPackage("UniProt.ws") : 
+    unit tests failed for package UniProt.ws
+  Execution halted
 
 checking R code for possible problems ... NOTE
 .getSomeUniprotGoodies: no visible global function definition for
@@ -3242,19 +3312,19 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Loading required package: Biostrings
-Loading required package: XVector
 
 Attaching package: ‘VariantAnnotation’
 
 The following object is masked from ‘package:base’:
 
+    tabulate
+
 ... 8 lines ...
-Error in eval(expr, envir, enclos) : database disk image is malformed
-Error in eval(expr, envir, enclos) : database disk image is malformed
+Error in sqliteSendQuery(con, statement, bind.data) : 
+  error in statement: database disk image is malformed
 Error : .onLoad failed in loadNamespace() for 'MafDb.1Kgenomes.phase3.hs37d5', details:
-  call: eval(expr, envir, enclos)
-  error: database disk image is malformed
+  call: sqliteSendQuery(con, statement, bind.data)
+  error: error in statement: database disk image is malformed
 
 Error: processing vignette 'usingVariantFiltering.Rnw' failed with diagnostics:
  chunk 3 
@@ -3263,9 +3333,9 @@ Error in VariantFilteringParam(vcfFilenames = CEUvcf) :
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  7.8Mb
+  installed size is  7.9Mb
   sub-directories of 1Mb or more:
-    R         3.5Mb
+    R         3.6Mb
     extdata   3.5Mb
 
 checking dependencies in R code ... NOTE

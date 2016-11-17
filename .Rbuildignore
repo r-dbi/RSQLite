@@ -24,3 +24,4 @@ a.out.dSYM
 ^\.idea$
 ^CMakeLists\.txt$
 ^clion-test\.R$
+^_pkgdown\.yml$

@@ -1,0 +1,43 @@
+* installing *source* package ‘RcppArmadillo’ ...
+** package ‘RcppArmadillo’ successfully unpacked and MD5 sums checked
+checking whether the C++ compiler works... yes
+checking for C++ compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C++ compiler... yes
+checking whether g++ accepts -g... yes
+checking how to run the C++ preprocessor... g++ -E
+checking whether we are using the GNU C++ compiler... (cached) yes
+checking whether g++ accepts -g... (cached) yes
+checking whether g++ version is sufficient... (5.4.0) yes
+checking LAPACK_LIBS... system LAPACK found
+configure: creating ./config.status
+config.status: creating inst/include/RcppArmadilloLapack.h
+** libs
+g++ -I/usr/share/R/include -DNDEBUG   -I"/home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/Rcpp/include"  -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c RcppArmadillo.cpp -o RcppArmadillo.o
+g++ -I/usr/share/R/include -DNDEBUG   -I"/home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/Rcpp/include"  -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c RcppExports.cpp -o RcppExports.o
+g++ -I/usr/share/R/include -DNDEBUG   -I"/home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/Rcpp/include"  -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c fastLm.cpp -o fastLm.o
+In file included from [01m[KRcppExports.cpp:4:0[m[K:
+[01m[K../inst/include/RcppArmadillo.h:31:34:[m[K [01;31m[Kfatal error: [m[KRcppArmadilloForward.h: No such file or directory
+compilation terminated.
+[01m[KRcppArmadillo.cpp:22:27:[m[K [01;31m[Kfatal error: [m[KRcppArmadillo.h: No such file or directory
+compilation terminated.
+[01m[KfastLm.cpp:22:27:[m[K [01;31m[Kfatal error: [m[KRcppArmadillo.h: No such file or directory
+compilation terminated.
+# cc1plus 0.00 0.00
+# as 0.00 0.00
+# cc1plus 0.00 0.00
+# as 0.00 0.00
+# cc1plus 0.00 0.00
+# as 0.00 0.00
+/usr/lib/R/etc/Makeconf:141: recipe for target 'RcppExports.o' failed
+make: *** [RcppExports.o] Error 1
+make: *** Waiting for unfinished jobs....
+/usr/lib/R/etc/Makeconf:141: recipe for target 'RcppArmadillo.o' failed
+make: *** [RcppArmadillo.o] Error 1
+/usr/lib/R/etc/Makeconf:141: recipe for target 'fastLm.o' failed
+make: *** [fastLm.o] Error 1
+ERROR: compilation failed for package ‘RcppArmadillo’
+* removing ‘/home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RcppArmadillo’
+* restoring previous ‘/home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RcppArmadillo’

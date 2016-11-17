@@ -1,0 +1,40 @@
+* installing *source* package ‘Hmisc’ ...
+** package ‘Hmisc’ successfully unpacked and MD5 sums checked
+** libs
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c Hmisc.c -o Hmisc.o
+gfortran   -fpic  -g -O2 -fstack-protector-strong  -c cidxcn.f -o cidxcn.o
+gfortran   -fpic  -g -O2 -fstack-protector-strong  -c cidxcp.f -o cidxcp.o
+gfortran   -fpic  -g -O2 -fstack-protector-strong  -c hoeffd.f -o hoeffd.o
+gfortran   -fpic  -g -O2 -fstack-protector-strong  -c jacklins.f -o jacklins.o
+gfortran   -fpic  -g -O2 -fstack-protector-strong  -c largrec.f -o largrec.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c mChoice.c -o mChoice.o
+gfortran   -fpic  -g -O2 -fstack-protector-strong  -c maxempr.f -o maxempr.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c nstr.c -o nstr.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c ranksort.c -o ranksort.o
+gfortran   -fpic  -g -O2 -fstack-protector-strong  -c rcorr.f -o rcorr.o
+gcc -std=gnu99 -I/usr/share/R/include -DNDEBUG     -fdiagnostics-color=always -time -pipe  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c string_box.c -o string_box.o
+gfortran   -fpic  -g -O2 -fstack-protector-strong  -c wclosest.f -o wclosest.o
+# cc1 0.02 0.00
+# cc1 0.02 0.00
+# as 0.00 0.00
+# cc1 0.02 0.00
+# cc1 0.02 0.00
+# as 0.00 0.00
+# cc1 0.02 0.00
+# cc1 0.04 0.00
+# as 0.00 0.00
+# cc1 0.01 0.00
+# cc1 0.02 0.00
+# as 0.00 0.00
+# cc1 0.02 0.00
+# cc1 0.07 0.00
+# as 0.00 0.00
+gcc -std=gnu99 -shared -L/usr/lib/R/lib -fuse-ld=gold -o Hmisc.so Hmisc.o cidxcn.o cidxcp.o hoeffd.o jacklins.o largrec.o mChoice.o maxempr.o nstr.o ranksort.o rcorr.o string_box.o wclosest.o -lgfortran -lm -lquadmath -L/usr/lib/R/lib -lR
+installing to /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/Hmisc/libs
+** R
+** inst
+** preparing package for lazy loading
+Error : package ‘survival’ 2.39.5 was found, but >= 2.40.1 is required by ‘Hmisc’
+ERROR: lazy loading failed for package ‘Hmisc’
+* removing ‘/home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/Hmisc’
+* restoring previous ‘/home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/Hmisc’

@@ -9,8 +9,8 @@
 |ui       |X11                          |
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
-|tz       |Zulu                         |
-|date     |2016-10-06                   |
+|tz       |Universal                    |
+|date     |2016-11-17                   |
 
 ## Packages
 
@@ -19,54 +19,56 @@
 |BH        |   |1.60.0-2   |2016-05-07 |cran (@1.60.0-)                    |
 |DBI       |   |0.5-12     |2016-10-06 |Github (rstats-db/DBI@4f00863)     |
 |DBItest   |   |1.3-10     |2016-10-06 |Github (rstats-db/DBItest@9e87611) |
-|knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
+|knitr     |   |1.15       |2016-11-09 |cran (@1.15)                       |
 |memoise   |   |1.0.0      |2016-01-29 |CRAN (R 3.3.1)                     |
 |plogr     |   |0.1-1      |2016-09-24 |cran (@0.1-1)                      |
 |Rcpp      |   |0.12.7     |2016-09-05 |cran (@0.12.7)                     |
-|rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
-|RSQLite   |   |1.0.9014   |2016-10-06 |local (rstats-db/RSQLite@e479dae)  |
+|rmarkdown |   |1.1        |2016-10-16 |cran (@1.1)                        |
+|RSQLite   |   |1.0.0      |2014-10-25 |CRAN (R 3.3.1)                     |
 |testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
 
-32 packages with problems
+34 packages with problems
 
-|package          |version  | errors| warnings| notes|
-|:----------------|:--------|------:|--------:|-----:|
-|AnnotationDbi    |1.34.4   |      0|        1|     5|
-|ChemmineR        |2.24.2   |      1|        0|     0|
-|clstutils        |1.20.0   |      0|        2|     5|
-|CNEr             |1.8.3    |      0|        2|     1|
-|customProDB      |1.12.0   |      1|        1|     3|
-|DECIPHER         |2.0.2    |      0|        2|     3|
-|ecd              |0.8.2    |      1|        0|     0|
-|ensembldb        |1.4.7    |      0|        1|     1|
-|filematrix       |1.1.0    |      0|        1|     0|
-|gcbd             |0.2.6    |      0|        1|     1|
-|GeneAnswers      |2.14.0   |      1|        3|     6|
-|lumi             |2.24.0   |      0|        5|     5|
-|maGUI            |1.0      |      1|        0|     0|
-|metaseqR         |1.12.2   |      1|        1|     4|
-|mgsa             |1.20.0   |      0|        1|     5|
-|oce              |0.9-19   |      1|        0|     1|
-|oligo            |1.36.1   |      1|        0|     8|
-|PAnnBuilder      |1.36.0   |      0|        3|     1|
-|PGA              |1.2.2    |      1|        1|     3|
-|plethy           |1.10.0   |      2|        1|     3|
-|poplite          |0.99.16  |      1|        0|     1|
-|recoup           |1.0.2    |      2|        0|     1|
-|RImmPort         |1.0.2    |      0|        1|     1|
-|RQDA             |0.2-7    |      1|        0|     1|
-|specL            |1.6.2    |      0|        1|     4|
-|sqldf            |0.4-10   |      1|        1|     2|
-|TFBSTools        |1.10.4   |      0|        1|     1|
-|trackeR          |0.0.3    |      0|        1|     0|
-|TSdata           |2016.8-1 |      0|        1|     0|
-|UniProt.ws       |2.12.0   |      0|        1|     1|
-|VariantFiltering |1.8.6    |      0|        3|     3|
-|vmsbase          |2.1.3    |      1|        0|     0|
+|package            |version  | errors| warnings| notes|
+|:------------------|:--------|------:|--------:|-----:|
+|AnnotationDbi      |1.36.0   |      0|        1|     5|
+|AnnotationHubData  |1.4.0    |      1|        0|     3|
+|AnnotationHub      |2.6.1    |      0|        1|     1|
+|archivist          |2.1      |      1|        0|     2|
+|ChemmineR          |2.26.0   |      1|        0|     0|
+|clstutils          |1.22.0   |      0|        2|     5|
+|CNEr               |1.10.1   |      0|        2|     2|
+|ecd                |0.8.2    |      1|        0|     0|
+|filematrix         |1.1.0    |      0|        1|     0|
+|gcbd               |0.2.6    |      0|        1|     1|
+|GeneAnswers        |2.16.0   |      1|        3|     6|
+|lumi               |2.26.3   |      0|        1|     3|
+|maGUI              |1.0      |      1|        0|     0|
+|metagenomeFeatures |1.4.0    |      0|        2|     2|
+|metaseqR           |1.14.0   |      1|        1|     4|
+|mgsa               |1.22.0   |      0|        1|     4|
+|oce                |0.9-19   |      1|        0|     1|
+|oligoClasses       |1.36.0   |      0|        1|     4|
+|oligo              |1.38.0   |      1|        0|     9|
+|PAnnBuilder        |1.38.0   |      0|        3|     1|
+|plethy             |1.12.0   |      2|        1|     3|
+|poplite            |0.99.16  |      1|        0|     1|
+|recoup             |1.2.0    |      2|        0|     1|
+|RImmPort           |1.2.0    |      0|        1|     1|
+|RQDA               |0.2-7    |      1|        0|     1|
+|specL              |1.8.0    |      0|        1|     3|
+|sqldf              |0.4-10   |      1|        1|     2|
+|TFBSTools          |1.12.1   |      0|        1|     2|
+|tigreBrowserWriter |0.1.2    |      1|        0|     0|
+|trackeR            |0.0.4    |      0|        1|     0|
+|TSdata             |2016.8-1 |      0|        1|     0|
+|UniProt.ws         |2.14.0   |      1|        0|     1|
+|VariantFiltering   |1.10.0   |      0|        2|     4|
+|vmsbase            |2.1.3    |      1|        0|     0|
 
-## AnnotationDbi (1.34.4)
+## AnnotationDbi (1.36.0)
 Maintainer: Bioconductor Package Maintainer
  <maintainer@bioconductor.org>
 
@@ -115,7 +117,118 @@ Rd file 'inpIDMapper.Rd':
 These lines will be truncated in the PDF manual.
 ```
 
-## ChemmineR (2.24.2)
+## AnnotationHubData (1.4.0)
+Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
+
+1 error  | 0 warnings | 3 notes
+
+```
+checking tests ... ERROR
+Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
+Last 13 lines of output:
+  ERROR in test_UCSCChainPreparer_recipe: Error : 1: Unknown IO error2: failed to load external entity "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=&retmax=0"
+  
+  
+  Test files with failing tests
+  
+     test_recipe.R 
+       test_UCSC2BitPreparer_recipe 
+       test_UCSCChainPreparer_recipe 
+  
+  
+  Error in BiocGenerics:::testPackage("AnnotationHubData") : 
+    unit tests failed for package AnnotationHubData
+  Execution halted
+
+checking top-level files ... NOTE
+Non-standard file/directory found at top level:
+  ‘appveyor.yml’
+
+checking dependencies in R code ... NOTE
+Missing object imported by a ':::' call: ‘AnnotationHub:::.db_connection’
+Unexported object imported by a ':::' call: ‘OrganismDbi:::.packageTaxIds’
+  See the note in ?`:::` about the use of this operator.
+
+checking R code for possible problems ... NOTE
+.NCBIMetadataFromUrl: no visible binding for global variable ‘results’
+.NCBIMetadataFromUrl: no visible binding for global variable ‘specData’
+.makeComplexGR: no visible binding for global variable ‘seqname’
+jsonPath: no visible binding for global variable ‘SourceFile’
+jsonPath: no visible binding for global variable ‘HubRoot’
+makeAnnotationHubMetadata : <anonymous>: no visible binding for global
+  variable ‘Title’
+makeAnnotationHubMetadata : <anonymous>: no visible binding for global
+  variable ‘Description’
+... 52 lines ...
+  SourceFile SourceType SourceUrl SourceVersion Species TaxonomyId
+  Title ahroot bucket checkTrue read.csv results seqname specData
+  suppresWarnings
+Consider adding
+  importFrom("utils", "read.csv")
+to your NAMESPACE file.
+
+Found the following calls to data() loading into the global environment:
+File ‘AnnotationHubData/R/makeNCBIToOrgDbs.R’:
+  data(specData, package = "GenomeInfoDb")
+See section ‘Good practice’ in ‘?data’.
+```
+
+## AnnotationHub (2.6.1)
+Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
+
+0 errors | 1 warning  | 1 note 
+
+```
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
+Quitting from lines 41-45 (AnnotationHub-HOWTO.Rmd) 
+Error: processing vignette 'AnnotationHub-HOWTO.Rmd' failed with diagnostics:
+'AH52107' not available in this version of the package; use biocLite() to update?
+Execution halted
+
+
+checking Rd files ... NOTE
+prepare_Rd: listResources.Rd:44-45: Dropping empty section \seealso
+```
+
+## archivist (2.1)
+Maintainer: Przemyslaw Biecek <przemyslaw.biecek@gmail.com>  
+Bug reports: https://github.com/pbiecek/archivist/issues
+
+1 error  | 0 warnings | 2 notes
+
+```
+checking examples ... ERROR
+Running examples in ‘archivist-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: aread
+> ### Title: Read Artifacts Given as md5hashes from the Repository
+> ### Aliases: aread
+> 
+> ### ** Examples
+> 
+> # read the object from local directory
+> setLocalRepo(system.file("graphGallery", package = "archivist"))
+> pl <- aread("f05f0ed0662fe01850ec1b928830ef32")
+> # plot it
+> pl
+Error: ScalesList was built with an incompatible version of ggproto.
+Please reinstall the package that provides this extension.
+Execution halted
+
+checking package dependencies ... NOTE
+Package which this enhances but not available for checking: ‘archivist.github’
+
+checking Rd cross-references ... NOTE
+Package unavailable to check Rd xrefs: ‘archivist.github’
+```
+
+## ChemmineR (2.26.0)
 Maintainer: Thomas Girke <thomas.girke@ucr.edu>
 
 1 error  | 0 warnings | 0 notes
@@ -126,7 +239,7 @@ Installation failed.
 See ‘/home/muelleki/git/R/RSQLite/revdep/checks/ChemmineR.Rcheck/00install.out’ for details.
 ```
 
-## clstutils (1.20.0)
+## clstutils (1.22.0)
 Maintainer: Noah Hoffman <ngh2@uw.edu>
 
 0 errors | 2 warnings | 5 notes
@@ -204,11 +317,11 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## CNEr (1.8.3)
+## CNEr (1.10.1)
 Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>  
 Bug reports: https://github.com/ge11232002/CNEr/issues
 
-0 errors | 2 warnings | 1 note 
+0 errors | 2 warnings | 2 notes
 
 ```
 checking compiled code ... WARNING
@@ -217,8 +330,6 @@ File ‘CNEr/libs/CNEr.so’:
     Object: ‘ucsc/errabort.o’
   Found ‘exit’, possibly from ‘exit’ (C)
     Objects: ‘ucsc/errabort.o’, ‘ucsc/pipeline.o’
-  Found ‘printf’, possibly from ‘printf’ (C)
-    Objects: ‘ceScan.o’, ‘ucsc/pipeline.o’
   Found ‘puts’, possibly from ‘printf’ (C), ‘puts’ (C)
     Object: ‘ucsc/pipeline.o’
   Found ‘rand’, possibly from ‘rand’ (C)
@@ -238,168 +349,25 @@ See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because CNEr.Rmd appears to be an R Markdown v2 document.
-Quitting from lines 2-16 (CNEr.Rmd) 
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
+Quitting from lines 2-15 (CNEr.Rmd) 
 Error: processing vignette 'CNEr.Rmd' failed with diagnostics:
 could not find function "doc_date"
 Execution halted
 
 
-checking dependencies in R code ... NOTE
-Unexported objects imported by ':::' calls:
-  ‘BiocGenerics:::replaceSlots’
-  ‘S4Vectors:::makeClassinfoRowForCompactPrinting’
-  ‘S4Vectors:::makePrettyMatrixForCompactPrinting’
-  ‘S4Vectors:::make_zero_col_DataFrame’
-  See the note in ?`:::` about the use of this operator.
-```
-
-## customProDB (1.12.0)
-Maintainer: xiaojing wang <xiaojing.wang@vanderbilt.edu>
-
-1 error  | 1 warning  | 3 notes
-
-```
-checking examples ... ERROR
-Running examples in ‘customProDB-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: PrepareAnnotationEnsembl
-> ### Title: prepare annotation from ENSEMBL
-> ### Aliases: PrepareAnnotationEnsembl
-> 
-> ### ** Examples
-... 29 lines ...
-8: Entity 'hellip' not defined
-9: Entity 'hellip' not defined
-10: Entity 'hellip' not defined
-11: Opening and ending tag mismatch: img line 68 and li
-12: Opening and ending tag mismatch: li line 68 and ul
-13: Opening and ending tag mismatch: ul line 67 and div
-14: Entity 'copy' not defined
-15: Opening and ending tag mismatch: div line 19 and body
-16: Opening and ending tag mismatch: body line 17 and html
-17: Premature end of data in tag html line 2
-Execution halted
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-    'citation("Biobase")', and for packages
-    'citation("pkgname")'.
-
-Loading required package: biomaRt
-Build TranscriptDB object (txdb.sqlite) ... 
-Download the refGene table ... OK
-Download the hgFixed.refLink table ... OK
-... 8 lines ...
-Warning: Named parameters not used in query: internal_id, name, chrom, strand, start, end
-Warning: Named parameters not used in query: internal_id, name, chrom, strand, start, end
-Warning: Named parameters not used in query: internal_tx_id, exon_rank, internal_exon_id, internal_cds_id
-Warning: Named parameters not used in query: gene_id, internal_tx_id
-OK
- done
-Prepare gene/transcript/protein id mapping information (ids.RData) ... 
-Error: processing vignette 'customProDB.Rnw' failed with diagnostics:
- chunk 3 (label = PrepareAnnoRef) 
-Error in normArgTable(value, x) : unknown table name 'refLink'
-Execution halted
-
-checking DESCRIPTION meta-information ... NOTE
-Malformed Title field: should not end in a period.
-Malformed Description field: should contain one or more complete sentences.
-Packages listed in more than one of Depends, Imports, Suggests, Enhances:
-  ‘IRanges’ ‘biomaRt’ ‘AnnotationDbi’
-A package should be listed in only one of these fields.
-
-checking dependencies in R code ... NOTE
-Unexported objects imported by ':::' calls:
-  ‘biomaRt:::martBM’ ‘biomaRt:::martDataset’ ‘biomaRt:::martHost’
-  See the note in ?`:::` about the use of this operator.
-
-checking R code for possible problems ... NOTE
-.Ensembl.getTable: no visible global function definition for
-  ‘download.file’
-.Ensembl.getTable: no visible global function definition for
-  ‘read.table’
-Bed2Range: no visible global function definition for ‘read.table’
-Bed2Range: no visible binding for global variable ‘V5’
-OutputNovelJun: no visible binding for global variable ‘jun_type’
-OutputVarproseq: no visible binding for global variable ‘genename’
-OutputVarproseq: no visible binding for global variable ‘txname’
-... 46 lines ...
-Varlocation: no visible binding for global variable ‘pro_name’
-easyRun: no visible global function definition for ‘write.table’
-easyRun_mul: no visible global function definition for ‘write.table’
-Undefined global functions or variables:
-  V5 aapos aaref aavar alleleCount alleles allsample cds_end cds_start
-  chrom download.file ensembl_gene_id genename jun_type mrnaAcc name
-  pro_name proname protAcc read.table rsid saveDb transcript txname
-  write.table
-Consider adding
-  importFrom("utils", "download.file", "read.table", "write.table")
-to your NAMESPACE file.
-```
-
-## DECIPHER (2.0.2)
-Maintainer: Erik Wright <DECIPHER@cae.wisc.edu>
-
-0 errors | 2 warnings | 3 notes
-
-```
-checking foreign function calls ... WARNING
-Registration problems:
-  symbol ‘functionCall’ in the local frame:
-   .Call(functionCall, myXStringSet, as.numeric(subMatrix), gapOpening, 
-       gapExtension, gapLetter, shiftPenalty, threshold, weight, 
-       PACKAGE = "DECIPHER")
-  symbol ‘functionCall’ in the local frame:
-   .Call(functionCall, seqs, sM, GO, gapExtensionMax, weights/mean(weights), 
-       structs, structureMatrix)
-  call to ‘"consensusProfileAA"’ with 2 parameters, expected 3:
-   .Call("consensusProfileAA", myXStringSet, rep(1, length(myXStringSet)), 
-       PACKAGE = "DECIPHER")
-See chapter ‘System and foreign language interfaces’ in the ‘Writing R
-Extensions’ manual.
-
-checking sizes of PDF files under ‘inst/doc’ ... WARNING
-  ‘gs+qpdf’ made some significant size reductions:
-     compacted ‘ArtOfAlignmentInR.pdf’ from 968Kb to 635Kb
-  consider running tools::compactPDF(gs_quality = "ebook") on these files
-
 checking installed package size ... NOTE
-  installed size is  8.9Mb
+  installed size is 28.9Mb
   sub-directories of 1Mb or more:
-    data      2.5Mb
-    doc       3.9Mb
-    extdata   1.4Mb
+    R        11.0Mb
+    extdata  15.9Mb
+    libs      1.1Mb
 
-checking DESCRIPTION meta-information ... NOTE
-'LinkingTo' for ‘RSQLite’ is unused as it has no 'include' directory
-
-checking R code for possible problems ... NOTE
-.CalculateEfficiencyFISH: no visible global function definition for
-  ‘uniroot’
-.midpointRoot : .containsZero: no visible global function definition
-  for ‘is.leaf’
-.midpointRoot : .findMax: no visible global function definition for
-  ‘is.leaf’
-.midpointRoot : .containsMax: no visible global function definition for
-  ‘is.leaf’
-.midpointRoot : .findMidpoint: no visible global function definition
-... 171 lines ...
-  importFrom("grDevices", "colorRampPalette", "colors", "dev.flush",
-             "dev.hold", "dev.size", "rainbow")
-  importFrom("graphics", "abline", "axis", "box", "legend", "mtext",
-             "par", "plot", "points", "rect", "segments", "strheight",
-             "strwidth", "text")
-  importFrom("stats", "dendrapply", "dist", "is.leaf", "nlminb",
-             "optimize", "order.dendrogram", "pbinom", "reorder",
-             "setNames", "step", "uniroot")
-  importFrom("utils", "browseURL", "data", "flush.console",
-             "object.size", "setTxtProgressBar", "txtProgressBar")
-to your NAMESPACE file.
+checking dependencies in R code ... NOTE
+Unexported objects imported by ':::' calls:
+  ‘BiocGenerics:::replaceSlots’ ‘S4Vectors:::make_zero_col_DataFrame’
+  See the note in ?`:::` about the use of this operator.
 ```
 
 ## ecd (0.8.2)
@@ -415,30 +383,6 @@ See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
 manual.
 ```
 
-## ensembldb (1.4.7)
-Maintainer: Johannes Rainer <johannes.rainer@eurac.edu>  
-Bug reports: https://github.com/jotsetung/ensembldb/issues
-
-0 errors | 1 warning  | 1 note 
-
-```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because ensembldb.Rmd appears to be an R Markdown v2 document.
-Quitting from lines 2-48 (ensembldb.Rmd) 
-Error: processing vignette 'ensembldb.Rmd' failed with diagnostics:
-could not find function "Biocpkg"
-Execution halted
-
-
-checking dependencies in R code ... NOTE
-Unexported objects imported by ':::' calls:
-  'GenomicFeatures:::fetchChromLengthsFromEnsembl'
-  'GenomicFeatures:::fetchChromLengthsFromEnsemblPlants'
-  See the note in ?`:::` about the use of this operator.
-```
-
 ## filematrix (1.1.0)
 Maintainer: Andrey A Shabalin <ashabalin@vcu.edu>  
 Bug reports: https://github.com/andreyshabalin/filematrix/issues
@@ -449,7 +393,8 @@ Bug reports: https://github.com/andreyshabalin/filematrix/issues
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because Best_Prectices.Rmd appears to be an R Markdown v2 document.
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
 Quitting from lines 2-23 (Best_Prectices.Rmd) 
 Error: processing vignette 'Best_Prectices.Rmd' failed with diagnostics:
 could not find function "doc_date"
@@ -477,7 +422,7 @@ checking package dependencies ... NOTE
 Package suggested but not available for checking: ‘gputools’
 ```
 
-## GeneAnswers (2.14.0)
+## GeneAnswers (2.16.0)
 Maintainer: Lei Huang <lhuang7@uchicago.edu> and Gang Feng <gilbertfeng@gmail.com>
 
 1 error  | 3 warnings | 6 notes
@@ -511,7 +456,7 @@ See ‘/home/muelleki/git/R/RSQLite/revdep/checks/GeneAnswers.Rcheck/00install.o
 
 checking sizes of PDF files under ‘inst/doc’ ... WARNING
   ‘gs+qpdf’ made some significant size reductions:
-     compacted ‘geneAnswers.pdf’ from 1401Kb to 597Kb
+     compacted ‘geneAnswers.pdf’ from 1373Kb to 600Kb
   consider running tools::compactPDF(gs_quality = "ebook") on these files
 
 checking re-building of vignette outputs ... WARNING
@@ -545,7 +490,7 @@ Adding so many packages to the search path is excessive and importing
 selectively is preferable.
 
 checking installed package size ... NOTE
-  installed size is 36.2Mb
+  installed size is 36.1Mb
   sub-directories of 1Mb or more:
     External  32.4Mb
     data       1.1Mb
@@ -612,97 +557,20 @@ Rd file 'topREACTOME.PATHGenes.Rd':
 These lines will be truncated in the PDF manual.
 ```
 
-## lumi (2.24.0)
+## lumi (2.26.3)
 Maintainer: Pan Du <dupan.mail@gmail.com>
 
-0 errors | 5 warnings | 5 notes
+0 errors | 1 warning  | 3 notes
 
 ```
-checking whether package ‘lumi’ can be installed ... WARNING
-Found the following significant warnings:
-  Warning: bad markup (extra space?) at lumiMethyR.Rd:18:16
-  Warning: bad markup (extra space?) at lumiMethyR.Rd:19:28
-  Warning: bad markup (extra space?) at lumiMethyR.Rd:20:13
-See ‘/home/muelleki/git/R/RSQLite/revdep/checks/lumi.Rcheck/00install.out’ for details.
-
 checking dependencies in R code ... WARNING
 '::' or ':::' import not declared from: ‘bigmemoryExtras’
-'library' or 'require' call to ‘vsn’ in package code.
-  Please use :: or requireNamespace() instead.
-  See section 'Suggested packages' in the 'Writing R Extensions' manual.
-
-checking Rd files ... WARNING
-prepare_Rd: getChrInfo.Rd:23-25: Dropping empty section \details
-prepare_Rd: getChrInfo.Rd:29-31: Dropping empty section \references
-prepare_Rd: getChrInfo.Rd:38-40: Dropping empty section \seealso
-prepare_Rd: getChrInfo.Rd:41-44: Dropping empty section \examples
-prepare_Rd: importMethyIDAT.Rd:39-42: Dropping empty section \examples
-prepare_Rd: bad markup (extra space?) at lumiMethyR.Rd:18:16
-prepare_Rd: bad markup (extra space?) at lumiMethyR.Rd:19:28
-prepare_Rd: bad markup (extra space?) at lumiMethyR.Rd:20:13
-
-checking Rd contents ... WARNING
-Argument items with no description in Rd object 'lumiMethyR':
-  ‘qcfile’ ‘sampleDescriptions’ ‘sep’
-
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-
-Attaching package: ‘XML’
-
-The following object is masked from ‘package:tools’:
-
-    toHTML
-
-... 8 lines ...
-  documentation provided with the lumi package.
-
-Error in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  : 
-  Running 'texi2dvi' on 'IlluminaAnnotation.tex' failed.
-LaTeX errors:
-! Package auto-pst-pdf Error: 
-    "shell escape" (or "write18") is not enabled:
-    auto-pst-pdf will not work!
-.
-Calls: buildVignettes -> texi2pdf -> texi2dvi
-Execution halted
 
 checking installed package size ... NOTE
-  installed size is 11.8Mb
+  installed size is  6.8Mb
   sub-directories of 1Mb or more:
     R      2.8Mb
     data   3.6Mb
-    doc    5.0Mb
-
-checking DESCRIPTION meta-information ... NOTE
-Package listed in more than one of Depends, Imports, Suggests, Enhances:
-  ‘Biobase’
-A package should be listed in only one of these fields.
-
-checking R code for possible problems ... NOTE
-.estimate.quantile.reference: no visible global function definition for
-  ‘approx’
-.initialGammaEstimation: no visible global function definition for
-  ‘quantile’
-.initialGammaEstimation: no visible global function definition for
-  ‘var’
-.quantileNormalization.reference: no visible global function definition
-  for ‘approx’
-addAnnotationInfo: no visible global function definition for ‘fData’
-... 247 lines ...
-Consider adding
-  importFrom("grDevices", "colors")
-  importFrom("graphics", "Axis", "arrows", "box", "layout", "legend",
-             "rect", "title")
-  importFrom("stats", "approx", "as.dist", "cmdscale", "cor",
-             "density.default", "dgamma", "dist", "ecdf", "hclust", "lm",
-             "median", "pgamma", "predict", "quantile", "sd", "start",
-             "supsmu", "var")
-  importFrom("utils", "head", "packageDescription", "read.table", "tail",
-             "write.table")
-to your NAMESPACE file.
 
 checking Rd line widths ... NOTE
 Rd file 'IlluminaID2nuID.Rd':
@@ -742,7 +610,60 @@ Installation failed.
 See ‘/home/muelleki/git/R/RSQLite/revdep/checks/maGUI.Rcheck/00install.out’ for details.
 ```
 
-## metaseqR (1.12.2)
+## metagenomeFeatures (1.4.0)
+Maintainer: Nathan D. Olson <nolson@umiacs.umd.edu>  
+Bug reports: https://github.com/HCBravoLab/metagenomeFeatures/issues
+
+0 errors | 2 warnings | 2 notes
+
+```
+checking for missing documentation entries ... WARNING
+Undocumented S4 methods:
+  generic 'taxa_columns' and siglist 'MgDb'
+  generic 'taxa_keys' and siglist 'MgDb'
+  generic 'taxa_keytypes' and siglist 'MgDb'
+All user-level objects in a package (including S4 classes and methods)
+should have documentation entries.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+
+checking Rd \usage sections ... WARNING
+Undocumented arguments in documentation object 'annotateFeatures'
+  ‘query_key’
+Documented arguments not in \usage in documentation object 'annotateFeatures':
+  ‘db_keys’ ‘query_df’
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+
+checking installed package size ... NOTE
+  installed size is  6.3Mb
+  sub-directories of 1Mb or more:
+    R         1.1Mb
+    extdata   3.4Mb
+
+checking R code for possible problems ... NOTE
+.mgDb_annotateFeatures: no visible binding for global variable
+  ‘db_keys’
+.select.taxa: no visible binding for global variable ‘Keys’
+.select.taxa: no visible binding for global variable ‘.’
+aggregate_taxa: no visible binding for global variable ‘.’
+aggregate_taxa: no visible binding for global variable ‘index’
+aggregate_taxa: no visible global function definition for
+  ‘newMRexperiment’
+vignette_pheno_data: no visible global function definition for
+  ‘read.csv’
+Undefined global functions or variables:
+  . Keys db_keys index newMRexperiment read.csv
+Consider adding
+  importFrom("utils", "read.csv")
+to your NAMESPACE file.
+```
+
+## metaseqR (1.14.0)
 Maintainer: Panagiotis Moulos <moulos@fleming.gr>
 
 1 error  | 1 warning  | 4 notes
@@ -769,7 +690,7 @@ checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
 
-The following objects are masked from 'package:GenomicAlignments':
+The following objects are masked from 'package:ShortRead':
 
     left, right
 
@@ -812,24 +733,24 @@ cdplot: no visible global function definition for ‘lines’
 countsBioToJSON: no visible binding for global variable ‘nams’
 diagplot.avg.ftd : <anonymous>: no visible binding for global variable
   ‘sd’
-... 239 lines ...
-Consider adding
-  importFrom("grDevices", "bmp", "colorRampPalette", "dev.new",
+... 246 lines ...
              "dev.off", "jpeg", "pdf", "png", "postscript", "tiff")
   importFrom("graphics", "abline", "arrows", "axis", "grid", "lines",
              "mtext", "par", "plot", "plot.new", "plot.window", "points",
              "text", "title")
+  importFrom("methods", "as", "new")
   importFrom("stats", "as.dist", "cmdscale", "cor", "end", "ks.test",
              "mad", "median", "model.matrix", "na.exclude", "optimize",
              "p.adjust", "p.adjust.methods", "pchisq", "quantile",
              "rexp", "rnbinom", "runif", "sd", "start", "var")
-to your NAMESPACE file.
+to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
+contains 'methods').
 ```
 
-## mgsa (1.20.0)
+## mgsa (1.22.0)
 Maintainer: Sebastian Bauer <mail@sebastianbauer.info>
 
-0 errors | 1 warning  | 5 notes
+0 errors | 1 warning  | 4 notes
 
 ```
 checking for GNU extensions in Makefiles ... WARNING
@@ -887,16 +808,6 @@ Consider adding
   importFrom("utils", "read.delim", "relist", "str")
 to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
 contains 'methods').
-
-checking compiled code ... NOTE
-File ‘mgsa/libs/mgsa.so’:
-  Found ‘printf’, possibly from ‘printf’ (C)
-    Object: ‘mgsa.o’
-
-Compiled code should not call entry points which might terminate R nor
-write to stdout/stderr instead of to the console, nor the system RNG.
-
-See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
 
 ## oce (0.9-19)
@@ -927,15 +838,78 @@ Calls: plot -> plot -> .local
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  5.1Mb
+  installed size is  5.3Mb
   sub-directories of 1Mb or more:
     help   2.0Mb
 ```
 
-## oligo (1.36.1)
+## oligoClasses (1.36.0)
+Maintainer: Benilton Carvalho <beniltoncarvalho@gmail.com> and Robert Scharpf <rscharpf@jhsph.edu>
+
+0 errors | 1 warning  | 4 notes
+
+```
+checking for missing documentation entries ... WARNING
+Undocumented S4 methods:
+  generic '[' and siglist 'CNSet,ANY,ANY,ANY'
+  generic '[' and siglist 'gSetList,ANY,ANY,ANY'
+All user-level objects in a package (including S4 classes and methods)
+should have documentation entries.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+
+checking package dependencies ... NOTE
+Packages which this enhances but not available for checking:
+  ‘doMC’ ‘doMPI’ ‘doSNOW’ ‘doRedis’
+
+checking dependencies in R code ... NOTE
+Unexported object imported by a ':::' call: ‘Biobase:::assayDataEnvLock’
+  See the note in ?`:::` about the use of this operator.
+
+checking R code for possible problems ... NOTE
+getSequenceLengths: no visible binding for global variable ‘seqlengths’
+pdPkgFromBioC: no visible binding for global variable ‘contrib.url’
+pdPkgFromBioC: no visible global function definition for
+  ‘available.packages’
+pdPkgFromBioC: no visible global function definition for
+  ‘install.packages’
+chromosome,gSetList: no visible global function definition for
+  ‘chromosomeList’
+coerce,CNSet-CopyNumberSet: no visible global function definition for
+  ‘totalCopynumber’
+geometry,FeatureSet: no visible global function definition for ‘getPD’
+Undefined global functions or variables:
+  available.packages chromosomeList contrib.url getPD install.packages
+  seqlengths totalCopynumber
+Consider adding
+  importFrom("utils", "available.packages", "contrib.url",
+             "install.packages")
+to your NAMESPACE file.
+
+checking Rd line widths ... NOTE
+Rd file 'AssayDataList.Rd':
+  \examples lines wider than 100 characters:
+     r <- lapply(r, function(x,dns) {dimnames(x) <- dns; return(x)}, dns=list(letters[1:5], LETTERS[1:5]))
+
+Rd file 'GenomeAnnotatedDataFrameFrom-methods.Rd':
+  \examples lines wider than 100 characters:
+                                 dimnames=list(c("rs10000092","rs1000055", "rs100016", "rs10003241", "rs10004197"), NULL))
+
+Rd file 'largeObjects.Rd':
+  \usage lines wider than 90 characters:
+     initializeBigMatrix(name=basename(tempfile()), nr=0L, nc=0L, vmode = "integer", initdata = NA)
+
+Rd file 'oligoSetExample.Rd':
+  \examples lines wider than 100 characters:
+                                     copyNumber=integerMatrix(log2(locusLevelData[["copynumber"]]/100), 100),
+
+These lines will be truncated in the PDF manual.
+```
+
+## oligo (1.38.0)
 Maintainer: Benilton Carvalho <benilton@unicamp.br>
 
-1 error  | 0 warnings | 8 notes
+1 error  | 0 warnings | 9 notes
 
 ```
 checking examples ... ERROR
@@ -965,8 +939,9 @@ checking package dependencies ... NOTE
 Packages which this enhances but not available for checking: ‘doMC’ ‘doMPI’
 
 checking installed package size ... NOTE
-  installed size is 30.0Mb
+  installed size is 30.3Mb
   sub-directories of 1Mb or more:
+    R         1.2Mb
     doc      12.9Mb
     scripts  15.7Mb
 
@@ -978,6 +953,15 @@ A package should be listed in only one of these fields.
 checking top-level files ... NOTE
 Non-standard file/directory found at top level:
   ‘TODO.org’
+
+checking whether the namespace can be loaded with stated dependencies ... NOTE
+Warning: no function found corresponding to methods exports from ‘oligo’ for: ‘show’
+
+A namespace must be able to be loaded with just the base namespace
+loaded: otherwise if the namespace gets loaded by a saved object, the
+session will be unable to start.
+
+Probably some imports need to be declared in the NAMESPACE file.
 
 checking dependencies in R code ... NOTE
 Unexported object imported by a ':::' call: ‘Biobase:::annotatedDataFrameFromMatrix’
@@ -1036,7 +1020,7 @@ Rd file 'preprocessTools.Rd':
 These lines will be truncated in the PDF manual.
 ```
 
-## PAnnBuilder (1.36.0)
+## PAnnBuilder (1.38.0)
 Maintainer: Li Hong <sysptm@gmail.com>
 
 0 errors | 3 warnings | 1 note 
@@ -1108,76 +1092,7 @@ Packages listed in more than one of Depends, Imports, Suggests, Enhances:
 A package should be listed in only one of these fields.
 ```
 
-## PGA (1.2.2)
-Maintainer: Bo Wen <wenbo@genomics.cn>, Shaohang Xu <xsh.skye@gmail.com>
-
-1 error  | 1 warning  | 3 notes
-
-```
-checking examples ... ERROR
-Running examples in ‘PGA-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: PrepareAnnotationEnsembl2
-> ### Title: Prepare annotation from ENSEMBL
-> ### Aliases: PrepareAnnotationEnsembl2
-> 
-> ### ** Examples
-... 29 lines ...
-8: Entity 'hellip' not defined
-9: Entity 'hellip' not defined
-10: Entity 'hellip' not defined
-11: Opening and ending tag mismatch: img line 68 and li
-12: Opening and ending tag mismatch: li line 68 and ul
-13: Opening and ending tag mismatch: ul line 67 and div
-14: Entity 'copy' not defined
-15: Opening and ending tag mismatch: div line 19 and body
-16: Opening and ending tag mismatch: body line 17 and html
-17: Premature end of data in tag html line 2
-Execution halted
-
-checking whether package ‘PGA’ can be installed ... WARNING
-Found the following significant warnings:
-  Warning: replacing previous import ‘data.table::shift’ by ‘IRanges::shift’ when loading ‘PGA’
-See ‘/home/muelleki/git/R/RSQLite/revdep/checks/PGA.Rcheck/00install.out’ for details.
-
-checking installed package size ... NOTE
-  installed size is  5.6Mb
-  sub-directories of 1Mb or more:
-    extdata   1.8Mb
-
-checking dependencies in R code ... NOTE
-Unexported objects imported by ':::' calls:
-  ‘biomaRt:::martBM’ ‘biomaRt:::martDataset’ ‘biomaRt:::martHost’
-  ‘customProDB:::makeTranscriptDbFromBiomart_archive’
-  See the note in ?`:::` about the use of this operator.
-
-checking R code for possible problems ... NOTE
-.base_transfer: no visible global function definition for ‘read.delim’
-.base_transfer: no visible binding for global variable ‘peptide’
-.base_transfer: no visible binding for global variable ‘refbase’
-.base_transfer: no visible binding for global variable ‘varbase’
-.base_transfer: no visible binding for global variable ‘aaref’
-.base_transfer: no visible binding for global variable ‘aavar’
-.base_transfer: no visible binding for global variable ‘Type’
-.base_transfer: no visible binding for global variable ‘Freq’
-.get_30aa_splited_seq: no visible global function definition for ‘.’
-... 301 lines ...
-  setNames subseq text transcript tx_name txid txname varbase
-  write.table writeXStringSet x xyz y
-Consider adding
-  importFrom("grDevices", "colorRampPalette", "dev.off", "pdf", "png",
-             "rainbow")
-  importFrom("graphics", "abline", "axTicks", "axis", "barplot", "box",
-             "clip", "hist", "lines", "mtext", "par", "pie", "plot",
-             "points", "rug", "text")
-  importFrom("stats", "density", "rt", "setNames")
-  importFrom("utils", "read.delim", "read.table", "write.table")
-to your NAMESPACE file.
-```
-
-## plethy (1.10.0)
+## plethy (1.12.0)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
 2 errors | 1 warning  | 3 notes
@@ -1334,7 +1249,7 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## recoup (1.0.2)
+## recoup (1.2.0)
 Maintainer: Panagiotis Moulos <moulos@fleming.gr>
 
 2 errors | 0 warnings | 1 note 
@@ -1385,26 +1300,26 @@ areColors : <anonymous>: no visible global function definition for
   ‘col2rgb’
 buildAnnotationStore: no visible global function definition for
   ‘Seqinfo’
+calcCoverage: no visible global function definition for ‘is’
 calcDesignPlotProfiles : <anonymous>: no visible global function
   definition for ‘smooth.spline’
 calcPlotProfiles : <anonymous>: no visible global function definition
   for ‘smooth.spline’
-cmclapply: no visible global function definition for ‘mclapply’
-... 85 lines ...
-  seqlevels seqlevels<- sexon smooth.spline spline subjectHits tiff
-  unzip var
+... 94 lines ...
 Consider adding
   importFrom("grDevices", "bmp", "col2rgb", "dev.new", "dev.off", "jpeg",
              "pdf", "png", "postscript", "tiff")
   importFrom("graphics", "plot")
+  importFrom("methods", "as", "is")
   importFrom("stats", "approx", "kmeans", "lowess", "quantile",
              "smooth.spline", "spline", "var")
   importFrom("utils", "download.file", "packageVersion", "read.delim",
              "unzip")
-to your NAMESPACE file.
+to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
+contains 'methods').
 ```
 
-## RImmPort (1.0.2)
+## RImmPort (1.2.0)
 Maintainer: Ravi Shankar <rshankar@stanford.edu>
 
 0 errors | 1 warning  | 1 note 
@@ -1412,7 +1327,7 @@ Maintainer: Ravi Shankar <rshankar@stanford.edu>
 ```
 checking sizes of PDF files under ‘inst/doc’ ... WARNING
   ‘gs+qpdf’ made some significant size reductions:
-     compacted ‘RImmPort_Article.pdf’ from 761Kb to 336Kb
+     compacted ‘RImmPort_Article.pdf’ from 731Kb to 336Kb
   consider running tools::compactPDF(gs_quality = "ebook") on these files
 
 checking R code for possible problems ... NOTE
@@ -1449,28 +1364,23 @@ Packages which this enhances but not available for checking:
   ‘rjpod’ ‘d3Network’
 ```
 
-## specL (1.6.2)
+## specL (1.8.0)
 Maintainer: Christian Panse <cp@fgcz.ethz.ch>, Witold E. Wolski <wewolski@gmail.com>  
 Bug reports: https://github.com/fgcz/specL/issues
 
-0 errors | 1 warning  | 4 notes
+0 errors | 1 warning  | 3 notes
 
 ```
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because cdsw.Rmd appears to be an R Markdown v2 document.
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
 Quitting from lines 2-25 (cdsw.Rmd) 
 Error: processing vignette 'cdsw.Rmd' failed with diagnostics:
 could not find function "doc_date"
 Execution halted
 
-
-checking for hidden files and directories ... NOTE
-Found the following hidden files and directories:
-  .travis.yml
-These were most likely included in error. See section ‘Package
-structure’ in the ‘Writing R Extensions’ manual.
 
 checking S3 generic/method consistency ... NOTE
 Found the following apparent S3 methods exported but not registered:
@@ -1479,11 +1389,15 @@ See section ‘Registering S3 methods’ in the ‘Writing R Extensions’
 manual.
 
 checking R code for possible problems ... NOTE
+.onAttach: no visible global function definition for ‘packageVersion’
 plot,specLSet: no visible global function definition for ‘draw.circle’
 summary,specLSet : <anonymous>: no visible binding for global variable
   ‘iRTpeptides’
 Undefined global functions or variables:
-  draw.circle iRTpeptides
+  draw.circle iRTpeptides packageVersion
+Consider adding
+  importFrom("utils", "packageVersion")
+to your NAMESPACE file.
 
 checking Rd files ... NOTE
 prepare_Rd: ms1.p2069.Rd:28-32: Dropping empty section \references
@@ -1541,22 +1455,28 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## TFBSTools (1.10.4)
+## TFBSTools (1.12.1)
 Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>  
 Bug reports: https://github.com/ge11232002/TFBSTools/issues
 
-0 errors | 1 warning  | 1 note 
+0 errors | 1 warning  | 2 notes
 
 ```
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because TFBSTools.Rmd appears to be an R Markdown v2 document.
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
 Quitting from lines 2-16 (TFBSTools.Rmd) 
 Error: processing vignette 'TFBSTools.Rmd' failed with diagnostics:
 could not find function "doc_date"
 Execution halted
 
+
+checking installed package size ... NOTE
+  installed size is 12.1Mb
+  sub-directories of 1Mb or more:
+    R  11.3Mb
 
 checking dependencies in R code ... NOTE
 Unexported objects imported by ':::' calls:
@@ -1564,8 +1484,41 @@ Unexported objects imported by ':::' calls:
   See the note in ?`:::` about the use of this operator.
 ```
 
-## trackeR (0.0.3)
-Maintainer: Hannah Frick <h.frick@ucl.ac.uk>
+## tigreBrowserWriter (0.1.2)
+Maintainer: Antti Honkela <antti.honkela@helsinki.fi>  
+Bug reports: https://github.com/PROBIC/tigreBrowserWriter/issues
+
+1 error  | 0 warnings | 0 notes
+
+```
+checking examples ... ERROR
+Running examples in ‘tigreBrowserWriter-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: closeDb
+> ### Title: Finalise and close the database
+> ### Aliases: closeDb
+> 
+> ### ** Examples
+> 
+>   db <- initializeDb("", "My Dataset")
+Warning: RSQLite::dbGetPreparedQuery() is deprecated, please switch to DBI::dbGetQuery(params = bind.data).
+Warning: Named parameters not used in query: name, species, source, platform, desc, save_location, figure_filename
+Warning: Named parameters not used in query: dname
+>   # ...
+>   closeDb(db)
+Warning: Named parameters not used in query: parent_id, name
+Warning: Named parameters not used in query: name, parent_id
+Error in eval(substitute(expr), envir, enclos) : 
+  Query requires 1 params; 2 supplied.
+Calls: closeDb ... <Anonymous> -> db_bind -> rsqlite_bind_rows -> .Call
+Execution halted
+```
+
+## trackeR (0.0.4)
+Maintainer: Hannah Frick <h.frick@ucl.ac.uk>  
+Bug reports: https://github.com/hfrick/trackeR/issues
 
 0 errors | 1 warning  | 0 notes
 
@@ -1573,24 +1526,24 @@ Maintainer: Hannah Frick <h.frick@ucl.ac.uk>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning in readLines(con) :
-  incomplete final line found on 'TourDetrackeR.Rmd'
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because TourDetrackeR.Rmd appears to be an R Markdown v2 document.
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
 Loading required package: zoo
 
 Attaching package: 'zoo'
 
+The following objects are masked from 'package:base':
 ... 7 lines ...
-Attaching package: 'trackeR'
 
 The following object is masked from 'package:base':
 
     append
 
 Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=57.157231,-2.104296&zoom=13&size=640x640&scale=2&maptype=terrain&sensor=false
-Quitting from lines 96-97 (TourDetrackeR.Rmd) 
+Quitting from lines 90-91 (TourDetrackeR.Rmd) 
 Error: processing vignette 'TourDetrackeR.Rmd' failed with diagnostics:
-there is no package called 'webshot'
+GeomRasterAnn was built with an incompatible version of ggproto.
+Please reinstall the package that provides this extension.
 Execution halted
 ```
 
@@ -1603,17 +1556,17 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Oct 06, 2016 9:57:32 PM it.bancaditalia.oss.sdmx.util.Configuration init
+Nov 17, 2016 10:44:21 AM it.bancaditalia.oss.sdmx.util.Configuration init
 INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
-Oct 06, 2016 9:57:32 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 17, 2016 10:44:21 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Oct 06, 2016 9:57:32 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 17, 2016 10:44:21 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Oct 06, 2016 9:57:32 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 17, 2016 10:44:21 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 ... 8 lines ...
-Oct 06, 2016 9:57:34 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 17, 2016 10:44:25 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/data/ESTAT,ei_nama_q,1.0/Q.MIO-EUR.NSA.CP.NA-P72.IT
-Oct 06, 2016 9:57:34 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
+Nov 17, 2016 10:44:25 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
 
@@ -1624,34 +1577,28 @@ Error in .local(serIDs, con, ...) :
 Execution halted
 ```
 
-## UniProt.ws (2.12.0)
+## UniProt.ws (2.14.0)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-0 errors | 1 warning  | 1 note 
+1 error  | 0 warnings | 1 note 
 
 ```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-
-    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
-    clusterExport, clusterMap, parApply, parCapply, parLapply,
-    parLapplyLB, parRapply, parSapply, parSapplyLB
-
-The following objects are masked from ‘package:stats’:
-
-... 8 lines ...
-    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int, rank,
-    rbind, rownames, sapply, setdiff, sort, table, tapply, union,
-    unique, unsplit
-
-Warning in file(con, "r") :
-  cannot open URL 'http://www.uniprot.org/uniprot/?query=organism:9606&format=tab&columns=id': HTTP status was '503 Service Unavailable'
-
-Error: processing vignette 'UniProt.ws.Rnw' failed with diagnostics:
- chunk 1 (label = loadPkg) 
-Error in file(con, "r") : cannot open the connection
-Execution halted
+checking tests ... ERROR
+Running the tests in ‘tests/UniProt.ws_unit_tests.R’ failed.
+Last 13 lines of output:
+  UniProt.ws RUnit Tests - 14 test functions, 1 error, 0 failures
+  ERROR in test_select_5: Error in .select(x, keys, columns, keytype) : 
+    No data is available for the keys provided.
+  
+  Test files with failing tests
+  
+     test_select.R 
+       test_select_5 
+  
+  
+  Error in BiocGenerics:::testPackage("UniProt.ws") : 
+    unit tests failed for package UniProt.ws
+  Execution halted
 
 checking R code for possible problems ... NOTE
 .getSomeUniprotGoodies: no visible global function definition for
@@ -1671,20 +1618,16 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## VariantFiltering (1.8.6)
+## VariantFiltering (1.10.0)
 Maintainer: Robert Castelo <robert.castelo@upf.edu>  
 Bug reports: https://github.com/rcastelo/VariantFiltering/issues
 
-0 errors | 3 warnings | 3 notes
+0 errors | 2 warnings | 4 notes
 
 ```
-checking Rd cross-references ... WARNING
-package ‘MafDb.1Kgenomes.phase3.hs37d5’ exists but was not installed under R >= 2.10.0 so xrefs cannot be checked
-Packages unavailable to check Rd xrefs: ‘MafDb.1Kgenomes.phase1.hs37d5’, ‘phastCons100way.UCSC.hg38’
-
 checking sizes of PDF files under ‘inst/doc’ ... WARNING
   ‘gs+qpdf’ made some significant size reductions:
-     compacted ‘usingVariantFiltering.pdf’ from 436Kb to 154Kb
+     compacted ‘usingVariantFiltering.pdf’ from 415Kb to 153Kb
   consider running tools::compactPDF(gs_quality = "ebook") on these files
 
 checking re-building of vignette outputs ... WARNING
@@ -1713,7 +1656,7 @@ Execution halted
 checking installed package size ... NOTE
   installed size is  7.8Mb
   sub-directories of 1Mb or more:
-    R         3.5Mb
+    R         3.6Mb
     extdata   3.5Mb
 
 checking dependencies in R code ... NOTE
@@ -1722,6 +1665,9 @@ Unexported objects imported by ':::' calls:
   'VariantAnnotation:::.consolidateHits'
   'VariantAnnotation:::.returnEmpty'
   See the note in ?`:::` about the use of this operator.
+There are ::: calls to the package's namespace in its code. A package
+  almost never needs to use ::: for its own objects:
+  '.adjustForStrandSense'
 
 checking Rd line widths ... NOTE
 Rd file 'MafDb-class.Rd':
@@ -1733,7 +1679,7 @@ Rd file 'MafDb2-class.Rd':
        ## founder mutation in a regulatory element located within the HERC2 gene inhibiting OCA2 expression.
 
 Rd file 'VariantFilteringParam-class.Rd':
-... 17 lines ...
+... 19 lines ...
 
 Rd file 'autosomalRecessiveHeterozygous.Rd':
   \usage lines wider than 90 characters:
@@ -1745,6 +1691,9 @@ Rd file 'autosomalRecessiveHomozygous.Rd':
                                                                     BPPARAM=bpparam("SerialParam"))
 
 These lines will be truncated in the PDF manual.
+
+checking Rd cross-references ... NOTE
+Package unavailable to check Rd xrefs: ‘phastCons100way.UCSC.hg38’
 ```
 
 ## vmsbase (2.1.3)

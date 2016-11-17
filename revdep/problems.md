@@ -14,25 +14,33 @@
 
 ## Packages
 
-|package  |*  |version    |date       |source                           |
-|:--------|:--|:----------|:----------|:--------------------------------|
-|DBI      |   |0.5-12     |2016-10-06 |Github (rstats-db/DBI@4f00863)   |
-|RSQLite  |   |1.0.0      |2014-10-25 |CRAN (R 3.3.1)                   |
-|testthat |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da) |
+|package   |*  |version    |date       |source                             |
+|:---------|:--|:----------|:----------|:----------------------------------|
+|BH        |   |1.60.0-2   |2016-05-07 |cran (@1.60.0-)                    |
+|DBI       |   |0.5-12     |2016-10-06 |Github (rstats-db/DBI@4f00863)     |
+|DBItest   |   |1.3-10     |2016-10-06 |Github (rstats-db/DBItest@9e87611) |
+|knitr     |   |1.15       |2016-11-09 |cran (@1.15)                       |
+|memoise   |   |1.0.0      |2016-01-29 |CRAN (R 3.3.1)                     |
+|plogr     |   |0.1-1      |2016-09-24 |cran (@0.1-1)                      |
+|Rcpp      |   |0.12.7     |2016-09-05 |cran (@0.12.7)                     |
+|rmarkdown |   |1.1        |2016-10-16 |cran (@1.1)                        |
+|RSQLite   |   |1.0.0      |2014-10-25 |CRAN (R 3.3.1)                     |
+|testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
 
-31 packages with problems
+34 packages with problems
 
 |package            |version  | errors| warnings| notes|
 |:------------------|:--------|------:|--------:|-----:|
 |AnnotationDbi      |1.36.0   |      0|        1|     5|
 |AnnotationHubData  |1.4.0    |      1|        0|     3|
-|AnnotationHub      |2.6.1    |      1|        1|     1|
+|AnnotationHub      |2.6.1    |      0|        1|     1|
 |archivist          |2.1      |      1|        0|     2|
 |ChemmineR          |2.26.0   |      1|        0|     0|
 |clstutils          |1.22.0   |      0|        2|     5|
-|CNEr               |1.10.1   |      1|        2|     2|
+|CNEr               |1.10.1   |      0|        2|     2|
+|ecd                |0.8.2    |      1|        0|     0|
 |filematrix         |1.1.0    |      0|        1|     0|
 |gcbd               |0.2.6    |      0|        1|     1|
 |GeneAnswers        |2.16.0   |      1|        3|     6|
@@ -45,16 +53,18 @@
 |oligoClasses       |1.36.0   |      0|        1|     4|
 |oligo              |1.38.0   |      1|        0|     9|
 |PAnnBuilder        |1.38.0   |      0|        3|     1|
-|plethy             |1.12.0   |      2|        0|     3|
+|plethy             |1.12.0   |      2|        1|     3|
+|poplite            |0.99.16  |      1|        0|     1|
 |recoup             |1.2.0    |      2|        0|     1|
 |RImmPort           |1.2.0    |      0|        1|     1|
 |RQDA               |0.2-7    |      1|        0|     1|
 |specL              |1.8.0    |      0|        1|     3|
-|sqldf              |0.4-10   |      0|        1|     2|
+|sqldf              |0.4-10   |      1|        1|     2|
 |TFBSTools          |1.12.1   |      0|        1|     2|
+|tigreBrowserWriter |0.1.2    |      1|        0|     0|
 |trackeR            |0.0.4    |      0|        1|     0|
 |TSdata             |2016.8-1 |      0|        1|     0|
-|UniProt.ws         |2.14.0   |      2|        0|     1|
+|UniProt.ws         |2.14.0   |      1|        0|     1|
 |VariantFiltering   |1.10.0   |      0|        2|     4|
 |vmsbase            |2.1.3    |      1|        0|     0|
 
@@ -116,12 +126,12 @@ Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 checking tests ... ERROR
 Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
 Last 13 lines of output:
+  ERROR in test_UCSCChainPreparer_recipe: Error : 1: Unknown IO error2: failed to load external entity "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=&retmax=0"
   
   
   Test files with failing tests
   
      test_recipe.R 
-       test_EncodeImportPreparer_recipe 
        test_UCSC2BitPreparer_recipe 
        test_UCSCChainPreparer_recipe 
   
@@ -166,26 +176,9 @@ See section ‘Good practice’ in ‘?data’.
 ## AnnotationHub (2.6.1)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-1 error  | 1 warning  | 1 note 
+0 errors | 1 warning  | 1 note 
 
 ```
-checking tests ... ERROR
-Running the tests in ‘tests/runTests.R’ failed.
-Last 13 lines of output:
-  FAILURE in test_tidyGRanges: Error in checkIdentical(setNames(rep(c(FALSE, TRUE), c(4, 1)), chr), GenomeInfoDb::isCircular(gr1)) : 
-    FALSE 
-   
-  
-  Test files with failing tests
-  
-     test_tidyGRanges.R 
-       test_tidyGRanges 
-  
-  
-  Error in BiocGenerics:::testPackage("AnnotationHub") : 
-    unit tests failed for package AnnotationHub
-  Execution halted
-
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
@@ -328,32 +321,9 @@ to your NAMESPACE file.
 Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>  
 Bug reports: https://github.com/ge11232002/CNEr/issues
 
-1 error  | 2 warnings | 2 notes
+0 errors | 2 warnings | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘CNEr-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: syntenicDotplot-methods
-> ### Title: Syntenic dotplot
-> ### Aliases: syntenicDotplot syntenicDotplot,Axt-method
-> ###   syntenicDotplot,GRangePairs-method
-> 
-... 35 lines ...
-    colMeans, colSums, expand.grid, rowMeans, rowSums
-
-Loading required package: IRanges
->   
->   ## dotplot for Axt object
->   fn <- file.path(system.file("extdata", package="CNEr"),
-+                   "chr4.hg19.galGal3.net.axt.gz")
->   axt <- readAxt(fn)
-The number of axt files 1
-Unexpected end of file in /home/muelleki/git/R/RSQLite/revdep/checks/CNEr.Rcheck/CNEr/extdata/chr4.hg19.galGal3.net.axt.gz
-** found \donttest examples: check also with --run-donttest
-
 checking compiled code ... WARNING
 File ‘CNEr/libs/CNEr.so’:
   Found ‘abort’, possibly from ‘abort’ (C)
@@ -398,6 +368,19 @@ checking dependencies in R code ... NOTE
 Unexported objects imported by ':::' calls:
   ‘BiocGenerics:::replaceSlots’ ‘S4Vectors:::make_zero_col_DataFrame’
   See the note in ?`:::` about the use of this operator.
+```
+
+## ecd (0.8.2)
+Maintainer: Stephen H-T. Lihn <stevelihn@gmail.com>
+
+1 error  | 0 warnings | 0 notes
+
+```
+checking package dependencies ... ERROR
+Package required and available but unsuitable version: ‘RSQLite’
+
+See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
+manual.
 ```
 
 ## filematrix (1.1.0)
@@ -586,7 +569,7 @@ checking dependencies in R code ... WARNING
 checking installed package size ... NOTE
   installed size is  6.8Mb
   sub-directories of 1Mb or more:
-    R      2.9Mb
+    R      2.8Mb
     data   3.6Mb
 
 checking Rd line widths ... NOTE
@@ -958,7 +941,7 @@ Packages which this enhances but not available for checking: ‘doMC’ ‘doMPI
 checking installed package size ... NOTE
   installed size is 30.3Mb
   sub-directories of 1Mb or more:
-    R         1.1Mb
+    R         1.2Mb
     doc      12.9Mb
     scripts  15.7Mb
 
@@ -1083,16 +1066,16 @@ See section ‘Good practice’ in ‘?data’.
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-             if(length(xx) > 0){
-                     # Get the value of the first key
-                     xx[[1]]
-                     # Get the values for a few keys
-                     if(length(xx) >= 3){
-                             xx[1:3]
-                     }
-... 8 lines ...
+             }
+     
 
-Warning in .local(conn, ...) : Closing open result set
+trying URL 'http://gpcr2.biocomp.unibo.it/bacello/dataset.htm'
+Content type 'text/html; charset=iso-8859-1' length 5062 bytes
+==================================================
+downloaded 5062 bytes
+... 8 lines ...
+Warning in rsqlite_disconnect(conn@ptr) :
+  There are 1 result in use. The connection will be released when they are closed
 Error in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  : 
   Running 'texi2dvi' on 'PAnnBuilder.tex' failed.
 LaTeX errors:
@@ -1112,7 +1095,7 @@ A package should be listed in only one of these fields.
 ## plethy (1.12.0)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
-2 errors | 0 warnings | 3 notes
+2 errors | 1 warning  | 3 notes
 
 ```
 checking examples ... ERROR
@@ -1120,40 +1103,63 @@ Running examples in ‘plethy-Ex.R’ failed
 The error most likely occurred in:
 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: Utility functions
-> ### Title: Utility functions to assist with QA/QC and analysis of
-> ###   plethysmography data
-> ### Aliases: add.labels.by.sample get.err.breaks adjust.labels proc.sanity
-> ### Keywords: Utilities
-... 21 lines ...
-> temp.db.file <- tempfile()
-> write(sim.bux.lines, file=temp.file)
-> test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
-Processing /tmp/Rtmpf2YN2e/filef8d73fc62d52 in chunks of 10000
-Starting chunk 1
-Reached breakpoint change
-Processing breakpoint 1
-Starting sample sample_1
-Error in if (sum(which.gt) > 0) { : missing value where TRUE/FALSE needed
-Calls: parse.buxco ... write.sample.breaks -> write.sample.db -> sanity.check.time
+> ### Name: BuxcoDB-class
+> ### Title: Class '"BuxcoDB"'
+> ### Aliases: BuxcoDB-class BuxcoDB addAnnotation,BuxcoDB-method
+> ###   addAnnotation annoTable,BuxcoDB-method annoTable
+> ###   annoCols,BuxcoDB-method annoCols annoLevels,BuxcoDB-method annoLevels
+... 53 lines ...
+> 
+> tables(bux.db)
+[1] "WBPth"
+> 
+> variables(bux.db)
+ [1] "f"     "TVb"   "MVb"   "Penh"  "PAU"   "Rpef"  "Comp"  "PIFb"  "PEFb" 
+[10] "Ti"    "Te"    "EF50"  "Tr"    "Tbody" "Tc"    "RH"    "Rinx" 
+> 
+> addAnnotation(bux.db, query=day.infer.query, index=FALSE)
+Error: is.null(dbGetQuery(db.con, i)) is not TRUE
 Execution halted
 
 checking tests ... ERROR
 Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
-  
-     test_check_helpers.R 
-       test.add.labels.by.sample 
+       test.db.insert.autoincrement 
        test.dbImport 
+       test.examine.table.lines 
        test.get.err.breaks 
+       test.parse.buxco 
+       test.retrieveData 
        test.summaryMeasures 
+       test.write.sample.db 
   
   
   Error in BiocGenerics:::testPackage("plethy") : 
     unit tests failed for package plethy
-  In addition: Warning message:
-  closing unused connection 3 (/tmp/RtmpLi3x4U/filef9754bd648c8) 
   Execution halted
+
+checking re-building of vignette outputs ... WARNING
+Error in re-building vignettes:
+  ...
+
+    IQR, mad, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    Filter, Find, Map, Position, Reduce, anyDuplicated, append, as.data.frame,
+    cbind, colnames, do.call, duplicated, eval, evalq, get, grep, grepl,
+... 8 lines ...
+Attaching package: ‘S4Vectors’
+
+The following objects are masked from ‘package:base’:
+
+    colMeans, colSums, expand.grid, rowMeans, rowSums
+
+
+Error: processing vignette 'plethy.Rnw' failed with diagnostics:
+ chunk 3 
+Error : is.null(dbGetQuery(db.con, query.list[[i]])) is not TRUE
+Execution halted
 
 checking dependencies in R code ... NOTE
 There are ::: calls to the package's namespace in its code. A package
@@ -1199,6 +1205,48 @@ Rd file 'utilities.Rd':
      sample.labels <- data.frame(samples=c("sample_1","sample_3"), response_type=c("high", "low"),stringsAsFactors=FALSE)
 
 These lines will be truncated in the PDF manual.
+```
+
+## poplite (0.99.16)
+Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
+
+1 error  | 0 warnings | 1 note 
+
+```
+checking tests ... ERROR
+Running the tests in ‘tests/testthat.R’ failed.
+Last 13 lines of output:
+  1. Failure: createTable (@test-poplite.R#252) 
+  2. Failure: createTable (@test-poplite.R#252) 
+  3. Failure: createTable (@test-poplite.R#252) 
+  4. Failure: createTable (@test-poplite.R#252) 
+  5. Failure: insertStatement (@test-poplite.R#330) 
+  6. Failure: insertStatement (@test-poplite.R#350) 
+  7. Failure: insertStatement (@test-poplite.R#330) 
+  8. Failure: insertStatement (@test-poplite.R#350) 
+  9. Failure: insertStatement (@test-poplite.R#330) 
+  1. ...
+  
+  Error: testthat unit tests failed
+  Execution halted
+
+checking R code for possible problems ... NOTE
+filter_.Database: no visible global function definition for ‘stack’
+get.starting.point : <anonymous>: no visible global function definition
+  for ‘na.omit’
+select_.Database: no visible global function definition for ‘stack’
+tsl.to.graph: no visible global function definition for ‘stack’
+join,Database: no visible global function definition for ‘stack’
+join,Database : .get.select.cols: no visible global function definition
+  for ‘setNames’
+join,Database: no visible binding for global variable ‘new.ancil’
+join,Database: no visible global function definition for ‘setNames’
+Undefined global functions or variables:
+  na.omit new.ancil setNames stack
+Consider adding
+  importFrom("stats", "na.omit", "setNames")
+  importFrom("utils", "stack")
+to your NAMESPACE file.
 ```
 
 ## recoup (1.2.0)
@@ -1360,9 +1408,32 @@ prepare_Rd: ms1.p2069.Rd:23-26: Dropping empty section \examples
 Maintainer: G. Grothendieck <ggrothendieck@gmail.com>  
 Bug reports: http://groups.google.com/group/sqldf
 
-0 errors | 1 warning  | 2 notes
+1 error  | 1 warning  | 2 notes
 
 ```
+checking examples ... ERROR
+Running examples in ‘sqldf-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: sqldf
+> ### Title: SQL select on data frames
+> ### Aliases: sqldf
+> ### Keywords: manip
+> 
+... 6 lines ...
+> # in R without SQL and then again with SQL
+> #
+> 
+> # head
+> a1r <- head(warpbreaks)
+> a1s <- sqldf("select * from warpbreaks limit 6")
+Loading required package: tcltk
+Error in eval(substitute(expr), envir, enclos) : 
+  no such table: warpbreaks
+Calls: sqldf ... initialize -> initialize -> rsqlite_send_query -> .Call
+Execution halted
+
 checking whether package ‘sqldf’ can be installed ... WARNING
 Found the following significant warnings:
   Warning: no DISPLAY variable so Tk is not available
@@ -1413,6 +1484,38 @@ Unexported objects imported by ':::' calls:
   See the note in ?`:::` about the use of this operator.
 ```
 
+## tigreBrowserWriter (0.1.2)
+Maintainer: Antti Honkela <antti.honkela@helsinki.fi>  
+Bug reports: https://github.com/PROBIC/tigreBrowserWriter/issues
+
+1 error  | 0 warnings | 0 notes
+
+```
+checking examples ... ERROR
+Running examples in ‘tigreBrowserWriter-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: closeDb
+> ### Title: Finalise and close the database
+> ### Aliases: closeDb
+> 
+> ### ** Examples
+> 
+>   db <- initializeDb("", "My Dataset")
+Warning: RSQLite::dbGetPreparedQuery() is deprecated, please switch to DBI::dbGetQuery(params = bind.data).
+Warning: Named parameters not used in query: name, species, source, platform, desc, save_location, figure_filename
+Warning: Named parameters not used in query: dname
+>   # ...
+>   closeDb(db)
+Warning: Named parameters not used in query: parent_id, name
+Warning: Named parameters not used in query: name, parent_id
+Error in eval(substitute(expr), envir, enclos) : 
+  Query requires 1 params; 2 supplied.
+Calls: closeDb ... <Anonymous> -> db_bind -> rsqlite_bind_rows -> .Call
+Execution halted
+```
+
 ## trackeR (0.0.4)
 Maintainer: Hannah Frick <h.frick@ucl.ac.uk>  
 Bug reports: https://github.com/hfrick/trackeR/issues
@@ -1453,17 +1556,17 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Nov 17, 2016 8:48:57 AM it.bancaditalia.oss.sdmx.util.Configuration init
+Nov 17, 2016 10:44:21 AM it.bancaditalia.oss.sdmx.util.Configuration init
 INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
-Nov 17, 2016 8:48:57 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 17, 2016 10:44:21 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 17, 2016 8:48:58 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 17, 2016 10:44:21 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 17, 2016 8:48:58 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 17, 2016 10:44:21 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 ... 8 lines ...
-Nov 17, 2016 8:49:00 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 17, 2016 10:44:25 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/data/ESTAT,ei_nama_q,1.0/Q.MIO-EUR.NSA.CP.NA-P72.IT
-Nov 17, 2016 8:49:00 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
+Nov 17, 2016 10:44:25 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
 
@@ -1477,43 +1580,20 @@ Execution halted
 ## UniProt.ws (2.14.0)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-2 errors | 0 warnings | 1 note 
+1 error  | 0 warnings | 1 note 
 
 ```
-checking examples ... ERROR
-Running examples in ‘UniProt.ws-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: UniProt.ws-objects
-> ### Title: UniProt.ws objects and their related methods and functions
-> ### Aliases: UniProt.ws class:UniProt.ws UniProt.ws-class
-> ###   show,UniProt.ws-method species species,UniProt.ws-method taxId
-> ###   taxId,UniProt.ws-method taxId<- taxId<-,UniProt.ws-method cols
-... 72 lines ...
-> 
-> ## use select to extract some data
-> res <- select(up, 
-+               keys = c("22627","22629"), 
-+               columns = c("PDB","UNIGENE","SEQUENCE"),
-+               keytype = "ENTREZ_GENE")
-Getting mapping data for 22627 ... and ACC
-Error in .select(x, keys, columns, keytype) : 
-  No data is available for the keys provided.
-Calls: select -> select -> .select
-Execution halted
-
 checking tests ... ERROR
 Running the tests in ‘tests/UniProt.ws_unit_tests.R’ failed.
 Last 13 lines of output:
-  UniProt.ws RUnit Tests - 14 test functions, 0 errors, 1 failure
-  FAILURE in test_mapUniprot: Error in checkTrue(res[1, 1] == "P13368") : Test not TRUE
-  
+  UniProt.ws RUnit Tests - 14 test functions, 1 error, 0 failures
+  ERROR in test_select_5: Error in .select(x, keys, columns, keytype) : 
+    No data is available for the keys provided.
   
   Test files with failing tests
   
-     test_serviceAccessors.R 
-       test_mapUniprot 
+     test_select.R 
+       test_select_5 
   
   
   Error in BiocGenerics:::testPackage("UniProt.ws") : 
@@ -1553,19 +1633,19 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
+Loading required package: Biostrings
+Loading required package: XVector
 
 Attaching package: ‘VariantAnnotation’
 
 The following object is masked from ‘package:base’:
 
-    tabulate
-
 ... 8 lines ...
-Error in sqliteSendQuery(con, statement, bind.data) : 
-  error in statement: database disk image is malformed
+Error in eval(expr, envir, enclos) : database disk image is malformed
+Error in eval(expr, envir, enclos) : database disk image is malformed
 Error : .onLoad failed in loadNamespace() for 'MafDb.1Kgenomes.phase3.hs37d5', details:
-  call: sqliteSendQuery(con, statement, bind.data)
-  error: error in statement: database disk image is malformed
+  call: eval(expr, envir, enclos)
+  error: database disk image is malformed
 
 Error: processing vignette 'usingVariantFiltering.Rnw' failed with diagnostics:
  chunk 3 
@@ -1574,7 +1654,7 @@ Error in VariantFilteringParam(vcfFilenames = CEUvcf) :
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  7.9Mb
+  installed size is  7.8Mb
   sub-directories of 1Mb or more:
     R         3.6Mb
     extdata   3.5Mb

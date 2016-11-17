@@ -1,4 +1,4 @@
-#' A sample sqlite database.
+#' A sample sqlite database
 #'
 #' This database is bundled with the package, and contains all data frames
 #' in the datasets package.

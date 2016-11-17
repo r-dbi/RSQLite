@@ -28,10 +28,10 @@ db <- dbConnect(RSQLite::SQLite(), ":memory:")
 sqliteCopyDatabase(datasetsDb(), db)
 dbListTables(db)
 }
-\author{
-Seth Falcon
-}
 \references{
 \url{http://www.sqlite.org/backup.html}
+}
+\author{
+Seth Falcon
 }
 

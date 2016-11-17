@@ -3,7 +3,7 @@
 \docType{methods}
 \name{dbListFields,SQLiteConnection,character-method}
 \alias{dbListFields,SQLiteConnection,character-method}
-\title{List fields in specified table.}
+\title{List fields in specified table}
 \usage{
 \S4method{dbListFields}{SQLiteConnection,character}(conn, name, ...)
 }
@@ -15,7 +15,7 @@
 \item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \description{
-List fields in specified table.
+List fields in specified table
 }
 \examples{
 con <- dbConnect(SQLite())

@@ -25,9 +25,6 @@ SQLite <- function(...) {
   new("SQLiteDriver")
 }
 
-#' @export
-DBI::dbDriver
-
 # From https://www.sqlite.org/c3ref/c_open_autoproxy.html
 #' @export
 SQLITE_RW <-  0x00000002L

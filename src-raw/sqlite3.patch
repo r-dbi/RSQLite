@@ -1,0 +1,17 @@
+diff --git a/src/sqlite3/sqlite3.h b/src/sqlite3/sqlite3.h
+index 37d1024..0f55423 100644
+--- a/src/sqlite3/sqlite3.h
++++ b/src/sqlite3/sqlite3.h
+@@ -248,8 +248,11 @@ typedef struct sqlite3 sqlite3;
+ ** between 0 and +18446744073709551615 inclusive.
+ */
+ #ifdef SQLITE_INT64_TYPE
++  #ifndef SQLITE_UINT64_TYPE
++  #define SQLITE_UINT64_TYPE unsigned SQLITE_INT64_TYPE
++  #endif
+   typedef SQLITE_INT64_TYPE sqlite_int64;
+-  typedef unsigned SQLITE_INT64_TYPE sqlite_uint64;
++  typedef SQLITE_UINT64_TYPE sqlite_uint64;
+ #elif defined(_MSC_VER) || defined(__BORLANDC__)
+   typedef __int64 sqlite_int64;
+   typedef unsigned __int64 sqlite_uint64;

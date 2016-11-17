@@ -1,3 +1,10 @@
+## RSQLite 1.0.9015 (2016-11-17)
+
+- Tweak documentation.
+- Prepare online documentation via `pkgdown`.
+- Improve performance of binding data frames (#181).
+
+
 ## RSQLite 1.0.9014 (2016-10-06)
 
 - `dbWriteTable()` supports `temporary` argument, default `FALSE` (#113).

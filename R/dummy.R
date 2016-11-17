@@ -4,7 +4,8 @@
 #' Recommended practice is to import all methods from \pkg{DBI}.
 #'
 #' @name dummy-methods
-
+#' @keywords internal
+NULL
 
 #' @rdname dummy-methods
 #' @aliases dbGetQuery,NULL,ANY-method

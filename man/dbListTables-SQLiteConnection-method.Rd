@@ -3,7 +3,7 @@
 \docType{methods}
 \name{dbListTables,SQLiteConnection-method}
 \alias{dbListTables,SQLiteConnection-method}
-\title{List available SQLite tables.}
+\title{List available SQLite tables}
 \usage{
 \S4method{dbListTables}{SQLiteConnection}(conn, ...)
 }
@@ -13,6 +13,6 @@
 \item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \description{
-List available SQLite tables.
+List available SQLite tables
 }
 

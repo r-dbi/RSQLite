@@ -22,6 +22,10 @@ private:
     static std::vector<std::string> get_column_names(sqlite3_stmt* stmt);
   } cache;
 
+  struct _param_cache {
+    std::vector<std::string> names_;
+  } param_cache;
+
   // State
   bool complete_;
   bool ready_;
@@ -52,6 +56,7 @@ public:
   List get_column_info_impl();
 
 private:
+  void set_params(const List& params);
   bool bind_row();
   void bind_parameter(int j, const std::string& name, SEXP values_);
   int find_parameter(const std::string& name);

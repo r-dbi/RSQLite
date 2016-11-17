@@ -1,4 +1,4 @@
-#' Add useful extension functions.
+#' Add useful extension functions
 #'
 #' These extension functions are written by Liam Healy and made available
 #' through the SQLite website (\url{http://www.sqlite.org/contrib}).

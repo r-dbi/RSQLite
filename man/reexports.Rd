@@ -2,9 +2,10 @@
 % Please edit documentation in R/connect.R, R/query.R
 \docType{import}
 \name{reexports}
-\alias{dbDriver}
-\alias{dbGetQuery}
 \alias{reexports}
+\alias{dbDriver}
+\alias{reexports}
+\alias{dbGetQuery}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{

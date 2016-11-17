@@ -20,4 +20,5 @@
 Define here so that these methods can also be imported from this package.
 Recommended practice is to import all methods from \pkg{DBI}.
 }
+\keyword{internal}
 

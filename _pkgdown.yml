@@ -3,26 +3,37 @@ templates:
     bootswatch: flatly # https://bootswatch.com/flatly/
 
 reference:
-  - title: Classes
-    contents:
-    - matches("-class$")
-
   - title: Driver methods
     contents:
     - matches("^[^,]+,SQLiteDriver")
+    - initExtension
+    - rsqliteVersion
+    exclude:
+    - ends_with("-class")
+    - dbGetInfo
 
   - title: Connection methods
     contents:
     - matches("^[^,]+,SQLiteConnection")
+    - sqliteCopyDatabase
     exclude:
+    - ends_with("-class")
+    - dbGetInfo
+    - starts_with("dbListResults")
     - query-dep
+    - starts_with("SQLKeywords")
 
   - title: Result methods
     contents:
     - matches("[^,]+,SQLiteResult")
     exclude:
+    - ends_with("-class")
     - starts_with("fetch")
     - query-dep
+
+  - title: Example data
+    contents:
+    - datasetsDb
 
 navbar:
   type: default

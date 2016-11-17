@@ -1,7 +1,7 @@
 #' @include SQLiteConnection.R
 NULL
 
-#' Generics for getting and sending prepared queries
+#' @rdname query-dep
 #'
 #' @param conn A `DBIConnection` object.
 #' @param statement A SQL string
@@ -12,7 +12,7 @@ setGeneric("dbSendPreparedQuery", function(conn, statement, bind.data, ...) {
   standardGeneric("dbSendPreparedQuery")
 })
 
-#' @rdname dbSendPreparedQuery
+#' @rdname query-dep
 #' @export
 setGeneric("dbGetPreparedQuery", function(conn, statement, bind.data, ...) {
   standardGeneric("dbGetPreparedQuery")

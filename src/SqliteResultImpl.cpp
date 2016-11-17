@@ -202,7 +202,7 @@ bool SqliteResultImpl::bind_row() {
   sqlite3_reset(stmt);
   sqlite3_clear_bindings(stmt);
 
-  for (int j = 0; j < param_cache.names_.size(); ++j) {
+  for (size_t j = 0; j < param_cache.names_.size(); ++j) {
     bind_parameter(j, param_cache.names_[j], params_[j]);
   }
 

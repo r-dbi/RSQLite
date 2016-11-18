@@ -4,13 +4,13 @@
 
 |setting  |value                        |
 |:--------|:----------------------------|
-|version  |R version 3.3.1 (2016-06-21) |
+|version  |R version 3.3.2 (2016-10-31) |
 |system   |x86_64, linux-gnu            |
 |ui       |X11                          |
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Universal                    |
-|date     |2016-11-17                   |
+|date     |2016-11-18                   |
 
 ## Packages
 
@@ -37,7 +37,7 @@
 |AnnotationDbi      |1.36.0    |      0|        1|     5|
 |AnnotationForge    |1.16.0    |      0|        0|     2|
 |AnnotationHubData  |1.4.0     |      1|        0|     3|
-|AnnotationHub      |2.6.1     |      0|        1|     1|
+|AnnotationHub      |2.6.2     |      0|        0|     1|
 |APSIM              |0.9.1     |      0|        0|     0|
 |archivist          |2.1       |      1|        0|     2|
 |BatchExperiments   |1.4.1     |      0|        0|     2|
@@ -62,13 +62,13 @@
 |dplyr              |0.5.0     |      0|        0|     1|
 |ecd                |0.8.2     |      1|        0|     0|
 |emuR               |0.2.0     |      0|        0|     0|
-|ensembldb          |1.6.1     |      0|        0|     2|
+|ensembldb          |1.6.2     |      0|        0|     2|
 |etl                |0.3.4     |      0|        0|     0|
 |ETLUtils           |1.3       |      0|        0|     0|
 |filehashSQLite     |0.2-4     |      0|        0|     3|
 |filematrix         |1.1.0     |      0|        1|     0|
 |freqweights        |1.0.2     |      0|        0|     1|
-|gcbd               |0.2.6     |      0|        1|     1|
+|gcbd               |0.2.6     |      0|        1|     0|
 |GeneAnswers        |2.16.0    |      1|        3|     6|
 |GenomicFeatures    |1.26.0    |      0|        0|     2|
 |Genominator        |1.28.0    |      0|        0|     4|
@@ -143,10 +143,10 @@
 |TSsql              |2015.1-2  |      0|        0|     1|
 |tweet2r            |1.0       |      0|        0|     0|
 |twitteR            |1.1.9     |      0|        0|     0|
-|UniProt.ws         |2.14.0    |      1|        0|     1|
+|UniProt.ws         |2.14.0    |      0|        0|     1|
 |Uniquorn           |1.2.0     |      0|        0|     2|
 |UPMASK             |1.0       |      0|        0|     1|
-|VariantFiltering   |1.10.0    |      0|        2|     4|
+|VariantFiltering   |1.10.0    |      0|        1|     4|
 |vegdata            |0.9       |      0|        0|     0|
 |vmsbase            |2.1.3     |      1|        0|     0|
 
@@ -277,23 +277,12 @@ File ‘AnnotationHubData/R/makeNCBIToOrgDbs.R’:
 See section ‘Good practice’ in ‘?data’.
 ```
 
-## AnnotationHub (2.6.1)
+## AnnotationHub (2.6.2)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-0 errors | 1 warning  | 1 note 
+0 errors | 0 warnings | 1 note 
 
 ```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning in engine$weave(file, quiet = quiet, encoding = enc) :
-  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
-Quitting from lines 41-45 (AnnotationHub-HOWTO.Rmd) 
-Error: processing vignette 'AnnotationHub-HOWTO.Rmd' failed with diagnostics:
-'AH52107' not available in this version of the package; use biocLite() to update?
-Execution halted
-
-
 checking Rd files ... NOTE
 prepare_Rd: listResources.Rd:44-45: Dropping empty section \seealso
 ```
@@ -905,7 +894,7 @@ Bug reports: https://github.com/IPS-LMU/emuR/issues
 
 0 errors | 0 warnings | 0 notes
 
-## ensembldb (1.6.1)
+## ensembldb (1.6.2)
 Maintainer: Johannes Rainer <johannes.rainer@eurac.edu>  
 Bug reports: https://github.com/jotsetung/ensembldb/issues
 
@@ -1029,21 +1018,17 @@ to your NAMESPACE file.
 ## gcbd (0.2.6)
 Maintainer: Dirk Eddelbuettel <edd@debian.org>
 
-0 errors | 1 warning  | 1 note 
+0 errors | 1 warning  | 0 notes
 
 ```
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning in packageDescription("gputools") :
-  no package 'gputools' was found
+Warning in packageDescription("getopt") : no package 'getopt' was found
 Error: processing vignette 'gcbd.Rnw' failed with diagnostics:
-at gcbd.Rnw:860, subscript out of bounds
+at gcbd.Rnw:863, subscript out of bounds
 Execution halted
 
-
-checking package dependencies ... NOTE
-Package suggested but not available for checking: ‘gputools’
 ```
 
 ## GeneAnswers (2.16.0)
@@ -3187,17 +3172,17 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Nov 17, 2016 10:44:21 AM it.bancaditalia.oss.sdmx.util.Configuration init
+Nov 18, 2016 3:53:58 PM it.bancaditalia.oss.sdmx.util.Configuration init
 INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
-Nov 17, 2016 10:44:21 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 18, 2016 3:53:58 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 17, 2016 10:44:21 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 18, 2016 3:53:58 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 17, 2016 10:44:21 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 18, 2016 3:53:58 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 ... 8 lines ...
-Nov 17, 2016 10:44:25 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 18, 2016 3:53:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/data/ESTAT,ei_nama_q,1.0/Q.MIO-EUR.NSA.CP.NA-P72.IT
-Nov 17, 2016 10:44:25 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
+Nov 18, 2016 3:53:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
 
@@ -3245,26 +3230,9 @@ Maintainer: Jeff Gentry <geoffjentry@gmail.com>
 ## UniProt.ws (2.14.0)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-1 error  | 0 warnings | 1 note 
+0 errors | 0 warnings | 1 note 
 
 ```
-checking tests ... ERROR
-Running the tests in ‘tests/UniProt.ws_unit_tests.R’ failed.
-Last 13 lines of output:
-  UniProt.ws RUnit Tests - 14 test functions, 1 error, 0 failures
-  ERROR in test_select_5: Error in .select(x, keys, columns, keytype) : 
-    No data is available for the keys provided.
-  
-  Test files with failing tests
-  
-     test_select.R 
-       test_select_5 
-  
-  
-  Error in BiocGenerics:::testPackage("UniProt.ws") : 
-    unit tests failed for package UniProt.ws
-  Execution halted
-
 checking R code for possible problems ... NOTE
 .getSomeUniprotGoodies: no visible global function definition for
   ‘head’
@@ -3331,36 +3299,13 @@ to your NAMESPACE file.
 Maintainer: Robert Castelo <robert.castelo@upf.edu>  
 Bug reports: https://github.com/rcastelo/VariantFiltering/issues
 
-0 errors | 2 warnings | 4 notes
+0 errors | 1 warning  | 4 notes
 
 ```
 checking sizes of PDF files under ‘inst/doc’ ... WARNING
   ‘gs+qpdf’ made some significant size reductions:
      compacted ‘usingVariantFiltering.pdf’ from 415Kb to 153Kb
   consider running tools::compactPDF(gs_quality = "ebook") on these files
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Loading required package: Biostrings
-Loading required package: XVector
-
-Attaching package: ‘VariantAnnotation’
-
-The following object is masked from ‘package:base’:
-
-... 8 lines ...
-Error in eval(expr, envir, enclos) : database disk image is malformed
-Error in eval(expr, envir, enclos) : database disk image is malformed
-Error : .onLoad failed in loadNamespace() for 'MafDb.1Kgenomes.phase3.hs37d5', details:
-  call: eval(expr, envir, enclos)
-  error: database disk image is malformed
-
-Error: processing vignette 'usingVariantFiltering.Rnw' failed with diagnostics:
- chunk 3 
-Error in VariantFilteringParam(vcfFilenames = CEUvcf) : 
-  package MafDb.1Kgenomes.phase3.hs37d5 could not be loaded.
-Execution halted
 
 checking installed package size ... NOTE
   installed size is  7.8Mb

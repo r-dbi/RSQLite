@@ -4,13 +4,13 @@
 
 |setting  |value                        |
 |:--------|:----------------------------|
-|version  |R version 3.3.1 (2016-06-21) |
+|version  |R version 3.3.2 (2016-10-31) |
 |system   |x86_64, linux-gnu            |
 |ui       |X11                          |
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Universal                    |
-|date     |2016-11-17                   |
+|date     |2016-11-18                   |
 
 ## Packages
 
@@ -22,19 +22,18 @@
 
 # Check results
 
-31 packages with problems
+30 packages with problems
 
 |package            |version  | errors| warnings| notes|
 |:------------------|:--------|------:|--------:|-----:|
 |AnnotationDbi      |1.36.0   |      0|        1|     5|
 |AnnotationHubData  |1.4.0    |      1|        0|     3|
-|AnnotationHub      |2.6.1    |      1|        1|     1|
 |archivist          |2.1      |      1|        0|     2|
 |ChemmineR          |2.26.0   |      1|        0|     0|
 |clstutils          |1.22.0   |      0|        2|     5|
-|CNEr               |1.10.1   |      1|        2|     2|
+|CNEr               |1.10.1   |      0|        2|     2|
 |filematrix         |1.1.0    |      0|        1|     0|
-|gcbd               |0.2.6    |      0|        1|     1|
+|gcbd               |0.2.6    |      0|        1|     0|
 |GeneAnswers        |2.16.0   |      1|        3|     6|
 |lumi               |2.26.3   |      0|        1|     3|
 |maGUI              |1.0      |      1|        0|     0|
@@ -54,8 +53,8 @@
 |TFBSTools          |1.12.1   |      0|        1|     2|
 |trackeR            |0.0.4    |      0|        1|     0|
 |TSdata             |2016.8-1 |      0|        1|     0|
-|UniProt.ws         |2.14.0   |      2|        0|     1|
-|VariantFiltering   |1.10.0   |      0|        2|     4|
+|UniProt.ws         |2.14.0   |      1|        0|     1|
+|VariantFiltering   |1.10.0   |      0|        1|     4|
 |vmsbase            |2.1.3    |      1|        0|     0|
 
 ## AnnotationDbi (1.36.0)
@@ -116,14 +115,14 @@ Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 checking tests ... ERROR
 Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
 Last 13 lines of output:
-  
-  
   Test files with failing tests
   
      test_recipe.R 
-       test_EncodeImportPreparer_recipe 
        test_UCSC2BitPreparer_recipe 
        test_UCSCChainPreparer_recipe 
+  
+     test_webAccessFunctions.R 
+       test_listRemoteFiles 
   
   
   Error in BiocGenerics:::testPackage("AnnotationHubData") : 
@@ -161,44 +160,6 @@ Found the following calls to data() loading into the global environment:
 File ‘AnnotationHubData/R/makeNCBIToOrgDbs.R’:
   data(specData, package = "GenomeInfoDb")
 See section ‘Good practice’ in ‘?data’.
-```
-
-## AnnotationHub (2.6.1)
-Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
-
-1 error  | 1 warning  | 1 note 
-
-```
-checking tests ... ERROR
-Running the tests in ‘tests/runTests.R’ failed.
-Last 13 lines of output:
-  FAILURE in test_tidyGRanges: Error in checkIdentical(setNames(rep(c(FALSE, TRUE), c(4, 1)), chr), GenomeInfoDb::isCircular(gr1)) : 
-    FALSE 
-   
-  
-  Test files with failing tests
-  
-     test_tidyGRanges.R 
-       test_tidyGRanges 
-  
-  
-  Error in BiocGenerics:::testPackage("AnnotationHub") : 
-    unit tests failed for package AnnotationHub
-  Execution halted
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning in engine$weave(file, quiet = quiet, encoding = enc) :
-  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
-Quitting from lines 41-45 (AnnotationHub-HOWTO.Rmd) 
-Error: processing vignette 'AnnotationHub-HOWTO.Rmd' failed with diagnostics:
-'AH52107' not available in this version of the package; use biocLite() to update?
-Execution halted
-
-
-checking Rd files ... NOTE
-prepare_Rd: listResources.Rd:44-45: Dropping empty section \seealso
 ```
 
 ## archivist (2.1)
@@ -328,32 +289,9 @@ to your NAMESPACE file.
 Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>  
 Bug reports: https://github.com/ge11232002/CNEr/issues
 
-1 error  | 2 warnings | 2 notes
+0 errors | 2 warnings | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘CNEr-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: syntenicDotplot-methods
-> ### Title: Syntenic dotplot
-> ### Aliases: syntenicDotplot syntenicDotplot,Axt-method
-> ###   syntenicDotplot,GRangePairs-method
-> 
-... 35 lines ...
-    colMeans, colSums, expand.grid, rowMeans, rowSums
-
-Loading required package: IRanges
->   
->   ## dotplot for Axt object
->   fn <- file.path(system.file("extdata", package="CNEr"),
-+                   "chr4.hg19.galGal3.net.axt.gz")
->   axt <- readAxt(fn)
-The number of axt files 1
-Unexpected end of file in /home/muelleki/git/R/RSQLite/revdep/checks/CNEr.Rcheck/CNEr/extdata/chr4.hg19.galGal3.net.axt.gz
-** found \donttest examples: check also with --run-donttest
-
 checking compiled code ... WARNING
 File ‘CNEr/libs/CNEr.so’:
   Found ‘abort’, possibly from ‘abort’ (C)
@@ -422,21 +360,17 @@ Execution halted
 ## gcbd (0.2.6)
 Maintainer: Dirk Eddelbuettel <edd@debian.org>
 
-0 errors | 1 warning  | 1 note 
+0 errors | 1 warning  | 0 notes
 
 ```
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning in packageDescription("gputools") :
-  no package 'gputools' was found
+Warning in packageDescription("getopt") : no package 'getopt' was found
 Error: processing vignette 'gcbd.Rnw' failed with diagnostics:
-at gcbd.Rnw:860, subscript out of bounds
+at gcbd.Rnw:863, subscript out of bounds
 Execution halted
 
-
-checking package dependencies ... NOTE
-Package suggested but not available for checking: ‘gputools’
 ```
 
 ## GeneAnswers (2.16.0)
@@ -1129,7 +1063,7 @@ The error most likely occurred in:
 > temp.db.file <- tempfile()
 > write(sim.bux.lines, file=temp.file)
 > test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
-Processing /tmp/Rtmpf2YN2e/filef8d73fc62d52 in chunks of 10000
+Processing /tmp/RtmpUmYjPW/filed52c298e3ea2 in chunks of 10000
 Starting chunk 1
 Reached breakpoint change
 Processing breakpoint 1
@@ -1152,7 +1086,7 @@ Last 13 lines of output:
   Error in BiocGenerics:::testPackage("plethy") : 
     unit tests failed for package plethy
   In addition: Warning message:
-  closing unused connection 3 (/tmp/RtmpLi3x4U/filef9754bd648c8) 
+  closing unused connection 3 (/tmp/RtmpmtQQ3m/filed6117e71fb4f) 
   Execution halted
 
 checking dependencies in R code ... NOTE
@@ -1453,17 +1387,17 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Nov 17, 2016 8:48:57 AM it.bancaditalia.oss.sdmx.util.Configuration init
+Nov 18, 2016 3:21:19 PM it.bancaditalia.oss.sdmx.util.Configuration init
 INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
-Nov 17, 2016 8:48:57 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 18, 2016 3:21:19 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 17, 2016 8:48:58 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 18, 2016 3:21:20 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 17, 2016 8:48:58 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 18, 2016 3:21:20 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 ... 8 lines ...
-Nov 17, 2016 8:49:00 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 18, 2016 3:21:22 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/data/ESTAT,ei_nama_q,1.0/Q.MIO-EUR.NSA.CP.NA-P72.IT
-Nov 17, 2016 8:49:00 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
+Nov 18, 2016 3:21:22 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
 
@@ -1477,37 +1411,14 @@ Execution halted
 ## UniProt.ws (2.14.0)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-2 errors | 0 warnings | 1 note 
+1 error  | 0 warnings | 1 note 
 
 ```
-checking examples ... ERROR
-Running examples in ‘UniProt.ws-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: UniProt.ws-objects
-> ### Title: UniProt.ws objects and their related methods and functions
-> ### Aliases: UniProt.ws class:UniProt.ws UniProt.ws-class
-> ###   show,UniProt.ws-method species species,UniProt.ws-method taxId
-> ###   taxId,UniProt.ws-method taxId<- taxId<-,UniProt.ws-method cols
-... 72 lines ...
-> 
-> ## use select to extract some data
-> res <- select(up, 
-+               keys = c("22627","22629"), 
-+               columns = c("PDB","UNIGENE","SEQUENCE"),
-+               keytype = "ENTREZ_GENE")
-Getting mapping data for 22627 ... and ACC
-Error in .select(x, keys, columns, keytype) : 
-  No data is available for the keys provided.
-Calls: select -> select -> .select
-Execution halted
-
 checking tests ... ERROR
 Running the tests in ‘tests/UniProt.ws_unit_tests.R’ failed.
 Last 13 lines of output:
   UniProt.ws RUnit Tests - 14 test functions, 0 errors, 1 failure
-  FAILURE in test_mapUniprot: Error in checkTrue(res[1, 1] == "P13368") : Test not TRUE
+  FAILURE in test_mapUniprot: Error in checkTrue(res[1, 1] == "1") : Test not TRUE
   
   
   Test files with failing tests
@@ -1542,36 +1453,13 @@ to your NAMESPACE file.
 Maintainer: Robert Castelo <robert.castelo@upf.edu>  
 Bug reports: https://github.com/rcastelo/VariantFiltering/issues
 
-0 errors | 2 warnings | 4 notes
+0 errors | 1 warning  | 4 notes
 
 ```
 checking sizes of PDF files under ‘inst/doc’ ... WARNING
   ‘gs+qpdf’ made some significant size reductions:
      compacted ‘usingVariantFiltering.pdf’ from 415Kb to 153Kb
   consider running tools::compactPDF(gs_quality = "ebook") on these files
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-
-Attaching package: ‘VariantAnnotation’
-
-The following object is masked from ‘package:base’:
-
-    tabulate
-
-... 8 lines ...
-Error in sqliteSendQuery(con, statement, bind.data) : 
-  error in statement: database disk image is malformed
-Error : .onLoad failed in loadNamespace() for 'MafDb.1Kgenomes.phase3.hs37d5', details:
-  call: sqliteSendQuery(con, statement, bind.data)
-  error: error in statement: database disk image is malformed
-
-Error: processing vignette 'usingVariantFiltering.Rnw' failed with diagnostics:
- chunk 3 
-Error in VariantFilteringParam(vcfFilenames = CEUvcf) : 
-  package MafDb.1Kgenomes.phase3.hs37d5 could not be loaded.
-Execution halted
 
 checking installed package size ... NOTE
   installed size is  7.9Mb

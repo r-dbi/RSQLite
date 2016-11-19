@@ -2,7 +2,7 @@
 #define __RSQLSITE_SQLITE_UTILS__
 
 #include <RSQLite.h>
-#include "sqlite3/sqlite3.h"
+#include "sqlite3.h"
 
 
 List inline dfResize(const List& df, const int n) {

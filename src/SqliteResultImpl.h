@@ -3,7 +3,7 @@
 
 
 #include <boost/noncopyable.hpp>
-#include "sqlite3/sqlite3.h"
+#include "sqlite3.h"
 
 class SqliteResultImpl : public boost::noncopyable {
 private:

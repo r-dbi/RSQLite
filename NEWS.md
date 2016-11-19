@@ -1,3 +1,11 @@
+## RSQLite 1.0.9016 (2016-11-19)
+
+- Fix `DESCRIPTION` and `.Rbuildignore` for release.
+- Test simple and named transactions (#163).
+- Avoid warning about missing `long long` data type in C++98 by using a compound data type built from two 32-bit integers, with static assert that the size is 8 indeed.
+- Remove all compilation warnings.
+
+
 ## RSQLite 1.0.9015 (2016-11-17)
 
 - Tweak documentation.

@@ -10,7 +10,6 @@ r:
 
 # Seems to be necessary with devtools 1.10.0, check again when the next version is on CRAN
 r_github_packages:
-  - hadley/testthat
   - jimhester/covr
 
 after_success:

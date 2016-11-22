@@ -26,6 +26,7 @@ SQLite <- function(...) {
 }
 
 #' @export
+#' @rawNamespace exportMethods(dbDriver)
 DBI::dbDriver
 
 # From https://www.sqlite.org/c3ref/c_open_autoproxy.html

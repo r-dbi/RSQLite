@@ -20,3 +20,6 @@ notifications:
   email:
     on_success: change
     on_failure: change
+
+before_script:
+- R -q -e 'install.packages("http://cran.r-project.org/src/contrib/Archive/Rcpp/Rcpp_0.12.7.tar.gz", repos = NULL)'

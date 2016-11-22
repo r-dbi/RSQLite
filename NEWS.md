@@ -1,3 +1,10 @@
+## RSQLite 1.0.9017 (2016-11-22)
+
+- Differential reverse dependency checks.
+- Properly reexport `dbDriver()` and `dbGetQuery()` from `DBI` (#183).
+- Run astyle check only if sources are found.
+
+
 ## RSQLite 1.0.9016 (2016-11-19)
 
 - Fix `DESCRIPTION` and `.Rbuildignore` for release.

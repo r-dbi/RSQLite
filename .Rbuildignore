@@ -25,4 +25,3 @@ a.out.dSYM
 ^CMakeLists\.txt$
 ^clion-test\.R$
 ^_pkgdown\.yml$
-^src/Makevars\.*$

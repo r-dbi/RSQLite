@@ -16,7 +16,13 @@ astyle <- function(extra_args = character()) {
     "--align-reference=type"
   )
 
-  src_path <- normalizePath(testthat::test_path("../../src"))
+  tryCatch(
+    src_path <- testthat::test_path("../../src"),
+    error = function(e) {
+      skip(paste0("Sources not found: ", conditionMessage(e)))
+    }
+  )
+  src_path <- normalizePath(src_path)
   src_files <- dir(src_path, "[.](?:cpp|h)$", recursive = FALSE, full.names = TRUE)
   astyle_files <- grep("(?:RcppExports[.]cpp)", src_files, value = TRUE, invert = TRUE)
   output <- system2(astyle_cmd, c(astyle_args, astyle_files, extra_args), stdout = TRUE, stderr = TRUE)

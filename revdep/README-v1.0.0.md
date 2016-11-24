@@ -10,7 +10,7 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Universal                    |
-|date     |2016-11-18                   |
+|date     |2016-11-24                   |
 
 ## Packages
 
@@ -22,7 +22,7 @@
 
 # Check results
 
-116 packages
+117 packages
 
 |package            |version   | errors| warnings| notes|
 |:------------------|:---------|------:|--------:|-----:|
@@ -32,7 +32,7 @@
 |AnnotationHubData  |1.4.0     |      1|        0|     3|
 |AnnotationHub      |2.6.2     |      0|        0|     1|
 |APSIM              |0.9.1     |      0|        0|     0|
-|archivist          |2.1       |      1|        0|     2|
+|archivist          |2.1.1     |      0|        0|     2|
 |BatchExperiments   |1.4.1     |      0|        0|     2|
 |BatchJobs          |1.6       |      0|        0|     0|
 |bibliospec         |0.0.4     |      0|        0|     0|
@@ -69,6 +69,7 @@
 |GWASTools          |1.20.0    |      0|        0|     1|
 |imputeMulti        |0.6.3     |      0|        0|     1|
 |iontree            |1.20.0    |      0|        0|     5|
+|KoNLP              |0.80.0    |      0|        0|     1|
 |lumi               |2.26.3    |      0|        1|     3|
 |macleish           |0.3.0     |      0|        0|     0|
 |maGUI              |1.0       |      1|        0|     0|
@@ -85,8 +86,8 @@
 |MUCflights         |0.0-3     |      0|        0|     3|
 |nutshell.bbdb      |1.0       |      0|        0|     2|
 |nutshell           |2.0       |      0|        0|     3|
-|oai                |0.2.0     |      0|        0|     0|
-|oce                |0.9-19    |      1|        0|     1|
+|oai                |0.2.2     |      0|        0|     0|
+|oce                |0.9-20    |      1|        0|     1|
 |oligoClasses       |1.36.0    |      0|        1|     4|
 |oligo              |1.38.0    |      1|        0|     9|
 |OrganismDbi        |1.16.0    |      0|        0|     2|
@@ -136,10 +137,10 @@
 |TSsql              |2015.1-2  |      0|        0|     1|
 |tweet2r            |1.0       |      0|        0|     0|
 |twitteR            |1.1.9     |      0|        0|     0|
-|UniProt.ws         |2.14.0    |      1|        0|     1|
+|UniProt.ws         |2.14.0    |      0|        0|     1|
 |Uniquorn           |1.2.0     |      0|        0|     2|
 |UPMASK             |1.0       |      0|        0|     1|
-|VariantFiltering   |1.10.0    |      0|        1|     4|
+|VariantFiltering   |1.10.1    |      0|        1|     4|
 |vegdata            |0.9       |      0|        0|     0|
 |vmsbase            |2.1.3     |      1|        0|     0|
 
@@ -223,14 +224,14 @@ Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 checking tests ... ERROR
 Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
 Last 13 lines of output:
+  ERROR in test_UCSCChainPreparer_recipe: Error : 1: Unknown IO error2: failed to load external entity "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=&retmax=0"
+  
+  
   Test files with failing tests
   
      test_recipe.R 
        test_UCSC2BitPreparer_recipe 
        test_UCSCChainPreparer_recipe 
-  
-     test_webAccessFunctions.R 
-       test_listRemoteFiles 
   
   
   Error in BiocGenerics:::testPackage("AnnotationHubData") : 
@@ -285,33 +286,13 @@ Maintainer: Justin Fainges <Justin.Fainges@csiro.au>
 
 0 errors | 0 warnings | 0 notes
 
-## archivist (2.1)
+## archivist (2.1.1)
 Maintainer: Przemyslaw Biecek <przemyslaw.biecek@gmail.com>  
 Bug reports: https://github.com/pbiecek/archivist/issues
 
-1 error  | 0 warnings | 2 notes
+0 errors | 0 warnings | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘archivist-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: aread
-> ### Title: Read Artifacts Given as md5hashes from the Repository
-> ### Aliases: aread
-> 
-> ### ** Examples
-> 
-> # read the object from local directory
-> setLocalRepo(system.file("graphGallery", package = "archivist"))
-> pl <- aread("f05f0ed0662fe01850ec1b928830ef32")
-> # plot it
-> pl
-Error: ScalesList was built with an incompatible version of ggproto.
-Please reinstall the package that provides this extension.
-Execution halted
-
 checking package dependencies ... NOTE
 Package which this enhances but not available for checking: ‘archivist.github’
 
@@ -863,9 +844,9 @@ Bug reports: https://github.com/hadley/dplyr/issues
 
 ```
 checking installed package size ... NOTE
-  installed size is 23.4Mb
+  installed size is 23.5Mb
   sub-directories of 1Mb or more:
-    libs  21.3Mb
+    libs  21.4Mb
 
 checking dependencies in R code ... NOTE
 Missing or unexported object: ‘RSQLite::rsqliteVersion’
@@ -1366,6 +1347,19 @@ Rd file 'searchMS2.Rd':
      searchMS2(querySpec, premz, dbname = "mzDB.db", scoreFun = "distMS2", output.record = 5, plot.top = TRUE)
 
 These lines will be truncated in the PDF manual.
+```
+
+## KoNLP (0.80.0)
+Maintainer: Heewon Jeon <madjakarta@gmail.com>  
+Bug reports: https://github.com/haven-jeon/KoNLP/issues
+
+0 errors | 0 warnings | 1 note 
+
+```
+checking installed package size ... NOTE
+  installed size is  6.4Mb
+  sub-directories of 1Mb or more:
+    java   5.9Mb
 ```
 
 ## lumi (2.26.3)
@@ -1914,13 +1908,13 @@ Packages in Depends field not imported from:
   for when this namespace is loaded but not attached.
 ```
 
-## oai (0.2.0)
+## oai (0.2.2)
 Maintainer: Scott Chamberlain <myrmecocystus@gmail.com>  
-Bug reports: https://github.com/sckott/oai/issues
+Bug reports: https://github.com/ropensci/oai/issues
 
 0 errors | 0 warnings | 0 notes
 
-## oce (0.9-19)
+## oce (0.9-20)
 Maintainer: Dan Kelley <Dan.Kelley@Dal.Ca>  
 Bug reports: https://github.com/dankelley/oce/issues
 
@@ -1948,9 +1942,9 @@ Calls: plot -> plot -> .local
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  5.3Mb
+  installed size is  5.4Mb
   sub-directories of 1Mb or more:
-    help   2.0Mb
+    help   2.1Mb
 ```
 
 ## oligoClasses (1.36.0)
@@ -2328,7 +2322,7 @@ The error most likely occurred in:
 > temp.db.file <- tempfile()
 > write(sim.bux.lines, file=temp.file)
 > test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
-Processing /tmp/RtmpUmYjPW/filed52c298e3ea2 in chunks of 10000
+Processing /tmp/RtmpcwL4RG/filee779641e173e in chunks of 10000
 Starting chunk 1
 Reached breakpoint change
 Processing breakpoint 1
@@ -2351,7 +2345,7 @@ Last 13 lines of output:
   Error in BiocGenerics:::testPackage("plethy") : 
     unit tests failed for package plethy
   In addition: Warning message:
-  closing unused connection 3 (/tmp/RtmpmtQQ3m/filed6117e71fb4f) 
+  closing unused connection 3 (/tmp/RtmppOK3Wi/filee8f02e70ec78) 
   Execution halted
 
 checking dependencies in R code ... NOTE
@@ -3079,24 +3073,24 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Nov 18, 2016 3:21:19 PM it.bancaditalia.oss.sdmx.util.Configuration init
+Loading required package: TSdbi
+Nov 24, 2016 3:15:47 PM it.bancaditalia.oss.sdmx.util.Configuration init
 INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
-Nov 18, 2016 3:21:19 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 24, 2016 3:15:47 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 18, 2016 3:21:20 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 24, 2016 3:15:48 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 18, 2016 3:21:20 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
-... 8 lines ...
-Nov 18, 2016 3:21:22 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
-INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/data/ESTAT,ei_nama_q,1.0/Q.MIO-EUR.NSA.CP.NA-P72.IT
-Nov 18, 2016 3:21:22 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
-INFO: The sdmx call returned messages in the footer:
- Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
+... 6 lines ...
+INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/dataflow/ESTAT/ei_nama_q/latest
+Nov 24, 2016 3:18:01 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+SEVERE: Exception. Class: java.net.ConnectException .Message: Connection timed out (Connection timed out)
+Nov 24, 2016 3:18:01 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getDataflow
+SEVERE: Exception caught parsing results from call to provider Eurostat
 
 Error: processing vignette 'Guide.Stex' failed with diagnostics:
  chunk 5 
 Error in .local(serIDs, con, ...) : 
-  ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT error: it.bancaditalia.oss.sdmx.util.SdmxException: The query: ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT did not match any time series on the provider.
+  ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT error: it.bancaditalia.oss.sdmx.util.SdmxException: Exception. Class: it.bancaditalia.oss.sdmx.util.SdmxException .Message: Exception. Class: java.net.ConnectException .Message: Connection timed out (Connection timed out)
 Execution halted
 ```
 
@@ -3137,26 +3131,9 @@ Maintainer: Jeff Gentry <geoffjentry@gmail.com>
 ## UniProt.ws (2.14.0)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-1 error  | 0 warnings | 1 note 
+0 errors | 0 warnings | 1 note 
 
 ```
-checking tests ... ERROR
-Running the tests in ‘tests/UniProt.ws_unit_tests.R’ failed.
-Last 13 lines of output:
-  UniProt.ws RUnit Tests - 14 test functions, 0 errors, 1 failure
-  FAILURE in test_mapUniprot: Error in checkTrue(res[1, 1] == "1") : Test not TRUE
-  
-  
-  Test files with failing tests
-  
-     test_serviceAccessors.R 
-       test_mapUniprot 
-  
-  
-  Error in BiocGenerics:::testPackage("UniProt.ws") : 
-    unit tests failed for package UniProt.ws
-  Execution halted
-
 checking R code for possible problems ... NOTE
 .getSomeUniprotGoodies: no visible global function definition for
   ‘head’
@@ -3219,7 +3196,7 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## VariantFiltering (1.10.0)
+## VariantFiltering (1.10.1)
 Maintainer: Robert Castelo <robert.castelo@upf.edu>  
 Bug reports: https://github.com/rcastelo/VariantFiltering/issues
 

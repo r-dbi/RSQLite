@@ -10,26 +10,19 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Universal                    |
-|date     |2016-11-18                   |
+|date     |2016-11-24                   |
 
 ## Packages
 
-|package   |*  |version    |date       |source                             |
-|:---------|:--|:----------|:----------|:----------------------------------|
-|BH        |   |1.60.0-2   |2016-05-07 |cran (@1.60.0-)                    |
-|DBI       |   |0.5-12     |2016-10-06 |Github (rstats-db/DBI@4f00863)     |
-|DBItest   |   |1.3-10     |2016-10-06 |Github (rstats-db/DBItest@9e87611) |
-|knitr     |   |1.15       |2016-11-09 |cran (@1.15)                       |
-|memoise   |   |1.0.0      |2016-01-29 |CRAN (R 3.3.1)                     |
-|plogr     |   |0.1-1      |2016-09-24 |cran (@0.1-1)                      |
-|Rcpp      |   |0.12.7     |2016-09-05 |cran (@0.12.7)                     |
-|rmarkdown |   |1.1        |2016-10-16 |cran (@1.1)                        |
-|RSQLite   |   |1.0.0      |2014-10-25 |CRAN (R 3.3.1)                     |
-|testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
+|package  |*  |version    |date       |source                           |
+|:--------|:--|:----------|:----------|:--------------------------------|
+|DBI      |   |0.5-12     |2016-10-06 |Github (rstats-db/DBI@4f00863)   |
+|RSQLite  |   |1.0.0      |2014-10-25 |CRAN (R 3.3.1)                   |
+|testthat |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da) |
 
 # Check results
 
-116 packages
+117 packages
 
 |package            |version   | errors| warnings| notes|
 |:------------------|:---------|------:|--------:|-----:|
@@ -39,7 +32,7 @@
 |AnnotationHubData  |1.4.0     |      1|        0|     3|
 |AnnotationHub      |2.6.2     |      0|        0|     1|
 |APSIM              |0.9.1     |      0|        0|     0|
-|archivist          |2.1       |      1|        0|     2|
+|archivist          |2.1.1     |      0|        0|     2|
 |BatchExperiments   |1.4.1     |      0|        0|     2|
 |BatchJobs          |1.6       |      0|        0|     0|
 |bibliospec         |0.0.4     |      0|        0|     0|
@@ -59,8 +52,8 @@
 |DBI                |0.5-1     |      0|        0|     1|
 |DECIPHER           |2.2.0     |      0|        0|     3|
 |diffrprojects      |0.1.14    |      0|        0|     0|
-|dplyr              |0.5.0     |      0|        0|     1|
-|ecd                |0.8.2     |      1|        0|     0|
+|dplyr              |0.5.0     |      0|        0|     2|
+|ecd                |0.8.2     |      0|        0|     0|
 |emuR               |0.2.0     |      0|        0|     0|
 |ensembldb          |1.6.2     |      0|        0|     2|
 |etl                |0.3.4     |      0|        0|     0|
@@ -76,6 +69,7 @@
 |GWASTools          |1.20.0    |      0|        0|     1|
 |imputeMulti        |0.6.3     |      0|        0|     1|
 |iontree            |1.20.0    |      0|        0|     5|
+|KoNLP              |0.80.0    |      0|        0|     1|
 |lumi               |2.26.3    |      0|        1|     3|
 |macleish           |0.3.0     |      0|        0|     0|
 |maGUI              |1.0       |      1|        0|     0|
@@ -92,8 +86,8 @@
 |MUCflights         |0.0-3     |      0|        0|     3|
 |nutshell.bbdb      |1.0       |      0|        0|     2|
 |nutshell           |2.0       |      0|        0|     3|
-|oai                |0.2.0     |      0|        0|     0|
-|oce                |0.9-19    |      1|        0|     1|
+|oai                |0.2.2     |      0|        0|     0|
+|oce                |0.9-20    |      1|        0|     1|
 |oligoClasses       |1.36.0    |      0|        1|     4|
 |oligo              |1.38.0    |      1|        0|     9|
 |OrganismDbi        |1.16.0    |      0|        0|     2|
@@ -101,8 +95,8 @@
 |pdInfoBuilder      |1.38.0    |      0|        0|     1|
 |PGA                |1.4.0     |      0|        0|     3|
 |pitchRx            |1.8.2     |      0|        0|     1|
-|plethy             |1.12.0    |      2|        1|     3|
-|poplite            |0.99.16   |      1|        0|     1|
+|plethy             |1.12.0    |      2|        0|     3|
+|poplite            |0.99.16   |      0|        0|     1|
 |ProjectTemplate    |0.7       |      0|        0|     0|
 |quantmod           |0.4-7     |      0|        0|     1|
 |rangeMapper        |0.3-0     |      0|        0|     0|
@@ -124,7 +118,7 @@
 |smnet              |2.1       |      0|        0|     0|
 |snplist            |0.16      |      0|        0|     0|
 |specL              |1.8.0     |      0|        1|     3|
-|sqldf              |0.4-10    |      1|        1|     2|
+|sqldf              |0.4-10    |      0|        1|     2|
 |sqliter            |0.1.0     |      0|        0|     0|
 |SRAdb              |1.32.0    |      0|        0|     6|
 |srvyr              |0.2.0     |      0|        0|     0|
@@ -135,7 +129,7 @@
 |taRifx             |1.0.6     |      0|        0|     4|
 |tcpl               |1.2.2     |      0|        0|     1|
 |TFBSTools          |1.12.1    |      0|        1|     2|
-|tigreBrowserWriter |0.1.2     |      1|        0|     0|
+|tigreBrowserWriter |0.1.2     |      0|        0|     0|
 |tigre              |1.28.0    |      0|        0|     2|
 |trackeR            |0.0.4     |      0|        1|     0|
 |TSdata             |2016.8-1  |      0|        1|     0|
@@ -146,7 +140,7 @@
 |UniProt.ws         |2.14.0    |      0|        0|     1|
 |Uniquorn           |1.2.0     |      0|        0|     2|
 |UPMASK             |1.0       |      0|        0|     1|
-|VariantFiltering   |1.10.0    |      0|        1|     4|
+|VariantFiltering   |1.10.1    |      0|        1|     4|
 |vegdata            |0.9       |      0|        0|     0|
 |vmsbase            |2.1.3     |      1|        0|     0|
 
@@ -292,33 +286,13 @@ Maintainer: Justin Fainges <Justin.Fainges@csiro.au>
 
 0 errors | 0 warnings | 0 notes
 
-## archivist (2.1)
+## archivist (2.1.1)
 Maintainer: Przemyslaw Biecek <przemyslaw.biecek@gmail.com>  
 Bug reports: https://github.com/pbiecek/archivist/issues
 
-1 error  | 0 warnings | 2 notes
+0 errors | 0 warnings | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘archivist-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: aread
-> ### Title: Read Artifacts Given as md5hashes from the Repository
-> ### Aliases: aread
-> 
-> ### ** Examples
-> 
-> # read the object from local directory
-> setLocalRepo(system.file("graphGallery", package = "archivist"))
-> pl <- aread("f05f0ed0662fe01850ec1b928830ef32")
-> # plot it
-> pl
-Error: ScalesList was built with an incompatible version of ggproto.
-Please reinstall the package that provides this extension.
-Execution halted
-
 checking package dependencies ... NOTE
 Package which this enhances but not available for checking: ‘archivist.github’
 
@@ -866,27 +840,22 @@ Bug reports: https://github.com/petermeissner/diffrprojects/issues
 Maintainer: Hadley Wickham <hadley@rstudio.com>  
 Bug reports: https://github.com/hadley/dplyr/issues
 
-0 errors | 0 warnings | 1 note 
+0 errors | 0 warnings | 2 notes
 
 ```
 checking installed package size ... NOTE
-  installed size is 23.4Mb
+  installed size is 23.5Mb
   sub-directories of 1Mb or more:
-    libs  21.3Mb
+    libs  21.4Mb
+
+checking dependencies in R code ... NOTE
+Missing or unexported object: ‘RSQLite::rsqliteVersion’
 ```
 
 ## ecd (0.8.2)
 Maintainer: Stephen H-T. Lihn <stevelihn@gmail.com>
 
-1 error  | 0 warnings | 0 notes
-
-```
-checking package dependencies ... ERROR
-Package required and available but unsuitable version: ‘RSQLite’
-
-See section ‘The DESCRIPTION file’ in the ‘Writing R Extensions’
-manual.
-```
+0 errors | 0 warnings | 0 notes
 
 ## emuR (0.2.0)
 Maintainer: Raphael Winkelmann <raphael@phonetik.uni-muenchen.de>  
@@ -1258,10 +1227,11 @@ These were most likely included in error. See section ‘Package
 structure’ in the ‘Writing R Extensions’ manual.
 
 checking R code for possible problems ... NOTE
+geoConvert: no visible global function definition for ‘dbDriver’
 getSQLiteFile: no visible global function definition for
   ‘download.file’
 Undefined global functions or variables:
-  download.file
+  dbDriver download.file
 Consider adding
   importFrom("utils", "download.file")
 to your NAMESPACE file.
@@ -1324,17 +1294,24 @@ is not mentioned in the DESCRIPTION file.
 
 checking R code for possible problems ... NOTE
 buildIonTree: no visible binding for global variable ‘median’
+createDB: no visible global function definition for ‘dbDriver’
+metaDataImport: no visible global function definition for ‘dbDriver’
+metaDataImport: no visible global function definition for ‘fetch’
 metaDataImport: no visible global function definition for
   ‘flush.console’
 metaDataImport: no visible global function definition for ‘fix’
+mzImport: no visible global function definition for ‘dbDriver’
+mzImport: no visible global function definition for ‘fetch’
 plotSpectrum: no visible global function definition for ‘text’
 plotSpectrum: no visible global function definition for ‘identify’
 saveMSnRaw: no visible global function definition for ‘flush.console’
+searchMS2: no visible global function definition for ‘dbDriver’
+searchMS2: no visible global function definition for ‘fetch’
 searchMS2: no visible global function definition for ‘par’
 plot,iontree: no visible global function definition for ‘par’
 plot,iontree: no visible global function definition for ‘layout’
 Undefined global functions or variables:
-  fix flush.console identify layout median par text
+  dbDriver fetch fix flush.console identify layout median par text
 Consider adding
   importFrom("graphics", "identify", "layout", "par", "text")
   importFrom("stats", "median")
@@ -1372,6 +1349,19 @@ Rd file 'searchMS2.Rd':
 These lines will be truncated in the PDF manual.
 ```
 
+## KoNLP (0.80.0)
+Maintainer: Heewon Jeon <madjakarta@gmail.com>  
+Bug reports: https://github.com/haven-jeon/KoNLP/issues
+
+0 errors | 0 warnings | 1 note 
+
+```
+checking installed package size ... NOTE
+  installed size is  6.4Mb
+  sub-directories of 1Mb or more:
+    java   5.9Mb
+```
+
 ## lumi (2.26.3)
 Maintainer: Pan Du <dupan.mail@gmail.com>
 
@@ -1384,7 +1374,7 @@ checking dependencies in R code ... WARNING
 checking installed package size ... NOTE
   installed size is  6.8Mb
   sub-directories of 1Mb or more:
-    R      2.8Mb
+    R      2.9Mb
     data   3.6Mb
 
 checking Rd line widths ... NOTE
@@ -1918,13 +1908,13 @@ Packages in Depends field not imported from:
   for when this namespace is loaded but not attached.
 ```
 
-## oai (0.2.0)
+## oai (0.2.2)
 Maintainer: Scott Chamberlain <myrmecocystus@gmail.com>  
-Bug reports: https://github.com/sckott/oai/issues
+Bug reports: https://github.com/ropensci/oai/issues
 
 0 errors | 0 warnings | 0 notes
 
-## oce (0.9-19)
+## oce (0.9-20)
 Maintainer: Dan Kelley <Dan.Kelley@Dal.Ca>  
 Bug reports: https://github.com/dankelley/oce/issues
 
@@ -1952,9 +1942,9 @@ Calls: plot -> plot -> .local
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  5.3Mb
+  installed size is  5.4Mb
   sub-directories of 1Mb or more:
-    help   2.0Mb
+    help   2.1Mb
 ```
 
 ## oligoClasses (1.36.0)
@@ -2055,7 +2045,7 @@ Packages which this enhances but not available for checking: ‘doMC’ ‘doMPI
 checking installed package size ... NOTE
   installed size is 30.3Mb
   sub-directories of 1Mb or more:
-    R         1.2Mb
+    R         1.1Mb
     doc      12.9Mb
     scripts  15.7Mb
 
@@ -2203,16 +2193,16 @@ See section ‘Good practice’ in ‘?data’.
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-             }
-     
-
-trying URL 'http://gpcr2.biocomp.unibo.it/bacello/dataset.htm'
-Content type 'text/html; charset=iso-8859-1' length 5062 bytes
-==================================================
-downloaded 5062 bytes
+             if(length(xx) > 0){
+                     # Get the value of the first key
+                     xx[[1]]
+                     # Get the values for a few keys
+                     if(length(xx) >= 3){
+                             xx[1:3]
+                     }
 ... 8 lines ...
-Warning in rsqlite_disconnect(conn@ptr) :
-  There are 1 result in use. The connection will be released when they are closed
+
+Warning in .local(conn, ...) : Closing open result set
 Error in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  : 
   Running 'texi2dvi' on 'PAnnBuilder.tex' failed.
 LaTeX errors:
@@ -2315,7 +2305,7 @@ Package suggested but not available for checking: ‘ggsubplot’
 ## plethy (1.12.0)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
-2 errors | 1 warning  | 3 notes
+2 errors | 0 warnings | 3 notes
 
 ```
 checking examples ... ERROR
@@ -2323,63 +2313,40 @@ Running examples in ‘plethy-Ex.R’ failed
 The error most likely occurred in:
 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: BuxcoDB-class
-> ### Title: Class '"BuxcoDB"'
-> ### Aliases: BuxcoDB-class BuxcoDB addAnnotation,BuxcoDB-method
-> ###   addAnnotation annoTable,BuxcoDB-method annoTable
-> ###   annoCols,BuxcoDB-method annoCols annoLevels,BuxcoDB-method annoLevels
-... 53 lines ...
-> 
-> tables(bux.db)
-[1] "WBPth"
-> 
-> variables(bux.db)
- [1] "f"     "TVb"   "MVb"   "Penh"  "PAU"   "Rpef"  "Comp"  "PIFb"  "PEFb" 
-[10] "Ti"    "Te"    "EF50"  "Tr"    "Tbody" "Tc"    "RH"    "Rinx" 
-> 
-> addAnnotation(bux.db, query=day.infer.query, index=FALSE)
-Error: is.null(dbGetQuery(db.con, i)) is not TRUE
+> ### Name: Utility functions
+> ### Title: Utility functions to assist with QA/QC and analysis of
+> ###   plethysmography data
+> ### Aliases: add.labels.by.sample get.err.breaks adjust.labels proc.sanity
+> ### Keywords: Utilities
+... 21 lines ...
+> temp.db.file <- tempfile()
+> write(sim.bux.lines, file=temp.file)
+> test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
+Processing /tmp/RtmpcwL4RG/filee779641e173e in chunks of 10000
+Starting chunk 1
+Reached breakpoint change
+Processing breakpoint 1
+Starting sample sample_1
+Error in if (sum(which.gt) > 0) { : missing value where TRUE/FALSE needed
+Calls: parse.buxco ... write.sample.breaks -> write.sample.db -> sanity.check.time
 Execution halted
 
 checking tests ... ERROR
 Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
-       test.db.insert.autoincrement 
+  
+     test_check_helpers.R 
+       test.add.labels.by.sample 
        test.dbImport 
-       test.examine.table.lines 
        test.get.err.breaks 
-       test.parse.buxco 
-       test.retrieveData 
        test.summaryMeasures 
-       test.write.sample.db 
   
   
   Error in BiocGenerics:::testPackage("plethy") : 
     unit tests failed for package plethy
+  In addition: Warning message:
+  closing unused connection 3 (/tmp/RtmppOK3Wi/filee8f02e70ec78) 
   Execution halted
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-
-    IQR, mad, xtabs
-
-The following objects are masked from ‘package:base’:
-
-    Filter, Find, Map, Position, Reduce, anyDuplicated, append, as.data.frame,
-    cbind, colnames, do.call, duplicated, eval, evalq, get, grep, grepl,
-... 8 lines ...
-Attaching package: ‘S4Vectors’
-
-The following objects are masked from ‘package:base’:
-
-    colMeans, colSums, expand.grid, rowMeans, rowSums
-
-
-Error: processing vignette 'plethy.Rnw' failed with diagnostics:
- chunk 3 
-Error : is.null(dbGetQuery(db.con, query.list[[i]])) is not TRUE
-Execution halted
 
 checking dependencies in R code ... NOTE
 There are ::: calls to the package's namespace in its code. A package
@@ -2430,26 +2397,9 @@ These lines will be truncated in the PDF manual.
 ## poplite (0.99.16)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
-1 error  | 0 warnings | 1 note 
+0 errors | 0 warnings | 1 note 
 
 ```
-checking tests ... ERROR
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-  1. Failure: createTable (@test-poplite.R#252) 
-  2. Failure: createTable (@test-poplite.R#252) 
-  3. Failure: createTable (@test-poplite.R#252) 
-  4. Failure: createTable (@test-poplite.R#252) 
-  5. Failure: insertStatement (@test-poplite.R#330) 
-  6. Failure: insertStatement (@test-poplite.R#350) 
-  7. Failure: insertStatement (@test-poplite.R#330) 
-  8. Failure: insertStatement (@test-poplite.R#350) 
-  9. Failure: insertStatement (@test-poplite.R#330) 
-  1. ...
-  
-  Error: testthat unit tests failed
-  Execution halted
-
 checking R code for possible problems ... NOTE
 filter_.Database: no visible global function definition for ‘stack’
 get.starting.point : <anonymous>: no visible global function definition
@@ -2820,32 +2770,9 @@ prepare_Rd: ms1.p2069.Rd:23-26: Dropping empty section \examples
 Maintainer: G. Grothendieck <ggrothendieck@gmail.com>  
 Bug reports: http://groups.google.com/group/sqldf
 
-1 error  | 1 warning  | 2 notes
+0 errors | 1 warning  | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘sqldf-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: sqldf
-> ### Title: SQL select on data frames
-> ### Aliases: sqldf
-> ### Keywords: manip
-> 
-... 6 lines ...
-> # in R without SQL and then again with SQL
-> #
-> 
-> # head
-> a1r <- head(warpbreaks)
-> a1s <- sqldf("select * from warpbreaks limit 6")
-Loading required package: tcltk
-Error in eval(substitute(expr), envir, enclos) : 
-  no such table: warpbreaks
-Calls: sqldf ... initialize -> initialize -> rsqlite_send_query -> .Call
-Execution halted
-
 checking whether package ‘sqldf’ can be installed ... WARNING
 Found the following significant warnings:
   Warning: no DISPLAY variable so Tk is not available
@@ -3074,33 +3001,7 @@ Unexported objects imported by ':::' calls:
 Maintainer: Antti Honkela <antti.honkela@helsinki.fi>  
 Bug reports: https://github.com/PROBIC/tigreBrowserWriter/issues
 
-1 error  | 0 warnings | 0 notes
-
-```
-checking examples ... ERROR
-Running examples in ‘tigreBrowserWriter-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: closeDb
-> ### Title: Finalise and close the database
-> ### Aliases: closeDb
-> 
-> ### ** Examples
-> 
->   db <- initializeDb("", "My Dataset")
-Warning: RSQLite::dbGetPreparedQuery() is deprecated, please switch to DBI::dbGetQuery(params = bind.data).
-Warning: Named parameters not used in query: name, species, source, platform, desc, save_location, figure_filename
-Warning: Named parameters not used in query: dname
->   # ...
->   closeDb(db)
-Warning: Named parameters not used in query: parent_id, name
-Warning: Named parameters not used in query: name, parent_id
-Error in eval(substitute(expr), envir, enclos) : 
-  Query requires 1 params; 2 supplied.
-Calls: closeDb ... <Anonymous> -> db_bind -> rsqlite_bind_rows -> .Call
-Execution halted
-```
+0 errors | 0 warnings | 0 notes
 
 ## tigre (1.28.0)
 Maintainer: Antti Honkela <antti.honkela@hiit.fi>  
@@ -3172,24 +3073,24 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Nov 18, 2016 3:53:58 PM it.bancaditalia.oss.sdmx.util.Configuration init
+Loading required package: TSdbi
+Nov 24, 2016 3:15:47 PM it.bancaditalia.oss.sdmx.util.Configuration init
 INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
-Nov 18, 2016 3:53:58 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 24, 2016 3:15:47 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 18, 2016 3:53:58 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 24, 2016 3:15:48 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 18, 2016 3:53:58 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
-... 8 lines ...
-Nov 18, 2016 3:53:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
-INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/data/ESTAT,ei_nama_q,1.0/Q.MIO-EUR.NSA.CP.NA-P72.IT
-Nov 18, 2016 3:53:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
-INFO: The sdmx call returned messages in the footer:
- Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
+... 6 lines ...
+INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/dataflow/ESTAT/ei_nama_q/latest
+Nov 24, 2016 3:18:01 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+SEVERE: Exception. Class: java.net.ConnectException .Message: Connection timed out (Connection timed out)
+Nov 24, 2016 3:18:01 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getDataflow
+SEVERE: Exception caught parsing results from call to provider Eurostat
 
 Error: processing vignette 'Guide.Stex' failed with diagnostics:
  chunk 5 
 Error in .local(serIDs, con, ...) : 
-  ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT error: it.bancaditalia.oss.sdmx.util.SdmxException: The query: ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT did not match any time series on the provider.
+  ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT error: it.bancaditalia.oss.sdmx.util.SdmxException: Exception. Class: it.bancaditalia.oss.sdmx.util.SdmxException .Message: Exception. Class: java.net.ConnectException .Message: Connection timed out (Connection timed out)
 Execution halted
 ```
 
@@ -3295,7 +3196,7 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## VariantFiltering (1.10.0)
+## VariantFiltering (1.10.1)
 Maintainer: Robert Castelo <robert.castelo@upf.edu>  
 Bug reports: https://github.com/rcastelo/VariantFiltering/issues
 
@@ -3308,7 +3209,7 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
   consider running tools::compactPDF(gs_quality = "ebook") on these files
 
 checking installed package size ... NOTE
-  installed size is  7.8Mb
+  installed size is  7.9Mb
   sub-directories of 1Mb or more:
     R         3.6Mb
     extdata   3.5Mb

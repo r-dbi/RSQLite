@@ -7,6 +7,12 @@ NULL
 #' a SQLite transaction and turns auto-commit off. `dbCommit()` and
 #' `dbRollback()` commit and rollback the transaction, respectively and turn
 #' auto-commit on.
+#' [DBI::dbWithTransaction()] is a convenient wrapper that makes sure that
+#' `dbCommit()` or `dbRollback()` is called.
+#'
+#' @seealso
+#' The corresponding generic functions [DBI::dbBegin()], [DBI::dbCommit()],
+#' and [DBI::dbRollback()].
 #'
 #' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
 #'   [DBI::dbConnect()]

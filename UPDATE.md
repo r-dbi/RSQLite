@@ -3,7 +3,7 @@
 Two components are shipped with the package that can be updated:
 
 - SQLite library
-- Datasets
+- Datasets database
 
 Ideally the update should happen right *after* each CRAN release, so that a new SQLite version is tested for some time before it's released to CRAN.
 
@@ -16,22 +16,7 @@ Ideally the update should happen right *after* each CRAN release, so that a new 
 
 1.  Update `NEWS`
 
-Ideally this should happen right *after* each CRAN release, so that a new SQLite version is tested for some time before it's released to CRAN.
 
 ## Datasets database
 
-RSQLite includes one SQLite database (accessible from `datasetsDb()` that contains all data frames in the datasets package. This is the code that created it.
-
-```R
-tables <- unique(data(package = "datasets")$results[, 3])
-tables <- tables[!grepl("(", tables, fixed = TRUE)]
-
-con <- dbConnect(SQLite(), "inst/db/datasets.sqlite")
-for(table in tables) {
-  df <- getExportedValue("datasets", table)
-  if (!is.data.frame(df)) next
-  
-  message("Creating table: ", table)
-  dbWriteTable(con, table, as.data.frame(df), overwrite = TRUE)
-}
-```
+RSQLite includes one SQLite database (accessible from `datasetsDb()` that contains all data frames in the datasets package. The code that created it is located in `data-raw/datasets.R`.

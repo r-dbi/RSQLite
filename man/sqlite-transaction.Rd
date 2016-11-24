@@ -31,6 +31,8 @@ By default, SQLite is in auto-commit mode. \code{dbBegin()} starts
 a SQLite transaction and turns auto-commit off. \code{dbCommit()} and
 \code{dbRollback()} commit and rollback the transaction, respectively and turn
 auto-commit on.
+\code{\link[DBI:dbWithTransaction]{DBI::dbWithTransaction()}} is a convenient wrapper that makes sure that
+\code{dbCommit()} or \code{dbRollback()} is called.
 }
 \examples{
 library(DBI)
@@ -61,5 +63,9 @@ dbRollback(con, "b")
 dbCommit(con, "a")
 
 dbDisconnect(con)
+}
+\seealso{
+The corresponding generic functions \code{\link[DBI:dbBegin]{DBI::dbBegin()}}, \code{\link[DBI:dbCommit]{DBI::dbCommit()}},
+and \code{\link[DBI:dbRollback]{DBI::dbRollback()}}.
 }
 

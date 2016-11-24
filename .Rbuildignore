@@ -8,7 +8,7 @@ a.out.dSYM
 ^\.travis\.yml$
 ^NEWS\.md$
 ^cran-comments\.md$
-^src-raw$
+^data-raw$
 ^src/sqlite3/.*\.o$
 ^src/sqlite3/.*\.a$
 ^appveyor\.yml$
@@ -25,3 +25,4 @@ a.out.dSYM
 ^CMakeLists\.txt$
 ^clion-test\.R$
 ^_pkgdown\.yml$
+^docs$

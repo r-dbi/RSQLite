@@ -3,18 +3,35 @@
 \docType{methods}
 \name{dbExistsTable,SQLiteConnection,character-method}
 \alias{dbExistsTable,SQLiteConnection,character-method}
-\title{Does the table exist?}
+\alias{dbListTables,SQLiteConnection-method}
+\title{Tables in a database}
 \usage{
 \S4method{dbExistsTable}{SQLiteConnection,character}(conn, name, ...)
+
+\S4method{dbListTables}{SQLiteConnection}(conn, ...)
 }
 \arguments{
 \item{conn}{An existing \code{\linkS4class{SQLiteConnection}}}
 
 \item{name}{String, name of table. Match is case insensitive.}
 
-\item{...}{Needed for compatibility with generic. Otherwise ignored.}
+\item{...}{Needed for compatibility with generics, otherwise ignored.}
 }
 \description{
-Does the table exist?
+\code{dbExistsTable()} returns a logical that indicates if a table exists,
+\code{dbListTables()} lists all tables as a character vector.
+}
+\examples{
+library(DBI)
+db <- RSQLite::datasetsDb()
+
+dbExistsTable(db, "mtcars")
+dbExistsTable(db, "nonexistingtable")
+dbListTables(db)
+
+dbDisconnect(db)
+}
+\seealso{
+The corresponding generic functions \code{\link[DBI:dbExistsTable]{DBI::dbExistsTable()}} and \code{\link[DBI:dbListTables]{DBI::dbListTables()}}.
 }
 

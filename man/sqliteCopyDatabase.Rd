@@ -16,17 +16,24 @@ sqliteCopyDatabase(from, to)
 Returns \code{NULL} (invisibly).
 }
 \description{
-This function copies a database connection to a file or to another database
+Copies a database connection to a file or to another database
 connection.  It can be used to save an in-memory database (created using
 \code{dbname = ":memory:"} or
 \code{dbname = "file::memory:"}) to a file or to create an in-memory database
 a copy of anothe database.
 }
 \examples{
-# Copy the built in databaseDb() to an in memory dataset
-db <- dbConnect(RSQLite::SQLite(), ":memory:")
-sqliteCopyDatabase(datasetsDb(), db)
-dbListTables(db)
+library(DBI)
+# Copy the built in databaseDb() to an in-memory database
+con <- dbConnect(RSQLite::SQLite(), ":memory:")
+dbListTables(con)
+
+db <- RSQLite::datasetsDb()
+RSQLite::sqliteCopyDatabase(db, con)
+dbDisconnect(db)
+dbListTables(con)
+
+dbDisconnect(con)
 }
 \references{
 \url{http://www.sqlite.org/backup.html}

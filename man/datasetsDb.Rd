@@ -12,7 +12,7 @@ in the datasets package.
 }
 \examples{
 library(DBI)
-db <- datasetsDb()
+db <- RSQLite::datasetsDb()
 dbListTables(db)
 
 dbReadTable(db, "CO2")

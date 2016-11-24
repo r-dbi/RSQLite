@@ -56,8 +56,6 @@ inputs, use \code{\link[=dbBind]{dbBind()}}.
 For statements that do not return a table,
 use \code{\link[=dbSendStatement]{dbSendStatement()}} and \code{\link[=dbExecute]{dbExecute()}} instead of \code{\link[=dbSendQuery]{dbSendQuery()}}
 and \code{\link[=dbGetQuery]{dbGetQuery()}}.
-}
-\details{
 See \link{sqlite-meta} for how to extract other metadata from the result set.
 }
 \examples{
@@ -112,5 +110,10 @@ dbGetQuery(con, "SELECT * FROM TEST WHERE a >= :a", list(a = 0:3))
 
 dbDisconnect(con)
 
+}
+\seealso{
+The corresponding generic functions
+\code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}}, \code{\link[DBI:dbFetch]{DBI::dbFetch()}}, \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}}, \code{\link[DBI:dbGetQuery]{DBI::dbGetQuery()}},
+\code{\link[DBI:dbBind]{DBI::dbBind()}}, \code{\link[DBI:dbSendStatement]{DBI::dbSendStatement()}}, and \code{\link[DBI:dbExecute]{DBI::dbExecute()}}.
 }
 

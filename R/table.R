@@ -3,8 +3,13 @@ NULL
 
 #' Write a local data frame or file to the database
 #'
-#' See also [DBI::dbWriteTable()] and [DBI::sqlData()] for the corresponding
-#' generic.
+#' Functions for writing data frames or delimiter-separated files
+#' to database tables.
+#' `sqlData()` is mostly useful to backend implementers,
+#' but must be documented here.
+#'
+#' @seealso
+#' The corresponding generic functions [DBI::dbWriteTable()] and [DBI::sqlData()].
 #'
 #' @export
 #' @rdname dbWriteTable
@@ -268,10 +273,13 @@ string_to_utf8 <- function(value) {
 
 #' Read a database table
 #'
-#' See also [DBI::dbReadTable()] for the corresponding generic.
+#' Returns the contents of a database table given by name as a data frame.
 #'
 #' Note that the data frame returned by `dbReadTable()` only has
 #' primitive data, e.g., it does not coerce character data to factors.
+#'
+#' @seealso
+#' The corresponding generic function [DBI::dbReadTable()].
 #'
 #' @return A data frame.
 #'
@@ -316,8 +324,10 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 
 #' Remove a table from the database
 #'
-#' Executes the SQL `DROP TABLE`. See also [DBI::dbRemoveTable()] for the
-#' corresponding generic.
+#' Executes the SQL `DROP TABLE`.
+#'
+#' @seealso
+#' The corresponding generic function [DBI::dbRemoveTable()].
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name character vector of length 1 giving name of table to remove
@@ -341,9 +351,11 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
 
 #' Tables in a database
 #'
-#' `dbExistsTable()` checks if a table exists,
-#' `dbListTables()` lists all tables.
-#' See also [DBI::dbExistsTable()] and [DBI::dbListTables()] for the generics.
+#' `dbExistsTable()` returns a logical that indicates if a table exists,
+#' `dbListTables()` lists all tables as a character vector.
+#'
+#' @seealso
+#' The corresponding generic functions [DBI::dbExistsTable()] and [DBI::dbListTables()].
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name String, name of table. Match is case insensitive.
@@ -402,7 +414,10 @@ sqliteListTablesQuery <- function(conn, name = NULL) {
 
 #' List fields in a table
 #'
-#' See also [DBI::dbListFields()] for the corresponding generic.
+#' Returns the fields of a given table as a character vector.
+#'
+#' @seealso
+#' The corresponding generic function [DBI::dbListFields()].
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name a length 1 character vector giving the name of a table.
@@ -426,8 +441,10 @@ setMethod("dbListFields", c("SQLiteConnection", "character"),
 
 #' Determine the SQL Data Type of an R object
 #'
-#' This method is a straight-forward implementation of the corresponding
-#' generic function [DBI::dbDataType()].
+#' Given an object, return its SQL data type as a SQL database identifier.
+#'
+#' @seealso
+#' The corresponding generic function [DBI::dbDataType()].
 #'
 #' @param dbObj a `SQLiteConnection` or `SQLiteDriver` object
 #' @param obj an R object whose SQL type we want to determine.

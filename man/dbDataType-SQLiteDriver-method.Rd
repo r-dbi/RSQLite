@@ -18,8 +18,7 @@
 \item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \description{
-This method is a straight-forward implementation of the corresponding
-generic function \code{\link[DBI:dbDataType]{DBI::dbDataType()}}.
+Given an object, return its SQL data type as a SQL database identifier.
 }
 \examples{
 library(DBI)
@@ -30,5 +29,8 @@ dbDataType(RSQLite::SQLite(), TRUE)
 dbDataType(RSQLite::SQLite(), list(raw(1)))
 
 sapply(datasets::quakes, dbDataType, dbObj = RSQLite::SQLite())
+}
+\seealso{
+The corresponding generic function \code{\link[DBI:dbDataType]{DBI::dbDataType()}}.
 }
 

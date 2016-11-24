@@ -15,8 +15,7 @@
 \item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \description{
-Executes the SQL \code{DROP TABLE}. See also \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}} for the
-corresponding generic.
+Executes the SQL \code{DROP TABLE}.
 }
 \examples{
 library(DBI)
@@ -26,5 +25,8 @@ dbListTables(con)
 dbRemoveTable(con, "test")
 dbListTables(con)
 dbDisconnect(con)
+}
+\seealso{
+The corresponding generic function \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}}.
 }
 

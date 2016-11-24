@@ -11,8 +11,12 @@ NULL
 #' For statements that do not return a table,
 #' use [dbSendStatement()] and [dbExecute()] instead of [dbSendQuery()]
 #' and [dbGetQuery()].
-#'
 #' See \link{sqlite-meta} for how to extract other metadata from the result set.
+#'
+#' @seealso
+#' The corresponding generic functions
+#' [DBI::dbSendQuery()], [DBI::dbFetch()], [DBI::dbClearResult()], [DBI::dbGetQuery()],
+#' [DBI::dbBind()], [DBI::dbSendStatement()], and [DBI::dbExecute()].
 #'
 #' @param conn an \code{\linkS4class{SQLiteConnection}} object.
 #' @param statement a character vector of length one specifying the SQL

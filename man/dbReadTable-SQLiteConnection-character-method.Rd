@@ -40,7 +40,7 @@ length 1) giving the columns to select. E.g. \code{"*"} selects all columns,
 A data frame.
 }
 \description{
-See also \code{\link[DBI:dbReadTable]{DBI::dbReadTable()}} for the corresponding generic.
+Returns the contents of a database table given by name as a data frame.
 }
 \details{
 Note that the data frame returned by \code{dbReadTable()} only has
@@ -54,5 +54,8 @@ dbReadTable(db, "mtcars", row.names = FALSE)
 dbReadTable(db, "mtcars", select.cols = "cyl, gear")
 dbReadTable(db, "mtcars", select.cols = "row_names, cyl, gear")
 dbDisconnect(db)
+}
+\seealso{
+The corresponding generic function \code{\link[DBI:dbReadTable]{DBI::dbReadTable()}}.
 }
 

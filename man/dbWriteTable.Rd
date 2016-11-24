@@ -70,8 +70,10 @@ defaults when imputing classes from on-disk file.}
 \code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
 }
 \description{
-See also \code{\link[DBI:dbWriteTable]{DBI::dbWriteTable()}} and \code{\link[DBI:sqlData]{DBI::sqlData()}} for the corresponding
-generic.
+Functions for writing data frames or delimiter-separated files
+to database tables.
+\code{sqlData()} is mostly useful to backend implementers,
+but must be documented here.
 }
 \details{
 In a primary key column qualified with
@@ -94,5 +96,8 @@ dbWriteTable(con, "mtcars2", mtcars[0, ])
 dbReadTable(con, "mtcars2")
 
 dbDisconnect(con)
+}
+\seealso{
+The corresponding generic functions \code{\link[DBI:dbWriteTable]{DBI::dbWriteTable()}} and \code{\link[DBI:sqlData]{DBI::sqlData()}}.
 }
 

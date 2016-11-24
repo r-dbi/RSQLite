@@ -15,12 +15,15 @@
 \item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \description{
-See also \code{\link[DBI:dbListFields]{DBI::dbListFields()}} for the corresponding generic.
+Returns the fields of a given table as a character vector.
 }
 \examples{
 library(DBI)
 db <- RSQLite::datasetsDb()
 dbListFields(db, "iris")
 dbDisconnect(db)
+}
+\seealso{
+The corresponding generic function \code{\link[DBI:dbListFields]{DBI::dbListFields()}}.
 }
 

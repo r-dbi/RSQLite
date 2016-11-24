@@ -419,17 +419,10 @@ setMethod("dbListFields", c("SQLiteConnection", "character"),
 #' dbDataType(SQLite(), 1L)
 #' dbDataType(SQLite(), "1")
 #' dbDataType(SQLite(), TRUE)
-#' dbDataType(SQLite(), list())
+#' dbDataType(SQLite(), list(raw(1)))
 #'
 #' sapply(datasets::quakes, dbDataType, dbObj = SQLite())
 #' @export
-setMethod("dbDataType", "SQLiteConnection", function(dbObj, obj, ...) {
-  dbDataType(SQLite(), obj, ...)
-})
-
-#' @rdname dbDataType-SQLiteConnection-method
-#' @export
-#' @rdname dbDataType-SQLiteConnection-method
 setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
   if (is.factor(obj)) return("TEXT")
 
@@ -442,4 +435,10 @@ setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
     raw = "TEXT",
     stop("Unsupported type", call. = FALSE)
   )
+})
+
+#' @rdname dbDataType-SQLiteDriver-method
+#' @export
+setMethod("dbDataType", "SQLiteConnection", function(dbObj, obj, ...) {
+  dbDataType(SQLite(), obj, ...)
 })

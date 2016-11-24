@@ -67,7 +67,7 @@ rsqlite_result_valid <- function(res) {
 #'   RSQLite.
 #' @export
 #' @examples
-#' rsqliteVersion()
+#' RSQLite::rsqliteVersion()
 rsqliteVersion <- function() {
     .Call('RSQLite_rsqliteVersion', PACKAGE = 'RSQLite')
 }

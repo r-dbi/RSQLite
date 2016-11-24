@@ -19,7 +19,7 @@
 #' @examples
 #' library(DBI)
 #' db <- RSQLite::datasetsDb()
-#' initExtension(db)
+#' RSQLite::initExtension(db)
 #'
 #' dbGetQuery(db, "SELECT stdev(mpg) FROM mtcars")
 #' sd(mtcars$mpg)

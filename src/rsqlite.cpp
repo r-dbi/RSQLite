@@ -7,7 +7,7 @@
 //'   RSQLite.
 //' @export
 //' @examples
-//' rsqliteVersion()
+//' RSQLite::rsqliteVersion()
 // [[Rcpp::export]]
 CharacterVector rsqliteVersion() {
   return

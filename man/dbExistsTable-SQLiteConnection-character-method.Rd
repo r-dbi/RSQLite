@@ -3,7 +3,7 @@
 \docType{methods}
 \name{dbExistsTable,SQLiteConnection,character-method}
 \alias{dbExistsTable,SQLiteConnection,character-method}
-\title{Does the table exist?}
+\title{Does the table exist? See also \code{\link[DBI:dbExistsTable]{DBI::dbExistsTable()}} for the generic.}
 \usage{
 \S4method{dbExistsTable}{SQLiteConnection,character}(conn, name, ...)
 }
@@ -15,6 +15,15 @@
 \item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \description{
-Does the table exist?
+Does the table exist? See also \code{\link[DBI:dbExistsTable]{DBI::dbExistsTable()}} for the generic.
+}
+\examples{
+library(DBI)
+db <- RSQLite::datasetsDb()
+
+dbExistsTable(db, "mtcars")
+dbExistsTable(db, "nonexistingtable")
+
+dbDisconnect(db)
 }
 

@@ -1,6 +1,7 @@
 ## Test environments
-* ubuntu 16.10 (local install), R 3.3.2
-* ubuntu 12.04 (on travis-ci), R devel, release, and oldrel
+* Ubuntu 16.10 (local install), R 3.3.2
+* Ubuntu 12.04 (on travis-ci), R devel, release, and oldrel
+* OS X (on travis-ci), R release
 * win-builder (devel and release)
 
 ## R CMD check results

@@ -1,79 +1,38 @@
-The following notes were generated across my local OS X install and ubuntu running on travis-ci. Response to NOTEs across three platforms below.
+## Test environments
+* ubuntu 16.10 (local install), R 3.3.2
+* ubuntu 12.04 (on travis-ci), R devel, release, and oldrel
+* win-builder (devel and release)
 
-* I am taking over maintenance of RSQLite. I'ved asked Seth Falcon to 
-  email you to confirm this.
+## R CMD check results
 
-* checking CRAN incoming feasibility ... NOTE
-  Possibly mis-spelled words in DESCRIPTION:
-    DBI (14:46)
-    SQLite (3:8, 12:46, 13:29, 15:24)
-    
-  These are correct spellings
+0 errors | 0 warnings | 1 notes
 
-* checking compiled code ... NOTE
-  File ‘/Users/hadley/Documents/databases/RSQLite.Rcheck/RSQLite/libs/RSQLite.so’:
-    Found ‘___stderrp’, possibly from ‘stderr’ (C)
-      Object: ‘sqlite-all.o’
-
-  This is in C code from the embedded SQLite database.
-  
-I also ran R CMD check on all downstream dependencies on R-devel. All packages that I install past R CMD check without ERRORs, WARNINGs, or NOTE. (See below for packages that I couldn't install). I informed all downstream maintainers of the pending update one month ago, giving plenty of time for fixes.
-
-Downstream dependency failure ---------------------------------------------------
-
-CITAN =================================================================== 
- *  checking package dependencies ... ERROR
-Package required but not available: ‘RGtk2’
-
-See the information on DESCRIPTION files in the chapter ‘Creating R
-packages’ of the ‘Writing R Extensions’ manual. 
-
-marmap ================================================================== 
- *  checking package dependencies ... ERROR
-Package required but not available: ‘ncdf’
-
-See the information on DESCRIPTION files in the chapter ‘Creating R
-packages’ of the ‘Writing R Extensions’ manual. 
-
-MUCflights ============================================================== 
- *  checking package dependencies ... ERROR
-Package required but not available: ‘XML’
-
-See the information on DESCRIPTION files in the chapter ‘Creating R
-packages’ of the ‘Writing R Extensions’ manual. 
-
-pitchRx ================================================================= 
- *  checking package dependencies ... ERROR
-Package required but not available: ‘XML2R’
-
-Package suggested but not available for checking: ‘rgl’
-
-See the information on DESCRIPTION files in the chapter ‘Creating R
-packages’ of the ‘Writing R Extensions’ manual. 
-
-rangeMapper ============================================================= 
- *  checking package dependencies ... ERROR
-Package required but not available: ‘rgdal’
-
-Package suggested but not available for checking: ‘rgeos’
-
-See the information on DESCRIPTION files in the chapter ‘Creating R
-packages’ of the ‘Writing R Extensions’ manual. 
-
-RQDA ==================================================================== 
- *  checking package dependencies ... ERROR
-Packages required but not available: ‘gWidgetsRGtk2’ ‘RGtk2’
-
-Package which this enhances but not available for checking: ‘rjpod’
-
-See the information on DESCRIPTION files in the chapter ‘Creating R
-packages’ of the ‘Writing R Extensions’ manual. 
-
-snplist ================================================================= 
- *  checking package dependencies ... ERROR
-Package required but not available: ‘biomaRt’
-
-See the information on DESCRIPTION files in the chapter ‘Creating R
-packages’ of the ‘Writing R Extensions’ manual. 
+* New maintainer: Kirill Müller, previous maintainer: Hadley Wickham.
+  See https://github.com/rstats-db/RSQLite/commit/1cfbce07c678de#commitcomment-18978172
+  for a comment that indicates Hadley's consent.
 
 
+## Reverse dependencies
+
+Checked all 117 CRAN and BioConductor reverse dependencies on Ubuntu 16.04.
+A few CRAN packages show errors in this version but succeed with RSQLite v1.0.0:
+
+- ecd (0.8.2) imports RSQLite <= 1.0.0, contacted maintainer several times,
+  last time on Oct 20
+
+- poplite (0.99.16), errors fixed in development version:
+  https://github.com/dbottomly/poplite/issues/2
+
+- tigreBrowserWriter (0.1.2), contacted maintainer on Nov 17, no response so far.
+  The code is using a prepared SQL query with more parameters than the query expects.
+  RSQLite is now intentially stricter about such errors, and I believe that a
+  downstream fix will be beneficial for the tigreBrowserWriter package.
+
+I couldn't check RQDA and vmsbase, they consistently fail checks with both
+versions of RSQLite on my system but succeed checks on CRAN.
+
+All other packages are consistent in their checking behavior for both RSQLite 1.0.0
+and 1.1.
+
+See https://github.com/rstats-db/RSQLite/blob/r-1.1/revdep/README.md for check results and https://github.com/rstats-db/RSQLite/blob/r-1.1/revdep/problems.md
+for results for packages with problems only.

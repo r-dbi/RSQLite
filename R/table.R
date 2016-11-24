@@ -394,17 +394,19 @@ sqliteListTablesQuery <- function(conn, name = NULL) {
     sep = "\n"))
 }
 
-#' List fields in specified table
+#' List fields in a table
+#'
+#' See also [DBI::dbListFields()] for the corresponding generic.
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name a length 1 character vector giving the name of a table.
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @export
 #' @examples
-#' con <- dbConnect(SQLite())
-#' dbWriteTable(con, "iris", iris)
-#' dbListFields(con, "iris")
-#' dbDisconnect(con)
+#' library(DBI)
+#' db <- RSQLite::datasetsDb()
+#' dbListFields(db, "iris")
+#' dbDisconnect(db)
 setMethod("dbListFields", c("SQLiteConnection", "character"),
   function(conn, name, ...) {
     rs <- dbSendQuery(conn, paste("SELECT * FROM ",

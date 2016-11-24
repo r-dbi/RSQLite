@@ -3,7 +3,7 @@
 \docType{methods}
 \name{dbListFields,SQLiteConnection,character-method}
 \alias{dbListFields,SQLiteConnection,character-method}
-\title{List fields in specified table}
+\title{List fields in a table}
 \usage{
 \S4method{dbListFields}{SQLiteConnection,character}(conn, name, ...)
 }
@@ -15,12 +15,12 @@
 \item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
 \description{
-List fields in specified table
+See also \code{\link[DBI:dbListFields]{DBI::dbListFields()}} for the corresponding generic.
 }
 \examples{
-con <- dbConnect(SQLite())
-dbWriteTable(con, "iris", iris)
-dbListFields(con, "iris")
-dbDisconnect(con)
+library(DBI)
+db <- RSQLite::datasetsDb()
+dbListFields(db, "iris")
+dbDisconnect(db)
 }
 

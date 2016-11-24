@@ -9,7 +9,6 @@
 #' @param from A `SQLiteConnection` object. The main database in
 #'   `from` will be copied to `to`.
 #' @param to A `SQLiteConnection` object pointing to an empty database.
-#' @return Returns `NULL` (invisibly).
 #' @author Seth Falcon
 #' @references \url{http://www.sqlite.org/backup.html}
 #' @export

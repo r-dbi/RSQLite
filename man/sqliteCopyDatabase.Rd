@@ -12,9 +12,6 @@ sqliteCopyDatabase(from, to)
 
 \item{to}{A \code{SQLiteConnection} object pointing to an empty database.}
 }
-\value{
-Returns \code{NULL} (invisibly).
-}
 \description{
 Copies a database connection to a file or to another database
 connection.  It can be used to save an in-memory database (created using

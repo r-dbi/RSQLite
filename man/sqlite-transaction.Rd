@@ -23,9 +23,6 @@ nest multiple transaction}
 
 \item{...}{Needed for compatibility with generic. Otherwise ignored.}
 }
-\value{
-A boolean, indicating success or failure.
-}
 \description{
 By default, SQLite is in auto-commit mode. \code{dbBegin()} starts
 a SQLite transaction and turns auto-commit off. \code{dbCommit()} and

@@ -28,10 +28,11 @@ upper_quartile}
 }
 \examples{
 library(DBI)
-db <- dbConnect(RSQLite::datasetsDb(), flags = RSQLite::SQLITE_RO)
+db <- RSQLite::datasetsDb()
 initExtension(db)
 
 dbGetQuery(db, "SELECT stdev(mpg) FROM mtcars")
 sd(mtcars$mpg)
+dbDisconnect(db)
 }
 

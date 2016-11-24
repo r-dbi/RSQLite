@@ -18,11 +18,12 @@
 #' @export
 #' @examples
 #' library(DBI)
-#' db <- dbConnect(RSQLite::datasetsDb(), flags = RSQLite::SQLITE_RO)
+#' db <- RSQLite::datasetsDb()
 #' initExtension(db)
 #'
 #' dbGetQuery(db, "SELECT stdev(mpg) FROM mtcars")
 #' sd(mtcars$mpg)
+#' dbDisconnect(db)
 initExtension <- function(db) {
   if (!db@loadable.extensions) {
     stop("Loadable extensions are not enabled for this db connection",

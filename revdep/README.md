@@ -37,7 +37,7 @@
 |AnnotationDbi      |1.36.0    |      0|        1|     5|
 |AnnotationForge    |1.16.0    |      0|        0|     2|
 |AnnotationHubData  |1.4.0     |      1|        0|     3|
-|AnnotationHub      |2.6.2     |      0|        0|     1|
+|AnnotationHub      |2.6.4     |      0|        0|     1|
 |APSIM              |0.9.1     |      0|        0|     0|
 |archivist          |2.1.1     |      0|        0|     2|
 |BatchExperiments   |1.4.1     |      0|        0|     2|
@@ -125,7 +125,7 @@
 |smnet              |2.1       |      0|        0|     0|
 |snplist            |0.16      |      0|        0|     0|
 |specL              |1.8.0     |      0|        1|     3|
-|sqldf              |0.4-10    |      1|        1|     2|
+|sqldf              |0.4-10    |      0|        1|     2|
 |sqliter            |0.1.0     |      0|        0|     0|
 |SRAdb              |1.32.0    |      0|        0|     6|
 |srvyr              |0.2.0     |      0|        0|     0|
@@ -231,18 +231,18 @@ Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 checking tests ... ERROR
 Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
 Last 13 lines of output:
+  ERROR in test_UCSCChainPreparer_recipe: Error : 1: Unknown IO error2: failed to load external entity "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=&retmax=0"
+  
+  
   Test files with failing tests
   
      test_recipe.R 
        test_UCSC2BitPreparer_recipe 
        test_UCSCChainPreparer_recipe 
-       test_dbSNPVCFPreparer_recipe 
   
   
   Error in BiocGenerics:::testPackage("AnnotationHubData") : 
     unit tests failed for package AnnotationHubData
-  In addition: Warning message:
-  closing unused connection 3 (ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/archive/2016/) 
   Execution halted
 
 checking top-level files ... NOTE
@@ -278,7 +278,7 @@ File ‘AnnotationHubData/R/makeNCBIToOrgDbs.R’:
 See section ‘Good practice’ in ‘?data’.
 ```
 
-## AnnotationHub (2.6.2)
+## AnnotationHub (2.6.4)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
 0 errors | 0 warnings | 1 note 
@@ -2814,32 +2814,9 @@ prepare_Rd: ms1.p2069.Rd:23-26: Dropping empty section \examples
 Maintainer: G. Grothendieck <ggrothendieck@gmail.com>  
 Bug reports: http://groups.google.com/group/sqldf
 
-1 error  | 1 warning  | 2 notes
+0 errors | 1 warning  | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘sqldf-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: sqldf
-> ### Title: SQL select on data frames
-> ### Aliases: sqldf
-> ### Keywords: manip
-> 
-... 6 lines ...
-> # in R without SQL and then again with SQL
-> #
-> 
-> # head
-> a1r <- head(warpbreaks)
-> a1s <- sqldf("select * from warpbreaks limit 6")
-Loading required package: tcltk
-Error in rsqlite_send_query(conn@ptr, statement) : 
-  no such table: warpbreaks
-Calls: sqldf ... initialize -> initialize -> rsqlite_send_query -> .Call
-Execution halted
-
 checking whether package ‘sqldf’ can be installed ... WARNING
 Found the following significant warnings:
   Warning: no DISPLAY variable so Tk is not available
@@ -3167,16 +3144,16 @@ checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
 INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
-Nov 24, 2016 9:00:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 24, 2016 11:19:23 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 24, 2016 9:00:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 24, 2016 11:19:24 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 24, 2016 9:00:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 24, 2016 11:19:24 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetData/QNA/CAN.B1_GE.CARSA.Q?format=compact_v2
 ... 8 lines ...
 SEVERE: Connection failed. HTTP error code : 500, message: Internal Server Error
 SDMX meaning: Error on the provider side.
-Nov 24, 2016 9:01:02 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getDataFlowStructure
+Nov 24, 2016 11:19:25 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getDataFlowStructure
 SEVERE: Exception caught parsing results from call to provider Eurostat
 
 Error: processing vignette 'Guide.Stex' failed with diagnostics:

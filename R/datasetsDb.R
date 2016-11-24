@@ -6,7 +6,7 @@
 #' @export
 #' @examples
 #' library(DBI)
-#' db <- datasetsDb()
+#' db <- RSQLite::datasetsDb()
 #' dbListTables(db)
 #'
 #' dbReadTable(db, "CO2")

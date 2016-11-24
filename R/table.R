@@ -409,7 +409,7 @@ setMethod("dbListFields", c("SQLiteConnection", "character"),
 #' Determine the SQL Data Type of an R object
 #'
 #' This method is a straight-forward implementation of the corresponding
-#' generic function.
+#' generic function [DBI::dbDataType()].
 #'
 #' @param dbObj a `SQLiteConnection` or `SQLiteDriver` object
 #' @param obj an R object whose SQL type we want to determine.

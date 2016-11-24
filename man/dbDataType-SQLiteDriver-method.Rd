@@ -19,7 +19,7 @@
 }
 \description{
 This method is a straight-forward implementation of the corresponding
-generic function.
+generic function \code{\link[DBI:dbDataType]{DBI::dbDataType()}}.
 }
 \examples{
 dbDataType(SQLite(), 1)

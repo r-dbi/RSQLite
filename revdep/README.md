@@ -16,14 +16,14 @@
 
 |package   |*  |version    |date       |source                             |
 |:---------|:--|:----------|:----------|:----------------------------------|
-|BH        |   |1.60.0-2   |2016-05-07 |cran (@1.60.0-)                    |
+|BH        |   |1.62.0-1   |2016-11-19 |cran (@1.62.0-)                    |
 |DBI       |   |0.5-12     |2016-10-06 |Github (rstats-db/DBI@4f00863)     |
 |DBItest   |   |1.3-10     |2016-10-06 |Github (rstats-db/DBItest@9e87611) |
-|knitr     |   |1.15       |2016-11-09 |cran (@1.15)                       |
+|knitr     |   |1.15.1     |2016-11-22 |cran (@1.15.1)                     |
 |memoise   |   |1.0.0      |2016-01-29 |CRAN (R 3.3.1)                     |
 |plogr     |   |0.1-1      |2016-09-24 |cran (@0.1-1)                      |
 |Rcpp      |   |0.12.8     |2016-11-17 |cran (@0.12.8)                     |
-|rmarkdown |   |1.1        |2016-10-16 |cran (@1.1)                        |
+|rmarkdown |   |1.2        |2016-11-21 |cran (@1.2)                        |
 |RSQLite   |   |1.0.0      |2014-10-25 |CRAN (R 3.3.1)                     |
 |testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
@@ -39,7 +39,7 @@
 |AnnotationHubData  |1.4.0     |      1|        0|     3|
 |AnnotationHub      |2.6.2     |      0|        0|     1|
 |APSIM              |0.9.1     |      0|        0|     0|
-|archivist          |2.1.1     |      1|        0|     2|
+|archivist          |2.1.1     |      0|        0|     2|
 |BatchExperiments   |1.4.1     |      0|        0|     2|
 |BatchJobs          |1.6       |      0|        0|     0|
 |bibliospec         |0.0.4     |      0|        0|     0|
@@ -47,12 +47,12 @@
 |bioassayR          |1.12.1    |      0|        0|     1|
 |BoSSA              |2.0       |      0|        0|     0|
 |caroline           |0.7.6     |      0|        0|     2|
-|Category           |2.40.0    |      1|        0|     1|
+|Category           |2.40.0    |      0|        0|     1|
 |ChemmineR          |2.26.0    |      1|        0|     0|
 |chunked            |0.3       |      0|        0|     0|
 |CITAN              |2015.12-2 |      0|        0|     0|
 |clstutils          |1.22.0    |      0|        2|     5|
-|CNEr               |1.10.1    |      2|        2|     3|
+|CNEr               |1.10.1    |      0|        2|     2|
 |CollapsABEL        |0.10.8    |      0|        0|     0|
 |cummeRbund         |2.16.0    |      0|        0|     6|
 |customProDB        |1.14.0    |      0|        0|     3|
@@ -135,7 +135,7 @@
 |survey             |3.31-2    |      0|        0|     0|
 |taRifx             |1.0.6     |      0|        0|     4|
 |tcpl               |1.2.2     |      0|        0|     1|
-|TFBSTools          |1.12.1    |      2|        1|     3|
+|TFBSTools          |1.12.1    |      0|        1|     2|
 |tigreBrowserWriter |0.1.2     |      1|        0|     0|
 |tigre              |1.28.0    |      0|        0|     2|
 |trackeR            |0.0.4     |      0|        1|     0|
@@ -147,7 +147,7 @@
 |UniProt.ws         |2.14.0    |      0|        0|     1|
 |Uniquorn           |1.2.0     |      0|        0|     2|
 |UPMASK             |1.0       |      0|        0|     1|
-|VariantFiltering   |1.10.1    |      0|        1|     5|
+|VariantFiltering   |1.10.1    |      0|        1|     4|
 |vegdata            |0.9       |      0|        0|     0|
 |vmsbase            |2.1.3     |      1|        0|     0|
 
@@ -231,18 +231,18 @@ Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 checking tests ... ERROR
 Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
 Last 13 lines of output:
-  ERROR in test_UCSCChainPreparer_recipe: Error : 1: Unknown IO error2: failed to load external entity "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=&retmax=0"
-  
-  
   Test files with failing tests
   
      test_recipe.R 
        test_UCSC2BitPreparer_recipe 
        test_UCSCChainPreparer_recipe 
+       test_dbSNPVCFPreparer_recipe 
   
   
   Error in BiocGenerics:::testPackage("AnnotationHubData") : 
     unit tests failed for package AnnotationHubData
+  In addition: Warning message:
+  closing unused connection 3 (ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/archive/2016/) 
   Execution halted
 
 checking top-level files ... NOTE
@@ -257,17 +257,17 @@ Unexported object imported by a ':::' call: ‘OrganismDbi:::.packageTaxIds’
 checking R code for possible problems ... NOTE
 .NCBIMetadataFromUrl: no visible binding for global variable ‘results’
 .NCBIMetadataFromUrl: no visible binding for global variable ‘specData’
-.cleanOneTable: no visible global function definition for ‘dbGetQuery’
-.getOtherTableDupIDs: no visible global function definition for
-  ‘dbGetQuery’
 .makeComplexGR: no visible binding for global variable ‘seqname’
-getCurrentResources: no visible global function definition for
-  ‘dbGetQuery’
 jsonPath: no visible binding for global variable ‘SourceFile’
-... 57 lines ...
+jsonPath: no visible binding for global variable ‘HubRoot’
+makeAnnotationHubMetadata : <anonymous>: no visible binding for global
+  variable ‘Title’
+makeAnnotationHubMetadata : <anonymous>: no visible binding for global
+  variable ‘Description’
+... 52 lines ...
   SourceFile SourceType SourceUrl SourceVersion Species TaxonomyId
-  Title ahroot bucket checkTrue dbGetQuery read.csv results seqname
-  specData suppresWarnings
+  Title ahroot bucket checkTrue read.csv results seqname specData
+  suppresWarnings
 Consider adding
   importFrom("utils", "read.csv")
 to your NAMESPACE file.
@@ -297,26 +297,9 @@ Maintainer: Justin Fainges <Justin.Fainges@csiro.au>
 Maintainer: Przemyslaw Biecek <przemyslaw.biecek@gmail.com>  
 Bug reports: https://github.com/pbiecek/archivist/issues
 
-1 error  | 0 warnings | 2 notes
+0 errors | 0 warnings | 2 notes
 
 ```
-checking tests ... ERROR
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-         fun(structure(list(message = msg, call = sys.call()), class = c(typeName, "GenericCurlError", 
-             "error", "condition")))
-     }(56L, "GnuTLS recv error (-54): Error in the pull function.", TRUE)
-  
-  Directory arepo did not exist. Forced to create a new directory.Directory arepo did not exist. Forced to create a new directory.Directory /tmp/Rtmp9gfGgS/file64a155386ffd did not exist. Forced to create a new directory.Directory repository did not exist. Forced to create a new directory.Directory repository did not exist. Forced to create a new directory.Directory repository did not exist. Forced to create a new directory.Directory test1234 did not exist. Forced to create a new directory.  adding: test1234/backpack.db (deflated 87%)
-    adding: test1234/gallery/ff575c261c949d073b2895b05d1097c3.rda (deflated 71%)
-    adding: test1234/gallery/ff575c261c949d073b2895b05d1097c3.txt (deflated 70%)
-  testthat results ================================================================
-  OK: 41 SKIPPED: 0 FAILED: 1
-  1. Error: aread downloads files (@test_jss_artilce.R#3) 
-  
-  Error: testthat unit tests failed
-  Execution halted
-
 checking package dependencies ... NOTE
 Package which this enhances but not available for checking: ‘archivist.github’
 
@@ -500,39 +483,14 @@ contains 'methods').
 ## Category (2.40.0)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-1 error  | 0 warnings | 1 note 
+0 errors | 0 warnings | 1 note 
 
 ```
-checking tests ... ERROR
-Running the tests in ‘tests/runTests.R’ failed.
-Last 13 lines of output:
-  ERROR in test_basic_regression_YEAST: Error in getGoToEntrezMap_db(p) : could not find function "dbGetQuery"
-  ERROR in test_basic_regression_hgu95av2: Error in getGoToEntrezMap_db(p) : could not find function "dbGetQuery"
-  
-  Test files with failing tests
-  
-     hyperGTest_test.R 
-       test_basic_regression_YEAST 
-       test_basic_regression_hgu95av2 
-  
-  
-  Error in BiocGenerics:::testPackage("Category", "UnitTests", ".*_test\\.R$") : 
-    unit tests failed for package Category
-  Execution halted
-
 checking R code for possible problems ... NOTE
 .linearMTestInternal: no visible global function definition for
   ‘setNames’
-getGoToEntrezMap_db: no visible global function definition for
-  ‘dbGetQuery’
-getUniverseViaKegg_db: no visible global function definition for
-  ‘dbGetQuery’
-getUniverseViaPfam_db: no visible global function definition for
-  ‘dbGetQuery’
-GO2AllProbes,Org.XX.egDatPkg: no visible global function definition for
-  ‘dbGetQuery’
 Undefined global functions or variables:
-  dbGetQuery setNames
+  setNames
 Consider adding
   importFrom("stats", "setNames")
 to your NAMESPACE file.
@@ -643,49 +601,9 @@ to your NAMESPACE file.
 Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>  
 Bug reports: https://github.com/ge11232002/CNEr/issues
 
-2 errors | 2 warnings | 3 notes
+0 errors | 2 warnings | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘CNEr-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: CNEDensity-methods
-> ### Title: CNEDensity function
-> ### Aliases: CNEDensity CNEDensity-methods
-> ###   CNEDensity,ANY,character,character,missing,missing-method
-> ###   CNEDensity,ANY,missing,character,character,character-method
-... 12 lines ...
-> cneDanRer10Hg38_45_50 <- 
-+   CNEDensity(dbName=dbName, 
-+              tableName="danRer10_hg38_45_50", 
-+              whichAssembly="first", chr=chr, start=start,
-+              end=end, windowSize=windowSize, 
-+              minLength=minLength)
-Error in readCNERangesFromSQLite(dbName, tableName, chr, context_start,  : 
-  could not find function "dbGetQuery"
-Calls: CNEDensity -> .CNEDensityInternal -> readCNERangesFromSQLite
-Execution halted
-** found \donttest examples: check also with --run-donttest
-
-checking tests ... ERROR
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-  1: readCNERangesFromSQLite(dbName = dbName, tableName = "danRer10_hg38_45_50") at testthat/test_IO.R:102
-  
-  The number of axt files 1
-  The number of axt alignments is 50
-  The number of axt files 1
-  The number of axt alignments is 352
-  testthat results ================================================================
-  OK: 80 SKIPPED: 0 FAILED: 2
-  1. Error: test_GRangePairs (@test_GRangePairs.R#94) 
-  2. Error: test_readCNERangesFromSQLite (@test_IO.R#102) 
-  
-  Error: testthat unit tests failed
-  Execution halted
-
 checking compiled code ... WARNING
 File ‘CNEr/libs/CNEr.so’:
   Found ‘abort’, possibly from ‘abort’ (C)
@@ -730,15 +648,6 @@ checking dependencies in R code ... NOTE
 Unexported objects imported by ':::' calls:
   ‘BiocGenerics:::replaceSlots’ ‘S4Vectors:::make_zero_col_DataFrame’
   See the note in ?`:::` about the use of this operator.
-
-checking R code for possible problems ... NOTE
-queryAnnotationSQLite: no visible global function definition for
-  ‘dbGetQuery’
-queryCNEData: no visible global function definition for ‘dbGetQuery’
-readCNERangesFromSQLite: no visible global function definition for
-  ‘dbGetQuery’
-Undefined global functions or variables:
-  dbGetQuery
 ```
 
 ## CollapsABEL (0.10.8)
@@ -942,9 +851,9 @@ Bug reports: https://github.com/hadley/dplyr/issues
 
 ```
 checking installed package size ... NOTE
-  installed size is 23.5Mb
+  installed size is 23.4Mb
   sub-directories of 1Mb or more:
-    libs  21.4Mb
+    libs  21.3Mb
 ```
 
 ## ecd (0.8.2)
@@ -2066,26 +1975,20 @@ Unexported object imported by a ':::' call: ‘Biobase:::assayDataEnvLock’
   See the note in ?`:::` about the use of this operator.
 
 checking R code for possible problems ... NOTE
-addFeatureAnnotation.pd2: no visible global function definition for
-  ‘dbGetQuery’
 getSequenceLengths: no visible binding for global variable ‘seqlengths’
 pdPkgFromBioC: no visible binding for global variable ‘contrib.url’
 pdPkgFromBioC: no visible global function definition for
   ‘available.packages’
 pdPkgFromBioC: no visible global function definition for
   ‘install.packages’
-allele,SnpFeatureSet: no visible global function definition for
-  ‘dbGetQuery’
 chromosome,gSetList: no visible global function definition for
   ‘chromosomeList’
 coerce,CNSet-CopyNumberSet: no visible global function definition for
   ‘totalCopynumber’
 geometry,FeatureSet: no visible global function definition for ‘getPD’
-initialize,DBPDInfo: no visible global function definition for
-  ‘dbGetQuery’
 Undefined global functions or variables:
-  available.packages chromosomeList contrib.url dbGetQuery getPD
-  install.packages seqlengths totalCopynumber
+  available.packages chromosomeList contrib.url getPD install.packages
+  seqlengths totalCopynumber
 Consider adding
   importFrom("utils", "available.packages", "contrib.url",
              "install.packages")
@@ -2241,11 +2144,6 @@ There are ::: calls to the package's namespace in its code. A package
   ‘.taxIdToOrgDbName’ ‘.testGraphData’ ‘.testKeys’ ‘OrganismDb’
 
 checking R code for possible problems ... NOTE
-.getMetaDataValue: no visible global function definition for
-  ‘dbGetQuery’
-Undefined global functions or variables:
-  dbGetQuery
-
 Found the following assignments to the global environment:
 File ‘OrganismDbi/R/createOrganismPackage.R’:
   assign(txdbName, txdb, .GlobalEnv)
@@ -2339,17 +2237,18 @@ cdf2table: no visible binding for global variable ‘unitLst’
 cdfUnits2table: no visible global function definition for ‘%do%’
 cdfUnits2table: no visible global function definition for ‘foreach’
 cdfUnits2table: no visible binding for global variable ‘i’
-connectDb: no visible global function definition for ‘dbGetQuery’
 createChrDict: no visible global function definition for ‘na.omit’
-... 61 lines ...
-  definition for ‘dbGetQuery’
-makePdInfoPackage,NgsExpressionPDInfoPkgSeed: no visible global
-  function definition for ‘dbGetQuery’
-makePdInfoPackage,NgsTilingPDInfoPkgSeed: no visible global function
-  definition for ‘dbGetQuery’
+getAllFSetMpsTables: no visible global function definition for
+  ‘%dopar%’
+getAllFSetMpsTables: no visible global function definition for
+  ‘foreach’
+getAllFSetMpsTables: no visible binding for global variable ‘i’
+parseBpmapCel: no visible global function definition for ‘aggregate’
+parseCdfSeqAnnotSnp: no visible global function definition for
+  ‘aggregate’
+parseNgsTrio: no visible global function definition for ‘aggregate’
 Undefined global functions or variables:
-  %do% %dopar% aggregate dbGetQuery foreach getDoParWorkers i na.omit
-  unitLst
+  %do% %dopar% aggregate foreach getDoParWorkers i na.omit unitLst
 Consider adding
   importFrom("stats", "aggregate", "na.omit")
 to your NAMESPACE file.
@@ -3140,49 +3039,9 @@ checking installed package size ... NOTE
 Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>  
 Bug reports: https://github.com/ge11232002/TFBSTools/issues
 
-2 errors | 1 warning  | 3 notes
+0 errors | 1 warning  | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘TFBSTools-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: PFMSimilarity-methods
-> ### Title: PFMSimilarity method
-> ### Aliases: PFMSimilarity PFMSimilarity-methods
-> ###   PFMSimilarity,matrix,character-method
-> ###   PFMSimilarity,matrix,matrix-method
-... 59 lines ...
-+     nrow=4, byrow=TRUE, dimnames=list(DNA_BASES))
->   pfmQuery <- PFMatrix(profileMatrix=profileMatrix)
->   pfmSubjects <- getMatrixSet(JASPAR2016,
-+                               opts=list(ID=c("MA0500", "MA0499", "MA0521",
-+                                              "MA0697", "MA0048", "MA0751",
-+                                              "MA0832")))
-Error in .get_latest_version(con, baseID) : 
-  could not find function "dbGetQuery"
-Calls: getMatrixSet ... getMatrixSet -> .get_IDlist_by_query -> .get_latest_version
-Execution halted
-** found \donttest examples: check also with --run-donttest
-
-checking tests ... ERROR
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-  3: getMatrixSet(x@db, opts)
-  4: getMatrixSet(x@db, opts)
-  5: getMatrixSet(con, opts)
-  6: getMatrixSet(con, opts)
-  7: .get_IDlist_by_query(x, opts)
-  8: .get_latest_version(con, baseID)
-  
-  testthat results ================================================================
-  OK: 26 SKIPPED: 0 FAILED: 1
-  1. Error: test_PFMSimilarity (@test_PFM.R#11) 
-  
-  Error: testthat unit tests failed
-  Execution halted
-
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
@@ -3203,29 +3062,6 @@ checking dependencies in R code ... NOTE
 Unexported objects imported by ':::' calls:
   ‘S4Vectors:::new_SimpleList_from_list’ ‘seqLogo:::pwm2ic’
   See the note in ?`:::` about the use of this operator.
-
-checking R code for possible problems ... NOTE
-.TAXIDToSpecies: no visible global function definition for ‘dbGetQuery’
-.create_tables: no visible global function definition for ‘dbGetQuery’
-.fixTAXID: no visible global function definition for ‘dbGetQuery’
-.get_IDlist_by_query: no visible global function definition for
-  ‘dbGetQuery’
-.get_Matrix_by_int_id: no visible global function definition for
-  ‘dbGetQuery’
-.get_internal_id: no visible global function definition for
-  ‘dbGetQuery’
-... 9 lines ...
-  ‘dbGetQuery’
-.store_matrix_data: no visible global function definition for
-  ‘dbGetQuery’
-.store_matrix_species: no visible global function definition for
-  ‘dbGetQuery’
-deleteMatrixHavingID,SQLiteConnection: no visible global function
-  definition for ‘dbGetQuery’
-getMatrixByName,SQLiteConnection: no visible global function definition
-  for ‘dbGetQuery’
-Undefined global functions or variables:
-  dbGetQuery
 ```
 
 ## tigreBrowserWriter (0.1.2)
@@ -3331,16 +3167,16 @@ checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
 INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
-Nov 24, 2016 3:48:04 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 24, 2016 9:00:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 24, 2016 3:48:04 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 24, 2016 9:00:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 24, 2016 3:48:04 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 24, 2016 9:00:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetData/QNA/CAN.B1_GE.CARSA.Q?format=compact_v2
 ... 8 lines ...
 SEVERE: Connection failed. HTTP error code : 500, message: Internal Server Error
 SDMX meaning: Error on the provider side.
-Nov 24, 2016 3:48:06 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getDataFlowStructure
+Nov 24, 2016 9:01:02 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getDataFlowStructure
 SEVERE: Exception caught parsing results from call to provider Eurostat
 
 Error: processing vignette 'Guide.Stex' failed with diagnostics:
@@ -3457,7 +3293,7 @@ to your NAMESPACE file.
 Maintainer: Robert Castelo <robert.castelo@upf.edu>  
 Bug reports: https://github.com/rcastelo/VariantFiltering/issues
 
-0 errors | 1 warning  | 5 notes
+0 errors | 1 warning  | 4 notes
 
 ```
 checking sizes of PDF files under ‘inst/doc’ ... WARNING
@@ -3480,11 +3316,6 @@ Unexported objects imported by ':::' calls:
 There are ::: calls to the package's namespace in its code. A package
   almost never needs to use ::: for its own objects:
   '.adjustForStrandSense'
-
-checking R code for possible problems ... NOTE
-.dbEasyQuery: no visible global function definition for 'dbGetQuery'
-Undefined global functions or variables:
-  dbGetQuery
 
 checking Rd line widths ... NOTE
 Rd file 'MafDb-class.Rd':

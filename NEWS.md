@@ -19,6 +19,10 @@
 - `RSQLite()` no longer automatically attaches DBI when loaded. This is to
   encourage you to use `library(DBI); dbConnect(RSQLite::SQLite())`.
 
+- Functions that take a table name, such as `dbWriteTable()` and `dbReadTable()`,
+  now quote the table name via `dbQuoteIdentifier()`.
+  This means that caller-quoted names should be marked as such with `DBI::SQL()`.
+
 ## New features
 
 - RSQLite has been rewritten (essentially from scratch) in C++ with
@@ -89,6 +93,10 @@
 - `sqliteCopyDatabase()` accepts character as `to` argument again, in this case a temporary connection is opened.
 
 - Reimplemented `dbWriteTable("SQLiteConnection", "character", "character")` for import of CSV files, using a function from the old codebase (#151).
+
+- `dbWriteTable("SQLiteConnection", "character", "data.frame")` looks
+  for table names already enclosed in backticks and uses these,
+  (with a warning), for compatibility with the sqldf package.
 
 ## Performance
 

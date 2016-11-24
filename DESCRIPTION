@@ -1,7 +1,7 @@
 Package: RSQLite
 Version: 1.1
 Date: 2016-11-24
-Title: SQLite Interface for R
+Title: 'SQLite' Interface for R
 Authors@R: c(
     person("Kirill", "Müller", role = c("aut", "cre"), email = "krlmlr+r@mailbox.org"),
     person("Hadley", "Wickham", role = c("aut")),
@@ -13,7 +13,7 @@ Authors@R: c(
     )
 Description: Embeds the 'SQLite' database engine in R and
     provides an interface compliant with the 'DBI' package. The
-    source for the SQLite engine (version 3.8.8.2) is included.
+    source for the 'SQLite' engine (version 3.8.8.2) is included.
 Depends:
     R (>= 3.1.0)
 Suggests:

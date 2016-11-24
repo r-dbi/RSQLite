@@ -4,9 +4,10 @@ NULL
 
 #' Connect to an SQLite database
 #'
-#' Together, `SQLite()` and [DBI::dbConnect()] allow you to connect to
+#' Together, `SQLite()` and `dbConnect()` allow you to connect to
 #' a SQLite database file. See \link{sqlite-query} for how to issue queries
 #' and receive results.
+#' See also [DBI::dbConnect()] for the corresponding generic.
 #'
 #' Connections are automatically cleaned-up after they're deleted and
 #' reclaimed by the GC. You can use [DBI::dbDisconnect()] to terminate the

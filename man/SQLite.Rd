@@ -72,9 +72,10 @@ read only mode.  Raise an error if the file does not already exist}
 \code{"unix-none"}.}
 }
 \description{
-Together, \code{SQLite()} and \code{\link[DBI:dbConnect]{DBI::dbConnect()}} allow you to connect to
+Together, \code{SQLite()} and \code{dbConnect()} allow you to connect to
 a SQLite database file. See \link{sqlite-query} for how to issue queries
 and receive results.
+See also \code{\link[DBI:dbConnect]{DBI::dbConnect()}} for the corresponding generic.
 }
 \details{
 Connections are automatically cleaned-up after they're deleted and

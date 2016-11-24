@@ -5,11 +5,13 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 notes
+0 errors | 0 warnings | 2 notes
 
 * New maintainer: Kirill Müller, previous maintainer: Hadley Wickham.
   See https://github.com/rstats-db/RSQLite/commit/1cfbce07c678de#commitcomment-18978172
   for a comment that indicates Hadley's consent.
+
+* Installed size: This package comes with a bundled RSQLite library.
 
 
 ## Reverse dependencies

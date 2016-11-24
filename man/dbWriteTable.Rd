@@ -70,17 +70,18 @@ defaults when imputing classes from on-disk file.}
 \code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
 }
 \description{
-Write a local data frame or file to the database
+See also \code{\link[DBI:dbWriteTable]{DBI::dbWriteTable()}} and \code{\link[DBI:sqlData]{DBI::sqlData()}} for the corresponding
+generic.
 }
 \details{
 In a primary key column qualified with
 \href{https://www.sqlite.org/autoinc.html}{\code{AUTOINCREMENT}}, missing
 values will be assigned the next largest positive integer,
 while nonmissing elements/cells retain their value.  If the
-autoincrement column exists in the \code{data.frame}
-(passed to \code{dbWriteTable}'s \code{value} parameter), the \code{NA}
-elements are overwritten.
-Similarly, if the key column is not present in the \code{data.frame}, all
+autoincrement column exists in the data frame
+passed to the \code{value} argument,
+the \code{NA} elements are overwritten.
+Similarly, if the key column is not present in the data frame, all
 elements are automatically assigned a value.
 }
 \examples{

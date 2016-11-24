@@ -3,6 +3,9 @@ NULL
 
 #' Write a local data frame or file to the database
 #'
+#' See also [DBI::dbWriteTable()] and [DBI::sqlData()] for the corresponding
+#' generic.
+#'
 #' @export
 #' @rdname dbWriteTable
 #' @param con,conn a \code{\linkS4class{SQLiteConnection}} object, produced by
@@ -34,10 +37,10 @@ NULL
 #' \href{https://www.sqlite.org/autoinc.html}{`AUTOINCREMENT`}, missing
 #' values will be assigned the next largest positive integer,
 #' while nonmissing elements/cells retain their value.  If the
-#' autoincrement column exists in the `data.frame`
-#' (passed to `dbWriteTable`'s `value` parameter), the `NA`
-#' elements are overwritten.
-#' Similarly, if the key column is not present in the `data.frame`, all
+#' autoincrement column exists in the data frame
+#' passed to the `value` argument,
+#' the `NA` elements are overwritten.
+#' Similarly, if the key column is not present in the data frame, all
 #' elements are automatically assigned a value.
 #' @export
 #' @examples

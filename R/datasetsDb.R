@@ -6,7 +6,7 @@
 #' @export
 #' @examples
 #' library(DBI)
-#' db <- datasetsDb()
+#' db <- RSQLite::datasetsDb()
 #' dbListTables(db)
 #'
 #' dbReadTable(db, "CO2")
@@ -14,5 +14,6 @@
 #'
 #' dbDisconnect(db)
 datasetsDb <- function() {
-  dbConnect(SQLite(), system.file("db", "datasets.sqlite", package = "RSQLite"))
+  dbConnect(SQLite(), system.file("db", "datasets.sqlite", package = "RSQLite"),
+            flags = SQLITE_RO)
 }

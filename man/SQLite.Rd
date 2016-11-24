@@ -9,7 +9,7 @@
 \alias{SQLITE_RO}
 \alias{dbConnect,SQLiteConnection-method}
 \alias{dbDisconnect,SQLiteConnection-method}
-\title{Connect to an SQLite datbase}
+\title{Connect to an SQLite database}
 \usage{
 SQLite(...)
 
@@ -22,7 +22,7 @@ SQLite(...)
 \S4method{dbDisconnect}{SQLiteConnection}(conn, ...)
 }
 \arguments{
-\item{...}{In previous versions, \code{\link[=SQLite]{SQLite()}} took arguments. These
+\item{...}{In previous versions, \code{SQLite()} took arguments. These
 have now all been moved to \code{\link[=dbConnect]{dbConnect()}}, and any arguments here
 will be ignored with a warning.}
 
@@ -72,13 +72,13 @@ read only mode.  Raise an error if the file does not already exist}
 \code{"unix-none"}.}
 }
 \description{
-Together, \code{\link[=SQLite]{SQLite()}} and \code{\link[=dbConnect]{dbConnect()}} allow you to connect to
+Together, \code{SQLite()} and \code{dbConnect()} allow you to connect to
 a SQLite database file. See \link{sqlite-query} for how to issue queries
 and receive results.
 }
 \details{
 Connections are automatically cleaned-up after they're deleted and
-reclaimed by the GC. You can use \code{\link[=dbDisconnect]{dbDisconnect()}} to terminate the
+reclaimed by the GC. You can use \code{\link[DBI:dbDisconnect]{DBI::dbDisconnect()}} to terminate the
 connection early, but it will not actually close until all open result
 sets have been closed (and you'll get a warning message to this effect).
 }
@@ -103,5 +103,8 @@ dbClearResult(rs)
 
 # clean up
 dbDisconnect(con)
+}
+\seealso{
+The corresponding generic functions \code{\link[DBI:dbConnect]{DBI::dbConnect()}} and \code{\link[DBI:dbDisconnect]{DBI::dbDisconnect()}}.
 }
 

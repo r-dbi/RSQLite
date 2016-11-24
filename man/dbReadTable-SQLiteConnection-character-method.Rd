@@ -3,7 +3,7 @@
 \docType{methods}
 \name{dbReadTable,SQLiteConnection,character-method}
 \alias{dbReadTable,SQLiteConnection,character-method}
-\title{Convenience functions for importing/exporting DBMS tables}
+\title{Read a database table.}
 \usage{
 \S4method{dbReadTable}{SQLiteConnection,character}(conn, name, ...,
   row.names = NA, check.names = TRUE, select.cols = "*")
@@ -32,34 +32,27 @@ For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
 \item{check.names}{If \code{TRUE}, the default, column names will be
 converted to valid R identifiers.}
 
-\item{select.cols}{A SQL statement (in the form of a character vector of
-length 1) giving the columns to select. E.g. "*" selects all columns,
-"x,y,z" selects three columns named as listed.}
+\item{select.cols}{A SQL expression (in the form of a character vector of
+length 1) giving the columns to select. E.g. \code{"*"} selects all columns,
+\code{"x, y, z"} selects three columns named as listed.}
 }
 \value{
-A data.frame in the case of \code{\link[=dbReadTable]{dbReadTable()}}; otherwise a logical
-indicating whether the operation was successful.
+A data frame.
 }
 \description{
-These functions mimic their R/S-Plus counterpart \code{get}, \code{assign},
-\code{exists}, \code{remove}, and \code{objects}, except that they generate
-code that gets remotely executed in a database engine.
+See also \code{\link[DBI:dbReadTable]{DBI::dbReadTable()}} for the corresponding generic.
 }
-\note{
-Note that the data.frame returned by \code{dbReadTable} only has
+\details{
+Note that the data frame returned by \code{dbReadTable()} only has
 primitive data, e.g., it does not coerce character data to factors.
 }
 \examples{
 library(DBI)
-con <- dbConnect(SQLite())
-dbWriteTable(con, "mtcars", mtcars)
-dbReadTable(con, "mtcars")
-dbGetQuery(con, "SELECT * FROM mtcars WHERE cyl = 8")
-
-# Supress row names
-dbReadTable(con, "mtcars", row.names = FALSE)
-dbGetQuery(con, "SELECT * FROM mtcars WHERE cyl = 8", row.names = FALSE)
-
-dbDisconnect(con)
+db <- RSQLite::datasetsDb()
+dbReadTable(db, "mtcars")
+dbReadTable(db, "mtcars", row.names = FALSE)
+dbReadTable(db, "mtcars", select.cols = "cyl, gear")
+dbReadTable(db, "mtcars", select.cols = "row_names, cyl, gear")
+dbDisconnect(db)
 }
 

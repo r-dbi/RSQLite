@@ -263,16 +263,14 @@ string_to_utf8 <- function(value) {
 }
 
 
-#' Convenience functions for importing/exporting DBMS tables
+#' Read a database table.
 #'
-#' These functions mimic their R/S-Plus counterpart `get`, `assign`,
-#' `exists`, `remove`, and `objects`, except that they generate
-#' code that gets remotely executed in a database engine.
+#' See also [DBI::dbReadTable()] for the corresponding generic.
 #'
-#' @return A data.frame in the case of [dbReadTable()]; otherwise a logical
-#' indicating whether the operation was successful.
-#' @note Note that the data.frame returned by `dbReadTable` only has
+#' Note that the data frame returned by `dbReadTable()` only has
 #' primitive data, e.g., it does not coerce character data to factors.
+#'
+#' @return A data frame.
 #'
 #' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
 #'   [DBI::dbConnect()]
@@ -281,24 +279,20 @@ string_to_utf8 <- function(value) {
 #'   are considered equal.
 #' @param check.names If `TRUE`, the default, column names will be
 #'   converted to valid R identifiers.
-#' @param select.cols  A SQL statement (in the form of a character vector of
-#'    length 1) giving the columns to select. E.g. "*" selects all columns,
-#'    "x,y,z" selects three columns named as listed.
+#' @param select.cols  A SQL expression (in the form of a character vector of
+#'    length 1) giving the columns to select. E.g. `"*"` selects all columns,
+#'    `"x, y, z"` selects three columns named as listed.
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @inheritParams DBI::sqlRownamesToColumn
 #' @export
 #' @examples
 #' library(DBI)
-#' con <- dbConnect(SQLite())
-#' dbWriteTable(con, "mtcars", mtcars)
-#' dbReadTable(con, "mtcars")
-#' dbGetQuery(con, "SELECT * FROM mtcars WHERE cyl = 8")
-#'
-#' # Supress row names
-#' dbReadTable(con, "mtcars", row.names = FALSE)
-#' dbGetQuery(con, "SELECT * FROM mtcars WHERE cyl = 8", row.names = FALSE)
-#'
-#' dbDisconnect(con)
+#' db <- RSQLite::datasetsDb()
+#' dbReadTable(db, "mtcars")
+#' dbReadTable(db, "mtcars", row.names = FALSE)
+#' dbReadTable(db, "mtcars", select.cols = "cyl, gear")
+#' dbReadTable(db, "mtcars", select.cols = "row_names, cyl, gear")
+#' dbDisconnect(db)
 setMethod("dbReadTable", c("SQLiteConnection", "character"),
   function(conn, name, ..., row.names = NA, check.names = TRUE, select.cols = "*") {
     row.names <- compatRowNames(row.names)

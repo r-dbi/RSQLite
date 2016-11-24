@@ -2,19 +2,19 @@
 #' @include SQLiteDriver.R
 NULL
 
-#' Connect to an SQLite datbase
+#' Connect to an SQLite database
 #'
-#' Together, [SQLite()] and [dbConnect()] allow you to connect to
+#' Together, `SQLite()` and [DBI::dbConnect()] allow you to connect to
 #' a SQLite database file. See \link{sqlite-query} for how to issue queries
 #' and receive results.
 #'
 #' Connections are automatically cleaned-up after they're deleted and
-#' reclaimed by the GC. You can use [dbDisconnect()] to terminate the
+#' reclaimed by the GC. You can use [DBI::dbDisconnect()] to terminate the
 #' connection early, but it will not actually close until all open result
 #' sets have been closed (and you'll get a warning message to this effect).
 #'
 #' @export
-#' @param ... In previous versions, [SQLite()] took arguments. These
+#' @param ... In previous versions, `SQLite()` took arguments. These
 #'   have now all been moved to [dbConnect()], and any arguments here
 #'   will be ignored with a warning.
 #' @import methods DBI

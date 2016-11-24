@@ -112,7 +112,6 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
 
 
 #' @export
-#' @rawNamespace exportMethods(dbGetQuery)
 DBI::dbGetQuery
 
 

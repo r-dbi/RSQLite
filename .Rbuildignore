@@ -26,3 +26,5 @@ a.out.dSYM
 ^clion-test\.R$
 ^_pkgdown\.yml$
 ^docs$
+^README\.Rmd$
+^UPDATE\.md$

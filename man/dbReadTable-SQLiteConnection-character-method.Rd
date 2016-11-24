@@ -3,7 +3,7 @@
 \docType{methods}
 \name{dbReadTable,SQLiteConnection,character-method}
 \alias{dbReadTable,SQLiteConnection,character-method}
-\title{Read a database table.}
+\title{Read a database table}
 \usage{
 \S4method{dbReadTable}{SQLiteConnection,character}(conn, name, ...,
   row.names = NA, check.names = TRUE, select.cols = "*")

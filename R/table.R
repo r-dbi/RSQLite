@@ -263,7 +263,7 @@ string_to_utf8 <- function(value) {
 }
 
 
-#' Read a database table.
+#' Read a database table
 #'
 #' See also [DBI::dbReadTable()] for the corresponding generic.
 #'

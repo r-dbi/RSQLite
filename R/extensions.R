@@ -14,14 +14,13 @@
 #' \item{Aggregate functions}{stdev, variance, mode, median, lower_quartile,
 #'   upper_quartile}
 #' }
-#' @param db A database to load these extensions.
+#' @param db A [SQLiteConnection] object to load these extensions into.
 #' @export
 #' @examples
 #' library(DBI)
-#' db <- dbConnect(SQLite())
+#' db <- dbConnect(RSQLite::datasetsDb(), flags = RSQLite::SQLITE_RO)
 #' initExtension(db)
 #'
-#' dbWriteTable(db, "mtcars", mtcars)
 #' dbGetQuery(db, "SELECT stdev(mpg) FROM mtcars")
 #' sd(mtcars$mpg)
 initExtension <- function(db) {

@@ -7,7 +7,7 @@
 initExtension(db)
 }
 \arguments{
-\item{db}{A database to load these extensions.}
+\item{db}{A \link{SQLiteConnection} object to load these extensions into.}
 }
 \description{
 These extension functions are written by Liam Healy and made available
@@ -28,10 +28,9 @@ upper_quartile}
 }
 \examples{
 library(DBI)
-db <- dbConnect(SQLite())
+db <- dbConnect(RSQLite::datasetsDb(), flags = RSQLite::SQLITE_RO)
 initExtension(db)
 
-dbWriteTable(db, "mtcars", mtcars)
 dbGetQuery(db, "SELECT stdev(mpg) FROM mtcars")
 sd(mtcars$mpg)
 }

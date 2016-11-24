@@ -6,6 +6,8 @@
 //' @return A character vector containing header and library versions of
 //'   RSQLite.
 //' @export
+//' @examples
+//' rsqliteVersion()
 // [[Rcpp::export]]
 CharacterVector rsqliteVersion() {
   return

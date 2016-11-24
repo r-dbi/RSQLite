@@ -66,6 +66,8 @@ rsqlite_result_valid <- function(res) {
 #' @return A character vector containing header and library versions of
 #'   RSQLite.
 #' @export
+#' @examples
+#' rsqliteVersion()
 rsqliteVersion <- function() {
     .Call('RSQLite_rsqliteVersion', PACKAGE = 'RSQLite')
 }

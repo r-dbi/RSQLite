@@ -10,7 +10,7 @@ Ideally the update should happen right *after* each CRAN release, so that a new 
 
 ## SQLite library
 
-1.  Download latest SQLite source by running `src-raw/upgrade.R`
+1.  Download latest SQLite source by running `data-raw/upgrade.R`
 
 1.  Update `DESCRIPTION` for included version of SQLite
 

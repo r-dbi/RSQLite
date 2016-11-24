@@ -14,6 +14,11 @@
 
 - Header files for `sqlite3` are no longer installed, linking to the package is not possible anymore. Packages that require access to the low-level sqlite3 API should bundle their own copy.
 
+## Breaking changes
+
+- `RSQLite()` no longer automatically attaches DBI when loaded. This is to
+  encourage you to use `library(DBI); dbConnect(RSQLite::SQLite())`.
+
 ## New features
 
 - RSQLite has been rewritten (essentially from scratch) in C++ with
@@ -51,10 +56,7 @@
 
 - Deprecation warnings are given only once, with a clear reference to the source.
 
-## Breaking changes
-
-- `RSQLite()` no longer automatically attaches DBI when loaded. This is to
-  encourage you to use `library(DBI); dbConnect(RSQLite::SQLite())`.
+- `datasetsDb()` now returns a read-only database, to avoid modifications to the installed file.
 
 ## Deprecated functions
 
@@ -96,14 +98,14 @@
 
 - Start on a basic vignette: `vignette("RSQLite")` (#50).
 
-- Using `dbExecute()` in examples.
+- Reworked function and method documentation, removed old documentation (#121).
+
+- Using `dbExecute()` in documentation and examples.
 
 - Using both `":memory:"` and `":file::memory:"` in documentation.
 
 - Added additional documentation and unit tests for
   [autoincrement keys](https://www.sqlite.org/autoinc.html) (#119, @wibeasley).
-
-- Removed old documentation (#121).
 
 ## Internal
 

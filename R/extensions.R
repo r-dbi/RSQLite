@@ -14,7 +14,7 @@
 #' \item{Aggregate functions}{stdev, variance, mode, median, lower_quartile,
 #'   upper_quartile}
 #' }
-#' @param db A [SQLiteConnection] object to load these extensions into.
+#' @param db A \code{\linkS4class{SQLiteConnection}} object to load these extensions into.
 #' @export
 #' @examples
 #' library(DBI)

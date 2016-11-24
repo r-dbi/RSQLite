@@ -7,7 +7,7 @@
 initExtension(db)
 }
 \arguments{
-\item{db}{A \link{SQLiteConnection} object to load these extensions into.}
+\item{db}{A \code{\linkS4class{SQLiteConnection}} object to load these extensions into.}
 }
 \description{
 These extension functions are written by Liam Healy and made available

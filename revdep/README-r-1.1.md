@@ -10,7 +10,7 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Universal                    |
-|date     |2016-11-24                   |
+|date     |2016-11-25                   |
 
 ## Packages
 
@@ -3144,16 +3144,16 @@ checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
 INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
-Nov 24, 2016 11:19:23 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 25, 2016 12:03:42 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 24, 2016 11:19:24 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 25, 2016 12:03:43 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 24, 2016 11:19:24 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 25, 2016 12:03:43 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetData/QNA/CAN.B1_GE.CARSA.Q?format=compact_v2
 ... 8 lines ...
 SEVERE: Connection failed. HTTP error code : 500, message: Internal Server Error
 SDMX meaning: Error on the provider side.
-Nov 24, 2016 11:19:25 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getDataFlowStructure
+Nov 25, 2016 12:03:44 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient getDataFlowStructure
 SEVERE: Exception caught parsing results from call to provider Eurostat
 
 Error: processing vignette 'Guide.Stex' failed with diagnostics:

@@ -9,6 +9,7 @@ Authors@R: c(
     person("Seth", "Falcon", role = "aut"),
     person(family = "SQLite Authors", role = "ctb", comment = "for the included SQLite sources"),
     person("Liam", "Healy", role = "ctb", comment = "for the included SQLite sources"),
+    person(family = "R Consortium", role = "cph"),
     person(family = "RStudio", role = "cph")
     )
 Description: Embeds the 'SQLite' database engine in R and

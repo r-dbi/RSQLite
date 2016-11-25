@@ -1,3 +1,5 @@
+# RSQLite 1.1 (2016-11-25)
+
 - New maintainer: Kirill Müller.
 
 ## Bundled SQLite

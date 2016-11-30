@@ -12,10 +12,19 @@ env:
   - _R_CHECK_FORCE_SUGGESTS_=false
   - MAKEFLAGS="-j 2"
 
+#addons
+addons:
+  apt:
+    packages:
+    - libmagick++-dev
+    - libssh2-1-dev
+
 #matrix: 3x Linux, 1x OS X
 matrix:
   include:
   - r: release
+    env:
+    - BUILD_PKGDOWN=true
   - r: oldrel
   - r: devel
   - os: osx
@@ -32,7 +41,29 @@ notifications:
 #before_script
 before_script:
 - R -q -e 'install.packages("http://cran.r-project.org/src/contrib/Archive/Rcpp/Rcpp_0.12.7.tar.gz", repos = NULL)'
+- R -q -e 'devtools::install_github("ropenscilabs/tic"); tic::prepare_all_stages()'
 
 #after_success
 after_success:
-- Rscript -e "covr::codecov(exclusions=c('src/sqlite3/sqlite3.c', 'src/sqlite3/extension-functions.c'))"
+- R -q -e 'tic::after_success()'
+
+#deploy // https://github.com/travis-ci/travis-build/blob/85ef7108/lib/travis/build/addons/deploy/script.rb#L100-L107
+deploy:
+  provider: script
+  script: R -q -e 'tic::deploy()'
+  on:
+    all_branches: true
+
+# Custom parts:
+
+#r_github_packages
+r_github_packages:
+
+#r_packages
+r_packages:
+
+#services
+services:
+
+#before_install
+before_install:

@@ -27,3 +27,4 @@ a.out.dSYM
 ^docs$
 ^README\.Rmd$
 ^UPDATE\.md$
+^tic\.R$

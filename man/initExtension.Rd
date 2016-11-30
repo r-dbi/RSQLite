@@ -7,7 +7,7 @@
 initExtension(db)
 }
 \arguments{
-\item{db}{A database to load these extensions.}
+\item{db}{A \code{\linkS4class{SQLiteConnection}} object to load these extensions into.}
 }
 \description{
 These extension functions are written by Liam Healy and made available
@@ -28,11 +28,11 @@ upper_quartile}
 }
 \examples{
 library(DBI)
-db <- dbConnect(SQLite())
-initExtension(db)
+db <- RSQLite::datasetsDb()
+RSQLite::initExtension(db)
 
-dbWriteTable(db, "mtcars", mtcars)
 dbGetQuery(db, "SELECT stdev(mpg) FROM mtcars")
 sd(mtcars$mpg)
+dbDisconnect(db)
 }
 

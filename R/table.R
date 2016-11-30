@@ -3,6 +3,14 @@ NULL
 
 #' Write a local data frame or file to the database
 #'
+#' Functions for writing data frames or delimiter-separated files
+#' to database tables.
+#' `sqlData()` is mostly useful to backend implementers,
+#' but must be documented here.
+#'
+#' @seealso
+#' The corresponding generic functions [DBI::dbWriteTable()] and [DBI::sqlData()].
+#'
 #' @export
 #' @rdname dbWriteTable
 #' @param con,conn a \code{\linkS4class{SQLiteConnection}} object, produced by
@@ -34,10 +42,10 @@ NULL
 #' \href{https://www.sqlite.org/autoinc.html}{`AUTOINCREMENT`}, missing
 #' values will be assigned the next largest positive integer,
 #' while nonmissing elements/cells retain their value.  If the
-#' autoincrement column exists in the `data.frame`
-#' (passed to `dbWriteTable`'s `value` parameter), the `NA`
-#' elements are overwritten.
-#' Similarly, if the key column is not present in the `data.frame`, all
+#' autoincrement column exists in the data frame
+#' passed to the `value` argument,
+#' the `NA` elements are overwritten.
+#' Similarly, if the key column is not present in the data frame, all
 #' elements are automatically assigned a value.
 #' @export
 #' @examples
@@ -56,6 +64,8 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
 
     if (overwrite && append)
       stop("overwrite and append cannot both be TRUE", call. = FALSE)
+
+    name <- check_quoted_identifier(name)
 
     row.names <- compatRowNames(row.names)
 
@@ -262,17 +272,27 @@ string_to_utf8 <- function(value) {
   value
 }
 
+check_quoted_identifier <- function(name) {
+  if (class(name)[[1L]] != "SQL" && grepl("^`.*`$", name)) {
+    warning_once("Quoted identifiers should have class SQL, use DBI::SQL() if the caller performs the quoting.")
+    name <- SQL(name)
+  }
 
-#' Convenience functions for importing/exporting DBMS tables
+  name
+}
+
+
+#' Read a database table
 #'
-#' These functions mimic their R/S-Plus counterpart `get`, `assign`,
-#' `exists`, `remove`, and `objects`, except that they generate
-#' code that gets remotely executed in a database engine.
+#' Returns the contents of a database table given by name as a data frame.
 #'
-#' @return A data.frame in the case of [dbReadTable()]; otherwise a logical
-#' indicating whether the operation was successful.
-#' @note Note that the data.frame returned by `dbReadTable` only has
+#' Note that the data frame returned by `dbReadTable()` only has
 #' primitive data, e.g., it does not coerce character data to factors.
+#'
+#' @seealso
+#' The corresponding generic function [DBI::dbReadTable()].
+#'
+#' @return A data frame.
 #'
 #' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
 #'   [DBI::dbConnect()]
@@ -281,24 +301,20 @@ string_to_utf8 <- function(value) {
 #'   are considered equal.
 #' @param check.names If `TRUE`, the default, column names will be
 #'   converted to valid R identifiers.
-#' @param select.cols  A SQL statement (in the form of a character vector of
-#'    length 1) giving the columns to select. E.g. "*" selects all columns,
-#'    "x,y,z" selects three columns named as listed.
+#' @param select.cols  A SQL expression (in the form of a character vector of
+#'    length 1) giving the columns to select. E.g. `"*"` selects all columns,
+#'    `"x, y, z"` selects three columns named as listed.
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @inheritParams DBI::sqlRownamesToColumn
 #' @export
 #' @examples
 #' library(DBI)
-#' con <- dbConnect(SQLite())
-#' dbWriteTable(con, "mtcars", mtcars)
-#' dbReadTable(con, "mtcars")
-#' dbGetQuery(con, "SELECT * FROM mtcars WHERE cyl = 8")
-#'
-#' # Supress row names
-#' dbReadTable(con, "mtcars", row.names = FALSE)
-#' dbGetQuery(con, "SELECT * FROM mtcars WHERE cyl = 8", row.names = FALSE)
-#'
-#' dbDisconnect(con)
+#' db <- RSQLite::datasetsDb()
+#' dbReadTable(db, "mtcars")
+#' dbReadTable(db, "mtcars", row.names = FALSE)
+#' dbReadTable(db, "mtcars", select.cols = "cyl, gear")
+#' dbReadTable(db, "mtcars", select.cols = "row_names, cyl, gear")
+#' dbDisconnect(db)
 setMethod("dbReadTable", c("SQLiteConnection", "character"),
   function(conn, name, ..., row.names = NA, check.names = TRUE, select.cols = "*") {
     row.names <- compatRowNames(row.names)
@@ -321,10 +337,21 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 #'
 #' Executes the SQL `DROP TABLE`.
 #'
+#' @seealso
+#' The corresponding generic function [DBI::dbRemoveTable()].
+#'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name character vector of length 1 giving name of table to remove
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @export
+#' @examples
+#' library(DBI)
+#' con <- dbConnect(RSQLite::SQLite())
+#' dbWriteTable(con, "test", data.frame(a = 1))
+#' dbListTables(con)
+#' dbRemoveTable(con, "test")
+#' dbListTables(con)
+#' dbDisconnect(con)
 setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
   function(conn, name, ...) {
     dbExecute(conn, paste("DROP TABLE ", dbQuoteIdentifier(conn, name)))
@@ -333,12 +360,27 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
 )
 
 
-#' Does the table exist?
+#' Tables in a database
+#'
+#' `dbExistsTable()` returns a logical that indicates if a table exists,
+#' `dbListTables()` lists all tables as a character vector.
+#'
+#' @seealso
+#' The corresponding generic functions [DBI::dbExistsTable()] and [DBI::dbListTables()].
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name String, name of table. Match is case insensitive.
-#' @param ... Needed for compatibility with generic. Otherwise ignored.
+#' @param ... Needed for compatibility with generics, otherwise ignored.
 #' @export
+#' @examples
+#' library(DBI)
+#' db <- RSQLite::datasetsDb()
+#'
+#' dbExistsTable(db, "mtcars")
+#' dbExistsTable(db, "nonexistingtable")
+#' dbListTables(db)
+#'
+#' dbDisconnect(db)
 setMethod(
   "dbExistsTable", c("SQLiteConnection", "character"),
   function(conn, name, ...) {
@@ -350,10 +392,7 @@ setMethod(
 )
 
 
-#' List available SQLite tables
-#'
-#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
-#' @param ... Needed for compatibility with generic. Otherwise ignored.
+#' @rdname dbExistsTable-SQLiteConnection-character-method
 #' @export
 setMethod("dbListTables", "SQLiteConnection", function(conn, ...) {
   rs <- sqliteListTables(conn)
@@ -384,17 +423,22 @@ sqliteListTablesQuery <- function(conn, name = NULL) {
     sep = "\n"))
 }
 
-#' List fields in specified table
+#' List fields in a table
+#'
+#' Returns the fields of a given table as a character vector.
+#'
+#' @seealso
+#' The corresponding generic function [DBI::dbListFields()].
 #'
 #' @param conn An existing \code{\linkS4class{SQLiteConnection}}
 #' @param name a length 1 character vector giving the name of a table.
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @export
 #' @examples
-#' con <- dbConnect(SQLite())
-#' dbWriteTable(con, "iris", iris)
-#' dbListFields(con, "iris")
-#' dbDisconnect(con)
+#' library(DBI)
+#' db <- RSQLite::datasetsDb()
+#' dbListFields(db, "iris")
+#' dbDisconnect(db)
 setMethod("dbListFields", c("SQLiteConnection", "character"),
   function(conn, name, ...) {
     rs <- dbSendQuery(conn, paste("SELECT * FROM ",
@@ -408,28 +452,24 @@ setMethod("dbListFields", c("SQLiteConnection", "character"),
 
 #' Determine the SQL Data Type of an R object
 #'
-#' This method is a straight-forward implementation of the corresponding
-#' generic function.
+#' Given an object, return its SQL data type as a SQL database identifier.
+#'
+#' @seealso
+#' The corresponding generic function [DBI::dbDataType()].
 #'
 #' @param dbObj a `SQLiteConnection` or `SQLiteDriver` object
 #' @param obj an R object whose SQL type we want to determine.
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @examples
-#' dbDataType(SQLite(), 1)
-#' dbDataType(SQLite(), 1L)
-#' dbDataType(SQLite(), "1")
-#' dbDataType(SQLite(), TRUE)
-#' dbDataType(SQLite(), list())
+#' library(DBI)
+#' dbDataType(RSQLite::SQLite(), 1)
+#' dbDataType(RSQLite::SQLite(), 1L)
+#' dbDataType(RSQLite::SQLite(), "1")
+#' dbDataType(RSQLite::SQLite(), TRUE)
+#' dbDataType(RSQLite::SQLite(), list(raw(1)))
 #'
-#' sapply(datasets::quakes, dbDataType, dbObj = SQLite())
+#' sapply(datasets::quakes, dbDataType, dbObj = RSQLite::SQLite())
 #' @export
-setMethod("dbDataType", "SQLiteConnection", function(dbObj, obj, ...) {
-  dbDataType(SQLite(), obj, ...)
-})
-
-#' @rdname dbDataType-SQLiteConnection-method
-#' @export
-#' @rdname dbDataType-SQLiteConnection-method
 setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
   if (is.factor(obj)) return("TEXT")
 
@@ -442,4 +482,10 @@ setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
     raw = "TEXT",
     stop("Unsupported type", call. = FALSE)
   )
+})
+
+#' @rdname dbDataType-SQLiteDriver-method
+#' @export
+setMethod("dbDataType", "SQLiteConnection", function(dbObj, obj, ...) {
+  dbDataType(SQLite(), obj, ...)
 })

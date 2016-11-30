@@ -8,7 +8,7 @@
 \alias{dbGetRowCount,SQLiteResult-method}
 \alias{dbHasCompleted,SQLiteResult-method}
 \alias{dbGetStatement,SQLiteResult-method}
-\title{Database interface meta-data}
+\title{Result information}
 \usage{
 \S4method{dbColumnInfo}{SQLiteResult}(res, ...)
 
@@ -26,33 +26,41 @@
 \item{...}{Ignored. Needed for compatibility with generic}
 }
 \description{
-See documentation of generics for more details.
+For a result object, returns information about the SQL statement used,
+the available columns and number of already fetched rows for a query,
+the number of affected rows for a statement,
+and the completion status.
 }
 \examples{
-data(USArrests)
-con <- dbConnect(SQLite(), dbname=":memory:")
-dbWriteTable(con, "t1", USArrests)
-dbWriteTable(con, "t2", USArrests)
-
-dbListTables(con)
-
-rs <- dbSendQuery(con, "select * from t1 where UrbanPop >= 80")
+library(DBI)
+db <- RSQLite::datasetsDb()
+rs <- dbSendQuery(db, "SELECT * FROM USArrests WHERE UrbanPop >= 80")
 dbGetStatement(rs)
+dbColumnInfo(rs)
 dbHasCompleted(rs)
+dbGetRowCount(rs)
 
-info <- dbGetInfo(rs)
-names(info)
-info$fields
-
-dbFetch(rs, n=2)
+dbFetch(rs, n = 2)
 dbHasCompleted(rs)
-info <- dbGetInfo(rs)
-info$fields
+dbGetRowCount(rs)
+
+invisible(dbFetch(rs))
+dbHasCompleted(rs)
+dbGetRowCount(rs)
 dbClearResult(rs)
 
-# DBIConnection info
-names(dbGetInfo(con))
+dbDisconnect(db)
 
+con <- dbConnect(RSQLite::SQLite(), ":memory:")
+dbExecute(con, "CREATE TABLE test (a INTEGER)")
+rs <- dbSendStatement(con, "INSERT INTO test VALUES (:a)", list(a = 1:3))
+dbGetRowsAffected(rs)
+dbClearResult(rs)
 dbDisconnect(con)
+}
+\seealso{
+The corresponding generic functions
+\code{\link[DBI:dbColumnInfo]{DBI::dbColumnInfo()}}, \code{\link[DBI:dbGetRowsAffected]{DBI::dbGetRowsAffected()}}, \code{\link[DBI:dbGetRowCount]{DBI::dbGetRowCount()}},
+\code{\link[DBI:dbHasCompleted]{DBI::dbHasCompleted()}}, and \code{\link[DBI:dbGetStatement]{DBI::dbGetStatement()}}.
 }
 

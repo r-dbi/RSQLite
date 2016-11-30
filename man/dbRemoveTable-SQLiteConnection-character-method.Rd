@@ -17,4 +17,16 @@
 \description{
 Executes the SQL \code{DROP TABLE}.
 }
+\examples{
+library(DBI)
+con <- dbConnect(RSQLite::SQLite())
+dbWriteTable(con, "test", data.frame(a = 1))
+dbListTables(con)
+dbRemoveTable(con, "test")
+dbListTables(con)
+dbDisconnect(con)
+}
+\seealso{
+The corresponding generic function \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}}.
+}
 

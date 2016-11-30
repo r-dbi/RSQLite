@@ -1,25 +1,38 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
+# Header
 language: r
-cache: packages
 sudo: false
-r:
-  - oldrel
-  - release
-  - devel
+cache: packages
+warnings_are_errors: true
 
-# Seems to be necessary with devtools 1.10.0, check again when the next version is on CRAN
-r_github_packages:
-  - hadley/testthat
-  - jimhester/covr
+#env
+env:
+  global:
+  - _R_CHECK_FORCE_SUGGESTS_=false
+  - MAKEFLAGS="-j 2"
 
-after_success:
-  - Rscript -e "covr::codecov(exclusions=c('src/sqlite3/sqlite3.c', 'src/sqlite3/extension-functions.c'))"
+#matrix: 3x Linux, 1x OS X
+matrix:
+  include:
+  - r: release
+  - r: oldrel
+  - r: devel
+  - os: osx
+    osx_image: xcode7.3
+    r: release
+    latex: false
 
+#notifications
 notifications:
   email:
     on_success: change
     on_failure: change
 
+#before_script
 before_script:
 - R -q -e 'install.packages("http://cran.r-project.org/src/contrib/Archive/Rcpp/Rcpp_0.12.7.tar.gz", repos = NULL)'
+
+#after_success
+after_success:
+- Rscript -e "covr::codecov(exclusions=c('src/sqlite3/sqlite3.c', 'src/sqlite3/extension-functions.c'))"

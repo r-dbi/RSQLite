@@ -26,15 +26,15 @@ statement that should be executed.  Only a single SQL statment should be
 provided.}
 
 \item{params}{A named list of query parameters to be substituted into
-a parameterised query.}
+a parameterised query. The elements of the list can be vectors
+which all must be of the same length.}
 
 \item{...}{Unused. Needed for compatibility with generic.}
 
 \item{res}{an \code{\linkS4class{SQLiteResult}} object.}
 
 \item{n}{maximum number of records to retrieve per fetch. Use \code{-1} to
-retrieve all pending records; use \code{0} for to fetch the default
-number of rows as defined in \code{\link[=SQLite]{SQLite()}}}
+retrieve all pending records; \code{0} retrieves only the table definition.}
 
 \item{row.names}{Either \code{TRUE}, \code{FALSE}, \code{NA} or a string.
 
@@ -53,8 +53,9 @@ To retrieve results a chunk at a time, use \code{\link[=dbSendQuery]{dbSendQuery
 results (and they'll fit in memory) use \code{\link[=dbGetQuery]{dbGetQuery()}} which sends,
 fetches and clears for you. To run the same prepared query with multiple
 inputs, use \code{\link[=dbBind]{dbBind()}}.
-}
-\details{
+For statements that do not return a table,
+use \code{\link[=dbSendStatement]{dbSendStatement()}} and \code{\link[=dbExecute]{dbExecute()}} instead of \code{\link[=dbSendQuery]{dbSendQuery()}}
+and \code{\link[=dbGetQuery]{dbGetQuery()}}.
 See \link{sqlite-meta} for how to extract other metadata from the result set.
 }
 \examples{
@@ -65,11 +66,11 @@ db <- RSQLite::datasetsDb()
 dbGetQuery(db, "SELECT * FROM USArrests LIMIT 3")
 
 # Send query to pull requests in batches
-res <- dbSendQuery(db, "SELECT * FROM USArrests")
-dbFetch(res, n = 2)
-dbFetch(res, n = 2)
-dbHasCompleted(res)
-dbClearResult(res)
+rs <- dbSendQuery(db, "SELECT * FROM USArrests")
+dbFetch(rs, n = 2)
+dbFetch(rs, n = 2)
+dbHasCompleted(rs)
+dbClearResult(rs)
 
 # Parameterised queries are safest when you accept user input
 dbGetQuery(db, "SELECT * FROM USArrests WHERE Murder < ?", list(3))
@@ -78,12 +79,41 @@ dbGetQuery(db, "SELECT * FROM USArrests WHERE Murder < ?", list(3))
 rs <- dbSendQuery(db, "SELECT * FROM USArrests WHERE Murder < ?")
 dbBind(rs, list(3))
 dbFetch(rs)
+dbClearResult(rs)
 
 # Named parameters are a little more convenient
 rs <- dbSendQuery(db, "SELECT * FROM USArrests WHERE Murder < :x")
 dbBind(rs, list(x = 3))
 dbFetch(rs)
-
+dbClearResult(rs)
 dbDisconnect(db)
+
+# Passing multiple values is especially useful for statements
+con <- dbConnect(RSQLite::SQLite())
+
+dbWriteTable(con, "test", data.frame(a = 1L, b = 2L))
+dbReadTable(con, "test")
+
+dbExecute(con, "INSERT INTO test VALUES (:a, :b)",
+          params = list(a = 2:4, b = 3:5))
+dbReadTable(con, "test")
+
+rs <- dbSendStatement(con, "DELETE FROM test WHERE a = :a AND b = :b")
+dbBind(rs, list(a = 3:1, b = 2:4))
+dbBind(rs, list(a = 4L, b = 5L))
+dbClearResult(rs)
+dbReadTable(con, "test")
+
+# Multiple values passed to queries are executed one after another,
+# the result appears as one data frame
+dbGetQuery(con, "SELECT * FROM TEST WHERE a >= :a", list(a = 0:3))
+
+dbDisconnect(con)
+
+}
+\seealso{
+The corresponding generic functions
+\code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}}, \code{\link[DBI:dbFetch]{DBI::dbFetch()}}, \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}}, \code{\link[DBI:dbGetQuery]{DBI::dbGetQuery()}},
+\code{\link[DBI:dbBind]{DBI::dbBind()}}, \code{\link[DBI:dbSendStatement]{DBI::dbSendStatement()}}, and \code{\link[DBI:dbExecute]{DBI::dbExecute()}}.
 }
 

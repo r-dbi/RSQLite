@@ -14,16 +14,16 @@
 #' \item{Aggregate functions}{stdev, variance, mode, median, lower_quartile,
 #'   upper_quartile}
 #' }
-#' @param db A database to load these extensions.
+#' @param db A \code{\linkS4class{SQLiteConnection}} object to load these extensions into.
 #' @export
 #' @examples
 #' library(DBI)
-#' db <- dbConnect(SQLite())
-#' initExtension(db)
+#' db <- RSQLite::datasetsDb()
+#' RSQLite::initExtension(db)
 #'
-#' dbWriteTable(db, "mtcars", mtcars)
 #' dbGetQuery(db, "SELECT stdev(mpg) FROM mtcars")
 #' sd(mtcars$mpg)
+#' dbDisconnect(db)
 initExtension <- function(db) {
   if (!db@loadable.extensions) {
     stop("Loadable extensions are not enabled for this db connection",

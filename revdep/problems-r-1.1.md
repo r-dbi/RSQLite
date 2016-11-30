@@ -4,32 +4,32 @@
 
 |setting  |value                        |
 |:--------|:----------------------------|
-|version  |R version 3.3.1 (2016-06-21) |
+|version  |R version 3.3.2 (2016-10-31) |
 |system   |x86_64, linux-gnu            |
 |ui       |X11                          |
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
-|tz       |Zulu                         |
-|date     |2016-10-19                   |
+|tz       |Universal                    |
+|date     |2016-11-25                   |
 
 ## Packages
 
 |package   |*  |version    |date       |source                             |
 |:---------|:--|:----------|:----------|:----------------------------------|
-|BH        |   |1.60.0-2   |2016-05-07 |cran (@1.60.0-)                    |
+|BH        |   |1.62.0-1   |2016-11-19 |cran (@1.62.0-)                    |
 |DBI       |   |0.5-12     |2016-10-06 |Github (rstats-db/DBI@4f00863)     |
 |DBItest   |   |1.3-10     |2016-10-06 |Github (rstats-db/DBItest@9e87611) |
-|knitr     |   |1.14       |2016-08-13 |cran (@1.14)                       |
+|knitr     |   |1.15.1     |2016-11-22 |cran (@1.15.1)                     |
 |memoise   |   |1.0.0      |2016-01-29 |CRAN (R 3.3.1)                     |
 |plogr     |   |0.1-1      |2016-09-24 |cran (@0.1-1)                      |
-|Rcpp      |   |0.12.7     |2016-09-05 |cran (@0.12.7)                     |
-|rmarkdown |   |1.0        |2016-07-08 |cran (@1.0)                        |
+|Rcpp      |   |0.12.8     |2016-11-17 |cran (@0.12.8)                     |
+|rmarkdown |   |1.2        |2016-11-21 |cran (@1.2)                        |
 |RSQLite   |   |1.0.0      |2014-10-25 |CRAN (R 3.3.1)                     |
 |testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
 
-29 packages with problems
+31 packages with problems
 
 |package            |version  | errors| warnings| notes|
 |:------------------|:--------|------:|--------:|-----:|
@@ -37,16 +37,17 @@
 |AnnotationHubData  |1.4.0    |      1|        0|     3|
 |ChemmineR          |2.26.0   |      1|        0|     0|
 |clstutils          |1.22.0   |      0|        2|     5|
-|CNEr               |1.10.0   |      0|        2|     2|
+|CNEr               |1.10.1   |      0|        2|     2|
 |ecd                |0.8.2    |      1|        0|     0|
 |filematrix         |1.1.0    |      0|        1|     0|
-|gcbd               |0.2.6    |      0|        1|     1|
+|gcbd               |0.2.6    |      0|        1|     0|
 |GeneAnswers        |2.16.0   |      1|        3|     6|
+|lumi               |2.26.3   |      0|        1|     3|
 |maGUI              |1.0      |      1|        0|     0|
 |metagenomeFeatures |1.4.0    |      0|        2|     2|
 |metaseqR           |1.14.0   |      1|        1|     4|
-|mgsa               |1.22.0   |      0|        1|     5|
-|oce                |0.9-19   |      1|        0|     1|
+|mgsa               |1.22.0   |      0|        1|     4|
+|oce                |0.9-20   |      1|        0|     1|
 |oligoClasses       |1.36.0   |      0|        1|     4|
 |oligo              |1.38.0   |      1|        0|     9|
 |PAnnBuilder        |1.38.0   |      0|        3|     1|
@@ -56,11 +57,12 @@
 |RImmPort           |1.2.0    |      0|        1|     1|
 |RQDA               |0.2-7    |      1|        0|     1|
 |specL              |1.8.0    |      0|        1|     3|
-|sqldf              |0.4-10   |      1|        1|     2|
-|TFBSTools          |1.12.0   |      0|        1|     2|
-|trackeR            |0.0.3    |      0|        1|     0|
+|sqldf              |0.4-10   |      0|        1|     2|
+|TFBSTools          |1.12.1   |      0|        1|     2|
+|tigreBrowserWriter |0.1.2    |      1|        0|     0|
+|trackeR            |0.0.4    |      0|        1|     0|
 |TSdata             |2016.8-1 |      0|        1|     0|
-|VariantFiltering   |1.10.0   |      0|        2|     4|
+|VariantFiltering   |1.10.1   |      0|        1|     4|
 |vmsbase            |2.1.3    |      1|        0|     0|
 
 ## AnnotationDbi (1.36.0)
@@ -121,8 +123,8 @@ Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 checking tests ... ERROR
 Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
 Last 13 lines of output:
-  ERROR in test_UCSC2BitPreparer_recipe: Error in ahms[[1]] : subscript out of bounds
-  ERROR in test_UCSCChainPreparer_recipe: Error in ahms[[1]] : subscript out of bounds
+  ERROR in test_UCSCChainPreparer_recipe: Error : 1: Unknown IO error2: failed to load external entity "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=&retmax=0"
+  
   
   Test files with failing tests
   
@@ -257,7 +259,7 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## CNEr (1.10.0)
+## CNEr (1.10.1)
 Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>  
 Bug reports: https://github.com/ge11232002/CNEr/issues
 
@@ -270,8 +272,6 @@ File ‘CNEr/libs/CNEr.so’:
     Object: ‘ucsc/errabort.o’
   Found ‘exit’, possibly from ‘exit’ (C)
     Objects: ‘ucsc/errabort.o’, ‘ucsc/pipeline.o’
-  Found ‘printf’, possibly from ‘printf’ (C)
-    Objects: ‘ceScan.o’, ‘ucsc/pipeline.o’
   Found ‘puts’, possibly from ‘printf’ (C), ‘puts’ (C)
     Object: ‘ucsc/pipeline.o’
   Found ‘rand’, possibly from ‘rand’ (C)
@@ -291,7 +291,8 @@ See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because CNEr.Rmd appears to be an R Markdown v2 document.
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
 Quitting from lines 2-15 (CNEr.Rmd) 
 Error: processing vignette 'CNEr.Rmd' failed with diagnostics:
 could not find function "doc_date"
@@ -299,10 +300,11 @@ Execution halted
 
 
 checking installed package size ... NOTE
-  installed size is 28.4Mb
+  installed size is 28.9Mb
   sub-directories of 1Mb or more:
     R        11.0Mb
     extdata  15.9Mb
+    libs      1.1Mb
 
 checking dependencies in R code ... NOTE
 Unexported objects imported by ':::' calls:
@@ -333,7 +335,8 @@ Bug reports: https://github.com/andreyshabalin/filematrix/issues
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because Best_Prectices.Rmd appears to be an R Markdown v2 document.
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
 Quitting from lines 2-23 (Best_Prectices.Rmd) 
 Error: processing vignette 'Best_Prectices.Rmd' failed with diagnostics:
 could not find function "doc_date"
@@ -344,21 +347,17 @@ Execution halted
 ## gcbd (0.2.6)
 Maintainer: Dirk Eddelbuettel <edd@debian.org>
 
-0 errors | 1 warning  | 1 note 
+0 errors | 1 warning  | 0 notes
 
 ```
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning in packageDescription("gputools") :
-  no package 'gputools' was found
+Warning in packageDescription("getopt") : no package 'getopt' was found
 Error: processing vignette 'gcbd.Rnw' failed with diagnostics:
-at gcbd.Rnw:860, subscript out of bounds
+at gcbd.Rnw:863, subscript out of bounds
 Execution halted
 
-
-checking package dependencies ... NOTE
-Package suggested but not available for checking: ‘gputools’
 ```
 
 ## GeneAnswers (2.16.0)
@@ -494,6 +493,48 @@ Rd file 'topREACTOME.PATHGenes.Rd':
      ## Not run: topREACTOME.PATHGenes(x, geneSymbol=TRUE, orderby='pvalue', top=10, topGenes='ALL', genesOrderBy='pValue', file=TRUE)
 
 These lines will be truncated in the PDF manual.
+```
+
+## lumi (2.26.3)
+Maintainer: Pan Du <dupan.mail@gmail.com>
+
+0 errors | 1 warning  | 3 notes
+
+```
+checking dependencies in R code ... WARNING
+'::' or ':::' import not declared from: ‘bigmemoryExtras’
+
+checking installed package size ... NOTE
+  installed size is  6.8Mb
+  sub-directories of 1Mb or more:
+    R      2.8Mb
+    data   3.6Mb
+
+checking Rd line widths ... NOTE
+Rd file 'IlluminaID2nuID.Rd':
+  \usage lines wider than 90 characters:
+     IlluminaID2nuID(IlluminaID, lib.mapping=NULL, species = c("Human", "Mouse", "Rat", "Unknown"), chipVersion = NULL, ...)
+
+Rd file 'addAnnotationInfo.Rd':
+  \usage lines wider than 90 characters:
+     addAnnotationInfo(methyLumiM, lib = 'FDb.InfiniumMethylation.hg19', annotationColumn=c('COLOR_CHANNEL', 'CHROMOSOME', 'POSITION'))
+
+Rd file 'addNuID2lumi.Rd':
+... 177 lines ...
+     smoothQuantileNormalization(dataMatrix, ref = NULL, adjData=NULL, logMode = TRUE, bandwidth = NULL, degree = 1, verbose = FALSE, ...)
+
+Rd file 'ssn.Rd':
+  \usage lines wider than 90 characters:
+     ssn(x.lumi, targetArray = NULL, scaling = TRUE, bgMethod=c('density', 'mean', 'median', 'none'), fgMethod=c('mean', 'density', 'median' ... [TRUNCATED]
+
+Rd file 'vst.Rd':
+  \usage lines wider than 90 characters:
+     vst(u, std, nSupport = min(length(u), 500), backgroundStd=NULL, fitMethod = c('linear', 'quadratic'), lowCutoff = 1/3, ifPlot = FALSE)
+
+These lines will be truncated in the PDF manual.
+
+checking Rd cross-references ... NOTE
+Package unavailable to check Rd xrefs: ‘bigmemoryExtras’
 ```
 
 ## maGUI (1.0)
@@ -647,7 +688,7 @@ contains 'methods').
 ## mgsa (1.22.0)
 Maintainer: Sebastian Bauer <mail@sebastianbauer.info>
 
-0 errors | 1 warning  | 5 notes
+0 errors | 1 warning  | 4 notes
 
 ```
 checking for GNU extensions in Makefiles ... WARNING
@@ -705,19 +746,9 @@ Consider adding
   importFrom("utils", "read.delim", "relist", "str")
 to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
 contains 'methods').
-
-checking compiled code ... NOTE
-File ‘mgsa/libs/mgsa.so’:
-  Found ‘printf’, possibly from ‘printf’ (C)
-    Object: ‘mgsa.o’
-
-Compiled code should not call entry points which might terminate R nor
-write to stdout/stderr instead of to the console, nor the system RNG.
-
-See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
 
-## oce (0.9-19)
+## oce (0.9-20)
 Maintainer: Dan Kelley <Dan.Kelley@Dal.Ca>  
 Bug reports: https://github.com/dankelley/oce/issues
 
@@ -745,9 +776,9 @@ Calls: plot -> plot -> .local
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  5.1Mb
+  installed size is  5.4Mb
   sub-directories of 1Mb or more:
-    help   2.0Mb
+    help   2.1Mb
 ```
 
 ## oligoClasses (1.36.0)
@@ -846,7 +877,7 @@ checking package dependencies ... NOTE
 Packages which this enhances but not available for checking: ‘doMC’ ‘doMPI’
 
 checking installed package size ... NOTE
-  installed size is 30.2Mb
+  installed size is 30.3Mb
   sub-directories of 1Mb or more:
     R         1.2Mb
     doc      12.9Mb
@@ -1281,7 +1312,8 @@ Bug reports: https://github.com/fgcz/specL/issues
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because cdsw.Rmd appears to be an R Markdown v2 document.
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
 Quitting from lines 2-25 (cdsw.Rmd) 
 Error: processing vignette 'cdsw.Rmd' failed with diagnostics:
 could not find function "doc_date"
@@ -1314,32 +1346,9 @@ prepare_Rd: ms1.p2069.Rd:23-26: Dropping empty section \examples
 Maintainer: G. Grothendieck <ggrothendieck@gmail.com>  
 Bug reports: http://groups.google.com/group/sqldf
 
-1 error  | 1 warning  | 2 notes
+0 errors | 1 warning  | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘sqldf-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: sqldf
-> ### Title: SQL select on data frames
-> ### Aliases: sqldf
-> ### Keywords: manip
-> 
-... 6 lines ...
-> # in R without SQL and then again with SQL
-> #
-> 
-> # head
-> a1r <- head(warpbreaks)
-> a1s <- sqldf("select * from warpbreaks limit 6")
-Loading required package: tcltk
-Error in eval(substitute(expr), envir, enclos) : 
-  no such table: warpbreaks
-Calls: sqldf ... initialize -> initialize -> rsqlite_send_query -> .Call
-Execution halted
-
 checking whether package ‘sqldf’ can be installed ... WARNING
 Found the following significant warnings:
   Warning: no DISPLAY variable so Tk is not available
@@ -1361,7 +1370,7 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## TFBSTools (1.12.0)
+## TFBSTools (1.12.1)
 Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>  
 Bug reports: https://github.com/ge11232002/TFBSTools/issues
 
@@ -1371,7 +1380,8 @@ Bug reports: https://github.com/ge11232002/TFBSTools/issues
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because TFBSTools.Rmd appears to be an R Markdown v2 document.
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
 Quitting from lines 2-16 (TFBSTools.Rmd) 
 Error: processing vignette 'TFBSTools.Rmd' failed with diagnostics:
 could not find function "doc_date"
@@ -1389,8 +1399,41 @@ Unexported objects imported by ':::' calls:
   See the note in ?`:::` about the use of this operator.
 ```
 
-## trackeR (0.0.3)
-Maintainer: Hannah Frick <h.frick@ucl.ac.uk>
+## tigreBrowserWriter (0.1.2)
+Maintainer: Antti Honkela <antti.honkela@helsinki.fi>  
+Bug reports: https://github.com/PROBIC/tigreBrowserWriter/issues
+
+1 error  | 0 warnings | 0 notes
+
+```
+checking examples ... ERROR
+Running examples in ‘tigreBrowserWriter-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: closeDb
+> ### Title: Finalise and close the database
+> ### Aliases: closeDb
+> 
+> ### ** Examples
+> 
+>   db <- initializeDb("", "My Dataset")
+Warning: RSQLite::dbGetPreparedQuery() is deprecated, please switch to DBI::dbGetQuery(params = bind.data).
+Warning: Named parameters not used in query: name, species, source, platform, desc, save_location, figure_filename
+Warning: Named parameters not used in query: dname
+>   # ...
+>   closeDb(db)
+Warning: Named parameters not used in query: parent_id, name
+Warning: Named parameters not used in query: name, parent_id
+Error in rsqlite_bind_rows(res@ptr, params) : 
+  Query requires 1 params; 2 supplied.
+Calls: closeDb ... <Anonymous> -> db_bind -> rsqlite_bind_rows -> .Call
+Execution halted
+```
+
+## trackeR (0.0.4)
+Maintainer: Hannah Frick <h.frick@ucl.ac.uk>  
+Bug reports: https://github.com/hfrick/trackeR/issues
 
 0 errors | 1 warning  | 0 notes
 
@@ -1398,24 +1441,24 @@ Maintainer: Hannah Frick <h.frick@ucl.ac.uk>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Warning in readLines(con) :
-  incomplete final line found on 'TourDetrackeR.Rmd'
-Warning: It seems you should call rmarkdown::render() instead of knitr::knit2html() because TourDetrackeR.Rmd appears to be an R Markdown v2 document.
+Warning in engine$weave(file, quiet = quiet, encoding = enc) :
+  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
 Loading required package: zoo
 
 Attaching package: 'zoo'
 
+The following objects are masked from 'package:base':
 ... 7 lines ...
-Attaching package: 'trackeR'
 
 The following object is masked from 'package:base':
 
     append
 
 Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=57.157231,-2.104296&zoom=13&size=640x640&scale=2&maptype=terrain&sensor=false
-Quitting from lines 96-97 (TourDetrackeR.Rmd) 
+Quitting from lines 90-91 (TourDetrackeR.Rmd) 
 Error: processing vignette 'TourDetrackeR.Rmd' failed with diagnostics:
-there is no package called 'webshot'
+GeomRasterAnn was built with an incompatible version of ggproto.
+Please reinstall the package that provides this extension.
 Execution halted
 ```
 
@@ -1428,32 +1471,32 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Oct 19, 2016 3:29:25 PM it.bancaditalia.oss.sdmx.util.Configuration init
 INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
-Oct 19, 2016 3:29:25 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 25, 2016 12:03:42 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Oct 19, 2016 3:29:25 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 25, 2016 12:03:43 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Oct 19, 2016 3:29:26 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 25, 2016 12:03:43 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetData/QNA/CAN.B1_GE.CARSA.Q?format=compact_v2
 ... 8 lines ...
-Oct 19, 2016 3:29:27 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
-INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/data/ESTAT,ei_nama_q,1.0/Q.MIO-EUR.NSA.CP.NA-P72.IT
-Oct 19, 2016 3:29:27 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
-INFO: The sdmx call returned messages in the footer:
- Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
+SEVERE: Connection failed. HTTP error code : 500, message: Internal Server Error
+SDMX meaning: Error on the provider side.
+Nov 25, 2016 12:03:44 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient getDataFlowStructure
+SEVERE: Exception caught parsing results from call to provider Eurostat
 
 Error: processing vignette 'Guide.Stex' failed with diagnostics:
  chunk 5 
 Error in .local(serIDs, con, ...) : 
-  ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT error: it.bancaditalia.oss.sdmx.util.SdmxException: The query: ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT did not match any time series on the provider.
+  ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT error: it.bancaditalia.oss.sdmx.util.SdmxException: Exception. Class: it.bancaditalia.oss.sdmx.util.SdmxException .Message: Connection failed. HTTP error code : 500, message: Internal Server Error
+SDMX meaning: Error on the provider side.
 Execution halted
 ```
 
-## VariantFiltering (1.10.0)
+## VariantFiltering (1.10.1)
 Maintainer: Robert Castelo <robert.castelo@upf.edu>  
 Bug reports: https://github.com/rcastelo/VariantFiltering/issues
 
-0 errors | 2 warnings | 4 notes
+0 errors | 1 warning  | 4 notes
 
 ```
 checking sizes of PDF files under ‘inst/doc’ ... WARNING
@@ -1461,33 +1504,10 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
      compacted ‘usingVariantFiltering.pdf’ from 415Kb to 153Kb
   consider running tools::compactPDF(gs_quality = "ebook") on these files
 
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Loading required package: Biostrings
-Loading required package: XVector
-
-Attaching package: ‘VariantAnnotation’
-
-The following object is masked from ‘package:base’:
-
-... 8 lines ...
-Error in eval(expr, envir, enclos) : database disk image is malformed
-Error in eval(expr, envir, enclos) : database disk image is malformed
-Error : .onLoad failed in loadNamespace() for 'MafDb.1Kgenomes.phase3.hs37d5', details:
-  call: eval(expr, envir, enclos)
-  error: database disk image is malformed
-
-Error: processing vignette 'usingVariantFiltering.Rnw' failed with diagnostics:
- chunk 3 
-Error in VariantFilteringParam(vcfFilenames = CEUvcf) : 
-  package MafDb.1Kgenomes.phase3.hs37d5 could not be loaded.
-Execution halted
-
 checking installed package size ... NOTE
   installed size is  7.8Mb
   sub-directories of 1Mb or more:
-    R         3.5Mb
+    R         3.6Mb
     extdata   3.5Mb
 
 checking dependencies in R code ... NOTE

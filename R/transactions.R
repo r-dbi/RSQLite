@@ -7,13 +7,18 @@ NULL
 #' a SQLite transaction and turns auto-commit off. `dbCommit()` and
 #' `dbRollback()` commit and rollback the transaction, respectively and turn
 #' auto-commit on.
+#' [DBI::dbWithTransaction()] is a convenient wrapper that makes sure that
+#' `dbCommit()` or `dbRollback()` is called.
+#'
+#' @seealso
+#' The corresponding generic functions [DBI::dbBegin()], [DBI::dbCommit()],
+#' and [DBI::dbRollback()].
 #'
 #' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
 #'   [DBI::dbConnect()]
 #' @param name Supply a name to use a named savepoint. This allows you to
 #'   nest multiple transaction
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
-#' @return A boolean, indicating success or failure.
 #' @examples
 #' library(DBI)
 #' con <- dbConnect(SQLite(), ":memory:")

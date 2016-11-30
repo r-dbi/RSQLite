@@ -1,3 +1,5 @@
+# RSQLite 1.1 (2016-11-25)
+
 - New maintainer: Kirill Müller.
 
 ## Bundled SQLite
@@ -13,6 +15,15 @@
 - Compilation limits `SQLITE_MAX_VARIABLE_NUMBER` and `SQLITE_MAX_COLUMN` have been reset to the defaults. The documentation suggests setting to such high values is a bad idea.
 
 - Header files for `sqlite3` are no longer installed, linking to the package is not possible anymore. Packages that require access to the low-level sqlite3 API should bundle their own copy.
+
+## Breaking changes
+
+- `RSQLite()` no longer automatically attaches DBI when loaded. This is to
+  encourage you to use `library(DBI); dbConnect(RSQLite::SQLite())`.
+
+- Functions that take a table name, such as `dbWriteTable()` and `dbReadTable()`,
+  now quote the table name via `dbQuoteIdentifier()`.
+  This means that caller-quoted names should be marked as such with `DBI::SQL()`.
 
 ## New features
 
@@ -51,10 +62,7 @@
 
 - Deprecation warnings are given only once, with a clear reference to the source.
 
-## Breaking changes
-
-- `RSQLite()` no longer automatically attaches DBI when loaded. This is to
-  encourage you to use `library(DBI); dbConnect(RSQLite::SQLite())`.
+- `datasetsDb()` now returns a read-only database, to avoid modifications to the installed file.
 
 ## Deprecated functions
 
@@ -88,6 +96,10 @@
 
 - Reimplemented `dbWriteTable("SQLiteConnection", "character", "character")` for import of CSV files, using a function from the old codebase (#151).
 
+- `dbWriteTable("SQLiteConnection", "character", "data.frame")` looks
+  for table names already enclosed in backticks and uses these,
+  (with a warning), for compatibility with the sqldf package.
+
 ## Performance
 
 - The `dbExistsTable()` function now works faster by filtering the list of tables using SQL (#166).
@@ -96,14 +108,14 @@
 
 - Start on a basic vignette: `vignette("RSQLite")` (#50).
 
-- Using `dbExecute()` in examples.
+- Reworked function and method documentation, removed old documentation (#121).
+
+- Using `dbExecute()` in documentation and examples.
 
 - Using both `":memory:"` and `":file::memory:"` in documentation.
 
 - Added additional documentation and unit tests for
   [autoincrement keys](https://www.sqlite.org/autoinc.html) (#119, @wibeasley).
-
-- Removed old documentation (#121).
 
 ## Internal
 

@@ -6,7 +6,6 @@ a.out.dSYM
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.travis\.yml$
-^NEWS\.md$
 ^cran-comments\.md$
 ^data-raw$
 ^src/sqlite3/.*\.o$
@@ -26,3 +25,5 @@ a.out.dSYM
 ^clion-test\.R$
 ^_pkgdown\.yml$
 ^docs$
+^README\.Rmd$
+^UPDATE\.md$

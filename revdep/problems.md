@@ -10,32 +10,31 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Universal                    |
-|date     |2016-11-18                   |
+|date     |2016-11-25                   |
 
 ## Packages
 
 |package   |*  |version    |date       |source                             |
 |:---------|:--|:----------|:----------|:----------------------------------|
-|BH        |   |1.60.0-2   |2016-05-07 |cran (@1.60.0-)                    |
+|BH        |   |1.62.0-1   |2016-11-19 |cran (@1.62.0-)                    |
 |DBI       |   |0.5-12     |2016-10-06 |Github (rstats-db/DBI@4f00863)     |
 |DBItest   |   |1.3-10     |2016-10-06 |Github (rstats-db/DBItest@9e87611) |
-|knitr     |   |1.15       |2016-11-09 |cran (@1.15)                       |
+|knitr     |   |1.15.1     |2016-11-22 |cran (@1.15.1)                     |
 |memoise   |   |1.0.0      |2016-01-29 |CRAN (R 3.3.1)                     |
 |plogr     |   |0.1-1      |2016-09-24 |cran (@0.1-1)                      |
-|Rcpp      |   |0.12.7     |2016-09-05 |cran (@0.12.7)                     |
-|rmarkdown |   |1.1        |2016-10-16 |cran (@1.1)                        |
+|Rcpp      |   |0.12.8     |2016-11-17 |cran (@0.12.8)                     |
+|rmarkdown |   |1.2        |2016-11-21 |cran (@1.2)                        |
 |RSQLite   |   |1.0.0      |2014-10-25 |CRAN (R 3.3.1)                     |
 |testthat  |   |1.0.2.9000 |2016-08-25 |Github (hadley/testthat@46d15da)   |
 
 # Check results
 
-32 packages with problems
+31 packages with problems
 
 |package            |version  | errors| warnings| notes|
 |:------------------|:--------|------:|--------:|-----:|
 |AnnotationDbi      |1.36.0   |      0|        1|     5|
 |AnnotationHubData  |1.4.0    |      1|        0|     3|
-|archivist          |2.1      |      1|        0|     2|
 |ChemmineR          |2.26.0   |      1|        0|     0|
 |clstutils          |1.22.0   |      0|        2|     5|
 |CNEr               |1.10.1   |      0|        2|     2|
@@ -48,7 +47,7 @@
 |metagenomeFeatures |1.4.0    |      0|        2|     2|
 |metaseqR           |1.14.0   |      1|        1|     4|
 |mgsa               |1.22.0   |      0|        1|     4|
-|oce                |0.9-19   |      1|        0|     1|
+|oce                |0.9-20   |      1|        0|     1|
 |oligoClasses       |1.36.0   |      0|        1|     4|
 |oligo              |1.38.0   |      1|        0|     9|
 |PAnnBuilder        |1.38.0   |      0|        3|     1|
@@ -58,12 +57,12 @@
 |RImmPort           |1.2.0    |      0|        1|     1|
 |RQDA               |0.2-7    |      1|        0|     1|
 |specL              |1.8.0    |      0|        1|     3|
-|sqldf              |0.4-10   |      1|        1|     2|
+|sqldf              |0.4-10   |      0|        1|     2|
 |TFBSTools          |1.12.1   |      0|        1|     2|
 |tigreBrowserWriter |0.1.2    |      1|        0|     0|
 |trackeR            |0.0.4    |      0|        1|     0|
 |TSdata             |2016.8-1 |      0|        1|     0|
-|VariantFiltering   |1.10.0   |      0|        1|     4|
+|VariantFiltering   |1.10.1   |      0|        1|     4|
 |vmsbase            |2.1.3    |      1|        0|     0|
 
 ## AnnotationDbi (1.36.0)
@@ -169,40 +168,6 @@ Found the following calls to data() loading into the global environment:
 File ‘AnnotationHubData/R/makeNCBIToOrgDbs.R’:
   data(specData, package = "GenomeInfoDb")
 See section ‘Good practice’ in ‘?data’.
-```
-
-## archivist (2.1)
-Maintainer: Przemyslaw Biecek <przemyslaw.biecek@gmail.com>  
-Bug reports: https://github.com/pbiecek/archivist/issues
-
-1 error  | 0 warnings | 2 notes
-
-```
-checking examples ... ERROR
-Running examples in ‘archivist-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: aread
-> ### Title: Read Artifacts Given as md5hashes from the Repository
-> ### Aliases: aread
-> 
-> ### ** Examples
-> 
-> # read the object from local directory
-> setLocalRepo(system.file("graphGallery", package = "archivist"))
-> pl <- aread("f05f0ed0662fe01850ec1b928830ef32")
-> # plot it
-> pl
-Error: ScalesList was built with an incompatible version of ggproto.
-Please reinstall the package that provides this extension.
-Execution halted
-
-checking package dependencies ... NOTE
-Package which this enhances but not available for checking: ‘archivist.github’
-
-checking Rd cross-references ... NOTE
-Package unavailable to check Rd xrefs: ‘archivist.github’
 ```
 
 ## ChemmineR (2.26.0)
@@ -783,7 +748,7 @@ to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
 contains 'methods').
 ```
 
-## oce (0.9-19)
+## oce (0.9-20)
 Maintainer: Dan Kelley <Dan.Kelley@Dal.Ca>  
 Bug reports: https://github.com/dankelley/oce/issues
 
@@ -811,9 +776,9 @@ Calls: plot -> plot -> .local
 Execution halted
 
 checking installed package size ... NOTE
-  installed size is  5.3Mb
+  installed size is  5.4Mb
   sub-directories of 1Mb or more:
-    help   2.0Mb
+    help   2.1Mb
 ```
 
 ## oligoClasses (1.36.0)
@@ -1381,32 +1346,9 @@ prepare_Rd: ms1.p2069.Rd:23-26: Dropping empty section \examples
 Maintainer: G. Grothendieck <ggrothendieck@gmail.com>  
 Bug reports: http://groups.google.com/group/sqldf
 
-1 error  | 1 warning  | 2 notes
+0 errors | 1 warning  | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘sqldf-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: sqldf
-> ### Title: SQL select on data frames
-> ### Aliases: sqldf
-> ### Keywords: manip
-> 
-... 6 lines ...
-> # in R without SQL and then again with SQL
-> #
-> 
-> # head
-> a1r <- head(warpbreaks)
-> a1s <- sqldf("select * from warpbreaks limit 6")
-Loading required package: tcltk
-Error in eval(substitute(expr), envir, enclos) : 
-  no such table: warpbreaks
-Calls: sqldf ... initialize -> initialize -> rsqlite_send_query -> .Call
-Execution halted
-
 checking whether package ‘sqldf’ can be installed ... WARNING
 Found the following significant warnings:
   Warning: no DISPLAY variable so Tk is not available
@@ -1483,7 +1425,7 @@ Warning: Named parameters not used in query: dname
 >   closeDb(db)
 Warning: Named parameters not used in query: parent_id, name
 Warning: Named parameters not used in query: name, parent_id
-Error in eval(substitute(expr), envir, enclos) : 
+Error in rsqlite_bind_rows(res@ptr, params) : 
   Query requires 1 params; 2 supplied.
 Calls: closeDb ... <Anonymous> -> db_bind -> rsqlite_bind_rows -> .Call
 Execution halted
@@ -1529,28 +1471,28 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Nov 18, 2016 3:53:58 PM it.bancaditalia.oss.sdmx.util.Configuration init
 INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
-Nov 18, 2016 3:53:58 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 25, 2016 12:03:42 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 18, 2016 3:53:58 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 25, 2016 12:03:43 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Nov 18, 2016 3:53:58 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Nov 25, 2016 12:03:43 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetData/QNA/CAN.B1_GE.CARSA.Q?format=compact_v2
 ... 8 lines ...
-Nov 18, 2016 3:53:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
-INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/data/ESTAT,ei_nama_q,1.0/Q.MIO-EUR.NSA.CP.NA-P72.IT
-Nov 18, 2016 3:53:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
-INFO: The sdmx call returned messages in the footer:
- Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
+SEVERE: Connection failed. HTTP error code : 500, message: Internal Server Error
+SDMX meaning: Error on the provider side.
+Nov 25, 2016 12:03:44 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient getDataFlowStructure
+SEVERE: Exception caught parsing results from call to provider Eurostat
 
 Error: processing vignette 'Guide.Stex' failed with diagnostics:
  chunk 5 
 Error in .local(serIDs, con, ...) : 
-  ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT error: it.bancaditalia.oss.sdmx.util.SdmxException: The query: ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT did not match any time series on the provider.
+  ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT error: it.bancaditalia.oss.sdmx.util.SdmxException: Exception. Class: it.bancaditalia.oss.sdmx.util.SdmxException .Message: Connection failed. HTTP error code : 500, message: Internal Server Error
+SDMX meaning: Error on the provider side.
 Execution halted
 ```
 
-## VariantFiltering (1.10.0)
+## VariantFiltering (1.10.1)
 Maintainer: Robert Castelo <robert.castelo@upf.edu>  
 Bug reports: https://github.com/rcastelo/VariantFiltering/issues
 

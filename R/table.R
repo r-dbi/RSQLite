@@ -65,6 +65,8 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     if (overwrite && append)
       stop("overwrite and append cannot both be TRUE", call. = FALSE)
 
+    name <- check_quoted_identifier(name)
+
     row.names <- compatRowNames(row.names)
 
     dbBegin(conn, "dbWriteTable")
@@ -268,6 +270,15 @@ string_to_utf8 <- function(value) {
   is_char <- vlapply(value, is.character)
   value[is_char] <- lapply(value[is_char], enc2utf8)
   value
+}
+
+check_quoted_identifier <- function(name) {
+  if (class(name)[[1L]] != "SQL" && grepl("^`.*`$", name)) {
+    warning_once("Quoted identifiers should have class SQL, use DBI::SQL() if the caller performs the quoting.")
+    name <- SQL(name)
+  }
+
+  name
 }
 
 

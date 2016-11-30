@@ -149,7 +149,7 @@
 
 - Differential reverse dependency checks.
 
-- Added upgrade script for sqlite3 sources to the `src-raw` directory.
+- Added upgrade script for sqlite3 sources and creation script for the datasets database to the `data-raw` directory.
 
 
 # Version 1.0.0

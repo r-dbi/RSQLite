@@ -3,6 +3,7 @@
 # Header
 language: r
 sudo: false
+dist: trusty
 cache: packages
 warnings_are_errors: true
 

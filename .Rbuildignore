@@ -28,3 +28,4 @@ a.out.dSYM
 ^README\.Rmd$
 ^UPDATE\.md$
 ^tic\.R$
+^cmake-build-debug$

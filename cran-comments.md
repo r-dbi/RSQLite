@@ -6,18 +6,20 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 2 notes
+0 errors | 0 warnings | 2 note
 
-* New maintainer: Kirill Müller, previous maintainer: Hadley Wickham.
-  See https://github.com/rstats-db/RSQLite/commit/1cfbce07c678de#commitcomment-18978172
-  for a comment that indicates Hadley's consent.
+* Severe bug makes immediate release necessary. (Added test that is triggered
+  by the now fixed bug.)
 
 * Installed size: This package comes with a bundled RSQLite library.
 
 
 ## Reverse dependencies
 
-Checked all 117 CRAN and BioConductor reverse dependencies on Ubuntu 16.04.
+Checked all 117 CRAN and BioConductor reverse dependencies on Ubuntu 16.04
+with RSQLite v1.1. No new checks made with RSQLite v1.1-1, because it only
+differs by adding protection in one place in C++ code.
+
 A few CRAN packages show errors in this version but succeed with RSQLite v1.0.0:
 
 - ecd (0.8.2) imports RSQLite <= 1.0.0, contacted maintainer several times,

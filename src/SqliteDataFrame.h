@@ -24,7 +24,7 @@ public:
   List get_data(std::vector<SEXPTYPE>& types);
 
 private:
-  void set_col_value(SEXP& col, const int j);
+  void set_col_value(RObject& col, const int j);
   void finalize_cols();
 
   void alloc_missing_cols();

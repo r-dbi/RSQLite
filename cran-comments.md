@@ -6,19 +6,20 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 2 note
+0 errors | 0 warnings | 1 note
+
+* Installed size: This package comes with a bundled RSQLite library.
 
 * Severe bug makes immediate release necessary. (Added test that is triggered
   by the now fixed bug.)
-
-* Installed size: This package comes with a bundled RSQLite library.
 
 
 ## Reverse dependencies
 
 Checked all 117 CRAN and BioConductor reverse dependencies on Ubuntu 16.04
 with RSQLite v1.1. No new checks made with RSQLite v1.1-1, because it only
-differs by adding protection in one place in C++ code.
+differs by adding protection in one place in C++ code. (Copied comments for
+v1.1 release below.)
 
 A few CRAN packages show errors in this version but succeed with RSQLite v1.0.0:
 

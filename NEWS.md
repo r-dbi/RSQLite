@@ -1,3 +1,8 @@
+## RSQLite 1.1-1 (2016-12-10)
+
+- Fix protection issue that could lead to memory access errors when fetching `BLOB` data.
+
+
 # RSQLite 1.1 (2016-11-25)
 
 - New maintainer: Kirill Müller.

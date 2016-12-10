@@ -13,6 +13,9 @@
 * Severe bug makes immediate release necessary. (Added test that is triggered
   by the now fixed bug.)
 
+* I've noticed the ASAN errors with gcc-7, will resolve with the next regular
+  release.
+
 
 ## Reverse dependencies
 

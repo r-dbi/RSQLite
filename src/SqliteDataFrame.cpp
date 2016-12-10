@@ -78,6 +78,10 @@ void SqliteDataFrame::alloc_missing_cols() {
 }
 
 void SqliteDataFrame::set_col_value(RObject& col, const int j) {
+  // col needs to be PROTECTed because it can be allocated
+  // just before a RAW vector that holds BLOB data is (#192).
+  // The easiest way to protect is to make it an RObject.
+
   SEXPTYPE type = types[j];
   int column_type = sqlite3_column_type(stmt, j);
 

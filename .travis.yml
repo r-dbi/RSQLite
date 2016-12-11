@@ -3,6 +3,7 @@
 # Header
 language: r
 sudo: false
+dist: trusty
 cache: packages
 warnings_are_errors: true
 
@@ -40,7 +41,6 @@ notifications:
 
 #before_script
 before_script:
-- R -q -e 'install.packages("http://cran.r-project.org/src/contrib/Archive/Rcpp/Rcpp_0.12.7.tar.gz", repos = NULL)'
 - R -q -e 'devtools::install_github("ropenscilabs/tic"); tic::prepare_all_stages()'
 
 #after_success

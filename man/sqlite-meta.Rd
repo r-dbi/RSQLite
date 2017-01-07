@@ -63,4 +63,3 @@ The corresponding generic functions
 \code{\link[DBI:dbColumnInfo]{DBI::dbColumnInfo()}}, \code{\link[DBI:dbGetRowsAffected]{DBI::dbGetRowsAffected()}}, \code{\link[DBI:dbGetRowCount]{DBI::dbGetRowCount()}},
 \code{\link[DBI:dbHasCompleted]{DBI::dbHasCompleted()}}, and \code{\link[DBI:dbGetStatement]{DBI::dbGetStatement()}}.
 }
-

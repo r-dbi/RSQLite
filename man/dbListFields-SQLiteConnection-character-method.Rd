@@ -26,4 +26,3 @@ dbDisconnect(db)
 \seealso{
 The corresponding generic function \code{\link[DBI:dbListFields]{DBI::dbListFields()}}.
 }
-

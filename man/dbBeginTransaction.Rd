@@ -15,4 +15,3 @@ dbBeginTransaction(conn, ...)
 See method documentation for details.
 }
 \keyword{internal}
-

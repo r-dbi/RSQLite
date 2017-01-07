@@ -17,4 +17,3 @@ The SQLiteDriver, which is used to select the correct method in
 It is used purely for dispatch and \code{\link[=dbUnloadDriver]{dbUnloadDriver()}} is a null-op.
 }
 \keyword{internal}
-

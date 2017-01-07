@@ -58,4 +58,3 @@ dbDisconnect(db)
 \seealso{
 The corresponding generic function \code{\link[DBI:dbReadTable]{DBI::dbReadTable()}}.
 }
-

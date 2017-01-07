@@ -116,4 +116,3 @@ The corresponding generic functions
 \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}}, \code{\link[DBI:dbFetch]{DBI::dbFetch()}}, \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}}, \code{\link[DBI:dbGetQuery]{DBI::dbGetQuery()}},
 \code{\link[DBI:dbBind]{DBI::dbBind()}}, \code{\link[DBI:dbSendStatement]{DBI::dbSendStatement()}}, and \code{\link[DBI:dbExecute]{DBI::dbExecute()}}.
 }
-

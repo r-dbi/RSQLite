@@ -2304,7 +2304,7 @@ The error most likely occurred in:
 > temp.db.file <- tempfile()
 > write(sim.bux.lines, file=temp.file)
 > test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
-Processing /tmp/RtmpQAJ0Yo/file1fd61939d0f6 in chunks of 10000
+Processing /tmp/RtmpZyhprh/filee4cd4e71a1e4 in chunks of 10000
 Starting chunk 1
 Reached breakpoint change
 Processing breakpoint 1
@@ -2327,7 +2327,7 @@ Last 13 lines of output:
   Error in BiocGenerics:::testPackage("plethy") : 
     unit tests failed for package plethy
   In addition: Warning message:
-  closing unused connection 3 (/tmp/RtmpAYd7sI/file212e717b22cf) 
+  closing unused connection 3 (/tmp/RtmpoW8w2r/filee66827ceb6fb) 
   Execution halted
 
 checking dependencies in R code ... NOTE
@@ -3084,17 +3084,17 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Jan 07, 2017 7:02:08 PM it.bancaditalia.oss.sdmx.util.Configuration init
+Jan 07, 2017 6:34:40 PM it.bancaditalia.oss.sdmx.util.Configuration init
 INFO: Configuration file: /home/muelleki/R/x86_64-pc-linux-gnu-library/3.3/RJSDMX/configuration.properties
-Jan 07, 2017 7:02:08 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jan 07, 2017 6:34:40 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Jan 07, 2017 7:02:09 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jan 07, 2017 6:34:41 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://stats.oecd.org/restsdmx/sdmx.ashx//GetDataStructure/QNA
-Jan 07, 2017 7:02:09 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jan 07, 2017 6:34:42 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 ... 8 lines ...
-Jan 07, 2017 7:02:10 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jan 07, 2017 6:34:43 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/data/ESTAT,ei_nama_q,1.0/Q.MIO-EUR.NSA.CP.NA-P72.IT
-Jan 07, 2017 7:02:10 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
+Jan 07, 2017 6:34:43 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
 

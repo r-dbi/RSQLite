@@ -36,4 +36,3 @@ These functions have been deprecated. Please switch to using
 or with calling \code{\link[=dbBind]{dbBind()}} instead.
 }
 \keyword{internal}
-

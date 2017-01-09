@@ -29,4 +29,3 @@ dbDisconnect(con)
 \seealso{
 The corresponding generic function \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}}.
 }
-

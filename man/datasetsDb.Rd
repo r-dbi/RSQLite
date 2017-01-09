@@ -20,4 +20,3 @@ dbGetQuery(db, "SELECT * FROM CO2 WHERE conc < 100")
 
 dbDisconnect(db)
 }
-

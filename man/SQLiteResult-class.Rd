@@ -13,4 +13,3 @@ SQLite's query results class.  This classes encapsulates the result of an
 SQL statement (either \code{SELECT} or not).
 }
 \keyword{internal}
-

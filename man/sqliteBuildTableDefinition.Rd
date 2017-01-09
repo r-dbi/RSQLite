@@ -29,4 +29,3 @@ The output SQL statement is a simple \code{CREATE TABLE} suitable for
 \code{dbGetQuery}
 }
 \keyword{internal}
-

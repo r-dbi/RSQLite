@@ -19,4 +19,3 @@
 \code{\link[DBI:dbConnect]{DBI::dbConnect()}}.
 }
 \keyword{internal}
-

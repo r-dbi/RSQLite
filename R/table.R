@@ -317,6 +317,8 @@ check_quoted_identifier <- function(name) {
 #' dbDisconnect(db)
 setMethod("dbReadTable", c("SQLiteConnection", "character"),
   function(conn, name, ..., row.names = NA, check.names = TRUE, select.cols = "*") {
+    name <- check_quoted_identifier(name)
+
     row.names <- compatRowNames(row.names)
 
     name <- dbQuoteIdentifier(conn, name)
@@ -354,6 +356,8 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 #' dbDisconnect(con)
 setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
   function(conn, name, ...) {
+    name <- check_quoted_identifier(name)
+
     dbExecute(conn, paste("DROP TABLE ", dbQuoteIdentifier(conn, name)))
     invisible(TRUE)
   }

@@ -65,4 +65,3 @@ dbDisconnect(con)
 The corresponding generic functions \code{\link[DBI:dbBegin]{DBI::dbBegin()}}, \code{\link[DBI:dbCommit]{DBI::dbCommit()}},
 and \code{\link[DBI:dbRollback]{DBI::dbRollback()}}.
 }
-

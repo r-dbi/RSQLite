@@ -33,4 +33,3 @@ sapply(datasets::quakes, dbDataType, dbObj = RSQLite::SQLite())
 \seealso{
 The corresponding generic function \code{\link[DBI:dbDataType]{DBI::dbDataType()}}.
 }
-

@@ -11,4 +11,3 @@
 DEPRECATED
 }
 \keyword{internal}
-

@@ -1,4 +1,10 @@
-## RSQLite 1.1-1 (2016-12-10)
+# RSQLite 1.1-2 (2017-01-07)
+
+- Check reverse dependencies.
+- Check and warn if the `name` argument is quoted in `dbReadTable()` and `dbRemoveTable()`, for compatibility with `sqldf` (#196).
+
+
+# RSQLite 1.1-1 (2016-12-10)
 
 - Fix protection issue that could lead to memory access errors when fetching `BLOB` data (#192, #194, @MikeBadescu).
 

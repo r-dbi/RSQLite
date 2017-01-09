@@ -10,4 +10,3 @@ isIdCurrent(obj)
 Deprecated. Please use dbIsValid instead.
 }
 \keyword{internal}
-

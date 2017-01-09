@@ -100,4 +100,3 @@ dbDisconnect(con)
 \seealso{
 The corresponding generic functions \code{\link[DBI:dbWriteTable]{DBI::dbWriteTable()}} and \code{\link[DBI:sqlData]{DBI::sqlData()}}.
 }
-

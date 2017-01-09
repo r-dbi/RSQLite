@@ -107,4 +107,3 @@ dbDisconnect(con)
 \seealso{
 The corresponding generic functions \code{\link[DBI:dbConnect]{DBI::dbConnect()}} and \code{\link[DBI:dbDisconnect]{DBI::dbDisconnect()}}.
 }
-

@@ -26,6 +26,7 @@ replace, replicate, reverse, rightstr, rtrim, strfilter, trim}
 upper_quartile}
 }
 }
+
 \examples{
 library(DBI)
 db <- RSQLite::datasetsDb()
@@ -35,4 +36,3 @@ dbGetQuery(db, "SELECT stdev(mpg) FROM mtcars")
 sd(mtcars$mpg)
 dbDisconnect(db)
 }
-

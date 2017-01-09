@@ -20,4 +20,3 @@
 Deprecated. Please use individual functions.
 }
 \keyword{internal}
-

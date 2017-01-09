@@ -19,4 +19,3 @@
 Deprecated. Please use \code{\link[=dbQuoteIdentifier]{dbQuoteIdentifier()}} instead.
 }
 \keyword{internal}
-

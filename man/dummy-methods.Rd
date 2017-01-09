@@ -10,7 +10,7 @@
 }
 \arguments{
 \item{conn}{A \code{\linkS4class{DBIConnection}} object, as produced by
-\code{\link[=dbConnect]{dbConnect()}}.}
+\code{\link{dbConnect}}.}
 
 \item{statement}{a character vector of length 1 containing SQL.}
 
@@ -21,4 +21,3 @@ Define here so that these methods can also be imported from this package.
 Recommended practice is to import all methods from \pkg{DBI}.
 }
 \keyword{internal}
-

@@ -12,4 +12,3 @@ A shortcut for \code{\link[DBI]{dbFetch}(res, n = n, row.names = FALSE)},
 kept for compatibility reasons.
 }
 \keyword{internal}
-

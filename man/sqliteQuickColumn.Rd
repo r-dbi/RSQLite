@@ -12,4 +12,3 @@ A shortcut for
 kept for compatibility reasons.
 }
 \keyword{internal}
-

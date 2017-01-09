@@ -34,4 +34,3 @@ dbDisconnect(db)
 \seealso{
 The corresponding generic functions \code{\link[DBI:dbExistsTable]{DBI::dbExistsTable()}} and \code{\link[DBI:dbListTables]{DBI::dbListTables()}}.
 }
-

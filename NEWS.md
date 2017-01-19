@@ -1,3 +1,8 @@
+## RSQLite 1.1-10 (2017-01-19)
+
+- Same as 1.1-2.
+
+
 # RSQLite 1.1-2 (2017-01-07)
 
 - Check reverse dependencies.

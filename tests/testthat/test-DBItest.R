@@ -16,19 +16,8 @@ DBItest::test_all(c(
   "get_query_n_.*",                             # rstats-db/DBI#76
   "data_logical",                               # not an error, no logical data type
   "data_logical_null_.*",                       # not an error, no logical data type
-  "data_64_bit",                                # #65
-  "data_64_bit_null_.*",                        # #65
+  "data_64_bit_.*",                             # #65
   "data_raw_null_.*",                           # #115
-  "data_date",                                  # #103
-  "data_date_null_.*",                          # #xxx
-  "data_time",                                  # syntax not supported
-  "data_time_null_.*",                          # syntax not supported
-  "data_timestamp",                             # syntax not supported
-  "data_timestamp_null_.*",                     # syntax not supported
-  "data_timestamp_utc",                         # syntax not supported
-  "data_timestamp_utc_null_.*",                 # syntax not supported
-  "data_timestamp_parens",                      # #104
-  "data_timestamp_parens_null_.*",              # #xxx
 
   # sql
   "append_table_error",                         # #112

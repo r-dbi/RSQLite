@@ -21,9 +21,6 @@ DBItest::test_all(c(
 
   # sql
   "append_table_error",                         # #112
-  "quote_identifier_not_vectorized",            # rstats-db/DBI#24
-  "roundtrip_quotes",                           # #107
-  "roundtrip_logical",                          # not an error, no logical data type
   "roundtrip_64_bit",                           # not an error, loose typing
   "roundtrip_raw",                              # #116
   "roundtrip_date",                             # #109

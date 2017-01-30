@@ -17,7 +17,6 @@ DBItest::test_all(c(
   "data_logical",                               # not an error, no logical data type
   "data_logical_null_.*",                       # not an error, no logical data type
   "data_64_bit_.*",                             # #65
-  "data_raw_null_.*",                           # #115
 
   # sql
   "append_table_error",                         # #112

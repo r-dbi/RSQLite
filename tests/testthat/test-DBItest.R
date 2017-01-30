@@ -25,6 +25,10 @@ DBItest::test_all(c(
   "roundtrip_raw",                              # #116
   "roundtrip_date",                             # #109
   "roundtrip_timestamp",                        # #110
+  "read_table_error",                           #
+  "write_table_error",                          #
+  "exists_table_error",                         #
+  "exists_table_name",                          #
 
   # result_meta
   "get_info_result",                            # rstats-db/DBI#55

@@ -322,9 +322,8 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
     row.names <- compatRowNames(row.names)
 
     name <- dbQuoteIdentifier(conn, name)
-    out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM",
-                                  dbQuoteIdentifier(conn, name)),
-      row.names = row.names)
+    out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM", name),
+                      row.names = row.names)
 
     if (check.names) {
       names(out) <- make.names(names(out), unique = TRUE)

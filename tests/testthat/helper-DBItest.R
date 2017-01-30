@@ -8,6 +8,7 @@ DBItest::make_context(
     time_cast = function(x) paste0("'", x, "'"),
     timestamp_cast = function(x) paste0("'", x, "'"),
     date_typed = FALSE,
+    time_typed = FALSE,
     timestamp_typed = FALSE
   ),
   name = "RSQLite"

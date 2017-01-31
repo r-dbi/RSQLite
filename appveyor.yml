@@ -22,7 +22,6 @@ environment:
     R_ARCH: x64
 
 build_script:
-  - travis-tool.sh install_github rstats-db/DBI rstats-db/DBItest@production
   - travis-tool.sh install_deps
 
 test_script:

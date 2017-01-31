@@ -141,7 +141,7 @@ void SqliteDataFrame::fill_default_col_value(const SEXP col, const int i_) {
     SET_STRING_ELT(col, i_, NA_STRING);
     break;
   case VECSXP:
-    SET_VECTOR_ELT(col, i_, RawVector(0));
+    SET_VECTOR_ELT(col, i_, R_NilValue);
     break;
   }
 }

@@ -1,3 +1,8 @@
+## RSQLite 1.1-11 (2017-02-01)
+
+- Upgrade embedded SQLite library to 3.16.2 (#180).
+
+
 ## RSQLite 1.1-10 (2017-01-19)
 
 - Same as 1.1-2.

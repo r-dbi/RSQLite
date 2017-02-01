@@ -3,7 +3,13 @@ DBItest::make_context(
   list(dbname = tempfile("DBItest", fileext = ".sqlite")),
   tweaks = DBItest::tweaks(
     constructor_relax_args = TRUE,
-    placeholder_pattern = c("?", "$1", "$name", ":name")
+    placeholder_pattern = c("?", "$1", "$name", ":name"),
+    date_cast = function(x) paste0("'", x, "'"),
+    time_cast = function(x) paste0("'", x, "'"),
+    timestamp_cast = function(x) paste0("'", x, "'"),
+    date_typed = FALSE,
+    time_typed = FALSE,
+    timestamp_typed = FALSE
   ),
   name = "RSQLite"
 )

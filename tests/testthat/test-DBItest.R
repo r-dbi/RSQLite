@@ -8,33 +8,26 @@ DBItest::test_all(c(
   "cannot_disconnect_twice",                    # TODO
 
   # result
-  "clear_result_return",                        # error: need to warn if closing result twice
+  "fetch_no_return_value",                      # need to warn when fetching statement
+  "fetch_n_bad",                                # n argument to dbFetch()
+  "fetch_n_good_after_bad",                     # n argument to dbFetch()
+  "cannot_clear_result_twice_.*",               # error: need to warn if closing result twice
   "stale_result_warning",                       # #120
+  "get_query_n_.*",                             # rstats-db/DBI#76
   "data_logical",                               # not an error, no logical data type
   "data_logical_null_.*",                       # not an error, no logical data type
-  "data_64_bit",                                # #65
-  "data_64_bit_null_.*",                        # #65
-  "data_raw_null_.*",                           # #115
-  "data_date",                                  # #103
-  "data_date_null_.*",                          # #xxx
-  "data_time",                                  # syntax not supported
-  "data_time_null_.*",                          # syntax not supported
-  "data_timestamp",                             # syntax not supported
-  "data_timestamp_null_.*",                     # syntax not supported
-  "data_timestamp_utc",                         # syntax not supported
-  "data_timestamp_utc_null_.*",                 # syntax not supported
-  "data_timestamp_parens",                      # #104
-  "data_timestamp_parens_null_.*",              # #xxx
+  "data_64_bit_.*",                             # #65
 
   # sql
   "append_table_error",                         # #112
-  "quote_identifier_not_vectorized",            # rstats-db/DBI#24
-  "roundtrip_quotes",                           # #107
-  "roundtrip_logical",                          # not an error, no logical data type
   "roundtrip_64_bit",                           # not an error, loose typing
   "roundtrip_raw",                              # #116
   "roundtrip_date",                             # #109
   "roundtrip_timestamp",                        # #110
+  "read_table_error",                           #
+  "write_table_error",                          #
+  "exists_table_error",                         #
+  "exists_table_name",                          #
 
   # result_meta
   "get_info_result",                            # rstats-db/DBI#55

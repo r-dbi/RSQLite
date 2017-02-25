@@ -30,8 +30,10 @@ DBItest::test_all(c(
   "exists_table_error",                         #
   "exists_table_name",                          #
 
-  # result_meta
+  # meta
+  "get_statement_error",                        #
   "get_info_result",                            # rstats-db/DBI#55
+  "bind_empty",                                 #
   "bind_logical.*",                             # not an error, no logical data type
   "bind_date.*",                                # #114
   "bind_timestamp.*",                           # #114

@@ -39,19 +39,11 @@ DBItest::test_all(c(
   "bind_timestamp.*",                           # #114
   "read_only",                                  # default connection is read-write
 
+  # transactions
+  "begin_write_disconnect",                     #
+
   # compliance
   "compliance",                                 # skipping for now because of dbGetInfo()
 
   NULL
 ))
-
-# Only read_only and interface compliance test run here
-# (opt-in not yet implemented, rstats-db/DBItest#33)
-DBItest::test_compliance(
-  ctx = DBItest::make_context(
-    SQLite(), list(flags = SQLITE_RO), set_as_default = FALSE, name = "RSQLite-RO"),
-  skip = c(
-    "compliance",                               # skipping for now because of dbGetInfo()
-    "ellipsis"                                  # redundant
-  )
-)

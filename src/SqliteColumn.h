@@ -9,8 +9,12 @@ public:
   SqliteColumn(SEXPTYPE type_) : type(type_), i(0) {}
 
 public:
-  static SqliteColumn as(SEXPTYPE type_) { return SqliteColumn(type_); }
-  static SEXPTYPE get_type_from_object(const SqliteColumn& col) { return col.get_type(); }
+  static SqliteColumn as(SEXPTYPE type_) {
+    return SqliteColumn(type_);
+  }
+  static SEXPTYPE get_type_from_object(const SqliteColumn& col) {
+    return col.get_type();
+  }
 
 public:
   const RObject& get_value() const {

@@ -6,7 +6,6 @@
 
 class SqliteColumn {
 public:
-  SqliteColumn() : type(NILSXP) {}
   SqliteColumn(SEXPTYPE type_) : type(type_) {}
 
 public:

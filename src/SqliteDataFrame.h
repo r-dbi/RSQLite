@@ -11,7 +11,6 @@ class SqliteDataFrame {
   int i, n;
   std::vector<SqliteColumn> data;
   std::vector<std::string> names;
-  std::vector<SEXPTYPE> types;
 
 public:
   SqliteDataFrame(sqlite3_stmt* stmt, std::vector<std::string> names, const int n_max, const std::vector<SEXPTYPE>& types);

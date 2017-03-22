@@ -6,12 +6,28 @@
 
 class SqliteColumn {
 public:
+  SqliteColumn() : type(NILSXP) {}
+  SqliteColumn(SEXPTYPE type_) : type(type_) {}
+
+public:
+  static SqliteColumn as(SEXPTYPE type_) { return SqliteColumn(type_); }
+  static SEXPTYPE get_type_from_object(const SqliteColumn& col) { return col.get_type(); }
+
+public:
   const RObject& get_value() const {
     return data;
   }
 
   void set_value(const RObject& data_) {
     data = data_;
+  }
+
+  SEXPTYPE get_type() const {
+    return type;
+  }
+
+  void set_type(SEXPTYPE type_) {
+    type = type_;
   }
 
   operator SEXP() const {
@@ -24,6 +40,7 @@ public:
 
 private:
   RObject data;
+  SEXPTYPE type;
 };
 
 

@@ -9,10 +9,9 @@ SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt_, std::vector<std::string> n
     n_max(n_max_),
     i(0),
     n(init_n()),
-    data(names_.size()),
-    names(names_),
-    types(types_)
+    names(names_)
 {
+  std::transform(types_.begin(), types_.end(), std::back_inserter(data), &SqliteColumn::as);
 }
 
 int SqliteDataFrame::init_n() const {
@@ -51,7 +50,8 @@ List SqliteDataFrame::get_data(std::vector<SEXPTYPE>& types_) {
   // Trim back to what we actually used
   finalize_cols();
 
-  types_ = this->types;
+  types_.clear();
+  std::transform(data.begin(), data.end(), std::back_inserter(types_), &SqliteColumn::get_type_from_object);
 
   List out(data.begin(), data.end());
   out.attr("names") = names;
@@ -81,11 +81,12 @@ void SqliteDataFrame::alloc_missing_cols() {
   // Create data for columns where all values were NULL (or for all columns
   // in the case of a 0-row data frame)
   for (size_t j = 0; j < data.size(); ++j) {
-    if (types[j] == NILSXP) {
-      types[j] =
+    if (data[j].get_type() == NILSXP) {
+      SEXPTYPE type =
         decltype_to_sexptype(sqlite3_column_decltype(stmt, j));
-      LOG_VERBOSE << j << ": " << types[j];
-      data[j].set_value(alloc_col(types[j]));
+      LOG_VERBOSE << j << ": " << type;
+      data[j].set_type(type);
+      data[j].set_value(alloc_col(type));
     }
   }
 }
@@ -95,7 +96,7 @@ void SqliteDataFrame::set_col_value(RObject& col, const int j) {
   // just before a RAW vector that holds BLOB data is (#192).
   // The easiest way to protect is to make it an RObject.
 
-  SEXPTYPE type = types[j];
+  SEXPTYPE type = data[j].get_type();
   int column_type = sqlite3_column_type(stmt, j);
 
   LOG_VERBOSE << "column_type: " << column_type;
@@ -112,7 +113,7 @@ void SqliteDataFrame::set_col_value(RObject& col, const int j) {
       return;
     else {
       col = alloc_col(type);
-      types[j] = type;
+      data[j].set_type(type);
     }
   }
 

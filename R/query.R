@@ -151,6 +151,8 @@ db_bind <- function(res, params, ..., allow_named_superset) {
 #' @rdname sqlite-query
 setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
   row.names <- compatRowNames(row.names)
+  if (n < -1) stop("n must be nonnegative or -1 in dbFetch()", call. = FALSE)
+  if (is.infinite(n)) n <- -1
   sqlColumnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
 })
 

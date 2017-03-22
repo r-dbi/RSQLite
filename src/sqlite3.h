@@ -16,6 +16,6 @@ typedef int sizeof_compound_int64_t_is_8[sizeof(compound_int64_t) == 8 ? 1 : -1]
 #define SQLITE_INT64_TYPE compound_int64_t
 #define SQLITE_UINT64_TYPE compound_int64_t
 
-#include "sqlite3/sqlite3.h"
+#include "vendor/sqlite3/sqlite3.h"
 
 #endif // #ifndef __RSQLITE_SQLITE_H

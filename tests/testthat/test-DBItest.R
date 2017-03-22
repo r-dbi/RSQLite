@@ -23,7 +23,6 @@ DBItest::test_all(c(
   # sql
   "append_table_error",                         # #112
   "roundtrip_64_bit",                           # not an error, loose typing
-  "roundtrip_raw",                              # #116
   "roundtrip_date",                             # #109
   "roundtrip_timestamp",                        # #110
   "read_table_error",                           #

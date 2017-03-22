@@ -18,6 +18,10 @@ public:
     return data;
   };
 
+  void resize(const int n) {
+    set_value(Rf_lengthgets(get_value(), n));
+  }
+
 private:
   RObject data;
 };

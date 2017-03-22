@@ -64,7 +64,7 @@ void SqliteDataFrame::resize() {
   int p = data.size();
 
   for (int j = 0; j < p; ++j) {
-    data[j].set_value(Rf_lengthgets(data[j].get_value(), n));
+    data[j].resize(n);
   }
 }
 

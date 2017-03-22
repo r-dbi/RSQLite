@@ -31,9 +31,7 @@ bool SqliteDataFrame::set_col_values() {
   }
 
   for (size_t j = 0; j < data.size(); ++j) {
-    RObject col = data[j].get_value();
-    set_col_value(col, j);
-    data[j].set_value(col);
+    data[j].set_col_value(stmt, j, n);
   }
 
   return true;
@@ -81,22 +79,16 @@ void SqliteDataFrame::alloc_missing_cols() {
   // Create data for columns where all values were NULL (or for all columns
   // in the case of a 0-row data frame)
   for (size_t j = 0; j < data.size(); ++j) {
-    if (data[j].get_type() == NILSXP) {
-      SEXPTYPE type =
-        decltype_to_sexptype(sqlite3_column_decltype(stmt, j));
-      LOG_VERBOSE << j << ": " << type;
-      data[j].set_type(type);
-      data[j].set_value(alloc_col(type));
-    }
+    data[j].alloc_missing(stmt, j, n);
   }
 }
 
-void SqliteDataFrame::set_col_value(RObject& col, const int j) {
+void SqliteColumn::set_col_value(sqlite3_stmt* stmt, const int j, const int n) {
   // col needs to be PROTECTed because it can be allocated
   // just before a RAW vector that holds BLOB data is (#192).
   // The easiest way to protect is to make it an RObject.
 
-  SEXPTYPE type = data[j].get_type();
+  SEXPTYPE type = get_type();
   int column_type = sqlite3_column_type(stmt, j);
 
   LOG_VERBOSE << "column_type: " << column_type;
@@ -108,99 +100,108 @@ void SqliteDataFrame::set_col_value(RObject& col, const int j) {
     LOG_VERBOSE << "type: " << type;
   }
 
-  if (Rf_isNull(col)) {
-    if (type == NILSXP)
+  if (Rf_isNull(data)) {
+    if (type == NILSXP) {
+      ++i;
       return;
+    }
     else {
-      col = alloc_col(type);
-      data[j].set_type(type);
+      set_type(type);
+      alloc_col(type, n);
     }
   }
 
   if (column_type == SQLITE_NULL) {
-    fill_default_col_value(col);
+    fill_default_col_value();
   }
   else {
-    fill_col_value(col, j);
+    fill_col_value(stmt, j);
   }
+  ++i;
   return;
 }
 
-SEXP SqliteDataFrame::alloc_col(const SEXPTYPE type) {
-  SEXP col = Rf_allocVector(type, n);
-  PROTECT(col);
-  for (int i_ = 0; i_ < i; i_++) {
-    fill_default_col_value(col, i_);
+SEXP SqliteColumn::alloc_col(const SEXPTYPE type, const int n) {
+  data = Rf_allocVector(type, n);
+  int i_ = i;
+  for (i = 0; i < i_; ++i) {
+    fill_default_col_value();
   }
-  UNPROTECT(1);
-  return col;
+  return data;
 }
 
-void SqliteDataFrame::fill_default_col_value(const SEXP col) {
-  fill_default_col_value(col, i);
-}
-
-void SqliteDataFrame::fill_default_col_value(const SEXP col, const int i_) {
-  switch (TYPEOF(col)) {
+void SqliteColumn::fill_default_col_value() {
+  switch (TYPEOF(data)) {
   case LGLSXP:
-    LOGICAL(col)[i_] = NA_LOGICAL;
+    LOGICAL(data)[i] = NA_LOGICAL;
     break;
   case INTSXP:
-    INTEGER(col)[i_] = NA_INTEGER;
+    INTEGER(data)[i] = NA_INTEGER;
     break;
   case REALSXP:
-    REAL(col)[i_] = NA_REAL;
+    REAL(data)[i] = NA_REAL;
     break;
   case STRSXP:
-    SET_STRING_ELT(col, i_, NA_STRING);
+    SET_STRING_ELT(data, i, NA_STRING);
     break;
   case VECSXP:
-    SET_VECTOR_ELT(col, i_, R_NilValue);
+    SET_VECTOR_ELT(data, i, R_NilValue);
     break;
   }
 }
 
-void SqliteDataFrame::fill_col_value(const SEXP col, const int j) {
-  switch (TYPEOF(col)) {
+void SqliteColumn::alloc_missing(sqlite3_stmt* stmt, const int j, const int n) {
+  if (get_type() != NILSXP) return;
+
+  SEXPTYPE type =
+    decltype_to_sexptype(sqlite3_column_decltype(stmt, j));
+  LOG_VERBOSE << j << ": " << type;
+  set_type(type);
+  alloc_col(type, n);
+}
+
+void SqliteColumn::fill_col_value(sqlite3_stmt* stmt, const int j) {
+  switch (TYPEOF(data)) {
   case INTSXP:
-    set_int_value(col, j);
+    set_int_value(stmt, j);
     break;
   case REALSXP:
-    set_real_value(col, j);
+    set_real_value(stmt, j);
     break;
   case STRSXP:
-    set_string_value(col, j);
+    set_string_value(stmt, j);
     break;
   case VECSXP:
-    set_raw_value(col, j);
+    set_raw_value(stmt, j);
     break;
   }
 }
 
-void SqliteDataFrame::set_int_value(const SEXP col, const int j) const {
-  INTEGER(col)[i] = sqlite3_column_int(stmt, j);
+void SqliteColumn::set_int_value(sqlite3_stmt* stmt, const int j) const {
+  INTEGER(data)[i] = sqlite3_column_int(stmt, j);
 }
 
-void SqliteDataFrame::set_real_value(const SEXP col, const int j) const {
-  REAL(col)[i] = sqlite3_column_double(stmt, j);
+void SqliteColumn::set_real_value(sqlite3_stmt* stmt, const int j) const {
+  REAL(data)[i] = sqlite3_column_double(stmt, j);
 }
 
-void SqliteDataFrame::set_string_value(const SEXP col, const int j) const {
+void SqliteColumn::set_string_value(sqlite3_stmt* stmt, const int j) const {
+  LOG_VERBOSE;
   const char* const text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, j));
-  SET_STRING_ELT(col, i, Rf_mkCharCE(text, CE_UTF8));
+  SET_STRING_ELT(data, i, Rf_mkCharCE(text, CE_UTF8));
 }
 
-void SqliteDataFrame::set_raw_value(const SEXP col, const int j) const {
+void SqliteColumn::set_raw_value(sqlite3_stmt* stmt, const int j) const {
   int size = sqlite3_column_bytes(stmt, j);
   const void* blob = sqlite3_column_blob(stmt, j);
 
   SEXP bytes = Rf_allocVector(RAWSXP, size);
   memcpy(RAW(bytes), blob, size);
 
-  SET_VECTOR_ELT(col, i, bytes);
+  SET_VECTOR_ELT(data, i, bytes);
 }
 
-SEXPTYPE SqliteDataFrame::datatype_to_sexptype(const int field_type) {
+SEXPTYPE SqliteColumn::datatype_to_sexptype(const int field_type) {
   switch (field_type) {
   case SQLITE_INTEGER:
     return INTSXP;
@@ -221,7 +222,7 @@ SEXPTYPE SqliteDataFrame::datatype_to_sexptype(const int field_type) {
   }
 }
 
-SEXPTYPE SqliteDataFrame::decltype_to_sexptype(const char* decl_type) {
+SEXPTYPE SqliteColumn::decltype_to_sexptype(const char* decl_type) {
   if (decl_type == NULL)
     return LGLSXP;
 

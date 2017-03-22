@@ -273,11 +273,15 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
     }
   } else if (TYPEOF(value_) == VECSXP) {
     SEXP value = VECTOR_ELT(value_, group_);
-    if (TYPEOF(value) != RAWSXP) {
-      stop("Can only bind lists of raw vectors");
+    if (TYPEOF(value) == NILSXP) {
+      sqlite3_bind_null(stmt, j);
     }
-
-    sqlite3_bind_blob(stmt, j, RAW(value), Rf_length(value), SQLITE_TRANSIENT);
+    else if (TYPEOF(value) == RAWSXP) {
+      sqlite3_bind_blob(stmt, j, RAW(value), Rf_length(value), SQLITE_TRANSIENT);
+    }
+    else {
+      stop("Can only bind lists of raw vectors (or NULL)");
+    }
   } else {
     stop("Don't know how to handle parameter of type %s.",
          Rf_type2char(TYPEOF(value_)));

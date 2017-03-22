@@ -10,7 +10,9 @@ SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt_, std::vector<std::string> n
     n(init_n()),
     names(names_)
 {
-  std::transform(types_.begin(), types_.end(), std::back_inserter(data), &SqliteColumn::as);
+  std::vector<std::pair<SEXPTYPE, int> > args;
+  std::transform(types_.begin(), types_.end(), std::back_inserter(args), std::bind2nd(std::ptr_fun(&std::make_pair<SEXPTYPE, int>), 0));
+  std::transform(args.begin(), args.end(), std::back_inserter(data), &SqliteColumn::as);
 }
 
 int SqliteDataFrame::init_n() const {

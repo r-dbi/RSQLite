@@ -9,8 +9,8 @@ public:
   SqliteColumn(SEXPTYPE type_) : type(type_), i(0) {}
 
 public:
-  static SqliteColumn as(SEXPTYPE type_) {
-    return SqliteColumn(type_);
+  static SqliteColumn as(const std::pair<SEXPTYPE, int>& x) {
+    return SqliteColumn(x.first);
   }
 
 public:

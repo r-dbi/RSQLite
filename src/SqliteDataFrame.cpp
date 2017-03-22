@@ -1,6 +1,5 @@
 #include <RSQLite.h>
 #include "SqliteDataFrame.h"
-#include "SqliteUtils.h"
 #include "affinity.h"
 
 
@@ -10,7 +9,8 @@ SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt_, std::vector<std::string> n
     n_max(n_max_),
     i(0),
     n(init_n()),
-    out(dfCreate(names_, n)),
+    data(names_.size()),
+    names(names_),
     types(types_)
 {
 }
@@ -28,13 +28,13 @@ bool SqliteDataFrame::set_col_values() {
       return false;
 
     n *= 2;
-    out = dfResize(out, n);
+    resize();
   }
 
-  for (int j = 0; j < out.length(); ++j) {
-    RObject col = out[j];
+  for (size_t j = 0; j < data.size(); ++j) {
+    RObject col = data[j].get_value();
     set_col_value(col, j);
-    out[j] = col;
+    data[j].set_value(col);
   }
 
   return true;
@@ -52,13 +52,26 @@ List SqliteDataFrame::get_data(std::vector<SEXPTYPE>& types_) {
   finalize_cols();
 
   types_ = this->types;
+
+  List out(data.begin(), data.end());
+  out.attr("names") = names;
+  out.attr("class") = "data.frame";
+  out.attr("row.names") = IntegerVector::create(NA_INTEGER, -n);
   return out;
+}
+
+void SqliteDataFrame::resize() {
+  int p = data.size();
+
+  for (int j = 0; j < p; ++j) {
+    data[j].set_value(Rf_lengthgets(data[j].get_value(), n));
+  }
 }
 
 void SqliteDataFrame::finalize_cols() {
   if (i < n) {
-    out = dfResize(out, i);
     n = i;
+    resize();
   }
 
   alloc_missing_cols();
@@ -67,12 +80,12 @@ void SqliteDataFrame::finalize_cols() {
 void SqliteDataFrame::alloc_missing_cols() {
   // Create data for columns where all values were NULL (or for all columns
   // in the case of a 0-row data frame)
-  for (int j = 0; j < out.length(); ++j) {
+  for (size_t j = 0; j < data.size(); ++j) {
     if (types[j] == NILSXP) {
       types[j] =
         decltype_to_sexptype(sqlite3_column_decltype(stmt, j));
       LOG_VERBOSE << j << ": " << types[j];
-      out[j] = alloc_col(types[j]);
+      data[j].set_value(alloc_col(types[j]));
     }
   }
 }

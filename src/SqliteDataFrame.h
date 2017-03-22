@@ -3,12 +3,14 @@
 
 
 #include "sqlite3.h"
+#include "SqliteColumn.h"
 
 class SqliteDataFrame {
   sqlite3_stmt* stmt;
   const int n_max;
   int i, n;
-  List out;
+  std::vector<SqliteColumn> data;
+  std::vector<std::string> names;
   std::vector<SEXPTYPE> types;
 
 public:
@@ -24,12 +26,14 @@ public:
   List get_data(std::vector<SEXPTYPE>& types);
 
 private:
-  void set_col_value(RObject& col, const int j);
+  void resize();
   void finalize_cols();
-
   void alloc_missing_cols();
+
+  void set_col_value(RObject& col, const int j);
   SEXP alloc_col(const unsigned int type);
   void fill_default_col_value(SEXP col);
+
   static void fill_default_col_value(SEXP col, const int i_);
   void fill_col_value(const SEXP col, const int j);
 

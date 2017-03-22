@@ -48,7 +48,7 @@ List SqliteDataFrame::get_data(std::vector<SEXPTYPE>& types_) {
   finalize_cols();
 
   types_.clear();
-  std::transform(data.begin(), data.end(), std::back_inserter(types_), &SqliteColumn::get_type_from_object);
+  std::transform(data.begin(), data.end(), std::back_inserter(types_), std::mem_fun_ref(&SqliteColumn::get_type));
 
   List out(data.begin(), data.end());
   out.attr("names") = names;

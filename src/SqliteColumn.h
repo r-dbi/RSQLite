@@ -39,7 +39,7 @@ public:
 
   void resize(const int n) {
     set_value(Rf_lengthgets(get_value(), n));
-    i = n;
+    if (i > n) i = n;
   }
 
   void set_col_value(sqlite3_stmt* stmt, const int j, const int n);

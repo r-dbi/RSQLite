@@ -3,7 +3,7 @@
 #include "affinity.h"
 
 
-void SqliteColumn::set_col_value(sqlite3_stmt* stmt, const int j, const int n) {
+void SqliteColumn::set_col_value(sqlite3_stmt* stmt, const int n) {
   // col needs to be PROTECTed because it can be allocated
   // just before a RAW vector that holds BLOB data is (#192).
   // The easiest way to protect is to make it an RObject.
@@ -35,7 +35,7 @@ void SqliteColumn::set_col_value(sqlite3_stmt* stmt, const int j, const int n) {
     fill_default_col_value();
   }
   else {
-    fill_col_value(stmt, j);
+    fill_col_value(stmt);
   }
   ++i;
   return;
@@ -70,7 +70,7 @@ void SqliteColumn::fill_default_col_value() {
   }
 }
 
-void SqliteColumn::alloc_missing(sqlite3_stmt* stmt, const int j, const int n) {
+void SqliteColumn::alloc_missing(sqlite3_stmt* stmt, const int n) {
   if (get_type() != NILSXP) return;
 
   SEXPTYPE type =
@@ -80,38 +80,38 @@ void SqliteColumn::alloc_missing(sqlite3_stmt* stmt, const int j, const int n) {
   alloc_col(type, n);
 }
 
-void SqliteColumn::fill_col_value(sqlite3_stmt* stmt, const int j) {
+void SqliteColumn::fill_col_value(sqlite3_stmt* stmt) {
   switch (TYPEOF(data)) {
   case INTSXP:
-    set_int_value(stmt, j);
+    set_int_value(stmt);
     break;
   case REALSXP:
-    set_real_value(stmt, j);
+    set_real_value(stmt);
     break;
   case STRSXP:
-    set_string_value(stmt, j);
+    set_string_value(stmt);
     break;
   case VECSXP:
-    set_raw_value(stmt, j);
+    set_raw_value(stmt);
     break;
   }
 }
 
-void SqliteColumn::set_int_value(sqlite3_stmt* stmt, const int j) const {
+void SqliteColumn::set_int_value(sqlite3_stmt* stmt) const {
   INTEGER(data)[i] = sqlite3_column_int(stmt, j);
 }
 
-void SqliteColumn::set_real_value(sqlite3_stmt* stmt, const int j) const {
+void SqliteColumn::set_real_value(sqlite3_stmt* stmt) const {
   REAL(data)[i] = sqlite3_column_double(stmt, j);
 }
 
-void SqliteColumn::set_string_value(sqlite3_stmt* stmt, const int j) const {
+void SqliteColumn::set_string_value(sqlite3_stmt* stmt) const {
   LOG_VERBOSE;
   const char* const text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, j));
   SET_STRING_ELT(data, i, Rf_mkCharCE(text, CE_UTF8));
 }
 
-void SqliteColumn::set_raw_value(sqlite3_stmt* stmt, const int j) const {
+void SqliteColumn::set_raw_value(sqlite3_stmt* stmt) const {
   int size = sqlite3_column_bytes(stmt, j);
   const void* blob = sqlite3_column_blob(stmt, j);
 

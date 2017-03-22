@@ -12,6 +12,8 @@ SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt_, std::vector<std::string> n
 {
   std::vector<std::pair<SEXPTYPE, int> > args;
   std::transform(types_.begin(), types_.end(), std::back_inserter(args), std::bind2nd(std::ptr_fun(&std::make_pair<SEXPTYPE, int>), 0));
+  for (size_t j = 0; j < args.size(); ++j)
+    args[j].second = j;
   std::transform(args.begin(), args.end(), std::back_inserter(data), &SqliteColumn::as);
 }
 
@@ -32,7 +34,7 @@ bool SqliteDataFrame::set_col_values() {
   }
 
   for (size_t j = 0; j < data.size(); ++j) {
-    data[j].set_col_value(stmt, j, n);
+    data[j].set_col_value(stmt, n);
   }
 
   return true;
@@ -80,6 +82,6 @@ void SqliteDataFrame::alloc_missing_cols() {
   // Create data for columns where all values were NULL (or for all columns
   // in the case of a 0-row data frame)
   for (size_t j = 0; j < data.size(); ++j) {
-    data[j].alloc_missing(stmt, j, n);
+    data[j].alloc_missing(stmt, n);
   }
 }

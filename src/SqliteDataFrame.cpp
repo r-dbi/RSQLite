@@ -11,10 +11,14 @@ SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt_, std::vector<std::string> n
     n(init_n()),
     names(names_)
 {
+  // Prepare arguments first
   std::vector<std::pair<SEXPTYPE, int> > args;
   std::transform(types_.begin(), types_.end(), std::back_inserter(args), std::bind2nd(std::ptr_fun(&std::make_pair<SEXPTYPE, int>), 0));
   for (size_t j = 0; j < args.size(); ++j)
     args[j].second = j;
+
+  // Then construct vector of SqliteColumn at once, without involving assignment
+  data.reserve(args.size());
   std::transform(args.begin(), args.end(), std::back_inserter(data), &SqliteColumn::as);
 }
 

@@ -40,6 +40,8 @@ public:
   }
 
   void set_col_value(sqlite3_stmt* stmt, const int n);
+  void finalize(sqlite3_stmt* stmt, const int n);
+
   SEXP alloc_col(const SEXPTYPE type, const int n);
   void alloc_missing(sqlite3_stmt* stmt, const int n);
 

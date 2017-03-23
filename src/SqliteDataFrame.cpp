@@ -1,6 +1,6 @@
 #include <RSQLite.h>
 #include "SqliteDataFrame.h"
-
+#include <boost/bind.hpp>
 
 SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt_, std::vector<std::string> names_, const int n_max_,
                                  const std::vector<SEXPTYPE>& types_)
@@ -73,9 +73,5 @@ void SqliteDataFrame::finalize_cols() {
     resize();
   }
 
-  // Create data for columns where all values were NULL (or for all columns
-  // in the case of a 0-row data frame)
-  for (size_t j = 0; j < data.size(); ++j) {
-    data[j].alloc_missing(stmt, i);
-  }
+  std::for_each(data.begin(), data.end(), boost::bind(&SqliteColumn::finalize, _1, stmt, i));
 }

@@ -41,6 +41,12 @@ void SqliteColumn::set_col_value(sqlite3_stmt* stmt, const int n) {
   return;
 }
 
+void SqliteColumn::finalize(sqlite3_stmt* stmt, const int n) {
+  // Create data for columns where all values were NULL (or for all columns
+  // in the case of a 0-row data frame)
+  alloc_missing(stmt, n);
+}
+
 SEXP SqliteColumn::alloc_col(const SEXPTYPE type, const int n) {
   data = Rf_allocVector(type, n);
   int i_ = i;

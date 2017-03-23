@@ -62,9 +62,7 @@ List SqliteDataFrame::get_data(std::vector<SEXPTYPE>& types_) {
 }
 
 void SqliteDataFrame::resize() {
-  int p = data.size();
-
-  for (int j = 0; j < p; ++j) {
+  for (int j = 0; j < data.size(); ++j) {
     data[j].resize(n);
   }
 }
@@ -75,13 +73,9 @@ void SqliteDataFrame::finalize_cols() {
     resize();
   }
 
-  alloc_missing_cols();
-}
-
-void SqliteDataFrame::alloc_missing_cols() {
   // Create data for columns where all values were NULL (or for all columns
   // in the case of a 0-row data frame)
   for (size_t j = 0; j < data.size(); ++j) {
-    data[j].alloc_missing(stmt, n);
+    data[j].alloc_missing(stmt, i);
   }
 }

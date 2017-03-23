@@ -27,7 +27,6 @@ public:
 private:
   void resize();
   void finalize_cols();
-  void alloc_missing_cols();
 };
 
 

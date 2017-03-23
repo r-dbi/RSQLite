@@ -3,6 +3,7 @@
 
 
 #include "sqlite3.h"
+#include <boost/container/stable_vector.hpp>
 
 class SqliteColumn;
 
@@ -10,7 +11,7 @@ class SqliteDataFrame {
   sqlite3_stmt* stmt;
   const int n_max;
   int i, n;
-  std::vector<SqliteColumn> data;
+  boost::container::stable_vector<SqliteColumn> data;
   std::vector<std::string> names;
 
 public:

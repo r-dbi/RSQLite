@@ -54,7 +54,8 @@ public:
 private:
   RObject data;
   SEXPTYPE type;
-  int i, j;
+  int i;
+  const int j;
 };
 
 

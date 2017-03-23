@@ -70,7 +70,6 @@ void SqliteDataFrame::resize() {
 void SqliteDataFrame::finalize_cols() {
   if (i < n) {
     n = i;
-    resize();
   }
 
   std::for_each(data.begin(), data.end(), boost::bind(&SqliteColumn::finalize, _1, stmt, i));

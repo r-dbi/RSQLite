@@ -42,6 +42,8 @@ void SqliteColumn::set_col_value(sqlite3_stmt* stmt, const int n) {
 }
 
 void SqliteColumn::finalize(sqlite3_stmt* stmt, const int n) {
+  resize(n);
+
   // Create data for columns where all values were NULL (or for all columns
   // in the case of a 0-row data frame)
   alloc_missing(stmt, n);

@@ -61,7 +61,7 @@ List SqliteDataFrame::get_data(std::vector<SEXPTYPE>& types_) {
   List out(data.begin(), data.end());
   out.attr("names") = names;
   out.attr("class") = "data.frame";
-  out.attr("row.names") = IntegerVector::create(NA_INTEGER, -n);
+  out.attr("row.names") = IntegerVector::create(NA_INTEGER, -i);
   return out;
 }
 

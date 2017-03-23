@@ -1,0 +1,10 @@
+#ifndef RSQLITE_COLUMNSTORAGE_H
+#define RSQLITE_COLUMNSTORAGE_H
+
+
+class ColumnStorage {
+
+};
+
+
+#endif // RSQLITE_COLUMNSTORAGE_H

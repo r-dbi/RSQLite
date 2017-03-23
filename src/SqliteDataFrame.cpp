@@ -1,5 +1,6 @@
 #include <RSQLite.h>
 #include "SqliteDataFrame.h"
+#include "SqliteColumn.h"
 #include <boost/bind.hpp>
 
 SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt_, std::vector<std::string> names_, const int n_max_,
@@ -15,6 +16,9 @@ SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt_, std::vector<std::string> n
   for (size_t j = 0; j < args.size(); ++j)
     args[j].second = j;
   std::transform(args.begin(), args.end(), std::back_inserter(data), &SqliteColumn::as);
+}
+
+SqliteDataFrame::~SqliteDataFrame() {
 }
 
 int SqliteDataFrame::init_n() const {

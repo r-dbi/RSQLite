@@ -3,7 +3,8 @@
 
 
 #include "sqlite3.h"
-#include "SqliteColumn.h"
+
+class SqliteColumn;
 
 class SqliteDataFrame {
   sqlite3_stmt* stmt;
@@ -14,6 +15,7 @@ class SqliteDataFrame {
 
 public:
   SqliteDataFrame(sqlite3_stmt* stmt, std::vector<std::string> names, const int n_max, const std::vector<SEXPTYPE>& types);
+  ~SqliteDataFrame();
 
 private:
   int init_n() const;

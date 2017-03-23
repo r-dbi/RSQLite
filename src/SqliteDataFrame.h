@@ -22,8 +22,8 @@ private:
   int init_n() const;
 
 public:
-  bool set_col_values();
-  void advance();
+  void set_col_values();
+  bool advance();
 
   List get_data(std::vector<SEXPTYPE>& types);
 

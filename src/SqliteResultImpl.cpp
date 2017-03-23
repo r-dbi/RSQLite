@@ -296,12 +296,11 @@ List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   while (!complete_) {
     LOG_VERBOSE << nrows_ << "/" << n;
 
-    if (!data.set_col_values())
-      break;
-
+    data.set_col_values();
     step();
-    data.advance();
     nrows_++;
+    if (!data.advance())
+      break;
   }
 
   LOG_VERBOSE << nrows_;

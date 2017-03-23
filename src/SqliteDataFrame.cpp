@@ -28,10 +28,10 @@ int SqliteDataFrame::init_n() const {
   return 100;
 }
 
-bool SqliteDataFrame::set_col_values() {
+void SqliteDataFrame::set_col_values() {
   if (i >= n) {
     if (n_max >= 0)
-      return false;
+      return;
 
     n *= 2;
     resize();
@@ -40,15 +40,15 @@ bool SqliteDataFrame::set_col_values() {
   for (size_t j = 0; j < data.size(); ++j) {
     data[j].set_col_value(stmt, n);
   }
-
-  return true;
 }
 
-void SqliteDataFrame::advance() {
+bool SqliteDataFrame::advance() {
   ++i;
 
   if (i % 1000 == 0)
     checkUserInterrupt();
+
+  return (n_max < 0 || i < n_max);
 }
 
 List SqliteDataFrame::get_data(std::vector<SEXPTYPE>& types_) {

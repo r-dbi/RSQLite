@@ -5,6 +5,11 @@
 #include "sqlite3.h"
 
 class SqliteColumn {
+  const int j, n_max;
+  RObject data;
+  SEXPTYPE type;
+  int i, n;
+
 public:
   SqliteColumn(SEXPTYPE type_, int j_, int n_max_);
 
@@ -54,12 +59,6 @@ private:
 
   static unsigned int datatype_to_sexptype(const int field_type);
   static unsigned int decltype_to_sexptype(const char* decl_type);
-
-private:
-  const int j, n_max;
-  RObject data;
-  SEXPTYPE type;
-  int i, n;
 };
 
 

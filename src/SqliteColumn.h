@@ -3,7 +3,9 @@
 
 
 #include "sqlite3.h"
-#include "SqliteColumnDataSource.h"
+#include <boost/shared_ptr.hpp>
+
+class SqliteColumnDataSource;
 
 class SqliteColumn {
 public:
@@ -16,7 +18,7 @@ public:
   };
 
 private:
-  SqliteColumnDataSource source;
+  boost::shared_ptr<SqliteColumnDataSource> source;
   const int n_max;
   RObject data;
   DATA_TYPE dt;

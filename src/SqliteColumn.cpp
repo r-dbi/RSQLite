@@ -1,10 +1,11 @@
 #include <RSQLite.h>
 #include "SqliteColumn.h"
+#include "SqliteColumnDataSource.h"
 #include "affinity.h"
 
 
 SqliteColumn::SqliteColumn(SEXPTYPE dt_, int n_max_, sqlite3_stmt* stmt_, int j_)
-  : source(stmt_, j_),
+  : source(new SqliteColumnDataSource(stmt_, j_)),
     dt((DATA_TYPE)dt_),
     n_max(n_max_),
     i(0),
@@ -36,7 +37,7 @@ void SqliteColumn::set_col_value() {
   // The easiest way to protect is to make it an RObject.
 
   SEXPTYPE type = get_type();
-  int column_type = sqlite3_column_type(source.get_stmt(), source.get_j());
+  int column_type = sqlite3_column_type(source->get_stmt(), source->get_j());
 
   LOG_VERBOSE << "column_type: " << column_type;
   LOG_VERBOSE << "type: " << type;
@@ -135,8 +136,8 @@ void SqliteColumn::alloc_missing() {
   if (get_type() != NILSXP) return;
 
   SEXPTYPE type =
-    decltype_to_sexptype(sqlite3_column_decltype(source.get_stmt(), source.get_j()));
-  LOG_VERBOSE << source.get_j() << ": " << type;
+    decltype_to_sexptype(sqlite3_column_decltype(source->get_stmt(), source->get_j()));
+  LOG_VERBOSE << source->get_j() << ": " << type;
   set_type(type);
   alloc_col(type);
 }
@@ -159,22 +160,22 @@ void SqliteColumn::fill_col_value() {
 }
 
 void SqliteColumn::set_int_value() const {
-  INTEGER(data)[i] = sqlite3_column_int(source.get_stmt(), source.get_j());
+  INTEGER(data)[i] = sqlite3_column_int(source->get_stmt(), source->get_j());
 }
 
 void SqliteColumn::set_real_value() const {
-  REAL(data)[i] = sqlite3_column_double(source.get_stmt(), source.get_j());
+  REAL(data)[i] = sqlite3_column_double(source->get_stmt(), source->get_j());
 }
 
 void SqliteColumn::set_string_value() const {
   LOG_VERBOSE;
-  const char* const text = reinterpret_cast<const char*>(sqlite3_column_text(source.get_stmt(), source.get_j()));
+  const char* const text = reinterpret_cast<const char*>(sqlite3_column_text(source->get_stmt(), source->get_j()));
   SET_STRING_ELT(data, i, Rf_mkCharCE(text, CE_UTF8));
 }
 
 void SqliteColumn::set_raw_value() const {
-  int size = sqlite3_column_bytes(source.get_stmt(), source.get_j());
-  const void* blob = sqlite3_column_blob(source.get_stmt(), source.get_j());
+  int size = sqlite3_column_bytes(source->get_stmt(), source->get_j());
+  const void* blob = sqlite3_column_blob(source->get_stmt(), source->get_j());
 
   SEXP bytes = Rf_allocVector(RAWSXP, size);
   memcpy(RAW(bytes), blob, size);

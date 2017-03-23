@@ -3,14 +3,13 @@
 #include "affinity.h"
 
 
-SqliteColumn::SqliteColumn(SEXPTYPE dt_, int j_, int n_max_)
-  : dt((DATA_TYPE)dt_),
-    j(j_),
+SqliteColumn::SqliteColumn(SEXPTYPE dt_, int n_max_, sqlite3_stmt* stmt_, int j_)
+  : source(stmt_, j_),
+    dt((DATA_TYPE)dt_),
     n_max(n_max_),
     i(0),
     n(init_n())
 {
-
 }
 
 SqliteColumn::~SqliteColumn() {
@@ -23,7 +22,7 @@ int SqliteColumn::init_n() const {
   return 100;
 }
 
-void SqliteColumn::set_col_value(sqlite3_stmt* stmt) {
+void SqliteColumn::set_col_value() {
   if (i >= n) {
     // No dynamic reallocation if n_max is given
     if (n_max >= 0) return;
@@ -37,7 +36,7 @@ void SqliteColumn::set_col_value(sqlite3_stmt* stmt) {
   // The easiest way to protect is to make it an RObject.
 
   SEXPTYPE type = get_type();
-  int column_type = sqlite3_column_type(stmt, j);
+  int column_type = sqlite3_column_type(source.get_stmt(), source.get_j());
 
   LOG_VERBOSE << "column_type: " << column_type;
   LOG_VERBOSE << "type: " << type;
@@ -63,19 +62,19 @@ void SqliteColumn::set_col_value(sqlite3_stmt* stmt) {
     fill_default_col_value();
   }
   else {
-    fill_col_value(stmt);
+    fill_col_value();
   }
   ++i;
   return;
 }
 
-void SqliteColumn::finalize(sqlite3_stmt* stmt, const int n_) {
+void SqliteColumn::finalize(const int n_) {
   n = n_;
   resize();
 
   // Create data for columns where all values were NULL (or for all columns
   // in the case of a 0-row data frame)
-  alloc_missing(stmt);
+  alloc_missing();
 }
 
 SqliteColumn::operator SEXP() const {
@@ -132,50 +131,50 @@ void SqliteColumn::fill_default_col_value() {
   }
 }
 
-void SqliteColumn::alloc_missing(sqlite3_stmt* stmt) {
+void SqliteColumn::alloc_missing() {
   if (get_type() != NILSXP) return;
 
   SEXPTYPE type =
-    decltype_to_sexptype(sqlite3_column_decltype(stmt, j));
-  LOG_VERBOSE << j << ": " << type;
+    decltype_to_sexptype(sqlite3_column_decltype(source.get_stmt(), source.get_j()));
+  LOG_VERBOSE << source.get_j() << ": " << type;
   set_type(type);
   alloc_col(type);
 }
 
-void SqliteColumn::fill_col_value(sqlite3_stmt* stmt) {
+void SqliteColumn::fill_col_value() {
   switch (TYPEOF(data)) {
   case INTSXP:
-    set_int_value(stmt);
+    set_int_value();
     break;
   case REALSXP:
-    set_real_value(stmt);
+    set_real_value();
     break;
   case STRSXP:
-    set_string_value(stmt);
+    set_string_value();
     break;
   case VECSXP:
-    set_raw_value(stmt);
+    set_raw_value();
     break;
   }
 }
 
-void SqliteColumn::set_int_value(sqlite3_stmt* stmt) const {
-  INTEGER(data)[i] = sqlite3_column_int(stmt, j);
+void SqliteColumn::set_int_value() const {
+  INTEGER(data)[i] = sqlite3_column_int(source.get_stmt(), source.get_j());
 }
 
-void SqliteColumn::set_real_value(sqlite3_stmt* stmt) const {
-  REAL(data)[i] = sqlite3_column_double(stmt, j);
+void SqliteColumn::set_real_value() const {
+  REAL(data)[i] = sqlite3_column_double(source.get_stmt(), source.get_j());
 }
 
-void SqliteColumn::set_string_value(sqlite3_stmt* stmt) const {
+void SqliteColumn::set_string_value() const {
   LOG_VERBOSE;
-  const char* const text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, j));
+  const char* const text = reinterpret_cast<const char*>(sqlite3_column_text(source.get_stmt(), source.get_j()));
   SET_STRING_ELT(data, i, Rf_mkCharCE(text, CE_UTF8));
 }
 
-void SqliteColumn::set_raw_value(sqlite3_stmt* stmt) const {
-  int size = sqlite3_column_bytes(stmt, j);
-  const void* blob = sqlite3_column_blob(stmt, j);
+void SqliteColumn::set_raw_value() const {
+  int size = sqlite3_column_bytes(source.get_stmt(), source.get_j());
+  const void* blob = sqlite3_column_blob(source.get_stmt(), source.get_j());
 
   SEXP bytes = Rf_allocVector(RAWSXP, size);
   memcpy(RAW(bytes), blob, size);

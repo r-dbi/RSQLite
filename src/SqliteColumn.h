@@ -3,6 +3,7 @@
 
 
 #include "sqlite3.h"
+#include "SqliteColumnDataSource.h"
 
 class SqliteColumn {
 public:
@@ -15,21 +16,22 @@ public:
   };
 
 private:
-  const int j, n_max;
+  SqliteColumnDataSource source;
+  const int n_max;
   RObject data;
-  enum DATA_TYPE dt;
+  DATA_TYPE dt;
   int i, n;
 
 public:
-  SqliteColumn(SEXPTYPE dt_, int j_, int n_max_);
+  SqliteColumn(SEXPTYPE dt_, int n_max_, sqlite3_stmt* stmt_, int j_);
   ~SqliteColumn();
 
 private:
   int init_n() const;
 
 public:
-  void set_col_value(sqlite3_stmt* stmt);
-  void finalize(sqlite3_stmt* stmt, const int n_);
+  void set_col_value();
+  void finalize(const int n_);
 
   operator SEXP() const;;
   SEXPTYPE get_type() const;
@@ -41,15 +43,15 @@ private:
   void resize();
 
   SEXP alloc_col(const SEXPTYPE type);
-  void alloc_missing(sqlite3_stmt* stmt);
+  void alloc_missing();
 
   void fill_default_col_value();
 
-  void fill_col_value(sqlite3_stmt* stmt);
-  void set_int_value(sqlite3_stmt* stmt) const;
-  void set_real_value(sqlite3_stmt* stmt) const;
-  void set_string_value(sqlite3_stmt* stmt) const;
-  void set_raw_value(sqlite3_stmt* stmt) const;
+  void fill_col_value();
+  void set_int_value() const;
+  void set_real_value() const;
+  void set_string_value() const;
+  void set_raw_value() const;
 
   static unsigned int datatype_to_sexptype(const int field_type);
   static unsigned int decltype_to_sexptype(const char* decl_type);

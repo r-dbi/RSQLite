@@ -12,7 +12,7 @@ SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt_, std::vector<std::string> n
 {
   data.reserve(types_.size());
   for (size_t j = 0; j < types_.size(); ++j) {
-    SqliteColumn x(types_[j], j, n_max);
+    SqliteColumn x(types_[j], n_max, stmt, j);
     data.push_back(x);
   }
 }
@@ -21,9 +21,7 @@ SqliteDataFrame::~SqliteDataFrame() {
 }
 
 void SqliteDataFrame::set_col_values() {
-  for (size_t j = 0; j < data.size(); ++j) {
-    data[j].set_col_value(stmt);
-  }
+  std::for_each(data.begin(), data.end(), boost::bind(&SqliteColumn::set_col_value, _1));
 }
 
 bool SqliteDataFrame::advance() {
@@ -50,5 +48,5 @@ List SqliteDataFrame::get_data(std::vector<SEXPTYPE>& types_) {
 }
 
 void SqliteDataFrame::finalize_cols() {
-  std::for_each(data.begin(), data.end(), boost::bind(&SqliteColumn::finalize, _1, stmt, i));
+  std::for_each(data.begin(), data.end(), boost::bind(&SqliteColumn::finalize, _1, i));
 }

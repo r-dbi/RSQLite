@@ -3,7 +3,32 @@
 #include "affinity.h"
 
 
-void SqliteColumn::set_col_value(sqlite3_stmt* stmt, const int n) {
+SqliteColumn::SqliteColumn(SEXPTYPE type_, int j_, int n_max_)
+  : type(type_),
+    j(j_),
+    n_max(n_max_),
+    i(0),
+    n(init_n())
+{
+
+}
+
+int SqliteColumn::init_n() const {
+  if (n_max >= 0)
+    return n_max;
+
+  return 100;
+}
+
+void SqliteColumn::set_col_value(sqlite3_stmt* stmt) {
+  if (i >= n) {
+    // No dynamic reallocation if n_max is given
+    if (n_max >= 0) return;
+
+    n *= 2;
+    resize();
+  }
+
   // col needs to be PROTECTed because it can be allocated
   // just before a RAW vector that holds BLOB data is (#192).
   // The easiest way to protect is to make it an RObject.
@@ -27,7 +52,7 @@ void SqliteColumn::set_col_value(sqlite3_stmt* stmt, const int n) {
     }
     else {
       set_type(type);
-      alloc_col(type, n);
+      alloc_col(type);
     }
   }
 
@@ -41,15 +66,16 @@ void SqliteColumn::set_col_value(sqlite3_stmt* stmt, const int n) {
   return;
 }
 
-void SqliteColumn::finalize(sqlite3_stmt* stmt, const int n) {
-  resize(n);
+void SqliteColumn::finalize(sqlite3_stmt* stmt, const int n_) {
+  n = n_;
+  resize();
 
   // Create data for columns where all values were NULL (or for all columns
   // in the case of a 0-row data frame)
-  alloc_missing(stmt, n);
+  alloc_missing(stmt);
 }
 
-SEXP SqliteColumn::alloc_col(const SEXPTYPE type, const int n) {
+SEXP SqliteColumn::alloc_col(const SEXPTYPE type) {
   data = Rf_allocVector(type, n);
   int i_ = i;
   for (i = 0; i < i_; ++i) {
@@ -78,14 +104,14 @@ void SqliteColumn::fill_default_col_value() {
   }
 }
 
-void SqliteColumn::alloc_missing(sqlite3_stmt* stmt, const int n) {
+void SqliteColumn::alloc_missing(sqlite3_stmt* stmt) {
   if (get_type() != NILSXP) return;
 
   SEXPTYPE type =
     decltype_to_sexptype(sqlite3_column_decltype(stmt, j));
   LOG_VERBOSE << j << ": " << type;
   set_type(type);
-  alloc_col(type, n);
+  alloc_col(type);
 }
 
 void SqliteColumn::fill_col_value(sqlite3_stmt* stmt) {

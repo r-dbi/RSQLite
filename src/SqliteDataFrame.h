@@ -10,16 +10,13 @@ class SqliteColumn;
 class SqliteDataFrame {
   sqlite3_stmt* stmt;
   const int n_max;
-  int i, n;
+  int i;
   boost::container::stable_vector<SqliteColumn> data;
   std::vector<std::string> names;
 
 public:
-  SqliteDataFrame(sqlite3_stmt* stmt, std::vector<std::string> names, const int n_max, const std::vector<SEXPTYPE>& types);
+  SqliteDataFrame(sqlite3_stmt* stmt, std::vector<std::string> names, const int n_max_, const std::vector<SEXPTYPE>& types);
   ~SqliteDataFrame();
-
-private:
-  int init_n() const;
 
 public:
   void set_col_values();
@@ -28,7 +25,6 @@ public:
   List get_data(std::vector<SEXPTYPE>& types);
 
 private:
-  void resize();
   void finalize_cols();
 };
 

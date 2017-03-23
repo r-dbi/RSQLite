@@ -75,6 +75,31 @@ void SqliteColumn::finalize(sqlite3_stmt* stmt, const int n_) {
   alloc_missing(stmt);
 }
 
+SqliteColumn::operator SEXP() const {
+  return data;
+}
+
+SEXPTYPE SqliteColumn::get_type() const {
+  return type;
+}
+
+const RObject& SqliteColumn::get_value() const {
+  return data;
+}
+
+void SqliteColumn::set_value(const RObject& data_) {
+  data = data_;
+}
+
+void SqliteColumn::set_type(SEXPTYPE type_) {
+  type = type_;
+}
+
+void SqliteColumn::resize() {
+  set_value(Rf_lengthgets(get_value(), n));
+  if (i > n) i = n;
+}
+
 SEXP SqliteColumn::alloc_col(const SEXPTYPE type) {
   data = Rf_allocVector(type, n);
   int i_ = i;

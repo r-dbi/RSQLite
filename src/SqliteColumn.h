@@ -20,31 +20,14 @@ public:
   void set_col_value(sqlite3_stmt* stmt);
   void finalize(sqlite3_stmt* stmt, const int n_);
 
-  operator SEXP() const {
-    return data;
-  };
-
-  SEXPTYPE get_type() const {
-    return type;
-  }
+  operator SEXP() const;;
+  SEXPTYPE get_type() const;
 
 private:
-  const RObject& get_value() const {
-    return data;
-  }
-
-  void set_value(const RObject& data_) {
-    data = data_;
-  }
-
-  void set_type(SEXPTYPE type_) {
-    type = type_;
-  }
-
-  void resize() {
-    set_value(Rf_lengthgets(get_value(), n));
-    if (i > n) i = n;
-  }
+  const RObject& get_value() const;
+  void set_value(const RObject& data_);
+  void set_type(SEXPTYPE type_);
+  void resize();
 
   SEXP alloc_col(const SEXPTYPE type);
   void alloc_missing(sqlite3_stmt* stmt);

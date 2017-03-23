@@ -5,13 +5,23 @@
 #include "sqlite3.h"
 
 class SqliteColumn {
+public:
+  enum DATA_TYPE {
+    DT_UNKNOWN = NILSXP,
+    DT_INT = INTSXP,
+    DT_REAL = REALSXP,
+    DT_STRING = STRSXP,
+    DT_BLOB = VECSXP,
+  };
+
+private:
   const int j, n_max;
   RObject data;
-  SEXPTYPE type;
+  enum DATA_TYPE dt;
   int i, n;
 
 public:
-  SqliteColumn(SEXPTYPE type_, int j_, int n_max_);
+  SqliteColumn(SEXPTYPE dt_, int j_, int n_max_);
 
 private:
   int init_n() const;

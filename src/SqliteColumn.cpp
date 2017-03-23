@@ -3,8 +3,8 @@
 #include "affinity.h"
 
 
-SqliteColumn::SqliteColumn(SEXPTYPE type_, int j_, int n_max_)
-  : type(type_),
+SqliteColumn::SqliteColumn(SEXPTYPE dt_, int j_, int n_max_)
+  : dt((DATA_TYPE)dt_),
     j(j_),
     n_max(n_max_),
     i(0),
@@ -80,7 +80,7 @@ SqliteColumn::operator SEXP() const {
 }
 
 SEXPTYPE SqliteColumn::get_type() const {
-  return type;
+  return (SEXPTYPE)dt;
 }
 
 const RObject& SqliteColumn::get_value() const {
@@ -91,8 +91,8 @@ void SqliteColumn::set_value(const RObject& data_) {
   data = data_;
 }
 
-void SqliteColumn::set_type(SEXPTYPE type_) {
-  type = type_;
+void SqliteColumn::set_type(SEXPTYPE dt_) {
+  dt = (DATA_TYPE)dt_;
 }
 
 void SqliteColumn::resize() {

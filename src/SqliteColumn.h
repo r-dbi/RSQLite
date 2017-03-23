@@ -9,11 +9,6 @@ public:
   SqliteColumn(SEXPTYPE type_, int j_) : type(type_), i(0), j(j_) {}
 
 public:
-  static SqliteColumn as(const std::pair<SEXPTYPE, int>& x) {
-    return SqliteColumn(x.first, x.second);
-  }
-
-public:
   const RObject& get_value() const {
     return data;
   }

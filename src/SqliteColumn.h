@@ -12,6 +12,18 @@ private:
   int init_n() const;
 
 public:
+  void set_col_value(sqlite3_stmt* stmt);
+  void finalize(sqlite3_stmt* stmt, const int n_);
+
+  operator SEXP() const {
+    return data;
+  };
+
+  SEXPTYPE get_type() const {
+    return type;
+  }
+
+private:
   const RObject& get_value() const {
     return data;
   }
@@ -20,25 +32,14 @@ public:
     data = data_;
   }
 
-  SEXPTYPE get_type() const {
-    return type;
-  }
-
   void set_type(SEXPTYPE type_) {
     type = type_;
   }
-
-  operator SEXP() const {
-    return data;
-  };
 
   void resize() {
     set_value(Rf_lengthgets(get_value(), n));
     if (i > n) i = n;
   }
-
-  void set_col_value(sqlite3_stmt* stmt);
-  void finalize(sqlite3_stmt* stmt, const int n_);
 
   SEXP alloc_col(const SEXPTYPE type);
   void alloc_missing(sqlite3_stmt* stmt);

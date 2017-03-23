@@ -22,6 +22,7 @@ private:
 
 public:
   SqliteColumn(SEXPTYPE dt_, int j_, int n_max_);
+  ~SqliteColumn();
 
 private:
   int init_n() const;

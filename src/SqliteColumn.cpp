@@ -13,6 +13,9 @@ SqliteColumn::SqliteColumn(SEXPTYPE dt_, int j_, int n_max_)
 
 }
 
+SqliteColumn::~SqliteColumn() {
+}
+
 int SqliteColumn::init_n() const {
   if (n_max >= 0)
     return n_max;

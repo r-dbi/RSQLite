@@ -15,6 +15,10 @@ test_that("passing field.types for some columns only", {
   on.exit(dbDisconnect(con))
 
   dbWriteTable(con, "a", data.frame(a = 1:3, b = 4:6), field.types = c("a" = "TEXT"))
+  expect_equal(
+    dbReadTable(con, "a"),
+    data.frame(a = as.character(1:3), b = 4:6, stringsAsFactors = FALSE)
+  )
 })
 
 test_that("passing field.types with wrong name", {

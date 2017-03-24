@@ -5,6 +5,10 @@ test_that("adding large blob to table survives valgrind check (#192)", {
   on.exit(dbDisconnect(con), add = TRUE)
 
   data <- data.frame(id = 1, data = I(list(raw(1e8))))
+  data$data <- unclass(data$data)
   dbWriteTable(con, "data", data)
-  dbReadTable(con, "data")
+  expect_equal(
+    dbReadTable(con, "data"),
+    data
+  )
 })

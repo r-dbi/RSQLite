@@ -8,11 +8,11 @@ using namespace Rcpp;
 ColumnStorage::ColumnStorage(DATA_TYPE dt_, const int capacity_, const int n_max_,
                              const SqliteColumnDataSource& source_)
   :
-    i(0),
-    dt(dt_),
-    capacity(capacity_),
-    n_max(n_max_),
-    source(source_)
+  i(0),
+  dt(dt_),
+  capacity(capacity_),
+  n_max(n_max_),
+  source(source_)
 {
   data = allocate(capacity);
 }

@@ -12,7 +12,11 @@ enum DATA_TYPE {
   DT_BLOB = VECSXP
 };
 
-inline DATA_TYPE datatype_from_sexptype(const SEXPTYPE type) { return (DATA_TYPE)type; }
-inline SEXPTYPE sexptype_from_datatype(const DATA_TYPE dt) { return (SEXPTYPE)dt; }
+inline DATA_TYPE datatype_from_sexptype(const SEXPTYPE type) {
+  return (DATA_TYPE)type;
+}
+inline SEXPTYPE sexptype_from_datatype(const DATA_TYPE dt) {
+  return (SEXPTYPE)dt;
+}
 
 #endif // RSQLITE_COLUMNDATATYPE_H

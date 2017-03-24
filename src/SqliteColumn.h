@@ -5,18 +5,11 @@
 #include "sqlite3.h"
 #include <boost/shared_ptr.hpp>
 
+#include "ColumnDataType.h"
+
 class SqliteColumnDataSource;
 
 class SqliteColumn {
-public:
-  enum DATA_TYPE {
-    DT_UNKNOWN = NILSXP,
-    DT_INT = INTSXP,
-    DT_REAL = REALSXP,
-    DT_STRING = STRSXP,
-    DT_BLOB = VECSXP,
-  };
-
 private:
   boost::shared_ptr<SqliteColumnDataSource> source;
   const int n_max;

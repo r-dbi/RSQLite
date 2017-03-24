@@ -110,7 +110,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
 
     dbCommit(conn, "dbWriteTable")
     on.exit(NULL)
-    TRUE
+    invisible(TRUE)
   }
 )
 

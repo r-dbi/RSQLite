@@ -9,7 +9,9 @@ os <- function() {
 
 # Specific to RSQLite
 test_that("can connect to memory database (#140)", {
-  dbDisconnect(dbConnect(SQLite(), ":memory:"))
+  expect_true(
+    dbDisconnect(dbConnect(SQLite(), ":memory:"))
+  )
 })
 
 # Specific to RSQLite

@@ -52,54 +52,28 @@ int ColumnStorage::copy_to(SEXP x, DATA_TYPE dt, const int pos, const int n) con
   return src;
 }
 
-void ColumnStorage::copy_value(SEXP x, DATA_TYPE dt, const int tgt, const int src) const {
-  if (Rf_isNull(data)) {
-      fill_default_value(x, dt, tgt);
-    }
-    else {
-      switch (dt) {
-      case DT_INT:
-        INTEGER(x)[tgt] = INTEGER(data)[src];
-        break;
-
-      case DT_INT64:
-        switch (TYPEOF(data)) {
-        case INTSXP:
-          INTEGER64(x)[tgt] = INTEGER(data)[src];
-          break;
-
-        case REALSXP:
-          INTEGER64(x)[tgt] = INTEGER64(data)[src];
-          break;
-        }
-        break;
-
-      case DT_REAL:
-        REAL(x)[tgt] = REAL(data)[src];
-        break;
-
-      case DT_STRING:
-        SET_STRING_ELT(x, tgt, STRING_ELT(data, src));
-        break;
-
-      case DT_BLOB:
-        SET_VECTOR_ELT(x, tgt, VECTOR_ELT(data, src));
-        break;
-
-      default:
-        stop("NYI: default");
-      }
-    }
-}
-
 R_xlen_t ColumnStorage::get_capacity() const {
   return Rf_xlength(data);
+}
+
+int ColumnStorage::get_new_capacity(const R_xlen_t desired_capacity) const {
+  if (n_max < 0) {
+    const R_xlen_t MIN_DATA_CAPACITY = 100;
+    return std::max(desired_capacity, MIN_DATA_CAPACITY);
+  }
+  else {
+    return std::max(desired_capacity, R_xlen_t(1));
+  }
 }
 
 ColumnStorage* ColumnStorage::append_null() {
   if (i < get_capacity()) fill_default_col_value();
   ++i;
   return this;
+}
+
+void ColumnStorage::fill_default_col_value() {
+  fill_default_value(data, dt, i);
 }
 
 ColumnStorage* ColumnStorage::append_data() {
@@ -119,48 +93,6 @@ ColumnStorage* ColumnStorage::append_data_to_new(DATA_TYPE new_dt) {
 
   ColumnStorage* spillover = new ColumnStorage(new_dt, desired_capacity, n_max, source);
   return spillover->append_data();
-}
-
-int ColumnStorage::get_new_capacity(const R_xlen_t desired_capacity) const {
-  if (n_max < 0) {
-    const R_xlen_t MIN_DATA_CAPACITY = 100;
-    return std::max(desired_capacity, MIN_DATA_CAPACITY);
-  }
-  else {
-    return std::max(desired_capacity, R_xlen_t(1));
-  }
-}
-
-void ColumnStorage::fill_default_col_value() {
-  fill_default_value(data, dt, i);
-}
-
-void ColumnStorage::fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i) {
-  switch (dt) {
-  case DT_BOOL:
-    LOGICAL(data)[i] = NA_LOGICAL;
-    break;
-
-  case DT_INT:
-    INTEGER(data)[i] = NA_INTEGER;
-    break;
-
-  case DT_INT64:
-    INTEGER64(data)[i] = NA_INTEGER64;
-    break;
-
-  case DT_REAL:
-    REAL(data)[i] = NA_REAL;
-    break;
-
-  case DT_STRING:
-    SET_STRING_ELT(data, i, NA_STRING);
-    break;
-
-  case DT_BLOB:
-    SET_VECTOR_ELT(data, i, R_NilValue);
-    break;
-  }
 }
 
 void ColumnStorage::fill_col_value() {
@@ -223,5 +155,73 @@ Rcpp::RObject ColumnStorage::class_from_datatype(DATA_TYPE dt) {
 
   default:
     return R_NilValue;
+  }
+}
+
+void ColumnStorage::fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i) {
+  switch (dt) {
+  case DT_BOOL:
+    LOGICAL(data)[i] = NA_LOGICAL;
+    break;
+
+  case DT_INT:
+    INTEGER(data)[i] = NA_INTEGER;
+    break;
+
+  case DT_INT64:
+    INTEGER64(data)[i] = NA_INTEGER64;
+    break;
+
+  case DT_REAL:
+    REAL(data)[i] = NA_REAL;
+    break;
+
+  case DT_STRING:
+    SET_STRING_ELT(data, i, NA_STRING);
+    break;
+
+  case DT_BLOB:
+    SET_VECTOR_ELT(data, i, R_NilValue);
+    break;
+  }
+}
+
+void ColumnStorage::copy_value(SEXP x, DATA_TYPE dt, const int tgt, const int src) const {
+  if (Rf_isNull(data)) {
+    fill_default_value(x, dt, tgt);
+  }
+  else {
+    switch (dt) {
+    case DT_INT:
+      INTEGER(x)[tgt] = INTEGER(data)[src];
+      break;
+
+    case DT_INT64:
+      switch (TYPEOF(data)) {
+      case INTSXP:
+        INTEGER64(x)[tgt] = INTEGER(data)[src];
+        break;
+
+      case REALSXP:
+        INTEGER64(x)[tgt] = INTEGER64(data)[src];
+        break;
+      }
+      break;
+
+    case DT_REAL:
+      REAL(x)[tgt] = REAL(data)[src];
+      break;
+
+    case DT_STRING:
+      SET_STRING_ELT(x, tgt, STRING_ELT(data, src));
+      break;
+
+    case DT_BLOB:
+      SET_VECTOR_ELT(x, tgt, VECTOR_ELT(data, src));
+      break;
+
+    default:
+      stop("NYI: default");
+    }
   }
 }

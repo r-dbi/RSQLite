@@ -27,23 +27,23 @@ public:
   int copy_to(SEXP x, DATA_TYPE dt, const int pos, const int n) const;
 
 private:
+  // append_col()
   R_xlen_t get_capacity() const;
+  int get_new_capacity(const R_xlen_t desired_capacity) const;
 
   ColumnStorage* append_null();
+  void fill_default_col_value();
 
   ColumnStorage* append_data();
   ColumnStorage* append_data_to_new(DATA_TYPE new_dt);
-
-  void fill_default_col_value();
-  static void fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i);
-
   void fill_col_value();
 
-  int get_new_capacity(const R_xlen_t desired_capacity) const;
-
+  // allocate()
   static SEXPTYPE sexptype_from_datatype(DATA_TYPE type);
   static Rcpp::RObject class_from_datatype(DATA_TYPE dt);
 
+  // copy_to()
+  static void fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i);
   void copy_value(SEXP x, DATA_TYPE dt, const int tgt, const int src) const;
 };
 

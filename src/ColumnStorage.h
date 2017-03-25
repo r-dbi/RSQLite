@@ -12,7 +12,7 @@ class ColumnStorage {
   Rcpp::RObject data;
   int i;
   DATA_TYPE dt;
-  const int capacity, n_max;
+  const int n_max;
   const SqliteColumnDataSource& source;
 
 public:
@@ -27,6 +27,8 @@ public:
   int copy_to(SEXP x, DATA_TYPE dt, const int pos, const int n) const;
 
 private:
+  R_xlen_t get_capacity() const;
+
   ColumnStorage* append_null();
 
   ColumnStorage* append_data();

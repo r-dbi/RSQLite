@@ -9,7 +9,7 @@ PKG_CPPFLAGS=-I. \
 
 PKG_LIBS = vendor/sqlite3/extension-functions.o vendor/sqlite3/sqlite3.o
 
-$(SHLIB): ${PKG_LIBS}
+$(SHLIB): $(PKG_LIBS)
 
 clean:
 	rm -f Makevars.local

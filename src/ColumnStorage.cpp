@@ -1,6 +1,5 @@
 #include "ColumnStorage.h"
 #include "SqliteColumnDataSource.h"
-#include "affinity.h"
 #include "integer64.h"
 
 
@@ -24,6 +23,93 @@ ColumnStorage::~ColumnStorage() {
 ColumnStorage* ColumnStorage::append_col() {
   if (source.is_null()) return append_null();
   return append_data();
+}
+
+DATA_TYPE ColumnStorage::get_data_type() const {
+  DATA_TYPE dt_final = dt;
+  if (dt_final == DT_UNKNOWN) dt_final = source.get_decl_data_type();
+  return dt_final;
+}
+
+SEXP ColumnStorage::allocate(const int length, DATA_TYPE dt) {
+  switch (dt) {
+  case DT_UNKNOWN:
+    return R_NilValue;
+
+  case DT_BOOL:
+    return Rf_allocVector(LGLSXP, length);
+
+  case DT_INT:
+    return Rf_allocVector(INTSXP, length);
+
+  case DT_INT64:
+  {
+    SEXP ret = Rf_allocVector(REALSXP, length);
+    Rf_setAttrib(ret, R_ClassSymbol, Rf_ScalarString(Rf_mkChar("integer64")));
+    return ret;
+  }
+
+  case DT_REAL:
+    return Rf_allocVector(REALSXP, length);
+
+  case DT_STRING:
+    return Rf_allocVector(STRSXP, length);
+
+  case DT_BLOB:
+    return Rf_allocVector(VECSXP, length);
+
+  default:
+    stop("Unknown type %d", dt);
+  }
+}
+
+int ColumnStorage::copy_to(SEXP x, DATA_TYPE dt, const int pos, const int n) const {
+  int src, tgt;
+  for (src = 0, tgt = pos; src < capacity && src < i && tgt < n; ++src, ++tgt) {
+    if (Rf_isNull(data)) {
+      fill_default_value(x, dt, tgt);
+    }
+    else {
+      switch (dt) {
+      case DT_INT:
+        INTEGER(x)[tgt] = INTEGER(data)[src];
+        break;
+
+      case DT_INT64:
+        switch (TYPEOF(data)) {
+        case INTSXP:
+          INTEGER64(x)[tgt] = INTEGER(data)[src];
+          break;
+
+        case REALSXP:
+          INTEGER64(x)[tgt] = INTEGER64(data)[src];
+          break;
+        }
+        break;
+
+      case DT_REAL:
+        REAL(x)[tgt] = REAL(data)[src];
+        break;
+
+      case DT_STRING:
+        SET_STRING_ELT(x, tgt, STRING_ELT(data, src));
+        break;
+
+      case DT_BLOB:
+        SET_VECTOR_ELT(x, tgt, VECTOR_ELT(data, src));
+        break;
+
+      default:
+        stop("NYI: default");
+      }
+    }
+  }
+
+  for (; src < i && tgt < n; ++src, ++tgt) {
+    fill_default_value(x, dt, tgt);
+  }
+
+  return src;
 }
 
 ColumnStorage* ColumnStorage::append_null() {
@@ -112,118 +198,6 @@ void ColumnStorage::fill_col_value() {
   }
 }
 
-DATA_TYPE SqliteColumnDataSource::datatype_from_decltype(const char* decl_type) {
-  if (decl_type == NULL)
-    return DT_BOOL;
-
-  char affinity = sqlite3AffinityType(decl_type);
-
-  switch (affinity) {
-  case SQLITE_AFF_INTEGER:
-    return DT_INT;
-
-  case SQLITE_AFF_NUMERIC:
-  case SQLITE_AFF_REAL:
-    return DT_REAL;
-
-  case SQLITE_AFF_TEXT:
-    return DT_STRING;
-
-  case SQLITE_AFF_BLOB:
-    return DT_BLOB;
-  }
-
-  // Shouldn't occur
-  return DT_BOOL;
-}
-
-DATA_TYPE ColumnStorage::get_data_type() const {
-  DATA_TYPE dt_final = dt;
-  if (dt_final == DT_UNKNOWN) dt_final = source.get_decl_data_type();
-  return dt_final;
-}
-
-SEXP ColumnStorage::allocate(const int length, DATA_TYPE dt) {
-  switch (dt) {
-  case DT_UNKNOWN:
-    return R_NilValue;
-
-  case DT_BOOL:
-    return Rf_allocVector(LGLSXP, length);
-
-  case DT_INT:
-    return Rf_allocVector(INTSXP, length);
-
-  case DT_INT64:
-  {
-    SEXP ret = Rf_allocVector(REALSXP, length);
-    Rf_setAttrib(ret, R_ClassSymbol, Rf_ScalarString(Rf_mkChar("integer64")));
-    return ret;
-  }
-
-  case DT_REAL:
-    return Rf_allocVector(REALSXP, length);
-
-  case DT_STRING:
-    return Rf_allocVector(STRSXP, length);
-
-  case DT_BLOB:
-    return Rf_allocVector(VECSXP, length);
-
-  default:
-    stop("Unknown type %d", dt);
-  }
-}
-
 SEXP ColumnStorage::allocate(const int capacity) const {
   return allocate(capacity, dt);
-}
-
-int ColumnStorage::copy_to(SEXP x, DATA_TYPE dt, const int pos, const int n) const {
-  int src, tgt;
-  for (src = 0, tgt = pos; src < capacity && src < i && tgt < n; ++src, ++tgt) {
-    if (Rf_isNull(data)) {
-      fill_default_value(x, dt, tgt);
-    }
-    else {
-      switch (dt) {
-      case DT_INT:
-        INTEGER(x)[tgt] = INTEGER(data)[src];
-        break;
-
-      case DT_INT64:
-        switch (TYPEOF(data)) {
-        case INTSXP:
-          INTEGER64(x)[tgt] = INTEGER(data)[src];
-          break;
-
-        case REALSXP:
-          INTEGER64(x)[tgt] = INTEGER64(data)[src];
-          break;
-        }
-        break;
-
-      case DT_REAL:
-        REAL(x)[tgt] = REAL(data)[src];
-        break;
-
-      case DT_STRING:
-        SET_STRING_ELT(x, tgt, STRING_ELT(data, src));
-        break;
-
-      case DT_BLOB:
-        SET_VECTOR_ELT(x, tgt, VECTOR_ELT(data, src));
-        break;
-
-      default:
-        stop("NYI: default");
-      }
-    }
-  }
-
-  for (; src < i && tgt < n; ++src, ++tgt) {
-    fill_default_value(x, dt, tgt);
-  }
-
-  return src;
 }

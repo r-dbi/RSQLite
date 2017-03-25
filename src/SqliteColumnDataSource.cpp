@@ -1,6 +1,7 @@
 #include <plogr.h>
 #include "SqliteColumnDataSource.h"
 #include "integer64.h"
+#include "affinity.h"
 
 SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_)
   :
@@ -87,4 +88,29 @@ void SqliteColumnDataSource::fetch_blob(SEXP x, int i) const {
 
 bool SqliteColumnDataSource::needs_64_bit(const int64_t ret) {
   return ret < INT32_MIN || ret > INT32_MAX;
+}
+
+DATA_TYPE SqliteColumnDataSource::datatype_from_decltype(const char* decl_type) {
+  if (decl_type == NULL)
+    return DT_BOOL;
+
+  char affinity = sqlite3AffinityType(decl_type);
+
+  switch (affinity) {
+  case SQLITE_AFF_INTEGER:
+    return DT_INT;
+
+  case SQLITE_AFF_NUMERIC:
+  case SQLITE_AFF_REAL:
+    return DT_REAL;
+
+  case SQLITE_AFF_TEXT:
+    return DT_STRING;
+
+  case SQLITE_AFF_BLOB:
+    return DT_BLOB;
+  }
+
+  // Shouldn't occur
+  return DT_BOOL;
 }

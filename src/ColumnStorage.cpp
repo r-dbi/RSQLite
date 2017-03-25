@@ -87,29 +87,24 @@ void ColumnStorage::fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i) {
 
 void ColumnStorage::fill_col_value() {
   switch (dt) {
-  case DT_INT: {
-    source.fetch_int(IntegerVector(data), i);
-  }
+  case DT_INT:
+    source.fetch_int(data, i);
     break;
 
-  case DT_INT64: {
-    source.fetch_int64(NumericVector(data), i);
-  }
+  case DT_INT64:
+    source.fetch_int64(data, i);
     break;
 
-  case DT_REAL: {
-    source.fetch_real(NumericVector(data), i);
-  }
+  case DT_REAL:
+    source.fetch_real(data, i);
     break;
 
-  case DT_STRING: {
-    source.fetch_string(CharacterVector(data), i);
-  }
+  case DT_STRING:
+    source.fetch_string(data, i);
     break;
 
-  case DT_BLOB: {
-    source.fetch_blob(List(data), i);
-  }
+  case DT_BLOB:
+    source.fetch_blob(data, i);
     break;
 
   default:

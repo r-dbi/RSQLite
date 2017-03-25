@@ -3,7 +3,6 @@
 
 #include "sqlite3.h"
 #include "ColumnDataType.h"
-#include <Rcpp.h>
 
 class SqliteColumnDataSource {
   sqlite3_stmt* stmt;
@@ -18,11 +17,11 @@ public:
 
   bool is_null() const;
 
-  void fetch_int(Rcpp::IntegerVector x, int i) const;
-  void fetch_int64(Rcpp::NumericVector x, int i) const;
-  void fetch_real(Rcpp::NumericVector x, int i) const;
-  void fetch_string(Rcpp::CharacterVector x, int i) const;
-  void fetch_blob(Rcpp::List x, int i) const;
+  void fetch_int(SEXP x, int i) const;
+  void fetch_int64(SEXP x, int i) const;
+  void fetch_real(SEXP x, int i) const;
+  void fetch_string(SEXP x, int i) const;
+  void fetch_blob(SEXP x, int i) const;
 
 private:
   static DATA_TYPE datatype_from_decltype(const char* decl_type);

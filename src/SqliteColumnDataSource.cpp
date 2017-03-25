@@ -10,14 +10,6 @@ SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_
 {
 }
 
-sqlite3_stmt* SqliteColumnDataSource::get_stmt() const {
-  return stmt;
-}
-
-int SqliteColumnDataSource::get_j() const {
-  return j;
-}
-
 DATA_TYPE SqliteColumnDataSource::get_data_type() const {
   const int field_type = get_column_type();
   switch (field_type) {
@@ -48,10 +40,6 @@ DATA_TYPE SqliteColumnDataSource::get_data_type() const {
 
 DATA_TYPE SqliteColumnDataSource::get_decl_data_type() const {
   return datatype_from_decltype(sqlite3_column_decltype(get_stmt(), get_j()));
-}
-
-int SqliteColumnDataSource::get_column_type() const {
-  return sqlite3_column_type(get_stmt(), get_j());
 }
 
 bool SqliteColumnDataSource::is_null() const {
@@ -86,9 +74,6 @@ void SqliteColumnDataSource::fetch_blob(SEXP x, int i) const {
   SET_VECTOR_ELT(x, i, bytes);
 }
 
-bool SqliteColumnDataSource::needs_64_bit(const int64_t ret) {
-  return ret < INT32_MIN || ret > INT32_MAX;
-}
 
 DATA_TYPE SqliteColumnDataSource::datatype_from_decltype(const char* decl_type) {
   if (decl_type == NULL)
@@ -113,4 +98,20 @@ DATA_TYPE SqliteColumnDataSource::datatype_from_decltype(const char* decl_type) 
 
   // Shouldn't occur
   return DT_BOOL;
+}
+
+sqlite3_stmt* SqliteColumnDataSource::get_stmt() const {
+  return stmt;
+}
+
+int SqliteColumnDataSource::get_j() const {
+  return j;
+}
+
+int SqliteColumnDataSource::get_column_type() const {
+  return sqlite3_column_type(get_stmt(), get_j());
+}
+
+bool SqliteColumnDataSource::needs_64_bit(const int64_t ret) {
+  return ret < INT32_MIN || ret > INT32_MAX;
 }

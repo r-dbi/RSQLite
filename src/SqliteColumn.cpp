@@ -8,19 +8,12 @@ SqliteColumn::SqliteColumn(DATA_TYPE dt, int n_max_, sqlite3_stmt* stmt_, int j_
   : source(new SqliteColumnDataSource(stmt_, j_)),
     n_max(n_max_),
     i(0),
-    n(init_n())
+    n(0)
 {
-  storage.push_back(new ColumnStorage(dt, init_n(), n_max_, *source));
+  storage.push_back(new ColumnStorage(dt, 0, n_max_, *source));
 }
 
 SqliteColumn::~SqliteColumn() {
-}
-
-int SqliteColumn::init_n() const {
-  if (n_max >= 0)
-    return n_max;
-
-  return 100;
 }
 
 void SqliteColumn::set_col_value() {

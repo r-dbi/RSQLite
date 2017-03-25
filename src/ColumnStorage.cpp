@@ -13,7 +13,7 @@ ColumnStorage::ColumnStorage(DATA_TYPE dt_, const int capacity_, const int n_max
   n_max(n_max_),
   source(source_)
 {
-  data = allocate(capacity_, dt);
+  data = allocate(get_new_capacity(capacity_), dt);
 }
 
 ColumnStorage::~ColumnStorage() {
@@ -133,20 +133,22 @@ ColumnStorage* ColumnStorage::append_data() {
 }
 
 ColumnStorage* ColumnStorage::append_data_to_new(DATA_TYPE new_dt) {
-  const R_xlen_t MIN_DATA_CAPACITY = 100;
-
   if (new_dt == DT_UNKNOWN) new_dt = source.get_data_type();
 
-  int new_capacity;
+  R_xlen_t desired_capacity = (n_max < 0) ? (get_capacity() * 2) : (n_max - i);
+
+  ColumnStorage* spillover = new ColumnStorage(new_dt, desired_capacity, n_max, source);
+  return spillover->append_data();
+}
+
+int ColumnStorage::get_new_capacity(const R_xlen_t desired_capacity) const {
   if (n_max < 0) {
-    new_capacity = std::max(get_capacity() * 2, MIN_DATA_CAPACITY);
+    const R_xlen_t MIN_DATA_CAPACITY = 100;
+    return std::max(desired_capacity, MIN_DATA_CAPACITY);
   }
   else {
-    new_capacity = std::max(n_max - i, 1);
+    return std::max(desired_capacity, R_xlen_t(1));
   }
-
-  ColumnStorage* spillover = new ColumnStorage(new_dt, new_capacity, n_max, source);
-  return spillover->append_data();
 }
 
 void ColumnStorage::fill_default_col_value() {

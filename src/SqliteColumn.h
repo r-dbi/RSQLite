@@ -21,9 +21,6 @@ public:
   SqliteColumn(DATA_TYPE dt_, int n_max_, sqlite3_stmt* stmt_, int j_);
   ~SqliteColumn();
 
-private:
-  int init_n() const;
-
 public:
   void set_col_value();
   void finalize(const int n_);

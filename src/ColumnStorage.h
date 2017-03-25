@@ -38,6 +38,8 @@ private:
   static void fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i);
 
   void fill_col_value();
+
+  int get_new_capacity(const R_xlen_t desired_capacity) const;
 };
 
 

@@ -6,7 +6,6 @@
 
 SqliteColumn::SqliteColumn(DATA_TYPE dt, int n_max_, sqlite3_stmt* stmt_, int j_)
   : source(new SqliteColumnDataSource(stmt_, j_)),
-    n_max(n_max_),
     i(0),
     n(0)
 {

@@ -13,7 +13,6 @@ class ColumnStorage;
 class SqliteColumn {
 private:
   boost::shared_ptr<SqliteColumnDataSource> source;
-  const int n_max;
   boost::ptr_vector<ColumnStorage> storage;
   int i, n;
 

@@ -22,14 +22,6 @@ void SqliteColumn::set_col_value() {
   if (last != next) storage.push_back(next);
 }
 
-ColumnStorage* SqliteColumn::get_last_storage() {
-  return &storage.end()[-1];
-}
-
-const ColumnStorage* SqliteColumn::get_last_storage() const {
-  return &storage.end()[-1];
-}
-
 void SqliteColumn::finalize(const int n_) {
   n = n_;
 }
@@ -47,4 +39,12 @@ SqliteColumn::operator SEXP() const {
 
 DATA_TYPE SqliteColumn::get_type() const {
   return get_last_storage()->get_data_type();
+}
+
+ColumnStorage* SqliteColumn::get_last_storage() {
+  return &storage.end()[-1];
+}
+
+const ColumnStorage* SqliteColumn::get_last_storage() const {
+  return &storage.end()[-1];
 }

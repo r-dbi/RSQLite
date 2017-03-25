@@ -43,6 +43,8 @@ private:
 
   static SEXPTYPE sexptype_from_datatype(DATA_TYPE type);
   static Rcpp::RObject class_from_datatype(DATA_TYPE dt);
+
+  void copy_value(SEXP x, DATA_TYPE dt, const int tgt, const int src) const;
 };
 
 

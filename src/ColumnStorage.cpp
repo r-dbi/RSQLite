@@ -42,7 +42,18 @@ int ColumnStorage::copy_to(SEXP x, DATA_TYPE dt, const int pos, const int n) con
   int src, tgt;
   R_xlen_t capacity = get_capacity();
   for (src = 0, tgt = pos; src < capacity && src < i && tgt < n; ++src, ++tgt) {
-    if (Rf_isNull(data)) {
+    copy_value(x, dt, tgt, src);
+  }
+
+  for (; src < i && tgt < n; ++src, ++tgt) {
+    fill_default_value(x, dt, tgt);
+  }
+
+  return src;
+}
+
+void ColumnStorage::copy_value(SEXP x, DATA_TYPE dt, const int tgt, const int src) const {
+  if (Rf_isNull(data)) {
       fill_default_value(x, dt, tgt);
     }
     else {
@@ -79,13 +90,6 @@ int ColumnStorage::copy_to(SEXP x, DATA_TYPE dt, const int pos, const int n) con
         stop("NYI: default");
       }
     }
-  }
-
-  for (; src < i && tgt < n; ++src, ++tgt) {
-    fill_default_value(x, dt, tgt);
-  }
-
-  return src;
 }
 
 R_xlen_t ColumnStorage::get_capacity() const {

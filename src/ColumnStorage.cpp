@@ -32,16 +32,15 @@ ColumnStorage* ColumnStorage::append_null() {
 }
 
 ColumnStorage* ColumnStorage::append_data() {
-  if (dt == DT_UNKNOWN) return append_data_to_new();
-  if (i >= capacity) return append_data_to_new();
+  if (dt == DT_UNKNOWN) return append_data_to_new(dt);
+  if (i >= capacity) return append_data_to_new(dt);
 
   fill_col_value();
   ++i;
   return this;
 }
 
-ColumnStorage* ColumnStorage::append_data_to_new() {
-  DATA_TYPE new_dt = dt;
+ColumnStorage* ColumnStorage::append_data_to_new(DATA_TYPE new_dt) {
   if (new_dt == DT_UNKNOWN) new_dt = source.get_data_type();
 
   int new_capacity;

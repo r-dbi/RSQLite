@@ -40,7 +40,7 @@ private:
 
   ColumnStorage* append_data();
 
-  ColumnStorage* append_data_to_new();
+  ColumnStorage* append_data_to_new(DATA_TYPE new_dt);
 
   SEXP allocate(const int capacity) const;
 };

@@ -6,7 +6,7 @@
 #include <boost/bind.hpp>
 
 SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt_, std::vector<std::string> names_, const int n_max_,
-                                 const std::vector<SEXPTYPE>& types_)
+                                 const std::vector<DATA_TYPE>& types_)
   : stmt(stmt_),
     n_max(n_max_),
     i(0),
@@ -35,7 +35,7 @@ bool SqliteDataFrame::advance() {
   return (n_max < 0 || i < n_max);
 }
 
-List SqliteDataFrame::get_data(std::vector<SEXPTYPE>& types_) {
+List SqliteDataFrame::get_data(std::vector<DATA_TYPE>& types_) {
   // Trim back to what we actually used
   finalize_cols();
 

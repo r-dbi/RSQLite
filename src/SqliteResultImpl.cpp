@@ -72,12 +72,9 @@ sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
 // We guess the correct R type for each column from the declared column type,
 // if possible.  The type of the column can be amended as new values come in,
 // but will be fixed after the first call to fetch().
-std::vector<SEXPTYPE> SqliteResultImpl::get_initial_field_types(const int ncols) {
-  std::vector<SEXPTYPE> types;
-  for (int j = 0; j < ncols; ++j) {
-    types.push_back(NILSXP);
-  }
-
+std::vector<DATA_TYPE> SqliteResultImpl::get_initial_field_types(const int ncols) {
+  std::vector<DATA_TYPE> types(ncols);
+  std::fill(types.begin(), types.end(), DT_UNKNOWN);
   return types;
 }
 

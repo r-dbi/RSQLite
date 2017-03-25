@@ -4,6 +4,7 @@
 
 #include <boost/noncopyable.hpp>
 #include "sqlite3.h"
+#include "ColumnDataType.h"
 
 class SqliteResultImpl : public boost::noncopyable {
 private:
@@ -33,7 +34,7 @@ private:
   int rows_affected_;
   List params_;
   int group_, groups_;
-  std::vector<SEXPTYPE> types_;
+  std::vector<DATA_TYPE> types_;
 
 public:
   SqliteResultImpl(sqlite3* conn_, const std::string& sql);
@@ -41,7 +42,7 @@ public:
 
 private:
   static sqlite3_stmt* prepare(sqlite3* conn, const std::string& sql);
-  static std::vector<SEXPTYPE> get_initial_field_types(const int ncols);
+  static std::vector<DATA_TYPE> get_initial_field_types(const int ncols);
   void after_bind(bool params_have_rows);
   void init(bool params_have_rows);
 

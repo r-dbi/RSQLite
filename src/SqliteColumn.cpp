@@ -4,13 +4,12 @@
 #include "SqliteColumnDataSource.h"
 
 
-SqliteColumn::SqliteColumn(SEXPTYPE dt_, int n_max_, sqlite3_stmt* stmt_, int j_)
+SqliteColumn::SqliteColumn(DATA_TYPE dt, int n_max_, sqlite3_stmt* stmt_, int j_)
   : source(new SqliteColumnDataSource(stmt_, j_)),
     n_max(n_max_),
     i(0),
     n(init_n())
 {
-  DATA_TYPE dt = datatype_from_sexptype(dt_);
   storage.push_back(new ColumnStorage(dt, init_n(), n_max_, *source));
 }
 
@@ -53,6 +52,6 @@ SqliteColumn::operator SEXP() const {
   return ret;
 }
 
-SEXPTYPE SqliteColumn::get_type() const {
-  return sexptype_from_datatype(get_last_storage()->get_data_type());
+DATA_TYPE SqliteColumn::get_type() const {
+  return get_last_storage()->get_data_type();
 }

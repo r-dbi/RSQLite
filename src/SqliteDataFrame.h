@@ -4,6 +4,7 @@
 
 #include "sqlite3.h"
 #include <boost/container/stable_vector.hpp>
+#include "ColumnDataType.h"
 
 class SqliteColumn;
 
@@ -15,14 +16,14 @@ class SqliteDataFrame {
   std::vector<std::string> names;
 
 public:
-  SqliteDataFrame(sqlite3_stmt* stmt, std::vector<std::string> names, const int n_max_, const std::vector<SEXPTYPE>& types);
+  SqliteDataFrame(sqlite3_stmt* stmt, std::vector<std::string> names, const int n_max_, const std::vector<DATA_TYPE>& types);
   ~SqliteDataFrame();
 
 public:
   void set_col_values();
   bool advance();
 
-  List get_data(std::vector<SEXPTYPE>& types);
+  List get_data(std::vector<DATA_TYPE>& types);
 
 private:
   void finalize_cols();

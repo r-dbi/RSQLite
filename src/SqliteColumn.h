@@ -18,7 +18,7 @@ private:
   int i, n;
 
 public:
-  SqliteColumn(SEXPTYPE dt_, int n_max_, sqlite3_stmt* stmt_, int j_);
+  SqliteColumn(DATA_TYPE dt_, int n_max_, sqlite3_stmt* stmt_, int j_);
   ~SqliteColumn();
 
 private:
@@ -29,7 +29,7 @@ public:
   void finalize(const int n_);
 
   operator SEXP() const;
-  SEXPTYPE get_type() const;
+  DATA_TYPE get_type() const;
 
 private:
   ColumnStorage* get_last_storage();

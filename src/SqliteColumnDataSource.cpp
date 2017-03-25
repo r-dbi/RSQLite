@@ -20,7 +20,13 @@ DATA_TYPE SqliteColumnDataSource::get_data_type() const {
   const int field_type = get_column_type();
   switch (field_type) {
   case SQLITE_INTEGER:
-    return DT_INT;
+  {
+    int64_t ret = sqlite3_column_int64(get_stmt(), get_j());
+    if (needs_64_bit(ret))
+      return DT_INT64;
+    else
+      return DT_INT;
+  }
 
   case SQLITE_FLOAT:
     return DT_REAL;
@@ -54,6 +60,13 @@ void SqliteColumnDataSource::fetch_int(Rcpp::IntegerVector x, int i) const {
   x[i] = sqlite3_column_int(get_stmt(), get_j());
 }
 
+void SqliteColumnDataSource::fetch_int64(Rcpp::NumericVector x, int i) const {
+  int64_t value = sqlite3_column_int64(get_stmt(), get_j());
+  double value_as_real;
+  memcpy(&value_as_real, &value, sizeof(value_as_real));
+  x[i] = value_as_real;
+}
+
 void SqliteColumnDataSource::fetch_real(Rcpp::NumericVector x, int i) const {
   x[i] = sqlite3_column_double(get_stmt(), get_j());
 }
@@ -72,4 +85,8 @@ void SqliteColumnDataSource::fetch_blob(Rcpp::List x, int i) const {
   memcpy(RAW(bytes), blob, size);
 
   x[i] = bytes;
+}
+
+bool SqliteColumnDataSource::needs_64_bit(const int64_t ret) {
+  return ret < INT32_MIN || ret > INT32_MAX;
 }

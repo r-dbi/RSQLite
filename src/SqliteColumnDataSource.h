@@ -19,6 +19,7 @@ public:
   bool is_null() const;
 
   void fetch_int(Rcpp::IntegerVector x, int i) const;
+  void fetch_int64(Rcpp::NumericVector x, int i) const;
   void fetch_real(Rcpp::NumericVector x, int i) const;
   void fetch_string(Rcpp::CharacterVector x, int i) const;
   void fetch_blob(Rcpp::List x, int i) const;
@@ -31,6 +32,8 @@ private:
   int get_j() const;
 
   int get_column_type() const;
+
+  static bool needs_64_bit(const int64_t ret);
 };
 
 #endif // RSQLITE_SQLITECOLUMNDATASOURCE_H

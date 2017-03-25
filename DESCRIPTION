@@ -23,6 +23,7 @@ Suggests:
     rmarkdown,
     testthat
 Imports:
+    bit64,
     DBI (>= 0.4-9),
     memoise,
     methods,

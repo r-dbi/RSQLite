@@ -7,6 +7,7 @@ enum DATA_TYPE {
   DT_UNKNOWN,
   DT_BOOL,
   DT_INT,
+  DT_INT64,
   DT_REAL,
   DT_STRING,
   DT_BLOB

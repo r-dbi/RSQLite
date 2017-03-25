@@ -32,6 +32,7 @@ private:
 
   void fill_col_value();
   void set_int_value() const;
+  void set_int64_value();
   void set_real_value() const;
   void set_string_value() const;
   void set_raw_value() const;

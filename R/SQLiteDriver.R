@@ -1,5 +1,6 @@
 #' @useDynLib RSQLite
 #' @importFrom Rcpp sourceCpp
+#' @importFrom bit64 integer64
 NULL
 
 #' Class SQLiteDriver (and methods)

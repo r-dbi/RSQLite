@@ -34,6 +34,7 @@ ColumnStorage* ColumnStorage::append_null() {
 ColumnStorage* ColumnStorage::append_data() {
   if (dt == DT_UNKNOWN) return append_data_to_new(dt);
   if (i >= capacity) return append_data_to_new(dt);
+  if (dt == DT_INT && source.get_data_type() == DT_INT64) return append_data_to_new(DT_INT64);
 
   fill_col_value();
   ++i;
@@ -56,19 +57,29 @@ void ColumnStorage::fill_default_col_value() {
 }
 
 void ColumnStorage::fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i) {
+  const int64_t NA_INTEGER64 = 0x8000000000000000;
+
   switch (dt) {
   case DT_BOOL:
     LOGICAL(data)[i] = NA_LOGICAL;
     break;
+
   case DT_INT:
     INTEGER(data)[i] = NA_INTEGER;
     break;
+
+  case DT_INT64:
+    memcpy(&REAL(data)[i], &NA_INTEGER64, sizeof(REAL(data)[i]));
+    break;
+
   case DT_REAL:
     REAL(data)[i] = NA_REAL;
     break;
+
   case DT_STRING:
     SET_STRING_ELT(data, i, NA_STRING);
     break;
+
   case DT_BLOB:
     SET_VECTOR_ELT(data, i, R_NilValue);
     break;
@@ -80,15 +91,23 @@ void ColumnStorage::fill_col_value() {
   case DT_INT:
     set_int_value();
     break;
+
+  case DT_INT64:
+    set_int64_value();
+    break;
+
   case DT_REAL:
     set_real_value();
     break;
+
   case DT_STRING:
     set_string_value();
     break;
+
   case DT_BLOB:
     set_raw_value();
     break;
+
   default:
     stop("NYI");
   }
@@ -96,6 +115,10 @@ void ColumnStorage::fill_col_value() {
 
 void ColumnStorage::set_int_value() const {
   source.fetch_int(IntegerVector(data), i);
+}
+
+void ColumnStorage::set_int64_value() {
+  source.fetch_int64(NumericVector(data), i);
 }
 
 void ColumnStorage::set_real_value() const {
@@ -152,6 +175,13 @@ SEXP ColumnStorage::allocate(const int length, DATA_TYPE dt) {
   case DT_INT:
     return Rf_allocVector(INTSXP, length);
 
+  case DT_INT64:
+  {
+    SEXP ret = Rf_allocVector(REALSXP, length);
+    Rf_setAttrib(ret, R_ClassSymbol, Rf_ScalarString(Rf_mkChar("integer64")));
+    return ret;
+  }
+
   case DT_REAL:
     return Rf_allocVector(REALSXP, length);
 
@@ -181,15 +211,34 @@ int ColumnStorage::copy_to(SEXP x, DATA_TYPE dt, const int pos, const int n) con
       case DT_INT:
         INTEGER(x)[tgt] = INTEGER(data)[src];
         break;
+
+      case DT_INT64:
+        switch (TYPEOF(data)) {
+        case INTSXP:
+        {
+          int64_t value = INTEGER(data)[src];
+          memcpy(&REAL(x)[tgt], &value, sizeof(value));
+          break;
+        }
+
+        case REALSXP:
+          REAL(x)[tgt] = REAL(data)[src];
+          break;
+        }
+        break;
+
       case DT_REAL:
         REAL(x)[tgt] = REAL(data)[src];
         break;
+
       case DT_STRING:
         SET_STRING_ELT(x, tgt, STRING_ELT(data, src));
         break;
+
       case DT_BLOB:
         SET_VECTOR_ELT(x, tgt, VECTOR_ELT(data, src));
         break;
+
       default:
         stop("NYI: default");
       }

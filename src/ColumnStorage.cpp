@@ -88,49 +88,34 @@ void ColumnStorage::fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i) {
 
 void ColumnStorage::fill_col_value() {
   switch (dt) {
-  case DT_INT:
-    set_int_value();
+  case DT_INT: {
+    source.fetch_int(IntegerVector(data), i);
+  }
     break;
 
-  case DT_INT64:
-    set_int64_value();
+  case DT_INT64: {
+    source.fetch_int64(NumericVector(data), i);
+  }
     break;
 
-  case DT_REAL:
-    set_real_value();
+  case DT_REAL: {
+    source.fetch_real(NumericVector(data), i);
+  }
     break;
 
-  case DT_STRING:
-    set_string_value();
+  case DT_STRING: {
+    source.fetch_string(CharacterVector(data), i);
+  }
     break;
 
-  case DT_BLOB:
-    set_raw_value();
+  case DT_BLOB: {
+    source.fetch_blob(List(data), i);
+  }
     break;
 
   default:
     stop("NYI");
   }
-}
-
-void ColumnStorage::set_int_value() const {
-  source.fetch_int(IntegerVector(data), i);
-}
-
-void ColumnStorage::set_int64_value() {
-  source.fetch_int64(NumericVector(data), i);
-}
-
-void ColumnStorage::set_real_value() const {
-  source.fetch_real(NumericVector(data), i);
-}
-
-void ColumnStorage::set_string_value() const {
-  source.fetch_string(CharacterVector(data), i);
-}
-
-void ColumnStorage::set_raw_value() const {
-  source.fetch_blob(List(data), i);
 }
 
 DATA_TYPE SqliteColumnDataSource::datatype_from_decltype(const char* decl_type) {

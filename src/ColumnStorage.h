@@ -31,16 +31,10 @@ private:
   static void fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i);
 
   void fill_col_value();
-  void set_int_value() const;
-  void set_int64_value();
-  void set_real_value() const;
-  void set_string_value() const;
-  void set_raw_value() const;
 
   ColumnStorage* append_null();
 
   ColumnStorage* append_data();
-
   ColumnStorage* append_data_to_new(DATA_TYPE new_dt);
 
   SEXP allocate(const int capacity) const;

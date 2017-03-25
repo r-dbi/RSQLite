@@ -67,12 +67,12 @@ int ColumnStorage::get_new_capacity(const R_xlen_t desired_capacity) const {
 }
 
 ColumnStorage* ColumnStorage::append_null() {
-  if (i < get_capacity()) fill_default_col_value();
+  if (i < get_capacity()) fill_default_value();
   ++i;
   return this;
 }
 
-void ColumnStorage::fill_default_col_value() {
+void ColumnStorage::fill_default_value() {
   fill_default_value(data, dt, i);
 }
 
@@ -81,7 +81,7 @@ ColumnStorage* ColumnStorage::append_data() {
   if (i >= get_capacity()) return append_data_to_new(dt);
   if (dt == DT_INT && source.get_data_type() == DT_INT64) return append_data_to_new(DT_INT64);
 
-  fill_col_value();
+  fetch_value();
   ++i;
   return this;
 }
@@ -95,7 +95,7 @@ ColumnStorage* ColumnStorage::append_data_to_new(DATA_TYPE new_dt) {
   return spillover->append_data();
 }
 
-void ColumnStorage::fill_col_value() {
+void ColumnStorage::fetch_value() {
   switch (dt) {
   case DT_INT:
     source.fetch_int(data, i);

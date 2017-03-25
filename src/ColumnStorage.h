@@ -32,11 +32,11 @@ private:
   int get_new_capacity(const R_xlen_t desired_capacity) const;
 
   ColumnStorage* append_null();
-  void fill_default_col_value();
+  void fill_default_value();
 
   ColumnStorage* append_data();
   ColumnStorage* append_data_to_new(DATA_TYPE new_dt);
-  void fill_col_value();
+  void fetch_value();
 
   // allocate()
   static SEXPTYPE sexptype_from_datatype(DATA_TYPE type);

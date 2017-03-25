@@ -25,9 +25,8 @@ ColumnStorage* ColumnStorage::append_col() {
 }
 
 DATA_TYPE ColumnStorage::get_data_type() const {
-  DATA_TYPE dt_final = dt;
-  if (dt_final == DT_UNKNOWN) dt_final = source.get_decl_data_type();
-  return dt_final;
+  if (dt == DT_UNKNOWN) return source.get_decl_data_type();
+  return dt;
 }
 
 SEXP ColumnStorage::allocate(const int length, DATA_TYPE dt) {

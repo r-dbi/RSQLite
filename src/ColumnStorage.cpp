@@ -142,8 +142,29 @@ DATA_TYPE ColumnStorage::get_data_type() const {
   return dt_final;
 }
 
-SEXP ColumnStorage::allocate(const int capacity, DATA_TYPE dt) {
-  return Rf_allocVector(sexptype_from_datatype(dt), capacity);
+SEXP ColumnStorage::allocate(const int length, DATA_TYPE dt) {
+  switch (dt) {
+  case DT_UNKNOWN:
+    return R_NilValue;
+
+  case DT_BOOL:
+    return Rf_allocVector(LGLSXP, length);
+
+  case DT_INT:
+    return Rf_allocVector(INTSXP, length);
+
+  case DT_REAL:
+    return Rf_allocVector(REALSXP, length);
+
+  case DT_STRING:
+    return Rf_allocVector(STRSXP, length);
+
+  case DT_BLOB:
+    return Rf_allocVector(VECSXP, length);
+
+  default:
+    stop("Unknown type %d", dt);
+  }
 }
 
 SEXP ColumnStorage::allocate(const int capacity) const {

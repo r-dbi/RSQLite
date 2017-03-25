@@ -12,8 +12,4 @@ enum DATA_TYPE {
   DT_BLOB = VECSXP
 };
 
-inline SEXPTYPE sexptype_from_datatype(const DATA_TYPE dt) {
-  return (SEXPTYPE)dt;
-}
-
 #endif // RSQLITE_COLUMNDATATYPE_H

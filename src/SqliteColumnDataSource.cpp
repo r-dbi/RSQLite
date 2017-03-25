@@ -17,7 +17,25 @@ int SqliteColumnDataSource::get_j() const {
 }
 
 DATA_TYPE SqliteColumnDataSource::get_data_type() const {
-  return datatype_from_sqlitetype(get_column_type());
+  const int field_type = get_column_type();
+  switch (field_type) {
+  case SQLITE_INTEGER:
+    return DT_INT;
+
+  case SQLITE_FLOAT:
+    return DT_REAL;
+
+  case SQLITE_TEXT:
+    return DT_STRING;
+
+  case SQLITE_BLOB:
+    // List of raw vectors
+    return DT_BLOB;
+
+  case SQLITE_NULL:
+  default:
+    return DT_UNKNOWN;
+  }
 }
 
 DATA_TYPE SqliteColumnDataSource::get_decl_data_type() const {
@@ -54,25 +72,4 @@ void SqliteColumnDataSource::fetch_blob(Rcpp::List x, int i) const {
   memcpy(RAW(bytes), blob, size);
 
   x[i] = bytes;
-}
-
-DATA_TYPE SqliteColumnDataSource::datatype_from_sqlitetype(const int field_type) {
-  switch (field_type) {
-  case SQLITE_INTEGER:
-    return DT_INT;
-
-  case SQLITE_FLOAT:
-    return DT_REAL;
-
-  case SQLITE_TEXT:
-    return DT_STRING;
-
-  case SQLITE_BLOB:
-    // List of raw vectors
-    return DT_BLOB;
-
-  case SQLITE_NULL:
-  default:
-    return DT_UNKNOWN;
-  }
 }

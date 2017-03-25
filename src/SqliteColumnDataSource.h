@@ -23,7 +23,7 @@ public:
   void fetch_string(Rcpp::CharacterVector x, int i) const;
   void fetch_blob(Rcpp::List x, int i) const;
 
-  static DATA_TYPE datatype_from_sqlitetype(const int field_type);
+private:
   static DATA_TYPE datatype_from_decltype(const char* decl_type);
 
 private:

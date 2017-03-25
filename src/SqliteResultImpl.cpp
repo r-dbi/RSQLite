@@ -72,12 +72,9 @@ sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
 // We guess the correct R type for each column from the declared column type,
 // if possible.  The type of the column can be amended as new values come in,
 // but will be fixed after the first call to fetch().
-std::vector<SEXPTYPE> SqliteResultImpl::get_initial_field_types(const int ncols) {
-  std::vector<SEXPTYPE> types;
-  for (int j = 0; j < ncols; ++j) {
-    types.push_back(NILSXP);
-  }
-
+std::vector<DATA_TYPE> SqliteResultImpl::get_initial_field_types(const int ncols) {
+  std::vector<DATA_TYPE> types(ncols);
+  std::fill(types.begin(), types.end(), DT_UNKNOWN);
   return types;
 }
 
@@ -273,11 +270,15 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
     }
   } else if (TYPEOF(value_) == VECSXP) {
     SEXP value = VECTOR_ELT(value_, group_);
-    if (TYPEOF(value) != RAWSXP) {
-      stop("Can only bind lists of raw vectors");
+    if (TYPEOF(value) == NILSXP) {
+      sqlite3_bind_null(stmt, j);
     }
-
-    sqlite3_bind_blob(stmt, j, RAW(value), Rf_length(value), SQLITE_TRANSIENT);
+    else if (TYPEOF(value) == RAWSXP) {
+      sqlite3_bind_blob(stmt, j, RAW(value), Rf_length(value), SQLITE_TRANSIENT);
+    }
+    else {
+      stop("Can only bind lists of raw vectors (or NULL)");
+    }
   } else {
     stop("Don't know how to handle parameter of type %s.",
          Rf_type2char(TYPEOF(value_)));
@@ -292,12 +293,11 @@ List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   while (!complete_) {
     LOG_VERBOSE << nrows_ << "/" << n;
 
-    if (!data.set_col_values())
-      break;
-
+    data.set_col_values();
     step();
-    data.advance();
     nrows_++;
+    if (!data.advance())
+      break;
   }
 
   LOG_VERBOSE << nrows_;

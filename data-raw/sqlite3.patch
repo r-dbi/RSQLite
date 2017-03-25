@@ -1,7 +1,7 @@
 diff --git a/src/sqlite3/sqlite3.h b/src/sqlite3/sqlite3.h
 index 37d1024..0f55423 100644
---- a/src/sqlite3/sqlite3.h
-+++ b/src/sqlite3/sqlite3.h
+--- a/src/vendor/sqlite3/sqlite3.h
++++ b/src/vendor/sqlite3/sqlite3.h
 @@ -248,8 +248,11 @@ typedef struct sqlite3 sqlite3;
  ** between 0 and +18446744073709551615 inclusive.
  */

@@ -1,0 +1,16 @@
+#ifndef RSQLITE_COLUMNDATATYPE_H
+#define RSQLITE_COLUMNDATATYPE_H
+
+#include <Rcpp.h>
+
+enum DATA_TYPE {
+  DT_UNKNOWN,
+  DT_BOOL,
+  DT_INT,
+  DT_INT64,
+  DT_REAL,
+  DT_STRING,
+  DT_BLOB
+};
+
+#endif // RSQLITE_COLUMNDATATYPE_H

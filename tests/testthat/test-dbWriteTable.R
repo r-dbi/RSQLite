@@ -295,10 +295,10 @@ test_that("dbWriteTable(iris, row.names = 'rn')", {
   expect_equal(rownames(res), as.character(seq_len(nrow(iris))))
   res$Species = factor(res$Species)
 
+  # Original row names are numeric, RSQLite returns them as character
+  # for simplicity
   attr(res, "row.names") <- attr(iris, "row.names")
   expect_identical(res, iris)
-
-  skip("Why do we need to fix row names here?")
 })
 
 test_that("dbWriteTable(mtcars, row.names = 'rn')", {

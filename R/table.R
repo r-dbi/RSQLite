@@ -110,7 +110,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
 
     dbCommit(conn, "dbWriteTable")
     on.exit(NULL)
-    TRUE
+    invisible(TRUE)
   }
 )
 
@@ -475,6 +475,7 @@ setMethod("dbListFields", c("SQLiteConnection", "character"),
 #' @export
 setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
   if (is.factor(obj)) return("TEXT")
+  if (is.data.frame(obj)) return(callNextMethod(dbObj, obj))
 
   switch(typeof(obj),
     integer = "INTEGER",

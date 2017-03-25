@@ -21,5 +21,5 @@ add_library(RSQLite ${SOURCE_FILES})
 add_custom_target(
     Rinstall
     # Using MAKEFLAGS=-j$(nproc) didn't work
-    COMMAND MAKEFLAGS=-j8 nice R CMD INSTALL --libs-only --no-test-load ${RSQLite_SOURCE_DIR}
+    COMMAND ${RSQLite_SOURCE_DIR}/build.sh
 )

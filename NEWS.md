@@ -1,3 +1,13 @@
+## RSQLite 1.1-12 (2017-03-26)
+
+- 64-bit integers are returned as `integer64` vectors. The `bit64` package is imported to support this data type (#65).
+- `dbWriteTable()` returns invisibly.
+- Reduced number of skips shown for tests.
+- Fix roundtrip of `raw` columns (#116).
+- Use `boost/cstdint` instead of compound data type for 64-bit values (#198).
+- `dbFetch()` now errs for `n < -1`, and accepts `n == Inf`.
+
+
 ## RSQLite 1.1-11 (2017-02-01)
 
 - Upgrade embedded SQLite library to 3.16.2 (#180).

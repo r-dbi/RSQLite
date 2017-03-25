@@ -40,6 +40,9 @@ private:
   void fill_col_value();
 
   int get_new_capacity(const R_xlen_t desired_capacity) const;
+
+  static SEXPTYPE sexptype_from_datatype(DATA_TYPE type);
+  static Rcpp::RObject class_from_datatype(DATA_TYPE dt);
 };
 
 

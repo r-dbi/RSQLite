@@ -30,35 +30,12 @@ DATA_TYPE ColumnStorage::get_data_type() const {
 }
 
 SEXP ColumnStorage::allocate(const int length, DATA_TYPE dt) {
-  switch (dt) {
-  case DT_UNKNOWN:
-    return R_NilValue;
+  SEXPTYPE type = sexptype_from_datatype(dt);
+  RObject class_ = class_from_datatype(dt);
 
-  case DT_BOOL:
-    return Rf_allocVector(LGLSXP, length);
-
-  case DT_INT:
-    return Rf_allocVector(INTSXP, length);
-
-  case DT_INT64:
-  {
-    SEXP ret = Rf_allocVector(REALSXP, length);
-    Rf_setAttrib(ret, R_ClassSymbol, Rf_ScalarString(Rf_mkChar("integer64")));
-    return ret;
-  }
-
-  case DT_REAL:
-    return Rf_allocVector(REALSXP, length);
-
-  case DT_STRING:
-    return Rf_allocVector(STRSXP, length);
-
-  case DT_BLOB:
-    return Rf_allocVector(VECSXP, length);
-
-  default:
-    stop("Unknown type %d", dt);
-  }
+  SEXP ret = Rf_allocVector(type, length);
+  if (!Rf_isNull(class_)) Rf_setAttrib(ret, R_ClassSymbol, class_);
+  return ret;
 }
 
 int ColumnStorage::copy_to(SEXP x, DATA_TYPE dt, const int pos, const int n) const {
@@ -206,5 +183,41 @@ void ColumnStorage::fill_col_value() {
 
   default:
     stop("NYI");
+  }
+}
+
+SEXPTYPE ColumnStorage::sexptype_from_datatype(DATA_TYPE dt) {
+  switch (dt) {
+  case DT_UNKNOWN:
+    return NILSXP;
+
+  case DT_BOOL:
+    return LGLSXP;
+
+  case DT_INT:
+    return INTSXP;
+
+  case DT_INT64:
+  case DT_REAL:
+    return REALSXP;
+
+  case DT_STRING:
+    return STRSXP;
+
+  case DT_BLOB:
+    return VECSXP;
+
+  default:
+    stop("Unknown type %d", dt);
+  }
+}
+
+Rcpp::RObject ColumnStorage::class_from_datatype(DATA_TYPE dt) {
+  switch (dt) {
+  case DT_INT64:
+    return CharacterVector::create("integer64");
+
+  default:
+    return R_NilValue;
   }
 }

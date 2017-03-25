@@ -36,8 +36,6 @@ private:
   static void fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i);
 
   void fill_col_value();
-
-  SEXP allocate(const int capacity) const;
 };
 
 

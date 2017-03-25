@@ -14,7 +14,7 @@ ColumnStorage::ColumnStorage(DATA_TYPE dt_, const int capacity_, const int n_max
   n_max(n_max_),
   source(source_)
 {
-  data = allocate(capacity);
+  data = allocate(capacity, dt);
 }
 
 ColumnStorage::~ColumnStorage() {
@@ -196,8 +196,4 @@ void ColumnStorage::fill_col_value() {
   default:
     stop("NYI");
   }
-}
-
-SEXP ColumnStorage::allocate(const int capacity) const {
-  return allocate(capacity, dt);
 }

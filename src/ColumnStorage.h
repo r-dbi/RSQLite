@@ -22,13 +22,13 @@ public:
   ColumnStorage* append_col();
 
   DATA_TYPE get_data_type() const;
-  int copy_to(SEXP x, const int pos, const int n) const;
+  int copy_to(SEXP x, DATA_TYPE dt, const int pos, const int n) const;
 
   static SEXP allocate(const int capacity, DATA_TYPE dt);
 
 private:
   void fill_default_col_value();
-  static void fill_default_value(SEXP data, R_xlen_t i);
+  static void fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i);
 
   void fill_col_value();
   void set_int_value() const;

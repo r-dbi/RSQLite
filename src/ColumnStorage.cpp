@@ -53,43 +53,45 @@ ColumnStorage* ColumnStorage::append_data_to_new() {
 }
 
 void ColumnStorage::fill_default_col_value() {
-  fill_default_value(data, i);
+  fill_default_value(data, dt, i);
 }
 
-void ColumnStorage::fill_default_value(SEXP data, R_xlen_t i) {
-  switch (TYPEOF(data)) {
-  case LGLSXP:
+void ColumnStorage::fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i) {
+  switch (dt) {
+  case DT_BOOL:
     LOGICAL(data)[i] = NA_LOGICAL;
     break;
-  case INTSXP:
+  case DT_INT:
     INTEGER(data)[i] = NA_INTEGER;
     break;
-  case REALSXP:
+  case DT_REAL:
     REAL(data)[i] = NA_REAL;
     break;
-  case STRSXP:
+  case DT_STRING:
     SET_STRING_ELT(data, i, NA_STRING);
     break;
-  case VECSXP:
+  case DT_BLOB:
     SET_VECTOR_ELT(data, i, R_NilValue);
     break;
   }
 }
 
 void ColumnStorage::fill_col_value() {
-  switch (TYPEOF(data)) {
-  case INTSXP:
+  switch (dt) {
+  case DT_INT:
     set_int_value();
     break;
-  case REALSXP:
+  case DT_REAL:
     set_real_value();
     break;
-  case STRSXP:
+  case DT_STRING:
     set_string_value();
     break;
-  case VECSXP:
+  case DT_BLOB:
     set_raw_value();
     break;
+  default:
+    stop("NYI");
   }
 }
 
@@ -148,32 +150,34 @@ SEXP ColumnStorage::allocate(const int capacity) const {
   return allocate(capacity, dt);
 }
 
-int ColumnStorage::copy_to(SEXP x, const int pos, const int n) const {
+int ColumnStorage::copy_to(SEXP x, DATA_TYPE dt, const int pos, const int n) const {
   int src, tgt;
   for (src = 0, tgt = pos; src < capacity && src < i && tgt < n; ++src, ++tgt) {
-    switch (TYPEOF(data)) {
-    case INTSXP:
-      INTEGER(x)[tgt] = INTEGER(data)[src];
-      break;
-    case REALSXP:
-      REAL(x)[tgt] = REAL(data)[src];
-      break;
-    case STRSXP:
-      SET_STRING_ELT(x, tgt, STRING_ELT(data, src));
-      break;
-    case VECSXP:
-      SET_VECTOR_ELT(x, tgt, VECTOR_ELT(data, src));
-      break;
-    case NILSXP:
-      fill_default_value(x, tgt);
-      break;
-    default:
-      stop("NYI: default");
+    if (Rf_isNull(data)) {
+      fill_default_value(x, dt, tgt);
+    }
+    else {
+      switch (dt) {
+      case DT_INT:
+        INTEGER(x)[tgt] = INTEGER(data)[src];
+        break;
+      case DT_REAL:
+        REAL(x)[tgt] = REAL(data)[src];
+        break;
+      case DT_STRING:
+        SET_STRING_ELT(x, tgt, STRING_ELT(data, src));
+        break;
+      case DT_BLOB:
+        SET_VECTOR_ELT(x, tgt, VECTOR_ELT(data, src));
+        break;
+      default:
+        stop("NYI: default");
+      }
     }
   }
 
   for (; src < i && tgt < n; ++src, ++tgt) {
-    fill_default_value(x, tgt);
+    fill_default_value(x, dt, tgt);
   }
 
   return src;

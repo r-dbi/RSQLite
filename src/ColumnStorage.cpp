@@ -38,7 +38,8 @@ SEXP ColumnStorage::allocate(const int length, DATA_TYPE dt) {
   return ret;
 }
 
-int ColumnStorage::copy_to(SEXP x, DATA_TYPE dt, const int pos, const int n) const {
+int ColumnStorage::copy_to(SEXP x, DATA_TYPE dt, const int pos) const {
+  R_xlen_t n = Rf_xlength(x);
   int src, tgt;
   R_xlen_t capacity = get_capacity();
   for (src = 0, tgt = pos; src < capacity && src < i && tgt < n; ++src, ++tgt) {

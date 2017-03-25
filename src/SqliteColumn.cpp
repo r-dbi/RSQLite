@@ -31,7 +31,7 @@ SqliteColumn::operator SEXP() const {
   int pos = 0;
   for (size_t k = 0; k < storage.size(); ++k) {
     const ColumnStorage& current = storage[k];
-    pos += current.copy_to(ret, dt, pos, n);
+    pos += current.copy_to(ret, dt, pos);
   }
   return ret;
 }

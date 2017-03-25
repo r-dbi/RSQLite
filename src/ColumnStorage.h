@@ -24,7 +24,7 @@ public:
 
   DATA_TYPE get_data_type() const;
   static SEXP allocate(const int length, DATA_TYPE dt);
-  int copy_to(SEXP x, DATA_TYPE dt, const int pos, const int n) const;
+  int copy_to(SEXP x, DATA_TYPE dt, const int pos) const;
 
 private:
   // append_col()

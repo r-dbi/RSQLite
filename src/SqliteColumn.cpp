@@ -43,7 +43,8 @@ void SqliteColumn::finalize(const int n_) {
 }
 
 SqliteColumn::operator SEXP() const {
-  SEXP ret = get_last_storage()->allocate_final(n);
+  DATA_TYPE dt = get_last_storage()->get_data_type();
+  SEXP ret = ColumnStorage::allocate(n, dt);
   int pos = 0;
   for (size_t k = 0; k < storage.size(); ++k) {
     const ColumnStorage& current = storage[k];

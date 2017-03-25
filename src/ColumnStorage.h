@@ -22,8 +22,9 @@ public:
   ColumnStorage* append_col();
 
   DATA_TYPE get_data_type() const;
-  SEXP allocate_final(const int n) const;
   int copy_to(SEXP x, const int pos, const int n) const;
+
+  static SEXP allocate(const int capacity, DATA_TYPE dt);
 
 private:
   void fill_default_col_value();

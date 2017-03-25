@@ -140,12 +140,12 @@ DATA_TYPE ColumnStorage::get_data_type() const {
   return dt_final;
 }
 
-SEXP ColumnStorage::allocate_final(int n) const {
-  return Rf_allocVector(sexptype_from_datatype(get_data_type()), n);
+SEXP ColumnStorage::allocate(const int capacity, DATA_TYPE dt) {
+  return Rf_allocVector(sexptype_from_datatype(dt), capacity);
 }
 
 SEXP ColumnStorage::allocate(const int capacity) const {
-  return Rf_allocVector(sexptype_from_datatype(dt), capacity);
+  return allocate(capacity, dt);
 }
 
 int ColumnStorage::copy_to(SEXP x, const int pos, const int n) const {

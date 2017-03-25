@@ -1,5 +1,6 @@
 #include <plogr.h>
 #include "SqliteColumnDataSource.h"
+#include "integer64.h"
 
 SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_)
   :
@@ -61,10 +62,7 @@ void SqliteColumnDataSource::fetch_int(Rcpp::IntegerVector x, int i) const {
 }
 
 void SqliteColumnDataSource::fetch_int64(Rcpp::NumericVector x, int i) const {
-  int64_t value = sqlite3_column_int64(get_stmt(), get_j());
-  double value_as_real;
-  memcpy(&value_as_real, &value, sizeof(value_as_real));
-  x[i] = value_as_real;
+  INTEGER64(x)[i] = sqlite3_column_int64(get_stmt(), get_j());
 }
 
 void SqliteColumnDataSource::fetch_real(Rcpp::NumericVector x, int i) const {

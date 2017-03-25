@@ -1,6 +1,7 @@
 #include "ColumnStorage.h"
 #include "SqliteColumnDataSource.h"
 #include "affinity.h"
+#include "integer64.h"
 
 
 using namespace Rcpp;
@@ -57,8 +58,6 @@ void ColumnStorage::fill_default_col_value() {
 }
 
 void ColumnStorage::fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i) {
-  const int64_t NA_INTEGER64 = 0x8000000000000000;
-
   switch (dt) {
   case DT_BOOL:
     LOGICAL(data)[i] = NA_LOGICAL;
@@ -69,7 +68,7 @@ void ColumnStorage::fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i) {
     break;
 
   case DT_INT64:
-    memcpy(&REAL(data)[i], &NA_INTEGER64, sizeof(REAL(data)[i]));
+    INTEGER64(data)[i] = NA_INTEGER64;
     break;
 
   case DT_REAL:
@@ -200,14 +199,11 @@ int ColumnStorage::copy_to(SEXP x, DATA_TYPE dt, const int pos, const int n) con
       case DT_INT64:
         switch (TYPEOF(data)) {
         case INTSXP:
-        {
-          int64_t value = INTEGER(data)[src];
-          memcpy(&REAL(x)[tgt], &value, sizeof(value));
+          INTEGER64(x)[tgt] = INTEGER(data)[src];
           break;
-        }
 
         case REALSXP:
-          REAL(x)[tgt] = REAL(data)[src];
+          INTEGER64(x)[tgt] = INTEGER64(data)[src];
           break;
         }
         break;

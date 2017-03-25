@@ -18,11 +18,9 @@ DBItest::test_all(c(
   "data_raw",                                   #
   "data_logical",                               # not an error, no logical data type
   "data_logical_null_.*",                       # not an error, no logical data type
-  "data_64_bit_.*",                             # #65
 
   # sql
   "append_table_error",                         # #112
-  "roundtrip_64_bit",                           # not an error, loose typing
   "roundtrip_date",                             # #109
   "roundtrip_timestamp",                        # #110
   "read_table_error",                           #

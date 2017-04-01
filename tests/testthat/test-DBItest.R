@@ -1,4 +1,7 @@
 DBItest::test_all(c(
+  # enable to test a particular test only
+  #"(?!data_timestamp_current).*$",
+
   # driver
   "constructor_strict",                         # relaxed constructor check still active
   "get_info_driver",                            # #117

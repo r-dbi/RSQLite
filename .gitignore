@@ -12,9 +12,8 @@ inst/doc
 /.metadata
 /.settings
 /src/.*
+/src/*.h.gch
 /*.pro*
 /Debug/
-/.idea
-/clion-test.R
 /docs
-cmake-build-debug
+.RData

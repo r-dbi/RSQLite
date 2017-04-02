@@ -2,7 +2,6 @@
 #define RSQLITE_COLUMNSTORAGE_H
 
 
-#include <Rcpp.h>
 #include "ColumnDataType.h"
 
 

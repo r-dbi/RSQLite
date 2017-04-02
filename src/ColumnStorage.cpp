@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ColumnStorage.h"
 #include "SqliteColumnDataSource.h"
 #include "integer64.h"

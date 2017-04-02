@@ -1,8 +1,6 @@
 #ifndef RSQLITE_COLUMNDATATYPE_H
 #define RSQLITE_COLUMNDATATYPE_H
 
-#include <Rcpp.h>
-
 enum DATA_TYPE {
   DT_UNKNOWN,
   DT_BOOL,

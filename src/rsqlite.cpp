@@ -1,4 +1,4 @@
-#include <RSQLite.h>
+#include "pch.h"
 #include "sqlite3.h"
 
 //' RSQLite version

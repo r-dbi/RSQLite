@@ -1,4 +1,4 @@
-#include <RSQLite.h>
+#include "pch.h"
 #include "SqliteResultImpl.h"
 #include "SqliteDataFrame.h"
 

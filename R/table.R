@@ -244,6 +244,7 @@ setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA, ..
   value <- factor_to_string(value)
   value <- raw_to_string(value)
   value <- string_to_utf8(value)
+  value <- quote_string(value, con)
 
   value
 })
@@ -263,6 +264,12 @@ raw_to_string <- function(value) {
     value[is_raw] <- lapply(value[is_raw], as.character)
   }
 
+  value
+}
+
+quote_string <- function(value, conn) {
+  is_character <- vlapply(value, is.character)
+  value[is_character] <- lapply(value[is_character], dbQuoteString, conn = conn)
   value
 }
 

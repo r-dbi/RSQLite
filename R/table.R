@@ -81,7 +81,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
       dbRemoveTable(conn, name)
     }
 
-    value <- sqlData(conn, value, row.names = row.names)
+    value <- sql_data(value, row.names = row.names)
 
     if (!found || overwrite) {
       fields <- field_def(conn, value, field.types)
@@ -122,9 +122,7 @@ match_col <- function(value, col_names) {
                 call. = FALSE)
         names(value) <- col_names
       } else {
-        warning("Column name mismatch, columns will be matched by position. This warning may be converted to an error soon.",
-                call. = FALSE)
-        names(value) <- col_names
+        stop("Column name mismatch.", call. = FALSE)
       }
     }
   } else {
@@ -238,16 +236,21 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 #' @export
 #' @rdname dbWriteTable
 setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA, ...) {
+  value <- sql_data(value, row.names)
+  value <- quote_string(value, con)
+
+  value
+})
+
+sql_data <- function(value, row.names) {
   row.names <- compatRowNames(row.names)
   value <- sqlRownamesToColumn(value, row.names)
 
   value <- factor_to_string(value)
   value <- raw_to_string(value)
   value <- string_to_utf8(value)
-
   value
-})
-
+}
 
 factor_to_string <- function(value) {
   is_factor <- vlapply(value, is.factor)
@@ -263,6 +266,12 @@ raw_to_string <- function(value) {
     value[is_raw] <- lapply(value[is_raw], as.character)
   }
 
+  value
+}
+
+quote_string <- function(value, conn) {
+  is_character <- vlapply(value, is.character)
+  value[is_character] <- lapply(value[is_character], dbQuoteString, conn = conn)
   value
 }
 

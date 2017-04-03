@@ -24,6 +24,8 @@ addons:
 matrix:
   include:
   - r: release
+    dist: precise
+  - r: release
     env:
     - BUILD_PKGDOWN=true
   - r: oldrel

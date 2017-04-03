@@ -1,4 +1,4 @@
-#include <RSQLite.h>
+#include "pch.h"
 #include <workarounds/XPtr.h>
 #include "SqliteConnection.h"
 

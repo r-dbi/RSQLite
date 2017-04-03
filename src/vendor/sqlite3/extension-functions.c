@@ -1606,7 +1606,7 @@ static void stdevFinalize(sqlite3_context *context){
   if( p && p->cnt>1 ){
     sqlite3_result_double(context, sqrt(p->rS/(p->cnt-1)));
   }else{
-    sqlite3_result_double(context, 0.0);
+    sqlite3_result_null(context);
   }
 }
 
@@ -1619,7 +1619,7 @@ static void varianceFinalize(sqlite3_context *context){
   if( p && p->cnt>1 ){
     sqlite3_result_double(context, p->rS/(p->cnt-1));
   }else{
-    sqlite3_result_double(context, 0.0);
+    sqlite3_result_null(context);
   }
 }
 

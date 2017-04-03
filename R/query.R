@@ -130,6 +130,8 @@ db_bind <- function(res, params, ..., allow_named_superset) {
     if (any(is.na(param_pos))) {
       warning("Named parameters not used in query: ",
               paste0(names(params)[is.na(param_pos)], collapse = ", "),
+              ". Use $", names(params)[is.na(param_pos)][[1]],
+              " etc. instead of ? with named lists.",
               call. = FALSE)
       params <- params[!is.na(param_pos)]
     }

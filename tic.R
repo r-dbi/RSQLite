@@ -1,6 +1,11 @@
 get_stage("after_success") %>%
   add_step(step_hello_world()) %>%
-  add_step(step_run_covr())
+  add_step(step_run_covr(
+    exclusions = c(
+      "src/vendor/sqlite3/sqlite3.c",
+      "src/vendor/sqlite3/extension-functions.c"
+    )
+  ))
 
 get_stage("deploy") %>%
   add_step(step_install_ssh_keys()) %>%

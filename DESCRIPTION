@@ -36,7 +36,7 @@ Encoding: UTF-8
 License: LGPL (>= 2)
 URL: https://github.com/rstats-db/RSQLite
 BugReports: https://github.com/rstats-db/RSQLite/issues
-Collate:
+Collate: 
     'RcppExports.R'
     'SQLiteConnection.R'
     'SQLiteDriver.R'
@@ -45,7 +45,6 @@ Collate:
     'copy.R'
     'datasetsDb.R'
     'deprecated.R'
-    'dummy.R'
     'extensions.R'
     'query.R'
     'rownames.R'

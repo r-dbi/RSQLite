@@ -1,3 +1,14 @@
+## RSQLite 1.1-13 (2017-04-03)
+
+- `dbWriteTable(append = TRUE)` raises an error if column names are not the same in the data and the existing table (#165).
+- Removed dummy `dbGetQuery()` method introduced for compatibility with some Bioconductor packages (#187).
+- The `variance()` and `stdev()` extension functions now return `NULL` for input of length 1 (#201).
+- Exclude SQLite3 source code from coverage computation again (#204).
+- `sqlData()` now returns quoted strings, like the default implementation in DBI (#207).
+- Restore compatibility with older compilers/libraries by using <boost/limits.hpp> (#206).
+- Remove `Makevars.local` logic, resolve installation issues with non-GNU Make (#203).
+
+
 ## RSQLite 1.1-12 (2017-03-26)
 
 - 64-bit integers are returned as `integer64` vectors. The `bit64` package is imported to support this data type (#65).

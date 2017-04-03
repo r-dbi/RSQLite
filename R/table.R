@@ -122,9 +122,7 @@ match_col <- function(value, col_names) {
                 call. = FALSE)
         names(value) <- col_names
       } else {
-        warning("Column name mismatch, columns will be matched by position. This warning may be converted to an error soon.",
-                call. = FALSE)
-        names(value) <- col_names
+        stop("Column name mismatch.", call. = FALSE)
       }
     }
   } else {

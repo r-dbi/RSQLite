@@ -25,12 +25,10 @@ test_that("passing field.types with wrong name", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con))
 
-  expect_warning(
+  expect_error(
     dbWriteTable(con, "a", data.frame(a = 1:3), field.types = c("b" = "TEXT")),
-    "mismatch")
-  res <- dbReadTable(con, "a")
-
-  expect_identical(res, data.frame(b = c("1", "2", "3"), stringsAsFactors = FALSE))
+    "mismatch"
+  )
 })
 
 test_that("passing field.types with primary key information", {

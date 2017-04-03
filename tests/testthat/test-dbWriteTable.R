@@ -182,13 +182,14 @@ test_that("appending to table ignores column order and column names", {
   on.exit(dbDisconnect(con), add = TRUE)
 
   dbWriteTable(con, "a", data.frame(a = 1, b = 2))
-  expect_warning(dbWriteTable(con, "a", data.frame(b = 1, a = 2), append = TRUE),
-                 "position")
-  expect_warning(dbWriteTable(con, "a", data.frame(c = 1, d = 2), append = TRUE),
-                 "position")
-
-  a <- dbReadTable(con, "a")
-  expect_identical(a, data.frame(a = c(1, 1, 1), b = c(2, 2, 2)))
+  expect_error(
+    dbWriteTable(con, "a", data.frame(b = 1, a = 2), append = TRUE),
+    "mismatch"
+  )
+  expect_error(
+    dbWriteTable(con, "a", data.frame(c = 1, d = 2), append = TRUE),
+    "mismatch"
+  )
 })
 
 test_that("appending to table gives error if fewer columns", {

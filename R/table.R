@@ -238,7 +238,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 #' @export
 #' @rdname dbWriteTable
 setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA, ...) {
-  value <- sql_data()
+  value <- sql_data(value, row.names)
   value <- quote_string(value, con)
 
   value

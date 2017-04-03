@@ -2,6 +2,7 @@
 #include "SqliteColumnDataSource.h"
 #include "integer64.h"
 #include "affinity.h"
+#include <boost/limits.hpp>
 
 SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_)
   :
@@ -113,5 +114,5 @@ int SqliteColumnDataSource::get_column_type() const {
 }
 
 bool SqliteColumnDataSource::needs_64_bit(const int64_t ret) {
-  return ret < INT32_MIN || ret > INT32_MAX;
+  return ret < std::numeric_limits<int32_t>::min() || ret > std::numeric_limits<int32_t>::max();
 }

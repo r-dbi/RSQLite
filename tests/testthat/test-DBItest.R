@@ -16,7 +16,6 @@ DBItest::test_all(c(
   "fetch_n_good_after_bad",                     # n argument to dbFetch()
   "fetch_n_more_rows",                          #
   "cannot_clear_result_twice_.*",               # error: need to warn if closing result twice
-  "stale_result_warning",                       # #120
   "get_query_n_.*",                             # rstats-db/DBI#76
   "data_raw",                                   #
   "data_logical",                               # not an error, no logical data type

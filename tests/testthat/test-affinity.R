@@ -59,3 +59,12 @@ test_that("affinity checks", {
 test_that("affinity checks for inline queries", {
   skip("NYI")
 })
+
+test_that("affinity of untyped NULL with repeated fetch", {
+  conn <- dbConnect(SQLite(), ":memory:")
+  res <- dbSendQuery(conn, "SELECT NULL UNION ALL SELECT NULL")
+  expect_identical(dbFetch(res, 1)[[1]], NA)
+  expect_identical(dbFetch(res, 1)[[1]], NA)
+  dbClearResult(res)
+  dbDisconnect(conn)
+})

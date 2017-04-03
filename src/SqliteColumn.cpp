@@ -9,6 +9,8 @@ SqliteColumn::SqliteColumn(DATA_TYPE dt, int n_max_, sqlite3_stmt* stmt_, int j_
     i(0),
     n(0)
 {
+  if (dt == DT_BOOL)
+    dt = DT_UNKNOWN;
   storage.push_back(new ColumnStorage(dt, 0, n_max_, *source));
 }
 

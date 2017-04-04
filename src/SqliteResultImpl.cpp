@@ -120,11 +120,12 @@ IntegerVector SqliteResultImpl::find_params_impl(const CharacterVector& param_na
   return res;
 }
 
-void SqliteResultImpl::bind_impl(const List& params) {
-  bind_rows_impl(params);
-}
-
 void SqliteResultImpl::bind_rows_impl(const List& params) {
+  if (cache.nparams_ == 0) {
+    stop("Query does not require parameters.",
+         cache.nparams_, params.size());
+  }
+
   if (params.size() != cache.nparams_) {
     stop("Query requires %i params; %i supplied.",
          cache.nparams_, params.size());

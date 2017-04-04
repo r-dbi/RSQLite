@@ -305,9 +305,7 @@ check_quoted_identifier <- function(name) {
 #'   are considered equal.
 #' @param check.names If `TRUE`, the default, column names will be
 #'   converted to valid R identifiers.
-#' @param select.cols  A SQL expression (in the form of a character vector of
-#'    length 1) giving the columns to select. E.g. `"*"` selects all columns,
-#'    `"x, y, z"` selects three columns named as listed.
+#' @param select.cols  Deprecated, do not use.
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @inheritParams DBI::sqlRownamesToColumn
 #' @export
@@ -316,14 +314,19 @@ check_quoted_identifier <- function(name) {
 #' db <- RSQLite::datasetsDb()
 #' dbReadTable(db, "mtcars")
 #' dbReadTable(db, "mtcars", row.names = FALSE)
-#' dbReadTable(db, "mtcars", select.cols = "cyl, gear")
-#' dbReadTable(db, "mtcars", select.cols = "row_names, cyl, gear")
 #' dbDisconnect(db)
 setMethod("dbReadTable", c("SQLiteConnection", "character"),
-  function(conn, name, ..., row.names = NA, check.names = TRUE, select.cols = "*") {
+  function(conn, name, ..., row.names = NA, check.names = TRUE, select.cols = NULL) {
     name <- check_quoted_identifier(name)
 
     row.names <- compatRowNames(row.names)
+
+    if (is.null(select.cols)) {
+      select.cols = "*"
+    } else {
+      warning_once("`select.cols` is deprecated, use `dbGetQuery()` for complex queries.",
+        call. = FALSE)
+    }
 
     name <- dbQuoteIdentifier(conn, name)
     out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM", name),

@@ -51,7 +51,6 @@ public:
   int nrows();
   int rows_affected();
   IntegerVector find_params_impl(const CharacterVector& param_names);
-  void bind_impl(const List& params);
   void bind_rows_impl(const List& params);
   List fetch_impl(const int n_max);
   List get_column_info_impl();

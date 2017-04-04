@@ -282,11 +282,6 @@ string_to_utf8 <- function(value) {
 }
 
 check_quoted_identifier <- function(name) {
-  if (class(name)[[1L]] != "SQL" && grepl("^`.*`$", name)) {
-    warning_once("Quoted identifiers should have class SQL, use DBI::SQL() if the caller performs the quoting.")
-    name <- SQL(name)
-  }
-
   name
 }
 

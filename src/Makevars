@@ -5,6 +5,7 @@ PKG_CPPFLAGS=-I. \
              -DSQLITE_ENABLE_FTS3_PARENTHESIS \
              -DSQLITE_ENABLE_FTS5 \
              -DSQLITE_ENABLE_JSON1 \
+             -DSQLITE_ENABLE_STAT4 \
              -DSQLITE_SOUNDEX
 
 PKG_LIBS = vendor/sqlite3/extension-functions.o vendor/sqlite3/sqlite3.o

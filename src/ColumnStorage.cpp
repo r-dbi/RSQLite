@@ -82,6 +82,7 @@ ColumnStorage* ColumnStorage::append_data() {
   if (dt == DT_UNKNOWN) return append_data_to_new(dt);
   if (i >= get_capacity()) return append_data_to_new(dt);
   if (dt == DT_INT && source.get_data_type() == DT_INT64) return append_data_to_new(DT_INT64);
+  if (dt == DT_INT && source.get_data_type() == DT_REAL) return append_data_to_new(DT_REAL);
 
   fetch_value();
   ++i;
@@ -211,7 +212,15 @@ void ColumnStorage::copy_value(SEXP x, DATA_TYPE dt, const int tgt, const int sr
       break;
 
     case DT_REAL:
-      REAL(x)[tgt] = REAL(data)[src];
+      switch (TYPEOF(data)) {
+      case INTSXP:
+        REAL(x)[tgt] = INTEGER(data)[src];
+        break;
+
+      case REALSXP:
+        REAL(x)[tgt] = REAL(data)[src];
+        break;
+      }
       break;
 
     case DT_STRING:

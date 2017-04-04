@@ -65,7 +65,8 @@ test_that("correct number of columns, even if 0 rows", {
 })
 
 test_that("BLOBs retrieve as raw vectors", {
-  con <- dbConnect(SQLite(), ":memory:")
+  con <- memory_db()
+  on.exit(dbDisconnect(con))
   local <- data.frame(
     a = 1:10,
     z = I(lapply(paste("hello", 1:10), charToRaw))
@@ -74,4 +75,18 @@ test_that("BLOBs retrieve as raw vectors", {
 
   remote <- dbReadTable(con, "t1")
   expect_equal(remote$z, unclass(local$z))
+})
+
+test_that("integers are upscaled to reals", {
+  con <- memory_db()
+  on.exit(dbDisconnect(con))
+
+  expect_equal(
+    dbGetQuery(con, "SELECT 1 AS a UNION SELECT 2.5 ORDER BY a")$a,
+    c(1, 2.5)
+  )
+  expect_equal(
+    dbGetQuery(con, "SELECT 3 AS a UNION SELECT 2.5 ORDER BY a")$a,
+    c(2.5, 3)
+  )
 })

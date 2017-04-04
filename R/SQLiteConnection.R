@@ -16,6 +16,26 @@ setClass("SQLiteConnection",
     ref = "environment"
   )
 )
+#' @rdname hidden_aliases
+#' @export
+setMethod("dbQuoteIdentifier", c("SQLiteConnection", "character"), function(conn, x, ...) {
+  if (any(is.na(x))) {
+    stop("Cannot pass NA to dbQuoteIdentifier()", call. = FALSE)
+  }
+  x <- gsub("`", "``", x, fixed = TRUE)
+  if (length(x) == 0L) {
+    SQL(character())
+  } else {
+    # Not calling encodeString() here to keep things simple
+    SQL(paste("`", x, "`", sep = ""))
+  }
+})
+
+#' @rdname hidden_aliases
+#' @export
+setMethod("dbQuoteIdentifier", c("SQLiteConnection", "SQL"), function(conn, x, ...) {
+  SQL(x)
+})
 
 #' @rdname SQLiteConnection-class
 #' @export

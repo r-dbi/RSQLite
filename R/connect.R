@@ -127,12 +127,26 @@ setMethod("dbConnect", "SQLiteDriver",
     ## experimental PRAGMAs
     if (!is.null(cache_size)) {
       cache_size <- as.integer(cache_size)
-      try(dbGetQuery(con, sprintf("PRAGMA cache_size=%d", cache_size)))
+      tryCatch(
+        dbExecute(con, sprintf("PRAGMA cache_size=%d", cache_size)),
+        error = function(e) {
+          warning("Couldn't set cache size: ", conditionMessage(e), "\n",
+            "Use `cache_size` = NULL to turn off this warning.",
+            call. = FALSE)
+        }
+      )
     }
 
     if (!is.null(synchronous)) {
       synchronous <- match.arg(synchronous, c("off", "normal", "full"))
-      try(dbGetQuery(con, sprintf("PRAGMA synchronous=%s", synchronous)))
+      tryCatch(
+        dbExecute(con, sprintf("PRAGMA synchronous=%s", synchronous)),
+        error = function(e) {
+          warning("Couldn't set synchronous mode: ", conditionMessage(e), "\n",
+                  "Use `synchronous` = NULL to turn off this warning.",
+                  call. = FALSE)
+        }
+      )
     }
 
     con

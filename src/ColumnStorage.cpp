@@ -81,8 +81,9 @@ void ColumnStorage::fill_default_value() {
 ColumnStorage* ColumnStorage::append_data() {
   if (dt == DT_UNKNOWN) return append_data_to_new(dt);
   if (i >= get_capacity()) return append_data_to_new(dt);
-  if (dt == DT_INT && source.get_data_type() == DT_INT64) return append_data_to_new(DT_INT64);
-  if (dt == DT_INT && source.get_data_type() == DT_REAL) return append_data_to_new(DT_REAL);
+  DATA_TYPE new_dt = source.get_data_type();
+  if (dt == DT_INT && new_dt == DT_INT64) return append_data_to_new(DT_INT64);
+  if (dt == DT_INT && new_dt == DT_REAL) return append_data_to_new(DT_REAL);
 
   fetch_value();
   ++i;

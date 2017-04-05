@@ -5,7 +5,7 @@ NULL
 #' Connect to an SQLite database
 #'
 #' Together, `SQLite()` and `dbConnect()` allow you to connect to
-#' a SQLite database file. See \link{sqlite-query} for how to issue queries
+#' a SQLite database file. See [DBI::dbSendQuery()] for how to issue queries
 #' and receive results.
 #'
 #' Connections are automatically cleaned-up after they're deleted and
@@ -20,17 +20,16 @@ NULL
 #' @param ... In previous versions, `SQLite()` took arguments. These
 #'   have now all been moved to [dbConnect()], and any arguments here
 #'   will be ignored with a warning.
+#'
+#' @return `SQLite()` returns an object of class [SQLiteDriver-class].
 #' @import methods DBI
+#' @aliases RSQLite RSQLite-package
 SQLite <- function(...) {
   if (nargs() > 0) {
     warning("All arguments to RSQLite Driver are ignored.", call. = FALSE)
   }
   new("SQLiteDriver")
 }
-
-#' @export
-#' @rawNamespace exportMethods(dbDriver)
-DBI::dbDriver
 
 # From https://www.sqlite.org/c3ref/c_open_autoproxy.html
 #' @export
@@ -79,6 +78,8 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #'   `"unix-posix"`, `"unix-unix-afp"`,
 #'   `"unix-unix-flock"`, `"unix-dotfile"`, and
 #'   `"unix-none"`.
+#' @return `dbConnect()` returns an object of class [SQLiteConnection-class].
+#'
 #' @aliases SQLITE_RWC SQLITE_RW SQLITE_RO
 #' @export
 #' @rdname SQLite

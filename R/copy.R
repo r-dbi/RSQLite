@@ -4,7 +4,7 @@
 #' connection.  It can be used to save an in-memory database (created using
 #' `dbname = ":memory:"` or
 #' `dbname = "file::memory:"`) to a file or to create an in-memory database
-#' a copy of anothe database.
+#' a copy of another database.
 #'
 #' @param from A `SQLiteConnection` object. The main database in
 #'   `from` will be copied to `to`.

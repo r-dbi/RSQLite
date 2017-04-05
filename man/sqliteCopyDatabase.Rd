@@ -17,7 +17,7 @@ Copies a database connection to a file or to another database
 connection.  It can be used to save an in-memory database (created using
 \code{dbname = ":memory:"} or
 \code{dbname = "file::memory:"}) to a file or to create an in-memory database
-a copy of anothe database.
+a copy of another database.
 }
 \examples{
 library(DBI)

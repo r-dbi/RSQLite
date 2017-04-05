@@ -370,27 +370,8 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
 )
 
 
-#' Tables in a database
-#'
-#' `dbExistsTable()` returns a logical that indicates if a table exists,
-#' `dbListTables()` lists all tables as a character vector.
-#'
-#' @seealso
-#' The corresponding generic functions [DBI::dbExistsTable()] and [DBI::dbListTables()].
-#'
-#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
-#' @param name String, name of table. Match is case insensitive.
-#' @param ... Needed for compatibility with generics, otherwise ignored.
+#' @rdname SQLiteConnection-class
 #' @export
-#' @examples
-#' library(DBI)
-#' db <- RSQLite::datasetsDb()
-#'
-#' dbExistsTable(db, "mtcars")
-#' dbExistsTable(db, "nonexistingtable")
-#' dbListTables(db)
-#'
-#' dbDisconnect(db)
 setMethod(
   "dbExistsTable", c("SQLiteConnection", "character"),
   function(conn, name, ...) {
@@ -402,7 +383,7 @@ setMethod(
 )
 
 
-#' @rdname dbExistsTable-SQLiteConnection-character-method
+#' @rdname SQLiteConnection-class
 #' @export
 setMethod("dbListTables", "SQLiteConnection", function(conn, ...) {
   rs <- sqliteListTables(conn)

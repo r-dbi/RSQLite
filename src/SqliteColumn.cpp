@@ -86,14 +86,22 @@ DATA_TYPE SqliteColumn::get_type() const {
 
 const char* SqliteColumn::format_data_type(const DATA_TYPE dt) {
   switch (dt) {
-  case DT_UNKNOWN: return "unknown";
-  case DT_BOOL: return "boolean";
-  case DT_INT: return "integer";
-  case DT_INT64: return "integer64";
-  case DT_REAL: return "real";
-  case DT_STRING: return "string";
-  case DT_BLOB: return "blob";
-  default: return "<unknown type>";
+  case DT_UNKNOWN:
+    return "unknown";
+  case DT_BOOL:
+    return "boolean";
+  case DT_INT:
+    return "integer";
+  case DT_INT64:
+    return "integer64";
+  case DT_REAL:
+    return "real";
+  case DT_STRING:
+    return "string";
+  case DT_BLOB:
+    return "blob";
+  default:
+    return "<unknown type>";
   }
 }
 

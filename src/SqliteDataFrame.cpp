@@ -4,6 +4,7 @@
 #include "ColumnStorage.h"
 #include "SqliteColumnDataSource.h"
 #include <boost/bind.hpp>
+#include <boost/range/algorithm_ext/for_each.hpp>
 
 SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt_, std::vector<std::string> names_, const int n_max_,
                                  const std::vector<DATA_TYPE>& types_)
@@ -41,6 +42,8 @@ List SqliteDataFrame::get_data(std::vector<DATA_TYPE>& types_) {
 
   types_.clear();
   std::transform(data.begin(), data.end(), std::back_inserter(types_), std::mem_fun_ref(&SqliteColumn::get_type));
+
+  boost::for_each(data, names, boost::bind(&SqliteColumn::warn_type_conflicts, _1, _2));
 
   List out(data.begin(), data.end());
   out.attr("names") = names;

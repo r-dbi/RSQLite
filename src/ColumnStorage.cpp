@@ -161,6 +161,9 @@ Rcpp::RObject ColumnStorage::class_from_datatype(DATA_TYPE dt) {
   case DT_INT64:
     return CharacterVector::create("integer64");
 
+  case DT_BLOB:
+    return CharacterVector::create("blob");
+
   default:
     return R_NilValue;
   }

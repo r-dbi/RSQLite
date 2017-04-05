@@ -64,9 +64,8 @@ test_that("correct number of columns, even if 0 rows", {
   expect_equal(dim(ans), c(0L, 2L))
 })
 
-test_that("BLOBs retrieve as raw vectors", {
+test_that("BLOBs retrieve as blob objects", {
   con <- memory_db()
-  on.exit(dbDisconnect(con))
   local <- data.frame(
     a = 1:10,
     z = I(lapply(paste("hello", 1:10), charToRaw))
@@ -74,7 +73,7 @@ test_that("BLOBs retrieve as raw vectors", {
   dbWriteTable(con, "t1", local)
 
   remote <- dbReadTable(con, "t1")
-  expect_equal(remote$z, unclass(local$z))
+  expect_equal(remote$z, blob::as.blob(unclass(local$z)))
 })
 
 test_that("integers are upscaled to reals", {

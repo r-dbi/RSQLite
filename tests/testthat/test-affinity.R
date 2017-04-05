@@ -62,7 +62,7 @@ test_that("affinity checks", {
   check_affinity("FLOA", "numeric")
   check_affinity("DOUB", "numeric")
   check_affinity("NUMERIC", "numeric")
-  check_affinity("BLOB", "list", "list")
+  check_affinity("BLOB", "blob", "integer")
 })
 
 test_that("affinity checks for inline queries", {

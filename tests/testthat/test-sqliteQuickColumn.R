@@ -9,7 +9,7 @@ test_that("sqliteQuickColumn round trips cleanly", {
     a = letters[1:10],
     b = rnorm(10),
     c = sample(1:10),
-    d = I(lapply(1:10, function(x) mk_blob(sample(10:256, 1)))),
+    d = blob::as.blob(lapply(1:10, function(x) mk_blob(sample(10:256, 1)))),
     stringsAsFactors = FALSE
   )
 
@@ -19,5 +19,5 @@ test_that("sqliteQuickColumn round trips cleanly", {
   expect_equal(sqliteQuickColumn(db, "t", "a"), df$a)
   expect_equal(sqliteQuickColumn(db, "t", "b"), df$b)
   expect_equal(sqliteQuickColumn(db, "t", "c"), df$c)
-  expect_equal(sqliteQuickColumn(db, "t", "d"), unclass(df$d))
+  expect_equal(sqliteQuickColumn(db, "t", "d"), df$d)
 })

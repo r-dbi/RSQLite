@@ -90,3 +90,35 @@ test_that("integers are upscaled to reals", {
     c(2.5, 3)
   )
 })
+
+test_that("warnings on mixed data types (#161)", {
+  con <- memory_db()
+  on.exit(dbDisconnect(con))
+
+  expect_warning(
+    expect_equal(
+      dbGetQuery(con, "SELECT 30000000000 AS a UNION SELECT 2.5 ORDER BY a")$a,
+      c(2.5, 3e10)
+    ),
+    "Column `a`: mixed type, first seen values of type real, coercing other values of type integer64",
+    fixed = TRUE
+  )
+
+  expect_warning(
+    expect_equal(
+      dbGetQuery(con, "SELECT 10000000000 AS a UNION SELECT 2.5e10 ORDER BY a")$a,
+      bit64::as.integer64(c(1e10, 2.5e10))
+    ),
+    "Column `a`: mixed type, first seen values of type integer64, coercing other values of type real",
+    fixed = TRUE
+  )
+
+  expect_warning(
+    expect_equal(
+      dbGetQuery(con, "SELECT 'a' AS a, 1 as id UNION SELECT 2, 2 UNION SELECT 2.5, 3 ORDER BY id")$a,
+      c("a", "2", "2.5")
+    ),
+    "Column `a`: mixed type, first seen values of type string, coercing other values of type integer, real",
+    fixed = TRUE
+  )
+})

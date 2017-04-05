@@ -11,6 +11,7 @@
 \alias{dbSendQuery,SQLiteConnection,character-method}
 \alias{dbExistsTable,SQLiteConnection,character-method}
 \alias{dbListTables,SQLiteConnection-method}
+\alias{dbListFields,SQLiteConnection,character-method}
 \alias{dbDataType,SQLiteConnection-method}
 \title{Class SQLiteConnection}
 \usage{
@@ -31,6 +32,8 @@
 
 \S4method{dbListTables}{SQLiteConnection}(conn, ...)
 
+\S4method{dbListFields}{SQLiteConnection,character}(conn, name, ...)
+
 \S4method{dbDataType}{SQLiteConnection}(dbObj, obj, ...)
 }
 \description{
@@ -41,6 +44,6 @@
 The corresponding generic functions
 \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}}, \code{\link[DBI:dbGetQuery]{DBI::dbGetQuery()}},
 \code{\link[DBI:dbSendStatement]{DBI::dbSendStatement()}}, \code{\link[DBI:dbExecute]{DBI::dbExecute()}},
-\code{\link[DBI:dbExistsTable]{DBI::dbExistsTable()}}, and \code{\link[DBI:dbListTables]{DBI::dbListTables()}}.
+\code{\link[DBI:dbExistsTable]{DBI::dbExistsTable()}}, \code{\link[DBI:dbListTables]{DBI::dbListTables()}}, and \code{\link[DBI:dbListFields]{DBI::dbListFields()}}.
 }
 \keyword{internal}

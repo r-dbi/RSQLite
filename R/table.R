@@ -414,22 +414,8 @@ sqliteListTablesQuery <- function(conn, name = NULL) {
     sep = "\n"))
 }
 
-#' List fields in a table
-#'
-#' Returns the fields of a given table as a character vector.
-#'
-#' @seealso
-#' The corresponding generic function [DBI::dbListFields()].
-#'
-#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
-#' @param name a length 1 character vector giving the name of a table.
-#' @param ... Needed for compatibility with generic. Otherwise ignored.
+#' @rdname SQLiteConnection-class
 #' @export
-#' @examples
-#' library(DBI)
-#' db <- RSQLite::datasetsDb()
-#' dbListFields(db, "iris")
-#' dbDisconnect(db)
 setMethod("dbListFields", c("SQLiteConnection", "character"),
   function(conn, name, ...) {
     rs <- dbSendQuery(conn, paste("SELECT * FROM ",

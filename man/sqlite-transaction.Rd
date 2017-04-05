@@ -8,20 +8,23 @@
 \alias{dbRollback,SQLiteConnection-method}
 \title{SQLite transaction management}
 \usage{
-\S4method{dbBegin}{SQLiteConnection}(conn, name = NULL, ...)
+\S4method{dbBegin}{SQLiteConnection}(conn, .name = NULL, ..., name = NULL)
 
-\S4method{dbCommit}{SQLiteConnection}(conn, name = NULL, ...)
+\S4method{dbCommit}{SQLiteConnection}(conn, .name = NULL, ..., name = NULL)
 
-\S4method{dbRollback}{SQLiteConnection}(conn, name = NULL, ...)
+\S4method{dbRollback}{SQLiteConnection}(conn, .name = NULL, ...,
+  name = NULL)
 }
 \arguments{
 \item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
 \code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
 
-\item{name}{Supply a name to use a named savepoint. This allows you to
-nest multiple transaction}
+\item{.name}{For backward compatibility, do not use.}
 
 \item{...}{Needed for compatibility with generic. Otherwise ignored.}
+
+\item{name}{Supply a name to use a named savepoint. This allows you to
+nest multiple transaction}
 }
 \description{
 By default, SQLite is in auto-commit mode. \code{dbBegin()} starts
@@ -54,10 +57,10 @@ dbCommit(con)
 dbGetQuery(con, "SELECT count(*) FROM arrests")[1, ]
 
 # Named savepoints can be nested --------------------------------------------
-dbBegin(con, "a")
-dbBegin(con, "b")
-dbRollback(con, "b")
-dbCommit(con, "a")
+dbBegin(con, name = "a")
+dbBegin(con, name = "b")
+dbRollback(con, name = "b")
+dbCommit(con, name = "a")
 
 dbDisconnect(con)
 }

@@ -16,9 +16,10 @@ NULL
 #'
 #' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
 #'   [DBI::dbConnect()]
+#' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @param name Supply a name to use a named savepoint. This allows you to
 #'   nest multiple transaction
-#' @param ... Needed for compatibility with generic. Otherwise ignored.
+#' @param .name For backward compatibility, do not use.
 #' @examples
 #' library(DBI)
 #' con <- dbConnect(SQLite(), ":memory:")
@@ -42,10 +43,10 @@ NULL
 #' dbGetQuery(con, "SELECT count(*) FROM arrests")[1, ]
 #'
 #' # Named savepoints can be nested --------------------------------------------
-#' dbBegin(con, "a")
-#' dbBegin(con, "b")
-#' dbRollback(con, "b")
-#' dbCommit(con, "a")
+#' dbBegin(con, name = "a")
+#' dbBegin(con, name = "b")
+#' dbRollback(con, name = "b")
+#' dbCommit(con, name = "a")
 #'
 #' dbDisconnect(con)
 #' @name sqlite-transaction
@@ -53,7 +54,8 @@ NULL
 
 #' @export
 #' @rdname sqlite-transaction
-setMethod("dbBegin", "SQLiteConnection", function(conn, name = NULL, ...) {
+setMethod("dbBegin", "SQLiteConnection", function(conn, .name = NULL, ..., name = NULL) {
+  name <- compat_name(name, .name)
   if (is.null(name)) {
     dbExecute(conn, "BEGIN")
   } else {
@@ -65,7 +67,8 @@ setMethod("dbBegin", "SQLiteConnection", function(conn, name = NULL, ...) {
 
 #' @export
 #' @rdname sqlite-transaction
-setMethod("dbCommit", "SQLiteConnection", function(conn, name = NULL, ...) {
+setMethod("dbCommit", "SQLiteConnection", function(conn, .name = NULL, ..., name = NULL) {
+  name <- compat_name(name, .name)
   if (is.null(name)) {
     dbExecute(conn, "COMMIT")
   } else {
@@ -77,7 +80,8 @@ setMethod("dbCommit", "SQLiteConnection", function(conn, name = NULL, ...) {
 
 #' @export
 #' @rdname sqlite-transaction
-setMethod("dbRollback", "SQLiteConnection", function(conn, name = NULL, ...) {
+setMethod("dbRollback", "SQLiteConnection", function(conn, .name = NULL, ..., name = NULL) {
+  name <- compat_name(name, .name)
   if (is.null(name)) {
     dbExecute(conn, "ROLLBACK")
   } else {
@@ -93,3 +97,13 @@ setMethod("dbRollback", "SQLiteConnection", function(conn, name = NULL, ...) {
 
   invisible(TRUE)
 })
+
+compat_name <- function(name, .name) {
+  if (!is.null(.name)) {
+    warning("Please use `name` = \"<savepoint>\" to specify the name of the savepoint.",
+      call. = FALSE)
+    .name
+  } else {
+    name
+  }
+}

@@ -8,7 +8,7 @@
 #' [DBI::dbSendQuery()], [DBI::dbGetQuery()],
 #' [DBI::dbSendStatement()], [DBI::dbExecute()],
 #' [DBI::dbExistsTable()], [DBI::dbListTables()], [DBI::dbListFields()],
-#' and [DBI::dbRemoveTable()].
+#' [DBI::dbRemoveTable()], and [DBI::sqlData()].
 #'
 #' @keywords internal
 #' @export

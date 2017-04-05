@@ -5,11 +5,9 @@ NULL
 #'
 #' Functions for writing data frames or delimiter-separated files
 #' to database tables.
-#' `sqlData()` is mostly useful to backend implementers,
-#' but must be documented here.
 #'
 #' @seealso
-#' The corresponding generic functions [DBI::dbWriteTable()] and [DBI::sqlData()].
+#' The corresponding generic function [DBI::dbWriteTable()].
 #'
 #' @export
 #' @rdname dbWriteTable
@@ -233,8 +231,8 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
   }
 )
 
+#' @rdname SQLiteConnection-class
 #' @export
-#' @rdname dbWriteTable
 setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA, ...) {
   value <- sql_data(value, row.names)
   value <- quote_string(value, con)

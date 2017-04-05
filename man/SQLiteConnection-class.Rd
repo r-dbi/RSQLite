@@ -3,11 +3,17 @@
 \docType{class}
 \name{SQLiteConnection-class}
 \alias{SQLiteConnection-class}
+\alias{dbQuoteIdentifier,SQLiteConnection,character-method}
+\alias{dbQuoteIdentifier,SQLiteConnection,SQL-method}
 \alias{show,SQLiteConnection-method}
 \alias{dbIsValid,SQLiteConnection-method}
 \alias{dbGetException,SQLiteConnection-method}
 \title{Class SQLiteConnection}
 \usage{
+\S4method{dbQuoteIdentifier}{SQLiteConnection,character}(conn, x, ...)
+
+\S4method{dbQuoteIdentifier}{SQLiteConnection,SQL}(conn, x, ...)
+
 \S4method{show}{SQLiteConnection}(object)
 
 \S4method{dbIsValid}{SQLiteConnection}(dbObj, ...)

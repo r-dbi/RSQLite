@@ -1,11 +1,6 @@
 context("affinity")
 
-check_affinity <- function(affinity, type,
-                           real_type = "numeric", integer_type = type,
-                           blob_type = real_type) {
-  con <- memory_db()
-  on.exit(dbDisconnect(con))
-
+create_affinity_test_table <- function(con, affinity) {
   dbExecute(con, paste0("CREATE TABLE a (a ", affinity, ")"))
   dbWriteTable(con, "a", data.frame(a = NA_integer_), append = TRUE)
   dbWriteTable(con, "a", data.frame(a = 1L), append = TRUE)
@@ -17,6 +12,15 @@ check_affinity <- function(affinity, type,
   dbWriteTable(con, "a", data.frame(a = 7L), append = TRUE)
   dbWriteTable(con, "a", list_df(a = list(as.raw(8))), append = TRUE)
   dbWriteTable(con, "a", data.frame(a = 9L), append = TRUE)
+}
+
+check_affinity_get <- function(affinity, type,
+                              real_type = "numeric", integer_type = type,
+                              blob_type = real_type) {
+  con <- memory_db()
+  on.exit(dbDisconnect(con))
+
+  create_affinity_test_table(con, affinity)
 
   expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 0")$a), type)
   expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 1")$a), type)
@@ -35,6 +39,15 @@ check_affinity <- function(affinity, type,
     expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 10")$a), real_type),
     if (type == "blob") NA else "coercing"
   )
+}
+
+check_affinity_fetch <- function(affinity, type,
+                                 real_type = "numeric", integer_type = type,
+                                 blob_type = real_type) {
+  con <- memory_db()
+  on.exit(dbDisconnect(con))
+
+  create_affinity_test_table(con, affinity)
 
   rs <- dbSendQuery(con, "SELECT * FROM a")
   expect_equal(class(dbFetch(rs, 0)$a), type)
@@ -54,17 +67,30 @@ check_affinity <- function(affinity, type,
   dbClearResult(rs)
 }
 
-test_that("affinity checks", {
-  check_affinity("INTEGER", "integer")
-  check_affinity("TEXT", "character", "character")
-  check_affinity("REAL", "numeric")
-  check_affinity("INT", "integer")
-  check_affinity("CHAR", "character", "character")
-  check_affinity("CLOB", "character", "character")
-  check_affinity("FLOA", "numeric")
-  check_affinity("DOUB", "numeric")
-  check_affinity("NUMERIC", "numeric", "numeric", "integer")
-  check_affinity("BLOB", "integer", "blob")
+test_that("affinity checks for dbGetQuery()", {
+  check_affinity_get("INTEGER", "integer")
+  check_affinity_get("TEXT", "character", "character")
+  check_affinity_get("REAL", "numeric")
+  check_affinity_get("INT", "integer")
+  check_affinity_get("CHAR", "character", "character")
+  check_affinity_get("CLOB", "character", "character")
+  check_affinity_get("FLOA", "numeric")
+  check_affinity_get("DOUB", "numeric")
+  check_affinity_get("NUMERIC", "numeric", "numeric", "integer")
+  check_affinity_get("BLOB", "integer", "blob")
+})
+
+test_that("affinity checks for dbFetch()", {
+  check_affinity_fetch("INTEGER", "integer")
+  check_affinity_fetch("TEXT", "character", "character")
+  check_affinity_fetch("REAL", "numeric")
+  check_affinity_fetch("INT", "integer")
+  check_affinity_fetch("CHAR", "character", "character")
+  check_affinity_fetch("CLOB", "character", "character")
+  check_affinity_fetch("FLOA", "numeric")
+  check_affinity_fetch("DOUB", "numeric")
+  check_affinity_fetch("NUMERIC", "numeric", "numeric", "integer")
+  check_affinity_fetch("BLOB", "integer", "blob")
 })
 
 test_that("affinity checks for inline queries", {

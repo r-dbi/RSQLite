@@ -14,3 +14,5 @@ DBItest::make_context(
   ),
   name = "RSQLite"
 )
+
+pkgconfig::set_config("RSQLite::row.names.table" = NA)

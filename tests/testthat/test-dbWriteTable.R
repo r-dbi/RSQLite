@@ -343,7 +343,7 @@ test_that("dbWriteTable with AsIs list fields", {
   res <- dbReadTable(con, "a")
 
   expected <- data.frame(a = 1:2)
-  expected$a <- list(as.raw(1:3), as.raw(4:5))
+  expected$a <- blob::blob(as.raw(1:3), as.raw(4:5))
   expect_identical(res, expected)
 })
 

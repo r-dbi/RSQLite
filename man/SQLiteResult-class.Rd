@@ -12,7 +12,7 @@
 \alias{dbGetRowCount,SQLiteResult-method}
 \alias{dbHasCompleted,SQLiteResult-method}
 \alias{dbGetStatement,SQLiteResult-method}
-\title{Class SQLiteResult}
+\title{Class SQLiteResult (and methods)}
 \usage{
 \S4method{dbIsValid}{SQLiteResult}(dbObj, ...)
 
@@ -33,8 +33,10 @@
 \S4method{dbGetStatement}{SQLiteResult}(res, ...)
 }
 \description{
-SQLite's query results class.  This classes encapsulates the result of an
-SQL statement (either \code{SELECT} or not).
+SQLiteDriver objects are created by \code{\link[=dbSendQuery]{dbSendQuery()}} or \code{\link[=dbSendStatement]{dbSendStatement()}},
+and encapsulate the result of an SQL statement (either \code{SELECT} or not).
+They are a superclass of the \linkS4class{DBIResult} class.
+The "Usage" section lists the class methods overridden by \pkg{RSQLite}.
 }
 \seealso{
 The corresponding generic functions

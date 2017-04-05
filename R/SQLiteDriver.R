@@ -6,9 +6,12 @@ NULL
 
 #' Class SQLiteDriver (and methods)
 #'
-#' The SQLiteDriver, which is used to select the correct method in
-#' [dbConnect()]. See more details in [SQLite()].
-#' It is used purely for dispatch and [dbUnloadDriver()] is a null-op.
+#' SQLiteDriver objects are created by [SQLite()], and used to select the
+#' correct method in [dbConnect()].
+#' They are a superclass of the [DBIDriver-class] class,
+#' and used purely for dispatch.
+#' The "Usage" section lists the class methods overridden by \pkg{RSQLite}.
+#' The [dbUnloadDriver()] method is a null-op.
 #'
 #' @keywords internal
 #' @export

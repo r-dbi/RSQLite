@@ -24,6 +24,7 @@ Suggests:
     testthat
 Imports:
     bit64,
+    blob (>= 1.0.0.9001),
     DBI (>= 0.4-9),
     memoise,
     methods,

@@ -85,70 +85,27 @@ setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
   invisible(TRUE)
 })
 
-#' Result information
-#'
-#' For a result object, returns information about the SQL statement used,
-#' the available columns and number of already fetched rows for a query,
-#' the number of affected rows for a statement,
-#' and the completion status.
-#'
-#' @seealso
-#' The corresponding generic functions
-#' [DBI::dbColumnInfo()], [DBI::dbGetRowsAffected()], [DBI::dbGetRowCount()],
-#' [DBI::dbHasCompleted()], and [DBI::dbGetStatement()].
-#'
-#' @param res An object of class \code{\linkS4class{SQLiteResult}}
-#' @param ... Ignored. Needed for compatibility with generic
-#' @examples
-#' library(DBI)
-#' db <- RSQLite::datasetsDb()
-#' rs <- dbSendQuery(db, "SELECT * FROM USArrests WHERE UrbanPop >= 80")
-#' dbGetStatement(rs)
-#' dbColumnInfo(rs)
-#' dbHasCompleted(rs)
-#' dbGetRowCount(rs)
-#'
-#' dbFetch(rs, n = 2)
-#' dbHasCompleted(rs)
-#' dbGetRowCount(rs)
-#'
-#' invisible(dbFetch(rs))
-#' dbHasCompleted(rs)
-#' dbGetRowCount(rs)
-#' dbClearResult(rs)
-#'
-#' dbDisconnect(db)
-#'
-#' con <- dbConnect(RSQLite::SQLite(), ":memory:")
-#' dbExecute(con, "CREATE TABLE test (a INTEGER)")
-#' rs <- dbSendStatement(con, "INSERT INTO test VALUES (:a)", list(a = 1:3))
-#' dbGetRowsAffected(rs)
-#' dbClearResult(rs)
-#' dbDisconnect(con)
-#' @name sqlite-meta
-NULL
-
 #' @export
-#' @rdname sqlite-meta
+#' @rdname SQLiteResult-class
 setMethod("dbColumnInfo", "SQLiteResult", function(res, ...) {
   rsqlite_column_info(res@ptr)
 })
 #' @export
-#' @rdname sqlite-meta
+#' @rdname SQLiteResult-class
 setMethod("dbGetRowsAffected", "SQLiteResult", function(res, ...) {
   rsqlite_rows_affected(res@ptr)
 })
 #' @export
-#' @rdname sqlite-meta
+#' @rdname SQLiteResult-class
 setMethod("dbGetRowCount", "SQLiteResult", function(res, ...) {
   rsqlite_row_count(res@ptr)
 })
 #' @export
-#' @rdname sqlite-meta
+#' @rdname SQLiteResult-class
 setMethod("dbHasCompleted", "SQLiteResult", function(res, ...) {
   rsqlite_has_completed(res@ptr)
 })
-#' @rdname sqlite-meta
+#' @rdname SQLiteResult-class
 #' @export
 setMethod("dbGetStatement", "SQLiteResult", function(res, ...) {
   res@sql

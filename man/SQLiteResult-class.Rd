@@ -7,6 +7,11 @@
 \alias{dbBind,SQLiteResult-method}
 \alias{dbFetch,SQLiteResult-method}
 \alias{dbClearResult,SQLiteResult-method}
+\alias{dbColumnInfo,SQLiteResult-method}
+\alias{dbGetRowsAffected,SQLiteResult-method}
+\alias{dbGetRowCount,SQLiteResult-method}
+\alias{dbHasCompleted,SQLiteResult-method}
+\alias{dbGetStatement,SQLiteResult-method}
 \title{Class SQLiteResult}
 \usage{
 \S4method{dbIsValid}{SQLiteResult}(dbObj, ...)
@@ -16,6 +21,16 @@
 \S4method{dbFetch}{SQLiteResult}(res, n = -1, ..., row.names = NA)
 
 \S4method{dbClearResult}{SQLiteResult}(res, ...)
+
+\S4method{dbColumnInfo}{SQLiteResult}(res, ...)
+
+\S4method{dbGetRowsAffected}{SQLiteResult}(res, ...)
+
+\S4method{dbGetRowCount}{SQLiteResult}(res, ...)
+
+\S4method{dbHasCompleted}{SQLiteResult}(res, ...)
+
+\S4method{dbGetStatement}{SQLiteResult}(res, ...)
 }
 \description{
 SQLite's query results class.  This classes encapsulates the result of an
@@ -23,6 +38,8 @@ SQL statement (either \code{SELECT} or not).
 }
 \seealso{
 The corresponding generic functions
-\code{\link[DBI:dbFetch]{DBI::dbFetch()}}, \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}}, and \code{\link[DBI:dbBind]{DBI::dbBind()}}.
+\code{\link[DBI:dbFetch]{DBI::dbFetch()}}, \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}}, and \code{\link[DBI:dbBind]{DBI::dbBind()}},
+\code{\link[DBI:dbColumnInfo]{DBI::dbColumnInfo()}}, \code{\link[DBI:dbGetRowsAffected]{DBI::dbGetRowsAffected()}}, \code{\link[DBI:dbGetRowCount]{DBI::dbGetRowCount()}},
+\code{\link[DBI:dbHasCompleted]{DBI::dbHasCompleted()}}, and \code{\link[DBI:dbGetStatement]{DBI::dbGetStatement()}}.
 }
 \keyword{internal}

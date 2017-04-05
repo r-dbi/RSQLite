@@ -5,7 +5,9 @@
 #'
 #' @seealso
 #' The corresponding generic functions
-#' [DBI::dbFetch()], [DBI::dbClearResult()], and [DBI::dbBind()].
+#' [DBI::dbFetch()], [DBI::dbClearResult()], and [DBI::dbBind()],
+#' [DBI::dbColumnInfo()], [DBI::dbGetRowsAffected()], [DBI::dbGetRowCount()],
+#' [DBI::dbHasCompleted()], and [DBI::dbGetStatement()].
 #'
 #' @export
 #' @keywords internal

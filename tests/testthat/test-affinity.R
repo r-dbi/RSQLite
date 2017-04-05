@@ -1,6 +1,6 @@
 context("affinity")
 
-check_affinity <- function(affinity, type, integer_type = type) {
+check_affinity <- function(affinity, type, real_type = "numeric") {
   con <- memory_db()
   on.exit(dbDisconnect(con))
 
@@ -18,42 +18,51 @@ check_affinity <- function(affinity, type, integer_type = type) {
 
   expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 0")$a), type)
   expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 1")$a), type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 2")$a), integer_type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 3")$a), integer_type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 4")$a), integer_type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 5")$a), integer_type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 6")$a), integer_type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 7")$a), integer_type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 8")$a), integer_type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 9")$a), integer_type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 10")$a), integer_type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 2")$a), type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 3")$a), type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 4")$a), real_type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 5")$a), real_type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 6")$a), real_type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 7")$a), real_type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 8")$a), real_type)
+  expect_warning(
+    expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 9")$a), real_type),
+    if (type == "blob") NA else "coercing"
+  )
+  expect_warning(
+    expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 10")$a), real_type),
+    if (type == "blob") NA else "coercing"
+  )
 
   rs <- dbSendQuery(con, "SELECT * FROM a")
   expect_equal(class(dbFetch(rs, 0)$a), type)
   expect_equal(class(dbFetch(rs, 1)$a), type)
   expect_equal(class(dbFetch(rs, 1)$a), type)
   expect_equal(class(dbFetch(rs, 1)$a), type)
-  expect_equal(class(dbFetch(rs, 1)$a), type)
-  expect_equal(class(dbFetch(rs, 1)$a), type)
-  expect_equal(class(dbFetch(rs, 1)$a), type)
-  expect_equal(class(dbFetch(rs, 1)$a), type)
-  expect_equal(class(dbFetch(rs, 1)$a), type)
-  expect_equal(class(dbFetch(rs, 1)$a), type)
-  expect_equal(class(dbFetch(rs, 1)$a), type)
+  expect_equal(class(dbFetch(rs, 1)$a), real_type)
+  expect_equal(class(dbFetch(rs, 1)$a), real_type)
+  expect_equal(class(dbFetch(rs, 1)$a), real_type)
+  expect_equal(class(dbFetch(rs, 1)$a), real_type)
+  expect_equal(class(dbFetch(rs, 1)$a), real_type)
+  expect_warning(
+    expect_equal(class(dbFetch(rs, 1)$a), real_type),
+    if (type == "blob") NA else "coercing"
+  )
+  expect_equal(class(dbFetch(rs, 1)$a), real_type)
   dbClearResult(rs)
 }
 
 test_that("affinity checks", {
   check_affinity("INTEGER", "integer")
-  check_affinity("TEXT", "character")
+  check_affinity("TEXT", "character", "character")
   check_affinity("REAL", "numeric")
   check_affinity("INT", "integer")
-  check_affinity("CHAR", "character")
-  check_affinity("CLOB", "character")
+  check_affinity("CHAR", "character", "character")
+  check_affinity("CLOB", "character", "character")
   check_affinity("FLOA", "numeric")
   check_affinity("DOUB", "numeric")
-  check_affinity("NUMERIC", "numeric", "integer")
-  check_affinity("BLOB", "list", "integer")
+  check_affinity("NUMERIC", "numeric")
+  check_affinity("BLOB", "list", "list")
 })
 
 test_that("affinity checks for inline queries", {

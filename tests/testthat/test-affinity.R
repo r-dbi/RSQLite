@@ -1,6 +1,8 @@
 context("affinity")
 
-check_affinity <- function(affinity, type, real_type = "numeric") {
+check_affinity <- function(affinity, type,
+                           real_type = "numeric", integer_type = type,
+                           blob_type = real_type) {
   con <- memory_db()
   on.exit(dbDisconnect(con))
 
@@ -18,8 +20,8 @@ check_affinity <- function(affinity, type, real_type = "numeric") {
 
   expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 0")$a), type)
   expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 1")$a), type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 2")$a), type)
-  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 3")$a), type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 2")$a), integer_type)
+  expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 3")$a), integer_type)
   expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 4")$a), real_type)
   expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 5")$a), real_type)
   expect_equal(class(dbGetQuery(con, "SELECT * FROM a LIMIT 6")$a), real_type)
@@ -61,8 +63,8 @@ test_that("affinity checks", {
   check_affinity("CLOB", "character", "character")
   check_affinity("FLOA", "numeric")
   check_affinity("DOUB", "numeric")
-  check_affinity("NUMERIC", "numeric")
-  check_affinity("BLOB", "blob", "integer")
+  check_affinity("NUMERIC", "numeric", "numeric", "integer")
+  check_affinity("BLOB", "integer", "blob")
 })
 
 test_that("affinity checks for inline queries", {

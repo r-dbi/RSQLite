@@ -408,23 +408,6 @@ setMethod("dbListFields", c("SQLiteConnection", "character"),
 )
 
 
-#' @rdname SQLiteDriver-class
-#' @export
-setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
-  if (is.factor(obj)) return("TEXT")
-  if (is.data.frame(obj)) return(callNextMethod(dbObj, obj))
-
-  switch(typeof(obj),
-    integer = "INTEGER",
-    double = "REAL",
-    character = "TEXT",
-    logical = "INTEGER",
-    list = "BLOB",
-    raw = "TEXT",
-    stop("Unsupported type", call. = FALSE)
-  )
-})
-
 #' @rdname SQLiteConnection-class
 #' @export
 setMethod("dbDataType", "SQLiteConnection", function(dbObj, obj, ...) {

@@ -18,6 +18,23 @@ setClass("SQLiteDriver",
 
 #' @rdname SQLiteDriver-class
 #' @export
+setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
+  if (is.factor(obj)) return("TEXT")
+  if (is.data.frame(obj)) return(callNextMethod(dbObj, obj))
+
+  switch(typeof(obj),
+    integer = "INTEGER",
+    double = "REAL",
+    character = "TEXT",
+    logical = "INTEGER",
+    list = "BLOB",
+    raw = "TEXT",
+    stop("Unsupported type", call. = FALSE)
+  )
+})
+
+#' @rdname SQLiteDriver-class
+#' @export
 setMethod("dbIsValid", "SQLiteDriver", function(dbObj, ...) {
   TRUE
 })

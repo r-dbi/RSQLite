@@ -93,5 +93,5 @@ dbReadTable(con, "mtcars2")
 dbDisconnect(con)
 }
 \seealso{
-The corresponding generic functions \code{\link[DBI:dbWriteTable]{DBI::dbWriteTable()}}.
+The corresponding generic function \code{\link[DBI:dbWriteTable]{DBI::dbWriteTable()}}.
 }

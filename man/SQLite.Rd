@@ -71,6 +71,11 @@ read only mode.  Raise an error if the file does not already exist}
 \code{"unix-unix-flock"}, \code{"unix-dotfile"}, and
 \code{"unix-none"}.}
 }
+\value{
+\code{SQLite()} returns an object of class \linkS4class{SQLiteDriver}.
+
+\code{dbConnect()} returns an object of class \linkS4class{SQLiteConnection}.
+}
 \description{
 Together, \code{SQLite()} and \code{dbConnect()} allow you to connect to
 a SQLite database file. See \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}} for how to issue queries

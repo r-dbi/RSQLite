@@ -20,6 +20,8 @@ NULL
 #' @param ... In previous versions, `SQLite()` took arguments. These
 #'   have now all been moved to [dbConnect()], and any arguments here
 #'   will be ignored with a warning.
+#'
+#' @return `SQLite()` returns an object of class [SQLiteDriver-class].
 #' @import methods DBI
 SQLite <- function(...) {
   if (nargs() > 0) {
@@ -79,6 +81,8 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #'   `"unix-posix"`, `"unix-unix-afp"`,
 #'   `"unix-unix-flock"`, `"unix-dotfile"`, and
 #'   `"unix-none"`.
+#' @return `dbConnect()` returns an object of class [SQLiteConnection-class].
+#'
 #' @aliases SQLITE_RWC SQLITE_RW SQLITE_RO
 #' @export
 #' @rdname SQLite

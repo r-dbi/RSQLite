@@ -460,25 +460,7 @@ setMethod("dbListFields", c("SQLiteConnection", "character"),
 )
 
 
-#' Determine the SQL Data Type of an R object
-#'
-#' Given an object, return its SQL data type as a SQL database identifier.
-#'
-#' @seealso
-#' The corresponding generic function [DBI::dbDataType()].
-#'
-#' @param dbObj a `SQLiteConnection` or `SQLiteDriver` object
-#' @param obj an R object whose SQL type we want to determine.
-#' @param ... Needed for compatibility with generic. Otherwise ignored.
-#' @examples
-#' library(DBI)
-#' dbDataType(RSQLite::SQLite(), 1)
-#' dbDataType(RSQLite::SQLite(), 1L)
-#' dbDataType(RSQLite::SQLite(), "1")
-#' dbDataType(RSQLite::SQLite(), TRUE)
-#' dbDataType(RSQLite::SQLite(), list(raw(1)))
-#'
-#' sapply(datasets::quakes, dbDataType, dbObj = RSQLite::SQLite())
+#' @rdname SQLiteDriver-class
 #' @export
 setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
   if (is.factor(obj)) return("TEXT")

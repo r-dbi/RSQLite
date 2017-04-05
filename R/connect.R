@@ -5,7 +5,7 @@ NULL
 #' Connect to an SQLite database
 #'
 #' Together, `SQLite()` and `dbConnect()` allow you to connect to
-#' a SQLite database file. See \link{sqlite-query} for how to issue queries
+#' a SQLite database file. See [DBI::dbSendQuery()] for how to issue queries
 #' and receive results.
 #'
 #' Connections are automatically cleaned-up after they're deleted and

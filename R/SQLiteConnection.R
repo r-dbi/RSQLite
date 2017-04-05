@@ -3,6 +3,11 @@
 #' `SQLiteConnection` objects are usually created by
 #' [DBI::dbConnect()].
 #'
+#' @seealso
+#' The corresponding generic functions
+#' [DBI::dbSendQuery()], [DBI::dbGetQuery()],
+#' [DBI::dbSendStatement()], and [DBI::dbExecute()].
+#'
 #' @keywords internal
 #' @export
 setClass("SQLiteConnection",

@@ -73,7 +73,7 @@ read only mode.  Raise an error if the file does not already exist}
 }
 \description{
 Together, \code{SQLite()} and \code{dbConnect()} allow you to connect to
-a SQLite database file. See \link{sqlite-query} for how to issue queries
+a SQLite database file. See \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}} for how to issue queries
 and receive results.
 }
 \details{

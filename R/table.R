@@ -341,25 +341,8 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 )
 
 
-#' Remove a table from the database
-#'
-#' Executes the SQL `DROP TABLE`.
-#'
-#' @seealso
-#' The corresponding generic function [DBI::dbRemoveTable()].
-#'
-#' @param conn An existing \code{\linkS4class{SQLiteConnection}}
-#' @param name character vector of length 1 giving name of table to remove
-#' @param ... Needed for compatibility with generic. Otherwise ignored.
+#' @rdname SQLiteConnection-class
 #' @export
-#' @examples
-#' library(DBI)
-#' con <- dbConnect(RSQLite::SQLite())
-#' dbWriteTable(con, "test", data.frame(a = 1))
-#' dbListTables(con)
-#' dbRemoveTable(con, "test")
-#' dbListTables(con)
-#' dbDisconnect(con)
 setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
   function(conn, name, ...) {
     name <- check_quoted_identifier(name)

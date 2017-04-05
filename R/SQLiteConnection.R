@@ -7,7 +7,8 @@
 #' The corresponding generic functions
 #' [DBI::dbSendQuery()], [DBI::dbGetQuery()],
 #' [DBI::dbSendStatement()], [DBI::dbExecute()],
-#' [DBI::dbExistsTable()], [DBI::dbListTables()], and [DBI::dbListFields()].
+#' [DBI::dbExistsTable()], [DBI::dbListTables()], [DBI::dbListFields()],
+#' and [DBI::dbRemoveTable()].
 #'
 #' @keywords internal
 #' @export

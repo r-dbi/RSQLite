@@ -9,6 +9,7 @@
 \alias{dbIsValid,SQLiteConnection-method}
 \alias{dbGetException,SQLiteConnection-method}
 \alias{dbSendQuery,SQLiteConnection,character-method}
+\alias{dbRemoveTable,SQLiteConnection,character-method}
 \alias{dbExistsTable,SQLiteConnection,character-method}
 \alias{dbListTables,SQLiteConnection-method}
 \alias{dbListFields,SQLiteConnection,character-method}
@@ -28,6 +29,8 @@
 \S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement,
   params = NULL, ...)
 
+\S4method{dbRemoveTable}{SQLiteConnection,character}(conn, name, ...)
+
 \S4method{dbExistsTable}{SQLiteConnection,character}(conn, name, ...)
 
 \S4method{dbListTables}{SQLiteConnection}(conn, ...)
@@ -44,6 +47,7 @@
 The corresponding generic functions
 \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}}, \code{\link[DBI:dbGetQuery]{DBI::dbGetQuery()}},
 \code{\link[DBI:dbSendStatement]{DBI::dbSendStatement()}}, \code{\link[DBI:dbExecute]{DBI::dbExecute()}},
-\code{\link[DBI:dbExistsTable]{DBI::dbExistsTable()}}, \code{\link[DBI:dbListTables]{DBI::dbListTables()}}, and \code{\link[DBI:dbListFields]{DBI::dbListFields()}}.
+\code{\link[DBI:dbExistsTable]{DBI::dbExistsTable()}}, \code{\link[DBI:dbListTables]{DBI::dbListTables()}}, \code{\link[DBI:dbListFields]{DBI::dbListFields()}},
+and \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}}.
 }
 \keyword{internal}

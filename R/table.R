@@ -477,7 +477,7 @@ setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
   )
 })
 
-#' @rdname dbDataType-SQLiteDriver-method
+#' @rdname SQLiteConnection-class
 #' @export
 setMethod("dbDataType", "SQLiteConnection", function(dbObj, obj, ...) {
   dbDataType(SQLite(), obj, ...)

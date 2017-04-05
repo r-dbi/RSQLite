@@ -25,6 +25,10 @@ ColumnStorage* ColumnStorage::append_col() {
   return append_data();
 }
 
+DATA_TYPE ColumnStorage::get_item_data_type() const {
+  return source.get_data_type();
+}
+
 DATA_TYPE ColumnStorage::get_data_type() const {
   if (dt == DT_UNKNOWN) return source.get_decl_data_type();
   return dt;
@@ -81,7 +85,9 @@ void ColumnStorage::fill_default_value() {
 ColumnStorage* ColumnStorage::append_data() {
   if (dt == DT_UNKNOWN) return append_data_to_new(dt);
   if (i >= get_capacity()) return append_data_to_new(dt);
-  if (dt == DT_INT && source.get_data_type() == DT_INT64) return append_data_to_new(DT_INT64);
+  DATA_TYPE new_dt = source.get_data_type();
+  if (dt == DT_INT && new_dt == DT_INT64) return append_data_to_new(DT_INT64);
+  if (dt == DT_INT && new_dt == DT_REAL) return append_data_to_new(DT_REAL);
 
   fetch_value();
   ++i;
@@ -214,7 +220,15 @@ void ColumnStorage::copy_value(SEXP x, DATA_TYPE dt, const int tgt, const int sr
       break;
 
     case DT_REAL:
-      REAL(x)[tgt] = REAL(data)[src];
+      switch (TYPEOF(data)) {
+      case INTSXP:
+        REAL(x)[tgt] = INTEGER(data)[src];
+        break;
+
+      case REALSXP:
+        REAL(x)[tgt] = REAL(data)[src];
+        break;
+      }
       break;
 
     case DT_STRING:

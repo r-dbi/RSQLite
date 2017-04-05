@@ -21,6 +21,7 @@ public:
 public:
   ColumnStorage* append_col();
 
+  DATA_TYPE get_item_data_type() const;
   DATA_TYPE get_data_type() const;
   static SEXP allocate(const int length, DATA_TYPE dt);
   int copy_to(SEXP x, DATA_TYPE dt, const int pos) const;

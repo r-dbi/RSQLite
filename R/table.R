@@ -11,7 +11,7 @@ NULL
 #'
 #' @export
 #' @rdname dbWriteTable
-#' @param con,conn a \code{\linkS4class{SQLiteConnection}} object, produced by
+#' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
 #'   [DBI::dbConnect()]
 #' @param name a character string specifying a table name. SQLite table names
 #'   are \emph{not} case sensitive, e.g., table names `ABC` and `abc`

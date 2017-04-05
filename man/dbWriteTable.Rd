@@ -16,6 +16,9 @@
   sep = ",", eol = "\\n", skip = 0, temporary = FALSE)
 }
 \arguments{
+\item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
+\code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
+
 \item{name}{a character string specifying a table name. SQLite table names
 are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc}
 are considered equal.}
@@ -62,9 +65,6 @@ defaults when imputing classes from on-disk file.}
 \item{eol}{The end-of-line delimiter, defaults to \code{'\n'}.}
 
 \item{skip}{number of lines to skip before reading the data. Defaults to 0.}
-
-\item{con, conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
-\code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
 }
 \description{
 Functions for writing data frames or delimiter-separated files

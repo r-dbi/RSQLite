@@ -16,7 +16,7 @@ setClass("SQLiteConnection",
     ref = "environment"
   )
 )
-#' @rdname hidden_aliases
+#' @rdname SQLiteConnection-class
 #' @export
 setMethod("dbQuoteIdentifier", c("SQLiteConnection", "character"), function(conn, x, ...) {
   if (any(is.na(x))) {
@@ -31,7 +31,7 @@ setMethod("dbQuoteIdentifier", c("SQLiteConnection", "character"), function(conn
   }
 })
 
-#' @rdname hidden_aliases
+#' @rdname SQLiteConnection-class
 #' @export
 setMethod("dbQuoteIdentifier", c("SQLiteConnection", "SQL"), function(conn, x, ...) {
   SQL(x)

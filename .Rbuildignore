@@ -8,8 +8,8 @@ a.out.dSYM
 ^\.travis\.yml$
 ^cran-comments\.md$
 ^data-raw$
-^src/sqlite3/.*\.o$
-^src/sqlite3/.*\.a$
+^src/sqlite3/vendor/.*\.o$
+^src/sqlite3/vendor/.*\.a$
 ^appveyor\.yml$
 ^revdep$
 ^src/.*\.d$

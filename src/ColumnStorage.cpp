@@ -25,6 +25,10 @@ ColumnStorage* ColumnStorage::append_col() {
   return append_data();
 }
 
+DATA_TYPE ColumnStorage::get_item_data_type() const {
+  return source.get_data_type();
+}
+
 DATA_TYPE ColumnStorage::get_data_type() const {
   if (dt == DT_UNKNOWN) return source.get_decl_data_type();
   return dt;

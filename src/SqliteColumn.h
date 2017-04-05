@@ -15,6 +15,7 @@ private:
   boost::shared_ptr<SqliteColumnDataSource> source;
   boost::ptr_vector<ColumnStorage> storage;
   int i, n;
+  std::set<DATA_TYPE> data_types_seen;
 
 public:
   SqliteColumn(DATA_TYPE dt_, int n_max_, sqlite3_stmt* stmt_, int j_);
@@ -23,9 +24,11 @@ public:
 public:
   void set_col_value();
   void finalize(const int n_);
+  void warn_type_conflicts(const String& name) const;
 
   operator SEXP() const;
   DATA_TYPE get_type() const;
+  static const char* format_data_type(const DATA_TYPE dt);
 
 private:
   ColumnStorage* get_last_storage();

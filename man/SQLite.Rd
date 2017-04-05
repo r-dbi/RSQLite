@@ -3,6 +3,8 @@
 \docType{methods}
 \name{SQLite}
 \alias{SQLite}
+\alias{RSQLite}
+\alias{RSQLite-package}
 \alias{dbConnect,SQLiteDriver-method}
 \alias{SQLITE_RWC}
 \alias{SQLITE_RW}

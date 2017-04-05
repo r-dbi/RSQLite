@@ -23,6 +23,7 @@ NULL
 #'
 #' @return `SQLite()` returns an object of class [SQLiteDriver-class].
 #' @import methods DBI
+#' @aliases RSQLite RSQLite-package
 SQLite <- function(...) {
   if (nargs() > 0) {
     warning("All arguments to RSQLite Driver are ignored.", call. = FALSE)

@@ -33,7 +33,7 @@ LinkingTo: Rcpp, BH, plogr
 Remotes:
     rstats-db/DBI@production,
     rstats-db/DBItest@production,
-    tidyverse/blob#5
+    tidyverse/blob
 Encoding: UTF-8
 License: LGPL (>= 2)
 URL: https://github.com/rstats-db/RSQLite

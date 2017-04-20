@@ -9,6 +9,7 @@ DBItest::test_all(c(
   # connection
   "get_info_connection",                        # #117
   "cannot_disconnect_twice",                    # TODO
+  "cannot_forget_disconnect",
 
   # result
   "fetch_no_return_value",                      # need to warn when fetching statement

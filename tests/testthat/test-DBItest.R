@@ -1,6 +1,6 @@
 DBItest::test_all(c(
   # enable to test a particular test only
-  #"(?!data_timestamp_current).*$",
+  #"(?!data_timestamp_current).*",
 
   # driver
   "get_info_driver",                            # #117

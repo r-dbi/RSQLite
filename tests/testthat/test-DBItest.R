@@ -9,6 +9,7 @@ DBItest::test_all(c(
   "get_info_connection",                        # #117
   "cannot_disconnect_twice",                    # TODO
   "cannot_forget_disconnect",
+  "quote_identifier_special",                   # empty column name
 
   # result
   "fetch_no_return_value",                      # need to warn when fetching statement
@@ -20,6 +21,7 @@ DBItest::test_all(c(
   "data_raw",                                   #
   "data_logical",                               # not an error, no logical data type
   "bind_blob",
+  "bind_factor",
 
   # sql
   "roundtrip_date",                             # #109

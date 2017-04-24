@@ -22,6 +22,7 @@ DBItest::test_all(c(
   "data_logical",                               # not an error, no logical data type
   "bind_blob",
   "bind_factor",
+  "bind_named_param_unnamed_placeholders",
 
   # sql
   "roundtrip_date",                             # #109

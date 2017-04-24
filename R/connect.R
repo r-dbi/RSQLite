@@ -113,6 +113,8 @@ setMethod("dbConnect", "SQLiteDriver",
       dbname <- normalizePath(dbname, mustWork = FALSE)
     }
 
+    dbname <- enc2utf8(dbname)
+
     vfs <- check_vfs(vfs)
     stopifnot(is.integer(flags), length(flags) == 1)
 

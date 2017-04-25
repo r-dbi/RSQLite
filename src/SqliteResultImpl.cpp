@@ -103,6 +103,7 @@ int SqliteResultImpl::nrows() {
 }
 
 int SqliteResultImpl::rows_affected() {
+  if (!ready_) return NA_INTEGER;
   return rows_affected_;
 }
 

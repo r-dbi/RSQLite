@@ -47,6 +47,7 @@ Collate:
     'copy.R'
     'datasetsDb.R'
     'deprecated.R'
+    'export.R'
     'extensions.R'
     'query.R'
     'rownames.R'

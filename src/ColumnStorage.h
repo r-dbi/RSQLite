@@ -15,7 +15,7 @@ class ColumnStorage {
   const SqliteColumnDataSource& source;
 
 public:
-  ColumnStorage(DATA_TYPE dt_, const int capacity_, const int n_max_, const SqliteColumnDataSource& source_);
+  ColumnStorage(DATA_TYPE dt_, const R_xlen_t capacity_, const int n_max_, const SqliteColumnDataSource& source_);
   ~ColumnStorage();
 
 public:
@@ -23,13 +23,13 @@ public:
 
   DATA_TYPE get_item_data_type() const;
   DATA_TYPE get_data_type() const;
-  static SEXP allocate(const int length, DATA_TYPE dt);
+  static SEXP allocate(const R_xlen_t length, DATA_TYPE dt);
   int copy_to(SEXP x, DATA_TYPE dt, const int pos) const;
 
 private:
   // append_col()
   R_xlen_t get_capacity() const;
-  int get_new_capacity(const R_xlen_t desired_capacity) const;
+  R_xlen_t get_new_capacity(const R_xlen_t desired_capacity) const;
 
   ColumnStorage* append_null();
   void fill_default_value();

@@ -15,7 +15,7 @@ SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt_, std::vector<std::string> n
 {
   data.reserve(types_.size());
   for (size_t j = 0; j < types_.size(); ++j) {
-    SqliteColumn x(types_[j], n_max, stmt, j);
+    SqliteColumn x(types_[j], n_max, stmt, (int)j);
     data.push_back(x);
   }
 }

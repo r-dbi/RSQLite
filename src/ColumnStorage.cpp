@@ -6,7 +6,7 @@
 
 using namespace Rcpp;
 
-ColumnStorage::ColumnStorage(DATA_TYPE dt_, const int capacity_, const int n_max_,
+ColumnStorage::ColumnStorage(DATA_TYPE dt_, const R_xlen_t capacity_, const int n_max_,
                              const SqliteColumnDataSource& source_)
   :
   i(0),
@@ -34,7 +34,7 @@ DATA_TYPE ColumnStorage::get_data_type() const {
   return dt;
 }
 
-SEXP ColumnStorage::allocate(const int length, DATA_TYPE dt) {
+SEXP ColumnStorage::allocate(const R_xlen_t length, DATA_TYPE dt) {
   SEXPTYPE type = sexptype_from_datatype(dt);
   RObject class_ = class_from_datatype(dt);
 
@@ -62,7 +62,7 @@ R_xlen_t ColumnStorage::get_capacity() const {
   return Rf_xlength(data);
 }
 
-int ColumnStorage::get_new_capacity(const R_xlen_t desired_capacity) const {
+R_xlen_t ColumnStorage::get_new_capacity(const R_xlen_t desired_capacity) const {
   if (n_max < 0) {
     const R_xlen_t MIN_DATA_CAPACITY = 100;
     return std::max(desired_capacity, MIN_DATA_CAPACITY);
@@ -194,6 +194,9 @@ void ColumnStorage::fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i) {
   case DT_BLOB:
     SET_VECTOR_ELT(data, i, R_NilValue);
     break;
+
+  case DT_UNKNOWN:
+    stop("Not setting value for unknown data type");
   }
 }
 

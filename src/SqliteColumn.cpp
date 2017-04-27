@@ -42,6 +42,9 @@ void SqliteColumn::warn_type_conflicts(const String& name) const {
   case DT_INT64:
     my_data_types_seen.erase(DT_INT);
     break;
+
+  default:
+    break;
   }
 
   my_data_types_seen.erase(DT_UNKNOWN);

@@ -60,8 +60,10 @@ SqliteResultImpl::~SqliteResultImpl() {
 sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
   sqlite3_stmt* stmt = NULL;
 
-  int rc = sqlite3_prepare_v2(conn, sql.c_str(), sql.size() + 1,
-                              &stmt, NULL);
+  int rc = sqlite3_prepare_v2(
+    conn, sql.c_str(), (int)std::min(sql.size() + 1, (size_t)INT_MAX),
+    &stmt, NULL
+  );
   if (rc != SQLITE_OK) {
     raise_sqlite_exception(conn);
   }
@@ -72,7 +74,7 @@ sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
 // We guess the correct R type for each column from the declared column type,
 // if possible.  The type of the column can be amended as new values come in,
 // but will be fixed after the first call to fetch().
-std::vector<DATA_TYPE> SqliteResultImpl::get_initial_field_types(const int ncols) {
+std::vector<DATA_TYPE> SqliteResultImpl::get_initial_field_types(const size_t ncols) {
   std::vector<DATA_TYPE> types(ncols);
   std::fill(types.begin(), types.end(), DT_UNKNOWN);
   return types;
@@ -108,7 +110,7 @@ int SqliteResultImpl::rows_affected() {
 }
 
 IntegerVector SqliteResultImpl::find_params_impl(const CharacterVector& param_names) {
-  int p = param_names.length();
+  R_xlen_t p = param_names.length();
   IntegerVector res(p);
 
   for (int j = 0; j < p; ++j) {
@@ -168,7 +170,7 @@ List SqliteResultImpl::get_column_info_impl() {
   CharacterVector names(cache.names_.begin(), cache.names_.end());
 
   CharacterVector types(cache.ncols_);
-  for (int i = 0; i < cache.ncols_; i++) {
+  for (size_t i = 0; i < cache.ncols_; i++) {
     types[i] = Rf_type2char(types_[i]);
   }
 
@@ -181,7 +183,7 @@ List SqliteResultImpl::get_column_info_impl() {
 
 void SqliteResultImpl::set_params(const List& params) {
   params_ = params;
-  CharacterVector names = params.names();
+  CharacterVector names = CharacterVector(params.names());
 
   param_cache.names_.clear();
   if (names.length() == 0) {
@@ -202,7 +204,7 @@ bool SqliteResultImpl::bind_row() {
   sqlite3_clear_bindings(stmt);
 
   for (size_t j = 0; j < param_cache.names_.size(); ++j) {
-    bind_parameter(j, param_cache.names_[j], params_[j]);
+    bind_parameter((int)j, param_cache.names_[j], params_[j]);
   }
 
   return true;

@@ -3,17 +3,23 @@
 \docType{class}
 \name{SQLiteDriver-class}
 \alias{SQLiteDriver-class}
+\alias{dbDataType,SQLiteDriver-method}
 \alias{dbIsValid,SQLiteDriver-method}
 \alias{dbUnloadDriver,SQLiteDriver-method}
 \title{Class SQLiteDriver (and methods)}
 \usage{
+\S4method{dbDataType}{SQLiteDriver}(dbObj, obj, ...)
+
 \S4method{dbIsValid}{SQLiteDriver}(dbObj, ...)
 
 \S4method{dbUnloadDriver}{SQLiteDriver}(drv, ...)
 }
 \description{
-The SQLiteDriver, which is used to select the correct method in
-\code{\link[=dbConnect]{dbConnect()}}. See more details in \code{\link[=SQLite]{SQLite()}}.
-It is used purely for dispatch and \code{\link[=dbUnloadDriver]{dbUnloadDriver()}} is a null-op.
+SQLiteDriver objects are created by \code{\link[=SQLite]{SQLite()}}, and used to select the
+correct method in \code{\link[=dbConnect]{dbConnect()}}.
+They are a superclass of the \linkS4class{DBIDriver} class,
+and used purely for dispatch.
+The "Usage" section lists the class methods overridden by \pkg{RSQLite}.
+The \code{\link[=dbUnloadDriver]{dbUnloadDriver()}} method is a null-op.
 }
 \keyword{internal}

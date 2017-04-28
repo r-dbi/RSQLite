@@ -1,14 +1,15 @@
 DBItest::test_all(c(
   # enable to test a particular test only
-  #"(?!data_timestamp_current).*$",
+  #"(?!data_timestamp_current).*",
 
   # driver
-  "constructor_strict",                         # relaxed constructor check still active
   "get_info_driver",                            # #117
 
   # connection
   "get_info_connection",                        # #117
   "cannot_disconnect_twice",                    # TODO
+  "cannot_forget_disconnect",
+  "quote_identifier_special",                   # empty column name
 
   # result
   "fetch_no_return_value",                      # need to warn when fetching statement
@@ -19,10 +20,11 @@ DBItest::test_all(c(
   "get_query_n_.*",                             # rstats-db/DBI#76
   "data_raw",                                   #
   "data_logical",                               # not an error, no logical data type
-  "data_logical_null_.*",                       # not an error, no logical data type
+  "bind_blob",
+  "bind_factor",
+  "bind_named_param_unnamed_placeholders",
 
   # sql
-  "append_table_error",                         # #112
   "roundtrip_date",                             # #109
   "roundtrip_timestamp",                        # #110
   "read_table_error",                           #
@@ -33,11 +35,6 @@ DBItest::test_all(c(
   # meta
   "get_statement_error",                        #
   "get_info_result",                            # rstats-db/DBI#55
-  "bind_empty",                                 #
-  "bind_logical.*",                             # not an error, no logical data type
-  "bind_date.*",                                # #114
-  "bind_timestamp.*",                           # #114
-  "read_only",                                  # default connection is read-write
 
   # transactions
   "begin_write_disconnect",                     #

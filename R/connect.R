@@ -5,7 +5,7 @@ NULL
 #' Connect to an SQLite database
 #'
 #' Together, `SQLite()` and `dbConnect()` allow you to connect to
-#' a SQLite database file. See \link{sqlite-query} for how to issue queries
+#' a SQLite database file. See [DBI::dbSendQuery()] for how to issue queries
 #' and receive results.
 #'
 #' Connections are automatically cleaned-up after they're deleted and
@@ -20,17 +20,16 @@ NULL
 #' @param ... In previous versions, `SQLite()` took arguments. These
 #'   have now all been moved to [dbConnect()], and any arguments here
 #'   will be ignored with a warning.
+#'
+#' @return `SQLite()` returns an object of class [SQLiteDriver-class].
 #' @import methods DBI
+#' @aliases RSQLite RSQLite-package
 SQLite <- function(...) {
   if (nargs() > 0) {
     warning("All arguments to RSQLite Driver are ignored.", call. = FALSE)
   }
   new("SQLiteDriver")
 }
-
-#' @export
-#' @rawNamespace exportMethods(dbDriver)
-DBI::dbDriver
 
 # From https://www.sqlite.org/c3ref/c_open_autoproxy.html
 #' @export
@@ -79,6 +78,8 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #'   `"unix-posix"`, `"unix-unix-afp"`,
 #'   `"unix-unix-flock"`, `"unix-dotfile"`, and
 #'   `"unix-none"`.
+#' @return `dbConnect()` returns an object of class [SQLiteConnection-class].
+#'
 #' @aliases SQLITE_RWC SQLITE_RW SQLITE_RO
 #' @export
 #' @rdname SQLite
@@ -112,6 +113,8 @@ setMethod("dbConnect", "SQLiteDriver",
       dbname <- normalizePath(dbname, mustWork = FALSE)
     }
 
+    dbname <- enc2utf8(dbname)
+
     vfs <- check_vfs(vfs)
     stopifnot(is.integer(flags), length(flags) == 1)
 
@@ -127,12 +130,26 @@ setMethod("dbConnect", "SQLiteDriver",
     ## experimental PRAGMAs
     if (!is.null(cache_size)) {
       cache_size <- as.integer(cache_size)
-      try(dbGetQuery(con, sprintf("PRAGMA cache_size=%d", cache_size)))
+      tryCatch(
+        dbExecute(con, sprintf("PRAGMA cache_size=%d", cache_size)),
+        error = function(e) {
+          warning("Couldn't set cache size: ", conditionMessage(e), "\n",
+            "Use `cache_size` = NULL to turn off this warning.",
+            call. = FALSE)
+        }
+      )
     }
 
     if (!is.null(synchronous)) {
       synchronous <- match.arg(synchronous, c("off", "normal", "full"))
-      try(dbGetQuery(con, sprintf("PRAGMA synchronous=%s", synchronous)))
+      tryCatch(
+        dbExecute(con, sprintf("PRAGMA synchronous=%s", synchronous)),
+        error = function(e) {
+          warning("Couldn't set synchronous mode: ", conditionMessage(e), "\n",
+                  "Use `synchronous` = NULL to turn off this warning.",
+                  call. = FALSE)
+        }
+      )
     }
 
     con

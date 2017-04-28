@@ -6,7 +6,7 @@
 
 using namespace Rcpp;
 
-ColumnStorage::ColumnStorage(DATA_TYPE dt_, const int capacity_, const int n_max_,
+ColumnStorage::ColumnStorage(DATA_TYPE dt_, const R_xlen_t capacity_, const int n_max_,
                              const SqliteColumnDataSource& source_)
   :
   i(0),
@@ -25,12 +25,16 @@ ColumnStorage* ColumnStorage::append_col() {
   return append_data();
 }
 
+DATA_TYPE ColumnStorage::get_item_data_type() const {
+  return source.get_data_type();
+}
+
 DATA_TYPE ColumnStorage::get_data_type() const {
   if (dt == DT_UNKNOWN) return source.get_decl_data_type();
   return dt;
 }
 
-SEXP ColumnStorage::allocate(const int length, DATA_TYPE dt) {
+SEXP ColumnStorage::allocate(const R_xlen_t length, DATA_TYPE dt) {
   SEXPTYPE type = sexptype_from_datatype(dt);
   RObject class_ = class_from_datatype(dt);
 
@@ -58,7 +62,7 @@ R_xlen_t ColumnStorage::get_capacity() const {
   return Rf_xlength(data);
 }
 
-int ColumnStorage::get_new_capacity(const R_xlen_t desired_capacity) const {
+R_xlen_t ColumnStorage::get_new_capacity(const R_xlen_t desired_capacity) const {
   if (n_max < 0) {
     const R_xlen_t MIN_DATA_CAPACITY = 100;
     return std::max(desired_capacity, MIN_DATA_CAPACITY);
@@ -81,7 +85,9 @@ void ColumnStorage::fill_default_value() {
 ColumnStorage* ColumnStorage::append_data() {
   if (dt == DT_UNKNOWN) return append_data_to_new(dt);
   if (i >= get_capacity()) return append_data_to_new(dt);
-  if (dt == DT_INT && source.get_data_type() == DT_INT64) return append_data_to_new(DT_INT64);
+  DATA_TYPE new_dt = source.get_data_type();
+  if (dt == DT_INT && new_dt == DT_INT64) return append_data_to_new(DT_INT64);
+  if (dt == DT_INT && new_dt == DT_REAL) return append_data_to_new(DT_REAL);
 
   fetch_value();
   ++i;
@@ -155,6 +161,9 @@ Rcpp::RObject ColumnStorage::class_from_datatype(DATA_TYPE dt) {
   case DT_INT64:
     return CharacterVector::create("integer64");
 
+  case DT_BLOB:
+    return CharacterVector::create("blob");
+
   default:
     return R_NilValue;
   }
@@ -185,6 +194,9 @@ void ColumnStorage::fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i) {
   case DT_BLOB:
     SET_VECTOR_ELT(data, i, R_NilValue);
     break;
+
+  case DT_UNKNOWN:
+    stop("Not setting value for unknown data type");
   }
 }
 
@@ -211,7 +223,15 @@ void ColumnStorage::copy_value(SEXP x, DATA_TYPE dt, const int tgt, const int sr
       break;
 
     case DT_REAL:
-      REAL(x)[tgt] = REAL(data)[src];
+      switch (TYPEOF(data)) {
+      case INTSXP:
+        REAL(x)[tgt] = INTEGER(data)[src];
+        break;
+
+      case REALSXP:
+        REAL(x)[tgt] = REAL(data)[src];
+        break;
+      }
       break;
 
     case DT_STRING:

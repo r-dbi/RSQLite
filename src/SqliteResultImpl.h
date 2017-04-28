@@ -15,7 +15,7 @@ private:
   // Cache
   struct _cache {
     const std::vector<std::string> names_;
-    const int ncols_;
+    const size_t ncols_;
     const int nparams_;
 
     _cache(sqlite3_stmt* stmt);
@@ -42,7 +42,7 @@ public:
 
 private:
   static sqlite3_stmt* prepare(sqlite3* conn, const std::string& sql);
-  static std::vector<DATA_TYPE> get_initial_field_types(const int ncols);
+  static std::vector<DATA_TYPE> get_initial_field_types(const size_t ncols);
   void after_bind(bool params_have_rows);
   void init(bool params_have_rows);
 
@@ -51,7 +51,6 @@ public:
   int nrows();
   int rows_affected();
   IntegerVector find_params_impl(const CharacterVector& param_names);
-  void bind_impl(const List& params);
   void bind_rows_impl(const List& params);
   List fetch_impl(const int n_max);
   List get_column_info_impl();

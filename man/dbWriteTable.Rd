@@ -4,7 +4,6 @@
 \name{dbWriteTable,SQLiteConnection,character,data.frame-method}
 \alias{dbWriteTable,SQLiteConnection,character,data.frame-method}
 \alias{dbWriteTable,SQLiteConnection,character,character-method}
-\alias{sqlData,SQLiteConnection-method}
 \title{Write a local data frame or file to the database}
 \usage{
 \S4method{dbWriteTable}{SQLiteConnection,character,data.frame}(conn, name,
@@ -15,10 +14,11 @@
   ..., field.types = NULL, overwrite = FALSE, append = FALSE,
   header = TRUE, colClasses = NA, row.names = FALSE, nrows = 50,
   sep = ",", eol = "\\n", skip = 0, temporary = FALSE)
-
-\S4method{sqlData}{SQLiteConnection}(con, value, row.names = NA, ...)
 }
 \arguments{
+\item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
+\code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
+
 \item{name}{a character string specifying a table name. SQLite table names
 are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc}
 are considered equal.}
@@ -65,15 +65,10 @@ defaults when imputing classes from on-disk file.}
 \item{eol}{The end-of-line delimiter, defaults to \code{'\n'}.}
 
 \item{skip}{number of lines to skip before reading the data. Defaults to 0.}
-
-\item{con, conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
-\code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
 }
 \description{
 Functions for writing data frames or delimiter-separated files
 to database tables.
-\code{sqlData()} is mostly useful to backend implementers,
-but must be documented here.
 }
 \details{
 In a primary key column qualified with
@@ -98,5 +93,5 @@ dbReadTable(con, "mtcars2")
 dbDisconnect(con)
 }
 \seealso{
-The corresponding generic functions \code{\link[DBI:dbWriteTable]{DBI::dbWriteTable()}} and \code{\link[DBI:sqlData]{DBI::sqlData()}}.
+The corresponding generic function \code{\link[DBI:dbWriteTable]{DBI::dbWriteTable()}}.
 }

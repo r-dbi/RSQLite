@@ -27,7 +27,7 @@ XPtr<SqliteConnectionPtr> rsqlite_connect(
 
 // [[Rcpp::export]]
 void rsqlite_disconnect(XPtr<SqliteConnectionPtr>& con) {
-  int n = con->use_count();
+  long n = con->use_count();
   if (n > 1) {
     warning(
       "There are %i result in use. The connection will be released when they are closed",

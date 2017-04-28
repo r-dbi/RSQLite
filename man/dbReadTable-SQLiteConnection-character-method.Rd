@@ -6,7 +6,7 @@
 \title{Read a database table}
 \usage{
 \S4method{dbReadTable}{SQLiteConnection,character}(conn, name, ...,
-  row.names = NA, check.names = TRUE, select.cols = "*")
+  row.names = NA, check.names = TRUE, select.cols = NULL)
 }
 \arguments{
 \item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
@@ -32,9 +32,7 @@ For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
 \item{check.names}{If \code{TRUE}, the default, column names will be
 converted to valid R identifiers.}
 
-\item{select.cols}{A SQL expression (in the form of a character vector of
-length 1) giving the columns to select. E.g. \code{"*"} selects all columns,
-\code{"x, y, z"} selects three columns named as listed.}
+\item{select.cols}{Deprecated, do not use.}
 }
 \value{
 A data frame.
@@ -51,8 +49,6 @@ library(DBI)
 db <- RSQLite::datasetsDb()
 dbReadTable(db, "mtcars")
 dbReadTable(db, "mtcars", row.names = FALSE)
-dbReadTable(db, "mtcars", select.cols = "cyl, gear")
-dbReadTable(db, "mtcars", select.cols = "row_names, cyl, gear")
 dbDisconnect(db)
 }
 \seealso{

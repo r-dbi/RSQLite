@@ -177,7 +177,7 @@ setMethod("dbGetPreparedQuery",
 #' @keywords internal
 #' @export
 sqliteQuickColumn <- function(con, table, column) {
-  dbReadTable(con, table, select.cols = column, row.names = FALSE)[[1]]
+  dbGetQuery(con, paste("SELECT ", column, " FROM ", table), row.names = FALSE)[[1]]
 }
 
 #' Get metadata about a database object

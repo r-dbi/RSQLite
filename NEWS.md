@@ -1,3 +1,27 @@
+## RSQLite 1.1-14 (2017-04-28)
+
+- C++ code now compiles with strict compiler settings `-Wall -Wextra -pedantic -Wconversion`.
+- All methods of DBI are reexported.
+- `dbGetRowsAffected()` now returns `NA` for a statement with placeholders, if `dbBind()` has not been called.
+- Use UTF-8 encoded file names as required by the SQLite API, to support non-ASCII file names (#211).
+- Calling `dbFetch(n = 0)` instead of `dbFetch(n = 1)` in `dbListFields()`.
+- Remove redundant documentation, link to `DBI` more prominently (#186).
+- Remove redundant reexports of `dbDriver()` and `dbGetQuery()`.
+- The `name` argument to `dbBegin()`, `dbCommit()`, and `dbRollback()` is now declared after the ellipsis. Code that calls these methods with an unnamed second argument still works but receives a warning (#208).
+- If a column contains incompatible values (e.g., numbers and strings), a warning is raised in `dbFetch()` (#161).
+- Now returning objects of type `blob` for blobs (#189).
+- Fix Travis errors.
+- The `select.cols` argument to `dbReadTable()` is deprecated, use `dbGetQuery()` with a `SELECT` query instead (#185).
+- SQLite collects additional histogram data during `ANALYZE`, which may lead to faster executions of queries (#124).
+- Failing to set `PRAGMA cache_size` or `PRAGMA synchronous` in `dbConnect()` now gives a clear warning (#197).
+- Fix `dbBind()` behavior and tests. Attempting to bind to a query without parameters throws an error (#114).
+- The methods related to tables (`dbReadTable()`, `dbWriteTable()`, `dbExistsTable()`, and `dbRemoveTable()`) always treat the `name` argument as literal name, even if it contains backticks. This breaks the CRAN version (but not the GitHub version) of the sqldf package (#188).
+- Identifiers are now escaped with backticks, to avoid ambiguous handling of double quotes in the context of strings (#123).
+- Fix corner case when repeatedly fetching from columns that don't have an affinity.
+- Registering native functions, as required by R >= 3.4.0.
+- Improve warning message if named parameters are not used in `dbGetPreparedQuery()` or `dbSendPreparedQuery()` (#193).
+
+
 ## RSQLite 1.1-13 (2017-04-03)
 
 - `dbWriteTable(append = TRUE)` raises an error if column names are not the same in the data and the existing table (#165).

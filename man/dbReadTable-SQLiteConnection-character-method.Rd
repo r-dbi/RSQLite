@@ -6,7 +6,8 @@
 \title{Read a database table}
 \usage{
 \S4method{dbReadTable}{SQLiteConnection,character}(conn, name, ...,
-  row.names = NA, check.names = TRUE, select.cols = NULL)
+  row.names = pkgconfig::get_config("RSQLite::row.names.table", FALSE),
+  check.names = TRUE, select.cols = NULL)
 }
 \arguments{
 \item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by

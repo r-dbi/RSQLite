@@ -63,7 +63,8 @@ db_bind <- function(res, params, ..., allow_named_superset) {
 
 #' @export
 #' @rdname SQLiteResult-class
-setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ..., row.names = NA) {
+setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ...,
+                                              row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE)) {
   row.names <- compatRowNames(row.names)
   if (n < -1) stop("n must be nonnegative or -1 in dbFetch()", call. = FALSE)
   if (is.infinite(n)) n <- -1

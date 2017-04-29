@@ -57,7 +57,9 @@ NULL
 #'
 #' dbDisconnect(con)
 setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
-  function(conn, name, value, ..., row.names = NA, overwrite = FALSE, append = FALSE,
+  function(conn, name, value, ...,
+           row.names = pkgconfig::get_config("RSQLite::row.names.table", FALSE),
+           overwrite = FALSE, append = FALSE,
            field.types = NULL, temporary = FALSE) {
 
     if (overwrite && append)
@@ -233,7 +235,9 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 
 #' @rdname SQLiteConnection-class
 #' @export
-setMethod("sqlData", "SQLiteConnection", function(con, value, row.names = NA, ...) {
+setMethod("sqlData", "SQLiteConnection", function(con, value,
+                                                  row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE),
+                                                  ...) {
   value <- sql_data(value, row.names)
   value <- quote_string(value, con)
 
@@ -314,7 +318,9 @@ check_quoted_identifier <- function(name) {
 #' dbReadTable(db, "mtcars", row.names = FALSE)
 #' dbDisconnect(db)
 setMethod("dbReadTable", c("SQLiteConnection", "character"),
-  function(conn, name, ..., row.names = NA, check.names = TRUE, select.cols = NULL) {
+  function(conn, name, ...,
+           row.names = pkgconfig::get_config("RSQLite::row.names.table", FALSE),
+           check.names = TRUE, select.cols = NULL) {
     name <- check_quoted_identifier(name)
 
     row.names <- compatRowNames(row.names)

@@ -6,7 +6,7 @@
 \title{Build the SQL CREATE TABLE definition as a string}
 \usage{
 sqliteBuildTableDefinition(con, name, value, field.types = NULL,
-  row.names = NA)
+  row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE))
 }
 \arguments{
 \item{name}{Name of the new SQL table}

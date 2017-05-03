@@ -60,10 +60,11 @@ SqliteResultImpl::~SqliteResultImpl() {
 sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
   sqlite3_stmt* stmt = NULL;
 
-  int rc = sqlite3_prepare_v2(
-    conn, sql.c_str(), (int)std::min(sql.size() + 1, (size_t)INT_MAX),
-    &stmt, NULL
-  );
+  int rc =
+    sqlite3_prepare_v2(
+      conn, sql.c_str(), (int)std::min(sql.size() + 1, (size_t)INT_MAX),
+      &stmt, NULL
+    );
   if (rc != SQLITE_OK) {
     raise_sqlite_exception(conn);
   }

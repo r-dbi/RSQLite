@@ -23,17 +23,19 @@ public:
 
 public:
   // Get access to the underlying sqlite3*
-  sqlite3* conn() const {
-    return pConn_;
-  }
+  sqlite3* conn() const;
 
-public:
+  // Is the connection valid?
+  bool is_valid() const;
+
   // Get the last exception as a string
   std::string getException() const;
 
-public:
   // Copies a database
   void copy_to(const SqliteConnectionPtr& pDest);
+
+  // Disconnects from a database
+  void disconnect();
 
 private:
   sqlite3* pConn_;

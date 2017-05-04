@@ -14,6 +14,8 @@ test_that("sqliteQuickColumn round trips cleanly", {
   )
 
   db <- dbConnect(SQLite(), dbname = ":memory:")
+  on.exit(dbDisconnect(db), add = TRUE)
+
   dbWriteTable(db, "t", df)
 
   expect_equal(sqliteQuickColumn(db, "t", "a"), df$a)

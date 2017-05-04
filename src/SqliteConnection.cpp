@@ -16,13 +16,23 @@ SqliteConnection::SqliteConnection(const std::string& path, const bool allow_ext
 }
 
 SqliteConnection::~SqliteConnection() {
-  try {
-    sqlite3_close_v2(pConn_);
-  } catch (...) {}
+  if (is_valid()) {
+    warning("call dbDisconnect() when finished working with a connection");
+    disconnect();
+  }
+}
+
+sqlite3* SqliteConnection::conn() const {
+  if (!is_valid()) stop("disconnected");
+  return pConn_;
+}
+
+bool SqliteConnection::is_valid() const {
+  return (pConn_ != NULL);
 }
 
 std::string SqliteConnection::getException() const {
-  if (pConn_ != NULL)
+  if (is_valid())
     return std::string(sqlite3_errmsg(pConn_));
   else
     return std::string();
@@ -40,4 +50,13 @@ void SqliteConnection::copy_to(const SqliteConnectionPtr& pDest) {
   if (rc != SQLITE_OK) {
     stop("Could not finish copy:\n%s", getException());
   }
+}
+
+void SqliteConnection::disconnect() {
+  if (!is_valid()) {
+    stop("cannot disconnect twice");
+  }
+
+  sqlite3_close_v2(pConn_);
+  pConn_ = NULL;
 }

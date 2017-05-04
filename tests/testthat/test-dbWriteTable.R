@@ -3,6 +3,7 @@ context("dbWriteTable")
 # Not generic enough for DBItest
 test_that("throws error if constraint violated", {
   con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
 
   x <- data.frame(col1 = 1:10, col2 = letters[1:10])
 
@@ -125,7 +126,7 @@ test_that("can roundtrip special field names", {
 
 test_that("comments are preserved", {
   con <- dbConnect(SQLite())
-  on.exit(dbDisconnect(con))
+  on.exit(dbDisconnect(con), add = TRUE)
 
   tmp_file <- tempfile()
   cat('A,B,C\n11,2#2,33\n', file = tmp_file)
@@ -138,7 +139,7 @@ test_that("comments are preserved", {
 
 test_that("colclasses overridden by argument", {
   con <- dbConnect(SQLite())
-  on.exit(dbDisconnect(con))
+  on.exit(dbDisconnect(con), add = TRUE)
 
   tmp_file <- tempfile()
   cat('A,B,C\n1,2,3\n4,5,6\na,7,8\n', file = tmp_file)
@@ -172,7 +173,7 @@ test_that("options work", {
 test_that("temporary works", {
   db_file <- tempfile(fileext = ".sqlite")
   con <- dbConnect(SQLite(), db_file)
-  on.exit(dbDisconnect(con))
+  on.exit(dbDisconnect(con), add = TRUE)
 
   dbWriteTable(con, "prm", "dat-n.txt", sep="|", eol="\n", overwrite = TRUE)
   dbWriteTable(con, "tmp", "dat-n.txt", sep="|", eol="\n", overwrite = TRUE, temporary = TRUE)
@@ -180,7 +181,7 @@ test_that("temporary works", {
   expect_true(dbExistsTable(con, "tmp"))
 
   con2 <- dbConnect(SQLite(), db_file)
-  on.exit(dbDisconnect(con2))
+  on.exit(dbDisconnect(con2), add = TRUE)
 
   expect_true(dbExistsTable(con2, "prm"))
   expect_false(dbExistsTable(con2, "tmp"))

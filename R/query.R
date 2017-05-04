@@ -77,7 +77,8 @@ setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ...,
 #' @rdname SQLiteResult-class
 setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
   if (!dbIsValid(res)) {
-    stop("Expired, result set already closed", call. = FALSE)
+    warningc("Expired, result set already closed")
+    return(invisible(TRUE))
   }
   rsqlite_clear_result(res@ptr)
   res@conn@ref$result <- NULL

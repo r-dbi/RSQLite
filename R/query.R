@@ -39,18 +39,42 @@ setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
 
 
 db_bind <- function(res, params, ..., allow_named_superset) {
-  if (is.null(names(params))) {
-    names(params) <- rep("", length(params))
-  } else if (allow_named_superset) {
-    param_pos <- rsqlite_find_params(res@ptr, names(params))
-    if (any(is.na(param_pos))) {
-      warning("Named parameters not used in query: ",
-              paste0(names(params)[is.na(param_pos)], collapse = ", "),
-              ". Use $", names(params)[is.na(param_pos)][[1]],
-              " etc. instead of ? with named lists.",
-              call. = FALSE)
-      params <- params[!is.na(param_pos)]
+  placeholder_names <- rsqlite_get_placeholder_names(res@ptr)
+  empty <- placeholder_names == ""
+  numbers <- grepl("^[1-9][0-9]*$", placeholder_names)
+  names <- !(empty | numbers)
+
+  if (any(empty) && !all(empty)) {
+    stopc("Cannot mix anonymous and named/numbered placeholders in query")
+  }
+
+  if (any(numbers) && !all(numbers)) {
+    stopc("Cannot mix numbered and named placeholders in query")
+  }
+
+  if (any(empty) || any(numbers)) {
+    if (!is.null(names(params))) {
+      stopc("Cannot use named parameters for anonymous/numbered placeholders")
     }
+  } else {
+    param_indexes <- match(placeholder_names, names(params))
+    if (any(is.na(param_indexes))) {
+      stopc(
+        "No value given for placeholder ",
+        paste0(placeholder_names[is.na(param_indexes)], collapse = ", ")
+      )
+    }
+    unmatched_param_indexes <- setdiff(seq_along(params), param_indexes)
+    if (length(unmatched_param_indexes) > 0L) {
+      if (allow_named_superset) {
+        warningc(
+          "Named parameters not used in query: ",
+          paste0(names(params)[unmatched_param_indexes], collapse = ", ")
+        )
+      }
+    }
+
+    params <- unname(params)
   }
 
   params <- factor_to_string(params, warn = TRUE)

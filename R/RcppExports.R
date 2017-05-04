@@ -33,8 +33,8 @@ rsqlite_fetch <- function(res, n = 10L) {
     .Call('RSQLite_rsqlite_fetch', PACKAGE = 'RSQLite', res, n)
 }
 
-rsqlite_find_params <- function(res, param_names) {
-    .Call('RSQLite_rsqlite_find_params', PACKAGE = 'RSQLite', res, param_names)
+rsqlite_get_placeholder_names <- function(res) {
+    .Call('RSQLite_rsqlite_get_placeholder_names', PACKAGE = 'RSQLite', res)
 }
 
 rsqlite_bind_rows <- function(res, params) {

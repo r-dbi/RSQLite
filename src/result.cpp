@@ -19,8 +19,8 @@ List rsqlite_fetch(const XPtr<SqliteResult>& res, const int n = 10) {
 }
 
 // [[Rcpp::export]]
-IntegerVector rsqlite_find_params(const XPtr<SqliteResult>& res, CharacterVector param_names) {
-  return res->find_params(param_names);
+CharacterVector rsqlite_get_placeholder_names(const XPtr<SqliteResult>& res) {
+  return res->get_placeholder_names();
 }
 
 // [[Rcpp::export]]

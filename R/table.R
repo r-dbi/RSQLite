@@ -254,8 +254,11 @@ sql_data <- function(value, row.names) {
   value
 }
 
-factor_to_string <- function(value) {
+factor_to_string <- function(value, warn = FALSE) {
   is_factor <- vlapply(value, is.factor)
+  if (warn && any(is_factor)) {
+    warning("Factors converted to character", call. = FALSE)
+  }
   value[is_factor] <- lapply(value[is_factor], as.character)
   value
 }

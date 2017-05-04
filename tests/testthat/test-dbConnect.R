@@ -74,8 +74,8 @@ test_that("can connect to same db from multiple connections", {
   con1 <- dbConnect(SQLite(), dbfile)
   con2 <- dbConnect(SQLite(), dbfile)
 
-  dbWriteTable(con1, "mtcars", mtcars)
-  expect_equal(dbReadTable(con2, "mtcars"), mtcars)
+  dbWriteTable(con1, "airquality", airquality)
+  expect_equal(dbReadTable(con2, "airquality"), airquality)
 })
 
 test_that("temporary tables are connection local", {

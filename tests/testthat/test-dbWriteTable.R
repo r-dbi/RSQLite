@@ -50,7 +50,7 @@ test_that("can't add table when result set open", {
   expect_error(dbClearResult(res), "Expired")
 })
 
-test_that("rownames preserved", {
+test_that("rownames not preserved by default", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con))
 
@@ -59,6 +59,18 @@ test_that("rownames preserved", {
 
   dbWriteTable(con, "t1", df)
   t1 <- dbReadTable(con, "t1")
+  expect_identical(.row_names_info(t1), -10L)
+})
+
+test_that("rownames preserved with row.names = TRUE", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con))
+
+  df <- data.frame(x = 1:10)
+  row.names(df) <- paste(letters[1:10], 1:10, sep="")
+
+  dbWriteTable(con, "t1", df, row.names = TRUE)
+  t1 <- dbReadTable(con, "t1", row.names = TRUE)
   expect_equal(rownames(t1), rownames(df))
 })
 
@@ -237,7 +249,7 @@ test_that("dbWriteTable(row.names = 1)", {
   on.exit(dbDisconnect(con), add = TRUE)
 
   expect_warning(dbWriteTable(con, "mtcars", mtcars, row.names = 1))
-  res <- dbReadTable(con, "mtcars")
+  res <- dbReadTable(con, "mtcars", row.names = TRUE)
 
   expect_identical(res, mtcars)
 })
@@ -259,7 +271,7 @@ test_that("dbWriteTable(row.names = TRUE)", {
   on.exit(dbDisconnect(con), add = TRUE)
 
   dbWriteTable(con, "mtcars", mtcars, row.names = TRUE)
-  res <- dbReadTable(con, "mtcars")
+  res <- dbReadTable(con, "mtcars", row.names = TRUE)
 
   expect_identical(res, mtcars)
 })
@@ -269,7 +281,7 @@ test_that("dbWriteTable(iris, row.names = NA)", {
   on.exit(dbDisconnect(con), add = TRUE)
 
   dbWriteTable(con, "iris", iris, row.names = NA)
-  res <- dbReadTable(con, "iris")
+  res <- dbReadTable(con, "iris", row.names = NA)
 
   expect_equal(rownames(res), as.character(seq_len(nrow(iris))))
   res$Species = factor(res$Species)
@@ -281,7 +293,7 @@ test_that("dbWriteTable(mtcars, row.names = NA)", {
   on.exit(dbDisconnect(con), add = TRUE)
 
   dbWriteTable(con, "mtcars", mtcars, row.names = NA)
-  res <- dbReadTable(con, "mtcars")
+  res <- dbReadTable(con, "mtcars", row.names = NA)
 
   expect_identical(res, mtcars)
 })

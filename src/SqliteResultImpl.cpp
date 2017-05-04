@@ -295,6 +295,10 @@ List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
 
   SqliteDataFrame data(stmt, cache.names_, n_max, types_);
 
+  if (complete_ && data.get_ncols() == 0) {
+    warning("Don't need to call dbFetch() for statements, only for queries");
+  }
+
   while (!complete_) {
     LOG_VERBOSE << nrows_ << "/" << n;
 

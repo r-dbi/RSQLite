@@ -54,10 +54,6 @@ void SqliteConnection::copy_to(const SqliteConnectionPtr& pDest) {
 }
 
 void SqliteConnection::disconnect() {
-  if (!is_valid()) {
-    stop("cannot disconnect twice");
-  }
-
   sqlite3_close_v2(pConn_);
   pConn_ = NULL;
 }

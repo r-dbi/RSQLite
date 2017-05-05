@@ -62,12 +62,28 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
            overwrite = FALSE, append = FALSE,
            field.types = NULL, temporary = FALSE) {
 
-    if (overwrite && append)
-      stop("overwrite and append cannot both be TRUE", call. = FALSE)
+    row.names <- compatRowNames(row.names)
+
+    if ((!is.logical(row.names) && !is.character(row.names)) || length(row.names) != 1L)  {
+      stopc("`row.names` must be a logical scalar or a string")
+    }
+    if (!is.logical(overwrite) || length(overwrite) != 1L || is.na(overwrite))  {
+      stopc("`overwrite` must be a logical scalar")
+    }
+    if (!is.logical(append) || length(append) != 1L || is.na(append))  {
+      stopc("`append` must be a logical scalar")
+    }
+    if (!is.logical(temporary) || length(temporary) != 1L)  {
+      stopc("`temporary` must be a logical scalar")
+    }
+    if (overwrite && append) {
+      stopc("overwrite and append cannot both be TRUE")
+    }
+    if (append && !is.null(field.types)) {
+      stopc("Cannot specify field.types with append = TRUE")
+    }
 
     name <- check_quoted_identifier(name)
-
-    row.names <- compatRowNames(row.names)
 
     dbBegin(conn, name = "dbWriteTable")
     on.exit(dbRollback(conn, name = "dbWriteTable"))
@@ -328,6 +344,14 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 
     row.names <- compatRowNames(row.names)
 
+    if ((!is.logical(row.names) && !is.character(row.names)) || length(row.names) != 1L)  {
+      stopc("`row.names` must be a logical scalar or a string")
+    }
+
+    if (!is.logical(check.names) || length(check.names) != 1L)  {
+      stopc("`check.names` must be a logical scalar")
+    }
+
     if (is.null(select.cols)) {
       select.cols = "*"
     } else {
@@ -365,6 +389,7 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
 setMethod(
   "dbExistsTable", c("SQLiteConnection", "character"),
   function(conn, name, ...) {
+    stopifnot(length(name) == 1L)
     rs <- sqliteListTablesWithName(conn, name)
     on.exit(dbClearResult(rs), add = TRUE)
 
@@ -388,6 +413,10 @@ sqliteListTables <- function(conn) {
 }
 
 sqliteListTablesWithName <- function(conn, name) {
+  # Also accept quoted identifiers
+  name <- as.character(dbQuoteIdentifier(conn, name))
+  name <- gsub("^`(.*)`$", "\\1", name)
+
   sql <- sqliteListTablesQuery(conn, SQL("$name"))
   rs <- dbSendQuery(conn, sql)
   dbBind(rs, list(name = tolower(name)))

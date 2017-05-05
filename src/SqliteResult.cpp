@@ -26,8 +26,8 @@ int SqliteResult::rows_affected() {
   return impl->rows_affected();
 }
 
-IntegerVector SqliteResult::find_params(const CharacterVector& param_names) {
-  return impl->find_params_impl(param_names);
+CharacterVector SqliteResult::get_placeholder_names() const {
+  return impl->get_placeholder_names();
 }
 
 void SqliteResult::bind_rows(const List& params) {

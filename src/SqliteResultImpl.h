@@ -23,10 +23,6 @@ private:
     static std::vector<std::string> get_column_names(sqlite3_stmt* stmt);
   } cache;
 
-  struct _param_cache {
-    std::vector<std::string> names_;
-  } param_cache;
-
   // State
   bool complete_;
   bool ready_;
@@ -50,7 +46,7 @@ public:
   bool complete();
   int nrows();
   int rows_affected();
-  IntegerVector find_params_impl(const CharacterVector& param_names);
+  CharacterVector get_placeholder_names() const;
   void bind_rows_impl(const List& params);
   List fetch_impl(const int n_max);
   List get_column_info_impl();
@@ -58,8 +54,6 @@ public:
 private:
   void set_params(const List& params);
   bool bind_row();
-  void bind_parameter(int j, const std::string& name, SEXP values_);
-  int find_parameter(const std::string& name);
   void bind_parameter_pos(int j, SEXP value_);
 
   List fetch_rows(int n_max, int& n);

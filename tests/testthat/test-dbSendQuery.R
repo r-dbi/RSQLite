@@ -71,7 +71,7 @@ test_that("named binding errors if missing name", {
       dbGetPreparedQuery(con, "INSERT INTO t1 VALUES (:x, :y)",
         bind.data = data.frame(y = 1)),
       "deprecated"),
-    "Query requires"
+    "No value given for placeholder"
   )
 })
 

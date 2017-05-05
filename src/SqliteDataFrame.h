@@ -24,6 +24,7 @@ public:
   bool advance();
 
   List get_data(std::vector<DATA_TYPE>& types);
+  size_t get_ncols() const;
 
 private:
   void finalize_cols();

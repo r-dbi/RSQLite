@@ -27,6 +27,11 @@ XPtr<SqliteConnectionPtr> rsqlite_connect(
 
 // [[Rcpp::export]]
 void rsqlite_disconnect(XPtr<SqliteConnectionPtr>& con) {
+  if (!con.get() || !(*con)->is_valid()) {
+    warning("Already disconnected");
+    return;
+  }
+
   long n = con->use_count();
   if (n > 1) {
     warning(

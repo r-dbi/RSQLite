@@ -110,15 +110,18 @@ int SqliteResultImpl::rows_affected() {
   return rows_affected_;
 }
 
-IntegerVector SqliteResultImpl::find_params_impl(const CharacterVector& param_names) {
-  R_xlen_t p = param_names.length();
-  IntegerVector res(p);
+CharacterVector SqliteResultImpl::get_placeholder_names() const {
+  int n = sqlite3_bind_parameter_count(stmt);
 
-  for (int j = 0; j < p; ++j) {
-    int pos = find_parameter(CHAR(param_names[j]));
-    if (pos == 0)
-      pos = NA_INTEGER;
-    res[j] = pos;
+  CharacterVector res(n);
+
+  for (int i = 0; i < n; ++i) {
+    const char* placeholder_name = sqlite3_bind_parameter_name(stmt, i + 1);
+    if (placeholder_name == NULL)
+      placeholder_name = "";
+    else
+      ++placeholder_name;
+    res[i] = String(placeholder_name, CE_UTF8);
   }
 
   return res;
@@ -134,9 +137,6 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
     stop("Query requires %i params; %i supplied.",
          cache.nparams_, params.size());
   }
-
-  if (cache.nparams_ == 0)
-    return;
 
   set_params(params);
 
@@ -184,15 +184,6 @@ List SqliteResultImpl::get_column_info_impl() {
 
 void SqliteResultImpl::set_params(const List& params) {
   params_ = params;
-  CharacterVector names = CharacterVector(params.names());
-
-  param_cache.names_.clear();
-  if (names.length() == 0) {
-    param_cache.names_.resize(params.length());
-  }
-  else {
-    param_cache.names_ = as<std::vector<std::string> >(names);
-  }
 }
 
 bool SqliteResultImpl::bind_row() {
@@ -204,42 +195,12 @@ bool SqliteResultImpl::bind_row() {
   sqlite3_reset(stmt);
   sqlite3_clear_bindings(stmt);
 
-  for (size_t j = 0; j < param_cache.names_.size(); ++j) {
-    bind_parameter((int)j, param_cache.names_[j], params_[j]);
+  for (R_xlen_t j = 0; j < params_.size(); ++j) {
+    // sqlite parameters are 1-indexed
+    bind_parameter_pos((int)j + 1, params_[j]);
   }
 
   return true;
-}
-
-void SqliteResultImpl::bind_parameter(int j0, const std::string& name, SEXP values_) {
-  if (name != "") {
-    int j = find_parameter(name);
-    if (j == 0)
-      stop("No parameter with name %s.", name);
-    bind_parameter_pos(j, values_);
-  } else {
-    // sqlite parameters are 1-indexed
-    bind_parameter_pos(j0 + 1, values_);
-  }
-}
-
-int SqliteResultImpl::find_parameter(const std::string& name) {
-  int i = 0;
-  i = sqlite3_bind_parameter_index(stmt, name.c_str());
-  if (i != 0)
-    return i;
-
-  std::string colon = ":" + name;
-  i = sqlite3_bind_parameter_index(stmt, colon.c_str());
-  if (i != 0)
-    return i;
-
-  std::string dollar = "$" + name;
-  i = sqlite3_bind_parameter_index(stmt, dollar.c_str());
-  if (i != 0)
-    return i;
-
-  return 0;
 }
 
 void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
@@ -294,6 +255,10 @@ List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
   SqliteDataFrame data(stmt, cache.names_, n_max, types_);
+
+  if (complete_ && data.get_ncols() == 0) {
+    warning("Don't need to call dbFetch() for statements, only for queries");
+  }
 
   while (!complete_) {
     LOG_VERBOSE << nrows_ << "/" << n;

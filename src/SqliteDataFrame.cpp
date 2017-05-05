@@ -52,6 +52,10 @@ List SqliteDataFrame::get_data(std::vector<DATA_TYPE>& types_) {
   return out;
 }
 
+size_t SqliteDataFrame::get_ncols() const {
+  return data.size();
+}
+
 void SqliteDataFrame::finalize_cols() {
   std::for_each(data.begin(), data.end(), boost::bind(&SqliteColumn::finalize, _1, i));
 }

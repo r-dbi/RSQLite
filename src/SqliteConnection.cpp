@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "SqliteConnection.h"
+#include "utils.h"
 
 
 SqliteConnection::SqliteConnection(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs)
@@ -17,7 +18,7 @@ SqliteConnection::SqliteConnection(const std::string& path, const bool allow_ext
 
 SqliteConnection::~SqliteConnection() {
   if (is_valid()) {
-    warning("call dbDisconnect() when finished working with a connection");
+    warning_once("call dbDisconnect() when finished working with a connection");
     disconnect();
   }
 }
@@ -53,10 +54,6 @@ void SqliteConnection::copy_to(const SqliteConnectionPtr& pDest) {
 }
 
 void SqliteConnection::disconnect() {
-  if (!is_valid()) {
-    stop("cannot disconnect twice");
-  }
-
   sqlite3_close_v2(pConn_);
   pConn_ = NULL;
 }

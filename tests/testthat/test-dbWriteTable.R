@@ -48,7 +48,7 @@ test_that("can't add table when result set open", {
 
   res <- dbSendQuery(con, "SELECT * FROM t1")
   expect_warning(dbWriteTable(con, "t2", x), "pending rows")
-  expect_error(dbClearResult(res), "Expired")
+  expect_warning(dbClearResult(res), "Expired")
 })
 
 test_that("rownames not preserved by default", {

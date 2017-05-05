@@ -20,7 +20,7 @@ public:
   bool complete();
   int nrows();
   int rows_affected();
-  IntegerVector find_params(const CharacterVector& param_names);
+  CharacterVector get_placeholder_names() const;
 
   void bind_rows(const List& params);
   List fetch(int n_max = -1);

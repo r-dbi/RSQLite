@@ -74,7 +74,7 @@ db_bind <- function(res, params, ..., allow_named_superset) {
       }
     }
 
-    params <- unname(params)
+    params <- unname(params[param_indexes])
   }
 
   params <- factor_to_string(params, warn = TRUE)

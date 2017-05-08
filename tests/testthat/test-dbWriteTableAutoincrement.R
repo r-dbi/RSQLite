@@ -111,6 +111,8 @@ test_that("autoincrement partially populated with duplicate IDs throws an error"
   )
 
   con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
   dbExecute(con, sql_ddl)
   expect_error(
     dbWriteTable(con, name = 'tbl', value = ds_local, append = TRUE, row.names = FALSE),

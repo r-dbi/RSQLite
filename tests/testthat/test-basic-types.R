@@ -9,6 +9,8 @@ basicDf <- data.frame(
 
 test_that("round-trip leaves data.frame unchanged", {
   db <- memory_db()
+  on.exit(dbDisconnect(db), add = TRUE)
+
   dbWriteTable(db, "t1", basicDf, row.names = FALSE)
 
   expect_equal(dbGetQuery(db, "select * from t1"), basicDf)
@@ -17,6 +19,7 @@ test_that("round-trip leaves data.frame unchanged", {
 
 test_that("NAs work in first row", {
   db <- memory_db()
+  on.exit(dbDisconnect(db), add = TRUE)
 
   na_first <- basicDf[c(5, 1:4), ]
   rownames(na_first) <- NULL
@@ -27,10 +30,12 @@ test_that("NAs work in first row", {
 
 test_that("row-by-row fetch is equivalent", {
   db <- memory_db()
+  on.exit(dbDisconnect(db), add = TRUE)
+
   dbWriteTable(db, "t1", basicDf, row.names = FALSE)
 
   rs <- dbSendQuery(db, "SELECT * FROM t1")
-  on.exit(dbClearResult(rs))
+  on.exit({dbClearResult(rs); dbDisconnect(db)}, add = FALSE)
   for (i in 1:5) {
     row <- dbFetch(rs, 1L)
     expect_equal(row, basicDf[i, ], check.attributes = FALSE)
@@ -44,6 +49,8 @@ test_that("row-by-row fetch is equivalent", {
 
 test_that("column types as expected in presence of NULLs", {
   db <- memory_db()
+  on.exit(dbDisconnect(db), add = TRUE)
+
   dbWriteTable(db, "t1", datasets::USArrests)
 
   a1 <- dbGetQuery(db, "SELECT Murder/(Murder - 8.1) FROM t1 LIMIT 10")
@@ -56,6 +63,7 @@ test_that("column types as expected in presence of NULLs", {
 
 test_that("correct number of columns, even if 0 rows", {
   db <- memory_db()
+  on.exit(dbDisconnect(db), add = TRUE)
 
   ans <- dbGetQuery(db, "select 1 as a, 2 as b where 1")
   expect_equal(dim(ans), c(1L, 2L))
@@ -66,6 +74,8 @@ test_that("correct number of columns, even if 0 rows", {
 
 test_that("BLOBs retrieve as blob objects", {
   con <- memory_db()
+  on.exit(dbDisconnect(con), add = TRUE)
+
   local <- data.frame(
     a = 1:10,
     z = I(lapply(paste("hello", 1:10), charToRaw))

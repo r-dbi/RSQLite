@@ -66,22 +66,26 @@ test_that("forbidden operations throw errors", {
 test_that("querying closed connection throws error", {
   db <- dbConnect(SQLite(), dbname = ":memory:")
   dbDisconnect(db)
-  expect_error(dbGetQuery(db, "select * from foo"), "external pointer")
+  expect_error(dbGetQuery(db, "select * from foo"), "disconnected")
 })
 
 test_that("can connect to same db from multiple connections", {
   dbfile <- tempfile()
   con1 <- dbConnect(SQLite(), dbfile)
   con2 <- dbConnect(SQLite(), dbfile)
+  on.exit(dbDisconnect(con2), add = TRUE)
+  on.exit(dbDisconnect(con1), add = TRUE)
 
-  dbWriteTable(con1, "mtcars", mtcars)
-  expect_equal(dbReadTable(con2, "mtcars"), mtcars)
+  dbWriteTable(con1, "airquality", airquality)
+  expect_equal(dbReadTable(con2, "airquality"), airquality)
 })
 
 test_that("temporary tables are connection local", {
   dbfile <- tempfile()
   con1 <- dbConnect(SQLite(), dbfile)
   con2 <- dbConnect(SQLite(), dbfile)
+  on.exit(dbDisconnect(con2), add = TRUE)
+  on.exit(dbDisconnect(con1), add = TRUE)
 
   dbExecute(con1, "CREATE TEMPORARY TABLE temp (a TEXT)")
   expect_true(dbExistsTable(con1, "temp"))

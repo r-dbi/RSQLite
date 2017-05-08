@@ -1,5 +1,19 @@
 context("dbSendQuery")
 
+bind_select_setup <- function() {
+  con <- dbConnect(SQLite())
+
+  df <- data.frame(
+    id = letters[1:5],
+    x = 1:5,
+    y = c(1L, 1L, 2L, 2L, 3L),
+    stringsAsFactors = FALSE
+  )
+
+  dbWriteTable(con, "t1", df, row.names = FALSE)
+  con
+}
+
 test_that("attempting to change schema with pending rows generates warning", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con))
@@ -20,6 +34,8 @@ test_that("attempting to change schema with pending rows generates warning", {
 test_that("simple position binding works", {
   memoise::forget(warning_once)
   con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+
   dbWriteTable(con, "t1", data.frame(x = 1, y = 2))
 
   expect_warning(
@@ -33,6 +49,8 @@ test_that("simple position binding works", {
 test_that("simple named binding works", {
   memoise::forget(warning_once)
   con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+
   dbWriteTable(con, "t1", data.frame(x = 1, y = 2))
 
   expect_warning(
@@ -46,26 +64,16 @@ test_that("simple named binding works", {
 test_that("named binding errors if missing name", {
   con <- dbConnect(SQLite(), ":memory:")
   dbWriteTable(con, "t1", data.frame(x = 1, y = 2))
+  on.exit(dbDisconnect(con), add = TRUE)
 
   expect_error(
     expect_warning(
       dbGetPreparedQuery(con, "INSERT INTO t1 VALUES (:x, :y)",
         bind.data = data.frame(y = 1)),
       "deprecated"),
-    "Query requires"
+    "No value given for placeholder"
   )
 })
-
-bind_select_setup <- function() {
-  con <- dbConnect(SQLite())
-  df <- data.frame(id = letters[1:5],
-    x = 1:5,
-    y = c(1L, 1L, 2L, 2L, 3L),
-    stringsAsFactors = FALSE)
-
-  dbWriteTable(con, "t1", df, row.names = FALSE)
-  con
-}
 
 test_that("one row per bound select, with factor", {
   memoise::forget(warning_once)
@@ -97,6 +105,7 @@ test_that("one row per bound select", {
 
 test_that("failed matches are silently dropped", {
   con <- bind_select_setup()
+  on.exit(dbDisconnect(con), add = TRUE)
   sql <- "SELECT * FROM t1 WHERE id = ?"
 
   memoise::forget(warning_once)
@@ -124,6 +133,8 @@ test_that("failed matches are silently dropped", {
 test_that("NA matches NULL", {
   memoise::forget(warning_once)
   con <- bind_select_setup()
+  on.exit(dbDisconnect(con), add = TRUE)
+
   dbExecute(con, "INSERT INTO t1 VALUES ('x', NULL, NULL)")
 
   expect_warning(

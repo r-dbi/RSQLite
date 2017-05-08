@@ -17,7 +17,7 @@ extern SEXP RSQLite_rsqlite_connection_valid(SEXP);
 extern SEXP RSQLite_rsqlite_copy_database(SEXP, SEXP);
 extern SEXP RSQLite_rsqlite_disconnect(SEXP);
 extern SEXP RSQLite_rsqlite_fetch(SEXP, SEXP);
-extern SEXP RSQLite_rsqlite_find_params(SEXP, SEXP);
+extern SEXP RSQLite_rsqlite_get_placeholder_names(SEXP);
 extern SEXP RSQLite_rsqlite_has_completed(SEXP);
 extern SEXP RSQLite_rsqlite_import_file(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP RSQLite_rsqlite_result_valid(SEXP);
@@ -36,7 +36,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"RSQLite_rsqlite_copy_database",    (DL_FUNC) &RSQLite_rsqlite_copy_database,    2},
   {"RSQLite_rsqlite_disconnect",       (DL_FUNC) &RSQLite_rsqlite_disconnect,       1},
   {"RSQLite_rsqlite_fetch",            (DL_FUNC) &RSQLite_rsqlite_fetch,            2},
-  {"RSQLite_rsqlite_find_params",      (DL_FUNC) &RSQLite_rsqlite_find_params,      2},
+  {"RSQLite_rsqlite_get_placeholder_names", (DL_FUNC) &RSQLite_rsqlite_get_placeholder_names, 1},
   {"RSQLite_rsqlite_has_completed",    (DL_FUNC) &RSQLite_rsqlite_has_completed,    1},
   {"RSQLite_rsqlite_import_file",      (DL_FUNC) &RSQLite_rsqlite_import_file,      6},
   {"RSQLite_rsqlite_result_valid",     (DL_FUNC) &RSQLite_rsqlite_result_valid,     1},

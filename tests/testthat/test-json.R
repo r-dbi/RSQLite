@@ -2,6 +2,8 @@ context("dbJson")
 
 test_that("JSON types function", {
   con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
   gotJson <- dbGetQuery(con, 'SELECT json(\'{"this":"is","a":["test"]}\')')
   expect_that(gotJson[1,], equals('{"this":"is","a":["test"]}'))
 

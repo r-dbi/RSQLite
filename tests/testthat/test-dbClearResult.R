@@ -9,7 +9,7 @@ test_that("warning on dbFetch if result set open", {
 
   expect_warning(dbGetQuery(con, "SELECT 1;"), "pending rows")
 
-  expect_error(dbClearResult(res), "Expired")
+  expect_warning(dbClearResult(res), "Expired")
 })
 
 test_that("accessing cleared result throws error", {
@@ -20,5 +20,5 @@ test_that("accessing cleared result throws error", {
   dbClearResult(res)
 
   expect_error(dbFetch(res), "external")
-  expect_error(dbGetInfo(res), "external")
+  expect_error(dbGetInfo(res), "closed")
 })

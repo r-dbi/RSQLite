@@ -1,3 +1,8 @@
+## RSQLite 1.1-16 (2017-05-09)
+
+- Most DBItest tests now pass.
+
+
 ## RSQLite 1.1-15 (2017-04-29)
 
 - The `row.names` argument to `dbFetch()`, `dbReadTable()`, `dbWriteTable()`, `sqliteBuildTableDefinition()`, and `sqlData()` now defaults to `FALSE`. The old default can be restored temporarily on a per-package basis by calling `pkgconfig::set_config("RSQLite::row.names.query" = NA)` (#210).

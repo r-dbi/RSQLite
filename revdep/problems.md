@@ -10,73 +10,63 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2017-04-29                   |
+|date     |2017-05-08                   |
 
 ## Packages
 
-|package   |*  |version    |date       |source                             |
-|:---------|:--|:----------|:----------|:----------------------------------|
-|BH        |   |1.62.0-1   |2016-11-19 |cran (@1.62.0-)                    |
-|bit64     |   |0.9-5      |2015-07-05 |cran (@0.9-5)                      |
-|blob      |   |1.0.0.9002 |2017-04-24 |Github (tidyverse/blob@615057a)    |
-|DBI       |   |0.6-11     |2017-04-24 |Github (rstats-db/DBI@20f1f02)     |
-|DBItest   |   |1.4-20     |2017-04-27 |Github (rstats-db/DBItest@669be28) |
-|knitr     |   |1.15.1     |2016-11-22 |cran (@1.15.1)                     |
-|memoise   |   |1.1.0      |2017-04-21 |CRAN (R 3.4.0)                     |
-|pkgconfig |   |2.0.1      |2017-03-21 |cran (@2.0.1)                      |
-|plogr     |   |0.1-1      |2016-09-24 |cran (@0.1-1)                      |
-|Rcpp      |   |0.12.10.2  |2017-04-27 |Github (RcppCore/Rcpp@feb4d7a)     |
-|rmarkdown |   |1.5        |2017-04-26 |cran (@1.5)                        |
-|RSQLite   |   |1.1-2      |2017-01-08 |CRAN (R 3.4.0)                     |
-|testthat  |   |1.0.2      |2016-04-23 |cran (@1.0.2)                      |
+|package   |*  |version  |date       |source                             |
+|:---------|:--|:--------|:----------|:----------------------------------|
+|BH        |   |1.62.0-1 |2016-11-19 |cran (@1.62.0-)                    |
+|DBI       |   |0.6-13   |2017-05-08 |Github (rstats-db/DBI@f6500a5)     |
+|DBItest   |   |1.4-22   |2017-05-08 |Github (rstats-db/DBItest@1f344a3) |
+|knitr     |   |1.15.1   |2016-11-22 |cran (@1.15.1)                     |
+|memoise   |   |1.1.0    |2017-04-21 |CRAN (R 3.4.0)                     |
+|plogr     |   |0.1-1    |2016-09-24 |cran (@0.1-1)                      |
+|Rcpp      |   |0.12.10  |2017-03-19 |CRAN (R 3.4.0)                     |
+|rmarkdown |   |1.5      |2017-04-26 |cran (@1.5)                        |
+|RSQLite   |   |1.1-2    |2017-01-08 |CRAN (R 3.4.0)                     |
+|testthat  |   |1.0.2    |2016-04-23 |cran (@1.0.2)                      |
 
 # Check results
 
-41 packages with problems
+34 packages with problems
 
-|package           |version  | errors| warnings| notes|
-|:-----------------|:--------|------:|--------:|-----:|
-|AnnotationDbi     |1.38.0   |      0|        1|     5|
-|AnnotationHubData |1.6.0    |      0|        1|     4|
-|bioassayR         |1.14.0   |      0|        1|     0|
-|ChemmineR         |2.28.0   |      0|        1|     8|
-|clstutils         |1.24.0   |      0|        2|     5|
-|CNEr              |1.12.0   |      2|        3|     3|
-|cummeRbund        |2.18.0   |      1|        1|     6|
-|DECIPHER          |2.4.0    |      0|        1|     4|
-|dplyr             |0.5.0    |      1|        0|     2|
-|filematrix        |1.1.0    |      0|        1|     0|
-|freqweights       |1.0.3    |      1|        0|     0|
-|gcbd              |0.2.6    |      0|        1|     1|
-|GeneAnswers       |2.18.0   |      1|        3|     6|
-|GenomicFeatures   |1.28.0   |      0|        1|     3|
-|GWASTools         |1.22.0   |      1|        0|     1|
-|lumi              |2.28.0   |      1|        2|     3|
-|maGUI             |2.2      |      1|        0|     0|
-|metaseqR          |1.16.0   |      2|        1|     4|
-|mgsa              |1.24.0   |      0|        1|     5|
-|MmPalateMiRNA     |1.26.0   |      0|        1|     4|
-|oce               |0.9-21   |      1|        0|     1|
-|oligoClasses      |1.38.0   |      0|        2|     4|
-|oligo             |1.40.0   |      1|        2|    10|
-|Organism.dplyr    |1.0.0    |      2|        1|     1|
-|PAnnBuilder       |1.40.0   |      0|        3|     1|
-|plethy            |1.14.0   |      2|        0|     3|
-|RecordLinkage     |0.4-10   |      1|        0|     1|
-|recoup            |1.4.0    |      2|        0|     1|
-|RImmPort          |1.4.0    |      0|        1|     0|
-|RObsDat           |16.03    |      1|        0|     1|
-|RQDA              |0.2-8    |      1|        0|     1|
-|seqplots          |1.13.0   |      1|        0|     3|
-|specL             |1.10.0   |      0|        1|     5|
-|sqldf             |0.4-10   |      1|        1|     2|
-|stream            |1.2-4    |      1|        1|     1|
-|survey            |3.31-5   |      2|        1|     0|
-|TFBSTools         |1.14.0   |      2|        1|     4|
-|trackeR           |0.0.5    |      0|        1|     0|
-|TSdata            |2016.8-1 |      0|        1|     0|
-|VariantFiltering  |1.12.0   |      0|        1|     4|
-|vmsbase           |2.1.3    |      1|        0|     0|
+|package            |version  | errors| warnings| notes|
+|:------------------|:--------|------:|--------:|-----:|
+|AnnotationDbi      |1.38.0   |      0|        1|     5|
+|AnnotationHubData  |1.6.0    |      1|        0|     4|
+|BiocFileCache      |1.0.0    |      1|        1|     0|
+|ChemmineR          |2.28.0   |      1|        0|     0|
+|chunked            |0.3      |      1|        0|     1|
+|clstutils          |1.24.0   |      0|        2|     5|
+|CNEr               |1.12.0   |      0|        2|     2|
+|dplyr              |0.5.0    |      1|        0|     2|
+|etl                |0.3.5    |      1|        1|     0|
+|GeneAnswers        |2.18.0   |      1|        3|     6|
+|GenomicFeatures    |1.28.0   |      0|        1|     3|
+|lumi               |2.28.0   |      0|        2|     3|
+|maGUI              |2.2      |      1|        0|     0|
+|metagenomeFeatures |1.8.0    |      1|        0|     0|
+|metaseqR           |1.16.0   |      1|        1|     4|
+|mgsa               |1.24.0   |      0|        1|     5|
+|MonetDBLite        |0.3.1    |      2|        0|     3|
+|oce                |0.9-21   |      1|        0|     1|
+|oligoClasses       |1.38.0   |      0|        2|     4|
+|oligo              |1.40.1   |      1|        1|     9|
+|Organism.dplyr     |1.0.0    |      1|        0|     0|
+|PAnnBuilder        |1.40.0   |      0|        3|     1|
+|PGA                |1.6.0    |      1|        0|     3|
+|plethy             |1.14.0   |      2|        0|     3|
+|recoup             |1.4.0    |      2|        0|     1|
+|RImmPort           |1.4.0    |      0|        1|     0|
+|RQDA               |0.2-8    |      1|        0|     1|
+|seqplots           |1.13.0   |      1|        0|     3|
+|sf                 |0.4-2    |      2|        0|     1|
+|sqldf              |0.4-10   |      0|        1|     2|
+|taxizedb           |0.1.0    |      1|        0|     0|
+|TSdata             |2016.8-1 |      0|        1|     0|
+|VariantFiltering   |1.12.1   |      0|        1|     4|
+|vmsbase            |2.1.3    |      1|        0|     0|
 
 ## AnnotationDbi (1.38.0)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
@@ -128,14 +118,28 @@ These lines will be truncated in the PDF manual.
 ## AnnotationHubData (1.6.0)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
-0 errors | 1 warning  | 4 notes
+1 error  | 0 warnings | 4 notes
 
 ```
-checking for code/documentation mismatches ... WARNING
-Functions or methods with usage in documentation object 'AnnotationHubMetadata-class' but not in code:
-  jsonPath constructAnnotationHubMetadataFromSourceFilePath
-  constructMetadataFromJsonPath
-
+checking tests ... ERROR
+  Running ‘AnnotationHubData_unit_tests.R’ [69s/97s]
+Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
+Last 13 lines of output:
+  
+   
+  1 Test Suite : 
+  AnnotationHubData RUnit Tests - 21 test functions, 1 error, 0 failures
+  ERROR in test_Grasp2Db_recipe: Error : object 'src_sql' is not exported by 'namespace:dplyr'
+  
+  Test files with failing tests
+  
+     test_recipe.R 
+       test_Grasp2Db_recipe 
+  
+  
+  Error in BiocGenerics:::testPackage("AnnotationHubData") : 
+    unit tests failed for package AnnotationHubData
+  Execution halted
 
 checking DESCRIPTION meta-information ... NOTE
 Package listed in more than one of Depends, Imports, Suggests, Enhances:
@@ -157,14 +161,14 @@ Unexported object imported by a ':::' call: ‘OrganismDbi:::.packageTaxIds’
 checking R code for possible problems ... NOTE
 .NCBIMetadataFromUrl: no visible binding for global variable ‘results’
 .NCBIMetadataFromUrl: no visible binding for global variable ‘specData’
-.cleanOneTable: no visible global function definition for ‘dbGetQuery’
-.getOtherTableDupIDs: no visible global function definition for
-  ‘dbGetQuery’
 .makeComplexGR: no visible binding for global variable ‘seqname’
-getCurrentResources: no visible global function definition for
-  ‘dbGetQuery’
 makeAnnotationHubMetadata : <anonymous> : <anonymous>: no visible
-... 44 lines ...
+  binding for global variable ‘Title’
+makeAnnotationHubMetadata : <anonymous> : <anonymous>: no visible
+  binding for global variable ‘Description’
+makeAnnotationHubMetadata : <anonymous> : <anonymous>: no visible
+  binding for global variable ‘BiocVersion’
+... 39 lines ...
 test_Inparanoid8ImportPreparer_recipe: no visible binding for global
   variable ‘BiocVersion’
 test_Inparanoid8ImportPreparer_recipe: no visible global function
@@ -175,155 +179,98 @@ Undefined global functions or variables:
   BiocVersion Coordinate_1_based DataProvider Description DispatchClass
   Genome Location_Prefix Maintainer RDataClass RDataDateAdded RDataPath
   SourceType SourceUrl SourceVersion Species TaxonomyId Title ahroot
-  checkTrue dbGetQuery results seqname specData suppresWarnings
+  checkTrue results seqname specData suppresWarnings
 ```
 
-## bioassayR (1.14.0)
-Maintainer: Tyler Backman <tbackman@lbl.gov>  
-Bug reports: https://github.com/TylerBackman/bioassayR/issues
+## BiocFileCache (1.0.0)
+Maintainer: Lori Shepherd <lori.shepherd@roswellpark.org>  
+Bug reports: https://github.com/Bioconductor/BiocFileCache/issues
 
-0 errors | 1 warning  | 0 notes
+1 error  | 1 warning  | 0 notes
 
 ```
+checking tests ... ERROR
+  Running ‘testthat.R’ [20s/20s]
+Running the tests in ‘tests/testthat.R’ failed.
+Last 13 lines of output:
+  
+      intersect, setdiff, setequal, union
+  
+  > 
+  > test_check("BiocFileCache")
+  1. Failure: bfcinfo works (@test_BiocFileCache_class.R#109) --------------------
+  bfcinfo(bfc) inherits from `tbl_bfc/tbl_dbi/tbl_sql/tbl_lazy/tbl` not `tbl_sqlite`.
+  
+  
+  testthat results ================================================================
+  OK: 116 SKIPPED: 0 FAILED: 1
+  1. Failure: bfcinfo works (@test_BiocFileCache_class.R#109) 
+  
+  Error: testthat unit tests failed
+  Execution halted
+
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
+Loading required package: dplyr
 
-label: unnamed-chunk-68 (with options) 
-List of 2
- $ eval: logi TRUE
- $ tidy: logi FALSE
+Attaching package: 'dplyr'
 
-  ordinary text without R code
-... 8 lines ...
-output file: bioassayR.knit.md
+The following objects are masked from 'package:stats':
 
-/usr/bin/pandoc +RTS -K512m -RTS bioassayR.utf8.md --to html --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output bioassayR.html --smart --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --template /home/muelleki/R/x86_64-pc-linux-gnu-library/3.4/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --variable 'theme:bootstrap' --include-in-header /tmp/RtmpFlrjIi/rmarkdown-str7bb723dad979.html --mathjax --variable 'mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --bibliography bibtex.bib --filter pandoc-citeproc 
-pandoc: Filter pandoc-citeproc not found
-Error: pandoc document conversion failed with error 85
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+Quitting from lines 88-89 (BiocFileCache.Rmd) 
+Error: processing vignette 'BiocFileCache.Rmd' failed with diagnostics:
+limit not greater than 0
 Execution halted
-Makefile:4: recipe for target 'all' failed
-make: *** [all] Error 1
-Error in buildVignettes(dir = "/home/muelleki/git/R/RSQLite/revdep/checks/bioassayR.Rcheck/vign_test/bioassayR") : 
-  running 'make' failed
-Execution halted
+
 ```
 
 ## ChemmineR (2.28.0)
 Maintainer: Thomas Girke <thomas.girke@ucr.edu>
 
-0 errors | 1 warning  | 8 notes
+1 error  | 0 warnings | 0 notes
 
 ```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
+checking whether package ‘ChemmineR’ can be installed ... ERROR
+Installation failed.
+See ‘/home/muelleki/git/R/RSQLite/revdep/checks/ChemmineR.Rcheck/00install.out’ for details.
+```
 
-label: binningClusterWWW (with options) 
-List of 2
- $ eval: logi FALSE
- $ tidy: logi FALSE
+## chunked (0.3)
+Maintainer: Edwin de Jonge <edwindjonge@gmail.com>  
+Bug reports: https://github.com/edwindj/chunked/issues
 
-  ordinary text without R code
-... 8 lines ...
-output file: ChemmineR.knit.md
+1 error  | 0 warnings | 1 note 
 
-/usr/bin/pandoc +RTS -K512m -RTS ChemmineR.utf8.md --to html --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output ChemmineR.html --smart --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --template /home/muelleki/R/x86_64-pc-linux-gnu-library/3.4/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --variable 'theme:bootstrap' --include-in-header /tmp/RtmpvGDJt4/rmarkdown-str7ebd145517d6.html --mathjax --variable 'mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --bibliography references.bib --filter pandoc-citeproc 
-pandoc: Filter pandoc-citeproc not found
-Error: pandoc document conversion failed with error 85
-Execution halted
-Makefile:4: recipe for target 'all' failed
-make: *** [all] Error 1
-Error in buildVignettes(dir = "/home/muelleki/git/R/RSQLite/revdep/checks/ChemmineR.Rcheck/vign_test/ChemmineR") : 
-  running 'make' failed
-Execution halted
-
-checking installed package size ... NOTE
-  installed size is  5.1Mb
-  sub-directories of 1Mb or more:
-    doc    2.2Mb
-    libs   1.7Mb
-
-checking DESCRIPTION meta-information ... NOTE
-Package listed in more than one of Depends, Imports, Suggests, Enhances:
-  ‘ChemmineOB’
-A package should be listed in only one of these fields.
-
-checking top-level files ... NOTE
-Non-standard files/directories found at top level:
-  ‘profiling’ ‘runSwig.sh’ ‘swig.i’
+```
+checking tests ... ERROR
+  Running ‘testthat.R’
+Running the tests in ‘tests/testthat.R’ failed.
+Last 13 lines of output:
+  1. Error: write_chunkwise to db works (@test-write.R#29) -----------------------
+  'sql_render' is not an exported object from 'namespace:dplyr'
+  1: write_chunkwise(iris2, tmp, row.names = FALSE) at testthat/test-write.R:29
+  2: write_chunkwise.tbl_sql(iris2, tmp, row.names = FALSE)
+  3: dplyr::sql_render
+  4: getExportedValue(pkg, name)
+  5: stop(gettextf("'%s' is not an exported object from 'namespace:%s'", name, getNamespaceName(ns)), 
+         call. = FALSE, domain = NA)
+  
+  testthat results ================================================================
+  OK: 28 SKIPPED: 0 FAILED: 1
+  1. Error: write_chunkwise to db works (@test-write.R#29) 
+  
+  Error: testthat unit tests failed
+  Execution halted
 
 checking dependencies in R code ... NOTE
-'library' or 'require' calls in package code:
-  ‘ChemmineDrugs’ ‘ChemmineOB’ ‘RPostgreSQL’ ‘RSQLite’ ‘fmcsR’ ‘grid’
-  ‘png’ ‘snow’
-  Please use :: or requireNamespace() instead.
-  See section 'Suggested packages' in the 'Writing R Extensions' manual.
-
-checking R code for possible problems ... NOTE
-Found the following possibly unsafe calls:
-File ‘ChemmineR/R/sim.R’:
-  unlockBinding(".progress_bar_int_cnt", environment(.progress_bar))
-
-.data.frame.to.str: no visible global function definition for
-  ‘write.table’
-.data.frame.to.str: no visible binding for global variable ‘string’
-.parseV3000: no visible binding for global variable ‘AW’
-.rings: no visible global function definition for ‘combn’
-... 72 lines ...
-  importFrom("utils", "browseURL", "combn", "data", "read.delim",
-             "read.table", "str", "write.table")
-to your NAMESPACE file.
-
-Found the following calls to data() loading into the global environment:
-File ‘ChemmineR/R/AllClasses.R’:
-  data(apfp)
-  data(atomprop)
-File ‘ChemmineR/R/sim.R’:
-  data(pubchemFPencoding)
-See section ‘Good practice’ in ‘?data’.
-
-checking Rd line widths ... NOTE
-Rd file 'cluster.visualize.Rd':
-  \usage lines wider than 90 characters:
-     cluster.visualize(db, cls, size.cutoff, distmat=NULL, color.vector=NULL, non.interactive="", cluster.result=1, dimensions=2, quiet=FALS ... [TRUNCATED]
-
-Rd file 'cmp.parse1.Rd':
-  \examples lines wider than 100 characters:
-     ## Not run: structure <- cmp.parse1("http://bioweb.ucr.edu/ChemMineV2/compound/Aurora/b32:NNQS2MBRHAZTI===/sdf")
-
-Rd file 'cmp.search.Rd':
-... 29 lines ...
-                                     dbGetQuery(dbConnection, paste("SELECT weight FROM table WHERE id IN (",paste(indexBatch,collapse=","), ... [TRUNCATED]
-
-Rd file 'sdfStream.Rd':
-  \usage lines wider than 90 characters:
-     sdfStream(input, output, append=FALSE, fct, Nlines = 10000, startline=1, restartNlines=10000, silent = FALSE, ...)
-
-Rd file 'smartsSearchOB.Rd':
-  \examples lines wider than 100 characters:
-                     rotableBonds = smartsSearchOB(sdfsample[1:5],"[!$(*#*)&!D1]-!@[!$(*#*)&!D1]",uniqueMatches=FALSE)
-
-These lines will be truncated in the PDF manual.
-
-checking for GNU extensions in Makefiles ... NOTE
-GNU make is a SystemRequirements.
-
-checking compiled code ... NOTE
-File ‘ChemmineR/libs/ChemmineR.so’:
-  Found ‘_ZSt4cerr’, possibly from ‘std::cerr’ (C++)
-    Objects: ‘desc.o’, ‘formats.o’, ‘script.o’
-  Found ‘_ZSt4cout’, possibly from ‘std::cout’ (C++)
-    Object: ‘cluster.o’
-File ‘ChemmineR/libs/ChemmineR.so’:
-  Found no call to: ‘R_useDynamicSymbols’
-
-Compiled code should not call entry points which might terminate R nor
-write to stdout/stderr instead of to the console, nor the system RNG.
-It is good practice to register native routines and to disable symbol
-search.
-
-See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
+Missing or unexported object: ‘dplyr::sql_render’
 ```
 
 ## clstutils (1.24.0)
@@ -408,52 +355,9 @@ to your NAMESPACE file.
 Maintainer: Ge Tan <ge_tan@live.com>  
 Bug reports: https://github.com/ge11232002/CNEr/issues
 
-2 errors | 3 warnings | 3 notes
+0 errors | 2 warnings | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘CNEr-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: CNEDensity-methods
-> ### Title: CNEDensity function
-> ### Aliases: CNEDensity CNEDensity-methods
-> ###   CNEDensity,ANY,character,character,missing,missing-method
-> ###   CNEDensity,ANY,missing,character,character,character-method
-... 11 lines ...
-> minLength <- 50L
-> cneDanRer10Hg38_45_50 <- 
-+   CNEDensity(dbName=dbName, 
-+              tableName="danRer10_hg38_45_50", 
-+              whichAssembly="first", chr=chr, start=start,
-+              end=end, windowSize=windowSize, 
-+              minLength=minLength)
-Error in dbGetQuery(con, sqlCmd) : could not find function "dbGetQuery"
-Calls: CNEDensity -> .CNEDensityInternal -> readCNERangesFromSQLite
-Execution halted
-** found \donttest examples: check also with --run-donttest
-
-checking tests ... ERROR
-  Running ‘testthat.R’ [27s/33s]
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-  2. Error: test_readCNERangesFromSQLite (@test_IO.R#102) ------------------------
-  could not find function "dbGetQuery"
-  1: readCNERangesFromSQLite(dbName = dbName, tableName = "danRer10_hg38_45_50") at testthat/test_IO.R:102
-  
-  The number of axt files 1
-  The number of axt alignments is 50
-  The number of axt files 1
-  The number of axt alignments is 352
-  testthat results ================================================================
-  OK: 81 SKIPPED: 0 FAILED: 2
-  1. Error: test_GRangePairs (@test_GRangePairs.R#94) 
-  2. Error: test_readCNERangesFromSQLite (@test_IO.R#102) 
-  
-  Error: testthat unit tests failed
-  Execution halted
-
 checking for missing documentation entries ... WARNING
 Undocumented code objects:
   ‘addAncestorGO’
@@ -487,17 +391,6 @@ search.
 
 See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning in engine$weave(file, quiet = quiet, encoding = enc) :
-  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
-Quitting from lines 2-15 (CNEr.Rmd) 
-Error: processing vignette 'CNEr.Rmd' failed with diagnostics:
-could not find function "doc_date"
-Execution halted
-
-
 checking installed package size ... NOTE
   installed size is 29.4Mb
   sub-directories of 1Mb or more:
@@ -509,221 +402,6 @@ checking dependencies in R code ... NOTE
 Unexported objects imported by ':::' calls:
   ‘BiocGenerics:::replaceSlots’ ‘S4Vectors:::make_zero_col_DataFrame’
   See the note in ?`:::` about the use of this operator.
-
-checking R code for possible problems ... NOTE
-queryAnnotationSQLite: no visible global function definition for
-  ‘dbGetQuery’
-queryCNEData: no visible global function definition for ‘dbGetQuery’
-readCNERangesFromSQLite: no visible global function definition for
-  ‘dbGetQuery’
-Undefined global functions or variables:
-  dbGetQuery
-```
-
-## cummeRbund (2.18.0)
-Maintainer: Loyal A. Goff <lgoff@csail.mit.edu>
-
-1 error  | 1 warning  | 6 notes
-
-```
-checking examples ... ERROR
-Running examples in ‘cummeRbund-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: MAplot
-> ### Title: MAplot
-> ### Aliases: MAplot MAplot,CuffData-method
-> ### Keywords: heatmap
-> 
-> ### ** Examples
-> 
-> 	a<-readCufflinks(system.file("extdata", package="cummeRbund")) #Create CuffSet object from sample data
-Creating database /home/muelleki/git/R/RSQLite/revdep/checks/cummeRbund.Rcheck/cummeRbund/extdata/cuffData.db
-Reading Run Info File /home/muelleki/git/R/RSQLite/revdep/checks/cummeRbund.Rcheck/cummeRbund/extdata/run.info
-Writing runInfo Table
-Warning: RSQLite::dbGetPreparedQuery() is deprecated, please switch to DBI::dbGetQuery(params = bind.data).
-Reading Read Group Info  /home/muelleki/git/R/RSQLite/revdep/checks/cummeRbund.Rcheck/cummeRbund/extdata/read_groups.info
-Warning: RSQLite::make.db.names() is deprecated, please switch to DBI::dbQuoteIdentifier().
-Writing replicates Table
-Reading /home/muelleki/git/R/RSQLite/revdep/checks/cummeRbund.Rcheck/cummeRbund/extdata/genes.fpkm_tracking
-Checking samples table...
-Populating samples table...
-Error: Column name mismatch.
-Execution halted
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-
-Loading required package: IRanges
-Loading required package: GenomeInfoDb
-Loading required package: Gviz
-Loading required package: grid
-
-Attaching package: 'cummeRbund'
-... 8 lines ...
-    promoters
-
-The following object is masked from 'package:BiocGenerics':
-
-    conditions
-
-
-Error: processing vignette 'cummeRbund-example-workflow.Rnw' failed with diagnostics:
- chunk 4 (label = model_fit_1) 
-Error in rsqlite_send_query(conn@ptr, statement) : near ")": syntax error
-Execution halted
-
-checking package dependencies ... NOTE
-Depends: includes the non-default packages:
-  ‘BiocGenerics’ ‘RSQLite’ ‘ggplot2’ ‘reshape2’ ‘fastcluster’
-  ‘rtracklayer’ ‘Gviz’
-Adding so many packages to the search path is excessive and importing
-selectively is preferable.
-
-checking installed package size ... NOTE
-  installed size is 11.4Mb
-  sub-directories of 1Mb or more:
-    R         3.9Mb
-    doc       1.6Mb
-    extdata   5.6Mb
-
-checking DESCRIPTION meta-information ... NOTE
-Malformed Title field: should not end in a period.
-Packages listed in more than one of Depends, Imports, Suggests, Enhances:
-  ‘BiocGenerics’ ‘plyr’
-A package should be listed in only one of these fields.
-
-checking dependencies in R code ... NOTE
-'library' or 'require' calls in package code:
-  'NMFN' 'cluster' 'rjson' 'stringr'
-  Please use :: or requireNamespace() instead.
-  See section 'Suggested packages' in the 'Writing R Extensions' manual.
-Packages in Depends field not imported from:
-  'Gviz' 'RSQLite' 'fastcluster' 'ggplot2' 'reshape2' 'rtracklayer'
-  These packages need to be imported from (in the NAMESPACE file)
-  for when this namespace is loaded but not attached.
-
-checking R code for possible problems ... NOTE
-.CVdensity: no visible global function definition for 'ggplot'
-.CVdensity: no visible global function definition for 'geom_density'
-.CVdensity: no visible global function definition for 'aes'
-.CVdensity: no visible binding for global variable 'CV'
-.CVdensity: no visible binding for global variable 'sample_name'
-.CVdensity: no visible global function definition for 'scale_x_log10'
-.MAplot: no visible global function definition for 'ggplot'
-.MAplot: no visible global function definition for 'geom_point'
-.MAplot: no visible global function definition for 'aes'
-... 1188 lines ...
-  scale_y_log10 seqnames significant stat_density stat_smooth stat_sum
-  stat_summary stdev str_split_fixed strand theme theme_bw toJSON
-  tracking_id tracks unit v1 v2 value variable varnames write.table x
-  xlab xlim y ylab
-Consider adding
-  importFrom("graphics", "plot")
-  importFrom("stats", "as.dendrogram", "as.dist", "as.formula",
-             "cmdscale", "dist", "hclust", "order.dendrogram",
-             "p.adjust", "prcomp")
-  importFrom("utils", "read.delim", "read.table", "write.table")
-to your NAMESPACE file.
-
-checking Rd line widths ... NOTE
-Rd file 'MAplot.Rd':
-  \examples lines wider than 100 characters:
-             a<-readCufflinks(system.file("extdata", package="cummeRbund")) #Create CuffSet object from sample data
-
-Rd file 'QCplots.Rd':
-  \examples lines wider than 100 characters:
-             a<-readCufflinks(system.file("extdata", package="cummeRbund")) #Read cufflinks data and create CuffSet object
-
-Rd file 'csBoxplot.Rd':
-... 96 lines ...
-                                     isoformFPKM = "isoforms.fpkm_tracking", isoformDiff = "isoform_exp.diff", isoformCount="isoforms.count_ ... [TRUNCATED]
-                                     TSSFPKM = "tss_groups.fpkm_tracking", TSSDiff = "tss_group_exp.diff", TSSCount="tss_groups.count_tracki ... [TRUNCATED]
-                                     CDSFPKM = "cds.fpkm_tracking", CDSExpDiff = "cds_exp.diff", CDSCount="cds.count_tracking", CDSRep="cds. ... [TRUNCATED]
-  \examples lines wider than 100 characters:
-             a<-readCufflinks(system.file("extdata", package="cummeRbund")) #Read cufflinks data in sample directory and creates CuffSet obj ... [TRUNCATED]
-
-Rd file 'sigMatrix.Rd':
-  \examples lines wider than 100 characters:
-             a<-readCufflinks(system.file("extdata", package="cummeRbund")) #Create CuffSet object from sample data
-
-These lines will be truncated in the PDF manual.
-```
-
-## DECIPHER (2.4.0)
-Maintainer: Erik Wright <eswright@pitt.edu>
-
-0 errors | 1 warning  | 4 notes
-
-```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-
-Loading required package: S4Vectors
-Loading required package: stats4
-
-Attaching package: ‘S4Vectors’
-
-The following object is masked from ‘package:base’:
-... 8 lines ...
-
-The following object is masked from ‘package:base’:
-
-    strsplit
-
-Loading required package: RSQLite
-
-Error: processing vignette 'DesignMicroarray.Rnw' failed with diagnostics:
- chunk 13 (label = expr11) 
-Error in linbin2D(x, gpoints1, gpoints2) : object 'F_lbtwod' not found
-Execution halted
-
-checking installed package size ... NOTE
-  installed size is  9.2Mb
-  sub-directories of 1Mb or more:
-    data      2.5Mb
-    doc       3.8Mb
-    extdata   1.4Mb
-
-checking foreign function calls ... NOTE
-Registration problems:
-  symbol ‘functionCall’ in the local frame:
-   .Call(functionCall, myXStringSet, as.numeric(subMatrix), gapOpening, 
-       gapExtension, gapLetter, shiftPenalty, threshold, weight, 
-       PACKAGE = "DECIPHER")
-  symbol ‘consensusProfile’ in the local frame:
-   .Call(consensusProfile, pattern, p.weight, NULL, PACKAGE = "DECIPHER")
-  symbol ‘consensusProfile’ in the local frame:
-   .Call(consensusProfile, subject, s.weight, NULL, PACKAGE = "DECIPHER")
-... 11 lines ...
-       structureMatrix)
-  Evaluating ‘compression[1]’ during check gives error
-‘object 'compression' not found’:
-   .Call(compression[1], x, 2L - length(compression), compressRepeats, 
-       processors, PACKAGE = "DECIPHER")
-  Evaluating ‘compression[1]’ during check gives error
-‘object 'compression' not found’:
-   .Call(compression[1], x, 2L - length(compression), processors, 
-       PACKAGE = "DECIPHER")
-See chapter ‘System and foreign language interfaces’ in the ‘Writing R
-Extensions’ manual.
-
-checking R code for possible problems ... NOTE
-DesignSignatures: no visible binding for global variable ‘deltaHrules’
-Undefined global functions or variables:
-  deltaHrules
-
-checking compiled code ... NOTE
-File ‘DECIPHER/libs/DECIPHER.so’:
-  Found no call to: ‘R_useDynamicSymbols’
-
-It is good practice to register native routines and to disable symbol
-search.
-
-See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
 
 ## dplyr (0.5.0)
@@ -737,26 +415,26 @@ checking tests ... ERROR
   Running ‘testthat.R’
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
-  Actual value: "Expecting a single value: [extent=0]."
-  
-  
-  2. Failure: summarise gives proper errors (#153) (@test-summarise.r#62) --------
-  error$message does not match "expecting a single value".
-  Actual value: "Expecting a single value: [extent=2]."
+  5. Failure: ungrouped output (@test-output.R#10) -------------------------------
+  print(iris_mem %>% head(), n = 30L, width = 80L) not equal to safe_read_lines("output/iris-head-30-80.txt").
+  Lengths differ: 12 vs 11
   
   
   testthat results ================================================================
-  OK: 1507 SKIPPED: 1 FAILED: 2
-  1. Failure: summarise gives proper errors (#153) (@test-summarise.r#61) 
-  2. Failure: summarise gives proper errors (#153) (@test-summarise.r#62) 
+  OK: 1504 SKIPPED: 1 FAILED: 5
+  1. Failure: ungrouped output (@test-output.R#10) 
+  2. Failure: ungrouped output (@test-output.R#10) 
+  3. Failure: ungrouped output (@test-output.R#10) 
+  4. Failure: ungrouped output (@test-output.R#10) 
+  5. Failure: ungrouped output (@test-output.R#10) 
   
   Error: testthat unit tests failed
   Execution halted
 
 checking installed package size ... NOTE
-  installed size is 24.0Mb
+  installed size is 23.4Mb
   sub-directories of 1Mb or more:
-    libs  21.9Mb
+    libs  21.3Mb
 
 checking compiled code ... NOTE
 File ‘dplyr/libs/dplyr.so’:
@@ -768,73 +446,39 @@ search.
 See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
 
-## filematrix (1.1.0)
-Maintainer: Andrey A Shabalin <ashabalin@vcu.edu>  
-Bug reports: https://github.com/andreyshabalin/filematrix/issues
+## etl (0.3.5)
+Maintainer: Ben Baumer <ben.baumer@gmail.com>  
+Bug reports: https://github.com/beanumber/etl/issues
 
-0 errors | 1 warning  | 0 notes
-
-```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning in engine$weave(file, quiet = quiet, encoding = enc) :
-  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
-Quitting from lines 2-23 (Best_Prectices.Rmd) 
-Error: processing vignette 'Best_Prectices.Rmd' failed with diagnostics:
-could not find function "doc_date"
-Execution halted
+1 error  | 1 warning  | 0 notes
 
 ```
+checking tests ... ERROR
+  Running ‘testthat.R’
+Running the tests in ‘tests/testthat.R’ failed.
+Last 13 lines of output:
+  downloaded 12 KB
+  
+  trying URL 'http://www.nytimes.com'
+  Content type 'text/html; charset=utf-8' length 213012 bytes (208 KB)
+  ==================================================
+  downloaded 208 KB
+  
+  testthat results ================================================================
+  OK: 15 SKIPPED: 0 FAILED: 3
+  1. Error: sqlite works (@test-etl.R#9) 
+  2. Failure: dplyr works (@test-etl.R#25) 
+  3. Error: MonetDBLite works (@test-etl.R#54) 
+  
+  Error: testthat unit tests failed
+  Execution halted
 
-## freqweights (1.0.3)
-Maintainer: Emilio Torres-Manzanera <torres@uniovi.es>
+checking Rd cross-references ... WARNING
+Missing link or links in documentation object 'etl.Rd':
+  ‘[dplyr]{src_sql}’
 
-1 error  | 0 warnings | 0 notes
+See section 'Cross-references' in the 'Writing R Extensions' manual.
 
-```
-checking examples ... ERROR
-Running examples in ‘freqweights-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: clarachunk
-> ### Title: Clustering Large Chunks
-> ### Aliases: clarachunk claramerge clarasub
-> 
-> ### ** Examples
-... 12 lines ...
-+   b <- claramerge(subclusters,k)
-+      print(b$medoids)
-+ 
-+    print(nrow(b$tablefreq))
-+   print(b$tablefreq)
-+ }
-Loading required package: cluster
-Error in cluster::clara(x, k, samples = samples, rngR = TRUE, keep.data = FALSE) : 
-  object 'cl_clara' not found
-Calls: clarasub -> <Anonymous>
-Execution halted
-```
-
-## gcbd (0.2.6)
-Maintainer: Dirk Eddelbuettel <edd@debian.org>
-
-0 errors | 1 warning  | 1 note 
-
-```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning in packageDescription("gputools") :
-  no package 'gputools' was found
-Error: processing vignette 'gcbd.Rnw' failed with diagnostics:
-at gcbd.Rnw:860, subscript out of bounds
-Execution halted
-
-
-checking package dependencies ... NOTE
-Package suggested but not available for checking: ‘gputools’
 ```
 
 ## GeneAnswers (2.18.0)
@@ -1010,75 +654,12 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## GWASTools (1.22.0)
-Maintainer: Stephanie M. Gogarten <sdmorris@u.washington.edu>, Adrienne Stilp <amstilp@u.washington.edu>
-
-1 error  | 0 warnings | 1 note 
-
-```
-checking tests ... ERROR
-  Running ‘test.R’ [196s/200s]
-Running the tests in ‘tests/test.R’ failed.
-Last 13 lines of output:
-  
-  Test files with failing tests
-  
-     assocCoxPH_test.R 
-       test_CPH 
-       test_GxE 
-       test_runCPH 
-       test_runCPH_GxE 
-       test_strata 
-  
-  
-  Error in BiocGenerics:::testPackage("GWASTools", pattern = ".*_test\\.R$") : 
-    unit tests failed for package GWASTools
-  In addition: There were 50 or more warnings (use warnings() to see the first 50)
-  Execution halted
-
-checking Rd line widths ... NOTE
-Rd file 'assocRegression.Rd':
-  \examples lines wider than 100 characters:
-     scanAnnot$blood.pressure[scanAnnot$case.cntl.status==1] <- rnorm(sum(scanAnnot$case.cntl.status==1), mean=100, sd=10)
-     scanAnnot$blood.pressure[scanAnnot$case.cntl.status==0] <- rnorm(sum(scanAnnot$case.cntl.status==0), mean=90, sd=5)
-
-Rd file 'createDataFile.Rd':
-  \usage lines wider than 90 characters:
-                    precision="single", compress="LZMA_RA:1M", compress.geno="", compress.annot="LZMA_RA",
-                             precision="single", compress="LZMA_RA:1M", compress.annot="LZMA_RA",
-
-These lines will be truncated in the PDF manual.
-```
-
 ## lumi (2.28.0)
 Maintainer: Pan Du <dupan.mail@gmail.com>, Lei Huang <lhuang@bsd.uchicago.edu>, Gang Feng <g-feng@northwestern.edu>
 
-1 error  | 2 warnings | 3 notes
+0 errors | 2 warnings | 3 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘lumi-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: MAplot-methods
-> ### Title: MAplot of a ExpressionSet object
-> ### Aliases: MAplot-methods MAplot MAplot.ExpressionSet
-> ###   MAplot,ExpressionSet-method
-> ### Keywords: methods hplot
-> 
-> ### ** Examples
-> 
-> ## load example data
-> data(example.lumi)
-> 
-> MAplot(example.lumi)
-> 
-> MAplot(example.lumi, smoothScatter=TRUE)
-Error in linbin2D(x, gpoints1, gpoints2) : object 'F_lbtwod' not found
-Calls: MAplot ... smoothScatter -> <Anonymous> -> <Anonymous> -> linbin2D
-Execution halted
-
 checking dependencies in R code ... WARNING
 '::' or ':::' imports not declared from:
   ‘IRanges’ ‘bigmemoryExtras’
@@ -1134,35 +715,26 @@ Installation failed.
 See ‘/home/muelleki/git/R/RSQLite/revdep/checks/maGUI.Rcheck/00install.out’ for details.
 ```
 
+## metagenomeFeatures (1.8.0)
+Maintainer: Nathan D. Olson <nolson@umiacs.umd.edu>  
+Bug reports: https://github.com/HCBravoLab/metagenomeFeatures/issues
+
+1 error  | 0 warnings | 0 notes
+
+```
+checking whether package ‘metagenomeFeatures’ can be installed ... ERROR
+Installation failed.
+See ‘/home/muelleki/git/R/RSQLite/revdep/checks/metagenomeFeatures.Rcheck/00install.out’ for details.
+```
+
 ## metaseqR (1.16.0)
 Maintainer: Panagiotis Moulos <moulos@fleming.gr>
 
-2 errors | 1 warning  | 4 notes
+1 error  | 1 warning  | 4 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘metaseqR-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: diagplot.edaseq
-> ### Title: Diagnostic plots based on the EDASeq package
-> ### Aliases: diagplot.edaseq
-> 
-> ### ** Examples
-> 
-> require(DESeq)
-> data.matrix <- counts(makeExampleCountDataSet())
-> sample.list <- list(A=c("A1","A2"),B=c("B1","B2","B3"))
-> diagplot.edaseq(data.matrix,sample.list,which.plot="meandiff")
-dev.new(): using pdf(file="Rplots6.pdf")
-Error in linbin2D(x, gpoints1, gpoints2) : object 'F_lbtwod' not found
-Calls: diagplot.edaseq ... smoothScatter -> <Anonymous> -> <Anonymous> -> linbin2D
-Execution halted
-** found \donttest examples: check also with --run-donttest
-
 checking tests ... ERROR
-  Running ‘runTests.R’ [24s/27s]
+  Running ‘runTests.R’ [21s/23s]
 Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
   ERROR in test_estimate_aufc_weights: Error in .check_ncores(cores) : 13 simultaneous processes spawned
@@ -1314,74 +886,76 @@ search.
 See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
 
-## MmPalateMiRNA (1.26.0)
-Maintainer: Guy Brock <guy.brock@louisville.edu>
+## MonetDBLite (0.3.1)
+Maintainer: Hannes Muehleisen <hannes@cwi.nl>  
+Bug reports: https://github.com/hannesmuehleisen/MonetDBLite/issues
 
-0 errors | 1 warning  | 4 notes
+2 errors | 0 warnings | 3 notes
 
 ```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-    'citation("pkgname")'.
+checking examples ... ERROR
+Running examples in ‘MonetDBLite-Ex.R’ failed
+The error most likely occurred in:
 
-Loading required package: xtable
-Loading required package: limma
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: src_monetdb
+> ### Title: dplyr integration from MonetDBLite
+> ### Aliases: src_monetdb src_monetdblite tbl.src_monetdb
+> ###   src_desc.src_monetdb src_translate_env.src_monetdb
+> ###   sample_frac.tbl_monetdb sample_n.tbl_monetdb
+... 18 lines ...
 
-Attaching package: ‘limma’
+The following objects are masked from ‘package:base’:
 
-... 8 lines ...
-Loading required package: latticeExtra
-Loading required package: RColorBrewer
-Loading required package: multtest
-Loading required package: clValid
-Loading required package: cluster
+    intersect, setdiff, setequal, union
 
-Error: processing vignette 'MmPalateMiRNA.Rnw' failed with diagnostics:
- chunk 39 (label = Clustering) 
-Error in silhouette.default(cluster, dmatrix = as.matrix(Dist)) : 
-  object 'sildist' not found
+> # Connection basics ---------------------------------------------------------
+> # To connect to a database first create a src:
+> dbdir <- file.path(tempdir(), "dplyrdir")
+> my_db <- MonetDBLite::src_monetdb(embedded=dbdir)
+Error: 'src_sql' is not an exported object from 'namespace:dplyr'
 Execution halted
 
-checking package dependencies ... NOTE
-Depends: includes the non-default packages:
-  ‘Biobase’ ‘xtable’ ‘limma’ ‘statmod’ ‘lattice’ ‘vsn’
-Adding so many packages to the search path is excessive and importing
-selectively is preferable.
+checking tests ... ERROR
+  Running ‘testthat.R’ [18s/60s]
+Running the tests in ‘tests/testthat.R’ failed.
+Last 13 lines of output:
+  testthat results ================================================================
+  OK: 132 SKIPPED: 0 FAILED: 13
+  1. Error: we can connect (@test_03_dplyr.R#15) 
+  2. Error: dplyr copy_to() (@test_03_dplyr.R#27) 
+  3. Error: dplyr tbl( sql() ) (@test_03_dplyr.R#35) 
+  4. Error: dplyr select() (@test_03_dplyr.R#43) 
+  5. Error: dplyr filter() (@test_03_dplyr.R#51) 
+  6. Error: dplyr arrange() (@test_03_dplyr.R#59) 
+  7. Error: dplyr mutate() (@test_03_dplyr.R#67) 
+  8. Error: dplyr summarise() (@test_03_dplyr.R#75) 
+  9. Error: dplyr multiple objects (@test_03_dplyr.R#84) 
+  1. ...
+  
+  Error: testthat unit tests failed
+  Execution halted
 
-checking DESCRIPTION meta-information ... NOTE
-Packages listed in more than one of Depends, Imports, Suggests, Enhances:
-  ‘limma’ ‘lattice’ ‘Biobase’
-A package should be listed in only one of these fields.
+checking installed package size ... NOTE
+  installed size is  6.9Mb
+  sub-directories of 1Mb or more:
+    libs   6.6Mb
 
 checking dependencies in R code ... NOTE
-Packages in Depends field not imported from:
-  ‘methods’ ‘statmod’ ‘vsn’ ‘xtable’
-  These packages need to be imported from (in the NAMESPACE file)
-  for when this namespace is loaded but not attached.
+Missing or unexported objects:
+  ‘dplyr::base_agg’ ‘dplyr::base_scalar’ ‘dplyr::base_win’
+  ‘dplyr::build_sql’ ‘dplyr::is.ident’ ‘dplyr::sql_infix’
+  ‘dplyr::sql_prefix’ ‘dplyr::sql_translator’ ‘dplyr::sql_variant’
+  ‘dplyr::src_sql’ ‘dplyr::tbl_sql’
 
-checking R code for possible problems ... NOTE
-clustPlot: no visible global function definition for ‘par’
-clustPlot: no visible global function definition for ‘plot’
-clustPlot: no visible global function definition for ‘axis’
-clustPlot: no visible global function definition for ‘lines’
-clustPlot: no visible global function definition for ‘legend’
-fixOutliers : <anonymous>: no visible global function definition for
-  ‘sd’
-imputeKNN: no visible global function definition for ‘sd’
-imputeKNN: no visible global function definition for ‘cor’
-... 36 lines ...
-  definition for ‘assayData’
-levelplot,list-missing: no visible global function definition for
-  ‘median’
-Undefined global functions or variables:
-  RG.MA as.formula assayData axis cor featureData legend lines mad
-  median pData par plot sd stack
-Consider adding
-  importFrom("graphics", "axis", "legend", "lines", "par", "plot")
-  importFrom("stats", "as.formula", "cor", "mad", "median", "sd")
-  importFrom("utils", "stack")
-to your NAMESPACE file.
+checking compiled code ... NOTE
+File ‘MonetDBLite/libs/libmonetdb5.so’:
+  Found no calls to: ‘R_registerRoutines’, ‘R_useDynamicSymbols’
+
+It is good practice to register native routines and to disable symbol
+search.
+
+See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
 
 ## oce (0.9-21)
@@ -1438,34 +1012,27 @@ Files in the 'vignettes' directory but no files in 'inst/doc':
 Package has no Sweave vignette sources and no VignetteBuilder field.
 
 checking package dependencies ... NOTE
-Packages which this enhances but not available for checking:
-  ‘doMC’ ‘doMPI’ ‘doSNOW’ ‘doRedis’
+Package which this enhances but not available for checking: ‘doRedis’
 
 checking dependencies in R code ... NOTE
 Unexported object imported by a ':::' call: ‘Biobase:::assayDataEnvLock’
   See the note in ?`:::` about the use of this operator.
 
 checking R code for possible problems ... NOTE
-addFeatureAnnotation.pd2: no visible global function definition for
-  ‘dbGetQuery’
 getSequenceLengths: no visible binding for global variable ‘seqlengths’
 pdPkgFromBioC: no visible binding for global variable ‘contrib.url’
 pdPkgFromBioC: no visible global function definition for
   ‘available.packages’
 pdPkgFromBioC: no visible global function definition for
   ‘install.packages’
-allele,SnpFeatureSet: no visible global function definition for
-  ‘dbGetQuery’
 chromosome,gSetList: no visible global function definition for
   ‘chromosomeList’
 coerce,CNSet-CopyNumberSet: no visible global function definition for
   ‘totalCopynumber’
 geometry,FeatureSet: no visible global function definition for ‘getPD’
-initialize,DBPDInfo: no visible global function definition for
-  ‘dbGetQuery’
 Undefined global functions or variables:
-  available.packages chromosomeList contrib.url dbGetQuery getPD
-  install.packages seqlengths totalCopynumber
+  available.packages chromosomeList contrib.url getPD install.packages
+  seqlengths totalCopynumber
 Consider adding
   importFrom("utils", "available.packages", "contrib.url",
              "install.packages")
@@ -1491,10 +1058,10 @@ Rd file 'oligoSetExample.Rd':
 These lines will be truncated in the PDF manual.
 ```
 
-## oligo (1.40.0)
+## oligo (1.40.1)
 Maintainer: Benilton Carvalho <benilton@unicamp.br>
 
-1 error  | 2 warnings | 10 notes
+1 error  | 1 warning  | 9 notes
 
 ```
 checking examples ... ERROR
@@ -1520,35 +1087,9 @@ Error in loadNamespace(name) : there is no package called ‘KernSmooth’
 Calls: MAplot ... tryCatch -> tryCatchList -> tryCatchOne -> <Anonymous>
 Execution halted
 
-checking for code/documentation mismatches ... WARNING
-Codoc mismatches from documentation object 'boxplot':
-\S4method{boxplot}{FeatureSet}
-  Code: function(x, which = c("pm", "mm", "bg", "both", "all"), transfo
-                 = log2, nsample = 10000, target = "mps1", ...)
-  Docs: function(x, which = c("pm", "mm", "bg", "both", "all"), transfo
-                 = log2, nsample = 10000, ...)
-  Argument names in code not in docs:
-    target
-  Mismatches in argument names:
-... 11 lines ...
-  Mismatches in argument names:
-    Position: 5 Code: target Docs: ...
-
-S4 class codoc mismatches from documentation object 'oligoPLM-class':
-Slots for class 'oligoPLM'
-  Code: annotation chip.coefs description geometry manufacturer method
-        narrays nprobes nprobesets phenoData probe.coefs protocolData
-        residualSE residuals se.chip.coefs se.probe.coefs weights
-  Docs: annotation chip.coefs geometry manufacturer method narrays
-        nprobes nprobesets probe.coefs residualSE residuals
-        se.chip.coefs se.probe.coefs weights
-
 checking files in ‘vignettes’ ... WARNING
 Files in the 'vignettes' directory newer than all files in 'inst/doc':
   ‘Makefile’
-
-checking package dependencies ... NOTE
-Packages which this enhances but not available for checking: ‘doMC’ ‘doMPI’
 
 checking installed package size ... NOTE
   installed size is 30.2Mb
@@ -1644,70 +1185,12 @@ See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ## Organism.dplyr (1.0.0)
 Maintainer: Martin Morgan <martin.morgan@roswellpark.org>
 
-2 errors | 1 warning  | 1 note 
+1 error  | 0 warnings | 0 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘Organism.dplyr-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: transcripts_tbl
-> ### Title: Extract genomic features from src_organism objects
-> ### Aliases: transcripts_tbl transcripts,src_organism-method exons_tbl
-> ###   exons,src_organism-method cds_tbl cds,src_organism-method genes_tbl
-> ###   genes,src_organism-method promoters_tbl promoters,src_organism-method
-... 80 lines ...
-4    chr15 25059538 25059633         + 123218 uc001yxl.5 SNORD116-4
-5    chr15 25062333 25062427         + 123219 uc001yxo.4 SNORD116-5
-6    chr15 25065026 25065121         + 123221 uc001yxp.5 SNORD116-2
-7    chr15 25067788 25067882         + 123222 uc059gus.1 SNORD116-5
-> ## transcript coordinates with filter in granges format
-> filters <- list(GRangesFilter(GenomicRanges::GRanges("chr15:1-25070000")))
-> transcripts(src, filters)
-Error in .normargSeqlengths(seqlengths, seqnames) : 
-  bad supplied 'seqlengths' vector
-Calls: transcripts ... .updateSeqinfo -> .getSeqinfo -> Seqinfo -> .normargSeqlengths
-Execution halted
-
-checking tests ... ERROR
-  Running ‘testthat.R’ [61s/62s]
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-  testthat results ================================================================
-  OK: 45 SKIPPED: 0 FAILED: 11
-  1. Error: transcripts-extractor (@test-GenomicFeatures-extractors.R#79) 
-  2. Error: exons-extractor (@test-GenomicFeatures-extractors.R#84) 
-  3. Error: cds-extractor (@test-GenomicFeatures-extractors.R#89) 
-  4. Error: promoters-extractor (@test-GenomicFeatures-extractors.R#94) 
-  5. Error: transcriptsBy-extractor (@test-GenomicFeatures-extractors.R#100) 
-  6. Error: exonsBy-extractor (@test-GenomicFeatures-extractors.R#115) 
-  7. Error: cdsBy-extractor (@test-GenomicFeatures-extractors.R#121) 
-  8. Error: intronsByTranscript-extractor (@test-GenomicFeatures-extractors.R#127) 
-  9. Error: fiveUTRsByTranscript-extractor (@test-GenomicFeatures-extractors.R#133) 
-  1. ...
-  
-  Error: testthat unit tests failed
-  Execution halted
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning in engine$weave(file, quiet = quiet, encoding = enc) :
-  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
-Quitting from lines 2-34 (Organism.dplyr.Rmd) 
-Error: processing vignette 'Organism.dplyr.Rmd' failed with diagnostics:
-could not find function "Biocpkg"
-Execution halted
-
-
-checking dependencies in R code ... NOTE
-Unexported objects imported by ':::' calls:
-  ‘AnnotationDbi:::smartKeys’ ‘GenomicFeatures:::.exons_with_3utr’
-  ‘GenomicFeatures:::.exons_with_5utr’
-  ‘GenomicFeatures:::get_TxDb_seqinfo0’
-  ‘S4Vectors:::extract_data_frame_rows’
-  See the note in ?`:::` about the use of this operator.
+checking whether package ‘Organism.dplyr’ can be installed ... ERROR
+Installation failed.
+See ‘/home/muelleki/git/R/RSQLite/revdep/checks/Organism.dplyr.Rcheck/00install.out’ for details.
 ```
 
 ## PAnnBuilder (1.40.0)
@@ -1782,6 +1265,70 @@ Packages listed in more than one of Depends, Imports, Suggests, Enhances:
 A package should be listed in only one of these fields.
 ```
 
+## PGA (1.6.0)
+Maintainer: Bo Wen <wenbo@genomics.cn>, Shaohang Xu <xsh.skye@gmail.com>
+
+1 error  | 0 warnings | 3 notes
+
+```
+checking examples ... ERROR
+Running examples in ‘PGA-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: easyRun
+> ### Title: easyRun
+> ### Aliases: easyRun
+> 
+> ### ** Examples
+... 88 lines ...
+ 8: f(l = layers[[i]], d = data[[i]])
+ 9: by_layer(function(l, d) l$compute_position(d, layout))
+10: ggplot_build(x)
+11: print.ggplot(ggobj)
+12: print(ggobj)
+13: .base_transfer(res$file)
+14: reportSNV(parser_dir, tab_dir, report_dir)
+15: reportGear(parser_dir = iddir, tab_dir = dbdir, report_dir = report_dir)
+16: easyRun(gtfFile = gtffile, vcfFile = vcffile, bedFile = bedfile,     spectra = msfile, annotation_path = annotation, genome = Hsapiens,     cpu = 6, enzyme = "[KR]|[X]", varmod = "15.994915@M", itol = 0.05,     fixmod = "57.021464@C", tol = 10, tolu = "ppm", itolu = "Daltons",     miss = 2, maxCharge = 8, ti = FALSE, xmx = 1)
+An irrecoverable exception occurred. R is aborting now ...
+Segmentation fault (core dumped)
+
+checking installed package size ... NOTE
+  installed size is  5.6Mb
+  sub-directories of 1Mb or more:
+    extdata   1.8Mb
+
+checking dependencies in R code ... NOTE
+Unexported objects imported by ':::' calls:
+  ‘biomaRt:::martBM’ ‘biomaRt:::martDataset’ ‘biomaRt:::martHost’
+  ‘customProDB:::makeTranscriptDbFromBiomart_archive’
+  See the note in ?`:::` about the use of this operator.
+
+checking R code for possible problems ... NOTE
+.base_transfer: no visible binding for global variable ‘peptide’
+.base_transfer: no visible binding for global variable ‘refbase’
+.base_transfer: no visible binding for global variable ‘varbase’
+.base_transfer: no visible binding for global variable ‘aaref’
+.base_transfer: no visible binding for global variable ‘aavar’
+.base_transfer: no visible binding for global variable ‘Type’
+.base_transfer: no visible binding for global variable ‘Freq’
+.get_30aa_splited_seq: no visible global function definition for ‘.’
+.get_30aa_splited_seq: no visible binding for global variable ‘id’
+... 216 lines ...
+reportSNV: no visible binding for global variable ‘abc’
+reportSNV: no visible binding for global variable ‘xyz’
+Undefined global functions or variables:
+  . .I .N .SD CUFF_ID Change Class Evalue Frame Freq ID Index Mass
+  MutNum Query Qvalue Strand Substring Type aapos aaref aavar abc
+  alleleCount alleles charge chr chrom cumlen delta_da delta_ppm evalue
+  gene_name genename genome<- id isSAP isUnique junType jun_type label
+  miss mods mrnaAcc mz name output pep peptide pincoding position
+  pro_name proname prot protAcc protein rbindlist readAAStringSet
+  readDNAStringSet refbase rsid seqlengths seqlevels seqlevels<- subseq
+  transcript tx_name txid txname varbase writeXStringSet x xyz y
+```
+
 ## plethy (1.14.0)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
@@ -1802,7 +1349,7 @@ The error most likely occurred in:
 > temp.db.file <- tempfile()
 > write(sim.bux.lines, file=temp.file)
 > test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
-Processing /tmp/RtmpZiwDkn/file20a56f571a57 in chunks of 10000
+Processing /tmp/RtmpOLBS9P/file119a3f585f3c in chunks of 10000
 Starting chunk 1
 Reached breakpoint change
 Processing breakpoint 1
@@ -1812,7 +1359,7 @@ Calls: parse.buxco ... write.sample.breaks -> write.sample.db -> sanity.check.ti
 Execution halted
 
 checking tests ... ERROR
-  Running ‘runTests.R’ [26s/26s]
+  Running ‘runTests.R’ [26s/25s]
 Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
   Test files with failing tests
@@ -1828,7 +1375,7 @@ Last 13 lines of output:
     unit tests failed for package plethy
   In addition: Warning message:
   In .Internal(gc(verbose, reset)) :
-    closing unused connection 3 (/tmp/RtmpyIZItY/file2230157cbf70)
+    closing unused connection 3 (/tmp/Rtmp6eGATd/file12c17f8309f7)
   Execution halted
 
 checking dependencies in R code ... NOTE
@@ -1877,44 +1424,6 @@ Rd file 'utilities.Rd':
 These lines will be truncated in the PDF manual.
 ```
 
-## RecordLinkage (0.4-10)
-Maintainer: Andreas Borg <borga@uni-mainz.de>
-
-1 error  | 0 warnings | 1 note 
-
-```
-checking examples ... ERROR
-Running examples in ‘RecordLinkage-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: classifyUnsup
-> ### Title: Unsupervised Classification
-> ### Aliases: classifyUnsup
-> ### Keywords: classif
-> 
-> ### ** Examples
-> 
-> # Classification with bclust
-> data(RLdata500)
-> rpairs=compare.dedup(RLdata500, identity=identity.RLdata500,
-+                     blockfld=list(1,3,5,6,7))
-> result=classifyUnsup(rpairs,method="bclust")
-Committee Member: 1(1) 2(1) 3(1) 4(1) 5(1) 6(1) 7(1) 8(1) 9(1) 10(1)Error in knn1(object$allcenters, x, factor(1:nrow(object$allcenters))) : 
-  object 'VR_knn1' not found
-Calls: classifyUnsup -> bclust -> knn1
-Execution halted
-
-checking compiled code ... NOTE
-File ‘RecordLinkage/libs/RecordLinkage.so’:
-  Found no calls to: ‘R_registerRoutines’, ‘R_useDynamicSymbols’
-
-It is good practice to register native routines and to disable symbol
-search.
-
-See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
-```
-
 ## recoup (1.4.0)
 Maintainer: Panagiotis Moulos <moulos@fleming.gr>
 
@@ -1945,7 +1454,7 @@ Execution halted
 ** found \donttest examples: check also with --run-donttest
 
 checking tests ... ERROR
-  Running ‘runTests.R’ [18s/18s]
+  Running ‘runTests.R’ [16s/15s]
 Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
   
@@ -2000,39 +1509,6 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
   consider running tools::compactPDF(gs_quality = "ebook") on these files
 ```
 
-## RObsDat (16.03)
-Maintainer: Dominik Reusser <reusser@pik-potsdam.de>
-
-1 error  | 0 warnings | 1 note 
-
-```
-checking examples ... ERROR
-Running examples in ‘RObsDat-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: RObsDat-package
-> ### Title: R-Package to the observations Data Model from CUAHSI
-> ### Aliases: RObsDat-package RObsDat
-> ### Keywords: package
-> 
-... 137 lines ...
-  the condition has length > 1 and only the first element will be used
-
-addDtV> #If only one time point or one location is selected you have to use '@ValueIDs' in addition.
-addDtV> if(dim(inDB@ValueIDs)[2]>=29) deleteDataValues(inDB@ValueIDs[,29],  "Remove a value")
-data frame with 0 columns and 0 rows
-
-addDtV> if(dim(inDB@ValueIDs)[2]>=14) deleteDataValues(inDB@ValueIDs[,10:14],  "Remove several values")
-Error in rsqlite_send_query(conn@ptr, statement) : 
-  UNIQUE constraint failed: DataValuesRepository.ValueID, DataValuesRepository.VersionID
-Calls: example ... initialize -> initialize -> rsqlite_send_query -> .Call
-Execution halted
-
-checking package dependencies ... NOTE
-Package suggested but not available for checking: ‘SSOAP’
-```
-
 ## RQDA (0.2-8)
 Maintainer: HUANG Ronggui <ronggui.huang@gmail.com>
 
@@ -2044,8 +1520,7 @@ Installation failed.
 See ‘/home/muelleki/git/R/RSQLite/revdep/checks/RQDA.Rcheck/00install.out’ for details.
 
 checking package dependencies ... NOTE
-Packages which this enhances but not available for checking:
-  ‘rjpod’ ‘d3Network’
+Package which this enhances but not available for checking: ‘rjpod’
 ```
 
 ## seqplots (1.13.0)
@@ -2056,7 +1531,7 @@ Bug reports: http://github.com/przemol/seqplots/issues
 
 ```
 checking tests ... ERROR
-  Running ‘test-all.R’ [24s/24s]
+  Running ‘test-all.R’ [25s/24s]
 Running the tests in ‘tests/test-all.R’ failed.
 Last 13 lines of output:
   6: plotHeatmap(plotset$data, main, labels, legend, keepratio, plotScale, sortrows, clusters, 
@@ -2112,93 +1587,73 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## specL (1.10.0)
-Maintainer: Christian Panse <cp@fgcz.ethz.ch>, Witold E. Wolski <wewolski@gmail.com>  
-Bug reports: https://github.com/fgcz/specL/issues
+## sf (0.4-2)
+Maintainer: Edzer Pebesma <edzer.pebesma@uni-muenster.de>  
+Bug reports: https://github.com/edzer/sfr/issues/
 
-0 errors | 1 warning  | 5 notes
+2 errors | 0 warnings | 1 note 
 
 ```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning in engine$weave(file, quiet = quiet, encoding = enc) :
-  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
-Quitting from lines 2-25 (cdsw.Rmd) 
-Error: processing vignette 'cdsw.Rmd' failed with diagnostics:
-could not find function "doc_date"
+checking examples ... ERROR
+Running examples in ‘sf-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: dplyr
+> ### Title: Dplyr verb methods for sf objects
+> ### Aliases: dplyr filter_.sf dplyr filter.sf dplyr arrange_.sf dplyr
+> ###   arrange.sf dplyr distinct_.sf dplyr distinct.sf dplyr group_by_.sf
+> ###   dplyr group_by.sf dplyr mutate_.sf dplyr mutate.sf dplyr
+... 29 lines ...
+epsg (SRID):    4267
+proj4string:    +proj=longlat +datum=NAD27 +no_defs
+> nc %>% filter(AREA > .1) %>% plot()
+Warning: plotting the first 10 out of 14 attributes; use max.plot = 14 to plot all
+> # plot 10 smallest counties in grey:
+> st_geometry(nc) %>% plot()
+> nc %>% select(AREA) %>% arrange(AREA) %>% slice(1:10) %>% plot(add = TRUE, col = 'grey')
+Error in select.sf(., AREA) : 
+  requires dplyr > 0.5.0: install that first, then reinstall sf
+Calls: %>% ... _fseq -> freduce -> <Anonymous> -> select -> select.sf
 Execution halted
 
+checking tests ... ERROR
+  Running ‘cast.R’
+  Comparing ‘cast.Rout’ to ‘cast.Rout.save’ ...4c4
+< Linking to GEOS 3.5.0, GDAL 2.1.0, proj.4 4.9.2
+---
+> Linking to GEOS 3.5.1, GDAL 2.1.3, proj.4 4.9.2
+  Running ‘crs.R’
+  Comparing ‘crs.Rout’ to ‘crs.Rout.save’ ... OK
+  Running ‘dist.R’
+  Comparing ‘dist.Rout’ to ‘dist.Rout.save’ ... OK
+... 8 lines ...
+  Warning message:
+  plotting the first 10 out of 14 attributes; use max.plot = 14 to plot all 
+  > 
+  > # plot 10 smallest counties in grey:
+  > nc %>% 
+  +   select(BIR74, geometry) %>% 
+  +   plot()
+  Error in select.sf(., BIR74, geometry) : 
+    requires dplyr > 0.5.0: install that first, then reinstall sf
+  Calls: %>% ... _fseq -> freduce -> <Anonymous> -> select -> select.sf
+  Execution halted
 
 checking installed package size ... NOTE
-  installed size is  5.7Mb
+  installed size is 10.3Mb
   sub-directories of 1Mb or more:
-    doc   4.2Mb
-
-checking S3 generic/method consistency ... NOTE
-Found the following apparent S3 methods exported but not registered:
-  merge.specLSet plot.psm plot.psmSet summary.psmSet
-See section ‘Registering S3 methods’ in the ‘Writing R Extensions’
-manual.
-
-checking R code for possible problems ... NOTE
-.onAttach: no visible global function definition for ‘packageVersion’
-.retentiontimePlotFile : <anonymous>: no visible global function
-  definition for ‘rgb’
-plot,specLSet: no visible global function definition for ‘draw.circle’
-summary,specLSet : <anonymous>: no visible binding for global variable
-  ‘iRTpeptides’
-Undefined global functions or variables:
-  draw.circle iRTpeptides packageVersion rgb
-Consider adding
-  importFrom("grDevices", "rgb")
-  importFrom("utils", "packageVersion")
-to your NAMESPACE file.
-
-checking Rd files ... NOTE
-prepare_Rd: ms1.p2069.Rd:28-32: Dropping empty section \references
-prepare_Rd: ms1.p2069.Rd:23-26: Dropping empty section \examples
-
-checking compiled code ... NOTE
-File ‘specL/libs/specL.so’:
-  Found no calls to: ‘R_registerRoutines’, ‘R_useDynamicSymbols’
-
-It is good practice to register native routines and to disable symbol
-search.
-
-See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
+    doc    4.0Mb
+    libs   4.2Mb
 ```
 
 ## sqldf (0.4-10)
 Maintainer: G. Grothendieck <ggrothendieck@gmail.com>  
 Bug reports: http://groups.google.com/group/sqldf
 
-1 error  | 1 warning  | 2 notes
+0 errors | 1 warning  | 2 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘sqldf-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: sqldf
-> ### Title: SQL select on data frames
-> ### Aliases: sqldf
-> ### Keywords: manip
-> 
-... 6 lines ...
-> # in R without SQL and then again with SQL
-> #
-> 
-> # head
-> a1r <- head(warpbreaks)
-> a1s <- sqldf("select * from warpbreaks limit 6")
-Loading required package: tcltk
-Error in rsqlite_send_query(conn@ptr, statement) : 
-  no such table: warpbreaks
-Calls: sqldf ... initialize -> initialize -> rsqlite_send_query -> .Call
-Execution halted
-
 checking whether package ‘sqldf’ can be installed ... WARNING
 Found the following significant warnings:
   Warning: no DISPLAY variable so Tk is not available
@@ -2220,281 +1675,30 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## stream (1.2-4)
-Maintainer: Michael Hahsler <mhahsler@lyle.smu.edu>  
-Bug reports: https://github.com/mhahsler/stream/issues
+## taxizedb (0.1.0)
+Maintainer: Scott Chamberlain <myrmecocystus+r@gmail.com>  
+Bug reports: https://github.com/ropensci/taxizedb/issues
 
-1 error  | 1 warning  | 1 note 
-
-```
-checking examples ... ERROR
-Running examples in ‘stream-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: DSC_TwoStage
-> ### Title: TwoStage Clustering Process
-> ### Aliases: DSC_TwoStage
-> 
-> ### ** Examples
-... 17 lines ...
-> win_km
-Sliding window + k-Means (weighted)
-Class: DSC_TwoStage, DSC_Macro, DSC 
-Number of micro-clusters: 100 
-Number of macro-clusters: 3 
-> plot(win_km, stream, type="both")  
-> evaluate(win_km, stream, assign="macro")
-Error in silhouette.default(clustering, dmatrix = dmat) : 
-  object 'sildist' not found
-Calls: evaluate -> <Anonymous> -> silhouette -> silhouette.default
-Execution halted
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Loading required package: proxy
-
-Attaching package: ‘proxy’
-
-The following objects are masked from ‘package:stats’:
-
-    as.dist, dist
-
-The following object is masked from ‘package:base’:
-
-    as.matrix
-
-Error in get_points.DSD_Memory(replayer, n = 2000) : 
-  Not enough data points left in stream! Only 1855 are available.
-
-Error: processing vignette 'stream.Rnw' failed with diagnostics:
- chunk 37 
-Error in silhouette.default(clustering, dmatrix = dmat) : 
-  object 'sildist' not found
-Execution halted
-
-
-checking installed package size ... NOTE
-  installed size is  6.7Mb
-  sub-directories of 1Mb or more:
-    doc    1.6Mb
-    libs   4.5Mb
-```
-
-## survey (3.31-5)
-Maintainer: "Thomas Lumley" <t.lumley@auckland.ac.nz>
-
-2 errors | 1 warning  | 0 notes
+1 error  | 0 warnings | 0 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘survey-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: marginpred
-> ### Title: Standardised predictions (predictive margins) for regression
-> ###   models.
-> ### Aliases: marginpred marginpred.svycoxph marginpred.svykmlist
-> ###   marginpred.svyglm
-... 11 lines ...
-> des<-svydesign(id=~1,data=df)
-Warning in svydesign.default(id = ~1, data = df) :
-  No weights or probabilities supplied, assuming equal probability
-> newdf<-data.frame(group=c(FALSE,TRUE), x=c(0,0))
-> 
-> ## Cox model
-> m0<-svycoxph(Surv(time,status)~group,design=des)
-Error in fitter(X, Y, strats, offset, init, control, weights = weights,  : 
-  object 'Ccoxmart' not found
-Calls: svycoxph ... with.default -> eval -> eval -> eval -> eval -> coxph -> fitter
-Execution halted
-
 checking tests ... ERROR
-  Running ‘DBIcheck.R’
-  Comparing ‘DBIcheck.Rout’ to ‘DBIcheck.Rout.save’ ... OK
-  Running ‘api.R’
-  Comparing ‘api.Rout’ to ‘api.Rout.save’ ...96c96
-< 0.003669 0.037743 0.052840 0.042390 0.052840 0.052840 
----
-> 0.003669 0.037740 0.052840 0.042390 0.052840 0.052840 
-124c124
-< 0.003669 0.037743 0.052840 0.042390 0.052840 0.052840 
-... 38 lines ...
-  +                        data=nwtco, subset=~I(rel |subcohort))
-  > 
-  > ##Coefficient results same as Splus with code from
-  > ## http://faculty.washington.edu/norm/software.html
-  > ## SE slightly larger due to using sandwich variance.
-  > 
-  > svycoxph(Surv(edrel, rel)~factor(stage)+factor(histol)+I(age/12), design=d_BorganII)
-  Error in fitter(X, Y, strats, offset, init, control, weights = weights,  : 
-    object 'Ccoxmart' not found
-  Calls: svycoxph ... with.default -> eval -> eval -> eval -> eval -> coxph -> fitter
-  Execution halted
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Loading required package: grid
-Loading required package: Matrix
-Loading required package: survival
-
-Attaching package: ‘survey’
-
-The following object is masked from ‘package:graphics’:
-
-    dotchart
-
-Warning in eval(family$initialize) :
-  non-integer #successes in a binomial glm!
-Warning in eval(family$initialize) :
-  non-integer #successes in a binomial glm!
-Warning in eval(family$initialize) :
-  non-integer #successes in a binomial glm!
-
-Error: processing vignette 'epi.Rnw' failed with diagnostics:
- chunk 6 
-Error in fitter(X, Y, strats, offset, init, control, weights = weights,  : 
-  object 'Ccoxmart' not found
-Execution halted
-
-```
-
-## TFBSTools (1.14.0)
-Maintainer: Ge Tan <ge.tan09@imperial.ac.uk>  
-Bug reports: https://github.com/ge11232002/TFBSTools/issues
-
-2 errors | 1 warning  | 4 notes
-
-```
-checking examples ... ERROR
-Running examples in ‘TFBSTools-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: PFMSimilarity-methods
-> ### Title: PFMSimilarity method
-> ### Aliases: PFMSimilarity PFMSimilarity-methods
-> ###   PFMSimilarity,matrix,character-method
-> ###   PFMSimilarity,matrix,matrix-method
-... 62 lines ...
-+       11,  0,  9,  0,  0,  0,  0, 52,  1,  6, 15, 20)),
-+     nrow=4, byrow=TRUE, dimnames=list(DNA_BASES))
->   pfmQuery <- PFMatrix(profileMatrix=profileMatrix)
->   pfmSubjects <- getMatrixSet(JASPAR2016,
-+                               opts=list(ID=c("MA0500", "MA0499", "MA0521",
-+                                              "MA0697", "MA0048", "MA0751",
-+                                              "MA0832")))
-Error in dbGetQuery(con, sqlCMD) : could not find function "dbGetQuery"
-Calls: getMatrixSet ... getMatrixSet -> .get_IDlist_by_query -> .get_latest_version
-Execution halted
-** found \donttest examples: check also with --run-donttest
-
-checking tests ... ERROR
-  Running ‘testthat.R’ [19s/19s]
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-  1: getMatrixSet(JASPAR2016, opts = list(ID = c("MA0500", "MA0499", "MA0521", "MA0697"))) at testthat/test_PFM.R:11
-  2: getMatrixSet(JASPAR2016, opts = list(ID = c("MA0500", "MA0499", "MA0521", "MA0697")))
-  3: getMatrixSet(x@db, opts)
-  4: getMatrixSet(x@db, opts)
-  5: getMatrixSet(con, opts)
-  6: getMatrixSet(con, opts)
-  7: .get_IDlist_by_query(x, opts)
-  8: .get_latest_version(con, baseID)
+  Running ‘test-all.R’
+Running the tests in ‘tests/test-all.R’ failed.
+Complete output:
+  > library(testthat)
+  > test_check("taxizedb")
+  Loading required package: taxizedb
+  1. Failure: sql_collect works (@test-sql_collect.R#9) --------------------------
+  `src` inherits from `src_dbi/src_sql/src` not `src_sqlite`.
+  
   
   testthat results ================================================================
-  OK: 29 SKIPPED: 0 FAILED: 1
-  1. Error: test_PFMSimilarity (@test_PFM.R#11) 
+  OK: 34 SKIPPED: 4 FAILED: 1
+  1. Failure: sql_collect works (@test-sql_collect.R#9) 
   
   Error: testthat unit tests failed
   Execution halted
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning in engine$weave(file, quiet = quiet, encoding = enc) :
-  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
-Quitting from lines 2-16 (TFBSTools.Rmd) 
-Error: processing vignette 'TFBSTools.Rmd' failed with diagnostics:
-could not find function "doc_date"
-Execution halted
-
-
-checking installed package size ... NOTE
-  installed size is 12.7Mb
-  sub-directories of 1Mb or more:
-    R  11.9Mb
-
-checking dependencies in R code ... NOTE
-Unexported objects imported by ':::' calls:
-  ‘S4Vectors:::new_SimpleList_from_list’ ‘seqLogo:::pwm2ic’
-  See the note in ?`:::` about the use of this operator.
-
-checking R code for possible problems ... NOTE
-.TAXIDToSpecies: no visible global function definition for ‘dbGetQuery’
-.create_tables: no visible global function definition for ‘dbGetQuery’
-.fixTAXID: no visible global function definition for ‘dbGetQuery’
-.get_IDlist_by_query: no visible global function definition for
-  ‘dbGetQuery’
-.get_Matrix_by_int_id: no visible global function definition for
-  ‘dbGetQuery’
-.get_internal_id: no visible global function definition for
-  ‘dbGetQuery’
-... 9 lines ...
-  ‘dbGetQuery’
-.store_matrix_data: no visible global function definition for
-  ‘dbGetQuery’
-.store_matrix_species: no visible global function definition for
-  ‘dbGetQuery’
-deleteMatrixHavingID,SQLiteConnection: no visible global function
-  definition for ‘dbGetQuery’
-getMatrixByName,SQLiteConnection: no visible global function definition
-  for ‘dbGetQuery’
-Undefined global functions or variables:
-  dbGetQuery
-
-checking compiled code ... NOTE
-File ‘TFBSTools/libs/TFBSTools.so’:
-  Found no call to: ‘R_useDynamicSymbols’
-
-It is good practice to register native routines and to disable symbol
-search.
-
-See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
-```
-
-## trackeR (0.0.5)
-Maintainer: Hannah Frick <h.frick@ucl.ac.uk>  
-Bug reports: https://github.com/hfrick/trackeR/issues
-
-0 errors | 1 warning  | 0 notes
-
-```
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Warning in engine$weave(file, quiet = quiet, encoding = enc) :
-  Pandoc (>= 1.12.3) and/or pandoc-citeproc not available. Falling back to R Markdown v1.
-Loading required package: zoo
-
-Attaching package: 'zoo'
-
-The following objects are masked from 'package:base':
-... 6 lines ...
-Attaching package: 'trackeR'
-
-The following object is masked from 'package:base':
-
-    append
-
-Map from URL : http://maps.googleapis.com/maps/api/staticmap?center=57.157231,-2.104296&zoom=13&size=640x640&scale=2&maptype=terrain&language=en-EN&sensor=false
-Quitting from lines 96-97 (TourDetrackeR.Rmd) 
-Error: processing vignette 'TourDetrackeR.Rmd' failed with diagnostics:
-there is no package called 'webshot'
-Execution halted
 ```
 
 ## TSdata (2016.8-1)
@@ -2507,16 +1711,16 @@ checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
 INFO: Contacting web service with query: https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/QNA/CAN+USA+MEX.B1_GE.CARSA.Q?format=compact_v2
-Apr 29, 2017 9:44:18 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+May 08, 2017 11:21:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/dataflow/ESTAT/ei_nama_q/latest
-Apr 29, 2017 9:44:18 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+May 08, 2017 11:21:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/dataflow/ESTAT/ei_nama_q/latest
-Apr 29, 2017 9:44:18 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+May 08, 2017 11:22:00 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/datastructure/ESTAT/DSD_ei_nama_q/1.0
 ... 8 lines ...
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
-Apr 29, 2017 9:44:19 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
+May 08, 2017 11:22:00 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
 
@@ -2527,7 +1731,7 @@ Error in .local(serIDs, con, ...) :
 Execution halted
 ```
 
-## VariantFiltering (1.12.0)
+## VariantFiltering (1.12.1)
 Maintainer: Robert Castelo <robert.castelo@upf.edu>  
 Bug reports: https://github.com/rcastelo/VariantFiltering/issues
 

@@ -10,162 +10,166 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2017-05-08                   |
+|date     |2017-06-12                   |
 
 ## Packages
 
-|package   |*  |version  |date       |source                             |
-|:---------|:--|:--------|:----------|:----------------------------------|
-|BH        |   |1.62.0-1 |2016-11-19 |cran (@1.62.0-)                    |
-|DBI       |   |0.6-13   |2017-05-08 |Github (rstats-db/DBI@f6500a5)     |
-|DBItest   |   |1.4-22   |2017-05-08 |Github (rstats-db/DBItest@1f344a3) |
-|knitr     |   |1.15.1   |2016-11-22 |cran (@1.15.1)                     |
-|memoise   |   |1.1.0    |2017-04-21 |CRAN (R 3.4.0)                     |
-|plogr     |   |0.1-1    |2016-09-24 |cran (@0.1-1)                      |
-|Rcpp      |   |0.12.10  |2017-03-19 |CRAN (R 3.4.0)                     |
-|rmarkdown |   |1.5      |2017-04-26 |cran (@1.5)                        |
-|RSQLite   |   |1.1-2    |2017-01-08 |CRAN (R 3.4.0)                     |
-|testthat  |   |1.0.2    |2016-04-23 |cran (@1.0.2)                      |
+|package   |*  |version   |date       |source                             |
+|:---------|:--|:---------|:----------|:----------------------------------|
+|BH        |   |1.62.0-1  |2016-11-19 |cran (@1.62.0-)                    |
+|DBI       |   |0.6-13    |2017-05-08 |Github (rstats-db/DBI@f6500a5)     |
+|DBItest   |   |1.4-22    |2017-05-08 |Github (rstats-db/DBItest@1f344a3) |
+|knitr     |   |1.16      |2017-05-18 |cran (@1.16)                       |
+|memoise   |   |1.1.0     |2017-04-21 |CRAN (R 3.4.0)                     |
+|plogr     |   |0.1-1     |2016-09-24 |cran (@0.1-1)                      |
+|Rcpp      |   |0.12.11.2 |2017-06-05 |local                              |
+|rmarkdown |   |1.5       |2017-04-26 |cran (@1.5)                        |
+|RSQLite   |   |1.1-2     |2017-01-08 |CRAN (R 3.4.0)                     |
+|testthat  |   |1.0.2     |2016-04-23 |cran (@1.0.2)                      |
 
 # Check results
 
-133 packages
+137 packages
 
-|package            |version   | errors| warnings| notes|
-|:------------------|:---------|------:|--------:|-----:|
-|acc                |1.3.3     |      0|        0|     1|
-|affycoretools      |1.48.0    |      0|        0|     0|
-|AnnotationDbi      |1.38.0    |      0|        1|     5|
-|AnnotationFilter   |1.0.0     |      0|        0|     1|
-|AnnotationForge    |1.18.0    |      0|        0|     1|
-|AnnotationHubData  |1.6.0     |      1|        0|     4|
-|AnnotationHub      |2.8.1     |      0|        0|     2|
-|APSIM              |0.9.1     |      0|        0|     0|
-|archivist          |2.1.2     |      0|        0|     2|
-|BatchExperiments   |1.4.1     |      0|        0|     2|
-|BatchJobs          |1.6       |      0|        0|     0|
-|bibliospec         |0.0.4     |      0|        0|     0|
-|biglm              |0.9-1     |      0|        0|     6|
-|bioassayR          |1.14.0    |      0|        0|     0|
-|BiocFileCache      |1.0.0     |      1|        1|     0|
-|BoSSA              |2.0       |      0|        0|     0|
-|caroline           |0.7.6     |      0|        0|     2|
-|Category           |2.42.0    |      0|        0|     1|
-|ChemmineR          |2.28.0    |      1|        0|     0|
-|chunked            |0.3       |      1|        0|     1|
-|CITAN              |2015.12-2 |      0|        0|     0|
-|clstutils          |1.24.0    |      0|        2|     5|
-|CNEr               |1.12.0    |      0|        2|     2|
-|CollapsABEL        |0.10.11   |      0|        0|     0|
-|cranlike           |1.0.0     |      0|        0|     0|
-|cummeRbund         |2.18.0    |      0|        0|     6|
-|customProDB        |1.16.0    |      0|        0|     3|
-|D3GB               |1.1       |      0|        0|     0|
-|DBI                |0.6-1     |      0|        0|     1|
-|DECIPHER           |2.4.0     |      0|        0|     4|
-|dexter             |0.1.7     |      0|        0|     1|
-|diffrprojects      |0.1.14    |      0|        0|     1|
-|dplyr              |0.5.0     |      1|        0|     2|
-|ecd                |0.8.3     |      0|        0|     0|
-|emuR               |0.2.2     |      0|        0|     0|
-|ensembldb          |2.0.1     |      0|        0|     3|
-|etl                |0.3.5     |      1|        1|     0|
-|ETLUtils           |1.3       |      0|        0|     0|
-|filehashSQLite     |0.2-4     |      0|        0|     3|
-|filematrix         |1.1.0     |      0|        0|     0|
-|freqweights        |1.0.3     |      0|        0|     0|
-|gcbd               |0.2.6     |      0|        0|     0|
-|GeneAnswers        |2.18.0    |      1|        3|     6|
-|GenomicFeatures    |1.28.0    |      0|        1|     3|
-|Genominator        |1.30.0    |      0|        0|     4|
-|GEOmetadb          |1.36.0    |      0|        0|     3|
-|GWASTools          |1.22.0    |      0|        0|     1|
-|healthcareai       |0.1.12    |      0|        0|     0|
-|imputeMulti        |0.6.4     |      0|        0|     2|
-|iontree            |1.22.0    |      0|        0|     5|
-|KoNLP              |0.80.1    |      0|        0|     1|
-|liteq              |1.0.0     |      0|        0|     0|
-|lumi               |2.28.0    |      0|        2|     3|
-|macleish           |0.3.0     |      0|        0|     0|
-|maGUI              |2.2       |      1|        0|     0|
-|manta              |1.22.0    |      0|        0|     7|
-|marmap             |0.9.6     |      0|        0|     0|
-|MeSHDbi            |1.12.0    |      0|        0|     2|
-|metagenomeFeatures |1.8.0     |      1|        0|     0|
-|MetaIntegrator     |1.0.3     |      0|        0|     0|
-|metaseqR           |1.16.0    |      1|        1|     4|
-|mgsa               |1.24.0    |      0|        1|     5|
-|miRNAtap           |1.10.0    |      0|        0|     2|
-|MmPalateMiRNA      |1.26.0    |      0|        0|     4|
-|MonetDBLite        |0.3.1     |      2|        0|     3|
-|mstherm            |0.4.7     |      0|        0|     0|
-|MUCflights         |0.0-3     |      0|        0|     3|
-|nutshell.bbdb      |1.0       |      0|        0|     2|
-|nutshell           |2.0       |      0|        0|     3|
-|oai                |0.2.2     |      0|        0|     1|
-|oce                |0.9-21    |      1|        0|     1|
-|oligoClasses       |1.38.0    |      0|        2|     4|
-|oligo              |1.40.1    |      1|        1|     9|
-|OrganismDbi        |1.18.0    |      0|        0|     2|
-|Organism.dplyr     |1.0.0     |      1|        0|     0|
-|PAnnBuilder        |1.40.0    |      0|        3|     1|
-|parsemsf           |0.1.0     |      0|        0|     0|
-|pdInfoBuilder      |1.40.0    |      0|        0|     2|
-|PGA                |1.6.0     |      1|        0|     3|
-|pitchRx            |1.8.2     |      0|        0|     1|
-|pleiades           |0.1.0     |      0|        0|     0|
-|plethy             |1.14.0    |      2|        0|     3|
-|poplite            |0.99.17.3 |      0|        0|     0|
-|ProjectTemplate    |0.7       |      0|        0|     0|
-|quantmod           |0.4-8     |      0|        0|     1|
-|rangeMapper        |0.3-1     |      0|        0|     0|
-|RecordLinkage      |0.4-10    |      0|        0|     1|
-|recoup             |1.4.0     |      2|        0|     1|
-|refGenome          |1.7.3     |      0|        0|     0|
-|replyr             |0.2.5     |      0|        0|     0|
-|rgrass7            |0.1-9     |      0|        0|     0|
-|RImmPort           |1.4.0     |      0|        1|     0|
-|RObsDat            |16.03     |      0|        0|     1|
-|RQDA               |0.2-8     |      1|        0|     1|
-|rtext              |0.1.20    |      0|        0|     1|
-|rTRM               |1.14.0    |      0|        0|     1|
-|rvertnet           |0.5.0     |      0|        0|     0|
-|scrime             |1.3.3     |      0|        0|     2|
-|SEERaBomb          |2017.1    |      0|        0|     0|
-|seqplots           |1.13.0    |      1|        0|     3|
-|sf                 |0.4-2     |      2|        0|     1|
-|SGP                |1.7-0.0   |      0|        0|     0|
-|smnet              |2.1.1     |      0|        0|     0|
-|snplist            |0.17      |      0|        0|     1|
-|specL              |1.10.0    |      0|        0|     5|
-|sqldf              |0.4-10    |      0|        1|     2|
-|sqliter            |0.1.0     |      0|        0|     0|
-|SRAdb              |1.34.0    |      0|        0|     6|
-|srvyr              |0.2.1     |      0|        0|     0|
-|SSN                |1.1.10    |      0|        0|     0|
-|storr              |1.1.0     |      0|        0|     0|
-|stream             |1.2-4     |      0|        0|     1|
-|survey             |3.31-5    |      0|        0|     0|
-|taRifx             |1.0.6     |      0|        0|     4|
-|taxizedb           |0.1.0     |      1|        0|     0|
-|taxonomizr         |0.2.2     |      0|        0|     0|
-|tcpl               |1.2.2     |      0|        0|     1|
-|TFBSTools          |1.14.0    |      0|        0|     3|
-|tigreBrowserWriter |0.1.4     |      0|        0|     0|
-|tigre              |1.30.0    |      0|        0|     2|
-|trackeR            |0.0.5     |      0|        0|     0|
-|TSdata             |2016.8-1  |      0|        1|     0|
-|TSSQLite           |2015.4-1  |      0|        0|     0|
-|TSsql              |2015.1-2  |      0|        0|     1|
-|tweet2r            |1.0       |      0|        0|     0|
-|twitteR            |1.1.9     |      0|        0|     0|
-|UniProt.ws         |2.16.0    |      0|        0|     2|
-|Uniquorn           |1.4.0     |      0|        0|     2|
-|UPMASK             |1.1       |      0|        0|     0|
-|VariantFiltering   |1.12.1    |      0|        1|     4|
-|vegdata            |0.9       |      0|        0|     0|
-|vmsbase            |2.1.3     |      1|        0|     0|
-|vtreat             |0.5.31    |      0|        0|     0|
+|package             |version   | errors| warnings| notes|
+|:-------------------|:---------|------:|--------:|-----:|
+|acc                 |1.3.3     |      0|        0|     1|
+|affycoretools       |1.48.0    |      0|        0|     0|
+|AnnotationDbi       |1.38.1    |      0|        1|     5|
+|AnnotationFilter    |1.0.0     |      0|        0|     1|
+|AnnotationForge     |1.18.0    |      0|        0|     1|
+|AnnotationHubData   |1.6.0     |      1|        0|     4|
+|AnnotationHub       |2.8.2     |      0|        0|     2|
+|APSIM               |0.9.1     |      0|        0|     0|
+|archivist           |2.1.2     |      0|        0|     2|
+|BatchExperiments    |1.4.1     |      0|        0|     2|
+|BatchJobs           |1.6       |      0|        0|     0|
+|bdlp                |0.9-1     |      0|        0|     0|
+|bibliospec          |0.0.4     |      0|        0|     0|
+|biglm               |0.9-1     |      0|        0|     6|
+|bikedata            |0.0.1     |      0|        0|     1|
+|bioassayR           |1.14.0    |      0|        0|     0|
+|BiocFileCache       |1.0.0     |      1|        1|     0|
+|BoSSA               |2.1       |      0|        0|     0|
+|caroline            |0.7.6     |      0|        0|     2|
+|Category            |2.42.0    |      0|        0|     1|
+|ChemmineR           |2.28.0    |      1|        0|     0|
+|chunked             |0.3       |      1|        0|     1|
+|CITAN               |2015.12-2 |      0|        0|     0|
+|clstutils           |1.24.0    |      0|        2|     5|
+|CNEr                |1.12.0    |      0|        2|     2|
+|CollapsABEL         |0.10.11   |      0|        0|     0|
+|cranlike            |1.0.0     |      0|        0|     0|
+|cummeRbund          |2.18.0    |      0|        0|     6|
+|customProDB         |1.16.0    |      0|        0|     3|
+|D3GB                |1.1       |      0|        0|     0|
+|DBI                 |0.6-1     |      0|        0|     1|
+|dbplyr              |1.0.0     |      0|        0|     0|
+|DECIPHER            |2.4.0     |      0|        0|     4|
+|dexter              |0.1.7     |      0|        0|     1|
+|diffrprojects       |0.1.14    |      0|        0|     1|
+|dplyr               |0.7.0     |      0|        0|     1|
+|ecd                 |0.8.3     |      0|        0|     0|
+|emuR                |0.2.2     |      0|        0|     0|
+|ensembldb           |2.0.3     |      0|        0|     3|
+|etl                 |0.3.5     |      1|        1|     0|
+|ETLUtils            |1.3       |      0|        0|     0|
+|filehashSQLite      |0.2-4     |      0|        0|     3|
+|filematrix          |1.1.0     |      0|        0|     0|
+|freqweights         |1.0.4     |      0|        0|     0|
+|gcbd                |0.2.6     |      0|        0|     0|
+|GeneAnswers         |2.18.0    |      1|        3|     6|
+|GenomicFeatures     |1.28.3    |      0|        1|     3|
+|Genominator         |1.30.0    |      0|        0|     4|
+|GEOmetadb           |1.36.0    |      0|        0|     3|
+|GWASTools           |1.22.0    |      0|        0|     1|
+|healthcareai        |0.1.12    |      0|        0|     0|
+|imputeMulti         |0.6.4     |      0|        0|     2|
+|InterpretMSSpectrum |1.0       |      0|        0|     0|
+|iontree             |1.22.0    |      0|        0|     5|
+|KoNLP               |0.80.1    |      0|        0|     1|
+|liteq               |1.0.0     |      0|        0|     0|
+|lumi                |2.28.0    |      0|        2|     3|
+|macleish            |0.3.0     |      0|        0|     0|
+|maGUI               |2.2       |      1|        0|     0|
+|manta               |1.22.0    |      0|        0|     7|
+|marmap              |0.9.6     |      0|        0|     0|
+|MeSHDbi             |1.12.0    |      0|        0|     2|
+|metagenomeFeatures  |1.8.0     |      1|        0|     0|
+|MetaIntegrator      |1.0.3     |      0|        0|     0|
+|metaseqR            |1.16.0    |      0|        0|     4|
+|mgsa                |1.24.0    |      0|        1|     5|
+|miRNAtap            |1.10.0    |      0|        0|     2|
+|MmPalateMiRNA       |1.26.0    |      0|        0|     4|
+|MonetDBLite         |0.3.1     |      2|        0|     3|
+|mstherm             |0.4.7     |      0|        0|     0|
+|MUCflights          |0.0-3     |      0|        0|     3|
+|nutshell.bbdb       |1.0       |      0|        0|     2|
+|nutshell            |2.0       |      0|        0|     3|
+|oai                 |0.2.2     |      0|        0|     1|
+|oce                 |0.9-21    |      1|        0|     1|
+|oligoClasses        |1.38.0    |      0|        2|     4|
+|oligo               |1.40.1    |      2|        1|     9|
+|OrganismDbi         |1.18.0    |      1|        0|     2|
+|Organism.dplyr      |1.0.0     |      1|        0|     0|
+|PAnnBuilder         |1.40.0    |      0|        3|     1|
+|parsemsf            |0.1.0     |      0|        0|     0|
+|pdInfoBuilder       |1.40.0    |      0|        0|     2|
+|PGA                 |1.6.0     |      0|        0|     3|
+|pitchRx             |1.8.2     |      0|        0|     1|
+|pleiades            |0.1.0     |      0|        0|     0|
+|plethy              |1.14.0    |      2|        0|     3|
+|poplite             |0.99.17.3 |      0|        0|     0|
+|ProjectTemplate     |0.7       |      0|        0|     0|
+|quantmod            |0.4-9     |      0|        0|     1|
+|rangeMapper         |0.3-1     |      0|        0|     0|
+|RecordLinkage       |0.4-10    |      0|        0|     1|
+|recoup              |1.4.0     |      0|        0|     1|
+|refGenome           |1.7.3     |      0|        0|     0|
+|replyr              |0.3.01    |      0|        0|     0|
+|rgrass7             |0.1-9     |      0|        0|     0|
+|RImmPort            |1.4.1     |      0|        1|     0|
+|RObsDat             |16.03     |      0|        0|     1|
+|RQDA                |0.2-8     |      1|        0|     1|
+|rtext               |0.1.20    |      0|        0|     1|
+|rTRM                |1.14.0    |      0|        0|     1|
+|rvertnet            |0.5.0     |      0|        0|     0|
+|scrime              |1.3.3     |      0|        0|     2|
+|SEERaBomb           |2017.1    |      0|        0|     0|
+|seqplots            |1.13.0    |      2|        0|     3|
+|sf                  |0.4-3     |      2|        0|     1|
+|SGP                 |1.7-0.0   |      0|        0|     0|
+|smnet               |2.1.1     |      0|        0|     0|
+|snplist             |0.17      |      0|        0|     1|
+|specL               |1.10.0    |      0|        0|     5|
+|sqldf               |0.4-10    |      0|        1|     2|
+|sqliter             |0.1.0     |      0|        0|     0|
+|SRAdb               |1.34.0    |      0|        0|     6|
+|srvyr               |0.2.1     |      0|        0|     0|
+|SSN                 |1.1.10    |      0|        0|     0|
+|storr               |1.1.1     |      0|        0|     0|
+|stream              |1.2-4     |      0|        0|     1|
+|survey              |3.32      |      0|        0|     0|
+|taRifx              |1.0.6     |      0|        0|     4|
+|taxizedb            |0.1.0     |      1|        0|     0|
+|taxonomizr          |0.2.2     |      0|        0|     0|
+|tcpl                |1.2.2     |      0|        0|     1|
+|TFBSTools           |1.14.0    |      0|        0|     3|
+|tigreBrowserWriter  |0.1.4     |      0|        0|     0|
+|tigre               |1.30.0    |      0|        0|     2|
+|trackeR             |0.0.5     |      0|        0|     0|
+|TSdata              |2016.8-1  |      0|        1|     0|
+|TSSQLite            |2015.4-1  |      0|        0|     0|
+|TSsql               |2017.4-1  |      0|        0|     0|
+|tweet2r             |1.0       |      0|        0|     0|
+|twitteR             |1.1.9     |      0|        0|     0|
+|UniProt.ws          |2.16.0    |      0|        0|     2|
+|Uniquorn            |1.4.2     |      0|        0|     1|
+|UPMASK              |1.1       |      0|        0|     0|
+|VariantFiltering    |1.12.1    |      0|        1|     4|
+|vegdata             |0.9       |      0|        0|     0|
+|vmsbase             |2.1.3     |      1|        0|     0|
+|vtreat              |0.5.31    |      0|        0|     0|
 
 ## acc (1.3.3)
 Maintainer: Jaejoon Song <jjsong2@mdanderson.org>
@@ -188,7 +192,7 @@ Maintainer: James W. MacDonald <jmacdon@u.washington.edu>
 
 0 errors | 0 warnings | 0 notes
 
-## AnnotationDbi (1.38.0)
+## AnnotationDbi (1.38.1)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
 0 errors | 1 warning  | 5 notes
@@ -267,7 +271,7 @@ Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
 ```
 checking tests ... ERROR
-  Running ‘AnnotationHubData_unit_tests.R’ [69s/97s]
+  Running ‘AnnotationHubData_unit_tests.R’ [60s/133s]
 Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
 Last 13 lines of output:
   
@@ -327,7 +331,7 @@ Undefined global functions or variables:
   checkTrue results seqname specData suppresWarnings
 ```
 
-## AnnotationHub (2.8.1)
+## AnnotationHub (2.8.2)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
 0 errors | 0 warnings | 2 notes
@@ -417,6 +421,11 @@ Bug reports: https://github.com/tudo-r/BatchJobs/issues
 
 0 errors | 0 warnings | 0 notes
 
+## bdlp (0.9-1)
+Maintainer: Rainer Dangl <rainer.dangl@boku.ac.at>
+
+0 errors | 0 warnings | 0 notes
+
 ## bibliospec (0.0.4)
 Maintainer: Witold E. Wolski <wew@fgcz.ethz.ch>  
 Bug reports: https://github.com/protViz/bibliospec/issues
@@ -484,6 +493,20 @@ search.
 See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
 
+## bikedata (0.0.1)
+Maintainer: Mark Padgham <mark.padgham@email.com>  
+Bug reports: https://github.com/mpadge/bikedata/issues
+
+0 errors | 0 warnings | 1 note 
+
+```
+checking installed package size ... NOTE
+  installed size is  8.8Mb
+  sub-directories of 1Mb or more:
+    doc    2.6Mb
+    libs   5.5Mb
+```
+
 ## bioassayR (1.14.0)
 Maintainer: Tyler Backman <tbackman@lbl.gov>  
 Bug reports: https://github.com/TylerBackman/bioassayR/issues
@@ -498,24 +521,24 @@ Bug reports: https://github.com/Bioconductor/BiocFileCache/issues
 
 ```
 checking tests ... ERROR
-  Running ‘testthat.R’ [20s/20s]
+  Running ‘testthat.R’
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
-  
-      intersect, setdiff, setequal, union
-  
-  > 
-  > test_check("BiocFileCache")
-  1. Failure: bfcinfo works (@test_BiocFileCache_class.R#109) --------------------
-  bfcinfo(bfc) inherits from `tbl_bfc/tbl_dbi/tbl_sql/tbl_lazy/tbl` not `tbl_sqlite`.
-  
-  
-  testthat results ================================================================
-  OK: 116 SKIPPED: 0 FAILED: 1
-  1. Failure: bfcinfo works (@test_BiocFileCache_class.R#109) 
-  
-  Error: testthat unit tests failed
-  Execution halted
+  39: eval(exprs, env)
+  40: source_file(path, new.env(parent = env), chdir = TRUE)
+  41: force(code)
+  42: with_reporter(reporter = reporter, start_end_reporter = start_end_reporter,     {        lister$start_file(basename(path))        source_file(path, new.env(parent = env), chdir = TRUE)        end_context()    })
+  43: FUN(X[[i]], ...)
+  44: lapply(paths, test_file, env = env, reporter = current_reporter,     start_end_reporter = FALSE, load_helpers = FALSE)
+  45: force(code)
+  46: with_reporter(reporter = current_reporter, results <- lapply(paths,     test_file, env = env, reporter = current_reporter, start_end_reporter = FALSE,     load_helpers = FALSE))
+  47: test_files(paths, reporter = reporter, env = env, ...)
+  48: test_dir(test_path, reporter = reporter, env = env, filter = filter,     ...)
+  49: with_top_env(env, {    test_dir(test_path, reporter = reporter, env = env, filter = filter,         ...)})
+  50: run_tests(package, test_path, filter, reporter, ...)
+  51: test_check("BiocFileCache")
+  An irrecoverable exception occurred. R is aborting now ...
+  Segmentation fault (core dumped)
 
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
@@ -539,7 +562,7 @@ Execution halted
 
 ```
 
-## BoSSA (2.0)
+## BoSSA (2.1)
 Maintainer: pierre lefeuvre <pierre.lefeuvre@cirad.fr>
 
 0 errors | 0 warnings | 0 notes
@@ -929,6 +952,12 @@ See section ‘Registering S3 methods’ in the ‘Writing R Extensions’
 manual.
 ```
 
+## dbplyr (1.0.0)
+Maintainer: Hadley Wickham <hadley@rstudio.com>  
+Bug reports: https://github.com/tidyverse/dplyr/issues
+
+0 errors | 0 warnings | 0 notes
+
 ## DECIPHER (2.4.0)
 Maintainer: Erik Wright <eswright@pitt.edu>
 
@@ -1013,46 +1042,17 @@ search.
 See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
 
-## dplyr (0.5.0)
+## dplyr (0.7.0)
 Maintainer: Hadley Wickham <hadley@rstudio.com>  
-Bug reports: https://github.com/hadley/dplyr/issues
+Bug reports: https://github.com/tidyverse/dplyr/issues
 
-1 error  | 0 warnings | 2 notes
+0 errors | 0 warnings | 1 note 
 
 ```
-checking tests ... ERROR
-  Running ‘testthat.R’
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-  5. Failure: ungrouped output (@test-output.R#10) -------------------------------
-  print(iris_mem %>% head(), n = 30L, width = 80L) not equal to safe_read_lines("output/iris-head-30-80.txt").
-  Lengths differ: 12 vs 11
-  
-  
-  testthat results ================================================================
-  OK: 1504 SKIPPED: 1 FAILED: 5
-  1. Failure: ungrouped output (@test-output.R#10) 
-  2. Failure: ungrouped output (@test-output.R#10) 
-  3. Failure: ungrouped output (@test-output.R#10) 
-  4. Failure: ungrouped output (@test-output.R#10) 
-  5. Failure: ungrouped output (@test-output.R#10) 
-  
-  Error: testthat unit tests failed
-  Execution halted
-
 checking installed package size ... NOTE
-  installed size is 23.4Mb
+  installed size is 33.0Mb
   sub-directories of 1Mb or more:
-    libs  21.3Mb
-
-checking compiled code ... NOTE
-File ‘dplyr/libs/dplyr.so’:
-  Found no calls to: ‘R_registerRoutines’, ‘R_useDynamicSymbols’
-
-It is good practice to register native routines and to disable symbol
-search.
-
-See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
+    libs  31.0Mb
 ```
 
 ## ecd (0.8.3)
@@ -1066,7 +1066,7 @@ Bug reports: https://github.com/IPS-LMU/emuR/issues
 
 0 errors | 0 warnings | 0 notes
 
-## ensembldb (2.0.1)
+## ensembldb (2.0.3)
 Maintainer: Johannes Rainer <johannes.rainer@eurac.edu>  
 Bug reports: https://github.com/jotsetung/ensembldb/issues
 
@@ -1074,10 +1074,10 @@ Bug reports: https://github.com/jotsetung/ensembldb/issues
 
 ```
 checking installed package size ... NOTE
-  installed size is  6.6Mb
+  installed size is  6.5Mb
   sub-directories of 1Mb or more:
     R     1.6Mb
-    doc   3.7Mb
+    doc   3.6Mb
 
 checking top-level files ... NOTE
 Non-standard file/directory found at top level:
@@ -1102,12 +1102,12 @@ checking tests ... ERROR
   Running ‘testthat.R’
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
-  downloaded 12 KB
+  downloaded 10 KB
   
   trying URL 'http://www.nytimes.com'
-  Content type 'text/html; charset=utf-8' length 213012 bytes (208 KB)
+  Content type 'text/html; charset=utf-8' length 221897 bytes (216 KB)
   ==================================================
-  downloaded 208 KB
+  downloaded 216 KB
   
   testthat results ================================================================
   OK: 15 SKIPPED: 0 FAILED: 3
@@ -1179,7 +1179,7 @@ Bug reports: https://github.com/andreyshabalin/filematrix/issues
 
 0 errors | 0 warnings | 0 notes
 
-## freqweights (1.0.3)
+## freqweights (1.0.4)
 Maintainer: Emilio Torres-Manzanera <torres@uniovi.es>
 
 0 errors | 0 warnings | 0 notes
@@ -1324,7 +1324,7 @@ Rd file 'topREACTOME.PATHGenes.Rd':
 These lines will be truncated in the PDF manual.
 ```
 
-## GenomicFeatures (1.28.0)
+## GenomicFeatures (1.28.3)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
 0 errors | 1 warning  | 3 notes
@@ -1492,6 +1492,11 @@ search.
 
 See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
+
+## InterpretMSSpectrum (1.0)
+Maintainer: Jan Lisec <jan.lisec@charite.de>
+
+0 errors | 0 warnings | 0 notes
 
 ## iontree (1.22.0)
 Maintainer: Mingshu Cao <mingshu.cao@agresearch.co.nz>
@@ -1785,52 +1790,9 @@ Maintainer: Winston A. Haynes <hayneswa@stanford.edu>
 ## metaseqR (1.16.0)
 Maintainer: Panagiotis Moulos <moulos@fleming.gr>
 
-1 error  | 1 warning  | 4 notes
+0 errors | 0 warnings | 4 notes
 
 ```
-checking tests ... ERROR
-  Running ‘runTests.R’ [21s/23s]
-Running the tests in ‘tests/runTests.R’ failed.
-Last 13 lines of output:
-  ERROR in test_estimate_aufc_weights: Error in .check_ncores(cores) : 13 simultaneous processes spawned
-  ERROR in test_metaseqr: Error in .check_ncores(cores) : 10 simultaneous processes spawned
-  
-  Test files with failing tests
-  
-     test_estimate_aufc_weights.R 
-       test_estimate_aufc_weights 
-  
-     test_metaseqr.R 
-       test_metaseqr 
-  
-  
-  Error in BiocGenerics:::testPackage("metaseqR") : 
-    unit tests failed for package metaseqR
-  Execution halted
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-
-The following objects are masked from 'package:ShortRead':
-
-    left, right
-
-Loading required package: lattice
-    Welcome to 'DESeq'. For improved performance, usability and
-... 8 lines ...
-    plotMA
-
-The following object is masked from 'package:BiocGenerics':
-
-    plotMA
-
-Loading required package: qvalue
-Quitting from lines 119-159 (metaseqr-pdf.Rnw) 
-Error: processing vignette 'metaseqr-pdf.Rnw' failed with diagnostics:
-13 simultaneous processes spawned
-Execution halted
-
 checking package dependencies ... NOTE
 Package which this enhances but not available for checking: ‘TCC’
 
@@ -2040,7 +2002,7 @@ Error: 'src_sql' is not an exported object from 'namespace:dplyr'
 Execution halted
 
 checking tests ... ERROR
-  Running ‘testthat.R’ [18s/60s]
+  Running ‘testthat.R’ [16s/49s]
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
   testthat results ================================================================
@@ -2289,7 +2251,7 @@ These lines will be truncated in the PDF manual.
 ## oligo (1.40.1)
 Maintainer: Benilton Carvalho <benilton@unicamp.br>
 
-1 error  | 1 warning  | 9 notes
+2 errors | 1 warning  | 9 notes
 
 ```
 checking examples ... ERROR
@@ -2314,6 +2276,26 @@ Loading required package: DBI
 Error in loadNamespace(name) : there is no package called ‘KernSmooth’
 Calls: MAplot ... tryCatch -> tryCatchList -> tryCatchOne -> <Anonymous>
 Execution halted
+
+checking tests ... ERROR
+  Running ‘doRUnit.R’ [94s/140s]
+Running the tests in ‘tests/doRUnit.R’ failed.
+Last 13 lines of output:
+  RUNIT TEST PROTOCOL -- Mon Jun 12 13:04:07 2017 
+  *********************************************** 
+  Number of test functions: 2 
+  Number of errors: 0 
+  Number of failures: 0 
+  
+   
+  1 Test Suite : 
+  oligo unit testing - 2 test functions, 0 errors, 0 failures
+  Error in system(paste("cat ", makeconfFile, " | grep  \"^CXX =\" "), intern = TRUE) : 
+    cannot popen 'cat  /usr/lib/R/etc/Makeconf  | grep  "^CXX =" ', probable reason 'Cannot allocate memory'
+  Calls: printHTMLProtocol -> system
+  Execution halted
+  Warning message:
+  system call failed: Cannot allocate memory 
 
 checking files in ‘vignettes’ ... WARNING
 Files in the 'vignettes' directory newer than all files in 'inst/doc':
@@ -2413,9 +2395,32 @@ See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ## OrganismDbi (1.18.0)
 Maintainer: Biocore Data Team <maintainer@bioconductor.org>
 
-0 errors | 0 warnings | 2 notes
+1 error  | 0 warnings | 2 notes
 
 ```
+checking examples ... ERROR
+Running examples in ‘OrganismDbi-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: makeOrganismDbFromBiomart
+> ### Title: Make a OrganismDb object from annotations available on a BioMart
+> ###   database
+> ### Aliases: makeOrganismDbFromBiomart
+> 
+... 42 lines ...
+# The OrgDb gene id ENSEMBL is mapped to the TxDb gene id GENEID .
+> 
+> ## Now what if we want to use another mirror?  We might make use of the
+> ## new host argument.  But wait!  If we use biomaRt, we can see that
+> ## this host has named the mart differently!
+> listMarts(host="uswest.ensembl.org")
+Error in listMarts(host = "uswest.ensembl.org") : 
+  Unexpected format to the list of available marts.
+Please check the following URL manually, and try ?listMarts for advice.
+http://uswest.ensembl.org:80/biomart/martservice?type=registry&requestid=biomaRt
+Execution halted
+
 checking dependencies in R code ... NOTE
 Unexported object imported by a ':::' call: ‘BiocGenerics:::testPackage’
   See the note in ?`:::` about the use of this operator.
@@ -2565,32 +2570,9 @@ See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ## PGA (1.6.0)
 Maintainer: Bo Wen <wenbo@genomics.cn>, Shaohang Xu <xsh.skye@gmail.com>
 
-1 error  | 0 warnings | 3 notes
+0 errors | 0 warnings | 3 notes
 
 ```
-checking examples ... ERROR
-Running examples in ‘PGA-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: easyRun
-> ### Title: easyRun
-> ### Aliases: easyRun
-> 
-> ### ** Examples
-... 88 lines ...
- 8: f(l = layers[[i]], d = data[[i]])
- 9: by_layer(function(l, d) l$compute_position(d, layout))
-10: ggplot_build(x)
-11: print.ggplot(ggobj)
-12: print(ggobj)
-13: .base_transfer(res$file)
-14: reportSNV(parser_dir, tab_dir, report_dir)
-15: reportGear(parser_dir = iddir, tab_dir = dbdir, report_dir = report_dir)
-16: easyRun(gtfFile = gtffile, vcfFile = vcffile, bedFile = bedfile,     spectra = msfile, annotation_path = annotation, genome = Hsapiens,     cpu = 6, enzyme = "[KR]|[X]", varmod = "15.994915@M", itol = 0.05,     fixmod = "57.021464@C", tol = 10, tolu = "ppm", itolu = "Daltons",     miss = 2, maxCharge = 8, ti = FALSE, xmx = 1)
-An irrecoverable exception occurred. R is aborting now ...
-Segmentation fault (core dumped)
-
 checking installed package size ... NOTE
   installed size is  5.6Mb
   sub-directories of 1Mb or more:
@@ -2663,7 +2645,7 @@ The error most likely occurred in:
 > temp.db.file <- tempfile()
 > write(sim.bux.lines, file=temp.file)
 > test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
-Processing /tmp/RtmpOLBS9P/file119a3f585f3c in chunks of 10000
+Processing /tmp/RtmpKXrfhy/file889c49c1042b in chunks of 10000
 Starting chunk 1
 Reached breakpoint change
 Processing breakpoint 1
@@ -2673,7 +2655,7 @@ Calls: parse.buxco ... write.sample.breaks -> write.sample.db -> sanity.check.ti
 Execution halted
 
 checking tests ... ERROR
-  Running ‘runTests.R’ [26s/25s]
+  Running ‘runTests.R’ [21s/21s]
 Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
   Test files with failing tests
@@ -2689,7 +2671,7 @@ Last 13 lines of output:
     unit tests failed for package plethy
   In addition: Warning message:
   In .Internal(gc(verbose, reset)) :
-    closing unused connection 3 (/tmp/Rtmp6eGATd/file12c17f8309f7)
+    closing unused connection 3 (/tmp/Rtmp95M376/file88b14cbc2f7d)
   Execution halted
 
 checking dependencies in R code ... NOTE
@@ -2749,7 +2731,7 @@ Bug reports: https://github.com/johnmyleswhite/ProjectTemplate/issues
 
 0 errors | 0 warnings | 0 notes
 
-## quantmod (0.4-8)
+## quantmod (0.4-9)
 Maintainer: Joshua M. Ulrich <josh.m.ulrich@gmail.com>  
 Bug reports: https://github.com/joshuaulrich/quantmod/issues
 
@@ -2788,52 +2770,9 @@ See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ## recoup (1.4.0)
 Maintainer: Panagiotis Moulos <moulos@fleming.gr>
 
-2 errors | 0 warnings | 1 note 
+0 errors | 0 warnings | 1 note 
 
 ```
-checking examples ... ERROR
-Running examples in ‘recoup-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: kmeansDesign
-> ### Title: Apply k-means clustering to profile data
-> ### Aliases: kmeansDesign
-> 
-> ### ** Examples
-... 16 lines ...
-+     rc=0.5
-+ )
-Getting main ranges for measurements
-  measurement type: chipseq
-  genomic region type: tss
-Calculating requested regions coverage for WT H4K20me1
-  processing chr12
-Error in .check_ncores(cores) : 8 simultaneous processes spawned
-Calls: recoup ... lapply -> FUN -> cmclapply -> mclapply -> .check_ncores
-Execution halted
-** found \donttest examples: check also with --run-donttest
-
-checking tests ... ERROR
-  Running ‘runTests.R’ [16s/15s]
-Running the tests in ‘tests/runTests.R’ failed.
-Last 13 lines of output:
-  
-   
-  1 Test Suite : 
-  recoup RUnit Tests - 1 test function, 1 error, 0 failures
-  ERROR in test_recoup: Error in .check_ncores(cores) : 8 simultaneous processes spawned
-  
-  Test files with failing tests
-  
-     test_recoup.R 
-       test_recoup 
-  
-  
-  Error in BiocGenerics:::testPackage("recoup") : 
-    unit tests failed for package recoup
-  Execution halted
-
 checking R code for possible problems ... NOTE
 baseCoverageMatrix: no visible global function definition for
   ‘runValue’
@@ -2863,7 +2802,7 @@ Maintainer: Wolfgang Kaisers <kaisers@med.uni-duesseldorf.de>
 
 0 errors | 0 warnings | 0 notes
 
-## replyr (0.2.5)
+## replyr (0.3.01)
 Maintainer: John Mount <jmount@win-vector.com>  
 Bug reports: https://github.com/WinVector/replyr/issues
 
@@ -2874,7 +2813,7 @@ Maintainer: Roger Bivand <Roger.Bivand@nhh.no>
 
 0 errors | 0 warnings | 0 notes
 
-## RImmPort (1.4.0)
+## RImmPort (1.4.1)
 Maintainer: Ravi Shankar <rshankar@stanford.edu>
 
 0 errors | 1 warning  | 0 notes
@@ -2882,7 +2821,7 @@ Maintainer: Ravi Shankar <rshankar@stanford.edu>
 ```
 checking sizes of PDF files under ‘inst/doc’ ... WARNING
   ‘gs+qpdf’ made some significant size reductions:
-     compacted ‘RImmPort_Article.pdf’ from 734Kb to 339Kb
+     compacted ‘RImmPort_Article.pdf’ from 735Kb to 339Kb
   consider running tools::compactPDF(gs_quality = "ebook") on these files
 ```
 
@@ -3005,25 +2944,48 @@ Maintainer: Tomas Radivoyevitch <radivot@ccf.org>
 Maintainer: Przemyslaw Stempor <ps562@cam.ac.uk>  
 Bug reports: http://github.com/przemol/seqplots/issues
 
-1 error  | 0 warnings | 3 notes
+2 errors | 0 warnings | 3 notes
 
 ```
+checking examples ... ERROR
+Running examples in ‘seqplots-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: plotAverage
+> ### Title: Create the average plot
+> ### Aliases: plotAverage plotAverage,PlotSetArray-method
+> ###   plotAverage,PlotSetList-method plotAverage,PlotSetPair-method
+> ###   plotAverage,list-method
+... 23 lines ...
++ } else {
++     load(system.file("extdata", "precalc_plotset.Rdata", package="seqplots"))
++ }
+character
+Processing: Transcripts_ce10_chrI_100Kb.bed @ GSM1208360_chrI_100Kb_q5_sample.bw [ 1 / 2 ]
+Error in FUN(X[[i]], ...) : invalid connection
+Calls: getPlotSetArray ... .supportedSeqnameMappings -> lapply -> lapply -> FUN
+Error in close.connection(file) : invalid connection
+Calls: getPlotSetArray ... lapply -> lapply -> FUN -> close -> close.connection
+Execution halted
+** found \donttest examples: check also with --run-donttest
+
 checking tests ... ERROR
-  Running ‘test-all.R’ [25s/24s]
+  Running ‘test-all.R’ [20s/20s]
 Running the tests in ‘tests/test-all.R’ failed.
 Last 13 lines of output:
-  6: plotHeatmap(plotset$data, main, labels, legend, keepratio, plotScale, sortrows, clusters, 
-         clstmethod, include, ssomt1, ssomt2, cex.main, cex.lab, cex.axis, cex.legend, 
-         xlab, ylab, autoscale, zmin, zmax, xlim, ln.v, s, indi, o_min, o_max, colvec, 
-         clspace, pointsize, embed, ggplot, raster, ...)
-  7: plotHeatmap(plotset$data, main, labels, legend, keepratio, plotScale, sortrows, clusters, 
-         clstmethod, include, ssomt1, ssomt2, cex.main, cex.lab, cex.axis, cex.legend, 
-         xlab, ylab, autoscale, zmin, zmax, xlim, ln.v, s, indi, o_min, o_max, colvec, 
-         clspace, pointsize, embed, ggplot, raster, ...)
   
+  Error in signalCondition(e) : 
+    no function to return from, jumping to top level
+  Calls: <Anonymous> ... close.connection -> .handleSimpleError -> h -> signalCondition
   testthat results ================================================================
-  OK: 63 SKIPPED: 0 FAILED: 1
-  1. Error: Test getPlotSetArray function and plotting interfaces (@test1.R#53) 
+  OK: 45 SKIPPED: 0 FAILED: 6
+  1. Error: Test getPlotSetArray function and plotting interfaces (@test1.R#21) 
+  2. Error: Test getPlotSetArray function and plotting interfaces (@test1.R#21) 
+  3. Error: Test motifs (@test1.R#137) 
+  4. Error: Test motifs (@test1.R#137) 
+  5. Error: Test motifs (@test1.R#137) 
+  6. Error: Test motifs (@test1.R#137) 
   
   Error: testthat unit tests failed
   Execution halted
@@ -3065,7 +3027,7 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## sf (0.4-2)
+## sf (0.4-3)
 Maintainer: Edzer Pebesma <edzer.pebesma@uni-muenster.de>  
 Bug reports: https://github.com/edzer/sfr/issues/
 
@@ -3081,8 +3043,8 @@ The error most likely occurred in:
 > ### Title: Dplyr verb methods for sf objects
 > ### Aliases: dplyr filter_.sf dplyr filter.sf dplyr arrange_.sf dplyr
 > ###   arrange.sf dplyr distinct_.sf dplyr distinct.sf dplyr group_by_.sf
-> ###   dplyr group_by.sf dplyr mutate_.sf dplyr mutate.sf dplyr
-... 29 lines ...
+> ###   dplyr group_by.sf dplyr ungroup.sf dplyr mutate_.sf dplyr mutate.sf
+... 30 lines ...
 epsg (SRID):    4267
 proj4string:    +proj=longlat +datum=NAD27 +no_defs
 > nc %>% filter(AREA > .1) %>% plot()
@@ -3119,10 +3081,11 @@ checking tests ... ERROR
   Execution halted
 
 checking installed package size ... NOTE
-  installed size is 10.3Mb
+  installed size is 13.2Mb
   sub-directories of 1Mb or more:
-    doc    4.0Mb
-    libs   4.2Mb
+    doc      4.0Mb
+    libs     5.7Mb
+    sqlite   1.5Mb
 ```
 
 ## SGP (1.7-0.0)
@@ -3160,7 +3123,7 @@ Bug reports: https://github.com/fgcz/specL/issues
 
 ```
 checking installed package size ... NOTE
-  installed size is  5.6Mb
+  installed size is  5.7Mb
   sub-directories of 1Mb or more:
     doc   4.2Mb
 
@@ -3319,7 +3282,7 @@ Maintainer: Jay Ver Hoef <ver.hoef@SpatialStreamNetworks.com>
 
 0 errors | 0 warnings | 0 notes
 
-## storr (1.1.0)
+## storr (1.1.1)
 Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>  
 Bug reports: https://github.com/richfitz/storr/issues
 
@@ -3333,13 +3296,13 @@ Bug reports: https://github.com/mhahsler/stream/issues
 
 ```
 checking installed package size ... NOTE
-  installed size is  6.2Mb
+  installed size is  6.6Mb
   sub-directories of 1Mb or more:
     doc    1.6Mb
-    libs   4.0Mb
+    libs   4.5Mb
 ```
 
-## survey (3.31-5)
+## survey (3.32)
 Maintainer: "Thomas Lumley" <t.lumley@auckland.ac.nz>
 
 0 errors | 0 warnings | 0 notes
@@ -3502,16 +3465,16 @@ checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
 INFO: Contacting web service with query: https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/QNA/CAN+USA+MEX.B1_GE.CARSA.Q?format=compact_v2
-May 08, 2017 11:21:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jun 12, 2017 2:00:19 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/dataflow/ESTAT/ei_nama_q/latest
-May 08, 2017 11:21:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jun 12, 2017 2:00:19 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/dataflow/ESTAT/ei_nama_q/latest
-May 08, 2017 11:22:00 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jun 12, 2017 2:00:19 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/datastructure/ESTAT/DSD_ei_nama_q/1.0
 ... 8 lines ...
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
-May 08, 2017 11:22:00 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
+Jun 12, 2017 2:00:20 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
 
@@ -3527,24 +3490,10 @@ Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 
 0 errors | 0 warnings | 0 notes
 
-## TSsql (2015.1-2)
+## TSsql (2017.4-1)
 Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
 
-0 errors | 0 warnings | 1 note 
-
-```
-checking R code for possible problems ... NOTE
-TSgetSQL: no visible global function definition for ‘ts’
-TSputSQL: no visible global function definition for ‘is.ts’
-TSputSQL: no visible global function definition for ‘frequency’
-TSputSQL: no visible global function definition for ‘time’
-TSquery: no visible global function definition for ‘ts’
-Undefined global functions or variables:
-  frequency is.ts time ts
-Consider adding
-  importFrom("stats", "frequency", "is.ts", "time", "ts")
-to your NAMESPACE file.
-```
+0 errors | 0 warnings | 0 notes
 
 ## tweet2r (1.0)
 Maintainer: Pau Aragó <parago@uji.es>
@@ -3572,15 +3521,12 @@ Undefined global functions or variables:
   codes
 ```
 
-## Uniquorn (1.4.0)
+## Uniquorn (1.4.2)
 Maintainer: 'Raik Otto' <raik.otto@hu-berlin.de>
 
-0 errors | 0 warnings | 2 notes
+0 errors | 0 warnings | 1 note 
 
 ```
-checking DESCRIPTION meta-information ... NOTE
-Malformed Description field: should contain one or more complete sentences.
-
 checking top-level files ... NOTE
 Non-standard file/directory found at top level:
   ‘unitTests’

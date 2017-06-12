@@ -10,65 +10,62 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2017-05-08                   |
+|date     |2017-06-12                   |
 
 ## Packages
 
-|package   |*  |version  |date       |source                             |
-|:---------|:--|:--------|:----------|:----------------------------------|
-|BH        |   |1.62.0-1 |2016-11-19 |cran (@1.62.0-)                    |
-|DBI       |   |0.6-13   |2017-05-08 |Github (rstats-db/DBI@f6500a5)     |
-|DBItest   |   |1.4-22   |2017-05-08 |Github (rstats-db/DBItest@1f344a3) |
-|knitr     |   |1.15.1   |2016-11-22 |cran (@1.15.1)                     |
-|memoise   |   |1.1.0    |2017-04-21 |CRAN (R 3.4.0)                     |
-|plogr     |   |0.1-1    |2016-09-24 |cran (@0.1-1)                      |
-|Rcpp      |   |0.12.10  |2017-03-19 |CRAN (R 3.4.0)                     |
-|rmarkdown |   |1.5      |2017-04-26 |cran (@1.5)                        |
-|RSQLite   |   |1.1-2    |2017-01-08 |CRAN (R 3.4.0)                     |
-|testthat  |   |1.0.2    |2016-04-23 |cran (@1.0.2)                      |
+|package   |*  |version   |date       |source                             |
+|:---------|:--|:---------|:----------|:----------------------------------|
+|BH        |   |1.62.0-1  |2016-11-19 |cran (@1.62.0-)                    |
+|DBI       |   |0.6-13    |2017-05-08 |Github (rstats-db/DBI@f6500a5)     |
+|DBItest   |   |1.4-22    |2017-05-08 |Github (rstats-db/DBItest@1f344a3) |
+|knitr     |   |1.16      |2017-05-18 |cran (@1.16)                       |
+|memoise   |   |1.1.0     |2017-04-21 |CRAN (R 3.4.0)                     |
+|plogr     |   |0.1-1     |2016-09-24 |cran (@0.1-1)                      |
+|Rcpp      |   |0.12.11.2 |2017-06-05 |local                              |
+|rmarkdown |   |1.5       |2017-04-26 |cran (@1.5)                        |
+|RSQLite   |   |1.1-2     |2017-01-08 |CRAN (R 3.4.0)                     |
+|testthat  |   |1.0.2     |2016-04-23 |cran (@1.0.2)                      |
 
 # Check results
 
-34 packages with problems
+31 packages with problems
 
 |package            |version  | errors| warnings| notes|
 |:------------------|:--------|------:|--------:|-----:|
-|AnnotationDbi      |1.38.0   |      0|        1|     5|
+|AnnotationDbi      |1.38.1   |      0|        1|     5|
 |AnnotationHubData  |1.6.0    |      1|        0|     4|
 |BiocFileCache      |1.0.0    |      1|        1|     0|
 |ChemmineR          |2.28.0   |      1|        0|     0|
 |chunked            |0.3      |      1|        0|     1|
 |clstutils          |1.24.0   |      0|        2|     5|
 |CNEr               |1.12.0   |      0|        2|     2|
-|dplyr              |0.5.0    |      1|        0|     2|
 |etl                |0.3.5    |      1|        1|     0|
 |GeneAnswers        |2.18.0   |      1|        3|     6|
-|GenomicFeatures    |1.28.0   |      0|        1|     3|
+|GenomicFeatures    |1.28.3   |      0|        1|     3|
 |lumi               |2.28.0   |      0|        2|     3|
 |maGUI              |2.2      |      1|        0|     0|
 |metagenomeFeatures |1.8.0    |      1|        0|     0|
-|metaseqR           |1.16.0   |      1|        1|     4|
 |mgsa               |1.24.0   |      0|        1|     5|
 |MonetDBLite        |0.3.1    |      2|        0|     3|
 |oce                |0.9-21   |      1|        0|     1|
 |oligoClasses       |1.38.0   |      0|        2|     4|
-|oligo              |1.40.1   |      1|        1|     9|
+|oligo              |1.40.1   |      2|        1|     9|
+|OrganismDbi        |1.18.0   |      1|        0|     2|
 |Organism.dplyr     |1.0.0    |      1|        0|     0|
 |PAnnBuilder        |1.40.0   |      0|        3|     1|
-|PGA                |1.6.0    |      1|        0|     3|
 |plethy             |1.14.0   |      2|        0|     3|
-|recoup             |1.4.0    |      2|        0|     1|
-|RImmPort           |1.4.0    |      0|        1|     0|
+|RImmPort           |1.4.1    |      0|        1|     0|
 |RQDA               |0.2-8    |      1|        0|     1|
-|seqplots           |1.13.0   |      1|        0|     3|
-|sf                 |0.4-2    |      2|        0|     1|
+|seqplots           |1.13.0   |      2|        0|     3|
+|sf                 |0.4-3    |      2|        0|     1|
 |sqldf              |0.4-10   |      0|        1|     2|
 |taxizedb           |0.1.0    |      1|        0|     0|
 |TSdata             |2016.8-1 |      0|        1|     0|
 |VariantFiltering   |1.12.1   |      0|        1|     4|
 |vmsbase            |2.1.3    |      1|        0|     0|
 
-## AnnotationDbi (1.38.0)
+## AnnotationDbi (1.38.1)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
 0 errors | 1 warning  | 5 notes
@@ -122,7 +119,7 @@ Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
 ```
 checking tests ... ERROR
-  Running ‘AnnotationHubData_unit_tests.R’ [69s/97s]
+  Running ‘AnnotationHubData_unit_tests.R’ [60s/133s]
 Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
 Last 13 lines of output:
   
@@ -190,24 +187,24 @@ Bug reports: https://github.com/Bioconductor/BiocFileCache/issues
 
 ```
 checking tests ... ERROR
-  Running ‘testthat.R’ [20s/20s]
+  Running ‘testthat.R’
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
-  
-      intersect, setdiff, setequal, union
-  
-  > 
-  > test_check("BiocFileCache")
-  1. Failure: bfcinfo works (@test_BiocFileCache_class.R#109) --------------------
-  bfcinfo(bfc) inherits from `tbl_bfc/tbl_dbi/tbl_sql/tbl_lazy/tbl` not `tbl_sqlite`.
-  
-  
-  testthat results ================================================================
-  OK: 116 SKIPPED: 0 FAILED: 1
-  1. Failure: bfcinfo works (@test_BiocFileCache_class.R#109) 
-  
-  Error: testthat unit tests failed
-  Execution halted
+  39: eval(exprs, env)
+  40: source_file(path, new.env(parent = env), chdir = TRUE)
+  41: force(code)
+  42: with_reporter(reporter = reporter, start_end_reporter = start_end_reporter,     {        lister$start_file(basename(path))        source_file(path, new.env(parent = env), chdir = TRUE)        end_context()    })
+  43: FUN(X[[i]], ...)
+  44: lapply(paths, test_file, env = env, reporter = current_reporter,     start_end_reporter = FALSE, load_helpers = FALSE)
+  45: force(code)
+  46: with_reporter(reporter = current_reporter, results <- lapply(paths,     test_file, env = env, reporter = current_reporter, start_end_reporter = FALSE,     load_helpers = FALSE))
+  47: test_files(paths, reporter = reporter, env = env, ...)
+  48: test_dir(test_path, reporter = reporter, env = env, filter = filter,     ...)
+  49: with_top_env(env, {    test_dir(test_path, reporter = reporter, env = env, filter = filter,         ...)})
+  50: run_tests(package, test_path, filter, reporter, ...)
+  51: test_check("BiocFileCache")
+  An irrecoverable exception occurred. R is aborting now ...
+  Segmentation fault (core dumped)
 
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
@@ -404,48 +401,6 @@ Unexported objects imported by ':::' calls:
   See the note in ?`:::` about the use of this operator.
 ```
 
-## dplyr (0.5.0)
-Maintainer: Hadley Wickham <hadley@rstudio.com>  
-Bug reports: https://github.com/hadley/dplyr/issues
-
-1 error  | 0 warnings | 2 notes
-
-```
-checking tests ... ERROR
-  Running ‘testthat.R’
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-  5. Failure: ungrouped output (@test-output.R#10) -------------------------------
-  print(iris_mem %>% head(), n = 30L, width = 80L) not equal to safe_read_lines("output/iris-head-30-80.txt").
-  Lengths differ: 12 vs 11
-  
-  
-  testthat results ================================================================
-  OK: 1504 SKIPPED: 1 FAILED: 5
-  1. Failure: ungrouped output (@test-output.R#10) 
-  2. Failure: ungrouped output (@test-output.R#10) 
-  3. Failure: ungrouped output (@test-output.R#10) 
-  4. Failure: ungrouped output (@test-output.R#10) 
-  5. Failure: ungrouped output (@test-output.R#10) 
-  
-  Error: testthat unit tests failed
-  Execution halted
-
-checking installed package size ... NOTE
-  installed size is 23.4Mb
-  sub-directories of 1Mb or more:
-    libs  21.3Mb
-
-checking compiled code ... NOTE
-File ‘dplyr/libs/dplyr.so’:
-  Found no calls to: ‘R_registerRoutines’, ‘R_useDynamicSymbols’
-
-It is good practice to register native routines and to disable symbol
-search.
-
-See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
-```
-
 ## etl (0.3.5)
 Maintainer: Ben Baumer <ben.baumer@gmail.com>  
 Bug reports: https://github.com/beanumber/etl/issues
@@ -457,12 +412,12 @@ checking tests ... ERROR
   Running ‘testthat.R’
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
-  downloaded 12 KB
+  downloaded 10 KB
   
   trying URL 'http://www.nytimes.com'
-  Content type 'text/html; charset=utf-8' length 213012 bytes (208 KB)
+  Content type 'text/html; charset=utf-8' length 221897 bytes (216 KB)
   ==================================================
-  downloaded 208 KB
+  downloaded 216 KB
   
   testthat results ================================================================
   OK: 15 SKIPPED: 0 FAILED: 3
@@ -616,7 +571,7 @@ Rd file 'topREACTOME.PATHGenes.Rd':
 These lines will be truncated in the PDF manual.
 ```
 
-## GenomicFeatures (1.28.0)
+## GenomicFeatures (1.28.3)
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
 0 errors | 1 warning  | 3 notes
@@ -727,93 +682,6 @@ Installation failed.
 See ‘/home/muelleki/git/R/RSQLite/revdep/checks/metagenomeFeatures.Rcheck/00install.out’ for details.
 ```
 
-## metaseqR (1.16.0)
-Maintainer: Panagiotis Moulos <moulos@fleming.gr>
-
-1 error  | 1 warning  | 4 notes
-
-```
-checking tests ... ERROR
-  Running ‘runTests.R’ [21s/23s]
-Running the tests in ‘tests/runTests.R’ failed.
-Last 13 lines of output:
-  ERROR in test_estimate_aufc_weights: Error in .check_ncores(cores) : 13 simultaneous processes spawned
-  ERROR in test_metaseqr: Error in .check_ncores(cores) : 10 simultaneous processes spawned
-  
-  Test files with failing tests
-  
-     test_estimate_aufc_weights.R 
-       test_estimate_aufc_weights 
-  
-     test_metaseqr.R 
-       test_metaseqr 
-  
-  
-  Error in BiocGenerics:::testPackage("metaseqR") : 
-    unit tests failed for package metaseqR
-  Execution halted
-
-checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-
-The following objects are masked from 'package:ShortRead':
-
-    left, right
-
-Loading required package: lattice
-    Welcome to 'DESeq'. For improved performance, usability and
-... 8 lines ...
-    plotMA
-
-The following object is masked from 'package:BiocGenerics':
-
-    plotMA
-
-Loading required package: qvalue
-Quitting from lines 119-159 (metaseqr-pdf.Rnw) 
-Error: processing vignette 'metaseqr-pdf.Rnw' failed with diagnostics:
-13 simultaneous processes spawned
-Execution halted
-
-checking package dependencies ... NOTE
-Package which this enhances but not available for checking: ‘TCC’
-
-checking DESCRIPTION meta-information ... NOTE
-Malformed Title field: should not end in a period.
-
-checking dependencies in R code ... NOTE
-'library' or 'require' calls in package code:
-  ‘BSgenome’ ‘BiocInstaller’ ‘GenomicRanges’ ‘RMySQL’ ‘RSQLite’
-  ‘Rsamtools’ ‘TCC’ ‘VennDiagram’ ‘parallel’ ‘rtracklayer’ ‘survcomp’
-  ‘zoo’
-  Please use :: or requireNamespace() instead.
-  See section 'Suggested packages' in the 'Writing R Extensions' manual.
-
-checking R code for possible problems ... NOTE
-biasPlotToJSON: no visible binding for global variable ‘nams’
-cddat: no visible global function definition for ‘assayData’
-cddat: no visible global function definition for ‘ks.test’
-cddat: no visible global function definition for ‘p.adjust’
-cdplot: no visible global function definition for ‘plot’
-cdplot: no visible global function definition for ‘lines’
-countsBioToJSON: no visible binding for global variable ‘nams’
-diagplot.avg.ftd : <anonymous>: no visible binding for global variable
-  ‘sd’
-... 246 lines ...
-             "dev.off", "jpeg", "pdf", "png", "postscript", "tiff")
-  importFrom("graphics", "abline", "arrows", "axis", "grid", "lines",
-             "mtext", "par", "plot", "plot.new", "plot.window", "points",
-             "text", "title")
-  importFrom("methods", "as", "new")
-  importFrom("stats", "as.dist", "cmdscale", "cor", "end", "ks.test",
-             "mad", "median", "model.matrix", "na.exclude", "optimize",
-             "p.adjust", "p.adjust.methods", "pchisq", "quantile",
-             "rexp", "rnbinom", "runif", "sd", "start", "var")
-to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
-contains 'methods').
-```
-
 ## mgsa (1.24.0)
 Maintainer: Sebastian Bauer <mail@sebastianbauer.info>
 
@@ -917,7 +785,7 @@ Error: 'src_sql' is not an exported object from 'namespace:dplyr'
 Execution halted
 
 checking tests ... ERROR
-  Running ‘testthat.R’ [18s/60s]
+  Running ‘testthat.R’ [16s/49s]
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
   testthat results ================================================================
@@ -1061,7 +929,7 @@ These lines will be truncated in the PDF manual.
 ## oligo (1.40.1)
 Maintainer: Benilton Carvalho <benilton@unicamp.br>
 
-1 error  | 1 warning  | 9 notes
+2 errors | 1 warning  | 9 notes
 
 ```
 checking examples ... ERROR
@@ -1086,6 +954,26 @@ Loading required package: DBI
 Error in loadNamespace(name) : there is no package called ‘KernSmooth’
 Calls: MAplot ... tryCatch -> tryCatchList -> tryCatchOne -> <Anonymous>
 Execution halted
+
+checking tests ... ERROR
+  Running ‘doRUnit.R’ [94s/140s]
+Running the tests in ‘tests/doRUnit.R’ failed.
+Last 13 lines of output:
+  RUNIT TEST PROTOCOL -- Mon Jun 12 13:04:07 2017 
+  *********************************************** 
+  Number of test functions: 2 
+  Number of errors: 0 
+  Number of failures: 0 
+  
+   
+  1 Test Suite : 
+  oligo unit testing - 2 test functions, 0 errors, 0 failures
+  Error in system(paste("cat ", makeconfFile, " | grep  \"^CXX =\" "), intern = TRUE) : 
+    cannot popen 'cat  /usr/lib/R/etc/Makeconf  | grep  "^CXX =" ', probable reason 'Cannot allocate memory'
+  Calls: printHTMLProtocol -> system
+  Execution halted
+  Warning message:
+  system call failed: Cannot allocate memory 
 
 checking files in ‘vignettes’ ... WARNING
 Files in the 'vignettes' directory newer than all files in 'inst/doc':
@@ -1182,6 +1070,52 @@ search.
 See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
 
+## OrganismDbi (1.18.0)
+Maintainer: Biocore Data Team <maintainer@bioconductor.org>
+
+1 error  | 0 warnings | 2 notes
+
+```
+checking examples ... ERROR
+Running examples in ‘OrganismDbi-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: makeOrganismDbFromBiomart
+> ### Title: Make a OrganismDb object from annotations available on a BioMart
+> ###   database
+> ### Aliases: makeOrganismDbFromBiomart
+> 
+... 42 lines ...
+# The OrgDb gene id ENSEMBL is mapped to the TxDb gene id GENEID .
+> 
+> ## Now what if we want to use another mirror?  We might make use of the
+> ## new host argument.  But wait!  If we use biomaRt, we can see that
+> ## this host has named the mart differently!
+> listMarts(host="uswest.ensembl.org")
+Error in listMarts(host = "uswest.ensembl.org") : 
+  Unexpected format to the list of available marts.
+Please check the following URL manually, and try ?listMarts for advice.
+http://uswest.ensembl.org:80/biomart/martservice?type=registry&requestid=biomaRt
+Execution halted
+
+checking dependencies in R code ... NOTE
+Unexported object imported by a ':::' call: ‘BiocGenerics:::testPackage’
+  See the note in ?`:::` about the use of this operator.
+There are ::: calls to the package's namespace in its code. A package
+  almost never needs to use ::: for its own objects:
+  ‘.biocAnnPackages’ ‘.extractPkgsAndCols’ ‘.gentlyExtractDbFiles’
+  ‘.lookupDbNameFromKeytype’ ‘.mungeGraphData’ ‘.taxIdToOrgDb’
+  ‘.taxIdToOrgDbName’ ‘.testGraphData’ ‘.testKeys’ ‘OrganismDb’
+
+checking R code for possible problems ... NOTE
+Found the following assignments to the global environment:
+File ‘OrganismDbi/R/createOrganismPackage.R’:
+  assign(txdbName, txdb, .GlobalEnv)
+  assign(orgdbName, orgdb, .GlobalEnv)
+  assign(orgdbName, orgdb, .GlobalEnv)
+```
+
 ## Organism.dplyr (1.0.0)
 Maintainer: Martin Morgan <martin.morgan@roswellpark.org>
 
@@ -1265,70 +1199,6 @@ Packages listed in more than one of Depends, Imports, Suggests, Enhances:
 A package should be listed in only one of these fields.
 ```
 
-## PGA (1.6.0)
-Maintainer: Bo Wen <wenbo@genomics.cn>, Shaohang Xu <xsh.skye@gmail.com>
-
-1 error  | 0 warnings | 3 notes
-
-```
-checking examples ... ERROR
-Running examples in ‘PGA-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: easyRun
-> ### Title: easyRun
-> ### Aliases: easyRun
-> 
-> ### ** Examples
-... 88 lines ...
- 8: f(l = layers[[i]], d = data[[i]])
- 9: by_layer(function(l, d) l$compute_position(d, layout))
-10: ggplot_build(x)
-11: print.ggplot(ggobj)
-12: print(ggobj)
-13: .base_transfer(res$file)
-14: reportSNV(parser_dir, tab_dir, report_dir)
-15: reportGear(parser_dir = iddir, tab_dir = dbdir, report_dir = report_dir)
-16: easyRun(gtfFile = gtffile, vcfFile = vcffile, bedFile = bedfile,     spectra = msfile, annotation_path = annotation, genome = Hsapiens,     cpu = 6, enzyme = "[KR]|[X]", varmod = "15.994915@M", itol = 0.05,     fixmod = "57.021464@C", tol = 10, tolu = "ppm", itolu = "Daltons",     miss = 2, maxCharge = 8, ti = FALSE, xmx = 1)
-An irrecoverable exception occurred. R is aborting now ...
-Segmentation fault (core dumped)
-
-checking installed package size ... NOTE
-  installed size is  5.6Mb
-  sub-directories of 1Mb or more:
-    extdata   1.8Mb
-
-checking dependencies in R code ... NOTE
-Unexported objects imported by ':::' calls:
-  ‘biomaRt:::martBM’ ‘biomaRt:::martDataset’ ‘biomaRt:::martHost’
-  ‘customProDB:::makeTranscriptDbFromBiomart_archive’
-  See the note in ?`:::` about the use of this operator.
-
-checking R code for possible problems ... NOTE
-.base_transfer: no visible binding for global variable ‘peptide’
-.base_transfer: no visible binding for global variable ‘refbase’
-.base_transfer: no visible binding for global variable ‘varbase’
-.base_transfer: no visible binding for global variable ‘aaref’
-.base_transfer: no visible binding for global variable ‘aavar’
-.base_transfer: no visible binding for global variable ‘Type’
-.base_transfer: no visible binding for global variable ‘Freq’
-.get_30aa_splited_seq: no visible global function definition for ‘.’
-.get_30aa_splited_seq: no visible binding for global variable ‘id’
-... 216 lines ...
-reportSNV: no visible binding for global variable ‘abc’
-reportSNV: no visible binding for global variable ‘xyz’
-Undefined global functions or variables:
-  . .I .N .SD CUFF_ID Change Class Evalue Frame Freq ID Index Mass
-  MutNum Query Qvalue Strand Substring Type aapos aaref aavar abc
-  alleleCount alleles charge chr chrom cumlen delta_da delta_ppm evalue
-  gene_name genename genome<- id isSAP isUnique junType jun_type label
-  miss mods mrnaAcc mz name output pep peptide pincoding position
-  pro_name proname prot protAcc protein rbindlist readAAStringSet
-  readDNAStringSet refbase rsid seqlengths seqlevels seqlevels<- subseq
-  transcript tx_name txid txname varbase writeXStringSet x xyz y
-```
-
 ## plethy (1.14.0)
 Maintainer: Daniel Bottomly <bottomly@ohsu.edu>
 
@@ -1349,7 +1219,7 @@ The error most likely occurred in:
 > temp.db.file <- tempfile()
 > write(sim.bux.lines, file=temp.file)
 > test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
-Processing /tmp/RtmpOLBS9P/file119a3f585f3c in chunks of 10000
+Processing /tmp/RtmpKXrfhy/file889c49c1042b in chunks of 10000
 Starting chunk 1
 Reached breakpoint change
 Processing breakpoint 1
@@ -1359,7 +1229,7 @@ Calls: parse.buxco ... write.sample.breaks -> write.sample.db -> sanity.check.ti
 Execution halted
 
 checking tests ... ERROR
-  Running ‘runTests.R’ [26s/25s]
+  Running ‘runTests.R’ [21s/21s]
 Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
   Test files with failing tests
@@ -1375,7 +1245,7 @@ Last 13 lines of output:
     unit tests failed for package plethy
   In addition: Warning message:
   In .Internal(gc(verbose, reset)) :
-    closing unused connection 3 (/tmp/Rtmp6eGATd/file12c17f8309f7)
+    closing unused connection 3 (/tmp/Rtmp95M376/file88b14cbc2f7d)
   Execution halted
 
 checking dependencies in R code ... NOTE
@@ -1424,80 +1294,7 @@ Rd file 'utilities.Rd':
 These lines will be truncated in the PDF manual.
 ```
 
-## recoup (1.4.0)
-Maintainer: Panagiotis Moulos <moulos@fleming.gr>
-
-2 errors | 0 warnings | 1 note 
-
-```
-checking examples ... ERROR
-Running examples in ‘recoup-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: kmeansDesign
-> ### Title: Apply k-means clustering to profile data
-> ### Aliases: kmeansDesign
-> 
-> ### ** Examples
-... 16 lines ...
-+     rc=0.5
-+ )
-Getting main ranges for measurements
-  measurement type: chipseq
-  genomic region type: tss
-Calculating requested regions coverage for WT H4K20me1
-  processing chr12
-Error in .check_ncores(cores) : 8 simultaneous processes spawned
-Calls: recoup ... lapply -> FUN -> cmclapply -> mclapply -> .check_ncores
-Execution halted
-** found \donttest examples: check also with --run-donttest
-
-checking tests ... ERROR
-  Running ‘runTests.R’ [16s/15s]
-Running the tests in ‘tests/runTests.R’ failed.
-Last 13 lines of output:
-  
-   
-  1 Test Suite : 
-  recoup RUnit Tests - 1 test function, 1 error, 0 failures
-  ERROR in test_recoup: Error in .check_ncores(cores) : 8 simultaneous processes spawned
-  
-  Test files with failing tests
-  
-     test_recoup.R 
-       test_recoup 
-  
-  
-  Error in BiocGenerics:::testPackage("recoup") : 
-    unit tests failed for package recoup
-  Execution halted
-
-checking R code for possible problems ... NOTE
-baseCoverageMatrix: no visible global function definition for
-  ‘runValue’
-baseCoverageMatrix : <anonymous>: no visible global function definition
-  for ‘runValue’
-binCoverageMatrix : <anonymous>: no visible global function definition
-  for ‘runValue’
-buildAnnotationStore: no visible global function definition for
-  ‘Seqinfo’
-calcCoverage: no visible global function definition for ‘runValue’
-... 66 lines ...
-recoupProfile: no visible binding for global variable ‘Design’
-reduceExons : <anonymous>: no visible global function definition for
-  ‘DataFrame’
-splitVector: no visible global function definition for ‘Rle’
-Undefined global functions or variables:
-  Condition Coverage DataFrame Design IRanges Index Rle ScanBamParam
-  Seqinfo Signal alphabetFrequency bamWhich<- biocLite dbConnect
-  dbDisconnect dbDriver dbGetQuery dbWriteTable flankedSexon gene
-  genomeRanges getBSgenome grid.text indexBam installed.genomes
-  mclapply mcmapply runValue seqlevels seqlevels<- sexon sortBam
-  subjectHits
-```
-
-## RImmPort (1.4.0)
+## RImmPort (1.4.1)
 Maintainer: Ravi Shankar <rshankar@stanford.edu>
 
 0 errors | 1 warning  | 0 notes
@@ -1505,7 +1302,7 @@ Maintainer: Ravi Shankar <rshankar@stanford.edu>
 ```
 checking sizes of PDF files under ‘inst/doc’ ... WARNING
   ‘gs+qpdf’ made some significant size reductions:
-     compacted ‘RImmPort_Article.pdf’ from 734Kb to 339Kb
+     compacted ‘RImmPort_Article.pdf’ from 735Kb to 339Kb
   consider running tools::compactPDF(gs_quality = "ebook") on these files
 ```
 
@@ -1527,25 +1324,48 @@ Package which this enhances but not available for checking: ‘rjpod’
 Maintainer: Przemyslaw Stempor <ps562@cam.ac.uk>  
 Bug reports: http://github.com/przemol/seqplots/issues
 
-1 error  | 0 warnings | 3 notes
+2 errors | 0 warnings | 3 notes
 
 ```
+checking examples ... ERROR
+Running examples in ‘seqplots-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: plotAverage
+> ### Title: Create the average plot
+> ### Aliases: plotAverage plotAverage,PlotSetArray-method
+> ###   plotAverage,PlotSetList-method plotAverage,PlotSetPair-method
+> ###   plotAverage,list-method
+... 23 lines ...
++ } else {
++     load(system.file("extdata", "precalc_plotset.Rdata", package="seqplots"))
++ }
+character
+Processing: Transcripts_ce10_chrI_100Kb.bed @ GSM1208360_chrI_100Kb_q5_sample.bw [ 1 / 2 ]
+Error in FUN(X[[i]], ...) : invalid connection
+Calls: getPlotSetArray ... .supportedSeqnameMappings -> lapply -> lapply -> FUN
+Error in close.connection(file) : invalid connection
+Calls: getPlotSetArray ... lapply -> lapply -> FUN -> close -> close.connection
+Execution halted
+** found \donttest examples: check also with --run-donttest
+
 checking tests ... ERROR
-  Running ‘test-all.R’ [25s/24s]
+  Running ‘test-all.R’ [20s/20s]
 Running the tests in ‘tests/test-all.R’ failed.
 Last 13 lines of output:
-  6: plotHeatmap(plotset$data, main, labels, legend, keepratio, plotScale, sortrows, clusters, 
-         clstmethod, include, ssomt1, ssomt2, cex.main, cex.lab, cex.axis, cex.legend, 
-         xlab, ylab, autoscale, zmin, zmax, xlim, ln.v, s, indi, o_min, o_max, colvec, 
-         clspace, pointsize, embed, ggplot, raster, ...)
-  7: plotHeatmap(plotset$data, main, labels, legend, keepratio, plotScale, sortrows, clusters, 
-         clstmethod, include, ssomt1, ssomt2, cex.main, cex.lab, cex.axis, cex.legend, 
-         xlab, ylab, autoscale, zmin, zmax, xlim, ln.v, s, indi, o_min, o_max, colvec, 
-         clspace, pointsize, embed, ggplot, raster, ...)
   
+  Error in signalCondition(e) : 
+    no function to return from, jumping to top level
+  Calls: <Anonymous> ... close.connection -> .handleSimpleError -> h -> signalCondition
   testthat results ================================================================
-  OK: 63 SKIPPED: 0 FAILED: 1
-  1. Error: Test getPlotSetArray function and plotting interfaces (@test1.R#53) 
+  OK: 45 SKIPPED: 0 FAILED: 6
+  1. Error: Test getPlotSetArray function and plotting interfaces (@test1.R#21) 
+  2. Error: Test getPlotSetArray function and plotting interfaces (@test1.R#21) 
+  3. Error: Test motifs (@test1.R#137) 
+  4. Error: Test motifs (@test1.R#137) 
+  5. Error: Test motifs (@test1.R#137) 
+  6. Error: Test motifs (@test1.R#137) 
   
   Error: testthat unit tests failed
   Execution halted
@@ -1587,7 +1407,7 @@ Consider adding
 to your NAMESPACE file.
 ```
 
-## sf (0.4-2)
+## sf (0.4-3)
 Maintainer: Edzer Pebesma <edzer.pebesma@uni-muenster.de>  
 Bug reports: https://github.com/edzer/sfr/issues/
 
@@ -1603,8 +1423,8 @@ The error most likely occurred in:
 > ### Title: Dplyr verb methods for sf objects
 > ### Aliases: dplyr filter_.sf dplyr filter.sf dplyr arrange_.sf dplyr
 > ###   arrange.sf dplyr distinct_.sf dplyr distinct.sf dplyr group_by_.sf
-> ###   dplyr group_by.sf dplyr mutate_.sf dplyr mutate.sf dplyr
-... 29 lines ...
+> ###   dplyr group_by.sf dplyr ungroup.sf dplyr mutate_.sf dplyr mutate.sf
+... 30 lines ...
 epsg (SRID):    4267
 proj4string:    +proj=longlat +datum=NAD27 +no_defs
 > nc %>% filter(AREA > .1) %>% plot()
@@ -1641,10 +1461,11 @@ checking tests ... ERROR
   Execution halted
 
 checking installed package size ... NOTE
-  installed size is 10.3Mb
+  installed size is 13.2Mb
   sub-directories of 1Mb or more:
-    doc    4.0Mb
-    libs   4.2Mb
+    doc      4.0Mb
+    libs     5.7Mb
+    sqlite   1.5Mb
 ```
 
 ## sqldf (0.4-10)
@@ -1711,16 +1532,16 @@ checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
 INFO: Contacting web service with query: https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/QNA/CAN+USA+MEX.B1_GE.CARSA.Q?format=compact_v2
-May 08, 2017 11:21:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jun 12, 2017 2:00:19 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/dataflow/ESTAT/ei_nama_q/latest
-May 08, 2017 11:21:59 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jun 12, 2017 2:00:19 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/dataflow/ESTAT/ei_nama_q/latest
-May 08, 2017 11:22:00 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jun 12, 2017 2:00:19 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/datastructure/ESTAT/DSD_ei_nama_q/1.0
 ... 8 lines ...
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
-May 08, 2017 11:22:00 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
+Jun 12, 2017 2:00:20 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
 

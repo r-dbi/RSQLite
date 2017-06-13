@@ -10,7 +10,7 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |Zulu                         |
-|date     |2017-06-12                   |
+|date     |2017-06-13                   |
 
 ## Packages
 
@@ -24,7 +24,7 @@
 |plogr     |   |0.1-1     |2016-09-24 |cran (@0.1-1)                      |
 |Rcpp      |   |0.12.11.2 |2017-06-05 |local                              |
 |rmarkdown |   |1.5       |2017-04-26 |cran (@1.5)                        |
-|RSQLite   |   |1.1-2     |2017-01-08 |CRAN (R 3.4.0)                     |
+|RSQLite   |   |1.1-16    |2017-06-12 |local                              |
 |testthat  |   |1.0.2     |2016-04-23 |cran (@1.0.2)                      |
 
 # Check results
@@ -51,7 +51,6 @@
 |oce                |0.9-21   |      1|        0|     1|
 |oligoClasses       |1.38.0   |      0|        2|     4|
 |oligo              |1.40.1   |      2|        1|     9|
-|OrganismDbi        |1.18.0   |      1|        0|     2|
 |Organism.dplyr     |1.0.0    |      1|        0|     0|
 |PAnnBuilder        |1.40.0   |      0|        3|     1|
 |plethy             |1.14.0   |      2|        0|     3|
@@ -62,6 +61,7 @@
 |sqldf              |0.4-10   |      0|        1|     2|
 |taxizedb           |0.1.0    |      1|        0|     0|
 |TSdata             |2016.8-1 |      0|        1|     0|
+|UniProt.ws         |2.16.0   |      1|        0|     2|
 |VariantFiltering   |1.12.1   |      0|        1|     4|
 |vmsbase            |2.1.3    |      1|        0|     0|
 
@@ -119,7 +119,7 @@ Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
 ```
 checking tests ... ERROR
-  Running ‘AnnotationHubData_unit_tests.R’ [60s/133s]
+  Running ‘AnnotationHubData_unit_tests.R’ [58s/137s]
 Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
 Last 13 lines of output:
   
@@ -187,45 +187,47 @@ Bug reports: https://github.com/Bioconductor/BiocFileCache/issues
 
 ```
 checking tests ... ERROR
-  Running ‘testthat.R’
+  Running ‘testthat.R’ [18s/20s]
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
-  39: eval(exprs, env)
-  40: source_file(path, new.env(parent = env), chdir = TRUE)
-  41: force(code)
-  42: with_reporter(reporter = reporter, start_end_reporter = start_end_reporter,     {        lister$start_file(basename(path))        source_file(path, new.env(parent = env), chdir = TRUE)        end_context()    })
-  43: FUN(X[[i]], ...)
-  44: lapply(paths, test_file, env = env, reporter = current_reporter,     start_end_reporter = FALSE, load_helpers = FALSE)
-  45: force(code)
-  46: with_reporter(reporter = current_reporter, results <- lapply(paths,     test_file, env = env, reporter = current_reporter, start_end_reporter = FALSE,     load_helpers = FALSE))
-  47: test_files(paths, reporter = reporter, env = env, ...)
-  48: test_dir(test_path, reporter = reporter, env = env, filter = filter,     ...)
-  49: with_top_env(env, {    test_dir(test_path, reporter = reporter, env = env, filter = filter,         ...)})
-  50: run_tests(package, test_path, filter, reporter, ...)
-  51: test_check("BiocFileCache")
-  An irrecoverable exception occurred. R is aborting now ...
-  Segmentation fault (core dumped)
+  
+      intersect, setdiff, setequal, union
+  
+  > 
+  > test_check("BiocFileCache")
+  1. Failure: bfcinfo works (@test_BiocFileCache_class.R#109) --------------------
+  bfcinfo(bfc) inherits from `tbl_bfc/tbl_dbi/tbl_sql/tbl_lazy/tbl` not `tbl_sqlite`.
+  
+  
+  testthat results ================================================================
+  OK: 116 SKIPPED: 0 FAILED: 1
+  1. Failure: bfcinfo works (@test_BiocFileCache_class.R#109) 
+  
+  Error: testthat unit tests failed
+  Execution halted
 
 checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
-Loading required package: dplyr
-
-Attaching package: 'dplyr'
-
-The following objects are masked from 'package:stats':
-
-    filter, lag
-
-The following objects are masked from 'package:base':
-
-    intersect, setdiff, setequal, union
-
-Quitting from lines 88-89 (BiocFileCache.Rmd) 
-Error: processing vignette 'BiocFileCache.Rmd' failed with diagnostics:
-limit not greater than 0
-Execution halted
-
+23: eval(expr, envir, enclos)
+24: withVisible(eval(expr, envir, enclos))
+25: withCallingHandlers(withVisible(eval(expr, envir, enclos)), warning = wHandler,     error = eHandler, message = mHandler)
+26: handle(ev <- withCallingHandlers(withVisible(eval(expr, envir,     enclos)), warning = wHandler, error = eHandler, message = mHandler))
+27: timing_fn(handle(ev <- withCallingHandlers(withVisible(eval(expr,     envir, enclos)), warning = wHandler, error = eHandler, message = mHandler)))
+28: evaluate_call(expr, parsed$src[[i]], envir = envir, enclos = enclos,     debug = debug, last = i == length(out), use_try = stop_on_error !=         2L, keep_warning = keep_warning, keep_message = keep_message,     output_handler = output_handler, include_timing = include_timing)
+29: evaluate(code, envir = env, new_device = FALSE, keep_warning = !isFALSE(options$warning),     keep_message = !isFALSE(options$message), stop_on_error = if (options$error &&         options$include) 0L else 2L, output_handler = knit_handlers(options$render,         options))
+... 8 lines ...
+37: knitr::knit(knit_input, knit_output, envir = envir, quiet = quiet,     encoding = encoding)
+38: rmarkdown::render(file, encoding = encoding, quiet = quiet, envir = globalenv())
+39: vweave_rmarkdown(...)
+40: engine$weave(file, quiet = quiet, encoding = enc)
+41: doTryCatch(return(expr), name, parentenv, handler)
+42: tryCatchOne(expr, names, parentenv, handlers[[1L]])
+43: tryCatchList(expr, classes, parentenv, handlers)
+44: tryCatch({    engine$weave(file, quiet = quiet, encoding = enc)    setwd(startdir)    find_vignette_product(name, by = "weave", engine = engine)}, error = function(e) {    stop(gettextf("processing vignette '%s' failed with diagnostics:\n%s",         file, conditionMessage(e)), domain = NA, call. = FALSE)})
+45: buildVignettes(dir = "/home/muelleki/git/R/RSQLite/revdep/checks/BiocFileCache.Rcheck/vign_test/BiocFileCache")
+An irrecoverable exception occurred. R is aborting now ...
+Segmentation fault (core dumped)
 ```
 
 ## ChemmineR (2.28.0)
@@ -415,9 +417,9 @@ Last 13 lines of output:
   downloaded 10 KB
   
   trying URL 'http://www.nytimes.com'
-  Content type 'text/html; charset=utf-8' length 221897 bytes (216 KB)
+  Content type 'text/html; charset=utf-8' length 233878 bytes (228 KB)
   ==================================================
-  downloaded 216 KB
+  downloaded 228 KB
   
   testthat results ================================================================
   OK: 15 SKIPPED: 0 FAILED: 3
@@ -956,10 +958,10 @@ Calls: MAplot ... tryCatch -> tryCatchList -> tryCatchOne -> <Anonymous>
 Execution halted
 
 checking tests ... ERROR
-  Running ‘doRUnit.R’ [94s/140s]
+  Running ‘doRUnit.R’ [94s/138s]
 Running the tests in ‘tests/doRUnit.R’ failed.
 Last 13 lines of output:
-  RUNIT TEST PROTOCOL -- Mon Jun 12 13:04:07 2017 
+  RUNIT TEST PROTOCOL -- Tue Jun 13 07:16:58 2017 
   *********************************************** 
   Number of test functions: 2 
   Number of errors: 0 
@@ -1070,52 +1072,6 @@ search.
 See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
 ```
 
-## OrganismDbi (1.18.0)
-Maintainer: Biocore Data Team <maintainer@bioconductor.org>
-
-1 error  | 0 warnings | 2 notes
-
-```
-checking examples ... ERROR
-Running examples in ‘OrganismDbi-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: makeOrganismDbFromBiomart
-> ### Title: Make a OrganismDb object from annotations available on a BioMart
-> ###   database
-> ### Aliases: makeOrganismDbFromBiomart
-> 
-... 42 lines ...
-# The OrgDb gene id ENSEMBL is mapped to the TxDb gene id GENEID .
-> 
-> ## Now what if we want to use another mirror?  We might make use of the
-> ## new host argument.  But wait!  If we use biomaRt, we can see that
-> ## this host has named the mart differently!
-> listMarts(host="uswest.ensembl.org")
-Error in listMarts(host = "uswest.ensembl.org") : 
-  Unexpected format to the list of available marts.
-Please check the following URL manually, and try ?listMarts for advice.
-http://uswest.ensembl.org:80/biomart/martservice?type=registry&requestid=biomaRt
-Execution halted
-
-checking dependencies in R code ... NOTE
-Unexported object imported by a ':::' call: ‘BiocGenerics:::testPackage’
-  See the note in ?`:::` about the use of this operator.
-There are ::: calls to the package's namespace in its code. A package
-  almost never needs to use ::: for its own objects:
-  ‘.biocAnnPackages’ ‘.extractPkgsAndCols’ ‘.gentlyExtractDbFiles’
-  ‘.lookupDbNameFromKeytype’ ‘.mungeGraphData’ ‘.taxIdToOrgDb’
-  ‘.taxIdToOrgDbName’ ‘.testGraphData’ ‘.testKeys’ ‘OrganismDb’
-
-checking R code for possible problems ... NOTE
-Found the following assignments to the global environment:
-File ‘OrganismDbi/R/createOrganismPackage.R’:
-  assign(txdbName, txdb, .GlobalEnv)
-  assign(orgdbName, orgdb, .GlobalEnv)
-  assign(orgdbName, orgdb, .GlobalEnv)
-```
-
 ## Organism.dplyr (1.0.0)
 Maintainer: Martin Morgan <martin.morgan@roswellpark.org>
 
@@ -1219,7 +1175,7 @@ The error most likely occurred in:
 > temp.db.file <- tempfile()
 > write(sim.bux.lines, file=temp.file)
 > test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
-Processing /tmp/RtmpKXrfhy/file889c49c1042b in chunks of 10000
+Processing /tmp/RtmpaM5wI3/file46e93613f9b1 in chunks of 10000
 Starting chunk 1
 Reached breakpoint change
 Processing breakpoint 1
@@ -1229,7 +1185,7 @@ Calls: parse.buxco ... write.sample.breaks -> write.sample.db -> sanity.check.ti
 Execution halted
 
 checking tests ... ERROR
-  Running ‘runTests.R’ [21s/21s]
+  Running ‘runTests.R’ [21s/22s]
 Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
   Test files with failing tests
@@ -1245,7 +1201,7 @@ Last 13 lines of output:
     unit tests failed for package plethy
   In addition: Warning message:
   In .Internal(gc(verbose, reset)) :
-    closing unused connection 3 (/tmp/Rtmp95M376/file88b14cbc2f7d)
+    closing unused connection 3 (/tmp/Rtmpnu6omm/file475d37452518)
   Execution halted
 
 checking dependencies in R code ... NOTE
@@ -1337,14 +1293,14 @@ The error most likely occurred in:
 > ### Aliases: plotAverage plotAverage,PlotSetArray-method
 > ###   plotAverage,PlotSetList-method plotAverage,PlotSetPair-method
 > ###   plotAverage,list-method
-... 23 lines ...
+... 21 lines ...
+> if(.Platform$OS.type != "windows" || .Machine$sizeof.pointer != 4) {
++     plotset1 <- getPlotSetArray(bw1, c(bed1, bed2), 'ce10')
 + } else {
 +     load(system.file("extdata", "precalc_plotset.Rdata", package="seqplots"))
 + }
 character
 Processing: Transcripts_ce10_chrI_100Kb.bed @ GSM1208360_chrI_100Kb_q5_sample.bw [ 1 / 2 ]
-Error in FUN(X[[i]], ...) : invalid connection
-Calls: getPlotSetArray ... .supportedSeqnameMappings -> lapply -> lapply -> FUN
 Error in close.connection(file) : invalid connection
 Calls: getPlotSetArray ... lapply -> lapply -> FUN -> close -> close.connection
 Execution halted
@@ -1532,16 +1488,16 @@ checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
 INFO: Contacting web service with query: https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/QNA/CAN+USA+MEX.B1_GE.CARSA.Q?format=compact_v2
-Jun 12, 2017 2:00:19 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jun 13, 2017 8:13:55 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/dataflow/ESTAT/ei_nama_q/latest
-Jun 12, 2017 2:00:19 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jun 13, 2017 8:13:55 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/dataflow/ESTAT/ei_nama_q/latest
-Jun 12, 2017 2:00:19 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jun 13, 2017 8:13:55 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/datastructure/ESTAT/DSD_ei_nama_q/1.0
 ... 8 lines ...
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
-Jun 12, 2017 2:00:20 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
+Jun 13, 2017 8:13:55 AM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
 
@@ -1550,6 +1506,45 @@ Error: processing vignette 'Guide.Stex' failed with diagnostics:
 Error in .local(serIDs, con, ...) : 
   ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT error: it.bancaditalia.oss.sdmx.exceptions.SdmxXmlContentException: The query: ei_nama_q.Q.MIO-EUR.NSA.CP.NA-P72.IT did not match any time series on the provider.
 Execution halted
+```
+
+## UniProt.ws (2.16.0)
+Maintainer: Marc Carlson <maintainer@bioconductor.org>
+
+1 error  | 0 warnings | 2 notes
+
+```
+checking examples ... ERROR
+Running examples in ‘UniProt.ws-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: utilities
+> ### Title: Utility functions
+> ### Aliases: taxname2domain taxname2species taxname2taxid updatespecfile
+> ###   utilities
+> 
+... 14 lines ...
+[1] E
+Levels: A B E O V
+> taxname2domain(c("PIG","HUMAN","TRIHA"))
+[1] E E E
+Levels: A B E O V
+> 
+> newspecfile <- updatespecfile()
+Error in function (type, msg, asError = TRUE)  : 
+  transfer closed with outstanding read data remaining
+Calls: updatespecfile ... getURL -> curlPerform -> .Call -> <Anonymous> -> fun
+Execution halted
+
+checking dependencies in R code ... NOTE
+Unexported object imported by a ':::' call: ‘BiocGenerics:::testPackage’
+  See the note in ?`:::` about the use of this operator.
+
+checking R code for possible problems ... NOTE
+.getSpecfile: no visible binding for global variable ‘codes’
+Undefined global functions or variables:
+  codes
 ```
 
 ## VariantFiltering (1.12.1)

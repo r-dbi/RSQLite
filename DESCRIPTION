@@ -1,5 +1,5 @@
 Package: RSQLite
-Version: 1.1-17
+Version: 1.1-18
 Date: 2017-06-17
 Title: 'SQLite' Interface for R
 Authors@R: c(

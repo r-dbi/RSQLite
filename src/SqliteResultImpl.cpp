@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "SqliteResultImpl.h"
 #include "SqliteDataFrame.h"
+#include "ColumnStorage.h"
 
 
 
@@ -172,7 +173,7 @@ List SqliteResultImpl::get_column_info_impl() {
 
   CharacterVector types(cache.ncols_);
   for (size_t i = 0; i < cache.ncols_; i++) {
-    types[i] = Rf_type2char(types_[i]);
+    types[i] = Rf_type2char(ColumnStorage::sexptype_from_datatype(types_[i]));
   }
 
   return List::create(names, types);

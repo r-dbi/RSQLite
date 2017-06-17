@@ -14,21 +14,21 @@
 
 ## Packages
 
-|package   |*  |version    |date       |source                             |
-|:---------|:--|:----------|:----------|:----------------------------------|
-|BH        |   |1.62.0-1   |2016-11-19 |cran (@1.62.0-)                    |
-|bit64     |   |0.9-7      |2017-05-08 |cran (@0.9-7)                      |
-|blob      |   |1.0.0.9002 |2017-06-17 |Github (tidyverse/blob@e10cbe3)    |
-|DBI       |   |0.6-13     |2017-05-08 |Github (rstats-db/DBI@f6500a5)     |
-|DBItest   |   |1.4-22     |2017-05-08 |Github (rstats-db/DBItest@1f344a3) |
-|knitr     |   |1.16       |2017-05-18 |cran (@1.16)                       |
-|memoise   |   |1.1.0      |2017-04-21 |CRAN (R 3.4.0)                     |
-|pkgconfig |   |2.0.1      |2017-03-21 |cran (@2.0.1)                      |
-|plogr     |   |0.1-1      |2016-09-24 |cran (@0.1-1)                      |
-|Rcpp      |   |0.12.11.2  |2017-06-05 |local                              |
-|rmarkdown |   |1.6        |2017-06-15 |cran (@1.6)                        |
-|RSQLite   |   |1.1-16     |2017-06-12 |local                              |
-|testthat  |   |1.0.2      |2016-04-23 |cran (@1.0.2)                      |
+|package   |*  |version   |date       |source                             |
+|:---------|:--|:---------|:----------|:----------------------------------|
+|BH        |   |1.62.0-1  |2016-11-19 |cran (@1.62.0-)                    |
+|bit64     |   |0.9-7     |2017-05-08 |cran (@0.9-7)                      |
+|blob      |   |1.1.0     |2017-06-17 |Github (tidyverse/blob@9dd54d9)    |
+|DBI       |   |0.6-13    |2017-05-08 |Github (rstats-db/DBI@f6500a5)     |
+|DBItest   |   |1.4-22    |2017-05-08 |Github (rstats-db/DBItest@1f344a3) |
+|knitr     |   |1.16      |2017-05-18 |cran (@1.16)                       |
+|memoise   |   |1.1.0     |2017-04-21 |CRAN (R 3.4.0)                     |
+|pkgconfig |   |2.0.1     |2017-03-21 |cran (@2.0.1)                      |
+|plogr     |   |0.1-1     |2016-09-24 |cran (@0.1-1)                      |
+|Rcpp      |   |0.12.11.2 |2017-06-05 |local                              |
+|rmarkdown |   |1.6       |2017-06-15 |cran (@1.6)                        |
+|RSQLite   |   |1.1-17    |2017-06-17 |local                              |
+|testthat  |   |1.0.2     |2016-04-23 |cran (@1.0.2)                      |
 
 # Check results
 
@@ -86,7 +86,7 @@
 |GenomicFeatures     |1.28.3    |      1|        1|     3|
 |Genominator         |1.30.0    |      0|        0|     4|
 |GEOmetadb           |1.36.0    |      0|        0|     3|
-|GWASTools           |1.22.0    |      2|        0|     1|
+|GWASTools           |1.22.0    |      0|        0|     1|
 |healthcareai        |0.1.12    |      0|        0|     0|
 |imputeMulti         |0.6.4     |      0|        0|     2|
 |InterpretMSSpectrum |1.0       |      0|        0|     0|
@@ -124,7 +124,7 @@
 |pleiades            |0.2.0     |      0|        0|     0|
 |plethy              |1.14.0    |      2|        0|     3|
 |poplite             |0.99.17.3 |      2|        1|     0|
-|ProjectTemplate     |0.7       |      1|        0|     0|
+|ProjectTemplate     |0.7       |      0|        0|     0|
 |quantmod            |0.4-9     |      0|        0|     1|
 |rangeMapper         |0.3-1     |      0|        0|     0|
 |RecordLinkage       |0.4-10    |      0|        0|     1|
@@ -133,7 +133,7 @@
 |replyr              |0.4.0     |      0|        0|     0|
 |rgrass7             |0.1-9     |      0|        0|     0|
 |RImmPort            |1.4.1     |      0|        1|     0|
-|RObsDat             |16.03     |      1|        0|     1|
+|RObsDat             |16.03     |      0|        0|     1|
 |RQDA                |0.2-8     |      1|        0|     1|
 |rtext               |0.1.20    |      0|        0|     1|
 |rTRM                |1.14.0    |      0|        0|     1|
@@ -291,7 +291,7 @@ Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
 ```
 checking tests ... ERROR
-  Running ‘AnnotationHubData_unit_tests.R’ [63s/150s]
+  Running ‘AnnotationHubData_unit_tests.R’ [66s/121s]
 Running the tests in ‘tests/AnnotationHubData_unit_tests.R’ failed.
 Last 13 lines of output:
   
@@ -541,7 +541,7 @@ Bug reports: https://github.com/Bioconductor/BiocFileCache/issues
 
 ```
 checking tests ... ERROR
-  Running ‘testthat.R’ [2s/41s]
+  Running ‘testthat.R’
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
   39: eval(exprs, env)
@@ -630,7 +630,7 @@ Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 
 ```
 checking tests ... ERROR
-  Running ‘runTests.R’ [38s/40s]
+  Running ‘runTests.R’ [39s/39s]
 Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
   1 Test Suite : 
@@ -824,7 +824,7 @@ Execution halted
 ** found \donttest examples: check also with --run-donttest
 
 checking tests ... ERROR
-  Running ‘testthat.R’ [20s/23s]
+  Running ‘testthat.R’ [21s/25s]
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
   2. Error: test_readCNERangesFromSQLite (@test_IO.R#102) ------------------------
@@ -1274,9 +1274,9 @@ Last 13 lines of output:
   downloaded 11 KB
   
   trying URL 'http://www.nytimes.com'
-  Content type 'text/html; charset=utf-8' length 223850 bytes (218 KB)
+  Content type 'text/html; charset=utf-8' length 225664 bytes (220 KB)
   ==================================================
-  downloaded 218 KB
+  downloaded 220 KB
   
   testthat results ================================================================
   OK: 16 SKIPPED: 0 FAILED: 3
@@ -1641,52 +1641,9 @@ These lines will be truncated in the PDF manual.
 ## GWASTools (1.22.0)
 Maintainer: Stephanie M. Gogarten <sdmorris@u.washington.edu>, Adrienne Stilp <amstilp@u.washington.edu>
 
-2 errors | 0 warnings | 1 note 
+0 errors | 0 warnings | 1 note 
 
 ```
-checking examples ... ERROR
-Running examples in ‘GWASTools-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: ScanAnnotationSQLite
-> ### Title: Class ScanAnotationSQLite
-> ### Aliases: ScanAnnotationSQLite-class ScanAnnotationSQLite
-> ###   hasVariable,ScanAnnotationSQLite-method
-> ###   getVariable,ScanAnnotationSQLite-method
-... 30 lines ...
-> writeMetadata(scanAnnot, metadf)
-> 
-> scanID <- getScanID(scanAnnot)
-> sex <- getSex(scanAnnot)
-> if (hasVariable(scanAnnot, "plate")) plate <- getVariable(scanAnnot, "plate")
-> subjectID <- getVariable(scanAnnot, "subjectID", condition="WHERE sex='M'")
-> 
-> # display data
-> head(getAnnotation(scanAnnot))
-Error: `row.names` must be a logical scalar or a string
-Execution halted
-
-checking tests ... ERROR
-  Running ‘test.R’ [166s/168s]
-Running the tests in ‘tests/test.R’ failed.
-Last 13 lines of output:
-  ERROR in test_SnpAnnotationSQLite: Error : `row.names` must be a logical scalar or a string
-  
-  Test files with failing tests
-  
-     ScanAnnotationSQLite_test.R 
-       test_ScanAnnotationSQLite 
-  
-     SnpAnnotationSQLite_test.R 
-       test_SnpAnnotationSQLite 
-  
-  
-  Error in BiocGenerics:::testPackage("GWASTools", pattern = ".*_test\\.R$") : 
-    unit tests failed for package GWASTools
-  In addition: There were 50 or more warnings (use warnings() to see the first 50)
-  Execution halted
-
 checking Rd line widths ... NOTE
 Rd file 'assocRegression.Rd':
   \examples lines wider than 100 characters:
@@ -1821,7 +1778,7 @@ Bug reports: https://github.com/gaborcsardi/liteq/issues
 
 ```
 checking tests ... ERROR
-  Running ‘testthat.R’ [5s/24s]
+  Running ‘testthat.R’ [5s/30s]
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
   1. Failure: ensure_db (@test-db.R#12) ------------------------------------------
@@ -2302,7 +2259,7 @@ Error: 'src_sql' is not an exported object from 'namespace:dplyr'
 Execution halted
 
 checking tests ... ERROR
-  Running ‘testthat.R’ [17s/41s]
+  Running ‘testthat.R’ [17s/45s]
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
   1. Error: we can connect (@test_03_dplyr.R#15) 
@@ -2912,7 +2869,7 @@ The error most likely occurred in:
 > temp.db.file <- tempfile()
 > write(sim.bux.lines, file=temp.file)
 > test.bux.db <- parse.buxco(file.name=temp.file, db.name=temp.db.file, chunk.size=10000)
-Processing /tmp/RtmpCJO6tl/fileeb9c1c6c37ed in chunks of 10000
+Processing /tmp/Rtmp9FbWp7/file116a39816e29 in chunks of 10000
 Starting chunk 1
 Reached breakpoint change
 Processing breakpoint 1
@@ -2938,7 +2895,7 @@ Last 13 lines of output:
     unit tests failed for package plethy
   In addition: Warning message:
   In .Internal(gc(verbose, reset)) :
-    closing unused connection 3 (/tmp/Rtmpab55br/fileec361b0bb535)
+    closing unused connection 3 (/tmp/RtmpbNCrTz/file11fd5eb27935)
   Execution halted
 
 checking dependencies in R code ... NOTE
@@ -3064,29 +3021,7 @@ Execution halted
 Maintainer: Kenton White <jkentonwhite@gmail.com>  
 Bug reports: https://github.com/johnmyleswhite/ProjectTemplate/issues
 
-1 error  | 0 warnings | 0 notes
-
-```
-checking tests ... ERROR
-  Running ‘run-all.R’
-Running the tests in ‘tests/run-all.R’ failed.
-Last 13 lines of output:
-  4: DBI::dbReadTable(connection, table, row.names = NULL)
-  5: DBI::dbReadTable(connection, table, row.names = NULL)
-  6: .local(conn, name, ...)
-  7: stopc("`row.names` must be a logical scalar or a string") at /home/muelleki/git/R/RSQLite/R/table.R:348
-  8: stop(..., call. = FALSE, domain = NA) at /home/muelleki/git/R/RSQLite/R/utils.R:10
-  
-  testthat results ================================================================
-  OK: 400 SKIPPED: 0 FAILED: 4
-  1. Error: Example 28: SQLite3 Support with .sql Extension with table = "..." (@test-readers.R#536) 
-  2. Error: Example 30: SQLite3 Support with .sql Extension and table = "*" (@test-readers.R#588) 
-  3. Error: Example 31: SQLite3 Support with .db Extension (@test-readers.R#618) 
-  4. Error: Example 33: Arbitary File Support with .file File Pointing to .db File (@test-readers.R#669) 
-  
-  Error: testthat unit tests failed
-  Execution halted
-```
+0 errors | 0 warnings | 0 notes
 
 ## quantmod (0.4-9)
 Maintainer: Joshua M. Ulrich <josh.m.ulrich@gmail.com>  
@@ -3154,7 +3089,7 @@ Execution halted
 ** found \donttest examples: check also with --run-donttest
 
 checking tests ... ERROR
-  Running ‘runTests.R’ [15s/15s]
+  Running ‘runTests.R’ [15s/16s]
 Running the tests in ‘tests/runTests.R’ failed.
 Last 13 lines of output:
   
@@ -3228,32 +3163,9 @@ checking sizes of PDF files under ‘inst/doc’ ... WARNING
 ## RObsDat (16.03)
 Maintainer: Dominik Reusser <reusser@pik-potsdam.de>
 
-1 error  | 0 warnings | 1 note 
+0 errors | 0 warnings | 1 note 
 
 ```
-checking examples ... ERROR
-Running examples in ‘RObsDat-Ex.R’ failed
-The error most likely occurred in:
-
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: RObsDat-package
-> ### Title: R-Package to the observations Data Model from CUAHSI
-> ### Aliases: RObsDat-package RObsDat
-> ### Keywords: package
-> 
-... 299 lines ...
-Warning in rsqlite_fetch(res@ptr, n = n) :
-  Don't need to call dbFetch() for statements, only for queries
-Warning in rsqlite_fetch(res@ptr, n = n) :
-  Don't need to call dbFetch() for statements, only for queries
-data frame with 0 columns and 0 rows
-
-addDtV> if(dim(inDB@ValueIDs)[2]>=14) deleteDataValues(inDB@ValueIDs[,10:14],  "Remove several values")
-Error in rsqlite_send_query(conn@ptr, statement) : 
-  UNIQUE constraint failed: DataValuesRepository.ValueID, DataValuesRepository.VersionID
-Calls: example ... initialize -> initialize -> rsqlite_send_query -> .Call
-Execution halted
-
 checking package dependencies ... NOTE
 Package suggested but not available for checking: ‘SSOAP’
 ```
@@ -3394,7 +3306,7 @@ Execution halted
 ** found \donttest examples: check also with --run-donttest
 
 checking tests ... ERROR
-  Running ‘test-all.R’ [25s/25s]
+  Running ‘test-all.R’ [25s/26s]
 Running the tests in ‘tests/test-all.R’ failed.
 Last 13 lines of output:
   Error in signalCondition(e) : 
@@ -3849,7 +3761,7 @@ Execution halted
 ** found \donttest examples: check also with --run-donttest
 
 checking tests ... ERROR
-  Running ‘testthat.R’ [19s/19s]
+  Running ‘testthat.R’ [21s/21s]
 Running the tests in ‘tests/testthat.R’ failed.
 Last 13 lines of output:
   1: getMatrixSet(JASPAR2016, opts = list(ID = c("MA0500", "MA0499", "MA0521", "MA0697"))) at testthat/test_PFM.R:11
@@ -3966,16 +3878,16 @@ checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
   ...
 INFO: Contacting web service with query: https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/QNA/CAN+USA+MEX.B1_GE.CARSA.Q?format=compact_v2
-Jun 17, 2017 1:37:53 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jun 17, 2017 6:52:04 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/dataflow/ESTAT/ei_nama_q/latest
-Jun 17, 2017 1:37:53 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jun 17, 2017 6:52:04 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/dataflow/ESTAT/ei_nama_q/latest
-Jun 17, 2017 1:37:53 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
+Jun 17, 2017 6:52:04 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient runQuery
 INFO: Contacting web service with query: http://ec.europa.eu/eurostat/SDMX/diss-web/rest/datastructure/ESTAT/DSD_ei_nama_q/1.0
 ... 8 lines ...
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
-Jun 17, 2017 1:37:54 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
+Jun 17, 2017 6:52:04 PM it.bancaditalia.oss.sdmx.client.RestSdmxClient getData
 INFO: The sdmx call returned messages in the footer:
  Message [code=400, severity=Error, url=null, text=[Error caused by the caller due to incorrect or semantically invalid arguments]]
 

@@ -1,9 +1,11 @@
 get_stage("after_success") %>%
   add_step(step_hello_world()) %>%
-  add_step(step_run_covr(
-    exclusions = c(
-      "src/vendor/sqlite3/sqlite3.c",
-      "src/vendor/sqlite3/extension-functions.c"
+  add_step(step_run_code(
+    covr::codecov(
+      exclusions = c(
+        "src/vendor/sqlite3/sqlite3.c",
+        "src/vendor/sqlite3/extension-functions.c"
+      )
     )
   ))
 

@@ -1,3 +1,9 @@
+## RSQLite 1.1-18 (2017-06-17)
+
+- Updated embedded SQLite to 3.19.3.
+- `NULL` is a valid value for the `row.names` argument, same as `FALSE`.
+
+
 ## RSQLite 1.1-17 (2017-06-17)
 
 - Fix `dbColumnInfo()`.

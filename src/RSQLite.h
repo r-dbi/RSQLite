@@ -1,14 +1,14 @@
 #ifndef RSQLite_RSQLite_H
-  #define RSQLite_RSQLite_H
+#define RSQLite_RSQLite_H
 
-  #ifdef __CLION__
-    // avoid inclusion of XPtr.h
-    #define Rcpp_XPtr_h
-  #endif
+#ifdef __CLION__
+  // avoid inclusion of XPtr.h
+  #define Rcpp_XPtr_h
+#endif
 
-  #include <Rcpp.h>
-  #include <plogr.h>
+#include <Rcpp.h>
+#include <plogr.h>
 
-  using namespace Rcpp;
+using namespace Rcpp;
 
 #endif

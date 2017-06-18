@@ -30,3 +30,4 @@ a.out.dSYM
 ^tic\.R$
 ^cmake-build-debug$
 ^build\.sh$
+^codecov\.yml$

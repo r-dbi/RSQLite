@@ -31,3 +31,4 @@ a.out.dSYM
 ^cmake-build-debug$
 ^build\.sh$
 ^codecov\.yml$
+^src/pch\.h\.gch$

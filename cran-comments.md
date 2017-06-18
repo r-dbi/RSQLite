@@ -6,9 +6,7 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
-
-* Installed size: This package comes with a bundled RSQLite library.
+OK
 
 ## Reverse dependencies
 

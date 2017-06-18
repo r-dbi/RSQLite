@@ -1,6 +1,6 @@
 Package: RSQLite
-Version: 1.1-18
-Date: 2017-06-17
+Version: 2.0
+Date: 2017-06-18
 Title: 'SQLite' Interface for R
 Authors@R: c(
     person("Kirill", "Müller", role = c("aut", "cre"), email = "krlmlr+r@mailbox.org"),

@@ -1,6 +1,6 @@
 Package: RSQLite
-Version: 1.1-18
-Date: 2017-06-17
+Version: 2.0
+Date: 2017-06-18
 Title: 'SQLite' Interface for R
 Authors@R: c(
     person("Kirill", "Müller", role = c("aut", "cre"), email = "krlmlr+r@mailbox.org"),
@@ -24,17 +24,13 @@ Suggests:
     testthat
 Imports:
     bit64,
-    blob (>= 1.0.0.9002),
+    blob (>= 1.1),
     DBI (>= 0.4-9),
     memoise,
     methods,
     pkgconfig,
     Rcpp (>= 0.12.7)
 LinkingTo: Rcpp, BH, plogr
-Remotes:
-    rstats-db/DBI@production,
-    rstats-db/DBItest@production,
-    tidyverse/blob
 Encoding: UTF-8
 License: LGPL (>= 2)
 URL: https://github.com/rstats-db/RSQLite

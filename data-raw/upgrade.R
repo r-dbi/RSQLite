@@ -9,7 +9,7 @@ latest_name <- html %>%
   grep("amalgamation", ., value = TRUE) %>%
   .[1]
 
-latest <- paste0("http://www.sqlite.org/", Sys.Date() %>% strftime("%Y"), "/", latest_name)
+latest <- paste0("https://sqlite.org/", Sys.Date() %>% strftime("%Y"), "/", latest_name)
 tmp <- tempfile()
 download.file(latest, tmp)
 unzip(tmp, exdir = "src/vendor/sqlite3", junkpaths = TRUE)

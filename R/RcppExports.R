@@ -72,7 +72,7 @@ rsqliteVersion <- function() {
     .Call(`_RSQLite_rsqliteVersion`)
 }
 
-init_logging <- function(log_level) {
-    invisible(.Call(`_RSQLite_init_logging`, log_level))
+rsqlite_init_logging <- function(log_level) {
+    invisible(.Call(`_RSQLite_rsqlite_init_logging`, log_level))
 }
 

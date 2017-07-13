@@ -2,63 +2,63 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 rsqlite_connect <- function(path, allow_ext, flags, vfs = "") {
-    .Call(`_RSQLite_rsqlite_connect`, path, allow_ext, flags, vfs)
+    .Call(RSQLite_rsqlite_connect, path, allow_ext, flags, vfs)
 }
 
 rsqlite_disconnect <- function(con) {
-    invisible(.Call(`_RSQLite_rsqlite_disconnect`, con))
+    invisible(.Call(RSQLite_rsqlite_disconnect, con))
 }
 
 rsqlite_copy_database <- function(from, to) {
-    invisible(.Call(`_RSQLite_rsqlite_copy_database`, from, to))
+    invisible(.Call(RSQLite_rsqlite_copy_database, from, to))
 }
 
 rsqlite_connection_valid <- function(con) {
-    .Call(`_RSQLite_rsqlite_connection_valid`, con)
+    .Call(RSQLite_rsqlite_connection_valid, con)
 }
 
 rsqlite_import_file <- function(con, name, value, sep, eol, skip) {
-    .Call(`_RSQLite_rsqlite_import_file`, con, name, value, sep, eol, skip)
+    .Call(RSQLite_rsqlite_import_file, con, name, value, sep, eol, skip)
 }
 
 rsqlite_send_query <- function(con, sql) {
-    .Call(`_RSQLite_rsqlite_send_query`, con, sql)
+    .Call(RSQLite_rsqlite_send_query, con, sql)
 }
 
 rsqlite_clear_result <- function(res) {
-    invisible(.Call(`_RSQLite_rsqlite_clear_result`, res))
+    invisible(.Call(RSQLite_rsqlite_clear_result, res))
 }
 
 rsqlite_fetch <- function(res, n = 10L) {
-    .Call(`_RSQLite_rsqlite_fetch`, res, n)
+    .Call(RSQLite_rsqlite_fetch, res, n)
 }
 
 rsqlite_get_placeholder_names <- function(res) {
-    .Call(`_RSQLite_rsqlite_get_placeholder_names`, res)
+    .Call(RSQLite_rsqlite_get_placeholder_names, res)
 }
 
 rsqlite_bind_rows <- function(res, params) {
-    invisible(.Call(`_RSQLite_rsqlite_bind_rows`, res, params))
+    invisible(.Call(RSQLite_rsqlite_bind_rows, res, params))
 }
 
 rsqlite_has_completed <- function(res) {
-    .Call(`_RSQLite_rsqlite_has_completed`, res)
+    .Call(RSQLite_rsqlite_has_completed, res)
 }
 
 rsqlite_row_count <- function(res) {
-    .Call(`_RSQLite_rsqlite_row_count`, res)
+    .Call(RSQLite_rsqlite_row_count, res)
 }
 
 rsqlite_rows_affected <- function(res) {
-    .Call(`_RSQLite_rsqlite_rows_affected`, res)
+    .Call(RSQLite_rsqlite_rows_affected, res)
 }
 
 rsqlite_column_info <- function(res) {
-    .Call(`_RSQLite_rsqlite_column_info`, res)
+    .Call(RSQLite_rsqlite_column_info, res)
 }
 
 rsqlite_result_valid <- function(res) {
-    .Call(`_RSQLite_rsqlite_result_valid`, res)
+    .Call(RSQLite_rsqlite_result_valid, res)
 }
 
 #' RSQLite version
@@ -69,10 +69,10 @@ rsqlite_result_valid <- function(res) {
 #' @examples
 #' RSQLite::rsqliteVersion()
 rsqliteVersion <- function() {
-    .Call(`_RSQLite_rsqliteVersion`)
+    .Call(RSQLite_rsqliteVersion)
 }
 
 init_logging <- function(log_level) {
-    invisible(.Call(`_RSQLite_init_logging`, log_level))
+    invisible(.Call(RSQLite_init_logging, log_level))
 }
 

@@ -18,6 +18,6 @@ CharacterVector rsqliteVersion() {
 }
 
 // [[Rcpp::export]]
-void rsqlite_init_logging(const std::string& log_level) {
+void init_logging(const std::string& log_level) {
   plog::init_r(log_level);
 }

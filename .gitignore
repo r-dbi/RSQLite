@@ -18,3 +18,5 @@ inst/doc
 /docs
 .RData
 /clion-test.R
+/revdep/checks/*/*/*.Rcheck
+/revdep/checks/*/*/libraries.txt

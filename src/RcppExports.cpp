@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // rsqlite_connect
 XPtr<SqliteConnectionPtr> rsqlite_connect(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs);
-RcppExport SEXP RSQLite_rsqlite_connect(SEXP pathSEXP, SEXP allow_extSEXP, SEXP flagsSEXP, SEXP vfsSEXP) {
+RcppExport SEXP _RSQLite_rsqlite_connect(SEXP pathSEXP, SEXP allow_extSEXP, SEXP flagsSEXP, SEXP vfsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -22,7 +22,7 @@ END_RCPP
 }
 // rsqlite_disconnect
 void rsqlite_disconnect(XPtr<SqliteConnectionPtr>& con);
-RcppExport SEXP RSQLite_rsqlite_disconnect(SEXP conSEXP) {
+RcppExport SEXP _RSQLite_rsqlite_disconnect(SEXP conSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< XPtr<SqliteConnectionPtr>& >::type con(conSEXP);
@@ -32,7 +32,7 @@ END_RCPP
 }
 // rsqlite_copy_database
 void rsqlite_copy_database(const XPtr<SqliteConnectionPtr>& from, const XPtr<SqliteConnectionPtr>& to);
-RcppExport SEXP RSQLite_rsqlite_copy_database(SEXP fromSEXP, SEXP toSEXP) {
+RcppExport SEXP _RSQLite_rsqlite_copy_database(SEXP fromSEXP, SEXP toSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const XPtr<SqliteConnectionPtr>& >::type from(fromSEXP);
@@ -43,7 +43,7 @@ END_RCPP
 }
 // rsqlite_connection_valid
 bool rsqlite_connection_valid(const XPtr<SqliteConnectionPtr>& con);
-RcppExport SEXP RSQLite_rsqlite_connection_valid(SEXP conSEXP) {
+RcppExport SEXP _RSQLite_rsqlite_connection_valid(SEXP conSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -54,7 +54,7 @@ END_RCPP
 }
 // rsqlite_import_file
 bool rsqlite_import_file(const XPtr<SqliteConnectionPtr>& con, const std::string& name, const std::string& value, const std::string& sep, const std::string& eol, const int skip);
-RcppExport SEXP RSQLite_rsqlite_import_file(SEXP conSEXP, SEXP nameSEXP, SEXP valueSEXP, SEXP sepSEXP, SEXP eolSEXP, SEXP skipSEXP) {
+RcppExport SEXP _RSQLite_rsqlite_import_file(SEXP conSEXP, SEXP nameSEXP, SEXP valueSEXP, SEXP sepSEXP, SEXP eolSEXP, SEXP skipSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -70,7 +70,7 @@ END_RCPP
 }
 // rsqlite_send_query
 XPtr<SqliteResult> rsqlite_send_query(const XPtr<SqliteConnectionPtr>& con, const std::string& sql);
-RcppExport SEXP RSQLite_rsqlite_send_query(SEXP conSEXP, SEXP sqlSEXP) {
+RcppExport SEXP _RSQLite_rsqlite_send_query(SEXP conSEXP, SEXP sqlSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -82,7 +82,7 @@ END_RCPP
 }
 // rsqlite_clear_result
 void rsqlite_clear_result(XPtr<SqliteResult>& res);
-RcppExport SEXP RSQLite_rsqlite_clear_result(SEXP resSEXP) {
+RcppExport SEXP _RSQLite_rsqlite_clear_result(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< XPtr<SqliteResult>& >::type res(resSEXP);
@@ -92,7 +92,7 @@ END_RCPP
 }
 // rsqlite_fetch
 List rsqlite_fetch(const XPtr<SqliteResult>& res, const int n);
-RcppExport SEXP RSQLite_rsqlite_fetch(SEXP resSEXP, SEXP nSEXP) {
+RcppExport SEXP _RSQLite_rsqlite_fetch(SEXP resSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -104,7 +104,7 @@ END_RCPP
 }
 // rsqlite_get_placeholder_names
 CharacterVector rsqlite_get_placeholder_names(const XPtr<SqliteResult>& res);
-RcppExport SEXP RSQLite_rsqlite_get_placeholder_names(SEXP resSEXP) {
+RcppExport SEXP _RSQLite_rsqlite_get_placeholder_names(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -115,7 +115,7 @@ END_RCPP
 }
 // rsqlite_bind_rows
 void rsqlite_bind_rows(const XPtr<SqliteResult>& res, List params);
-RcppExport SEXP RSQLite_rsqlite_bind_rows(SEXP resSEXP, SEXP paramsSEXP) {
+RcppExport SEXP _RSQLite_rsqlite_bind_rows(SEXP resSEXP, SEXP paramsSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const XPtr<SqliteResult>& >::type res(resSEXP);
@@ -126,7 +126,7 @@ END_RCPP
 }
 // rsqlite_has_completed
 bool rsqlite_has_completed(const XPtr<SqliteResult>& res);
-RcppExport SEXP RSQLite_rsqlite_has_completed(SEXP resSEXP) {
+RcppExport SEXP _RSQLite_rsqlite_has_completed(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -137,7 +137,7 @@ END_RCPP
 }
 // rsqlite_row_count
 int rsqlite_row_count(const XPtr<SqliteResult>& res);
-RcppExport SEXP RSQLite_rsqlite_row_count(SEXP resSEXP) {
+RcppExport SEXP _RSQLite_rsqlite_row_count(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -148,7 +148,7 @@ END_RCPP
 }
 // rsqlite_rows_affected
 int rsqlite_rows_affected(const XPtr<SqliteResult>& res);
-RcppExport SEXP RSQLite_rsqlite_rows_affected(SEXP resSEXP) {
+RcppExport SEXP _RSQLite_rsqlite_rows_affected(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -159,7 +159,7 @@ END_RCPP
 }
 // rsqlite_column_info
 List rsqlite_column_info(const XPtr<SqliteResult>& res);
-RcppExport SEXP RSQLite_rsqlite_column_info(SEXP resSEXP) {
+RcppExport SEXP _RSQLite_rsqlite_column_info(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -170,7 +170,7 @@ END_RCPP
 }
 // rsqlite_result_valid
 bool rsqlite_result_valid(const XPtr<SqliteResult>& res);
-RcppExport SEXP RSQLite_rsqlite_result_valid(SEXP resSEXP) {
+RcppExport SEXP _RSQLite_rsqlite_result_valid(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -181,7 +181,7 @@ END_RCPP
 }
 // rsqliteVersion
 CharacterVector rsqliteVersion();
-RcppExport SEXP RSQLite_rsqliteVersion() {
+RcppExport SEXP _RSQLite_rsqliteVersion() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -191,7 +191,7 @@ END_RCPP
 }
 // init_logging
 void init_logging(const std::string& log_level);
-RcppExport SEXP RSQLite_init_logging(SEXP log_levelSEXP) {
+RcppExport SEXP _RSQLite_init_logging(SEXP log_levelSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::string& >::type log_level(log_levelSEXP);
@@ -201,23 +201,23 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"RSQLite_rsqlite_connect", (DL_FUNC) &RSQLite_rsqlite_connect, 4},
-    {"RSQLite_rsqlite_disconnect", (DL_FUNC) &RSQLite_rsqlite_disconnect, 1},
-    {"RSQLite_rsqlite_copy_database", (DL_FUNC) &RSQLite_rsqlite_copy_database, 2},
-    {"RSQLite_rsqlite_connection_valid", (DL_FUNC) &RSQLite_rsqlite_connection_valid, 1},
-    {"RSQLite_rsqlite_import_file", (DL_FUNC) &RSQLite_rsqlite_import_file, 6},
-    {"RSQLite_rsqlite_send_query", (DL_FUNC) &RSQLite_rsqlite_send_query, 2},
-    {"RSQLite_rsqlite_clear_result", (DL_FUNC) &RSQLite_rsqlite_clear_result, 1},
-    {"RSQLite_rsqlite_fetch", (DL_FUNC) &RSQLite_rsqlite_fetch, 2},
-    {"RSQLite_rsqlite_get_placeholder_names", (DL_FUNC) &RSQLite_rsqlite_get_placeholder_names, 1},
-    {"RSQLite_rsqlite_bind_rows", (DL_FUNC) &RSQLite_rsqlite_bind_rows, 2},
-    {"RSQLite_rsqlite_has_completed", (DL_FUNC) &RSQLite_rsqlite_has_completed, 1},
-    {"RSQLite_rsqlite_row_count", (DL_FUNC) &RSQLite_rsqlite_row_count, 1},
-    {"RSQLite_rsqlite_rows_affected", (DL_FUNC) &RSQLite_rsqlite_rows_affected, 1},
-    {"RSQLite_rsqlite_column_info", (DL_FUNC) &RSQLite_rsqlite_column_info, 1},
-    {"RSQLite_rsqlite_result_valid", (DL_FUNC) &RSQLite_rsqlite_result_valid, 1},
-    {"RSQLite_rsqliteVersion", (DL_FUNC) &RSQLite_rsqliteVersion, 0},
-    {"RSQLite_init_logging", (DL_FUNC) &RSQLite_init_logging, 1},
+    {"_RSQLite_rsqlite_connect", (DL_FUNC) &_RSQLite_rsqlite_connect, 4},
+    {"_RSQLite_rsqlite_disconnect", (DL_FUNC) &_RSQLite_rsqlite_disconnect, 1},
+    {"_RSQLite_rsqlite_copy_database", (DL_FUNC) &_RSQLite_rsqlite_copy_database, 2},
+    {"_RSQLite_rsqlite_connection_valid", (DL_FUNC) &_RSQLite_rsqlite_connection_valid, 1},
+    {"_RSQLite_rsqlite_import_file", (DL_FUNC) &_RSQLite_rsqlite_import_file, 6},
+    {"_RSQLite_rsqlite_send_query", (DL_FUNC) &_RSQLite_rsqlite_send_query, 2},
+    {"_RSQLite_rsqlite_clear_result", (DL_FUNC) &_RSQLite_rsqlite_clear_result, 1},
+    {"_RSQLite_rsqlite_fetch", (DL_FUNC) &_RSQLite_rsqlite_fetch, 2},
+    {"_RSQLite_rsqlite_get_placeholder_names", (DL_FUNC) &_RSQLite_rsqlite_get_placeholder_names, 1},
+    {"_RSQLite_rsqlite_bind_rows", (DL_FUNC) &_RSQLite_rsqlite_bind_rows, 2},
+    {"_RSQLite_rsqlite_has_completed", (DL_FUNC) &_RSQLite_rsqlite_has_completed, 1},
+    {"_RSQLite_rsqlite_row_count", (DL_FUNC) &_RSQLite_rsqlite_row_count, 1},
+    {"_RSQLite_rsqlite_rows_affected", (DL_FUNC) &_RSQLite_rsqlite_rows_affected, 1},
+    {"_RSQLite_rsqlite_column_info", (DL_FUNC) &_RSQLite_rsqlite_column_info, 1},
+    {"_RSQLite_rsqlite_result_valid", (DL_FUNC) &_RSQLite_rsqlite_result_valid, 1},
+    {"_RSQLite_rsqliteVersion", (DL_FUNC) &_RSQLite_rsqliteVersion, 0},
+    {"_RSQLite_init_logging", (DL_FUNC) &_RSQLite_init_logging, 1},
     {NULL, NULL, 0}
 };
 

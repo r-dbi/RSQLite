@@ -1,3 +1,9 @@
+## RSQLite 2.0-10 (2017-09-22)
+
+- Now raising error if `dbBind()` is called with too many named arguments, according to spec.
+- `dbIsValid()` returns `FALSE` instead of throwing an error for an invalid connection object (#217).
+
+
 # RSQLite 2.0 (2017-06-18)
 
 API changes

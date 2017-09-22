@@ -130,8 +130,7 @@ CharacterVector SqliteResultImpl::get_placeholder_names() const {
 
 void SqliteResultImpl::bind_rows_impl(const List& params) {
   if (cache.nparams_ == 0) {
-    stop("Query does not require parameters.",
-         cache.nparams_, params.size());
+    stop("Query does not require parameters.");
   }
 
   if (params.size() != cache.nparams_) {

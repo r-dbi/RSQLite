@@ -66,12 +66,13 @@ db_bind <- function(res, params, ..., allow_named_superset) {
     }
     unmatched_param_indexes <- setdiff(seq_along(params), param_indexes)
     if (length(unmatched_param_indexes) > 0L) {
-      if (allow_named_superset) {
-        warningc(
-          "Named parameters not used in query: ",
-          paste0(names(params)[unmatched_param_indexes], collapse = ", ")
-        )
-      }
+      if (allow_named_superset) errorc <- warningc
+      else errorc <- stopc
+
+      errorc(
+        "Named parameters not used in query: ",
+        paste0(names(params)[unmatched_param_indexes], collapse = ", ")
+      )
     }
 
     params <- unname(params[param_indexes])

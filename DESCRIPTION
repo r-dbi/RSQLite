@@ -31,6 +31,8 @@ Imports:
     pkgconfig,
     Rcpp (>= 0.12.7)
 LinkingTo: Rcpp, BH, plogr
+Remotes: 
+    rstats-db/DBItest
 Encoding: UTF-8
 License: LGPL (>= 2)
 URL: https://github.com/rstats-db/RSQLite

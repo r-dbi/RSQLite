@@ -134,7 +134,7 @@ setMethod("dbHasCompleted", "SQLiteResult", function(res, ...) {
 #' @export
 setMethod("dbGetStatement", "SQLiteResult", function(res, ...) {
   if (!dbIsValid(res)) {
-    stop("Expired, result set already closed")
+    stopc("Expired, result set already closed")
   }
   res@sql
 })

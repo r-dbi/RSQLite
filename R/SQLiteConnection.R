@@ -31,7 +31,7 @@ setMethod("dbQuoteIdentifier", c("SQLiteConnection", "character"), function(conn
   if (any(is.na(x))) {
     stop("Cannot pass NA to dbQuoteIdentifier()", call. = FALSE)
   }
-  x <- gsub("`", "``", x, fixed = TRUE)
+  x <- gsub("`", "``", enc2utf8(x), fixed = TRUE, useBytes = TRUE)
   if (length(x) == 0L) {
     SQL(character())
   } else {

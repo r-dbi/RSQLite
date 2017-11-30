@@ -10,7 +10,7 @@
 class DbColumnDataSource;
 class DbColumnStorage;
 
-class SqliteColumn {
+class DbColumn {
 private:
   boost::shared_ptr<DbColumnDataSource> source;
   boost::ptr_vector<DbColumnStorage> storage;
@@ -18,8 +18,8 @@ private:
   std::set<DATA_TYPE> data_types_seen;
 
 public:
-  SqliteColumn(DATA_TYPE dt_, int n_max_, sqlite3_stmt* stmt_, int j_);
-  ~SqliteColumn();
+  DbColumn(DATA_TYPE dt_, int n_max_, sqlite3_stmt* stmt_, int j_);
+  ~DbColumn();
 
 public:
   void set_col_value();

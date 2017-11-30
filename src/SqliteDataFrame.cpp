@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "SqliteDataFrame.h"
-#include "SqliteColumn.h"
+#include "DbColumn.h"
 #include "DbColumnStorage.h"
 #include "SqliteColumnDataSource.h"
 #include <boost/bind.hpp>
@@ -15,7 +15,7 @@ SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt_, std::vector<std::string> n
 {
   data.reserve(types_.size());
   for (size_t j = 0; j < types_.size(); ++j) {
-    SqliteColumn x(types_[j], n_max, stmt, (int)j);
+    DbColumn x(types_[j], n_max, stmt, (int)j);
     data.push_back(x);
   }
 }
@@ -24,7 +24,7 @@ SqliteDataFrame::~SqliteDataFrame() {
 }
 
 void SqliteDataFrame::set_col_values() {
-  std::for_each(data.begin(), data.end(), boost::bind(&SqliteColumn::set_col_value, _1));
+  std::for_each(data.begin(), data.end(), boost::bind(&DbColumn::set_col_value, _1));
 }
 
 bool SqliteDataFrame::advance() {
@@ -41,9 +41,9 @@ List SqliteDataFrame::get_data(std::vector<DATA_TYPE>& types_) {
   finalize_cols();
 
   types_.clear();
-  std::transform(data.begin(), data.end(), std::back_inserter(types_), std::mem_fun_ref(&SqliteColumn::get_type));
+  std::transform(data.begin(), data.end(), std::back_inserter(types_), std::mem_fun_ref(&DbColumn::get_type));
 
-  boost::for_each(data, names, boost::bind(&SqliteColumn::warn_type_conflicts, _1, _2));
+  boost::for_each(data, names, boost::bind(&DbColumn::warn_type_conflicts, _1, _2));
 
   List out(data.begin(), data.end());
   out.attr("names") = names;
@@ -57,5 +57,5 @@ size_t SqliteDataFrame::get_ncols() const {
 }
 
 void SqliteDataFrame::finalize_cols() {
-  std::for_each(data.begin(), data.end(), boost::bind(&SqliteColumn::finalize, _1, i));
+  std::for_each(data.begin(), data.end(), boost::bind(&DbColumn::finalize, _1, i));
 }

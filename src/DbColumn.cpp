@@ -1,10 +1,10 @@
 #include "pch.h"
-#include "SqliteColumn.h"
+#include "DbColumn.h"
 #include "DbColumnStorage.h"
 #include "SqliteColumnDataSource.h"
 
 
-SqliteColumn::SqliteColumn(DATA_TYPE dt, int n_max_, sqlite3_stmt* stmt_, int j_)
+DbColumn::DbColumn(DATA_TYPE dt, int n_max_, sqlite3_stmt* stmt_, int j_)
   : source(new SqliteColumnDataSource(stmt_, j_)),
     i(0),
     n(0)
@@ -14,10 +14,10 @@ SqliteColumn::SqliteColumn(DATA_TYPE dt, int n_max_, sqlite3_stmt* stmt_, int j_
   storage.push_back(new DbColumnStorage(dt, 0, n_max_, *source));
 }
 
-SqliteColumn::~SqliteColumn() {
+DbColumn::~DbColumn() {
 }
 
-void SqliteColumn::set_col_value() {
+void DbColumn::set_col_value() {
   DbColumnStorage* last = get_last_storage();
   DATA_TYPE dt = last->get_item_data_type();
   data_types_seen.insert(dt);
@@ -26,11 +26,11 @@ void SqliteColumn::set_col_value() {
   if (last != next) storage.push_back(next);
 }
 
-void SqliteColumn::finalize(const int n_) {
+void DbColumn::finalize(const int n_) {
   n = n_;
 }
 
-void SqliteColumn::warn_type_conflicts(const String& name) const {
+void DbColumn::warn_type_conflicts(const String& name) const {
   std::set<DATA_TYPE> my_data_types_seen = data_types_seen;
   DATA_TYPE dt = get_last_storage()->get_data_type();
 
@@ -71,7 +71,7 @@ void SqliteColumn::warn_type_conflicts(const String& name) const {
   warning(ss.str());
 }
 
-SqliteColumn::operator SEXP() const {
+DbColumn::operator SEXP() const {
   DATA_TYPE dt = get_last_storage()->get_data_type();
   SEXP ret = DbColumnStorage::allocate(n, dt);
   int pos = 0;
@@ -82,12 +82,12 @@ SqliteColumn::operator SEXP() const {
   return ret;
 }
 
-DATA_TYPE SqliteColumn::get_type() const {
+DATA_TYPE DbColumn::get_type() const {
   const DATA_TYPE dt = get_last_storage()->get_data_type();
   return dt;
 }
 
-const char* SqliteColumn::format_data_type(const DATA_TYPE dt) {
+const char* DbColumn::format_data_type(const DATA_TYPE dt) {
   switch (dt) {
   case DT_UNKNOWN:
     return "unknown";
@@ -108,10 +108,10 @@ const char* SqliteColumn::format_data_type(const DATA_TYPE dt) {
   }
 }
 
-DbColumnStorage* SqliteColumn::get_last_storage() {
+DbColumnStorage* DbColumn::get_last_storage() {
   return &storage.end()[-1];
 }
 
-const DbColumnStorage* SqliteColumn::get_last_storage() const {
+const DbColumnStorage* DbColumn::get_last_storage() const {
   return &storage.end()[-1];
 }

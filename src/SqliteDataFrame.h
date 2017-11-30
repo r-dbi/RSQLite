@@ -6,13 +6,13 @@
 #include <boost/container/stable_vector.hpp>
 #include "DbColumnDataType.h"
 
-class SqliteColumn;
+class DbColumn;
 
 class SqliteDataFrame {
   sqlite3_stmt* stmt;
   const int n_max;
   int i;
-  boost::container::stable_vector<SqliteColumn> data;
+  boost::container::stable_vector<DbColumn> data;
   std::vector<std::string> names;
 
 public:

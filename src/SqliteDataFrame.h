@@ -4,12 +4,14 @@
 
 #include "sqlite3.h"
 #include <boost/container/stable_vector.hpp>
+#include <boost/scoped_ptr.hpp>
 #include "DbColumnDataType.h"
 
 class DbColumn;
+class DbColumnDataSourceFactory;
 
 class SqliteDataFrame {
-  sqlite3_stmt* stmt;
+  boost::scoped_ptr<DbColumnDataSourceFactory> factory;
   const int n_max;
   int i;
   boost::container::stable_vector<DbColumn> data;

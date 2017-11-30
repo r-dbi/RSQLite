@@ -3,19 +3,21 @@
 #include "DbColumn.h"
 #include "DbColumnStorage.h"
 #include "SqliteColumnDataSource.h"
+#include "SqliteColumnDataSourceFactory.h"
 #include <boost/bind.hpp>
 #include <boost/range/algorithm_ext/for_each.hpp>
 
-SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt_, std::vector<std::string> names_, const int n_max_,
+SqliteDataFrame::SqliteDataFrame(sqlite3_stmt* stmt, std::vector<std::string> names_, const int n_max_,
                                  const std::vector<DATA_TYPE>& types_)
-  : stmt(stmt_),
-    n_max(n_max_),
+  : n_max(n_max_),
     i(0),
     names(names_)
 {
+  factory.reset(new SqliteColumnDataSourceFactory(stmt));
+
   data.reserve(types_.size());
   for (size_t j = 0; j < types_.size(); ++j) {
-    DbColumn x(types_[j], n_max, stmt, (int)j);
+    DbColumn x(types_[j], n_max, factory.get(), (int)j);
     data.push_back(x);
   }
 }

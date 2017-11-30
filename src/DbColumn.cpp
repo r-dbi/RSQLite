@@ -1,11 +1,11 @@
 #include "pch.h"
 #include "DbColumn.h"
+#include "DbColumnDataSource.h"
 #include "DbColumnStorage.h"
-#include "SqliteColumnDataSource.h"
 
 
-DbColumn::DbColumn(DATA_TYPE dt, int n_max_, sqlite3_stmt* stmt_, int j_)
-  : source(new SqliteColumnDataSource(stmt_, j_)),
+DbColumn::DbColumn(DATA_TYPE dt, const int n_max_, DbColumnDataSourceFactory* factory, const int j)
+  : source(factory->create(j)),
     i(0),
     n(0)
 {

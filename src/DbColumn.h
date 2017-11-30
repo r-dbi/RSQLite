@@ -2,11 +2,12 @@
 #define RSQLITE_SQLITECOLUMN_H
 
 
-#include "sqlite3.h"
 #include "DbColumnDataType.h"
+#include "DbColumnDataSourceFactory.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 
+class DbColumnDataSourceFactory;
 class DbColumnDataSource;
 class DbColumnStorage;
 
@@ -18,7 +19,7 @@ private:
   std::set<DATA_TYPE> data_types_seen;
 
 public:
-  DbColumn(DATA_TYPE dt_, int n_max_, sqlite3_stmt* stmt_, int j_);
+  DbColumn(DATA_TYPE dt_, const int n_max_, DbColumnDataSourceFactory* factory, const int j);
   ~DbColumn();
 
 public:

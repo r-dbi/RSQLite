@@ -87,12 +87,6 @@ sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
   return stmt;
 }
 
-void SqliteResultImpl::after_bind(bool params_have_rows) {
-  init(params_have_rows);
-  if (params_have_rows)
-    step();
-}
-
 void SqliteResultImpl::init(bool params_have_rows) {
   ready_ = true;
   nrows_ = 0;
@@ -258,6 +252,12 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
     stop("Don't know how to handle parameter of type %s.",
          Rf_type2char(TYPEOF(value_)));
   }
+}
+
+void SqliteResultImpl::after_bind(bool params_have_rows) {
+  init(params_have_rows);
+  if (params_have_rows)
+    step();
 }
 
 List SqliteResultImpl::fetch_rows(const int n_max, int& n) {

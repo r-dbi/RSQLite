@@ -19,7 +19,8 @@ SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
     groups_(0),
     types_(get_initial_field_types(cache.ncols_))
 {
-  LOG_VERBOSE << sql;
+
+  LOG_DEBUG << sql;
 
   try {
     if (cache.nparams_ == 0) {
@@ -31,6 +32,18 @@ SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
     throw;
   }
 }
+
+SqliteResultImpl::~SqliteResultImpl() {
+  LOG_VERBOSE;
+
+  try {
+    sqlite3_finalize(stmt);
+  } catch (...) {}
+}
+
+
+
+// Cache ///////////////////////////////////////////////////////////////////////
 
 SqliteResultImpl::_cache::_cache(sqlite3_stmt* stmt)
   : names_(get_column_names(stmt)),
@@ -50,12 +63,13 @@ std::vector<std::string> SqliteResultImpl::_cache::get_column_names(sqlite3_stmt
   return names;
 }
 
-SqliteResultImpl::~SqliteResultImpl() {
-  LOG_VERBOSE;
-
-  try {
-    sqlite3_finalize(stmt);
-  } catch (...) {}
+// We guess the correct R type for each column from the declared column type,
+// if possible.  The type of the column can be amended as new values come in,
+// but will be fixed after the first call to fetch().
+std::vector<DATA_TYPE> SqliteResultImpl::get_initial_field_types(const size_t ncols) {
+  std::vector<DATA_TYPE> types(ncols);
+  std::fill(types.begin(), types.end(), DT_UNKNOWN);
+  return types;
 }
 
 sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
@@ -71,15 +85,6 @@ sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
   }
 
   return stmt;
-}
-
-// We guess the correct R type for each column from the declared column type,
-// if possible.  The type of the column can be amended as new values come in,
-// but will be fixed after the first call to fetch().
-std::vector<DATA_TYPE> SqliteResultImpl::get_initial_field_types(const size_t ncols) {
-  std::vector<DATA_TYPE> types(ncols);
-  std::fill(types.begin(), types.end(), DT_UNKNOWN);
-  return types;
 }
 
 void SqliteResultImpl::after_bind(bool params_have_rows) {

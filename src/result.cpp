@@ -9,7 +9,7 @@ XPtr<DbResult> result_send_query(const XPtr<DbConnectionPtr>& con, const std::st
 }
 
 // [[Rcpp::export]]
-void result_clear_result(XPtr<DbResult>& res) {
+void result_release(XPtr<DbResult> res) {
   res.release();
 }
 

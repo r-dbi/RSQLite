@@ -25,8 +25,8 @@ result_send_query <- function(con, sql) {
     .Call(`_RSQLite_result_send_query`, con, sql)
 }
 
-result_clear_result <- function(res) {
-    invisible(.Call(`_RSQLite_result_clear_result`, res))
+result_release <- function(res) {
+    invisible(.Call(`_RSQLite_result_release`, res))
 }
 
 result_fetch <- function(res, n) {

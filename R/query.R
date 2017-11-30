@@ -105,7 +105,7 @@ setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
     warningc("Expired, result set already closed")
     return(invisible(TRUE))
   }
-  result_clear_result(res@ptr)
+  result_release(res@ptr)
   res@conn@ref$result <- NULL
   invisible(TRUE)
 })

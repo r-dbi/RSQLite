@@ -111,23 +111,6 @@ int SqliteResultImpl::n_rows_affected() {
   return rows_affected_;
 }
 
-CharacterVector SqliteResultImpl::get_placeholder_names() const {
-  int n = sqlite3_bind_parameter_count(stmt);
-
-  CharacterVector res(n);
-
-  for (int i = 0; i < n; ++i) {
-    const char* placeholder_name = sqlite3_bind_parameter_name(stmt, i + 1);
-    if (placeholder_name == NULL)
-      placeholder_name = "";
-    else
-      ++placeholder_name;
-    res[i] = String(placeholder_name, CE_UTF8);
-  }
-
-  return res;
-}
-
 void SqliteResultImpl::bind(const List& params) {
   if (cache.nparams_ == 0) {
     stop("Query does not require parameters.");
@@ -176,6 +159,27 @@ List SqliteResultImpl::get_column_info() {
   }
 
   return List::create(names, types);
+}
+
+
+
+// Publics (custom) ////////////////////////////////////////////////////////////
+
+CharacterVector SqliteResultImpl::get_placeholder_names() const {
+  int n = sqlite3_bind_parameter_count(stmt);
+
+  CharacterVector res(n);
+
+  for (int i = 0; i < n; ++i) {
+    const char* placeholder_name = sqlite3_bind_parameter_name(stmt, i + 1);
+    if (placeholder_name == NULL)
+      placeholder_name = "";
+    else
+      ++placeholder_name;
+    res[i] = String(placeholder_name, CE_UTF8);
+  }
+
+  return res;
 }
 
 

@@ -46,11 +46,13 @@ public:
   bool complete();
   int n_rows_fetched();
   int n_rows_affected();
-  CharacterVector get_placeholder_names() const;
   void bind(const List& params);
   List fetch(const int n_max);
 
   List get_column_info();
+
+public:
+  CharacterVector get_placeholder_names() const;
 
 private:
   void set_params(const List& params);

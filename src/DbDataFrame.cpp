@@ -2,8 +2,8 @@
 #include "DbDataFrame.h"
 #include "DbColumn.h"
 #include "DbColumnStorage.h"
-#include "SqliteColumnDataSource.h"
-#include "SqliteColumnDataSourceFactory.h"
+#include "DbColumnDataSource.h"
+#include "DbColumnDataSourceFactory.h"
 #include <boost/bind.hpp>
 #include <boost/range/algorithm_ext/for_each.hpp>
 

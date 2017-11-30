@@ -119,7 +119,7 @@ setMethod("dbConnect", "SQLiteDriver",
     stopifnot(is.integer(flags), length(flags) == 1)
 
     con <- new("SQLiteConnection",
-      ptr = rsqlite_connect(dbname, loadable.extensions, flags, vfs),
+      ptr = connection_connect(dbname, loadable.extensions, flags, vfs),
       dbname = dbname,
       flags = flags,
       vfs = vfs,
@@ -195,6 +195,6 @@ setMethod("dbConnect", "SQLiteConnection", function(drv, ...){
 #' @export
 #' @rdname SQLite
 setMethod("dbDisconnect", "SQLiteConnection", function(conn, ...) {
-  rsqlite_disconnect(conn@ptr)
+  connection_disconnect(conn@ptr)
   invisible(TRUE)
 })

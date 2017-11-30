@@ -14,7 +14,7 @@ extern "C" {
 }
 
 // [[Rcpp::export]]
-XPtr<DbConnectionPtr> rsqlite_connect(
+XPtr<DbConnectionPtr> connection_connect(
   const std::string& path, const bool allow_ext, const int flags, const std::string& vfs = "")
 {
 
@@ -26,7 +26,7 @@ XPtr<DbConnectionPtr> rsqlite_connect(
 }
 
 // [[Rcpp::export]]
-void rsqlite_disconnect(XPtr<DbConnectionPtr>& con) {
+void connection_disconnect(XPtr<DbConnectionPtr>& con) {
   if (!con.get() || !(*con)->is_valid()) {
     warning("Already disconnected");
     return;
@@ -44,18 +44,18 @@ void rsqlite_disconnect(XPtr<DbConnectionPtr>& con) {
 }
 
 // [[Rcpp::export]]
-void rsqlite_copy_database(const XPtr<DbConnectionPtr>& from,
+void connection_copy_database(const XPtr<DbConnectionPtr>& from,
                            const XPtr<DbConnectionPtr>& to) {
   (*from)->copy_to((*to));
 }
 
 // [[Rcpp::export]]
-bool rsqlite_connection_valid(const XPtr<DbConnectionPtr>& con) {
+bool connection_connection_valid(const XPtr<DbConnectionPtr>& con) {
   return (con.get() != NULL) && (*con)->is_valid();
 }
 
 // [[Rcpp::export]]
-bool rsqlite_import_file(const XPtr<DbConnectionPtr>& con,
+bool connection_import_file(const XPtr<DbConnectionPtr>& con,
                          const std::string& name, const std::string& value,
                          const std::string& sep, const std::string& eol,
                          const int skip) {

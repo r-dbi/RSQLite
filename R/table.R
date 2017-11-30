@@ -119,7 +119,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
 
       names(value) <- rep("", length(value))
       tryCatch(
-        rsqlite_bind_rows(rs@ptr, value),
+        result_bind_rows(rs@ptr, value),
         finally = dbClearResult(rs)
       )
     }
@@ -241,7 +241,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
     }
 
     skip <- skip + as.integer(header)
-    rsqlite_import_file(conn@ptr, name, value, sep, eol, skip)
+    connection_import_file(conn@ptr, name, value, sep, eol, skip)
 
     dbCommit(conn)
     on.exit(NULL)

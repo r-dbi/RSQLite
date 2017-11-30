@@ -62,3 +62,15 @@ bool rsqlite_import_file(const XPtr<DbConnectionPtr>& con,
   return !!RS_sqlite_import(con->get()->conn(), name.c_str(), value.c_str(),
                             sep.c_str(), eol.c_str(), skip);
 }
+
+namespace Rcpp {
+
+template<>
+DbConnection* as(SEXP x) {
+  DbConnectionPtr* connection = (DbConnectionPtr*)(R_ExternalPtrAddr(x));
+  if (!connection)
+    stop("Invalid connection");
+  return connection->get();
+}
+
+}

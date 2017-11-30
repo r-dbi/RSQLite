@@ -53,3 +53,15 @@ List rsqlite_column_info(const XPtr<DbResult>& res) {
 bool rsqlite_result_valid(const XPtr<DbResult>& res) {
   return res.get() != NULL;
 }
+
+namespace Rcpp {
+
+template<>
+DbResult* as(SEXP x) {
+  DbResult* result = (DbResult*)(R_ExternalPtrAddr(x));
+  if (!result)
+    stop("Invalid result set");
+  return result;
+}
+
+}

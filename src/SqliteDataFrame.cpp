@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "SqliteDataFrame.h"
 #include "SqliteColumn.h"
-#include "ColumnStorage.h"
+#include "DbColumnStorage.h"
 #include "SqliteColumnDataSource.h"
 #include <boost/bind.hpp>
 #include <boost/range/algorithm_ext/for_each.hpp>

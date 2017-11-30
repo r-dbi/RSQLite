@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "SqliteColumn.h"
-#include "ColumnStorage.h"
+#include "DbColumnStorage.h"
 #include "SqliteColumnDataSource.h"
 
 
@@ -11,18 +11,18 @@ SqliteColumn::SqliteColumn(DATA_TYPE dt, int n_max_, sqlite3_stmt* stmt_, int j_
 {
   if (dt == DT_BOOL)
     dt = DT_UNKNOWN;
-  storage.push_back(new ColumnStorage(dt, 0, n_max_, *source));
+  storage.push_back(new DbColumnStorage(dt, 0, n_max_, *source));
 }
 
 SqliteColumn::~SqliteColumn() {
 }
 
 void SqliteColumn::set_col_value() {
-  ColumnStorage* last = get_last_storage();
+  DbColumnStorage* last = get_last_storage();
   DATA_TYPE dt = last->get_item_data_type();
   data_types_seen.insert(dt);
 
-  ColumnStorage* next = last->append_col();
+  DbColumnStorage* next = last->append_col();
   if (last != next) storage.push_back(next);
 }
 
@@ -73,10 +73,10 @@ void SqliteColumn::warn_type_conflicts(const String& name) const {
 
 SqliteColumn::operator SEXP() const {
   DATA_TYPE dt = get_last_storage()->get_data_type();
-  SEXP ret = ColumnStorage::allocate(n, dt);
+  SEXP ret = DbColumnStorage::allocate(n, dt);
   int pos = 0;
   for (size_t k = 0; k < storage.size(); ++k) {
-    const ColumnStorage& current = storage[k];
+    const DbColumnStorage& current = storage[k];
     pos += current.copy_to(ret, dt, pos);
   }
   return ret;
@@ -108,10 +108,10 @@ const char* SqliteColumn::format_data_type(const DATA_TYPE dt) {
   }
 }
 
-ColumnStorage* SqliteColumn::get_last_storage() {
+DbColumnStorage* SqliteColumn::get_last_storage() {
   return &storage.end()[-1];
 }
 
-const ColumnStorage* SqliteColumn::get_last_storage() const {
+const DbColumnStorage* SqliteColumn::get_last_storage() const {
   return &storage.end()[-1];
 }

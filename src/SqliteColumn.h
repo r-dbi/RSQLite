@@ -8,12 +8,12 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 
 class SqliteColumnDataSource;
-class ColumnStorage;
+class DbColumnStorage;
 
 class SqliteColumn {
 private:
   boost::shared_ptr<SqliteColumnDataSource> source;
-  boost::ptr_vector<ColumnStorage> storage;
+  boost::ptr_vector<DbColumnStorage> storage;
   int i, n;
   std::set<DATA_TYPE> data_types_seen;
 
@@ -31,8 +31,8 @@ public:
   static const char* format_data_type(const DATA_TYPE dt);
 
 private:
-  ColumnStorage* get_last_storage();
-  const ColumnStorage* get_last_storage() const;
+  DbColumnStorage* get_last_storage();
+  const DbColumnStorage* get_last_storage() const;
 };
 
 

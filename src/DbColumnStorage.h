@@ -7,7 +7,7 @@
 
 class DbColumnDataSource;
 
-class ColumnStorage {
+class DbColumnStorage {
   Rcpp::RObject data;
   int i;
   DATA_TYPE dt;
@@ -15,11 +15,11 @@ class ColumnStorage {
   const DbColumnDataSource& source;
 
 public:
-  ColumnStorage(DATA_TYPE dt_, const R_xlen_t capacity_, const int n_max_, const DbColumnDataSource& source_);
-  ~ColumnStorage();
+  DbColumnStorage(DATA_TYPE dt_, const R_xlen_t capacity_, const int n_max_, const DbColumnDataSource& source_);
+  ~DbColumnStorage();
 
 public:
-  ColumnStorage* append_col();
+  DbColumnStorage* append_col();
 
   DATA_TYPE get_item_data_type() const;
   DATA_TYPE get_data_type() const;
@@ -34,11 +34,11 @@ private:
   R_xlen_t get_capacity() const;
   R_xlen_t get_new_capacity(const R_xlen_t desired_capacity) const;
 
-  ColumnStorage* append_null();
+  DbColumnStorage* append_null();
   void fill_default_value();
 
-  ColumnStorage* append_data();
-  ColumnStorage* append_data_to_new(DATA_TYPE new_dt);
+  DbColumnStorage* append_data();
+  DbColumnStorage* append_data_to_new(DATA_TYPE new_dt);
   void fetch_value();
 
   // allocate()

@@ -113,14 +113,14 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// result_bind_rows
-void result_bind_rows(const XPtr<DbResult>& res, List params);
-RcppExport SEXP _RSQLite_result_bind_rows(SEXP resSEXP, SEXP paramsSEXP) {
+// result_bind
+void result_bind(DbResult* res, List params);
+RcppExport SEXP _RSQLite_result_bind(SEXP resSEXP, SEXP paramsSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const XPtr<DbResult>& >::type res(resSEXP);
+    Rcpp::traits::input_parameter< DbResult* >::type res(resSEXP);
     Rcpp::traits::input_parameter< List >::type params(paramsSEXP);
-    result_bind_rows(res, params);
+    result_bind(res, params);
     return R_NilValue;
 END_RCPP
 }
@@ -210,7 +210,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_result_release", (DL_FUNC) &_RSQLite_result_release, 1},
     {"_RSQLite_result_fetch", (DL_FUNC) &_RSQLite_result_fetch, 2},
     {"_RSQLite_result_get_placeholder_names", (DL_FUNC) &_RSQLite_result_get_placeholder_names, 1},
-    {"_RSQLite_result_bind_rows", (DL_FUNC) &_RSQLite_result_bind_rows, 2},
+    {"_RSQLite_result_bind", (DL_FUNC) &_RSQLite_result_bind, 2},
     {"_RSQLite_result_has_completed", (DL_FUNC) &_RSQLite_result_has_completed, 1},
     {"_RSQLite_result_row_count", (DL_FUNC) &_RSQLite_result_row_count, 1},
     {"_RSQLite_result_rows_affected", (DL_FUNC) &_RSQLite_result_rows_affected, 1},

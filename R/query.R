@@ -81,7 +81,7 @@ db_bind <- function(res, params, ..., allow_named_superset) {
   params <- factor_to_string(params, warn = TRUE)
   params <- string_to_utf8(params)
 
-  result_bind_rows(res@ptr, params)
+  result_bind(res@ptr, params)
   invisible(res)
 }
 

@@ -37,8 +37,8 @@ result_get_placeholder_names <- function(res) {
     .Call(`_RSQLite_result_get_placeholder_names`, res)
 }
 
-result_bind_rows <- function(res, params) {
-    invisible(.Call(`_RSQLite_result_bind_rows`, res, params))
+result_bind <- function(res, params) {
+    invisible(.Call(`_RSQLite_result_bind`, res, params))
 }
 
 result_has_completed <- function(res) {

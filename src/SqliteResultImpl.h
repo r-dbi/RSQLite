@@ -47,7 +47,7 @@ public:
   int nrows();
   int rows_affected();
   CharacterVector get_placeholder_names() const;
-  void bind_rows_impl(const List& params);
+  void bind_impl(const List& params);
   List fetch_impl(const int n_max);
   List get_column_info_impl();
 

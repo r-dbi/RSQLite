@@ -24,8 +24,8 @@ CharacterVector result_get_placeholder_names(const XPtr<DbResult>& res) {
 }
 
 // [[Rcpp::export]]
-void result_bind_rows(const XPtr<DbResult>& res, List params) {
-  res->bind_rows(params);
+void result_bind(DbResult* res, List params) {
+  res->bind(params);
 }
 
 

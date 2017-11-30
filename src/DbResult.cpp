@@ -30,9 +30,9 @@ CharacterVector DbResult::get_placeholder_names() const {
   return impl->get_placeholder_names();
 }
 
-void DbResult::bind_rows(const List& params) {
+void DbResult::bind(const List& params) {
   validate_params(params);
-  impl->bind_rows_impl(params);
+  impl->bind_impl(params);
 }
 
 List DbResult::fetch(const int n_max) {

@@ -119,7 +119,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
 
       names(value) <- rep("", length(value))
       tryCatch(
-        result_bind_rows(rs@ptr, value),
+        result_bind(rs@ptr, value),
         finally = dbClearResult(rs)
       )
     }

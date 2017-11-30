@@ -22,7 +22,7 @@ public:
   int rows_affected();
   CharacterVector get_placeholder_names() const;
 
-  void bind_rows(const List& params);
+  void bind(const List& params);
   List fetch(int n_max = -1);
   List get_column_info();
 

@@ -20,13 +20,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// connection_disconnect
-void connection_disconnect(XPtr<DbConnectionPtr>& con);
-RcppExport SEXP _RSQLite_connection_disconnect(SEXP conSEXP) {
+// connection_valid
+bool connection_valid(XPtr<DbConnectionPtr> con_);
+RcppExport SEXP _RSQLite_connection_valid(SEXP con_SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< XPtr<DbConnectionPtr> >::type con_(con_SEXP);
+    rcpp_result_gen = Rcpp::wrap(connection_valid(con_));
+    return rcpp_result_gen;
+END_RCPP
+}
+// connection_release
+void connection_release(XPtr<DbConnectionPtr> con_);
+RcppExport SEXP _RSQLite_connection_release(SEXP con_SEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< XPtr<DbConnectionPtr>& >::type con(conSEXP);
-    connection_disconnect(con);
+    Rcpp::traits::input_parameter< XPtr<DbConnectionPtr> >::type con_(con_SEXP);
+    connection_release(con_);
     return R_NilValue;
 END_RCPP
 }
@@ -39,17 +50,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const XPtr<DbConnectionPtr>& >::type to(toSEXP);
     connection_copy_database(from, to);
     return R_NilValue;
-END_RCPP
-}
-// connection_connection_valid
-bool connection_connection_valid(const XPtr<DbConnectionPtr>& con);
-RcppExport SEXP _RSQLite_connection_connection_valid(SEXP conSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const XPtr<DbConnectionPtr>& >::type con(conSEXP);
-    rcpp_result_gen = Rcpp::wrap(connection_connection_valid(con));
-    return rcpp_result_gen;
 END_RCPP
 }
 // connection_import_file
@@ -88,6 +88,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< XPtr<DbResult> >::type res(resSEXP);
     result_release(res);
     return R_NilValue;
+END_RCPP
+}
+// result_valid
+bool result_valid(XPtr<DbResult> res_);
+RcppExport SEXP _RSQLite_result_valid(SEXP res_SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< XPtr<DbResult> >::type res_(res_SEXP);
+    rcpp_result_gen = Rcpp::wrap(result_valid(res_));
+    return rcpp_result_gen;
 END_RCPP
 }
 // result_fetch
@@ -132,17 +143,6 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< DbResult* >::type res(resSEXP);
     rcpp_result_gen = Rcpp::wrap(result_has_completed(res));
-    return rcpp_result_gen;
-END_RCPP
-}
-// result_valid
-bool result_valid(XPtr<DbResult> res_);
-RcppExport SEXP _RSQLite_result_valid(SEXP res_SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< XPtr<DbResult> >::type res_(res_SEXP);
-    rcpp_result_gen = Rcpp::wrap(result_valid(res_));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -202,17 +202,17 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_connection_connect", (DL_FUNC) &_RSQLite_connection_connect, 4},
-    {"_RSQLite_connection_disconnect", (DL_FUNC) &_RSQLite_connection_disconnect, 1},
+    {"_RSQLite_connection_valid", (DL_FUNC) &_RSQLite_connection_valid, 1},
+    {"_RSQLite_connection_release", (DL_FUNC) &_RSQLite_connection_release, 1},
     {"_RSQLite_connection_copy_database", (DL_FUNC) &_RSQLite_connection_copy_database, 2},
-    {"_RSQLite_connection_connection_valid", (DL_FUNC) &_RSQLite_connection_connection_valid, 1},
     {"_RSQLite_connection_import_file", (DL_FUNC) &_RSQLite_connection_import_file, 6},
     {"_RSQLite_result_send_query", (DL_FUNC) &_RSQLite_result_send_query, 2},
     {"_RSQLite_result_release", (DL_FUNC) &_RSQLite_result_release, 1},
+    {"_RSQLite_result_valid", (DL_FUNC) &_RSQLite_result_valid, 1},
     {"_RSQLite_result_fetch", (DL_FUNC) &_RSQLite_result_fetch, 2},
     {"_RSQLite_result_get_placeholder_names", (DL_FUNC) &_RSQLite_result_get_placeholder_names, 1},
     {"_RSQLite_result_bind", (DL_FUNC) &_RSQLite_result_bind, 2},
     {"_RSQLite_result_has_completed", (DL_FUNC) &_RSQLite_result_has_completed, 1},
-    {"_RSQLite_result_valid", (DL_FUNC) &_RSQLite_result_valid, 1},
     {"_RSQLite_result_rows_fetched", (DL_FUNC) &_RSQLite_result_rows_fetched, 1},
     {"_RSQLite_result_rows_affected", (DL_FUNC) &_RSQLite_result_rows_affected, 1},
     {"_RSQLite_result_column_info", (DL_FUNC) &_RSQLite_result_column_info, 1},

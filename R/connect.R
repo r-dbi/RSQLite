@@ -195,6 +195,6 @@ setMethod("dbConnect", "SQLiteConnection", function(drv, ...){
 #' @export
 #' @rdname SQLite
 setMethod("dbDisconnect", "SQLiteConnection", function(conn, ...) {
-  connection_disconnect(conn@ptr)
+  connection_release(conn@ptr)
   invisible(TRUE)
 })

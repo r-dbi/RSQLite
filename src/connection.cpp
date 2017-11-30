@@ -15,8 +15,9 @@ extern "C" {
 
 // [[Rcpp::export]]
 XPtr<DbConnectionPtr> connection_connect(
-  const std::string& path, const bool allow_ext, const int flags, const std::string& vfs = "")
-{
+  const std::string& path, const bool allow_ext, const int flags, const std::string& vfs = ""
+) {
+  LOG_VERBOSE;
 
   DbConnectionPtr* pConn = new DbConnectionPtr(
     new DbConnection(path, allow_ext, flags, vfs)
@@ -26,13 +27,20 @@ XPtr<DbConnectionPtr> connection_connect(
 }
 
 // [[Rcpp::export]]
-void connection_disconnect(XPtr<DbConnectionPtr>& con) {
-  if (!con.get() || !(*con)->is_valid()) {
+bool connection_valid(XPtr<DbConnectionPtr> con_) {
+  DbConnectionPtr* con = con_.get();
+  return con && con->get()->is_valid();
+}
+
+// [[Rcpp::export]]
+void connection_release(XPtr<DbConnectionPtr> con_) {
+  if (!connection_valid(con_)) {
     warning("Already disconnected");
     return;
   }
 
-  long n = con->use_count();
+  DbConnectionPtr* con = con_.get();
+  long n = con_->use_count();
   if (n > 1) {
     warning(
       "There are %i result in use. The connection will be released when they are closed",
@@ -40,18 +48,22 @@ void connection_disconnect(XPtr<DbConnectionPtr>& con) {
     );
   }
 
-  (*con)->disconnect();
+  con->get()->disconnect();
+  con_.release();
 }
+
+
+// Quoting
+
+
+// Transactions
+
+// Specific functions
 
 // [[Rcpp::export]]
 void connection_copy_database(const XPtr<DbConnectionPtr>& from,
                            const XPtr<DbConnectionPtr>& to) {
   (*from)->copy_to((*to));
-}
-
-// [[Rcpp::export]]
-bool connection_connection_valid(const XPtr<DbConnectionPtr>& con) {
-  return (con.get() != NULL) && (*con)->is_valid();
 }
 
 // [[Rcpp::export]]
@@ -62,6 +74,8 @@ bool connection_import_file(const XPtr<DbConnectionPtr>& con,
   return !!RS_sqlite_import(con->get()->conn(), name.c_str(), value.c_str(),
                             sep.c_str(), eol.c_str(), skip);
 }
+
+// as() override
 
 namespace Rcpp {
 

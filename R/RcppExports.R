@@ -5,16 +5,16 @@ connection_connect <- function(path, allow_ext, flags, vfs = "") {
     .Call(`_RSQLite_connection_connect`, path, allow_ext, flags, vfs)
 }
 
-connection_disconnect <- function(con) {
-    invisible(.Call(`_RSQLite_connection_disconnect`, con))
+connection_valid <- function(con_) {
+    .Call(`_RSQLite_connection_valid`, con_)
+}
+
+connection_release <- function(con_) {
+    invisible(.Call(`_RSQLite_connection_release`, con_))
 }
 
 connection_copy_database <- function(from, to) {
     invisible(.Call(`_RSQLite_connection_copy_database`, from, to))
-}
-
-connection_connection_valid <- function(con) {
-    .Call(`_RSQLite_connection_connection_valid`, con)
 }
 
 connection_import_file <- function(con, name, value, sep, eol, skip) {
@@ -27,6 +27,10 @@ result_send_query <- function(con, sql) {
 
 result_release <- function(res) {
     invisible(.Call(`_RSQLite_result_release`, res))
+}
+
+result_valid <- function(res_) {
+    .Call(`_RSQLite_result_valid`, res_)
 }
 
 result_fetch <- function(res, n) {
@@ -43,10 +47,6 @@ result_bind <- function(res, params) {
 
 result_has_completed <- function(res) {
     .Call(`_RSQLite_result_has_completed`, res)
-}
-
-result_valid <- function(res_) {
-    .Call(`_RSQLite_result_valid`, res_)
 }
 
 result_rows_fetched <- function(res) {

@@ -62,7 +62,7 @@ setMethod("show", "SQLiteConnection", function(object) {
 #' @rdname SQLiteConnection-class
 #' @export
 setMethod("dbIsValid", "SQLiteConnection", function(dbObj, ...) {
-  connection_connection_valid(dbObj@ptr)
+  connection_valid(dbObj@ptr)
 })
 
 #' @rdname SQLiteConnection-class

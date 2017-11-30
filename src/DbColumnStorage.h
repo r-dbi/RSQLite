@@ -1,5 +1,5 @@
-#ifndef RSQLITE_COLUMNSTORAGE_H
-#define RSQLITE_COLUMNSTORAGE_H
+#ifndef DB_COLUMNSTORAGE_H
+#define DB_COLUMNSTORAGE_H
 
 
 #include "DbColumnDataType.h"
@@ -50,4 +50,4 @@ private:
 };
 
 
-#endif // RSQLITE_COLUMNSTORAGE_H
+#endif // DB_COLUMNSTORAGE_H

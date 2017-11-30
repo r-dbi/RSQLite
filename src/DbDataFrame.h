@@ -1,5 +1,5 @@
-#ifndef RSQLITE_DBDATAFRAME_H
-#define RSQLITE_DBDATAFRAME_H
+#ifndef DB_DATAFRAME_H
+#define DB_DATAFRAME_H
 
 #include <boost/container/stable_vector.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -31,4 +31,4 @@ private:
 };
 
 
-#endif //RSQLITE_DBDATAFRAME_H
+#endif //DB_DATAFRAME_H

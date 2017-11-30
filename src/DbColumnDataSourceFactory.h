@@ -1,5 +1,5 @@
-#ifndef RSQLITE_DBCOLUMNFACTORY_H
-#define RSQLITE_DBCOLUMNFACTORY_H
+#ifndef DB_COLUMNDATASOURCEFACTORY_H
+#define DB_COLUMNDATASOURCEFACTORY_H
 
 class DbColumnDataSource;
 
@@ -14,4 +14,4 @@ public:
   virtual DbColumnDataSource* create(const int j) = 0;
 };
 
-#endif //RSQLITE_DBCOLUMNFACTORY_H
+#endif //DB_COLUMNDATASOURCEFACTORY_H

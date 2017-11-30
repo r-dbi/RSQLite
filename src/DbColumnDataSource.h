@@ -1,5 +1,5 @@
-#ifndef RSQLITE_DBCOLUMNDATASOURCE_H
-#define RSQLITE_DBCOLUMNDATASOURCE_H
+#ifndef DB_COLUMNDATASOURCE_H
+#define DB_COLUMNDATASOURCE_H
 
 #include "DbColumnDataType.h"
 
@@ -28,4 +28,4 @@ protected:
   int get_j() const;
 };
 
-#endif //RSQLITE_DBCOLUMNDATASOURCE_H
+#endif //DB_COLUMNDATASOURCE_H

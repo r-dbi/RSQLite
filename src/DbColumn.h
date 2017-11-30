@@ -1,5 +1,5 @@
-#ifndef RSQLITE_SQLITECOLUMN_H
-#define RSQLITE_SQLITECOLUMN_H
+#ifndef DB_COLUMN_H
+#define DB_COLUMN_H
 
 
 #include "DbColumnDataType.h"
@@ -37,4 +37,4 @@ private:
 };
 
 
-#endif // RSQLITE_SQLITECOLUMN_H
+#endif // DB_COLUMN_H

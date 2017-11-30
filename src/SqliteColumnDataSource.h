@@ -2,11 +2,10 @@
 #define RSQLITE_SQLITECOLUMNDATASOURCE_H
 
 #include "sqlite3.h"
-#include "DbColumnDataType.h"
+#include "DbColumnDataSource.h"
 
-class SqliteColumnDataSource {
+class SqliteColumnDataSource : public DbColumnDataSource {
   sqlite3_stmt* stmt;
-  const int j;
 
 public:
   SqliteColumnDataSource(sqlite3_stmt* stmt, const int j);
@@ -28,7 +27,6 @@ private:
 
 private:
   sqlite3_stmt* get_stmt() const;
-  int get_j() const;
 
   int get_column_type() const;
 

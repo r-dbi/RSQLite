@@ -7,7 +7,7 @@
 using namespace Rcpp;
 
 ColumnStorage::ColumnStorage(DATA_TYPE dt_, const R_xlen_t capacity_, const int n_max_,
-                             const SqliteColumnDataSource& source_)
+                             const DbColumnDataSource& source_)
   :
   i(0),
   dt(dt_),

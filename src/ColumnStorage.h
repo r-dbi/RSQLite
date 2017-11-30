@@ -5,17 +5,17 @@
 #include "DbColumnDataType.h"
 
 
-class SqliteColumnDataSource;
+class DbColumnDataSource;
 
 class ColumnStorage {
   Rcpp::RObject data;
   int i;
   DATA_TYPE dt;
   const int n_max;
-  const SqliteColumnDataSource& source;
+  const DbColumnDataSource& source;
 
 public:
-  ColumnStorage(DATA_TYPE dt_, const R_xlen_t capacity_, const int n_max_, const SqliteColumnDataSource& source_);
+  ColumnStorage(DATA_TYPE dt_, const R_xlen_t capacity_, const int n_max_, const DbColumnDataSource& source_);
   ~ColumnStorage();
 
 public:

@@ -4,10 +4,9 @@
 #include "affinity.h"
 #include <boost/limits.hpp>
 
-SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_)
-  :
-  stmt(stmt_),
-  j(j_)
+SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_) :
+DbColumnDataSource(j_),
+stmt(stmt_)
 {
 }
 
@@ -103,10 +102,6 @@ DATA_TYPE SqliteColumnDataSource::datatype_from_decltype(const char* decl_type) 
 
 sqlite3_stmt* SqliteColumnDataSource::get_stmt() const {
   return stmt;
-}
-
-int SqliteColumnDataSource::get_j() const {
-  return j;
 }
 
 int SqliteColumnDataSource::get_column_type() const {

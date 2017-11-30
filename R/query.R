@@ -123,7 +123,7 @@ setMethod("dbGetRowsAffected", "SQLiteResult", function(res, ...) {
 #' @export
 #' @rdname SQLiteResult-class
 setMethod("dbGetRowCount", "SQLiteResult", function(res, ...) {
-  result_row_count(res@ptr)
+  result_rows_fetched(res@ptr)
 })
 #' @export
 #' @rdname SQLiteResult-class

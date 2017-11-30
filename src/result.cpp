@@ -30,28 +30,29 @@ void result_bind(DbResult* res, List params) {
 
 
 // [[Rcpp::export]]
-bool result_has_completed(const XPtr<DbResult>& res) {
+bool result_has_completed(DbResult* res) {
   return res->complete();
 }
 
 // [[Rcpp::export]]
-int result_row_count(const XPtr<DbResult>& res) {
-  return res->nrows();
+bool result_valid(XPtr<DbResult> res_) {
+  DbResult* res = res_.get();
+  return res != NULL;
 }
 
 // [[Rcpp::export]]
-int result_rows_affected(const XPtr<DbResult>& res) {
-  return res->rows_affected();
+int result_rows_fetched(DbResult* res) {
+  return res->n_rows_fetched();
 }
 
 // [[Rcpp::export]]
-List result_column_info(const XPtr<DbResult>& res) {
+int result_rows_affected(DbResult* res) {
+  return res->n_rows_affected();
+}
+
+// [[Rcpp::export]]
+List result_column_info(DbResult* res) {
   return res->get_column_info();
-}
-
-// [[Rcpp::export]]
-bool result_result_valid(const XPtr<DbResult>& res) {
-  return res.get() != NULL;
 }
 
 namespace Rcpp {

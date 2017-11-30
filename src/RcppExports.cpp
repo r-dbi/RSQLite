@@ -125,57 +125,57 @@ BEGIN_RCPP
 END_RCPP
 }
 // result_has_completed
-bool result_has_completed(const XPtr<DbResult>& res);
+bool result_has_completed(DbResult* res);
 RcppExport SEXP _RSQLite_result_has_completed(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const XPtr<DbResult>& >::type res(resSEXP);
+    Rcpp::traits::input_parameter< DbResult* >::type res(resSEXP);
     rcpp_result_gen = Rcpp::wrap(result_has_completed(res));
     return rcpp_result_gen;
 END_RCPP
 }
-// result_row_count
-int result_row_count(const XPtr<DbResult>& res);
-RcppExport SEXP _RSQLite_result_row_count(SEXP resSEXP) {
+// result_valid
+bool result_valid(XPtr<DbResult> res_);
+RcppExport SEXP _RSQLite_result_valid(SEXP res_SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const XPtr<DbResult>& >::type res(resSEXP);
-    rcpp_result_gen = Rcpp::wrap(result_row_count(res));
+    Rcpp::traits::input_parameter< XPtr<DbResult> >::type res_(res_SEXP);
+    rcpp_result_gen = Rcpp::wrap(result_valid(res_));
+    return rcpp_result_gen;
+END_RCPP
+}
+// result_rows_fetched
+int result_rows_fetched(DbResult* res);
+RcppExport SEXP _RSQLite_result_rows_fetched(SEXP resSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< DbResult* >::type res(resSEXP);
+    rcpp_result_gen = Rcpp::wrap(result_rows_fetched(res));
     return rcpp_result_gen;
 END_RCPP
 }
 // result_rows_affected
-int result_rows_affected(const XPtr<DbResult>& res);
+int result_rows_affected(DbResult* res);
 RcppExport SEXP _RSQLite_result_rows_affected(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const XPtr<DbResult>& >::type res(resSEXP);
+    Rcpp::traits::input_parameter< DbResult* >::type res(resSEXP);
     rcpp_result_gen = Rcpp::wrap(result_rows_affected(res));
     return rcpp_result_gen;
 END_RCPP
 }
 // result_column_info
-List result_column_info(const XPtr<DbResult>& res);
+List result_column_info(DbResult* res);
 RcppExport SEXP _RSQLite_result_column_info(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const XPtr<DbResult>& >::type res(resSEXP);
+    Rcpp::traits::input_parameter< DbResult* >::type res(resSEXP);
     rcpp_result_gen = Rcpp::wrap(result_column_info(res));
-    return rcpp_result_gen;
-END_RCPP
-}
-// result_result_valid
-bool result_result_valid(const XPtr<DbResult>& res);
-RcppExport SEXP _RSQLite_result_result_valid(SEXP resSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const XPtr<DbResult>& >::type res(resSEXP);
-    rcpp_result_gen = Rcpp::wrap(result_result_valid(res));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -212,10 +212,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_result_get_placeholder_names", (DL_FUNC) &_RSQLite_result_get_placeholder_names, 1},
     {"_RSQLite_result_bind", (DL_FUNC) &_RSQLite_result_bind, 2},
     {"_RSQLite_result_has_completed", (DL_FUNC) &_RSQLite_result_has_completed, 1},
-    {"_RSQLite_result_row_count", (DL_FUNC) &_RSQLite_result_row_count, 1},
+    {"_RSQLite_result_valid", (DL_FUNC) &_RSQLite_result_valid, 1},
+    {"_RSQLite_result_rows_fetched", (DL_FUNC) &_RSQLite_result_rows_fetched, 1},
     {"_RSQLite_result_rows_affected", (DL_FUNC) &_RSQLite_result_rows_affected, 1},
     {"_RSQLite_result_column_info", (DL_FUNC) &_RSQLite_result_column_info, 1},
-    {"_RSQLite_result_result_valid", (DL_FUNC) &_RSQLite_result_result_valid, 1},
     {"_RSQLite_rsqliteVersion", (DL_FUNC) &_RSQLite_rsqliteVersion, 0},
     {"_RSQLite_init_logging", (DL_FUNC) &_RSQLite_init_logging, 1},
     {NULL, NULL, 0}

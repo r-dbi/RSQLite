@@ -18,11 +18,11 @@ bool DbResult::complete() {
   return impl->complete();
 }
 
-int DbResult::nrows() {
+int DbResult::n_rows_fetched() {
   return impl->nrows();
 }
 
-int DbResult::rows_affected() {
+int DbResult::n_rows_affected() {
   return impl->rows_affected();
 }
 

@@ -45,8 +45,12 @@ result_has_completed <- function(res) {
     .Call(`_RSQLite_result_has_completed`, res)
 }
 
-result_row_count <- function(res) {
-    .Call(`_RSQLite_result_row_count`, res)
+result_valid <- function(res_) {
+    .Call(`_RSQLite_result_valid`, res_)
+}
+
+result_rows_fetched <- function(res) {
+    .Call(`_RSQLite_result_rows_fetched`, res)
 }
 
 result_rows_affected <- function(res) {
@@ -55,10 +59,6 @@ result_rows_affected <- function(res) {
 
 result_column_info <- function(res) {
     .Call(`_RSQLite_result_column_info`, res)
-}
-
-result_result_valid <- function(res) {
-    .Call(`_RSQLite_result_result_valid`, res)
 }
 
 #' RSQLite version

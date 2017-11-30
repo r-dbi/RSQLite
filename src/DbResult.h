@@ -18,8 +18,8 @@ public:
 
 public:
   bool complete();
-  int nrows();
-  int rows_affected();
+  int n_rows_fetched();
+  int n_rows_affected();
   CharacterVector get_placeholder_names() const;
 
   void bind(const List& params);

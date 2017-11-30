@@ -2,7 +2,7 @@
 #define RSQLITE_COLUMNSTORAGE_H
 
 
-#include "ColumnDataType.h"
+#include "DbColumnDataType.h"
 
 
 class SqliteColumnDataSource;

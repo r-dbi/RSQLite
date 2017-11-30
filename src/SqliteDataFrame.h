@@ -4,7 +4,7 @@
 
 #include "sqlite3.h"
 #include <boost/container/stable_vector.hpp>
-#include "ColumnDataType.h"
+#include "DbColumnDataType.h"
 
 class SqliteColumn;
 

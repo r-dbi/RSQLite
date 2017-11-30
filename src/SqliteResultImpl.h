@@ -4,7 +4,7 @@
 
 #include <boost/noncopyable.hpp>
 #include "sqlite3.h"
-#include "ColumnDataType.h"
+#include "DbColumnDataType.h"
 
 class SqliteResultImpl : public boost::noncopyable {
 private:

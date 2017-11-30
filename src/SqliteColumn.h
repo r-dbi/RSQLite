@@ -3,7 +3,7 @@
 
 
 #include "sqlite3.h"
-#include "ColumnDataType.h"
+#include "DbColumnDataType.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 

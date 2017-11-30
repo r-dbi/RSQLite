@@ -2,7 +2,7 @@
 #define RSQLITE_SQLITECOLUMNDATASOURCE_H
 
 #include "sqlite3.h"
-#include "ColumnDataType.h"
+#include "DbColumnDataType.h"
 
 class SqliteColumnDataSource {
   sqlite3_stmt* stmt;

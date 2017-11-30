@@ -15,7 +15,7 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
 
     rs <- new("SQLiteResult",
       sql = statement,
-      ptr = result_send_query(conn@ptr, statement),
+      ptr = result_create(conn@ptr, statement),
       conn = conn
     )
     on.exit(dbClearResult(rs), add = TRUE)

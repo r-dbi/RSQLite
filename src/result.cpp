@@ -3,8 +3,9 @@
 #include "DbResult.h"
 
 // [[Rcpp::export]]
-XPtr<DbResult> result_send_query(const XPtr<DbConnectionPtr>& con, const std::string& sql) {
-  DbResult* res = new DbResult((*con), sql);
+XPtr<DbResult> result_create(XPtr<DbConnectionPtr> con, std::string sql, bool is_statement = false) {
+  (void)is_statement;
+  DbResult* res = new DbResult(*con, sql);
   return XPtr<DbResult>(res, true);
 }
 

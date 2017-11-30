@@ -113,17 +113,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// result_get_placeholder_names
-CharacterVector result_get_placeholder_names(const XPtr<DbResult>& res);
-RcppExport SEXP _RSQLite_result_get_placeholder_names(SEXP resSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const XPtr<DbResult>& >::type res(resSEXP);
-    rcpp_result_gen = Rcpp::wrap(result_get_placeholder_names(res));
-    return rcpp_result_gen;
-END_RCPP
-}
 // result_bind
 void result_bind(DbResult* res, List params);
 RcppExport SEXP _RSQLite_result_bind(SEXP resSEXP, SEXP paramsSEXP) {
@@ -179,6 +168,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// result_get_placeholder_names
+CharacterVector result_get_placeholder_names(DbResult* res);
+RcppExport SEXP _RSQLite_result_get_placeholder_names(SEXP resSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< DbResult* >::type res(resSEXP);
+    rcpp_result_gen = Rcpp::wrap(result_get_placeholder_names(res));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rsqliteVersion
 CharacterVector rsqliteVersion();
 RcppExport SEXP _RSQLite_rsqliteVersion() {
@@ -210,12 +210,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_result_release", (DL_FUNC) &_RSQLite_result_release, 1},
     {"_RSQLite_result_valid", (DL_FUNC) &_RSQLite_result_valid, 1},
     {"_RSQLite_result_fetch", (DL_FUNC) &_RSQLite_result_fetch, 2},
-    {"_RSQLite_result_get_placeholder_names", (DL_FUNC) &_RSQLite_result_get_placeholder_names, 1},
     {"_RSQLite_result_bind", (DL_FUNC) &_RSQLite_result_bind, 2},
     {"_RSQLite_result_has_completed", (DL_FUNC) &_RSQLite_result_has_completed, 1},
     {"_RSQLite_result_rows_fetched", (DL_FUNC) &_RSQLite_result_rows_fetched, 1},
     {"_RSQLite_result_rows_affected", (DL_FUNC) &_RSQLite_result_rows_affected, 1},
     {"_RSQLite_result_column_info", (DL_FUNC) &_RSQLite_result_column_info, 1},
+    {"_RSQLite_result_get_placeholder_names", (DL_FUNC) &_RSQLite_result_get_placeholder_names, 1},
     {"_RSQLite_rsqliteVersion", (DL_FUNC) &_RSQLite_rsqliteVersion, 0},
     {"_RSQLite_init_logging", (DL_FUNC) &_RSQLite_init_logging, 1},
     {NULL, NULL, 0}

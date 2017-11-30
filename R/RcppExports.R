@@ -37,10 +37,6 @@ result_fetch <- function(res, n) {
     .Call(`_RSQLite_result_fetch`, res, n)
 }
 
-result_get_placeholder_names <- function(res) {
-    .Call(`_RSQLite_result_get_placeholder_names`, res)
-}
-
 result_bind <- function(res, params) {
     invisible(.Call(`_RSQLite_result_bind`, res, params))
 }
@@ -59,6 +55,10 @@ result_rows_affected <- function(res) {
 
 result_column_info <- function(res) {
     .Call(`_RSQLite_result_column_info`, res)
+}
+
+result_get_placeholder_names <- function(res) {
+    .Call(`_RSQLite_result_get_placeholder_names`, res)
 }
 
 #' RSQLite version

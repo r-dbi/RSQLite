@@ -25,11 +25,6 @@ List result_fetch(DbResult* res, const int n) {
 }
 
 // [[Rcpp::export]]
-CharacterVector result_get_placeholder_names(const XPtr<DbResult>& res) {
-  return res->get_placeholder_names();
-}
-
-// [[Rcpp::export]]
 void result_bind(DbResult* res, List params) {
   res->bind(params);
 }
@@ -52,6 +47,11 @@ int result_rows_affected(DbResult* res) {
 // [[Rcpp::export]]
 List result_column_info(DbResult* res) {
   return res->get_column_info();
+}
+
+// [[Rcpp::export]]
+CharacterVector result_get_placeholder_names(DbResult* res) {
+  return res->get_placeholder_names();
 }
 
 namespace Rcpp {

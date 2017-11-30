@@ -19,11 +19,11 @@ bool DbResult::complete() {
 }
 
 int DbResult::n_rows_fetched() {
-  return impl->nrows();
+  return impl->n_rows_fetched();
 }
 
 int DbResult::n_rows_affected() {
-  return impl->rows_affected();
+  return impl->n_rows_affected();
 }
 
 CharacterVector DbResult::get_placeholder_names() const {
@@ -32,16 +32,16 @@ CharacterVector DbResult::get_placeholder_names() const {
 
 void DbResult::bind(const List& params) {
   validate_params(params);
-  impl->bind_impl(params);
+  impl->bind(params);
 }
 
 List DbResult::fetch(const int n_max) {
-  return impl->fetch_impl(n_max);
+  return impl->fetch(n_max);
 
 }
 
 List DbResult::get_column_info() {
-  List out = impl->get_column_info_impl();
+  List out = impl->get_column_info();
 
   out.attr("row.names") = IntegerVector::create(NA_INTEGER, -Rf_length(out[0]));
   out.attr("class") = "data.frame";

@@ -102,11 +102,11 @@ bool SqliteResultImpl::complete() {
   return complete_;
 }
 
-int SqliteResultImpl::nrows() {
+int SqliteResultImpl::n_rows_fetched() {
   return nrows_;
 }
 
-int SqliteResultImpl::rows_affected() {
+int SqliteResultImpl::n_rows_affected() {
   if (!ready_) return NA_INTEGER;
   return rows_affected_;
 }
@@ -128,7 +128,7 @@ CharacterVector SqliteResultImpl::get_placeholder_names() const {
   return res;
 }
 
-void SqliteResultImpl::bind_impl(const List& params) {
+void SqliteResultImpl::bind(const List& params) {
   if (cache.nparams_ == 0) {
     stop("Query does not require parameters.");
   }
@@ -150,7 +150,7 @@ void SqliteResultImpl::bind_impl(const List& params) {
   after_bind(has_params);
 }
 
-List SqliteResultImpl::fetch_impl(const int n_max) {
+List SqliteResultImpl::fetch(const int n_max) {
   if (!ready_)
     stop("Query needs to be bound before fetching");
 
@@ -165,7 +165,7 @@ List SqliteResultImpl::fetch_impl(const int n_max) {
   return out;
 }
 
-List SqliteResultImpl::get_column_info_impl() {
+List SqliteResultImpl::get_column_info() {
   peek_first_row();
 
   CharacterVector names(cache.names_.begin(), cache.names_.end());

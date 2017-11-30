@@ -44,12 +44,13 @@ private:
 
 public:
   bool complete();
-  int nrows();
-  int rows_affected();
+  int n_rows_fetched();
+  int n_rows_affected();
   CharacterVector get_placeholder_names() const;
-  void bind_impl(const List& params);
-  List fetch_impl(const int n_max);
-  List get_column_info_impl();
+  void bind(const List& params);
+  List fetch(const int n_max);
+
+  List get_column_info();
 
 private:
   void set_params(const List& params);
@@ -62,6 +63,7 @@ private:
   bool step_done();
   List peek_first_row();
 
+private:
   void NORET raise_sqlite_exception() const;
   static void NORET raise_sqlite_exception(sqlite3* conn);
 };

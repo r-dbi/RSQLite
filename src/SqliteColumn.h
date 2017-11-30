@@ -7,12 +7,12 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 
-class SqliteColumnDataSource;
+class DbColumnDataSource;
 class DbColumnStorage;
 
 class SqliteColumn {
 private:
-  boost::shared_ptr<SqliteColumnDataSource> source;
+  boost::shared_ptr<DbColumnDataSource> source;
   boost::ptr_vector<DbColumnStorage> storage;
   int i, n;
   std::set<DATA_TYPE> data_types_seen;

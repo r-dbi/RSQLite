@@ -3,7 +3,7 @@
 
 #include <RSQLite.h>
 
-#include "SqliteResult.h"
-#include "SqliteConnection.h"
+#include "DbResult.h"
+#include "DbConnection.h"
 
 #endif // __RSQLSITE_TYPES__

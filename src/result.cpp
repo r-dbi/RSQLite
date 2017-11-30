@@ -1,6 +1,6 @@
 #include "pch.h"
 #include <workarounds/XPtr.h>
-#include "SqliteResult.h"
+#include "DbResult.h"
 
 // [[Rcpp::export]]
 XPtr<SqliteResult> rsqlite_send_query(const XPtr<SqliteConnectionPtr>& con, const std::string& sql) {

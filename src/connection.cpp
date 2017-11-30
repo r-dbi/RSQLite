@@ -1,6 +1,6 @@
 #include "pch.h"
 #include <workarounds/XPtr.h>
-#include "SqliteConnection.h"
+#include "DbConnection.h"
 
 extern "C" {
   int RS_sqlite_import(

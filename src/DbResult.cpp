@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "SqliteResult.h"
+#include "DbResult.h"
 #include "SqliteResultImpl.h"
 
 

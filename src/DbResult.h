@@ -20,11 +20,14 @@ public:
   bool complete();
   int n_rows_fetched();
   int n_rows_affected();
-  CharacterVector get_placeholder_names() const;
 
   void bind(const List& params);
   List fetch(int n_max = -1);
+
   List get_column_info();
+
+public:
+  CharacterVector get_placeholder_names() const;
 
 private:
   void validate_params(const List& params) const;

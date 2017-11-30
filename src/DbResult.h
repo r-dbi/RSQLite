@@ -8,13 +8,13 @@
 
 class SqliteResultImpl;
 
-class SqliteResult : boost::noncopyable {
-  SqliteConnectionPtr pConn_;
+class DbResult : boost::noncopyable {
+  DbConnectionPtr pConn_;
   boost::scoped_ptr<SqliteResultImpl> impl;
 
 public:
-  SqliteResult(const SqliteConnectionPtr& pConn, const std::string& sql);
-  ~SqliteResult();
+  DbResult(const DbConnectionPtr& pConn, const std::string& sql);
+  ~DbResult();
 
 public:
   bool complete();

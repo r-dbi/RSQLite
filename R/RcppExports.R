@@ -29,7 +29,7 @@ result_clear_result <- function(res) {
     invisible(.Call(`_RSQLite_result_clear_result`, res))
 }
 
-result_fetch <- function(res, n = 10L) {
+result_fetch <- function(res, n) {
     .Call(`_RSQLite_result_fetch`, res, n)
 }
 

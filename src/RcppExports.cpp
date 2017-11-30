@@ -91,12 +91,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // result_fetch
-List result_fetch(const XPtr<DbResult>& res, const int n);
+List result_fetch(DbResult* res, const int n);
 RcppExport SEXP _RSQLite_result_fetch(SEXP resSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const XPtr<DbResult>& >::type res(resSEXP);
+    Rcpp::traits::input_parameter< DbResult* >::type res(resSEXP);
     Rcpp::traits::input_parameter< const int >::type n(nSEXP);
     rcpp_result_gen = Rcpp::wrap(result_fetch(res, n));
     return rcpp_result_gen;

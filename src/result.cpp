@@ -14,7 +14,7 @@ void result_clear_result(XPtr<DbResult>& res) {
 }
 
 // [[Rcpp::export]]
-List result_fetch(const XPtr<DbResult>& res, const int n = 10) {
+List result_fetch(DbResult* res, const int n) {
   return res->fetch(n);
 }
 

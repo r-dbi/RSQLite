@@ -7,17 +7,17 @@
 
 // Construction ////////////////////////////////////////////////////////////////
 
-SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
-  : conn(conn_),
-    stmt(prepare(conn_, sql)),
-    cache(stmt),
-    complete_(false),
-    ready_(false),
-    nrows_(0),
-    rows_affected_(0),
-    group_(0),
-    groups_(0),
-    types_(get_initial_field_types(cache.ncols_))
+SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql) :
+conn(conn_),
+stmt(prepare(conn_, sql)),
+cache(stmt),
+complete_(false),
+ready_(false),
+nrows_(0),
+rows_affected_(0),
+group_(0),
+groups_(0),
+types_(get_initial_field_types(cache.ncols_))
 {
 
   LOG_DEBUG << sql;

@@ -1,55 +1,68 @@
 #include "pch.h"
 #include <workarounds/XPtr.h>
-#include "SqliteResult.h"
+#include "DbResult.h"
 
 // [[Rcpp::export]]
-XPtr<SqliteResult> rsqlite_send_query(const XPtr<SqliteConnectionPtr>& con, const std::string& sql) {
-  SqliteResult* res = new SqliteResult((*con), sql);
-  return XPtr<SqliteResult>(res, true);
+XPtr<DbResult> result_create(XPtr<DbConnectionPtr> con, std::string sql, bool is_statement = false) {
+  (void)is_statement;
+  DbResult* res = new DbResult(*con, sql);
+  return XPtr<DbResult>(res, true);
 }
 
 // [[Rcpp::export]]
-void rsqlite_clear_result(XPtr<SqliteResult>& res) {
+void result_release(XPtr<DbResult> res) {
   res.release();
 }
 
 // [[Rcpp::export]]
-List rsqlite_fetch(const XPtr<SqliteResult>& res, const int n = 10) {
+bool result_valid(XPtr<DbResult> res_) {
+  DbResult* res = res_.get();
+  return res != NULL;
+}
+
+// [[Rcpp::export]]
+List result_fetch(DbResult* res, const int n) {
   return res->fetch(n);
 }
 
 // [[Rcpp::export]]
-CharacterVector rsqlite_get_placeholder_names(const XPtr<SqliteResult>& res) {
-  return res->get_placeholder_names();
+void result_bind(DbResult* res, List params) {
+  res->bind(params);
 }
 
 // [[Rcpp::export]]
-void rsqlite_bind_rows(const XPtr<SqliteResult>& res, List params) {
-  res->bind_rows(params);
-}
-
-
-// [[Rcpp::export]]
-bool rsqlite_has_completed(const XPtr<SqliteResult>& res) {
+bool result_has_completed(DbResult* res) {
   return res->complete();
 }
 
 // [[Rcpp::export]]
-int rsqlite_row_count(const XPtr<SqliteResult>& res) {
-  return res->nrows();
+int result_rows_fetched(DbResult* res) {
+  return res->n_rows_fetched();
 }
 
 // [[Rcpp::export]]
-int rsqlite_rows_affected(const XPtr<SqliteResult>& res) {
-  return res->rows_affected();
+int result_rows_affected(DbResult* res) {
+  return res->n_rows_affected();
 }
 
 // [[Rcpp::export]]
-List rsqlite_column_info(const XPtr<SqliteResult>& res) {
+List result_column_info(DbResult* res) {
   return res->get_column_info();
 }
 
 // [[Rcpp::export]]
-bool rsqlite_result_valid(const XPtr<SqliteResult>& res) {
-  return res.get() != NULL;
+CharacterVector result_get_placeholder_names(DbResult* res) {
+  return res->get_placeholder_names();
+}
+
+namespace Rcpp {
+
+template<>
+DbResult* as(SEXP x) {
+  DbResult* result = (DbResult*)(R_ExternalPtrAddr(x));
+  if (!result)
+    stop("Invalid result set");
+  return result;
+}
+
 }

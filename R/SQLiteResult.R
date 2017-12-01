@@ -25,5 +25,5 @@ setClass("SQLiteResult",
 #' @rdname SQLiteResult-class
 #' @export
 setMethod("dbIsValid", "SQLiteResult", function(dbObj, ...) {
-  rsqlite_result_valid(dbObj@ptr)
+  result_valid(dbObj@ptr)
 })

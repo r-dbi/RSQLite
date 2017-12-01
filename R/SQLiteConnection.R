@@ -25,8 +25,40 @@ setClass("SQLiteConnection",
     ref = "environment"
   )
 )
-#' @rdname SQLiteConnection-class
+
+# show()
 #' @export
+#' @rdname SQLiteConnection-class
+setMethod("show", "SQLiteConnection", function(object) {
+  cat("<SQLiteConnection>\n")
+  if (dbIsValid(object)) {
+    cat("  Path: ", object@dbname, "\n", sep = "")
+    cat("  Extensions: ", object@loadable.extensions, "\n", sep = "")
+  } else {
+    cat("  DISCONNECTED\n")
+  }
+})
+
+# dbIsValid()
+#' @export
+#' @rdname SQLiteConnection-class
+setMethod("dbIsValid", "SQLiteConnection", function(dbObj, ...) {
+  connection_valid(dbObj@ptr)
+})
+
+# dbDisconnect()
+
+# dbSendQuery()
+
+# dbSendStatement()
+
+# dbDataType()
+
+# dbQuoteString()
+
+# dbQuoteIdentifier()
+#' @export
+#' @rdname SQLiteConnection-class
 setMethod("dbQuoteIdentifier", c("SQLiteConnection", "character"), function(conn, x, ...) {
   if (any(is.na(x))) {
     stop("Cannot pass NA to dbQuoteIdentifier()", call. = FALSE)
@@ -47,23 +79,25 @@ setMethod("dbQuoteIdentifier", c("SQLiteConnection", "SQL"), function(conn, x, .
   SQL(x)
 })
 
-#' @rdname SQLiteConnection-class
-#' @export
-setMethod("show", "SQLiteConnection", function(object) {
-  cat("<SQLiteConnection>\n")
-  if (dbIsValid(object)) {
-    cat("  Path: ", object@dbname, "\n", sep = "")
-    cat("  Extensions: ", object@loadable.extensions, "\n", sep = "")
-  } else {
-    cat("  DISCONNECTED\n")
-  }
-})
+# dbWriteTable()
 
-#' @rdname SQLiteConnection-class
-#' @export
-setMethod("dbIsValid", "SQLiteConnection", function(dbObj, ...) {
-  rsqlite_connection_valid(dbObj@ptr)
-})
+# dbReadTable()
+
+# dbListTables()
+
+# dbExistsTable()
+
+# dbListFields()
+
+# dbRemoveTable()
+
+# dbBegin()
+
+# dbCommit()
+
+# dbRollback()
+
+# other
 
 #' @rdname SQLiteConnection-class
 #' @export
@@ -74,3 +108,4 @@ setMethod("dbGetException", "SQLiteConnection", function(conn, ...) {
     errorMsg = "OK"
   )
 })
+

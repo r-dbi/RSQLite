@@ -1,13 +1,13 @@
 #include "pch.h"
-#include "ColumnStorage.h"
-#include "SqliteColumnDataSource.h"
+#include "DbColumnStorage.h"
+#include "DbColumnDataSource.h"
 #include "integer64.h"
 
 
 using namespace Rcpp;
 
-ColumnStorage::ColumnStorage(DATA_TYPE dt_, const R_xlen_t capacity_, const int n_max_,
-                             const SqliteColumnDataSource& source_)
+DbColumnStorage::DbColumnStorage(DATA_TYPE dt_, const R_xlen_t capacity_, const int n_max_,
+                                 const DbColumnDataSource& source_)
   :
   i(0),
   dt(dt_),
@@ -17,24 +17,24 @@ ColumnStorage::ColumnStorage(DATA_TYPE dt_, const R_xlen_t capacity_, const int 
   data = allocate(get_new_capacity(capacity_), dt);
 }
 
-ColumnStorage::~ColumnStorage() {
+DbColumnStorage::~DbColumnStorage() {
 }
 
-ColumnStorage* ColumnStorage::append_col() {
+DbColumnStorage* DbColumnStorage::append_col() {
   if (source.is_null()) return append_null();
   return append_data();
 }
 
-DATA_TYPE ColumnStorage::get_item_data_type() const {
+DATA_TYPE DbColumnStorage::get_item_data_type() const {
   return source.get_data_type();
 }
 
-DATA_TYPE ColumnStorage::get_data_type() const {
+DATA_TYPE DbColumnStorage::get_data_type() const {
   if (dt == DT_UNKNOWN) return source.get_decl_data_type();
   return dt;
 }
 
-SEXP ColumnStorage::allocate(const R_xlen_t length, DATA_TYPE dt) {
+SEXP DbColumnStorage::allocate(const R_xlen_t length, DATA_TYPE dt) {
   SEXPTYPE type = sexptype_from_datatype(dt);
   RObject class_ = class_from_datatype(dt);
 
@@ -43,7 +43,7 @@ SEXP ColumnStorage::allocate(const R_xlen_t length, DATA_TYPE dt) {
   return ret;
 }
 
-int ColumnStorage::copy_to(SEXP x, DATA_TYPE dt, const int pos) const {
+int DbColumnStorage::copy_to(SEXP x, DATA_TYPE dt, const int pos) const {
   R_xlen_t n = Rf_xlength(x);
   int src, tgt;
   R_xlen_t capacity = get_capacity();
@@ -58,11 +58,11 @@ int ColumnStorage::copy_to(SEXP x, DATA_TYPE dt, const int pos) const {
   return src;
 }
 
-R_xlen_t ColumnStorage::get_capacity() const {
+R_xlen_t DbColumnStorage::get_capacity() const {
   return Rf_xlength(data);
 }
 
-R_xlen_t ColumnStorage::get_new_capacity(const R_xlen_t desired_capacity) const {
+R_xlen_t DbColumnStorage::get_new_capacity(const R_xlen_t desired_capacity) const {
   if (n_max < 0) {
     const R_xlen_t MIN_DATA_CAPACITY = 100;
     return std::max(desired_capacity, MIN_DATA_CAPACITY);
@@ -72,17 +72,17 @@ R_xlen_t ColumnStorage::get_new_capacity(const R_xlen_t desired_capacity) const 
   }
 }
 
-ColumnStorage* ColumnStorage::append_null() {
+DbColumnStorage* DbColumnStorage::append_null() {
   if (i < get_capacity()) fill_default_value();
   ++i;
   return this;
 }
 
-void ColumnStorage::fill_default_value() {
+void DbColumnStorage::fill_default_value() {
   fill_default_value(data, dt, i);
 }
 
-ColumnStorage* ColumnStorage::append_data() {
+DbColumnStorage* DbColumnStorage::append_data() {
   if (dt == DT_UNKNOWN) return append_data_to_new(dt);
   if (i >= get_capacity()) return append_data_to_new(dt);
   DATA_TYPE new_dt = source.get_data_type();
@@ -94,35 +94,35 @@ ColumnStorage* ColumnStorage::append_data() {
   return this;
 }
 
-ColumnStorage* ColumnStorage::append_data_to_new(DATA_TYPE new_dt) {
+DbColumnStorage* DbColumnStorage::append_data_to_new(DATA_TYPE new_dt) {
   if (new_dt == DT_UNKNOWN) new_dt = source.get_data_type();
 
   R_xlen_t desired_capacity = (n_max < 0) ? (get_capacity() * 2) : (n_max - i);
 
-  ColumnStorage* spillover = new ColumnStorage(new_dt, desired_capacity, n_max, source);
+  DbColumnStorage* spillover = new DbColumnStorage(new_dt, desired_capacity, n_max, source);
   return spillover->append_data();
 }
 
-void ColumnStorage::fetch_value() {
+void DbColumnStorage::fetch_value() {
   switch (dt) {
   case DT_INT:
-    source.fetch_int(data, i);
+    INTEGER(data)[i] = source.fetch_int();
     break;
 
   case DT_INT64:
-    source.fetch_int64(data, i);
+    INTEGER64(data)[i] = source.fetch_int64();
     break;
 
   case DT_REAL:
-    source.fetch_real(data, i);
+    REAL(data)[i] = source.fetch_real();
     break;
 
   case DT_STRING:
-    source.fetch_string(data, i);
+    SET_STRING_ELT(data, i, source.fetch_string());
     break;
 
   case DT_BLOB:
-    source.fetch_blob(data, i);
+    SET_VECTOR_ELT(data, i, source.fetch_blob());
     break;
 
   default:
@@ -130,7 +130,7 @@ void ColumnStorage::fetch_value() {
   }
 }
 
-SEXPTYPE ColumnStorage::sexptype_from_datatype(DATA_TYPE dt) {
+SEXPTYPE DbColumnStorage::sexptype_from_datatype(DATA_TYPE dt) {
   switch (dt) {
   case DT_UNKNOWN:
     return NILSXP;
@@ -156,7 +156,7 @@ SEXPTYPE ColumnStorage::sexptype_from_datatype(DATA_TYPE dt) {
   }
 }
 
-Rcpp::RObject ColumnStorage::class_from_datatype(DATA_TYPE dt) {
+Rcpp::RObject DbColumnStorage::class_from_datatype(DATA_TYPE dt) {
   switch (dt) {
   case DT_INT64:
     return CharacterVector::create("integer64");
@@ -169,7 +169,7 @@ Rcpp::RObject ColumnStorage::class_from_datatype(DATA_TYPE dt) {
   }
 }
 
-void ColumnStorage::fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i) {
+void DbColumnStorage::fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i) {
   switch (dt) {
   case DT_BOOL:
     LOGICAL(data)[i] = NA_LOGICAL;
@@ -200,7 +200,7 @@ void ColumnStorage::fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i) {
   }
 }
 
-void ColumnStorage::copy_value(SEXP x, DATA_TYPE dt, const int tgt, const int src) const {
+void DbColumnStorage::copy_value(SEXP x, DATA_TYPE dt, const int tgt, const int src) const {
   if (Rf_isNull(data)) {
     fill_default_value(x, dt, tgt);
   }

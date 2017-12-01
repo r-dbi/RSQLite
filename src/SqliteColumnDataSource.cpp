@@ -4,10 +4,9 @@
 #include "affinity.h"
 #include <boost/limits.hpp>
 
-SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_)
-  :
-  stmt(stmt_),
-  j(j_)
+SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_) :
+DbColumnDataSource(j_),
+stmt(stmt_)
 {
 }
 
@@ -47,32 +46,32 @@ bool SqliteColumnDataSource::is_null() const {
   return get_column_type() == SQLITE_NULL;
 }
 
-void SqliteColumnDataSource::fetch_int(SEXP x, int i) const {
-  INTEGER(x)[i] = sqlite3_column_int(get_stmt(), get_j());
+int SqliteColumnDataSource::fetch_int() const {
+  return sqlite3_column_int(get_stmt(), get_j());
 }
 
-void SqliteColumnDataSource::fetch_int64(SEXP x, int i) const {
-  INTEGER64(x)[i] = sqlite3_column_int64(get_stmt(), get_j());
+int64_t SqliteColumnDataSource::fetch_int64() const {
+  return sqlite3_column_int64(get_stmt(), get_j());
 }
 
-void SqliteColumnDataSource::fetch_real(SEXP x, int i) const {
-  REAL(x)[i] = sqlite3_column_double(get_stmt(), get_j());
+double SqliteColumnDataSource::fetch_real() const {
+  return sqlite3_column_double(get_stmt(), get_j());
 }
 
-void SqliteColumnDataSource::fetch_string(SEXP x, int i) const {
+SEXP SqliteColumnDataSource::fetch_string() const {
   LOG_VERBOSE;
   const char* const text = reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
-  SET_STRING_ELT(x, i, Rf_mkCharCE(text, CE_UTF8));
+  return Rf_mkCharCE(text, CE_UTF8);
 }
 
-void SqliteColumnDataSource::fetch_blob(SEXP x, int i) const {
+SEXP SqliteColumnDataSource::fetch_blob() const {
   int size = sqlite3_column_bytes(get_stmt(), get_j());
   const void* blob = sqlite3_column_blob(get_stmt(), get_j());
 
   SEXP bytes = Rf_allocVector(RAWSXP, size);
   memcpy(RAW(bytes), blob, size);
 
-  SET_VECTOR_ELT(x, i, bytes);
+  return bytes;
 }
 
 
@@ -103,10 +102,6 @@ DATA_TYPE SqliteColumnDataSource::datatype_from_decltype(const char* decl_type) 
 
 sqlite3_stmt* SqliteColumnDataSource::get_stmt() const {
   return stmt;
-}
-
-int SqliteColumnDataSource::get_j() const {
-  return j;
 }
 
 int SqliteColumnDataSource::get_column_type() const {

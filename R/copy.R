@@ -34,6 +34,6 @@ sqliteCopyDatabase <- function(from, to) {
   if (!is(to, "SQLiteConnection"))
     stop("'to' must be a SQLiteConnection object")
 
-  rsqlite_copy_database(from@ptr, to@ptr)
+  connection_copy_database(from@ptr, to@ptr)
   invisible(NULL)
 }

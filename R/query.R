@@ -15,7 +15,7 @@ setMethod("dbSendQuery", c("SQLiteConnection", "character"),
 
     rs <- new("SQLiteResult",
       sql = statement,
-      ptr = rsqlite_send_query(conn@ptr, statement),
+      ptr = result_create(conn@ptr, statement),
       conn = conn
     )
     on.exit(dbClearResult(rs), add = TRUE)
@@ -39,7 +39,7 @@ setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
 
 
 db_bind <- function(res, params, ..., allow_named_superset) {
-  placeholder_names <- rsqlite_get_placeholder_names(res@ptr)
+  placeholder_names <- result_get_placeholder_names(res@ptr)
   empty <- placeholder_names == ""
   numbers <- grepl("^[1-9][0-9]*$", placeholder_names)
   names <- !(empty | numbers)
@@ -81,7 +81,7 @@ db_bind <- function(res, params, ..., allow_named_superset) {
   params <- factor_to_string(params, warn = TRUE)
   params <- string_to_utf8(params)
 
-  rsqlite_bind_rows(res@ptr, params)
+  result_bind(res@ptr, params)
   invisible(res)
 }
 
@@ -95,7 +95,7 @@ setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ...,
   if (n < -1) stopc("n must be nonnegative or -1")
   if (is.infinite(n)) n <- -1
   if (trunc(n) != n) stopc("n must be a whole number")
-  sqlColumnToRownames(rsqlite_fetch(res@ptr, n = n), row.names)
+  sqlColumnToRownames(result_fetch(res@ptr, n = n), row.names)
 })
 
 #' @export
@@ -105,7 +105,7 @@ setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
     warningc("Expired, result set already closed")
     return(invisible(TRUE))
   }
-  rsqlite_clear_result(res@ptr)
+  result_release(res@ptr)
   res@conn@ref$result <- NULL
   invisible(TRUE)
 })
@@ -113,22 +113,22 @@ setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
 #' @export
 #' @rdname SQLiteResult-class
 setMethod("dbColumnInfo", "SQLiteResult", function(res, ...) {
-  rsqlite_column_info(res@ptr)
+  result_column_info(res@ptr)
 })
 #' @export
 #' @rdname SQLiteResult-class
 setMethod("dbGetRowsAffected", "SQLiteResult", function(res, ...) {
-  rsqlite_rows_affected(res@ptr)
+  result_rows_affected(res@ptr)
 })
 #' @export
 #' @rdname SQLiteResult-class
 setMethod("dbGetRowCount", "SQLiteResult", function(res, ...) {
-  rsqlite_row_count(res@ptr)
+  result_rows_fetched(res@ptr)
 })
 #' @export
 #' @rdname SQLiteResult-class
 setMethod("dbHasCompleted", "SQLiteResult", function(res, ...) {
-  rsqlite_has_completed(res@ptr)
+  result_has_completed(res@ptr)
 })
 #' @rdname SQLiteResult-class
 #' @export

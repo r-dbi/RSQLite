@@ -4,27 +4,30 @@
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 
-#include "SqliteConnection.h"
+#include "DbConnection.h"
 
 class SqliteResultImpl;
 
-class SqliteResult : boost::noncopyable {
-  SqliteConnectionPtr pConn_;
+class DbResult : boost::noncopyable {
+  DbConnectionPtr pConn_;
   boost::scoped_ptr<SqliteResultImpl> impl;
 
 public:
-  SqliteResult(const SqliteConnectionPtr& pConn, const std::string& sql);
-  ~SqliteResult();
+  DbResult(const DbConnectionPtr& pConn, const std::string& sql);
+  ~DbResult();
 
 public:
   bool complete();
-  int nrows();
-  int rows_affected();
-  CharacterVector get_placeholder_names() const;
+  int n_rows_fetched();
+  int n_rows_affected();
 
-  void bind_rows(const List& params);
+  void bind(const List& params);
   List fetch(int n_max = -1);
+
   List get_column_info();
+
+public:
+  CharacterVector get_placeholder_names() const;
 
 private:
   void validate_params(const List& params) const;

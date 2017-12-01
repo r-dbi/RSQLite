@@ -1,25 +1,26 @@
 #include "pch.h"
 #include "SqliteResultImpl.h"
 #include "SqliteDataFrame.h"
-#include "ColumnStorage.h"
+#include "DbColumnStorage.h"
 
 
 
 // Construction ////////////////////////////////////////////////////////////////
 
-SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
-  : conn(conn_),
-    stmt(prepare(conn_, sql)),
-    cache(stmt),
-    complete_(false),
-    ready_(false),
-    nrows_(0),
-    rows_affected_(0),
-    group_(0),
-    groups_(0),
-    types_(get_initial_field_types(cache.ncols_))
+SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql) :
+conn(conn_),
+stmt(prepare(conn_, sql)),
+cache(stmt),
+complete_(false),
+ready_(false),
+nrows_(0),
+rows_affected_(0),
+group_(0),
+groups_(0),
+types_(get_initial_field_types(cache.ncols_))
 {
-  LOG_VERBOSE << sql;
+
+  LOG_DEBUG << sql;
 
   try {
     if (cache.nparams_ == 0) {
@@ -31,6 +32,18 @@ SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql)
     throw;
   }
 }
+
+SqliteResultImpl::~SqliteResultImpl() {
+  LOG_VERBOSE;
+
+  try {
+    sqlite3_finalize(stmt);
+  } catch (...) {}
+}
+
+
+
+// Cache ///////////////////////////////////////////////////////////////////////
 
 SqliteResultImpl::_cache::_cache(sqlite3_stmt* stmt)
   : names_(get_column_names(stmt)),
@@ -50,12 +63,13 @@ std::vector<std::string> SqliteResultImpl::_cache::get_column_names(sqlite3_stmt
   return names;
 }
 
-SqliteResultImpl::~SqliteResultImpl() {
-  LOG_VERBOSE;
-
-  try {
-    sqlite3_finalize(stmt);
-  } catch (...) {}
+// We guess the correct R type for each column from the declared column type,
+// if possible.  The type of the column can be amended as new values come in,
+// but will be fixed after the first call to fetch().
+std::vector<DATA_TYPE> SqliteResultImpl::get_initial_field_types(const size_t ncols) {
+  std::vector<DATA_TYPE> types(ncols);
+  std::fill(types.begin(), types.end(), DT_UNKNOWN);
+  return types;
 }
 
 sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
@@ -73,21 +87,6 @@ sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
   return stmt;
 }
 
-// We guess the correct R type for each column from the declared column type,
-// if possible.  The type of the column can be amended as new values come in,
-// but will be fixed after the first call to fetch().
-std::vector<DATA_TYPE> SqliteResultImpl::get_initial_field_types(const size_t ncols) {
-  std::vector<DATA_TYPE> types(ncols);
-  std::fill(types.begin(), types.end(), DT_UNKNOWN);
-  return types;
-}
-
-void SqliteResultImpl::after_bind(bool params_have_rows) {
-  init(params_have_rows);
-  if (params_have_rows)
-    step();
-}
-
 void SqliteResultImpl::init(bool params_have_rows) {
   ready_ = true;
   nrows_ = 0;
@@ -102,33 +101,16 @@ bool SqliteResultImpl::complete() {
   return complete_;
 }
 
-int SqliteResultImpl::nrows() {
+int SqliteResultImpl::n_rows_fetched() {
   return nrows_;
 }
 
-int SqliteResultImpl::rows_affected() {
+int SqliteResultImpl::n_rows_affected() {
   if (!ready_) return NA_INTEGER;
   return rows_affected_;
 }
 
-CharacterVector SqliteResultImpl::get_placeholder_names() const {
-  int n = sqlite3_bind_parameter_count(stmt);
-
-  CharacterVector res(n);
-
-  for (int i = 0; i < n; ++i) {
-    const char* placeholder_name = sqlite3_bind_parameter_name(stmt, i + 1);
-    if (placeholder_name == NULL)
-      placeholder_name = "";
-    else
-      ++placeholder_name;
-    res[i] = String(placeholder_name, CE_UTF8);
-  }
-
-  return res;
-}
-
-void SqliteResultImpl::bind_rows_impl(const List& params) {
+void SqliteResultImpl::bind(const List& params) {
   if (cache.nparams_ == 0) {
     stop("Query does not require parameters.");
   }
@@ -150,7 +132,7 @@ void SqliteResultImpl::bind_rows_impl(const List& params) {
   after_bind(has_params);
 }
 
-List SqliteResultImpl::fetch_impl(const int n_max) {
+List SqliteResultImpl::fetch(const int n_max) {
   if (!ready_)
     stop("Query needs to be bound before fetching");
 
@@ -165,17 +147,38 @@ List SqliteResultImpl::fetch_impl(const int n_max) {
   return out;
 }
 
-List SqliteResultImpl::get_column_info_impl() {
+List SqliteResultImpl::get_column_info() {
   peek_first_row();
 
   CharacterVector names(cache.names_.begin(), cache.names_.end());
 
   CharacterVector types(cache.ncols_);
   for (size_t i = 0; i < cache.ncols_; i++) {
-    types[i] = Rf_type2char(ColumnStorage::sexptype_from_datatype(types_[i]));
+    types[i] = Rf_type2char(DbColumnStorage::sexptype_from_datatype(types_[i]));
   }
 
   return List::create(names, types);
+}
+
+
+
+// Publics (custom) ////////////////////////////////////////////////////////////
+
+CharacterVector SqliteResultImpl::get_placeholder_names() const {
+  int n = sqlite3_bind_parameter_count(stmt);
+
+  CharacterVector res(n);
+
+  for (int i = 0; i < n; ++i) {
+    const char* placeholder_name = sqlite3_bind_parameter_name(stmt, i + 1);
+    if (placeholder_name == NULL)
+      placeholder_name = "";
+    else
+      ++placeholder_name;
+    res[i] = String(placeholder_name, CE_UTF8);
+  }
+
+  return res;
 }
 
 
@@ -249,6 +252,12 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
     stop("Don't know how to handle parameter of type %s.",
          Rf_type2char(TYPEOF(value_)));
   }
+}
+
+void SqliteResultImpl::after_bind(bool params_have_rows) {
+  init(params_have_rows);
+  if (params_have_rows)
+    step();
 }
 
 List SqliteResultImpl::fetch_rows(const int n_max, int& n) {

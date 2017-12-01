@@ -49,7 +49,7 @@ void connection_release(XPtr<DbConnectionPtr> con_) {
   }
 
   con->get()->disconnect();
-  con_.release();
+  // don't release here to make sure a nice error message is delivered
 }
 
 

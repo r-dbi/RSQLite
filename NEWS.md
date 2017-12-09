@@ -11,7 +11,7 @@ API changes
 
 - Updated embedded SQLite to 3.19.3.
 - 64-bit integers are returned as `integer64` vectors. The `bit64` package is imported to support this data type (#65).
-- The `row.names` argument to `dbFetch()`, `dbReadTable()`, `dbWriteTable()`, `sqliteBuildTableDefinition()`, and `sqlData()` now defaults to `FALSE`. The old default can be restored temporarily on a per-package basis by calling `pkgconfig::set_config("RSQLite::row.names.query" = NA)`. `NULL` is a valid value for the `row.names` argument, same as `FALSE` (#210).
+- The `row.names` argument to `dbFetch()`, `dbReadTable()`, `dbWriteTable()`, `sqliteBuildTableDefinition()`, and `sqlData()` now defaults to `FALSE`. (This also affects `dbGetQuery()`.) The old default can be restored temporarily on a per-package basis by calling `pkgconfig::set_config("RSQLite::row.names.query" = NA)`. `NULL` is a valid value for the `row.names` argument, same as `FALSE` (#210).
 - The `name` argument to `dbBegin()`, `dbCommit()`, and `dbRollback()` is now declared after the ellipsis. Code that calls these methods with an unnamed second argument still works but receives a warning (#208).
 - The `select.cols` argument to `dbReadTable()` is deprecated, use `dbGetQuery()` with a `SELECT` query instead (#185).
 - The methods related to tables (`dbReadTable()`, `dbWriteTable()`, `dbExistsTable()`, and `dbRemoveTable()`) always treat the `name` argument as literal name, even if it contains backticks. This breaks the CRAN version (but not the GitHub version) of the sqldf package (#188).

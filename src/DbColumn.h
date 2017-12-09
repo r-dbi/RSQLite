@@ -5,7 +5,6 @@
 #include "DbColumnDataType.h"
 #include "DbColumnDataSourceFactory.h"
 #include <boost/shared_ptr.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
 
 class DbColumnDataSourceFactory;
 class DbColumnDataSource;

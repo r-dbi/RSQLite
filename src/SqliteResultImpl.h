@@ -27,7 +27,7 @@ private:
   bool complete_;
   bool ready_;
   int nrows_;
-  int rows_affected_;
+  int total_changes_start_;
   List params_;
   int group_, groups_;
   std::vector<DATA_TYPE> types_;

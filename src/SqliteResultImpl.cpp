@@ -14,7 +14,7 @@ cache(stmt),
 complete_(false),
 ready_(false),
 nrows_(0),
-rows_affected_(0),
+total_changes_start_(sqlite3_total_changes(conn_)),
 group_(0),
 groups_(0),
 types_(get_initial_field_types(cache.ncols_))
@@ -107,7 +107,7 @@ int SqliteResultImpl::n_rows_fetched() {
 
 int SqliteResultImpl::n_rows_affected() {
   if (!ready_) return NA_INTEGER;
-  return rows_affected_;
+  return sqlite3_total_changes(conn) - total_changes_start_;
 }
 
 void SqliteResultImpl::bind(const List& params) {
@@ -126,7 +126,7 @@ void SqliteResultImpl::bind(const List& params) {
   groups_ = Rf_length(first_col);
   group_ = 0;
 
-  rows_affected_ = 0;
+  total_changes_start_ = sqlite3_total_changes(conn);
 
   bool has_params = bind_row();
   after_bind(has_params);
@@ -305,8 +305,6 @@ bool SqliteResultImpl::step_run() {
 }
 
 bool SqliteResultImpl::step_done() {
-  rows_affected_ += sqlite3_changes(conn);
-
   ++group_;
   bool more_params = bind_row();
 

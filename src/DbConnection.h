@@ -28,6 +28,9 @@ public:
   // Is the connection valid?
   bool is_valid() const;
 
+  // Fail if the connection is invalid
+  void check_connection() const;
+
   // Get the last exception as a string
   std::string getException() const;
 

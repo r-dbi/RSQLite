@@ -11,11 +11,20 @@ DbResult::DbResult(const DbConnectionPtr& pConn, const std::string& sql)
 
 DbResult::~DbResult() {}
 
+DbResult* DbResult::create_and_send_query(const DbConnectionPtr& con, const std::string& sql, bool is_statement) {
+  (void)is_statement;
+  return new DbResult(con, sql);
+}
+
 
 // Publics /////////////////////////////////////////////////////////////////////
 
 bool DbResult::complete() {
   return impl->complete();
+}
+
+bool DbResult::is_active() const {
+  return true;
 }
 
 int DbResult::n_rows_fetched() {

@@ -1,11 +1,14 @@
 #include "pch.h"
-#include <workarounds/XPtr.h>
-#include "DbResult.h"
+#include "workarounds/XPtr.h"
+#include "RSQLite_types.h"
+
+//#include "DbResult.h"
+
 
 // [[Rcpp::export]]
 XPtr<DbResult> result_create(XPtr<DbConnectionPtr> con, std::string sql, bool is_statement = false) {
-  (void)is_statement;
-  DbResult* res = new DbResult(*con, sql);
+  (*con)->check_connection();
+  DbResult* res = DbResult::create_and_send_query(*con, sql, is_statement);
   return XPtr<DbResult>(res, true);
 }
 
@@ -17,7 +20,7 @@ void result_release(XPtr<DbResult> res) {
 // [[Rcpp::export]]
 bool result_valid(XPtr<DbResult> res_) {
   DbResult* res = res_.get();
-  return res != NULL;
+  return res != NULL && res->is_active();
 }
 
 // [[Rcpp::export]]

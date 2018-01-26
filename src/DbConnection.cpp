@@ -32,6 +32,12 @@ bool DbConnection::is_valid() const {
   return (pConn_ != NULL);
 }
 
+void DbConnection::check_connection() const {
+  if (!is_valid()) {
+    stop("Invalid or closed connection");
+  }
+}
+
 std::string DbConnection::getException() const {
   if (is_valid())
     return std::string(sqlite3_errmsg(pConn_));

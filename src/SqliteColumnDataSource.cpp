@@ -5,8 +5,8 @@
 #include <boost/limits.hpp>
 
 SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_) :
-DbColumnDataSource(j_),
-stmt(stmt_)
+  DbColumnDataSource(j_),
+  stmt(stmt_)
 {
 }
 
@@ -14,13 +14,13 @@ DATA_TYPE SqliteColumnDataSource::get_data_type() const {
   const int field_type = get_column_type();
   switch (field_type) {
   case SQLITE_INTEGER:
-  {
-    int64_t ret = sqlite3_column_int64(get_stmt(), get_j());
-    if (needs_64_bit(ret))
-      return DT_INT64;
-    else
-      return DT_INT;
-  }
+    {
+      int64_t ret = sqlite3_column_int64(get_stmt(), get_j());
+      if (needs_64_bit(ret))
+        return DT_INT64;
+      else
+        return DT_INT;
+    }
 
   case SQLITE_FLOAT:
     return DT_REAL;

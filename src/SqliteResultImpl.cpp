@@ -8,16 +8,16 @@
 // Construction ////////////////////////////////////////////////////////////////
 
 SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql) :
-conn(conn_),
-stmt(prepare(conn_, sql)),
-cache(stmt),
-complete_(false),
-ready_(false),
-nrows_(0),
-total_changes_start_(sqlite3_total_changes(conn_)),
-group_(0),
-groups_(0),
-types_(get_initial_field_types(cache.ncols_))
+  conn(conn_),
+  stmt(prepare(conn_, sql)),
+  cache(stmt),
+  complete_(false),
+  ready_(false),
+  nrows_(0),
+  total_changes_start_(sqlite3_total_changes(conn_)),
+  group_(0),
+  groups_(0),
+  types_(get_initial_field_types(cache.ncols_))
 {
 
   LOG_DEBUG << sql;

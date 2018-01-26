@@ -3,7 +3,7 @@
 #include "SqliteColumnDataSource.h"
 
 SqliteColumnDataSourceFactory::SqliteColumnDataSourceFactory(sqlite3_stmt* stmt_) :
-stmt(stmt_)
+  stmt(stmt_)
 {
 }
 

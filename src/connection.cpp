@@ -62,15 +62,15 @@ void connection_release(XPtr<DbConnectionPtr> con_) {
 
 // [[Rcpp::export]]
 void connection_copy_database(const XPtr<DbConnectionPtr>& from,
-                           const XPtr<DbConnectionPtr>& to) {
+                              const XPtr<DbConnectionPtr>& to) {
   (*from)->copy_to((*to));
 }
 
 // [[Rcpp::export]]
 bool connection_import_file(const XPtr<DbConnectionPtr>& con,
-                         const std::string& name, const std::string& value,
-                         const std::string& sep, const std::string& eol,
-                         const int skip) {
+                            const std::string& name, const std::string& value,
+                            const std::string& sep, const std::string& eol,
+                            const int skip) {
   return !!RS_sqlite_import(con->get()->conn(), name.c_str(), value.c_str(),
                             sep.c_str(), eol.c_str(), skip);
 }

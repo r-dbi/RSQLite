@@ -73,7 +73,7 @@ void DbColumn::warn_type_conflicts(const String& name) const {
 
 DbColumn::operator SEXP() const {
   DATA_TYPE dt = get_last_storage()->get_data_type();
-  SEXP ret = DbColumnStorage::allocate(n, dt);
+  RObject ret = DbColumnStorage::allocate(n, dt);
   int pos = 0;
   for (size_t k = 0; k < storage.size(); ++k) {
     const DbColumnStorage& current = storage[k];

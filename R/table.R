@@ -382,13 +382,13 @@ sqliteListTablesWithName <- function(conn, name) {
 }
 
 sqliteListTablesQuery <- function(conn, name = NULL) {
-  SQL(paste(
-    "SELECT name FROM",
+  SQL(paste("SELECT name FROM",
     "(SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master)",
     "WHERE (type = 'table' OR type = 'view')",
     if (!is.null(name)) paste0("AND (lower(name) = ", dbQuoteString(conn, name), ")"),
     "ORDER BY name",
-    sep = "\n"))
+    sep = "\n"
+  ))
 }
 
 #' @rdname SQLiteConnection-class

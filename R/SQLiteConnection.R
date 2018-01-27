@@ -66,17 +66,17 @@ setMethod("dbQuoteIdentifier", c("SQLiteConnection", "character"), function(conn
   # Avoid fixed = TRUE due to https://github.com/r-dbi/DBItest/issues/156
   x <- gsub("`", "``", enc2utf8(x))
   if (length(x) == 0L) {
-    SQL(character())
+    SQL(character(), names = names(x))
   } else {
     # Not calling encodeString() here to keep things simple
-    SQL(paste("`", x, "`", sep = ""))
+    SQL(paste("`", x, "`", sep = ""), names = names(x))
   }
 })
 
 #' @rdname SQLiteConnection-class
 #' @export
 setMethod("dbQuoteIdentifier", c("SQLiteConnection", "SQL"), function(conn, x, ...) {
-  SQL(x)
+  x
 })
 
 # dbWriteTable()

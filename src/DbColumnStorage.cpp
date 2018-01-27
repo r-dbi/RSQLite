@@ -38,8 +38,10 @@ SEXP DbColumnStorage::allocate(const R_xlen_t length, DATA_TYPE dt) {
   SEXPTYPE type = sexptype_from_datatype(dt);
   RObject class_ = class_from_datatype(dt);
 
-  SEXP ret = Rf_allocVector(type, length);
+  SEXP ret = PROTECT(Rf_allocVector(type, length));
   if (!Rf_isNull(class_)) Rf_setAttrib(ret, R_ClassSymbol, class_);
+  set_attribs_from_datatype(ret, dt);
+  UNPROTECT(1);
   return ret;
 }
 
@@ -142,7 +144,13 @@ SEXPTYPE DbColumnStorage::sexptype_from_datatype(DATA_TYPE dt) {
     return INTSXP;
 
   case DT_INT64:
+    return INT64SXP;
+
   case DT_REAL:
+  case DT_DATE:
+  case DT_DATETIME:
+  case DT_DATETIMETZ:
+  case DT_TIME:
     return REALSXP;
 
   case DT_STRING:
@@ -164,8 +172,30 @@ Rcpp::RObject DbColumnStorage::class_from_datatype(DATA_TYPE dt) {
   case DT_BLOB:
     return CharacterVector::create("blob");
 
+  case DT_DATE:
+    return CharacterVector::create("Date");
+
+  case DT_DATETIME:
+  case DT_DATETIMETZ:
+    return CharacterVector::create("POSIXct", "POSIXt");
+
+  case DT_TIME:
+    return CharacterVector::create("hms", "difftime");
+
   default:
     return R_NilValue;
+  }
+}
+
+void DbColumnStorage::set_attribs_from_datatype(SEXP x, DATA_TYPE dt) {
+  switch (dt) {
+  case DT_TIME:
+    Rf_setAttrib(x, PROTECT(CharacterVector::create("units")), PROTECT(CharacterVector::create("secs")));
+    UNPROTECT(2);
+    break;
+
+  default:
+    ;
   }
 }
 
@@ -184,6 +214,10 @@ void DbColumnStorage::fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i) {
     break;
 
   case DT_REAL:
+  case DT_DATE:
+  case DT_DATETIME:
+  case DT_DATETIMETZ:
+  case DT_TIME:
     REAL(data)[i] = NA_REAL;
     break;
 
@@ -206,6 +240,10 @@ void DbColumnStorage::copy_value(SEXP x, DATA_TYPE dt, const int tgt, const int 
   }
   else {
     switch (dt) {
+    case DT_BOOL:
+      LOGICAL(x)[tgt] = LOGICAL(data)[src];
+      break;
+
     case DT_INT:
       INTEGER(x)[tgt] = INTEGER(data)[src];
       break;
@@ -240,6 +278,13 @@ void DbColumnStorage::copy_value(SEXP x, DATA_TYPE dt, const int tgt, const int 
 
     case DT_BLOB:
       SET_VECTOR_ELT(x, tgt, VECTOR_ELT(data, src));
+      break;
+
+    case DT_DATE:
+    case DT_DATETIME:
+    case DT_DATETIMETZ:
+    case DT_TIME:
+      REAL(x)[tgt] = REAL(data)[src];
       break;
 
     default:

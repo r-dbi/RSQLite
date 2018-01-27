@@ -1,6 +1,7 @@
 #ifndef DB_DATAFRAME_H
 #define DB_DATAFRAME_H
 
+#include <boost/container/stable_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include "DbColumnDataType.h"
 
@@ -22,6 +23,7 @@ public:
   void set_col_values();
   bool advance();
 
+  List get_data();
   List get_data(std::vector<DATA_TYPE>& types);
   size_t get_ncols() const;
 

@@ -5,6 +5,7 @@
 #include "DbColumnDataType.h"
 #include "DbColumnDataSourceFactory.h"
 #include <boost/shared_ptr.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 class DbColumnDataSourceFactory;
 class DbColumnDataSource;
@@ -14,7 +15,7 @@ class DbColumn {
 private:
   boost::shared_ptr<DbColumnDataSource> source;
   boost::ptr_vector<DbColumnStorage> storage;
-  int i, n;
+  int n;
   std::set<DATA_TYPE> data_types_seen;
 
 public:

@@ -37,6 +37,8 @@ LinkingTo:
     BH,
     plogr,
     Rcpp
+Remotes: 
+    r-lib/DBI
 VignetteBuilder: knitr
 Encoding: UTF-8
 Remotes: rstats-db/DBItest

@@ -37,11 +37,11 @@ LinkingTo:
     BH,
     plogr,
     Rcpp
-Remotes: 
-    r-lib/DBI
 VignetteBuilder: knitr
+Remotes: 
+    r-dbi/DBI,
+    r-dbi/DBItest
 Encoding: UTF-8
-Remotes: rstats-db/DBItest
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.0.1
 Collate: 

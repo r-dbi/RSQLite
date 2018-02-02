@@ -32,4 +32,3 @@ a.out.dSYM
 ^build\.sh$
 ^codecov\.yml$
 ^src/pch\.h\.gch$
-^_pkgdown\.yml$

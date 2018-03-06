@@ -1,6 +1,6 @@
 pandoc: 1.15.2
 pkgdown: 0.1.0.9000
-pkgdown_sha: 408dc8985028b7a95fb249ad44fad53eed198f58
+pkgdown_sha: 17f683717d0a1547f13a08a259b34c58927452d6
 articles:
   RSQLite: RSQLite.html
 

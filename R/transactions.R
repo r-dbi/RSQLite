@@ -100,7 +100,7 @@ setMethod("dbRollback", "SQLiteConnection", function(conn, .name = NULL, ..., na
 
 compat_name <- function(name, .name) {
   if (!is.null(.name)) {
-    warning("Please use `name` = \"<savepoint>\" to specify the name of the savepoint.",
+    warning("Please use `dbBegin(..., name = \"<savepoint>\")` to specify the name of the savepoint.",
       call. = FALSE)
     .name
   } else {

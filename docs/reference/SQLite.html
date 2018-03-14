@@ -25,8 +25,6 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
 <meta property="og:title" content="Connect to an SQLite database — SQLite" />
 
 <meta property="og:description" content="Together, SQLite() and dbConnect() allow you to connect to
@@ -136,7 +134,8 @@ will be cloned.</p></td>
       <td><p>The path to the database file. SQLite keeps each database
 instance in one single file. The name of the database <em>is</em> the file
 name, thus database names should be legal file names in the running
-platform. There are two exceptions:</p><ul>
+platform. There are two exceptions:</p>
+<ul>
 <li><p><code>""</code> will create a temporary on-disk database. The file
 will be deleted when the connection is closed.</p></li>
 <li><p><code>":memory:"</code> or <code>"file::memory:"</code> will create a temporary
@@ -186,9 +185,8 @@ read only mode.  Raise an error if the file does not already exist</p></td>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>SQLite()</code> returns an object of class <a href='SQLiteDriver-class.html'>SQLiteDriver</a>.
-
-<code><a href='http://www.rdocumentation.org/packages/DBI/topics/dbConnect'>dbConnect()</a></code> returns an object of class <a href='SQLiteConnection-class.html'>SQLiteConnection</a>.</p>
+    <p><code>SQLite()</code> returns an object of class <a href='SQLiteDriver-class.html'>SQLiteDriver</a>.</p>
+<p><code><a href='http://www.rdocumentation.org/packages/DBI/topics/dbConnect'>dbConnect()</a></code> returns an object of class <a href='SQLiteConnection-class.html'>SQLiteConnection</a>.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
@@ -301,3 +299,4 @@ sets have been closed (and you'll get a warning message to this effect).</p>
 
   </body>
 </html>
+

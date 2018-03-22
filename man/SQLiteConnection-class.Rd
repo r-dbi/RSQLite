@@ -7,6 +7,7 @@
 \alias{dbIsValid,SQLiteConnection-method}
 \alias{dbQuoteIdentifier,SQLiteConnection,character-method}
 \alias{dbQuoteIdentifier,SQLiteConnection,SQL-method}
+\alias{dbUnquoteIdentifier,SQLiteConnection,SQL-method}
 \alias{dbGetException,SQLiteConnection-method}
 \alias{dbSendQuery,SQLiteConnection,character-method}
 \alias{sqlData,SQLiteConnection-method}
@@ -24,6 +25,8 @@
 \S4method{dbQuoteIdentifier}{SQLiteConnection,character}(conn, x, ...)
 
 \S4method{dbQuoteIdentifier}{SQLiteConnection,SQL}(conn, x, ...)
+
+\S4method{dbUnquoteIdentifier}{SQLiteConnection,SQL}(conn, x, ...)
 
 \S4method{dbGetException}{SQLiteConnection}(conn, ...)
 

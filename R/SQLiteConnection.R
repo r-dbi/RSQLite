@@ -79,6 +79,31 @@ setMethod("dbQuoteIdentifier", c("SQLiteConnection", "SQL"), function(conn, x, .
   x
 })
 
+#' @rdname SQLiteConnection-class
+#' @export
+setMethod("dbUnquoteIdentifier", c("SQLiteConnection", "SQL"), function(conn, x, ...) {
+  rx <- '^(?:|`((?:[^`]|``)+)`[.])(?:|`((?:[^`]|``)*)`)$'
+  bad <- grep(rx, x, invert = TRUE)
+  if (length(bad) > 0) {
+    stop("Can't unquote ", x[bad[[1]]], call. = FALSE)
+  }
+  schema <- gsub(rx, "\\1", x)
+  schema <- gsub("``", "`", schema)
+  table <- gsub(rx, "\\2", x)
+  table <- gsub("``", "`", table)
+
+  ret <- Map(schema, table, f = as_table)
+  names(ret) <- names(x)
+  ret
+})
+
+as_table <- function(schema, table) {
+  args <- c(schema = schema, table = table)
+  # Also omits NA args
+  args <- args[!is.na(args) & args != ""]
+  do.call(Id, as.list(args))
+}
+
 # dbWriteTable()
 
 # dbReadTable()

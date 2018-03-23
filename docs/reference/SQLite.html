@@ -112,8 +112,9 @@ and receive results.</p>
 
 <span class='co'># S4 method for SQLiteDriver</span>
 <span class='fu'>dbConnect</span>(<span class='no'>drv</span>, <span class='kw'>dbname</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='no'>...</span>,
-  <span class='kw'>loadable.extensions</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>cache_size</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>synchronous</span> <span class='kw'>=</span> <span class='st'>"off"</span>,
-  <span class='kw'>flags</span> <span class='kw'>=</span> <span class='no'>SQLITE_RWC</span>, <span class='kw'>vfs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+  <span class='kw'>loadable.extensions</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>default.extensions</span> <span class='kw'>=</span> <span class='no'>loadable.extensions</span>,
+  <span class='kw'>cache_size</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>synchronous</span> <span class='kw'>=</span> <span class='st'>"off"</span>, <span class='kw'>flags</span> <span class='kw'>=</span> <span class='no'>SQLITE_RWC</span>,
+  <span class='kw'>vfs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='co'># S4 method for SQLiteConnection</span>
 <span class='fu'>dbConnect</span>(<span class='no'>drv</span>, <span class='no'>...</span>)
@@ -154,6 +155,12 @@ in-memory database.</p></li>
       <td><p>When <code>TRUE</code> (default) SQLite3
 loadable extensions are enabled. Setting this value to <code>FALSE</code>
 prevents extensions from being loaded.</p></td>
+    </tr>
+    <tr>
+      <th>default.extensions</th>
+      <td><p>When <code>TRUE</code> (default) the <code><a href='initExtension.html'>initExtension()</a></code>
+function will be called on the new connection.Setting this value to <code>FALSE</code>
+requires calling <code><a href='initExtension.html'>initExtension()</a></code> manually.</p></td>
     </tr>
     <tr>
       <th>cache_size</th>

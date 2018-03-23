@@ -8,7 +8,7 @@ subset_available <- function(available, pkg) {
   }
 }
 
-download <- function(pkg, available, dep_list) {
+download <- function(pkg, available, ...) {
   dir <- fs::dir_create("revdep/download")
   dir <- fs::path_real(dir)
 
@@ -113,12 +113,14 @@ get_plan <- function() {
 # Leads to errors, need to check!
 #options(buildtools.check = identity)
 
+  deps <- readd(deps)
+
   make_subset_available <- function(pkg) {
     expr(subset_available(available, !!pkg))
   }
 
   plan_available <-
-    readd(deps) %>%
+    deps %>%
     enframe() %>%
     transmute(
       target = glue("av_{name}"),
@@ -127,17 +129,22 @@ get_plan <- function() {
     deframe() %>%
     drake_plan(list = .)
 
-  make_download <- function(pkg) {
+  make_download <- function(pkg, my_pkgs) {
     av_pkg <- sym(glue("av_{pkg}"))
-    expr(download(!!pkg, available = !!av_pkg))
+    deps <- list()
+    if (!(pkg %in% my_pkgs)) {
+      deps <- c(deps, expr(old_lib))
+    }
+
+    expr(download(!!pkg, available = !!av_pkg, !!!deps))
   }
 
   plan_download <-
-    readd(deps) %>%
+    deps %>%
     enframe() %>%
     transmute(
       target = glue("d_{name}"),
-      call = map(name, make_download)
+      call = map(name, make_download, c(get_this_pkg(), deps[[get_this_pkg()]]))
     ) %>%
     deframe() %>%
     drake_plan(list = .)
@@ -153,7 +160,7 @@ get_plan <- function() {
   }
 
   plan_install <-
-    readd(deps) %>%
+    deps %>%
     enframe() %>%
     mutate(target = glue("i_{name}")) %>%
     mutate(
@@ -247,15 +254,6 @@ get_plan <- function() {
 }
 
 plan <- get_plan()
-
-if ("new_lib" %in% plan$target) {
-  make(
-    plan,
-    "new_lib",
-    #parallelism = "future"
-    , jobs = parallel::detectCores()
-  )
-}
 
 #trace(conditionCall.condition, recover)
 make(

@@ -73,6 +73,9 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #' @param loadable.extensions When `TRUE` (default) SQLite3
 #'   loadable extensions are enabled. Setting this value to `FALSE`
 #'   prevents extensions from being loaded.
+#' @param default.extensions When `TRUE` (default) the [initExtension()]
+#'   function will be called on the new connection.Setting this value to `FALSE`
+#'   requires calling `initExtension()` manually.
 #' @param vfs Select the SQLite3 OS interface. See
 #'   \url{http://www.sqlite.org/vfs.html} for details. Allowed values are
 #'   `"unix-posix"`, `"unix-unix-afp"`,
@@ -105,7 +108,8 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #' # clean up
 #' dbDisconnect(con)
 setMethod("dbConnect", "SQLiteDriver",
-  function(drv, dbname = "", ..., loadable.extensions = TRUE, cache_size = NULL,
+  function(drv, dbname = "", ..., loadable.extensions = TRUE,
+           default.extensions = loadable.extensions, cache_size = NULL,
            synchronous = "off", flags = SQLITE_RWC, vfs = NULL) {
     stopifnot(length(dbname) == 1, !is.na(dbname))
 
@@ -150,6 +154,10 @@ setMethod("dbConnect", "SQLiteDriver",
                   call. = FALSE)
         }
       )
+    }
+
+    if (default.extensions) {
+      initExtension(con)
     }
 
     con

@@ -2,6 +2,7 @@
 #include "SqliteResultImpl.h"
 #include "SqliteDataFrame.h"
 #include "DbColumnStorage.h"
+#include "integer64.h"
 
 
 
@@ -216,28 +217,40 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
     } else {
       sqlite3_bind_int(stmt, j, value);
     }
-  } else if (TYPEOF(value_) == INTSXP) {
+  }
+  else if (TYPEOF(value_) == INT64SXP && Rf_inherits(value_, "integer64")) {
+    int64_t value = INTEGER64(value_)[group_];
+    if (value == NA_INTEGER64) {
+      sqlite3_bind_null(stmt, j);
+    } else {
+      sqlite3_bind_int64(stmt, j, value);
+    }
+  }
+  else if (TYPEOF(value_) == INTSXP) {
     int value = INTEGER(value_)[group_];
     if (value == NA_INTEGER) {
       sqlite3_bind_null(stmt, j);
     } else {
       sqlite3_bind_int(stmt, j, value);
     }
-  } else if (TYPEOF(value_) == REALSXP) {
+  }
+  else if (TYPEOF(value_) == REALSXP) {
     double value = REAL(value_)[group_];
     if (value == NA_REAL) {
       sqlite3_bind_null(stmt, j);
     } else {
       sqlite3_bind_double(stmt, j, value);
     }
-  } else if (TYPEOF(value_) == STRSXP) {
+  }
+  else if (TYPEOF(value_) == STRSXP) {
     SEXP value = STRING_ELT(value_, group_);
     if (value == NA_STRING) {
       sqlite3_bind_null(stmt, j);
     } else {
       sqlite3_bind_text(stmt, j, CHAR(value), -1, SQLITE_TRANSIENT);
     }
-  } else if (TYPEOF(value_) == VECSXP) {
+  }
+  else if (TYPEOF(value_) == VECSXP) {
     SEXP value = VECTOR_ELT(value_, group_);
     if (TYPEOF(value) == NILSXP) {
       sqlite3_bind_null(stmt, j);
@@ -248,7 +261,8 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
     else {
       stop("Can only bind lists of raw vectors (or NULL)");
     }
-  } else {
+  }
+  else {
     stop("Don't know how to handle parameter of type %s.",
          Rf_type2char(TYPEOF(value_)));
   }

@@ -24,6 +24,7 @@ setClass("SQLiteDriver",
 setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
   if (is.factor(obj)) return("TEXT")
   if (is.data.frame(obj)) return(callNextMethod(dbObj, obj))
+  if (is.integer64(obj)) return("INTEGER")
 
   switch(typeof(obj),
     integer = "INTEGER",

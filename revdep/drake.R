@@ -92,7 +92,7 @@ check <- function(tarball, lib, ...) {
   pkgs <- c(...)
   check_lib <- fs::file_temp("checklib")
   create_lib(pkgs, check_lib)
-  withr::with_libpaths(c(lib, check_lib), rcmdcheck::rcmdcheck(tarball, quiet = TRUE))
+  withr::with_libpaths(c(lib, check_lib), rcmdcheck::rcmdcheck(tarball, quiet = TRUE, timeout = ignore(600)))
 }
 
 compare <- function(old, new) {
@@ -261,5 +261,6 @@ make(
   #"compare_all",
   keep_going = TRUE,
   #parallelism = "future"
+  , verbose = 3
   , jobs = parallel::detectCores()
 )

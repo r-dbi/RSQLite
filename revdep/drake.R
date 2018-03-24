@@ -222,6 +222,7 @@ get_plan <- function() {
 
   make_compare_all <- function(pkg) {
     check_targets <- set_names(syms(glue("c_{pkg}")), pkg)
+    check_targets <- map(check_targets, function(x) expr(try(!!x)))
     expr(list(!!! check_targets))
   }
 

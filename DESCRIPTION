@@ -22,7 +22,7 @@ Depends:
     R (>= 3.1.0)
 Imports: 
     bit64,
-    blob (>= 1.1.0.9000),
+    blob (>= 1.1),
     DBI (>= 0.7-14),
     memoise,
     methods,
@@ -40,8 +40,7 @@ LinkingTo:
 VignetteBuilder: knitr
 Remotes: 
     r-dbi/DBI,
-    r-dbi/DBItest,
-    tidyverse/blob
+    r-dbi/DBItest
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.0.1.9000

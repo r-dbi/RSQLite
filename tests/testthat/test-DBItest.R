@@ -1,3 +1,5 @@
+if (identical(Sys.getenv("NOT_CRAN"), "true")) {
+
 DBItest::test_all(c(
   # enable to test a particular test only
   #"(?!data_timestamp_current).*",
@@ -22,3 +24,5 @@ DBItest::test_all(c(
 
   NULL
 ))
+
+}

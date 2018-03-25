@@ -52,7 +52,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.0.10</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.0.11</span>
       </span>
     </div>
 
@@ -99,6 +99,22 @@
     </div>
 
     <div class="contents">
+    <div id="rsqlite-2-0-11-2018-03-25" class="section level2">
+<h2 class="hasAnchor">
+<a href="#rsqlite-2-0-11-2018-03-25" class="anchor"></a>RSQLite 2.0-11 (2018-03-25)</h2>
+<ul>
+<li>Values of class <code>"integer64"</code> are now supported for <code>dbWriteTable()</code> and <code>dbBind()</code> (<a href='https://github.com/rstats-db/RSQLite/issues/243'>#243</a>).</li>
+<li>New connections now automatically load default RSQLite extensions (<a href='https://github.com/rstats-db/RSQLite/issues/236'>#236</a>).</li>
+<li>Implement <code>dbUnquoteIdentifier()</code>.</li>
+<li>Update bundled sqlite3 library to 3.22 (<a href='https://github.com/rstats-db/RSQLite/issues/252'>#252</a>).</li>
+<li>Names in the <code>x</code> argument to <code>dbQuoteIdentifier()</code> are preserved in the output (r-lib/DBI<a href='https://github.com/rstats-db/RSQLite/issues/173'>#173</a>).</li>
+<li>Fix rchk warnings on CRAN (<a href='https://github.com/rstats-db/RSQLite/issues/250'>#250</a>).</li>
+<li>
+<code>dbRowsAffected()</code> and <code>dbExecute()</code> return zero after a <code>DROP TABLE</code> statement, and not the number of rows affected by the last <code>INSERT</code>, <code>UPDATE</code>, or <code>DELETE</code> (<a href='https://github.com/rstats-db/RSQLite/issues/238'>#238</a>).</li>
+<li>Refactor connection and result handling to be more similar to other backends.</li>
+<li>Fix <code>dbQuoteIdentifier()</code> to ignore invalid UTF-8 strings (r-dbi/DBItest<a href='https://github.com/rstats-db/RSQLite/issues/156'>#156</a>).</li>
+</ul>
+</div>
     <div id="rsqlite-2-0-10-2017-09-22" class="section level2">
 <h2 class="hasAnchor">
 <a href="#rsqlite-2-0-10-2017-09-22" class="anchor"></a>RSQLite 2.0-10 (2017-09-22)</h2>
@@ -737,6 +753,7 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+'&<a 
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#rsqlite-2-0-11-2018-03-25">2.0-11</a></li>
         <li><a href="#rsqlite-2-0-10-2017-09-22">2.0-10</a></li>
         <li><a href="#rsqlite-2-0-2017-06-18">2.0</a></li>
         <li><a href="#rsqlite-1-1-2-2017-01-07">1.1-2</a></li>

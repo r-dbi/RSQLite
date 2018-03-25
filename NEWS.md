@@ -1,3 +1,16 @@
+## RSQLite 2.0-11 (2018-03-25)
+
+- Values of class `"integer64"` are now supported for `dbWriteTable()` and `dbBind()` (#243).
+- New connections now automatically load default RSQLite extensions (#236).
+- Implement `dbUnquoteIdentifier()`.
+- Update bundled sqlite3 library to 3.22 (#252).
+- Names in the `x` argument to `dbQuoteIdentifier()` are preserved in the output (r-lib/DBI#173).
+- Fix rchk warnings on CRAN (#250).
+- `dbRowsAffected()` and `dbExecute()` return zero after a `DROP TABLE` statement, and not the number of rows affected by the last `INSERT`, `UPDATE`, or `DELETE` (#238).
+- Refactor connection and result handling to be more similar to other backends.
+- Fix `dbQuoteIdentifier()` to ignore invalid UTF-8 strings (r-dbi/DBItest#156).
+
+
 ## RSQLite 2.0-10 (2017-09-22)
 
 - Now raising error if `dbBind()` is called with too many named arguments, according to spec.

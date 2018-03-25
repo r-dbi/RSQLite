@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "SqliteConnection.h"
+#include "DbConnection.h"
 #include "utils.h"
 
 
-SqliteConnection::SqliteConnection(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs)
+DbConnection::DbConnection(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs)
   : pConn_(NULL) {
 
   // Get the underlying database connection
@@ -16,30 +16,36 @@ SqliteConnection::SqliteConnection(const std::string& path, const bool allow_ext
   }
 }
 
-SqliteConnection::~SqliteConnection() {
+DbConnection::~DbConnection() {
   if (is_valid()) {
     warning_once("call dbDisconnect() when finished working with a connection");
     disconnect();
   }
 }
 
-sqlite3* SqliteConnection::conn() const {
+sqlite3* DbConnection::conn() const {
   if (!is_valid()) stop("disconnected");
   return pConn_;
 }
 
-bool SqliteConnection::is_valid() const {
+bool DbConnection::is_valid() const {
   return (pConn_ != NULL);
 }
 
-std::string SqliteConnection::getException() const {
+void DbConnection::check_connection() const {
+  if (!is_valid()) {
+    stop("Invalid or closed connection");
+  }
+}
+
+std::string DbConnection::getException() const {
   if (is_valid())
     return std::string(sqlite3_errmsg(pConn_));
   else
     return std::string();
 }
 
-void SqliteConnection::copy_to(const SqliteConnectionPtr& pDest) {
+void DbConnection::copy_to(const DbConnectionPtr& pDest) {
   sqlite3_backup* backup =
     sqlite3_backup_init(pDest->conn(), "main", pConn_, "main");
 
@@ -53,7 +59,7 @@ void SqliteConnection::copy_to(const SqliteConnectionPtr& pDest) {
   }
 }
 
-void SqliteConnection::disconnect() {
+void DbConnection::disconnect() {
   sqlite3_close_v2(pConn_);
   pConn_ = NULL;
 }

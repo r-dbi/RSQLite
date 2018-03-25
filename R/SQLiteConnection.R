@@ -25,29 +25,10 @@ setClass("SQLiteConnection",
     ref = "environment"
   )
 )
-#' @rdname SQLiteConnection-class
-#' @export
-setMethod("dbQuoteIdentifier", c("SQLiteConnection", "character"), function(conn, x, ...) {
-  if (any(is.na(x))) {
-    stop("Cannot pass NA to dbQuoteIdentifier()", call. = FALSE)
-  }
-  x <- gsub("`", "``", x, fixed = TRUE)
-  if (length(x) == 0L) {
-    SQL(character())
-  } else {
-    # Not calling encodeString() here to keep things simple
-    SQL(paste("`", x, "`", sep = ""))
-  }
-})
 
-#' @rdname SQLiteConnection-class
+# show()
 #' @export
-setMethod("dbQuoteIdentifier", c("SQLiteConnection", "SQL"), function(conn, x, ...) {
-  SQL(x)
-})
-
 #' @rdname SQLiteConnection-class
-#' @export
 setMethod("show", "SQLiteConnection", function(object) {
   cat("<SQLiteConnection>\n")
   if (dbIsValid(object)) {
@@ -58,11 +39,90 @@ setMethod("show", "SQLiteConnection", function(object) {
   }
 })
 
+# dbIsValid()
+#' @export
+#' @rdname SQLiteConnection-class
+setMethod("dbIsValid", "SQLiteConnection", function(dbObj, ...) {
+  connection_valid(dbObj@ptr)
+})
+
+# dbDisconnect()
+
+# dbSendQuery()
+
+# dbSendStatement()
+
+# dbDataType()
+
+# dbQuoteString()
+
+# dbQuoteIdentifier()
+#' @export
+#' @rdname SQLiteConnection-class
+setMethod("dbQuoteIdentifier", c("SQLiteConnection", "character"), function(conn, x, ...) {
+  if (any(is.na(x))) {
+    stop("Cannot pass NA to dbQuoteIdentifier()", call. = FALSE)
+  }
+  # Avoid fixed = TRUE due to https://github.com/r-dbi/DBItest/issues/156
+  x <- gsub("`", "``", enc2utf8(x))
+  if (length(x) == 0L) {
+    SQL(character(), names = names(x))
+  } else {
+    # Not calling encodeString() here to keep things simple
+    SQL(paste("`", x, "`", sep = ""), names = names(x))
+  }
+})
+
 #' @rdname SQLiteConnection-class
 #' @export
-setMethod("dbIsValid", "SQLiteConnection", function(dbObj, ...) {
-  rsqlite_connection_valid(dbObj@ptr)
+setMethod("dbQuoteIdentifier", c("SQLiteConnection", "SQL"), function(conn, x, ...) {
+  x
 })
+
+#' @rdname SQLiteConnection-class
+#' @export
+setMethod("dbUnquoteIdentifier", c("SQLiteConnection", "SQL"), function(conn, x, ...) {
+  rx <- '^(?:|`((?:[^`]|``)+)`[.])(?:|`((?:[^`]|``)*)`)$'
+  bad <- grep(rx, x, invert = TRUE)
+  if (length(bad) > 0) {
+    stop("Can't unquote ", x[bad[[1]]], call. = FALSE)
+  }
+  schema <- gsub(rx, "\\1", x)
+  schema <- gsub("``", "`", schema)
+  table <- gsub(rx, "\\2", x)
+  table <- gsub("``", "`", table)
+
+  ret <- Map(schema, table, f = as_table)
+  names(ret) <- names(x)
+  ret
+})
+
+as_table <- function(schema, table) {
+  args <- c(schema = schema, table = table)
+  # Also omits NA args
+  args <- args[!is.na(args) & args != ""]
+  do.call(Id, as.list(args))
+}
+
+# dbWriteTable()
+
+# dbReadTable()
+
+# dbListTables()
+
+# dbExistsTable()
+
+# dbListFields()
+
+# dbRemoveTable()
+
+# dbBegin()
+
+# dbCommit()
+
+# dbRollback()
+
+# other
 
 #' @rdname SQLiteConnection-class
 #' @export
@@ -73,3 +133,4 @@ setMethod("dbGetException", "SQLiteConnection", function(conn, ...) {
     errorMsg = "OK"
   )
 })
+

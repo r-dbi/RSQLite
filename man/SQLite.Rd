@@ -16,8 +16,9 @@
 SQLite(...)
 
 \S4method{dbConnect}{SQLiteDriver}(drv, dbname = "", ...,
-  loadable.extensions = TRUE, cache_size = NULL, synchronous = "off",
-  flags = SQLITE_RWC, vfs = NULL)
+  loadable.extensions = TRUE, default.extensions = loadable.extensions,
+  cache_size = NULL, synchronous = "off", flags = SQLITE_RWC,
+  vfs = NULL)
 
 \S4method{dbConnect}{SQLiteConnection}(drv, ...)
 
@@ -47,6 +48,10 @@ in-memory database.
 \item{loadable.extensions}{When \code{TRUE} (default) SQLite3
 loadable extensions are enabled. Setting this value to \code{FALSE}
 prevents extensions from being loaded.}
+
+\item{default.extensions}{When \code{TRUE} (default) the \code{\link[=initExtension]{initExtension()}}
+function will be called on the new connection.Setting this value to \code{FALSE}
+requires calling \code{initExtension()} manually.}
 
 \item{cache_size}{Advanced option. A positive integer to change the maximum
 number of disk pages that SQLite holds in memory (SQLite's default is

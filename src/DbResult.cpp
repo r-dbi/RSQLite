@@ -1,47 +1,56 @@
 #include "pch.h"
-#include "SqliteResult.h"
+#include "DbResult.h"
 #include "SqliteResultImpl.h"
 
 
 
 // Construction ////////////////////////////////////////////////////////////////
 
-SqliteResult::SqliteResult(const SqliteConnectionPtr& pConn, const std::string& sql)
+DbResult::DbResult(const DbConnectionPtr& pConn, const std::string& sql)
   : pConn_(pConn), impl(new SqliteResultImpl(pConn->conn(), sql)) {}
 
-SqliteResult::~SqliteResult() {}
+DbResult::~DbResult() {}
+
+DbResult* DbResult::create_and_send_query(const DbConnectionPtr& con, const std::string& sql, bool is_statement) {
+  (void)is_statement;
+  return new DbResult(con, sql);
+}
 
 
 // Publics /////////////////////////////////////////////////////////////////////
 
-bool SqliteResult::complete() {
+bool DbResult::complete() {
   return impl->complete();
 }
 
-int SqliteResult::nrows() {
-  return impl->nrows();
+bool DbResult::is_active() const {
+  return true;
 }
 
-int SqliteResult::rows_affected() {
-  return impl->rows_affected();
+int DbResult::n_rows_fetched() {
+  return impl->n_rows_fetched();
 }
 
-CharacterVector SqliteResult::get_placeholder_names() const {
+int DbResult::n_rows_affected() {
+  return impl->n_rows_affected();
+}
+
+CharacterVector DbResult::get_placeholder_names() const {
   return impl->get_placeholder_names();
 }
 
-void SqliteResult::bind_rows(const List& params) {
+void DbResult::bind(const List& params) {
   validate_params(params);
-  impl->bind_rows_impl(params);
+  impl->bind(params);
 }
 
-List SqliteResult::fetch(const int n_max) {
-  return impl->fetch_impl(n_max);
+List DbResult::fetch(const int n_max) {
+  return impl->fetch(n_max);
 
 }
 
-List SqliteResult::get_column_info() {
-  List out = impl->get_column_info_impl();
+List DbResult::get_column_info() {
+  List out = impl->get_column_info();
 
   out.attr("row.names") = IntegerVector::create(NA_INTEGER, -Rf_length(out[0]));
   out.attr("class") = "data.frame";
@@ -53,7 +62,7 @@ List SqliteResult::get_column_info() {
 
 // Privates ///////////////////////////////////////////////////////////////////
 
-void SqliteResult::validate_params(const List& params) const {
+void DbResult::validate_params(const List& params) const {
   if (params.size() != 0) {
     SEXP first_col = params[0];
     int n = Rf_length(first_col);

@@ -1,6 +1,6 @@
 #' @useDynLib RSQLite, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
-#' @importFrom bit64 integer64
+#' @importFrom bit64 integer64 is.integer64
 #' @importFrom blob blob
 NULL
 
@@ -24,6 +24,7 @@ setClass("SQLiteDriver",
 setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ...) {
   if (is.factor(obj)) return("TEXT")
   if (is.data.frame(obj)) return(callNextMethod(dbObj, obj))
+  if (is.integer64(obj)) return("INTEGER")
 
   switch(typeof(obj),
     integer = "INTEGER",

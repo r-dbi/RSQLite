@@ -10,16 +10,16 @@
 // Reference counted wrapper for a sqlite3* connnection which will keep the
 // connection alive as long as there are references to this object alive.
 
-// convenience typedef for shared_ptr to SqliteConnectionWrapper
-class SqliteConnection;
-typedef boost::shared_ptr<SqliteConnection> SqliteConnectionPtr;
+// convenience typedef for shared_ptr to DbConnectionWrapper
+class DbConnection;
+typedef boost::shared_ptr<DbConnection> DbConnectionPtr;
 
-class SqliteConnection : boost::noncopyable {
+class DbConnection : boost::noncopyable {
 public:
   // Create a new connection handle
-  SqliteConnection(const std::string& path, bool allow_ext,
-                   int flags, const std::string& vfs = "");
-  ~SqliteConnection();
+  DbConnection(const std::string& path, bool allow_ext,
+               int flags, const std::string& vfs = "");
+  ~DbConnection();
 
 public:
   // Get access to the underlying sqlite3*
@@ -28,11 +28,14 @@ public:
   // Is the connection valid?
   bool is_valid() const;
 
+  // Fail if the connection is invalid
+  void check_connection() const;
+
   // Get the last exception as a string
   std::string getException() const;
 
   // Copies a database
-  void copy_to(const SqliteConnectionPtr& pDest);
+  void copy_to(const DbConnectionPtr& pDest);
 
   // Disconnects from a database
   void disconnect();

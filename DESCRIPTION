@@ -3,13 +3,13 @@ Title: 'SQLite' Interface for R
 Version: 2.0-11
 Date: 2018-03-25
 Authors@R: c(
-    person("Kirill", "Müller", role = c("aut", "cre"), email = "krlmlr+r@mailbox.org"),
+    person("Kirill", "M\u00fcller", role = c("aut", "cre"), email = "krlmlr+r@mailbox.org", comment = c(ORCID = "0000-0002-1416-3412")),
     person("Hadley", "Wickham", role = c("aut")),
     person(c("David", "A."), "James", role = "aut"),
     person("Seth", "Falcon", role = "aut"),
     person(family = "SQLite Authors", role = "ctb", comment = "for the included SQLite sources"),
     person("Liam", "Healy", role = "ctb", comment = "for the included SQLite sources"),
-    person(family = "R Consortium", role = "cph"),
+    person(family = "R Consortium", role = "fnd"),
     person(family = "RStudio", role = "cph")
     )
 Description: Embeds the 'SQLite' database engine in R and
@@ -23,7 +23,7 @@ Depends:
 Imports: 
     bit64,
     blob (>= 1.1.1),
-    DBI (>= 0.7-14),
+    DBI (>= 0.8),
     memoise,
     methods,
     pkgconfig,

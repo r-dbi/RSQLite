@@ -1,7 +1,6 @@
 ---
 title: "RSQLite"
 author: "Hadley Wickham"
-date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{RSQLite}

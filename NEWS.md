@@ -1,3 +1,8 @@
+# RSQLite 2.1.0.9000 (2018-04-01)
+
+- Same as previous version.
+
+
 # RSQLite 2.1.0 (2018-03-29)
 
 ## Bug fixes

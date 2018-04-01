@@ -34,3 +34,4 @@ a.out.dSYM
 ^src/.*\.gch$
 ^_pkgdown\.yml$
 .*\.orig$
+^CRAN-RELEASE$

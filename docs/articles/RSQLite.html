@@ -18,7 +18,7 @@
 <![endif]-->
 </head>
 <body>
-    <div class="container template-vignette">
+    <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
@@ -29,7 +29,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.0.11</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.1.0.9000</span>
       </span>
     </div>
 
@@ -53,7 +53,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstats-db/RSQLite">
+  <a href="https://github.com/r-dbi/RSQLite">
     <span class="fa fa-github fa-lg"></span>
      
   </a>
@@ -68,19 +68,18 @@
 
       
       </header><div class="row">
-  <div class="col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>RSQLite</h1>
                         <h4 class="author">Hadley Wickham</h4>
             
       
-      <small>Source: <a href="https://github.com/rstats-db/RSQLite/blob/master/vignettes/RSQLite.Rmd"><code>vignettes/RSQLite.Rmd</code></a></small>
+      <small>Source: <a href="https://github.com/r-dbi/RSQLite/blob/master/vignettes/RSQLite.Rmd"><code>vignettes/RSQLite.Rmd</code></a></small>
 
     </div>
 
     
     
-<div class="contents">
 <p>RSQLite is the easiest way to use a database from R because the package itself contains <a href="https://www.sqlite.org">SQLite</a>; no external software is needed. This vignette will walk you through the basics of using a SQLite database.</p>
 <p>RSQLite is a DBI-compatible interface which means you primarily use functions defined in the DBI package, so you should always start by loading DBI, not RSQLite:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(DBI)</code></pre></div>
@@ -180,7 +179,6 @@ rs &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumenta
 <span class="kw"><a href="http://www.rdocumentation.org/packages/DBI/topics/dbGetRowsAffected">dbGetRowsAffected</a></span>(rs)
 <span class="co">#&gt; [1] 4</span>
 <span class="kw"><a href="http://www.rdocumentation.org/packages/DBI/topics/dbClearResult">dbClearResult</a></span>(rs)</code></pre></div>
-</div>
 </div>
   </div>
 

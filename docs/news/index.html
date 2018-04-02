@@ -54,7 +54,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.0.11</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.1.0.9000</span>
       </span>
     </div>
 
@@ -79,7 +79,7 @@
       
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/rstats-db/RSQLite">
+  <a href="https://github.com/r-dbi/RSQLite">
     <span class="fa fa-github fa-lg"></span>
      
   </a>
@@ -93,39 +93,56 @@
       
       </header>
 
-      <div class="row">
-
-  <div class="col-md-9">
+<div class="row">
+  <div class="col-md-9 contents">
     <div class="page-header">
       <h1>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/rstats-db/RSQLite/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+      <small>Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div class="contents">
-    <div id="rsqlite-2-0-11-2018-03-25" class="section level2">
-<h2 class="hasAnchor">
-<a href="#rsqlite-2-0-11-2018-03-25" class="anchor"></a>RSQLite 2.0-11 (2018-03-25)</h2>
+    <div id="rsqlite-2-1-0-9000-2018-04-01" class="section level1">
+<h1 class="page-header">
+<a href="#rsqlite-2-1-0-9000-2018-04-01" class="anchor"></a>RSQLite 2.1.0.9000 (2018-04-01)<small> Unreleased </small>
+</h1>
 <ul>
-<li>Values of class <code>"integer64"</code> are now supported for <code>dbWriteTable()</code> and <code>dbBind()</code> (<a href='https://github.com/rstats-db/RSQLite/issues/243'>#243</a>).</li>
-<li>New connections now automatically load default RSQLite extensions (<a href='https://github.com/rstats-db/RSQLite/issues/236'>#236</a>).</li>
-<li>Implement <code>dbUnquoteIdentifier()</code>.</li>
-<li>Update bundled sqlite3 library to 3.22 (<a href='https://github.com/rstats-db/RSQLite/issues/252'>#252</a>).</li>
-<li>Names in the <code>x</code> argument to <code>dbQuoteIdentifier()</code> are preserved in the output (r-lib/DBI<a href='https://github.com/rstats-db/RSQLite/issues/173'>#173</a>).</li>
-<li>Fix rchk warnings on CRAN (<a href='https://github.com/rstats-db/RSQLite/issues/250'>#250</a>).</li>
-<li>
-<code>dbRowsAffected()</code> and <code>dbExecute()</code> return zero after a <code>DROP TABLE</code> statement, and not the number of rows affected by the last <code>INSERT</code>, <code>UPDATE</code>, or <code>DELETE</code> (<a href='https://github.com/rstats-db/RSQLite/issues/238'>#238</a>).</li>
-<li>Refactor connection and result handling to be more similar to other backends.</li>
-<li>Fix <code>dbQuoteIdentifier()</code> to ignore invalid UTF-8 strings (r-dbi/DBItest<a href='https://github.com/rstats-db/RSQLite/issues/156'>#156</a>).</li>
+<li>Same as previous version.</li>
 </ul>
 </div>
-    <div id="rsqlite-2-0-10-2017-09-22" class="section level2">
+    <div id="rsqlite-2-1-0-2018-03-29" class="section level1">
+<h1 class="page-header">
+<a href="#rsqlite-2-1-0-2018-03-29" class="anchor"></a>RSQLite 2.1.0 (2018-03-29)<small> 2018-03-29 </small>
+</h1>
+<div id="bug-fixes" class="section level2">
 <h2 class="hasAnchor">
-<a href="#rsqlite-2-0-10-2017-09-22" class="anchor"></a>RSQLite 2.0-10 (2017-09-22)</h2>
+<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
+<ul>
+<li>Fix rchk warnings on CRAN (<a href='https://github.com/r-dbi/RSQLite/issues/250'>#250</a>).</li>
+<li>
+<code>dbRowsAffected()</code> and <code>dbExecute()</code> return zero after a <code>DROP TABLE</code> statement, and not the number of rows affected by the last <code>INSERT</code>, <code>UPDATE</code>, or <code>DELETE</code> (<a href='https://github.com/r-dbi/RSQLite/issues/238'>#238</a>).</li>
+<li>
+<code>dbIsValid()</code> returns <code>FALSE</code> instead of throwing an error for an invalid connection object (<a href='https://github.com/r-dbi/RSQLite/issues/217'>#217</a>).</li>
+<li>Names in the <code>x</code> argument to <code>dbQuoteIdentifier()</code> are preserved in the output (r-lib/DBI<a href='https://github.com/r-dbi/RSQLite/issues/173'>#173</a>).</li>
+<li>Ignore invalid UTF-8 strings in <code>dbQuoteIdentifier()</code> (r-dbi/DBItest<a href='https://github.com/r-dbi/RSQLite/issues/156'>#156</a>).</li>
+</ul>
+</div>
+<div id="features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#features" class="anchor"></a>Features</h2>
+<ul>
+<li>Update bundled sqlite3 library to 3.22 (<a href='https://github.com/r-dbi/RSQLite/issues/252'>#252</a>).</li>
+<li>Values of class <code>"integer64"</code> are now supported for <code>dbWriteTable()</code> and <code>dbBind()</code> (<a href='https://github.com/r-dbi/RSQLite/issues/243'>#243</a>).</li>
+<li>New connections now automatically load default RSQLite extensions (<a href='https://github.com/r-dbi/RSQLite/issues/236'>#236</a>).</li>
+<li>Implement <code>dbUnquoteIdentifier()</code>.</li>
+</ul>
+</div>
+<div id="internal" class="section level2">
+<h2 class="hasAnchor">
+<a href="#internal" class="anchor"></a>Internal</h2>
 <ul>
 <li>Now raising error if <code>dbBind()</code> is called with too many named arguments, according to spec.</li>
-<li>
-<code>dbIsValid()</code> returns <code>FALSE</code> instead of throwing an error for an invalid connection object (<a href='https://github.com/rstats-db/RSQLite/issues/217'>#217</a>).</li>
+<li>Refactor connection and result handling to be more similar to other backends.</li>
 </ul>
+</div>
 </div>
     <div id="rsqlite-2-0-2017-06-18" class="section level1">
 <h1 class="page-header">
@@ -136,61 +153,61 @@
 <a href="#api-changes" class="anchor"></a>API changes</h2>
 <ul>
 <li>Updated embedded SQLite to 3.19.3.</li>
-<li>64-bit integers are returned as <code>integer64</code> vectors. The <code>bit64</code> package is imported to support this data type (<a href='https://github.com/rstats-db/RSQLite/issues/65'>#65</a>).</li>
-<li>The <code>row.names</code> argument to <code>dbFetch()</code>, <code>dbReadTable()</code>, <code>dbWriteTable()</code>, <code><a href="../reference/sqliteBuildTableDefinition.html">sqliteBuildTableDefinition()</a></code>, and <code>sqlData()</code> now defaults to <code>FALSE</code>. (This also affects <code>dbGetQuery()</code>.) The old default can be restored temporarily on a per-package basis by calling <code><a href="http://www.rdocumentation.org/packages/pkgconfig/topics/set_config">pkgconfig::set_config("RSQLite::row.names.query" = NA)</a></code>. <code>NULL</code> is a valid value for the <code>row.names</code> argument, same as <code>FALSE</code> (<a href='https://github.com/rstats-db/RSQLite/issues/210'>#210</a>).</li>
-<li>The <code>name</code> argument to <code>dbBegin()</code>, <code>dbCommit()</code>, and <code>dbRollback()</code> is now declared after the ellipsis. Code that calls these methods with an unnamed second argument still works but receives a warning (<a href='https://github.com/rstats-db/RSQLite/issues/208'>#208</a>).</li>
-<li>The <code>select.cols</code> argument to <code>dbReadTable()</code> is deprecated, use <code>dbGetQuery()</code> with a <code>SELECT</code> query instead (<a href='https://github.com/rstats-db/RSQLite/issues/185'>#185</a>).</li>
-<li>The methods related to tables (<code>dbReadTable()</code>, <code>dbWriteTable()</code>, <code>dbExistsTable()</code>, and <code>dbRemoveTable()</code>) always treat the <code>name</code> argument as literal name, even if it contains backticks. This breaks the CRAN version (but not the GitHub version) of the sqldf package (<a href='https://github.com/rstats-db/RSQLite/issues/188'>#188</a>).</li>
+<li>64-bit integers are returned as <code>integer64</code> vectors. The <code>bit64</code> package is imported to support this data type (<a href='https://github.com/r-dbi/RSQLite/issues/65'>#65</a>).</li>
+<li>The <code>row.names</code> argument to <code>dbFetch()</code>, <code>dbReadTable()</code>, <code>dbWriteTable()</code>, <code><a href="../reference/sqliteBuildTableDefinition.html">sqliteBuildTableDefinition()</a></code>, and <code>sqlData()</code> now defaults to <code>FALSE</code>. (This also affects <code>dbGetQuery()</code>.) The old default can be restored temporarily on a per-package basis by calling <code><a href="http://www.rdocumentation.org/packages/pkgconfig/topics/set_config">pkgconfig::set_config("RSQLite::row.names.query" = NA)</a></code>. <code>NULL</code> is a valid value for the <code>row.names</code> argument, same as <code>FALSE</code> (<a href='https://github.com/r-dbi/RSQLite/issues/210'>#210</a>).</li>
+<li>The <code>name</code> argument to <code>dbBegin()</code>, <code>dbCommit()</code>, and <code>dbRollback()</code> is now declared after the ellipsis. Code that calls these methods with an unnamed second argument still works but receives a warning (<a href='https://github.com/r-dbi/RSQLite/issues/208'>#208</a>).</li>
+<li>The <code>select.cols</code> argument to <code>dbReadTable()</code> is deprecated, use <code>dbGetQuery()</code> with a <code>SELECT</code> query instead (<a href='https://github.com/r-dbi/RSQLite/issues/185'>#185</a>).</li>
+<li>The methods related to tables (<code>dbReadTable()</code>, <code>dbWriteTable()</code>, <code>dbExistsTable()</code>, and <code>dbRemoveTable()</code>) always treat the <code>name</code> argument as literal name, even if it contains backticks. This breaks the CRAN version (but not the GitHub version) of the sqldf package (<a href='https://github.com/r-dbi/RSQLite/issues/188'>#188</a>).</li>
 <li>
-<code>dbWriteTable(append = TRUE)</code> raises an error if column names are not the same in the data and the existing table (<a href='https://github.com/rstats-db/RSQLite/issues/165'>#165</a>).</li>
+<code>dbWriteTable(append = TRUE)</code> raises an error if column names are not the same in the data and the existing table (<a href='https://github.com/r-dbi/RSQLite/issues/165'>#165</a>).</li>
 <li>
 <code>dbFetch()</code> now errs for <code>n &lt; -1</code>, and accepts <code>n == Inf</code>.</li>
-<li>Removed dummy <code>dbGetQuery()</code> method introduced for compatibility with some Bioconductor packages (<a href='https://github.com/rstats-db/RSQLite/issues/187'>#187</a>).</li>
+<li>Removed dummy <code>dbGetQuery()</code> method introduced for compatibility with some Bioconductor packages (<a href='https://github.com/r-dbi/RSQLite/issues/187'>#187</a>).</li>
 <li>
-<code>sqlData()</code> now returns quoted strings, like the default implementation in DBI (<a href='https://github.com/rstats-db/RSQLite/issues/207'>#207</a>).</li>
+<code>sqlData()</code> now returns quoted strings, like the default implementation in DBI (<a href='https://github.com/r-dbi/RSQLite/issues/207'>#207</a>).</li>
 <li>
 <code>dbWriteTable()</code> returns invisibly.</li>
-<li>Now returning objects of type <code>blob</code> for blobs (<a href='https://github.com/rstats-db/RSQLite/issues/189'>#189</a>).</li>
+<li>Now returning objects of type <code>blob</code> for blobs (<a href='https://github.com/r-dbi/RSQLite/issues/189'>#189</a>).</li>
 <li>
 <code>dbGetRowsAffected()</code> now returns <code>NA</code> for a statement with placeholders, if <code>dbBind()</code> has not been called.</li>
-<li>If a column contains incompatible values (e.g., numbers and strings), a warning is raised in <code>dbFetch()</code> (<a href='https://github.com/rstats-db/RSQLite/issues/161'>#161</a>).</li>
-<li>Failing to set <code>PRAGMA cache_size</code> or <code>PRAGMA synchronous</code> in <code>dbConnect()</code> now gives a clear warning (<a href='https://github.com/rstats-db/RSQLite/issues/197'>#197</a>).</li>
-<li>Improve warning message if named parameters are not used in <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> or <code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> (<a href='https://github.com/rstats-db/RSQLite/issues/193'>#193</a>).</li>
-<li>SQLite collects additional histogram data during <code>ANALYZE</code>, which may lead to faster executions of queries (<a href='https://github.com/rstats-db/RSQLite/issues/124'>#124</a>).</li>
+<li>If a column contains incompatible values (e.g., numbers and strings), a warning is raised in <code>dbFetch()</code> (<a href='https://github.com/r-dbi/RSQLite/issues/161'>#161</a>).</li>
+<li>Failing to set <code>PRAGMA cache_size</code> or <code>PRAGMA synchronous</code> in <code>dbConnect()</code> now gives a clear warning (<a href='https://github.com/r-dbi/RSQLite/issues/197'>#197</a>).</li>
+<li>Improve warning message if named parameters are not used in <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> or <code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/193'>#193</a>).</li>
+<li>SQLite collects additional histogram data during <code>ANALYZE</code>, which may lead to faster executions of queries (<a href='https://github.com/r-dbi/RSQLite/issues/124'>#124</a>).</li>
 </ul>
 </div>
-<div id="bug-fixes" class="section level2">
+<div id="bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
 <ul>
-<li>Identifiers are now escaped with backticks, to avoid ambiguous handling of double quotes in the context of strings (<a href='https://github.com/rstats-db/RSQLite/issues/123'>#123</a>).</li>
-<li>Fix <code>dbBind()</code> behavior and tests. Attempting to bind to a query without parameters throws an error (<a href='https://github.com/rstats-db/RSQLite/issues/114'>#114</a>).</li>
+<li>Identifiers are now escaped with backticks, to avoid ambiguous handling of double quotes in the context of strings (<a href='https://github.com/r-dbi/RSQLite/issues/123'>#123</a>).</li>
+<li>Fix <code>dbBind()</code> behavior and tests. Attempting to bind to a query without parameters throws an error (<a href='https://github.com/r-dbi/RSQLite/issues/114'>#114</a>).</li>
 <li>Fix corner case when repeatedly fetching from columns that don’t have an affinity.</li>
-<li>The <code>variance()</code> and <code>stdev()</code> extension functions now return <code>NULL</code> for input of length 1 (<a href='https://github.com/rstats-db/RSQLite/issues/201'>#201</a>).</li>
-<li>Fix roundtrip of <code>raw</code> columns (<a href='https://github.com/rstats-db/RSQLite/issues/116'>#116</a>).</li>
+<li>The <code>variance()</code> and <code>stdev()</code> extension functions now return <code>NULL</code> for input of length 1 (<a href='https://github.com/r-dbi/RSQLite/issues/201'>#201</a>).</li>
+<li>Fix roundtrip of <code>raw</code> columns (<a href='https://github.com/r-dbi/RSQLite/issues/116'>#116</a>).</li>
 </ul>
 </div>
 <div id="documentation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#documentation" class="anchor"></a>Documentation</h2>
 <ul>
-<li>Remove redundant documentation, link to <code>DBI</code> more prominently (<a href='https://github.com/rstats-db/RSQLite/issues/186'>#186</a>).</li>
+<li>Remove redundant documentation, link to <code>DBI</code> more prominently (<a href='https://github.com/r-dbi/RSQLite/issues/186'>#186</a>).</li>
 </ul>
 </div>
-<div id="internal" class="section level2">
+<div id="internal-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#internal" class="anchor"></a>Internal</h2>
+<a href="#internal-1" class="anchor"></a>Internal</h2>
 <ul>
 <li>Most DBItest tests now pass. Reduced number of skips shown for tests.</li>
 <li>C++ code now compiles with strict compiler settings <code>-Wall -Wextra -pedantic -Wconversion</code>.</li>
-<li>Restore compatibility with older compilers/libraries by using &lt;boost/limits.hpp&gt; (<a href='https://github.com/rstats-db/RSQLite/issues/206'>#206</a>).</li>
-<li>Use <code>boost/cstdint</code> instead of compound data type for 64-bit values (<a href='https://github.com/rstats-db/RSQLite/issues/198'>#198</a>).</li>
-<li>Remove <code>Makevars.local</code> logic, resolve installation issues with non-GNU Make (<a href='https://github.com/rstats-db/RSQLite/issues/203'>#203</a>).</li>
+<li>Restore compatibility with older compilers/libraries by using &lt;boost/limits.hpp&gt; (<a href='https://github.com/r-dbi/RSQLite/issues/206'>#206</a>).</li>
+<li>Use <code>boost/cstdint</code> instead of compound data type for 64-bit values (<a href='https://github.com/r-dbi/RSQLite/issues/198'>#198</a>).</li>
+<li>Remove <code>Makevars.local</code> logic, resolve installation issues with non-GNU Make (<a href='https://github.com/r-dbi/RSQLite/issues/203'>#203</a>).</li>
 <li>All methods of DBI are reexported.</li>
 <li>Registering native functions, as required by R &gt;= 3.4.0.</li>
-<li>Use UTF-8 encoded file names as required by the SQLite API, to support non-ASCII file names (<a href='https://github.com/rstats-db/RSQLite/issues/211'>#211</a>).</li>
+<li>Use UTF-8 encoded file names as required by the SQLite API, to support non-ASCII file names (<a href='https://github.com/r-dbi/RSQLite/issues/211'>#211</a>).</li>
 <li>Calling <code>dbFetch(n = 0)</code> instead of <code>dbFetch(n = 1)</code> in <code>dbListFields()</code>.</li>
-<li>Exclude SQLite3 source code from coverage computation again (<a href='https://github.com/rstats-db/RSQLite/issues/204'>#204</a>).</li>
+<li>Exclude SQLite3 source code from coverage computation again (<a href='https://github.com/r-dbi/RSQLite/issues/204'>#204</a>).</li>
 </ul>
 </div>
 </div>
@@ -200,7 +217,7 @@
 </h1>
 <ul>
 <li>Check reverse dependencies.</li>
-<li>Check and warn if the <code>name</code> argument is quoted in <code>dbReadTable()</code> and <code>dbRemoveTable()</code>, for compatibility with <code>sqldf</code> (<a href='https://github.com/rstats-db/RSQLite/issues/196'>#196</a>).</li>
+<li>Check and warn if the <code>name</code> argument is quoted in <code>dbReadTable()</code> and <code>dbRemoveTable()</code>, for compatibility with <code>sqldf</code> (<a href='https://github.com/r-dbi/RSQLite/issues/196'>#196</a>).</li>
 </ul>
 </div>
     <div id="rsqlite-1-1-1-2016-12-10" class="section level1">
@@ -208,7 +225,7 @@
 <a href="#rsqlite-1-1-1-2016-12-10" class="anchor"></a>RSQLite 1.1-1 (2016-12-10)<small> 2016-12-10 </small>
 </h1>
 <ul>
-<li>Fix protection issue that could lead to memory access errors when fetching <code>BLOB</code> data (<a href='https://github.com/rstats-db/RSQLite/issues/192'>#192</a>, <a href='https://github.com/rstats-db/RSQLite/issues/194'>#194</a>, <a href='http://github.com/MikeBadescu'>@MikeBadescu</a>).</li>
+<li>Fix protection issue that could lead to memory access errors when fetching <code>BLOB</code> data (<a href='https://github.com/r-dbi/RSQLite/issues/192'>#192</a>, <a href='https://github.com/r-dbi/RSQLite/issues/194'>#194</a>, <a href='http://github.com/MikeBadescu'>@MikeBadescu</a>).</li>
 </ul>
 </div>
     <div id="rsqlite-1-1-2016-11-25" class="section level1">
@@ -224,7 +241,7 @@
 <ul>
 <li><p>RSQLite always builds with the included source, which is located in <code>src/sqlite3</code>. This prevents bugs due to API mismatches and considerably simplifies the build process.</p></li>
 <li><p>Current version: 3.11.1.</p></li>
-<li><p>Enable JSON1 extension (<a href='https://github.com/rstats-db/RSQLite/issues/152'>#152</a>, <a href='http://github.com/tigertoes'>@tigertoes</a>).</p></li>
+<li><p>Enable JSON1 extension (<a href='https://github.com/r-dbi/RSQLite/issues/152'>#152</a>, <a href='http://github.com/tigertoes'>@tigertoes</a>).</p></li>
 <li><p>Include support for FTS5 (<a href='http://github.com/mkuhn'>@mkuhn</a>).</p></li>
 <li><p>Compilation limits <code>SQLITE_MAX_VARIABLE_NUMBER</code> and <code>SQLITE_MAX_COLUMN</code> have been reset to the defaults. The documentation suggests setting to such high values is a bad idea.</p></li>
 <li><p>Header files for <code>sqlite3</code> are no longer installed, linking to the package is not possible anymore. Packages that require access to the low-level sqlite3 API should bundle their own copy.</p></li>
@@ -242,14 +259,14 @@
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>New features</h2>
 <ul>
-<li><p>RSQLite has been rewritten (essentially from scratch) in C++ with Rcpp. This has considerably reduced the amount of code, and allows us to take advantage of the more sophisticated memory management tools available in Rcpp. This rewrite should yield some minor performance improvements, but most importantly protect against memory leaks and crashes. It also provides a better base for future development. In particular, it is now technically possible to have multiple result sets per connection, although this feature is currently disabled (<a href='https://github.com/rstats-db/RSQLite/issues/150'>#150</a>).</p></li>
-<li><p>You can now use SQLite’s URL specification for databases. This allows you to create <a href="https://www.sqlite.org/inmemorydb.html">shared in-memory</a> databases (<a href='https://github.com/rstats-db/RSQLite/issues/70'>#70</a>).</p></li>
-<li><p>Queries (<a href='https://github.com/rstats-db/RSQLite/issues/69'>#69</a>), query parameters and table data are always converted to UTF-8 before being sent to the database.</p></li>
+<li><p>RSQLite has been rewritten (essentially from scratch) in C++ with Rcpp. This has considerably reduced the amount of code, and allows us to take advantage of the more sophisticated memory management tools available in Rcpp. This rewrite should yield some minor performance improvements, but most importantly protect against memory leaks and crashes. It also provides a better base for future development. In particular, it is now technically possible to have multiple result sets per connection, although this feature is currently disabled (<a href='https://github.com/r-dbi/RSQLite/issues/150'>#150</a>).</p></li>
+<li><p>You can now use SQLite’s URL specification for databases. This allows you to create <a href="https://www.sqlite.org/inmemorydb.html">shared in-memory</a> databases (<a href='https://github.com/r-dbi/RSQLite/issues/70'>#70</a>).</p></li>
+<li><p>Queries (<a href='https://github.com/r-dbi/RSQLite/issues/69'>#69</a>), query parameters and table data are always converted to UTF-8 before being sent to the database.</p></li>
 <li><p>Adapted to <code>DBI</code> 0.5, new code should use <code>dbExecute()</code> instead of <code>dbGetQuery()</code>, and <code>dbSendStatement()</code> instead of <code>dbSendQuery()</code> where appropriate.</p></li>
-<li><p>New strategy for prepared queries. Create a prepared query with <code>dbSendQuery()</code> or <code>dbSendStatement()</code> and bind values with <code>dbBind()</code>. The same query/statement can be executed efficiently multiple times by passing a data-frame-like object (<a href='https://github.com/rstats-db/RSQLite/issues/168'>#168</a>, <a href='https://github.com/rstats-db/RSQLite/issues/178'>#178</a>, <a href='https://github.com/rstats-db/RSQLite/issues/181'>#181</a>).</p></li>
+<li><p>New strategy for prepared queries. Create a prepared query with <code>dbSendQuery()</code> or <code>dbSendStatement()</code> and bind values with <code>dbBind()</code>. The same query/statement can be executed efficiently multiple times by passing a data-frame-like object (<a href='https://github.com/r-dbi/RSQLite/issues/168'>#168</a>, <a href='https://github.com/r-dbi/RSQLite/issues/178'>#178</a>, <a href='https://github.com/r-dbi/RSQLite/issues/181'>#181</a>).</p></li>
 <li><p><code>dbSendQuery()</code>, <code>dbGetQuery()</code>, <code>dbSendStatement()</code> and <code>dbExecute()</code> also support inline parameterised queries, like <code>dbGetQuery(datasetsDb(), "SELECT * FROM mtcars WHERE cyl = :cyl",   params = list(cyl = 4))</code>. This has no performance benefits but protects you from SQL injection attacks.</p></li>
-<li><p>Improve column type inference: the first non-<code>NULL</code> value decides the type of a column (<a href='https://github.com/rstats-db/RSQLite/issues/111'>#111</a>). If there are no non-<code>NULL</code> values, the column affinity is used, determined according to sqlite3 rules (<a href='https://github.com/rstats-db/RSQLite/issues/160'>#160</a>).</p></li>
-<li><p><code>dbFetch()</code> uses the same row name strategy as <code>dbReadTable()</code> (<a href='https://github.com/rstats-db/RSQLite/issues/53'>#53</a>).</p></li>
+<li><p>Improve column type inference: the first non-<code>NULL</code> value decides the type of a column (<a href='https://github.com/r-dbi/RSQLite/issues/111'>#111</a>). If there are no non-<code>NULL</code> values, the column affinity is used, determined according to sqlite3 rules (<a href='https://github.com/r-dbi/RSQLite/issues/160'>#160</a>).</p></li>
+<li><p><code>dbFetch()</code> uses the same row name strategy as <code>dbReadTable()</code> (<a href='https://github.com/r-dbi/RSQLite/issues/53'>#53</a>).</p></li>
 <li><p><code>dbColumnInfo()</code> will now return information even before you’ve retrieved any data.</p></li>
 <li><p>New <code>sqliteVersion()</code> prints the header and library versions of RSQLite.</p></li>
 <li><p>Deprecation warnings are given only once, with a clear reference to the source.</p></li>
@@ -260,12 +277,12 @@
 <h2 class="hasAnchor">
 <a href="#deprecated-functions" class="anchor"></a>Deprecated functions</h2>
 <ul>
-<li><p><code>make.db.names()</code> has been formally deprecated. Please use <code>dbQuoteIdentifier()</code> instead. This function is also used in <code>dbReadTable()</code>, <code>dbRemoveTable()</code>, and <code>dbListFields()</code> (<a href='https://github.com/rstats-db/RSQLite/issues/106'>#106</a>, <a href='https://github.com/rstats-db/RSQLite/issues/132'>#132</a>).</p></li>
+<li><p><code>make.db.names()</code> has been formally deprecated. Please use <code>dbQuoteIdentifier()</code> instead. This function is also used in <code>dbReadTable()</code>, <code>dbRemoveTable()</code>, and <code>dbListFields()</code> (<a href='https://github.com/r-dbi/RSQLite/issues/106'>#106</a>, <a href='https://github.com/r-dbi/RSQLite/issues/132'>#132</a>).</p></li>
 <li><p><code><a href="../reference/sqliteBuildTableDefinition.html">sqliteBuildTableDefinition()</a></code> has been deprecated. Use <code><a href="http://www.rdocumentation.org/packages/DBI/topics/sqlCreateTable">DBI::sqlCreateTable()</a></code> instead.</p></li>
-<li><p><code>dbGetException()</code> now raises a deprecation warning and always returns <code>list(errorNum = 0L, errorMsg = "OK")</code>, because querying the last SQLite error only works if an error actually occurred (<a href='https://github.com/rstats-db/RSQLite/issues/129'>#129</a>).</p></li>
-<li><p><code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> and <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> have been reimplemented (with deprecation warning) using <code>dbSendQuery()</code>, <code>dbBind()</code> and <code>dbFetch()</code> for compatibility with existing packages (<a href='https://github.com/rstats-db/RSQLite/issues/100'>#100</a>, <a href='https://github.com/rstats-db/RSQLite/issues/153'>#153</a>, <a href='https://github.com/rstats-db/RSQLite/issues/168'>#168</a>, <a href='https://github.com/rstats-db/RSQLite/issues/181'>#181</a>). Please convert to the new API, because the old function may be removed completely very soon: They were never part of the official API, and do less argument checking than the new APIs. Both <code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> and <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> ignore parameters not found in the query, with a warning (<a href='https://github.com/rstats-db/RSQLite/issues/174'>#174</a>).</p></li>
-<li><p>Reimplemented <code>dbListResults()</code> (with deprecation warning) for compatibility with existing packages (<a href='https://github.com/rstats-db/RSQLite/issues/154'>#154</a>).</p></li>
-<li><p>Soft-deprecated <code><a href="../reference/dbGetInfo.html">dbGetInfo()</a></code>: The “Result” method is implemented by DBI, the methods for the other classes raise a warning (<a href='https://github.com/rstats-db/RSQLite/issues/137'>#137</a>). It’s now better to access the metadata with individual functions <code>dbHasCompleted()</code>, <code>dbGetRowCount()</code> and <code>dbGetRowsAffected()</code>.</p></li>
+<li><p><code>dbGetException()</code> now raises a deprecation warning and always returns <code>list(errorNum = 0L, errorMsg = "OK")</code>, because querying the last SQLite error only works if an error actually occurred (<a href='https://github.com/r-dbi/RSQLite/issues/129'>#129</a>).</p></li>
+<li><p><code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> and <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> have been reimplemented (with deprecation warning) using <code>dbSendQuery()</code>, <code>dbBind()</code> and <code>dbFetch()</code> for compatibility with existing packages (<a href='https://github.com/r-dbi/RSQLite/issues/100'>#100</a>, <a href='https://github.com/r-dbi/RSQLite/issues/153'>#153</a>, <a href='https://github.com/r-dbi/RSQLite/issues/168'>#168</a>, <a href='https://github.com/r-dbi/RSQLite/issues/181'>#181</a>). Please convert to the new API, because the old function may be removed completely very soon: They were never part of the official API, and do less argument checking than the new APIs. Both <code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> and <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> ignore parameters not found in the query, with a warning (<a href='https://github.com/r-dbi/RSQLite/issues/174'>#174</a>).</p></li>
+<li><p>Reimplemented <code>dbListResults()</code> (with deprecation warning) for compatibility with existing packages (<a href='https://github.com/r-dbi/RSQLite/issues/154'>#154</a>).</p></li>
+<li><p>Soft-deprecated <code><a href="../reference/dbGetInfo.html">dbGetInfo()</a></code>: The “Result” method is implemented by DBI, the methods for the other classes raise a warning (<a href='https://github.com/r-dbi/RSQLite/issues/137'>#137</a>). It’s now better to access the metadata with individual functions <code>dbHasCompleted()</code>, <code>dbGetRowCount()</code> and <code>dbGetRowsAffected()</code>.</p></li>
 <li><p>All <code>summary()</code> methods have been removed: the same information is now displayed in the <code>show()</code> methods, which were previously pretty useless.</p></li>
 </ul>
 </div>
@@ -273,13 +290,13 @@
 <h2 class="hasAnchor">
 <a href="#compatibility-fixes" class="anchor"></a>Compatibility fixes</h2>
 <ul>
-<li><p>The <code>raw</code> data type is supported in <code>dbWriteTable()</code>, creates a <code>TEXT</code> column with a warning (<a href='https://github.com/rstats-db/RSQLite/issues/173'>#173</a>).</p></li>
-<li><p>Numeric values for the <code>row.names</code> argument are converted to logical, with a warning (<a href='https://github.com/rstats-db/RSQLite/issues/170'>#170</a>).</p></li>
-<li><p>If the number of data frame columns matches the number of existing columns for <code>dbWriteTable(append = TRUE)</code>, columns will be matched by position for compatibility, with a warning in case of a name mismatch (<a href='https://github.com/rstats-db/RSQLite/issues/164'>#164</a>).</p></li>
-<li><p><code>dbWriteTable()</code> supports the <code>field.types</code> argument when creating a new table (<a href='https://github.com/rstats-db/RSQLite/issues/171'>#171</a>), and the <code>temporary</code> argument, default <code>FALSE</code> (<a href='https://github.com/rstats-db/RSQLite/issues/113'>#113</a>).</p></li>
-<li><p>Reexporting <code>dbGetQuery()</code> and <code>dbDriver()</code> (<a href='https://github.com/rstats-db/RSQLite/issues/147'>#147</a>, <a href='https://github.com/rstats-db/RSQLite/issues/148'>#148</a>, <a href='https://github.com/rstats-db/RSQLite/issues/183'>#183</a>).</p></li>
+<li><p>The <code>raw</code> data type is supported in <code>dbWriteTable()</code>, creates a <code>TEXT</code> column with a warning (<a href='https://github.com/r-dbi/RSQLite/issues/173'>#173</a>).</p></li>
+<li><p>Numeric values for the <code>row.names</code> argument are converted to logical, with a warning (<a href='https://github.com/r-dbi/RSQLite/issues/170'>#170</a>).</p></li>
+<li><p>If the number of data frame columns matches the number of existing columns for <code>dbWriteTable(append = TRUE)</code>, columns will be matched by position for compatibility, with a warning in case of a name mismatch (<a href='https://github.com/r-dbi/RSQLite/issues/164'>#164</a>).</p></li>
+<li><p><code>dbWriteTable()</code> supports the <code>field.types</code> argument when creating a new table (<a href='https://github.com/r-dbi/RSQLite/issues/171'>#171</a>), and the <code>temporary</code> argument, default <code>FALSE</code> (<a href='https://github.com/r-dbi/RSQLite/issues/113'>#113</a>).</p></li>
+<li><p>Reexporting <code>dbGetQuery()</code> and <code>dbDriver()</code> (<a href='https://github.com/r-dbi/RSQLite/issues/147'>#147</a>, <a href='https://github.com/r-dbi/RSQLite/issues/148'>#148</a>, <a href='https://github.com/r-dbi/RSQLite/issues/183'>#183</a>).</p></li>
 <li><p><code><a href="../reference/sqliteCopyDatabase.html">sqliteCopyDatabase()</a></code> accepts character as <code>to</code> argument again, in this case a temporary connection is opened.</p></li>
-<li><p>Reimplemented <code>dbWriteTable("SQLiteConnection", "character", "character")</code> for import of CSV files, using a function from the old codebase (<a href='https://github.com/rstats-db/RSQLite/issues/151'>#151</a>).</p></li>
+<li><p>Reimplemented <code>dbWriteTable("SQLiteConnection", "character", "character")</code> for import of CSV files, using a function from the old codebase (<a href='https://github.com/r-dbi/RSQLite/issues/151'>#151</a>).</p></li>
 <li><p><code>dbWriteTable("SQLiteConnection", "character", "data.frame")</code> looks for table names already enclosed in backticks and uses these, (with a warning), for compatibility with the sqldf package.</p></li>
 </ul>
 </div>
@@ -287,36 +304,36 @@
 <h2 class="hasAnchor">
 <a href="#performance" class="anchor"></a>Performance</h2>
 <ul>
-<li>The <code>dbExistsTable()</code> function now works faster by filtering the list of tables using SQL (<a href='https://github.com/rstats-db/RSQLite/issues/166'>#166</a>).</li>
+<li>The <code>dbExistsTable()</code> function now works faster by filtering the list of tables using SQL (<a href='https://github.com/r-dbi/RSQLite/issues/166'>#166</a>).</li>
 </ul>
 </div>
 <div id="documentation-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#documentation-1" class="anchor"></a>Documentation</h2>
 <ul>
-<li><p>Start on a basic vignette: <code><a href="../articles/RSQLite.html">vignette("RSQLite")</a></code> (<a href='https://github.com/rstats-db/RSQLite/issues/50'>#50</a>).</p></li>
-<li><p>Reworked function and method documentation, removed old documentation (<a href='https://github.com/rstats-db/RSQLite/issues/121'>#121</a>).</p></li>
+<li><p>Start on a basic vignette: <code><a href="../articles/RSQLite.html">vignette("RSQLite")</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/50'>#50</a>).</p></li>
+<li><p>Reworked function and method documentation, removed old documentation (<a href='https://github.com/r-dbi/RSQLite/issues/121'>#121</a>).</p></li>
 <li><p>Using <code>dbExecute()</code> in documentation and examples.</p></li>
 <li><p>Using both <code>":memory:"</code> and <code>":file::memory:"</code> in documentation.</p></li>
-<li><p>Added additional documentation and unit tests for <a href="https://www.sqlite.org/autoinc.html">autoincrement keys</a> (<a href='https://github.com/rstats-db/RSQLite/issues/119'>#119</a>, <a href='http://github.com/wibeasley'>@wibeasley</a>).</p></li>
+<li><p>Added additional documentation and unit tests for <a href="https://www.sqlite.org/autoinc.html">autoincrement keys</a> (<a href='https://github.com/r-dbi/RSQLite/issues/119'>#119</a>, <a href='http://github.com/wibeasley'>@wibeasley</a>).</p></li>
 </ul>
 </div>
-<div id="internal-1" class="section level2">
+<div id="internal-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#internal-1" class="anchor"></a>Internal</h2>
+<a href="#internal-2" class="anchor"></a>Internal</h2>
 <ul>
 <li><p>Avoid warning about missing <code>long long</code> data type in C++98 by using a compound data type built from two 32-bit integers, with static assert that the size is 8 indeed.</p></li>
 <li><p>Remove all compilation warnings.</p></li>
 <li><p>All DBI methods contain an ellipsis <code>...</code> in their signature. Only the <code>name</code> argument to the transaction methods appears before the ellipsis for compatibility reasons.</p></li>
-<li><p>Using the <code>DBItest</code> package for testing (<a href='https://github.com/rstats-db/RSQLite/issues/105'>#105</a>), with the new <code>constructor_relax_args</code> tweak.</p></li>
+<li><p>Using the <code>DBItest</code> package for testing (<a href='https://github.com/r-dbi/RSQLite/issues/105'>#105</a>), with the new <code>constructor_relax_args</code> tweak.</p></li>
 <li><p>Using the <code>plogr</code> for logging at the C++ level, can be enabled via <code>RSQLite:::init_logging()</code>.</p></li>
-<li><p>Using new <code>sqlRownamesToColumn()</code> and <code>sqlColumnToRownames()</code> (rstats-db/DBI<a href='https://github.com/rstats-db/RSQLite/issues/91'>#91</a>).</p></li>
-<li><p>Using <code>astyle</code> for code formatting (<a href='https://github.com/rstats-db/RSQLite/issues/159'>#159</a>), also in tests (but only if sources can be located), stripped space at end of line in all source files.</p></li>
-<li><p>Tracking dependencies between source and header files (<a href='https://github.com/rstats-db/RSQLite/issues/138'>#138</a>).</p></li>
-<li><p>Moved all functions from headers to modules (<a href='https://github.com/rstats-db/RSQLite/issues/162'>#162</a>).</p></li>
-<li><p>Fixed all warnings in tests (<a href='https://github.com/rstats-db/RSQLite/issues/157'>#157</a>).</p></li>
-<li><p>Checking message wording for deprecation warnings (<a href='https://github.com/rstats-db/RSQLite/issues/157'>#157</a>).</p></li>
-<li><p>Testing simple and named transactions (<a href='https://github.com/rstats-db/RSQLite/issues/163'>#163</a>).</p></li>
+<li><p>Using new <code>sqlRownamesToColumn()</code> and <code>sqlColumnToRownames()</code> (rstats-db/DBI<a href='https://github.com/r-dbi/RSQLite/issues/91'>#91</a>).</p></li>
+<li><p>Using <code>astyle</code> for code formatting (<a href='https://github.com/r-dbi/RSQLite/issues/159'>#159</a>), also in tests (but only if sources can be located), stripped space at end of line in all source files.</p></li>
+<li><p>Tracking dependencies between source and header files (<a href='https://github.com/r-dbi/RSQLite/issues/138'>#138</a>).</p></li>
+<li><p>Moved all functions from headers to modules (<a href='https://github.com/r-dbi/RSQLite/issues/162'>#162</a>).</p></li>
+<li><p>Fixed all warnings in tests (<a href='https://github.com/r-dbi/RSQLite/issues/157'>#157</a>).</p></li>
+<li><p>Checking message wording for deprecation warnings (<a href='https://github.com/r-dbi/RSQLite/issues/157'>#157</a>).</p></li>
+<li><p>Testing simple and named transactions (<a href='https://github.com/r-dbi/RSQLite/issues/163'>#163</a>).</p></li>
 <li><p>Using container-based builds and development version of <code>testthat</code> on Travis.</p></li>
 <li><p>Enabled AppVeyor testing.</p></li>
 <li><p>Differential reverse dependency checks.</p></li>
@@ -333,9 +350,9 @@
 <a href="#new-features-1" class="anchor"></a>New features</h2>
 <ul>
 <li><p>Updated to SQLite 3.8.6</p></li>
-<li><p>Added <code><a href="../reference/datasetsDb.html">datasetsDb()</a></code>, a bundled SQLite database containing all data frames in the datasets package (<a href='https://github.com/rstats-db/RSQLite/issues/15'>#15</a>).</p></li>
-<li><p>Inlined <code>RSQLite.extfuns</code> - use <code><a href="../reference/initExtension.html">initExtension()</a></code> to load the many useful extension functions (<a href='https://github.com/rstats-db/RSQLite/issues/44'>#44</a>).</p></li>
-<li><p>Methods no longer automatically clone the connection if there is an open result set. This was implement inconsistently in a handful of places (<a href='https://github.com/rstats-db/RSQLite/issues/22'>#22</a>). RSQLite is now more forgiving if you forget to close a result set - it will close it for you, with a warning. It’s still good practice to clean up after yourself, but you don’t have to.</p></li>
+<li><p>Added <code><a href="../reference/datasetsDb.html">datasetsDb()</a></code>, a bundled SQLite database containing all data frames in the datasets package (<a href='https://github.com/r-dbi/RSQLite/issues/15'>#15</a>).</p></li>
+<li><p>Inlined <code>RSQLite.extfuns</code> - use <code><a href="../reference/initExtension.html">initExtension()</a></code> to load the many useful extension functions (<a href='https://github.com/r-dbi/RSQLite/issues/44'>#44</a>).</p></li>
+<li><p>Methods no longer automatically clone the connection if there is an open result set. This was implement inconsistently in a handful of places (<a href='https://github.com/r-dbi/RSQLite/issues/22'>#22</a>). RSQLite is now more forgiving if you forget to close a result set - it will close it for you, with a warning. It’s still good practice to clean up after yourself, but you don’t have to.</p></li>
 <li><p><code>dbBegin()</code>, <code>dbCommit()</code>, <code>dbRollback()</code> throw errors on failure, rather than return <code>FALSE</code>. They all gain a <code>name</code> argument to specify named savepoints.</p></li>
 <li><p><code>dbFetch()</code> method added (<code>fetch()</code> will be deprecated in the future)</p></li>
 <li><p><code>dbRemoveTable()</code> throws errors on failure, rather than returning <code>FALSE</code>.</p></li>
@@ -346,8 +363,8 @@
 <li><p>It now throws errors on failure, rather than returning FALSE.</p></li>
 <li><p>It will automatically add row names only if they are character, not integer.</p></li>
 <li><p>When loading a file from disk, <code>dbWriteTable()</code> will no longer attempt to guess the correct values for <code>row.names</code> and <code>header</code> - instead supply them explicitly if the defaults are incorrect.</p></li>
-<li><p>It uses named save points so it can be nested inside other transactions (<a href='https://github.com/rstats-db/RSQLite/issues/41'>#41</a>).</p></li>
-<li><p>When given a zero-row data frame it will just creates the table definition (<a href='https://github.com/rstats-db/RSQLite/issues/35'>#35</a>).</p></li>
+<li><p>It uses named save points so it can be nested inside other transactions (<a href='https://github.com/r-dbi/RSQLite/issues/41'>#41</a>).</p></li>
+<li><p>When given a zero-row data frame it will just creates the table definition (<a href='https://github.com/r-dbi/RSQLite/issues/35'>#35</a>).</p></li>
 </ul>
 </li>
 </ul>
@@ -363,14 +380,14 @@
 <h2 class="hasAnchor">
 <a href="#deprecated-and-removed-functions" class="anchor"></a>Deprecated and removed functions</h2>
 <ul>
-<li><p>RSQLite is no longer nominally compatible with S (<a href='https://github.com/rstats-db/RSQLite/issues/39'>#39</a>).</p></li>
+<li><p>RSQLite is no longer nominally compatible with S (<a href='https://github.com/r-dbi/RSQLite/issues/39'>#39</a>).</p></li>
 <li><p><code>idIsValid()</code> is deprecated. Please use <code>dbIsValid()</code> instead.</p></li>
 <li><p><code><a href="../reference/dbBeginTransaction.html">dbBeginTransaction()</a></code> has been deprecated. Please use <code>dbBegin()</code> instead.</p></li>
 <li><p><code>dbCallProc()</code> method removed, since generic is now deprecated.</p></li>
 <li><p>Renamed <code><a href="../reference/sqliteBuildTableDefinition.html">dbBuildTableDefinition()</a></code> to <code><a href="../reference/sqliteBuildTableDefinition.html">sqliteBuildTableDefinition()</a></code> to avoid implying it’s a DBI generic. Old function is aliased to new with a warning.</p></li>
 <li><p><code>dbFetch()</code> no longer numbers row names sequentially between fetches.</p></li>
-<li><p><code>safe.write()</code> is no longer exported as it shouldn’t be part of the public RSQLite interface (<a href='https://github.com/rstats-db/RSQLite/issues/26'>#26</a>).</p></li>
-<li><p>Internal <code>sqlite*()</code> functions are no longer exported (<a href='https://github.com/rstats-db/RSQLite/issues/20'>#20</a>).</p></li>
+<li><p><code>safe.write()</code> is no longer exported as it shouldn’t be part of the public RSQLite interface (<a href='https://github.com/r-dbi/RSQLite/issues/26'>#26</a>).</p></li>
+<li><p>Internal <code>sqlite*()</code> functions are no longer exported (<a href='https://github.com/r-dbi/RSQLite/issues/20'>#20</a>).</p></li>
 <li><p>Removed <code>SqliteObject</code> and <code>dbObject</code> classes, modifying <code>SqliteDriver</code>, <code>SqliteConnection</code>, and <code>SqliteResult</code> to use composition instead of multiple inheritance.</p></li>
 </ul>
 </div>
@@ -497,7 +514,7 @@
 <li>
 <p>Refactor to use external pointers to wrap handle IDs; remove handle ID coerce code (e.g. as(<script type="text/javascript">
 <!--
-h='&#x49;&<a href='https://github.com/rstats-db/RSQLite/issues/100'>#100</a>;';a='&<a href='https://github.com/rstats-db/RSQLite/issues/64'>#64</a>;';n='&#x6f;&<a href='https://github.com/rstats-db/RSQLite/issues/98'>#98</a>;&<a href='https://github.com/rstats-db/RSQLite/issues/106'>#106</a>;';e=n+a+h;
+h='&#x49;&<a href='https://github.com/r-dbi/RSQLite/issues/100'>#100</a>;';a='&<a href='https://github.com/r-dbi/RSQLite/issues/64'>#64</a>;';n='&#x6f;&<a href='https://github.com/r-dbi/RSQLite/issues/98'>#98</a>;&<a href='https://github.com/r-dbi/RSQLite/issues/106'>#106</a>;';e=n+a+h;
 document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\/'+'a'+'>');
 // -->
 </script></p>
@@ -620,8 +637,8 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\
 <li>
 <p>Added generic methods dbSendPreparedQuery() and dbGetPreparedQuery() which are similiar to dbSendQuery() and dbGetQuery(), but take an extra “bind.data” parameter, which is a data frame. The statement is assumed to contain bind variables. Bind variables are either for a column name (“:name” or <script type="text/javascript">
 <!--
-h='&<a href='https://github.com/rstats-db/RSQLite/issues/110'>#110</a>;&#x61;&#x6d;&#x65;&#x25;&<a href='https://github.com/rstats-db/RSQLite/issues/50'>#50</a>;&<a href='https://github.com/rstats-db/RSQLite/issues/50'>#50</a>;';a='&<a href='https://github.com/rstats-db/RSQLite/issues/64'>#64</a>;';n='&#x25;&<a href='https://github.com/rstats-db/RSQLite/issues/50'>#50</a>;&<a href='https://github.com/rstats-db/RSQLite/issues/50'>#50</a>;';e=n+a+h;
-document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+'&<a href='https://github.com/rstats-db/RSQLite/issues/34'>#34</a>;&<a href='https://github.com/rstats-db/RSQLite/issues/64'>#64</a>;&<a href='https://github.com/rstats-db/RSQLite/issues/110'>#110</a>;&#x61;&#x6d;&#x65;&<a href='https://github.com/rstats-db/RSQLite/issues/34'>#34</a>;'+'<\/'+'a'+'>');
+h='&<a href='https://github.com/r-dbi/RSQLite/issues/110'>#110</a>;&#x61;&#x6d;&#x65;&#x25;&<a href='https://github.com/r-dbi/RSQLite/issues/50'>#50</a>;&<a href='https://github.com/r-dbi/RSQLite/issues/50'>#50</a>;';a='&<a href='https://github.com/r-dbi/RSQLite/issues/64'>#64</a>;';n='&#x25;&<a href='https://github.com/r-dbi/RSQLite/issues/50'>#50</a>;&<a href='https://github.com/r-dbi/RSQLite/issues/50'>#50</a>;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+'&<a href='https://github.com/r-dbi/RSQLite/issues/34'>#34</a>;&<a href='https://github.com/r-dbi/RSQLite/issues/64'>#64</a>;&<a href='https://github.com/r-dbi/RSQLite/issues/110'>#110</a>;&#x61;&#x6d;&#x65;&<a href='https://github.com/r-dbi/RSQLite/issues/34'>#34</a>;'+'<\/'+'a'+'>');
 // -->
 </script></p>
 <noscript>"<a href='http://github.com/name'>@name</a>" (%22 at name%22)</noscript>) or for a column index (“?”) in the data frame. See <a href="http://sqlite.org/capi3ref.html" class="uri">http://sqlite.org/capi3ref.html</a> for more details.</li>
@@ -749,15 +766,14 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+'&<a 
 <li>First implementation – used the RS-DBI.[ch] code (which is the core connection/cursor manager) “as is” and modified the RS-MySQL.[hc], (which sits directly on top of the MySQL C API) and replace the MySQL API calls with SQLite API calls. This was pretty easy, except for the fact that the SQLite API is so minimal (3, yes, 3 C functions) with no support for connections, result set (cursors), data types, meta-data – nothing. So I had to simulate all this. (Actually it wasn’t too bad).</li>
 </ul>
 </div>
-    </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-        <li><a href="#rsqlite-2-0-11-2018-03-25">2.0-11</a></li>
-        <li><a href="#rsqlite-2-0-10-2017-09-22">2.0-10</a></li>
+        <li><a href="#rsqlite-2-1-0-9000-2018-04-01">2.1.0.9000</a></li>
+        <li><a href="#rsqlite-2-1-0-2018-03-29">2.1.0</a></li>
         <li><a href="#rsqlite-2-0-2017-06-18">2.0</a></li>
         <li><a href="#rsqlite-1-1-2-2017-01-07">1.1-2</a></li>
         <li><a href="#rsqlite-1-1-1-2016-12-10">1.1-1</a></li>

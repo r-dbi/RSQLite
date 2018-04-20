@@ -21,6 +21,8 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
@@ -105,10 +107,11 @@ The dbUnloadDriver() method is a null-op." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Class SQLiteDriver (and methods)</h1>
-    <small>Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/R/SQLiteDriver.R'><code>R/SQLiteDriver.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/R/SQLiteDriver.R'><code>R/SQLiteDriver.R</code></a></small>
     <div class="hidden name"><code>SQLiteDriver-class.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>SQLiteDriver objects are created by <code><a href='SQLite.html'>SQLite()</a></code>, and used to select the
 correct method in <code>dbConnect()</code>.
@@ -117,6 +120,7 @@ and used purely for dispatch.
 The "Usage" section lists the class methods overridden by <span class="pkg">RSQLite</span>.
 The <code>dbUnloadDriver()</code> method is a null-op.</p>
     
+    </div>
 
     <pre class="usage"><span class='co'># S4 method for SQLiteDriver</span>
 <span class='fu'>dbDataType</span>(<span class='no'>dbObj</span>, <span class='no'>obj</span>, <span class='no'>...</span>)

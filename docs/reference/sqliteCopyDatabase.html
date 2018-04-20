@@ -21,6 +21,8 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
@@ -104,10 +106,11 @@ a copy of another database." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Copy a SQLite database</h1>
-    <small>Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/R/copy.R'><code>R/copy.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/R/copy.R'><code>R/copy.R</code></a></small>
     <div class="hidden name"><code>sqliteCopyDatabase.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Copies a database connection to a file or to another database
 connection.  It can be used to save an in-memory database (created using
@@ -115,6 +118,7 @@ connection.  It can be used to save an in-memory database (created using
 <code>dbname = "file::memory:"</code>) to a file or to create an in-memory database
 a copy of another database.</p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>sqliteCopyDatabase</span>(<span class='no'>from</span>, <span class='no'>to</span>)</pre>
     

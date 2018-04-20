@@ -21,6 +21,8 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
@@ -101,14 +103,16 @@ dbGetQuery" />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Build the SQL CREATE TABLE definition as a string</h1>
-    <small>Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/R/deprecated.R'><code>R/deprecated.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/R/deprecated.R'><code>R/deprecated.R</code></a></small>
     <div class="hidden name"><code>sqliteBuildTableDefinition.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>The output SQL statement is a simple <code>CREATE TABLE</code> suitable for
 <code>dbGetQuery</code></p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>sqliteBuildTableDefinition</span>(<span class='no'>con</span>, <span class='no'>name</span>, <span class='no'>value</span>, <span class='kw'>field.types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='kw pkg'>pkgconfig</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/pkgconfig/topics/get_config'>get_config</a></span>(<span class='st'>"RSQLite::row.names.query"</span>, <span class='fl'>FALSE</span>))</pre>

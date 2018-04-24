@@ -39,7 +39,8 @@
 \S4method{sqlData}{SQLiteConnection}(con, value,
   row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE), ...)
 
-\S4method{dbRemoveTable}{SQLiteConnection,character}(conn, name, ...)
+\S4method{dbRemoveTable}{SQLiteConnection,character}(conn, name, ...,
+  fail_if_missing = TRUE)
 
 \S4method{dbExistsTable}{SQLiteConnection,character}(conn, name, ...)
 
@@ -48,6 +49,10 @@
 \S4method{dbListFields}{SQLiteConnection,character}(conn, name, ...)
 
 \S4method{dbDataType}{SQLiteConnection}(dbObj, obj, ...)
+}
+\arguments{
+\item{fail_if_missing}{If \code{FALSE}, \code{dbRemoveTable()} succeeds if the
+table doesn't exist.}
 }
 \description{
 SQLiteConnection objects are created by passing \code{\link[=SQLite]{SQLite()}} as first

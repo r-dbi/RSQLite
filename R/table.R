@@ -333,10 +333,17 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 #' @rdname SQLiteConnection-class
 #' @export
 setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
-  function(conn, name, ...) {
+  function(conn, name, ..., fail_if_missing = TRUE) {
     name <- check_quoted_identifier(name)
+    name <- dbQuoteIdentifier(conn, name)
 
-    dbExecute(conn, paste("DROP TABLE ", dbQuoteIdentifier(conn, name)))
+    if (fail_if_missing) {
+      extra <- ""
+    } else {
+      extra <- "IF EXISTS "
+    }
+
+    dbExecute(conn, paste0("DROP TABLE ", extra, name))
     invisible(TRUE)
   }
 )

@@ -81,6 +81,9 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #'   `"unix-posix"`, `"unix-unix-afp"`,
 #'   `"unix-unix-flock"`, `"unix-dotfile"`, and
 #'   `"unix-none"`.
+#' @param bigint The R type that 64-bit integer types should be mapped to,
+#'   default is [bit64::integer64], which allows the full range of 64 bit
+#'   integers.
 #' @return `dbConnect()` returns an object of class [SQLiteConnection-class].
 #'
 #' @aliases SQLITE_RWC SQLITE_RW SQLITE_RO
@@ -110,7 +113,8 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 setMethod("dbConnect", "SQLiteDriver",
   function(drv, dbname = "", ..., loadable.extensions = TRUE,
            default.extensions = loadable.extensions, cache_size = NULL,
-           synchronous = "off", flags = SQLITE_RWC, vfs = NULL) {
+           synchronous = "off", flags = SQLITE_RWC, vfs = NULL,
+           bigint = c("integer64", "integer", "numeric", "character")) {
     stopifnot(length(dbname) == 1, !is.na(dbname))
 
     if (!is_url_or_special_filename(dbname)) {
@@ -122,13 +126,16 @@ setMethod("dbConnect", "SQLiteDriver",
     vfs <- check_vfs(vfs)
     stopifnot(is.integer(flags), length(flags) == 1)
 
+    bigint <- match.arg(bigint)
+
     con <- new("SQLiteConnection",
       ptr = connection_connect(dbname, loadable.extensions, flags, vfs),
       dbname = dbname,
       flags = flags,
       vfs = vfs,
       loadable.extensions = loadable.extensions,
-      ref = new.env(parent = emptyenv())
+      ref = new.env(parent = emptyenv()),
+      bigint = bigint
     )
 
     ## experimental PRAGMAs

@@ -18,7 +18,8 @@ setClass("SQLiteResult",
   slots = list(
     sql = "character",
     ptr = "externalptr",
-    conn = "SQLiteConnection"
+    conn = "SQLiteConnection",
+    bigint = "character"
   )
 )
 

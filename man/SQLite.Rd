@@ -18,7 +18,7 @@ SQLite(...)
 \S4method{dbConnect}{SQLiteDriver}(drv, dbname = "", ...,
   loadable.extensions = TRUE, default.extensions = loadable.extensions,
   cache_size = NULL, synchronous = "off", flags = SQLITE_RWC,
-  vfs = NULL)
+  vfs = NULL, bigint = c("integer64", "integer", "numeric", "character"))
 
 \S4method{dbConnect}{SQLiteConnection}(drv, ...)
 
@@ -77,6 +77,10 @@ read only mode.  Raise an error if the file does not already exist}
 \code{"unix-posix"}, \code{"unix-unix-afp"},
 \code{"unix-unix-flock"}, \code{"unix-dotfile"}, and
 \code{"unix-none"}.}
+
+\item{bigint}{The R type that 64-bit integer types should be mapped to,
+default is \link[bit64:integer64]{bit64::integer64}, which allows the full range of 64 bit
+integers.}
 }
 \value{
 \code{SQLite()} returns an object of class \linkS4class{SQLiteDriver}.

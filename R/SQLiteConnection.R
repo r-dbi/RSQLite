@@ -22,7 +22,8 @@ setClass("SQLiteConnection",
     loadable.extensions = "logical",
     flags = "integer",
     vfs = "character",
-    ref = "environment"
+    ref = "environment",
+    bigint = "character"
   )
 )
 

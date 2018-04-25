@@ -27,7 +27,7 @@ test_that("passing field.types with wrong name", {
 
   expect_error(
     dbWriteTable(con, "a", data.frame(a = 1:3), field.types = c("b" = "TEXT")),
-    "mismatch"
+    "not found"
   )
 })
 

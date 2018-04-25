@@ -79,6 +79,9 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     if (overwrite && append) {
       stopc("overwrite and append cannot both be TRUE")
     }
+    if (!is.null(field.types) && !(is.character(field.types) && !is.null(names(field.types)) && !anyDuplicated(names(field.types)))) {
+      stopc("`field.types` must be a named character vector with unique names, or NULL")
+    }
     if (append && !is.null(field.types)) {
       stopc("Cannot specify field.types with append = TRUE")
     }
@@ -102,25 +105,22 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     if (!found || overwrite) {
       fields <- field_def(conn, value, field.types)
 
-      # Names from field type definition win, a warning has been issued in
-      # field_def()
-      names(value) <- names(fields)
-
-      sql <- sqlCreateTable(conn, name, fields, row.names = FALSE, temporary = temporary)
-      dbExecute(conn, sql)
+      dbCreateTable(
+        conn = conn,
+        name = name,
+        fields = fields,
+        temporary = temporary
+      )
     } else if (append) {
       col_names <- dbListFields(conn, name)
       value <- match_col(value, col_names)
     }
 
     if (nrow(value) > 0) {
-      sql <- parameterised_insert(conn, name, value)
-      rs <- dbSendStatement(conn, sql)
-
-      names(value) <- rep("", length(value))
-      tryCatch(
-        result_bind(rs@ptr, value),
-        finally = dbClearResult(rs)
+      dbAppendTable(
+        conn = conn,
+        name = name,
+        values = value
       )
     }
 
@@ -137,15 +137,17 @@ match_col <- function(value, col_names) {
         warning("Column names will be matched ignoring character case",
                 call. = FALSE)
         names(value) <- col_names
-      } else {
-        stop("Column name mismatch.", call. = FALSE)
+        return(value)
       }
     }
-  } else {
-    if (!all(names(value) %in% col_names)) {
-      stop("Columns ", paste0(setdiff(names(value), col_names)),
-           " not found", call. = FALSE)
-    }
+  }
+
+  if (!all(names(value) %in% col_names)) {
+    stop("Columns ",
+      paste0("`", setdiff(names(value), col_names), "`", collapse = ", "),
+      " not found",
+      call. = FALSE
+    )
   }
 
   value
@@ -155,19 +157,12 @@ field_def <- function(conn, data, field_types) {
   # Match column names with compatibility rules
   new_field_types <- match_col(field_types, names(data))
 
-  if (any(names(new_field_types) != names(field_types))) {
-    # The names in field_types win (compatibility!), update names in data
-    column_names_map <- names(field_types)
-    names(column_names_map) <- names(new_field_types)
-    names(data) <- column_names_map[names(data)]
-  }
-
   # Automatic types for all other fields
   auto_field_types <- db_data_types(conn, data[setdiff(names(data), names(field_types))])
   field_types[names(auto_field_types)] <- auto_field_types
 
   # Reorder
-  field_types[] <- field_types[names(data)]
+  field_types <- field_types[names(data)]
 
   field_types
 }
@@ -175,21 +170,6 @@ field_def <- function(conn, data, field_types) {
 db_data_types <- function(conn, data) {
   vcapply(data, function(x) dbDataType(conn, x))
 }
-
-parameterised_insert <- function(con, name, values) {
-  table <- dbQuoteIdentifier(con, name)
-  fields <- dbQuoteIdentifier(con, names(values))
-
-  # Convert fields into a character matrix
-  SQL(paste0(
-    "INSERT INTO ", table, "\n",
-    "  (", paste(fields, collapse = ", "), ")\n",
-    "VALUES\n",
-    paste0("  (", paste(rep("?", length(fields)), collapse = ", "), ")", collapse = ",\n")
-  ))
-
-}
-
 
 #' @param header is a logical indicating whether the first data line (but see
 #'   `skip`) has a header or not.  If missing, it value is determined

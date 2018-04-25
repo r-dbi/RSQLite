@@ -197,11 +197,11 @@ test_that("appending to table ignores column order and column names", {
   dbWriteTable(con, "a", data.frame(a = 1, b = 2))
   expect_error(
     dbWriteTable(con, "a", data.frame(b = 1, a = 2), append = TRUE),
-    "mismatch"
+    NA
   )
   expect_error(
     dbWriteTable(con, "a", data.frame(c = 1, d = 2), append = TRUE),
-    "mismatch"
+    "not found"
   )
 })
 

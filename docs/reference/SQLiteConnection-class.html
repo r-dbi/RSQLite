@@ -148,7 +148,7 @@ The "Usage" section lists the class methods overridden by <span class="pkg">RSQL
 
 <span class='co'># S4 method for SQLiteConnection,character</span>
 <span class='fu'>dbRemoveTable</span>(<span class='no'>conn</span>, <span class='no'>name</span>, <span class='no'>...</span>,
-  <span class='kw'>fail_if_missing</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+  <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>fail_if_missing</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># S4 method for SQLiteConnection,character</span>
 <span class='fu'>dbExistsTable</span>(<span class='no'>conn</span>, <span class='no'>name</span>, <span class='no'>...</span>)
@@ -165,6 +165,10 @@ The "Usage" section lists the class methods overridden by <span class="pkg">RSQL
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>temporary</th>
+      <td><p>If <code>TRUE</code>, only temporary tables are considered.</p></td>
+    </tr>
     <tr>
       <th>fail_if_missing</th>
       <td><p>If <code>FALSE</code>, <code>dbRemoveTable()</code> succeeds if the

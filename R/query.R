@@ -98,7 +98,8 @@ setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ...,
   if (trunc(n) != n) stopc("n must be a whole number")
   ret <- result_fetch(res@ptr, n = n)
   ret <- convert_bigint(ret, res@bigint)
-  sqlColumnToRownames(ret, row.names)
+  ret <- sqlColumnToRownames(ret, row.names)
+  set_tidy_names(ret)
 })
 
 convert_bigint <- function(df, bigint) {
@@ -131,8 +132,11 @@ setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
 #' @export
 #' @rdname SQLiteResult-class
 setMethod("dbColumnInfo", "SQLiteResult", function(res, ...) {
-  result_column_info(res@ptr)
+  df <- result_column_info(res@ptr)
+  df$name <- tidy_names(df$name)
+  df
 })
+
 #' @export
 #' @rdname SQLiteResult-class
 setMethod("dbGetRowsAffected", "SQLiteResult", function(res, ...) {

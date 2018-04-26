@@ -312,10 +312,11 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
 
 #' @rdname SQLiteConnection-class
 #' @export
+#' @param temporary If `TRUE`, only temporary tables are considered.
 #' @param fail_if_missing If `FALSE`, `dbRemoveTable()` succeeds if the
 #'   table doesn't exist.
 setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
-  function(conn, name, ..., fail_if_missing = TRUE) {
+  function(conn, name, ..., temporary = FALSE, fail_if_missing = TRUE) {
     name <- check_quoted_identifier(name)
     name <- dbQuoteIdentifier(conn, name)
 
@@ -323,6 +324,9 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
       extra <- ""
     } else {
       extra <- "IF EXISTS "
+    }
+    if (temporary) {
+      extra <- paste0(extra, "temp.")
     }
 
     dbExecute(conn, paste0("DROP TABLE ", extra, name))

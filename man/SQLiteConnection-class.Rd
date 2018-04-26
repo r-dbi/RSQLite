@@ -40,7 +40,7 @@
   row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE), ...)
 
 \S4method{dbRemoveTable}{SQLiteConnection,character}(conn, name, ...,
-  fail_if_missing = TRUE)
+  temporary = FALSE, fail_if_missing = TRUE)
 
 \S4method{dbExistsTable}{SQLiteConnection,character}(conn, name, ...)
 
@@ -51,6 +51,8 @@
 \S4method{dbDataType}{SQLiteConnection}(dbObj, obj, ...)
 }
 \arguments{
+\item{temporary}{If \code{TRUE}, only temporary tables are considered.}
+
 \item{fail_if_missing}{If \code{FALSE}, \code{dbRemoveTable()} succeeds if the
 table doesn't exist.}
 }

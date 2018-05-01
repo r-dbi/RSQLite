@@ -1,3 +1,16 @@
+# RSQLite 2.1.0.9001 (2018-05-01)
+
+- `Id()` is reexported from DBI.
+- Support `temporary` argument in `dbRemoveTable()` (default: `FALSE`) (r-dbi/DBI#141).
+- Data frames resulting from a query always have unique non-empty column names (r-dbi/DBItest#137).
+- Add support for `bigint` argument to `dbConnect()`, supported values are `"integer64"`, `"integer"`, `"numeric"` and `"character"`. Large integers are returned as values of that type (r-dbi/DBItest#133).
+- The `field.types` argument to `dbWriteTable()` no longer takes precedence when defining the order of the columns in the new table.
+- Using `dbCreateTable()` and `dbAppendTable()` internally (r-dbi/DBI#74).
+- New argument `fail_if_missing` (default: `TRUE`) to `dbRemoveTable()` (r-dbi/DBI#197).
+- Implement `format()` method for `SqliteConnection` (r-dbi/DBI#163).
+- Reexporting `DBI::dbIsReadOnly()` and `DBI::dbCanConnect()`.
+
+
 # RSQLite 2.1.0.9000 (2018-04-01)
 
 - Same as previous version.

@@ -30,7 +30,9 @@ get_plan_deps <- function() {
   plan_deps <- drake_plan(
     available = available.packages(),
     this_pkg = get_this_pkg(),
-    revdeps = tools::package_dependencies(this_pkg, available, 'most', reverse = TRUE) %>% flatten(),
+    revdeps_1 = tools::package_dependencies(this_pkg, available, 'most', reverse = TRUE) %>% flatten(),
+    revdeps_2 = tools::package_dependencies(revdeps_1, available, 'most', reverse = TRUE) %>% flatten(),
+    revdeps = unique(c(revdeps_1, revdeps_2)),
     first_level_deps = tools::package_dependencies(revdeps, available, 'most'),
     all_level_deps = tools::package_dependencies(first_level_deps %>% flatten(), available, recursive = TRUE),
     base_pkgs = get_base_pkgs(),

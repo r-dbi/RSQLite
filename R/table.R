@@ -120,7 +120,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
       dbAppendTable(
         conn = conn,
         name = name,
-        values = value
+        value = value
       )
     }
 

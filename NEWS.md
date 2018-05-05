@@ -1,3 +1,8 @@
+# RSQLite 2.1.1 (2018-05-05)
+
+- Now imports DBI 1.0.0.
+
+
 # RSQLite 2.1.0.9001 (2018-05-01)
 
 - `Id()` is reexported from DBI.

@@ -1,3 +1,8 @@
+# RSQLite 2.1.1.9000 (2018-05-06)
+
+- Same as previous version.
+
+
 # RSQLite 2.1.1 (2018-05-05)
 
 - Breaking change: The `field.types` argument to `dbWriteTable()` no longer takes precedence when defining the order of the columns in the new table.

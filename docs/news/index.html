@@ -106,32 +106,14 @@
 <a href="#rsqlite-2-1-1-2018-05-05" class="anchor"></a>RSQLite 2.1.1 (2018-05-05)<small> Unreleased </small>
 </h1>
 <ul>
-<li>Now imports DBI 1.0.0.</li>
-</ul>
-</div>
-    <div id="rsqlite-2-1-0-9001-2018-05-01" class="section level1">
-<h1 class="page-header">
-<a href="#rsqlite-2-1-0-9001-2018-05-01" class="anchor"></a>RSQLite 2.1.0.9001 (2018-05-01)<small> Unreleased </small>
-</h1>
-<ul>
-<li>
-<code><a href="http://www.rdocumentation.org/packages/DBI/topics/Id">Id()</a></code> is reexported from DBI.</li>
-<li>Support <code>temporary</code> argument in <code>dbRemoveTable()</code> (default: <code>FALSE</code>) (r-dbi/DBI<a href='https://github.com/r-dbi/RSQLite/issues/141'>#141</a>).</li>
-<li>Data frames resulting from a query always have unique non-empty column names (r-dbi/DBItest<a href='https://github.com/r-dbi/RSQLite/issues/137'>#137</a>).</li>
+<li>Breaking change: The <code>field.types</code> argument to <code>dbWriteTable()</code> no longer takes precedence when defining the order of the columns in the new table.</li>
 <li>Add support for <code>bigint</code> argument to <code>dbConnect()</code>, supported values are <code>"integer64"</code>, <code>"integer"</code>, <code>"numeric"</code> and <code>"character"</code>. Large integers are returned as values of that type (r-dbi/DBItest<a href='https://github.com/r-dbi/RSQLite/issues/133'>#133</a>).</li>
-<li>The <code>field.types</code> argument to <code>dbWriteTable()</code> no longer takes precedence when defining the order of the columns in the new table.</li>
+<li>Data frames resulting from a query always have unique non-empty column names (r-dbi/DBItest<a href='https://github.com/r-dbi/RSQLite/issues/137'>#137</a>).</li>
+<li>New arguments <code>temporary</code> and <code>fail_if_missing</code> (default: <code>TRUE</code>) to <code>dbRemoveTable()</code> (r-dbi/DBI<a href='https://github.com/r-dbi/RSQLite/issues/141'>#141</a>, r-dbi/DBI<a href='https://github.com/r-dbi/RSQLite/issues/197'>#197</a>).</li>
 <li>Using <code>dbCreateTable()</code> and <code>dbAppendTable()</code> internally (r-dbi/DBI<a href='https://github.com/r-dbi/RSQLite/issues/74'>#74</a>).</li>
-<li>New argument <code>fail_if_missing</code> (default: <code>TRUE</code>) to <code>dbRemoveTable()</code> (r-dbi/DBI<a href='https://github.com/r-dbi/RSQLite/issues/197'>#197</a>).</li>
 <li>Implement <code>format()</code> method for <code>SqliteConnection</code> (r-dbi/DBI<a href='https://github.com/r-dbi/RSQLite/issues/163'>#163</a>).</li>
-<li>Reexporting <code><a href="http://www.rdocumentation.org/packages/DBI/topics/dbIsReadOnly">DBI::dbIsReadOnly()</a></code> and <code><a href="http://www.rdocumentation.org/packages/DBI/topics/dbCanConnect">DBI::dbCanConnect()</a></code>.</li>
-</ul>
-</div>
-    <div id="rsqlite-2-1-0-9000-2018-04-01" class="section level1">
-<h1 class="page-header">
-<a href="#rsqlite-2-1-0-9000-2018-04-01" class="anchor"></a>RSQLite 2.1.0.9000 (2018-04-01)<small> Unreleased </small>
-</h1>
-<ul>
-<li>Same as previous version.</li>
+<li>Reexporting <code><a href="http://www.rdocumentation.org/packages/DBI/topics/Id">Id()</a></code>, <code><a href="http://www.rdocumentation.org/packages/DBI/topics/dbIsReadOnly">DBI::dbIsReadOnly()</a></code> and <code><a href="http://www.rdocumentation.org/packages/DBI/topics/dbCanConnect">DBI::dbCanConnect()</a></code>.</li>
+<li>Now imports DBI 1.0.0.</li>
 </ul>
 </div>
     <div id="rsqlite-2-1-0-2018-03-29" class="section level1">
@@ -799,8 +781,6 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+'&<a 
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
         <li><a href="#rsqlite-2-1-1-2018-05-05">2.1.1</a></li>
-        <li><a href="#rsqlite-2-1-0-9001-2018-05-01">2.1.0.9001</a></li>
-        <li><a href="#rsqlite-2-1-0-9000-2018-04-01">2.1.0.9000</a></li>
         <li><a href="#rsqlite-2-1-0-2018-03-29">2.1.0</a></li>
         <li><a href="#rsqlite-2-0-2017-06-18">2.0</a></li>
         <li><a href="#rsqlite-1-1-2-2017-01-07">1.1-2</a></li>

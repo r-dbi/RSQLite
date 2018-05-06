@@ -1,3 +1,8 @@
+# RSQLite 2.1.1.9001 (2018-05-06)
+
+- Upgrade to SQLite 3.23.1.
+
+
 # RSQLite 2.1.1.9000 (2018-05-06)
 
 - Same as previous version.

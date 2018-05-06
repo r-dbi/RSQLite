@@ -38,6 +38,9 @@ LinkingTo:
     plogr (>= 0.2.0),
     Rcpp
 VignetteBuilder: knitr
+Remotes: 
+    r-dbi/DBI,
+    r-dbi/DBItest
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.0.1.9000

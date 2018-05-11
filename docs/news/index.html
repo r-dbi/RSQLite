@@ -288,7 +288,7 @@
 <li><p>Queries (<a href='https://github.com/r-dbi/RSQLite/issues/69'>#69</a>), query parameters and table data are always converted to UTF-8 before being sent to the database.</p></li>
 <li><p>Adapted to <code>DBI</code> 0.5, new code should use <code>dbExecute()</code> instead of <code>dbGetQuery()</code>, and <code>dbSendStatement()</code> instead of <code>dbSendQuery()</code> where appropriate.</p></li>
 <li><p>New strategy for prepared queries. Create a prepared query with <code>dbSendQuery()</code> or <code>dbSendStatement()</code> and bind values with <code>dbBind()</code>. The same query/statement can be executed efficiently multiple times by passing a data-frame-like object (<a href='https://github.com/r-dbi/RSQLite/issues/168'>#168</a>, <a href='https://github.com/r-dbi/RSQLite/issues/178'>#178</a>, <a href='https://github.com/r-dbi/RSQLite/issues/181'>#181</a>).</p></li>
-<li><p><code>dbSendQuery()</code>, <code>dbGetQuery()</code>, <code>dbSendStatement()</code> and <code>dbExecute()</code> also support inline parameterised queries, like <code>dbGetQuery(datasetsDb(), "SELECT * FROM mtcars WHERE cyl = :cyl",   params = list(cyl = 4))</code>. This has no performance benefits but protects you from SQL injection attacks.</p></li>
+<li><p><code>dbSendQuery()</code>, <code>dbGetQuery()</code>, <code>dbSendStatement()</code> and <code>dbExecute()</code> also support inline parameterised queries, like <code>dbGetQuery(datasetsDb(), "SELECT * FROM mtcars WHERE cyl = :cyl", params = list(cyl = 4))</code>. This has no performance benefits but protects you from SQL injection attacks.</p></li>
 <li><p>Improve column type inference: the first non-<code>NULL</code> value decides the type of a column (<a href='https://github.com/r-dbi/RSQLite/issues/111'>#111</a>). If there are no non-<code>NULL</code> values, the column affinity is used, determined according to sqlite3 rules (<a href='https://github.com/r-dbi/RSQLite/issues/160'>#160</a>).</p></li>
 <li><p><code>dbFetch()</code> uses the same row name strategy as <code>dbReadTable()</code> (<a href='https://github.com/r-dbi/RSQLite/issues/53'>#53</a>).</p></li>
 <li><p><code>dbColumnInfo()</code> will now return information even before you’ve retrieved any data.</p></li>
@@ -535,14 +535,7 @@
 </h1>
 <ul>
 <li><p>The SQLite driver handle validation code, is_ValidHandle, no longer requires the driver ID to be equal to the current process ID. SQLite supports multiple processes accessing the same SQLite file via locking (however, results are known to be unreliable on NFS). This change should make using RSQLite with the multicore package easier. For an example of the issue that the PID check causes see: <a href="https://stat.ethz.ch/pipermail/r-sig-hpc/2009-August/000335.html" class="uri">https://stat.ethz.ch/pipermail/r-sig-hpc/2009-August/000335.html</a></p></li>
-<li>
-<p>Refactor to use external pointers to wrap handle IDs; remove handle ID coerce code (e.g. as(<script type="text/javascript">
-<!--
-h='&#x49;&<a href='https://github.com/r-dbi/RSQLite/issues/100'>#100</a>;';a='&<a href='https://github.com/r-dbi/RSQLite/issues/64'>#64</a>;';n='&#x6f;&<a href='https://github.com/r-dbi/RSQLite/issues/98'>#98</a>;&<a href='https://github.com/r-dbi/RSQLite/issues/106'>#106</a>;';e=n+a+h;
-document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\/'+'a'+'>');
-// -->
-</script></p>
-<noscript>obj at Id</noscript>, “integer”)). For now, the old scheme of storing handle IDs in an integer vector is mostly maintained only these integer vectors are stored in the protection slot of an external pointer. Using external pointers will allow the use of finalizer code so that, for example, unreferenced result sets can be cleaned up.</li>
+<li><p>Refactor to use external pointers to wrap handle IDs; remove handle ID coerce code (e.g. as(<a href="mailto:obj<a href='http://github.com/Id'>@Id</a>">obj<a href='http://github.com/Id'>@Id</a></a>, “integer”)). For now, the old scheme of storing handle IDs in an integer vector is mostly maintained only these integer vectors are stored in the protection slot of an external pointer. Using external pointers will allow the use of finalizer code so that, for example, unreferenced result sets can be cleaned up.</p></li>
 <li><p>Upgrade to SQLite 3.6.23.1.</p></li>
 <li>
 <p>The memory mangement code for keeping track of database connections was significantly refactored. Instead of tracking connections in a pre-allocated array attached to the driver manager, connections are now managed dynamically using R’s external pointers and finalizers. Consequences of this change are as follows:</p>
@@ -611,9 +604,11 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\
 <li><p>Increase the default max connections from 16 to 200 in SQLite(). Connections to SQLite are inexpensive and there is no longer any hard-coded limit to the number of connections you can have. However, memory is allocated at driver initialization time based on the maximum, so it is best not to use very large values unless you really need the connections.</p></li>
 <li><p>sqliteTransactionStatement, which is used by dbCommit, dbRollback, and dbBeginTransaction, now passes silent=TRUE to try() to suppress error messages. Without this, code that could otherwise handle a failed commit gracefully had no way to suppress the error message. You can use dbGetException to see the error when sqliteTransactionStatement returns FALSE.</p></li>
 <li><p>dbConnect/sqliteNewConnection now throws an error if dbname argument is NA. Previously, if as.character(NA) was provided, a database with filename “NA” was created.</p></li>
-<li><p>dbConnect/sqliteNewConnection now accepts two new arguments:</p></li>
-</ul>
+<li>
+<p>dbConnect/sqliteNewConnection now accepts two new arguments:</p>
 <p>flags: provides additional control over connetion details. For convenience, you can specify one of SQLITE_RWC (default), SQLITE_RW, or SQLITE_RO to obtain a connection in read/write/create, read/write, or read only mode, respectively. See <a href="http://sqlite.org/c3ref/open.html" class="uri">http://sqlite.org/c3ref/open.html</a> for details. vfs: controls the virtual filesystem used by SQLite. The default, NULL, lets SQLite select the appropriate vfs for the system. You can specify one of “unix-posix”, “unix-afp”, “unix-flock”, “unix-dotfile”, or “unix-none”. For details, see <a href="http://www.sqlite.org/compile.html" class="uri">http://www.sqlite.org/compile.html</a>. This functionality is only fully available on OSX. On non-OSX Unix, you can use unix-dotfile and unix-none. None of these modules are available on Windows where a non-NULL values of the vfs argument will be ignored with a warning.</p>
+</li>
+</ul>
 </div>
     <div id="version-0-7-3" class="section level1">
 <h1 class="page-header">
@@ -659,18 +654,11 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\
 <li><p>Implemented dbCommit() and dbRollback(). There is also a new generic method dbBeginTransaction(), which begins a transaction. Note that this is an extension to the DBI interface.</p></li>
 <li><p>Update to the SQLite 3 API for fetching records. This means that the records are pulled from the database as required, and not cached in memory as was previously done.</p></li>
 <li>
-<p>Added generic methods dbSendPreparedQuery() and dbGetPreparedQuery() which are similiar to dbSendQuery() and dbGetQuery(), but take an extra “bind.data” parameter, which is a data frame. The statement is assumed to contain bind variables. Bind variables are either for a column name (“:name” or <script type="text/javascript">
-<!--
-h='&<a href='https://github.com/r-dbi/RSQLite/issues/110'>#110</a>;&#x61;&#x6d;&#x65;&#x25;&<a href='https://github.com/r-dbi/RSQLite/issues/50'>#50</a>;&<a href='https://github.com/r-dbi/RSQLite/issues/50'>#50</a>;';a='&<a href='https://github.com/r-dbi/RSQLite/issues/64'>#64</a>;';n='&#x25;&<a href='https://github.com/r-dbi/RSQLite/issues/50'>#50</a>;&<a href='https://github.com/r-dbi/RSQLite/issues/50'>#50</a>;';e=n+a+h;
-document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+'&<a href='https://github.com/r-dbi/RSQLite/issues/34'>#34</a>;&<a href='https://github.com/r-dbi/RSQLite/issues/64'>#64</a>;&<a href='https://github.com/r-dbi/RSQLite/issues/110'>#110</a>;&#x61;&#x6d;&#x65;&<a href='https://github.com/r-dbi/RSQLite/issues/34'>#34</a>;'+'<\/'+'a'+'>');
-// -->
-</script></p>
-<noscript>"<a href='http://github.com/name'>@name</a>" (%22 at name%22)</noscript>) or for a column index (“?”) in the data frame. See <a href="http://sqlite.org/capi3ref.html" class="uri">http://sqlite.org/capi3ref.html</a> for more details.</li>
-</ul>
+<p>Added generic methods dbSendPreparedQuery() and dbGetPreparedQuery() which are similiar to dbSendQuery() and dbGetQuery(), but take an extra “bind.data” parameter, which is a data frame. The statement is assumed to contain bind variables. Bind variables are either for a column name (“:name” or “<a href='http://github.com/name'>@name</a>”) or for a column index (“?”) in the data frame. See <a href="http://sqlite.org/capi3ref.html" class="uri">http://sqlite.org/capi3ref.html</a> for more details.</p>
 <p>dbGetPreparedQuery(con, “INSERT INTO table1 VALUES (:col1)”, data.frame(col1=c(1, 2)) )</p>
 <p>Each bind variable in the query has to be bound only once, either via named or positional parameters. If it is not bound or is bound more than once (due to a mix or positional/named parameters) an error is thrown. Any extra columns in the data frame are ignored.</p>
 <p>If you are having a lot of string parameters, use stringsAsFactors=FALSE when creating the bind.data data.frame instance. You can also use I().</p>
-<ul>
+</li>
 <li><p>Added experimental sqliteQuickColumn function that retrieves an entire column from a specified table as quickly as possible.</p></li>
 <li><p>The SQLite driver has a new logical parameter “shared.cache” to enable the shared-cache mode, which allows multiple connections to share a single data and schema cache. See <a href="http://www.sqlite.org/sharedcache.html" class="uri">http://www.sqlite.org/sharedcache.html</a></p></li>
 </ul>
@@ -754,10 +742,8 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+'&<a 
 <li>
 <p>Ported to Windows. It now installs fine under Windows with</p>
 <p>Rcmd INSTALL RSQLite_0.3-2.tar.gz</p>
-</li>
-</ul>
 <p>(there’s also a binary RSQLite_0.3-2.zip)</p>
-<ul>
+</li>
 <li><p>Added code to verify that the SQLite library versions used for compilation and at runtime agree.</p></li>
 <li><p>Added source sqlite-2.8.3.</p></li>
 <li><p>Fixed minor documentation errors and removed the DBI.pdf documentation file, which is included in the required DBI package.</p></li>

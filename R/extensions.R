@@ -3,6 +3,8 @@
 #' These extension functions are written by Liam Healy and made available
 #' through the SQLite website (\url{http://www.sqlite.org/contrib}).
 #'
+#' regexp is included in the sqlite source code
+#'
 #' @section Available extension functions:
 #'
 #' \describe{
@@ -10,7 +12,7 @@
 #'   ceil, cos, cosh, cot, coth, degrees, difference, exp, floor, log, log10,
 #'   pi, power, radians, sign, sin, sinh, sqrt, square, tan, tanh}
 #' \item{String functions}{charindex, leftstr, ltrim, padc, padl, padr, proper,
-#'   replace, replicate, reverse, rightstr, rtrim, strfilter, trim}
+#'   replace, replicate, reverse, rightstr, rtrim, strfilter, trim, regexp}
 #' \item{Aggregate functions}{stdev, variance, mode, median, lower_quartile,
 #'   upper_quartile}
 #' }

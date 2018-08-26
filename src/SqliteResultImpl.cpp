@@ -280,7 +280,7 @@ List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   SqliteDataFrame data(stmt, cache.names_, n_max, types_);
 
   if (complete_ && data.get_ncols() == 0) {
-    warning("Don't need to call dbFetch() for statements, only for queries");
+    warning("SQL statements must be issued with dbExecute() or dbSendStatement() instead of dbGetQuery() or dbSendQuery().");
   }
 
   while (!complete_) {

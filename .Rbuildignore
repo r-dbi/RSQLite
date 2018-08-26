@@ -1,3 +1,4 @@
+^\.github$
 config.log
 config.cache
 config.status
@@ -32,6 +33,5 @@ a.out.dSYM
 ^build\.sh$
 ^codecov\.yml$
 ^src/.*\.gch$
-^_pkgdown\.yml$
 .*\.orig$
 ^CRAN-RELEASE$

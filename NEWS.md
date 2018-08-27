@@ -1,3 +1,9 @@
+# RSQLite 2.1.1.9002
+
+- Improve warning when `dbGetQuery()` is called with a statement (#226).
+- Update bundled sqlite3 to 3.24 (#262).
+
+
 # RSQLite 2.1.1.9001 (2018-05-06)
 
 - Upgrade to SQLite 3.23.1.

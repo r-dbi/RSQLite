@@ -148,9 +148,11 @@ test_that("NA matches NULL", {
 test_that("mark UTF-8 encoding on non-ASCII colnames", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con))
-  tbl <- data.frame("中文" = "a")
+  cn_field <- '\u4e2d\u6587'
+  tbl <- data.frame("a")
+  colnames(tbl) <- cn_field
   dbWriteTable(con, name = "test", value = tbl)
   got <- dbListFields(con, "test")
   expect_equal(Encoding(got), "UTF-8")
-  expect_equal(got, "中文")
+  expect_equal(got, cn_field)
 })

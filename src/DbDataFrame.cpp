@@ -55,7 +55,9 @@ List DbDataFrame::get_data(std::vector<DATA_TYPE>& types_) {
 
   List out(data.begin(), data.end());
   StringVector names_utf8 = wrap(names);
-  for (int i = 0; i < names_utf8.size(); ++i) names_utf8[i] = Rf_mkCharCE(names_utf8[i], CE_UTF8);
+  for (int j = 0; j < names_utf8.size(); ++j) {
+    names_utf8[j] = Rf_mkCharCE(names_utf8[j], CE_UTF8);
+  }
   out.attr("names") = names_utf8;
   out.attr("class") = "data.frame";
   out.attr("row.names") = IntegerVector::create(NA_INTEGER, -i);

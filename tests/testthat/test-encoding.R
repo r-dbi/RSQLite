@@ -9,7 +9,6 @@ test_that("write a table whose colnames is BIG5 encoded", {
     class = "data.frame",
     row.names = c(NA, -3L))
   . <- rawToChar(as.raw(c(0xa4, 0xa4, 0xa4, 0xe5)))
-  Encoding(.) <- "BIG5"
   colnames(df) <- .
   dbWriteTable(con, "a", df)
   res <- dbReadTable(con, "a")

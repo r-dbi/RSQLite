@@ -31,6 +31,7 @@ Imports:
 Suggests: 
     DBItest,
     knitr,
+    pkgload,
     rmarkdown,
     testthat
 LinkingTo: 

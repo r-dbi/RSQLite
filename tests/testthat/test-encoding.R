@@ -13,7 +13,7 @@ test_that("write a table whose colnames is BIG5 encoded", {
   dbWriteTable(con, "a", df)
   res <- dbReadTable(con, "a")
 
-  expect_identical(res, df, stringsAsFactors = FALSE)
+  expect_identical(res, df)
 })
 
 test_that("write a table whose colnames is UTF-8 encoded", {
@@ -29,7 +29,7 @@ test_that("write a table whose colnames is UTF-8 encoded", {
   colnames(df) <- .
   dbWriteTable(con, "a", df)
   res <- dbReadTable(con, "a")
-  expect_identical(res, df, stringsAsFactors = FALSE)
+  expect_identical(res, df)
 })
 
 test_that("list the field of a table whose colnames is UTF-8 encoded", {

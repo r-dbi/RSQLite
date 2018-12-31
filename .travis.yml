@@ -51,14 +51,13 @@ addons:
 matrix:
   include:
   - r: devel
-  - r: 3.1
+  - r: 3.2
   - stage: full
     r: release
     env:
     - BUILD_PKGDOWN=true
   - r: oldrel
   - r: 3.3
-  - r: 3.2
   - os: osx
     osx_image: xcode7.3
     r: release

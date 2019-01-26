@@ -365,18 +365,25 @@ sqliteListTables <- function(conn) {
 
 sqliteListTablesWithName <- function(conn, name) {
   # Also accept quoted identifiers
-  name <- as.character(dbQuoteIdentifier(conn, name))
-  name <- gsub("^`(.*)`$", "\\1", name)
+  id <- as.list(dbUnquoteIdentifier(conn, dbQuoteIdentifier(conn, name))[[1]]@name)
+  schema <- id[["schema"]]
+  table <- id[["table"]]
 
-  sql <- sqliteListTablesQuery(conn, SQL("$name"))
+  sql <- sqliteListTablesQuery(conn, schema, SQL("$name"))
   rs <- dbSendQuery(conn, sql)
-  dbBind(rs, list(name = tolower(name)))
+  dbBind(rs, list(name = tolower(table)))
   rs
 }
 
-sqliteListTablesQuery <- function(conn, name = NULL) {
+sqliteListTablesQuery <- function(conn, schema = NULL, name = NULL) {
+  if (is.null(schema)) {
+    info_sql <- "(SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master)"
+  } else {
+    info_sql <- paste0("(SELECT * FROM ", dbQuoteIdentifier(conn, schema), ".sqlite_master")
+  }
+
   SQL(paste("SELECT name FROM",
-    "(SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master)",
+    info_sql,
     "WHERE (type = 'table' OR type = 'view')",
     if (!is.null(name)) paste0("AND (lower(name) = ", dbQuoteString(conn, name), ")"),
     "ORDER BY name",

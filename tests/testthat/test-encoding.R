@@ -123,7 +123,7 @@ test_that("list the field of tables whose colnames are UTF-8 encoded", {
   dbWriteTable(con, "a", df)
   expect_identical(dbListFields(con, "a"), colnames(df))
   df <- structure(
-    list(V1 = 1:3, V2 = rep(., 3)),
+    list(V1 = 1:3, V2 = rep(utf8_string, 3)),
     class = "data.frame",
     row.names = 1:3)
   colnames(df) <- paste(utf8_string, 1:2, sep = "")

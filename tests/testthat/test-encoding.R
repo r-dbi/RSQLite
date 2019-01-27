@@ -1,7 +1,9 @@
 context("encoding")
 
 test_that("write tables whose colnames or contents are BIG5 encoded", {
-  skip_if(.Platform$OS.type != "windows")
+  skip_on_os("linux")
+  skip_on_os("mac")
+  skip_on_os("solaris")
   .loc <- Sys.getlocale("LC_COLLATE")
   Sys.setlocale(locale = "cht")
   con <- dbConnect(SQLite())

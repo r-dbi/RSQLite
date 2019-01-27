@@ -31,13 +31,22 @@ after_script: R -q -e 'tic::after_script()'
 # Header
 language: r
 sudo: false
+dist: trusty
 cache: packages
 latex: false
+fortran: false
+
+#stages: test, full
+stages:
+- name: test
+- name: full
+  if: branch = master
 
 #env
 env:
   global:
   - _R_CHECK_FORCE_SUGGESTS_=false
+  - _R_CHECK_SYSTEM_CLOCK_=false
   - MAKEFLAGS="-j 2"
 
 #addons
@@ -47,21 +56,21 @@ addons:
     - libmagick++-dev
     - libssh2-1-dev
 
-#matrix: 3x Linux, 1x OS X
+#jobs
 matrix:
   include:
   - r: devel
-  - r: 3.2
+  - r: 3.1
   - stage: full
-    r: release
+    os: osx
+    latex: false
+  - r: release
     env:
     - BUILD_PKGDOWN=true
-  - r: oldrel
+  - r: 3.4
   - r: 3.3
-  - os: osx
-    osx_image: xcode7.3
-    r: release
-    latex: false
+  - r: 3.2
+  fast_finish: true
 
 #notifications
 notifications:

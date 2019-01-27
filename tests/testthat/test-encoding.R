@@ -67,7 +67,9 @@ test_that("write tables whose colnames and contents are UTF-8 encoded", {
 })
 
 test_that("list the field of tables whose colnames are BIG5 encoded", {
-  skip_if(.Platform$OS.type != "windows")
+  skip_on_os("linux")
+  skip_on_os("mac")
+  skip_on_os("solaris")
   .loc <- Sys.getlocale("LC_COLLATE")
   if (.Platform$OS.type == "windows") {
     Sys.setlocale(locale = "cht")

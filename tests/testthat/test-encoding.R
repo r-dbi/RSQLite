@@ -150,7 +150,7 @@ test_that("append tables whose colnames are UTF-8 encoded", {
     class = "data.frame",
     row.names = c(NA, -3L))
   utf8_string <- rawToChar(as.raw(c(0xe4, 0xb8, 0xad, 0xe6, 0x96, 0x87)))
-  Encoding(.) <- "UTF-8"
+  Encoding(utf8_string) <- "UTF-8"
   colnames(df) <- utf8_string
   dbWriteTable(con, "a", df)
   dbWriteTable(con, "a", df, append = TRUE)

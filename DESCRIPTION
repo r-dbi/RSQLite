@@ -62,7 +62,6 @@ Collate:
     'query.R'
     'rownames.R'
     'table.R'
-    'test.R'
     'transactions.R'
     'utils.R'
     'zzz.R'

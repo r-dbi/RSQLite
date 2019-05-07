@@ -1,7 +1,7 @@
 Package: RSQLite
 Title: 'SQLite' Interface for R
-Version: 2.1.1.9002
-Date: 2018-08-27
+Version: 2.1.1.9003
+Date: 2019-05-08
 Authors@R: c(
     person("Kirill", "M\u00fcller", role = c("aut", "cre"), email = "krlmlr+r@mailbox.org", comment = c(ORCID = "0000-0002-1416-3412")),
     person("Hadley", "Wickham", role = c("aut")),
@@ -45,7 +45,7 @@ Remotes:
     r-lib/pkgload#83
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.0.1.9000
+RoxygenNote: 6.1.1
 Collate: 
     'RcppExports.R'
     'SQLiteConnection.R'
@@ -62,6 +62,7 @@ Collate:
     'query.R'
     'rownames.R'
     'table.R'
+    'test.R'
     'transactions.R'
     'utils.R'
     'zzz.R'

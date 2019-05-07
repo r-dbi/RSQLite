@@ -1,3 +1,12 @@
+# RSQLite 2.1.1.9003
+
+- Add test for correct use of non-UTF8-encoded column names (#277, @wush978).
+- `dbExistsTable()` works in corner cases where the table name contains backticks (#275).
+- Avoid including the call in errors.
+- Upgrade bundled sqlite to version 3.25.3 (#273).
+- Column names are marked as UTF-8 on return, to fix encoding problems on Windows (#276, @shrektan).
+
+
 # RSQLite 2.1.1.9002
 
 - Improve warning when `dbGetQuery()` is called with a statement (#226).

@@ -8,11 +8,6 @@ install: R -q -e 'tic::install()'
 after_install: R -q -e 'tic::after_install()'
 before_script:
 - R -q -e 'tic::before_script()'
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo rm -rf /usr/local/var/postgres; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then initdb /usr/local/var/postgres; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pg_ctl -D /usr/local/var/postgres start; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then createuser -s travis || true; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then createdb travis || true; fi
 script: R -q -e 'tic::script()'
 after_success: R -q -e 'tic::after_success()'
 after_failure: R -q -e 'tic::after_failure()'

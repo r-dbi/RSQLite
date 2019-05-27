@@ -187,6 +187,26 @@ test_that("temporary works", {
   expect_false(dbExistsTable(con2, "tmp"))
 })
 
+test_that("works within transaction", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con))
+
+  df <- data.frame(
+    a = c(1:3, NA),
+    b = c("x", "y", "z", "E"),
+    stringsAsFactors = FALSE
+  )
+
+  csv_file <- tempfile(fileext='.csv')
+  write.csv(df, file=csv_file, row.names=FALSE, eol='\n')
+  dbWithTransaction(con, {
+    dbWriteTable(con, 'tbl', csv_file, eol='\n', overwrite=TRUE)
+    expect_true(dbExistsTable(con, 'tbl'))
+    dbBreak()
+  })
+  expect_false(dbExistsTable(con, 'tbl'))
+})
+
 
 # Append ------------------------------------------------------------------
 

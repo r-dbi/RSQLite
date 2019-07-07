@@ -107,6 +107,10 @@ DbColumnStorage* DbColumnStorage::append_data_to_new(DATA_TYPE new_dt) {
 
 void DbColumnStorage::fetch_value() {
   switch (dt) {
+  case DT_BOOL:
+    LOGICAL(data)[i] = source.fetch_bool();
+    break;
+
   case DT_INT:
     INTEGER(data)[i] = source.fetch_int();
     break;
@@ -125,6 +129,22 @@ void DbColumnStorage::fetch_value() {
 
   case DT_BLOB:
     SET_VECTOR_ELT(data, i, source.fetch_blob());
+    break;
+
+  case DT_DATE:
+    REAL(data)[i] = source.fetch_date();
+    break;
+
+  case DT_DATETIME:
+    REAL(data)[i] = source.fetch_datetime_local();
+    break;
+
+  case DT_DATETIMETZ:
+    REAL(data)[i] = source.fetch_datetime();
+    break;
+
+  case DT_TIME:
+    REAL(data)[i] = source.fetch_time();
     break;
 
   default:

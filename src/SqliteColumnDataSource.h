@@ -11,16 +11,21 @@ public:
   SqliteColumnDataSource(sqlite3_stmt* stmt, const int j);
 
 public:
-  DATA_TYPE get_data_type() const;
-  DATA_TYPE get_decl_data_type() const;
+  virtual DATA_TYPE get_data_type() const;
+  virtual DATA_TYPE get_decl_data_type() const;
 
-  bool is_null() const;
+  virtual bool is_null() const;
 
+  virtual int fetch_bool() const;
   virtual int fetch_int() const;
   virtual int64_t fetch_int64() const;
   virtual double fetch_real() const;
   virtual SEXP fetch_string() const;
   virtual SEXP fetch_blob() const;
+  virtual double fetch_date() const;
+  virtual double fetch_datetime_local() const;
+  virtual double fetch_datetime() const;
+  virtual double fetch_time() const;
 
 private:
   static DATA_TYPE datatype_from_decltype(const char* decl_type);

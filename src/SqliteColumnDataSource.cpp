@@ -46,6 +46,11 @@ bool SqliteColumnDataSource::is_null() const {
   return get_column_type() == SQLITE_NULL;
 }
 
+int SqliteColumnDataSource::fetch_bool() const {
+  // No such data type
+  return 0;
+}
+
 int SqliteColumnDataSource::fetch_int() const {
   return sqlite3_column_int(get_stmt(), get_j());
 }
@@ -72,6 +77,26 @@ SEXP SqliteColumnDataSource::fetch_blob() const {
   memcpy(RAW(bytes), blob, size);
 
   return bytes;
+}
+
+double SqliteColumnDataSource::fetch_date() const {
+  // No such data type
+  return 0.0;
+}
+
+double SqliteColumnDataSource::fetch_datetime_local() const {
+  // No such data type
+  return 0.0;
+}
+
+double SqliteColumnDataSource::fetch_datetime() const {
+  // No such data type
+  return 0.0;
+}
+
+double SqliteColumnDataSource::fetch_time() const {
+  // No such data type
+  return 0.0;
 }
 
 

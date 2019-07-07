@@ -3,12 +3,19 @@
 
 # RSQLite
 
+<!-- badges: start -->
+
+[![Lifecycle:
+stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
 [![Build
 Status](https://travis-ci.org/r-dbi/RSQLite.png?branch=master)](https://travis-ci.org/r-dbi/RSQLite)
 [![AppVeyor Build
 Status](https://ci.appveyor.com/api/projects/status/github/r-dbi/RSQLite?branch=master&svg=true)](https://ci.appveyor.com/project/r-dbi/RSQLite)
 [![Coverage
 Status](https://codecov.io/gh/r-dbi/RSQLite/branch/master/graph/badge.svg)](https://codecov.io/github/r-dbi/RSQLite?branch=master)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/RSQLite)](https://cran.r-project.org/package=RSQLite)
+<!-- badges: end -->
 
 Embeds the SQLite database engine in R, providing a DBI-compliant
 interface. [SQLite](http://www.sqlite.org) is a public-domain,

@@ -78,7 +78,7 @@ test_that("affinity checks for dbGetQuery()", {
   check_affinity_get("DOUB", "numeric")
   check_affinity_get("NUMERIC", "numeric", "numeric", "integer")
   expect_warning(
-    check_affinity_get("BLOB", "blob", "numeric", "integer", "numeric"),
+    check_affinity_get("BLOB", class(blob()), "numeric", "integer", "numeric"),
     "coercing"
   )
 })
@@ -94,7 +94,7 @@ test_that("affinity checks for dbFetch()", {
   check_affinity_fetch("DOUB", "numeric")
   check_affinity_fetch("NUMERIC", "numeric", "numeric", "integer")
   expect_warning(
-    check_affinity_fetch("BLOB", "blob", "blob"),
+    check_affinity_fetch("BLOB", class(blob()), class(blob())),
     "coercing"
   )
 })

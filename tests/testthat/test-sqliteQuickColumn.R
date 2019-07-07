@@ -9,7 +9,7 @@ test_that("sqliteQuickColumn round trips cleanly", {
     a = letters[1:10],
     b = rnorm(10),
     c = sample(1:10),
-    d = blob::as.blob(lapply(1:10, function(x) mk_blob(sample(10:256, 1)))),
+    d = blob::as_blob(lapply(1:10, function(x) mk_blob(sample(10:256, 1)))),
     stringsAsFactors = FALSE
   )
 

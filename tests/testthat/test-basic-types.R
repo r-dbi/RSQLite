@@ -83,7 +83,7 @@ test_that("BLOBs retrieve as blob objects", {
   dbWriteTable(con, "t1", local)
 
   remote <- dbReadTable(con, "t1")
-  expect_equal(remote$z, blob::as.blob(unclass(local$z)))
+  expect_equal(remote$z, blob::as_blob(unclass(local$z)))
 })
 
 test_that("integers are upscaled to reals", {

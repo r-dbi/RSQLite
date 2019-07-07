@@ -11,7 +11,7 @@ test_that("adding large blob to table survives valgrind check (#192)", {
   data$data <- unclass(data$data)
   dbWriteTable(con, "data", data)
 
-  data$data <- blob::as.blob(data$data)
+  data$data <- blob::as_blob(data$data)
   expect_equal(
     dbReadTable(con, "data"),
     data

@@ -60,7 +60,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9003</span>
       </span>
     </div>
 
@@ -106,6 +106,19 @@
       <small>Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="rsqlite-2-1-1-9003" class="section level1">
+<h1 class="page-header">
+<a href="#rsqlite-2-1-1-9003" class="anchor"></a>RSQLite 2.1.1.9003<small> Unreleased </small>
+</h1>
+<ul>
+<li>Add test for correct use of non-UTF8-encoded column names (<a href='https://github.com/r-dbi/RSQLite/issues/277'>#277</a>, <a href='https://github.com/wush978'>@wush978</a>).</li>
+<li>
+<code>dbExistsTable()</code> works in corner cases where the table name contains backticks (<a href='https://github.com/r-dbi/RSQLite/issues/275'>#275</a>).</li>
+<li>Avoid including the call in errors.</li>
+<li>Upgrade bundled sqlite to version 3.25.3 (<a href='https://github.com/r-dbi/RSQLite/issues/273'>#273</a>).</li>
+<li>Column names are marked as UTF-8 on return, to fix encoding problems on Windows (<a href='https://github.com/r-dbi/RSQLite/issues/276'>#276</a>, <a href='https://github.com/shrektan'>@shrektan</a>).</li>
+</ul>
+</div>
     <div id="rsqlite-2-1-1-9002" class="section level1">
 <h1 class="page-header">
 <a href="#rsqlite-2-1-1-9002" class="anchor"></a>RSQLite 2.1.1.9002<small> Unreleased </small>
@@ -796,6 +809,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#rsqlite-2-1-1-9003">2.1.1.9003</a></li>
         <li><a href="#rsqlite-2-1-1-9002">2.1.1.9002</a></li>
         <li><a href="#rsqlite-2-1-1-9001-2018-05-06">2.1.1.9001</a></li>
         <li><a href="#rsqlite-2-1-1-9000-2018-05-06">2.1.1.9000</a></li>

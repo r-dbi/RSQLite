@@ -29,7 +29,7 @@ Imports:
     pkgconfig,
     Rcpp (>= 0.12.7)
 Suggests: 
-    DBItest,
+    DBItest (>= 1.6.0.9002),
     knitr,
     pkgload,
     rmarkdown,

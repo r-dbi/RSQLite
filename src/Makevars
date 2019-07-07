@@ -9,6 +9,7 @@ PKG_CPPFLAGS=-I. \
              -DSQLITE_ENABLE_STAT4 \
              -DSQLITE_SOUNDEX \
              -DRCPP_DEFAULT_INCLUDE_CALL=false \
+             -DRCPP_USING_UTF8_ERROR_STRING \
              -DBOOST_NO_AUTO_PTR
 
 PKG_LIBS = vendor/sqlite3/extension-functions.o vendor/sqlite3/sqlite3.o

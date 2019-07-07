@@ -1,6 +1,6 @@
 context("encoding")
 
-test_that("write tables whose colnames or contents are BIG5 encoded", {
+test_that("write tables whose colnames or contents are BIG5 encoded (#277)", {
   skip_on_os("linux")
   skip_on_os("mac")
   skip_on_os("solaris")
@@ -32,7 +32,7 @@ test_that("write tables whose colnames or contents are BIG5 encoded", {
   expect_identical(res, df)
 })
 
-test_that("write tables whose colnames and contents are UTF-8 encoded", {
+test_that("write tables whose colnames and contents are UTF-8 encoded (#277)", {
   .loc <- Sys.getlocale("LC_COLLATE")
   if (.Platform$OS.type == "windows") {
     Sys.setlocale(locale = "cht")
@@ -66,7 +66,7 @@ test_that("write tables whose colnames and contents are UTF-8 encoded", {
   expect_identical(res, df)
 })
 
-test_that("list the field of tables whose colnames are BIG5 encoded", {
+test_that("list the field of tables whose colnames are BIG5 encoded (#277)", {
   skip_on_os("linux")
   skip_on_os("mac")
   skip_on_os("solaris")
@@ -100,7 +100,7 @@ test_that("list the field of tables whose colnames are BIG5 encoded", {
 
 })
 
-test_that("list the field of tables whose colnames are UTF-8 encoded", {
+test_that("list the field of tables whose colnames are UTF-8 encoded (#277)", {
   .loc <- Sys.getlocale("LC_COLLATE")
   if (.Platform$OS.type == "windows") {
     Sys.setlocale(locale = "cht")
@@ -132,7 +132,7 @@ test_that("list the field of tables whose colnames are UTF-8 encoded", {
 
 })
 
-test_that("append tables whose colnames are UTF-8 encoded", {
+test_that("append tables whose colnames are UTF-8 encoded (#277)", {
   .loc <- Sys.getlocale("LC_COLLATE")
   if (.Platform$OS.type == "windows") {
     Sys.setlocale(locale = "cht")

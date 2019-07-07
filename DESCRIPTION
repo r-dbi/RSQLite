@@ -31,7 +31,6 @@ Imports:
 Suggests: 
     DBItest (>= 1.6.0.9002),
     knitr,
-    pkgload,
     rmarkdown,
     testthat
 LinkingTo: 
@@ -42,8 +41,7 @@ VignetteBuilder: knitr
 Remotes: 
     tidyverse/blob,
     r-dbi/DBI,
-    r-dbi/DBItest,
-    r-lib/pkgload
+    r-dbi/DBItest
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1

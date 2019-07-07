@@ -1,6 +1,9 @@
-add_package_checks()
+do_package_checks()
 
 if (Sys.getenv("BUILD_PKGDOWN") != "" && !ci()$is_tag()) {
+  get_stage("install") %>%
+    add_step(step_install_github("r-lib/pkgload"))
+
   get_stage("deploy") %>%
     add_step(step_build_pkgdown())
 

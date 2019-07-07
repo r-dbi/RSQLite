@@ -40,9 +40,10 @@ LinkingTo:
     Rcpp
 VignetteBuilder: knitr
 Remotes: 
+    tidyverse/blob,
     r-dbi/DBI,
     r-dbi/DBItest,
-    r-lib/pkgload#83
+    r-lib/pkgload
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1

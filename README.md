@@ -3,7 +3,7 @@
 RSQLite
 =======
 
-[![Build Status](https://travis-ci.org/rstats-db/RSQLite.png?branch=master)](https://travis-ci.org/rstats-db/RSQLite) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rstats-db/RSQLite?branch=master&svg=true)](https://ci.appveyor.com/project/rstats-db/RSQLite) [![Coverage Status](https://codecov.io/gh/rstats-db/RSQLite/branch/master/graph/badge.svg)](https://codecov.io/github/rstats-db/RSQLite?branch=master)
+[![Build Status](https://travis-ci.org/r-dbi/RSQLite.png?branch=master)](https://travis-ci.org/r-dbi/RSQLite) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/r-dbi/RSQLite?branch=master&svg=true)](https://ci.appveyor.com/project/r-dbi/RSQLite) [![Coverage Status](https://codecov.io/gh/r-dbi/RSQLite/branch/master/graph/badge.svg)](https://codecov.io/github/r-dbi/RSQLite?branch=master)
 
 Embeds the SQLite database engine in R, providing a DBI-compliant interface. [SQLite](http://www.sqlite.org) is a public-domain, single-user, very light-weight database engine that implements a decent subset of the SQL 92 standard, including the core table creation, updating, insertion, and selection operations, plus transaction management.
 
@@ -17,7 +17,7 @@ Or install the latest development version from GitHub with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("rstats-db/RSQLite")
+devtools::install_github("r-dbi/RSQLite")
 ```
 
 To install from GitHub, you'll need a [development environment](http://www.rstudio.com/ide/docs/packages/prerequisites).

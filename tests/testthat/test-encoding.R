@@ -153,12 +153,13 @@ test_that("append tables whose colnames are UTF-8 encoded (#277)", {
   Encoding(utf8_string) <- "UTF-8"
   colnames(df) <- utf8_string
   dbWriteTable(con, "a", df)
-  dbWriteTable(con, "a", df, append = TRUE)
+  expect_error(dbWriteTable(con, "a", df, append = TRUE), NA)
+
   df <- structure(
     list(V1 = 1:3, V2 = rep(utf8_string, 3)),
     class = "data.frame",
     row.names = 1:3)
   colnames(df) <- paste(utf8_string, 1:2, sep = "")
   dbWriteTable(con, "b", df)
-  dbWriteTable(con, "b", df, append = TRUE)
+  expect_error(dbWriteTable(con, "b", df, append = TRUE), NA)
 })

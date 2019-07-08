@@ -18,3 +18,4 @@ inst/doc
 .RData
 /clion-test.R
 /.drake
+.vscode/

@@ -7,6 +7,7 @@
 
 #include "DbConnection.h"
 #include "DbResult.h"
+#include "SqliteResult.h"
 
 namespace Rcpp {
 
@@ -15,6 +16,9 @@ DbConnection* as(SEXP x);
 
 template<>
 DbResult* as(SEXP x);
+
+template<>
+SqliteResult* as(SEXP x);
 
 }
 

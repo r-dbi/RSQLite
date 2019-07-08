@@ -69,15 +69,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // result_create
-XPtr<DbResult> result_create(XPtr<DbConnectionPtr> con, std::string sql, bool is_statement);
-RcppExport SEXP _RSQLite_result_create(SEXP conSEXP, SEXP sqlSEXP, SEXP is_statementSEXP) {
+XPtr<DbResult> result_create(XPtr<DbConnectionPtr> con, std::string sql);
+RcppExport SEXP _RSQLite_result_create(SEXP conSEXP, SEXP sqlSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< XPtr<DbConnectionPtr> >::type con(conSEXP);
     Rcpp::traits::input_parameter< std::string >::type sql(sqlSEXP);
-    Rcpp::traits::input_parameter< bool >::type is_statement(is_statementSEXP);
-    rcpp_result_gen = Rcpp::wrap(result_create(con, sql, is_statement));
+    rcpp_result_gen = Rcpp::wrap(result_create(con, sql));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -170,12 +169,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // result_get_placeholder_names
-CharacterVector result_get_placeholder_names(DbResult* res);
+CharacterVector result_get_placeholder_names(SqliteResult* res);
 RcppExport SEXP _RSQLite_result_get_placeholder_names(SEXP resSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< DbResult* >::type res(resSEXP);
+    Rcpp::traits::input_parameter< SqliteResult* >::type res(resSEXP);
     rcpp_result_gen = Rcpp::wrap(result_get_placeholder_names(res));
     return rcpp_result_gen;
 END_RCPP
@@ -207,7 +206,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_connection_release", (DL_FUNC) &_RSQLite_connection_release, 1},
     {"_RSQLite_connection_copy_database", (DL_FUNC) &_RSQLite_connection_copy_database, 2},
     {"_RSQLite_connection_import_file", (DL_FUNC) &_RSQLite_connection_import_file, 6},
-    {"_RSQLite_result_create", (DL_FUNC) &_RSQLite_result_create, 3},
+    {"_RSQLite_result_create", (DL_FUNC) &_RSQLite_result_create, 2},
     {"_RSQLite_result_release", (DL_FUNC) &_RSQLite_result_release, 1},
     {"_RSQLite_result_valid", (DL_FUNC) &_RSQLite_result_valid, 1},
     {"_RSQLite_result_fetch", (DL_FUNC) &_RSQLite_result_fetch, 2},

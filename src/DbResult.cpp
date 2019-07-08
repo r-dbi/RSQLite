@@ -15,11 +15,6 @@ DbResult::DbResult(const DbConnectionPtr& pConn, const std::string& sql) :
 DbResult::~DbResult() {
 }
 
-DbResult* DbResult::create_and_send_query(const DbConnectionPtr& con, const std::string& sql, const bool is_statement) {
-  (void)is_statement;
-  return new DbResult(con, sql);
-}
-
 
 // Publics /////////////////////////////////////////////////////////////////////
 
@@ -58,10 +53,6 @@ List DbResult::get_column_info() {
   out.attr("class") = "data.frame";
 
   return out;
-}
-
-CharacterVector DbResult::get_placeholder_names() const {
-  return impl->get_placeholder_names();
 }
 
 // Privates ///////////////////////////////////////////////////////////////////

@@ -21,7 +21,7 @@ DbResult* DbResult::create_and_send_query(const DbConnectionPtr& con, const std:
 // Publics /////////////////////////////////////////////////////////////////////
 
 bool DbResult::complete() const {
-  return impl->complete();
+  return (impl == NULL) || impl->complete();
 }
 
 bool DbResult::is_active() const {
@@ -37,10 +37,14 @@ int DbResult::n_rows_affected() {
 }
 
 void DbResult::bind(const List& params) {
-  return impl->bind(params);
+  validate_params(params);
+  impl->bind(params);
 }
 
 List DbResult::fetch(const int n_max) {
+  if (!is_active())
+    stop("Inactive result set");
+
   return impl->fetch(n_max);
 }
 

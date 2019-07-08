@@ -9,6 +9,8 @@
 class DbConnection;
 typedef boost::shared_ptr<DbConnection> DbConnectionPtr;
 
+// DbResult --------------------------------------------------------------------
+
 class SqliteResultImpl;
 typedef SqliteResultImpl DbResultImpl;
 

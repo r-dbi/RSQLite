@@ -193,8 +193,8 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 
     row.names <- compatRowNames(row.names)
 
-    dbBegin(conn, name='dbWriteTable')
-    on.exit(dbRollback(conn, name='dbWriteTable'))
+    dbBegin(conn, name = "dbWriteTable")
+    on.exit(dbRollback(conn, name = "dbWriteTable"))
 
     found <- dbExistsTable(conn, name)
     if (found && !overwrite && !append) {
@@ -223,7 +223,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
     skip <- skip + as.integer(header)
     connection_import_file(conn@ptr, name, value, sep, eol, skip)
 
-    dbCommit(conn, name='dbWriteTable')
+    dbCommit(conn, name = "dbWriteTable")
     on.exit(NULL)
     invisible(TRUE)
   }

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "DbResult.h"
+#include "DbConnection.h"
 #include "SqliteResultImpl.h"
 
 
@@ -19,7 +20,7 @@ DbResult* DbResult::create_and_send_query(const DbConnectionPtr& con, const std:
 
 // Publics /////////////////////////////////////////////////////////////////////
 
-bool DbResult::complete() {
+bool DbResult::complete() const {
   return impl->complete();
 }
 
@@ -35,18 +36,12 @@ int DbResult::n_rows_affected() {
   return impl->n_rows_affected();
 }
 
-CharacterVector DbResult::get_placeholder_names() const {
-  return impl->get_placeholder_names();
-}
-
 void DbResult::bind(const List& params) {
-  validate_params(params);
-  impl->bind(params);
+  return impl->bind(params);
 }
 
 List DbResult::fetch(const int n_max) {
   return impl->fetch(n_max);
-
 }
 
 List DbResult::get_column_info() {
@@ -59,6 +54,9 @@ List DbResult::get_column_info() {
   return out;
 }
 
+CharacterVector DbResult::get_placeholder_names() const {
+  return impl->get_placeholder_names();
+}
 
 // Privates ///////////////////////////////////////////////////////////////////
 

@@ -1,7 +1,7 @@
 #include "pch.h"
 
-#ifndef __RSQLSITE_TYPES__
-#define __RSQLSITE_TYPES__
+#ifndef __RSQLITE_TYPES__
+#define __RSQLITE_TYPES__
 
 #include <RSQLite.h>
 

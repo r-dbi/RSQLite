@@ -3,8 +3,12 @@
 
 
 #include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
 #include "sqlite3.h"
 #include "DbColumnDataType.h"
+
+class DbConnection;
+typedef boost::shared_ptr<DbConnection> DbConnectionPtr;
 
 class SqliteResultImpl : public boost::noncopyable {
 private:
@@ -33,7 +37,7 @@ private:
   std::vector<DATA_TYPE> types_;
 
 public:
-  SqliteResultImpl(sqlite3* conn_, const std::string& sql);
+  SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);
   ~SqliteResultImpl();
 
 private:

@@ -1,9 +1,11 @@
-#ifndef __RSQLSITE_SQLITE_CONNECTION__
-#define __RSQLSITE_SQLITE_CONNECTION__
+#ifndef __RSQLITE_SQLITE_CONNECTION__
+#define __RSQLITE_SQLITE_CONNECTION__
 
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include "sqlite3.h"
+
+class DbResult;
 
 // Connection ------------------------------------------------------------------
 
@@ -28,6 +30,11 @@ public:
   // Is the connection valid?
   bool is_valid() const;
 
+  // Current result set:
+  void set_current_result(const DbResult* pResult) const;
+  void reset_current_result(const DbResult* pResult) const;
+  bool is_current_result(const DbResult* pResult) const;
+
   // Fail if the connection is invalid
   void check_connection() const;
 
@@ -44,4 +51,4 @@ private:
   sqlite3* pConn_;
 };
 
-#endif // __RSQLSITE_SQLITE_CONNECTION__
+#endif // __RSQLITE_SQLITE_CONNECTION__

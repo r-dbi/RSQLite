@@ -8,11 +8,26 @@
 // Construction ////////////////////////////////////////////////////////////////
 
 DbResult::DbResult(const DbConnectionPtr& pConn, const std::string& sql) :
-  pConn_(pConn), impl(new SqliteResultImpl(pConn->conn(), sql))
+  pConn_(pConn)
 {
+  pConn->check_connection();
+  pConn->set_current_result(this);
+
+  try {
+    impl.reset(new DbResultImpl(pConn, sql));
+  }
+  catch (...) {
+    pConn->reset_current_result(this);
+    throw;
+  }
 }
 
 DbResult::~DbResult() {
+  try {
+    if (is_active()) {
+      pConn_->reset_current_result(this);
+    }
+  } catch (...) {}
 }
 
 
@@ -23,7 +38,7 @@ bool DbResult::complete() const {
 }
 
 bool DbResult::is_active() const {
-  return true;
+  return pConn_->is_current_result(this);
 }
 
 int DbResult::n_rows_fetched() {

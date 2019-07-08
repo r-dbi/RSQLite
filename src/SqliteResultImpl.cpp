@@ -158,7 +158,7 @@ List SqliteResultImpl::get_column_info() {
     types[i] = Rf_type2char(DbColumnStorage::sexptype_from_datatype(types_[i]));
   }
 
-  return List::create(names, types);
+  return List::create(_["name"] = names, _["type"] = types);
 }
 
 

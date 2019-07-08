@@ -1,18 +1,21 @@
 #include "pch.h"
 #include "DbResult.h"
 #include "DbConnection.h"
-#include "SqliteResultImpl.h"
+#include "DbResultImpl.h"
 
 
 
 // Construction ////////////////////////////////////////////////////////////////
 
-DbResult::DbResult(const DbConnectionPtr& pConn, const std::string& sql)
-  : pConn_(pConn), impl(new SqliteResultImpl(pConn->conn(), sql)) {}
+DbResult::DbResult(const DbConnectionPtr& pConn, const std::string& sql) :
+  pConn_(pConn), impl(new SqliteResultImpl(pConn->conn(), sql))
+{
+}
 
-DbResult::~DbResult() {}
+DbResult::~DbResult() {
+}
 
-DbResult* DbResult::create_and_send_query(const DbConnectionPtr& con, const std::string& sql, bool is_statement) {
+DbResult* DbResult::create_and_send_query(const DbConnectionPtr& con, const std::string& sql, const bool is_statement) {
   (void)is_statement;
   return new DbResult(con, sql);
 }
@@ -53,7 +56,6 @@ List DbResult::get_column_info() {
 
   out.attr("row.names") = IntegerVector::create(NA_INTEGER, -Rf_length(out[0]));
   out.attr("class") = "data.frame";
-  out.names() = CharacterVector::create("name", "type");
 
   return out;
 }

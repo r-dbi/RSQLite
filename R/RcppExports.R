@@ -21,8 +21,8 @@ connection_import_file <- function(con, name, value, sep, eol, skip) {
     .Call(`_RSQLite_connection_import_file`, con, name, value, sep, eol, skip)
 }
 
-result_create <- function(con, sql, is_statement = FALSE) {
-    .Call(`_RSQLite_result_create`, con, sql, is_statement)
+result_create <- function(con, sql) {
+    .Call(`_RSQLite_result_create`, con, sql)
 }
 
 result_release <- function(res) {

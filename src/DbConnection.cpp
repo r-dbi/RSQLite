@@ -32,6 +32,16 @@ bool DbConnection::is_valid() const {
   return (pConn_ != NULL);
 }
 
+void DbConnection::set_current_result(const DbResult*) const {
+}
+
+void DbConnection::reset_current_result(const DbResult*) const {
+}
+
+bool DbConnection::is_current_result(const DbResult*) const {
+  return true;
+}
+
 void DbConnection::check_connection() const {
   if (!is_valid()) {
     stop("Invalid or closed connection");

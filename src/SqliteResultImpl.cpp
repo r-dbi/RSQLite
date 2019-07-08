@@ -2,20 +2,21 @@
 #include "SqliteResultImpl.h"
 #include "SqliteDataFrame.h"
 #include "DbColumnStorage.h"
+#include "DbConnection.h"
 #include "integer64.h"
 
 
 
 // Construction ////////////////////////////////////////////////////////////////
 
-SqliteResultImpl::SqliteResultImpl(sqlite3* conn_, const std::string& sql) :
-  conn(conn_),
-  stmt(prepare(conn_, sql)),
+SqliteResultImpl::SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql) :
+  conn(conn_->conn()),
+  stmt(prepare(conn, sql)),
   cache(stmt),
   complete_(false),
   ready_(false),
   nrows_(0),
-  total_changes_start_(sqlite3_total_changes(conn_)),
+  total_changes_start_(sqlite3_total_changes(conn)),
   group_(0),
   groups_(0),
   types_(get_initial_field_types(cache.ncols_))
@@ -158,7 +159,7 @@ List SqliteResultImpl::get_column_info() {
     types[i] = Rf_type2char(DbColumnStorage::sexptype_from_datatype(types_[i]));
   }
 
-  return List::create(names, types);
+  return List::create(_["name"] = names, _["type"] = types);
 }
 
 

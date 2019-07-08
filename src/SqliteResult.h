@@ -6,7 +6,7 @@
 // DbResult --------------------------------------------------------------------
 
 class SqliteResult : public DbResult {
-public:
+protected:
   SqliteResult(const DbConnectionPtr& pConn, const std::string& sql);
 
 public:

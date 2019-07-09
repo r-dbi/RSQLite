@@ -59,6 +59,7 @@ Collate:
     'extensions.R'
     'names.R'
     'query.R'
+    'regularExpressions.R'
     'rownames.R'
     'table.R'
     'transactions.R'

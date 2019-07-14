@@ -29,7 +29,12 @@ initRegExp <- function(db) {
   # replace right-most name of library,
   # should work across platforms
   lib_path <- sub("(.*)RSQLite[.]", "\\1regexp.", lib_path)
-  res <- dbGetQuery(db, sprintf("SELECT load_extension('%s')", lib_path))
 
-  invisible(TRUE)
+  # repeat loading would throw error
+  res <- try(
+    dbGetQuery(db, sprintf("SELECT load_extension('%s')", lib_path)),
+    silent = TRUE)
+
+  # inform user
+  invisible(!"try-error" %in% class(res))
 }

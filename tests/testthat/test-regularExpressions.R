@@ -9,8 +9,11 @@ test_that("adding support for regular expressions(#296)", {
     dbDisconnect(con),
     add = TRUE)
 
-  initRegExp(
-    db = con)
+  # note true only from first
+  # invocation of dbConnect()
+  expect_true(
+    initRegExp(
+      db = con))
 
   dbWriteTable(
     conn = con,
@@ -29,10 +32,6 @@ test_that("adding support for regular expressions(#296)", {
 
   expect_true(
     object = (6.2 < mean(res$Sepal.Length)) < 6.3)
-
-  res <- dbGetQuery(
-    conn = con,
-    statement = 'SELECT "Sepal.Length" FROM iris WHERE Species REGEXP "\\w";')
 
 })
 

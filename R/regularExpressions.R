@@ -9,6 +9,8 @@
 #'
 #' Note this only affects the specified connection.
 #'
+#' @return \code{TRUE} if the operator has been loaded.
+#'
 #' @param db A \code{\linkS4class{SQLiteConnection}} object to add the
 #' regular expression operator into the connection.
 #' @export
@@ -26,15 +28,25 @@ initRegExp <- function(db) {
   }
 
   lib_path <- getLoadedDLLs()[["RSQLite"]][["path"]]
-  # replace right-most name of library,
-  # should work across platforms
-  lib_path <- sub("(.*)RSQLite[.]", "\\1regexp.", lib_path)
+  # replace right-most name of library object (RSQLite) with
+  # name of the regexp object, should work across platforms
+  lib_path <- sub("(.*)RSQLite([.][a-zA-Z]+?)$", "\\1regexp\\2", lib_path)
 
   # repeat loading would throw error
-  res <- try(
-    dbGetQuery(db, sprintf("SELECT load_extension('%s')", lib_path)),
-    silent = TRUE)
+  if (is.null(getLoadedDLLs()[["regexp"]][["path"]])) {
 
-  # inform user
-  invisible(!"try-error" %in% class(res))
+    # try to load
+    res <- try(
+      dbGetQuery(db, sprintf("SELECT load_extension('%s')", lib_path)),
+      silent = TRUE)
+
+    # inform user
+    invisible(!"try-error" %in% class(res))
+
+  } else {
+
+    # already loaded
+    invisible(TRUE)
+  }
+
 }

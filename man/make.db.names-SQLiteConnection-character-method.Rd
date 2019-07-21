@@ -8,7 +8,8 @@
 \title{Make R/S-Plus identifiers into legal SQL identifiers}
 \usage{
 \S4method{make.db.names}{SQLiteConnection,character}(dbObj, snames,
-  keywords = .SQL92Keywords, unique = TRUE, allow.keywords = TRUE, ...)
+  keywords = .SQL92Keywords, unique = TRUE, allow.keywords = TRUE,
+  ...)
 
 \S4method{SQLKeywords}{SQLiteConnection}(dbObj, ...)
 

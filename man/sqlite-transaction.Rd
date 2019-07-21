@@ -8,9 +8,11 @@
 \alias{dbRollback,SQLiteConnection-method}
 \title{SQLite transaction management}
 \usage{
-\S4method{dbBegin}{SQLiteConnection}(conn, .name = NULL, ..., name = NULL)
+\S4method{dbBegin}{SQLiteConnection}(conn, .name = NULL, ...,
+  name = NULL)
 
-\S4method{dbCommit}{SQLiteConnection}(conn, .name = NULL, ..., name = NULL)
+\S4method{dbCommit}{SQLiteConnection}(conn, .name = NULL, ...,
+  name = NULL)
 
 \S4method{dbRollback}{SQLiteConnection}(conn, .name = NULL, ...,
   name = NULL)

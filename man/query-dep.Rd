@@ -13,7 +13,8 @@ dbSendPreparedQuery(conn, statement, bind.data, ...)
 
 dbGetPreparedQuery(conn, statement, bind.data, ...)
 
-\S4method{dbSendPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
+
+  \S4method{dbSendPreparedQuery}{SQLiteConnection,character,data.frame}(conn,
   statement, bind.data, ...)
 
 \S4method{dbGetPreparedQuery}{SQLiteConnection,character,data.frame}(conn,

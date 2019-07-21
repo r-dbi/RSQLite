@@ -18,7 +18,8 @@ SQLite(...)
 \S4method{dbConnect}{SQLiteDriver}(drv, dbname = "", ...,
   loadable.extensions = TRUE, default.extensions = loadable.extensions,
   cache_size = NULL, synchronous = "off", flags = SQLITE_RWC,
-  vfs = NULL, bigint = c("integer64", "integer", "numeric", "character"))
+  vfs = NULL, bigint = c("integer64", "integer", "numeric",
+  "character"))
 
 \S4method{dbConnect}{SQLiteConnection}(drv, ...)
 

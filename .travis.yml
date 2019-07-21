@@ -6,6 +6,7 @@
 before_install: R -q -e 'install.packages(c("remotes", "curl")); remotes::install_github("ropenscilabs/tic"); tic::prepare_all_stages(); tic::before_install()'
 install: R -q -e 'tic::install()'
 after_install: R -q -e 'tic::after_install()'
+
 before_script:
 - R -q -e 'tic::before_script()'
 script: R -q -e 'tic::script()'
@@ -55,6 +56,8 @@ addons:
 matrix:
   include:
   - r: devel
+    env:
+    - DEV_VERSIONS=true
   - r: 3.2
   - stage: full
     os: osx

@@ -29,7 +29,7 @@ Imports:
     pkgconfig,
     Rcpp (>= 0.12.7)
 Suggests: 
-    DBItest (>= 1.6.0.9002),
+    DBItest,
     knitr,
     rmarkdown,
     testthat
@@ -38,9 +38,6 @@ LinkingTo:
     plogr (>= 0.2.0),
     Rcpp
 VignetteBuilder: knitr
-Remotes: 
-    r-dbi/DBI,
-    r-dbi/DBItest
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1

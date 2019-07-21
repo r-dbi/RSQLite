@@ -102,24 +102,31 @@ setMethod("dbQuoteIdentifier", c("SQLiteConnection", "SQL"), function(conn, x, .
 #' @rdname SQLiteConnection-class
 #' @export
 setMethod("dbUnquoteIdentifier", c("SQLiteConnection", "SQL"), function(conn, x, ...) {
-  rx <- '^(?:(?:|`((?:[^`]|``)+)`[.])(?:|`((?:[^`]|``)*)`)|([^`. ]+))$'
+  id_rx <- "(?:`((?:[^`]|``)+)`|([^`. ]+))"
+
+  rx <- paste0(
+    "^",
+    "(?:|", id_rx, "[.])",
+    "(?:|", id_rx, ")",
+    "$"
+  )
+
   bad <- grep(rx, x, invert = TRUE)
   if (length(bad) > 0) {
     stop("Can't unquote ", x[bad[[1]]], call. = FALSE)
   }
-  schema <- gsub(rx, "\\1", x)
+  schema <- gsub(rx, "\\1\\2", x)
   schema <- gsub("``", "`", schema)
-  table <- gsub(rx, "\\2", x)
+  table <- gsub(rx, "\\3\\4", x)
   table <- gsub("``", "`", table)
-  naked_table <- gsub(rx, "\\3", x)
 
-  ret <- Map(schema, table, naked_table, f = as_table)
+  ret <- Map(schema, table, f = as_table)
   names(ret) <- names(x)
   ret
 })
 
-as_table <- function(schema, table, naked_table = NULL) {
-  args <- c(schema = schema, table = table, table = naked_table)
+as_table <- function(schema, table) {
+  args <- c(schema = schema, table = table)
   # Also omits NA args
   args <- args[!is.na(args) & args != ""]
   do.call(Id, as.list(args))

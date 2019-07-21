@@ -379,13 +379,13 @@ sqliteListTablesQuery <- function(conn, schema = NULL, name = NULL) {
   if (is.null(schema)) {
     info_sql <- "(SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master)"
   } else {
-    info_sql <- paste0("(SELECT * FROM ", dbQuoteIdentifier(conn, schema), ".sqlite_master")
+    info_sql <- paste0("(SELECT * FROM ", dbQuoteIdentifier(conn, schema), ".sqlite_master)")
   }
 
-  SQL(paste("SELECT name FROM",
-    info_sql,
-    "WHERE (type = 'table' OR type = 'view')",
-    if (!is.null(name)) paste0("AND (lower(name) = ", dbQuoteString(conn, name), ")"),
+  SQL(paste0("SELECT name ",
+    "FROM ", info_sql, " ",
+    "WHERE (type = 'table' OR type = 'view') ",
+    if (!is.null(name)) paste0("AND (lower(name) = ", dbQuoteString(conn, name), ") "),
     "ORDER BY name",
     sep = "\n"
   ))

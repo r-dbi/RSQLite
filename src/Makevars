@@ -14,4 +14,13 @@ PKG_CPPFLAGS=-I. \
 
 PKG_LIBS = vendor/sqlite3/extension-functions.o vendor/sqlite3/sqlite3.o
 
+.PHONY: all
+
+all: regexp $(SHLIB)
+
 $(SHLIB): $(PKG_LIBS)
+
+REGEXP_OBJECT = vendor/sqlite3/regexp.o
+
+regexp: $(REGEXP_OBJECT)
+	$(SHLIB_LINK) -o regexp$(SHLIB_EXT) $(REGEXP_OBJECT)

@@ -14,3 +14,10 @@ tmp <- tempfile()
 download.file(latest, tmp)
 unzip(tmp, exdir = "src/vendor/sqlite3", junkpaths = TRUE)
 unlink("src/vendor/sqlite3/shell.c")
+
+# Regular expression source code
+download.file(
+  url = "https://sqlite.org/src/raw?filename=ext/misc/regexp.c&ci=trunk",
+  destfile = "src/vendor/sqlite3/regexp.c",
+  quiet = TRUE,
+  mode = "w")

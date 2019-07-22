@@ -92,19 +92,20 @@
 <div id="basic-usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#basic-usage" class="anchor"></a>Basic usage</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(DBI)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co"># Create an ephemeral in-memory RSQLite database</span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3">con &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbConnect">dbConnect</a></span>(RSQLite<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/RSQLite/topics/SQLite">SQLite</a></span>(), <span class="st">":memory:"</span>)</a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbListTables">dbListTables</a></span>(con)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(DBI)</a></code></pre></div>
+<pre><code>## Warning: package 'DBI' was built under R version 3.6.1</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># Create an ephemeral in-memory RSQLite database</span></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">con &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbConnect">dbConnect</a></span>(RSQLite<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/RSQLite/topics/SQLite">SQLite</a></span>(), <span class="st">":memory:"</span>)</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbListTables">dbListTables</a></span>(con)</a></code></pre></div>
 <pre><code>## character(0)</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbWriteTable">dbWriteTable</a></span>(con, <span class="st">"mtcars"</span>, mtcars)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbListTables">dbListTables</a></span>(con)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbWriteTable">dbWriteTable</a></span>(con, <span class="st">"mtcars"</span>, mtcars)</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbListTables">dbListTables</a></span>(con)</a></code></pre></div>
 <pre><code>## [1] "mtcars"</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbListFields">dbListFields</a></span>(con, <span class="st">"mtcars"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbListFields">dbListFields</a></span>(con, <span class="st">"mtcars"</span>)</a></code></pre></div>
 <pre><code>##  [1] "mpg"  "cyl"  "disp" "hp"   "drat" "wt"   "qsec" "vs"   "am"   "gear"
 ## [11] "carb"</code></pre>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbReadTable">dbReadTable</a></span>(con, <span class="st">"mtcars"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbReadTable">dbReadTable</a></span>(con, <span class="st">"mtcars"</span>)</a></code></pre></div>
 <pre><code>##     mpg cyl  disp  hp drat    wt  qsec vs am gear carb
 ## 1  21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
 ## 2  21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
@@ -138,9 +139,9 @@
 ## 30 19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6
 ## 31 15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
 ## 32 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</code></pre>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="co"># You can fetch all results:</span></a>
-<a class="sourceLine" id="cb11-2" data-line-number="2">res &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbSendQuery">dbSendQuery</a></span>(con, <span class="st">"SELECT * FROM mtcars WHERE cyl = 4"</span>)</a>
-<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbFetch">dbFetch</a></span>(res)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="co"># You can fetch all results:</span></a>
+<a class="sourceLine" id="cb13-2" data-line-number="2">res &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbSendQuery">dbSendQuery</a></span>(con, <span class="st">"SELECT * FROM mtcars WHERE cyl = 4"</span>)</a>
+<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbFetch">dbFetch</a></span>(res)</a></code></pre></div>
 <pre><code>##     mpg cyl  disp  hp drat    wt  qsec vs am gear carb
 ## 1  22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
 ## 2  24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
@@ -153,22 +154,22 @@
 ## 9  26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
 ## 10 30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2
 ## 11 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbClearResult">dbClearResult</a></span>(res)</a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="co"># Or a chunk at a time</span></a>
-<a class="sourceLine" id="cb13-4" data-line-number="4">res &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbSendQuery">dbSendQuery</a></span>(con, <span class="st">"SELECT * FROM mtcars WHERE cyl = 4"</span>)</a>
-<a class="sourceLine" id="cb13-5" data-line-number="5"><span class="cf">while</span>(<span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbHasCompleted">dbHasCompleted</a></span>(res)){</a>
-<a class="sourceLine" id="cb13-6" data-line-number="6">  chunk &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbFetch">dbFetch</a></span>(res, <span class="dt">n =</span> <span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb13-7" data-line-number="7">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(chunk))</a>
-<a class="sourceLine" id="cb13-8" data-line-number="8">}</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbClearResult">dbClearResult</a></span>(res)</a>
+<a class="sourceLine" id="cb15-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb15-3" data-line-number="3"><span class="co"># Or a chunk at a time</span></a>
+<a class="sourceLine" id="cb15-4" data-line-number="4">res &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbSendQuery">dbSendQuery</a></span>(con, <span class="st">"SELECT * FROM mtcars WHERE cyl = 4"</span>)</a>
+<a class="sourceLine" id="cb15-5" data-line-number="5"><span class="cf">while</span>(<span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbHasCompleted">dbHasCompleted</a></span>(res)){</a>
+<a class="sourceLine" id="cb15-6" data-line-number="6">  chunk &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbFetch">dbFetch</a></span>(res, <span class="dt">n =</span> <span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb15-7" data-line-number="7">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(chunk))</a>
+<a class="sourceLine" id="cb15-8" data-line-number="8">}</a></code></pre></div>
 <pre><code>## [1] 5
 ## [1] 5
 ## [1] 1</code></pre>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="co"># Clear the result</span></a>
-<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbClearResult">dbClearResult</a></span>(res)</a>
-<a class="sourceLine" id="cb15-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb15-4" data-line-number="4"><span class="co"># Disconnect from the database</span></a>
-<a class="sourceLine" id="cb15-5" data-line-number="5"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbDisconnect">dbDisconnect</a></span>(con)</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="co"># Clear the result</span></a>
+<a class="sourceLine" id="cb17-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbClearResult">dbClearResult</a></span>(res)</a>
+<a class="sourceLine" id="cb17-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb17-4" data-line-number="4"><span class="co"># Disconnect from the database</span></a>
+<a class="sourceLine" id="cb17-5" data-line-number="5"><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbDisconnect">dbDisconnect</a></span>(con)</a></code></pre></div>
 </div>
 <div id="acknowledgements" class="section level2">
 <h2 class="hasAnchor">

@@ -35,18 +35,11 @@ initRegExp <- function(db) {
   # repeat loading would throw error
   if (is.null(getLoadedDLLs()[["regexp"]][["path"]])) {
 
-    # try to load
-    res <- try(
-      dbGetQuery(db, sprintf("SELECT load_extension('%s')", lib_path)),
-      silent = TRUE)
+    # load
+    dbExecute(db, sprintf("SELECT load_extension('%s')", lib_path))
 
-    # inform user
-    invisible(!"try-error" %in% class(res))
-
-  } else {
-
-    # already loaded
-    invisible(TRUE)
   }
 
+  # always return TRUE after loading
+  invisible(TRUE)
 }

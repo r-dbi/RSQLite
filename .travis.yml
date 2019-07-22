@@ -44,6 +44,7 @@ env:
   - _R_CHECK_FORCE_SUGGESTS_=false
   - _R_CHECK_SYSTEM_CLOCK_=false
   - MAKEFLAGS="-j 2"
+  - NOT_CRAN=false
 
 #addons
 addons:
@@ -58,6 +59,7 @@ matrix:
   - r: devel
     env:
     - DEV_VERSIONS=true
+    - NOT_CRAN=true
   - r: 3.2
   - stage: full
     os: osx

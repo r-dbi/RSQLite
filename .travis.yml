@@ -58,10 +58,7 @@ matrix:
   - r: devel
     env:
     - DEV_VERSIONS=true
-    - NOT_CRAN=true
   - r: 3.2
-    env:
-    - NOT_CRAN=false
   - stage: full
     os: osx
     latex: false

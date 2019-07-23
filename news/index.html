@@ -134,6 +134,7 @@
 <li><p><code>dbExistsTable()</code> works in corner cases where the table name contains backticks (<a href='https://github.com/r-dbi/RSQLite/issues/275'>#275</a>).</p></li>
 <li><p>Error messages are encoded in UTF-8.</p></li>
 <li><p>Column names are marked as UTF-8 on return, to fix encoding problems on Windows (<a href='https://github.com/r-dbi/RSQLite/issues/276'>#276</a>, <a href='https://github.com/shrektan'>@shrektan</a>).</p></li>
+<li><p>Fix segmentation fault when an open connection is garbage-collected with <code><a href="https://www.rdocumentation.org/packages/base/topics/options">options(warn = 2)</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/245'>#245</a>).</p></li>
 </ul>
 </div>
 <div id="new-features" class="section level2">

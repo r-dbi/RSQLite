@@ -60,7 +60,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9004</span>
       </span>
     </div>
 
@@ -106,6 +106,25 @@
       <small>Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="rsqlite-2-1-1-9004" class="section level1">
+<h1 class="page-header">
+<a href="#rsqlite-2-1-1-9004" class="anchor"></a>RSQLite 2.1.1.9004<small> Unreleased </small>
+</h1>
+<ul>
+<li>Upgrade bundled sqlite version to 3.29.0.</li>
+<li>Load extensions through API call, to support repeated loading.</li>
+<li>Add regular expression operator (<a href='https://github.com/r-dbi/RSQLite/issues/296'>#296</a>, <a href='https://github.com/rfhb'>@rfhb</a>).</li>
+<li>Fix query for listing tables in schema (<a href='https://github.com/r-dbi/RSQLite/issues/279'>#279</a>).</li>
+<li>
+<code>dbUnquoteIdentifier()</code> also handles unquoted identifiers of the form <code>table</code> or <code>schema.table</code>, for compatibility with dbplyr.</li>
+<li>Coercing <code>NULL</code> values to <code>integer64</code> and <code>numeric</code> now works in corner cases (<a href='https://github.com/r-dbi/RSQLite/issues/291'>#291</a>).</li>
+<li>Align <code>DbResult</code> and other classes with RPostgres and RMariaDB.</li>
+<li>Error messages are encoded in UTF-8.</li>
+<li>Require R 3.2.</li>
+<li>Use <code>default_skip</code>.</li>
+<li>Compatibility with upcoming releases of blob and hms.</li>
+</ul>
+</div>
     <div id="rsqlite-2-1-1-9003" class="section level1">
 <h1 class="page-header">
 <a href="#rsqlite-2-1-1-9003" class="anchor"></a>RSQLite 2.1.1.9003<small> Unreleased </small>
@@ -809,6 +828,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#rsqlite-2-1-1-9004">2.1.1.9004</a></li>
         <li><a href="#rsqlite-2-1-1-9003">2.1.1.9003</a></li>
         <li><a href="#rsqlite-2-1-1-9002">2.1.1.9002</a></li>
         <li><a href="#rsqlite-2-1-1-9001-2018-05-06">2.1.1.9001</a></li>

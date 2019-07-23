@@ -24,6 +24,8 @@
 
 - Column names are marked as UTF-8 on return, to fix encoding problems on Windows (#276, @shrektan).
 
+- Fix segmentation fault when an open connection is garbage-collected with `options(warn = 2)` (#245).
+
 
 ## New features
 

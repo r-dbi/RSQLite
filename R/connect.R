@@ -167,6 +167,15 @@ setMethod("dbConnect", "SQLiteDriver",
       initExtension(con)
     }
 
+    reg.finalizer(
+      con@ptr,
+      function(x) {
+        if (dbIsValid(con)) {
+          warning_once("call dbDisconnect() when finished working with a connection");
+        }
+      }
+    )
+
     con
   }
 )

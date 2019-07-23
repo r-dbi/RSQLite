@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "DbConnection.h"
-#include "utils.h"
 
 
 DbConnection::DbConnection(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs)
@@ -18,7 +17,6 @@ DbConnection::DbConnection(const std::string& path, const bool allow_ext, const 
 
 DbConnection::~DbConnection() {
   if (is_valid()) {
-    warning_once("call dbDisconnect() when finished working with a connection");
     disconnect();
   }
 }

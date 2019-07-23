@@ -1,3 +1,18 @@
+# RSQLite 2.1.1.9004
+
+- Upgrade bundled sqlite version to 3.29.0.
+- Load extensions through API call, to support repeated loading.
+- Add regular expression operator (#296, @rfhb).
+- Fix query for listing tables in schema (#279).
+- `dbUnquoteIdentifier()` also handles unquoted identifiers of the form `table` or `schema.table`, for compatibility with dbplyr.
+- Coercing `NULL` values to `integer64` and `numeric` now works in corner cases (#291).
+- Align `DbResult` and other classes with RPostgres and RMariaDB.
+- Error messages are encoded in UTF-8.
+- Require R 3.2.
+- Use `default_skip`.
+- Compatibility with upcoming releases of blob and hms.
+
+
 # RSQLite 2.1.1.9003
 
 - Add test for correct use of non-UTF8-encoded column names (#277, @wush978).

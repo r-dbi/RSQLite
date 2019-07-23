@@ -1,41 +1,50 @@
-# RSQLite 2.1.1.9004
+# RSQLite 2.1.2
+
+## Bundled library
 
 - Upgrade bundled sqlite version to 3.29.0.
-- Load extensions through API call, to support repeated loading.
-- Add regular expression operator (#296, @rfhb).
-- Fix query for listing tables in schema (#279).
+
+
+## Compatibility fixes
+
+- Compatibility with new releases of blob and hms.
+
 - `dbUnquoteIdentifier()` also handles unquoted identifiers of the form `table` or `schema.table`, for compatibility with dbplyr.
+
+
+## Bug fixes
+
+- Fix query for listing tables in schema (#279).
+
 - Coercing `NULL` values to `integer64` and `numeric` now works in corner cases (#291).
-- Align `DbResult` and other classes with RPostgres and RMariaDB.
-- Error messages are encoded in UTF-8.
-- Require R 3.2.
-- Use `default_skip`.
-- Compatibility with upcoming releases of blob and hms.
 
-
-# RSQLite 2.1.1.9003
-
-- Add test for correct use of non-UTF8-encoded column names (#277, @wush978).
 - `dbExistsTable()` works in corner cases where the table name contains backticks (#275).
-- Avoid including the call in errors.
-- Upgrade bundled sqlite to version 3.25.3 (#273).
+
+- Error messages are encoded in UTF-8.
+
 - Column names are marked as UTF-8 on return, to fix encoding problems on Windows (#276, @shrektan).
 
 
-# RSQLite 2.1.1.9002
+## New features
+
+- Add regular expression operator (#296, @rfhb).
+
+
+## Internal
+
+- Load extensions through API call, to support repeated loading.
+
+- Align `DbResult` and other classes with RPostgres and RMariaDB.
+
+- Tested with R >= 3.2 only (but not declared).
+
+- Use `default_skip`.
 
 - Improve warning when `dbGetQuery()` is called with a statement (#226).
-- Update bundled sqlite3 to 3.24 (#262).
 
+- Add test for correct use of non-UTF8-encoded column names (#277, @wush978).
 
-# RSQLite 2.1.1.9001 (2018-05-06)
-
-- Upgrade to SQLite 3.23.1.
-
-
-# RSQLite 2.1.1.9000 (2018-05-06)
-
-- Same as previous version.
+- Avoid including the call in errors.
 
 
 # RSQLite 2.1.1 (2018-05-05)

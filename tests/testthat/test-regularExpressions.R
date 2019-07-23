@@ -1,6 +1,6 @@
 context("regexp")
 
-test_that("adding support for regular expressions(#296)", {
+test_that("adding support for regular expressions (#296)", {
 
   con <- dbConnect(
     SQLite())
@@ -58,6 +58,16 @@ test_that("adding support for regular expressions(#296)", {
 
   # expected output
   expect_setequal(res$row_names, c("Merc 450SL", "Merc 450SLC"))
+
+})
+
+
+test_that("regular expressions can be initialized twice without harm", {
+
+  con <- dbConnect(SQLite())
+
+  expect_true(initRegExp(db = con))
+  expect_true(initRegExp(db = con))
 
 })
 

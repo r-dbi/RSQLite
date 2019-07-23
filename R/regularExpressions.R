@@ -27,18 +27,11 @@ initRegExp <- function(db) {
          call. = FALSE)
   }
 
-  lib_path <- getLoadedDLLs()[["RSQLite"]][["path"]]
-  # replace right-most name of library object (RSQLite) with
-  # name of the regexp object, should work across platforms
-  lib_path <- sub("(.*)RSQLite([.][a-zA-Z]+?)$", "\\1regexp\\2", lib_path)
+  lib_path <- system.file(
+    "src", paste0("regexp", .Platform$dynlib.ext), package = packageName()
+  )
 
-  # repeat loading would throw error
-  if (is.null(getLoadedDLLs()[["regexp"]][["path"]])) {
-
-    # load
-    dbExecute(db, sprintf("SELECT load_extension('%s')", lib_path))
-
-  }
+  extension_load(db@ptr, lib_path, "sqlite3_regexp_init")
 
   # always return TRUE after loading
   invisible(TRUE)

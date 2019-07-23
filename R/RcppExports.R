@@ -21,6 +21,10 @@ connection_import_file <- function(con, name, value, sep, eol, skip) {
     .Call(`_RSQLite_connection_import_file`, con, name, value, sep, eol, skip)
 }
 
+extension_load <- function(con, file, entry_point) {
+    invisible(.Call(`_RSQLite_extension_load`, con, file, entry_point))
+}
+
 result_create <- function(con, sql) {
     .Call(`_RSQLite_result_create`, con, sql)
 }

@@ -31,7 +31,7 @@ initExtension <- function(db) {
   }
 
   lib_path <- getLoadedDLLs()[["RSQLite"]][["path"]]
-  res <- dbGetQuery(db, sprintf("SELECT load_extension('%s')", lib_path))
+  extension_load(db@ptr, lib_path, "sqlite3_extension_init")
 
   invisible(TRUE)
 }

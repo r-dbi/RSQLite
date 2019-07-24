@@ -61,7 +61,7 @@ check_affinity_fetch <- function(affinity, type,
   expect_equal(class(dbFetch(rs, 1)$a), real_type)
   expect_warning(
     expect_equal(class(dbFetch(rs, 1)$a), real_type),
-    if (type == "blob") NA else "coercing"
+    if (identical(type, class(blob()))) NA else "coercing"
   )
   expect_equal(class(dbFetch(rs, 1)$a), real_type)
   dbClearResult(rs)

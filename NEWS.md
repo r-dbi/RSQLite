@@ -1,3 +1,8 @@
+# RSQLite 2.1.2.9000
+
+- Same as previous version.
+
+
 # RSQLite 2.1.2
 
 ## Bundled library

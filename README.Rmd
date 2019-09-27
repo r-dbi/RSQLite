@@ -33,6 +33,9 @@ devtools::install_github("r-dbi/RSQLite")
 
 To install from GitHub, you'll need a [development environment](https://www.rstudio.com/ide/docs/packages/prerequisites).
 
+Discussions associated with DBI and related database packages take place on [R-SIG-DB](https://stat.ethz.ch/mailman/listinfo/r-sig-db).
+The website [Databases using R](https://db.rstudio.com/) describes the tools and best practices in this ecosystem.
+
 ## Basic usage
 
 ```{r}

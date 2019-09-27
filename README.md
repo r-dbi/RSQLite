@@ -18,7 +18,7 @@ status](https://www.r-pkg.org/badges/version/RSQLite)](https://cran.r-project.or
 <!-- badges: end -->
 
 Embeds the SQLite database engine in R, providing a DBI-compliant
-interface. [SQLite](http://www.sqlite.org) is a public-domain,
+interface. [SQLite](https://www.sqlite.org/) is a public-domain,
 single-user, very light-weight database engine that implements a decent
 subset of the SQL 92 standard, including the core table creation,
 updating, insertion, and selection operations, plus transaction
@@ -38,7 +38,7 @@ devtools::install_github("r-dbi/RSQLite")
 ```
 
 To install from GitHub, you’ll need a [development
-environment](http://www.rstudio.com/ide/docs/packages/prerequisites).
+environment](https://www.rstudio.com/ide/docs/packages/prerequisites).
 
 ## Basic usage
 

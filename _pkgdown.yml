@@ -5,7 +5,7 @@ template:
 home:
   links:
   - text: Report a security vulnerability
-    href: https://github.com/r-dbi/RSQLite/security.html
+    href: https://github.com/r-dbi/RSQLite/security/policy
 
 authors:
   Kirill Müller:

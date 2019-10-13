@@ -128,7 +128,7 @@ setMethod("dbConnect", "SQLiteDriver",
 
     bigint <- match.arg(bigint)
 
-    con <- new("SQLiteConnection",
+    conn <- new("SQLiteConnection",
       ptr = connection_connect(dbname, loadable.extensions, flags, vfs),
       dbname = dbname,
       flags = flags,
@@ -142,7 +142,7 @@ setMethod("dbConnect", "SQLiteDriver",
     if (!is.null(cache_size)) {
       cache_size <- as.integer(cache_size)
       tryCatch(
-        dbExecute(con, sprintf("PRAGMA cache_size=%d", cache_size)),
+        dbExecute(conn, sprintf("PRAGMA cache_size=%d", cache_size)),
         error = function(e) {
           warning("Couldn't set cache size: ", conditionMessage(e), "\n",
             "Use `cache_size` = NULL to turn off this warning.",
@@ -154,7 +154,7 @@ setMethod("dbConnect", "SQLiteDriver",
     if (!is.null(synchronous)) {
       synchronous <- match.arg(synchronous, c("off", "normal", "full"))
       tryCatch(
-        dbExecute(con, sprintf("PRAGMA synchronous=%s", synchronous)),
+        dbExecute(conn, sprintf("PRAGMA synchronous=%s", synchronous)),
         error = function(e) {
           warning("Couldn't set synchronous mode: ", conditionMessage(e), "\n",
                   "Use `synchronous` = NULL to turn off this warning.",
@@ -164,19 +164,19 @@ setMethod("dbConnect", "SQLiteDriver",
     }
 
     if (default.extensions) {
-      initExtension(con)
+      initExtension(conn)
     }
 
     reg.finalizer(
-      con@ptr,
+      conn@ptr,
       function(x) {
-        if (dbIsValid(con)) {
+        if (dbIsValid(conn)) {
           warning_once("call dbDisconnect() when finished working with a connection");
         }
       }
     )
 
-    con
+    conn
   }
 )
 

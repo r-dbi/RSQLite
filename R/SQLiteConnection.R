@@ -1,6 +1,3 @@
-#' @include s4.R
-NULL
-
 #' Class SQLiteConnection (and methods)
 #'
 #' SQLiteConnection objects are created by passing [SQLite()] as first

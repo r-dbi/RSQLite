@@ -191,20 +191,6 @@ sqliteQuickColumn <- function(con, table, column) {
 #' @keywords internal
 NULL
 
-#' @rdname dbGetInfo
-#' @export
-setMethod("dbGetInfo", "SQLiteDriver", function(dbObj, ...) {
-  warning_once("RSQLite::dbGetInfo() is deprecated: please use individual metadata functions instead")
-  list()
-})
-
-#' @rdname dbGetInfo
-#' @export
-setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
-  warning_once("RSQLite::dbGetInfo() is deprecated: please use individual metadata functions instead")
-  list()
-})
-
 #' dbListResults
 #'
 #' DEPRECATED

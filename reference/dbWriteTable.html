@@ -123,17 +123,36 @@ to database tables.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for SQLiteConnection,character,data.frame</span>
-<span class='fu'>dbWriteTable</span>(<span class='no'>conn</span>, <span class='no'>name</span>,
-  <span class='no'>value</span>, <span class='no'>...</span>,
+<span class='fu'>dbWriteTable</span>(
+  <span class='no'>conn</span>,
+  <span class='no'>name</span>,
+  <span class='no'>value</span>,
+  <span class='no'>...</span>,
   <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='kw pkg'>pkgconfig</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/pkgconfig/man/get_config.html'>get_config</a></span>(<span class='st'>"RSQLite::row.names.table"</span>, <span class='fl'>FALSE</span>),
-  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>append</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>field.types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>append</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>field.types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)
 
 <span class='co'># S4 method for SQLiteConnection,character,character</span>
-<span class='fu'>dbWriteTable</span>(<span class='no'>conn</span>, <span class='no'>name</span>,
-  <span class='no'>value</span>, <span class='no'>...</span>, <span class='kw'>field.types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>append</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>header</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>colClasses</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>nrows</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>sep</span> <span class='kw'>=</span> <span class='st'>","</span>, <span class='kw'>eol</span> <span class='kw'>=</span> <span class='st'>"\n"</span>, <span class='kw'>skip</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+<span class='fu'>dbWriteTable</span>(
+  <span class='no'>conn</span>,
+  <span class='no'>name</span>,
+  <span class='no'>value</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>field.types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>append</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>header</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>colClasses</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>nrows</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='kw'>sep</span> <span class='kw'>=</span> <span class='st'>","</span>,
+  <span class='kw'>eol</span> <span class='kw'>=</span> <span class='st'>"\n"</span>,
+  <span class='kw'>skip</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

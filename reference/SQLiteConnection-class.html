@@ -148,17 +148,18 @@ The "Usage" section lists the class methods overridden by <span class="pkg">RSQL
 <span class='fu'>dbGetException</span>(<span class='no'>conn</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection,character</span>
-<span class='fu'>dbSendQuery</span>(<span class='no'>conn</span>, <span class='no'>statement</span>,
-  <span class='kw'>params</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'>dbSendQuery</span>(<span class='no'>conn</span>, <span class='no'>statement</span>, <span class='kw'>params</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>sqlData</span>(<span class='no'>con</span>, <span class='no'>value</span>,
+<span class='fu'>sqlData</span>(
+  <span class='no'>con</span>,
+  <span class='no'>value</span>,
   <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='kw pkg'>pkgconfig</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/pkgconfig/man/get_config.html'>get_config</a></span>(<span class='st'>"RSQLite::row.names.query"</span>, <span class='fl'>FALSE</span>),
-  <span class='no'>...</span>)
+  <span class='no'>...</span>
+)
 
 <span class='co'># S4 method for SQLiteConnection,character</span>
-<span class='fu'>dbRemoveTable</span>(<span class='no'>conn</span>, <span class='no'>name</span>, <span class='no'>...</span>,
-  <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>fail_if_missing</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>dbRemoveTable</span>(<span class='no'>conn</span>, <span class='no'>name</span>, <span class='no'>...</span>, <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>fail_if_missing</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># S4 method for SQLiteConnection,character</span>
 <span class='fu'>dbExistsTable</span>(<span class='no'>conn</span>, <span class='no'>name</span>, <span class='no'>...</span>)

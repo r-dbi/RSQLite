@@ -127,11 +127,18 @@ and receive results.</p>
     <pre class="usage"><span class='fu'>SQLite</span>(<span class='no'>...</span>)
 
 <span class='co'># S4 method for SQLiteDriver</span>
-<span class='fu'>dbConnect</span>(<span class='no'>drv</span>, <span class='kw'>dbname</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='no'>...</span>,
-  <span class='kw'>loadable.extensions</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>default.extensions</span> <span class='kw'>=</span> <span class='no'>loadable.extensions</span>,
-  <span class='kw'>cache_size</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>synchronous</span> <span class='kw'>=</span> <span class='st'>"off"</span>, <span class='kw'>flags</span> <span class='kw'>=</span> <span class='no'>SQLITE_RWC</span>,
-  <span class='kw'>vfs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>bigint</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"integer64"</span>, <span class='st'>"integer"</span>, <span class='st'>"numeric"</span>,
-  <span class='st'>"character"</span>))
+<span class='fu'>dbConnect</span>(
+  <span class='no'>drv</span>,
+  <span class='kw'>dbname</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>loadable.extensions</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>default.extensions</span> <span class='kw'>=</span> <span class='no'>loadable.extensions</span>,
+  <span class='kw'>cache_size</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>synchronous</span> <span class='kw'>=</span> <span class='st'>"off"</span>,
+  <span class='kw'>flags</span> <span class='kw'>=</span> <span class='no'>SQLITE_RWC</span>,
+  <span class='kw'>vfs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>bigint</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"integer64"</span>, <span class='st'>"integer"</span>, <span class='st'>"numeric"</span>, <span class='st'>"character"</span>)
+)
 
 <span class='co'># S4 method for SQLiteConnection</span>
 <span class='fu'>dbConnect</span>(<span class='no'>drv</span>, <span class='no'>...</span>)

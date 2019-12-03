@@ -121,16 +121,26 @@
     </div>
 
     <pre class="usage"><span class='co'># S4 method for SQLiteConnection,character</span>
-<span class='fu'>make.db.names</span>(<span class='no'>dbObj</span>, <span class='no'>snames</span>,
-  <span class='kw'>keywords</span> <span class='kw'>=</span> <span class='no'>.SQL92Keywords</span>, <span class='kw'>unique</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>allow.keywords</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='no'>...</span>)
+<span class='fu'>make.db.names</span>(
+  <span class='no'>dbObj</span>,
+  <span class='no'>snames</span>,
+  <span class='kw'>keywords</span> <span class='kw'>=</span> <span class='no'>.SQL92Keywords</span>,
+  <span class='kw'>unique</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>allow.keywords</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='no'>...</span>
+)
 
 <span class='co'># S4 method for SQLiteConnection</span>
 <span class='fu'>SQLKeywords</span>(<span class='no'>dbObj</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection,character</span>
-<span class='fu'>isSQLKeyword</span>(<span class='no'>dbObj</span>, <span class='no'>name</span>,
-  <span class='kw'>keywords</span> <span class='kw'>=</span> <span class='no'>.SQL92Keywords</span>, <span class='kw'>case</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"lower"</span>, <span class='st'>"upper"</span>, <span class='st'>"any"</span>)[<span class='fl'>3</span>], <span class='no'>...</span>)</pre>
+<span class='fu'>isSQLKeyword</span>(
+  <span class='no'>dbObj</span>,
+  <span class='no'>name</span>,
+  <span class='kw'>keywords</span> <span class='kw'>=</span> <span class='no'>.SQL92Keywords</span>,
+  <span class='kw'>case</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"lower"</span>, <span class='st'>"upper"</span>, <span class='st'>"any"</span>)[<span class='fl'>3</span>],
+  <span class='no'>...</span>
+)</pre>
         
 
   </div>

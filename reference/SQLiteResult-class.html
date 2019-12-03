@@ -133,8 +133,12 @@ The "Usage" section lists the class methods overridden by <span class="pkg">RSQL
 <span class='fu'>dbBind</span>(<span class='no'>res</span>, <span class='no'>params</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for SQLiteResult</span>
-<span class='fu'>dbFetch</span>(<span class='no'>res</span>, <span class='kw'>n</span> <span class='kw'>=</span> -<span class='fl'>1</span>, <span class='no'>...</span>,
-  <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='kw pkg'>pkgconfig</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/pkgconfig/man/get_config.html'>get_config</a></span>(<span class='st'>"RSQLite::row.names.query"</span>, <span class='fl'>FALSE</span>))
+<span class='fu'>dbFetch</span>(
+  <span class='no'>res</span>,
+  <span class='kw'>n</span> <span class='kw'>=</span> -<span class='fl'>1</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='kw pkg'>pkgconfig</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/pkgconfig/man/get_config.html'>get_config</a></span>(<span class='st'>"RSQLite::row.names.query"</span>, <span class='fl'>FALSE</span>)
+)
 
 <span class='co'># S4 method for SQLiteResult</span>
 <span class='fu'>dbClearResult</span>(<span class='no'>res</span>, <span class='no'>...</span>)

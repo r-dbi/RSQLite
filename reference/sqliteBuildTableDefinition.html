@@ -122,8 +122,13 @@ dbGetQuery" />
     
     </div>
 
-    <pre class="usage"><span class='fu'>sqliteBuildTableDefinition</span>(<span class='no'>con</span>, <span class='no'>name</span>, <span class='no'>value</span>, <span class='kw'>field.types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='kw pkg'>pkgconfig</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/pkgconfig/man/get_config.html'>get_config</a></span>(<span class='st'>"RSQLite::row.names.query"</span>, <span class='fl'>FALSE</span>))</pre>
+    <pre class="usage"><span class='fu'>sqliteBuildTableDefinition</span>(
+  <span class='no'>con</span>,
+  <span class='no'>name</span>,
+  <span class='no'>value</span>,
+  <span class='kw'>field.types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='kw pkg'>pkgconfig</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/pkgconfig/man/get_config.html'>get_config</a></span>(<span class='st'>"RSQLite::row.names.query"</span>, <span class='fl'>FALSE</span>)
+)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

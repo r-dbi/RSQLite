@@ -33,15 +33,16 @@
 
 \S4method{dbGetException}{SQLiteConnection}(conn, ...)
 
-\S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement,
-  params = NULL, ...)
+\S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement, params = NULL, ...)
 
-\S4method{sqlData}{SQLiteConnection}(con, value,
+\S4method{sqlData}{SQLiteConnection}(
+  con,
+  value,
   row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE),
-  ...)
+  ...
+)
 
-\S4method{dbRemoveTable}{SQLiteConnection,character}(conn, name, ...,
-  temporary = FALSE, fail_if_missing = TRUE)
+\S4method{dbRemoveTable}{SQLiteConnection,character}(conn, name, ..., temporary = FALSE, fail_if_missing = TRUE)
 
 \S4method{dbExistsTable}{SQLiteConnection,character}(conn, name, ...)
 

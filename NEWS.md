@@ -1,3 +1,12 @@
+# RSQLite 2.1.2.9001
+
+- `dbGetInfo()` no longer issues a deprecation warning.
+- `dbGetInfo()` return meaningful information for the driver object.
+- Only export relevant symbols to the shared library (#303, @troels).
+--no-byte-compile
+- Fulfill requirements for CII badge (#300).
+
+
 # RSQLite 2.1.2.9000
 
 - Same as previous version.

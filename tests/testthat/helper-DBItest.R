@@ -3,9 +3,6 @@ default_skip <-
     # enable to test a particular test only
     #"(?!data_timestamp_current).*",
 
-    # driver
-    "get_info_driver",                            # #117
-
     # connection
     "get_info_connection",                        # #117
 

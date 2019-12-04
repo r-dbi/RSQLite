@@ -12,6 +12,9 @@ PKG_CPPFLAGS=-I. \
              -DRCPP_USING_UTF8_ERROR_STRING \
              -DBOOST_NO_AUTO_PTR
 
+PKG_CXXFLAGS=$(CXX_VISIBILITY)
+PKG_CFLAGS=$(C_VISIBILITY)
+
 PKG_LIBS = vendor/sqlite3/sqlite3.o
 
 .PHONY: all

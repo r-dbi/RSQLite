@@ -10,6 +10,9 @@ initRegExp(db)
 \item{db}{A \code{\linkS4class{SQLiteConnection}} object to add the
 regular expression operator into the connection.}
 }
+\value{
+Always \code{TRUE}, invisibly.
+}
 \description{
 This loads a regular-expression matcher for posix extended regular
 expressions, as available through the SQLite source code repository

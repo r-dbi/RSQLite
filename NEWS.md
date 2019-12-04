@@ -1,3 +1,8 @@
+# RSQLite 2.1.4
+
+- Replace `std::mem_fn()` by `boost::mem_fn()` which works for older compilers.
+
+
 # RSQLite 2.1.3
 
 - Replace `std::mem_fun_ref()` by `std::mem_fn()`.

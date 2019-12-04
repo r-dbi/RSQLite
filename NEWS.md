@@ -1,3 +1,8 @@
+# RSQLite 2.1.3.9001
+
+- Same as previous version.
+
+
 # RSQLite 2.1.3
 
 - Replace `std::mem_fun_ref()` by `std::mem_fn()`.

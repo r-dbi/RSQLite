@@ -48,3 +48,12 @@ setMethod("dbIsValid", "SQLiteDriver", function(dbObj, ...) {
 setMethod("dbUnloadDriver", "SQLiteDriver", function(drv, ...) {
   invisible(TRUE)
 })
+
+#' @rdname dbGetInfo
+#' @export
+setMethod("dbGetInfo", "SQLiteDriver", function(dbObj, ...) {
+  list(
+    driver.version = RSQLite::rsqliteVersion()[[1]],
+    client.version = RSQLite::rsqliteVersion()[[2]]
+  )
+})

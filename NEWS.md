@@ -1,3 +1,11 @@
+# RSQLite 2.1.4.9001
+
+- `dbGetInfo()` no longer issues a deprecation warning.
+- `dbGetInfo()` return meaningful information for the driver object.
+- Only export relevant symbols to the shared library (#303, @troels).
+- Fulfill requirements for CII badge (#300).
+
+
 # RSQLite 2.1.4
 
 - Replace `std::mem_fn()` by `boost::mem_fn()` which works for older compilers.

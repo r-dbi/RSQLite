@@ -162,3 +162,8 @@ setMethod("dbGetException", "SQLiteConnection", function(conn, ...) {
   )
 })
 
+#' @rdname dbGetInfo
+#' @export
+setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
+  list()
+})

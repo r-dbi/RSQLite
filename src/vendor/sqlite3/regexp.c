@@ -58,6 +58,7 @@
 */
 #include <string.h>
 #include <stdlib.h>
+#include <R_ext/Visibility.h>
 #include "sqlite3ext.h"
 SQLITE_EXTENSION_INIT1
 
@@ -747,7 +748,7 @@ static void re_sql_func(
 #ifdef _WIN32
 __declspec(dllexport)
 #endif
-int sqlite3_regexp_init(
+attribute_visible int sqlite3_regexp_init(
   sqlite3 *db, 
   char **pzErrMsg, 
   const sqlite3_api_routines *pApi

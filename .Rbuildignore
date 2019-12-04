@@ -36,3 +36,5 @@ a.out.dSYM
 .*\.orig$
 ^CRAN-RELEASE$
 ^\.vscode$
+^LICENSE\.md$
+^CODE_OF_CONDUCT\.md$

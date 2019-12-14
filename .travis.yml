@@ -35,6 +35,7 @@ fortran: false
 #stages: test, full
 stages:
 - name: test
+  if: branch != docs
 - name: docs
   if: branch = docs OR branch = master
 - name: full

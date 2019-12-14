@@ -52,8 +52,9 @@ setMethod("dbUnloadDriver", "SQLiteDriver", function(drv, ...) {
 #' @rdname dbGetInfo
 #' @export
 setMethod("dbGetInfo", "SQLiteDriver", function(dbObj, ...) {
+  version <- RSQLite::rsqliteVersion()
   list(
-    driver.version = RSQLite::rsqliteVersion()[[1]],
-    client.version = RSQLite::rsqliteVersion()[[2]]
+    driver.version = version[[1]],
+    client.version = version[[2]]
   )
 })

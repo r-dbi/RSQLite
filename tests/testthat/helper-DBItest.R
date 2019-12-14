@@ -3,15 +3,9 @@ default_skip <-
     # enable to test a particular test only
     #"(?!data_timestamp_current).*",
 
-    # connection
-    "get_info_connection",                        # #117
-
     # sql
     "roundtrip_date",                             # #109
     "roundtrip_timestamp",                        # #110
-
-    # meta
-    "get_info_result",                            # rstats-db/DBI#55
 
     # transactions
 

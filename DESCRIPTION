@@ -24,7 +24,7 @@ Authors@R:
              family = "Healy",
              role = "ctb",
              comment = "for the included SQLite sources"),
-      person(family = "R Consortium",
+      person(given = "R Consortium",
              role = "fnd"),
       person(family = "RStudio",
              role = "cph"))

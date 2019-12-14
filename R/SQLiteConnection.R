@@ -162,7 +162,7 @@ setMethod("dbGetException", "SQLiteConnection", function(conn, ...) {
   )
 })
 
-#' @rdname dbGetInfo
+#' @rdname SQLiteConnection-class
 #' @export
 setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
   version <- RSQLite::rsqliteVersion()

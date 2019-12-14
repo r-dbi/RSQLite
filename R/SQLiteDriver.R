@@ -52,7 +52,7 @@ setMethod("dbUnloadDriver", "SQLiteDriver", function(drv, ...) {
 # Set during installation time for the correct library
 PACKAGE_VERSION <- utils::packageVersion(utils::packageName())
 
-#' @rdname dbGetInfo
+#' @rdname SQLiteDriver-class
 #' @export
 setMethod("dbGetInfo", "SQLiteDriver", function(dbObj, ...) {
   version <- RSQLite::rsqliteVersion()

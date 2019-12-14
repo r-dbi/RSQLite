@@ -180,17 +180,6 @@ sqliteQuickColumn <- function(con, table, column) {
   dbGetQuery(con, paste("SELECT ", column, " FROM ", table), row.names = FALSE)[[1]]
 }
 
-#' Get metadata about a database object
-#'
-#' Deprecated. Please use individual functions.
-#'
-#' @param dbObj An object of class \code{\linkS4class{SQLiteDriver}},
-#'   \code{\linkS4class{SQLiteConnection}} or
-#'   \code{\linkS4class{SQLiteResult}}
-#' @name dbGetInfo
-#' @keywords internal
-NULL
-
 #' dbListResults
 #'
 #' DEPRECATED

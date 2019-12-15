@@ -69,7 +69,7 @@ The &quot;Usage&quot; section lists the class methods overridden by RSQLite." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.4.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.4</span>
       </span>
     </div>
 
@@ -133,12 +133,8 @@ The "Usage" section lists the class methods overridden by <span class="pkg">RSQL
 <span class='fu'>dbBind</span>(<span class='no'>res</span>, <span class='no'>params</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for SQLiteResult</span>
-<span class='fu'>dbFetch</span>(
-  <span class='no'>res</span>,
-  <span class='kw'>n</span> <span class='kw'>=</span> -<span class='fl'>1</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='kw pkg'>pkgconfig</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/pkgconfig/man/get_config.html'>get_config</a></span>(<span class='st'>"RSQLite::row.names.query"</span>, <span class='fl'>FALSE</span>)
-)
+<span class='fu'>dbFetch</span>(<span class='no'>res</span>, <span class='kw'>n</span> <span class='kw'>=</span> -<span class='fl'>1</span>, <span class='no'>...</span>,
+  <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='kw pkg'>pkgconfig</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/pkgconfig/man/get_config.html'>get_config</a></span>(<span class='st'>"RSQLite::row.names.query"</span>, <span class='fl'>FALSE</span>))
 
 <span class='co'># S4 method for SQLiteResult</span>
 <span class='fu'>dbClearResult</span>(<span class='no'>res</span>, <span class='no'>...</span>)
@@ -161,9 +157,9 @@ The "Usage" section lists the class methods overridden by <span class="pkg">RSQL
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>The corresponding generic functions
-<code><a href='https://rdrr.io/pkg/DBI/man/dbFetch.html'>DBI::dbFetch()</a></code>, <code><a href='https://rdrr.io/pkg/DBI/man/dbClearResult.html'>DBI::dbClearResult()</a></code>, and <code><a href='https://rdrr.io/pkg/DBI/man/dbBind.html'>DBI::dbBind()</a></code>,
-<code><a href='https://rdrr.io/pkg/DBI/man/dbColumnInfo.html'>DBI::dbColumnInfo()</a></code>, <code><a href='https://rdrr.io/pkg/DBI/man/dbGetRowsAffected.html'>DBI::dbGetRowsAffected()</a></code>, <code><a href='https://rdrr.io/pkg/DBI/man/dbGetRowCount.html'>DBI::dbGetRowCount()</a></code>,
-<code><a href='https://rdrr.io/pkg/DBI/man/dbHasCompleted.html'>DBI::dbHasCompleted()</a></code>, and <code><a href='https://rdrr.io/pkg/DBI/man/dbGetStatement.html'>DBI::dbGetStatement()</a></code>.</p></div>
+<code><a href='https://dbi.r-dbi.org/reference/dbFetch.html'>DBI::dbFetch()</a></code>, <code><a href='https://dbi.r-dbi.org/reference/dbClearResult.html'>DBI::dbClearResult()</a></code>, and <code><a href='https://dbi.r-dbi.org/reference/dbBind.html'>DBI::dbBind()</a></code>,
+<code><a href='https://dbi.r-dbi.org/reference/dbColumnInfo.html'>DBI::dbColumnInfo()</a></code>, <code><a href='https://dbi.r-dbi.org/reference/dbGetRowsAffected.html'>DBI::dbGetRowsAffected()</a></code>, <code><a href='https://dbi.r-dbi.org/reference/dbGetRowCount.html'>DBI::dbGetRowCount()</a></code>,
+<code><a href='https://dbi.r-dbi.org/reference/dbHasCompleted.html'>DBI::dbHasCompleted()</a></code>, and <code><a href='https://dbi.r-dbi.org/reference/dbGetStatement.html'>DBI::dbGetStatement()</a></code>.</p></div>
     
 
   </div>

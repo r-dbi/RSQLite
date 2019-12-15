@@ -68,7 +68,7 @@ expressions, as available through the SQLite source code repository
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.4.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.4</span>
       </span>
     </div>
 
@@ -136,10 +136,6 @@ regular expression operator into the connection.</p></td>
     </tr>
     </table>
     
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>Always <code>TRUE</code>, invisibly.</p>
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>SQLite will then implement the "A regexp B" operator,
@@ -152,7 +148,7 @@ where A is the string to be matched and B is the regular expression.</p>
 <span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/RSQLite/man/datasetsDb.html'>datasetsDb</a></span>()
 <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/RSQLite/man/initRegExp.html'>initRegExp</a></span>(<span class='no'>db</span>)
 
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>db</span>, <span class='st'>"SELECT * FROM mtcars WHERE carb REGEXP '[12]'"</span>)</div><div class='output co'>#&gt;            row_names  mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>db</span>, <span class='st'>"SELECT * FROM mtcars WHERE carb REGEXP '[12]'"</span>)</div><div class='output co'>#&gt;            row_names  mpg cyl  disp  hp drat    wt  qsec vs am gear carb
 #&gt; 1         Datsun 710 22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
 #&gt; 2     Hornet 4 Drive 21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
 #&gt; 3  Hornet Sportabout 18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2
@@ -169,15 +165,13 @@ where A is the string to be matched and B is the regular expression.</p>
 #&gt; 14         Fiat X1-9 27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1
 #&gt; 15     Porsche 914-2 26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
 #&gt; 16      Lotus Europa 30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2
-#&gt; 17        Volvo 142E 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>db</span>)</div></pre>
+#&gt; 17        Volvo 142E 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>db</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
       
       <li><a href="#examples">Examples</a></li>

@@ -71,7 +71,7 @@ dbCommit() or dbRollback() is called." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.4.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.4</span>
       </span>
     </div>
 
@@ -125,19 +125,22 @@ dbCommit() or dbRollback() is called." />
 a SQLite transaction and turns auto-commit off. <code>dbCommit()</code> and
 <code>dbRollback()</code> commit and rollback the transaction, respectively and turn
 auto-commit on.
-<code><a href='https://rdrr.io/pkg/DBI/man/dbWithTransaction.html'>DBI::dbWithTransaction()</a></code> is a convenient wrapper that makes sure that
+<code><a href='https://dbi.r-dbi.org/reference/dbWithTransaction.html'>DBI::dbWithTransaction()</a></code> is a convenient wrapper that makes sure that
 <code>dbCommit()</code> or <code>dbRollback()</code> is called.</p>
     
     </div>
 
     <pre class="usage"><span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>dbBegin</span>(<span class='no'>conn</span>, <span class='kw'>.name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+<span class='fu'>dbBegin</span>(<span class='no'>conn</span>, <span class='kw'>.name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>,
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>dbCommit</span>(<span class='no'>conn</span>, <span class='kw'>.name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+<span class='fu'>dbCommit</span>(<span class='no'>conn</span>, <span class='kw'>.name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>,
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>dbRollback</span>(<span class='no'>conn</span>, <span class='kw'>.name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+<span class='fu'>dbRollback</span>(<span class='no'>conn</span>, <span class='kw'>.name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>,
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -145,7 +148,7 @@ auto-commit on.
     <tr>
       <th>conn</th>
       <td><p>a <code><a href='SQLiteConnection-class.html'>SQLiteConnection</a></code> object, produced by
-<code><a href='https://rdrr.io/pkg/DBI/man/dbConnect.html'>DBI::dbConnect()</a></code></p></td>
+<code><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>DBI::dbConnect()</a></code></p></td>
     </tr>
     <tr>
       <th>.name</th>
@@ -164,36 +167,36 @@ nest multiple transaction</p></td>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>The corresponding generic functions <code><a href='https://rdrr.io/pkg/DBI/man/transactions.html'>DBI::dbBegin()</a></code>, <code><a href='https://rdrr.io/pkg/DBI/man/transactions.html'>DBI::dbCommit()</a></code>,
-and <code><a href='https://rdrr.io/pkg/DBI/man/transactions.html'>DBI::dbRollback()</a></code>.</p></div>
+    <div class='dont-index'><p>The corresponding generic functions <code><a href='https://dbi.r-dbi.org/reference/transactions.html'>DBI::dbBegin()</a></code>, <code><a href='https://dbi.r-dbi.org/reference/transactions.html'>DBI::dbCommit()</a></code>,
+and <code><a href='https://dbi.r-dbi.org/reference/transactions.html'>DBI::dbRollback()</a></code>.</p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>DBI</span>)
-<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbConnect.html'>dbConnect</a></span>(<span class='fu'><a href='SQLite.html'>SQLite</a></span>(), <span class='st'>":memory:"</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbWriteTable.html'>dbWriteTable</a></span>(<span class='no'>con</span>, <span class='st'>"arrests"</span>, <span class='kw pkg'>datasets</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/r/datasets/USArrests.html'>USArrests</a></span>)
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>con</span>, <span class='st'>"select count(*) from arrests"</span>)</div><div class='output co'>#&gt;   count(*)
+<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span>(<span class='fu'><a href='SQLite.html'>SQLite</a></span>(), <span class='st'>":memory:"</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbWriteTable.html'>dbWriteTable</a></span>(<span class='no'>con</span>, <span class='st'>"arrests"</span>, <span class='kw pkg'>datasets</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/r/datasets/USArrests.html'>USArrests</a></span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>con</span>, <span class='st'>"select count(*) from arrests"</span>)</div><div class='output co'>#&gt;   count(*)
 #&gt; 1       50</div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/transactions.html'>dbBegin</a></span>(<span class='no'>con</span>)
-<span class='no'>rs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbSendStatement.html'>dbSendStatement</a></span>(<span class='no'>con</span>, <span class='st'>"DELETE from arrests WHERE Murder &gt; 1"</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbGetRowsAffected.html'>dbGetRowsAffected</a></span>(<span class='no'>rs</span>)</div><div class='output co'>#&gt; [1] 49</div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbClearResult.html'>dbClearResult</a></span>(<span class='no'>rs</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/transactions.html'>dbBegin</a></span>(<span class='no'>con</span>)
+<span class='no'>rs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbSendStatement.html'>dbSendStatement</a></span>(<span class='no'>con</span>, <span class='st'>"DELETE from arrests WHERE Murder &gt; 1"</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetRowsAffected.html'>dbGetRowsAffected</a></span>(<span class='no'>rs</span>)</div><div class='output co'>#&gt; [1] 49</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbClearResult.html'>dbClearResult</a></span>(<span class='no'>rs</span>)
 
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>con</span>, <span class='st'>"select count(*) from arrests"</span>)</div><div class='output co'>#&gt;   count(*)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>con</span>, <span class='st'>"select count(*) from arrests"</span>)</div><div class='output co'>#&gt;   count(*)
 #&gt; 1        1</div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/transactions.html'>dbRollback</a></span>(<span class='no'>con</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>con</span>, <span class='st'>"select count(*) from arrests"</span>)[<span class='fl'>1</span>, ]</div><div class='output co'>#&gt; [1] 50</div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/transactions.html'>dbBegin</a></span>(<span class='no'>con</span>)
-<span class='no'>rs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbSendStatement.html'>dbSendStatement</a></span>(<span class='no'>con</span>, <span class='st'>"DELETE FROM arrests WHERE Murder &gt; 5"</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbClearResult.html'>dbClearResult</a></span>(<span class='no'>rs</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/transactions.html'>dbCommit</a></span>(<span class='no'>con</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>con</span>, <span class='st'>"SELECT count(*) FROM arrests"</span>)[<span class='fl'>1</span>, ]</div><div class='output co'>#&gt; [1] 16</div><div class='input'>
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/transactions.html'>dbRollback</a></span>(<span class='no'>con</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>con</span>, <span class='st'>"select count(*) from arrests"</span>)[<span class='fl'>1</span>, ]</div><div class='output co'>#&gt; [1] 50</div><div class='input'>
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/transactions.html'>dbBegin</a></span>(<span class='no'>con</span>)
+<span class='no'>rs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbSendStatement.html'>dbSendStatement</a></span>(<span class='no'>con</span>, <span class='st'>"DELETE FROM arrests WHERE Murder &gt; 5"</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbClearResult.html'>dbClearResult</a></span>(<span class='no'>rs</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/transactions.html'>dbCommit</a></span>(<span class='no'>con</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>con</span>, <span class='st'>"SELECT count(*) FROM arrests"</span>)[<span class='fl'>1</span>, ]</div><div class='output co'>#&gt; [1] 16</div><div class='input'>
 <span class='co'># Named savepoints can be nested --------------------------------------------</span>
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/transactions.html'>dbBegin</a></span>(<span class='no'>con</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"a"</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/transactions.html'>dbBegin</a></span>(<span class='no'>con</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"b"</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/transactions.html'>dbRollback</a></span>(<span class='no'>con</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"b"</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/transactions.html'>dbCommit</a></span>(<span class='no'>con</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"a"</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/transactions.html'>dbBegin</a></span>(<span class='no'>con</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"a"</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/transactions.html'>dbBegin</a></span>(<span class='no'>con</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"b"</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/transactions.html'>dbRollback</a></span>(<span class='no'>con</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"b"</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/transactions.html'>dbCommit</a></span>(<span class='no'>con</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"a"</span>)
 
-<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>con</span>)</div></pre>
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>con</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

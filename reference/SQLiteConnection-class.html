@@ -69,7 +69,7 @@ The &quot;Usage&quot; section lists the class methods overridden by RSQLite." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.4.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.4</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@ The &quot;Usage&quot; section lists the class methods overridden by RSQLite." />
     <div class="ref-description">
     
     <p>SQLiteConnection objects are created by passing <code><a href='SQLite.html'>SQLite()</a></code> as first
-argument to <code><a href='https://rdrr.io/pkg/DBI/man/dbConnect.html'>DBI::dbConnect()</a></code>.
+argument to <code><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>DBI::dbConnect()</a></code>.
 They are a superclass of the DBIConnection class.
 The "Usage" section lists the class methods overridden by <span class="pkg">RSQLite</span>.</p>
     
@@ -148,18 +148,17 @@ The "Usage" section lists the class methods overridden by <span class="pkg">RSQL
 <span class='fu'>dbGetException</span>(<span class='no'>conn</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection,character</span>
-<span class='fu'>dbSendQuery</span>(<span class='no'>conn</span>, <span class='no'>statement</span>, <span class='kw'>params</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'>dbSendQuery</span>(<span class='no'>conn</span>, <span class='no'>statement</span>,
+  <span class='kw'>params</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>sqlData</span>(
-  <span class='no'>con</span>,
-  <span class='no'>value</span>,
+<span class='fu'>sqlData</span>(<span class='no'>con</span>, <span class='no'>value</span>,
   <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='kw pkg'>pkgconfig</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/pkgconfig/man/get_config.html'>get_config</a></span>(<span class='st'>"RSQLite::row.names.query"</span>, <span class='fl'>FALSE</span>),
-  <span class='no'>...</span>
-)
+  <span class='no'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection,character</span>
-<span class='fu'>dbRemoveTable</span>(<span class='no'>conn</span>, <span class='no'>name</span>, <span class='no'>...</span>, <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>fail_if_missing</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>dbRemoveTable</span>(<span class='no'>conn</span>, <span class='no'>name</span>, <span class='no'>...</span>,
+  <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>fail_if_missing</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># S4 method for SQLiteConnection,character</span>
 <span class='fu'>dbExistsTable</span>(<span class='no'>conn</span>, <span class='no'>name</span>, <span class='no'>...</span>)
@@ -190,10 +189,10 @@ table doesn't exist.</p></td>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>The corresponding generic functions
-<code><a href='https://rdrr.io/pkg/DBI/man/dbSendQuery.html'>DBI::dbSendQuery()</a></code>, <code><a href='https://rdrr.io/pkg/DBI/man/dbGetQuery.html'>DBI::dbGetQuery()</a></code>,
-<code><a href='https://rdrr.io/pkg/DBI/man/dbSendStatement.html'>DBI::dbSendStatement()</a></code>, <code><a href='https://rdrr.io/pkg/DBI/man/dbExecute.html'>DBI::dbExecute()</a></code>,
-<code><a href='https://rdrr.io/pkg/DBI/man/dbExistsTable.html'>DBI::dbExistsTable()</a></code>, <code><a href='https://rdrr.io/pkg/DBI/man/dbListTables.html'>DBI::dbListTables()</a></code>, <code><a href='https://rdrr.io/pkg/DBI/man/dbListFields.html'>DBI::dbListFields()</a></code>,
-<code><a href='https://rdrr.io/pkg/DBI/man/dbRemoveTable.html'>DBI::dbRemoveTable()</a></code>, and <code><a href='https://rdrr.io/pkg/DBI/man/sqlData.html'>DBI::sqlData()</a></code>.</p></div>
+<code><a href='https://dbi.r-dbi.org/reference/dbSendQuery.html'>DBI::dbSendQuery()</a></code>, <code><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>DBI::dbGetQuery()</a></code>,
+<code><a href='https://dbi.r-dbi.org/reference/dbSendStatement.html'>DBI::dbSendStatement()</a></code>, <code><a href='https://dbi.r-dbi.org/reference/dbExecute.html'>DBI::dbExecute()</a></code>,
+<code><a href='https://dbi.r-dbi.org/reference/dbExistsTable.html'>DBI::dbExistsTable()</a></code>, <code><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>DBI::dbListTables()</a></code>, <code><a href='https://dbi.r-dbi.org/reference/dbListFields.html'>DBI::dbListFields()</a></code>,
+<code><a href='https://dbi.r-dbi.org/reference/dbRemoveTable.html'>DBI::dbRemoveTable()</a></code>, and <code><a href='https://dbi.r-dbi.org/reference/sqlData.html'>DBI::sqlData()</a></code>.</p></div>
     
 
   </div>

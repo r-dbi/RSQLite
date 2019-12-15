@@ -68,7 +68,7 @@ or with calling dbBind() instead." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.4.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.4</span>
       </span>
     </div>
 
@@ -128,11 +128,14 @@ or with calling <code>dbBind()</code> instead.</p>
 
 <span class='fu'>dbGetPreparedQuery</span>(<span class='no'>conn</span>, <span class='no'>statement</span>, <span class='no'>bind.data</span>, <span class='no'>...</span>)
 
-<span class='co'># S4 method for SQLiteConnection,character,data.frame</span>
-<span class='fu'>dbSendPreparedQuery</span>(<span class='no'>conn</span>, <span class='no'>statement</span>, <span class='no'>bind.data</span>, <span class='no'>...</span>)
+
+  <span class='co'># S4 method for SQLiteConnection,character,data.frame</span>
+<span class='fu'>dbSendPreparedQuery</span>(<span class='no'>conn</span>,
+  <span class='no'>statement</span>, <span class='no'>bind.data</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection,character,data.frame</span>
-<span class='fu'>dbGetPreparedQuery</span>(<span class='no'>conn</span>, <span class='no'>statement</span>, <span class='no'>bind.data</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>dbGetPreparedQuery</span>(<span class='no'>conn</span>,
+  <span class='no'>statement</span>, <span class='no'>bind.data</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -147,11 +150,15 @@ or with calling <code>dbBind()</code> instead.</p>
     </tr>
     <tr>
       <th>bind.data</th>
-      <td><p>A data frame of data to be bound.</p></td>
+      <td><p>A data frame</p></td>
     </tr>
     <tr>
       <th>...</th>
       <td><p>Other arguments used by methods</p></td>
+    </tr>
+    <tr>
+      <th>bind.data</th>
+      <td><p>A data frame of data to be bound.</p></td>
     </tr>
     </table>
     

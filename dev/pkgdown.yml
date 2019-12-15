@@ -1,0 +1,9 @@
+pandoc: '2.2'
+pkgdown: 1.4.1
+pkgdown_sha: ~
+articles:
+  RSQLite: RSQLite.html
+urls:
+  reference: https://rsqlite.r-dbi.org/reference
+  article: https://rsqlite.r-dbi.org/articles
+

@@ -1,3 +1,8 @@
+# RSQLite 2.1.4.9002
+
+- Implement `dbGetInfo()` (#117).
+
+
 # RSQLite 2.1.4.9001
 
 - `dbGetInfo()` no longer issues a deprecation warning.

@@ -7,11 +7,6 @@ default_skip <-
     "roundtrip_date",                             # #109
     "roundtrip_timestamp",                        # #110
 
-    # transactions
-
-    # compliance
-    "compliance",                                 # skipping for now because of dbGetInfo()
-
     NULL
   )
 

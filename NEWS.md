@@ -1,22 +1,8 @@
 # RSQLite 2.1.5
 
-- Same as previous version.
-
-
-# RSQLite 2.1.4.9003
-
-- Remove custom `dbListFields()` method (#228).
 - Upgrade RSQLite to 3.30.1.
-
-# RSQLite 2.1.4.9002
-
-- Implement `dbGetInfo()` (#117).
-
-
-# RSQLite 2.1.4.9001
-
-- `dbGetInfo()` no longer issues a deprecation warning.
-- `dbGetInfo()` return meaningful information for the driver object.
+- Implement `dbGetInfo()` for driver and connection objects (#117).
+- Remove custom `dbListFields()` method (#228).
 - Only export relevant symbols to the shared library (#303, @troels).
 - Fulfill requirements for CII badge (#300).
 

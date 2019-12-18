@@ -22,9 +22,6 @@
     <loc>https://rsqlite.r-dbi.org/reference/dbBeginTransaction.html</loc>
   </url>
   <url>
-    <loc>https://rsqlite.r-dbi.org/reference/dbGetInfo.html</loc>
-  </url>
-  <url>
     <loc>https://rsqlite.r-dbi.org/reference/dbListResults-SQLiteConnection-method.html</loc>
   </url>
   <url>

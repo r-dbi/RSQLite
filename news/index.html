@@ -63,7 +63,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.5</span>
       </span>
     </div>
 
@@ -110,6 +110,18 @@
       <small>Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="rsqlite-2-1-5" class="section level1">
+<h1 class="page-header">
+<a href="#rsqlite-2-1-5" class="anchor"></a>RSQLite 2.1.5<small> Unreleased </small>
+</h1>
+<ul>
+<li>Upgrade RSQLite to 3.30.1.</li>
+<li>Implement <code>dbGetInfo()</code> for driver and connection objects (<a href='https://github.com/r-dbi/RSQLite/issues/117'>#117</a>).</li>
+<li>Remove custom <code>dbListFields()</code> method (<a href='https://github.com/r-dbi/RSQLite/issues/228'>#228</a>).</li>
+<li>Only export relevant symbols to the shared library (<a href='https://github.com/r-dbi/RSQLite/issues/303'>#303</a>, <a href='https://github.com/troels'>@troels</a>).</li>
+<li>Fulfill requirements for CII badge (<a href='https://github.com/r-dbi/RSQLite/issues/300'>#300</a>).</li>
+</ul>
+</div>
     <div id="rsqlite-2-1-4" class="section level1">
 <h1 class="page-header">
 <a href="#rsqlite-2-1-4" class="anchor"></a>RSQLite 2.1.4<small> 2019-12-04 </small>
@@ -367,7 +379,7 @@
 <li><p><code>dbGetException()</code> now raises a deprecation warning and always returns <code><a href="https://rdrr.io/r/base/list.html">list(errorNum = 0L, errorMsg = "OK")</a></code>, because querying the last SQLite error only works if an error actually occurred (<a href='https://github.com/r-dbi/RSQLite/issues/129'>#129</a>).</p></li>
 <li><p><code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> and <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> have been reimplemented (with deprecation warning) using <code>dbSendQuery()</code>, <code>dbBind()</code> and <code>dbFetch()</code> for compatibility with existing packages (<a href='https://github.com/r-dbi/RSQLite/issues/100'>#100</a>, <a href='https://github.com/r-dbi/RSQLite/issues/153'>#153</a>, <a href='https://github.com/r-dbi/RSQLite/issues/168'>#168</a>, <a href='https://github.com/r-dbi/RSQLite/issues/181'>#181</a>). Please convert to the new API, because the old function may be removed completely very soon: They were never part of the official API, and do less argument checking than the new APIs. Both <code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> and <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> ignore parameters not found in the query, with a warning (<a href='https://github.com/r-dbi/RSQLite/issues/174'>#174</a>).</p></li>
 <li><p>Reimplemented <code>dbListResults()</code> (with deprecation warning) for compatibility with existing packages (<a href='https://github.com/r-dbi/RSQLite/issues/154'>#154</a>).</p></li>
-<li><p>Soft-deprecated <code><a href="../reference/dbGetInfo.html">dbGetInfo()</a></code>: The “Result” method is implemented by DBI, the methods for the other classes raise a warning (<a href='https://github.com/r-dbi/RSQLite/issues/137'>#137</a>). It’s now better to access the metadata with individual functions <code>dbHasCompleted()</code>, <code>dbGetRowCount()</code> and <code>dbGetRowsAffected()</code>.</p></li>
+<li><p>Soft-deprecated <code>dbGetInfo()</code>: The “Result” method is implemented by DBI, the methods for the other classes raise a warning (<a href='https://github.com/r-dbi/RSQLite/issues/137'>#137</a>). It’s now better to access the metadata with individual functions <code>dbHasCompleted()</code>, <code>dbGetRowCount()</code> and <code>dbGetRowsAffected()</code>.</p></li>
 <li><p>All <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> methods have been removed: the same information is now displayed in the <code>show()</code> methods, which were previously pretty useless.</p></li>
 </ul>
 </div>
@@ -458,7 +470,7 @@
 <h2 class="hasAnchor">
 <a href="#changes-to-objects" class="anchor"></a>Changes to objects</h2>
 <ul>
-<li>The <code>dbname</code>, <code>loadable.extensions</code>, <code>flags</code> and <code>vfs</code> properties of a SqliteConnection are now slots. Access them directly instead of using <code><a href="../reference/dbGetInfo.html">dbGetInfo()</a></code>.</li>
+<li>The <code>dbname</code>, <code>loadable.extensions</code>, <code>flags</code> and <code>vfs</code> properties of a SqliteConnection are now slots. Access them directly instead of using <code>dbGetInfo()</code>.</li>
 </ul>
 </div>
 <div id="deprecated-and-removed-functions" class="section level2">
@@ -843,6 +855,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#rsqlite-2-1-5">2.1.5</a></li>
         <li><a href="#rsqlite-2-1-4">2.1.4</a></li>
         <li><a href="#rsqlite-2-1-3">2.1.3</a></li>
         <li><a href="#rsqlite-2-1-2">2.1.2</a></li>
@@ -897,7 +910,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='http://krlmlr.info'>Kirill Müller</a>, <a href='http://hadley.nz'>Hadley Wickham</a>, David A. James, Seth Falcon,  R Consortium.</p>
+  <p>Developed by <a href='http://krlmlr.info'>Kirill Müller</a>, <a href='http://hadley.nz'>Hadley Wickham</a>, David A. James, Seth Falcon, <a href='https://www.r-consortium.org'>R Consortium</a>.</p>
 </div>
 
 <div class="pkgdown">

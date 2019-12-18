@@ -71,7 +71,7 @@ dbCommit() or dbRollback() is called." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.5</span>
       </span>
     </div>
 
@@ -131,16 +131,13 @@ auto-commit on.
     </div>
 
     <pre class="usage"><span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>dbBegin</span>(<span class='no'>conn</span>, <span class='kw'>.name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>,
-  <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+<span class='fu'>dbBegin</span>(<span class='no'>conn</span>, <span class='kw'>.name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>dbCommit</span>(<span class='no'>conn</span>, <span class='kw'>.name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>,
-  <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+<span class='fu'>dbCommit</span>(<span class='no'>conn</span>, <span class='kw'>.name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>dbRollback</span>(<span class='no'>conn</span>, <span class='kw'>.name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>,
-  <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+<span class='fu'>dbRollback</span>(<span class='no'>conn</span>, <span class='kw'>.name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -214,7 +211,7 @@ and <code><a href='https://dbi.r-dbi.org/reference/transactions.html'>DBI::dbRol
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='http://krlmlr.info'>Kirill Müller</a>, <a href='http://hadley.nz'>Hadley Wickham</a>, David A. James, Seth Falcon,  R Consortium.</p>
+  <p>Developed by <a href='http://krlmlr.info'>Kirill Müller</a>, <a href='http://hadley.nz'>Hadley Wickham</a>, David A. James, Seth Falcon, <a href='https://www.r-consortium.org'>R Consortium</a>.</p>
 </div>
 
 <div class="pkgdown">

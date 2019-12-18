@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Updates • RSQLite</title>
+<title>Contributing to RSQLite • RSQLite</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -32,7 +32,7 @@
 
 
 
-<meta property="og:title" content="Updates" />
+<meta property="og:title" content="Contributing to RSQLite" />
 
 
 
@@ -106,30 +106,45 @@
 <div class="row">
   <div class="contents col-md-9">
     <div class="page-header">
-      <h1>Updates</h1>
+      <h1>Contributing to RSQLite</h1>
     </div>
 
-<div id="updates" class="section level1">
+<div id="contributing-to-rsqlite" class="section level1">
 
-<p>Two components are shipped with the package that can be updated:</p>
+<p>This outlines how to propose a change to RSQLite.</p>
+<div id="fixing-typos" class="section level3">
+<h3 class="hasAnchor">
+<a href="#fixing-typos" class="anchor"></a>Fixing typos</h3>
+<p>Small typos or grammatical errors in documentation may be edited directly using the GitHub web interface, so long as the changes are made in the <em>source</em> file.</p>
 <ul>
-<li>SQLite library</li>
-<li>Datasets database</li>
+<li>YES: you edit a roxygen comment in a <code>.R</code> file below <code>R/</code>.</li>
+<li>NO: you edit an <code>.Rd</code> file below <code>man/</code>.</li>
 </ul>
-<p>Ideally the update should happen right <em>after</em> each CRAN release, so that a new SQLite version is tested for some time before it’s released to CRAN.</p>
-<div id="sqlite-library" class="section level2">
-<h2 class="hasAnchor">
-<a href="#sqlite-library" class="anchor"></a>SQLite library</h2>
-<ol>
-<li><p>Download latest SQLite source by running <code>data-raw/upgrade.R</code></p></li>
-<li><p>Update <code>DESCRIPTION</code> for included version of SQLite</p></li>
-<li><p>Update <code>NEWS</code></p></li>
-</ol>
 </div>
-<div id="datasets-database" class="section level2">
-<h2 class="hasAnchor">
-<a href="#datasets-database" class="anchor"></a>Datasets database</h2>
-<p>RSQLite includes one SQLite database (accessible from <code><a href="reference/datasetsDb.html">datasetsDb()</a></code> that contains all data frames in the datasets package. The code that created it is located in <code>data-raw/datasets.R</code>.</p>
+<div id="prerequisites" class="section level3">
+<h3 class="hasAnchor">
+<a href="#prerequisites" class="anchor"></a>Prerequisites</h3>
+<p>Before you make a substantial pull request, you should always file an issue and make sure someone from the team agrees that it’s a problem. If you’ve found a bug, create an associated issue and illustrate the bug with a minimal <a href="https://www.tidyverse.org/help/#reprex">reprex</a>.</p>
+</div>
+<div id="pull-request-process" class="section level3">
+<h3 class="hasAnchor">
+<a href="#pull-request-process" class="anchor"></a>Pull request process</h3>
+<ul>
+<li>We recommend that you create a Git branch for each pull request (PR).<br>
+</li>
+<li>Look at the Travis and AppVeyor build status before and after making changes. The <code>README</code> should contain badges for any continuous integration services used by the package.<br>
+</li>
+<li>We use <a href="https://cran.r-project.org/package=roxygen2">roxygen2</a>, with <a href="https://cran.r-project.org/web/packages/roxygen2/vignettes/markdown.html">Markdown syntax</a>, for documentation.<br>
+</li>
+<li>We use <a href="https://cran.r-project.org/package=testthat">testthat</a>. Contributions with test cases included are easier to accept.<br>
+</li>
+<li>Please do not update <code>NEWS.md</code>.</li>
+</ul>
+</div>
+<div id="code-of-conduct" class="section level3">
+<h3 class="hasAnchor">
+<a href="#code-of-conduct" class="anchor"></a>Code of Conduct</h3>
+<p>Please note that the RSQLite project is released with a <a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By contributing to this project you agree to abide by its terms.</p>
 </div>
 </div>
 

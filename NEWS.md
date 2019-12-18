@@ -1,3 +1,8 @@
+# RSQLite 2.1.4.9003
+
+- Remove custom `dbListFields()` method (#228).
+- Upgrade RSQLite to 3.30.1.
+
 # RSQLite 2.1.4.9002
 
 - Implement `dbGetInfo()` (#117).

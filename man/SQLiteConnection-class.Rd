@@ -16,7 +16,6 @@
 \alias{dbRemoveTable,SQLiteConnection,character-method}
 \alias{dbExistsTable,SQLiteConnection,character-method}
 \alias{dbListTables,SQLiteConnection-method}
-\alias{dbListFields,SQLiteConnection,character-method}
 \alias{dbDataType,SQLiteConnection-method}
 \title{Class SQLiteConnection (and methods)}
 \usage{
@@ -50,8 +49,6 @@
 \S4method{dbExistsTable}{SQLiteConnection,character}(conn, name, ...)
 
 \S4method{dbListTables}{SQLiteConnection}(conn, ...)
-
-\S4method{dbListFields}{SQLiteConnection,character}(conn, name, ...)
 
 \S4method{dbDataType}{SQLiteConnection}(dbObj, obj, ...)
 }

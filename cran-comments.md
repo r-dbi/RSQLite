@@ -1,10 +1,6 @@
-## Reverse dependencies
-
-Not checked.
-
 ## Release description
 
-Fix for unexpected breakage after update.
+Minor update.
 
 ## Test environments
 

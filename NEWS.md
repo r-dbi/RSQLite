@@ -1,3 +1,8 @@
+# RSQLite 2.1.5.9000
+
+- Internal changes only.
+
+
 # RSQLite 2.1.5
 
 - Upgrade bundled sqlite version to 3.30.1.

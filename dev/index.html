@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">RSQLite</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">2.1.4.9003</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">2.1.5.9000</span>
       </span>
     </div>
 
@@ -104,30 +104,30 @@
 <div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">##  [1] "mpg"  "cyl"  "disp" "hp"   "drat" "wt"   "qsec" "vs"   "am"   "gear"</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2">## [11] "carb"</a></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="https://dbi.r-dbi.org/reference/dbReadTable.html">dbReadTable</a></span>(con, <span class="st">"mtcars"</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">##     mpg cyl  disp  hp drat    wt  qsec vs am gear carb</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2">## 1  21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4</a>
-<a class="sourceLine" id="cb10-3" data-line-number="3">## 2  21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4</a>
-<a class="sourceLine" id="cb10-4" data-line-number="4">## 3  22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1</a>
-<a class="sourceLine" id="cb10-5" data-line-number="5">## 4  21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1</a>
-<a class="sourceLine" id="cb10-6" data-line-number="6">## 5  18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2</a>
-<a class="sourceLine" id="cb10-7" data-line-number="7">## 6  18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1</a>
-<a class="sourceLine" id="cb10-8" data-line-number="8">## 7  14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4</a>
-<a class="sourceLine" id="cb10-9" data-line-number="9">## 8  24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2</a>
-<a class="sourceLine" id="cb10-10" data-line-number="10">## 9  22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2</a>
+<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">##    mpg cyl  disp  hp drat    wt  qsec vs am gear carb</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">## 1 21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4</a>
+<a class="sourceLine" id="cb10-3" data-line-number="3">## 2 21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4</a>
+<a class="sourceLine" id="cb10-4" data-line-number="4">## 3 22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1</a>
+<a class="sourceLine" id="cb10-5" data-line-number="5">## 4 21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1</a>
+<a class="sourceLine" id="cb10-6" data-line-number="6">## 5 18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2</a>
+<a class="sourceLine" id="cb10-7" data-line-number="7">## 6 18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1</a>
+<a class="sourceLine" id="cb10-8" data-line-number="8">## 7 14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4</a>
+<a class="sourceLine" id="cb10-9" data-line-number="9">## 8 24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2</a>
+<a class="sourceLine" id="cb10-10" data-line-number="10">## 9 22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2</a>
 <a class="sourceLine" id="cb10-11" data-line-number="11">##  [ reached 'max' / getOption("max.print") -- omitted 23 rows ]</a></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="co"># You can fetch all results:</span></a>
 <a class="sourceLine" id="cb11-2" data-line-number="2">res &lt;-<span class="st"> </span><span class="kw"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html">dbSendQuery</a></span>(con, <span class="st">"SELECT * FROM mtcars WHERE cyl = 4"</span>)</a>
 <a class="sourceLine" id="cb11-3" data-line-number="3"><span class="kw"><a href="https://dbi.r-dbi.org/reference/dbFetch.html">dbFetch</a></span>(res)</a></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">##     mpg cyl  disp  hp drat    wt  qsec vs am gear carb</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2">## 1  22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1</a>
-<a class="sourceLine" id="cb12-3" data-line-number="3">## 2  24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2</a>
-<a class="sourceLine" id="cb12-4" data-line-number="4">## 3  22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2</a>
-<a class="sourceLine" id="cb12-5" data-line-number="5">## 4  32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1</a>
-<a class="sourceLine" id="cb12-6" data-line-number="6">## 5  30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2</a>
-<a class="sourceLine" id="cb12-7" data-line-number="7">## 6  33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1</a>
-<a class="sourceLine" id="cb12-8" data-line-number="8">## 7  21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1</a>
-<a class="sourceLine" id="cb12-9" data-line-number="9">## 8  27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1</a>
-<a class="sourceLine" id="cb12-10" data-line-number="10">## 9  26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2</a>
+<div class="sourceCode" id="cb12"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">##    mpg cyl  disp hp drat    wt  qsec vs am gear carb</a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">## 1 22.8   4 108.0 93 3.85 2.320 18.61  1  1    4    1</a>
+<a class="sourceLine" id="cb12-3" data-line-number="3">## 2 24.4   4 146.7 62 3.69 3.190 20.00  1  0    4    2</a>
+<a class="sourceLine" id="cb12-4" data-line-number="4">## 3 22.8   4 140.8 95 3.92 3.150 22.90  1  0    4    2</a>
+<a class="sourceLine" id="cb12-5" data-line-number="5">## 4 32.4   4  78.7 66 4.08 2.200 19.47  1  1    4    1</a>
+<a class="sourceLine" id="cb12-6" data-line-number="6">## 5 30.4   4  75.7 52 4.93 1.615 18.52  1  1    4    2</a>
+<a class="sourceLine" id="cb12-7" data-line-number="7">## 6 33.9   4  71.1 65 4.22 1.835 19.90  1  1    4    1</a>
+<a class="sourceLine" id="cb12-8" data-line-number="8">## 7 21.5   4 120.1 97 3.70 2.465 20.01  1  0    3    1</a>
+<a class="sourceLine" id="cb12-9" data-line-number="9">## 8 27.3   4  79.0 66 4.08 1.935 18.90  1  1    4    1</a>
+<a class="sourceLine" id="cb12-10" data-line-number="10">## 9 26.0   4 120.3 91 4.43 2.140 16.70  0  1    5    2</a>
 <a class="sourceLine" id="cb12-11" data-line-number="11">##  [ reached 'max' / getOption("max.print") -- omitted 2 rows ]</a></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html">dbClearResult</a></span>(res)</a>
 <a class="sourceLine" id="cb13-2" data-line-number="2"></a>
@@ -151,7 +151,7 @@
 <a href="#acknowledgements" class="anchor"></a>Acknowledgements</h2>
 <p>Many thanks to Doug Bates, Seth Falcon, Detlef Groth, Ronggui Huang, Kurt Hornik, Uwe Ligges, Charles Loboz, Duncan Murdoch, and Brian D. Ripley for comments, suggestions, bug reports, and/or patches.</p>
 <hr>
-<p>Please note that the ‘RSQLite’ project is released with a <a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
+<p>Please note that the ‘RSQLite’ project is released with a <a href="https://rsqlite.r-dbi.org/code_of_conduct">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
 </div>
 </div>
   </div>

@@ -15,10 +15,12 @@ Status](https://ci.appveyor.com/api/projects/status/github/r-dbi/RSQLite?branch=
 Status](https://codecov.io/gh/r-dbi/RSQLite/branch/master/graph/badge.svg)](https://codecov.io/github/r-dbi/RSQLite?branch=master)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/RSQLite)](https://cran.r-project.org/package=RSQLite)
+[![CII Best
+Practices](https://bestpractices.coreinfrastructure.org/projects/3234/badge)](https://bestpractices.coreinfrastructure.org/projects/3234)
 <!-- badges: end -->
 
 Embeds the SQLite database engine in R, providing a DBI-compliant
-interface. [SQLite](http://www.sqlite.org) is a public-domain,
+interface. [SQLite](https://www.sqlite.org) is a public-domain,
 single-user, very light-weight database engine that implements a decent
 subset of the SQL 92 standard, including the core table creation,
 updating, insertion, and selection operations, plus transaction
@@ -38,7 +40,12 @@ devtools::install_github("r-dbi/RSQLite")
 ```
 
 To install from GitHub, you’ll need a [development
-environment](http://www.rstudio.com/ide/docs/packages/prerequisites).
+environment](https://www.rstudio.com/ide/docs/packages/prerequisites).
+
+Discussions associated with DBI and related database packages take place
+on [R-SIG-DB](https://stat.ethz.ch/mailman/listinfo/r-sig-db). The
+website [Databases using R](https://db.rstudio.com/) describes the tools
+and best practices in this ecosystem.
 
 ## Basic usage
 
@@ -128,3 +135,9 @@ dbDisconnect(con)
 Many thanks to Doug Bates, Seth Falcon, Detlef Groth, Ronggui Huang,
 Kurt Hornik, Uwe Ligges, Charles Loboz, Duncan Murdoch, and Brian D.
 Ripley for comments, suggestions, bug reports, and/or patches.
+
+-----
+
+Please note that the ‘RSQLite’ project is released with a [Contributor
+Code of Conduct](https://rsqlite.r-dbi.org/code_of_conduct). By
+contributing to this project, you agree to abide by its terms.

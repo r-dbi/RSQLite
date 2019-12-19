@@ -5,8 +5,13 @@
 \alias{dbBuildTableDefinition}
 \title{Build the SQL CREATE TABLE definition as a string}
 \usage{
-sqliteBuildTableDefinition(con, name, value, field.types = NULL,
-  row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE))
+sqliteBuildTableDefinition(
+  con,
+  name,
+  value,
+  field.types = NULL,
+  row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE)
+)
 }
 \arguments{
 \item{name}{Name of the new SQL table}
@@ -25,7 +30,7 @@ field in \code{value}}
 An SQL string
 }
 \description{
-The output SQL statement is a simple \code{CREATE TABLE} suitable for
+The output SQL statement is a simple \verb{CREATE TABLE} suitable for
 \code{dbGetQuery}
 }
 \keyword{internal}

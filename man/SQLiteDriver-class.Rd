@@ -6,6 +6,7 @@
 \alias{dbDataType,SQLiteDriver-method}
 \alias{dbIsValid,SQLiteDriver-method}
 \alias{dbUnloadDriver,SQLiteDriver-method}
+\alias{dbGetInfo,SQLiteDriver-method}
 \title{Class SQLiteDriver (and methods)}
 \usage{
 \S4method{dbDataType}{SQLiteDriver}(dbObj, obj, ...)
@@ -13,6 +14,8 @@
 \S4method{dbIsValid}{SQLiteDriver}(dbObj, ...)
 
 \S4method{dbUnloadDriver}{SQLiteDriver}(drv, ...)
+
+\S4method{dbGetInfo}{SQLiteDriver}(dbObj, ...)
 }
 \description{
 SQLiteDriver objects are created by \code{\link[=SQLite]{SQLite()}}, and used to select the

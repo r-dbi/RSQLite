@@ -10,12 +10,12 @@
 \alias{dbQuoteIdentifier,SQLiteConnection,SQL-method}
 \alias{dbUnquoteIdentifier,SQLiteConnection,SQL-method}
 \alias{dbGetException,SQLiteConnection-method}
+\alias{dbGetInfo,SQLiteConnection-method}
 \alias{dbSendQuery,SQLiteConnection,character-method}
 \alias{sqlData,SQLiteConnection-method}
 \alias{dbRemoveTable,SQLiteConnection,character-method}
 \alias{dbExistsTable,SQLiteConnection,character-method}
 \alias{dbListTables,SQLiteConnection-method}
-\alias{dbListFields,SQLiteConnection,character-method}
 \alias{dbDataType,SQLiteConnection-method}
 \title{Class SQLiteConnection (and methods)}
 \usage{
@@ -33,21 +33,22 @@
 
 \S4method{dbGetException}{SQLiteConnection}(conn, ...)
 
-\S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement,
-  params = NULL, ...)
+\S4method{dbGetInfo}{SQLiteConnection}(dbObj, ...)
 
-\S4method{sqlData}{SQLiteConnection}(con, value,
+\S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement, params = NULL, ...)
+
+\S4method{sqlData}{SQLiteConnection}(
+  con,
+  value,
   row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE),
-  ...)
+  ...
+)
 
-\S4method{dbRemoveTable}{SQLiteConnection,character}(conn, name, ...,
-  temporary = FALSE, fail_if_missing = TRUE)
+\S4method{dbRemoveTable}{SQLiteConnection,character}(conn, name, ..., temporary = FALSE, fail_if_missing = TRUE)
 
 \S4method{dbExistsTable}{SQLiteConnection,character}(conn, name, ...)
 
 \S4method{dbListTables}{SQLiteConnection}(conn, ...)
-
-\S4method{dbListFields}{SQLiteConnection,character}(conn, name, ...)
 
 \S4method{dbDataType}{SQLiteConnection}(dbObj, obj, ...)
 }

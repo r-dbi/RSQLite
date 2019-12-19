@@ -9,7 +9,7 @@
 #'
 #' Note this only affects the specified connection.
 #'
-#' @return \code{TRUE} if the operator has been loaded.
+#' @return Always \code{TRUE}, invisibly.
 #'
 #' @param db A \code{\linkS4class{SQLiteConnection}} object to add the
 #' regular expression operator into the connection.

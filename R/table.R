@@ -393,19 +393,6 @@ sqliteListTablesQuery <- function(conn, schema = NULL, name = NULL) {
 
 #' @rdname SQLiteConnection-class
 #' @export
-setMethod("dbListFields", c("SQLiteConnection", "character"),
-  function(conn, name, ...) {
-    rs <- dbSendQuery(conn, paste("SELECT * FROM ",
-                                  dbQuoteIdentifier(conn, name), "LIMIT 0"))
-    on.exit(dbClearResult(rs))
-
-    names(dbFetch(rs, n = 0, row.names = FALSE))
-  }
-)
-
-
-#' @rdname SQLiteConnection-class
-#' @export
 setMethod("dbDataType", "SQLiteConnection", function(dbObj, obj, ...) {
   dbDataType(SQLite(), obj, ...)
 })

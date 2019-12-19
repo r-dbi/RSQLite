@@ -1,3 +1,12 @@
+# RSQLite 2.1.5
+
+- Upgrade bundled sqlite version to 3.30.1.
+- Implement `dbGetInfo()` for driver and connection objects (#117).
+- Remove custom `dbListFields()` method (#228).
+- Only export relevant symbols to the shared library (#303, @troels).
+- Fulfill requirements for CII badge (#300, @TSchiefer).
+
+
 # RSQLite 2.1.4
 
 - Replace `std::mem_fn()` by `boost::mem_fn()` which works for older compilers.

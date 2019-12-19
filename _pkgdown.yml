@@ -6,6 +6,8 @@ template:
 
 home:
   links:
+  - text: Report a security vulnerability
+    href: https://rsqlite.r-dbi.org/security.html
   - text: DBI project website
     href: https://r-dbi.org
 

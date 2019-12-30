@@ -27,7 +27,7 @@ after_script: R -q -e 'tic::after_script()'
 # Header
 language: r
 sudo: false
-dist: trusty
+dist: xenial
 cache: packages
 latex: false
 fortran: false
@@ -46,6 +46,8 @@ env:
   global:
   - _R_CHECK_FORCE_SUGGESTS_=false
   - _R_CHECK_SYSTEM_CLOCK_=false
+  - _R_SHLIB_STRIP_=true
+  - R_STRIP_SHARED_LIB="/usr/bin/strip -g"
   - MAKEFLAGS="-j 2"
 
 #addons

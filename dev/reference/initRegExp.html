@@ -8,10 +8,12 @@
 
 <title>Add regular expression operator — initRegExp • RSQLite</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
@@ -32,12 +34,13 @@
 
 
 
-<meta property="og:title" content="Add regular expression operator — initRegExp" />
 
+<meta property="og:title" content="Add regular expression operator — initRegExp" />
 <meta property="og:description" content="This loads a regular-expression matcher for posix extended regular
 expressions, as available through the SQLite source code repository
 (https://sqlite.org/src/raw?filename=ext/misc/regexp.c)." />
 <meta name="twitter:card" content="summary" />
+
 
 <meta name="robots" content="noindex">
 
@@ -90,7 +93,6 @@ expressions, as available through the SQLite source code repository
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/r-dbi/RSQLite">
@@ -117,15 +119,13 @@ expressions, as available through the SQLite source code repository
     </div>
 
     <div class="ref-description">
-    
     <p>This loads a regular-expression matcher for posix extended regular
 expressions, as available through the SQLite source code repository
 (<a href='https://sqlite.org/src/raw?filename=ext/misc/regexp.c'>https://sqlite.org/src/raw?filename=ext/misc/regexp.c</a>).</p>
-    
     </div>
 
     <pre class="usage"><span class='fu'>initRegExp</span>(<span class='no'>db</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -135,17 +135,15 @@ expressions, as available through the SQLite source code repository
 regular expression operator into the connection.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Always <code>TRUE</code>, invisibly.</p>
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>SQLite will then implement the "A regexp B" operator,
 where A is the string to be matched and B is the regular expression.</p>
 <p>Note this only affects the specified connection.</p>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>DBI</span>)
@@ -175,11 +173,8 @@ where A is the string to be matched and B is the regular expression.</p>
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 

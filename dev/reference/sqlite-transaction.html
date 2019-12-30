@@ -8,10 +8,12 @@
 
 <title>SQLite transaction management — sqlite-transaction • RSQLite</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
@@ -32,8 +34,8 @@
 
 
 
-<meta property="og:title" content="SQLite transaction management — sqlite-transaction" />
 
+<meta property="og:title" content="SQLite transaction management — sqlite-transaction" />
 <meta property="og:description" content="By default, SQLite is in auto-commit mode. dbBegin() starts
 a SQLite transaction and turns auto-commit off. dbCommit() and
 dbRollback() commit and rollback the transaction, respectively and turn
@@ -41,6 +43,7 @@ auto-commit on.
 DBI::dbWithTransaction() is a convenient wrapper that makes sure that
 dbCommit() or dbRollback() is called." />
 <meta name="twitter:card" content="summary" />
+
 
 <meta name="robots" content="noindex">
 
@@ -93,7 +96,6 @@ dbCommit() or dbRollback() is called." />
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/r-dbi/RSQLite">
@@ -120,14 +122,12 @@ dbCommit() or dbRollback() is called." />
     </div>
 
     <div class="ref-description">
-    
     <p>By default, SQLite is in auto-commit mode. <code>dbBegin()</code> starts
 a SQLite transaction and turns auto-commit off. <code>dbCommit()</code> and
 <code>dbRollback()</code> commit and rollback the transaction, respectively and turn
 auto-commit on.
 <code><a href='https://dbi.r-dbi.org/reference/dbWithTransaction.html'>DBI::dbWithTransaction()</a></code> is a convenient wrapper that makes sure that
 <code>dbCommit()</code> or <code>dbRollback()</code> is called.</p>
-    
     </div>
 
     <pre class="usage"><span class='co'># S4 method for SQLiteConnection</span>
@@ -138,7 +138,7 @@ auto-commit on.
 
 <span class='co'># S4 method for SQLiteConnection</span>
 <span class='fu'>dbRollback</span>(<span class='no'>conn</span>, <span class='kw'>.name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -161,12 +161,11 @@ auto-commit on.
 nest multiple transaction</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>The corresponding generic functions <code><a href='https://dbi.r-dbi.org/reference/transactions.html'>DBI::dbBegin()</a></code>, <code><a href='https://dbi.r-dbi.org/reference/transactions.html'>DBI::dbCommit()</a></code>,
 and <code><a href='https://dbi.r-dbi.org/reference/transactions.html'>DBI::dbRollback()</a></code>.</p></div>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>DBI</span>)
@@ -199,9 +198,7 @@ and <code><a href='https://dbi.r-dbi.org/reference/transactions.html'>DBI::dbRol
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#see-also">See also</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 

@@ -71,6 +71,7 @@ Collate:
     'export.R'
     'extensions.R'
     'names.R'
+    'pkgconfig.R'
     'query.R'
     'regularExpressions.R'
     'rownames.R'

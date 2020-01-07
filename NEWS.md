@@ -1,3 +1,8 @@
+# RSQLite 2.2.0.9000
+
+- Same as previous version.
+
+
 # RSQLite 2.2.0
 
 - Avoid mangling column names (#259).

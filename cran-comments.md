@@ -1,6 +1,6 @@
 ## Release description
 
-Minor update.
+Removed mangling of column names.
 
 ## Test environments
 

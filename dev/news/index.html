@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -53,7 +57,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-news">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -91,7 +95,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/r-dbi/RSQLite">
+  <a href="https://github.com/r-dbi/RSQLite/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -109,12 +113,12 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Changelog <small></small></h1>
+      <h1 data-toc-skip>Changelog <small></small></h1>
       <small>Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
     <div id="rsqlite-2-2-0-9000" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="2.2.0.9000">
 <a href="#rsqlite-2-2-0-9000" class="anchor"></a>RSQLite 2.2.0.9000<small> Unreleased </small>
 </h1>
 <ul>
@@ -122,7 +126,7 @@
 </ul>
 </div>
     <div id="rsqlite-2-2-0" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="2.2.0">
 <a href="#rsqlite-2-2-0" class="anchor"></a>RSQLite 2.2.0<small> 2020-01-07 </small>
 </h1>
 <ul>
@@ -130,7 +134,7 @@
 </ul>
 </div>
     <div id="rsqlite-2-1-5" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="2.1.5">
 <a href="#rsqlite-2-1-5" class="anchor"></a>RSQLite 2.1.5<small> 2019-12-18 </small>
 </h1>
 <ul>
@@ -142,7 +146,7 @@
 </ul>
 </div>
     <div id="rsqlite-2-1-4" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="2.1.4">
 <a href="#rsqlite-2-1-4" class="anchor"></a>RSQLite 2.1.4<small> 2019-12-04 </small>
 </h1>
 <ul>
@@ -150,7 +154,7 @@
 </ul>
 </div>
     <div id="rsqlite-2-1-3" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="2.1.3">
 <a href="#rsqlite-2-1-3" class="anchor"></a>RSQLite 2.1.3<small> 2019-12-03 </small>
 </h1>
 <ul>
@@ -158,7 +162,7 @@
 </ul>
 </div>
     <div id="rsqlite-2-1-2" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="2.1.2">
 <a href="#rsqlite-2-1-2" class="anchor"></a>RSQLite 2.1.2<small> 2019-07-24 </small>
 </h1>
 <div id="bundled-library" class="section level2">
@@ -210,7 +214,7 @@
 </div>
 </div>
     <div id="rsqlite-2-1-1-2018-05-05" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="2.1.1">
 <a href="#rsqlite-2-1-1-2018-05-05" class="anchor"></a>RSQLite 2.1.1 (2018-05-05)<small> 2018-05-06 </small>
 </h1>
 <ul>
@@ -225,7 +229,7 @@
 </ul>
 </div>
     <div id="rsqlite-2-1-0-2018-03-29" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="2.1.0">
 <a href="#rsqlite-2-1-0-2018-03-29" class="anchor"></a>RSQLite 2.1.0 (2018-03-29)<small> 2018-03-29 </small>
 </h1>
 <div id="bug-fixes-1" class="section level2">
@@ -261,7 +265,7 @@
 </div>
 </div>
     <div id="rsqlite-2-0-2017-06-18" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="2.0">
 <a href="#rsqlite-2-0-2017-06-18" class="anchor"></a>RSQLite 2.0 (2017-06-18)<small> 2017-06-19 </small>
 </h1>
 <div id="api-changes" class="section level2">
@@ -328,7 +332,7 @@
 </div>
 </div>
     <div id="rsqlite-1-1-2-2017-01-07" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.1-2">
 <a href="#rsqlite-1-1-2-2017-01-07" class="anchor"></a>RSQLite 1.1-2 (2017-01-07)<small> 2017-01-08 </small>
 </h1>
 <ul>
@@ -337,7 +341,7 @@
 </ul>
 </div>
     <div id="rsqlite-1-1-1-2016-12-10" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.1-1">
 <a href="#rsqlite-1-1-1-2016-12-10" class="anchor"></a>RSQLite 1.1-1 (2016-12-10)<small> 2016-12-10 </small>
 </h1>
 <ul>
@@ -345,7 +349,7 @@
 </ul>
 </div>
     <div id="rsqlite-1-1-2016-11-25" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.1">
 <a href="#rsqlite-1-1-2016-11-25" class="anchor"></a>RSQLite 1.1 (2016-11-25)<small> 2016-11-27 </small>
 </h1>
 <ul>
@@ -367,7 +371,7 @@
 <h2 class="hasAnchor">
 <a href="#breaking-changes" class="anchor"></a>Breaking changes</h2>
 <ul>
-<li><p><code><a href="../reference/SQLite.html">RSQLite()</a></code> no longer automatically attaches DBI when loaded. This is to encourage you to use <code><a href="https://rdrr.io/r/base/library.html">library(DBI); dbConnect(RSQLite::SQLite())</a></code>.</p></li>
+<li><p><code><a href="../reference/SQLite.html">RSQLite()</a></code> no longer automatically attaches DBI when loaded. This is to encourage you to use <code><a href="https://dbi.r-dbi.org/reference">library(DBI); dbConnect(RSQLite::SQLite())</a></code>.</p></li>
 <li><p>Functions that take a table name, such as <code>dbWriteTable()</code> and <code>dbReadTable()</code>, now quote the table name via <code>dbQuoteIdentifier()</code>. This means that caller-quoted names should be marked as such with <code><a href="https://dbi.r-dbi.org/reference/SQL.html">DBI::SQL()</a></code>.</p></li>
 </ul>
 </div>
@@ -458,7 +462,7 @@
 </div>
 </div>
     <div id="version-1-0-0" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.0.0">
 <a href="#version-1-0-0" class="anchor"></a>Version 1.0.0<small> 2014-10-25 </small>
 </h1>
 <div id="new-features-2" class="section level2">
@@ -509,7 +513,7 @@
 </div>
 </div>
     <div id="version-0-11-6" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.11.6">
 <a href="#version-0-11-6" class="anchor"></a>Version 0.11.6<small> Unreleased </small>
 </h1>
 <ul>
@@ -517,7 +521,7 @@
 </ul>
 </div>
     <div id="version-0-11-5" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.11.5">
 <a href="#version-0-11-5" class="anchor"></a>Version 0.11.5<small> Unreleased </small>
 </h1>
 <ul>
@@ -527,7 +531,7 @@
 </ul>
 </div>
     <div id="version-0-11-4" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.11.4">
 <a href="#version-0-11-4" class="anchor"></a>Version 0.11.4<small> 2013-05-26 </small>
 </h1>
 <ul>
@@ -536,7 +540,7 @@
 </ul>
 </div>
     <div id="version-0-11-3" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.11.3">
 <a href="#version-0-11-3" class="anchor"></a>Version 0.11.3<small> 2013-04-16 </small>
 </h1>
 <ul>
@@ -544,7 +548,7 @@
 </ul>
 </div>
     <div id="version-0-11-2" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.11.2">
 <a href="#version-0-11-2" class="anchor"></a>Version 0.11.2<small> 2012-09-16 </small>
 </h1>
 <ul>
@@ -552,7 +556,7 @@
 </ul>
 </div>
     <div id="version-0-11-1" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.11.1">
 <a href="#version-0-11-1" class="anchor"></a>Version 0.11.1<small> 2011-12-07 </small>
 </h1>
 <ul>
@@ -560,7 +564,7 @@
 </ul>
 </div>
     <div id="version-0-11-0" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.11.0">
 <a href="#version-0-11-0" class="anchor"></a>Version 0.11.0<small> 2011-12-01 </small>
 </h1>
 <ul>
@@ -572,7 +576,7 @@
 </ul>
 </div>
     <div id="version-0-10-0" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.10.0">
 <a href="#version-0-10-0" class="anchor"></a>Version 0.10.0<small> 2011-10-02 </small>
 </h1>
 <ul>
@@ -580,7 +584,7 @@
 </ul>
 </div>
     <div id="version-0-9-5" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.9-5">
 <a href="#version-0-9-5" class="anchor"></a>Version 0.9-5<small> Unreleased </small>
 </h1>
 <ul>
@@ -588,7 +592,7 @@
 </ul>
 </div>
     <div id="version-0-9-4" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.9-4">
 <a href="#version-0-9-4" class="anchor"></a>Version 0.9-4<small> 2010-11-24 </small>
 </h1>
 <ul>
@@ -596,7 +600,7 @@
 </ul>
 </div>
     <div id="version-0-9-3" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.9-3">
 <a href="#version-0-9-3" class="anchor"></a>Version 0.9-3<small> 2010-11-07 </small>
 </h1>
 <ul>
@@ -605,7 +609,7 @@
 </ul>
 </div>
     <div id="version-0-9-2" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.9-2">
 <a href="#version-0-9-2" class="anchor"></a>Version 0.9-2<small> 2010-07-24 </small>
 </h1>
 <ul>
@@ -613,7 +617,7 @@
 </ul>
 </div>
     <div id="version-0-9-1" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.9-1">
 <a href="#version-0-9-1" class="anchor"></a>Version 0.9-1<small> 2010-05-29 </small>
 </h1>
 <ul>
@@ -622,7 +626,7 @@
 </ul>
 </div>
     <div id="version-0-9-0" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.9-0">
 <a href="#version-0-9-0" class="anchor"></a>Version 0.9-0<small> 2010-05-07 </small>
 </h1>
 <ul>
@@ -643,7 +647,7 @@
 </ul>
 </div>
     <div id="version-0-8-4" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.8-4">
 <a href="#version-0-8-4" class="anchor"></a>Version 0.8-4<small> 2010-03-10 </small>
 </h1>
 <ul>
@@ -659,7 +663,7 @@
 </ul>
 </div>
     <div id="version-0-8-3" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.8-3">
 <a href="#version-0-8-3" class="anchor"></a>Version 0.8-3<small> 2010-02-11 </small>
 </h1>
 <ul>
@@ -667,7 +671,7 @@
 </ul>
 </div>
     <div id="version-0-8-2" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.8-2">
 <a href="#version-0-8-2" class="anchor"></a>Version 0.8-2<small> 2010-01-22 </small>
 </h1>
 <ul>
@@ -675,7 +679,7 @@
 </ul>
 </div>
     <div id="version-0-8-1" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.8-1">
 <a href="#version-0-8-1" class="anchor"></a>Version 0.8-1<small> 2010-01-07 </small>
 </h1>
 <ul>
@@ -685,7 +689,7 @@
 </ul>
 </div>
     <div id="version-0-8-0" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.8-0">
 <a href="#version-0-8-0" class="anchor"></a>Version 0.8-0<small> 2009-12-22 </small>
 </h1>
 <ul>
@@ -703,7 +707,7 @@
 </ul>
 </div>
     <div id="version-0-7-3" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.7-3">
 <a href="#version-0-7-3" class="anchor"></a>Version 0.7-3<small> 2009-10-04 </small>
 </h1>
 <ul>
@@ -712,7 +716,7 @@
 </ul>
 </div>
     <div id="version-0-7-2" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.7-2">
 <a href="#version-0-7-2" class="anchor"></a>Version 0.7-2<small> 2009-08-14 </small>
 </h1>
 <ul>
@@ -721,7 +725,7 @@
 </ul>
 </div>
     <div id="version-0-7-1" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.7-1">
 <a href="#version-0-7-1" class="anchor"></a>Version 0.7-1<small> 2008-10-25 </small>
 </h1>
 <ul>
@@ -731,7 +735,7 @@
 </ul>
 </div>
     <div id="version-0-4-12" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.4-12">
 <a href="#version-0-4-12" class="anchor"></a>Version 0.4-12<small> Unreleased </small>
 </h1>
 <ul>
@@ -739,7 +743,7 @@
 </ul>
 </div>
     <div id="version-0-4-11" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.4-11">
 <a href="#version-0-4-11" class="anchor"></a>Version 0.4-11<small> Unreleased </small>
 </h1>
 <ul>
@@ -756,7 +760,7 @@
 </ul>
 </div>
     <div id="version-0-4-9" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.4-9">
 <a href="#version-0-4-9" class="anchor"></a>Version 0.4-9<small> 2006-10-26 </small>
 </h1>
 <ul>
@@ -766,7 +770,7 @@
 </ul>
 </div>
     <div id="version-0-4-4" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.4-4">
 <a href="#version-0-4-4" class="anchor"></a>Version 0.4-4<small> 2006-09-29 </small>
 </h1>
 <ul>
@@ -776,7 +780,7 @@
 </ul>
 </div>
     <div id="version-0-4-1" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.4-1">
 <a href="#version-0-4-1" class="anchor"></a>Version 0.4-1<small> 2006-01-19 </small>
 </h1>
 <ul>
@@ -787,7 +791,7 @@
 </ul>
 </div>
     <div id="version-0-4-0" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.4-0">
 <a href="#version-0-4-0" class="anchor"></a>Version 0.4-0<small> 2005-04-06 </small>
 </h1>
 <ul>
@@ -800,7 +804,7 @@
 </ul>
 </div>
     <div id="version-0-3-5" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.3-5">
 <a href="#version-0-3-5" class="anchor"></a>Version 0.3-5<small> 2005-01-31 </small>
 </h1>
 <ul>
@@ -808,7 +812,7 @@
 </ul>
 </div>
     <div id="version-0-3-4" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.3-4">
 <a href="#version-0-3-4" class="anchor"></a>Version 0.3-4<small> 2004-06-22 </small>
 </h1>
 <ul>
@@ -816,7 +820,7 @@
 </ul>
 </div>
     <div id="version-0-3-3" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.3-3">
 <a href="#version-0-3-3" class="anchor"></a>Version 0.3-3<small> 2003-11-05 </small>
 </h1>
 <ul>
@@ -827,7 +831,7 @@
 </ul>
 </div>
     <div id="version-0-3-2" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.3-2">
 <a href="#version-0-3-2" class="anchor"></a>Version 0.3-2<small> 2003-06-16 </small>
 </h1>
 <ul>
@@ -843,7 +847,7 @@
 </ul>
 </div>
     <div id="version-0-3-1" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.3-1">
 <a href="#version-0-3-1" class="anchor"></a>Version 0.3-1<small> 2003-03-31 </small>
 </h1>
 <ul>
@@ -853,7 +857,7 @@
 </ul>
 </div>
     <div id="version-0-2-1" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.2-1">
 <a href="#version-0-2-1" class="anchor"></a>Version 0.2-1<small> 2001-10-29 </small>
 </h1>
 <ul>
@@ -861,7 +865,7 @@
 </ul>
 </div>
     <div id="version-0-1-1" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.1-1">
 <a href="#version-0-1-1" class="anchor"></a>Version 0.1-1<small> Unreleased </small>
 </h1>
 <ul>
@@ -870,60 +874,10 @@
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <div id="tocnav">
-      <h2>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-        <li><a href="#rsqlite-2-2-0-9000">2.2.0.9000</a></li>
-        <li><a href="#rsqlite-2-2-0">2.2.0</a></li>
-        <li><a href="#rsqlite-2-1-5">2.1.5</a></li>
-        <li><a href="#rsqlite-2-1-4">2.1.4</a></li>
-        <li><a href="#rsqlite-2-1-3">2.1.3</a></li>
-        <li><a href="#rsqlite-2-1-2">2.1.2</a></li>
-        <li><a href="#rsqlite-2-1-1-2018-05-05">2.1.1</a></li>
-        <li><a href="#rsqlite-2-1-0-2018-03-29">2.1.0</a></li>
-        <li><a href="#rsqlite-2-0-2017-06-18">2.0</a></li>
-        <li><a href="#rsqlite-1-1-2-2017-01-07">1.1-2</a></li>
-        <li><a href="#rsqlite-1-1-1-2016-12-10">1.1-1</a></li>
-        <li><a href="#rsqlite-1-1-2016-11-25">1.1</a></li>
-        <li><a href="#version-1-0-0">1.0.0</a></li>
-        <li><a href="#version-0-11-6">0.11.6</a></li>
-        <li><a href="#version-0-11-5">0.11.5</a></li>
-        <li><a href="#version-0-11-4">0.11.4</a></li>
-        <li><a href="#version-0-11-3">0.11.3</a></li>
-        <li><a href="#version-0-11-2">0.11.2</a></li>
-        <li><a href="#version-0-11-1">0.11.1</a></li>
-        <li><a href="#version-0-11-0">0.11.0</a></li>
-        <li><a href="#version-0-10-0">0.10.0</a></li>
-        <li><a href="#version-0-9-5">0.9-5</a></li>
-        <li><a href="#version-0-9-4">0.9-4</a></li>
-        <li><a href="#version-0-9-3">0.9-3</a></li>
-        <li><a href="#version-0-9-2">0.9-2</a></li>
-        <li><a href="#version-0-9-1">0.9-1</a></li>
-        <li><a href="#version-0-9-0">0.9-0</a></li>
-        <li><a href="#version-0-8-4">0.8-4</a></li>
-        <li><a href="#version-0-8-3">0.8-3</a></li>
-        <li><a href="#version-0-8-2">0.8-2</a></li>
-        <li><a href="#version-0-8-1">0.8-1</a></li>
-        <li><a href="#version-0-8-0">0.8-0</a></li>
-        <li><a href="#version-0-7-3">0.7-3</a></li>
-        <li><a href="#version-0-7-2">0.7-2</a></li>
-        <li><a href="#version-0-7-1">0.7-1</a></li>
-        <li><a href="#version-0-4-12">0.4-12</a></li>
-        <li><a href="#version-0-4-11">0.4-11</a></li>
-        <li><a href="#version-0-4-9">0.4-9</a></li>
-        <li><a href="#version-0-4-4">0.4-4</a></li>
-        <li><a href="#version-0-4-1">0.4-1</a></li>
-        <li><a href="#version-0-4-0">0.4-0</a></li>
-        <li><a href="#version-0-3-5">0.3-5</a></li>
-        <li><a href="#version-0-3-4">0.3-4</a></li>
-        <li><a href="#version-0-3-3">0.3-3</a></li>
-        <li><a href="#version-0-3-2">0.3-2</a></li>
-        <li><a href="#version-0-3-1">0.3-1</a></li>
-        <li><a href="#version-0-2-1">0.2-1</a></li>
-        <li><a href="#version-0-1-1">0.1-1</a></li>
-      </ul>
-    </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 
 </div>
@@ -935,7 +889,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.0.</p>
 </div>
 
       </footer>

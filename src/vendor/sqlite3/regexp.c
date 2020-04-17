@@ -747,7 +747,8 @@ static void re_sql_func(
 #ifdef _WIN32
 __declspec(dllexport)
 #endif
-int sqlite3_regexp_init(
+// Keep attribute_visible when upgrading
+attribute_visible int sqlite3_regexp_init(
   sqlite3 *db, 
   char **pzErrMsg, 
   const sqlite3_api_routines *pApi

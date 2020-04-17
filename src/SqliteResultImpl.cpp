@@ -77,13 +77,21 @@ std::vector<DATA_TYPE> SqliteResultImpl::get_initial_field_types(const size_t nc
 sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
   sqlite3_stmt* stmt = NULL;
 
+  const char *tail = NULL;
+
   int rc =
     sqlite3_prepare_v2(
       conn, sql.c_str(), (int)std::min(sql.size() + 1, (size_t)INT_MAX),
-      &stmt, NULL
+      &stmt, &tail
     );
   if (rc != SQLITE_OK) {
     raise_sqlite_exception(conn);
+  }
+  if (tail) {
+    while (isspace(*tail)) ++tail;
+    if (*tail) {
+      Rcpp::warning(std::string("Ignoring remaining part of query: ") + tail);
+    }
   }
 
   return stmt;

@@ -47,7 +47,7 @@ setGeneric("dbBeginTransaction", function(conn, ...) {
 #' @keywords internal
 #' @aliases dbBuildTableDefinition
 #' @export
-sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL,
+sqliteBuildTableDefinition <- function(conn, name, value, field.types = NULL,
                                        row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE)) {
 
   warning_once("RSQLite::sqliteBuildTableDefinition() is deprecated, please switch to DBI::sqlCreateTable().")

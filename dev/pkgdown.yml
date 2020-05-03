@@ -3,7 +3,7 @@ pkgdown: 1.5.1
 pkgdown_sha: ~
 articles:
   RSQLite: RSQLite.html
-last_built: 2020-05-02T00:44Z
+last_built: 2020-05-03T00:44Z
 urls:
   reference: https://rsqlite.r-dbi.org/reference
   article: https://rsqlite.r-dbi.org/articles

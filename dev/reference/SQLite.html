@@ -123,7 +123,7 @@ and receive results." />
 
     <div class="ref-description">
     <p>Together, <code>SQLite()</code> and <code>dbConnect()</code> allow you to connect to
-a SQLite database file. See <code><a href='https://dbi.r-dbi.org/reference/dbSendQuery.html'>DBI::dbSendQuery()</a></code> for how to issue queries
+a SQLite database file. See <code><a href='https://rdrr.io/pkg/DBI/man/dbSendQuery.html'>DBI::dbSendQuery()</a></code> for how to issue queries
 and receive results.</p>
     </div>
 
@@ -233,26 +233,26 @@ integers.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>SQLite()</code> returns an object of class <a href='SQLiteDriver-class.html'>SQLiteDriver</a>.</p>
-<p><code><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect()</a></code> returns an object of class <a href='SQLiteConnection-class.html'>SQLiteConnection</a>.</p>
+<p><code><a href='https://rdrr.io/pkg/DBI/man/dbConnect.html'>dbConnect()</a></code> returns an object of class <a href='SQLiteConnection-class.html'>SQLiteConnection</a>.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Connections are automatically cleaned-up after they're deleted and
-reclaimed by the GC. You can use <code><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>DBI::dbDisconnect()</a></code> to terminate the
+reclaimed by the GC. You can use <code><a href='https://rdrr.io/pkg/DBI/man/dbDisconnect.html'>DBI::dbDisconnect()</a></code> to terminate the
 connection early, but it will not actually close until all open result
 sets have been closed (and you'll get a warning message to this effect).</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>The corresponding generic functions <code><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>DBI::dbConnect()</a></code> and <code><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>DBI::dbDisconnect()</a></code>.</p></div>
+    <div class='dont-index'><p>The corresponding generic functions <code><a href='https://rdrr.io/pkg/DBI/man/dbConnect.html'>DBI::dbConnect()</a></code> and <code><a href='https://rdrr.io/pkg/DBI/man/dbDisconnect.html'>DBI::dbDisconnect()</a></code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>DBI</span>)
 <span class='co'># Initialize a temporary in memory database and copy a data.frame into it</span>
-<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span>(<span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'>SQLite</span>(), <span class='st'>":memory:"</span>)
+<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbConnect.html'>dbConnect</a></span>(<span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'>SQLite</span>(), <span class='st'>":memory:"</span>)
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>USArrests</span>)
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbWriteTable.html'>dbWriteTable</a></span>(<span class='no'>con</span>, <span class='st'>"USArrests"</span>, <span class='no'>USArrests</span>)
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>dbListTables</a></span>(<span class='no'>con</span>)</div><div class='output co'>#&gt; [1] "USArrests"</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbWriteTable.html'>dbWriteTable</a></span>(<span class='no'>con</span>, <span class='st'>"USArrests"</span>, <span class='no'>USArrests</span>)
+<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbListTables.html'>dbListTables</a></span>(<span class='no'>con</span>)</div><div class='output co'>#&gt; [1] "USArrests"</div><div class='input'>
 <span class='co'># Fetch all query results into a data frame:</span>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>con</span>, <span class='st'>"SELECT * FROM USArrests"</span>)</div><div class='output co'>#&gt;    Murder Assault UrbanPop Rape
+<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>con</span>, <span class='st'>"SELECT * FROM USArrests"</span>)</div><div class='output co'>#&gt;    Murder Assault UrbanPop Rape
 #&gt; 1    13.2     236       58 21.2
 #&gt; 2    10.0     263       48 44.5
 #&gt; 3     8.1     294       80 31.0
@@ -304,13 +304,13 @@ sets have been closed (and you'll get a warning message to this effect).</p>
 #&gt; 49    2.6      53       66 10.8
 #&gt; 50    6.8     161       60 15.6</div><div class='input'>
 <span class='co'># Or do it in batches</span>
-<span class='no'>rs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbSendQuery.html'>dbSendQuery</a></span>(<span class='no'>con</span>, <span class='st'>"SELECT * FROM USArrests"</span>)
-<span class='no'>d1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbFetch.html'>dbFetch</a></span>(<span class='no'>rs</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>10</span>)      <span class='co'># extract data in chunks of 10 rows</span>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbHasCompleted.html'>dbHasCompleted</a></span>(<span class='no'>rs</span>)</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'><span class='no'>d2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbFetch.html'>dbFetch</a></span>(<span class='no'>rs</span>, <span class='kw'>n</span> <span class='kw'>=</span> -<span class='fl'>1</span>)      <span class='co'># extract all remaining data</span>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbHasCompleted.html'>dbHasCompleted</a></span>(<span class='no'>rs</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbClearResult.html'>dbClearResult</a></span>(<span class='no'>rs</span>)
+<span class='no'>rs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbSendQuery.html'>dbSendQuery</a></span>(<span class='no'>con</span>, <span class='st'>"SELECT * FROM USArrests"</span>)
+<span class='no'>d1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbFetch.html'>dbFetch</a></span>(<span class='no'>rs</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>10</span>)      <span class='co'># extract data in chunks of 10 rows</span>
+<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbHasCompleted.html'>dbHasCompleted</a></span>(<span class='no'>rs</span>)</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'><span class='no'>d2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbFetch.html'>dbFetch</a></span>(<span class='no'>rs</span>, <span class='kw'>n</span> <span class='kw'>=</span> -<span class='fl'>1</span>)      <span class='co'># extract all remaining data</span>
+<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbHasCompleted.html'>dbHasCompleted</a></span>(<span class='no'>rs</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbClearResult.html'>dbClearResult</a></span>(<span class='no'>rs</span>)
 
 <span class='co'># clean up</span>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>con</span>)</div></pre>
+<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>con</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

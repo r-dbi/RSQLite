@@ -158,8 +158,8 @@ upper_quartile</p></dd>
 <span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='datasetsDb.html'>datasetsDb</a></span>()
 <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'>initExtension</span>(<span class='no'>db</span>)
 
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>db</span>, <span class='st'>"SELECT stdev(mpg) FROM mtcars"</span>)</div><div class='output co'>#&gt;   stdev(mpg)
-#&gt; 1   6.026948</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/stats/sd.html'>sd</a></span>(<span class='no'>mtcars</span>$<span class='no'>mpg</span>)</div><div class='output co'>#&gt; [1] 6.026948</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>db</span>)</div></pre>
+<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>db</span>, <span class='st'>"SELECT stdev(mpg) FROM mtcars"</span>)</div><div class='output co'>#&gt;   stdev(mpg)
+#&gt; 1   6.026948</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/stats/sd.html'>sd</a></span>(<span class='no'>mtcars</span>$<span class='no'>mpg</span>)</div><div class='output co'>#&gt; [1] 6.026948</div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>db</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

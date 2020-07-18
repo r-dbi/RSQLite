@@ -154,12 +154,12 @@ a copy of another database.</p>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>DBI</span>)
 <span class='co'># Copy the built in databaseDb() to an in-memory database</span>
-<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span>(<span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='SQLite.html'>SQLite</a></span>(), <span class='st'>":memory:"</span>)
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>dbListTables</a></span>(<span class='no'>con</span>)</div><div class='output co'>#&gt; character(0)</div><div class='input'>
+<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbConnect.html'>dbConnect</a></span>(<span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='SQLite.html'>SQLite</a></span>(), <span class='st'>":memory:"</span>)
+<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbListTables.html'>dbListTables</a></span>(<span class='no'>con</span>)</div><div class='output co'>#&gt; character(0)</div><div class='input'>
 <span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='datasetsDb.html'>datasetsDb</a></span>()
 <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'>sqliteCopyDatabase</span>(<span class='no'>db</span>, <span class='no'>con</span>)
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>db</span>)
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>dbListTables</a></span>(<span class='no'>con</span>)</div><div class='output co'>#&gt;  [1] "BOD"              "CO2"              "ChickWeight"      "DNase"           
+<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>db</span>)
+<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbListTables.html'>dbListTables</a></span>(<span class='no'>con</span>)</div><div class='output co'>#&gt;  [1] "BOD"              "CO2"              "ChickWeight"      "DNase"           
 #&gt;  [5] "Formaldehyde"     "Indometh"         "InsectSprays"     "LifeCycleSavings"
 #&gt;  [9] "Loblolly"         "Orange"           "OrchardSprays"    "PlantGrowth"     
 #&gt; [13] "Puromycin"        "Theoph"           "ToothGrowth"      "USArrests"       
@@ -170,7 +170,7 @@ a copy of another database.</p>
 #&gt; [33] "pressure"         "quakes"           "randu"            "rock"            
 #&gt; [37] "sleep"            "stackloss"        "swiss"            "trees"           
 #&gt; [41] "warpbreaks"       "women"           </div><div class='input'>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>con</span>)</div></pre>
+<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>con</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -139,7 +139,7 @@
     <tr>
       <th>conn</th>
       <td><p>a <code><a href='SQLiteConnection-class.html'>SQLiteConnection</a></code> object, produced by
-<code><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>DBI::dbConnect()</a></code></p></td>
+<code><a href='https://rdrr.io/pkg/DBI/man/dbConnect.html'>DBI::dbConnect()</a></code></p></td>
     </tr>
     <tr>
       <th>name</th>
@@ -177,16 +177,16 @@ converted to valid R identifiers.</p></td>
     <p>A data frame.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Note that the data frame returned by <code><a href='https://dbi.r-dbi.org/reference/dbReadTable.html'>dbReadTable()</a></code> only has
+    <p>Note that the data frame returned by <code><a href='https://rdrr.io/pkg/DBI/man/dbReadTable.html'>dbReadTable()</a></code> only has
 primitive data, e.g., it does not coerce character data to factors.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>The corresponding generic function <code><a href='https://dbi.r-dbi.org/reference/dbReadTable.html'>DBI::dbReadTable()</a></code>.</p></div>
+    <div class='dont-index'><p>The corresponding generic function <code><a href='https://rdrr.io/pkg/DBI/man/dbReadTable.html'>DBI::dbReadTable()</a></code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>DBI</span>)
 <span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='datasetsDb.html'>datasetsDb</a></span>()
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbReadTable.html'>dbReadTable</a></span>(<span class='no'>db</span>, <span class='st'>"mtcars"</span>)</div><div class='output co'>#&gt;              row_names  mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+<span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbReadTable.html'>dbReadTable</a></span>(<span class='no'>db</span>, <span class='st'>"mtcars"</span>)</div><div class='output co'>#&gt;              row_names  mpg cyl  disp  hp drat    wt  qsec vs am gear carb
 #&gt; 1            Mazda RX4 21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
 #&gt; 2        Mazda RX4 Wag 21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
 #&gt; 3           Datsun 710 22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
@@ -218,7 +218,7 @@ primitive data, e.g., it does not coerce character data to factors.</p>
 #&gt; 29      Ford Pantera L 15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
 #&gt; 30        Ferrari Dino 19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6
 #&gt; 31       Maserati Bora 15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
-#&gt; 32          Volvo 142E 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbReadTable.html'>dbReadTable</a></span>(<span class='no'>db</span>, <span class='st'>"mtcars"</span>, <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt;              row_names  mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+#&gt; 32          Volvo 142E 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbReadTable.html'>dbReadTable</a></span>(<span class='no'>db</span>, <span class='st'>"mtcars"</span>, <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt;              row_names  mpg cyl  disp  hp drat    wt  qsec vs am gear carb
 #&gt; 1            Mazda RX4 21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
 #&gt; 2        Mazda RX4 Wag 21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
 #&gt; 3           Datsun 710 22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
@@ -250,7 +250,7 @@ primitive data, e.g., it does not coerce character data to factors.</p>
 #&gt; 29      Ford Pantera L 15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
 #&gt; 30        Ferrari Dino 19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6
 #&gt; 31       Maserati Bora 15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
-#&gt; 32          Volvo 142E 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>db</span>)</div></pre>
+#&gt; 32          Volvo 142E 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>db</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

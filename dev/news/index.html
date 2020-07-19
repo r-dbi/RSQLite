@@ -224,7 +224,7 @@
 <li>New arguments <code>temporary</code> and <code>fail_if_missing</code> (default: <code>TRUE</code>) to <code>dbRemoveTable()</code> (r-dbi/DBI<a href='https://github.com/r-dbi/RSQLite/issues/141'>#141</a>, r-dbi/DBI<a href='https://github.com/r-dbi/RSQLite/issues/197'>#197</a>).</li>
 <li>Using <code>dbCreateTable()</code> and <code>dbAppendTable()</code> internally (r-dbi/DBI<a href='https://github.com/r-dbi/RSQLite/issues/74'>#74</a>).</li>
 <li>Implement <code><a href="https://rdrr.io/r/base/format.html">format()</a></code> method for <code>SqliteConnection</code> (r-dbi/DBI<a href='https://github.com/r-dbi/RSQLite/issues/163'>#163</a>).</li>
-<li>Reexporting <code><a href="https://rdrr.io/pkg/DBI/man/Id.html">Id()</a></code>, <code><a href="https://rdrr.io/pkg/DBI/man/dbIsReadOnly.html">DBI::dbIsReadOnly()</a></code> and <code><a href="https://rdrr.io/pkg/DBI/man/dbCanConnect.html">DBI::dbCanConnect()</a></code>.</li>
+<li>Reexporting <code><a href="https://dbi.r-dbi.org/reference/Id.html">Id()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbIsReadOnly.html">DBI::dbIsReadOnly()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbCanConnect.html">DBI::dbCanConnect()</a></code>.</li>
 <li>Now imports DBI 1.0.0.</li>
 </ul>
 </div>
@@ -371,8 +371,8 @@
 <h2 class="hasAnchor">
 <a href="#breaking-changes" class="anchor"></a>Breaking changes</h2>
 <ul>
-<li><p><code><a href="../reference/SQLite.html">RSQLite()</a></code> no longer automatically attaches DBI when loaded. This is to encourage you to use <code><a href="https://rdrr.io/pkg/DBI/man">library(DBI); dbConnect(RSQLite::SQLite())</a></code>.</p></li>
-<li><p>Functions that take a table name, such as <code>dbWriteTable()</code> and <code>dbReadTable()</code>, now quote the table name via <code>dbQuoteIdentifier()</code>. This means that caller-quoted names should be marked as such with <code><a href="https://rdrr.io/pkg/DBI/man/SQL.html">DBI::SQL()</a></code>.</p></li>
+<li><p><code><a href="../reference/SQLite.html">RSQLite()</a></code> no longer automatically attaches DBI when loaded. This is to encourage you to use <code><a href="https://dbi.r-dbi.org/reference">library(DBI); dbConnect(RSQLite::SQLite())</a></code>.</p></li>
+<li><p>Functions that take a table name, such as <code>dbWriteTable()</code> and <code>dbReadTable()</code>, now quote the table name via <code>dbQuoteIdentifier()</code>. This means that caller-quoted names should be marked as such with <code><a href="https://dbi.r-dbi.org/reference/SQL.html">DBI::SQL()</a></code>.</p></li>
 </ul>
 </div>
 <div id="new-features-1" class="section level2">
@@ -398,7 +398,7 @@
 <a href="#deprecated-functions" class="anchor"></a>Deprecated functions</h2>
 <ul>
 <li><p><code>make.db.names()</code> has been formally deprecated. Please use <code>dbQuoteIdentifier()</code> instead. This function is also used in <code>dbReadTable()</code>, <code>dbRemoveTable()</code>, and <code>dbListFields()</code> (<a href='https://github.com/r-dbi/RSQLite/issues/106'>#106</a>, <a href='https://github.com/r-dbi/RSQLite/issues/132'>#132</a>).</p></li>
-<li><p><code><a href="../reference/sqliteBuildTableDefinition.html">sqliteBuildTableDefinition()</a></code> has been deprecated. Use <code><a href="https://rdrr.io/pkg/DBI/man/sqlCreateTable.html">DBI::sqlCreateTable()</a></code> instead.</p></li>
+<li><p><code><a href="../reference/sqliteBuildTableDefinition.html">sqliteBuildTableDefinition()</a></code> has been deprecated. Use <code><a href="https://dbi.r-dbi.org/reference/sqlCreateTable.html">DBI::sqlCreateTable()</a></code> instead.</p></li>
 <li><p><code>dbGetException()</code> now raises a deprecation warning and always returns <code><a href="https://rdrr.io/r/base/list.html">list(errorNum = 0L, errorMsg = "OK")</a></code>, because querying the last SQLite error only works if an error actually occurred (<a href='https://github.com/r-dbi/RSQLite/issues/129'>#129</a>).</p></li>
 <li><p><code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> and <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> have been reimplemented (with deprecation warning) using <code>dbSendQuery()</code>, <code>dbBind()</code> and <code>dbFetch()</code> for compatibility with existing packages (<a href='https://github.com/r-dbi/RSQLite/issues/100'>#100</a>, <a href='https://github.com/r-dbi/RSQLite/issues/153'>#153</a>, <a href='https://github.com/r-dbi/RSQLite/issues/168'>#168</a>, <a href='https://github.com/r-dbi/RSQLite/issues/181'>#181</a>). Please convert to the new API, because the old function may be removed completely very soon: They were never part of the official API, and do less argument checking than the new APIs. Both <code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> and <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> ignore parameters not found in the query, with a warning (<a href='https://github.com/r-dbi/RSQLite/issues/174'>#174</a>).</p></li>
 <li><p>Reimplemented <code>dbListResults()</code> (with deprecation warning) for compatibility with existing packages (<a href='https://github.com/r-dbi/RSQLite/issues/154'>#154</a>).</p></li>

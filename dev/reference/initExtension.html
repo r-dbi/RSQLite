@@ -125,7 +125,7 @@ through the SQLite website (http://www.sqlite.org/contrib)." />
 through the SQLite website (<a href='http://www.sqlite.org/contrib'>http://www.sqlite.org/contrib</a>).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>initExtension</span>(<span class='no'>db</span>)</pre>
+    <pre class="usage"><span class='fu'>initExtension</span>(<span class='kw'>db</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -141,7 +141,7 @@ through the SQLite website (<a href='http://www.sqlite.org/contrib'>http://www.s
     
 
 
-<dl'>
+<dl>
 <dt>Math functions</dt><dd><p>acos, acosh, asin, asinh, atan, atan2, atanh, atn2,
 ceil, cos, cosh, cot, coth, degrees, difference, exp, floor, log, log10,
 pi, power, radians, sign, sin, sinh, sqrt, square, tan, tanh</p></dd>
@@ -154,12 +154,15 @@ upper_quartile</p></dd>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>DBI</span>)
-<span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='datasetsDb.html'>datasetsDb</a></span>()
-<span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'>initExtension</span>(<span class='no'>db</span>)
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://r-dbi.github.io/DBI'>DBI</a></span>)
+<span class='kw'>db</span> <span class='op'>&lt;-</span> <span class='kw'>RSQLite</span>::<span class='fu'><a href='datasetsDb.html'>datasetsDb</a></span>()
+<span class='kw'>RSQLite</span>::<span class='fu'>initExtension</span>(<span class='kw'>db</span>)
 
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>db</span>, <span class='st'>"SELECT stdev(mpg) FROM mtcars"</span>)</div><div class='output co'>#&gt;   stdev(mpg)
-#&gt; 1   6.026948</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/stats/sd.html'>sd</a></span>(<span class='no'>mtcars</span>$<span class='no'>mpg</span>)</div><div class='output co'>#&gt; [1] 6.026948</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>db</span>)</div></pre>
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>dbGetQuery</a></span>(<span class='kw'>db</span>, <span class='st'>"SELECT stdev(mpg) FROM mtcars"</span>)
+</div><div class='output co'>#&gt;   stdev(mpg)
+#&gt; 1   6.026948</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/stats/sd.html'>sd</a></span>(<span class='kw'>mtcars</span><span class='op'>$</span><span class='kw'>mpg</span>)
+</div><div class='output co'>#&gt; [1] 6.026948</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span>(<span class='kw'>db</span>)
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -175,7 +178,7 @@ upper_quartile</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

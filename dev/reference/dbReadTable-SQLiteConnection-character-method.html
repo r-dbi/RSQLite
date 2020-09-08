@@ -124,13 +124,13 @@
     </div>
 
     <pre class="usage"><span class='co'># S4 method for SQLiteConnection,character</span>
-<span class='fu'>dbReadTable</span>(
-  <span class='no'>conn</span>,
-  <span class='no'>name</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='kw pkg'>pkgconfig</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/pkgconfig/man/get_config.html'>get_config</a></span>(<span class='st'>"RSQLite::row.names.table"</span>, <span class='fl'>FALSE</span>),
-  <span class='kw'>check.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>select.cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbReadTable.html'>dbReadTable</a></span>(
+  <span class='kw'>conn</span>,
+  <span class='kw'>name</span>,
+  <span class='kw'>...</span>,
+  row.names = <span class='kw'>pkgconfig</span>::<span class='fu'><a href='https://rdrr.io/pkg/pkgconfig/man/get_config.html'>get_config</a></span>(<span class='st'>"RSQLite::row.names.table"</span>, <span class='fl'>FALSE</span>),
+  check.names = <span class='fl'>TRUE</span>,
+  select.cols = <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -184,9 +184,10 @@ primitive data, e.g., it does not coerce character data to factors.</p>
     <div class='dont-index'><p>The corresponding generic function <code><a href='https://dbi.r-dbi.org/reference/dbReadTable.html'>DBI::dbReadTable()</a></code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>DBI</span>)
-<span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='datasetsDb.html'>datasetsDb</a></span>()
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbReadTable.html'>dbReadTable</a></span>(<span class='no'>db</span>, <span class='st'>"mtcars"</span>)</div><div class='output co'>#&gt;              row_names  mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://r-dbi.github.io/DBI'>DBI</a></span>)
+<span class='kw'>db</span> <span class='op'>&lt;-</span> <span class='kw'>RSQLite</span>::<span class='fu'><a href='datasetsDb.html'>datasetsDb</a></span>()
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbReadTable.html'>dbReadTable</a></span>(<span class='kw'>db</span>, <span class='st'>"mtcars"</span>)
+</div><div class='output co'>#&gt;              row_names  mpg cyl  disp  hp drat    wt  qsec vs am gear carb
 #&gt; 1            Mazda RX4 21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
 #&gt; 2        Mazda RX4 Wag 21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
 #&gt; 3           Datsun 710 22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
@@ -218,7 +219,8 @@ primitive data, e.g., it does not coerce character data to factors.</p>
 #&gt; 29      Ford Pantera L 15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
 #&gt; 30        Ferrari Dino 19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6
 #&gt; 31       Maserati Bora 15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
-#&gt; 32          Volvo 142E 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbReadTable.html'>dbReadTable</a></span>(<span class='no'>db</span>, <span class='st'>"mtcars"</span>, <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt;              row_names  mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+#&gt; 32          Volvo 142E 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbReadTable.html'>dbReadTable</a></span>(<span class='kw'>db</span>, <span class='st'>"mtcars"</span>, row.names = <span class='fl'>FALSE</span>)
+</div><div class='output co'>#&gt;              row_names  mpg cyl  disp  hp drat    wt  qsec vs am gear carb
 #&gt; 1            Mazda RX4 21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
 #&gt; 2        Mazda RX4 Wag 21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
 #&gt; 3           Datsun 710 22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
@@ -250,7 +252,8 @@ primitive data, e.g., it does not coerce character data to factors.</p>
 #&gt; 29      Ford Pantera L 15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
 #&gt; 30        Ferrari Dino 19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6
 #&gt; 31       Maserati Bora 15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
-#&gt; 32          Volvo 142E 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>db</span>)</div></pre>
+#&gt; 32          Volvo 142E 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span>(<span class='kw'>db</span>)
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -266,7 +269,7 @@ primitive data, e.g., it does not coerce character data to factors.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

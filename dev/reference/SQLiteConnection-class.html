@@ -125,56 +125,56 @@ The &quot;Usage&quot; section lists the class methods overridden by RSQLite." />
     <div class="ref-description">
     <p>SQLiteConnection objects are created by passing <code><a href='SQLite.html'>SQLite()</a></code> as first
 argument to <code><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>DBI::dbConnect()</a></code>.
-They are a superclass of the DBIConnection class.
+They are a superclass of the <a href='https://dbi.r-dbi.org/reference/DBIConnection-class.html'>DBIConnection</a> class.
 The "Usage" section lists the class methods overridden by <span class="pkg">RSQLite</span>.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for SQLiteConnection</span>
-<span class='fu'><a href='https://rdrr.io/r/base/format.html'>format</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/format.html'>format</a></span>(<span class='kw'>x</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>show</span>(<span class='no'>object</span>)
+<span class='fu'>show</span>(<span class='kw'>object</span>)
 
 <span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>dbIsValid</span>(<span class='no'>dbObj</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbIsValid.html'>dbIsValid</a></span>(<span class='kw'>dbObj</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection,character</span>
-<span class='fu'>dbQuoteIdentifier</span>(<span class='no'>conn</span>, <span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html'>dbQuoteIdentifier</a></span>(<span class='kw'>conn</span>, <span class='kw'>x</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection,SQL</span>
-<span class='fu'>dbQuoteIdentifier</span>(<span class='no'>conn</span>, <span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html'>dbQuoteIdentifier</a></span>(<span class='kw'>conn</span>, <span class='kw'>x</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection,SQL</span>
-<span class='fu'>dbUnquoteIdentifier</span>(<span class='no'>conn</span>, <span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbUnquoteIdentifier.html'>dbUnquoteIdentifier</a></span>(<span class='kw'>conn</span>, <span class='kw'>x</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>dbGetException</span>(<span class='no'>conn</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetException.html'>dbGetException</a></span>(<span class='kw'>conn</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>dbGetInfo</span>(<span class='no'>dbObj</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetInfo.html'>dbGetInfo</a></span>(<span class='kw'>dbObj</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection,character</span>
-<span class='fu'>dbSendQuery</span>(<span class='no'>conn</span>, <span class='no'>statement</span>, <span class='kw'>params</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbSendQuery.html'>dbSendQuery</a></span>(<span class='kw'>conn</span>, <span class='kw'>statement</span>, params = <span class='kw'>NULL</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>sqlData</span>(
-  <span class='no'>con</span>,
-  <span class='no'>value</span>,
-  <span class='kw'>row.names</span> <span class='kw'>=</span> <span class='kw pkg'>pkgconfig</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/pkgconfig/man/get_config.html'>get_config</a></span>(<span class='st'>"RSQLite::row.names.query"</span>, <span class='fl'>FALSE</span>),
-  <span class='no'>...</span>
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/sqlData.html'>sqlData</a></span>(
+  <span class='kw'>con</span>,
+  <span class='kw'>value</span>,
+  row.names = <span class='kw'>pkgconfig</span>::<span class='fu'><a href='https://rdrr.io/pkg/pkgconfig/man/get_config.html'>get_config</a></span>(<span class='st'>"RSQLite::row.names.query"</span>, <span class='fl'>FALSE</span>),
+  <span class='kw'>...</span>
 )
 
 <span class='co'># S4 method for SQLiteConnection,character</span>
-<span class='fu'>dbRemoveTable</span>(<span class='no'>conn</span>, <span class='no'>name</span>, <span class='no'>...</span>, <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>fail_if_missing</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbRemoveTable.html'>dbRemoveTable</a></span>(<span class='kw'>conn</span>, <span class='kw'>name</span>, <span class='kw'>...</span>, temporary = <span class='fl'>FALSE</span>, fail_if_missing = <span class='fl'>TRUE</span>)
 
 <span class='co'># S4 method for SQLiteConnection,character</span>
-<span class='fu'>dbExistsTable</span>(<span class='no'>conn</span>, <span class='no'>name</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbExistsTable.html'>dbExistsTable</a></span>(<span class='kw'>conn</span>, <span class='kw'>name</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>dbListTables</span>(<span class='no'>conn</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>dbListTables</a></span>(<span class='kw'>conn</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>dbDataType</span>(<span class='no'>dbObj</span>, <span class='no'>obj</span>, <span class='no'>...</span>)</pre>
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDataType.html'>dbDataType</a></span>(<span class='kw'>dbObj</span>, <span class='kw'>obj</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -185,7 +185,7 @@ The "Usage" section lists the class methods overridden by <span class="pkg">RSQL
     </tr>
     <tr>
       <th>fail_if_missing</th>
-      <td><p>If <code>FALSE</code>, <code>dbRemoveTable()</code> succeeds if the
+      <td><p>If <code>FALSE</code>, <code><a href='https://dbi.r-dbi.org/reference/dbRemoveTable.html'>dbRemoveTable()</a></code> succeeds if the
 table doesn't exist.</p></td>
     </tr>
     </table>
@@ -213,7 +213,7 @@ table doesn't exist.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

@@ -123,19 +123,19 @@ or with calling dbBind() instead." />
 
     <div class="ref-description">
     <p>These functions have been deprecated. Please switch to using
-<code>dbSendQuery()</code>/<code>dbGetQuery()</code> with the <code>params</code> argument
-or with calling <code>dbBind()</code> instead.</p>
+<code><a href='https://dbi.r-dbi.org/reference/dbSendQuery.html'>dbSendQuery()</a></code>/<code><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>dbGetQuery()</a></code> with the <code>params</code> argument
+or with calling <code><a href='https://dbi.r-dbi.org/reference/dbBind.html'>dbBind()</a></code> instead.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>dbSendPreparedQuery</span>(<span class='no'>conn</span>, <span class='no'>statement</span>, <span class='no'>bind.data</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>dbSendPreparedQuery</span>(<span class='kw'>conn</span>, <span class='kw'>statement</span>, <span class='kw'>bind.data</span>, <span class='kw'>...</span>)
 
-<span class='fu'>dbGetPreparedQuery</span>(<span class='no'>conn</span>, <span class='no'>statement</span>, <span class='no'>bind.data</span>, <span class='no'>...</span>)
-
-<span class='co'># S4 method for SQLiteConnection,character,data.frame</span>
-<span class='fu'>dbSendPreparedQuery</span>(<span class='no'>conn</span>, <span class='no'>statement</span>, <span class='no'>bind.data</span>, <span class='no'>...</span>)
+<span class='fu'>dbGetPreparedQuery</span>(<span class='kw'>conn</span>, <span class='kw'>statement</span>, <span class='kw'>bind.data</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection,character,data.frame</span>
-<span class='fu'>dbGetPreparedQuery</span>(<span class='no'>conn</span>, <span class='no'>statement</span>, <span class='no'>bind.data</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>dbSendPreparedQuery</span>(<span class='kw'>conn</span>, <span class='kw'>statement</span>, <span class='kw'>bind.data</span>, <span class='kw'>...</span>)
+
+<span class='co'># S4 method for SQLiteConnection,character,data.frame</span>
+<span class='fu'>dbGetPreparedQuery</span>(<span class='kw'>conn</span>, <span class='kw'>statement</span>, <span class='kw'>bind.data</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -174,7 +174,7 @@ or with calling <code>dbBind()</code> instead.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

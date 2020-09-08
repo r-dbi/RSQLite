@@ -122,32 +122,32 @@ and receive results." />
     </div>
 
     <div class="ref-description">
-    <p>Together, <code>SQLite()</code> and <code>dbConnect()</code> allow you to connect to
+    <p>Together, <code>SQLite()</code> and <code><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect()</a></code> allow you to connect to
 a SQLite database file. See <code><a href='https://dbi.r-dbi.org/reference/dbSendQuery.html'>DBI::dbSendQuery()</a></code> for how to issue queries
 and receive results.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>SQLite</span>(<span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>SQLite</span>(<span class='kw'>...</span>)
 
 <span class='co'># S4 method for SQLiteDriver</span>
-<span class='fu'>dbConnect</span>(
-  <span class='no'>drv</span>,
-  <span class='kw'>dbname</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>loadable.extensions</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>default.extensions</span> <span class='kw'>=</span> <span class='no'>loadable.extensions</span>,
-  <span class='kw'>cache_size</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>synchronous</span> <span class='kw'>=</span> <span class='st'>"off"</span>,
-  <span class='kw'>flags</span> <span class='kw'>=</span> <span class='no'>SQLITE_RWC</span>,
-  <span class='kw'>vfs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>bigint</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"integer64"</span>, <span class='st'>"integer"</span>, <span class='st'>"numeric"</span>, <span class='st'>"character"</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span>(
+  <span class='kw'>drv</span>,
+  dbname = <span class='st'>""</span>,
+  <span class='kw'>...</span>,
+  loadable.extensions = <span class='fl'>TRUE</span>,
+  default.extensions = <span class='kw'>loadable.extensions</span>,
+  cache_size = <span class='kw'>NULL</span>,
+  synchronous = <span class='st'>"off"</span>,
+  flags = <span class='kw'>SQLITE_RWC</span>,
+  vfs = <span class='kw'>NULL</span>,
+  bigint = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"integer64"</span>, <span class='st'>"integer"</span>, <span class='st'>"numeric"</span>, <span class='st'>"character"</span>)
 )
 
 <span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>dbConnect</span>(<span class='no'>drv</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span>(<span class='kw'>drv</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'>dbDisconnect</span>(<span class='no'>conn</span>, <span class='no'>...</span>)</pre>
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span>(<span class='kw'>conn</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -155,7 +155,7 @@ and receive results.</p>
     <tr>
       <th>...</th>
       <td><p>In previous versions, <code>SQLite()</code> took arguments. These
-have now all been moved to <code>dbConnect()</code>, and any arguments here
+have now all been moved to <code><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect()</a></code>, and any arguments here
 will be ignored with a warning.</p></td>
     </tr>
     <tr>
@@ -245,14 +245,16 @@ sets have been closed (and you'll get a warning message to this effect).</p>
     <div class='dont-index'><p>The corresponding generic functions <code><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>DBI::dbConnect()</a></code> and <code><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>DBI::dbDisconnect()</a></code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>DBI</span>)
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://r-dbi.github.io/DBI'>DBI</a></span>)
 <span class='co'># Initialize a temporary in memory database and copy a data.frame into it</span>
-<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span>(<span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'>SQLite</span>(), <span class='st'>":memory:"</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>USArrests</span>)
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbWriteTable.html'>dbWriteTable</a></span>(<span class='no'>con</span>, <span class='st'>"USArrests"</span>, <span class='no'>USArrests</span>)
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>dbListTables</a></span>(<span class='no'>con</span>)</div><div class='output co'>#&gt; [1] "USArrests"</div><div class='input'>
+<span class='kw'>con</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span>(<span class='kw'>RSQLite</span>::<span class='fu'>SQLite</span>(), <span class='st'>":memory:"</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>USArrests</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbWriteTable.html'>dbWriteTable</a></span>(<span class='kw'>con</span>, <span class='st'>"USArrests"</span>, <span class='kw'>USArrests</span>)
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>dbListTables</a></span>(<span class='kw'>con</span>)
+</div><div class='output co'>#&gt; [1] "USArrests"</div><div class='input'>
 <span class='co'># Fetch all query results into a data frame:</span>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>dbGetQuery</a></span>(<span class='no'>con</span>, <span class='st'>"SELECT * FROM USArrests"</span>)</div><div class='output co'>#&gt;    Murder Assault UrbanPop Rape
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>dbGetQuery</a></span>(<span class='kw'>con</span>, <span class='st'>"SELECT * FROM USArrests"</span>)
+</div><div class='output co'>#&gt;    Murder Assault UrbanPop Rape
 #&gt; 1    13.2     236       58 21.2
 #&gt; 2    10.0     263       48 44.5
 #&gt; 3     8.1     294       80 31.0
@@ -304,13 +306,16 @@ sets have been closed (and you'll get a warning message to this effect).</p>
 #&gt; 49    2.6      53       66 10.8
 #&gt; 50    6.8     161       60 15.6</div><div class='input'>
 <span class='co'># Or do it in batches</span>
-<span class='no'>rs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbSendQuery.html'>dbSendQuery</a></span>(<span class='no'>con</span>, <span class='st'>"SELECT * FROM USArrests"</span>)
-<span class='no'>d1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbFetch.html'>dbFetch</a></span>(<span class='no'>rs</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>10</span>)      <span class='co'># extract data in chunks of 10 rows</span>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbHasCompleted.html'>dbHasCompleted</a></span>(<span class='no'>rs</span>)</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'><span class='no'>d2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbFetch.html'>dbFetch</a></span>(<span class='no'>rs</span>, <span class='kw'>n</span> <span class='kw'>=</span> -<span class='fl'>1</span>)      <span class='co'># extract all remaining data</span>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbHasCompleted.html'>dbHasCompleted</a></span>(<span class='no'>rs</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbClearResult.html'>dbClearResult</a></span>(<span class='no'>rs</span>)
+<span class='kw'>rs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbSendQuery.html'>dbSendQuery</a></span>(<span class='kw'>con</span>, <span class='st'>"SELECT * FROM USArrests"</span>)
+<span class='kw'>d1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbFetch.html'>dbFetch</a></span>(<span class='kw'>rs</span>, n = <span class='fl'>10</span>)      <span class='co'># extract data in chunks of 10 rows</span>
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbHasCompleted.html'>dbHasCompleted</a></span>(<span class='kw'>rs</span>)
+</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'><span class='kw'>d2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbFetch.html'>dbFetch</a></span>(<span class='kw'>rs</span>, n = <span class='op'>-</span><span class='fl'>1</span>)      <span class='co'># extract all remaining data</span>
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbHasCompleted.html'>dbHasCompleted</a></span>(<span class='kw'>rs</span>)
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbClearResult.html'>dbClearResult</a></span>(<span class='kw'>rs</span>)
 
 <span class='co'># clean up</span>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span>(<span class='no'>con</span>)</div></pre>
+<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span>(<span class='kw'>con</span>)
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -326,7 +331,7 @@ sets have been closed (and you'll get a warning message to this effect).</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

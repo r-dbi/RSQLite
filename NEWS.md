@@ -1,3 +1,8 @@
+# RSQLite 2.2.1 (2020-09-28)
+
+- Internal changes only.
+
+
 # RSQLite 2.2.0.9001 (2020-09-28)
 
 - Use transaction for faster processing in `dbAppendTable()` (#306).

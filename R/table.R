@@ -236,7 +236,12 @@ setMethod("dbAppendTable", "SQLiteConnection", function(conn, name, value, ...,
   dbBegin(conn, name = "dbAppendTable")
   on.exit(dbRollback(conn, name = "dbAppendTable"))
 
-  callNextMethod()
+  out <- callNextMethod()
+
+  on.exit(NULL)
+  dbCommit(conn, name = "dbAppendTable")
+
+  out
 })
 
 #' @rdname SQLiteConnection-class

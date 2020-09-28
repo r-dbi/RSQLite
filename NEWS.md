@@ -484,7 +484,7 @@ Internal
 
 - Fix incorrect handling of NA's for character data in the code that
   binds parameters to a SQL query.  The string "NA" was incorrectly
-  interpretted as a missing value.
+  interpreted as a missing value.
 
 # Version 0.9-3
 
@@ -530,7 +530,7 @@ Internal
 
 - Upgrade to SQLite 3.6.23.1.
 
-- The memory mangement code for keeping track of database connections
+- The memory management code for keeping track of database connections
   was significantly refactored.  Instead of tracking connections in a
   pre-allocated array attached to the driver manager, connections are
   now managed dynamically using R's external pointers and finalizers.
@@ -728,7 +728,7 @@ Internal
   cached in memory as was previously done.
 
 * Added generic methods dbSendPreparedQuery() and dbGetPreparedQuery()
-  which are similiar to dbSendQuery() and dbGetQuery(), but take an
+  which are similar to dbSendQuery() and dbGetQuery(), but take an
   extra "bind.data" parameter, which is a data frame. The statement
   is assumed to contain bind variables. Bind variables are either
   for a column name (":name" or "@name") or for a column index ("?")
@@ -779,13 +779,13 @@ Internal
 * Added a method for dbWriteTable to write table from a text file, e.g.,
   dbWriteTable(con, "tablename", "filename")
 
-* Fixed problems exporting/importing NA's (thanks to Ronngui Huang for
+* Fixed problems exporting/importing NA's (thanks to Ronggui Huang for
   a very clear bug report).
 
 * Fixed double free() in the C code, a tiny memory leak, and configure now
   builds sqlite properly on 64-bit linux (thanks to Seth Falcon for these).
 
-* dbConnect() now accepts values for the "cache_size" and "sychnronous"
+* dbConnect() now accepts values for the "cache_size" and "synchronous"
   PRAGMAs ("synchronous" defaults to 0 or "off") to improve
   performance (thanks to Charles Loboz for pointing these out, see the
   file "rsqlitePerf.txt").
@@ -825,7 +825,7 @@ Internal
 
 # Version 0.3-3
 
-* Minor fixes to accommadate R 1.8.0 changes to data.frame subsetting.
+* Minor fixes to accommodate R 1.8.0 changes to data.frame subsetting.
 
 * Updated the documentation to use 1.8.0 new S4-style method documentation.
 

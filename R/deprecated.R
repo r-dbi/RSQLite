@@ -36,7 +36,7 @@ setGeneric("dbBeginTransaction", function(conn, ...) {
 #' The output SQL statement is a simple `CREATE TABLE` suitable for
 #' `dbGetQuery`
 #'
-#' @param conn A database connection.
+#' @param con A database connection.
 #' @param name Name of the new SQL table
 #' @param value A data.frame, for which we want to create a table.
 #' @param field.types Optional, named character vector of the types for each

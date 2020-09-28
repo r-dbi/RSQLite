@@ -56,7 +56,7 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #'   }
 #' @param cache_size Advanced option. A positive integer to change the maximum
 #'   number of disk pages that SQLite holds in memory (SQLite's default is
-#'   2000 pages). See \url{http://www.sqlite.org/pragma.html#pragma_cache_size}
+#'   2000 pages). See \url{https://www.sqlite.org/pragma.html#pragma_cache_size}
 #'   for details.
 #' @param synchronous Advanced options. Possible values for `synchronous`
 #'   are "off" (the default), "normal", or  "full".  Users have reported
@@ -64,7 +64,7 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #'   documentation itself implies considerable improved performance at the very
 #'   modest risk of database corruption in the unlikely case of the operating
 #'   system (\emph{not} the R application) crashing. See
-#'   \url{http://www.sqlite.org/pragma.html#pragma_synchronous} for details.
+#'   \url{https://www.sqlite.org/pragma.html#pragma_synchronous} for details.
 #' @param flags `SQLITE_RWC`: open the database in read/write mode
 #'   and create the database file if it does not already exist;
 #'   `SQLITE_RW`: open the database in read/write mode. Raise an error
@@ -77,7 +77,7 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #'   function will be called on the new connection.Setting this value to `FALSE`
 #'   requires calling `initExtension()` manually.
 #' @param vfs Select the SQLite3 OS interface. See
-#'   \url{http://www.sqlite.org/vfs.html} for details. Allowed values are
+#'   \url{https://www.sqlite.org/vfs.html} for details. Allowed values are
 #'   `"unix-posix"`, `"unix-unix-afp"`,
 #'   `"unix-unix-flock"`, `"unix-dotfile"`, and
 #'   `"unix-none"`.

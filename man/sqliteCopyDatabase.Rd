@@ -33,7 +33,7 @@ dbListTables(con)
 dbDisconnect(con)
 }
 \references{
-\url{http://www.sqlite.org/backup.html}
+\url{https://www.sqlite.org/backup.html}
 }
 \author{
 Seth Falcon

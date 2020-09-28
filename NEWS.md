@@ -483,11 +483,11 @@ Internal
 
 # Version 0.9-3
 
-- Upgrade SQLite to 3.7.3.  See http://www.sqlite.org/changes.html
+- Upgrade SQLite to 3.7.3.  See https://www.sqlite.org/changes.html
   for release notes for SQLite.
 
 - Enable the sounder(X) function via the SQLITE_SOUNDEX compile time
-  flag.  See http://www.sqlite.org/lang_corefunc.html#soundex for
+  flag.  See https://www.sqlite.org/lang_corefunc.html#soundex for
   details.
 
 # Version 0.9-2
@@ -589,7 +589,7 @@ Internal
 - Add name space unload hook to unload RSQLite.so.
 
 - Enable full-text search module by default.  See
-  http://www.sqlite.org/fts3.html for details on this SQLite
+  https://www.sqlite.org/fts3.html for details on this SQLite
   module.
 
 - Add support for prepared queries that involve a SELECT.  This was
@@ -676,7 +676,7 @@ Internal
       NULL, lets SQLite select the appropriate vfs for the system.
       You can specify one of "unix-posix", "unix-afp", "unix-flock",
       "unix-dotfile", or "unix-none".  For details, see
-      http://www.sqlite.org/compile.html.  This functionality is only
+      https://www.sqlite.org/compile.html.  This functionality is only
       fully available on OSX.  On non-OSX Unix, you can use
       unix-dotfile and unix-none.  None of these modules are available
       on Windows where a non-NULL values of the vfs argument will be
@@ -746,7 +746,7 @@ Internal
 * The SQLite driver has a new logical parameter "shared.cache" to
   enable the shared-cache mode, which allows multiple connections
   to share a single data and schema cache. See
-  http://www.sqlite.org/sharedcache.html
+  https://www.sqlite.org/sharedcache.html
 
 # Version 0.4-9
 
@@ -758,7 +758,7 @@ Internal
 * dbConnect() now has a logical parameter "loadable.extensions"
   which will allow loading of extensions. See the Loadable
   Extensions documentation:
-  http://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions
+  https://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions
 
 # Version 0.4-4
 
@@ -858,7 +858,7 @@ Internal
 
 * Updated to sqlite version 2.7.1 (note that if you have an sqlite
   database file from a version prior to 2.6 you'll need to update
-  it -- for details see http://www.hwaic.com/sw/sqlite).
+  it -- for details see https://www.hwaic.com/sw/sqlite).
 
 # Version 0.2-1
 

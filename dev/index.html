@@ -80,80 +80,102 @@
 <a href="#rsqlite" class="anchor"></a>RSQLite</h1></div>
 <!-- badges: start -->
 
+<!-- badges: end -->
 <p>Embeds the SQLite database engine in R, providing a DBI-compliant interface. <a href="https://www.sqlite.org">SQLite</a> is a public-domain, single-user, very light-weight database engine that implements a decent subset of the SQL 92 standard, including the core table creation, updating, insertion, and selection operations, plus transaction management.</p>
 <p>You can install the latest released version from CRAN with:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"RSQLite"</span><span class="op">)</span></pre></div>
+<pre class="chroma">
+<span class="nf"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="s">"RSQLite"</span>)
+</pre>
 <p>Or install the latest development version from GitHub with:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="co"># install.packages("devtools")</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"r-dbi/RSQLite"</span><span class="op">)</span></pre></div>
+<pre class="chroma">
+<span class="c"># install.packages("devtools")</span>
+<span class="k">devtools</span>::<span class="nf"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="s">"r-dbi/RSQLite"</span>)
+</pre>
 <p>To install from GitHub, you’ll need a <a href="https://www.rstudio.com/ide/docs/packages/prerequisites">development environment</a>.</p>
 <p>Discussions associated with DBI and related database packages take place on <a href="https://stat.ethz.ch/mailman/listinfo/r-sig-db">R-SIG-DB</a>. The website <a href="https://db.rstudio.com/">Databases using R</a> describes the tools and best practices in this ecosystem.</p>
 <div id="basic-usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#basic-usage" class="anchor"></a>Basic usage</h2>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://r-dbi.github.io/DBI">DBI</a></span><span class="op">)</span>
-<span class="co"># Create an ephemeral in-memory RSQLite database</span>
-<span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="reference/SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span>
+<pre class="chroma">
+<span class="nf"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="k"><a href="http://r-dbi.github.io/DBI">DBI</a></span>)
+<span class="c"># Create an ephemeral in-memory RSQLite database</span>
+<span class="k">con</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span>(<span class="k">RSQLite</span>::<span class="nf"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span>(), <span class="s">":memory:"</span>)
 
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListTables.html">dbListTables</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">## character(0)</a></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">dbWriteTable</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span>, <span class="va">mtcars</span><span class="op">)</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListTables.html">dbListTables</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></pre></div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">## [1] "mtcars"</a></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListFields.html">dbListFields</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span><span class="op">)</span></pre></div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">##  [1] "mpg"  "cyl"  "disp" "hp"   "drat" "wt"   "qsec" "vs"   "am"   "gear"</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2">## [11] "carb"</a></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbReadTable.html">dbReadTable</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span><span class="op">)</span></pre></div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">##    mpg cyl  disp  hp drat    wt  qsec vs am gear carb</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2">## 1 21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4</a>
-<a class="sourceLine" id="cb10-3" data-line-number="3">## 2 21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4</a>
-<a class="sourceLine" id="cb10-4" data-line-number="4">## 3 22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1</a>
-<a class="sourceLine" id="cb10-5" data-line-number="5">## 4 21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1</a>
-<a class="sourceLine" id="cb10-6" data-line-number="6">## 5 18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2</a>
-<a class="sourceLine" id="cb10-7" data-line-number="7">## 6 18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1</a>
-<a class="sourceLine" id="cb10-8" data-line-number="8">## 7 14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4</a>
-<a class="sourceLine" id="cb10-9" data-line-number="9">## 8 24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2</a>
-<a class="sourceLine" id="cb10-10" data-line-number="10">## 9 22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2</a>
-<a class="sourceLine" id="cb10-11" data-line-number="11">##  [ reached 'max' / getOption("max.print") -- omitted 23 rows ]</a></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="downlit">
-<span class="co"># You can fetch all results:</span>
-<span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html">dbSendQuery</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"SELECT * FROM mtcars WHERE cyl = 4"</span><span class="op">)</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbFetch.html">dbFetch</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></pre></div>
-<div class="sourceCode" id="cb12"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">##    mpg cyl  disp hp drat    wt  qsec vs am gear carb</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2">## 1 22.8   4 108.0 93 3.85 2.320 18.61  1  1    4    1</a>
-<a class="sourceLine" id="cb12-3" data-line-number="3">## 2 24.4   4 146.7 62 3.69 3.190 20.00  1  0    4    2</a>
-<a class="sourceLine" id="cb12-4" data-line-number="4">## 3 22.8   4 140.8 95 3.92 3.150 22.90  1  0    4    2</a>
-<a class="sourceLine" id="cb12-5" data-line-number="5">## 4 32.4   4  78.7 66 4.08 2.200 19.47  1  1    4    1</a>
-<a class="sourceLine" id="cb12-6" data-line-number="6">## 5 30.4   4  75.7 52 4.93 1.615 18.52  1  1    4    2</a>
-<a class="sourceLine" id="cb12-7" data-line-number="7">## 6 33.9   4  71.1 65 4.22 1.835 19.90  1  1    4    1</a>
-<a class="sourceLine" id="cb12-8" data-line-number="8">## 7 21.5   4 120.1 97 3.70 2.465 20.01  1  0    3    1</a>
-<a class="sourceLine" id="cb12-9" data-line-number="9">## 8 27.3   4  79.0 66 4.08 1.935 18.90  1  1    4    1</a>
-<a class="sourceLine" id="cb12-10" data-line-number="10">## 9 26.0   4 120.3 91 4.43 2.140 16.70  0  1    5    2</a>
-<a class="sourceLine" id="cb12-11" data-line-number="11">##  [ reached 'max' / getOption("max.print") -- omitted 2 rows ]</a></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit">
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html">dbClearResult</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span>
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbListTables.html">dbListTables</a></span>(<span class="k">con</span>)
+</pre>
+<pre class="chroma">
+<span class="c">## character(0)</span>
+</pre>
+<pre class="chroma">
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">dbWriteTable</a></span>(<span class="k">con</span>, <span class="s">"mtcars"</span>, <span class="k">mtcars</span>)
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbListTables.html">dbListTables</a></span>(<span class="k">con</span>)
+</pre>
+<pre class="chroma">
+<span class="c">## [1] "mtcars"</span>
+</pre>
+<pre class="chroma">
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbListFields.html">dbListFields</a></span>(<span class="k">con</span>, <span class="s">"mtcars"</span>)
+</pre>
+<pre class="chroma">
+<span class="c">##  [1] "mpg"  "cyl"  "disp" "hp"   "drat" "wt"   "qsec" "vs"   "am"   "gear"</span>
+<span class="c">## [11] "carb"</span>
+</pre>
+<pre class="chroma">
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbReadTable.html">dbReadTable</a></span>(<span class="k">con</span>, <span class="s">"mtcars"</span>)
+</pre>
+<pre class="chroma">
+<span class="c">##    mpg cyl  disp  hp drat    wt  qsec vs am gear carb</span>
+<span class="c">## 1 21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4</span>
+<span class="c">## 2 21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4</span>
+<span class="c">## 3 22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1</span>
+<span class="c">## 4 21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1</span>
+<span class="c">## 5 18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2</span>
+<span class="c">## 6 18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1</span>
+<span class="c">## 7 14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4</span>
+<span class="c">## 8 24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2</span>
+<span class="c">## 9 22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2</span>
+<span class="c">##  [ reached 'max' / getOption("max.print") -- omitted 23 rows ]</span>
+</pre>
+<pre class="chroma">
+<span class="c"># You can fetch all results:</span>
+<span class="k">res</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html">dbSendQuery</a></span>(<span class="k">con</span>, <span class="s">"SELECT * FROM mtcars WHERE cyl = 4"</span>)
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbFetch.html">dbFetch</a></span>(<span class="k">res</span>)
+</pre>
+<pre class="chroma">
+<span class="c">##    mpg cyl  disp hp drat    wt  qsec vs am gear carb</span>
+<span class="c">## 1 22.8   4 108.0 93 3.85 2.320 18.61  1  1    4    1</span>
+<span class="c">## 2 24.4   4 146.7 62 3.69 3.190 20.00  1  0    4    2</span>
+<span class="c">## 3 22.8   4 140.8 95 3.92 3.150 22.90  1  0    4    2</span>
+<span class="c">## 4 32.4   4  78.7 66 4.08 2.200 19.47  1  1    4    1</span>
+<span class="c">## 5 30.4   4  75.7 52 4.93 1.615 18.52  1  1    4    2</span>
+<span class="c">## 6 33.9   4  71.1 65 4.22 1.835 19.90  1  1    4    1</span>
+<span class="c">## 7 21.5   4 120.1 97 3.70 2.465 20.01  1  0    3    1</span>
+<span class="c">## 8 27.3   4  79.0 66 4.08 1.935 18.90  1  1    4    1</span>
+<span class="c">## 9 26.0   4 120.3 91 4.43 2.140 16.70  0  1    5    2</span>
+<span class="c">##  [ reached 'max' / getOption("max.print") -- omitted 2 rows ]</span>
+</pre>
+<pre class="chroma">
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html">dbClearResult</a></span>(<span class="k">res</span>)
 
-<span class="co"># Or a chunk at a time</span>
-<span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html">dbSendQuery</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"SELECT * FROM mtcars WHERE cyl = 4"</span><span class="op">)</span>
-<span class="kw">while</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html">dbHasCompleted</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
-  <span class="va">chunk</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbFetch.html">dbFetch</a></span><span class="op">(</span><span class="va">res</span>, n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">chunk</span><span class="op">)</span><span class="op">)</span>
-<span class="op">}</span></pre></div>
-<div class="sourceCode" id="cb14"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">## [1] 5</a>
-<a class="sourceLine" id="cb14-2" data-line-number="2">## [1] 5</a>
-<a class="sourceLine" id="cb14-3" data-line-number="3">## [1] 1</a></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="downlit">
-<span class="co"># Clear the result</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html">dbClearResult</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span>
+<span class="c"># Or a chunk at a time</span>
+<span class="k">res</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html">dbSendQuery</a></span>(<span class="k">con</span>, <span class="s">"SELECT * FROM mtcars WHERE cyl = 4"</span>)
+<span class="kr">while</span>(<span class="o">!</span><span class="nf"><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html">dbHasCompleted</a></span>(<span class="k">res</span>)){
+  <span class="k">chunk</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbFetch.html">dbFetch</a></span>(<span class="k">res</span>, n = <span class="m">5</span>)
+  <span class="nf"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="nf"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="k">chunk</span>))
+}
+</pre>
+<pre class="chroma">
+<span class="c">## [1] 5</span>
+<span class="c">## [1] 5</span>
+<span class="c">## [1] 1</span>
+</pre>
+<pre class="chroma">
+<span class="c"># Clear the result</span>
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html">dbClearResult</a></span>(<span class="k">res</span>)
 
-<span class="co"># Disconnect from the database</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></pre></div>
+<span class="c"># Disconnect from the database</span>
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span>(<span class="k">con</span>)
+</pre>
 </div>
 <div id="acknowledgements" class="section level2">
 <h2 class="hasAnchor">
@@ -214,7 +236,7 @@
 <h2>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://www.tidyverse.org/lifecycle/#stable"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
-<li><a href="https://travis-ci.org/r-dbi/RSQLite"><img src="https://travis-ci.org/r-dbi/RSQLite.png?branch=master" alt="Build Status"></a></li>
+<li><a href="https://travis-ci.com/github/r-dbi/RSQLite"><img src="https://travis-ci.com/r-dbi/RSQLite.png?branch=master" alt="Build Status"></a></li>
 <li><a href="https://ci.appveyor.com/project/r-dbi/RSQLite"><img src="https://ci.appveyor.com/api/projects/status/github/r-dbi/RSQLite?branch=master&amp;svg=true" alt="AppVeyor Build Status"></a></li>
 <li><a href="https://codecov.io/github/r-dbi/RSQLite?branch=master"><img src="https://codecov.io/gh/r-dbi/RSQLite/branch/master/graph/badge.svg" alt="Coverage Status"></a></li>
 <li><a href="https://cran.r-project.org/package=RSQLite"><img src="https://www.r-pkg.org/badges/version/RSQLite" alt="CRAN status"></a></li>

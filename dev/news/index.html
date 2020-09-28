@@ -607,7 +607,7 @@
 <a href="#version-0-9-4" class="anchor"></a>Version 0.9-4<small> 2010-11-24 </small>
 </h1>
 <ul>
-<li>Fix incorrect handling of NA’s for character data in the code that binds parameters to a SQL query. The string “NA” was incorrectly interpretted as a missing value.</li>
+<li>Fix incorrect handling of NA’s for character data in the code that binds parameters to a SQL query. The string “NA” was incorrectly interpreted as a missing value.</li>
 </ul>
 </div>
     <div id="version-0-9-3" class="section level1">
@@ -645,7 +645,7 @@
 <li><p>Refactor to use external pointers to wrap handle IDs; remove handle ID coerce code (e.g. as(<a href="mailto:obj@Id">obj@Id</a>, “integer”)). For now, the old scheme of storing handle IDs in an integer vector is mostly maintained only these integer vectors are stored in the protection slot of an external pointer. Using external pointers will allow the use of finalizer code so that, for example, unreferenced result sets can be cleaned up.</p></li>
 <li><p>Upgrade to SQLite 3.6.23.1.</p></li>
 <li>
-<p>The memory mangement code for keeping track of database connections was significantly refactored. Instead of tracking connections in a pre-allocated array attached to the driver manager, connections are now managed dynamically using R’s external pointers and finalizers. Consequences of this change are as follows:</p>
+<p>The memory management code for keeping track of database connections was significantly refactored. Instead of tracking connections in a pre-allocated array attached to the driver manager, connections are now managed dynamically using R’s external pointers and finalizers. Consequences of this change are as follows:</p>
 <ul>
 <li><p>There is no longer a maximum connection limit (values specified using the max.con argument to SQLite() are now ignored).</p></li>
 <li><p>The dbGetInfo(mgr) method no longer lists open connections and dbListConnections will now always return an empty list. This functionality was only needed because one needed a reference to a connection in order to finalize the resource via dbDisconnect(). While calling dbDisconnect() is still the recommended approach, database connections that are no longer referenced by any R variables will be finalized by R’s garbage collector.</p></li>
@@ -761,7 +761,7 @@
 <li><p>Implemented dbCommit() and dbRollback(). There is also a new generic method dbBeginTransaction(), which begins a transaction. Note that this is an extension to the DBI interface.</p></li>
 <li><p>Update to the SQLite 3 API for fetching records. This means that the records are pulled from the database as required, and not cached in memory as was previously done.</p></li>
 <li>
-<p>Added generic methods dbSendPreparedQuery() and dbGetPreparedQuery() which are similiar to dbSendQuery() and dbGetQuery(), but take an extra “bind.data” parameter, which is a data frame. The statement is assumed to contain bind variables. Bind variables are either for a column name (“:name” or “@name”) or for a column index (“?”) in the data frame. See <a href="http://sqlite.org/capi3ref.html" class="uri">http://sqlite.org/capi3ref.html</a> for more details.</p>
+<p>Added generic methods dbSendPreparedQuery() and dbGetPreparedQuery() which are similar to dbSendQuery() and dbGetQuery(), but take an extra “bind.data” parameter, which is a data frame. The statement is assumed to contain bind variables. Bind variables are either for a column name (“:name” or “@name”) or for a column index (“?”) in the data frame. See <a href="http://sqlite.org/capi3ref.html" class="uri">http://sqlite.org/capi3ref.html</a> for more details.</p>
 <p>dbGetPreparedQuery(con, “INSERT INTO table1 VALUES (:col1)”, data.frame(col1=c(1, 2)) )</p>
 <p>Each bind variable in the query has to be bound only once, either via named or positional parameters. If it is not bound or is bound more than once (due to a mix or positional/named parameters) an error is thrown. Any extra columns in the data frame are ignored.</p>
 <p>If you are having a lot of string parameters, use stringsAsFactors=FALSE when creating the bind.data data.frame instance. You can also use I().</p>
@@ -796,9 +796,9 @@
 </h1>
 <ul>
 <li><p>Added a method for dbWriteTable to write table from a text file, e.g., dbWriteTable(con, “tablename”, “filename”)</p></li>
-<li><p>Fixed problems exporting/importing NA’s (thanks to Ronngui Huang for a very clear bug report).</p></li>
+<li><p>Fixed problems exporting/importing NA’s (thanks to Ronggui Huang for a very clear bug report).</p></li>
 <li><p>Fixed double free() in the C code, a tiny memory leak, and configure now builds sqlite properly on 64-bit linux (thanks to Seth Falcon for these).</p></li>
-<li><p>dbConnect() now accepts values for the “cache_size” and “sychnronous” PRAGMAs (“synchronous” defaults to 0 or “off”) to improve performance (thanks to Charles Loboz for pointing these out, see the file “rsqlitePerf.txt”).</p></li>
+<li><p>dbConnect() now accepts values for the “cache_size” and “synchronous” PRAGMAs (“synchronous” defaults to 0 or “off”) to improve performance (thanks to Charles Loboz for pointing these out, see the file “rsqlitePerf.txt”).</p></li>
 </ul>
 </div>
     <div id="version-0-4-0" class="section level1">
@@ -835,7 +835,7 @@
 <a href="#version-0-3-3" class="anchor"></a>Version 0.3-3<small> 2003-11-05 </small>
 </h1>
 <ul>
-<li><p>Minor fixes to accommadate R 1.8.0 changes to data.frame subsetting.</p></li>
+<li><p>Minor fixes to accommodate R 1.8.0 changes to data.frame subsetting.</p></li>
 <li><p>Updated the documentation to use 1.8.0 new S4-style method documentation.</p></li>
 <li><p>Updated to SQLite to the latest 2.8.6 (included with RSQLite).</p></li>
 <li><p>Added file NAMESPACE.future to prepare for namespace implementation at some future release.</p></li>

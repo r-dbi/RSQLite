@@ -1,16 +1,19 @@
 ---
-output:
-  github_document:
-    html_preview: false
+output: downlit::readme_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+pkgload::load_all()
+```
+
 
 # RSQLite
 
 <!-- badges: start -->
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
-[![Build Status](https://travis-ci.org/r-dbi/RSQLite.png?branch=master)](https://travis-ci.org/r-dbi/RSQLite)
+[![Build Status](https://travis-ci.com/r-dbi/RSQLite.png?branch=master)](https://travis-ci.com/github/r-dbi/RSQLite)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/r-dbi/RSQLite?branch=master&svg=true)](https://ci.appveyor.com/project/r-dbi/RSQLite)
 [![Coverage Status](https://codecov.io/gh/r-dbi/RSQLite/branch/master/graph/badge.svg)](https://codecov.io/github/r-dbi/RSQLite?branch=master)
 [![CRAN status](https://www.r-pkg.org/badges/version/RSQLite)](https://cran.r-project.org/package=RSQLite)

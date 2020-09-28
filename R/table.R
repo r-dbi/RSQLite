@@ -231,6 +231,21 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 
 #' @rdname SQLiteConnection-class
 #' @export
+setMethod("dbAppendTable", "SQLiteConnection", function(conn, name, value, ...,
+                                                        row.names = NULL) {
+  dbBegin(conn, name = "dbAppendTable")
+  on.exit(dbRollback(conn, name = "dbAppendTable"))
+
+  out <- callNextMethod()
+
+  on.exit(NULL)
+  dbCommit(conn, name = "dbAppendTable")
+
+  out
+})
+
+#' @rdname SQLiteConnection-class
+#' @export
 setMethod("sqlData", "SQLiteConnection", function(con, value,
                                                   row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE),
                                                   ...) {

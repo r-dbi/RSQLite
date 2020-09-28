@@ -21,3 +21,5 @@ download.file(
   destfile = "src/vendor/sqlite3/regexp.c",
   quiet = TRUE,
   mode = "w")
+
+stopifnot(system2("patch", "-p1", stdin = "data-raw/regexp.patch") == 0)

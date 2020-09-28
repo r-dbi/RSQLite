@@ -86,7 +86,7 @@ read only mode.  Raise an error if the file does not already exist}
 \code{"unix-none"}.}
 
 \item{bigint}{The R type that 64-bit integer types should be mapped to,
-default is \link[bit64:integer64]{bit64::integer64}, which allows the full range of 64 bit
+default is \link[bit64:bit64-package]{bit64::integer64}, which allows the full range of 64 bit
 integers.}
 }
 \value{

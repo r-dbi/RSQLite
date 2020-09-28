@@ -63,6 +63,6 @@ dbCommit(con, name = "a")
 dbDisconnect(con)
 }
 \seealso{
-The corresponding generic functions \code{\link[DBI:dbBegin]{DBI::dbBegin()}}, \code{\link[DBI:dbCommit]{DBI::dbCommit()}},
-and \code{\link[DBI:dbRollback]{DBI::dbRollback()}}.
+The corresponding generic functions \code{\link[DBI:transactions]{DBI::dbBegin()}}, \code{\link[DBI:transactions]{DBI::dbCommit()}},
+and \code{\link[DBI:transactions]{DBI::dbRollback()}}.
 }

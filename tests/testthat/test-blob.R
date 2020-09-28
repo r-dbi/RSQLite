@@ -28,12 +28,11 @@ test_that("can read more than standard limit (#314)", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 
-  data <- data.frame(id = 1, data = blob(raw(1e9)))
-  dbWriteTable(con, "data", data)
+  dbWriteTable(con, "data", data.frame(id = 1, data = blob(raw(1e9 + 1))))
 
   expect_equal(
-    dbReadTable(con, "data"),
-    data
+    dbGetQuery(con, "SELECT length(data) AS len FROM data")$len,
+    1e9 + 1
   )
 })
 

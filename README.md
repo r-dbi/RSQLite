@@ -30,7 +30,7 @@ Discussions associated with DBI and related database packages take place on [R-S
 ## Basic usage
 
 <pre class='chroma'>
-<span class='nf'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='k'><a href='http://r-dbi.github.io/DBI'>DBI</a></span>)
+<span class='nf'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='k'><a href='https://dbi.r-dbi.org'>DBI</a></span>)
 <span class='c'># Create an ephemeral in-memory RSQLite database</span>
 <span class='k'>con</span> <span class='o'>&lt;-</span> <span class='nf'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span>(<span class='k'>RSQLite</span>::<span class='nf'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span>(), <span class='s'>":memory:"</span>)
 

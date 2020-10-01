@@ -1,3 +1,8 @@
+# RSQLite 2.2.1.9000 (2020-09-28)
+
+- Internal changes only.
+
+
 # RSQLite 2.2.1 (2020-09-28)
 
 - Upgrade to SQLite 3.33.0 (#321).

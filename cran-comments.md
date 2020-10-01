@@ -1,14 +1,16 @@
-## Release description
+RSQLite 2.2.1
 
-Removed mangling of column names.
+## Cran Repository Policy
 
-## Test environments
-
-* Ubuntu 18.04 (local install), R 3.6.1
-* Ubuntu 16.04 (on travis-ci), R devel, release, and oldrel
-* OS X (on travis-ci), R release
-* win-builder (devel)
+- [x] Reviewed CRP last edited 2020-07-11.
 
 ## R CMD check results
 
-OK
+- [x] Checked locally, R 4.0.2
+- [x] Checked on CI system, R 4.0.2
+- [x] Checked on win-builder, R devel
+
+## Current CRAN check results
+
+- [x] Checked on 2020-09-28, problems found: https://cran.r-project.org/web/checks/check_results_RSQLite.html
+- [x] NOTE: r-devel-linux-x86_64-fedora-clang, r-devel-windows-ix86+x86_64, r-release-macos-x86_64, r-release-windows-ix86+x86_64, r-oldrel-macos-x86_64: SQLite is linked statically, hence the size.

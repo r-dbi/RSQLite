@@ -8,7 +8,7 @@
 
 <!-- badges: end -->
 
-Embeds the SQLite database engine in R, providing a DBI-compliant interface. [SQLite](https://www.sqlite.org) is a public-domain, single-user, very light-weight database engine that implements a decent subset of the SQL 92 standard, including the core table creation, updating, insertion, and selection operations, plus transaction management.
+Embeds the SQLite database engine in R, providing a DBI-compliant interface. [SQLite](https://www.sqlite.org/index.html) is a public-domain, single-user, very light-weight database engine that implements a decent subset of the SQL 92 standard, including the core table creation, updating, insertion, and selection operations, plus transaction management.
 
 You can install the latest released version from CRAN with:
 
@@ -23,14 +23,16 @@ Or install the latest development version from GitHub with:
 <span class='k'>devtools</span>::<span class='nf'><a href='https://devtools.r-lib.org//reference/remote-reexports.html'>install_github</a></span>(<span class='s'>"r-dbi/RSQLite"</span>)
 </pre>
 
-To install from GitHub, you’ll need a [development environment](https://www.rstudio.com/ide/docs/packages/prerequisites).
+<!-- https://www.rstudio.com/ide/docs/packages/prerequisites -->
+
+To install from GitHub, you’ll need a [development environment](https://support.rstudio.com/hc/en-us/articles/200486498-Package-Development-Prerequisites).
 
 Discussions associated with DBI and related database packages take place on [R-SIG-DB](https://stat.ethz.ch/mailman/listinfo/r-sig-db). The website [Databases using R](https://db.rstudio.com/) describes the tools and best practices in this ecosystem.
 
 ## Basic usage
 
 <pre class='chroma'>
-<span class='nf'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='k'><a href='http://r-dbi.github.io/DBI'>DBI</a></span>)
+<span class='nf'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='k'><a href='https://dbi.r-dbi.org'>DBI</a></span>)
 <span class='c'># Create an ephemeral in-memory RSQLite database</span>
 <span class='k'>con</span> <span class='o'>&lt;-</span> <span class='nf'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span>(<span class='k'>RSQLite</span>::<span class='nf'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span>(), <span class='s'>":memory:"</span>)
 

@@ -12,7 +12,7 @@ vignette: >
 knitr::opts_chunk$set(comment = "#>", collapse = TRUE)
 ```
 
-RSQLite is the easiest way to use a database from R because the package itself contains [SQLite](https://www.sqlite.org); no external software is needed. This vignette will walk you through the basics of using a SQLite database.
+RSQLite is the easiest way to use a database from R because the package itself contains [SQLite](https://www.sqlite.org/index.html); no external software is needed. This vignette will walk you through the basics of using a SQLite database.
 
 RSQLite is a DBI-compatible interface which means you primarily use functions defined in the DBI package, so you should always start by loading DBI, not RSQLite:
 

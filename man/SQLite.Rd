@@ -62,7 +62,7 @@ requires calling \code{initExtension()} manually.}
 
 \item{cache_size}{Advanced option. A positive integer to change the maximum
 number of disk pages that SQLite holds in memory (SQLite's default is
-2000 pages). See \url{http://www.sqlite.org/pragma.html#pragma_cache_size}
+2000 pages). See \url{https://www.sqlite.org/pragma.html#pragma_cache_size}
 for details.}
 
 \item{synchronous}{Advanced options. Possible values for \code{synchronous}
@@ -71,7 +71,7 @@ significant speed ups using \code{sychronous = "off"}, and the SQLite
 documentation itself implies considerable improved performance at the very
 modest risk of database corruption in the unlikely case of the operating
 system (\emph{not} the R application) crashing. See
-\url{http://www.sqlite.org/pragma.html#pragma_synchronous} for details.}
+\url{https://www.sqlite.org/pragma.html#pragma_synchronous} for details.}
 
 \item{flags}{\code{SQLITE_RWC}: open the database in read/write mode
 and create the database file if it does not already exist;
@@ -80,7 +80,7 @@ if the file does not already exist; \code{SQLITE_RO}: open the database in
 read only mode.  Raise an error if the file does not already exist}
 
 \item{vfs}{Select the SQLite3 OS interface. See
-\url{http://www.sqlite.org/vfs.html} for details. Allowed values are
+\url{https://www.sqlite.org/vfs.html} for details. Allowed values are
 \code{"unix-posix"}, \code{"unix-unix-afp"},
 \code{"unix-unix-flock"}, \code{"unix-dotfile"}, and
 \code{"unix-none"}.}

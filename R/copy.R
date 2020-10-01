@@ -10,7 +10,7 @@
 #'   `from` will be copied to `to`.
 #' @param to A `SQLiteConnection` object pointing to an empty database.
 #' @author Seth Falcon
-#' @references \url{http://www.sqlite.org/backup.html}
+#' @references \url{https://www.sqlite.org/backup.html}
 #' @export
 #' @examples
 #' library(DBI)

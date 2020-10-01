@@ -81,7 +81,7 @@
 <!-- badges: start -->
 
 <!-- badges: end -->
-<p>Embeds the SQLite database engine in R, providing a DBI-compliant interface. <a href="https://www.sqlite.org">SQLite</a> is a public-domain, single-user, very light-weight database engine that implements a decent subset of the SQL 92 standard, including the core table creation, updating, insertion, and selection operations, plus transaction management.</p>
+<p>Embeds the SQLite database engine in R, providing a DBI-compliant interface. <a href="https://www.sqlite.org/index.html">SQLite</a> is a public-domain, single-user, very light-weight database engine that implements a decent subset of the SQL 92 standard, including the core table creation, updating, insertion, and selection operations, plus transaction management.</p>
 <p>You can install the latest released version from CRAN with:</p>
 <pre class="chroma">
 <span class="nf"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="s">"RSQLite"</span>)
@@ -91,13 +91,14 @@
 <span class="c"># install.packages("devtools")</span>
 <span class="k">devtools</span>::<span class="nf"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="s">"r-dbi/RSQLite"</span>)
 </pre>
-<p>To install from GitHub, you’ll need a <a href="https://www.rstudio.com/ide/docs/packages/prerequisites">development environment</a>.</p>
+<!-- https://www.rstudio.com/ide/docs/packages/prerequisites -->
+<p>To install from GitHub, you’ll need a <a href="https://support.rstudio.com/hc/en-us/articles/200486498-Package-Development-Prerequisites">development environment</a>.</p>
 <p>Discussions associated with DBI and related database packages take place on <a href="https://stat.ethz.ch/mailman/listinfo/r-sig-db">R-SIG-DB</a>. The website <a href="https://db.rstudio.com/">Databases using R</a> describes the tools and best practices in this ecosystem.</p>
 <div id="basic-usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#basic-usage" class="anchor"></a>Basic usage</h2>
 <pre class="chroma">
-<span class="nf"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="k"><a href="http://r-dbi.github.io/DBI">DBI</a></span>)
+<span class="nf"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="k"><a href="https://dbi.r-dbi.org">DBI</a></span>)
 <span class="c"># Create an ephemeral in-memory RSQLite database</span>
 <span class="k">con</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span>(<span class="k">RSQLite</span>::<span class="nf"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span>(), <span class="s">":memory:"</span>)
 

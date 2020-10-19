@@ -77,7 +77,7 @@ std::vector<DATA_TYPE> SqliteResultImpl::get_initial_field_types(const size_t nc
 sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
   sqlite3_stmt* stmt = NULL;
 
-  const char *tail = NULL;
+  const char* tail = NULL;
 
   int rc =
     sqlite3_prepare_v2(

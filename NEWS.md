@@ -1,3 +1,8 @@
+# RSQLite 2.2.1.9001 (2020-12-01)
+
+- Switch to GitHub Actions (#331).
+
+
 # RSQLite 2.2.1.9000 (2020-09-28)
 
 - Internal changes only.

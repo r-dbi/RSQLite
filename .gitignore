@@ -20,3 +20,4 @@ inst/doc
 /.drake
 .vscode/
 CRAN-RELEASE
+tests/testthat/testthat-problems.rds

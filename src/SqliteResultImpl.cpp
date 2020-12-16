@@ -164,7 +164,20 @@ List SqliteResultImpl::get_column_info() {
 
   CharacterVector types(cache.ncols_);
   for (size_t i = 0; i < cache.ncols_; i++) {
-    types[i] = Rf_type2char(DbColumnStorage::sexptype_from_datatype(types_[i]));
+    switch(types_[i]) {
+    case DT_DATE:
+      types[i] = "Date";
+      break;
+    case DT_DATETIME:
+      types[i] = "POSIXct";
+      break;
+    case DT_TIME:
+      types[i] = "hms";
+      break;
+    default:
+      types[i] = Rf_type2char(DbColumnStorage::sexptype_from_datatype(types_[i]));
+      break;
+    }
   }
 
   return List::create(_["name"] = names, _["type"] = types);

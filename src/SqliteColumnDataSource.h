@@ -6,9 +6,10 @@
 
 class SqliteColumnDataSource : public DbColumnDataSource {
   sqlite3_stmt* stmt;
-
+  const bool with_alt_types;
+  
 public:
-  SqliteColumnDataSource(sqlite3_stmt* stmt, const int j);
+  SqliteColumnDataSource(sqlite3_stmt* stmt, const int j, bool with_alt_types);
 
 public:
   virtual DATA_TYPE get_data_type() const;
@@ -28,7 +29,7 @@ public:
   virtual double fetch_time() const;
 
 private:
-  static DATA_TYPE datatype_from_decltype(const char* decl_type);
+  static DATA_TYPE datatype_from_decltype(const char* decl_type, bool with_alt_types);
 
 private:
   sqlite3_stmt* get_stmt() const;

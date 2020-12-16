@@ -3,14 +3,29 @@
 #include "integer64.h"
 #include "affinity.h"
 #include <boost/limits.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
-SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_) :
+
+SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_, bool with_alt_types_ = true) :
   DbColumnDataSource(j_),
-  stmt(stmt_)
+  stmt(stmt_),
+  with_alt_types(with_alt_types_)
 {
 }
 
 DATA_TYPE SqliteColumnDataSource::get_data_type() const {
+
+  if (with_alt_types) {
+      DATA_TYPE decl_dt = get_decl_data_type();
+    if (decl_dt == DT_DATE
+          || decl_dt == DT_DATETIME
+          || decl_dt == DT_TIME) {
+
+          return decl_dt;
+      }
+  }
+
   const int field_type = get_column_type();
   switch (field_type) {
   case SQLITE_INTEGER:
@@ -39,7 +54,7 @@ DATA_TYPE SqliteColumnDataSource::get_data_type() const {
 }
 
 DATA_TYPE SqliteColumnDataSource::get_decl_data_type() const {
-  return datatype_from_decltype(sqlite3_column_decltype(get_stmt(), get_j()));
+  return datatype_from_decltype(sqlite3_column_decltype(get_stmt(), get_j()), with_alt_types);
 }
 
 bool SqliteColumnDataSource::is_null() const {
@@ -80,13 +95,51 @@ SEXP SqliteColumnDataSource::fetch_blob() const {
 }
 
 double SqliteColumnDataSource::fetch_date() const {
-  // No such data type
-  return 0.0;
+
+  namespace bg = boost::gregorian;
+
+  int dt = get_column_type();
+
+  if (dt == SQLITE_TEXT) {
+      const char* dtstr = reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
+      double dateval;
+
+      try {
+          bg::date dt(bg::from_simple_string(dtstr));
+          bg::date_duration delta = dt - bg::date(1970, 1, 1);
+          dateval = static_cast<double>(delta.days());
+      } catch (...) {
+          dateval = NA_REAL;
+      }
+      return dateval;
+  } else {
+      return sqlite3_column_double(get_stmt(), get_j());
+  }
 }
 
 double SqliteColumnDataSource::fetch_datetime_local() const {
-  // No such data type
-  return 0.0;
+
+  namespace bp = boost::posix_time;
+  namespace bg = boost::gregorian;
+  namespace bd = boost::date_time;
+
+  int dt = get_column_type();
+
+  if (dt == SQLITE_TEXT) {
+      const char* dtstr = reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
+      double dateval;
+      try {
+          bp::ptime dttm(bd::parse_delimited_time<bp::ptime>(dtstr, ' '));
+          auto delta = dttm - bp::ptime(bg::date(1970, 1, 1), bp::seconds(0));
+          dateval = delta.total_microseconds() * 1e-6;
+      } catch (...) {
+          dateval = NA_REAL;
+      }
+      return dateval;
+  } else {
+    return sqlite3_column_double(get_stmt(), get_j());
+  }
+
 }
 
 double SqliteColumnDataSource::fetch_datetime() const {
@@ -95,14 +148,41 @@ double SqliteColumnDataSource::fetch_datetime() const {
 }
 
 double SqliteColumnDataSource::fetch_time() const {
-  // No such data type
-  return 0.0;
+
+
+  namespace bp = boost::posix_time;
+
+  int dt = get_column_type();
+
+  if (dt == SQLITE_TEXT) {
+    const char *tmstr = reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
+    double dateval;
+    try {
+        auto secs(bp::duration_from_string(tmstr));
+        dateval = secs.total_microseconds() * 1e-6;
+    } catch (...) {
+        dateval = NA_REAL;
+    }
+    return dateval;
+  } else {
+    return sqlite3_column_double(get_stmt(), get_j());
+  }
 }
 
 
-DATA_TYPE SqliteColumnDataSource::datatype_from_decltype(const char* decl_type) {
+DATA_TYPE SqliteColumnDataSource::datatype_from_decltype(const char* decl_type, bool with_alt_types) {
   if (decl_type == NULL)
     return DT_BOOL;
+
+  if (with_alt_types) {
+      if (_strcmpi(decl_type, "datetime") == 0 || _strcmpi(decl_type, "timestamp") == 0) {
+          return DT_DATETIME;
+      } else if (_strcmpi(decl_type, "date") == 0) {
+          return DT_DATE;
+      } else if (_strcmpi(decl_type, "time") == 0) {
+          return DT_TIME;
+      }
+  }
 
   char affinity = sqlite3AffinityType(decl_type);
 

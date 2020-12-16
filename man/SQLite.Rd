@@ -24,7 +24,8 @@ SQLite(...)
   synchronous = "off",
   flags = SQLITE_RWC,
   vfs = NULL,
-  bigint = c("integer64", "integer", "numeric", "character")
+  bigint = c("integer64", "integer", "numeric", "character"),
+  extended_types = TRUE
 )
 
 \S4method{dbConnect}{SQLiteConnection}(drv, ...)
@@ -88,6 +89,9 @@ read only mode.  Raise an error if the file does not already exist}
 \item{bigint}{The R type that 64-bit integer types should be mapped to,
 default is \link[bit64:bit64-package]{bit64::integer64}, which allows the full range of 64 bit
 integers.}
+
+\item{extended_types}{When \code{TRUE} (default) columns of type \code{DATE}, \code{DATETIME}
+/ \code{TIMESTAMP}, and \code{TIME} are mapped to corresponding R-classes.}
 }
 \value{
 \code{SQLite()} returns an object of class \linkS4class{SQLiteDriver}.

@@ -84,6 +84,8 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #' @param bigint The R type that 64-bit integer types should be mapped to,
 #'   default is [bit64::integer64], which allows the full range of 64 bit
 #'   integers.
+#' @param extended_types When `TRUE` (default) columns of type `DATE`, `DATETIME`
+#' / `TIMESTAMP`, and `TIME` are mapped to corresponding R-classes.
 #' @return `dbConnect()` returns an object of class [SQLiteConnection-class].
 #'
 #' @aliases SQLITE_RWC SQLITE_RW SQLITE_RO
@@ -114,7 +116,8 @@ setMethod("dbConnect", "SQLiteDriver",
   function(drv, dbname = "", ..., loadable.extensions = TRUE,
            default.extensions = loadable.extensions, cache_size = NULL,
            synchronous = "off", flags = SQLITE_RWC, vfs = NULL,
-           bigint = c("integer64", "integer", "numeric", "character")) {
+           bigint = c("integer64", "integer", "numeric", "character"),
+           extended_types = TRUE) {
     stopifnot(length(dbname) == 1, !is.na(dbname))
 
     if (!is_url_or_special_filename(dbname)) {
@@ -128,14 +131,17 @@ setMethod("dbConnect", "SQLiteDriver",
 
     bigint <- match.arg(bigint)
 
+    extended_types <- isTRUE(extended_types)
+
     conn <- new("SQLiteConnection",
-      ptr = connection_connect(dbname, loadable.extensions, flags, vfs),
+      ptr = connection_connect(dbname, loadable.extensions, flags, vfs, extended_types),
       dbname = dbname,
       flags = flags,
       vfs = vfs,
       loadable.extensions = loadable.extensions,
       ref = new.env(parent = emptyenv()),
-      bigint = bigint
+      bigint = bigint,
+      extended_types = extended_types
     )
 
     ## experimental PRAGMAs

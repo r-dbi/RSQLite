@@ -7,7 +7,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 
-SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_, bool with_alt_types_ = true) :
+SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_, bool with_alt_types_) :
   DbColumnDataSource(j_),
   stmt(stmt_),
   with_alt_types(with_alt_types_)
@@ -18,10 +18,7 @@ DATA_TYPE SqliteColumnDataSource::get_data_type() const {
 
   if (with_alt_types) {
       DATA_TYPE decl_dt = get_decl_data_type();
-    if (decl_dt == DT_DATE
-          || decl_dt == DT_DATETIME
-          || decl_dt == DT_TIME) {
-
+      if (decl_dt == DT_DATE || decl_dt == DT_DATETIME || decl_dt == DT_TIME) {
           return decl_dt;
       }
   }
@@ -113,7 +110,7 @@ double SqliteColumnDataSource::fetch_date() const {
       }
       return dateval;
   } else {
-      return sqlite3_column_double(get_stmt(), get_j());
+      return static_cast<double>(sqlite3_column_int(get_stmt(), get_j()));
   }
 }
 

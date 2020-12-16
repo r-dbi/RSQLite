@@ -2,8 +2,9 @@
 #include "DbConnection.h"
 
 
-DbConnection::DbConnection(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs)
-  : pConn_(NULL) {
+DbConnection::DbConnection(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs, bool with_alt_types)
+  : pConn_(NULL), 
+    with_alt_types_(with_alt_types) {
 
   // Get the underlying database connection
   int rc = sqlite3_open_v2(path.c_str(), &pConn_, flags, vfs.size() ? vfs.c_str() : NULL);
@@ -70,4 +71,9 @@ void DbConnection::copy_to(const DbConnectionPtr& pDest) {
 void DbConnection::disconnect() {
   sqlite3_close_v2(pConn_);
   pConn_ = NULL;
+}
+
+
+bool DbConnection::with_alt_types() const {
+  return with_alt_types_;
 }

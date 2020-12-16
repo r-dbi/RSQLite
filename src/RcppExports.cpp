@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // connection_connect
-XPtr<DbConnectionPtr> connection_connect(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs);
-RcppExport SEXP _RSQLite_connection_connect(SEXP pathSEXP, SEXP allow_extSEXP, SEXP flagsSEXP, SEXP vfsSEXP) {
+XPtr<DbConnectionPtr> connection_connect(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs, bool with_alt_types);
+RcppExport SEXP _RSQLite_connection_connect(SEXP pathSEXP, SEXP allow_extSEXP, SEXP flagsSEXP, SEXP vfsSEXP, SEXP with_alt_typesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -16,7 +16,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const bool >::type allow_ext(allow_extSEXP);
     Rcpp::traits::input_parameter< const int >::type flags(flagsSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type vfs(vfsSEXP);
-    rcpp_result_gen = Rcpp::wrap(connection_connect(path, allow_ext, flags, vfs));
+    Rcpp::traits::input_parameter< bool >::type with_alt_types(with_alt_typesSEXP);
+    rcpp_result_gen = Rcpp::wrap(connection_connect(path, allow_ext, flags, vfs, with_alt_types));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -213,7 +214,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_RSQLite_connection_connect", (DL_FUNC) &_RSQLite_connection_connect, 4},
+    {"_RSQLite_connection_connect", (DL_FUNC) &_RSQLite_connection_connect, 5},
     {"_RSQLite_connection_valid", (DL_FUNC) &_RSQLite_connection_valid, 1},
     {"_RSQLite_connection_release", (DL_FUNC) &_RSQLite_connection_release, 1},
     {"_RSQLite_connection_copy_database", (DL_FUNC) &_RSQLite_connection_copy_database, 2},

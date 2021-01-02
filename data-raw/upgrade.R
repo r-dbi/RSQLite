@@ -9,9 +9,21 @@ latest_name <- html %>%
   grep("amalgamation", ., value = TRUE) %>%
   .[1]
 
-latest <- paste0("https://sqlite.org/", Sys.Date() %>% strftime("%Y"), "/", latest_name)
 tmp <- tempfile()
-download.file(latest, tmp)
+
+year <- as.integer(strftime(Sys.Date(), "%Y"))
+latest <- paste0("https://sqlite.org/", year, "/", latest_name)
+
+tryCatch(
+  download.file(latest, tmp),
+  warning = function(e) {
+    if (grepl("404", conditionMessage(e))) {
+      latest <- paste0("https://sqlite.org/", year - 1, "/", latest_name)
+      download.file(latest, tmp)
+    }
+  }
+)
+
 unzip(tmp, exdir = "src/vendor/sqlite3", junkpaths = TRUE)
 unlink("src/vendor/sqlite3/shell.c")
 

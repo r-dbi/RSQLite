@@ -46,9 +46,13 @@ Imports:
     Rcpp (>= 0.12.7)
 Suggests: 
     DBItest (>= 1.7.0),
+    gert,
+    gh,
     knitr,
     rmarkdown,
-    testthat
+    rvest,
+    testthat,
+    xml2
 LinkingTo: 
     BH,
     plogr (>= 0.2.0),

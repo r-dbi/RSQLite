@@ -1,3 +1,9 @@
+# RSQLite 2.2.1.9002 (2021-01-02)
+
+- Upgrade bundled SQLite to version 3.34 (#337).
+- Implement automatic upgrade of bundled SQLite via GitHub Actions (#335).
+
+
 # RSQLite 2.2.1.9001 (2020-12-01)
 
 - Switch to GitHub Actions (#331).

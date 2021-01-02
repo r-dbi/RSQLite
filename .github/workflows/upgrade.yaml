@@ -63,7 +63,7 @@ jobs:
       - name: Install package and dependencies
         run: |
           remotes::install_deps(dependencies = TRUE, type = .Platform$pkgType)
-          install.packages(c("gh", "gert"))
+          install.packages(c("gh", "gert", "xml2", "rvest"))
         shell: Rscript {0}
 
       - name: Session info

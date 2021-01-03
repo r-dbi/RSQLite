@@ -125,7 +125,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
       )
     }
 
-    dbCommit(conn, name = "dbWriteTable")
+    dbCommit(conn, name = savepoint_id)
     on.exit(NULL)
     invisible(TRUE)
   }
@@ -225,7 +225,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
     skip <- skip + as.integer(header)
     connection_import_file(conn@ptr, name, value, sep, eol, skip)
 
-    dbCommit(conn, name = "dbWriteTable")
+    dbCommit(conn, name = savepoint_id)
     on.exit(NULL)
     invisible(TRUE)
   }
@@ -242,7 +242,7 @@ setMethod("dbAppendTable", "SQLiteConnection", function(conn, name, value, ...,
   out <- callNextMethod()
 
   on.exit(NULL)
-  dbCommit(conn, name = "dbAppendTable")
+  dbCommit(conn, name = savepoint_id)
 
   out
 })

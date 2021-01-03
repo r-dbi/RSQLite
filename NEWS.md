@@ -1,3 +1,9 @@
+# RSQLite 2.2.1.9003 (2021-01-03)
+
+- `dbWriteTable()` and `dbAppendTable()` use transactions with unique savepoint IDs (#338).
+- Loading extensions works when RSQLite is installed in a path with non-ASCII characters (#310).
+
+
 # RSQLite 2.2.1.9002 (2021-01-02)
 
 - Upgrade bundled SQLite to version 3.34 (#337).

@@ -27,8 +27,7 @@ initRegExp <- function(db) {
          call. = FALSE)
   }
 
-  lib_path <- getLoadedDLLs()[["RSQLite"]][["path"]]
-  extension_load(db@ptr, lib_path, "sqlite3_regexp_init")
+  extension_load(db@ptr, get_lib_path(), "sqlite3_regexp_init")
 
   # always return TRUE after loading
   invisible(TRUE)

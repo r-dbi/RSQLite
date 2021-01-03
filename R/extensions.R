@@ -30,8 +30,12 @@ initExtension <- function(db) {
       call. = FALSE)
   }
 
-  lib_path <- getLoadedDLLs()[["RSQLite"]][["path"]]
-  extension_load(db@ptr, lib_path, "sqlite3_math_init")
+  extension_load(db@ptr, get_lib_path(), "sqlite3_math_init")
 
   invisible(TRUE)
+}
+
+get_lib_path <- function() {
+  lib_path <- getLoadedDLLs()[["RSQLite"]][["path"]]
+  enc2utf8(lib_path)
 }

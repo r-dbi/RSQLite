@@ -88,8 +88,9 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
 
     name <- check_quoted_identifier(name)
 
-    dbBegin(conn, name = "dbWriteTable")
-    on.exit(dbRollback(conn, name = "dbWriteTable"))
+    savepoint_id <- get_savepoint_id("dbWriteTable")
+    dbBegin(conn, name = savepoint_id)
+    on.exit(dbRollback(conn, name = savepoint_id))
 
     found <- dbExistsTable(conn, name)
     if (found && !overwrite && !append) {
@@ -193,8 +194,9 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 
     row.names <- compatRowNames(row.names)
 
-    dbBegin(conn, name = "dbWriteTable")
-    on.exit(dbRollback(conn, name = "dbWriteTable"))
+    savepoint_id <- get_savepoint_id("dbWriteTable")
+    dbBegin(conn, name = savepoint_id)
+    on.exit(dbRollback(conn, name = savepoint_id))
 
     found <- dbExistsTable(conn, name)
     if (found && !overwrite && !append) {
@@ -233,8 +235,9 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 #' @export
 setMethod("dbAppendTable", "SQLiteConnection", function(conn, name, value, ...,
                                                         row.names = NULL) {
-  dbBegin(conn, name = "dbAppendTable")
-  on.exit(dbRollback(conn, name = "dbAppendTable"))
+  savepoint_id <- get_savepoint_id("dbAppendTable")
+  dbBegin(conn, name = savepoint_id)
+  on.exit(dbRollback(conn, name = savepoint_id))
 
   out <- callNextMethod()
 

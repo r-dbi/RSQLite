@@ -110,5 +110,5 @@ compat_name <- function(name, .name) {
 
 get_savepoint_id <- function(name) {
   random_string <- paste(sample(letters, 10, replace = TRUE), collapse = "")
-  paste0(name, "-", Sys.getpid(), "-", random_string)
+  paste0(name, "_", Sys.getpid(), "_", random_string)
 }

@@ -84,9 +84,24 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #' @param bigint The R type that 64-bit integer types should be mapped to,
 #'   default is [bit64::integer64], which allows the full range of 64 bit
 #'   integers.
-#' @param extended_types When `TRUE` (default) columns of type `DATE`, `DATETIME`
-#' / `TIMESTAMP`, and `TIME` are mapped to corresponding R-classes.
+#' @param extended_types When `TRUE` columns of type `DATE`, `DATETIME` /
+#' `TIMESTAMP`, and `TIME` are mapped to corresponding R-classes, c.f. below
+#' for details. Defaults to `FALSE`.
+#'
 #' @return `dbConnect()` returns an object of class [SQLiteConnection-class].
+#'
+#' @section Extended Types:
+#' When parameter `extended_types = TRUE` date and time columns are directly
+#' mapped to corresponding R-types. How exactly depends on whether the actual
+#' value is a number or a string:
+#'
+#' | *Column type* | *Value is numeric* | *Value is Text* | *R-class* |
+#' | ------------- | ------------------ | --------------- | --------- |
+#' | DATE | Count of days since 1970-01-01 | YMD formatted string (e.g. 2020-01-23) | `Date` |
+#' | TIME | Count of (fractional) seconds | HMS formatted string (e.g. 12:34:56) | `hms` (and `difftime`) |
+#' | DATETIME / TIMESTAMP | Count of (fractional) seconds since midnight 1970-01-01 UTC | DATE and TIME as above separated by a space | `POSIXct` with time zone UTC |
+#'
+#' If a value cannot be mapped an `NA` is returned in its place with a warning.
 #'
 #' @aliases SQLITE_RWC SQLITE_RW SQLITE_RO
 #' @export
@@ -117,7 +132,7 @@ setMethod("dbConnect", "SQLiteDriver",
            default.extensions = loadable.extensions, cache_size = NULL,
            synchronous = "off", flags = SQLITE_RWC, vfs = NULL,
            bigint = c("integer64", "integer", "numeric", "character"),
-           extended_types = TRUE) {
+           extended_types = FALSE) {
     stopifnot(length(dbname) == 1, !is.na(dbname))
 
     if (!is_url_or_special_filename(dbname)) {

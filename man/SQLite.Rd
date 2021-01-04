@@ -25,7 +25,7 @@ SQLite(...)
   flags = SQLITE_RWC,
   vfs = NULL,
   bigint = c("integer64", "integer", "numeric", "character"),
-  extended_types = TRUE
+  extended_types = FALSE
 )
 
 \S4method{dbConnect}{SQLiteConnection}(drv, ...)
@@ -90,8 +90,9 @@ read only mode.  Raise an error if the file does not already exist}
 default is \link[bit64:bit64-package]{bit64::integer64}, which allows the full range of 64 bit
 integers.}
 
-\item{extended_types}{When \code{TRUE} (default) columns of type \code{DATE}, \code{DATETIME}
-/ \code{TIMESTAMP}, and \code{TIME} are mapped to corresponding R-classes.}
+\item{extended_types}{When \code{TRUE} columns of type \code{DATE}, \code{DATETIME} /
+\code{TIMESTAMP}, and \code{TIME} are mapped to corresponding R-classes, c.f. below
+for details. Defaults to \code{FALSE}.}
 }
 \value{
 \code{SQLite()} returns an object of class \linkS4class{SQLiteDriver}.
@@ -109,6 +110,21 @@ reclaimed by the GC. You can use \code{\link[DBI:dbDisconnect]{DBI::dbDisconnect
 connection early, but it will not actually close until all open result
 sets have been closed (and you'll get a warning message to this effect).
 }
+\section{Extended Types}{
+
+When parameter \code{extended_types = TRUE} date and time columns are directly
+mapped to corresponding R-types. How exactly depends on whether the actual
+value is a number or a string:\tabular{llll}{
+   \emph{Column type} \tab \emph{Value is numeric} \tab \emph{Value is Text} \tab \emph{R-class} \cr
+   DATE \tab Count of days since 1970-01-01 \tab YMD formatted string (e.g. 2020-01-23) \tab \code{Date} \cr
+   TIME \tab Count of (fractional) seconds \tab HMS formatted string (e.g. 12:34:56) \tab \code{hms} (and \code{difftime}) \cr
+   DATETIME / TIMESTAMP \tab Count of (fractional) seconds since midnight 1970-01-01 UTC \tab DATE and TIME as above separated by a space \tab \code{POSIXct} with time zone UTC \cr
+}
+
+
+If a value cannot be mapped an \code{NA} is returned in its place with a warning.
+}
+
 \examples{
 library(DBI)
 # Initialize a temporary in memory database and copy a data.frame into it

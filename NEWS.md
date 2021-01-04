@@ -1,3 +1,8 @@
+# RSQLite 2.2.2.9000 (2021-01-04)
+
+- Internal changes only.
+
+
 # RSQLite 2.2.2 (2021-01-04)
 
 - Same as previous version.

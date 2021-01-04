@@ -1,3 +1,8 @@
+# RSQLite 2.2.2 (2021-01-04)
+
+- Same as previous version.
+
+
 # RSQLite 2.2.1.9003 (2021-01-03)
 
 - `dbWriteTable()` and `dbAppendTable()` use transactions with unique savepoint IDs (#338).

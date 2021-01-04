@@ -106,9 +106,13 @@ double SqliteColumnDataSource::fetch_date() const {
           bg::date_duration delta = dt - bg::date(1970, 1, 1);
           dateval = static_cast<double>(delta.days());
       } catch (...) {
+          Rcpp::warning("Unknown string format, NA is returned.");
           dateval = NA_REAL;
       }
       return dateval;
+  } else if (dt == SQLITE_BLOB) {
+    Rcpp::warning("Cannot convert blob, NA is returned.");
+    return NA_REAL;
   } else {
       return static_cast<double>(sqlite3_column_int(get_stmt(), get_j()));
   }
@@ -130,9 +134,13 @@ double SqliteColumnDataSource::fetch_datetime_local() const {
           auto delta = dttm - bp::ptime(bg::date(1970, 1, 1), bp::seconds(0));
           dateval = delta.total_microseconds() * 1e-6;
       } catch (...) {
+          Rcpp::warning("Unknown string format, NA is returned.");
           dateval = NA_REAL;
       }
       return dateval;
+  } else if (dt == SQLITE_BLOB) {
+    Rcpp::warning("Cannot convert blob, NA is returned.");
+    return NA_REAL;
   } else {
     return sqlite3_column_double(get_stmt(), get_j());
   }
@@ -158,9 +166,13 @@ double SqliteColumnDataSource::fetch_time() const {
         auto secs(bp::duration_from_string(tmstr));
         dateval = secs.total_microseconds() * 1e-6;
     } catch (...) {
+        Rcpp::warning("Unknown string format, NA is returned.");
         dateval = NA_REAL;
     }
     return dateval;
+  } else if (dt == SQLITE_BLOB) {
+    Rcpp::warning("Cannot convert blob, NA is returned.");
+    return NA_REAL;
   } else {
     return sqlite3_column_double(get_stmt(), get_j());
   }

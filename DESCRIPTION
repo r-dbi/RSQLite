@@ -43,13 +43,13 @@ Imports:
     memoise,
     methods,
     pkgconfig,
-    Rcpp (>= 0.12.7),
-    hms
+    Rcpp (>= 0.12.7)
 Suggests: 
     DBItest (>= 1.7.0),
     knitr,
     rmarkdown,
-    testthat
+    testthat,
+    hms
 LinkingTo: 
     BH (>= 1.75.0-0),
     plogr (>= 0.2.0),

@@ -1,7 +1,7 @@
 Package: RSQLite
 Title: 'SQLite' Interface for R
-Version: 2.2.1.9001
-Date: 2020-12-01
+Version: 2.2.2.9000
+Date: 2021-01-04
 Authors@R: 
     c(person(given = "Kirill",
              family = "M\u00fcller",
@@ -46,10 +46,14 @@ Imports:
     Rcpp (>= 0.12.7)
 Suggests: 
     DBItest (>= 1.7.0),
+    gert,
+    gh,
     knitr,
     rmarkdown,
+    hms,
+    rvest,
     testthat,
-    hms
+    xml2
 LinkingTo: 
     BH (>= 1.75.0-0),
     plogr (>= 0.2.0),

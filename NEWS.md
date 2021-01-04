@@ -1,3 +1,25 @@
+# RSQLite 2.2.2.9000 (2021-01-04)
+
+- Internal changes only.
+
+
+# RSQLite 2.2.2 (2021-01-04)
+
+- Same as previous version.
+
+
+# RSQLite 2.2.1.9003 (2021-01-03)
+
+- `dbWriteTable()` and `dbAppendTable()` use transactions with unique savepoint IDs (#338).
+- Loading extensions works when RSQLite is installed in a path with non-ASCII characters (#310).
+
+
+# RSQLite 2.2.1.9002 (2021-01-02)
+
+- Upgrade bundled SQLite to version 3.34 (#337).
+- Implement automatic upgrade of bundled SQLite via GitHub Actions (#335).
+
+
 # RSQLite 2.2.1.9001 (2020-12-01)
 
 - Switch to GitHub Actions (#331).

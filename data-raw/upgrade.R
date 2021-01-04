@@ -9,9 +9,21 @@ latest_name <- html %>%
   grep("amalgamation", ., value = TRUE) %>%
   .[1]
 
-latest <- paste0("https://sqlite.org/", Sys.Date() %>% strftime("%Y"), "/", latest_name)
 tmp <- tempfile()
-download.file(latest, tmp)
+
+year <- as.integer(strftime(Sys.Date(), "%Y"))
+latest <- paste0("https://sqlite.org/", year, "/", latest_name)
+
+tryCatch(
+  download.file(latest, tmp),
+  warning = function(e) {
+    if (grepl("404", conditionMessage(e))) {
+      latest <- paste0("https://sqlite.org/", year - 1, "/", latest_name)
+      download.file(latest, tmp)
+    }
+  }
+)
+
 unzip(tmp, exdir = "src/vendor/sqlite3", junkpaths = TRUE)
 unlink("src/vendor/sqlite3/shell.c")
 
@@ -23,3 +35,33 @@ download.file(
   mode = "w")
 
 stopifnot(system2("patch", "-p1", stdin = "data-raw/regexp.patch") == 0)
+
+branch <- paste0("f-", sub("[.][^.]*$", "", latest_name))
+version <- sub("^.*-([0-9])([0-9][0-9])[0-9]+[.].*$", "\\1.\\2", latest_name)
+
+if (any(grepl("^src/", gert::git_status()$file))) {
+  old_branch <- gert::git_branch()
+
+  gert::git_branch_create(branch)
+  gert::git_add("src")
+
+  title <- paste0("Upgrade bundled SQLite to ", version)
+
+  gert::git_commit(title)
+  gert::git_push()
+
+  message("Opening PR")
+  pr <- gh::gh(
+    "/repos/r-dbi/RSQLite/pulls", head = branch, base = old_branch,
+    title = title, body = ".",
+    .method = "POST"
+  )
+
+  body <- paste0("NEWS entry:\n\n```\n- Upgrade bundled SQLite to version ", version, " (#", pr$number, ").\n```")
+
+  gh::gh(
+    paste0("/repos/r-dbi/RSQLite/pulls/", pr$number),
+    body = body,
+    .method = "PATCH"
+  )
+}

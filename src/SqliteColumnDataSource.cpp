@@ -5,6 +5,7 @@
 #include <boost/limits.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/algorithm/string.hpp>
 
 
 SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_, bool with_alt_types_) :
@@ -184,11 +185,11 @@ DATA_TYPE SqliteColumnDataSource::datatype_from_decltype(const char* decl_type, 
     return DT_BOOL;
 
   if (with_alt_types) {
-      if (_strcmpi(decl_type, "datetime") == 0 || _strcmpi(decl_type, "timestamp") == 0) {
+      if (boost::iequals(decl_type, "datetime") || boost::iequals(decl_type, "timestamp")) {
           return DT_DATETIME;
-      } else if (_strcmpi(decl_type, "date") == 0) {
+      } else if (boost::iequals(decl_type, "date")) {
           return DT_DATE;
-      } else if (_strcmpi(decl_type, "time") == 0) {
+      } else if (boost::iequals(decl_type, "time")) {
           return DT_TIME;
       }
   }

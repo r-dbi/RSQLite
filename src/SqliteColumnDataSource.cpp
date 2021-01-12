@@ -131,7 +131,7 @@ double SqliteColumnDataSource::fetch_datetime_local() const {
       double dateval;
       try {
           bp::ptime dttm(bd::parse_delimited_time<bp::ptime>(dtstr, ' '));
-          auto delta = dttm - bp::ptime(bg::date(1970, 1, 1), bp::seconds(0));
+          bp::time_duration delta = dttm - bp::ptime(bg::date(1970, 1, 1), bp::seconds(0));
           dateval = delta.total_microseconds() * 1e-6;
       } catch (...) {
           Rcpp::warning("Unknown string format, NA is returned.");
@@ -163,7 +163,7 @@ double SqliteColumnDataSource::fetch_time() const {
     const char *tmstr = reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
     double dateval;
     try {
-        auto secs(bp::duration_from_string(tmstr));
+        bp::time_duration secs(bp::duration_from_string(tmstr));
         dateval = secs.total_microseconds() * 1e-6;
     } catch (...) {
         Rcpp::warning("Unknown string format, NA is returned.");

@@ -210,13 +210,13 @@ SEXP DbColumnStorage::set_attribs_from_datatype(SEXP x, DATA_TYPE dt) {
     return new_blob(x);
 
   case DT_TIME: {
-      auto ro = Rcpp::RObject(x);
+      Rcpp::RObject ro = Rcpp::RObject(x);
       ro.attr("units") = "secs";
       return ro;
     }
 
   case DT_DATETIME: {
-      auto ro = Rcpp::RObject(x);
+      Rcpp::RObject ro = Rcpp::RObject(x);
       ro.attr("tzone") = "UTC";
       return ro;
     }

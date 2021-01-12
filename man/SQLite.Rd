@@ -25,7 +25,7 @@ SQLite(...)
   flags = SQLITE_RWC,
   vfs = NULL,
   bigint = c("integer64", "integer", "numeric", "character"),
-  extended_types = FALSE
+  extended_types = getOption("RSQLite_extended_types", FALSE)
 )
 
 \S4method{dbConnect}{SQLiteConnection}(drv, ...)

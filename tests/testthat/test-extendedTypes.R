@@ -116,7 +116,7 @@ test_that("Blob as datetime", {
   dbExecute(con, "insert into t1 values (?)", param=list(blob::as_blob(as.raw(7))))
 
   expect_warning(resdf <- dbGetQuery(con, 'SELECT * from t1'), "Cannot convert blob, NA is returned.")
-  expect_that(resdf[[1]], equals(as.POSIXct(NA_real_, tz="UTC")))
+  expect_that(resdf[[1]], equals(as.POSIXct(NA_real_, origin="1970-01-01", tz="UTC")))
 
 })
 

@@ -132,7 +132,7 @@ setMethod("dbConnect", "SQLiteDriver",
            default.extensions = loadable.extensions, cache_size = NULL,
            synchronous = "off", flags = SQLITE_RWC, vfs = NULL,
            bigint = c("integer64", "integer", "numeric", "character"),
-           extended_types = getOption("RSQLite_extended_types", FALSE)) {
+           extended_types = FALSE) {
     stopifnot(length(dbname) == 1, !is.na(dbname))
 
     if (!is_url_or_special_filename(dbname)) {

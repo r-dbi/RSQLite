@@ -147,7 +147,11 @@ setMethod("dbConnect", "SQLiteDriver",
     bigint <- match.arg(bigint)
 
     extended_types <- isTRUE(extended_types)
-
+    if (extended_types) {
+      if (!requireNamespace("hms", quietly = TRUE)) {
+        stopc("Install the hms package for `extended_types = TRUE`.")
+      }
+    }
     conn <- new("SQLiteConnection",
       ptr = connection_connect(dbname, loadable.extensions, flags, vfs, extended_types),
       dbname = dbname,

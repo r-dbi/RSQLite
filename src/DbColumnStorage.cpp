@@ -196,9 +196,6 @@ Rcpp::RObject DbColumnStorage::class_from_datatype(DATA_TYPE dt) {
   case DT_DATETIMETZ:
     return CharacterVector::create("POSIXct", "POSIXt");
 
-  case DT_TIME:
-    return CharacterVector::create("hms", "difftime");
-
   default:
     return R_NilValue;
   }
@@ -209,11 +206,8 @@ SEXP DbColumnStorage::set_attribs_from_datatype(SEXP x, DATA_TYPE dt) {
   case DT_BLOB:
     return new_blob(x);
 
-  case DT_TIME: {
-      Rcpp::RObject ro = Rcpp::RObject(x);
-      ro.attr("units") = "secs";
-      return ro;
-    }
+  case DT_TIME:
+    return new_hms(x);
 
   case DT_DATETIME: {
       Rcpp::RObject ro = Rcpp::RObject(x);

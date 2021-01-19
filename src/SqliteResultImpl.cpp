@@ -19,7 +19,8 @@ SqliteResultImpl::SqliteResultImpl(const DbConnectionPtr& conn_, const std::stri
   total_changes_start_(sqlite3_total_changes(conn)),
   group_(0),
   groups_(0),
-  types_(get_initial_field_types(cache.ncols_))
+  types_(get_initial_field_types(cache.ncols_)),
+  with_alt_types_(conn_->with_alt_types())
 {
 
   LOG_DEBUG << sql;
@@ -164,7 +165,20 @@ List SqliteResultImpl::get_column_info() {
 
   CharacterVector types(cache.ncols_);
   for (size_t i = 0; i < cache.ncols_; i++) {
-    types[i] = Rf_type2char(DbColumnStorage::sexptype_from_datatype(types_[i]));
+    switch(types_[i]) {
+    case DT_DATE:
+      types[i] = "Date";
+      break;
+    case DT_DATETIME:
+      types[i] = "POSIXct";
+      break;
+    case DT_TIME:
+      types[i] = "hms";
+      break;
+    default:
+      types[i] = Rf_type2char(DbColumnStorage::sexptype_from_datatype(types_[i]));
+      break;
+    }
   }
 
   return List::create(_["name"] = names, _["type"] = types);
@@ -286,7 +300,7 @@ void SqliteResultImpl::after_bind(bool params_have_rows) {
 List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
-  SqliteDataFrame data(stmt, cache.names_, n_max, types_);
+  SqliteDataFrame data(stmt, cache.names_, n_max, types_, with_alt_types_);
 
   if (complete_ && data.get_ncols() == 0) {
     warning("SQL statements must be issued with dbExecute() or dbSendStatement() instead of dbGetQuery() or dbSendQuery().");
@@ -339,7 +353,7 @@ bool SqliteResultImpl::step_done() {
 }
 
 List SqliteResultImpl::peek_first_row() {
-  SqliteDataFrame data(stmt, cache.names_, 1, types_);
+  SqliteDataFrame data(stmt, cache.names_, 1, types_, with_alt_types_);
 
   if (!complete_)
     data.set_col_values();

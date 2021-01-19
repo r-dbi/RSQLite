@@ -20,7 +20,7 @@ class DbConnection : boost::noncopyable {
 public:
   // Create a new connection handle
   DbConnection(const std::string& path, bool allow_ext,
-               int flags, const std::string& vfs = "");
+               int flags, const std::string& vfs = "", bool with_alt_types = false);
   ~DbConnection();
 
 public:
@@ -47,8 +47,10 @@ public:
   // Disconnects from a database
   void disconnect();
 
+  bool with_alt_types() const;
 private:
   sqlite3* pConn_;
+  const bool with_alt_types_;
 };
 
 #endif // __RSQLITE_SQLITE_CONNECTION__

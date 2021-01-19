@@ -6,7 +6,8 @@
 
 class SqliteDataFrame : public DbDataFrame {
 public:
-  SqliteDataFrame(sqlite3_stmt* stmt, std::vector<std::string> names, const int n_max_, const std::vector<DATA_TYPE>& types);
+  SqliteDataFrame(sqlite3_stmt* stmt, std::vector<std::string> names, const int n_max_, const std::vector<DATA_TYPE>& types,
+                  bool with_alt_types);
   virtual ~SqliteDataFrame();
 };
 

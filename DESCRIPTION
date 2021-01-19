@@ -50,11 +50,12 @@ Suggests:
     gh,
     knitr,
     rmarkdown,
+    hms,
     rvest,
     testthat,
     xml2
 LinkingTo: 
-    BH,
+    BH (>= 1.75.0-0),
     plogr (>= 0.2.0),
     Rcpp
 VignetteBuilder: 

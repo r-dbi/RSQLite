@@ -125,44 +125,30 @@
 <h1 class="page-header" data-toc-text="2.2.2">
 <a href="#rsqlite-222-2021-01-04" class="anchor"></a>RSQLite 2.2.2 (2021-01-04)<small> 2021-01-08 </small>
 </h1>
+<div id="features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#features" class="anchor"></a>Features</h2>
 <ul>
-<li>Same as previous version.</li>
+<li>Upgrade bundled SQLite to version 3.34 (<a href='https://github.com/r-dbi/RSQLite/issues/337'>#337</a>).</li>
 </ul>
 </div>
-    <div id="rsqlite-2219003-2021-01-03" class="section level1">
-<h1 class="page-header" data-toc-text="2.2.1.9003">
-<a href="#rsqlite-2219003-2021-01-03" class="anchor"></a>RSQLite 2.2.1.9003 (2021-01-03)<small> Unreleased </small>
-</h1>
+<div id="bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>
 <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">dbWriteTable()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbAppendTable.html">dbAppendTable()</a></code> use transactions with unique savepoint IDs (<a href='https://github.com/r-dbi/RSQLite/issues/338'>#338</a>).</li>
 <li>Loading extensions works when RSQLite is installed in a path with non-ASCII characters (<a href='https://github.com/r-dbi/RSQLite/issues/310'>#310</a>).</li>
 </ul>
 </div>
-    <div id="rsqlite-2219002-2021-01-02" class="section level1">
-<h1 class="page-header" data-toc-text="2.2.1.9002">
-<a href="#rsqlite-2219002-2021-01-02" class="anchor"></a>RSQLite 2.2.1.9002 (2021-01-02)<small> Unreleased </small>
-</h1>
+<div id="internal" class="section level2">
+<h2 class="hasAnchor">
+<a href="#internal" class="anchor"></a>Internal</h2>
 <ul>
-<li>Upgrade bundled SQLite to version 3.34 (<a href='https://github.com/r-dbi/RSQLite/issues/337'>#337</a>).</li>
 <li>Implement automatic upgrade of bundled SQLite via GitHub Actions (<a href='https://github.com/r-dbi/RSQLite/issues/335'>#335</a>).</li>
-</ul>
-</div>
-    <div id="rsqlite-2219001-2020-12-01" class="section level1">
-<h1 class="page-header" data-toc-text="2.2.1.9001">
-<a href="#rsqlite-2219001-2020-12-01" class="anchor"></a>RSQLite 2.2.1.9001 (2020-12-01)<small> Unreleased </small>
-</h1>
-<ul>
 <li>Switch to GitHub Actions (<a href='https://github.com/r-dbi/RSQLite/issues/331'>#331</a>).</li>
 </ul>
 </div>
-    <div id="rsqlite-2219000-2020-09-28" class="section level1">
-<h1 class="page-header" data-toc-text="2.2.1.9000">
-<a href="#rsqlite-2219000-2020-09-28" class="anchor"></a>RSQLite 2.2.1.9000 (2020-09-28)<small> Unreleased </small>
-</h1>
-<ul>
-<li>Internal changes only.</li>
-</ul>
 </div>
     <div id="rsqlite-221-2020-09-28" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.1">
@@ -230,9 +216,9 @@
 <li><p><code><a href="https://dbi.r-dbi.org/reference/dbUnquoteIdentifier.html">dbUnquoteIdentifier()</a></code> also handles unquoted identifiers of the form <code>table</code> or <code>schema.table</code>, for compatibility with dbplyr.</p></li>
 </ul>
 </div>
-<div id="bug-fixes" class="section level2">
+<div id="bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li><p>Fix query for listing tables in schema (<a href='https://github.com/r-dbi/RSQLite/issues/279'>#279</a>).</p></li>
 <li><p>Coercing <code>NULL</code> values to <code>integer64</code> and <code>numeric</code> now works in corner cases (<a href='https://github.com/r-dbi/RSQLite/issues/291'>#291</a>).</p></li>
@@ -249,9 +235,9 @@
 <li>Add regular expression operator (<a href='https://github.com/r-dbi/RSQLite/issues/296'>#296</a>, <a href='https://github.com/rfhb'>@rfhb</a>).</li>
 </ul>
 </div>
-<div id="internal" class="section level2">
+<div id="internal-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#internal" class="anchor"></a>Internal</h2>
+<a href="#internal-1" class="anchor"></a>Internal</h2>
 <ul>
 <li><p>Load extensions through API call, to support repeated loading.</p></li>
 <li><p>Align <code>DbResult</code> and other classes with RPostgres and RMariaDB.</p></li>
@@ -282,9 +268,9 @@
 <h1 class="page-header" data-toc-text="2.1.0">
 <a href="#rsqlite-210-2018-03-29" class="anchor"></a>RSQLite 2.1.0 (2018-03-29)<small> 2018-03-29 </small>
 </h1>
-<div id="bug-fixes-1" class="section level2">
+<div id="bug-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-2" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>Fix rchk warnings on CRAN (<a href='https://github.com/r-dbi/RSQLite/issues/250'>#250</a>).</li>
 <li>
@@ -295,9 +281,9 @@
 <li>Ignore invalid UTF-8 strings in <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html">dbQuoteIdentifier()</a></code> (r-dbi/DBItest<a href='https://github.com/r-dbi/RSQLite/issues/156'>#156</a>).</li>
 </ul>
 </div>
-<div id="features" class="section level2">
+<div id="features-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features" class="anchor"></a>Features</h2>
+<a href="#features-1" class="anchor"></a>Features</h2>
 <ul>
 <li>Update bundled sqlite3 library to 3.22 (<a href='https://github.com/r-dbi/RSQLite/issues/252'>#252</a>).</li>
 <li>Values of class <code>"integer64"</code> are now supported for <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">dbWriteTable()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbBind.html">dbBind()</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/243'>#243</a>).</li>
@@ -305,9 +291,9 @@
 <li>Implement <code><a href="https://dbi.r-dbi.org/reference/dbUnquoteIdentifier.html">dbUnquoteIdentifier()</a></code>.</li>
 </ul>
 </div>
-<div id="internal-1" class="section level2">
+<div id="internal-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#internal-1" class="anchor"></a>Internal</h2>
+<a href="#internal-2" class="anchor"></a>Internal</h2>
 <ul>
 <li>Now raising error if <code><a href="https://dbi.r-dbi.org/reference/dbBind.html">dbBind()</a></code> is called with too many named arguments, according to spec.</li>
 <li>Refactor connection and result handling to be more similar to other backends.</li>
@@ -346,9 +332,9 @@
 <li>SQLite collects additional histogram data during <code>ANALYZE</code>, which may lead to faster executions of queries (<a href='https://github.com/r-dbi/RSQLite/issues/124'>#124</a>).</li>
 </ul>
 </div>
-<div id="bug-fixes-2" class="section level2">
+<div id="bug-fixes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-2" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-3" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>Identifiers are now escaped with backticks, to avoid ambiguous handling of double quotes in the context of strings (<a href='https://github.com/r-dbi/RSQLite/issues/123'>#123</a>).</li>
 <li>Fix <code><a href="https://dbi.r-dbi.org/reference/dbBind.html">dbBind()</a></code> behavior and tests. Attempting to bind to a query without parameters throws an error (<a href='https://github.com/r-dbi/RSQLite/issues/114'>#114</a>).</li>
@@ -364,9 +350,9 @@
 <li>Remove redundant documentation, link to <code>DBI</code> more prominently (<a href='https://github.com/r-dbi/RSQLite/issues/186'>#186</a>).</li>
 </ul>
 </div>
-<div id="internal-2" class="section level2">
+<div id="internal-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#internal-2" class="anchor"></a>Internal</h2>
+<a href="#internal-3" class="anchor"></a>Internal</h2>
 <ul>
 <li>Most DBItest tests now pass. Reduced number of skips shown for tests.</li>
 <li>C++ code now compiles with strict compiler settings <code>-Wall -Wextra -pedantic -Wconversion</code>.</li>
@@ -421,7 +407,7 @@
 <h2 class="hasAnchor">
 <a href="#breaking-changes" class="anchor"></a>Breaking changes</h2>
 <ul>
-<li><p><code><a href="../reference/SQLite.html">RSQLite()</a></code> no longer automatically attaches DBI when loaded. This is to encourage you to use <code><a href="http://r-dbi.github.io/DBI">library(DBI); dbConnect(RSQLite::SQLite())</a></code>.</p></li>
+<li><p><code><a href="../reference/SQLite.html">RSQLite()</a></code> no longer automatically attaches DBI when loaded. This is to encourage you to use <code><a href="https://dbi.r-dbi.org">library(DBI); dbConnect(RSQLite::SQLite())</a></code>.</p></li>
 <li><p>Functions that take a table name, such as <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">dbWriteTable()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbReadTable.html">dbReadTable()</a></code>, now quote the table name via <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html">dbQuoteIdentifier()</a></code>. This means that caller-quoted names should be marked as such with <code><a href="https://dbi.r-dbi.org/reference/SQL.html">DBI::SQL()</a></code>.</p></li>
 </ul>
 </div>
@@ -488,9 +474,9 @@
 <li><p>Added additional documentation and unit tests for <a href="https://www.sqlite.org/autoinc.html">autoincrement keys</a> (<a href='https://github.com/r-dbi/RSQLite/issues/119'>#119</a>, <a href='https://github.com/wibeasley'>@wibeasley</a>).</p></li>
 </ul>
 </div>
-<div id="internal-3" class="section level2">
+<div id="internal-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#internal-3" class="anchor"></a>Internal</h2>
+<a href="#internal-4" class="anchor"></a>Internal</h2>
 <ul>
 <li><p>Avoid warning about missing <code>long long</code> data type in C++98 by using a compound data type built from two 32-bit integers, with static assert that the size is 8 indeed.</p></li>
 <li><p>Remove all compilation warnings.</p></li>

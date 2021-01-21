@@ -37,7 +37,7 @@ download.file(
 stopifnot(system2("patch", "-p1", stdin = "data-raw/regexp.patch") == 0)
 
 branch <- paste0("f-", sub("[.][^.]*$", "", latest_name))
-version <- sub("^.*-([0-9])([0-9][0-9])[0-9]+[.].*$", "\\1.\\2", latest_name)
+version <- sub("^.*-([0-9])([0-9][0-9])(?:0([0-9])|([1-9][0-9]))[0-9]+[.].*$", "\\1.\\2.\\3\\4", latest_name)
 
 if (any(grepl("^src/", gert::git_status()$file))) {
   old_branch <- gert::git_branch()

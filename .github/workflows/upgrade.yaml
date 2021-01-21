@@ -1,6 +1,9 @@
 on:
   schedule:
     - cron:  '0 8 * * *'
+  push:
+    paths:
+      - "data-raw/upgrade.R"
   workflow_dispatch:
 
 name: upgrade

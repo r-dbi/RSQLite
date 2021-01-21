@@ -2,6 +2,9 @@ on:
   schedule:
     - cron:  '0 8 * * *'
   push:
+    branches:
+      - master
+      - main
     paths:
       - "data-raw/upgrade.R"
   workflow_dispatch:

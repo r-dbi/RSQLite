@@ -36,18 +36,23 @@ download.file(
 
 stopifnot(system2("patch", "-p1", stdin = "data-raw/regexp.patch") == 0)
 
-branch <- paste0("f-", sub("[.][^.]*$", "", latest_name))
-version <- sub("^.*-([0-9])([0-9][0-9])(?:0([0-9])|([1-9][0-9]))[0-9]+[.].*$", "\\1.\\2.\\3\\4", latest_name)
-
 if (any(grepl("^src/", gert::git_status()$file))) {
+  branch <- paste0("f-", sub("[.][^.]*$", "", latest_name))
+  message("Changes detected, creating branch: ", branch)
+
+  version <- sub("^.*-([0-9])([0-9][0-9])(?:0([0-9])|([1-9][0-9]))[0-9]+[.].*$", "\\1.\\2.\\3\\4", latest_name)
+
   old_branch <- gert::git_branch()
+  message("Old branch: ", old_branch)
 
   gert::git_branch_create(branch)
   gert::git_add("src")
 
   title <- paste0("Upgrade bundled SQLite to ", version)
-
+  message("Commit message: ", title)
   gert::git_commit(title)
+
+  message("Pushing branch")
   gert::git_push()
 
   message("Opening PR")
@@ -57,6 +62,7 @@ if (any(grepl("^src/", gert::git_status()$file))) {
     .method = "POST"
   )
 
+  message("Tweaking PR body")
   body <- paste0("NEWS entry:\n\n```\n- Upgrade bundled SQLite to version ", version, " (#", pr$number, ").\n```")
 
   gh::gh(

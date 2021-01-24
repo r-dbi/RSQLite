@@ -44,6 +44,8 @@
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -71,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.3</span>
       </span>
     </div>
 
@@ -111,9 +113,27 @@
       <small>Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="rsqlite-223-2021-01-24" class="section level1">
+<h1 class="page-header" data-toc-text="2.2.3">
+<a href="#rsqlite-223-2021-01-24" class="anchor"></a>RSQLite 2.2.3 (2021-01-24)<small> Unreleased </small>
+</h1>
+<ul>
+<li>Upgrade bundled SQLite to version 3.34.1 (<a href='https://github.com/r-dbi/RSQLite/issues/342'>#342</a>).</li>
+<li>
+<code><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect()</a></code> gains an <code>extended_types</code> argument that adds support for date, time and timestamp columns. If a column has a declared type <code>DATE</code>, <code>TIME</code> or <code>TIMESTAMP</code>, it is returned as <code>Date</code>, <code>hms</code> or <code>POSIXct</code> value, respectively (<a href='https://github.com/r-dbi/RSQLite/issues/333'>#333</a>, <a href='https://github.com/anderic1'>@anderic1</a>).</li>
+</ul>
+</div>
+    <div id="rsqlite-2229000-2021-01-04" class="section level1">
+<h1 class="page-header" data-toc-text="2.2.2.9000">
+<a href="#rsqlite-2229000-2021-01-04" class="anchor"></a>RSQLite 2.2.2.9000 (2021-01-04)<small> Unreleased </small>
+</h1>
+<ul>
+<li>Internal changes only.</li>
+</ul>
+</div>
     <div id="rsqlite-222-2021-01-04" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.2">
-<a href="#rsqlite-222-2021-01-04" class="anchor"></a>RSQLite 2.2.2 (2021-01-04)<small> Unreleased </small>
+<a href="#rsqlite-222-2021-01-04" class="anchor"></a>RSQLite 2.2.2 (2021-01-04)<small> 2021-01-08 </small>
 </h1>
 <div id="features" class="section level2">
 <h2 class="hasAnchor">
@@ -397,7 +417,7 @@
 <h2 class="hasAnchor">
 <a href="#breaking-changes" class="anchor"></a>Breaking changes</h2>
 <ul>
-<li><p><code><a href="../reference/SQLite.html">RSQLite()</a></code> no longer automatically attaches DBI when loaded. This is to encourage you to use <code><a href="http://r-dbi.github.io/DBI">library(DBI); dbConnect(RSQLite::SQLite())</a></code>.</p></li>
+<li><p><code><a href="../reference/SQLite.html">RSQLite()</a></code> no longer automatically attaches DBI when loaded. This is to encourage you to use <code><a href="https://dbi.r-dbi.org">library(DBI); dbConnect(RSQLite::SQLite())</a></code>.</p></li>
 <li><p>Functions that take a table name, such as <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">dbWriteTable()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbReadTable.html">dbReadTable()</a></code>, now quote the table name via <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html">dbQuoteIdentifier()</a></code>. This means that caller-quoted names should be marked as such with <code><a href="https://dbi.r-dbi.org/reference/SQL.html">DBI::SQL()</a></code>.</p></li>
 </ul>
 </div>

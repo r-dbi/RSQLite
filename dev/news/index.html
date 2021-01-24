@@ -73,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">2.2.2.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">2.2.3.9000</span>
       </span>
     </div>
 
@@ -113,6 +113,26 @@
       <small>Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="rsqlite-2239000-2021-01-24" class="section level1">
+<h1 class="page-header" data-toc-text="2.2.3.9000">
+<a href="#rsqlite-2239000-2021-01-24" class="anchor"></a>RSQLite 2.2.3.9000 (2021-01-24)<small> Unreleased </small>
+</h1>
+<ul>
+<li>Upgrade bundled SQLite to version 3.34.1 (<a href='https://github.com/r-dbi/RSQLite/issues/342'>#342</a>).</li>
+<li>
+<code><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect()</a></code> gains an <code>extended_types</code> argument that adds support for date, time and timestamp columns. If a column has a declared type <code>DATE</code>, <code>TIME</code> or <code>TIMESTAMP</code>, it is returned as <code>Date</code>, <code>hms</code> or <code>POSIXct</code> value, respectively (<a href='https://github.com/r-dbi/RSQLite/issues/333'>#333</a>, <a href='https://github.com/anderic1'>@anderic1</a>).</li>
+</ul>
+</div>
+    <div id="rsqlite-223-2021-01-24" class="section level1">
+<h1 class="page-header" data-toc-text="2.2.3">
+<a href="#rsqlite-223-2021-01-24" class="anchor"></a>RSQLite 2.2.3 (2021-01-24)<small> Unreleased </small>
+</h1>
+<ul>
+<li>Upgrade bundled SQLite to version 3.34.1 (<a href='https://github.com/r-dbi/RSQLite/issues/342'>#342</a>).</li>
+<li>
+<code><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect()</a></code> gains an <code>extended_types</code> argument that adds support for date, time and timestamp columns. If a column has a declared type <code>DATE</code>, <code>TIME</code> or <code>TIMESTAMP</code>, it is returned as <code>Date</code>, <code>hms</code> or <code>POSIXct</code> value, respectively (<a href='https://github.com/r-dbi/RSQLite/issues/333'>#333</a>, <a href='https://github.com/anderic1'>@anderic1</a>).</li>
+</ul>
+</div>
     <div id="rsqlite-2229000-2021-01-04" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.2.9000">
 <a href="#rsqlite-2229000-2021-01-04" class="anchor"></a>RSQLite 2.2.2.9000 (2021-01-04)<small> Unreleased </small>

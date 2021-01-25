@@ -4,7 +4,7 @@
 
 <!-- badges: start -->
 
-[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable) [![rcc](https://github.com/r-dbi/RSQLite/workflows/rcc/badge.svg)](https://github.com/r-dbi/RSQLite/actions) [![Coverage Status](https://codecov.io/gh/r-dbi/RSQLite/branch/master/graph/badge.svg)](https://codecov.io/github/r-dbi/RSQLite?branch=master) [![CRAN status](https://www.r-pkg.org/badges/version/RSQLite)](https://cran.r-project.org/package=RSQLite) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3234/badge)](https://bestpractices.coreinfrastructure.org/projects/3234)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html) [![rcc](https://github.com/r-dbi/RSQLite/workflows/rcc/badge.svg)](https://github.com/r-dbi/RSQLite/actions) [![Coverage Status](https://codecov.io/gh/r-dbi/RSQLite/branch/master/graph/badge.svg)](https://codecov.io/github/r-dbi/RSQLite?branch=master) [![CRAN status](https://www.r-pkg.org/badges/version/RSQLite)](https://cran.r-project.org/package=RSQLite) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3234/badge)](https://bestpractices.coreinfrastructure.org/projects/3234)
 
 <!-- badges: end -->
 

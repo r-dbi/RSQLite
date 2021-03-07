@@ -176,3 +176,34 @@ setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
     port = NA
   )
 })
+
+#' @rdname SQLiteConnection-class
+#' @export
+
+setGeneric("dbSetBusyHandler", function(dbObj, handler, ...) {
+  standardGeneric("dbSetBusyHandler")
+})
+
+#' @rdname SQLiteConnection-class
+#' @param handler Specifies what to do when the database is locked by
+#' another transaction. It can be:
+#' * `NULL`: fail immediately,
+#' * an integer scalar: this is a timeout in milliseconds that corresponds to
+#'   `PRAGMA busy_timeout`,
+#' * an R function: this function is called with one argument, the number
+#'   of times that the busy handler has been invoked previously for the
+#'   same locking event. If the function returns `0L`, then then no
+#'   additional attempts are made to access the database, and an error
+#'   is thrown. Otherwise another attempt is made to access the database
+#'   and the cycle repeats.
+#'
+#' @export
+setMethod("dbSetBusyHandler", c("SQLiteConnection", "ANY"), function(dbObj, handler, ...) {
+  stopifnot(
+    is.null(handler) ||
+    is.function(handler) ||
+    is.numeric(handler) && length(handler) == 1 && !is.na(handler)
+  )
+  if (is.numeric(handler)) handler <- as.integer(handler)
+  set_busy_handler(dbObj@ptr, handler)
+})

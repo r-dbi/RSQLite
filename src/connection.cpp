@@ -88,3 +88,8 @@ DbConnection* as(SEXP x) {
 }
 
 }
+
+// [[Rcpp::export]]
+void set_busy_handler(const XPtr<DbConnectionPtr>& con, SEXP r_callback) {
+  con->get()->set_busy_handler(r_callback);
+}

@@ -21,6 +21,10 @@ connection_import_file <- function(con, name, value, sep, eol, skip) {
     .Call(`_RSQLite_connection_import_file`, con, name, value, sep, eol, skip)
 }
 
+set_busy_handler <- function(con, r_callback) {
+    invisible(.Call(`_RSQLite_set_busy_handler`, con, r_callback))
+}
+
 extension_load <- function(con, file, entry_point) {
     invisible(.Call(`_RSQLite_extension_load`, con, file, entry_point))
 }

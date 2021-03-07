@@ -4,7 +4,8 @@
 
 DbConnection::DbConnection(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs, bool with_alt_types)
   : pConn_(NULL), 
-    with_alt_types_(with_alt_types) {
+    with_alt_types_(with_alt_types),
+    busy_callback_(0) {
 
   // Get the underlying database connection
   int rc = sqlite3_open_v2(path.c_str(), &pConn_, flags, vfs.size() ? vfs.c_str() : NULL);
@@ -13,6 +14,11 @@ DbConnection::DbConnection(const std::string& path, const bool allow_ext, const 
   }
   if (allow_ext) {
     sqlite3_enable_load_extension(pConn_, 1);
+  }
+  if (busy_callback_ && Rf_isInteger(busy_callback_)) {
+    sqlite3_busy_timeout(pConn_, INTEGER(busy_callback_)[0]);
+  } else {
+    sqlite3_busy_handler(pConn_, busy_callback_helper, busy_callback_);
   }
 }
 
@@ -71,9 +77,39 @@ void DbConnection::copy_to(const DbConnectionPtr& pDest) {
 void DbConnection::disconnect() {
   sqlite3_close_v2(pConn_);
   pConn_ = NULL;
+  if (busy_callback_) {
+    R_ReleaseObject(busy_callback_);
+    busy_callback_ = NULL;
+  }
 }
-
 
 bool DbConnection::with_alt_types() const {
   return with_alt_types_;
+}
+
+void DbConnection::set_busy_handler(SEXP r_callback) {
+  if (busy_callback_) {
+    R_ReleaseObject(busy_callback_);
+    busy_callback_ = NULL;
+  }
+
+  if (! Rf_isNull(r_callback)) {
+    R_PreserveObject(r_callback);
+    busy_callback_ = r_callback;
+  }
+
+  if (pConn_) {
+    if (busy_callback_ && Rf_isInteger(busy_callback_)) {
+      sqlite3_busy_timeout(pConn_, INTEGER(busy_callback_)[0]);
+    } else {
+      sqlite3_busy_handler(pConn_, busy_callback_helper, busy_callback_);
+    }
+  }
+}
+
+int DbConnection::busy_callback_helper(void *data, int num) {
+  SEXP r_callback = reinterpret_cast <SEXP> (data);
+  Function rfun = r_callback;
+  IntegerVector ret = rfun(num);
+  return as<int>(ret);
 }

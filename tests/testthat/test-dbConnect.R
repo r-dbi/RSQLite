@@ -95,3 +95,43 @@ test_that("temporary tables are connection local", {
   expect_true(dbExistsTable(con1, "temp"))
   expect_false(dbExistsTable(con2, "temp"))
 })
+
+test_that("busy_handler", {
+  dbfile <- tempfile()
+  con1 <- dbConnect(SQLite(), dbfile)
+  con2 <- dbConnect(SQLite(), dbfile)
+  on.exit(dbDisconnect(con2), add = TRUE)
+  on.exit(dbDisconnect(con1), add = TRUE)
+
+  num <- NULL
+  cb <- function(n) { num <<- n; if (n >= 5) 0L else 1L }
+  dbSetBusyHandler(con2, cb)
+
+  dbExecute(con1, "BEGIN IMMEDIATE")
+  expect_error(dbExecute(con2, "BEGIN IMMEDIATE"), "database is locked")
+  expect_equal(num, 5L)
+})
+
+test_that("busy_handler timeout", {
+  dbfile <- tempfile()
+  con1 <- dbConnect(SQLite(), dbfile)
+  on.exit(dbDisconnect(con1), add = TRUE)
+
+  rs <- callr::r_session$new()
+  on.exit(rs$close(), add = TRUE)
+
+  dbExecute(con1, "BEGIN IMMEDIATE")
+
+  ret <- rs$run(function(dbfile) {
+    con2 <- RSQLite::dbConnect(RSQLite::SQLite(), dbfile)
+    RSQLite::dbSetBusyHandler(con2, 500L)
+    tic <- Sys.time()
+    err <- tryCatch(RSQLite::dbExecute(con2, "BEGIN IMMEDIATE"), error = identity)
+    toc <- Sys.time()
+    list(err = err, time = toc - tic)
+  }, list(dbfile))
+
+  expect_match(conditionMessage(ret$err), "database is locked")
+  expect_true(ret$time >= as.difftime(0.5, units = "secs"))
+  expect_true(ret$time <  as.difftime(1.0, units = "secs"))
+})

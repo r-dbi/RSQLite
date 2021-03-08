@@ -113,6 +113,9 @@ test_that("busy_handler", {
 })
 
 test_that("busy_handler timeout", {
+
+  skip_on_cran()
+
   dbfile <- tempfile()
   con1 <- dbConnect(SQLite(), dbfile)
   con2 <- dbConnect(RSQLite::SQLite(), dbfile)

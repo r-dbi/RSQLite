@@ -11,8 +11,6 @@
 \alias{dbUnquoteIdentifier,SQLiteConnection,SQL-method}
 \alias{dbGetException,SQLiteConnection-method}
 \alias{dbGetInfo,SQLiteConnection-method}
-\alias{dbSetBusyHandler}
-\alias{dbSetBusyHandler,SQLiteConnection-method}
 \alias{dbSendQuery,SQLiteConnection,character-method}
 \alias{dbAppendTable,SQLiteConnection-method}
 \alias{sqlData,SQLiteConnection-method}
@@ -38,10 +36,6 @@
 
 \S4method{dbGetInfo}{SQLiteConnection}(dbObj, ...)
 
-dbSetBusyHandler(dbObj, handler, ...)
-
-\S4method{dbSetBusyHandler}{SQLiteConnection}(dbObj, handler, ...)
-
 \S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement, params = NULL, ...)
 
 \S4method{dbAppendTable}{SQLiteConnection}(conn, name, value, ..., row.names = NULL)
@@ -62,20 +56,6 @@ dbSetBusyHandler(dbObj, handler, ...)
 \S4method{dbDataType}{SQLiteConnection}(dbObj, obj, ...)
 }
 \arguments{
-\item{handler}{Specifies what to do when the database is locked by
-another transaction. It can be:
-\itemize{
-\item \code{NULL}: fail immediately,
-\item an integer scalar: this is a timeout in milliseconds that corresponds to
-\verb{PRAGMA busy_timeout},
-\item an R function: this function is called with one argument, the number
-of times that the busy handler has been invoked previously for the
-same locking event. If the function returns \code{0L}, then then no
-additional attempts are made to access the database, and an error
-is thrown. Otherwise another attempt is made to access the database
-and the cycle repeats.
-}}
-
 \item{temporary}{If \code{TRUE}, only temporary tables are considered.}
 
 \item{fail_if_missing}{If \code{FALSE}, \code{dbRemoveTable()} succeeds if the

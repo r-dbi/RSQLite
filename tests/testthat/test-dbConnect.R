@@ -105,7 +105,7 @@ test_that("busy_handler", {
 
   num <- NULL
   cb <- function(n) { num <<- n; if (n >= 5) 0L else 1L }
-  dbSetBusyHandler(con2, cb)
+  sqliteSetBusyHandler(con2, cb)
 
   dbExecute(con1, "BEGIN IMMEDIATE")
   expect_error(dbExecute(con2, "BEGIN IMMEDIATE"), "database is locked")
@@ -119,7 +119,7 @@ test_that("busy_handler timeout", {
   on.exit(dbDisconnect(con1), add = TRUE)
   on.exit(dbDisconnect(con2), add = TRUE)
 
-  RSQLite::dbSetBusyHandler(con2, 200L)
+  sqliteSetBusyHandler(con2, 200L)
   dbExecute(con1, "BEGIN IMMEDIATE")
 
   { # {} is to not mess up the timing when copy-pasting this interactively

@@ -220,7 +220,7 @@ setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
 #' Calling `sqliteSetBusyHandler()` on a connection that is not connected
 #' is an error.
 #'
-#' @param dbObj A [SQLiteConnection] object.
+#' @param dbObj A [SQLiteConnection-class] object.
 #' @param handler Specifies what to do when the database is locked by
 #' another transaction. It can be:
 #' * `NULL`: fail immediately,

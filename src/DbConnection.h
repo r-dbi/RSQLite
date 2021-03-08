@@ -55,6 +55,7 @@ private:
   sqlite3* pConn_;
   const bool with_alt_types_;
   SEXP busy_callback_;
+  void release_callback_data();
   static int busy_callback_helper(void *data, int num);;
 };
 

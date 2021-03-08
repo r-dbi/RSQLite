@@ -115,23 +115,20 @@ test_that("busy_handler", {
 test_that("busy_handler timeout", {
   dbfile <- tempfile()
   con1 <- dbConnect(SQLite(), dbfile)
+  con2 <- dbConnect(RSQLite::SQLite(), dbfile)
   on.exit(dbDisconnect(con1), add = TRUE)
+  on.exit(dbDisconnect(con2), add = TRUE)
 
-  rs <- callr::r_session$new()
-  on.exit(rs$close(), add = TRUE)
-
+  RSQLite::dbSetBusyHandler(con2, 200L)
   dbExecute(con1, "BEGIN IMMEDIATE")
 
-  ret <- rs$run(function(dbfile) {
-    con2 <- RSQLite::dbConnect(RSQLite::SQLite(), dbfile)
-    RSQLite::dbSetBusyHandler(con2, 500L)
+  { # {} is to not mess up the timing when copy-pasting this interactively
     tic <- Sys.time()
-    err <- tryCatch(RSQLite::dbExecute(con2, "BEGIN IMMEDIATE"), error = identity)
-    toc <- Sys.time()
-    list(err = err, time = toc - tic)
-  }, list(dbfile))
+    err <- tryCatch(dbExecute(con2, "BEGIN IMMEDIATE"), error = identity)
+    time <- Sys.time() - tic
+  }
 
-  expect_match(conditionMessage(ret$err), "database is locked")
-  expect_true(ret$time >= as.difftime(0.5, units = "secs"))
-  expect_true(ret$time <  as.difftime(1.0, units = "secs"))
+  expect_match(conditionMessage(err), "database is locked")
+  expect_true(time >= as.difftime(0.2, units = "secs"))
+  expect_true(time <  as.difftime(1.0, units = "secs"))
 })

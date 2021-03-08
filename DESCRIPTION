@@ -45,7 +45,6 @@ Imports:
     pkgconfig,
     Rcpp (>= 0.12.7)
 Suggests: 
-    callr,
     DBItest (>= 1.7.0),
     gert,
     gh,

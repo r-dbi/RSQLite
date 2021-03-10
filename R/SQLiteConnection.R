@@ -179,6 +179,7 @@ setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
 
 #' Configure what SQLite should do when the database is locked
 #'
+#' @description
 #' When a transaction cannot lock the database, because it is already
 #' locked by another one, SQLite by default throws an error:
 #' `database is locked`. This behavior is usually not appropriate when
@@ -196,6 +197,7 @@ setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
 #' ```
 #' sets the busy timeout to three seconds.
 #'
+#' @details
 #' Note that SQLite currently does _not_ schedule concurrent transactions
 #' fairly. If multiple transactions are waiting on the same database,
 #' any one of them can be granted access next. Moreover, SQLite does not

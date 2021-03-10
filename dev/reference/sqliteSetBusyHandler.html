@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>dbListResults — dbListResults,SQLiteConnection-method • RSQLite</title>
+<title>Configure what SQLite should do when the database is locked — sqliteSetBusyHandler • RSQLite</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,19 @@
 
 
 
-<meta property="og:title" content="dbListResults — dbListResults,SQLiteConnection-method" />
-<meta property="og:description" content="DEPRECATED" />
+<meta property="og:title" content="Configure what SQLite should do when the database is locked — sqliteSetBusyHandler" />
+<meta property="og:description" content="When a transaction cannot lock the database, because it is already
+locked by another one, SQLite by default throws an error:
+database is locked. This behavior is usually not appropriate when
+concurrent access is needed, typically when multiple processes write to
+the same database.
+sqliteSetBusyHandler() lets you set a timeout or a handler for these
+events. When setting a timeout, SQLite will try the transaction multiple
+times within this timeout. To set a timeout, pass an integer scalar to
+sqliteSetBusyHandler().
+Another way to set a timeout is to use a PRAGMA, e.g. the SQL queryPRAGMA busy_timeout=3000
+
+sets the busy timeout to three seconds." />
 
 
 <meta name="robots" content="noindex">
@@ -116,19 +127,79 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>dbListResults</h1>
-    <small class="dont-index">Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/R/deprecated.R'><code>R/deprecated.R</code></a></small>
-    <div class="hidden name"><code>dbListResults-SQLiteConnection-method.Rd</code></div>
+    <h1>Configure what SQLite should do when the database is locked</h1>
+    <small class="dont-index">Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/R/SQLiteConnection.R'><code>R/SQLiteConnection.R</code></a></small>
+    <div class="hidden name"><code>sqliteSetBusyHandler.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>DEPRECATED</p>
+    <p>When a transaction cannot lock the database, because it is already
+locked by another one, SQLite by default throws an error:
+<code>database is locked</code>. This behavior is usually not appropriate when
+concurrent access is needed, typically when multiple processes write to
+the same database.</p>
+<p><code>sqliteSetBusyHandler()</code> lets you set a timeout or a handler for these
+events. When setting a timeout, SQLite will try the transaction multiple
+times within this timeout. To set a timeout, pass an integer scalar to
+<code>sqliteSetBusyHandler()</code>.</p>
+<p>Another way to set a timeout is to use a <code>PRAGMA</code>, e.g. the SQL query<div class="sql"></p><pre>PRAGMA busy_timeout=3000
+</pre><p></div></p>
+<p>sets the busy timeout to three seconds.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S4 method for SQLiteConnection</span>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListResults.html'>dbListResults</a></span><span class='op'>(</span><span class='va'>conn</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>sqliteSetBusyHandler</span><span class='op'>(</span><span class='va'>dbObj</span>, <span class='va'>handler</span><span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>dbObj</th>
+      <td><p>A <a href='SQLiteConnection-class.html'>SQLiteConnection</a> object.</p></td>
+    </tr>
+    <tr>
+      <th>handler</th>
+      <td><p>Specifies what to do when the database is locked by
+another transaction. It can be:</p><ul>
+<li><p><code>NULL</code>: fail immediately,</p></li>
+<li><p>an integer scalar: this is a timeout in milliseconds that corresponds
+to <code>PRAGMA busy_timeout</code>,</p></li>
+<li><p>an R function: this function is called with one argument, see details
+below.</p></li>
+</ul></td>
+    </tr>
+    </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Invisible <code>NULL</code>.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Note that SQLite currently does <em>not</em> schedule concurrent transactions
+fairly. If multiple transactions are waiting on the same database,
+any one of them can be granted access next. Moreover, SQLite does not
+currently ensure that access is granted as soon as the database is
+available. Make sure that you set the busy timeout to a high enough
+value for applications with high concurrency and many writes.</p>
+<p>If the <code>handler</code> argument is a function, then it is used as a callback
+function. When the database is locked, this will be called with a single
+integer, which is the number of calls for same locking event. The
+callback function must return an integer scalar. If it returns <code>0L</code>,
+then no additional attempts are made to access the database, and
+an error is thrown. Otherwise another attempt is made to access the
+database and the cycle repeats.</p>
+<p>Handler callbacks are useful for debugging concurrent behavior, or to
+implement a more sophisticated busy algorithm. The latter is currently
+considered experimental in RSQLite, especially with respect to errors and
+interruption in the handler function. According to our current tests,
+after the handler function fails or is interrupted, the database
+connection is still functional, but this might not be always the case.</p>
+<p>Note that every database connection has its own busy timeout or handler
+function.</p>
+<p>Calling <code>sqliteSetBusyHandler()</code> on a connection that is not connected
+is an error.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><a href='https://www.sqlite.org/c3ref/busy_handler.html'>https://www.sqlite.org/c3ref/busy_handler.html</a></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

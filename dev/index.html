@@ -22,6 +22,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -75,40 +77,40 @@
 <!-- badges: start -->
 
 <!-- badges: end -->
-<p>Embeds the SQLite database engine in R, providing a DBI-compliant interface. <a href="https://www.sqlite.org/index.html">SQLite</a> is a public-domain, single-user, very light-weight database engine that implements a decent subset of the SQL 92 standard, including the core table creation, updating, insertion, and selection operations, plus transaction management.</p>
+<p>Embeds the SQLite database engine in R, providing a DBI-compliant interface. <a href="https://www.sqlite.org/index.html" class="external-link">SQLite</a> is a public-domain, single-user, very light-weight database engine that implements a decent subset of the SQL 92 standard, including the core table creation, updating, insertion, and selection operations, plus transaction management.</p>
 <p>You can install the latest released version from CRAN with:</p>
 <pre class="chroma">
-<span class="nf"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="o">(</span><span class="s">"RSQLite"</span><span class="o">)</span></pre>
+<span class="nf"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="o">(</span><span class="s">"RSQLite"</span><span class="o">)</span></pre>
 <p>Or install the latest development version from GitHub with:</p>
 <pre class="chroma">
 <span class="c"># install.packages("devtools")</span>
-<span class="nf">devtools</span><span class="nf">::</span><span class="nf"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="o">(</span><span class="s">"r-dbi/RSQLite"</span><span class="o">)</span></pre>
+<span class="nf">devtools</span><span class="nf">::</span><span class="nf"><a href="https://devtools.r-lib.org//reference/remote-reexports.html" class="external-link">install_github</a></span><span class="o">(</span><span class="s">"r-dbi/RSQLite"</span><span class="o">)</span></pre>
 <!-- https://www.rstudio.com/ide/docs/packages/prerequisites -->
-<p>To install from GitHub, you’ll need a <a href="https://support.rstudio.com/hc/en-us/articles/200486498-Package-Development-Prerequisites">development environment</a>.</p>
-<p>Discussions associated with DBI and related database packages take place on <a href="https://stat.ethz.ch/mailman/listinfo/r-sig-db">R-SIG-DB</a>. The website <a href="https://db.rstudio.com/">Databases using R</a> describes the tools and best practices in this ecosystem.</p>
+<p>To install from GitHub, you’ll need a <a href="https://support.rstudio.com/hc/en-us/articles/200486498-Package-Development-Prerequisites" class="external-link">development environment</a>.</p>
+<p>Discussions associated with DBI and related database packages take place on <a href="https://stat.ethz.ch/mailman/listinfo/r-sig-db" class="external-link">R-SIG-DB</a>. The website <a href="https://db.rstudio.com/" class="external-link">Databases using R</a> describes the tools and best practices in this ecosystem.</p>
 <div id="basic-usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#basic-usage" class="anchor"></a>Basic usage</h2>
 <pre class="chroma">
-<span class="kr"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="o">(</span><span class="nv"><a href="https://dbi.r-dbi.org">DBI</a></span><span class="o">)</span>
+<span class="kr"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="o">(</span><span class="nv"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="o">)</span>
 <span class="c"># Create an ephemeral in-memory RSQLite database</span>
-<span class="nv">con</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="o">(</span><span class="nf">RSQLite</span><span class="nf">::</span><span class="nf"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span><span class="o">(</span><span class="o">)</span>, <span class="s">":memory:"</span><span class="o">)</span>
+<span class="nv">con</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="o">(</span><span class="nf">RSQLite</span><span class="nf">::</span><span class="nf"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span><span class="o">(</span><span class="o">)</span>, <span class="s">":memory:"</span><span class="o">)</span>
 
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbListTables.html">dbListTables</a></span><span class="o">(</span><span class="nv">con</span><span class="o">)</span></pre>
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables</a></span><span class="o">(</span><span class="nv">con</span><span class="o">)</span></pre>
 <pre class="chroma">
 <span class="c">## character(0)</span></pre>
 <pre class="chroma">
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">dbWriteTable</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"mtcars"</span>, <span class="nv">mtcars</span><span class="o">)</span>
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbListTables.html">dbListTables</a></span><span class="o">(</span><span class="nv">con</span><span class="o">)</span></pre>
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"mtcars"</span>, <span class="nv">mtcars</span><span class="o">)</span>
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables</a></span><span class="o">(</span><span class="nv">con</span><span class="o">)</span></pre>
 <pre class="chroma">
 <span class="c">## [1] "mtcars"</span></pre>
 <pre class="chroma">
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbListFields.html">dbListFields</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"mtcars"</span><span class="o">)</span></pre>
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbListFields.html" class="external-link">dbListFields</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"mtcars"</span><span class="o">)</span></pre>
 <pre class="chroma">
 <span class="c">##  [1] "mpg"  "cyl"  "disp" "hp"   "drat" "wt"   "qsec" "vs"   "am"   "gear"</span>
 <span class="c">## [11] "carb"</span></pre>
 <pre class="chroma">
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbReadTable.html">dbReadTable</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"mtcars"</span><span class="o">)</span></pre>
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"mtcars"</span><span class="o">)</span></pre>
 <pre class="chroma">
 <span class="c">##    mpg cyl  disp  hp drat    wt  qsec vs am gear carb</span>
 <span class="c">## 1 21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4</span>
@@ -123,8 +125,8 @@
 <span class="c">##  [ reached 'max' / getOption("max.print") -- omitted 23 rows ]</span></pre>
 <pre class="chroma">
 <span class="c"># You can fetch all results:</span>
-<span class="nv">res</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html">dbSendQuery</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"SELECT * FROM mtcars WHERE cyl = 4"</span><span class="o">)</span>
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbFetch.html">dbFetch</a></span><span class="o">(</span><span class="nv">res</span><span class="o">)</span></pre>
+<span class="nv">res</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"SELECT * FROM mtcars WHERE cyl = 4"</span><span class="o">)</span>
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch</a></span><span class="o">(</span><span class="nv">res</span><span class="o">)</span></pre>
 <pre class="chroma">
 <span class="c">##    mpg cyl  disp hp drat    wt  qsec vs am gear carb</span>
 <span class="c">## 1 22.8   4 108.0 93 3.85 2.320 18.61  1  1    4    1</span>
@@ -138,13 +140,13 @@
 <span class="c">## 9 26.0   4 120.3 91 4.43 2.140 16.70  0  1    5    2</span>
 <span class="c">##  [ reached 'max' / getOption("max.print") -- omitted 2 rows ]</span></pre>
 <pre class="chroma">
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html">dbClearResult</a></span><span class="o">(</span><span class="nv">res</span><span class="o">)</span>
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html" class="external-link">dbClearResult</a></span><span class="o">(</span><span class="nv">res</span><span class="o">)</span>
 
 <span class="c"># Or a chunk at a time</span>
-<span class="nv">res</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html">dbSendQuery</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"SELECT * FROM mtcars WHERE cyl = 4"</span><span class="o">)</span>
-<span class="kr">while</span><span class="o">(</span><span class="o">!</span><span class="nf"><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html">dbHasCompleted</a></span><span class="o">(</span><span class="nv">res</span><span class="o">)</span><span class="o">)</span><span class="o">{</span>
-  <span class="nv">chunk</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbFetch.html">dbFetch</a></span><span class="o">(</span><span class="nv">res</span>, n <span class="o">=</span> <span class="m">5</span><span class="o">)</span>
-  <span class="nf"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="o">(</span><span class="nf"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="o">(</span><span class="nv">chunk</span><span class="o">)</span><span class="o">)</span>
+<span class="nv">res</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"SELECT * FROM mtcars WHERE cyl = 4"</span><span class="o">)</span>
+<span class="kr">while</span><span class="o">(</span><span class="o">!</span><span class="nf"><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html" class="external-link">dbHasCompleted</a></span><span class="o">(</span><span class="nv">res</span><span class="o">)</span><span class="o">)</span><span class="o">{</span>
+  <span class="nv">chunk</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch</a></span><span class="o">(</span><span class="nv">res</span>, n <span class="o">=</span> <span class="m">5</span><span class="o">)</span>
+  <span class="nf"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="o">(</span><span class="nf"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="o">(</span><span class="nv">chunk</span><span class="o">)</span><span class="o">)</span>
 <span class="o">}</span></pre>
 <pre class="chroma">
 <span class="c">## [1] 5</span>
@@ -152,10 +154,10 @@
 <span class="c">## [1] 1</span></pre>
 <pre class="chroma">
 <span class="c"># Clear the result</span>
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html">dbClearResult</a></span><span class="o">(</span><span class="nv">res</span><span class="o">)</span>
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html" class="external-link">dbClearResult</a></span><span class="o">(</span><span class="nv">res</span><span class="o">)</span>
 
 <span class="c"># Disconnect from the database</span>
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="o">(</span><span class="nv">con</span><span class="o">)</span></pre>
+<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="o">(</span><span class="nv">con</span><span class="o">)</span></pre>
 </div>
 <div id="acknowledgements" class="section level2">
 <h2 class="hasAnchor">
@@ -169,7 +171,7 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=RSQLite">https://​cloud.r-project.org/​package=RSQLite</a>
 </li>
@@ -183,22 +185,25 @@
 </li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
 <li><small>LGPL (&gt;= 2.1)</small></li>
 </ul>
 </div>
+
 <div class="community">
-<h2>Community</h2>
+<h2 data-toc-skip>Community</h2>
 <ul class="list-unstyled">
 <li><a href="CONTRIBUTING.html">Contributing guide</a></li>
 <li><a href="CODE_OF_CONDUCT.html">Code of conduct</a></li>
 </ul>
 </div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>
 <a href="http://krlmlr.info">Kirill Müller</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-1416-3412" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
@@ -208,30 +213,33 @@
 <li>Seth Falcon <br><small class="roles"> Author </small>  </li>
 <li>
 <a href="https://www.r-consortium.org">R Consortium</a> <br><small class="roles"> Funder </small>  </li>
-<li><a href="authors.html">All authors...</a></li>
+<li><a href="authors.html">More on authors...</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://lifecycle.r-lib.org/articles/stages.html"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
-<li><a href="https://github.com/r-dbi/RSQLite/actions"><img src="https://github.com/r-dbi/RSQLite/workflows/rcc/badge.svg" alt="rcc"></a></li>
-<li><a href="https://codecov.io/github/r-dbi/RSQLite?branch=master"><img src="https://codecov.io/gh/r-dbi/RSQLite/branch/master/graph/badge.svg" alt="Coverage Status"></a></li>
-<li><a href="https://cran.r-project.org/package=RSQLite"><img src="https://www.r-pkg.org/badges/version/RSQLite" alt="CRAN status"></a></li>
-<li><a href="https://bestpractices.coreinfrastructure.org/projects/3234"><img src="https://bestpractices.coreinfrastructure.org/projects/3234/badge" alt="CII Best Practices"></a></li>
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
+<li><a href="https://github.com/r-dbi/RSQLite/actions" class="external-link"><img src="https://github.com/r-dbi/RSQLite/workflows/rcc/badge.svg" alt="rcc"></a></li>
+<li><a href="https://codecov.io/github/r-dbi/RSQLite?branch=master" class="external-link"><img src="https://codecov.io/gh/r-dbi/RSQLite/branch/master/graph/badge.svg" alt="Coverage Status"></a></li>
+<li><a href="https://cran.r-project.org/package=RSQLite" class="external-link"><img src="https://www.r-pkg.org/badges/version/RSQLite" alt="CRAN status"></a></li>
+<li><a href="https://bestpractices.coreinfrastructure.org/projects/3234" class="external-link"><img src="https://bestpractices.coreinfrastructure.org/projects/3234/badge" alt="CII Best Practices"></a></li>
 </ul>
 </div>
-</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="http://krlmlr.info">Kirill Müller</a>, <a href="http://hadley.nz">Hadley Wickham</a>, David A. James, Seth Falcon, <a href="https://www.r-consortium.org">R Consortium</a>.</p>
+  <p></p>
+<p>Developed by <a href="http://krlmlr.info" class="external-link">Kirill Müller</a>, <a href="http://hadley.nz" class="external-link">Hadley Wickham</a>, David A. James, Seth Falcon, <a href="https://www.r-consortium.org" class="external-link">R Consortium</a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
@@ -239,6 +247,8 @@
 
   
 
+
+  
 
   </body>
 </html>

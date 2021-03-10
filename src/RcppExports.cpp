@@ -69,6 +69,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// set_busy_handler
+void set_busy_handler(const XPtr<DbConnectionPtr>& con, SEXP r_callback);
+RcppExport SEXP _RSQLite_set_busy_handler(SEXP conSEXP, SEXP r_callbackSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const XPtr<DbConnectionPtr>& >::type con(conSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type r_callback(r_callbackSEXP);
+    set_busy_handler(con, r_callback);
+    return R_NilValue;
+END_RCPP
+}
 // extension_load
 void extension_load(XPtr<DbConnectionPtr> con, const std::string& file, const std::string& entry_point);
 RcppExport SEXP _RSQLite_extension_load(SEXP conSEXP, SEXP fileSEXP, SEXP entry_pointSEXP) {
@@ -219,6 +230,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_connection_release", (DL_FUNC) &_RSQLite_connection_release, 1},
     {"_RSQLite_connection_copy_database", (DL_FUNC) &_RSQLite_connection_copy_database, 2},
     {"_RSQLite_connection_import_file", (DL_FUNC) &_RSQLite_connection_import_file, 6},
+    {"_RSQLite_set_busy_handler", (DL_FUNC) &_RSQLite_set_busy_handler, 2},
     {"_RSQLite_extension_load", (DL_FUNC) &_RSQLite_extension_load, 3},
     {"_RSQLite_result_create", (DL_FUNC) &_RSQLite_result_create, 2},
     {"_RSQLite_result_release", (DL_FUNC) &_RSQLite_result_release, 1},

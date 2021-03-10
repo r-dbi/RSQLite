@@ -95,3 +95,66 @@ test_that("temporary tables are connection local", {
   expect_true(dbExistsTable(con1, "temp"))
   expect_false(dbExistsTable(con2, "temp"))
 })
+
+test_that("busy_handler", {
+  dbfile <- tempfile()
+  con1 <- dbConnect(SQLite(), dbfile)
+  con2 <- dbConnect(SQLite(), dbfile)
+  on.exit(dbDisconnect(con2), add = TRUE)
+  on.exit(dbDisconnect(con1), add = TRUE)
+
+  num <- NULL
+  cb <- function(n) { num <<- n; if (n >= 5) 0L else 1L }
+  sqliteSetBusyHandler(con2, cb)
+
+  dbExecute(con1, "BEGIN IMMEDIATE")
+  expect_error(dbExecute(con2, "BEGIN IMMEDIATE"), "database is locked")
+  expect_equal(num, 5L)
+})
+
+test_that("error in busy handler", {
+  dbfile <- tempfile()
+  con1 <- dbConnect(SQLite(), dbfile)
+  con2 <- dbConnect(SQLite(), dbfile)
+  on.exit(dbDisconnect(con2), add = TRUE)
+  on.exit(dbDisconnect(con1), add = TRUE)
+
+  cb <- function(n) stop("oops")
+  sqliteSetBusyHandler(con2, cb)
+
+  dbExecute(con1, "BEGIN IMMEDIATE")
+  expect_error(dbExecute(con2, "BEGIN IMMEDIATE"), "oops")
+
+  # con1 is still fine of course
+  dbWriteTable(con1, "mtcars", mtcars)
+  dbExecute(con1, "COMMIT")
+
+  # but con2 is fine as well
+  dbExecute(con2, "BEGIN IMMEDIATE")
+  expect_silent(dbGetQuery(con2, "SELECT * FROM mtcars"))
+  dbExecute(con2, "COMMIT")
+})
+
+test_that("busy_handler timeout", {
+
+  skip_on_cran()
+
+  dbfile <- tempfile()
+  con1 <- dbConnect(SQLite(), dbfile)
+  con2 <- dbConnect(RSQLite::SQLite(), dbfile)
+  on.exit(dbDisconnect(con1), add = TRUE)
+  on.exit(dbDisconnect(con2), add = TRUE)
+
+  sqliteSetBusyHandler(con2, 200L)
+  dbExecute(con1, "BEGIN IMMEDIATE")
+
+  { # {} is to not mess up the timing when copy-pasting this interactively
+    tic <- Sys.time()
+    err <- tryCatch(dbExecute(con2, "BEGIN IMMEDIATE"), error = identity)
+    time <- Sys.time() - tic
+  }
+
+  expect_match(conditionMessage(err), "database is locked")
+  expect_true(time >= as.difftime(0.2, units = "secs"))
+  expect_true(time <  as.difftime(1.0, units = "secs"))
+})

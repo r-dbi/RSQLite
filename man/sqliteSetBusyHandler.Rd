@@ -56,7 +56,11 @@ an error is thrown. Otherwise another attempt is made to access the
 database and the cycle repeats.
 
 Handler callbacks are useful for debugging concurrent behavior, or to
-implement a more sophisticated busy algorithm.
+implement a more sophisticated busy algorithm. The latter is currently
+considered experimental in RSQLite, especially with respect to errors and
+interruption in the handler function. According to our current tests,
+after the handler function fails or is interrupted, the database
+connection is still functional, but this might not be always the case.
 
 Note that every database connection has its own busy timeout or handler
 function.

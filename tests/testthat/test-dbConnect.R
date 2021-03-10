@@ -112,6 +112,29 @@ test_that("busy_handler", {
   expect_equal(num, 5L)
 })
 
+test_that("error in busy handler", {
+  dbfile <- tempfile()
+  con1 <- dbConnect(SQLite(), dbfile)
+  con2 <- dbConnect(SQLite(), dbfile)
+  on.exit(dbDisconnect(con2), add = TRUE)
+  on.exit(dbDisconnect(con1), add = TRUE)
+
+  cb <- function(n) stop("oops")
+  sqliteSetBusyHandler(con2, cb)
+
+  dbExecute(con1, "BEGIN IMMEDIATE")
+  expect_error(dbExecute(con2, "BEGIN IMMEDIATE"), "oops")
+
+  # con1 is still fine of course
+  dbWriteTable(con1, "mtcars", mtcars)
+  dbExecute(con1, "COMMIT")
+
+  # but con2 is fine as well
+  dbExecute(con2, "BEGIN IMMEDIATE")
+  expect_silent(dbGetQuery(con2, "SELECT * FROM mtcars"))
+  dbExecute(con2, "COMMIT")
+})
+
 test_that("busy_handler timeout", {
 
   skip_on_cran()

@@ -28,8 +28,7 @@ locked by another one, SQLite by default throws an error:
 \verb{database is locked}. This behavior is usually not appropriate when
 concurrent access is needed, typically when multiple processes write to
 the same database.
-}
-\details{
+
 \code{sqliteSetBusyHandler()} lets you set a timeout or a handler for these
 events. When setting a timeout, SQLite will try the transaction multiple
 times within this timeout. To set a timeout, pass an integer scalar to
@@ -39,7 +38,8 @@ Another way to set a timeout is to use a \code{PRAGMA}, e.g. the SQL query\if{ht
 }\if{html}{\out{</div>}}
 
 sets the busy timeout to three seconds.
-
+}
+\details{
 Note that SQLite currently does \emph{not} schedule concurrent transactions
 fairly. If multiple transactions are waiting on the same database,
 any one of them can be granted access next. Moreover, SQLite does not

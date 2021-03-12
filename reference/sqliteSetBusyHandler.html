@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Add regular expression operator — initRegExp • RSQLite</title>
+<title>Configure what SQLite should do when the database is locked — sqliteSetBusyHandler • RSQLite</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,19 @@
 
 
 
-<meta property="og:title" content="Add regular expression operator — initRegExp" />
-<meta property="og:description" content="This loads a regular-expression matcher for posix extended regular
-expressions, as available through the SQLite source code repository
-(https://sqlite.org/src/raw?filename=ext/misc/regexp.c)." />
+<meta property="og:title" content="Configure what SQLite should do when the database is locked — sqliteSetBusyHandler" />
+<meta property="og:description" content="When a transaction cannot lock the database, because it is already
+locked by another one, SQLite by default throws an error:
+database is locked. This behavior is usually not appropriate when
+concurrent access is needed, typically when multiple processes write to
+the same database.
+sqliteSetBusyHandler() lets you set a timeout or a handler for these
+events. When setting a timeout, SQLite will try the transaction multiple
+times within this timeout. To set a timeout, pass an integer scalar to
+sqliteSetBusyHandler().
+Another way to set a timeout is to use a PRAGMA, e.g. the SQL queryPRAGMA busy_timeout=3000
+
+sets the busy timeout to three seconds." />
 
 
 
@@ -118,63 +127,80 @@ expressions, as available through the SQLite source code repository
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Add regular expression operator</h1>
-    <small class="dont-index">Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/R/regularExpressions.R'><code>R/regularExpressions.R</code></a></small>
-    <div class="hidden name"><code>initRegExp.Rd</code></div>
+    <h1>Configure what SQLite should do when the database is locked</h1>
+    <small class="dont-index">Source: <a href='https://github.com/r-dbi/RSQLite/blob/master/R/SQLiteConnection.R'><code>R/SQLiteConnection.R</code></a></small>
+    <div class="hidden name"><code>sqliteSetBusyHandler.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This loads a regular-expression matcher for posix extended regular
-expressions, as available through the SQLite source code repository
-(<a href='https://sqlite.org/src/raw?filename=ext/misc/regexp.c'>https://sqlite.org/src/raw?filename=ext/misc/regexp.c</a>).</p>
+    <p>When a transaction cannot lock the database, because it is already
+locked by another one, SQLite by default throws an error:
+<code>database is locked</code>. This behavior is usually not appropriate when
+concurrent access is needed, typically when multiple processes write to
+the same database.</p>
+<p><code>sqliteSetBusyHandler()</code> lets you set a timeout or a handler for these
+events. When setting a timeout, SQLite will try the transaction multiple
+times within this timeout. To set a timeout, pass an integer scalar to
+<code>sqliteSetBusyHandler()</code>.</p>
+<p>Another way to set a timeout is to use a <code>PRAGMA</code>, e.g. the SQL query<div class="sql"></p><pre>PRAGMA busy_timeout=3000
+</pre><p></div></p>
+<p>sets the busy timeout to three seconds.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>initRegExp</span><span class='op'>(</span><span class='va'>db</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>sqliteSetBusyHandler</span><span class='op'>(</span><span class='va'>dbObj</span>, <span class='va'>handler</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>db</th>
-      <td><p>A <code><a href='SQLiteConnection-class.html'>SQLiteConnection</a></code> object to add the
-regular expression operator into the connection.</p></td>
+      <th>dbObj</th>
+      <td><p>A <a href='SQLiteConnection-class.html'>SQLiteConnection</a> object.</p></td>
+    </tr>
+    <tr>
+      <th>handler</th>
+      <td><p>Specifies what to do when the database is locked by
+another transaction. It can be:</p><ul>
+<li><p><code>NULL</code>: fail immediately,</p></li>
+<li><p>an integer scalar: this is a timeout in milliseconds that corresponds
+to <code>PRAGMA busy_timeout</code>,</p></li>
+<li><p>an R function: this function is called with one argument, see details
+below.</p></li>
+</ul></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Always <code>TRUE</code>, invisibly.</p>
+    <p>Invisible <code>NULL</code>.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>SQLite will then implement the "A regexp B" operator,
-where A is the string to be matched and B is the regular expression.</p>
-<p>Note this only affects the specified connection.</p>
+    <p>Note that SQLite currently does <em>not</em> schedule concurrent transactions
+fairly. If multiple transactions are waiting on the same database,
+any one of them can be granted access next. Moreover, SQLite does not
+currently ensure that access is granted as soon as the database is
+available. Make sure that you set the busy timeout to a high enough
+value for applications with high concurrency and many writes.</p>
+<p>If the <code>handler</code> argument is a function, then it is used as a callback
+function. When the database is locked, this will be called with a single
+integer, which is the number of calls for same locking event. The
+callback function must return an integer scalar. If it returns <code>0L</code>,
+then no additional attempts are made to access the database, and
+an error is thrown. Otherwise another attempt is made to access the
+database and the cycle repeats.</p>
+<p>Handler callbacks are useful for debugging concurrent behavior, or to
+implement a more sophisticated busy algorithm. The latter is currently
+considered experimental in RSQLite, especially with respect to errors and
+interruption in the handler function. According to our current tests,
+after the handler function fails or is interrupted, the database
+connection is still functional, but this might not be always the case.</p>
+<p>Note that every database connection has its own busy timeout or handler
+function.</p>
+<p>Calling <code>sqliteSetBusyHandler()</code> on a connection that is not connected
+is an error.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dbi.r-dbi.org'>DBI</a></span><span class='op'>)</span>
-<span class='va'>db</span> <span class='op'>&lt;-</span> <span class='fu'>RSQLite</span><span class='fu'>::</span><span class='fu'><a href='datasetsDb.html'>datasetsDb</a></span><span class='op'>(</span><span class='op'>)</span>
-<span class='fu'>RSQLite</span><span class='fu'>::</span><span class='fu'>initRegExp</span><span class='op'>(</span><span class='va'>db</span><span class='op'>)</span>
+    <div class='dont-index'><p><a href='https://www.sqlite.org/c3ref/busy_handler.html'>https://www.sqlite.org/c3ref/busy_handler.html</a></p></div>
 
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>dbGetQuery</a></span><span class='op'>(</span><span class='va'>db</span>, <span class='st'>"SELECT * FROM mtcars WHERE carb REGEXP '[12]'"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;            row_names  mpg cyl  disp  hp drat    wt  qsec vs am gear carb
-#&gt; 1         Datsun 710 22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
-#&gt; 2     Hornet 4 Drive 21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
-#&gt; 3  Hornet Sportabout 18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2
-#&gt; 4            Valiant 18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1
-#&gt; 5          Merc 240D 24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
-#&gt; 6           Merc 230 22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2
-#&gt; 7           Fiat 128 32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1
-#&gt; 8        Honda Civic 30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2
-#&gt; 9     Toyota Corolla 33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1
-#&gt; 10     Toyota Corona 21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1
-#&gt; 11  Dodge Challenger 15.5   8 318.0 150 2.76 3.520 16.87  0  0    3    2
-#&gt; 12       AMC Javelin 15.2   8 304.0 150 3.15 3.435 17.30  0  0    3    2
-#&gt; 13  Pontiac Firebird 19.2   8 400.0 175 3.08 3.845 17.05  0  0    3    2
-#&gt; 14         Fiat X1-9 27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1
-#&gt; 15     Porsche 914-2 26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
-#&gt; 16      Lotus Europa 30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2
-#&gt; 17        Volvo 142E 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span><span class='op'>(</span><span class='va'>db</span><span class='op'>)</span>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

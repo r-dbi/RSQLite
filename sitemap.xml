@@ -67,6 +67,9 @@
     <loc>https://rsqlite.r-dbi.org/reference/sqliteQuickColumn.html</loc>
   </url>
   <url>
+    <loc>https://rsqlite.r-dbi.org/reference/sqliteSetBusyHandler.html</loc>
+  </url>
+  <url>
     <loc>https://rsqlite.r-dbi.org/articles/RSQLite.html</loc>
   </url>
 </urlset>

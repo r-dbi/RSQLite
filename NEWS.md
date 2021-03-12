@@ -1,5 +1,10 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
+# RSQLite 2.2.4 (2021-03-12)
+
+- Same as previous version.
+
+
 # RSQLite 2.2.3.9001 (2021-03-12)
 
 - New `sqliteSetBusyHandler()` helps configure what SQLite should do when the database is locked. Improve concurrency behavior (#280, @gaborcsardi).

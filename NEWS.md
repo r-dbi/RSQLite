@@ -7,18 +7,12 @@
 
 # RSQLite 2.2.4 (2021-03-12)
 
-- Same as previous version.
+## Features
 
-
-# RSQLite 2.2.3.9001 (2021-03-12)
-
-- New `sqliteSetBusyHandler()` helps configure what SQLite should do when the database is locked. Improve concurrency behavior (#280, @gaborcsardi).
-
-
-# RSQLite 2.2.3.9000 (2021-01-24)
-
-- Upgrade bundled SQLite to version 3.34.1 (#342).
+- Improve concurrency behavior with multiple writers (#280, @gaborcsardi).
+- New `sqliteSetBusyHandler()` helps configure what SQLite should do when the database is locked (#280, @gaborcsardi).
 - `dbConnect()` gains an `extended_types` argument that adds support for date, time and timestamp columns. If a column has a declared type `DATE`, `TIME` or `TIMESTAMP`, it is returned as `Date`, `hms` or `POSIXct` value, respectively (#333, @anderic1).
+- Upgrade bundled SQLite to version 3.34.1 (#342).
 
 
 # RSQLite 2.2.3 (2021-01-24)
@@ -387,7 +381,7 @@ Internal
 
 - Updated to SQLite 3.8.6
 
-- Added `datasetsDb()`, a bundled SQLite database containing all data frames 
+- Added `datasetsDb()`, a bundled SQLite database containing all data frames
   in the datasets package (#15).
 
 - Inlined `RSQLite.extfuns` - use `initExtension()` to load the many
@@ -399,7 +393,7 @@ Internal
   close it for you, with a warning. It's still good practice to clean up
   after yourself, but you don't have to.
 
-- `dbBegin()`, `dbCommit()`, `dbRollback()` throw errors on failure, rather than 
+- `dbBegin()`, `dbCommit()`, `dbRollback()` throw errors on failure, rather than
   return `FALSE`.  They all gain a `name` argument to specify named savepoints.
 
 - `dbFetch()` method added (`fetch()` will be deprecated in the future)
@@ -411,24 +405,24 @@ Internal
     * It quotes field names using `dbQuoteIdentifier()`, rather
       than use a flawed black-list based approach with name munging.
 
-    * It now throws errors on failure, rather than returning FALSE. 
-    
+    * It now throws errors on failure, rather than returning FALSE.
+
     * It will automatically add row names only if they are character, not integer.
-    
+
     * When loading a file from disk, `dbWriteTable()` will no longer
       attempt to guess the correct values for `row.names` and `header` - instead
-      supply them explicitly if the defaults are incorrect. 
-    
-    * It uses named save points so it can be nested inside other 
-      transactions (#41). 
-    
-    * When given a zero-row data frame it will just creates the table 
-      definition (#35). 
+      supply them explicitly if the defaults are incorrect.
+
+    * It uses named save points so it can be nested inside other
+      transactions (#41).
+
+    * When given a zero-row data frame it will just creates the table
+      definition (#35).
 
 ## Changes to objects
 
 - The `dbname`, `loadable.extensions`, `flags` and `vfs` properties of
-  a SqliteConnection are now slots. Access them directly instead of using 
+  a SqliteConnection are now slots. Access them directly instead of using
   `dbGetInfo()`.
 
 ## Deprecated and removed functions
@@ -441,18 +435,18 @@ Internal
 
 - `dbCallProc()` method removed, since generic is now deprecated.
 
-- Renamed `dbBuildTableDefinition()` to `sqliteBuildTableDefinition()` 
+- Renamed `dbBuildTableDefinition()` to `sqliteBuildTableDefinition()`
   to avoid implying it's a DBI generic. Old function is aliased to new with
   a warning.
 
 - `dbFetch()` no longer numbers row names sequentially between fetches.
 
-- `safe.write()` is no longer exported as it shouldn't be part of the 
+- `safe.write()` is no longer exported as it shouldn't be part of the
   public RSQLite interface (#26).
 
 - Internal `sqlite*()` functions are no longer exported (#20).
 
-- Removed `SqliteObject` and `dbObject` classes, modifying `SqliteDriver`, 
+- Removed `SqliteObject` and `dbObject` classes, modifying `SqliteDriver`,
   `SqliteConnection`, and `SqliteResult` to use composition instead of multiple
   inheritance.
 
@@ -788,7 +782,7 @@ Internal
   If you are having a lot of string parameters, use stringsAsFactors=FALSE
   when creating the bind.data data.frame instance.  You can also use I().
 
-* Added experimental sqliteQuickColumn function that retrieves an entire 
+* Added experimental sqliteQuickColumn function that retrieves an entire
   column from a specified table as quickly as possible.
 
 * The SQLite driver has a new logical parameter "shared.cache" to
@@ -924,4 +918,3 @@ Internal
   with no support for connections, result set (cursors), data types,
   meta-data -- nothing.  So I had to simulate all this. (Actually it
   wasn't too bad).
-

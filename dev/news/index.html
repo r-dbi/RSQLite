@@ -129,37 +129,27 @@
 </div>
     <div id="rsqlite-224-2021-03-12" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.4">
-<a href="#rsqlite-224-2021-03-12" class="anchor"></a>RSQLite 2.2.4 (2021-03-12)<small> Unreleased </small>
+<a href="#rsqlite-224-2021-03-12" class="anchor"></a>RSQLite 2.2.4 (2021-03-12)<small> 2021-03-12 </small>
 </h1>
+<div id="features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#features" class="anchor"></a>Features</h2>
 <ul>
-<li>Same as previous version.</li>
-</ul>
-</div>
-    <div id="rsqlite-2239001-2021-03-12" class="section level1">
-<h1 class="page-header" data-toc-text="2.2.3.9001">
-<a href="#rsqlite-2239001-2021-03-12" class="anchor"></a>RSQLite 2.2.3.9001 (2021-03-12)<small> Unreleased </small>
-</h1>
-<ul>
-<li>New <code><a href="../reference/sqliteSetBusyHandler.html">sqliteSetBusyHandler()</a></code> helps configure what SQLite should do when the database is locked. Improve concurrency behavior (<a href='https://github.com/r-dbi/RSQLite/issues/280'>#280</a>, <a href='https://github.com/gaborcsardi'>@gaborcsardi</a>).</li>
-</ul>
-</div>
-    <div id="rsqlite-2239000-2021-01-24" class="section level1">
-<h1 class="page-header" data-toc-text="2.2.3.9000">
-<a href="#rsqlite-2239000-2021-01-24" class="anchor"></a>RSQLite 2.2.3.9000 (2021-01-24)<small> Unreleased </small>
-</h1>
-<ul>
-<li>Upgrade bundled SQLite to version 3.34.1 (<a href='https://github.com/r-dbi/RSQLite/issues/342'>#342</a>).</li>
+<li>Improve concurrency behavior with multiple writers (<a href='https://github.com/r-dbi/RSQLite/issues/280'>#280</a>, <a href='https://github.com/gaborcsardi'>@gaborcsardi</a>).</li>
+<li>New <code><a href="../reference/sqliteSetBusyHandler.html">sqliteSetBusyHandler()</a></code> helps configure what SQLite should do when the database is locked (<a href='https://github.com/r-dbi/RSQLite/issues/280'>#280</a>, <a href='https://github.com/gaborcsardi'>@gaborcsardi</a>).</li>
 <li>
 <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect()</a></code> gains an <code>extended_types</code> argument that adds support for date, time and timestamp columns. If a column has a declared type <code>DATE</code>, <code>TIME</code> or <code>TIMESTAMP</code>, it is returned as <code>Date</code>, <code>hms</code> or <code>POSIXct</code> value, respectively (<a href='https://github.com/r-dbi/RSQLite/issues/333'>#333</a>, <a href='https://github.com/anderic1'>@anderic1</a>).</li>
+<li>Upgrade bundled SQLite to version 3.34.1 (<a href='https://github.com/r-dbi/RSQLite/issues/342'>#342</a>).</li>
 </ul>
+</div>
 </div>
     <div id="rsqlite-223-2021-01-24" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.3">
 <a href="#rsqlite-223-2021-01-24" class="anchor"></a>RSQLite 2.2.3 (2021-01-24)<small> 2021-01-24 </small>
 </h1>
-<div id="features" class="section level2">
+<div id="features-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features" class="anchor"></a>Features</h2>
+<a href="#features-1" class="anchor"></a>Features</h2>
 <ul>
 <li>Upgrade bundled SQLite to version 3.34.1 (<a href='https://github.com/r-dbi/RSQLite/issues/342'>#342</a>).</li>
 <li>
@@ -171,9 +161,9 @@
 <h1 class="page-header" data-toc-text="2.2.2">
 <a href="#rsqlite-222-2021-01-04" class="anchor"></a>RSQLite 2.2.2 (2021-01-04)<small> 2021-01-08 </small>
 </h1>
-<div id="features-1" class="section level2">
+<div id="features-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-1" class="anchor"></a>Features</h2>
+<a href="#features-2" class="anchor"></a>Features</h2>
 <ul>
 <li>Upgrade bundled SQLite to version 3.34 (<a href='https://github.com/r-dbi/RSQLite/issues/337'>#337</a>).</li>
 </ul>
@@ -327,9 +317,9 @@
 <li>Ignore invalid UTF-8 strings in <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html" class="external-link">dbQuoteIdentifier()</a></code> (r-dbi/DBItest<a href='https://github.com/r-dbi/RSQLite/issues/156'>#156</a>).</li>
 </ul>
 </div>
-<div id="features-2" class="section level2">
+<div id="features-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features-2" class="anchor"></a>Features</h2>
+<a href="#features-3" class="anchor"></a>Features</h2>
 <ul>
 <li>Update bundled sqlite3 library to 3.22 (<a href='https://github.com/r-dbi/RSQLite/issues/252'>#252</a>).</li>
 <li>Values of class <code>"integer64"</code> are now supported for <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind()</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/243'>#243</a>).</li>

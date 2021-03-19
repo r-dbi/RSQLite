@@ -123,7 +123,10 @@ test_that("error in busy handler", {
   sqliteSetBusyHandler(con2, cb)
 
   dbExecute(con1, "BEGIN IMMEDIATE")
-  expect_error(dbExecute(con2, "BEGIN IMMEDIATE"), "oops")
+  expect_error(
+    expect_warning(dbExecute(con2, "BEGIN IMMEDIATE"), "aborting"),
+    "database is locked"
+  )
 
   # con1 is still fine of course
   dbWriteTable(con1, "mtcars", mtcars)

@@ -109,7 +109,12 @@ void DbConnection::release_callback_data() {
 
 int DbConnection::busy_callback_helper(void *data, int num) {
   SEXP r_callback = reinterpret_cast <SEXP> (data);
-  Function rfun = r_callback;
-  IntegerVector ret = rfun(num);
-  return as<int>(ret);
+  try {
+    Function rfun = r_callback;
+    IntegerVector ret = rfun(num);
+    return as<int>(ret);
+  } catch(...) {
+    Rcpp::warning("Busy callback failed, aborting transaction");
+    return 0;
+  }
 }

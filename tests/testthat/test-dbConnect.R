@@ -124,7 +124,10 @@ test_that("error in busy handler", {
 
   dbExecute(con1, "BEGIN IMMEDIATE")
   expect_error(
-    expect_warning(dbExecute(con2, "BEGIN IMMEDIATE"), "aborting"),
+    expect_warning(
+      dbExecute(con2, "BEGIN IMMEDIATE"),
+      "Busy callback failed, aborting.*oops"
+    ),
     "database is locked"
   )
 

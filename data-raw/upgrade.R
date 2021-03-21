@@ -32,7 +32,8 @@ download.file(
   url = "https://sqlite.org/src/raw?filename=ext/misc/regexp.c&ci=trunk",
   destfile = "src/vendor/sqlite3/regexp.c",
   quiet = TRUE,
-  mode = "w")
+  mode = "w"
+)
 
 stopifnot(system2("patch", "-p1", stdin = "data-raw/regexp.patch") == 0)
 
@@ -66,11 +67,13 @@ if (any(grepl("^src/", gert::git_status()$file))) {
 
   if (length(existing_pr) > 0) {
     message("Open PR already exists, leaving")
+    return()
   }
 
   message("Opening PR")
   pr <- gh::gh(
-    "/repos/r-dbi/RSQLite/pulls", head = branch, base = old_branch,
+    "/repos/r-dbi/RSQLite/pulls",
+    head = branch, base = old_branch,
     title = title, body = ".",
     .method = "POST"
   )

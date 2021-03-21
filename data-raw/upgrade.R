@@ -52,8 +52,10 @@ if (any(grepl("^src/", gert::git_status()$file))) {
   message("Commit message: ", title)
   gert::git_commit(title)
 
+  # Force-pushing: this job is run daily, will give a daily notification
+  # and still succeed
   message("Pushing branch")
-  gert::git_push()
+  gert::git_push(force = TRUE)
 
   message("Opening PR")
   pr <- gh::gh(

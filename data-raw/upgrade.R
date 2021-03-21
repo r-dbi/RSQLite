@@ -32,8 +32,7 @@ download.file(
   url = "https://sqlite.org/src/raw?filename=ext/misc/regexp.c&ci=trunk",
   destfile = "src/vendor/sqlite3/regexp.c",
   quiet = TRUE,
-  mode = "w"
-)
+  mode = "w")
 
 stopifnot(system2("patch", "-p1", stdin = "data-raw/regexp.patch") == 0)
 
@@ -46,17 +45,8 @@ if (any(grepl("^src/", gert::git_status()$file))) {
   old_branch <- gert::git_branch()
   message("Old branch: ", old_branch)
 
-  tryCatch(
-    gert::git_branch_checkout(branch),
-    error = function(e) {
-      gert::git_branch_create(branch)
-    }
-  )
+  gert::git_branch_create(branch)
   gert::git_add("src")
-
-  if (NROW(gert::git_status(staged = TRUE)) == 0) {
-    message("No changes, exiting")
-  }
 
   title <- paste0("Upgrade bundled SQLite to ", version)
   message("Commit message: ", title)
@@ -67,8 +57,7 @@ if (any(grepl("^src/", gert::git_status()$file))) {
 
   message("Opening PR")
   pr <- gh::gh(
-    "/repos/r-dbi/RSQLite/pulls",
-    head = branch, base = old_branch,
+    "/repos/r-dbi/RSQLite/pulls", head = branch, base = old_branch,
     title = title, body = ".",
     .method = "POST"
   )

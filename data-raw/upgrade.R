@@ -67,23 +67,22 @@ if (any(grepl("^src/", gert::git_status()$file))) {
 
   if (length(existing_pr) > 0) {
     message("Open PR already exists, leaving")
-    return()
+  } else {
+    message("Opening PR")
+    pr <- gh::gh(
+      "/repos/r-dbi/RSQLite/pulls",
+      head = branch, base = old_branch,
+      title = title, body = ".",
+      .method = "POST"
+    )
+
+    message("Tweaking PR body")
+    body <- paste0("NEWS entry:\n\n```\n- Upgrade bundled SQLite to version ", version, " (#", pr$number, ").\n```")
+
+    gh::gh(
+      paste0("/repos/r-dbi/RSQLite/pulls/", pr$number),
+      body = body,
+      .method = "PATCH"
+    )
   }
-
-  message("Opening PR")
-  pr <- gh::gh(
-    "/repos/r-dbi/RSQLite/pulls",
-    head = branch, base = old_branch,
-    title = title, body = ".",
-    .method = "POST"
-  )
-
-  message("Tweaking PR body")
-  body <- paste0("NEWS entry:\n\n```\n- Upgrade bundled SQLite to version ", version, " (#", pr$number, ").\n```")
-
-  gh::gh(
-    paste0("/repos/r-dbi/RSQLite/pulls/", pr$number),
-    body = body,
-    .method = "PATCH"
-  )
 }

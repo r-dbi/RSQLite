@@ -57,6 +57,17 @@ if (any(grepl("^src/", gert::git_status()$file))) {
   message("Pushing branch")
   gert::git_push(force = TRUE)
 
+  message("Checking if PR exists")
+  existing_pr <- gh::gh(
+    "/repos/r-dbi/RSQLite/pulls",
+    head = paste0("r-dbi:", branch), base = old_branch,
+    state = "open"
+  )
+
+  if (length(existing_pr) > 0) {
+    message("Open PR already exists, leaving")
+  }
+
   message("Opening PR")
   pr <- gh::gh(
     "/repos/r-dbi/RSQLite/pulls", head = branch, base = old_branch,

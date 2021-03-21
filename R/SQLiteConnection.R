@@ -215,10 +215,9 @@ setMethod("dbGetInfo", "SQLiteConnection", function(dbObj, ...) {
 #'
 #' Handler callbacks are useful for debugging concurrent behavior, or to
 #' implement a more sophisticated busy algorithm. The latter is currently
-#' considered experimental in RSQLite, especially with respect to errors and
-#' interruption in the handler function. According to our current tests,
-#' after the handler function fails or is interrupted, the database
-#' connection is still functional, but this might not be always the case.
+#' considered experimental in RSQLite. If the callback function fails, then
+#' RSQLite will print a warning, and the transaction is aborted with a
+#' "database is locked" error.
 #'
 #' Note that every database connection has its own busy timeout or handler
 #' function.

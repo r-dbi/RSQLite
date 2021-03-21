@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "workarounds/XPtr.h"
 #include "RSQLite_types.h"
 
 //#include "DbResult.h"

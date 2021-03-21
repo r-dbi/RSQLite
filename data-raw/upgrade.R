@@ -1,7 +1,5 @@
 library(magrittr)
 
-do_upgrade <- function() {
-
 html <- xml2::read_html("https://www.sqlite.org/download.html")
 
 latest_name <- html %>%
@@ -10,22 +8,6 @@ latest_name <- html %>%
   rvest::html_text() %>%
   grep("amalgamation", ., value = TRUE) %>%
   .[1]
-
-old_branch <- gert::git_branch()
-message("Old branch: ", old_branch)
-
-stopifnot(NROW(gert::git_status()) == 0)
-
-message("Branch name: ", branch)
-tryCatch(
-  gert::git_branch_checkout(branch),
-  error = function(e) {
-    message("Creating new branch ", branch)
-    gert::git_branch_create(branch)
-  }
-)
-
-withr::defer(gert::git_branch_checkout(old_branch))
 
 tmp <- tempfile()
 
@@ -55,13 +37,26 @@ download.file(
 
 stopifnot(system2("patch", "-p1", stdin = "data-raw/regexp.patch") == 0)
 
-gert::git_add("src")
-if (NROW(gert::git_status(staged = TRUE)) == 0) {
-  message("No changes detected")
-} else {
-  message("Changes detected")
+if (any(grepl("^src/", gert::git_status()$file))) {
+  branch <- paste0("f-", sub("[.][^.]*$", "", latest_name))
+  message("Changes detected, creating branch: ", branch)
 
   version <- sub("^.*-([0-9])([0-9][0-9])(?:0([0-9])|([1-9][0-9]))[0-9]+[.].*$", "\\1.\\2.\\3\\4", latest_name)
+
+  old_branch <- gert::git_branch()
+  message("Old branch: ", old_branch)
+
+  tryCatch(
+    gert::git_branch_checkout(branch),
+    error = function(e) {
+      gert::git_branch_create(branch)
+    }
+  )
+  gert::git_add("src")
+
+  if (NROW(gert::git_status(staged = TRUE)) == 0) {
+    message("No changes, exiting")
+  }
 
   title <- paste0("Upgrade bundled SQLite to ", version)
   message("Commit message: ", title)
@@ -69,9 +64,6 @@ if (NROW(gert::git_status(staged = TRUE)) == 0) {
 
   message("Pushing branch")
   gert::git_push()
-
-  # PR will fail to open if an existing branch is pushed to,
-  # this is a feature
 
   message("Opening PR")
   pr <- gh::gh(
@@ -90,7 +82,3 @@ if (NROW(gert::git_status(staged = TRUE)) == 0) {
     .method = "PATCH"
   )
 }
-
-}
-
-do_upgrade()

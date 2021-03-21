@@ -107,24 +107,37 @@ void DbConnection::release_callback_data() {
   }
 }
 
-int DbConnection::busy_callback_helper(void *data, int num) {
-  SEXP r_callback = reinterpret_cast <SEXP> (data);
+int DbConnection::busy_callback_helper(void *data, int num)
+{
+  SEXP r_callback = reinterpret_cast<SEXP>(data);
 
-  try {
-    Function rfun = r_callback;
-    IntegerVector ret = rfun(num);
-    return as<int>(ret);
-
-  } catch(eval_error &e) {
-    Rcpp::warning("Busy callback failed, aborting transaction: %s", e.what());
-    return 0;
-
-  } catch(Rcpp::internal::InterruptedException &e) {
-    // Not warning on explicit interrupt
-    return 0;
-
-  } catch(...) {
-    Rcpp::warning("Busy callback failed, aborting transaction");
+  // Overarching safety net
+  try
+  {
+    try
+    {
+      Function rfun = r_callback;
+      IntegerVector ret = rfun(num);
+      return as<int>(ret);
+    }
+    catch (eval_error &e)
+    {
+      Rcpp::message("Busy callback failed, aborting transaction: %s", e.what());
+      return 0;
+    }
+    catch (Rcpp::internal::InterruptedException &e)
+    {
+      // Not warning on explicit interrupt
+      return 0;
+    }
+    catch (...)
+    {
+      Rcpp::message("Busy callback failed, aborting transaction");
+      return 0;
+    }
+  }
+  catch (...)
+  {
     return 0;
   }
 }

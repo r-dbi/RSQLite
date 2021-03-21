@@ -66,7 +66,12 @@ if (any(grepl("^src/", gert::git_status()$file))) {
   )
 
   if (length(existing_pr) > 0) {
-    message("Open PR already exists, leaving")
+    message("Nudging")
+    gh::gh(
+      paste0("/repos/r-dbi/RSQLite/issues/", existing_pr[[1]]$number, "/comments"),
+      body = "PR updated.",
+      .method = "POST"
+    )
   } else {
     message("Opening PR")
     pr <- gh::gh(

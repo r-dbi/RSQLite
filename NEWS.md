@@ -2,8 +2,7 @@
 
 # RSQLite 2.2.5.9000 (2021-03-25)
 
-- Upgrade bundled SQLite to version 3.35.2 (#357).
-- If the busy handler fails, the transaction is aborted explicitly (#348, @gaborcsardi).
+- Same as previous version.
 
 
 # RSQLite 2.2.5 (2021-03-25)

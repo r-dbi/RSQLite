@@ -6,11 +6,6 @@
 - If the busy handler fails, the transaction is aborted explicitly (#348, @gaborcsardi).
 
 
-# RSQLite 2.2.4.9000 (2021-03-12)
-
-- Same as previous version.
-
-
 # RSQLite 2.2.4 (2021-03-12)
 
 ## Features

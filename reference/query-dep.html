@@ -130,15 +130,15 @@ or with calling dbBind() instead." />
 or with calling <code><a href='https://dbi.r-dbi.org/reference/dbBind.html'>dbBind()</a></code> instead.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>dbSendPreparedQuery</span><span class='op'>(</span><span class='va'>conn</span>, <span class='va'>statement</span>, <span class='va'>bind.data</span>, <span class='va'>...</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'><a href='query-dep.html'>dbSendPreparedQuery</a></span><span class='op'>(</span><span class='va'>conn</span>, <span class='va'>statement</span>, <span class='va'>bind.data</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>dbGetPreparedQuery</span><span class='op'>(</span><span class='va'>conn</span>, <span class='va'>statement</span>, <span class='va'>bind.data</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S4 method for SQLiteConnection,character,data.frame</span>
-<span class='fu'>dbSendPreparedQuery</span><span class='op'>(</span><span class='va'>conn</span>, <span class='va'>statement</span>, <span class='va'>bind.data</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'><a href='query-dep.html'>dbGetPreparedQuery</a></span><span class='op'>(</span><span class='va'>conn</span>, <span class='va'>statement</span>, <span class='va'>bind.data</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for SQLiteConnection,character,data.frame</span>
-<span class='fu'>dbGetPreparedQuery</span><span class='op'>(</span><span class='va'>conn</span>, <span class='va'>statement</span>, <span class='va'>bind.data</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'><a href='query-dep.html'>dbSendPreparedQuery</a></span><span class='op'>(</span><span class='va'>conn</span>, <span class='va'>statement</span>, <span class='va'>bind.data</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S4 method for SQLiteConnection,character,data.frame</span>
+<span class='fu'><a href='query-dep.html'>dbGetPreparedQuery</a></span><span class='op'>(</span><span class='va'>conn</span>, <span class='va'>statement</span>, <span class='va'>bind.data</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

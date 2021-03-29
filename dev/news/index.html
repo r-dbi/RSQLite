@@ -130,19 +130,11 @@
 </div>
     <div id="rsqlite-225-2021-03-25" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.5">
-<a href="#rsqlite-225-2021-03-25" class="anchor"></a>RSQLite 2.2.5 (2021-03-25)<small> Unreleased </small>
+<a href="#rsqlite-225-2021-03-25" class="anchor"></a>RSQLite 2.2.5 (2021-03-25)<small> 2021-03-27 </small>
 </h1>
 <ul>
 <li>Upgrade bundled SQLite to version 3.35.2 (<a href='https://github.com/r-dbi/RSQLite/issues/357'>#357</a>).</li>
 <li>If the busy handler fails, the transaction is aborted explicitly (<a href='https://github.com/r-dbi/RSQLite/issues/348'>#348</a>, <a href='https://github.com/gaborcsardi'>@gaborcsardi</a>).</li>
-</ul>
-</div>
-    <div id="rsqlite-2249000-2021-03-12" class="section level1">
-<h1 class="page-header" data-toc-text="2.2.4.9000">
-<a href="#rsqlite-2249000-2021-03-12" class="anchor"></a>RSQLite 2.2.4.9000 (2021-03-12)<small> Unreleased </small>
-</h1>
-<ul>
-<li>Same as previous version.</li>
 </ul>
 </div>
     <div id="rsqlite-224-2021-03-12" class="section level1">
@@ -382,7 +374,7 @@
 <code><a href="https://dbi.r-dbi.org/reference/dbGetRowsAffected.html" class="external-link">dbGetRowsAffected()</a></code> now returns <code>NA</code> for a statement with placeholders, if <code><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind()</a></code> has not been called.</li>
 <li>If a column contains incompatible values (e.g., numbers and strings), a warning is raised in <code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch()</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/161'>#161</a>).</li>
 <li>Failing to set <code>PRAGMA cache_size</code> or <code>PRAGMA synchronous</code> in <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect()</a></code> now gives a clear warning (<a href='https://github.com/r-dbi/RSQLite/issues/197'>#197</a>).</li>
-<li>Improve warning message if named parameters are not used in <code><a href="../reference/dbSendPreparedQuery.html">dbGetPreparedQuery()</a></code> or <code><a href="../reference/dbSendPreparedQuery.html">dbSendPreparedQuery()</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/193'>#193</a>).</li>
+<li>Improve warning message if named parameters are not used in <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> or <code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/193'>#193</a>).</li>
 <li>SQLite collects additional histogram data during <code>ANALYZE</code>, which may lead to faster executions of queries (<a href='https://github.com/r-dbi/RSQLite/issues/124'>#124</a>).</li>
 </ul>
 </div>
@@ -490,7 +482,7 @@
 <li><p><code><a href="https://dbi.r-dbi.org/reference/make.db.names.html" class="external-link">make.db.names()</a></code> has been formally deprecated. Please use <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html" class="external-link">dbQuoteIdentifier()</a></code> instead. This function is also used in <code><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">dbRemoveTable()</a></code>, and <code><a href="https://dbi.r-dbi.org/reference/dbListFields.html" class="external-link">dbListFields()</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/106'>#106</a>, <a href='https://github.com/r-dbi/RSQLite/issues/132'>#132</a>).</p></li>
 <li><p><code><a href="../reference/sqliteBuildTableDefinition.html">sqliteBuildTableDefinition()</a></code> has been deprecated. Use <code><a href="https://dbi.r-dbi.org/reference/sqlCreateTable.html" class="external-link">DBI::sqlCreateTable()</a></code> instead.</p></li>
 <li><p><code><a href="https://dbi.r-dbi.org/reference/dbGetException.html" class="external-link">dbGetException()</a></code> now raises a deprecation warning and always returns <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list(errorNum = 0L, errorMsg = "OK")</a></code>, because querying the last SQLite error only works if an error actually occurred (<a href='https://github.com/r-dbi/RSQLite/issues/129'>#129</a>).</p></li>
-<li><p><code><a href="../reference/dbSendPreparedQuery.html">dbSendPreparedQuery()</a></code> and <code><a href="../reference/dbSendPreparedQuery.html">dbGetPreparedQuery()</a></code> have been reimplemented (with deprecation warning) using <code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch()</a></code> for compatibility with existing packages (<a href='https://github.com/r-dbi/RSQLite/issues/100'>#100</a>, <a href='https://github.com/r-dbi/RSQLite/issues/153'>#153</a>, <a href='https://github.com/r-dbi/RSQLite/issues/168'>#168</a>, <a href='https://github.com/r-dbi/RSQLite/issues/181'>#181</a>). Please convert to the new API, because the old function may be removed completely very soon: They were never part of the official API, and do less argument checking than the new APIs. Both <code><a href="../reference/dbSendPreparedQuery.html">dbSendPreparedQuery()</a></code> and <code><a href="../reference/dbSendPreparedQuery.html">dbGetPreparedQuery()</a></code> ignore parameters not found in the query, with a warning (<a href='https://github.com/r-dbi/RSQLite/issues/174'>#174</a>).</p></li>
+<li><p><code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> and <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> have been reimplemented (with deprecation warning) using <code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch()</a></code> for compatibility with existing packages (<a href='https://github.com/r-dbi/RSQLite/issues/100'>#100</a>, <a href='https://github.com/r-dbi/RSQLite/issues/153'>#153</a>, <a href='https://github.com/r-dbi/RSQLite/issues/168'>#168</a>, <a href='https://github.com/r-dbi/RSQLite/issues/181'>#181</a>). Please convert to the new API, because the old function may be removed completely very soon: They were never part of the official API, and do less argument checking than the new APIs. Both <code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> and <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> ignore parameters not found in the query, with a warning (<a href='https://github.com/r-dbi/RSQLite/issues/174'>#174</a>).</p></li>
 <li><p>Reimplemented <code><a href="https://dbi.r-dbi.org/reference/dbListResults.html" class="external-link">dbListResults()</a></code> (with deprecation warning) for compatibility with existing packages (<a href='https://github.com/r-dbi/RSQLite/issues/154'>#154</a>).</p></li>
 <li><p>Soft-deprecated <code><a href="https://dbi.r-dbi.org/reference/dbGetInfo.html" class="external-link">dbGetInfo()</a></code>: The “Result” method is implemented by DBI, the methods for the other classes raise a warning (<a href='https://github.com/r-dbi/RSQLite/issues/137'>#137</a>). It’s now better to access the metadata with individual functions <code><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html" class="external-link">dbHasCompleted()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbGetRowCount.html" class="external-link">dbGetRowCount()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbGetRowsAffected.html" class="external-link">dbGetRowsAffected()</a></code>.</p></li>
 <li><p>All <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> methods have been removed: the same information is now displayed in the <code>show()</code> methods, which were previously pretty useless.</p></li>
@@ -975,7 +967,7 @@
 
       <footer>
       <div class="copyright">
-  <p><p>Developed by <a href="http://krlmlr.info" class="external-link">Kirill Müller</a>, <a href="http://hadley.nz" class="external-link">Hadley Wickham</a>, David A. James, Seth Falcon, <a href="https://www.r-consortium.org" class="external-link">R Consortium</a>.</p></p>
+  <p><p>Developed by <a href="https://krlmlr.info" class="external-link">Kirill Müller</a>, <a href="http://hadley.nz" class="external-link">Hadley Wickham</a>, David A. James, Seth Falcon, <a href="https://www.r-consortium.org" class="external-link">R Consortium</a>.</p></p>
 </div>
 
 <div class="pkgdown">

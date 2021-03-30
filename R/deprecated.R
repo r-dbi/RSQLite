@@ -93,7 +93,7 @@ isIdCurrent <- function(obj) {
 #' @keywords internal
 #' @export
 setMethod("make.db.names",
-  signature(dbObj="SQLiteConnection", snames = "character"),
+  signature(dbObj = "SQLiteConnection", snames = "character"),
   function(dbObj, snames, keywords, unique, allow.keywords, ...) {
     warning_once("RSQLite::make.db.names() is deprecated, please switch to DBI::dbQuoteIdentifier().")
     make.db.names.default(snames, keywords, unique, allow.keywords)
@@ -109,7 +109,7 @@ setMethod("SQLKeywords", "SQLiteConnection", function(dbObj, ...) {
 #' @export
 #' @rdname make.db.names-SQLiteConnection-character-method
 setMethod("isSQLKeyword",
-  signature(dbObj="SQLiteConnection", name="character"),
+  signature(dbObj = "SQLiteConnection", name = "character"),
   function(dbObj, name, keywords, case, ...) {
     warning_once("RSQLite::isSQLKeyword() is deprecated, please switch to DBI::dbQuoteIdentifier().")
     isSQLKeyword.default(name, keywords = .SQL92Keywords, case)

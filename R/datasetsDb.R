@@ -15,5 +15,5 @@
 #' dbDisconnect(db)
 datasetsDb <- function() {
   dbConnect(SQLite(), system.file("db", "datasets.sqlite", package = "RSQLite"),
-            flags = SQLITE_RO)
+    flags = SQLITE_RO)
 }

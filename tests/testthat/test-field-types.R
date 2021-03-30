@@ -44,7 +44,7 @@ test_that("passing field.types with primary key information and non-unique value
   on.exit(dbDisconnect(con))
 
   expect_error(dbWriteTable(con, "a", data.frame(a = c(1, 2, 1)), field.types = c("a" = "INTEGER PRIMARY KEY")),
-               "UNIQUE")
+    "UNIQUE")
 })
 
 test_that("combining numeric types and NA to integer64 (#291)", {

@@ -139,7 +139,7 @@ test_that("NA matches NULL", {
 
   expect_warning(
     got <- dbGetPreparedQuery(con, "SELECT id FROM t1 WHERE y IS :y",
-                              data.frame(y = NA_integer_)),
+      data.frame(y = NA_integer_)),
     "deprecated")
 
   expect_equal(got$id, "x")

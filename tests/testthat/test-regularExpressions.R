@@ -70,4 +70,3 @@ test_that("regular expressions can be initialized twice without harm", {
   expect_true(initRegExp(db = con))
 
 })
-

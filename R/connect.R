@@ -182,8 +182,8 @@ setMethod("dbConnect", "SQLiteDriver",
         dbExecute(conn, sprintf("PRAGMA synchronous=%s", synchronous)),
         error = function(e) {
           warning("Couldn't set synchronous mode: ", conditionMessage(e), "\n",
-                  "Use `synchronous` = NULL to turn off this warning.",
-                  call. = FALSE)
+            "Use `synchronous` = NULL to turn off this warning.",
+            call. = FALSE)
         }
       )
     }
@@ -231,7 +231,7 @@ is_url_or_special_filename <- function(x) grepl("^(?:file|http|ftp|https|):", x)
 
 #' @export
 #' @rdname SQLite
-setMethod("dbConnect", "SQLiteConnection", function(drv, ...){
+setMethod("dbConnect", "SQLiteConnection", function(drv, ...) {
   if (drv@dbname %in% c("", ":memory:", "file::memory:")) {
     stop("Can't clone a temporary database", call. = FALSE)
   }

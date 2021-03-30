@@ -16,7 +16,7 @@ test_that("parameters with length != 1 (#89)", {
     dbExecute(
       con,
       "INSERT INTO records (x, y) VALUES (:x, :y)",
-      params = list(x = 1, y = list(1,2))
+      params = list(x = 1, y = list(1, 2))
     ),
     "Parameter 2 does not have length 1")
   expect_error(

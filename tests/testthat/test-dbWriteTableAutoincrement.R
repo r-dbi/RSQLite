@@ -6,8 +6,8 @@ sql_ddl <- "CREATE TABLE `tbl` (
 	`name`  TEXT    NOT NULL UNIQUE,
 	`score` INTEGER NOT NULL);"
 
-create_and_compare_table <- function( d_local, expected_remote_id ) {
-  #Create a connection, create a table, and populate the table.
+create_and_compare_table <- function(d_local, expected_remote_id) {
+  # Create a connection, create a table, and populate the table.
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 
@@ -15,11 +15,11 @@ create_and_compare_table <- function( d_local, expected_remote_id ) {
   write_successful <- dbWriteTable(con, name = 'tbl', value = d_local, append = TRUE, row.names = FALSE)
   expect_true(write_successful)
 
-  #Reads from the database and sort so comparisons are more robust.
+  # Reads from the database and sort so comparisons are more robust.
   d_remote <- dbReadTable(con, "tbl")
   d_remote <- d_remote[order(d_remote$score), ]
 
-  #Compares actual to expected values.
+  # Compares actual to expected values.
   expect_equal(d_remote$id,    expected_remote_id, label = "The autoincrement values should be assigned correctly.")
   expect_equal(d_remote$name,  d_local$name)
   expect_equal(d_remote$score, d_local$score)
@@ -27,7 +27,7 @@ create_and_compare_table <- function( d_local, expected_remote_id ) {
 }
 
 test_that("autoincrement column not present before sending to database", {
-  #The column is created and populated in the DB.
+  # The column is created and populated in the DB.
   ds_local <- data.frame(
     # id             = <not created>, # The 'id' column is not declared in R.
     name             = letters,
@@ -39,7 +39,7 @@ test_that("autoincrement column not present before sending to database", {
 })
 
 test_that("autoincrement populated before database with integers", {
-  #The id column is set locally, which prevents/overrides the autoincrement assignment in the DB.
+  # The id column is set locally, which prevents/overrides the autoincrement assignment in the DB.
   ds_local <- data.frame(
     id               = 126:101,
     name             = letters,
@@ -51,7 +51,7 @@ test_that("autoincrement populated before database with integers", {
 })
 
 test_that("autoincrement populated before database with all NAs", {
-  #The id column is set to NAs, and replaced by an incremented value in the DB.
+  # The id column is set to NAs, and replaced by an incremented value in the DB.
   ds_local <- data.frame(
     id               = NA_integer_,
     name             = letters,
@@ -63,14 +63,14 @@ test_that("autoincrement populated before database with all NAs", {
 })
 
 test_that("autoincrement populated before database with some NAs in sequential order", {
-  #The NA holes are assigned an autoincrementing value in the DB.
+  # The NA holes are assigned an autoincrementing value in the DB.
   ds_local <- data.frame(
     id               = c(101, 102, NA_integer_, 204, NA_integer_, 306, NA_integer_),
     name             = letters[1:7],
     score            = 1:7,
     stringsAsFactors = FALSE
   )
-  expected_ids <- c(101, 102, 103, 204, 205, 306, 307) #Notice the jumps to 204 and to 306.
+  expected_ids <- c(101, 102, 103, 204, 205, 306, 307) # Notice the jumps to 204 and to 306.
   create_and_compare_table(ds_local, expected_ids)
 })
 
@@ -83,7 +83,7 @@ test_that("autoincrement populated before database with some NAs in reverse orde
     score            = 1:7,
     stringsAsFactors = FALSE
   )
-  expected_ids <- c(1, 306, 307, -204, 103, 102, 308) #The last value is `308`, not a duplicate `103`.
+  expected_ids <- c(1, 306, 307, -204, 103, 102, 308) # The last value is `308`, not a duplicate `103`.
   create_and_compare_table(ds_local, expected_ids)
 })
 

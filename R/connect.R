@@ -33,9 +33,9 @@ SQLite <- function(...) {
 
 # From https://www.sqlite.org/c3ref/c_open_autoproxy.html
 #' @export
-SQLITE_RW <-  0x00000002L
+SQLITE_RW <- 0x00000002L
 #' @export
-SQLITE_RO <-  0x00000001L
+SQLITE_RO <- 0x00000001L
 #' @export
 SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 # read/write + create + url
@@ -119,9 +119,9 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #'
 #' # Or do it in batches
 #' rs <- dbSendQuery(con, "SELECT * FROM USArrests")
-#' d1 <- dbFetch(rs, n = 10)      # extract data in chunks of 10 rows
+#' d1 <- dbFetch(rs, n = 10) # extract data in chunks of 10 rows
 #' dbHasCompleted(rs)
-#' d2 <- dbFetch(rs, n = -1)      # extract all remaining data
+#' d2 <- dbFetch(rs, n = -1) # extract all remaining data
 #' dbHasCompleted(rs)
 #' dbClearResult(rs)
 #'
@@ -171,7 +171,8 @@ setMethod("dbConnect", "SQLiteDriver",
         error = function(e) {
           warning("Couldn't set cache size: ", conditionMessage(e), "\n",
             "Use `cache_size` = NULL to turn off this warning.",
-            call. = FALSE)
+            call. = FALSE
+          )
         }
       )
     }
@@ -183,7 +184,8 @@ setMethod("dbConnect", "SQLiteDriver",
         error = function(e) {
           warning("Couldn't set synchronous mode: ", conditionMessage(e), "\n",
             "Use `synchronous` = NULL to turn off this warning.",
-            call. = FALSE)
+            call. = FALSE
+          )
         }
       )
     }
@@ -210,12 +212,16 @@ check_vfs <- function(vfs) {
 
   if (.Platform[["OS.type"]] == "windows") {
     warning("vfs customization not available on this platform.",
-      " Ignoring value: vfs = ", vfs, call. = FALSE)
+      " Ignoring value: vfs = ", vfs,
+      call. = FALSE
+    )
     return("")
   }
 
-  match.arg(vfs, c("unix-posix", "unix-afp", "unix-flock", "unix-dotfile",
-    "unix-none"))
+  match.arg(vfs, c(
+    "unix-posix", "unix-afp", "unix-flock", "unix-dotfile",
+    "unix-none"
+  ))
 }
 
 # From the SQLite docs: If the filename is ":memory:", then a private,
@@ -236,8 +242,10 @@ setMethod("dbConnect", "SQLiteConnection", function(drv, ...) {
     stop("Can't clone a temporary database", call. = FALSE)
   }
 
-  dbConnect(SQLite(), drv@dbname, vfs = drv@vfs, flags = drv@flags,
-    loadable.extensions = drv@loadable.extensions)
+  dbConnect(SQLite(), drv@dbname,
+    vfs = drv@vfs, flags = drv@flags,
+    loadable.extensions = drv@loadable.extensions
+  )
 })
 
 

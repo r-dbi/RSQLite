@@ -144,7 +144,6 @@ test_that("error in busy handler", {
 })
 
 test_that("busy_handler timeout", {
-
   skip_on_cran()
 
   dbfile <- tempfile()

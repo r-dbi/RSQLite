@@ -27,7 +27,8 @@
 initExtension <- function(db) {
   if (!db@loadable.extensions) {
     stop("Loadable extensions are not enabled for this db connection",
-      call. = FALSE)
+      call. = FALSE
+    )
   }
 
   extension_load(db@ptr, get_lib_path(), "sqlite3_math_init")

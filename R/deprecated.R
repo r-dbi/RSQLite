@@ -59,8 +59,10 @@ sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL,
   value <- sqlColumnToRownames(value, row.names)
 
   if (is.null(field.types)) {
-    field.types <- vapply(value, dbDataType, dbObj = con,
-      FUN.VALUE = character(1))
+    field.types <- vapply(value, dbDataType,
+      dbObj = con,
+      FUN.VALUE = character(1)
+    )
   }
   # Escape field names
   names(field.types) <- dbQuoteIdentifier(con, names(field.types))
@@ -188,7 +190,8 @@ sqliteQuickColumn <- function(con, table, column) {
 #' @export
 setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
   warning("Querying the results associated with a connection is no longer supported",
-    call. = FALSE)
+    call. = FALSE
+  )
   if (is.null(conn@ref$result))
     list()
   else

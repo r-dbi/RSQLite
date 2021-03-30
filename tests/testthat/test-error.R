@@ -11,22 +11,24 @@ test_that("parameters with length != 1 (#89)", {
       "INSERT INTO records (x, y) VALUES (:x, :y)",
       params = list(x = 1, y = 1)
     ),
-    NA)
+    NA
+  )
   expect_error(
     dbExecute(
       con,
       "INSERT INTO records (x, y) VALUES (:x, :y)",
       params = list(x = 1, y = list(1, 2))
     ),
-    "Parameter 2 does not have length 1")
+    "Parameter 2 does not have length 1"
+  )
   expect_error(
     dbExecute(
       con,
       "INSERT INTO records (x, y) VALUES (:x, :y)",
       params = list(x = 1, y = NULL)
     ),
-    "Parameter 2 does not have length 1")
-
+    "Parameter 2 does not have length 1"
+  )
 })
 
 test_that("multipart queries (#313)", {

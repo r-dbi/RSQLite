@@ -9,8 +9,10 @@ test_that("throws error if constraint violated", {
 
   dbWriteTable(con, "t1", x)
   dbExecute(con, "CREATE UNIQUE INDEX t1_c1_c2_idx ON t1(col1, col2)")
-  expect_error(dbWriteTable(con, "t1", x, append = TRUE),
-    "UNIQUE constraint failed")
+  expect_error(
+    dbWriteTable(con, "t1", x, append = TRUE),
+    "UNIQUE constraint failed"
+  )
 })
 
 
@@ -33,8 +35,10 @@ test_that("throws error if constrainted violated", {
 
   dbWriteTable(con, "t1", x)
   dbExecute(con, "CREATE UNIQUE INDEX t1_c1_c2_idx ON t1(col1, col2)")
-  expect_error(dbWriteTable(con, "t1", x, append = TRUE),
-    "UNIQUE constraint failed")
+  expect_error(
+    dbWriteTable(con, "t1", x, append = TRUE),
+    "UNIQUE constraint failed"
+  )
 })
 
 test_that("can't add table when result set open", {
@@ -145,12 +149,16 @@ test_that("colclasses overridden by argument", {
   cat('A,B,C\n1,2,3\n4,5,6\na,7,8\n', file = tmp_file)
   on.exit(file.remove(tmp_file), add = TRUE)
 
-  dbWriteTable(con, "t1", tmp_file, header = TRUE, sep = ",",
-    colClasses = c("character", "integer", "double"))
+  dbWriteTable(con, "t1", tmp_file,
+    header = TRUE, sep = ",",
+    colClasses = c("character", "integer", "double")
+  )
 
   remote <- dbReadTable(con, "t1")
-  expect_equal(sapply(remote, class),
-    c(A = "character", B = "integer", C = "numeric"))
+  expect_equal(
+    sapply(remote, class),
+    c(A = "character", B = "integer", C = "numeric")
+  )
 })
 
 test_that("options work", {
@@ -386,8 +394,10 @@ test_that("dbWriteTable with AsIs raw fields", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con))
 
-  expect_warning(dbWriteTable(con, "a", data.frame(a = I(as.raw(1:3)))),
-    " raw ")
+  expect_warning(
+    dbWriteTable(con, "a", data.frame(a = I(as.raw(1:3)))),
+    " raw "
+  )
   res <- dbReadTable(con, "a")
 
   expected <- data.frame(a = 1:3)

@@ -8,7 +8,8 @@ test_that("autocommit", {
     {
       dbDisconnect(con); dbDisconnect(con2)
     },
-    add = TRUE)
+    add = TRUE
+  )
 
   dbWriteTable(con, "a", data.frame(a = 1))
   expect_equal(dbListTables(con2), "a")
@@ -22,7 +23,8 @@ test_that("commit unnamed transactions", {
     {
       dbDisconnect(con); dbDisconnect(con2)
     },
-    add = TRUE)
+    add = TRUE
+  )
 
   dbBegin(con)
   dbWriteTable(con, "a", data.frame(a = 1))
@@ -45,7 +47,8 @@ test_that("rollback unnamed transactions", {
     {
       dbDisconnect(con); dbDisconnect(con2)
     },
-    add = TRUE)
+    add = TRUE
+  )
 
   dbBegin(con)
   dbWriteTable(con, "a", data.frame(a = 1))
@@ -68,7 +71,8 @@ test_that("no nested unnamed transactions (commit after error)", {
     {
       dbDisconnect(con); dbDisconnect(con2)
     },
-    add = TRUE)
+    add = TRUE
+  )
 
   dbBegin(con)
   expect_error(dbBegin(con))
@@ -87,7 +91,8 @@ test_that("no nested unnamed transactions (rollback after error)", {
     {
       dbDisconnect(con); dbDisconnect(con2)
     },
-    add = TRUE)
+    add = TRUE
+  )
 
   dbBegin(con)
   expect_error(dbBegin(con))
@@ -106,7 +111,8 @@ test_that("commit named transactions", {
     {
       dbDisconnect(con); dbDisconnect(con2)
     },
-    add = TRUE)
+    add = TRUE
+  )
 
   dbBegin(con, name = "tx")
   dbWriteTable(con, "a", data.frame(a = 1))
@@ -129,7 +135,8 @@ test_that("rollback named transactions", {
     {
       dbDisconnect(con); dbDisconnect(con2)
     },
-    add = TRUE)
+    add = TRUE
+  )
 
   dbBegin(con, name = "tx")
   dbWriteTable(con, "a", data.frame(a = 1))
@@ -153,7 +160,8 @@ test_that("nested named transactions (commit - commit)", {
     {
       dbDisconnect(con); dbDisconnect(con2)
     },
-    add = TRUE)
+    add = TRUE
+  )
 
   dbBegin(con, name = "tx")
   dbWriteTable(con, "a", data.frame(a = 1))
@@ -189,7 +197,8 @@ test_that("nested named transactions (commit - rollback)", {
     {
       dbDisconnect(con); dbDisconnect(con2)
     },
-    add = TRUE)
+    add = TRUE
+  )
 
   dbBegin(con, name = "tx")
   dbWriteTable(con, "a", data.frame(a = 1))
@@ -225,7 +234,8 @@ test_that("nested named transactions (rollback - commit)", {
     {
       dbDisconnect(con); dbDisconnect(con2)
     },
-    add = TRUE)
+    add = TRUE
+  )
 
   dbBegin(con, name = "tx")
   dbWriteTable(con, "a", data.frame(a = 1))
@@ -261,7 +271,8 @@ test_that("nested named transactions (rollback - rollback)", {
     {
       dbDisconnect(con); dbDisconnect(con2)
     },
-    add = TRUE)
+    add = TRUE
+  )
 
   dbBegin(con, name = "tx")
   dbWriteTable(con, "a", data.frame(a = 1))

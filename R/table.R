@@ -192,8 +192,9 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
            append = FALSE, header = TRUE, colClasses = NA, row.names = FALSE,
            nrows = 50, sep = ",", eol = "\n", skip = 0, temporary = FALSE) {
 
-    if (overwrite && append)
+    if (overwrite && append) {
       stop("overwrite and append cannot both be TRUE")
+    }
     value <- path.expand(value)
 
     row.names <- compatRowNames(row.names)

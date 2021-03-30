@@ -208,7 +208,9 @@ setMethod("dbConnect", "SQLiteDriver",
 )
 
 check_vfs <- function(vfs) {
-  if (is.null(vfs) || vfs == "") return("")
+  if (is.null(vfs) || vfs == "") {
+    return("")
+  }
 
   if (.Platform[["OS.type"]] == "windows") {
     warning("vfs customization not available on this platform.",

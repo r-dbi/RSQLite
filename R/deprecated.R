@@ -192,10 +192,11 @@ setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
   warning("Querying the results associated with a connection is no longer supported",
     call. = FALSE
   )
-  if (is.null(conn@ref$result))
+  if (is.null(conn@ref$result)) {
     list()
-  else
+  } else {
     list(conn@ref$result)
+  }
 })
 
 

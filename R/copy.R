@@ -25,14 +25,16 @@
 #'
 #' dbDisconnect(con)
 sqliteCopyDatabase <- function(from, to) {
-  if (!is(from, "SQLiteConnection"))
+  if (!is(from, "SQLiteConnection")) {
     stop("'from' must be a SQLiteConnection object")
+  }
   if (is.character(to)) {
     to <- dbConnect(SQLite(), to)
     on.exit(dbDisconnect(to), add = TRUE)
   }
-  if (!is(to, "SQLiteConnection"))
+  if (!is(to, "SQLiteConnection")) {
     stop("'to' must be a SQLiteConnection object")
+  }
 
   connection_copy_database(from@ptr, to@ptr)
   invisible(NULL)

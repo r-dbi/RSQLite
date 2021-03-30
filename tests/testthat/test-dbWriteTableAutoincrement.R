@@ -12,7 +12,7 @@ create_and_compare_table <- function(d_local, expected_remote_id) {
   on.exit(dbDisconnect(con), add = TRUE)
 
   dbExecute(con, sql_ddl)
-  write_successful <- dbWriteTable(con, name = 'tbl', value = d_local, append = TRUE, row.names = FALSE)
+  write_successful <- dbWriteTable(con, name = "tbl", value = d_local, append = TRUE, row.names = FALSE)
   expect_true(write_successful)
 
   # Reads from the database and sort so comparisons are more robust.
@@ -115,7 +115,7 @@ test_that("autoincrement partially populated with duplicate IDs throws an error"
 
   dbExecute(con, sql_ddl)
   expect_error(
-    dbWriteTable(con, name = 'tbl', value = ds_local, append = TRUE, row.names = FALSE),
+    dbWriteTable(con, name = "tbl", value = ds_local, append = TRUE, row.names = FALSE),
     "UNIQUE constraint failed: tbl[.]id"
   )
 })

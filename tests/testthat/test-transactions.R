@@ -6,7 +6,8 @@ test_that("autocommit", {
   con2 <- dbConnect(SQLite(), db_file)
   on.exit(
     {
-      dbDisconnect(con); dbDisconnect(con2)
+      dbDisconnect(con)
+      dbDisconnect(con2)
     },
     add = TRUE
   )
@@ -21,7 +22,8 @@ test_that("commit unnamed transactions", {
   con2 <- dbConnect(SQLite(), db_file)
   on.exit(
     {
-      dbDisconnect(con); dbDisconnect(con2)
+      dbDisconnect(con)
+      dbDisconnect(con2)
     },
     add = TRUE
   )
@@ -45,7 +47,8 @@ test_that("rollback unnamed transactions", {
   con2 <- dbConnect(SQLite(), db_file)
   on.exit(
     {
-      dbDisconnect(con); dbDisconnect(con2)
+      dbDisconnect(con)
+      dbDisconnect(con2)
     },
     add = TRUE
   )
@@ -69,7 +72,8 @@ test_that("no nested unnamed transactions (commit after error)", {
   con2 <- dbConnect(SQLite(), db_file)
   on.exit(
     {
-      dbDisconnect(con); dbDisconnect(con2)
+      dbDisconnect(con)
+      dbDisconnect(con2)
     },
     add = TRUE
   )
@@ -89,7 +93,8 @@ test_that("no nested unnamed transactions (rollback after error)", {
   con2 <- dbConnect(SQLite(), db_file)
   on.exit(
     {
-      dbDisconnect(con); dbDisconnect(con2)
+      dbDisconnect(con)
+      dbDisconnect(con2)
     },
     add = TRUE
   )
@@ -109,7 +114,8 @@ test_that("commit named transactions", {
   con2 <- dbConnect(SQLite(), db_file)
   on.exit(
     {
-      dbDisconnect(con); dbDisconnect(con2)
+      dbDisconnect(con)
+      dbDisconnect(con2)
     },
     add = TRUE
   )
@@ -133,7 +139,8 @@ test_that("rollback named transactions", {
   con2 <- dbConnect(SQLite(), db_file)
   on.exit(
     {
-      dbDisconnect(con); dbDisconnect(con2)
+      dbDisconnect(con)
+      dbDisconnect(con2)
     },
     add = TRUE
   )
@@ -158,7 +165,8 @@ test_that("nested named transactions (commit - commit)", {
   con2 <- dbConnect(SQLite(), db_file)
   on.exit(
     {
-      dbDisconnect(con); dbDisconnect(con2)
+      dbDisconnect(con)
+      dbDisconnect(con2)
     },
     add = TRUE
   )
@@ -195,7 +203,8 @@ test_that("nested named transactions (commit - rollback)", {
   con2 <- dbConnect(SQLite(), db_file)
   on.exit(
     {
-      dbDisconnect(con); dbDisconnect(con2)
+      dbDisconnect(con)
+      dbDisconnect(con2)
     },
     add = TRUE
   )
@@ -232,7 +241,8 @@ test_that("nested named transactions (rollback - commit)", {
   con2 <- dbConnect(SQLite(), db_file)
   on.exit(
     {
-      dbDisconnect(con); dbDisconnect(con2)
+      dbDisconnect(con)
+      dbDisconnect(con2)
     },
     add = TRUE
   )
@@ -269,7 +279,8 @@ test_that("nested named transactions (rollback - rollback)", {
   con2 <- dbConnect(SQLite(), db_file)
   on.exit(
     {
-      dbDisconnect(con); dbDisconnect(con2)
+      dbDisconnect(con)
+      dbDisconnect(con2)
     },
     add = TRUE
   )

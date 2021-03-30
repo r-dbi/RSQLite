@@ -133,7 +133,7 @@ test_that("comments are preserved", {
   on.exit(dbDisconnect(con), add = TRUE)
 
   tmp_file <- tempfile()
-  cat('A,B,C\n11,2#2,33\n', file = tmp_file)
+  cat("A,B,C\n11,2#2,33\n", file = tmp_file)
   on.exit(file.remove(tmp_file), add = TRUE)
 
   dbWriteTable(con, "t1", tmp_file, header = TRUE, sep = ",")
@@ -146,7 +146,7 @@ test_that("colclasses overridden by argument", {
   on.exit(dbDisconnect(con), add = TRUE)
 
   tmp_file <- tempfile()
-  cat('A,B,C\n1,2,3\n4,5,6\na,7,8\n', file = tmp_file)
+  cat("A,B,C\n1,2,3\n4,5,6\na,7,8\n", file = tmp_file)
   on.exit(file.remove(tmp_file), add = TRUE)
 
   dbWriteTable(con, "t1", tmp_file,
@@ -207,14 +207,14 @@ test_that("works within transaction", {
     stringsAsFactors = FALSE
   )
 
-  csv_file <- tempfile(fileext = '.csv')
-  write.csv(df, file = csv_file, row.names = FALSE, eol = '\n')
+  csv_file <- tempfile(fileext = ".csv")
+  write.csv(df, file = csv_file, row.names = FALSE, eol = "\n")
   dbWithTransaction(con, {
-    dbWriteTable(con, 'tbl', csv_file, eol = '\n', overwrite = TRUE)
-    expect_true(dbExistsTable(con, 'tbl'))
+    dbWriteTable(con, "tbl", csv_file, eol = "\n", overwrite = TRUE)
+    expect_true(dbExistsTable(con, "tbl"))
     dbBreak()
   })
-  expect_false(dbExistsTable(con, 'tbl'))
+  expect_false(dbExistsTable(con, "tbl"))
 })
 
 
@@ -315,7 +315,7 @@ test_that("dbWriteTable(iris, row.names = NA)", {
   res <- dbReadTable(con, "iris", row.names = NA)
 
   expect_equal(rownames(res), as.character(seq_len(nrow(iris))))
-  res$Species = factor(res$Species)
+  res$Species <- factor(res$Species)
   expect_identical(res, iris)
 })
 
@@ -337,7 +337,7 @@ test_that("dbWriteTable(iris, row.names = 'rn')", {
   res <- dbReadTable(con, "iris", row.names = "rn")
 
   expect_equal(rownames(res), as.character(seq_len(nrow(iris))))
-  res$Species = factor(res$Species)
+  res$Species <- factor(res$Species)
 
   # Original row names are numeric, RSQLite returns them as character
   # for simplicity

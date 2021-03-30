@@ -198,7 +198,7 @@ setMethod("dbConnect", "SQLiteDriver",
       conn@ptr,
       function(x) {
         if (dbIsValid(conn)) {
-          warning_once("call dbDisconnect() when finished working with a connection");
+          warning_once("call dbDisconnect() when finished working with a connection")
         }
       }
     )

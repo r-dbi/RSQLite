@@ -37,7 +37,8 @@ test_that("row-by-row fetch is equivalent", {
   rs <- dbSendQuery(db, "SELECT * FROM t1")
   on.exit(
     {
-      dbClearResult(rs); dbDisconnect(db)
+      dbClearResult(rs)
+      dbDisconnect(db)
     },
     add = FALSE
   )

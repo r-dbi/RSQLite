@@ -320,7 +320,7 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
     }
 
     if (is.null(select.cols)) {
-      select.cols = "*"
+      select.cols <- "*"
     } else {
       warning_once("`select.cols` is deprecated, use `dbGetQuery()` for complex queries.",
         call. = FALSE

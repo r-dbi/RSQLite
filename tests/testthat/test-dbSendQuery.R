@@ -164,7 +164,7 @@ test_that("NA matches NULL", {
 test_that("mark UTF-8 encoding on non-ASCII colnames", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con))
-  cn_field <- '\u4e2d\u6587'
+  cn_field <- "\u4e2d\u6587"
   tbl <- data.frame("a")
   colnames(tbl) <- cn_field
   dbWriteTable(con, name = "test", value = tbl)

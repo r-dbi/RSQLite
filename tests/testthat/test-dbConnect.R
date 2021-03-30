@@ -105,7 +105,8 @@ test_that("busy_handler", {
 
   num <- NULL
   cb <- function(n) {
-    num <<- n; if (n >= 5) 0L else 1L
+    num <<- n
+    if (n >= 5) 0L else 1L
   }
   sqliteSetBusyHandler(con2, cb)
 

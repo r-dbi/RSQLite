@@ -79,6 +79,7 @@ Collate:
     'query.R'
     'regularExpressions.R'
     'rownames.R'
+    'rstudioConnections.R'
     'table.R'
     'transactions.R'
     'utils.R'

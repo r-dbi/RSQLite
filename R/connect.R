@@ -203,6 +203,9 @@ setMethod("dbConnect", "SQLiteDriver",
       }
     )
 
+    # rstudio connections tab
+    on_connection_opened(conn)
+
     conn
   }
 )
@@ -255,5 +258,9 @@ setMethod("dbConnect", "SQLiteConnection", function(drv, ...) {
 #' @rdname SQLite
 setMethod("dbDisconnect", "SQLiteConnection", function(conn, ...) {
   connection_release(conn@ptr)
+
+  # rstudio connections tab
+  on_connection_closed(conn)
+
   invisible(TRUE)
 })

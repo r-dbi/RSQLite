@@ -129,6 +129,10 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
 
     dbCommit(conn, name = savepoint_id)
     on.exit(NULL)
+
+    # rstudio connections tab
+    on_connection_updated(conn, paste0("Updating table '", name, "'"))
+
     invisible(TRUE)
   }
 )
@@ -238,6 +242,10 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 
     dbCommit(conn, name = savepoint_id)
     on.exit(NULL)
+
+    # rstudio connections tab
+    on_connection_updated(conn, paste0("Updating table '", name, "'"))
+
     invisible(TRUE)
   }
 )
@@ -362,6 +370,10 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
     }
 
     dbExecute(conn, paste0("DROP TABLE ", extra, name))
+
+    # rstudio connections tab
+    on_connection_updated(conn, paste0("Removing table '", name, "'"))
+
     invisible(TRUE)
   }
 )

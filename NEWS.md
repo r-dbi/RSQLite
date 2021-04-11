@@ -2,29 +2,11 @@
 
 # RSQLite 2.2.6 (2021-04-11)
 
-- Same as previous version.
-
-
-# RSQLite 2.2.5.9003 (2021-04-11)
-
+- Upgrade bundled SQLite to 3.35.4 (#361).
 - Implement RStudio Connection Contract (#352, @edwindj).
-
-
-# RSQLite 2.2.5.9002 (2021-04-11)
-
 - `dbDataType()` supports extended types for connections created with `extended_types = TRUE` (#360, @ablack3).
 - `dbWriteTable()` creates tables with extended types for connections created with `extended_types = TRUE` (#360, @ablack3).
 - Remove BH dependency by inlining the header files (#362).
-
-
-# RSQLite 2.2.5.9001 (2021-04-05)
-
-- Upgrade bundled SQLite to 3.35.4 (#361).
-
-
-# RSQLite 2.2.5.9000 (2021-03-25)
-
-- Same as previous version.
 
 
 # RSQLite 2.2.5 (2021-03-25)

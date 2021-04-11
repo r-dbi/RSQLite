@@ -132,15 +132,18 @@ test_that("roundtrip extended_types with dbWriteTable", {
   con <- dbConnect(SQLite(), extended_types = TRUE)
   on.exit(dbDisconnect(con), add = TRUE)
 
-  dates_times <- data.frame(some_date = as.Date(c("2000-01-01", "2000-02-03")),
-                            some_datetime = .POSIXct(1:2, tz = "UTC"),
-                            some_time = hms::hms(1:2))
+  dates_times <- data.frame(
+    some_date = as.Date(c("2000-01-01", "2000-02-03")),
+    some_datetime = .POSIXct(1:2, tz = "UTC"),
+    some_time = hms::hms(1:2)
+  )
 
   dbWriteTable(con, "dates_times", dates_times)
 
   to_match <- dbReadTable(con, "dates_times")
 
-  expect_identical(lapply(to_match, class),
-                   lapply(dates_times, class))
-
+  expect_identical(
+    lapply(to_match, class),
+    lapply(dates_times, class)
+  )
 })

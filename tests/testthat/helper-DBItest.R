@@ -1,7 +1,7 @@
 default_skip <-
   c(
     # enable to test a particular test only
-    #"(?!data_timestamp_current).*",
+    # "(?!data_timestamp_current).*",
 
     # sql
     "roundtrip_date",                             # #109

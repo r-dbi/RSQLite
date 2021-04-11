@@ -28,7 +28,7 @@ test_that("character and factor stored as TEXT", {
 test_that("raw and list stored as BLOB", {
   expect_equal(sqliteDataType(list(raw(1))), "BLOB")
   expect_equal(sqliteDataType(list()), "BLOB")
-  expect_equal(sqliteDataType(list(a=NULL)), "BLOB")
+  expect_equal(sqliteDataType(list(a = NULL)), "BLOB")
 })
 
 # Specific to RSQLite
@@ -46,19 +46,19 @@ test_that("AsIs class is ignored", {
     d = I(c(1.1, 2.2))
   )
   got <- sapply(df, sqliteDataType)
-  expect_equal(got, c(a="INTEGER", b="TEXT", c="BLOB", d="REAL"))
+  expect_equal(got, c(a = "INTEGER", b = "TEXT", c = "BLOB", d = "REAL"))
 })
 
 test_that("unknown classes default to storage.mode()", {
   expect_equal(sqliteDataType(Sys.Date()), "REAL")
   expect_equal(sqliteDataType(Sys.time()), "REAL")
 
-  intClass <- structure(1L, class="unknown1")
+  intClass <- structure(1L, class = "unknown1")
   expect_equal(sqliteDataType(intClass), "INTEGER")
 
-  dblClass <- structure(3.14, class="unknown1")
+  dblClass <- structure(3.14, class = "unknown1")
   expect_equal(sqliteDataType(dblClass), "REAL")
 
-  strClass <- structure("abc", class="unknown1")
+  strClass <- structure("abc", class = "unknown1")
   expect_equal(sqliteDataType(strClass), "TEXT")
 })

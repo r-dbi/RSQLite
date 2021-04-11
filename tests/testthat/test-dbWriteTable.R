@@ -9,8 +9,10 @@ test_that("throws error if constraint violated", {
 
   dbWriteTable(con, "t1", x)
   dbExecute(con, "CREATE UNIQUE INDEX t1_c1_c2_idx ON t1(col1, col2)")
-  expect_error(dbWriteTable(con, "t1", x, append = TRUE),
-    "UNIQUE constraint failed")
+  expect_error(
+    dbWriteTable(con, "t1", x, append = TRUE),
+    "UNIQUE constraint failed"
+  )
 })
 
 
@@ -33,8 +35,10 @@ test_that("throws error if constrainted violated", {
 
   dbWriteTable(con, "t1", x)
   dbExecute(con, "CREATE UNIQUE INDEX t1_c1_c2_idx ON t1(col1, col2)")
-  expect_error(dbWriteTable(con, "t1", x, append = TRUE),
-    "UNIQUE constraint failed")
+  expect_error(
+    dbWriteTable(con, "t1", x, append = TRUE),
+    "UNIQUE constraint failed"
+  )
 })
 
 test_that("can't add table when result set open", {
@@ -56,7 +60,7 @@ test_that("rownames not preserved by default", {
   on.exit(dbDisconnect(con))
 
   df <- data.frame(x = 1:10)
-  row.names(df) <- paste(letters[1:10], 1:10, sep="")
+  row.names(df) <- paste(letters[1:10], 1:10, sep = "")
 
   dbWriteTable(con, "t1", df)
   t1 <- dbReadTable(con, "t1")
@@ -68,7 +72,7 @@ test_that("rownames preserved with row.names = TRUE", {
   on.exit(dbDisconnect(con))
 
   df <- data.frame(x = 1:10)
-  row.names(df) <- paste(letters[1:10], 1:10, sep="")
+  row.names(df) <- paste(letters[1:10], 1:10, sep = "")
 
   dbWriteTable(con, "t1", df, row.names = TRUE)
   t1 <- dbReadTable(con, "t1", row.names = TRUE)
@@ -80,7 +84,7 @@ test_that("commas in fields are preserved", {
   on.exit(dbDisconnect(con))
 
   df <- data.frame(
-    x = c("ABC, Inc.","DEF Holdings"),
+    x = c("ABC, Inc.", "DEF Holdings"),
     stringsAsFactors = FALSE
   )
   dbWriteTable(con, "t1", df, row.names = FALSE)
@@ -129,7 +133,7 @@ test_that("comments are preserved", {
   on.exit(dbDisconnect(con), add = TRUE)
 
   tmp_file <- tempfile()
-  cat('A,B,C\n11,2#2,33\n', file = tmp_file)
+  cat("A,B,C\n11,2#2,33\n", file = tmp_file)
   on.exit(file.remove(tmp_file), add = TRUE)
 
   dbWriteTable(con, "t1", tmp_file, header = TRUE, sep = ",")
@@ -142,15 +146,19 @@ test_that("colclasses overridden by argument", {
   on.exit(dbDisconnect(con), add = TRUE)
 
   tmp_file <- tempfile()
-  cat('A,B,C\n1,2,3\n4,5,6\na,7,8\n', file = tmp_file)
+  cat("A,B,C\n1,2,3\n4,5,6\na,7,8\n", file = tmp_file)
   on.exit(file.remove(tmp_file), add = TRUE)
 
-  dbWriteTable(con, "t1", tmp_file, header = TRUE, sep = ",",
-    colClasses = c("character", "integer", "double"))
+  dbWriteTable(con, "t1", tmp_file,
+    header = TRUE, sep = ",",
+    colClasses = c("character", "integer", "double")
+  )
 
   remote <- dbReadTable(con, "t1")
-  expect_equal(sapply(remote, class),
-    c(A="character", B="integer", C="numeric"))
+  expect_equal(
+    sapply(remote, class),
+    c(A = "character", B = "integer", C = "numeric")
+  )
 })
 
 test_that("options work", {
@@ -163,12 +171,12 @@ test_that("options work", {
     stringsAsFactors = FALSE
   )
 
-  dbWriteTable(con, "dat", "dat-rn.txt", sep="|", eol="\r\n", overwrite = TRUE)
+  dbWriteTable(con, "dat", "dat-rn.txt", sep = "|", eol = "\r\n", overwrite = TRUE)
   expect_equal(dbReadTable(con, "dat"), expected)
 
   # No idea why this fails in GHA on Windows
   skip_on_os("windows")
-  dbWriteTable(con, "dat", "dat-n.txt", sep="|", eol="\n", overwrite = TRUE)
+  dbWriteTable(con, "dat", "dat-n.txt", sep = "|", eol = "\n", overwrite = TRUE)
   expect_equal(dbReadTable(con, "dat"), expected)
 })
 
@@ -177,8 +185,8 @@ test_that("temporary works", {
   con <- dbConnect(SQLite(), db_file)
   on.exit(dbDisconnect(con), add = TRUE)
 
-  dbWriteTable(con, "prm", "dat-n.txt", sep="|", eol="\n", overwrite = TRUE)
-  dbWriteTable(con, "tmp", "dat-n.txt", sep="|", eol="\n", overwrite = TRUE, temporary = TRUE)
+  dbWriteTable(con, "prm", "dat-n.txt", sep = "|", eol = "\n", overwrite = TRUE)
+  dbWriteTable(con, "tmp", "dat-n.txt", sep = "|", eol = "\n", overwrite = TRUE, temporary = TRUE)
   expect_true(dbExistsTable(con, "prm"))
   expect_true(dbExistsTable(con, "tmp"))
 
@@ -199,14 +207,14 @@ test_that("works within transaction", {
     stringsAsFactors = FALSE
   )
 
-  csv_file <- tempfile(fileext='.csv')
-  write.csv(df, file=csv_file, row.names=FALSE, eol='\n')
+  csv_file <- tempfile(fileext = ".csv")
+  write.csv(df, file = csv_file, row.names = FALSE, eol = "\n")
   dbWithTransaction(con, {
-    dbWriteTable(con, 'tbl', csv_file, eol='\n', overwrite=TRUE)
-    expect_true(dbExistsTable(con, 'tbl'))
+    dbWriteTable(con, "tbl", csv_file, eol = "\n", overwrite = TRUE)
+    expect_true(dbExistsTable(con, "tbl"))
     dbBreak()
   })
-  expect_false(dbExistsTable(con, 'tbl'))
+  expect_false(dbExistsTable(con, "tbl"))
 })
 
 
@@ -307,7 +315,7 @@ test_that("dbWriteTable(iris, row.names = NA)", {
   res <- dbReadTable(con, "iris", row.names = NA)
 
   expect_equal(rownames(res), as.character(seq_len(nrow(iris))))
-  res$Species = factor(res$Species)
+  res$Species <- factor(res$Species)
   expect_identical(res, iris)
 })
 
@@ -329,7 +337,7 @@ test_that("dbWriteTable(iris, row.names = 'rn')", {
   res <- dbReadTable(con, "iris", row.names = "rn")
 
   expect_equal(rownames(res), as.character(seq_len(nrow(iris))))
-  res$Species = factor(res$Species)
+  res$Species <- factor(res$Species)
 
   # Original row names are numeric, RSQLite returns them as character
   # for simplicity
@@ -386,8 +394,10 @@ test_that("dbWriteTable with AsIs raw fields", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con))
 
-  expect_warning(dbWriteTable(con, "a", data.frame(a = I(as.raw(1:3)))),
-                 " raw ")
+  expect_warning(
+    dbWriteTable(con, "a", data.frame(a = I(as.raw(1:3)))),
+    " raw "
+  )
   res <- dbReadTable(con, "a")
 
   expected <- data.frame(a = 1:3)

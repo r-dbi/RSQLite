@@ -2,8 +2,12 @@ context("dbConnect")
 
 os <- function() {
   ostype <- .Platform[["OS.type"]]
-  if (ostype == "windows") return("windows")
-  if (grepl("darwin", R.Version()$os)) return("osx")
+  if (ostype == "windows") {
+    return("windows")
+  }
+  if (grepl("darwin", R.Version()$os)) {
+    return("osx")
+  }
   ostype
 }
 
@@ -50,7 +54,7 @@ test_that("forbidden operations throw errors", {
   expect_error(dbConnect(SQLite(), tmpFile, flags = SQLITE_RW), "unable to open")
 
   dbrw <- dbConnect(SQLite(), tmpFile, flags = SQLITE_RWC)
-  df <- data.frame(a=letters, b=runif(26L), stringsAsFactors=FALSE)
+  df <- data.frame(a = letters, b = runif(26L), stringsAsFactors = FALSE)
   expect_true(dbWriteTable(dbrw, "t1", df))
   dbDisconnect(dbrw)
 
@@ -104,7 +108,10 @@ test_that("busy_handler", {
   on.exit(dbDisconnect(con1), add = TRUE)
 
   num <- NULL
-  cb <- function(n) { num <<- n; if (n >= 5) 0L else 1L }
+  cb <- function(n) {
+    num <<- n
+    if (n >= 5) 0L else 1L
+  }
   sqliteSetBusyHandler(con2, cb)
 
   dbExecute(con1, "BEGIN IMMEDIATE")
@@ -123,7 +130,13 @@ test_that("error in busy handler", {
   sqliteSetBusyHandler(con2, cb)
 
   dbExecute(con1, "BEGIN IMMEDIATE")
-  expect_error(dbExecute(con2, "BEGIN IMMEDIATE"), "oops")
+  expect_error(
+    expect_warning(
+      dbExecute(con2, "BEGIN IMMEDIATE"),
+      "Busy callback failed, aborting.*oops"
+    ),
+    "database is locked"
+  )
 
   # con1 is still fine of course
   dbWriteTable(con1, "mtcars", mtcars)
@@ -136,7 +149,6 @@ test_that("error in busy handler", {
 })
 
 test_that("busy_handler timeout", {
-
   skip_on_cran()
 
   dbfile <- tempfile()

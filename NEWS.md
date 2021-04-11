@@ -1,8 +1,19 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
-# RSQLite 2.2.4.9000 (2021-03-12)
+# RSQLite 2.2.5.9001 (2021-04-05)
+
+- Upgrade bundled SQLite to 3.35.4 (#361).
+
+
+# RSQLite 2.2.5.9000 (2021-03-25)
 
 - Same as previous version.
+
+
+# RSQLite 2.2.5 (2021-03-25)
+
+- Upgrade bundled SQLite to version 3.35.2 (#357).
+- If the busy handler fails, the transaction is aborted explicitly (#348, @gaborcsardi).
 
 
 # RSQLite 2.2.4 (2021-03-12)

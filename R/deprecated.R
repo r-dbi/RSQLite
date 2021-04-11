@@ -59,8 +59,10 @@ sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL,
   value <- sqlColumnToRownames(value, row.names)
 
   if (is.null(field.types)) {
-    field.types <- vapply(value, dbDataType, dbObj = con,
-      FUN.VALUE = character(1))
+    field.types <- vapply(value, dbDataType,
+      dbObj = con,
+      FUN.VALUE = character(1)
+    )
   }
   # Escape field names
   names(field.types) <- dbQuoteIdentifier(con, names(field.types))
@@ -93,7 +95,7 @@ isIdCurrent <- function(obj) {
 #' @keywords internal
 #' @export
 setMethod("make.db.names",
-  signature(dbObj="SQLiteConnection", snames = "character"),
+  signature(dbObj = "SQLiteConnection", snames = "character"),
   function(dbObj, snames, keywords, unique, allow.keywords, ...) {
     warning_once("RSQLite::make.db.names() is deprecated, please switch to DBI::dbQuoteIdentifier().")
     make.db.names.default(snames, keywords, unique, allow.keywords)
@@ -109,7 +111,7 @@ setMethod("SQLKeywords", "SQLiteConnection", function(dbObj, ...) {
 #' @export
 #' @rdname make.db.names-SQLiteConnection-character-method
 setMethod("isSQLKeyword",
-  signature(dbObj="SQLiteConnection", name="character"),
+  signature(dbObj = "SQLiteConnection", name = "character"),
   function(dbObj, name, keywords, case, ...) {
     warning_once("RSQLite::isSQLKeyword() is deprecated, please switch to DBI::dbQuoteIdentifier().")
     isSQLKeyword.default(name, keywords = .SQL92Keywords, case)
@@ -188,11 +190,13 @@ sqliteQuickColumn <- function(con, table, column) {
 #' @export
 setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
   warning("Querying the results associated with a connection is no longer supported",
-    call. = FALSE)
-  if (is.null(conn@ref$result))
+    call. = FALSE
+  )
+  if (is.null(conn@ref$result)) {
     list()
-  else
+  } else {
     list(conn@ref$result)
+  }
 })
 
 

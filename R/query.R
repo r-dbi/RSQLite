@@ -67,8 +67,11 @@ db_bind <- function(res, params, ..., allow_named_superset) {
     }
     unmatched_param_indexes <- setdiff(seq_along(params), param_indexes)
     if (length(unmatched_param_indexes) > 0L) {
-      if (allow_named_superset) errorc <- warningc
-      else errorc <- stopc
+      if (allow_named_superset) {
+        errorc <- warningc
+      } else {
+        errorc <- stopc
+      }
 
       errorc(
         "Named parameters not used in query: ",
@@ -103,9 +106,13 @@ setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ...,
 })
 
 convert_bigint <- function(df, bigint) {
-  if (bigint == "integer64") return(df)
+  if (bigint == "integer64") {
+    return(df)
+  }
   is_int64 <- which(vlapply(df, inherits, "integer64"))
-  if (length(is_int64) == 0) return(df)
+  if (length(is_int64) == 0) {
+    return(df)
+  }
 
   as_bigint <- switch(bigint,
     integer = as.integer,

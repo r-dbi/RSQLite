@@ -35,7 +35,13 @@ test_that("row-by-row fetch is equivalent", {
   dbWriteTable(db, "t1", basicDf, row.names = FALSE)
 
   rs <- dbSendQuery(db, "SELECT * FROM t1")
-  on.exit({dbClearResult(rs); dbDisconnect(db)}, add = FALSE)
+  on.exit(
+    {
+      dbClearResult(rs)
+      dbDisconnect(db)
+    },
+    add = FALSE
+  )
   for (i in 1:5) {
     row <- dbFetch(rs, 1L)
     expect_equal(row, basicDf[i, ], check.attributes = FALSE)

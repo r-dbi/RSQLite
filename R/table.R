@@ -64,16 +64,16 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
 
     row.names <- compatRowNames(row.names)
 
-    if ((!is.logical(row.names) && !is.character(row.names)) || length(row.names) != 1L)  {
+    if ((!is.logical(row.names) && !is.character(row.names)) || length(row.names) != 1L) {
       stopc("`row.names` must be a logical scalar or a string")
     }
-    if (!is.logical(overwrite) || length(overwrite) != 1L || is.na(overwrite))  {
+    if (!is.logical(overwrite) || length(overwrite) != 1L || is.na(overwrite)) {
       stopc("`overwrite` must be a logical scalar")
     }
-    if (!is.logical(append) || length(append) != 1L || is.na(append))  {
+    if (!is.logical(append) || length(append) != 1L || is.na(append)) {
       stopc("`append` must be a logical scalar")
     }
-    if (!is.logical(temporary) || length(temporary) != 1L)  {
+    if (!is.logical(temporary) || length(temporary) != 1L) {
       stopc("`temporary` must be a logical scalar")
     }
     if (overwrite && append) {
@@ -95,7 +95,9 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     found <- dbExistsTable(conn, name)
     if (found && !overwrite && !append) {
       stop("Table ", name, " exists in database, and both overwrite and",
-        " append are FALSE", call. = FALSE)
+        " append are FALSE",
+        call. = FALSE
+      )
     }
     if (found && overwrite) {
       dbRemoveTable(conn, name)
@@ -140,7 +142,8 @@ match_col <- function(value, col_names) {
     if (!all(names(value) == col_names)) {
       if (all(tolower(names(value)) == tolower(col_names))) {
         warning("Column names will be matched ignoring character case",
-                call. = FALSE)
+          call. = FALSE
+        )
         names(value) <- col_names
         return(value)
       }
@@ -191,9 +194,11 @@ db_data_types <- function(conn, data) {
 setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
   function(conn, name, value, ..., field.types = NULL, overwrite = FALSE,
            append = FALSE, header = TRUE, colClasses = NA, row.names = FALSE,
-           nrows = 50, sep = ",", eol="\n", skip = 0, temporary = FALSE) {
-    if(overwrite && append)
+           nrows = 50, sep = ",", eol = "\n", skip = 0, temporary = FALSE) {
+
+    if (overwrite && append) {
       stop("overwrite and append cannot both be TRUE")
+    }
     value <- path.expand(value)
 
     row.names <- compatRowNames(row.names)
@@ -205,7 +210,9 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
     found <- dbExistsTable(conn, name)
     if (found && !overwrite && !append) {
       stop("Table ", name, " exists in database, and both overwrite and",
-           " append are FALSE", call. = FALSE)
+        " append are FALSE",
+        call. = FALSE
+      )
     }
     if (found && overwrite) {
       dbRemoveTable(conn, name)
@@ -215,14 +222,18 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
       # Initialise table with first `nrows` lines
       if (is.null(field.types)) {
         fields <- utils::read.table(
-          value, sep = sep, header = header, skip = skip, nrows = nrows,
+          value,
+          sep = sep, header = header, skip = skip, nrows = nrows,
           na.strings = "\\N", comment.char = "", colClasses = colClasses,
-          stringsAsFactors = FALSE)
+          stringsAsFactors = FALSE
+        )
       } else {
         fields <- field.types
       }
-      sql <- sqlCreateTable(conn, name, fields, row.names = FALSE,
-                            temporary = temporary)
+      sql <- sqlCreateTable(conn, name, fields,
+        row.names = FALSE,
+        temporary = temporary
+      )
       dbExecute(conn, sql)
     }
 
@@ -300,28 +311,31 @@ setMethod("dbReadTable", c("SQLiteConnection", "character"),
   function(conn, name, ...,
            row.names = pkgconfig::get_config("RSQLite::row.names.table", FALSE),
            check.names = TRUE, select.cols = NULL) {
+
     name <- check_quoted_identifier(name)
 
     row.names <- compatRowNames(row.names)
 
-    if ((!is.logical(row.names) && !is.character(row.names)) || length(row.names) != 1L)  {
+    if ((!is.logical(row.names) && !is.character(row.names)) || length(row.names) != 1L) {
       stopc("`row.names` must be a logical scalar or a string")
     }
 
-    if (!is.logical(check.names) || length(check.names) != 1L)  {
+    if (!is.logical(check.names) || length(check.names) != 1L) {
       stopc("`check.names` must be a logical scalar")
     }
 
     if (is.null(select.cols)) {
-      select.cols = "*"
+      select.cols <- "*"
     } else {
       warning_once("`select.cols` is deprecated, use `dbGetQuery()` for complex queries.",
-        call. = FALSE)
+        call. = FALSE
+      )
     }
 
     name <- dbQuoteIdentifier(conn, name)
     out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM", name),
-                      row.names = row.names)
+      row.names = row.names
+    )
 
     if (check.names) {
       names(out) <- make.names(names(out), unique = TRUE)
@@ -420,5 +434,5 @@ sqliteListTablesQuery <- function(conn, schema = NULL, name = NULL) {
 #' @rdname SQLiteConnection-class
 #' @export
 setMethod("dbDataType", "SQLiteConnection", function(dbObj, obj, ...) {
-  dbDataType(SQLite(), obj, ...)
+  dbDataType(SQLite(), obj, extended_types = dbObj@extended_types, ...)
 })

@@ -1,5 +1,4 @@
 #include "pch.h"
-#include <workarounds/XPtr.h>
 #include "DbConnection.h"
 
 extern "C" {

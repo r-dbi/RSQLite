@@ -131,7 +131,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
     on.exit(NULL)
 
     # rstudio connections tab
-    on_connection_updated(conn, paste0("Updating table '",name,"'"))
+    on_connection_updated(conn, paste0("Updating table '", name, "'"))
 
     invisible(TRUE)
   }
@@ -368,7 +368,7 @@ setMethod("dbRemoveTable", c("SQLiteConnection", "character"),
     dbExecute(conn, paste0("DROP TABLE ", extra, name))
 
     # rstudio connections tab
-    on_connection_updated(conn, paste0("Removing table '",name,"'"))
+    on_connection_updated(conn, paste0("Removing table '", name, "'"))
 
     invisible(TRUE)
   }

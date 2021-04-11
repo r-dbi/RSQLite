@@ -1,30 +1,30 @@
 # Functions used to connect to Connections Pane in Rstudio
 # Implementing connections contract: https://rstudio.github.io/rstudio-extensions/connections-contract.html
 sqlite_ListObjectTypes <- function(con) {
-  object_types <- list(table = list(contains="data"))
+  object_types <- list(table = list(contains = "data"))
 
   types <- dbGetQuery(con, "SELECT DISTINCT type FROM sqlite_master")[[1]]
-  if (any(types =="view")){
-    object_types <- c(object_types, view=list(contains="data"))
+  if (any(types == "view")) {
+    object_types <- c(object_types, view = list(contains = "data"))
   }
   object_types
 }
 
 sqlite_ListObjects <- function(con, catalog = NULL, schema = NULL, name = NULL, type = NULL, ...) {
   objects <- dbGetQuery(con, "SELECT name,type FROM sqlite_master")
-  objects <- objects[objects$type %in% c("table","view"),]
+  objects <- objects[objects$type %in% c("table", "view"), ]
   objects
 }
 
 sqlite_ListColumns <- function(con, table = NULL, view = NULL,
-                                           catalog = NULL, schema = NULL, ...) {
-  if (is.null(table)){
+                               catalog = NULL, schema = NULL, ...) {
+  if (is.null(table)) {
     table <- view
   }
 
   tb <- dbGetQuery(
     con,
-    paste("SELECT * FROM",dbQuoteIdentifier(con, table),"WHERE FALSE")
+    paste("SELECT * FROM", dbQuoteIdentifier(con, table), "WHERE FALSE")
   )
 
   name <- names(tb)
@@ -44,7 +44,7 @@ sqlite_PreviewObject <- function(con, rowLimit, table = NULL, view = NULL, ...) 
 }
 
 sqlite_ConnectionIcon <- function(con) {
-  system.file("icons/sqlite.png", package="RSQLite")
+  system.file("icons/sqlite.png", package = "RSQLite")
 }
 
 sqlite_ConnectionActions <- function(con) {
@@ -62,41 +62,42 @@ sqlite_ConnectionActions <- function(con) {
 }
 
 
-get_host <- function(con){
-  if (con@dbname == ""){
+get_host <- function(con) {
+  if (con@dbname == "") {
     return("")
   }
-  paste0("<",con@dbname, ">")
+  paste0("<", con@dbname, ">")
 }
 
 ##### Functions that trigger update in Rstudio Connections tab
 
 on_connection_opened <- function(con) {
   observer <- getOption("connectionObserver")
-  if (is.null(observer))
+  if (is.null(observer)) {
     return(invisible(NULL))
+  }
 
   code <- paste0(
-"library(DBI)
-con <- dbConnect(RSQLite::SQLite(), dbname=\"",con@dbname,"\")
-")
+    "library(DBI)
+con <- dbConnect(RSQLite::SQLite(), dbname=\"", con@dbname, "\")
+"
+  )
   icon <- sqlite_ConnectionIcon(con)
 
   host <- get_host(con)
 
-    # let observer know that connection has opened
+  # let observer know that connection has opened
   observer$connectionOpened(
     # connection type
     type = "RSQLite",
 
     # name displayed in connection pane (to be improved)
-    displayName = paste0("SQLite "
-                        , host
-                        , if (con@dbname == "") " (temporary)"
-                        ),
-
+    displayName = paste0(
+      "SQLite ",
+      host,
+      if (con@dbname == "") " (temporary)"
+    ),
     host = host,
-
     icon = icon,
 
     # connection code
@@ -106,8 +107,7 @@ con <- dbConnect(RSQLite::SQLite(), dbname=\"",con@dbname,"\")
     disconnect = function() {
       dbDisconnect(con, shutdown = TRUE)
     },
-
-    listObjectTypes = function () {
+    listObjectTypes = function() {
       sqlite_ListObjectTypes(con)
     },
 
@@ -136,8 +136,9 @@ con <- dbConnect(RSQLite::SQLite(), dbname=\"",con@dbname,"\")
 
 on_connection_updated <- function(con, hint) {
   observer <- getOption("connectionObserver")
-  if (is.null(observer))
+  if (is.null(observer)) {
     return(invisible(NULL))
+  }
 
   host <- get_host(con)
   observer$connectionUpdated("RSQLite", host, hint = hint)
@@ -145,8 +146,9 @@ on_connection_updated <- function(con, hint) {
 
 on_connection_closed <- function(con) {
   observer <- getOption("connectionObserver")
-  if (is.null(observer))
+  if (is.null(observer)) {
     return(invisible(NULL))
+  }
 
   host <- get_host(con)
   observer$connectionClosed("RSQLite", host)

@@ -21,7 +21,7 @@ setClass("SQLiteDriver",
 
 #' @rdname SQLiteDriver-class
 #' @export
-setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, extended_types = FALSE, ...) {
+setMethod("dbDataType", "SQLiteDriver", function(dbObj, obj, ..., extended_types = FALSE) {
   if (is.factor(obj)) {
     return("TEXT")
   }

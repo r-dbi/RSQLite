@@ -1,5 +1,10 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
+# RSQLite 2.2.6 (2021-04-11)
+
+- Same as previous version.
+
+
 # RSQLite 2.2.5.9003 (2021-04-11)
 
 - Implement RStudio Connection Contract (#352, @edwindj).

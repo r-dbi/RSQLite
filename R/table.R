@@ -242,6 +242,10 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "character"),
 
     dbCommit(conn, name = savepoint_id)
     on.exit(NULL)
+
+    # rstudio connections tab
+    on_connection_updated(conn, paste0("Updating table '", name, "'"))
+
     invisible(TRUE)
   }
 )

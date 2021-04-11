@@ -1,5 +1,10 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
+# RSQLite 2.2.5.9003 (2021-04-11)
+
+- Implement RStudio Connection Contract (#352, @edwindj).
+
+
 # RSQLite 2.2.5.9002 (2021-04-11)
 
 - `dbDataType()` supports extended types for connections created with `extended_types = TRUE` (#360, @ablack3).

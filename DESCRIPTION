@@ -1,7 +1,7 @@
 Package: RSQLite
 Title: 'SQLite' Interface for R
-Version: 2.2.6.9000
-Date: 2021-04-11
+Version: 2.2.7
+Date: 2021-04-22
 Authors@R: 
     c(person(given = "Kirill",
              family = "M\u00fcller",

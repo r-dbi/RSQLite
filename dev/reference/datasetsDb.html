@@ -135,121 +135,124 @@ in the datasets package.</p>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dbi.r-dbi.org'>DBI</a></span><span class='op'>)</span>
-<span class='va'>db</span> <span class='op'>&lt;-</span> <span class='fu'>RSQLite</span><span class='fu'>::</span><span class='fu'>datasetsDb</span><span class='op'>(</span><span class='op'>)</span>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>dbListTables</a></span><span class='op'>(</span><span class='va'>db</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] "BOD"              "CO2"              "ChickWeight"      "DNase"           
-#&gt;  [5] "Formaldehyde"     "Indometh"         "InsectSprays"     "LifeCycleSavings"
-#&gt;  [9] "Loblolly"         "Orange"           "OrchardSprays"    "PlantGrowth"     
-#&gt; [13] "Puromycin"        "Theoph"           "ToothGrowth"      "USArrests"       
-#&gt; [17] "USJudgeRatings"   "airquality"       "anscombe"         "attenu"          
-#&gt; [21] "attitude"         "cars"             "chickwts"         "esoph"           
-#&gt; [25] "faithful"         "freeny"           "infert"           "iris"            
-#&gt; [29] "longley"          "morley"           "mtcars"           "npk"             
-#&gt; [33] "pressure"         "quakes"           "randu"            "rock"            
-#&gt; [37] "sleep"            "stackloss"        "swiss"            "trees"           
-#&gt; [41] "warpbreaks"       "women"           </div><div class='input'>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbReadTable.html'>dbReadTable</a></span><span class='op'>(</span><span class='va'>db</span>, <span class='st'>"CO2"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    Plant        Type  Treatment conc uptake
-#&gt; 1    Qn1      Quebec nonchilled   95   16.0
-#&gt; 2    Qn1      Quebec nonchilled  175   30.4
-#&gt; 3    Qn1      Quebec nonchilled  250   34.8
-#&gt; 4    Qn1      Quebec nonchilled  350   37.2
-#&gt; 5    Qn1      Quebec nonchilled  500   35.3
-#&gt; 6    Qn1      Quebec nonchilled  675   39.2
-#&gt; 7    Qn1      Quebec nonchilled 1000   39.7
-#&gt; 8    Qn2      Quebec nonchilled   95   13.6
-#&gt; 9    Qn2      Quebec nonchilled  175   27.3
-#&gt; 10   Qn2      Quebec nonchilled  250   37.1
-#&gt; 11   Qn2      Quebec nonchilled  350   41.8
-#&gt; 12   Qn2      Quebec nonchilled  500   40.6
-#&gt; 13   Qn2      Quebec nonchilled  675   41.4
-#&gt; 14   Qn2      Quebec nonchilled 1000   44.3
-#&gt; 15   Qn3      Quebec nonchilled   95   16.2
-#&gt; 16   Qn3      Quebec nonchilled  175   32.4
-#&gt; 17   Qn3      Quebec nonchilled  250   40.3
-#&gt; 18   Qn3      Quebec nonchilled  350   42.1
-#&gt; 19   Qn3      Quebec nonchilled  500   42.9
-#&gt; 20   Qn3      Quebec nonchilled  675   43.9
-#&gt; 21   Qn3      Quebec nonchilled 1000   45.5
-#&gt; 22   Qc1      Quebec    chilled   95   14.2
-#&gt; 23   Qc1      Quebec    chilled  175   24.1
-#&gt; 24   Qc1      Quebec    chilled  250   30.3
-#&gt; 25   Qc1      Quebec    chilled  350   34.6
-#&gt; 26   Qc1      Quebec    chilled  500   32.5
-#&gt; 27   Qc1      Quebec    chilled  675   35.4
-#&gt; 28   Qc1      Quebec    chilled 1000   38.7
-#&gt; 29   Qc2      Quebec    chilled   95    9.3
-#&gt; 30   Qc2      Quebec    chilled  175   27.3
-#&gt; 31   Qc2      Quebec    chilled  250   35.0
-#&gt; 32   Qc2      Quebec    chilled  350   38.8
-#&gt; 33   Qc2      Quebec    chilled  500   38.6
-#&gt; 34   Qc2      Quebec    chilled  675   37.5
-#&gt; 35   Qc2      Quebec    chilled 1000   42.4
-#&gt; 36   Qc3      Quebec    chilled   95   15.1
-#&gt; 37   Qc3      Quebec    chilled  175   21.0
-#&gt; 38   Qc3      Quebec    chilled  250   38.1
-#&gt; 39   Qc3      Quebec    chilled  350   34.0
-#&gt; 40   Qc3      Quebec    chilled  500   38.9
-#&gt; 41   Qc3      Quebec    chilled  675   39.6
-#&gt; 42   Qc3      Quebec    chilled 1000   41.4
-#&gt; 43   Mn1 Mississippi nonchilled   95   10.6
-#&gt; 44   Mn1 Mississippi nonchilled  175   19.2
-#&gt; 45   Mn1 Mississippi nonchilled  250   26.2
-#&gt; 46   Mn1 Mississippi nonchilled  350   30.0
-#&gt; 47   Mn1 Mississippi nonchilled  500   30.9
-#&gt; 48   Mn1 Mississippi nonchilled  675   32.4
-#&gt; 49   Mn1 Mississippi nonchilled 1000   35.5
-#&gt; 50   Mn2 Mississippi nonchilled   95   12.0
-#&gt; 51   Mn2 Mississippi nonchilled  175   22.0
-#&gt; 52   Mn2 Mississippi nonchilled  250   30.6
-#&gt; 53   Mn2 Mississippi nonchilled  350   31.8
-#&gt; 54   Mn2 Mississippi nonchilled  500   32.4
-#&gt; 55   Mn2 Mississippi nonchilled  675   31.1
-#&gt; 56   Mn2 Mississippi nonchilled 1000   31.5
-#&gt; 57   Mn3 Mississippi nonchilled   95   11.3
-#&gt; 58   Mn3 Mississippi nonchilled  175   19.4
-#&gt; 59   Mn3 Mississippi nonchilled  250   25.8
-#&gt; 60   Mn3 Mississippi nonchilled  350   27.9
-#&gt; 61   Mn3 Mississippi nonchilled  500   28.5
-#&gt; 62   Mn3 Mississippi nonchilled  675   28.1
-#&gt; 63   Mn3 Mississippi nonchilled 1000   27.8
-#&gt; 64   Mc1 Mississippi    chilled   95   10.5
-#&gt; 65   Mc1 Mississippi    chilled  175   14.9
-#&gt; 66   Mc1 Mississippi    chilled  250   18.1
-#&gt; 67   Mc1 Mississippi    chilled  350   18.9
-#&gt; 68   Mc1 Mississippi    chilled  500   19.5
-#&gt; 69   Mc1 Mississippi    chilled  675   22.2
-#&gt; 70   Mc1 Mississippi    chilled 1000   21.9
-#&gt; 71   Mc2 Mississippi    chilled   95    7.7
-#&gt; 72   Mc2 Mississippi    chilled  175   11.4
-#&gt; 73   Mc2 Mississippi    chilled  250   12.3
-#&gt; 74   Mc2 Mississippi    chilled  350   13.0
-#&gt; 75   Mc2 Mississippi    chilled  500   12.5
-#&gt; 76   Mc2 Mississippi    chilled  675   13.7
-#&gt; 77   Mc2 Mississippi    chilled 1000   14.4
-#&gt; 78   Mc3 Mississippi    chilled   95   10.6
-#&gt; 79   Mc3 Mississippi    chilled  175   18.0
-#&gt; 80   Mc3 Mississippi    chilled  250   17.9
-#&gt; 81   Mc3 Mississippi    chilled  350   17.9
-#&gt; 82   Mc3 Mississippi    chilled  500   17.9
-#&gt; 83   Mc3 Mississippi    chilled  675   18.9
-#&gt; 84   Mc3 Mississippi    chilled 1000   19.9</div><div class='input'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>dbGetQuery</a></span><span class='op'>(</span><span class='va'>db</span>, <span class='st'>"SELECT * FROM CO2 WHERE conc &lt; 100"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    Plant        Type  Treatment conc uptake
-#&gt; 1    Qn1      Quebec nonchilled   95   16.0
-#&gt; 2    Qn2      Quebec nonchilled   95   13.6
-#&gt; 3    Qn3      Quebec nonchilled   95   16.2
-#&gt; 4    Qc1      Quebec    chilled   95   14.2
-#&gt; 5    Qc2      Quebec    chilled   95    9.3
-#&gt; 6    Qc3      Quebec    chilled   95   15.1
-#&gt; 7    Mn1 Mississippi nonchilled   95   10.6
-#&gt; 8    Mn2 Mississippi nonchilled   95   12.0
-#&gt; 9    Mn3 Mississippi nonchilled   95   11.3
-#&gt; 10   Mc1 Mississippi    chilled   95   10.5
-#&gt; 11   Mc2 Mississippi    chilled   95    7.7
-#&gt; 12   Mc3 Mississippi    chilled   95   10.6</div><div class='input'>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span><span class='op'>(</span><span class='va'>db</span><span class='op'>)</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dbi.r-dbi.org'>DBI</a></span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>db</span> <span class='op'>&lt;-</span> <span class='fu'>RSQLite</span><span class='fu'>::</span><span class='fu'>datasetsDb</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>dbListTables</a></span><span class='op'>(</span><span class='va'>db</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "BOD"              "CO2"              "ChickWeight"      "DNase"           </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [5] "Formaldehyde"     "Indometh"         "InsectSprays"     "LifeCycleSavings"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [9] "Loblolly"         "Orange"           "OrchardSprays"    "PlantGrowth"     </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "Puromycin"        "Theoph"           "ToothGrowth"      "USArrests"       </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [17] "USJudgeRatings"   "airquality"       "anscombe"         "attenu"          </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [21] "attitude"         "cars"             "chickwts"         "esoph"           </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [25] "faithful"         "freeny"           "infert"           "iris"            </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [29] "longley"          "morley"           "mtcars"           "npk"             </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [33] "pressure"         "quakes"           "randu"            "rock"            </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [37] "sleep"            "stackloss"        "swiss"            "trees"           </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [41] "warpbreaks"       "women"           </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbReadTable.html'>dbReadTable</a></span><span class='op'>(</span><span class='va'>db</span>, <span class='st'>"CO2"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    Plant        Type  Treatment conc uptake</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1    Qn1      Quebec nonchilled   95   16.0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2    Qn1      Quebec nonchilled  175   30.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3    Qn1      Quebec nonchilled  250   34.8</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4    Qn1      Quebec nonchilled  350   37.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5    Qn1      Quebec nonchilled  500   35.3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6    Qn1      Quebec nonchilled  675   39.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 7    Qn1      Quebec nonchilled 1000   39.7</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 8    Qn2      Quebec nonchilled   95   13.6</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 9    Qn2      Quebec nonchilled  175   27.3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 10   Qn2      Quebec nonchilled  250   37.1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 11   Qn2      Quebec nonchilled  350   41.8</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 12   Qn2      Quebec nonchilled  500   40.6</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 13   Qn2      Quebec nonchilled  675   41.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 14   Qn2      Quebec nonchilled 1000   44.3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 15   Qn3      Quebec nonchilled   95   16.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 16   Qn3      Quebec nonchilled  175   32.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 17   Qn3      Quebec nonchilled  250   40.3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 18   Qn3      Quebec nonchilled  350   42.1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 19   Qn3      Quebec nonchilled  500   42.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 20   Qn3      Quebec nonchilled  675   43.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 21   Qn3      Quebec nonchilled 1000   45.5</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 22   Qc1      Quebec    chilled   95   14.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 23   Qc1      Quebec    chilled  175   24.1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 24   Qc1      Quebec    chilled  250   30.3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 25   Qc1      Quebec    chilled  350   34.6</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 26   Qc1      Quebec    chilled  500   32.5</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 27   Qc1      Quebec    chilled  675   35.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 28   Qc1      Quebec    chilled 1000   38.7</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 29   Qc2      Quebec    chilled   95    9.3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 30   Qc2      Quebec    chilled  175   27.3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 31   Qc2      Quebec    chilled  250   35.0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 32   Qc2      Quebec    chilled  350   38.8</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 33   Qc2      Quebec    chilled  500   38.6</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 34   Qc2      Quebec    chilled  675   37.5</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 35   Qc2      Quebec    chilled 1000   42.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 36   Qc3      Quebec    chilled   95   15.1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 37   Qc3      Quebec    chilled  175   21.0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 38   Qc3      Quebec    chilled  250   38.1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 39   Qc3      Quebec    chilled  350   34.0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 40   Qc3      Quebec    chilled  500   38.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 41   Qc3      Quebec    chilled  675   39.6</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 42   Qc3      Quebec    chilled 1000   41.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 43   Mn1 Mississippi nonchilled   95   10.6</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 44   Mn1 Mississippi nonchilled  175   19.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 45   Mn1 Mississippi nonchilled  250   26.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 46   Mn1 Mississippi nonchilled  350   30.0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 47   Mn1 Mississippi nonchilled  500   30.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 48   Mn1 Mississippi nonchilled  675   32.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 49   Mn1 Mississippi nonchilled 1000   35.5</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 50   Mn2 Mississippi nonchilled   95   12.0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 51   Mn2 Mississippi nonchilled  175   22.0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 52   Mn2 Mississippi nonchilled  250   30.6</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 53   Mn2 Mississippi nonchilled  350   31.8</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 54   Mn2 Mississippi nonchilled  500   32.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 55   Mn2 Mississippi nonchilled  675   31.1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 56   Mn2 Mississippi nonchilled 1000   31.5</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 57   Mn3 Mississippi nonchilled   95   11.3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 58   Mn3 Mississippi nonchilled  175   19.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 59   Mn3 Mississippi nonchilled  250   25.8</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 60   Mn3 Mississippi nonchilled  350   27.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 61   Mn3 Mississippi nonchilled  500   28.5</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 62   Mn3 Mississippi nonchilled  675   28.1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 63   Mn3 Mississippi nonchilled 1000   27.8</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 64   Mc1 Mississippi    chilled   95   10.5</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 65   Mc1 Mississippi    chilled  175   14.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 66   Mc1 Mississippi    chilled  250   18.1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 67   Mc1 Mississippi    chilled  350   18.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 68   Mc1 Mississippi    chilled  500   19.5</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 69   Mc1 Mississippi    chilled  675   22.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 70   Mc1 Mississippi    chilled 1000   21.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 71   Mc2 Mississippi    chilled   95    7.7</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 72   Mc2 Mississippi    chilled  175   11.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 73   Mc2 Mississippi    chilled  250   12.3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 74   Mc2 Mississippi    chilled  350   13.0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 75   Mc2 Mississippi    chilled  500   12.5</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 76   Mc2 Mississippi    chilled  675   13.7</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 77   Mc2 Mississippi    chilled 1000   14.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 78   Mc3 Mississippi    chilled   95   10.6</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 79   Mc3 Mississippi    chilled  175   18.0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 80   Mc3 Mississippi    chilled  250   17.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 81   Mc3 Mississippi    chilled  350   17.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 82   Mc3 Mississippi    chilled  500   17.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 83   Mc3 Mississippi    chilled  675   18.9</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 84   Mc3 Mississippi    chilled 1000   19.9</span>
+<span class='r-in'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbGetQuery.html'>dbGetQuery</a></span><span class='op'>(</span><span class='va'>db</span>, <span class='st'>"SELECT * FROM CO2 WHERE conc &lt; 100"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    Plant        Type  Treatment conc uptake</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1    Qn1      Quebec nonchilled   95   16.0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2    Qn2      Quebec nonchilled   95   13.6</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3    Qn3      Quebec nonchilled   95   16.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4    Qc1      Quebec    chilled   95   14.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5    Qc2      Quebec    chilled   95    9.3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6    Qc3      Quebec    chilled   95   15.1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 7    Mn1 Mississippi nonchilled   95   10.6</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 8    Mn2 Mississippi nonchilled   95   12.0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 9    Mn3 Mississippi nonchilled   95   11.3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 10   Mc1 Mississippi    chilled   95   10.5</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 11   Mc2 Mississippi    chilled   95    7.7</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 12   Mc3 Mississippi    chilled   95   10.6</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span><span class='op'>(</span><span class='va'>db</span><span class='op'>)</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

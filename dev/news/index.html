@@ -122,270 +122,207 @@
 
     <div id="rsqlite-2279000-2021-04-22" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.7.9000">
-<a href="#rsqlite-2279000-2021-04-22" class="anchor" aria-hidden="true"></a>RSQLite 2.2.7.9000 (2021-04-22)<small> Unreleased </small>
-</h1>
-<ul>
-<li>Remove RStudio Connection pane support due to problems reported by users.</li>
+<a href="#rsqlite-2279000-2021-04-22" class="anchor" aria-hidden="true"></a>RSQLite 2.2.7.9000 (2021-04-22)<small> Unreleased </small></h1>
+<ul><li>Remove RStudio Connection pane support due to problems reported by users.</li>
 <li>Upgrade bundled SQLite to version 3.35.5 (<a href='https://github.com/r-dbi/RSQLite/issues/368'>#368</a>).</li>
-</ul>
-</div>
+</ul></div>
     <div id="rsqlite-227-2021-04-22" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.7">
-<a href="#rsqlite-227-2021-04-22" class="anchor" aria-hidden="true"></a>RSQLite 2.2.7 (2021-04-22)<small> 2021-04-22 </small>
-</h1>
-<ul>
-<li>Remove RStudio Connection pane support due to problems reported by users (<a href='https://github.com/r-dbi/RSQLite/issues/352'>#352</a>).</li>
+<a href="#rsqlite-227-2021-04-22" class="anchor" aria-hidden="true"></a>RSQLite 2.2.7 (2021-04-22)<small> 2021-04-22 </small></h1>
+<ul><li>Remove RStudio Connection pane support due to problems reported by users (<a href='https://github.com/r-dbi/RSQLite/issues/352'>#352</a>).</li>
 <li>Upgrade bundled SQLite to version 3.35.5 (<a href='https://github.com/r-dbi/RSQLite/issues/368'>#368</a>).</li>
-</ul>
-</div>
+</ul></div>
     <div id="rsqlite-226-2021-04-11" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.6">
-<a href="#rsqlite-226-2021-04-11" class="anchor" aria-hidden="true"></a>RSQLite 2.2.6 (2021-04-11)<small> 2021-04-11 </small>
-</h1>
-<ul>
-<li>Upgrade bundled SQLite to 3.35.4 (<a href='https://github.com/r-dbi/RSQLite/issues/361'>#361</a>).</li>
+<a href="#rsqlite-226-2021-04-11" class="anchor" aria-hidden="true"></a>RSQLite 2.2.6 (2021-04-11)<small> 2021-04-11 </small></h1>
+<ul><li>Upgrade bundled SQLite to 3.35.4 (<a href='https://github.com/r-dbi/RSQLite/issues/361'>#361</a>).</li>
 <li>Implement RStudio Connection Contract (<a href='https://github.com/r-dbi/RSQLite/issues/352'>#352</a>, <a href='https://github.com/edwindj'>@edwindj</a>).</li>
 <li>
 <code><a href="https://dbi.r-dbi.org/reference/dbDataType.html" class="external-link">dbDataType()</a></code> supports extended types for connections created with <code>extended_types = TRUE</code> (<a href='https://github.com/r-dbi/RSQLite/issues/360'>#360</a>, <a href='https://github.com/ablack3'>@ablack3</a>).</li>
 <li>
 <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable()</a></code> creates tables with extended types for connections created with <code>extended_types = TRUE</code> (<a href='https://github.com/r-dbi/RSQLite/issues/360'>#360</a>, <a href='https://github.com/ablack3'>@ablack3</a>).</li>
 <li>Remove BH dependency by inlining the header files (<a href='https://github.com/r-dbi/RSQLite/issues/362'>#362</a>).</li>
-</ul>
-</div>
+</ul></div>
     <div id="rsqlite-225-2021-03-25" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.5">
-<a href="#rsqlite-225-2021-03-25" class="anchor" aria-hidden="true"></a>RSQLite 2.2.5 (2021-03-25)<small> 2021-03-27 </small>
-</h1>
-<ul>
-<li>Upgrade bundled SQLite to version 3.35.2 (<a href='https://github.com/r-dbi/RSQLite/issues/357'>#357</a>).</li>
+<a href="#rsqlite-225-2021-03-25" class="anchor" aria-hidden="true"></a>RSQLite 2.2.5 (2021-03-25)<small> 2021-03-27 </small></h1>
+<ul><li>Upgrade bundled SQLite to version 3.35.2 (<a href='https://github.com/r-dbi/RSQLite/issues/357'>#357</a>).</li>
 <li>If the busy handler fails, the transaction is aborted explicitly (<a href='https://github.com/r-dbi/RSQLite/issues/348'>#348</a>, <a href='https://github.com/gaborcsardi'>@gaborcsardi</a>).</li>
-</ul>
-</div>
+</ul></div>
     <div id="rsqlite-224-2021-03-12" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.4">
-<a href="#rsqlite-224-2021-03-12" class="anchor" aria-hidden="true"></a>RSQLite 2.2.4 (2021-03-12)<small> 2021-03-12 </small>
-</h1>
+<a href="#rsqlite-224-2021-03-12" class="anchor" aria-hidden="true"></a>RSQLite 2.2.4 (2021-03-12)<small> 2021-03-12 </small></h1>
 <div id="features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#features" class="anchor" aria-hidden="true"></a>Features</h2>
-<ul>
-<li>Improve concurrency behavior with multiple writers (<a href='https://github.com/r-dbi/RSQLite/issues/280'>#280</a>, <a href='https://github.com/gaborcsardi'>@gaborcsardi</a>).</li>
+<ul><li>Improve concurrency behavior with multiple writers (<a href='https://github.com/r-dbi/RSQLite/issues/280'>#280</a>, <a href='https://github.com/gaborcsardi'>@gaborcsardi</a>).</li>
 <li>New <code><a href="../reference/sqliteSetBusyHandler.html">sqliteSetBusyHandler()</a></code> helps configure what SQLite should do when the database is locked (<a href='https://github.com/r-dbi/RSQLite/issues/280'>#280</a>, <a href='https://github.com/gaborcsardi'>@gaborcsardi</a>).</li>
 <li>
 <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect()</a></code> gains an <code>extended_types</code> argument that adds support for date, time and timestamp columns. If a column has a declared type <code>DATE</code>, <code>TIME</code> or <code>TIMESTAMP</code>, it is returned as <code>Date</code>, <code>hms</code> or <code>POSIXct</code> value, respectively (<a href='https://github.com/r-dbi/RSQLite/issues/333'>#333</a>, <a href='https://github.com/anderic1'>@anderic1</a>).</li>
 <li>Upgrade bundled SQLite to version 3.34.1 (<a href='https://github.com/r-dbi/RSQLite/issues/342'>#342</a>).</li>
-</ul>
-</div>
+</ul></div>
 </div>
     <div id="rsqlite-223-2021-01-24" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.3">
-<a href="#rsqlite-223-2021-01-24" class="anchor" aria-hidden="true"></a>RSQLite 2.2.3 (2021-01-24)<small> 2021-01-24 </small>
-</h1>
+<a href="#rsqlite-223-2021-01-24" class="anchor" aria-hidden="true"></a>RSQLite 2.2.3 (2021-01-24)<small> 2021-01-24 </small></h1>
 <div id="features-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#features-1" class="anchor" aria-hidden="true"></a>Features</h2>
-<ul>
-<li>Upgrade bundled SQLite to version 3.34.1 (<a href='https://github.com/r-dbi/RSQLite/issues/342'>#342</a>).</li>
+<ul><li>Upgrade bundled SQLite to version 3.34.1 (<a href='https://github.com/r-dbi/RSQLite/issues/342'>#342</a>).</li>
 <li>
 <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect()</a></code> gains an <code>extended_types</code> argument that adds support for date, time and timestamp columns. If a column has a declared type <code>DATE</code>, <code>TIME</code> or <code>TIMESTAMP</code>, it is returned as <code>Date</code>, <code>hms</code> or <code>POSIXct</code> value, respectively (<a href='https://github.com/r-dbi/RSQLite/issues/333'>#333</a>, <a href='https://github.com/anderic1'>@anderic1</a>).</li>
-</ul>
-</div>
+</ul></div>
 </div>
     <div id="rsqlite-222-2021-01-04" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.2">
-<a href="#rsqlite-222-2021-01-04" class="anchor" aria-hidden="true"></a>RSQLite 2.2.2 (2021-01-04)<small> 2021-01-08 </small>
-</h1>
+<a href="#rsqlite-222-2021-01-04" class="anchor" aria-hidden="true"></a>RSQLite 2.2.2 (2021-01-04)<small> 2021-01-08 </small></h1>
 <div id="features-2" class="section level2">
 <h2 class="hasAnchor">
 <a href="#features-2" class="anchor" aria-hidden="true"></a>Features</h2>
-<ul>
-<li>Upgrade bundled SQLite to version 3.34 (<a href='https://github.com/r-dbi/RSQLite/issues/337'>#337</a>).</li>
-</ul>
-</div>
+<ul><li>Upgrade bundled SQLite to version 3.34 (<a href='https://github.com/r-dbi/RSQLite/issues/337'>#337</a>).</li>
+</ul></div>
 <div id="bug-fixes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bug-fixes" class="anchor" aria-hidden="true"></a>Bug fixes</h2>
-<ul>
-<li>
+<ul><li>
 <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbAppendTable.html" class="external-link">dbAppendTable()</a></code> use transactions with unique savepoint IDs (<a href='https://github.com/r-dbi/RSQLite/issues/338'>#338</a>).</li>
 <li>Loading extensions works when RSQLite is installed in a path with non-ASCII characters (<a href='https://github.com/r-dbi/RSQLite/issues/310'>#310</a>).</li>
-</ul>
-</div>
+</ul></div>
 <div id="internal" class="section level2">
 <h2 class="hasAnchor">
 <a href="#internal" class="anchor" aria-hidden="true"></a>Internal</h2>
-<ul>
-<li>Implement automatic upgrade of bundled SQLite via GitHub Actions (<a href='https://github.com/r-dbi/RSQLite/issues/335'>#335</a>).</li>
+<ul><li>Implement automatic upgrade of bundled SQLite via GitHub Actions (<a href='https://github.com/r-dbi/RSQLite/issues/335'>#335</a>).</li>
 <li>Switch to GitHub Actions (<a href='https://github.com/r-dbi/RSQLite/issues/331'>#331</a>).</li>
-</ul>
-</div>
+</ul></div>
 </div>
     <div id="rsqlite-221-2020-09-28" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.1">
-<a href="#rsqlite-221-2020-09-28" class="anchor" aria-hidden="true"></a>RSQLite 2.2.1 (2020-09-28)<small> 2020-09-30 </small>
-</h1>
-<ul>
-<li>Upgrade to SQLite 3.33.0 (<a href='https://github.com/r-dbi/RSQLite/issues/321'>#321</a>).</li>
+<a href="#rsqlite-221-2020-09-28" class="anchor" aria-hidden="true"></a>RSQLite 2.2.1 (2020-09-28)<small> 2020-09-30 </small></h1>
+<ul><li>Upgrade to SQLite 3.33.0 (<a href='https://github.com/r-dbi/RSQLite/issues/321'>#321</a>).</li>
 <li>Use transaction for faster processing in <code><a href="https://dbi.r-dbi.org/reference/dbAppendTable.html" class="external-link">dbAppendTable()</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/306'>#306</a>).</li>
 <li>Strings and blobs now can have a size of up to 2 GB (<a href='https://github.com/r-dbi/RSQLite/issues/314'>#314</a>, <a href='https://github.com/shutinet'>@shutinet</a>).</li>
 <li>Multipart queries now give a warning (<a href='https://github.com/r-dbi/RSQLite/issues/313'>#313</a>).</li>
-</ul>
-</div>
+</ul></div>
     <div id="rsqlite-220" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.0">
-<a href="#rsqlite-220" class="anchor" aria-hidden="true"></a>RSQLite 2.2.0<small> 2020-01-07 </small>
-</h1>
-<ul>
-<li>Avoid mangling column names (<a href='https://github.com/r-dbi/RSQLite/issues/259'>#259</a>).</li>
-</ul>
-</div>
+<a href="#rsqlite-220" class="anchor" aria-hidden="true"></a>RSQLite 2.2.0<small> 2020-01-07 </small></h1>
+<ul><li>Avoid mangling column names (<a href='https://github.com/r-dbi/RSQLite/issues/259'>#259</a>).</li>
+</ul></div>
     <div id="rsqlite-215" class="section level1">
 <h1 class="page-header" data-toc-text="2.1.5">
-<a href="#rsqlite-215" class="anchor" aria-hidden="true"></a>RSQLite 2.1.5<small> 2019-12-18 </small>
-</h1>
-<ul>
-<li>Upgrade bundled sqlite version to 3.30.1.</li>
+<a href="#rsqlite-215" class="anchor" aria-hidden="true"></a>RSQLite 2.1.5<small> 2019-12-18 </small></h1>
+<ul><li>Upgrade bundled sqlite version to 3.30.1.</li>
 <li>Implement <code><a href="https://dbi.r-dbi.org/reference/dbGetInfo.html" class="external-link">dbGetInfo()</a></code> for driver and connection objects (<a href='https://github.com/r-dbi/RSQLite/issues/117'>#117</a>).</li>
 <li>Remove custom <code><a href="https://dbi.r-dbi.org/reference/dbListFields.html" class="external-link">dbListFields()</a></code> method (<a href='https://github.com/r-dbi/RSQLite/issues/228'>#228</a>).</li>
 <li>Only export relevant symbols to the shared library (<a href='https://github.com/r-dbi/RSQLite/issues/303'>#303</a>, <a href='https://github.com/troels'>@troels</a>).</li>
 <li>Fulfill requirements for CII badge (<a href='https://github.com/r-dbi/RSQLite/issues/300'>#300</a>, <a href='https://github.com/TSchiefer'>@TSchiefer</a>).</li>
-</ul>
-</div>
+</ul></div>
     <div id="rsqlite-214" class="section level1">
 <h1 class="page-header" data-toc-text="2.1.4">
-<a href="#rsqlite-214" class="anchor" aria-hidden="true"></a>RSQLite 2.1.4<small> 2019-12-04 </small>
-</h1>
-<ul>
-<li>Replace <code>std::mem_fn()</code> by <code>boost::mem_fn()</code> which works for older compilers.</li>
-</ul>
-</div>
+<a href="#rsqlite-214" class="anchor" aria-hidden="true"></a>RSQLite 2.1.4<small> 2019-12-04 </small></h1>
+<ul><li>Replace <code>std::mem_fn()</code> by <code>boost::mem_fn()</code> which works for older compilers.</li>
+</ul></div>
     <div id="rsqlite-213" class="section level1">
 <h1 class="page-header" data-toc-text="2.1.3">
-<a href="#rsqlite-213" class="anchor" aria-hidden="true"></a>RSQLite 2.1.3<small> 2019-12-03 </small>
-</h1>
-<ul>
-<li>Replace <code>std::mem_fun_ref()</code> by <code>std::mem_fn()</code>.</li>
-</ul>
-</div>
+<a href="#rsqlite-213" class="anchor" aria-hidden="true"></a>RSQLite 2.1.3<small> 2019-12-03 </small></h1>
+<ul><li>Replace <code>std::mem_fun_ref()</code> by <code>std::mem_fn()</code>.</li>
+</ul></div>
     <div id="rsqlite-212" class="section level1">
 <h1 class="page-header" data-toc-text="2.1.2">
-<a href="#rsqlite-212" class="anchor" aria-hidden="true"></a>RSQLite 2.1.2<small> 2019-07-24 </small>
-</h1>
+<a href="#rsqlite-212" class="anchor" aria-hidden="true"></a>RSQLite 2.1.2<small> 2019-07-24 </small></h1>
 <div id="bundled-library" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bundled-library" class="anchor" aria-hidden="true"></a>Bundled library</h2>
-<ul>
-<li>Upgrade bundled sqlite version to 3.29.0.</li>
-</ul>
-</div>
+<ul><li>Upgrade bundled sqlite version to 3.29.0.</li>
+</ul></div>
 <div id="compatibility-fixes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#compatibility-fixes" class="anchor" aria-hidden="true"></a>Compatibility fixes</h2>
-<ul>
-<li><p>Compatibility with new releases of blob and hms.</p></li>
+<ul><li><p>Compatibility with new releases of blob and hms.</p></li>
 <li><p><code><a href="https://dbi.r-dbi.org/reference/dbUnquoteIdentifier.html" class="external-link">dbUnquoteIdentifier()</a></code> also handles unquoted identifiers of the form <code>table</code> or <code>schema.table</code>, for compatibility with dbplyr.</p></li>
-</ul>
-</div>
+</ul></div>
 <div id="bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bug-fixes-1" class="anchor" aria-hidden="true"></a>Bug fixes</h2>
-<ul>
-<li><p>Fix query for listing tables in schema (<a href='https://github.com/r-dbi/RSQLite/issues/279'>#279</a>).</p></li>
+<ul><li><p>Fix query for listing tables in schema (<a href='https://github.com/r-dbi/RSQLite/issues/279'>#279</a>).</p></li>
 <li><p>Coercing <code>NULL</code> values to <code>integer64</code> and <code>numeric</code> now works in corner cases (<a href='https://github.com/r-dbi/RSQLite/issues/291'>#291</a>).</p></li>
 <li><p><code><a href="https://dbi.r-dbi.org/reference/dbExistsTable.html" class="external-link">dbExistsTable()</a></code> works in corner cases where the table name contains backticks (<a href='https://github.com/r-dbi/RSQLite/issues/275'>#275</a>).</p></li>
 <li><p>Error messages are encoded in UTF-8.</p></li>
 <li><p>Column names are marked as UTF-8 on return, to fix encoding problems on Windows (<a href='https://github.com/r-dbi/RSQLite/issues/276'>#276</a>, <a href='https://github.com/shrektan'>@shrektan</a>).</p></li>
-<li><p>Fix segmentation fault when an open connection is garbage-collected with <code><a href="https://rdrr.io/r/base/options.html" class="external-link">options(warn = 2)</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/245'>#245</a>).</p></li>
-</ul>
-</div>
+<li><p>Fix segmentation fault when an open connection is garbage-collected with <code>options(warn = 2)</code> (<a href='https://github.com/r-dbi/RSQLite/issues/245'>#245</a>).</p></li>
+</ul></div>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor" aria-hidden="true"></a>New features</h2>
-<ul>
-<li>Add regular expression operator (<a href='https://github.com/r-dbi/RSQLite/issues/296'>#296</a>, <a href='https://github.com/rfhb'>@rfhb</a>).</li>
-</ul>
-</div>
+<ul><li>Add regular expression operator (<a href='https://github.com/r-dbi/RSQLite/issues/296'>#296</a>, <a href='https://github.com/rfhb'>@rfhb</a>).</li>
+</ul></div>
 <div id="internal-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#internal-1" class="anchor" aria-hidden="true"></a>Internal</h2>
-<ul>
-<li><p>Load extensions through API call, to support repeated loading.</p></li>
+<ul><li><p>Load extensions through API call, to support repeated loading.</p></li>
 <li><p>Align <code>DbResult</code> and other classes with RPostgres and RMariaDB.</p></li>
 <li><p>Tested with R &gt;= 3.2 only (but not declared).</p></li>
 <li><p>Use <code>default_skip</code>.</p></li>
 <li><p>Improve warning when <code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery()</a></code> is called with a statement (<a href='https://github.com/r-dbi/RSQLite/issues/226'>#226</a>).</p></li>
 <li><p>Add test for correct use of non-UTF8-encoded column names (<a href='https://github.com/r-dbi/RSQLite/issues/277'>#277</a>, <a href='https://github.com/wush978'>@wush978</a>).</p></li>
 <li><p>Avoid including the call in errors.</p></li>
-</ul>
-</div>
+</ul></div>
 </div>
     <div id="rsqlite-211-2018-05-05" class="section level1">
 <h1 class="page-header" data-toc-text="2.1.1">
-<a href="#rsqlite-211-2018-05-05" class="anchor" aria-hidden="true"></a>RSQLite 2.1.1 (2018-05-05)<small> 2018-05-06 </small>
-</h1>
-<ul>
-<li>Breaking change: The <code>field.types</code> argument to <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable()</a></code> no longer takes precedence when defining the order of the columns in the new table.</li>
-<li>Add support for <code>bigint</code> argument to <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect()</a></code>, supported values are <code>"integer64"</code>, <code>"integer"</code>, <code>"numeric"</code> and <code>"character"</code>. Large integers are returned as values of that type (r-dbi/DBItest<a href='https://github.com/r-dbi/RSQLite/issues/133'>#133</a>).</li>
-<li>Data frames resulting from a query always have unique non-empty column names (r-dbi/DBItest<a href='https://github.com/r-dbi/RSQLite/issues/137'>#137</a>).</li>
-<li>New arguments <code>temporary</code> and <code>fail_if_missing</code> (default: <code>TRUE</code>) to <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">dbRemoveTable()</a></code> (r-dbi/DBI<a href='https://github.com/r-dbi/RSQLite/issues/141'>#141</a>, r-dbi/DBI<a href='https://github.com/r-dbi/RSQLite/issues/197'>#197</a>).</li>
-<li>Using <code><a href="https://dbi.r-dbi.org/reference/dbCreateTable.html" class="external-link">dbCreateTable()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbAppendTable.html" class="external-link">dbAppendTable()</a></code> internally (r-dbi/DBI<a href='https://github.com/r-dbi/RSQLite/issues/74'>#74</a>).</li>
-<li>Implement <code><a href="https://rdrr.io/r/base/format.html" class="external-link">format()</a></code> method for <code>SqliteConnection</code> (r-dbi/DBI<a href='https://github.com/r-dbi/RSQLite/issues/163'>#163</a>).</li>
+<a href="#rsqlite-211-2018-05-05" class="anchor" aria-hidden="true"></a>RSQLite 2.1.1 (2018-05-05)<small> 2018-05-06 </small></h1>
+<ul><li>Breaking change: The <code>field.types</code> argument to <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable()</a></code> no longer takes precedence when defining the order of the columns in the new table.</li>
+<li>Add support for <code>bigint</code> argument to <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect()</a></code>, supported values are <code>"integer64"</code>, <code>"integer"</code>, <code>"numeric"</code> and <code>"character"</code>. Large integers are returned as values of that type (r-dbi/DBItest#133).</li>
+<li>Data frames resulting from a query always have unique non-empty column names (r-dbi/DBItest#137).</li>
+<li>New arguments <code>temporary</code> and <code>fail_if_missing</code> (default: <code>TRUE</code>) to <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">dbRemoveTable()</a></code> (r-dbi/DBI#141, r-dbi/DBI#197).</li>
+<li>Using <code><a href="https://dbi.r-dbi.org/reference/dbCreateTable.html" class="external-link">dbCreateTable()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbAppendTable.html" class="external-link">dbAppendTable()</a></code> internally (r-dbi/DBI#74).</li>
+<li>Implement <code><a href="https://rdrr.io/r/base/format.html" class="external-link">format()</a></code> method for <code>SqliteConnection</code> (r-dbi/DBI#163).</li>
 <li>Reexporting <code><a href="https://dbi.r-dbi.org/reference/Id.html" class="external-link">Id()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbIsReadOnly.html" class="external-link">DBI::dbIsReadOnly()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbCanConnect.html" class="external-link">DBI::dbCanConnect()</a></code>.</li>
 <li>Now imports DBI 1.0.0.</li>
-</ul>
-</div>
+</ul></div>
     <div id="rsqlite-210-2018-03-29" class="section level1">
 <h1 class="page-header" data-toc-text="2.1.0">
-<a href="#rsqlite-210-2018-03-29" class="anchor" aria-hidden="true"></a>RSQLite 2.1.0 (2018-03-29)<small> 2018-03-29 </small>
-</h1>
+<a href="#rsqlite-210-2018-03-29" class="anchor" aria-hidden="true"></a>RSQLite 2.1.0 (2018-03-29)<small> 2018-03-29 </small></h1>
 <div id="bug-fixes-2" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bug-fixes-2" class="anchor" aria-hidden="true"></a>Bug fixes</h2>
-<ul>
-<li>Fix rchk warnings on CRAN (<a href='https://github.com/r-dbi/RSQLite/issues/250'>#250</a>).</li>
+<ul><li>Fix rchk warnings on CRAN (<a href='https://github.com/r-dbi/RSQLite/issues/250'>#250</a>).</li>
 <li>
 <code>dbRowsAffected()</code> and <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">dbExecute()</a></code> return zero after a <code>DROP TABLE</code> statement, and not the number of rows affected by the last <code>INSERT</code>, <code>UPDATE</code>, or <code>DELETE</code> (<a href='https://github.com/r-dbi/RSQLite/issues/238'>#238</a>).</li>
 <li>
 <code><a href="https://dbi.r-dbi.org/reference/dbIsValid.html" class="external-link">dbIsValid()</a></code> returns <code>FALSE</code> instead of throwing an error for an invalid connection object (<a href='https://github.com/r-dbi/RSQLite/issues/217'>#217</a>).</li>
-<li>Names in the <code>x</code> argument to <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html" class="external-link">dbQuoteIdentifier()</a></code> are preserved in the output (r-lib/DBI<a href='https://github.com/r-dbi/RSQLite/issues/173'>#173</a>).</li>
-<li>Ignore invalid UTF-8 strings in <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html" class="external-link">dbQuoteIdentifier()</a></code> (r-dbi/DBItest<a href='https://github.com/r-dbi/RSQLite/issues/156'>#156</a>).</li>
-</ul>
-</div>
+<li>Names in the <code>x</code> argument to <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html" class="external-link">dbQuoteIdentifier()</a></code> are preserved in the output (r-lib/DBI#173).</li>
+<li>Ignore invalid UTF-8 strings in <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html" class="external-link">dbQuoteIdentifier()</a></code> (r-dbi/DBItest#156).</li>
+</ul></div>
 <div id="features-3" class="section level2">
 <h2 class="hasAnchor">
 <a href="#features-3" class="anchor" aria-hidden="true"></a>Features</h2>
-<ul>
-<li>Update bundled sqlite3 library to 3.22 (<a href='https://github.com/r-dbi/RSQLite/issues/252'>#252</a>).</li>
+<ul><li>Update bundled sqlite3 library to 3.22 (<a href='https://github.com/r-dbi/RSQLite/issues/252'>#252</a>).</li>
 <li>Values of class <code>"integer64"</code> are now supported for <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind()</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/243'>#243</a>).</li>
 <li>New connections now automatically load default RSQLite extensions (<a href='https://github.com/r-dbi/RSQLite/issues/236'>#236</a>).</li>
 <li>Implement <code><a href="https://dbi.r-dbi.org/reference/dbUnquoteIdentifier.html" class="external-link">dbUnquoteIdentifier()</a></code>.</li>
-</ul>
-</div>
+</ul></div>
 <div id="internal-2" class="section level2">
 <h2 class="hasAnchor">
 <a href="#internal-2" class="anchor" aria-hidden="true"></a>Internal</h2>
-<ul>
-<li>Now raising error if <code><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind()</a></code> is called with too many named arguments, according to spec.</li>
+<ul><li>Now raising error if <code><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind()</a></code> is called with too many named arguments, according to spec.</li>
 <li>Refactor connection and result handling to be more similar to other backends.</li>
-</ul>
-</div>
+</ul></div>
 </div>
     <div id="rsqlite-20-2017-06-18" class="section level1">
 <h1 class="page-header" data-toc-text="2.0">
-<a href="#rsqlite-20-2017-06-18" class="anchor" aria-hidden="true"></a>RSQLite 2.0 (2017-06-18)<small> 2017-06-19 </small>
-</h1>
+<a href="#rsqlite-20-2017-06-18" class="anchor" aria-hidden="true"></a>RSQLite 2.0 (2017-06-18)<small> 2017-06-19 </small></h1>
 <div id="api-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#api-changes" class="anchor" aria-hidden="true"></a>API changes</h2>
-<ul>
-<li>Updated embedded SQLite to 3.19.3.</li>
+<ul><li>Updated embedded SQLite to 3.19.3.</li>
 <li>64-bit integers are returned as <code>integer64</code> vectors. The <code>bit64</code> package is imported to support this data type (<a href='https://github.com/r-dbi/RSQLite/issues/65'>#65</a>).</li>
-<li>The <code>row.names</code> argument to <code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable()</a></code>, <code><a href="../reference/sqliteBuildTableDefinition.html">sqliteBuildTableDefinition()</a></code>, and <code><a href="https://dbi.r-dbi.org/reference/sqlData.html" class="external-link">sqlData()</a></code> now defaults to <code>FALSE</code>. (This also affects <code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery()</a></code>.) The old default can be restored temporarily on a per-package basis by calling <code><a href="https://rdrr.io/pkg/pkgconfig/man/set_config.html" class="external-link">pkgconfig::set_config("RSQLite::row.names.query" = NA)</a></code>. <code>NULL</code> is a valid value for the <code>row.names</code> argument, same as <code>FALSE</code> (<a href='https://github.com/r-dbi/RSQLite/issues/210'>#210</a>).</li>
+<li>The <code>row.names</code> argument to <code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable()</a></code>, <code><a href="../reference/sqliteBuildTableDefinition.html">sqliteBuildTableDefinition()</a></code>, and <code><a href="https://dbi.r-dbi.org/reference/sqlData.html" class="external-link">sqlData()</a></code> now defaults to <code>FALSE</code>. (This also affects <code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery()</a></code>.) The old default can be restored temporarily on a per-package basis by calling <code>pkgconfig::set_config("RSQLite::row.names.query" = NA)</code>. <code>NULL</code> is a valid value for the <code>row.names</code> argument, same as <code>FALSE</code> (<a href='https://github.com/r-dbi/RSQLite/issues/210'>#210</a>).</li>
 <li>The <code>name</code> argument to <code><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbBegin()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbCommit()</a></code>, and <code><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbRollback()</a></code> is now declared after the ellipsis. Code that calls these methods with an unnamed second argument still works but receives a warning (<a href='https://github.com/r-dbi/RSQLite/issues/208'>#208</a>).</li>
 <li>The <code>select.cols</code> argument to <code><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable()</a></code> is deprecated, use <code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery()</a></code> with a <code>SELECT</code> query instead (<a href='https://github.com/r-dbi/RSQLite/issues/185'>#185</a>).</li>
 <li>The methods related to tables (<code><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbExistsTable.html" class="external-link">dbExistsTable()</a></code>, and <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">dbRemoveTable()</a></code>) always treat the <code>name</code> argument as literal name, even if it contains backticks. This breaks the CRAN version (but not the GitHub version) of the sqldf package (<a href='https://github.com/r-dbi/RSQLite/issues/188'>#188</a>).</li>
 <li>
-<code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable(append = TRUE)</a></code> raises an error if column names are not the same in the data and the existing table (<a href='https://github.com/r-dbi/RSQLite/issues/165'>#165</a>).</li>
+<code>dbWriteTable(append = TRUE)</code> raises an error if column names are not the same in the data and the existing table (<a href='https://github.com/r-dbi/RSQLite/issues/165'>#165</a>).</li>
 <li>
 <code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch()</a></code> now errs for <code>n &lt; -1</code>, and accepts <code>n == Inf</code>.</li>
 <li>Removed dummy <code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery()</a></code> method introduced for compatibility with some Bioconductor packages (<a href='https://github.com/r-dbi/RSQLite/issues/187'>#187</a>).</li>
@@ -400,31 +337,25 @@
 <li>Failing to set <code>PRAGMA cache_size</code> or <code>PRAGMA synchronous</code> in <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect()</a></code> now gives a clear warning (<a href='https://github.com/r-dbi/RSQLite/issues/197'>#197</a>).</li>
 <li>Improve warning message if named parameters are not used in <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> or <code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/193'>#193</a>).</li>
 <li>SQLite collects additional histogram data during <code>ANALYZE</code>, which may lead to faster executions of queries (<a href='https://github.com/r-dbi/RSQLite/issues/124'>#124</a>).</li>
-</ul>
-</div>
+</ul></div>
 <div id="bug-fixes-3" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bug-fixes-3" class="anchor" aria-hidden="true"></a>Bug fixes</h2>
-<ul>
-<li>Identifiers are now escaped with backticks, to avoid ambiguous handling of double quotes in the context of strings (<a href='https://github.com/r-dbi/RSQLite/issues/123'>#123</a>).</li>
+<ul><li>Identifiers are now escaped with backticks, to avoid ambiguous handling of double quotes in the context of strings (<a href='https://github.com/r-dbi/RSQLite/issues/123'>#123</a>).</li>
 <li>Fix <code><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind()</a></code> behavior and tests. Attempting to bind to a query without parameters throws an error (<a href='https://github.com/r-dbi/RSQLite/issues/114'>#114</a>).</li>
 <li>Fix corner case when repeatedly fetching from columns that don’t have an affinity.</li>
 <li>The <code>variance()</code> and <code>stdev()</code> extension functions now return <code>NULL</code> for input of length 1 (<a href='https://github.com/r-dbi/RSQLite/issues/201'>#201</a>).</li>
 <li>Fix roundtrip of <code>raw</code> columns (<a href='https://github.com/r-dbi/RSQLite/issues/116'>#116</a>).</li>
-</ul>
-</div>
+</ul></div>
 <div id="documentation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#documentation" class="anchor" aria-hidden="true"></a>Documentation</h2>
-<ul>
-<li>Remove redundant documentation, link to <code>DBI</code> more prominently (<a href='https://github.com/r-dbi/RSQLite/issues/186'>#186</a>).</li>
-</ul>
-</div>
+<ul><li>Remove redundant documentation, link to <code>DBI</code> more prominently (<a href='https://github.com/r-dbi/RSQLite/issues/186'>#186</a>).</li>
+</ul></div>
 <div id="internal-3" class="section level2">
 <h2 class="hasAnchor">
 <a href="#internal-3" class="anchor" aria-hidden="true"></a>Internal</h2>
-<ul>
-<li>Most DBItest tests now pass. Reduced number of skips shown for tests.</li>
+<ul><li>Most DBItest tests now pass. Reduced number of skips shown for tests.</li>
 <li>C++ code now compiles with strict compiler settings <code>-Wall -Wextra -pedantic -Wconversion</code>.</li>
 <li>Restore compatibility with older compilers/libraries by using &lt;boost/limits.hpp&gt; (<a href='https://github.com/r-dbi/RSQLite/issues/206'>#206</a>).</li>
 <li>Use <code>boost/cstdint</code> instead of compound data type for 64-bit values (<a href='https://github.com/r-dbi/RSQLite/issues/198'>#198</a>).</li>
@@ -432,128 +363,103 @@
 <li>All methods of DBI are reexported.</li>
 <li>Registering native functions, as required by R &gt;= 3.4.0.</li>
 <li>Use UTF-8 encoded file names as required by the SQLite API, to support non-ASCII file names (<a href='https://github.com/r-dbi/RSQLite/issues/211'>#211</a>).</li>
-<li>Calling <code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch(n = 0)</a></code> instead of <code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch(n = 1)</a></code> in <code><a href="https://dbi.r-dbi.org/reference/dbListFields.html" class="external-link">dbListFields()</a></code>.</li>
+<li>Calling <code>dbFetch(n = 0)</code> instead of <code>dbFetch(n = 1)</code> in <code><a href="https://dbi.r-dbi.org/reference/dbListFields.html" class="external-link">dbListFields()</a></code>.</li>
 <li>Exclude SQLite3 source code from coverage computation again (<a href='https://github.com/r-dbi/RSQLite/issues/204'>#204</a>).</li>
-</ul>
-</div>
+</ul></div>
 </div>
     <div id="rsqlite-11-2-2017-01-07" class="section level1">
 <h1 class="page-header" data-toc-text="1.1-2">
-<a href="#rsqlite-11-2-2017-01-07" class="anchor" aria-hidden="true"></a>RSQLite 1.1-2 (2017-01-07)<small> 2017-01-08 </small>
-</h1>
-<ul>
-<li>Check reverse dependencies.</li>
+<a href="#rsqlite-11-2-2017-01-07" class="anchor" aria-hidden="true"></a>RSQLite 1.1-2 (2017-01-07)<small> 2017-01-08 </small></h1>
+<ul><li>Check reverse dependencies.</li>
 <li>Check and warn if the <code>name</code> argument is quoted in <code><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">dbRemoveTable()</a></code>, for compatibility with <code>sqldf</code> (<a href='https://github.com/r-dbi/RSQLite/issues/196'>#196</a>).</li>
-</ul>
-</div>
+</ul></div>
     <div id="rsqlite-11-1-2016-12-10" class="section level1">
 <h1 class="page-header" data-toc-text="1.1-1">
-<a href="#rsqlite-11-1-2016-12-10" class="anchor" aria-hidden="true"></a>RSQLite 1.1-1 (2016-12-10)<small> 2016-12-10 </small>
-</h1>
-<ul>
-<li>Fix protection issue that could lead to memory access errors when fetching <code>BLOB</code> data (<a href='https://github.com/r-dbi/RSQLite/issues/192'>#192</a>, <a href='https://github.com/r-dbi/RSQLite/issues/194'>#194</a>, <a href='https://github.com/MikeBadescu'>@MikeBadescu</a>).</li>
-</ul>
-</div>
+<a href="#rsqlite-11-1-2016-12-10" class="anchor" aria-hidden="true"></a>RSQLite 1.1-1 (2016-12-10)<small> 2016-12-10 </small></h1>
+<ul><li>Fix protection issue that could lead to memory access errors when fetching <code>BLOB</code> data (<a href='https://github.com/r-dbi/RSQLite/issues/192'>#192</a>, <a href='https://github.com/r-dbi/RSQLite/issues/194'>#194</a>, <a href='https://github.com/MikeBadescu'>@MikeBadescu</a>).</li>
+</ul></div>
     <div id="rsqlite-11-2016-11-25" class="section level1">
 <h1 class="page-header" data-toc-text="1.1">
-<a href="#rsqlite-11-2016-11-25" class="anchor" aria-hidden="true"></a>RSQLite 1.1 (2016-11-25)<small> 2016-11-27 </small>
-</h1>
-<ul>
-<li>New maintainer: Kirill Müller.</li>
-</ul>
-<div id="bundled-sqlite" class="section level2">
+<a href="#rsqlite-11-2016-11-25" class="anchor" aria-hidden="true"></a>RSQLite 1.1 (2016-11-25)<small> 2016-11-27 </small></h1>
+<ul><li>New maintainer: Kirill Müller.</li>
+</ul><div id="bundled-sqlite" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bundled-sqlite" class="anchor" aria-hidden="true"></a>Bundled SQLite</h2>
-<ul>
-<li><p>RSQLite always builds with the included source, which is located in <code>src/sqlite3</code>. This prevents bugs due to API mismatches and considerably simplifies the build process.</p></li>
+<ul><li><p>RSQLite always builds with the included source, which is located in <code>src/sqlite3</code>. This prevents bugs due to API mismatches and considerably simplifies the build process.</p></li>
 <li><p>Current version: 3.11.1.</p></li>
 <li><p>Enable JSON1 extension (<a href='https://github.com/r-dbi/RSQLite/issues/152'>#152</a>, <a href='https://github.com/tigertoes'>@tigertoes</a>).</p></li>
 <li><p>Include support for FTS5 (<a href='https://github.com/mkuhn'>@mkuhn</a>).</p></li>
 <li><p>Compilation limits <code>SQLITE_MAX_VARIABLE_NUMBER</code> and <code>SQLITE_MAX_COLUMN</code> have been reset to the defaults. The documentation suggests setting to such high values is a bad idea.</p></li>
 <li><p>Header files for <code>sqlite3</code> are no longer installed, linking to the package is not possible anymore. Packages that require access to the low-level sqlite3 API should bundle their own copy.</p></li>
-</ul>
-</div>
+</ul></div>
 <div id="breaking-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#breaking-changes" class="anchor" aria-hidden="true"></a>Breaking changes</h2>
-<ul>
-<li><p><code><a href="../reference/SQLite.html">RSQLite()</a></code> no longer automatically attaches DBI when loaded. This is to encourage you to use <code><a href="https://dbi.r-dbi.org" class="external-link">library(DBI); dbConnect(RSQLite::SQLite())</a></code>.</p></li>
+<ul><li><p><code><a href="../reference/SQLite.html">RSQLite()</a></code> no longer automatically attaches DBI when loaded. This is to encourage you to use <code><a href="https://dbi.r-dbi.org" class="external-link">library(DBI); dbConnect(RSQLite::SQLite())</a></code>.</p></li>
 <li><p>Functions that take a table name, such as <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable()</a></code>, now quote the table name via <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html" class="external-link">dbQuoteIdentifier()</a></code>. This means that caller-quoted names should be marked as such with <code><a href="https://dbi.r-dbi.org/reference/SQL.html" class="external-link">DBI::SQL()</a></code>.</p></li>
-</ul>
-</div>
+</ul></div>
 <div id="new-features-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features-1" class="anchor" aria-hidden="true"></a>New features</h2>
-<ul>
-<li><p>RSQLite has been rewritten (essentially from scratch) in C++ with Rcpp. This has considerably reduced the amount of code, and allows us to take advantage of the more sophisticated memory management tools available in Rcpp. This rewrite should yield some minor performance improvements, but most importantly protect against memory leaks and crashes. It also provides a better base for future development. In particular, it is now technically possible to have multiple result sets per connection, although this feature is currently disabled (<a href='https://github.com/r-dbi/RSQLite/issues/150'>#150</a>).</p></li>
+<ul><li><p>RSQLite has been rewritten (essentially from scratch) in C++ with Rcpp. This has considerably reduced the amount of code, and allows us to take advantage of the more sophisticated memory management tools available in Rcpp. This rewrite should yield some minor performance improvements, but most importantly protect against memory leaks and crashes. It also provides a better base for future development. In particular, it is now technically possible to have multiple result sets per connection, although this feature is currently disabled (<a href='https://github.com/r-dbi/RSQLite/issues/150'>#150</a>).</p></li>
 <li><p>You can now use SQLite’s URL specification for databases. This allows you to create <a href="https://www.sqlite.org/inmemorydb.html" class="external-link">shared in-memory</a> databases (<a href='https://github.com/r-dbi/RSQLite/issues/70'>#70</a>).</p></li>
 <li><p>Queries (<a href='https://github.com/r-dbi/RSQLite/issues/69'>#69</a>), query parameters and table data are always converted to UTF-8 before being sent to the database.</p></li>
 <li><p>Adapted to <code>DBI</code> 0.5, new code should use <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">dbExecute()</a></code> instead of <code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery()</a></code>, and <code><a href="https://dbi.r-dbi.org/reference/dbSendStatement.html" class="external-link">dbSendStatement()</a></code> instead of <code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery()</a></code> where appropriate.</p></li>
 <li><p>New strategy for prepared queries. Create a prepared query with <code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery()</a></code> or <code><a href="https://dbi.r-dbi.org/reference/dbSendStatement.html" class="external-link">dbSendStatement()</a></code> and bind values with <code><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind()</a></code>. The same query/statement can be executed efficiently multiple times by passing a data-frame-like object (<a href='https://github.com/r-dbi/RSQLite/issues/168'>#168</a>, <a href='https://github.com/r-dbi/RSQLite/issues/178'>#178</a>, <a href='https://github.com/r-dbi/RSQLite/issues/181'>#181</a>).</p></li>
-<li><p><code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbSendStatement.html" class="external-link">dbSendStatement()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">dbExecute()</a></code> also support inline parameterised queries, like <code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery(datasetsDb(), "SELECT * FROM mtcars WHERE cyl = :cyl", params = list(cyl = 4))</a></code>. This has no performance benefits but protects you from SQL injection attacks.</p></li>
+<li><p><code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbSendStatement.html" class="external-link">dbSendStatement()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">dbExecute()</a></code> also support inline parameterised queries, like <code>dbGetQuery(datasetsDb(), "SELECT * FROM mtcars WHERE cyl = :cyl", params = list(cyl = 4))</code>. This has no performance benefits but protects you from SQL injection attacks.</p></li>
 <li><p>Improve column type inference: the first non-<code>NULL</code> value decides the type of a column (<a href='https://github.com/r-dbi/RSQLite/issues/111'>#111</a>). If there are no non-<code>NULL</code> values, the column affinity is used, determined according to sqlite3 rules (<a href='https://github.com/r-dbi/RSQLite/issues/160'>#160</a>).</p></li>
 <li><p><code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch()</a></code> uses the same row name strategy as <code><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable()</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/53'>#53</a>).</p></li>
 <li><p><code><a href="https://dbi.r-dbi.org/reference/dbColumnInfo.html" class="external-link">dbColumnInfo()</a></code> will now return information even before you’ve retrieved any data.</p></li>
 <li><p>New <code>sqliteVersion()</code> prints the header and library versions of RSQLite.</p></li>
 <li><p>Deprecation warnings are given only once, with a clear reference to the source.</p></li>
 <li><p><code><a href="../reference/datasetsDb.html">datasetsDb()</a></code> now returns a read-only database, to avoid modifications to the installed file.</p></li>
-</ul>
-</div>
+</ul></div>
 <div id="deprecated-functions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#deprecated-functions" class="anchor" aria-hidden="true"></a>Deprecated functions</h2>
-<ul>
-<li><p><code><a href="https://dbi.r-dbi.org/reference/make.db.names.html" class="external-link">make.db.names()</a></code> has been formally deprecated. Please use <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html" class="external-link">dbQuoteIdentifier()</a></code> instead. This function is also used in <code><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">dbRemoveTable()</a></code>, and <code><a href="https://dbi.r-dbi.org/reference/dbListFields.html" class="external-link">dbListFields()</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/106'>#106</a>, <a href='https://github.com/r-dbi/RSQLite/issues/132'>#132</a>).</p></li>
+<ul><li><p><code><a href="https://dbi.r-dbi.org/reference/make.db.names.html" class="external-link">make.db.names()</a></code> has been formally deprecated. Please use <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html" class="external-link">dbQuoteIdentifier()</a></code> instead. This function is also used in <code><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">dbRemoveTable()</a></code>, and <code><a href="https://dbi.r-dbi.org/reference/dbListFields.html" class="external-link">dbListFields()</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/106'>#106</a>, <a href='https://github.com/r-dbi/RSQLite/issues/132'>#132</a>).</p></li>
 <li><p><code><a href="../reference/sqliteBuildTableDefinition.html">sqliteBuildTableDefinition()</a></code> has been deprecated. Use <code><a href="https://dbi.r-dbi.org/reference/sqlCreateTable.html" class="external-link">DBI::sqlCreateTable()</a></code> instead.</p></li>
-<li><p><code><a href="https://dbi.r-dbi.org/reference/dbGetException.html" class="external-link">dbGetException()</a></code> now raises a deprecation warning and always returns <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list(errorNum = 0L, errorMsg = "OK")</a></code>, because querying the last SQLite error only works if an error actually occurred (<a href='https://github.com/r-dbi/RSQLite/issues/129'>#129</a>).</p></li>
+<li><p><code><a href="https://dbi.r-dbi.org/reference/dbGetException.html" class="external-link">dbGetException()</a></code> now raises a deprecation warning and always returns <code>list(errorNum = 0L, errorMsg = "OK")</code>, because querying the last SQLite error only works if an error actually occurred (<a href='https://github.com/r-dbi/RSQLite/issues/129'>#129</a>).</p></li>
 <li><p><code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> and <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> have been reimplemented (with deprecation warning) using <code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch()</a></code> for compatibility with existing packages (<a href='https://github.com/r-dbi/RSQLite/issues/100'>#100</a>, <a href='https://github.com/r-dbi/RSQLite/issues/153'>#153</a>, <a href='https://github.com/r-dbi/RSQLite/issues/168'>#168</a>, <a href='https://github.com/r-dbi/RSQLite/issues/181'>#181</a>). Please convert to the new API, because the old function may be removed completely very soon: They were never part of the official API, and do less argument checking than the new APIs. Both <code><a href="../reference/query-dep.html">dbSendPreparedQuery()</a></code> and <code><a href="../reference/query-dep.html">dbGetPreparedQuery()</a></code> ignore parameters not found in the query, with a warning (<a href='https://github.com/r-dbi/RSQLite/issues/174'>#174</a>).</p></li>
 <li><p>Reimplemented <code><a href="https://dbi.r-dbi.org/reference/dbListResults.html" class="external-link">dbListResults()</a></code> (with deprecation warning) for compatibility with existing packages (<a href='https://github.com/r-dbi/RSQLite/issues/154'>#154</a>).</p></li>
 <li><p>Soft-deprecated <code><a href="https://dbi.r-dbi.org/reference/dbGetInfo.html" class="external-link">dbGetInfo()</a></code>: The “Result” method is implemented by DBI, the methods for the other classes raise a warning (<a href='https://github.com/r-dbi/RSQLite/issues/137'>#137</a>). It’s now better to access the metadata with individual functions <code><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html" class="external-link">dbHasCompleted()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbGetRowCount.html" class="external-link">dbGetRowCount()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbGetRowsAffected.html" class="external-link">dbGetRowsAffected()</a></code>.</p></li>
-<li><p>All <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> methods have been removed: the same information is now displayed in the <code>show()</code> methods, which were previously pretty useless.</p></li>
-</ul>
-</div>
+<li><p>All <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> methods have been removed: the same information is now displayed in the <code><a href="https://rdrr.io/r/methods/show.html" class="external-link">show()</a></code> methods, which were previously pretty useless.</p></li>
+</ul></div>
 <div id="compatibility-fixes-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#compatibility-fixes-1" class="anchor" aria-hidden="true"></a>Compatibility fixes</h2>
-<ul>
-<li><p>The <code>raw</code> data type is supported in <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable()</a></code>, creates a <code>TEXT</code> column with a warning (<a href='https://github.com/r-dbi/RSQLite/issues/173'>#173</a>).</p></li>
+<ul><li><p>The <code>raw</code> data type is supported in <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable()</a></code>, creates a <code>TEXT</code> column with a warning (<a href='https://github.com/r-dbi/RSQLite/issues/173'>#173</a>).</p></li>
 <li><p>Numeric values for the <code>row.names</code> argument are converted to logical, with a warning (<a href='https://github.com/r-dbi/RSQLite/issues/170'>#170</a>).</p></li>
-<li><p>If the number of data frame columns matches the number of existing columns for <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable(append = TRUE)</a></code>, columns will be matched by position for compatibility, with a warning in case of a name mismatch (<a href='https://github.com/r-dbi/RSQLite/issues/164'>#164</a>).</p></li>
+<li><p>If the number of data frame columns matches the number of existing columns for <code>dbWriteTable(append = TRUE)</code>, columns will be matched by position for compatibility, with a warning in case of a name mismatch (<a href='https://github.com/r-dbi/RSQLite/issues/164'>#164</a>).</p></li>
 <li><p><code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable()</a></code> supports the <code>field.types</code> argument when creating a new table (<a href='https://github.com/r-dbi/RSQLite/issues/171'>#171</a>), and the <code>temporary</code> argument, default <code>FALSE</code> (<a href='https://github.com/r-dbi/RSQLite/issues/113'>#113</a>).</p></li>
 <li><p>Reexporting <code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbDriver.html" class="external-link">dbDriver()</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/147'>#147</a>, <a href='https://github.com/r-dbi/RSQLite/issues/148'>#148</a>, <a href='https://github.com/r-dbi/RSQLite/issues/183'>#183</a>).</p></li>
 <li><p><code><a href="../reference/sqliteCopyDatabase.html">sqliteCopyDatabase()</a></code> accepts character as <code>to</code> argument again, in this case a temporary connection is opened.</p></li>
-<li><p>Reimplemented <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable("SQLiteConnection", "character", "character")</a></code> for import of CSV files, using a function from the old codebase (<a href='https://github.com/r-dbi/RSQLite/issues/151'>#151</a>).</p></li>
-<li><p><code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable("SQLiteConnection", "character", "data.frame")</a></code> looks for table names already enclosed in backticks and uses these, (with a warning), for compatibility with the sqldf package.</p></li>
-</ul>
-</div>
+<li><p>Reimplemented <code>dbWriteTable("SQLiteConnection", "character", "character")</code> for import of CSV files, using a function from the old codebase (<a href='https://github.com/r-dbi/RSQLite/issues/151'>#151</a>).</p></li>
+<li><p><code>dbWriteTable("SQLiteConnection", "character", "data.frame")</code> looks for table names already enclosed in backticks and uses these, (with a warning), for compatibility with the sqldf package.</p></li>
+</ul></div>
 <div id="performance" class="section level2">
 <h2 class="hasAnchor">
 <a href="#performance" class="anchor" aria-hidden="true"></a>Performance</h2>
-<ul>
-<li>The <code><a href="https://dbi.r-dbi.org/reference/dbExistsTable.html" class="external-link">dbExistsTable()</a></code> function now works faster by filtering the list of tables using SQL (<a href='https://github.com/r-dbi/RSQLite/issues/166'>#166</a>).</li>
-</ul>
-</div>
+<ul><li>The <code><a href="https://dbi.r-dbi.org/reference/dbExistsTable.html" class="external-link">dbExistsTable()</a></code> function now works faster by filtering the list of tables using SQL (<a href='https://github.com/r-dbi/RSQLite/issues/166'>#166</a>).</li>
+</ul></div>
 <div id="documentation-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#documentation-1" class="anchor" aria-hidden="true"></a>Documentation</h2>
-<ul>
-<li><p>Start on a basic vignette: <code><a href="../articles/RSQLite.html">vignette("RSQLite")</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/50'>#50</a>).</p></li>
+<ul><li><p>Start on a basic vignette: <code><a href="../articles/RSQLite.html">vignette("RSQLite")</a></code> (<a href='https://github.com/r-dbi/RSQLite/issues/50'>#50</a>).</p></li>
 <li><p>Reworked function and method documentation, removed old documentation (<a href='https://github.com/r-dbi/RSQLite/issues/121'>#121</a>).</p></li>
 <li><p>Using <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">dbExecute()</a></code> in documentation and examples.</p></li>
 <li><p>Using both <code>":memory:"</code> and <code>":file::memory:"</code> in documentation.</p></li>
 <li><p>Added additional documentation and unit tests for <a href="https://www.sqlite.org/autoinc.html" class="external-link">autoincrement keys</a> (<a href='https://github.com/r-dbi/RSQLite/issues/119'>#119</a>, <a href='https://github.com/wibeasley'>@wibeasley</a>).</p></li>
-</ul>
-</div>
+</ul></div>
 <div id="internal-4" class="section level2">
 <h2 class="hasAnchor">
 <a href="#internal-4" class="anchor" aria-hidden="true"></a>Internal</h2>
-<ul>
-<li><p>Avoid warning about missing <code>long long</code> data type in C++98 by using a compound data type built from two 32-bit integers, with static assert that the size is 8 indeed.</p></li>
+<ul><li><p>Avoid warning about missing <code>long long</code> data type in C++98 by using a compound data type built from two 32-bit integers, with static assert that the size is 8 indeed.</p></li>
 <li><p>Remove all compilation warnings.</p></li>
 <li><p>All DBI methods contain an ellipsis <code>...</code> in their signature. Only the <code>name</code> argument to the transaction methods appears before the ellipsis for compatibility reasons.</p></li>
 <li><p>Using the <code>DBItest</code> package for testing (<a href='https://github.com/r-dbi/RSQLite/issues/105'>#105</a>), with the new <code>constructor_relax_args</code> tweak.</p></li>
 <li><p>Using the <code>plogr</code> for logging at the C++ level, can be enabled via <code>RSQLite:::init_logging()</code>.</p></li>
-<li><p>Using new <code><a href="https://dbi.r-dbi.org/reference/rownames.html" class="external-link">sqlRownamesToColumn()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/rownames.html" class="external-link">sqlColumnToRownames()</a></code> (rstats-db/DBI<a href='https://github.com/r-dbi/RSQLite/issues/91'>#91</a>).</p></li>
+<li><p>Using new <code><a href="https://dbi.r-dbi.org/reference/rownames.html" class="external-link">sqlRownamesToColumn()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/rownames.html" class="external-link">sqlColumnToRownames()</a></code> (rstats-db/DBI#91).</p></li>
 <li><p>Using <code>astyle</code> for code formatting (<a href='https://github.com/r-dbi/RSQLite/issues/159'>#159</a>), also in tests (but only if sources can be located), stripped space at end of line in all source files.</p></li>
 <li><p>Tracking dependencies between source and header files (<a href='https://github.com/r-dbi/RSQLite/issues/138'>#138</a>).</p></li>
 <li><p>Moved all functions from headers to modules (<a href='https://github.com/r-dbi/RSQLite/issues/162'>#162</a>).</p></li>
@@ -564,18 +470,15 @@
 <li><p>Enabled AppVeyor testing.</p></li>
 <li><p>Differential reverse dependency checks.</p></li>
 <li><p>Added upgrade script for sqlite3 sources and creation script for the datasets database to the <code>data-raw</code> directory.</p></li>
-</ul>
-</div>
+</ul></div>
 </div>
     <div id="version-100" class="section level1">
 <h1 class="page-header" data-toc-text="1.0.0">
-<a href="#version-100" class="anchor" aria-hidden="true"></a>Version 1.0.0<small> 2014-10-25 </small>
-</h1>
+<a href="#version-100" class="anchor" aria-hidden="true"></a>Version 1.0.0<small> 2014-10-25 </small></h1>
 <div id="new-features-2" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features-2" class="anchor" aria-hidden="true"></a>New features</h2>
-<ul>
-<li><p>Updated to SQLite 3.8.6</p></li>
+<ul><li><p>Updated to SQLite 3.8.6</p></li>
 <li><p>Added <code><a href="../reference/datasetsDb.html">datasetsDb()</a></code>, a bundled SQLite database containing all data frames in the datasets package (<a href='https://github.com/r-dbi/RSQLite/issues/15'>#15</a>).</p></li>
 <li><p>Inlined <code>RSQLite.extfuns</code> - use <code><a href="../reference/initExtension.html">initExtension()</a></code> to load the many useful extension functions (<a href='https://github.com/r-dbi/RSQLite/issues/44'>#44</a>).</p></li>
 <li><p>Methods no longer automatically clone the connection if there is an open result set. This was implement inconsistently in a handful of places (<a href='https://github.com/r-dbi/RSQLite/issues/22'>#22</a>). RSQLite is now more forgiving if you forget to close a result set - it will close it for you, with a warning. It’s still good practice to clean up after yourself, but you don’t have to.</p></li>
@@ -584,29 +487,23 @@
 <li><p><code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">dbRemoveTable()</a></code> throws errors on failure, rather than returning <code>FALSE</code>.</p></li>
 <li>
 <p><code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable()</a></code> has been rewritten:</p>
-<ul>
-<li><p>It quotes field names using <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html" class="external-link">dbQuoteIdentifier()</a></code>, rather than use a flawed black-list based approach with name munging.</p></li>
+<ul><li><p>It quotes field names using <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html" class="external-link">dbQuoteIdentifier()</a></code>, rather than use a flawed black-list based approach with name munging.</p></li>
 <li><p>It now throws errors on failure, rather than returning FALSE.</p></li>
 <li><p>It will automatically add row names only if they are character, not integer.</p></li>
 <li><p>When loading a file from disk, <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable()</a></code> will no longer attempt to guess the correct values for <code>row.names</code> and <code>header</code> - instead supply them explicitly if the defaults are incorrect.</p></li>
 <li><p>It uses named save points so it can be nested inside other transactions (<a href='https://github.com/r-dbi/RSQLite/issues/41'>#41</a>).</p></li>
 <li><p>When given a zero-row data frame it will just creates the table definition (<a href='https://github.com/r-dbi/RSQLite/issues/35'>#35</a>).</p></li>
-</ul>
-</li>
-</ul>
-</div>
+</ul></li>
+</ul></div>
 <div id="changes-to-objects" class="section level2">
 <h2 class="hasAnchor">
 <a href="#changes-to-objects" class="anchor" aria-hidden="true"></a>Changes to objects</h2>
-<ul>
-<li>The <code>dbname</code>, <code>loadable.extensions</code>, <code>flags</code> and <code>vfs</code> properties of a SqliteConnection are now slots. Access them directly instead of using <code><a href="https://dbi.r-dbi.org/reference/dbGetInfo.html" class="external-link">dbGetInfo()</a></code>.</li>
-</ul>
-</div>
+<ul><li>The <code>dbname</code>, <code>loadable.extensions</code>, <code>flags</code> and <code>vfs</code> properties of a SqliteConnection are now slots. Access them directly instead of using <code><a href="https://dbi.r-dbi.org/reference/dbGetInfo.html" class="external-link">dbGetInfo()</a></code>.</li>
+</ul></div>
 <div id="deprecated-and-removed-functions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#deprecated-and-removed-functions" class="anchor" aria-hidden="true"></a>Deprecated and removed functions</h2>
-<ul>
-<li><p>RSQLite is no longer nominally compatible with S (<a href='https://github.com/r-dbi/RSQLite/issues/39'>#39</a>).</p></li>
+<ul><li><p>RSQLite is no longer nominally compatible with S (<a href='https://github.com/r-dbi/RSQLite/issues/39'>#39</a>).</p></li>
 <li><p><code>idIsValid()</code> is deprecated. Please use <code><a href="https://dbi.r-dbi.org/reference/dbIsValid.html" class="external-link">dbIsValid()</a></code> instead.</p></li>
 <li><p><code><a href="../reference/dbBeginTransaction.html">dbBeginTransaction()</a></code> has been deprecated. Please use <code><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbBegin()</a></code> instead.</p></li>
 <li><p><code><a href="https://dbi.r-dbi.org/reference/dbCallProc.html" class="external-link">dbCallProc()</a></code> method removed, since generic is now deprecated.</p></li>
@@ -615,191 +512,132 @@
 <li><p><code>safe.write()</code> is no longer exported as it shouldn’t be part of the public RSQLite interface (<a href='https://github.com/r-dbi/RSQLite/issues/26'>#26</a>).</p></li>
 <li><p>Internal <code>sqlite*()</code> functions are no longer exported (<a href='https://github.com/r-dbi/RSQLite/issues/20'>#20</a>).</p></li>
 <li><p>Removed <code>SqliteObject</code> and <code>dbObject</code> classes, modifying <code>SqliteDriver</code>, <code>SqliteConnection</code>, and <code>SqliteResult</code> to use composition instead of multiple inheritance.</p></li>
-</ul>
-</div>
+</ul></div>
 </div>
     <div id="version-0116" class="section level1">
 <h1 class="page-header" data-toc-text="0.11.6">
-<a href="#version-0116" class="anchor" aria-hidden="true"></a>Version 0.11.6<small> Unreleased </small>
-</h1>
-<ul>
-<li>Upgrade to SQLite 3.8.4.2</li>
-</ul>
-</div>
+<a href="#version-0116" class="anchor" aria-hidden="true"></a>Version 0.11.6<small> Unreleased </small></h1>
+<ul><li>Upgrade to SQLite 3.8.4.2</li>
+</ul></div>
     <div id="version-0115" class="section level1">
 <h1 class="page-header" data-toc-text="0.11.5">
-<a href="#version-0115" class="anchor" aria-hidden="true"></a>Version 0.11.5<small> Unreleased </small>
-</h1>
-<ul>
-<li><p>Include temporary tables in dbListTables()</p></li>
+<a href="#version-0115" class="anchor" aria-hidden="true"></a>Version 0.11.5<small> Unreleased </small></h1>
+<ul><li><p>Include temporary tables in dbListTables()</p></li>
 <li><p>Added Rstudio project file</p></li>
 <li><p>Added select.cols capability to sqliteReadTable()</p></li>
-</ul>
-</div>
+</ul></div>
     <div id="version-0114" class="section level1">
 <h1 class="page-header" data-toc-text="0.11.4">
-<a href="#version-0114" class="anchor" aria-hidden="true"></a>Version 0.11.4<small> 2013-05-26 </small>
-</h1>
-<ul>
-<li><p>Upgrade to SQLite 3.7.7</p></li>
+<a href="#version-0114" class="anchor" aria-hidden="true"></a>Version 0.11.4<small> 2013-05-26 </small></h1>
+<ul><li><p>Upgrade to SQLite 3.7.7</p></li>
 <li><p>Fix bug in dbWriteTable preventing use of colClasses argument from being used to control input types.</p></li>
-</ul>
-</div>
+</ul></div>
     <div id="version-0113" class="section level1">
 <h1 class="page-header" data-toc-text="0.11.3">
-<a href="#version-0113" class="anchor" aria-hidden="true"></a>Version 0.11.3<small> 2013-04-16 </small>
-</h1>
-<ul>
-<li>Upgrade to SQLite 3.7.16.2</li>
-</ul>
-</div>
+<a href="#version-0113" class="anchor" aria-hidden="true"></a>Version 0.11.3<small> 2013-04-16 </small></h1>
+<ul><li>Upgrade to SQLite 3.7.16.2</li>
+</ul></div>
     <div id="version-0112" class="section level1">
 <h1 class="page-header" data-toc-text="0.11.2">
-<a href="#version-0112" class="anchor" aria-hidden="true"></a>Version 0.11.2<small> 2012-09-16 </small>
-</h1>
-<ul>
-<li>Upgrade to SQLite 3.7.14</li>
-</ul>
-</div>
+<a href="#version-0112" class="anchor" aria-hidden="true"></a>Version 0.11.2<small> 2012-09-16 </small></h1>
+<ul><li>Upgrade to SQLite 3.7.14</li>
+</ul></div>
     <div id="version-0111" class="section level1">
 <h1 class="page-header" data-toc-text="0.11.1">
-<a href="#version-0111" class="anchor" aria-hidden="true"></a>Version 0.11.1<small> 2011-12-07 </small>
-</h1>
-<ul>
-<li>Prevent RSQLite from crashing R when operations are attempted on expired (closed) connections.</li>
-</ul>
-</div>
+<a href="#version-0111" class="anchor" aria-hidden="true"></a>Version 0.11.1<small> 2011-12-07 </small></h1>
+<ul><li>Prevent RSQLite from crashing R when operations are attempted on expired (closed) connections.</li>
+</ul></div>
     <div id="version-0110" class="section level1">
 <h1 class="page-header" data-toc-text="0.11.0">
-<a href="#version-0110" class="anchor" aria-hidden="true"></a>Version 0.11.0<small> 2011-12-01 </small>
-</h1>
-<ul>
-<li><p>Enhance type detection in sqliteDataType (dbDataType). The storage mode of a data.frame column is now used as part of the type detection. Prior to this patch, all vectors with class other than numeric or logical were mapped to a TEXT column. This patch uses the output of storage.mode to map to integer and double vectors to INTEGER and REAL columns, respectively. All other modes are mapped to a TEXT column.</p></li>
+<a href="#version-0110" class="anchor" aria-hidden="true"></a>Version 0.11.0<small> 2011-12-01 </small></h1>
+<ul><li><p>Enhance type detection in sqliteDataType (dbDataType). The storage mode of a data.frame column is now used as part of the type detection. Prior to this patch, all vectors with class other than numeric or logical were mapped to a TEXT column. This patch uses the output of storage.mode to map to integer and double vectors to INTEGER and REAL columns, respectively. All other modes are mapped to a TEXT column.</p></li>
 <li><p>Detection of BLOBs was narrowed slightly. The code now treats only objects with data.class(obj) == “list” as BLOBs. Previously, is.list was used which could return TRUE for lists of various classes.</p></li>
 <li><p>Fix bug in sqliteImportFile (used by dbWriteTable) that prevented a comment character from being specified for the input file.</p></li>
 <li><p>Increase compile-time SQLite limits for maximum number of columns in a table to 30000 and maximum number of parameters (?N) in a SELECT to 40000. Use of wide tables is not encouraged. The default values for SQLite are 2000 and 999, respectively. Databases containing tables with more than 2000 columns may not be compatible with versions of SQLite compiled with default settings.</p></li>
 <li><p>Upgrade to SQLite 3.7.9.</p></li>
-</ul>
-</div>
+</ul></div>
     <div id="version-0100" class="section level1">
 <h1 class="page-header" data-toc-text="0.10.0">
-<a href="#version-0100" class="anchor" aria-hidden="true"></a>Version 0.10.0<small> 2011-10-02 </small>
-</h1>
-<ul>
-<li>Upgrade to SQLite 3.7.8.</li>
-</ul>
-</div>
+<a href="#version-0100" class="anchor" aria-hidden="true"></a>Version 0.10.0<small> 2011-10-02 </small></h1>
+<ul><li>Upgrade to SQLite 3.7.8.</li>
+</ul></div>
     <div id="version-09-5" class="section level1">
 <h1 class="page-header" data-toc-text="0.9-5">
-<a href="#version-09-5" class="anchor" aria-hidden="true"></a>Version 0.9-5<small> Unreleased </small>
-</h1>
-<ul>
-<li>Fix error handling for prepared queries when bind data is missing a named parameter.</li>
-</ul>
-</div>
+<a href="#version-09-5" class="anchor" aria-hidden="true"></a>Version 0.9-5<small> Unreleased </small></h1>
+<ul><li>Fix error handling for prepared queries when bind data is missing a named parameter.</li>
+</ul></div>
     <div id="version-09-4" class="section level1">
 <h1 class="page-header" data-toc-text="0.9-4">
-<a href="#version-09-4" class="anchor" aria-hidden="true"></a>Version 0.9-4<small> 2010-11-24 </small>
-</h1>
-<ul>
-<li>Fix incorrect handling of NA’s for character data in the code that binds parameters to a SQL query. The string “NA” was incorrectly interpreted as a missing value.</li>
-</ul>
-</div>
+<a href="#version-09-4" class="anchor" aria-hidden="true"></a>Version 0.9-4<small> 2010-11-24 </small></h1>
+<ul><li>Fix incorrect handling of NA’s for character data in the code that binds parameters to a SQL query. The string “NA” was incorrectly interpreted as a missing value.</li>
+</ul></div>
     <div id="version-09-3" class="section level1">
 <h1 class="page-header" data-toc-text="0.9-3">
-<a href="#version-09-3" class="anchor" aria-hidden="true"></a>Version 0.9-3<small> 2010-11-07 </small>
-</h1>
-<ul>
-<li><p>Upgrade SQLite to 3.7.3. See https://www.sqlite.org/changes.html for release notes for SQLite.</p></li>
-<li><p>Enable the sounder(X) function via the SQLITE_SOUNDEX compile time flag. See https://www.sqlite.org/lang_corefunc.html#soundex for details.</p></li>
-</ul>
-</div>
+<a href="#version-09-3" class="anchor" aria-hidden="true"></a>Version 0.9-3<small> 2010-11-07 </small></h1>
+<ul><li><p>Upgrade SQLite to 3.7.3. See <a href="https://www.sqlite.org/changes.html" class="external-link uri">https://www.sqlite.org/changes.html</a> for release notes for SQLite.</p></li>
+<li><p>Enable the sounder(X) function via the SQLITE_SOUNDEX compile time flag. See <a href="https://www.sqlite.org/lang_corefunc.html#soundex" class="external-link uri">https://www.sqlite.org/lang_corefunc.html#soundex</a> for details.</p></li>
+</ul></div>
     <div id="version-09-2" class="section level1">
 <h1 class="page-header" data-toc-text="0.9-2">
-<a href="#version-09-2" class="anchor" aria-hidden="true"></a>Version 0.9-2<small> 2010-07-24 </small>
-</h1>
-<ul>
-<li>Fix two missing PROTECTs in RS_SQLite_managerInfo and RS_SQLite_getException, thanks to a patch from Andrew Runnalls</li>
-</ul>
-</div>
+<a href="#version-09-2" class="anchor" aria-hidden="true"></a>Version 0.9-2<small> 2010-07-24 </small></h1>
+<ul><li>Fix two missing PROTECTs in RS_SQLite_managerInfo and RS_SQLite_getException, thanks to a patch from Andrew Runnalls</li>
+</ul></div>
     <div id="version-09-1" class="section level1">
 <h1 class="page-header" data-toc-text="0.9-1">
-<a href="#version-09-1" class="anchor" aria-hidden="true"></a>Version 0.9-1<small> 2010-05-29 </small>
-</h1>
-<ul>
-<li><p>SQLite header files needed to compile SQLite extension functions are now made available by RSQLite. Packages can bundle SQLite extension functions and use LinkingTo: RSQLite in the DESCRIPTION file.</p></li>
+<a href="#version-09-1" class="anchor" aria-hidden="true"></a>Version 0.9-1<small> 2010-05-29 </small></h1>
+<ul><li><p>SQLite header files needed to compile SQLite extension functions are now made available by RSQLite. Packages can bundle SQLite extension functions and use LinkingTo: RSQLite in the DESCRIPTION file.</p></li>
 <li><p>SQLite loadable extensions are now enabled by default for new connections. If you wish to disallow loadable extensions for a given connection, loadable.extensions=FALSE to dbConnect.</p></li>
-</ul>
-</div>
+</ul></div>
     <div id="version-09-0" class="section level1">
 <h1 class="page-header" data-toc-text="0.9-0">
-<a href="#version-09-0" class="anchor" aria-hidden="true"></a>Version 0.9-0<small> 2010-05-07 </small>
-</h1>
-<ul>
-<li><p>The SQLite driver handle validation code, is_ValidHandle, no longer requires the driver ID to be equal to the current process ID. SQLite supports multiple processes accessing the same SQLite file via locking (however, results are known to be unreliable on NFS). This change should make using RSQLite with the multicore package easier. For an example of the issue that the PID check causes see: https://stat.ethz.ch/pipermail/r-sig-hpc/2009-August/000335.html</p></li>
-<li><p>Refactor to use external pointers to wrap handle IDs; remove handle ID coerce code (e.g. as(obj@Id, “integer”)). For now, the old scheme of storing handle IDs in an integer vector is mostly maintained only these integer vectors are stored in the protection slot of an external pointer. Using external pointers will allow the use of finalizer code so that, for example, unreferenced result sets can be cleaned up.</p></li>
+<a href="#version-09-0" class="anchor" aria-hidden="true"></a>Version 0.9-0<small> 2010-05-07 </small></h1>
+<ul><li><p>The SQLite driver handle validation code, is_ValidHandle, no longer requires the driver ID to be equal to the current process ID. SQLite supports multiple processes accessing the same SQLite file via locking (however, results are known to be unreliable on NFS). This change should make using RSQLite with the multicore package easier. For an example of the issue that the PID check causes see: <a href="https://stat.ethz.ch/pipermail/r-sig-hpc/2009-August/000335.html" class="external-link uri">https://stat.ethz.ch/pipermail/r-sig-hpc/2009-August/000335.html</a></p></li>
+<li><p>Refactor to use external pointers to wrap handle IDs; remove handle ID coerce code (e.g. as(<a href="mailto:obj@Id" class="email">obj@Id</a>, “integer”)). For now, the old scheme of storing handle IDs in an integer vector is mostly maintained only these integer vectors are stored in the protection slot of an external pointer. Using external pointers will allow the use of finalizer code so that, for example, unreferenced result sets can be cleaned up.</p></li>
 <li><p>Upgrade to SQLite 3.6.23.1.</p></li>
 <li>
 <p>The memory management code for keeping track of database connections was significantly refactored. Instead of tracking connections in a pre-allocated array attached to the driver manager, connections are now managed dynamically using R’s external pointers and finalizers. Consequences of this change are as follows:</p>
-<ul>
-<li><p>There is no longer a maximum connection limit (values specified using the max.con argument to SQLite() are now ignored).</p></li>
+<ul><li><p>There is no longer a maximum connection limit (values specified using the max.con argument to SQLite() are now ignored).</p></li>
 <li><p>The dbGetInfo(mgr) method no longer lists open connections and dbListConnections will now always return an empty list. This functionality was only needed because one needed a reference to a connection in order to finalize the resource via dbDisconnect(). While calling dbDisconnect() is still the recommended approach, database connections that are no longer referenced by any R variables will be finalized by R’s garbage collector.</p></li>
 <li><p>The behavior of SQLiteConnection objects now follows typical R semantics. If no R variables reference a given connection, it will be finalized by R’s garbage collector.</p></li>
-</ul>
-</li>
+</ul></li>
 <li><p>Add support for SQLite BLOBs. You can now insert and retrieve BLOBs using raw vectors. For parameterized queries using dbSendPreparedQuery, the BLOB column must be a list. When a query returns a result set with a BLOB column, that column will be a list of raw vectors. Lists as columns in data.frames work for simple access, but may break some code that expects columns to be atomic vectors. A database NULL value is mapped to an R NULL value for BLOBs. This differs from the mapping of database NULL to NA used for other datatypes (there is no notion of NA for a raw vector).</p></li>
 <li><p>The behavior of dbDataType, sqliteDataType, and as a consequence, dbWriteTable has been changed to support BLOBs represented as a column of type list in a data.frame. Such columns were previously mapped to a TEXT column in SQLite and are not mapped to BLOB.</p></li>
 <li><p>RSQLite now depends on R &gt;= 2.10.0.</p></li>
-</ul>
-</div>
+</ul></div>
     <div id="version-08-4" class="section level1">
 <h1 class="page-header" data-toc-text="0.8-4">
-<a href="#version-08-4" class="anchor" aria-hidden="true"></a>Version 0.8-4<small> 2010-03-10 </small>
-</h1>
-<ul>
-<li><p>Fix a memory leak in bound parameter management and resolve a missing PROTECT bug that caused spurious crashes when performing many prepared queries.</p></li>
+<a href="#version-08-4" class="anchor" aria-hidden="true"></a>Version 0.8-4<small> 2010-03-10 </small></h1>
+<ul><li><p>Fix a memory leak in bound parameter management and resolve a missing PROTECT bug that caused spurious crashes when performing many prepared queries.</p></li>
 <li><p>Improve internal memory handling for prepared queries. Use R_PreserveObject/R_ReleaseObject instead of the protection stack to manage parameter binding. Logical vectors are now properly coerced to integer vectors and Rf_asCharacterFactor is used to convert factors in bind data.</p></li>
 <li><p>RSQLite now requires DBI &gt;= 0.2-5</p></li>
 <li><p>There is now a fairly comprehensive example of using prepared queries in the man page for dbSendQuery-methods.</p></li>
 <li><p>Upgrade to SQLite 3.6.21 =&gt; 3.6.22 (minor bug fixes).</p></li>
 <li><p>Use sqlite3_prepare_v2 throughout, remove workaround code needed for legacy sqlite3_prepare behavior.</p></li>
 <li><p>Add name space unload hook to unload RSQLite.so.</p></li>
-<li><p>Enable full-text search module by default. See https://www.sqlite.org/fts3.html for details on this SQLite module.</p></li>
+<li><p>Enable full-text search module by default. See <a href="https://www.sqlite.org/fts3.html" class="external-link uri">https://www.sqlite.org/fts3.html</a> for details on this SQLite module.</p></li>
 <li><p>Add support for prepared queries that involve a SELECT. This was previously unsupported. SELECT queries can now be used with dbSendPreparedQuery. The return value is the same as rbind’ing the results of the individual queries. This means that parameters that return no results are ignored in the result.</p></li>
-</ul>
-</div>
+</ul></div>
     <div id="version-08-3" class="section level1">
 <h1 class="page-header" data-toc-text="0.8-3">
-<a href="#version-08-3" class="anchor" aria-hidden="true"></a>Version 0.8-3<small> 2010-02-11 </small>
-</h1>
-<ul>
-<li>Enable RTree module for the Windows build. The configure script is not run on Windows, options are set directly in src/Makevars.win.</li>
-</ul>
-</div>
+<a href="#version-08-3" class="anchor" aria-hidden="true"></a>Version 0.8-3<small> 2010-02-11 </small></h1>
+<ul><li>Enable RTree module for the Windows build. The configure script is not run on Windows, options are set directly in src/Makevars.win.</li>
+</ul></div>
     <div id="version-08-2" class="section level1">
 <h1 class="page-header" data-toc-text="0.8-2">
-<a href="#version-08-2" class="anchor" aria-hidden="true"></a>Version 0.8-2<small> 2010-01-22 </small>
-</h1>
-<ul>
-<li>Changes to support WIN64</li>
-</ul>
-</div>
+<a href="#version-08-2" class="anchor" aria-hidden="true"></a>Version 0.8-2<small> 2010-01-22 </small></h1>
+<ul><li>Changes to support WIN64</li>
+</ul></div>
     <div id="version-08-1" class="section level1">
 <h1 class="page-header" data-toc-text="0.8-1">
-<a href="#version-08-1" class="anchor" aria-hidden="true"></a>Version 0.8-1<small> 2010-01-07 </small>
-</h1>
-<ul>
-<li><p>sqliteFetch now returns a data.frame with the expected number of columns when a query returns zero rows. Before, a 0 x 0 data.frame was returned regardless of the number of columns in the original query. The change will be seen in calls to fetch and dbGetQuery for queries that return no result rows.</p></li>
+<a href="#version-08-1" class="anchor" aria-hidden="true"></a>Version 0.8-1<small> 2010-01-07 </small></h1>
+<ul><li><p>sqliteFetch now returns a data.frame with the expected number of columns when a query returns zero rows. Before, a 0 x 0 data.frame was returned regardless of the number of columns in the original query. The change will be seen in calls to fetch and dbGetQuery for queries that return no result rows.</p></li>
 <li><p>sqliteCopyDatabase has been refactored to support copying to either a file or an open and empty database connection. This makes it possible to transfer a disk based database to an in-memory based database. The changes to sqliteCopyDatabase are NOT BACKWARDS COMPATIBLE: the return value is now NULL (an error is raised if the copying fails) and the argument names have been changed to ‘from’ and ‘to’. As this was a newly added feature that uses an experimental SQLite API, I decided to disregards compatibility.</p></li>
 <li><p>Calling dbSendPreparedQuery with a non-NULL bind.data that has zero rows or zero columns is now an error.</p></li>
-</ul>
-</div>
+</ul></div>
     <div id="version-08-0" class="section level1">
 <h1 class="page-header" data-toc-text="0.8-0">
-<a href="#version-08-0" class="anchor" aria-hidden="true"></a>Version 0.8-0<small> 2009-12-22 </small>
-</h1>
-<ul>
-<li><p>Upgrade to SQLite 3.6.21</p></li>
+<a href="#version-08-0" class="anchor" aria-hidden="true"></a>Version 0.8-0<small> 2009-12-22 </small></h1>
+<ul><li><p>Upgrade to SQLite 3.6.21</p></li>
 <li><p>Apply some code and Rd cleanups contributed by Mattias Burger. Avoid partial argument name matching, use TRUE/FALSE not T/F and improve Rd markup.</p></li>
 <li><p>Integrate RUnit unit tests so that they run during R CMD check. Small improvements to make the tests run more quietly. You can run the unit tests by calling RSQLite:::.test_RSQLite() (require latest version of the RUnit package). Also had to disable some unit tests on Windows. Investigation of details is on the TODO list.</p></li>
 <li><p>Add sqliteCopyDatabase, a function that uses SQLite’s online backup API to allow a specified database to be copied to a file. This can be used to create a file copy of an in memory database.</p></li>
@@ -808,140 +646,101 @@
 <li><p>dbConnect/sqliteNewConnection now throws an error if dbname argument is NA. Previously, if as.character(NA) was provided, a database with filename “NA” was created.</p></li>
 <li>
 <p>dbConnect/sqliteNewConnection now accepts two new arguments:</p>
-<p>flags: provides additional control over connetion details. For convenience, you can specify one of SQLITE_RWC (default), SQLITE_RW, or SQLITE_RO to obtain a connection in read/write/create, read/write, or read only mode, respectively. See http://sqlite.org/c3ref/open.html for details. vfs: controls the virtual filesystem used by SQLite. The default, NULL, lets SQLite select the appropriate vfs for the system. You can specify one of “unix-posix”, “unix-afp”, “unix-flock”, “unix-dotfile”, or “unix-none”. For details, see https://www.sqlite.org/compile.html. This functionality is only fully available on OSX. On non-OSX Unix, you can use unix-dotfile and unix-none. None of these modules are available on Windows where a non-NULL values of the vfs argument will be ignored with a warning.</p>
+<p>flags: provides additional control over connetion details. For convenience, you can specify one of SQLITE_RWC (default), SQLITE_RW, or SQLITE_RO to obtain a connection in read/write/create, read/write, or read only mode, respectively. See <a href="http://sqlite.org/c3ref/open.html" class="external-link uri">http://sqlite.org/c3ref/open.html</a> for details. vfs: controls the virtual filesystem used by SQLite. The default, NULL, lets SQLite select the appropriate vfs for the system. You can specify one of “unix-posix”, “unix-afp”, “unix-flock”, “unix-dotfile”, or “unix-none”. For details, see <a href="https://www.sqlite.org/compile.html" class="external-link uri">https://www.sqlite.org/compile.html</a>. This functionality is only fully available on OSX. On non-OSX Unix, you can use unix-dotfile and unix-none. None of these modules are available on Windows where a non-NULL values of the vfs argument will be ignored with a warning.</p>
 </li>
-</ul>
-</div>
+</ul></div>
     <div id="version-07-3" class="section level1">
 <h1 class="page-header" data-toc-text="0.7-3">
-<a href="#version-07-3" class="anchor" aria-hidden="true"></a>Version 0.7-3<small> 2009-10-04 </small>
-</h1>
-<ul>
-<li><p>Use the default value for SQLITE_MAX_SQL_LENGTH which has now been significantly increased over the value of 2 million that we had set in 2008.</p></li>
+<a href="#version-07-3" class="anchor" aria-hidden="true"></a>Version 0.7-3<small> 2009-10-04 </small></h1>
+<ul><li><p>Use the default value for SQLITE_MAX_SQL_LENGTH which has now been significantly increased over the value of 2 million that we had set in 2008.</p></li>
 <li><p>Fix some Rd cross references in the documentation.</p></li>
-</ul>
-</div>
+</ul></div>
     <div id="version-07-2" class="section level1">
 <h1 class="page-header" data-toc-text="0.7-2">
-<a href="#version-07-2" class="anchor" aria-hidden="true"></a>Version 0.7-2<small> 2009-08-14 </small>
-</h1>
-<ul>
-<li><p>Fixed some partial argument matching warnings. Thanks to Matthias Burger for reporting and sending a patch.</p></li>
+<a href="#version-07-2" class="anchor" aria-hidden="true"></a>Version 0.7-2<small> 2009-08-14 </small></h1>
+<ul><li><p>Fixed some partial argument matching warnings. Thanks to Matthias Burger for reporting and sending a patch.</p></li>
 <li><p>Added dbBuildTableDefinition to exports per user request.</p></li>
-</ul>
-</div>
+</ul></div>
     <div id="version-07-1" class="section level1">
 <h1 class="page-header" data-toc-text="0.7-1">
-<a href="#version-07-1" class="anchor" aria-hidden="true"></a>Version 0.7-1<small> 2008-10-25 </small>
-</h1>
-<ul>
-<li><p>Upgraded included SQLite from 3.6.0 to 3.6.4</p></li>
+<a href="#version-07-1" class="anchor" aria-hidden="true"></a>Version 0.7-1<small> 2008-10-25 </small></h1>
+<ul><li><p>Upgraded included SQLite from 3.6.0 to 3.6.4</p></li>
 <li><p>Old news is now in ONEWS. Taking a fresh start with this NEWS file to keep better track of changes on a per-release basis.</p></li>
 <li><p>Added a HACKING file where we will add notes about how to do development on RSQLite.</p></li>
-</ul>
-</div>
+</ul></div>
     <div id="version-04-12" class="section level1">
 <h1 class="page-header" data-toc-text="0.4-12">
-<a href="#version-04-12" class="anchor" aria-hidden="true"></a>Version 0.4-12<small> Unreleased </small>
-</h1>
-<ul>
-<li>Fix bug in dbListTables for empty databases</li>
-</ul>
-</div>
+<a href="#version-04-12" class="anchor" aria-hidden="true"></a>Version 0.4-12<small> Unreleased </small></h1>
+<ul><li>Fix bug in dbListTables for empty databases</li>
+</ul></div>
     <div id="version-04-11" class="section level1">
 <h1 class="page-header" data-toc-text="0.4-11">
-<a href="#version-04-11" class="anchor" aria-hidden="true"></a>Version 0.4-11<small> Unreleased </small>
-</h1>
-<ul>
-<li><p>Implemented dbCommit() and dbRollback(). There is also a new generic method dbBeginTransaction(), which begins a transaction. Note that this is an extension to the DBI interface.</p></li>
+<a href="#version-04-11" class="anchor" aria-hidden="true"></a>Version 0.4-11<small> Unreleased </small></h1>
+<ul><li><p>Implemented dbCommit() and dbRollback(). There is also a new generic method dbBeginTransaction(), which begins a transaction. Note that this is an extension to the DBI interface.</p></li>
 <li><p>Update to the SQLite 3 API for fetching records. This means that the records are pulled from the database as required, and not cached in memory as was previously done.</p></li>
 <li>
-<p>Added generic methods dbSendPreparedQuery() and dbGetPreparedQuery() which are similar to dbSendQuery() and dbGetQuery(), but take an extra “bind.data” parameter, which is a data frame. The statement is assumed to contain bind variables. Bind variables are either for a column name (“:name” or “@name”) or for a column index (“?”) in the data frame. See http://sqlite.org/capi3ref.html for more details.</p>
+<p>Added generic methods dbSendPreparedQuery() and dbGetPreparedQuery() which are similar to dbSendQuery() and dbGetQuery(), but take an extra “bind.data” parameter, which is a data frame. The statement is assumed to contain bind variables. Bind variables are either for a column name (“:name” or “@name”) or for a column index (“?”) in the data frame. See <a href="http://sqlite.org/capi3ref.html" class="external-link uri">http://sqlite.org/capi3ref.html</a> for more details.</p>
 <p>dbGetPreparedQuery(con, “INSERT INTO table1 VALUES (:col1)”, data.frame(col1=c(1, 2)) )</p>
 <p>Each bind variable in the query has to be bound only once, either via named or positional parameters. If it is not bound or is bound more than once (due to a mix or positional/named parameters) an error is thrown. Any extra columns in the data frame are ignored.</p>
 <p>If you are having a lot of string parameters, use stringsAsFactors=FALSE when creating the bind.data data.frame instance. You can also use I().</p>
 </li>
 <li><p>Added experimental sqliteQuickColumn function that retrieves an entire column from a specified table as quickly as possible.</p></li>
-<li><p>The SQLite driver has a new logical parameter “shared.cache” to enable the shared-cache mode, which allows multiple connections to share a single data and schema cache. See https://www.sqlite.org/sharedcache.html</p></li>
-</ul>
-</div>
+<li><p>The SQLite driver has a new logical parameter “shared.cache” to enable the shared-cache mode, which allows multiple connections to share a single data and schema cache. See <a href="https://www.sqlite.org/sharedcache.html" class="external-link uri">https://www.sqlite.org/sharedcache.html</a></p></li>
+</ul></div>
     <div id="version-04-9" class="section level1">
 <h1 class="page-header" data-toc-text="0.4-9">
-<a href="#version-04-9" class="anchor" aria-hidden="true"></a>Version 0.4-9<small> 2006-10-26 </small>
-</h1>
-<ul>
-<li><p>Upgraded to SQLite 3.3.8</p></li>
+<a href="#version-04-9" class="anchor" aria-hidden="true"></a>Version 0.4-9<small> 2006-10-26 </small></h1>
+<ul><li><p>Upgraded to SQLite 3.3.8</p></li>
 <li><p>Use .SQLitePkgName instead of hard-coding the package name when using .Call</p></li>
-<li><p>dbConnect() now has a logical parameter “loadable.extensions” which will allow loading of extensions. See the Loadable Extensions documentation: https://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions</p></li>
-</ul>
-</div>
+<li><p>dbConnect() now has a logical parameter “loadable.extensions” which will allow loading of extensions. See the Loadable Extensions documentation: <a href="https://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions" class="external-link uri">https://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions</a></p></li>
+</ul></div>
     <div id="version-04-4" class="section level1">
 <h1 class="page-header" data-toc-text="0.4-4">
-<a href="#version-04-4" class="anchor" aria-hidden="true"></a>Version 0.4-4<small> 2006-09-29 </small>
-</h1>
-<ul>
-<li><p>Upgraded to SQLite 3.3.7</p></li>
+<a href="#version-04-4" class="anchor" aria-hidden="true"></a>Version 0.4-4<small> 2006-09-29 </small></h1>
+<ul><li><p>Upgraded to SQLite 3.3.7</p></li>
 <li><p>Default when building from source is now to compile the included version of SQLite and link to it statically</p></li>
 <li><p>Fixed unclosed textConnections</p></li>
-</ul>
-</div>
+</ul></div>
     <div id="version-04-1" class="section level1">
 <h1 class="page-header" data-toc-text="0.4-1">
-<a href="#version-04-1" class="anchor" aria-hidden="true"></a>Version 0.4-1<small> 2006-01-19 </small>
-</h1>
-<ul>
-<li><p>Added a method for dbWriteTable to write table from a text file, e.g., dbWriteTable(con, “tablename”, “filename”)</p></li>
+<a href="#version-04-1" class="anchor" aria-hidden="true"></a>Version 0.4-1<small> 2006-01-19 </small></h1>
+<ul><li><p>Added a method for dbWriteTable to write table from a text file, e.g., dbWriteTable(con, “tablename”, “filename”)</p></li>
 <li><p>Fixed problems exporting/importing NA’s (thanks to Ronggui Huang for a very clear bug report).</p></li>
 <li><p>Fixed double free() in the C code, a tiny memory leak, and configure now builds sqlite properly on 64-bit linux (thanks to Seth Falcon for these).</p></li>
 <li><p>dbConnect() now accepts values for the “cache_size” and “synchronous” PRAGMAs (“synchronous” defaults to 0 or “off”) to improve performance (thanks to Charles Loboz for pointing these out, see the file “rsqlitePerf.txt”).</p></li>
-</ul>
-</div>
+</ul></div>
     <div id="version-04-0" class="section level1">
 <h1 class="page-header" data-toc-text="0.4-0">
-<a href="#version-04-0" class="anchor" aria-hidden="true"></a>Version 0.4-0<small> 2005-04-06 </small>
-</h1>
-<ul>
-<li><p>First attempt at using the new SQLite Version 3 API. This version is a bridge to the new API, but it does not make available the new capabilities (e.g., prepared statements, data bindings, etc.) but prepares us for those new features.</p></li>
+<a href="#version-04-0" class="anchor" aria-hidden="true"></a>Version 0.4-0<small> 2005-04-06 </small></h1>
+<ul><li><p>First attempt at using the new SQLite Version 3 API. This version is a bridge to the new API, but it does not make available the new capabilities (e.g., prepared statements, data bindings, etc.) but prepares us for those new features.</p></li>
 <li><p>Clean up some installation code (mainly to make it easy to automatically build on Windows, as per Kurt Hornik and Uwe Ligges suggestions).</p></li>
 <li><p>Fixed bug that ignored “fetch.default.rec” in SQLite()/dbDriver() (as reported by Duncan Murdoch)</p></li>
 <li><p>Fixed bug in dbReadTable() that was not recognizing “row.names” in its default, thus it now re-creates a data.frame that has been exported with dbWriteTable().</p></li>
 <li><p>Fixed bug where dbListTables was not listing views (as reported by Doug Bates).</p></li>
 <li><p>Added code in “configure.in” to determine CC/CFLAGS used in compiling R (as suggested by Brian D. Ripley to get it to compile on 64-bit machines). As of today, I can’t test this myself.</p></li>
-</ul>
-</div>
+</ul></div>
     <div id="version-03-5" class="section level1">
 <h1 class="page-header" data-toc-text="0.3-5">
-<a href="#version-03-5" class="anchor" aria-hidden="true"></a>Version 0.3-5<small> 2005-01-31 </small>
-</h1>
-<ul>
-<li>Documentation typos, trivial packaging changes, as per CRAN maintainer request.</li>
-</ul>
-</div>
+<a href="#version-03-5" class="anchor" aria-hidden="true"></a>Version 0.3-5<small> 2005-01-31 </small></h1>
+<ul><li>Documentation typos, trivial packaging changes, as per CRAN maintainer request.</li>
+</ul></div>
     <div id="version-03-4" class="section level1">
 <h1 class="page-header" data-toc-text="0.3-4">
-<a href="#version-03-4" class="anchor" aria-hidden="true"></a>Version 0.3-4<small> 2004-06-22 </small>
-</h1>
-<ul>
-<li>Fixed documentation typos.</li>
-</ul>
-</div>
+<a href="#version-03-4" class="anchor" aria-hidden="true"></a>Version 0.3-4<small> 2004-06-22 </small></h1>
+<ul><li>Fixed documentation typos.</li>
+</ul></div>
     <div id="version-03-3" class="section level1">
 <h1 class="page-header" data-toc-text="0.3-3">
-<a href="#version-03-3" class="anchor" aria-hidden="true"></a>Version 0.3-3<small> 2003-11-05 </small>
-</h1>
-<ul>
-<li><p>Minor fixes to accommodate R 1.8.0 changes to data.frame subsetting.</p></li>
+<a href="#version-03-3" class="anchor" aria-hidden="true"></a>Version 0.3-3<small> 2003-11-05 </small></h1>
+<ul><li><p>Minor fixes to accommodate R 1.8.0 changes to data.frame subsetting.</p></li>
 <li><p>Updated the documentation to use 1.8.0 new S4-style method documentation.</p></li>
 <li><p>Updated to SQLite to the latest 2.8.6 (included with RSQLite).</p></li>
 <li><p>Added file NAMESPACE.future to prepare for namespace implementation at some future release.</p></li>
-</ul>
-</div>
+</ul></div>
     <div id="version-03-2" class="section level1">
 <h1 class="page-header" data-toc-text="0.3-2">
-<a href="#version-03-2" class="anchor" aria-hidden="true"></a>Version 0.3-2<small> 2003-06-16 </small>
-</h1>
-<ul>
-<li>
+<a href="#version-03-2" class="anchor" aria-hidden="true"></a>Version 0.3-2<small> 2003-06-16 </small></h1>
+<ul><li>
 <p>Ported to Windows. It now installs fine under Windows with</p>
 <p>Rcmd INSTALL RSQLite_0.3-2.tar.gz</p>
 <p>(there’s also a binary RSQLite_0.3-2.zip)</p>
@@ -950,34 +749,24 @@
 <li><p>Added source sqlite-2.8.3.</p></li>
 <li><p>Fixed minor documentation errors and removed the DBI.pdf documentation file, which is included in the required DBI package.</p></li>
 <li><p>The package now installs as a binary image by default (use the –no-save argument to R CMD INSTALL to override this).</p></li>
-</ul>
-</div>
+</ul></div>
     <div id="version-03-1" class="section level1">
 <h1 class="page-header" data-toc-text="0.3-1">
-<a href="#version-03-1" class="anchor" aria-hidden="true"></a>Version 0.3-1<small> 2003-03-31 </small>
-</h1>
-<ul>
-<li><p>Moved the implementation to version 4 style classes, and it now it is fully compliant with the DBI 0.1-3.</p></li>
+<a href="#version-03-1" class="anchor" aria-hidden="true"></a>Version 0.3-1<small> 2003-03-31 </small></h1>
+<ul><li><p>Moved the implementation to version 4 style classes, and it now it is fully compliant with the DBI 0.1-3.</p></li>
 <li><p>Simplified the core helper R/SQLite functions (w. prefix “sqlite”) following the ROracle model.</p></li>
-<li><p>Updated to sqlite version 2.7.1 (note that if you have an sqlite database file from a version prior to 2.6 you’ll need to update it – for details see https://www.hwaic.com/sw/sqlite).</p></li>
-</ul>
-</div>
+<li><p>Updated to sqlite version 2.7.1 (note that if you have an sqlite database file from a version prior to 2.6 you’ll need to update it – for details see <a href="https://www.hwaic.com/sw/sqlite" class="external-link uri">https://www.hwaic.com/sw/sqlite</a>).</p></li>
+</ul></div>
     <div id="version-02-1" class="section level1">
 <h1 class="page-header" data-toc-text="0.2-1">
-<a href="#version-02-1" class="anchor" aria-hidden="true"></a>Version 0.2-1<small> 2001-10-29 </small>
-</h1>
-<ul>
-<li>Worked mostly in the configuration; added the –enable-sqlite and –with-sqlite arguments to have the RSQLite configuration also install SQLite or locate it, respectively.</li>
-</ul>
-</div>
+<a href="#version-02-1" class="anchor" aria-hidden="true"></a>Version 0.2-1<small> 2001-10-29 </small></h1>
+<ul><li>Worked mostly in the configuration; added the –enable-sqlite and –with-sqlite arguments to have the RSQLite configuration also install SQLite or locate it, respectively.</li>
+</ul></div>
     <div id="version-01-1" class="section level1">
 <h1 class="page-header" data-toc-text="0.1-1">
-<a href="#version-01-1" class="anchor" aria-hidden="true"></a>Version 0.1-1<small> Unreleased </small>
-</h1>
-<ul>
-<li>First implementation – used the RS-DBI.[ch] code (which is the core connection/cursor manager) “as is” and modified the RS-MySQL.[hc], (which sits directly on top of the MySQL C API) and replace the MySQL API calls with SQLite API calls. This was pretty easy, except for the fact that the SQLite API is so minimal (3, yes, 3 C functions) with no support for connections, result set (cursors), data types, meta-data – nothing. So I had to simulate all this. (Actually it wasn’t too bad).</li>
-</ul>
-</div>
+<a href="#version-01-1" class="anchor" aria-hidden="true"></a>Version 0.1-1<small> Unreleased </small></h1>
+<ul><li>First implementation – used the RS-DBI.[ch] code (which is the core connection/cursor manager) “as is” and modified the RS-MySQL.[hc], (which sits directly on top of the MySQL C API) and replace the MySQL API calls with SQLite API calls. This was pretty easy, except for the fact that the SQLite API is so minimal (3, yes, 3 C functions) with no support for connections, result set (cursors), data types, meta-data – nothing. So I had to simulate all this. (Actually it wasn’t too bad).</li>
+</ul></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

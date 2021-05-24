@@ -143,12 +143,12 @@ the same database.</p>
 events. When setting a timeout, SQLite will try the transaction multiple
 times within this timeout. To set a timeout, pass an integer scalar to
 <code>sqliteSetBusyHandler()</code>.</p>
-<p>Another way to set a timeout is to use a <code>PRAGMA</code>, e.g. the SQL query<div class="sql"></p><pre>PRAGMA busy_timeout=3000
-</pre><p></div></p>
+<p>Another way to set a timeout is to use a <code>PRAGMA</code>, e.g. the SQL query<div class="sql"></p><pre><code>PRAGMA busy_timeout=3000
+</code></pre><p></div></p>
 <p>sets the busy timeout to three seconds.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sqliteSetBusyHandler</span><span class='op'>(</span><span class='va'>dbObj</span>, <span class='va'>handler</span><span class='op'>)</span></pre>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>sqliteSetBusyHandler</span><span class='op'>(</span><span class='va'>dbObj</span>, <span class='va'>handler</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

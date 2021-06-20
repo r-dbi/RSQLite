@@ -1,5 +1,11 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
+# RSQLite 2.2.7.9001 (2021-06-20)
+
+- Upgrade bundled SQLite to version 3.36.0 (#374).
+- Avoid using memoise at build time (#371).
+
+
 # RSQLite 2.2.7.9000 (2021-04-22)
 
 - Remove RStudio Connection pane support due to problems reported by users.

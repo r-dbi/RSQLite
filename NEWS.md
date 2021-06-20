@@ -8,8 +8,7 @@
 
 # RSQLite 2.2.7.9000 (2021-04-22)
 
-- Remove RStudio Connection pane support due to problems reported by users.
-- Upgrade bundled SQLite to version 3.35.5 (#368).
+- Only internal changes.
 
 
 # RSQLite 2.2.7 (2021-04-22)

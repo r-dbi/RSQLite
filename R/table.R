@@ -83,7 +83,7 @@ setMethod("dbWriteTable", c("SQLiteConnection", "character", "data.frame"),
       stopc("`field.types` must be a named character vector with unique names, or NULL")
     }
     if (append && !is.null(field.types)) {
-      stopc("Cannot specify field.types with append = TRUE")
+      stopc("Cannot specify `field.types` with `append = TRUE`")
     }
 
     name <- check_quoted_identifier(name)

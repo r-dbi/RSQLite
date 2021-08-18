@@ -6,7 +6,7 @@ test_that("Can read dates", {
 
   dbExecute(con, "drop table if exists t1")
   dbExecute(con, "create table t1(dt DATE)")
-  dbExecute(con, "insert into t1 values (1), (18612.2), ('2020-01-10') , ('not a date'), (?)", param = as.Date("2021-12-11"))
+  dbExecute(con, "insert into t1 values (1), (18612.2), ('2020-01-10') , ('not a date'), (?)", params = as.Date("2021-12-11"))
 
   expect_warning(resdf <- dbGetQuery(con, "SELECT * from t1"), "Unknown string format, NA is returned.")
   expect_that(resdf[[1]], equals(as.Date(c("1970-01-02", "2020-12-16", "2020-01-10", NA, "2021-12-11"))))
@@ -19,7 +19,7 @@ test_that("Can read datetime", {
   dbExecute(con, "drop table if exists t1")
   dbExecute(con, "create table t1(dt DATETIME)")
   dbExecute(con, "insert into t1 values (1), (1608110307.2), ('2020-01-10 12:13:14'), ('not a date'), (?)",
-    param = as.POSIXct("2021-11-12 13:12:11", tz = "UTC")
+    params = as.POSIXct("2021-11-12 13:12:11", tz = "UTC")
   )
 
   expect_warning(resdf <- dbGetQuery(con, "SELECT * from t1"), "Unknown string format, NA is returned.")
@@ -35,7 +35,7 @@ test_that("Can read time", {
   dbExecute(con, "drop table if exists t1")
   dbExecute(con, "create table t1(dt TIME)")
   dbExecute(con, "insert into t1 values (1), (-90000.2), ('25:12:13.123') , ('not a time'), (?)",
-    param = structure(123, units = "secs", class = c("hms", "difftime"))
+    params = structure(123, units = "secs", class = c("hms", "difftime"))
   )
 
   expect_warning(resdf <- dbGetQuery(con, "SELECT * from t1"), "Unknown string format, NA is returned.")
@@ -96,7 +96,7 @@ test_that("Blob as dates", {
 
   dbExecute(con, "drop table if exists t1")
   dbExecute(con, "create table t1(dt DATE)")
-  dbExecute(con, "insert into t1 values (?)", param = list(blob::as_blob(as.raw(7))))
+  dbExecute(con, "insert into t1 values (?)", params = list(blob::as_blob(as.raw(7))))
 
   expect_warning(resdf <- dbGetQuery(con, "SELECT * from t1"), "Cannot convert blob, NA is returned.")
   expect_that(resdf[[1]], equals(as.Date(NA)))
@@ -108,7 +108,7 @@ test_that("Blob as datetime", {
 
   dbExecute(con, "drop table if exists t1")
   dbExecute(con, "create table t1(dt DATETIME)")
-  dbExecute(con, "insert into t1 values (?)", param = list(blob::as_blob(as.raw(7))))
+  dbExecute(con, "insert into t1 values (?)", params = list(blob::as_blob(as.raw(7))))
 
   expect_warning(resdf <- dbGetQuery(con, "SELECT * from t1"), "Cannot convert blob, NA is returned.")
   expect_that(resdf[[1]], equals(as.POSIXct(NA_real_, origin = "1970-01-01", tz = "UTC")))
@@ -121,7 +121,7 @@ test_that("Blob as time", {
 
   dbExecute(con, "drop table if exists t1")
   dbExecute(con, "create table t1(dt TIME)")
-  dbExecute(con, "insert into t1 values (?)", param = list(blob::as_blob(as.raw(7))))
+  dbExecute(con, "insert into t1 values (?)", params = list(blob::as_blob(as.raw(7))))
 
   expect_warning(resdf <- dbGetQuery(con, "SELECT * from t1"), "Cannot convert blob, NA is returned.")
   expect_that(resdf[[1]], equals(structure(NA_real_, units = "secs", class = c("hms", "difftime"))))

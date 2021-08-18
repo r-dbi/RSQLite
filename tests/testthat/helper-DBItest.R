@@ -7,7 +7,7 @@ default_skip <-
     "roundtrip_date",                             # #109
     "roundtrip_timestamp",                        # #110
 
-    "column_info_consistent",                     # #259
+    "column_info_consistent",                     # https://github.com/r-dbi/DBItest/issues/181
 
     NULL
   )

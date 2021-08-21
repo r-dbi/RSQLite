@@ -1,5 +1,10 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
+# RSQLite 2.2.8 (2021-08-21)
+
+- Same as previous version.
+
+
 # RSQLite 2.2.7.9002 (2021-08-21)
 
 - Fix build on CentOS 7 (#367).

@@ -2,24 +2,10 @@
 
 # RSQLite 2.2.8 (2021-08-21)
 
-- Same as previous version.
-
-
-# RSQLite 2.2.7.9002 (2021-08-21)
-
+- Upgrade bundled SQLite to version 3.36.0 (#374).
 - Fix build on CentOS 7 (#367).
 - Busy callback emits message instead of warning (#355).
-
-
-# RSQLite 2.2.7.9001 (2021-06-20)
-
-- Upgrade bundled SQLite to version 3.36.0 (#374).
 - Avoid using memoise at build time (#371).
-
-
-# RSQLite 2.2.7.9000 (2021-04-22)
-
-- Only internal changes.
 
 
 # RSQLite 2.2.7 (2021-04-22)

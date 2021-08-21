@@ -1,5 +1,11 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
+# RSQLite 2.2.7.9002 (2021-08-21)
+
+- Fix build on CentOS 7 (#367).
+- Busy callback emits message instead of warning (#355).
+
+
 # RSQLite 2.2.7.9001 (2021-06-20)
 
 - Upgrade bundled SQLite to version 3.36.0 (#374).

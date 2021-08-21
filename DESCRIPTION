@@ -43,7 +43,7 @@ Imports:
     memoise,
     methods,
     pkgconfig,
-    Rcpp (>= 0.12.7)
+    Rcpp (>= 1.0.7)
 Suggests: 
     DBItest (>= 1.7.0),
     gert,

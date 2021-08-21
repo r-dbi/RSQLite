@@ -1,8 +1,35 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
-# RSQLite 2.2.4.9000 (2021-03-12)
+# RSQLite 2.2.7.9001 (2021-06-20)
 
-- Same as previous version.
+- Upgrade bundled SQLite to version 3.36.0 (#374).
+- Avoid using memoise at build time (#371).
+
+
+# RSQLite 2.2.7.9000 (2021-04-22)
+
+- Only internal changes.
+
+
+# RSQLite 2.2.7 (2021-04-22)
+
+- Remove RStudio Connection pane support due to problems reported by users (#352).
+- Upgrade bundled SQLite to version 3.35.5 (#368).
+
+
+# RSQLite 2.2.6 (2021-04-11)
+
+- Upgrade bundled SQLite to 3.35.4 (#361).
+- Implement RStudio Connection Contract (#352, @edwindj).
+- `dbDataType()` supports extended types for connections created with `extended_types = TRUE` (#360, @ablack3).
+- `dbWriteTable()` creates tables with extended types for connections created with `extended_types = TRUE` (#360, @ablack3).
+- Remove BH dependency by inlining the header files (#362).
+
+
+# RSQLite 2.2.5 (2021-03-25)
+
+- Upgrade bundled SQLite to version 3.35.2 (#357).
+- If the busy handler fails, the transaction is aborted explicitly (#348, @gaborcsardi).
 
 
 # RSQLite 2.2.4 (2021-03-12)

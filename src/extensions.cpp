@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "DbConnection.h"
-#include "workarounds/XPtr.h"
 
 
 // [[Rcpp::export]]

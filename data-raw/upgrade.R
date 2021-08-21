@@ -32,7 +32,8 @@ download.file(
   url = "https://sqlite.org/src/raw?filename=ext/misc/regexp.c&ci=trunk",
   destfile = "src/vendor/sqlite3/regexp.c",
   quiet = TRUE,
-  mode = "w")
+  mode = "w"
+)
 
 stopifnot(system2("patch", "-p1", stdin = "data-raw/regexp.patch") == 0)
 
@@ -52,22 +53,41 @@ if (any(grepl("^src/", gert::git_status()$file))) {
   message("Commit message: ", title)
   gert::git_commit(title)
 
+  # Force-pushing: this job is run daily, will give a daily notification
+  # and still succeed
   message("Pushing branch")
-  gert::git_push()
+  gert::git_push(force = TRUE)
 
-  message("Opening PR")
-  pr <- gh::gh(
-    "/repos/r-dbi/RSQLite/pulls", head = branch, base = old_branch,
-    title = title, body = ".",
-    .method = "POST"
+  message("Checking if PR exists")
+  existing_pr <- gh::gh(
+    "/repos/r-dbi/RSQLite/pulls",
+    head = paste0("r-dbi:", branch), base = old_branch,
+    state = "open"
   )
 
-  message("Tweaking PR body")
-  body <- paste0("NEWS entry:\n\n```\n- Upgrade bundled SQLite to version ", version, " (#", pr$number, ").\n```")
+  if (length(existing_pr) > 0) {
+    message("Nudging")
+    gh::gh(
+      paste0("/repos/r-dbi/RSQLite/issues/", existing_pr[[1]]$number, "/comments"),
+      body = "PR updated.",
+      .method = "POST"
+    )
+  } else {
+    message("Opening PR")
+    pr <- gh::gh(
+      "/repos/r-dbi/RSQLite/pulls",
+      head = branch, base = old_branch,
+      title = title, body = ".",
+      .method = "POST"
+    )
 
-  gh::gh(
-    paste0("/repos/r-dbi/RSQLite/pulls/", pr$number),
-    body = body,
-    .method = "PATCH"
-  )
+    message("Tweaking PR body")
+    body <- paste0("NEWS entry:\n\n```\n- Upgrade bundled SQLite to version ", version, " (#", pr$number, ").\n```")
+
+    gh::gh(
+      paste0("/repos/r-dbi/RSQLite/pulls/", pr$number),
+      body = body,
+      .method = "PATCH"
+    )
+  }
 }

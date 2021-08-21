@@ -14,5 +14,5 @@ warningc <- function(...) {
   warning(..., call. = FALSE, domain = NA)
 }
 
-#' @importFrom memoise memoise
-warning_once <- memoise(warningc)
+# memoise is used in .onLoad()
+warning_once <- warningc

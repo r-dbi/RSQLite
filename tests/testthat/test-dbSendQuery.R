@@ -25,8 +25,10 @@ test_that("attempting to change schema with pending rows generates warning", {
   row1 <- dbFetch(rs, n = 1)
   expect_equal(row1, df[1, ])
 
-  expect_warning(rs <- dbSendStatement(con, "CREATE TABLE t2 (x text, y integer)"),
-    "pending rows")
+  expect_warning(
+    rs <- dbSendStatement(con, "CREATE TABLE t2 (x text, y integer)"),
+    "pending rows"
+  )
   dbClearResult(rs)
 })
 
@@ -40,8 +42,10 @@ test_that("simple position binding works", {
 
   expect_warning(
     dbGetPreparedQuery(con, "INSERT INTO t1 VALUES (?, ?)",
-      bind.data = data.frame(x = 2, y = 1)),
-    "deprecated")
+      bind.data = data.frame(x = 2, y = 1)
+    ),
+    "deprecated"
+  )
 
   expect_equal(dbReadTable(con, "t1")$x, c(1, 2))
 })
@@ -55,8 +59,10 @@ test_that("simple named binding works", {
 
   expect_warning(
     dbGetPreparedQuery(con, "INSERT INTO t1 VALUES (:x, :y)",
-      bind.data = data.frame(y = 1, x = 2)),
-    "deprecated")
+      bind.data = data.frame(y = 1, x = 2)
+    ),
+    "deprecated"
+  )
 
   expect_equal(dbReadTable(con, "t1")$x, c(1, 2))
 })
@@ -69,8 +75,10 @@ test_that("named binding errors if missing name", {
   expect_error(
     expect_warning(
       dbGetPreparedQuery(con, "INSERT INTO t1 VALUES (:x, :y)",
-        bind.data = data.frame(y = 1)),
-      "deprecated"),
+        bind.data = data.frame(y = 1)
+      ),
+      "deprecated"
+    ),
     "No value given for placeholder"
   )
 })
@@ -84,7 +92,8 @@ test_that("one row per bound select, with factor", {
 
   expect_warning(
     got <- dbGetPreparedQuery(con, "select * from t1 where id = ?", id_frame),
-    "deprecated")
+    "deprecated"
+  )
 
   expect_equal(got$id, c("e", "a", "c"))
 })
@@ -98,7 +107,8 @@ test_that("one row per bound select", {
 
   expect_warning(
     got <- dbGetPreparedQuery(con, "select * from t1 where id = ?", id_frame),
-    "deprecated")
+    "deprecated"
+  )
 
   expect_equal(got$id, c("e", "a", "c"))
 })
@@ -111,21 +121,24 @@ test_that("failed matches are silently dropped", {
   memoise::forget(warning_once)
   expect_warning(
     df1 <- dbGetPreparedQuery(con, sql, data.frame(id = I("X"))),
-    "deprecated")
+    "deprecated"
+  )
   expect_equal(nrow(df1), 0)
   expect_equal(names(df1), c("id", "x", "y"))
 
   memoise::forget(warning_once)
   expect_warning(
     df2 <- dbGetPreparedQuery(con, sql, data.frame(id = I(c("X", "Y")))),
-    "deprecated")
+    "deprecated"
+  )
   expect_equal(nrow(df2), 0)
   expect_equal(names(df2), c("id", "x", "y"))
 
   memoise::forget(warning_once)
   expect_warning(
     df3 <- dbGetPreparedQuery(con, sql, data.frame(id = I(c("X", "a", "Y")))),
-    "deprecated")
+    "deprecated"
+  )
   expect_equal(nrow(df3), 1)
   expect_equal(names(df3), c("id", "x", "y"))
 })
@@ -138,9 +151,12 @@ test_that("NA matches NULL", {
   dbExecute(con, "INSERT INTO t1 VALUES ('x', NULL, NULL)")
 
   expect_warning(
-    got <- dbGetPreparedQuery(con, "SELECT id FROM t1 WHERE y IS :y",
-                              data.frame(y = NA_integer_)),
-    "deprecated")
+    got <- dbGetPreparedQuery(
+      con, "SELECT id FROM t1 WHERE y IS :y",
+      data.frame(y = NA_integer_)
+    ),
+    "deprecated"
+  )
 
   expect_equal(got$id, "x")
 })
@@ -148,7 +164,7 @@ test_that("NA matches NULL", {
 test_that("mark UTF-8 encoding on non-ASCII colnames", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con))
-  cn_field <- '\u4e2d\u6587'
+  cn_field <- "\u4e2d\u6587"
   tbl <- data.frame("a")
   colnames(tbl) <- cn_field
   dbWriteTable(con, name = "test", value = tbl)

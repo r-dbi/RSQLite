@@ -9,7 +9,7 @@
 \alias{dbGetInfo,SQLiteDriver-method}
 \title{Class SQLiteDriver (and methods)}
 \usage{
-\S4method{dbDataType}{SQLiteDriver}(dbObj, obj, ...)
+\S4method{dbDataType}{SQLiteDriver}(dbObj, obj, ..., extended_types = FALSE)
 
 \S4method{dbIsValid}{SQLiteDriver}(dbObj, ...)
 

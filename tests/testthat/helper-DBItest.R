@@ -1,13 +1,13 @@
 default_skip <-
   c(
     # enable to test a particular test only
-    #"(?!data_timestamp_current).*",
+    # "(?!data_timestamp_current).*",
 
     # sql
     "roundtrip_date",                             # #109
     "roundtrip_timestamp",                        # #110
 
-    "column_info_consistent",                     # #259
+    "column_info_consistent",                     # https://github.com/r-dbi/DBItest/issues/181
 
     NULL
   )

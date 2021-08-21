@@ -242,8 +242,8 @@ sqliteSetBusyHandler <- function(dbObj, handler) {
   stopifnot(
     inherits(dbObj, "SQLiteConnection"),
     is.null(handler) ||
-    is.function(handler) ||
-    (is.numeric(handler) && length(handler) == 1 && !is.na(handler))
+      is.function(handler) ||
+      (is.numeric(handler) && length(handler) == 1 && !is.na(handler))
   )
   if (is.numeric(handler)) handler <- as.integer(handler)
   set_busy_handler(dbObj@ptr, handler)

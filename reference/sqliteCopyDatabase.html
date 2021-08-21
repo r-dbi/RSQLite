@@ -62,9 +62,6 @@ a copy of another database." />
 
 
 
-<!-- dependencies from examples -->
-
-
   
 
   
@@ -87,7 +84,7 @@ a copy of another database." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.8</span>
       </span>
     </div>
 
@@ -136,7 +133,7 @@ connection.  It can be used to save an in-memory database (created using
 a copy of another database.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sqliteCopyDatabase</span><span class='op'>(</span><span class='va'>from</span>, <span class='va'>to</span><span class='op'>)</span></pre>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>sqliteCopyDatabase</span><span class='op'>(</span><span class='va'>from</span>, <span class='va'>to</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -160,28 +157,30 @@ a copy of another database.</p>
     <p>Seth Falcon</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dbi.r-dbi.org'>DBI</a></span><span class='op'>)</span>
-<span class='co'># Copy the built in databaseDb() to an in-memory database</span>
-<span class='va'>con</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span><span class='op'>(</span><span class='fu'>RSQLite</span><span class='fu'>::</span><span class='fu'><a href='SQLite.html'>SQLite</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>":memory:"</span><span class='op'>)</span>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>dbListTables</a></span><span class='op'>(</span><span class='va'>con</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; character(0)</div><div class='input'>
-<span class='va'>db</span> <span class='op'>&lt;-</span> <span class='fu'>RSQLite</span><span class='fu'>::</span><span class='fu'><a href='datasetsDb.html'>datasetsDb</a></span><span class='op'>(</span><span class='op'>)</span>
-<span class='fu'>RSQLite</span><span class='fu'>::</span><span class='fu'>sqliteCopyDatabase</span><span class='op'>(</span><span class='va'>db</span>, <span class='va'>con</span><span class='op'>)</span>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span><span class='op'>(</span><span class='va'>db</span><span class='op'>)</span>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>dbListTables</a></span><span class='op'>(</span><span class='va'>con</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] "BOD"              "CO2"              "ChickWeight"      "DNase"           
-#&gt;  [5] "Formaldehyde"     "Indometh"         "InsectSprays"     "LifeCycleSavings"
-#&gt;  [9] "Loblolly"         "Orange"           "OrchardSprays"    "PlantGrowth"     
-#&gt; [13] "Puromycin"        "Theoph"           "ToothGrowth"      "USArrests"       
-#&gt; [17] "USJudgeRatings"   "airquality"       "anscombe"         "attenu"          
-#&gt; [21] "attitude"         "cars"             "chickwts"         "esoph"           
-#&gt; [25] "faithful"         "freeny"           "infert"           "iris"            
-#&gt; [29] "longley"          "morley"           "mtcars"           "npk"             
-#&gt; [33] "pressure"         "quakes"           "randu"            "rock"            
-#&gt; [37] "sleep"            "stackloss"        "swiss"            "trees"           
-#&gt; [41] "warpbreaks"       "women"           </div><div class='input'>
-<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span><span class='op'>(</span><span class='va'>con</span><span class='op'>)</span>
-</div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dbi.r-dbi.org'>DBI</a></span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># Copy the built in databaseDb() to an in-memory database</span></span>
+<span class='r-in'><span class='va'>con</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span><span class='op'>(</span><span class='fu'>RSQLite</span><span class='fu'>::</span><span class='fu'><a href='SQLite.html'>SQLite</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>":memory:"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>dbListTables</a></span><span class='op'>(</span><span class='va'>con</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> character(0)</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>db</span> <span class='op'>&lt;-</span> <span class='fu'>RSQLite</span><span class='fu'>::</span><span class='fu'><a href='datasetsDb.html'>datasetsDb</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>RSQLite</span><span class='fu'>::</span><span class='fu'>sqliteCopyDatabase</span><span class='op'>(</span><span class='va'>db</span>, <span class='va'>con</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span><span class='op'>(</span><span class='va'>db</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>dbListTables</a></span><span class='op'>(</span><span class='va'>con</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "BOD"              "CO2"              "ChickWeight"      "DNase"           </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [5] "Formaldehyde"     "Indometh"         "InsectSprays"     "LifeCycleSavings"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [9] "Loblolly"         "Orange"           "OrchardSprays"    "PlantGrowth"     </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "Puromycin"        "Theoph"           "ToothGrowth"      "USArrests"       </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [17] "USJudgeRatings"   "airquality"       "anscombe"         "attenu"          </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [21] "attitude"         "cars"             "chickwts"         "esoph"           </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [25] "faithful"         "freeny"           "infert"           "iris"            </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [29] "longley"          "morley"           "mtcars"           "npk"             </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [33] "pressure"         "quakes"           "randu"            "rock"            </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [37] "sleep"            "stackloss"        "swiss"            "trees"           </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [41] "warpbreaks"       "women"           </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span><span class='op'>(</span><span class='va'>con</span><span class='op'>)</span></span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

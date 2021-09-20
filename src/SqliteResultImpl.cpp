@@ -108,7 +108,10 @@ void SqliteResultImpl::init(bool params_have_rows) {
 
 // Publics /////////////////////////////////////////////////////////////////////
 
-bool SqliteResultImpl::complete() {
+void SqliteResultImpl::close() {
+}
+
+bool SqliteResultImpl::complete() const {
   return complete_;
 }
 

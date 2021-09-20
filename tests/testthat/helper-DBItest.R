@@ -17,6 +17,7 @@ if (packageVersion("DBItest") >= "1.6.0") {
     SQLite(),
     list(dbname = tempfile("DBItest", fileext = ".sqlite")),
     tweaks = DBItest::tweaks(
+      dbitest_version = "1.7.2",
       constructor_relax_args = TRUE,
       placeholder_pattern = c("?", "$1", "$name", ":name"),
       date_cast = function(x) paste0("'", x, "'"),

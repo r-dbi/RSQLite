@@ -59,7 +59,7 @@ setMethod("dbBegin", "SQLiteConnection", function(conn, .name = NULL, ..., name 
   if (is.null(name)) {
     dbExecute(conn, "BEGIN")
   } else {
-    dbExecute(conn, paste("SAVEPOINT ", name))
+    dbExecute(conn, paste0("SAVEPOINT ", dbQuoteIdentifier(conn, name)))
   }
 
   invisible(TRUE)
@@ -72,7 +72,7 @@ setMethod("dbCommit", "SQLiteConnection", function(conn, .name = NULL, ..., name
   if (is.null(name)) {
     dbExecute(conn, "COMMIT")
   } else {
-    dbExecute(conn, paste("RELEASE SAVEPOINT ", name))
+    dbExecute(conn, paste0("RELEASE SAVEPOINT ", dbQuoteIdentifier(conn, name)))
   }
 
   invisible(TRUE)
@@ -91,8 +91,9 @@ setMethod("dbRollback", "SQLiteConnection", function(conn, .name = NULL, ..., na
     # cancel the transaction. Instead of cancelling the transaction, the
     # ROLLBACK TO command restarts the transaction again at the beginning. All
     # intervening SAVEPOINTs are canceled, however.
-    dbExecute(conn, paste("ROLLBACK TO ", name))
-    dbExecute(conn, paste("RELEASE SAVEPOINT ", name))
+    name_quoted <- dbQuoteIdentifier(conn, name)
+    dbExecute(conn, paste0("ROLLBACK TO ", name_quoted))
+    dbExecute(conn, paste0("RELEASE SAVEPOINT ", name_quoted))
   }
 
   invisible(TRUE)

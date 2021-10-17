@@ -79,7 +79,8 @@ times within this timeout. To set a timeout, pass an integer scalar to
 
     <div class="ref-usage sourceCode"><pre class="sourceCode r"><code><span class="fu">sqliteSetBusyHandler</span><span class="op">(</span><span class="va">dbObj</span>, <span class="va">handler</span><span class="op">)</span></code></pre></div>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <div id="arguments">
+    <h2>Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <table class="ref-arguments"><colgroup><col class="name"><col class="desc"></colgroup><tr><th>dbObj</th>
       <td><p>A <a href="SQLiteConnection-class.html">SQLiteConnection</a> object.</p></td>
     </tr><tr><th>handler</th>
@@ -90,11 +91,14 @@ to <code>PRAGMA busy_timeout</code>,</p></li>
 <li><p>an R function: this function is called with one argument, see details
 below.</p></li>
 </ul></td>
-    </tr></table><h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    </tr></table></div>
 
+    <div id="value">
+    <h2>Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Invisible <code>NULL</code>.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
+    </div>
+    <div id="details">
+    <h2>Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Note that SQLite currently does <em>not</em> schedule concurrent transactions
 fairly. If multiple transactions are waiting on the same database,
 any one of them can be granted access next. Moreover, SQLite does not
@@ -117,9 +121,11 @@ RSQLite will print a warning, and the transaction is aborted with a
 function.</p>
 <p>Calling <code>sqliteSetBusyHandler()</code> on a connection that is not connected
 is an error.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
+    </div>
+    <div id="see-also">
+    <h2>See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><a href="https://www.sqlite.org/c3ref/busy_handler.html">https://www.sqlite.org/c3ref/busy_handler.html</a></p></div>
+    </div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -33,7 +33,7 @@ in the datasets package."><meta name="robots" content="noindex"><!-- mathjax -->
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/r-dbi/RSQLite/">
+  <a href="https://github.com/r-dbi/RSQLite/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -48,7 +48,7 @@ in the datasets package."><meta name="robots" content="noindex"><!-- mathjax -->
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>A sample sqlite database</h1>
-    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/master/R/datasetsDb.R"><code>R/datasetsDb.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/master/R/datasetsDb.R" class="external-link"><code>R/datasetsDb.R</code></a></small>
     <div class="hidden name"><code>datasetsDb.Rd</code></div>
     </div>
 
@@ -59,13 +59,14 @@ in the datasets package.</p>
 
     <div class="ref-usage sourceCode"><pre class="sourceCode r"><code><span class="fu">datasetsDb</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 
-
+    <div id="ref-sections">
+    </div>
 
     <div id="examples">
-    <h2>Examples<a class="anchor" aria-label="anchor" href="#examples"></a></h2>
-    <div class="ref-examples sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org">DBI</a></span><span class="op">)</span></span>
+    <h2>Examples</h2>
+    <div class="ref-examples sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="op">)</span></span>
 <span class="r-in"><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu">RSQLite</span><span class="fu">::</span><span class="fu">datasetsDb</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListTables.html">dbListTables</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "BOD"              "CO2"              "ChickWeight"      "DNase"           </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [5] "Formaldehyde"     "Indometh"         "InsectSprays"     "LifeCycleSavings"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [9] "Loblolly"         "Orange"           "OrchardSprays"    "PlantGrowth"     </span>
@@ -78,7 +79,7 @@ in the datasets package.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [37] "sleep"            "stackloss"        "swiss"            "trees"           </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [41] "warpbreaks"       "women"           </span>
 <span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbReadTable.html">dbReadTable</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"CO2"</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"CO2"</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Plant        Type  Treatment conc uptake</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1    Qn1      Quebec nonchilled   95   16.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2    Qn1      Quebec nonchilled  175   30.4</span>
@@ -164,7 +165,7 @@ in the datasets package.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 82   Mc3 Mississippi    chilled  500   17.9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 83   Mc3 Mississippi    chilled  675   18.9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 84   Mc3 Mississippi    chilled 1000   19.9</span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"SELECT * FROM CO2 WHERE conc &lt; 100"</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"SELECT * FROM CO2 WHERE conc &lt; 100"</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Plant        Type  Treatment conc uptake</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1    Qn1      Quebec nonchilled   95   16.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2    Qn2      Quebec nonchilled   95   13.6</span>
@@ -179,7 +180,7 @@ in the datasets package.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 11   Mc2 Mississippi    chilled   95    7.7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 12   Mc3 Mississippi    chilled   95   10.6</span>
 <span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span>
 </code></pre></div>
     </div>
   </div>

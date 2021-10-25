@@ -35,7 +35,7 @@ The "Usage" section lists the class methods overridden by RSQLite.'><meta name="
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/r-dbi/RSQLite/">
+  <a href="https://github.com/r-dbi/RSQLite/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -50,56 +50,57 @@ The "Usage" section lists the class methods overridden by RSQLite.'><meta name="
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Class SQLiteResult (and methods)</h1>
-    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/master/R/SQLiteResult.R"><code>R/SQLiteResult.R</code></a>, <a href="https://github.com/r-dbi/RSQLite/blob/master/R/query.R"><code>R/query.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/master/R/SQLiteResult.R" class="external-link"><code>R/SQLiteResult.R</code></a>, <a href="https://github.com/r-dbi/RSQLite/blob/master/R/query.R" class="external-link"><code>R/query.R</code></a></small>
     <div class="hidden name"><code>SQLiteResult-class.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>SQLiteDriver objects are created by <code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html">dbSendQuery()</a></code> or <code><a href="https://dbi.r-dbi.org/reference/dbSendStatement.html">dbSendStatement()</a></code>,
+    <p>SQLiteDriver objects are created by <code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery()</a></code> or <code><a href="https://dbi.r-dbi.org/reference/dbSendStatement.html" class="external-link">dbSendStatement()</a></code>,
 and encapsulate the result of an SQL statement (either <code>SELECT</code> or not).
-They are a superclass of the <a href="https://dbi.r-dbi.org/reference/DBIResult-class.html">DBIResult</a> class.
+They are a superclass of the <a href="https://dbi.r-dbi.org/reference/DBIResult-class.html" class="external-link">DBIResult</a> class.
 The "Usage" section lists the class methods overridden by <span class="pkg">RSQLite</span>.</p>
     </div>
 
     <div class="ref-usage sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbIsValid.html">dbIsValid</a></span><span class="op">(</span><span class="va">dbObj</span>, <span class="va">...</span><span class="op">)</span>
+<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbIsValid.html" class="external-link">dbIsValid</a></span><span class="op">(</span><span class="va">dbObj</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbBind.html">dbBind</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">params</span>, <span class="va">...</span><span class="op">)</span>
+<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">params</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbFetch.html">dbFetch</a></span><span class="op">(</span>
+<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch</a></span><span class="op">(</span>
   <span class="va">res</span>,
   n <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,
   <span class="va">...</span>,
-  row.names <span class="op">=</span> <span class="fu">pkgconfig</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pkgconfig/man/get_config.html">get_config</a></span><span class="op">(</span><span class="st">"RSQLite::row.names.query"</span>, <span class="cn">FALSE</span><span class="op">)</span>
+  row.names <span class="op">=</span> <span class="fu">pkgconfig</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pkgconfig/man/get_config.html" class="external-link">get_config</a></span><span class="op">(</span><span class="st">"RSQLite::row.names.query"</span>, <span class="cn">FALSE</span><span class="op">)</span>
 <span class="op">)</span>
 
 <span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html">dbClearResult</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
+<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html" class="external-link">dbClearResult</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbColumnInfo.html">dbColumnInfo</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
+<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbColumnInfo.html" class="external-link">dbColumnInfo</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetRowsAffected.html">dbGetRowsAffected</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
+<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetRowsAffected.html" class="external-link">dbGetRowsAffected</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetRowCount.html">dbGetRowCount</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
+<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetRowCount.html" class="external-link">dbGetRowCount</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html">dbHasCompleted</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
+<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html" class="external-link">dbHasCompleted</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetStatement.html">dbGetStatement</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetStatement.html" class="external-link">dbGetStatement</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
 
-
+    <div id="ref-sections">
     <div id="see-also">
-    <h2>See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <h2>See also</h2>
     <div class="dont-index"><p>The corresponding generic functions
-<code><a href="https://dbi.r-dbi.org/reference/dbFetch.html">DBI::dbFetch()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbClearResult.html">DBI::dbClearResult()</a></code>, and <code><a href="https://dbi.r-dbi.org/reference/dbBind.html">DBI::dbBind()</a></code>,
-<code><a href="https://dbi.r-dbi.org/reference/dbColumnInfo.html">DBI::dbColumnInfo()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbGetRowsAffected.html">DBI::dbGetRowsAffected()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbGetRowCount.html">DBI::dbGetRowCount()</a></code>,
-<code><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html">DBI::dbHasCompleted()</a></code>, and <code><a href="https://dbi.r-dbi.org/reference/dbGetStatement.html">DBI::dbGetStatement()</a></code>.</p></div>
+<code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">DBI::dbFetch()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbClearResult.html" class="external-link">DBI::dbClearResult()</a></code>, and <code><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">DBI::dbBind()</a></code>,
+<code><a href="https://dbi.r-dbi.org/reference/dbColumnInfo.html" class="external-link">DBI::dbColumnInfo()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbGetRowsAffected.html" class="external-link">DBI::dbGetRowsAffected()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbGetRowCount.html" class="external-link">DBI::dbGetRowCount()</a></code>,
+<code><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html" class="external-link">DBI::dbHasCompleted()</a></code>, and <code><a href="https://dbi.r-dbi.org/reference/dbGetStatement.html" class="external-link">DBI::dbGetStatement()</a></code>.</p></div>
+    </div>
     </div>
 
   </div>

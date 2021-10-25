@@ -33,7 +33,7 @@ dbGetQuery"><meta name="robots" content="noindex"><!-- mathjax --><script src="h
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/r-dbi/RSQLite/">
+  <a href="https://github.com/r-dbi/RSQLite/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -48,7 +48,7 @@ dbGetQuery"><meta name="robots" content="noindex"><!-- mathjax --><script src="h
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Build the SQL CREATE TABLE definition as a string</h1>
-    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/master/R/deprecated.R"><code>R/deprecated.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/master/R/deprecated.R" class="external-link"><code>R/deprecated.R</code></a></small>
     <div class="hidden name"><code>sqliteBuildTableDefinition.Rd</code></div>
     </div>
 
@@ -62,28 +62,26 @@ dbGetQuery"><meta name="robots" content="noindex"><!-- mathjax --><script src="h
   <span class="va">name</span>,
   <span class="va">value</span>,
   field.types <span class="op">=</span> <span class="cn">NULL</span>,
-  row.names <span class="op">=</span> <span class="fu">pkgconfig</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pkgconfig/man/get_config.html">get_config</a></span><span class="op">(</span><span class="st">"RSQLite::row.names.query"</span>, <span class="cn">FALSE</span><span class="op">)</span>
+  row.names <span class="op">=</span> <span class="fu">pkgconfig</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pkgconfig/man/get_config.html" class="external-link">get_config</a></span><span class="op">(</span><span class="st">"RSQLite::row.names.query"</span>, <span class="cn">FALSE</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
 
+    <div id="ref-sections">
     <div id="arguments">
-    <h2>Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <table class="ref-arguments"><colgroup><col class="name"><col class="desc"></colgroup><tr><th>con</th>
-      <td><p>A database connection.</p></td>
-    </tr><tr><th>name</th>
-      <td><p>Name of the new SQL table</p></td>
-    </tr><tr><th>value</th>
-      <td><p>A data.frame, for which we want to create a table.</p></td>
-    </tr><tr><th>field.types</th>
-      <td><p>Optional, named character vector of the types for each
-field in <code>value</code></p></td>
-    </tr><tr><th>row.names</th>
-      <td><p>Logical. Should row.name of <code>value</code> be exported as a
-<code>row_names</code> field? Default is <code>TRUE</code></p></td>
-    </tr></table></div>
+    <h2>Arguments</h2>
+    
 
+<dl><dt>con</dt><dd><p>A database connection.</p></dd>
+</dl><dl><dt>name</dt><dd><p>Name of the new SQL table</p></dd>
+</dl><dl><dt>value</dt><dd><p>A data.frame, for which we want to create a table.</p></dd>
+</dl><dl><dt>field.types</dt><dd><p>Optional, named character vector of the types for each
+field in <code>value</code></p></dd>
+</dl><dl><dt>row.names</dt><dd><p>Logical. Should row.name of <code>value</code> be exported as a
+<code>row_names</code> field? Default is <code>TRUE</code></p></dd>
+</dl></div>
     <div id="value">
-    <h2>Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <h2>Value</h2>
     <p>An SQL string</p>
+    </div>
     </div>
 
   </div>

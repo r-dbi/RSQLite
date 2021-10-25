@@ -34,7 +34,7 @@ or with calling dbBind() instead."><meta name="robots" content="noindex"><!-- ma
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/r-dbi/RSQLite/">
+  <a href="https://github.com/r-dbi/RSQLite/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -49,14 +49,14 @@ or with calling dbBind() instead."><meta name="robots" content="noindex"><!-- ma
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Deprecated querying tools</h1>
-    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/master/R/deprecated.R"><code>R/deprecated.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/master/R/deprecated.R" class="external-link"><code>R/deprecated.R</code></a></small>
     <div class="hidden name"><code>query-dep.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>These functions have been deprecated. Please switch to using
-<code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html">dbSendQuery()</a></code>/<code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html">dbGetQuery()</a></code> with the <code>params</code> argument
-or with calling <code><a href="https://dbi.r-dbi.org/reference/dbBind.html">dbBind()</a></code> instead.</p>
+<code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery()</a></code>/<code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery()</a></code> with the <code>params</code> argument
+or with calling <code><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind()</a></code> instead.</p>
     </div>
 
     <div class="ref-usage sourceCode"><pre class="sourceCode r"><code><span class="fu">dbSendPreparedQuery</span><span class="op">(</span><span class="va">conn</span>, <span class="va">statement</span>, <span class="va">bind.data</span>, <span class="va">...</span><span class="op">)</span>
@@ -69,18 +69,17 @@ or with calling <code><a href="https://dbi.r-dbi.org/reference/dbBind.html">dbBi
 <span class="co"># S4 method for SQLiteConnection,character,data.frame</span>
 <span class="fu">dbGetPreparedQuery</span><span class="op">(</span><span class="va">conn</span>, <span class="va">statement</span>, <span class="va">bind.data</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
 
+    <div id="ref-sections">
     <div id="arguments">
-    <h2>Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <table class="ref-arguments"><colgroup><col class="name"><col class="desc"></colgroup><tr><th>conn</th>
-      <td><p>A <code>DBIConnection</code> object.</p></td>
-    </tr><tr><th>statement</th>
-      <td><p>A SQL string</p></td>
-    </tr><tr><th>bind.data</th>
-      <td><p>A data frame of data to be bound.</p></td>
-    </tr><tr><th>...</th>
-      <td><p>Other arguments used by methods</p></td>
-    </tr></table></div>
+    <h2>Arguments</h2>
+    
 
+<dl><dt>conn</dt><dd><p>A <code>DBIConnection</code> object.</p></dd>
+</dl><dl><dt>statement</dt><dd><p>A SQL string</p></dd>
+</dl><dl><dt>bind.data</dt><dd><p>A data frame of data to be bound.</p></dd>
+</dl><dl><dt>...</dt><dd><p>Other arguments used by methods</p></dd>
+</dl></div>
+    </div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

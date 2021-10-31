@@ -24,7 +24,8 @@ SQLite(...)
   synchronous = "off",
   flags = SQLITE_RWC,
   vfs = NULL,
-  bigint = c("integer64", "integer", "numeric", "character")
+  bigint = c("integer64", "integer", "numeric", "character"),
+  extended_types = FALSE
 )
 
 \S4method{dbConnect}{SQLiteConnection}(drv, ...)
@@ -62,7 +63,7 @@ requires calling \code{initExtension()} manually.}
 
 \item{cache_size}{Advanced option. A positive integer to change the maximum
 number of disk pages that SQLite holds in memory (SQLite's default is
-2000 pages). See \url{http://www.sqlite.org/pragma.html#pragma_cache_size}
+2000 pages). See \url{https://www.sqlite.org/pragma.html#pragma_cache_size}
 for details.}
 
 \item{synchronous}{Advanced options. Possible values for \code{synchronous}
@@ -71,7 +72,7 @@ significant speed ups using \code{sychronous = "off"}, and the SQLite
 documentation itself implies considerable improved performance at the very
 modest risk of database corruption in the unlikely case of the operating
 system (\emph{not} the R application) crashing. See
-\url{http://www.sqlite.org/pragma.html#pragma_synchronous} for details.}
+\url{https://www.sqlite.org/pragma.html#pragma_synchronous} for details.}
 
 \item{flags}{\code{SQLITE_RWC}: open the database in read/write mode
 and create the database file if it does not already exist;
@@ -80,14 +81,18 @@ if the file does not already exist; \code{SQLITE_RO}: open the database in
 read only mode.  Raise an error if the file does not already exist}
 
 \item{vfs}{Select the SQLite3 OS interface. See
-\url{http://www.sqlite.org/vfs.html} for details. Allowed values are
+\url{https://www.sqlite.org/vfs.html} for details. Allowed values are
 \code{"unix-posix"}, \code{"unix-unix-afp"},
 \code{"unix-unix-flock"}, \code{"unix-dotfile"}, and
 \code{"unix-none"}.}
 
 \item{bigint}{The R type that 64-bit integer types should be mapped to,
-default is \link[bit64:integer64]{bit64::integer64}, which allows the full range of 64 bit
+default is \link[bit64:bit64-package]{bit64::integer64}, which allows the full range of 64 bit
 integers.}
+
+\item{extended_types}{When \code{TRUE} columns of type \code{DATE}, \code{DATETIME} /
+\code{TIMESTAMP}, and \code{TIME} are mapped to corresponding R-classes, c.f. below
+for details. Defaults to \code{FALSE}.}
 }
 \value{
 \code{SQLite()} returns an object of class \linkS4class{SQLiteDriver}.
@@ -105,6 +110,21 @@ reclaimed by the GC. You can use \code{\link[DBI:dbDisconnect]{DBI::dbDisconnect
 connection early, but it will not actually close until all open result
 sets have been closed (and you'll get a warning message to this effect).
 }
+\section{Extended Types}{
+
+When parameter \code{extended_types = TRUE} date and time columns are directly
+mapped to corresponding R-types. How exactly depends on whether the actual
+value is a number or a string:\tabular{llll}{
+   \emph{Column type} \tab \emph{Value is numeric} \tab \emph{Value is Text} \tab \emph{R-class} \cr
+   DATE \tab Count of days since 1970-01-01 \tab YMD formatted string (e.g. 2020-01-23) \tab \code{Date} \cr
+   TIME \tab Count of (fractional) seconds \tab HMS formatted string (e.g. 12:34:56) \tab \code{hms} (and \code{difftime}) \cr
+   DATETIME / TIMESTAMP \tab Count of (fractional) seconds since midnight 1970-01-01 UTC \tab DATE and TIME as above separated by a space \tab \code{POSIXct} with time zone UTC \cr
+}
+
+
+If a value cannot be mapped an \code{NA} is returned in its place with a warning.
+}
+
 \examples{
 library(DBI)
 # Initialize a temporary in memory database and copy a data.frame into it
@@ -118,9 +138,9 @@ dbGetQuery(con, "SELECT * FROM USArrests")
 
 # Or do it in batches
 rs <- dbSendQuery(con, "SELECT * FROM USArrests")
-d1 <- dbFetch(rs, n = 10)      # extract data in chunks of 10 rows
+d1 <- dbFetch(rs, n = 10) # extract data in chunks of 10 rows
 dbHasCompleted(rs)
-d2 <- dbFetch(rs, n = -1)      # extract all remaining data
+d2 <- dbFetch(rs, n = -1) # extract all remaining data
 dbHasCompleted(rs)
 dbClearResult(rs)
 

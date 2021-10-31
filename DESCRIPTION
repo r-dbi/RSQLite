@@ -1,7 +1,7 @@
 Package: RSQLite
 Title: 'SQLite' Interface for R
-Version: 2.1.5
-Date: 2019-12-18
+Version: 2.2.8
+Date: 2021-08-21
 Authors@R: 
     c(person(given = "Kirill",
              family = "M\u00fcller",
@@ -43,21 +43,25 @@ Imports:
     memoise,
     methods,
     pkgconfig,
-    Rcpp (>= 0.12.7)
+    Rcpp (>= 1.0.7)
 Suggests: 
     DBItest (>= 1.7.0),
+    gert,
+    gh,
     knitr,
     rmarkdown,
-    testthat
+    hms,
+    rvest,
+    testthat,
+    xml2
 LinkingTo: 
-    BH,
     plogr (>= 0.2.0),
     Rcpp
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 Collate: 
     'RcppExports.R'
     'SQLiteConnection.R'
@@ -71,6 +75,7 @@ Collate:
     'export.R'
     'extensions.R'
     'names.R'
+    'pkgconfig.R'
     'query.R'
     'regularExpressions.R'
     'rownames.R'

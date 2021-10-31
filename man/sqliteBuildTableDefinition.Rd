@@ -14,6 +14,8 @@ sqliteBuildTableDefinition(
 )
 }
 \arguments{
+\item{con}{A database connection.}
+
 \item{name}{Name of the new SQL table}
 
 \item{value}{A data.frame, for which we want to create a table.}
@@ -23,8 +25,6 @@ field in \code{value}}
 
 \item{row.names}{Logical. Should row.name of \code{value} be exported as a
 \code{row_names} field? Default is \code{TRUE}}
-
-\item{conn}{A database connection.}
 }
 \value{
 An SQL string

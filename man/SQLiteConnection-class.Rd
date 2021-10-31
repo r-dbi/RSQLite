@@ -12,6 +12,7 @@
 \alias{dbGetException,SQLiteConnection-method}
 \alias{dbGetInfo,SQLiteConnection-method}
 \alias{dbSendQuery,SQLiteConnection,character-method}
+\alias{dbAppendTable,SQLiteConnection-method}
 \alias{sqlData,SQLiteConnection-method}
 \alias{dbRemoveTable,SQLiteConnection,character-method}
 \alias{dbExistsTable,SQLiteConnection,character-method}
@@ -36,6 +37,8 @@
 \S4method{dbGetInfo}{SQLiteConnection}(dbObj, ...)
 
 \S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement, params = NULL, ...)
+
+\S4method{dbAppendTable}{SQLiteConnection}(conn, name, value, ..., row.names = NULL)
 
 \S4method{sqlData}{SQLiteConnection}(
   con,

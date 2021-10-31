@@ -2,8 +2,10 @@
 #include "DbConnection.h"
 
 
-DbConnection::DbConnection(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs)
-  : pConn_(NULL) {
+DbConnection::DbConnection(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs, bool with_alt_types)
+  : pConn_(NULL), 
+    with_alt_types_(with_alt_types),
+    busy_callback_(NULL) {
 
   // Get the underlying database connection
   int rc = sqlite3_open_v2(path.c_str(), &pConn_, flags, vfs.size() ? vfs.c_str() : NULL);
@@ -19,6 +21,8 @@ DbConnection::~DbConnection() {
   if (is_valid()) {
     disconnect();
   }
+  // in case this is still lingering for an invalid connection
+  release_callback_data();
 }
 
 sqlite3* DbConnection::conn() const {
@@ -70,4 +74,71 @@ void DbConnection::copy_to(const DbConnectionPtr& pDest) {
 void DbConnection::disconnect() {
   sqlite3_close_v2(pConn_);
   pConn_ = NULL;
+  release_callback_data();
+}
+
+bool DbConnection::with_alt_types() const {
+  return with_alt_types_;
+}
+
+void DbConnection::set_busy_handler(SEXP r_callback) {
+  check_connection();
+  if (busy_callback_) {
+    R_ReleaseObject(busy_callback_);
+    busy_callback_ = NULL;
+  }
+
+  if (! Rf_isNull(r_callback)) {
+    R_PreserveObject(r_callback);
+    busy_callback_ = r_callback;
+  }
+
+  if (busy_callback_ && Rf_isInteger(busy_callback_)) {
+    sqlite3_busy_timeout(pConn_, INTEGER(busy_callback_)[0]);
+  } else {
+    sqlite3_busy_handler(pConn_, busy_callback_helper, busy_callback_);
+  }
+}
+
+void DbConnection::release_callback_data() {
+  if (busy_callback_) {
+    R_ReleaseObject(busy_callback_);
+    busy_callback_ = NULL;
+  }
+}
+
+int DbConnection::busy_callback_helper(void *data, int num)
+{
+  SEXP r_callback = reinterpret_cast<SEXP>(data);
+
+  // Overarching safety net
+  try
+  {
+    try
+    {
+      Function rfun = r_callback;
+      IntegerVector ret = rfun(num);
+      return as<int>(ret);
+    }
+    catch (eval_error &e)
+    {
+      std::string msg = std::string("Busy callback failed, aborting transaction: ") + e.what();
+      Rcpp::message(Rcpp::StringVector::create(msg));
+      return 0;
+    }
+    catch (Rcpp::internal::InterruptedException &e)
+    {
+      // Not warning on explicit interrupt
+      return 0;
+    }
+    catch (...)
+    {
+      Rcpp::message(Rcpp::StringVector::create("Busy callback failed, aborting transaction"));
+      return 0;
+    }
+  }
+  catch (...)
+  {
+    return 0;
+  }
 }

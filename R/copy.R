@@ -10,7 +10,7 @@
 #'   `from` will be copied to `to`.
 #' @param to A `SQLiteConnection` object pointing to an empty database.
 #' @author Seth Falcon
-#' @references \url{http://www.sqlite.org/backup.html}
+#' @references \url{https://www.sqlite.org/backup.html}
 #' @export
 #' @examples
 #' library(DBI)
@@ -25,14 +25,16 @@
 #'
 #' dbDisconnect(con)
 sqliteCopyDatabase <- function(from, to) {
-  if (!is(from, "SQLiteConnection"))
+  if (!is(from, "SQLiteConnection")) {
     stop("'from' must be a SQLiteConnection object")
+  }
   if (is.character(to)) {
     to <- dbConnect(SQLite(), to)
     on.exit(dbDisconnect(to), add = TRUE)
   }
-  if (!is(to, "SQLiteConnection"))
+  if (!is(to, "SQLiteConnection")) {
     stop("'to' must be a SQLiteConnection object")
+  }
 
   connection_copy_database(from@ptr, to@ptr)
   invisible(NULL)

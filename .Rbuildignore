@@ -6,12 +6,10 @@ a.out.dSYM
 .gitignore
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^\.travis\.yml$
 ^cran-comments\.md$
 ^data-raw$
 ^src/vendor/sqlite3/.*\.o$
 ^src/vendor/sqlite3/.*\.a$
-^appveyor\.yml$
 ^revdep$
 ^src/.*\.d$
 ^src/Makevars\.local$
@@ -28,7 +26,6 @@ a.out.dSYM
 ^docs$
 ^README\.Rmd$
 ^UPDATE\.md$
-^tic\.R$
 ^cmake-build-debug$
 ^build\.sh$
 ^codecov\.yml$
@@ -38,3 +35,4 @@ a.out.dSYM
 ^\.vscode$
 ^LICENSE\.md$
 ^CODE_OF_CONDUCT\.md$
+^tests/testthat/testthat-problems\.rds$

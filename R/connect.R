@@ -33,9 +33,9 @@ SQLite <- function(...) {
 
 # From https://www.sqlite.org/c3ref/c_open_autoproxy.html
 #' @export
-SQLITE_RW <-  0x00000002L
+SQLITE_RW <- 0x00000002L
 #' @export
-SQLITE_RO <-  0x00000001L
+SQLITE_RO <- 0x00000001L
 #' @export
 SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 # read/write + create + url
@@ -56,7 +56,7 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #'   }
 #' @param cache_size Advanced option. A positive integer to change the maximum
 #'   number of disk pages that SQLite holds in memory (SQLite's default is
-#'   2000 pages). See \url{http://www.sqlite.org/pragma.html#pragma_cache_size}
+#'   2000 pages). See \url{https://www.sqlite.org/pragma.html#pragma_cache_size}
 #'   for details.
 #' @param synchronous Advanced options. Possible values for `synchronous`
 #'   are "off" (the default), "normal", or  "full".  Users have reported
@@ -64,7 +64,7 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #'   documentation itself implies considerable improved performance at the very
 #'   modest risk of database corruption in the unlikely case of the operating
 #'   system (\emph{not} the R application) crashing. See
-#'   \url{http://www.sqlite.org/pragma.html#pragma_synchronous} for details.
+#'   \url{https://www.sqlite.org/pragma.html#pragma_synchronous} for details.
 #' @param flags `SQLITE_RWC`: open the database in read/write mode
 #'   and create the database file if it does not already exist;
 #'   `SQLITE_RW`: open the database in read/write mode. Raise an error
@@ -77,14 +77,31 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #'   function will be called on the new connection.Setting this value to `FALSE`
 #'   requires calling `initExtension()` manually.
 #' @param vfs Select the SQLite3 OS interface. See
-#'   \url{http://www.sqlite.org/vfs.html} for details. Allowed values are
+#'   \url{https://www.sqlite.org/vfs.html} for details. Allowed values are
 #'   `"unix-posix"`, `"unix-unix-afp"`,
 #'   `"unix-unix-flock"`, `"unix-dotfile"`, and
 #'   `"unix-none"`.
 #' @param bigint The R type that 64-bit integer types should be mapped to,
 #'   default is [bit64::integer64], which allows the full range of 64 bit
 #'   integers.
+#' @param extended_types When `TRUE` columns of type `DATE`, `DATETIME` /
+#' `TIMESTAMP`, and `TIME` are mapped to corresponding R-classes, c.f. below
+#' for details. Defaults to `FALSE`.
+#'
 #' @return `dbConnect()` returns an object of class [SQLiteConnection-class].
+#'
+#' @section Extended Types:
+#' When parameter `extended_types = TRUE` date and time columns are directly
+#' mapped to corresponding R-types. How exactly depends on whether the actual
+#' value is a number or a string:
+#'
+#' | *Column type* | *Value is numeric* | *Value is Text* | *R-class* |
+#' | ------------- | ------------------ | --------------- | --------- |
+#' | DATE | Count of days since 1970-01-01 | YMD formatted string (e.g. 2020-01-23) | `Date` |
+#' | TIME | Count of (fractional) seconds | HMS formatted string (e.g. 12:34:56) | `hms` (and `difftime`) |
+#' | DATETIME / TIMESTAMP | Count of (fractional) seconds since midnight 1970-01-01 UTC | DATE and TIME as above separated by a space | `POSIXct` with time zone UTC |
+#'
+#' If a value cannot be mapped an `NA` is returned in its place with a warning.
 #'
 #' @aliases SQLITE_RWC SQLITE_RW SQLITE_RO
 #' @export
@@ -102,9 +119,9 @@ SQLITE_RWC <- bitwOr(bitwOr(0x00000004L, 0x00000002L), 0x00000040L)
 #'
 #' # Or do it in batches
 #' rs <- dbSendQuery(con, "SELECT * FROM USArrests")
-#' d1 <- dbFetch(rs, n = 10)      # extract data in chunks of 10 rows
+#' d1 <- dbFetch(rs, n = 10) # extract data in chunks of 10 rows
 #' dbHasCompleted(rs)
-#' d2 <- dbFetch(rs, n = -1)      # extract all remaining data
+#' d2 <- dbFetch(rs, n = -1) # extract all remaining data
 #' dbHasCompleted(rs)
 #' dbClearResult(rs)
 #'
@@ -114,7 +131,8 @@ setMethod("dbConnect", "SQLiteDriver",
   function(drv, dbname = "", ..., loadable.extensions = TRUE,
            default.extensions = loadable.extensions, cache_size = NULL,
            synchronous = "off", flags = SQLITE_RWC, vfs = NULL,
-           bigint = c("integer64", "integer", "numeric", "character")) {
+           bigint = c("integer64", "integer", "numeric", "character"),
+           extended_types = FALSE) {
     stopifnot(length(dbname) == 1, !is.na(dbname))
 
     if (!is_url_or_special_filename(dbname)) {
@@ -128,14 +146,21 @@ setMethod("dbConnect", "SQLiteDriver",
 
     bigint <- match.arg(bigint)
 
+    extended_types <- isTRUE(extended_types)
+    if (extended_types) {
+      if (!requireNamespace("hms", quietly = TRUE)) {
+        stopc("Install the hms package for `extended_types = TRUE`.")
+      }
+    }
     conn <- new("SQLiteConnection",
-      ptr = connection_connect(dbname, loadable.extensions, flags, vfs),
+      ptr = connection_connect(dbname, loadable.extensions, flags, vfs, extended_types),
       dbname = dbname,
       flags = flags,
       vfs = vfs,
       loadable.extensions = loadable.extensions,
       ref = new.env(parent = emptyenv()),
-      bigint = bigint
+      bigint = bigint,
+      extended_types = extended_types
     )
 
     ## experimental PRAGMAs
@@ -146,7 +171,8 @@ setMethod("dbConnect", "SQLiteDriver",
         error = function(e) {
           warning("Couldn't set cache size: ", conditionMessage(e), "\n",
             "Use `cache_size` = NULL to turn off this warning.",
-            call. = FALSE)
+            call. = FALSE
+          )
         }
       )
     }
@@ -157,8 +183,9 @@ setMethod("dbConnect", "SQLiteDriver",
         dbExecute(conn, sprintf("PRAGMA synchronous=%s", synchronous)),
         error = function(e) {
           warning("Couldn't set synchronous mode: ", conditionMessage(e), "\n",
-                  "Use `synchronous` = NULL to turn off this warning.",
-                  call. = FALSE)
+            "Use `synchronous` = NULL to turn off this warning.",
+            call. = FALSE
+          )
         }
       )
     }
@@ -171,7 +198,7 @@ setMethod("dbConnect", "SQLiteDriver",
       conn@ptr,
       function(x) {
         if (dbIsValid(conn)) {
-          warning_once("call dbDisconnect() when finished working with a connection");
+          warning_once("call dbDisconnect() when finished working with a connection")
         }
       }
     )
@@ -181,16 +208,22 @@ setMethod("dbConnect", "SQLiteDriver",
 )
 
 check_vfs <- function(vfs) {
-  if (is.null(vfs) || vfs == "") return("")
-
-  if (.Platform[["OS.type"]] == "windows") {
-    warning("vfs customization not available on this platform.",
-      " Ignoring value: vfs = ", vfs, call. = FALSE)
+  if (is.null(vfs) || vfs == "") {
     return("")
   }
 
-  match.arg(vfs, c("unix-posix", "unix-afp", "unix-flock", "unix-dotfile",
-    "unix-none"))
+  if (.Platform[["OS.type"]] == "windows") {
+    warning("vfs customization not available on this platform.",
+      " Ignoring value: vfs = ", vfs,
+      call. = FALSE
+    )
+    return("")
+  }
+
+  match.arg(vfs, c(
+    "unix-posix", "unix-afp", "unix-flock", "unix-dotfile",
+    "unix-none"
+  ))
 }
 
 # From the SQLite docs: If the filename is ":memory:", then a private,
@@ -206,13 +239,15 @@ is_url_or_special_filename <- function(x) grepl("^(?:file|http|ftp|https|):", x)
 
 #' @export
 #' @rdname SQLite
-setMethod("dbConnect", "SQLiteConnection", function(drv, ...){
+setMethod("dbConnect", "SQLiteConnection", function(drv, ...) {
   if (drv@dbname %in% c("", ":memory:", "file::memory:")) {
     stop("Can't clone a temporary database", call. = FALSE)
   }
 
-  dbConnect(SQLite(), drv@dbname, vfs = drv@vfs, flags = drv@flags,
-    loadable.extensions = drv@loadable.extensions)
+  dbConnect(SQLite(), drv@dbname,
+    vfs = drv@vfs, flags = drv@flags,
+    loadable.extensions = drv@loadable.extensions
+  )
 })
 
 

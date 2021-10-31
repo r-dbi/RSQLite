@@ -101,9 +101,15 @@ setMethod("dbRollback", "SQLiteConnection", function(conn, .name = NULL, ..., na
 compat_name <- function(name, .name) {
   if (!is.null(.name)) {
     warning("Please use `dbBegin(..., name = \"<savepoint>\")` to specify the name of the savepoint.",
-      call. = FALSE)
+      call. = FALSE
+    )
     .name
   } else {
     name
   }
+}
+
+get_savepoint_id <- function(name) {
+  random_string <- paste(sample(letters, 10, replace = TRUE), collapse = "")
+  paste0(name, "_", Sys.getpid(), "_", random_string)
 }

@@ -19,3 +19,5 @@ inst/doc
 /clion-test.R
 /.drake
 .vscode/
+CRAN-RELEASE
+tests/testthat/testthat-problems.rds

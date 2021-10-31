@@ -1,7 +1,7 @@
 #' Add useful extension functions
 #'
 #' These extension functions are written by Liam Healy and made available
-#' through the SQLite website (\url{http://www.sqlite.org/contrib}).
+#' through the SQLite website (\url{https://www.sqlite.org/contrib}).
 #'
 #' @section Available extension functions:
 #'
@@ -27,11 +27,16 @@
 initExtension <- function(db) {
   if (!db@loadable.extensions) {
     stop("Loadable extensions are not enabled for this db connection",
-      call. = FALSE)
+      call. = FALSE
+    )
   }
 
-  lib_path <- getLoadedDLLs()[["RSQLite"]][["path"]]
-  extension_load(db@ptr, lib_path, "sqlite3_math_init")
+  extension_load(db@ptr, get_lib_path(), "sqlite3_math_init")
 
   invisible(TRUE)
+}
+
+get_lib_path <- function() {
+  lib_path <- getLoadedDLLs()[["RSQLite"]][["path"]]
+  enc2utf8(lib_path)
 }

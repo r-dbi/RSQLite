@@ -15,8 +15,8 @@ create_affinity_test_table <- function(con, affinity) {
 }
 
 check_affinity_get <- function(affinity, type,
-                              real_type = "numeric", integer_type = type,
-                              blob_integer_type = integer_type) {
+                               real_type = "numeric", integer_type = type,
+                               blob_integer_type = integer_type) {
   con <- memory_db()
   on.exit(dbDisconnect(con))
 

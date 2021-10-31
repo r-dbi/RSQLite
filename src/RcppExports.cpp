@@ -6,9 +6,14 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // connection_connect
-XPtr<DbConnectionPtr> connection_connect(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs);
-RcppExport SEXP _RSQLite_connection_connect(SEXP pathSEXP, SEXP allow_extSEXP, SEXP flagsSEXP, SEXP vfsSEXP) {
+XPtr<DbConnectionPtr> connection_connect(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs, bool with_alt_types);
+RcppExport SEXP _RSQLite_connection_connect(SEXP pathSEXP, SEXP allow_extSEXP, SEXP flagsSEXP, SEXP vfsSEXP, SEXP with_alt_typesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -16,7 +21,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const bool >::type allow_ext(allow_extSEXP);
     Rcpp::traits::input_parameter< const int >::type flags(flagsSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type vfs(vfsSEXP);
-    rcpp_result_gen = Rcpp::wrap(connection_connect(path, allow_ext, flags, vfs));
+    Rcpp::traits::input_parameter< bool >::type with_alt_types(with_alt_typesSEXP);
+    rcpp_result_gen = Rcpp::wrap(connection_connect(path, allow_ext, flags, vfs, with_alt_types));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -66,6 +72,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const int >::type skip(skipSEXP);
     rcpp_result_gen = Rcpp::wrap(connection_import_file(con, name, value, sep, eol, skip));
     return rcpp_result_gen;
+END_RCPP
+}
+// set_busy_handler
+void set_busy_handler(const XPtr<DbConnectionPtr>& con, SEXP r_callback);
+RcppExport SEXP _RSQLite_set_busy_handler(SEXP conSEXP, SEXP r_callbackSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const XPtr<DbConnectionPtr>& >::type con(conSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type r_callback(r_callbackSEXP);
+    set_busy_handler(con, r_callback);
+    return R_NilValue;
 END_RCPP
 }
 // extension_load
@@ -213,11 +230,12 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_RSQLite_connection_connect", (DL_FUNC) &_RSQLite_connection_connect, 4},
+    {"_RSQLite_connection_connect", (DL_FUNC) &_RSQLite_connection_connect, 5},
     {"_RSQLite_connection_valid", (DL_FUNC) &_RSQLite_connection_valid, 1},
     {"_RSQLite_connection_release", (DL_FUNC) &_RSQLite_connection_release, 1},
     {"_RSQLite_connection_copy_database", (DL_FUNC) &_RSQLite_connection_copy_database, 2},
     {"_RSQLite_connection_import_file", (DL_FUNC) &_RSQLite_connection_import_file, 6},
+    {"_RSQLite_set_busy_handler", (DL_FUNC) &_RSQLite_set_busy_handler, 2},
     {"_RSQLite_extension_load", (DL_FUNC) &_RSQLite_extension_load, 3},
     {"_RSQLite_result_create", (DL_FUNC) &_RSQLite_result_create, 2},
     {"_RSQLite_result_release", (DL_FUNC) &_RSQLite_result_release, 1},

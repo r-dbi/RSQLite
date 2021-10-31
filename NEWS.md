@@ -35,8 +35,6 @@
 
 - Improve concurrency behavior with multiple writers (#280, @gaborcsardi).
 - New `sqliteSetBusyHandler()` helps configure what SQLite should do when the database is locked (#280, @gaborcsardi).
-- `dbConnect()` gains an `extended_types` argument that adds support for date, time and timestamp columns. If a column has a declared type `DATE`, `TIME` or `TIMESTAMP`, it is returned as `Date`, `hms` or `POSIXct` value, respectively (#333, @anderic1).
-- Upgrade bundled SQLite to version 3.34.1 (#342).
 
 
 # RSQLite 2.2.3 (2021-01-24)

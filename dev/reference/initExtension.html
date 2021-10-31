@@ -48,7 +48,7 @@ through the SQLite website (https://www.sqlite.org/contrib)."><meta name="robots
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Add useful extension functions</h1>
-    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/master/R/extensions.R" class="external-link"><code>R/extensions.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/HEAD/R/extensions.R" class="external-link"><code>R/extensions.R</code></a></small>
     <div class="hidden name"><code>initExtension.Rd</code></div>
     </div>
 
@@ -62,22 +62,27 @@ through the SQLite website (<a href="https://www.sqlite.org/contrib" class="exte
     <div id="ref-sections">
     <div id="arguments">
     <h2>Arguments</h2>
-    
-
-<dl><dt>db</dt><dd><p>A <code><a href="SQLiteConnection-class.html">SQLiteConnection</a></code> object to load these extensions into.</p></dd>
+    <dl><dt>db</dt>
+<dd><p>A <code><a href="SQLiteConnection-class.html">SQLiteConnection</a></code> object to load these extensions into.</p></dd>
 </dl></div>
     <div id="available-extension-functions">
     <h2>Available extension functions</h2>
     
 
 
-<dl><dt>Math functions</dt><dd><p>acos, acosh, asin, asinh, atan, atan2, atanh, atn2,
+<dl><dt>Math functions</dt>
+<dd><p>acos, acosh, asin, asinh, atan, atan2, atanh, atn2,
 ceil, cos, cosh, cot, coth, degrees, difference, exp, floor, log, log10,
 pi, power, radians, sign, sin, sinh, sqrt, square, tan, tanh</p></dd>
-<dt>String functions</dt><dd><p>charindex, leftstr, ltrim, padc, padl, padr, proper,
+
+<dt>String functions</dt>
+<dd><p>charindex, leftstr, ltrim, padc, padl, padr, proper,
 replace, replicate, reverse, rightstr, rtrim, strfilter, trim</p></dd>
-<dt>Aggregate functions</dt><dd><p>stdev, variance, mode, median, lower_quartile,
+
+<dt>Aggregate functions</dt>
+<dd><p>stdev, variance, mode, median, lower_quartile,
 upper_quartile</p></dd>
+
 
 </dl></div>
     </div>

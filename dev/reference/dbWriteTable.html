@@ -48,7 +48,7 @@ to database tables."><meta name="robots" content="noindex"><!-- mathjax --><scri
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Write a local data frame or file to the database</h1>
-    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/master/R/table.R" class="external-link"><code>R/table.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/HEAD/R/table.R" class="external-link"><code>R/table.R</code></a></small>
     <div class="hidden name"><code>dbWriteTable.Rd</code></div>
     </div>
 
@@ -92,43 +92,56 @@ to database tables.</p>
     <div id="ref-sections">
     <div id="arguments">
     <h2>Arguments</h2>
-    
-
-<dl><dt>conn</dt><dd><p>a <code><a href="SQLiteConnection-class.html">SQLiteConnection</a></code> object, produced by
+    <dl><dt>conn</dt>
+<dd><p>a <code><a href="SQLiteConnection-class.html">SQLiteConnection</a></code> object, produced by
 <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">DBI::dbConnect()</a></code></p></dd>
-</dl><dl><dt>name</dt><dd><p>a character string specifying a table name. SQLite table names
+<dt>name</dt>
+<dd><p>a character string specifying a table name. SQLite table names
 are <em>not</em> case sensitive, e.g., table names <code>ABC</code> and <code>abc</code>
 are considered equal.</p></dd>
-</dl><dl><dt>value</dt><dd><p>a data.frame (or coercible to data.frame) object or a
+<dt>value</dt>
+<dd><p>a data.frame (or coercible to data.frame) object or a
 file name (character).  In the first case, the data.frame is
 written to a temporary file and then imported to SQLite; when <code>value</code>
 is a character, it is interpreted as a file name and its contents imported
 to SQLite.</p></dd>
-</dl><dl><dt>...</dt><dd><p>Needed for compatibility with generic. Otherwise ignored.</p></dd>
-</dl><dl><dt>row.names</dt><dd><p>A logical specifying whether the <code>row.names</code> should be
+<dt>...</dt>
+<dd><p>Needed for compatibility with generic. Otherwise ignored.</p></dd>
+<dt>row.names</dt>
+<dd><p>A logical specifying whether the <code>row.names</code> should be
 output to the output DBMS table; if <code>TRUE</code>, an extra field whose name
 will be whatever the R identifier <code>"row.names"</code> maps to the DBMS (see
 <code><a href="https://dbi.r-dbi.org/reference/make.db.names.html" class="external-link">DBI::make.db.names()</a></code>). If <code>NA</code> will add rows names if
 they are characters, otherwise will ignore.</p></dd>
-</dl><dl><dt>overwrite</dt><dd><p>a logical specifying whether to overwrite an existing table
+<dt>overwrite</dt>
+<dd><p>a logical specifying whether to overwrite an existing table
 or not. Its default is <code>FALSE</code>.</p></dd>
-</dl><dl><dt>append</dt><dd><p>a logical specifying whether to append to an existing table
+<dt>append</dt>
+<dd><p>a logical specifying whether to append to an existing table
 in the DBMS.  Its default is <code>FALSE</code>.</p></dd>
-</dl><dl><dt>field.types</dt><dd><p>character vector of named  SQL field types where
+<dt>field.types</dt>
+<dd><p>character vector of named  SQL field types where
 the names are the names of new table's columns. If missing, types inferred
 with <code><a href="https://dbi.r-dbi.org/reference/dbDataType.html" class="external-link">DBI::dbDataType()</a></code>).</p></dd>
-</dl><dl><dt>temporary</dt><dd><p>a logical specifying whether the new table should be
+<dt>temporary</dt>
+<dd><p>a logical specifying whether the new table should be
 temporary. Its default is <code>FALSE</code>.</p></dd>
-</dl><dl><dt>header</dt><dd><p>is a logical indicating whether the first data line (but see
+<dt>header</dt>
+<dd><p>is a logical indicating whether the first data line (but see
 <code>skip</code>) has a header or not.  If missing, it value is determined
 following <code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table()</a></code> convention, namely, it is set to TRUE if
 and only if the first row has one fewer field that the number of columns.</p></dd>
-</dl><dl><dt>colClasses</dt><dd><p>Character vector of R type names, used to override
+<dt>colClasses</dt>
+<dd><p>Character vector of R type names, used to override
 defaults when imputing classes from on-disk file.</p></dd>
-</dl><dl><dt>nrows</dt><dd><p>Number of rows to read to determine types.</p></dd>
-</dl><dl><dt>sep</dt><dd><p>The field separator, defaults to <code>','</code>.</p></dd>
-</dl><dl><dt>eol</dt><dd><p>The end-of-line delimiter, defaults to <code>'\n'</code>.</p></dd>
-</dl><dl><dt>skip</dt><dd><p>number of lines to skip before reading the data. Defaults to 0.</p></dd>
+<dt>nrows</dt>
+<dd><p>Number of rows to read to determine types.</p></dd>
+<dt>sep</dt>
+<dd><p>The field separator, defaults to <code>','</code>.</p></dd>
+<dt>eol</dt>
+<dd><p>The end-of-line delimiter, defaults to <code>'\n'</code>.</p></dd>
+<dt>skip</dt>
+<dd><p>number of lines to skip before reading the data. Defaults to 0.</p></dd>
 </dl></div>
     <div id="details">
     <h2>Details</h2>

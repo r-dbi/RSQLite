@@ -47,7 +47,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Read a database table</h1>
-    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/master/R/table.R" class="external-link"><code>R/table.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/HEAD/R/table.R" class="external-link"><code>R/table.R</code></a></small>
     <div class="hidden name"><code>dbReadTable-SQLiteConnection-character-method.Rd</code></div>
     </div>
 
@@ -68,21 +68,28 @@
     <div id="ref-sections">
     <div id="arguments">
     <h2>Arguments</h2>
-    
-
-<dl><dt>conn</dt><dd><p>a <code><a href="SQLiteConnection-class.html">SQLiteConnection</a></code> object, produced by
+    <dl><dt>conn</dt>
+<dd><p>a <code><a href="SQLiteConnection-class.html">SQLiteConnection</a></code> object, produced by
 <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">DBI::dbConnect()</a></code></p></dd>
-</dl><dl><dt>name</dt><dd><p>a character string specifying a table name. SQLite table names
+<dt>name</dt>
+<dd><p>a character string specifying a table name. SQLite table names
 are <em>not</em> case sensitive, e.g., table names <code>ABC</code> and <code>abc</code>
 are considered equal.</p></dd>
-</dl><dl><dt>...</dt><dd><p>Needed for compatibility with generic. Otherwise ignored.</p></dd>
-</dl><dl><dt>row.names</dt><dd><p>Either <code>TRUE</code>, <code>FALSE</code>, <code>NA</code> or a string.If <code>TRUE</code>, always translate row names to a column called "row_names".
+<dt>...</dt>
+<dd><p>Needed for compatibility with generic. Otherwise ignored.</p></dd>
+<dt>row.names</dt>
+<dd><p>Either <code>TRUE</code>, <code>FALSE</code>, <code>NA</code> or a string.</p>
+<p>If <code>TRUE</code>, always translate row names to a column called "row_names".
 If <code>FALSE</code>, never translate row names. If <code>NA</code>, translate
-rownames only if they're a character vector.A string is equivalent to <code>TRUE</code>, but allows you to override the
-default name.For backward compatibility, <code>NULL</code> is equivalent to <code>FALSE</code>.</p></dd>
-</dl><dl><dt>check.names</dt><dd><p>If <code>TRUE</code>, the default, column names will be
+rownames only if they're a character vector.</p>
+<p>A string is equivalent to <code>TRUE</code>, but allows you to override the
+default name.</p>
+<p>For backward compatibility, <code>NULL</code> is equivalent to <code>FALSE</code>.</p></dd>
+<dt>check.names</dt>
+<dd><p>If <code>TRUE</code>, the default, column names will be
 converted to valid R identifiers.</p></dd>
-</dl><dl><dt>select.cols</dt><dd><p>Deprecated, do not use.</p></dd>
+<dt>select.cols</dt>
+<dd><p>Deprecated, do not use.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>

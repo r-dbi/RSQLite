@@ -58,7 +58,7 @@ sets the busy timeout to three seconds."><meta name="robots" content="noindex"><
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Configure what SQLite should do when the database is locked</h1>
-    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/master/R/SQLiteConnection.R" class="external-link"><code>R/SQLiteConnection.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/HEAD/R/SQLiteConnection.R" class="external-link"><code>R/SQLiteConnection.R</code></a></small>
     <div class="hidden name"><code>sqliteSetBusyHandler.Rd</code></div>
     </div>
 
@@ -82,12 +82,11 @@ times within this timeout. To set a timeout, pass an integer scalar to
     <div id="ref-sections">
     <div id="arguments">
     <h2>Arguments</h2>
-    
-
-<dl><dt>dbObj</dt><dd><p>A <a href="SQLiteConnection-class.html">SQLiteConnection</a> object.</p></dd>
-</dl><dl><dt>handler</dt><dd><p>Specifies what to do when the database is locked by
-another transaction. It can be:
-</p><ul><li><p><code>NULL</code>: fail immediately,</p></li>
+    <dl><dt>dbObj</dt>
+<dd><p>A <a href="SQLiteConnection-class.html">SQLiteConnection</a> object.</p></dd>
+<dt>handler</dt>
+<dd><p>Specifies what to do when the database is locked by
+another transaction. It can be:</p><ul><li><p><code>NULL</code>: fail immediately,</p></li>
 <li><p>an integer scalar: this is a timeout in milliseconds that corresponds
 to <code>PRAGMA busy_timeout</code>,</p></li>
 <li><p>an R function: this function is called with one argument, see details

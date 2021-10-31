@@ -48,7 +48,7 @@ dbGetQuery"><meta name="robots" content="noindex"><!-- mathjax --><script src="h
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Build the SQL CREATE TABLE definition as a string</h1>
-    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/master/R/deprecated.R" class="external-link"><code>R/deprecated.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/HEAD/R/deprecated.R" class="external-link"><code>R/deprecated.R</code></a></small>
     <div class="hidden name"><code>sqliteBuildTableDefinition.Rd</code></div>
     </div>
 
@@ -68,14 +68,17 @@ dbGetQuery"><meta name="robots" content="noindex"><!-- mathjax --><script src="h
     <div id="ref-sections">
     <div id="arguments">
     <h2>Arguments</h2>
-    
-
-<dl><dt>con</dt><dd><p>A database connection.</p></dd>
-</dl><dl><dt>name</dt><dd><p>Name of the new SQL table</p></dd>
-</dl><dl><dt>value</dt><dd><p>A data.frame, for which we want to create a table.</p></dd>
-</dl><dl><dt>field.types</dt><dd><p>Optional, named character vector of the types for each
+    <dl><dt>con</dt>
+<dd><p>A database connection.</p></dd>
+<dt>name</dt>
+<dd><p>Name of the new SQL table</p></dd>
+<dt>value</dt>
+<dd><p>A data.frame, for which we want to create a table.</p></dd>
+<dt>field.types</dt>
+<dd><p>Optional, named character vector of the types for each
 field in <code>value</code></p></dd>
-</dl><dl><dt>row.names</dt><dd><p>Logical. Should row.name of <code>value</code> be exported as a
+<dt>row.names</dt>
+<dd><p>Logical. Should row.name of <code>value</code> be exported as a
 <code>row_names</code> field? Default is <code>TRUE</code></p></dd>
 </dl></div>
     <div id="value">

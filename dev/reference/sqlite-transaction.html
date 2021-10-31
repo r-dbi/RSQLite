@@ -52,7 +52,7 @@ dbCommit() or dbRollback() is called."><meta name="robots" content="noindex"><!-
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>SQLite transaction management</h1>
-    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/master/R/transactions.R" class="external-link"><code>R/transactions.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/HEAD/R/transactions.R" class="external-link"><code>R/transactions.R</code></a></small>
     <div class="hidden name"><code>sqlite-transaction.Rd</code></div>
     </div>
 
@@ -77,13 +77,15 @@ auto-commit on.
     <div id="ref-sections">
     <div id="arguments">
     <h2>Arguments</h2>
-    
-
-<dl><dt>conn</dt><dd><p>a <code><a href="SQLiteConnection-class.html">SQLiteConnection</a></code> object, produced by
+    <dl><dt>conn</dt>
+<dd><p>a <code><a href="SQLiteConnection-class.html">SQLiteConnection</a></code> object, produced by
 <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">DBI::dbConnect()</a></code></p></dd>
-</dl><dl><dt>.name</dt><dd><p>For backward compatibility, do not use.</p></dd>
-</dl><dl><dt>...</dt><dd><p>Needed for compatibility with generic. Otherwise ignored.</p></dd>
-</dl><dl><dt>name</dt><dd><p>Supply a name to use a named savepoint. This allows you to
+<dt>.name</dt>
+<dd><p>For backward compatibility, do not use.</p></dd>
+<dt>...</dt>
+<dd><p>Needed for compatibility with generic. Otherwise ignored.</p></dd>
+<dt>name</dt>
+<dd><p>Supply a name to use a named savepoint. This allows you to
 nest multiple transaction</p></dd>
 </dl></div>
     <div id="see-also">

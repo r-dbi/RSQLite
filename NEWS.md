@@ -399,7 +399,7 @@ Internal
 - Added upgrade script for sqlite3 sources and creation script for the datasets database to the `data-raw` directory.
 
 
-# Version 1.0.0
+# RSQLite 1.0.0 (2014-10-25)
 
 ## New features
 

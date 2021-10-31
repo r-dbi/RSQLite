@@ -72,12 +72,12 @@
 - Multipart queries now give a warning (#313).
 
 
-# RSQLite 2.2.0
+# RSQLite 2.2.0 (2020-01-07)
 
 - Avoid mangling column names (#259).
 
 
-# RSQLite 2.1.5
+# RSQLite 2.1.5 (2019-12-18)
 
 - Upgrade bundled sqlite version to 3.30.1.
 - Implement `dbGetInfo()` for driver and connection objects (#117).
@@ -86,17 +86,17 @@
 - Fulfill requirements for CII badge (#300, @TSchiefer).
 
 
-# RSQLite 2.1.4
+# RSQLite 2.1.4 (2019-12-04)
 
 - Replace `std::mem_fn()` by `boost::mem_fn()` which works for older compilers.
 
 
-# RSQLite 2.1.3
+# RSQLite 2.1.3 (2019-12-03)
 
 - Replace `std::mem_fun_ref()` by `std::mem_fn()`.
 
 
-# RSQLite 2.1.2
+# RSQLite 2.1.2 (2019-07-24)
 
 ## Bundled library
 

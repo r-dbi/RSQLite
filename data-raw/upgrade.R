@@ -28,12 +28,27 @@ unzip(tmp, exdir = "src/vendor/sqlite3", junkpaths = TRUE)
 unlink("src/vendor/sqlite3/shell.c")
 
 # Regular expression source code
-download.file(
-  url = "https://sqlite.org/src/raw?filename=ext/misc/regexp.c&ci=trunk",
-  destfile = "src/vendor/sqlite3/regexp.c",
-  quiet = TRUE,
-  mode = "w"
-)
+add_extension <- function(name) {
+  download.file(
+    url = paste0("https://sqlite.org/src/raw?filename=ext/misc/", name, ".c&ci=trunk"),
+    destfile = paste0("src/vendor/sqlite3/", name, ".c"),
+    quiet = TRUE,
+    mode = "w")
+
+  lines <- c(
+    "#define SQLITE_CORE",
+    "#include <R_ext/Visibility.h>",
+    paste0('#include "vendor/sqlite3/', name, '.c"')
+  )
+
+  writeLines(lines, paste0("src/extension-", name, ".c"))
+  # stopifnot(system2("patch", "-p1", stdin = paste0("data-raw/", name, ".patch")) == 0)
+}
+
+# Regular expression source code
+add_extension("regexp")
+add_extension("csv")
+add_extension("series")
 
 stopifnot(system2("patch", "-p1", stdin = "data-raw/regexp.patch") == 0)
 

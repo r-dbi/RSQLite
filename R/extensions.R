@@ -36,6 +36,35 @@ initExtension <- function(db) {
   invisible(TRUE)
 }
 
+#' Add `generate_series()` function
+#'
+#' This loads the table-valued function `generate_series()`,
+#' as available through the SQLite source code repository
+#' (\url{https://sqlite.org/src/raw?filename=ext/misc/series.c}).
+#'
+#' @param db A \code{\linkS4class{SQLiteConnection}} object to load these extensions into.
+#'
+#' @return Always \code{TRUE}, invisibly.
+#' @export
+#' @examples
+#' library(DBI)
+#' db <- RSQLite::datasetsDb()
+#' RSQLite::initSeries(db)
+#'
+#' dbGetQuery(db, "SELECT value FROM generate_series(0, 20, 5);")
+#' dbDisconnect(db)
+initSeries <- function(db) {
+  if (!db@loadable.extensions) {
+    stop("Loadable extensions are not enabled for this db connection",
+      call. = FALSE
+    )
+  }
+
+  extension_load(db@ptr, get_lib_path(), "sqlite3_series_init")
+
+  invisible(TRUE)
+}
+
 get_lib_path <- function() {
   lib_path <- getLoadedDLLs()[["RSQLite"]][["path"]]
   enc2utf8(lib_path)

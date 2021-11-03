@@ -299,9 +299,9 @@ static int re_match(ReCompiled *pRe, const unsigned char *zIn, int nIn){
         }
         case RE_OP_CC_EXC: {
           if( c==0 ) break;
-          /* fall-through */ goto re_op_cc_inc;
+          /* fall-through */
         }
-        case RE_OP_CC_INC: re_op_cc_inc: {
+        case RE_OP_CC_INC: {
           int j = 1;
           int n = pRe->aArg[x];
           int hit = 0;

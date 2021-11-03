@@ -27,13 +27,26 @@ tryCatch(
 unzip(tmp, exdir = "src/vendor/sqlite3", junkpaths = TRUE)
 unlink("src/vendor/sqlite3/shell.c")
 
+
+tmp_source_zip <- tempfile()
+latest_code <- "https://www.sqlite.org/src/zip/sqlite.zip?r=release"
+download.file(latest_code, tmp_source_zip)
+
+tmp_source_dir <- tempdir()
+unzip(tmp_source_zip, exdir = tmp_source_dir)
+
+
 # Regular expression source code
-add_extension <- function(name) {
-  download.file(
-    url = paste0("https://sqlite.org/src/raw?filename=ext/misc/", name, ".c&ci=trunk"),
-    destfile = paste0("src/vendor/sqlite3/", name, ".c"),
-    quiet = TRUE,
-    mode = "w")
+register_misc_extension <- function(name) {
+  ext_dir <- "src/vendor/sqlite3/"
+  if (!dir.exists(ext_dir))
+    dir.create(ext_dir, recursive = TRUE)
+
+  file.copy(
+    paste0(tmp_source_dir, "/sqlite/ext/misc/", name, ".c"),
+    paste0(ext_dir, name, ".c"),
+    overwrite = TRUE
+  )
 
   lines <- c(
     "#define SQLITE_CORE",
@@ -45,12 +58,10 @@ add_extension <- function(name) {
   # stopifnot(system2("patch", "-p1", stdin = paste0("data-raw/", name, ".patch")) == 0)
 }
 
-# Regular expression source code
-add_extension("regexp")
-add_extension("csv")
-add_extension("series")
-
+register_misc_extension("regexp")
 stopifnot(system2("patch", "-p1", stdin = "data-raw/regexp.patch") == 0)
+register_misc_extension("series")
+
 
 if (any(grepl("^src/", gert::git_status()$file))) {
   branch <- paste0("f-", sub("[.][^.]*$", "", latest_name))

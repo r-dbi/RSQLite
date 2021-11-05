@@ -38,7 +38,7 @@ unzip(tmp_source_zip, exdir = tmp_source_dir)
 
 # Regular expression source code
 register_misc_extension <- function(name) {
-  ext_dir <- "src/vendor/sqlite3/"
+  ext_dir <- "src/vendor/extensions/"
   if (!dir.exists(ext_dir))
     dir.create(ext_dir, recursive = TRUE)
 
@@ -48,19 +48,21 @@ register_misc_extension <- function(name) {
     overwrite = TRUE
   )
 
+  # TODO compile as shared library? see https://www.sqlite.org/loadext.html
   lines <- c(
     "#define SQLITE_CORE",
     "#include <R_ext/Visibility.h>",
-    paste0('#include "vendor/sqlite3/', name, '.c"')
+    paste0('#include "vendor/extensions/', name, '.c"')
   )
 
-  writeLines(lines, paste0("src/extension-", name, ".c"))
+  writeLines(lines, paste0("src/vendor/extensions/ext-", name, ".c"))
   # stopifnot(system2("patch", "-p1", stdin = paste0("data-raw/", name, ".patch")) == 0)
 }
 
 register_misc_extension("regexp")
 stopifnot(system2("patch", "-p1", stdin = "data-raw/regexp.patch") == 0)
 register_misc_extension("series")
+register_misc_extension("csv")
 
 
 if (any(grepl("^src/", gert::git_status()$file))) {

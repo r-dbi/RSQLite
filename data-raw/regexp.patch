@@ -4,10 +4,10 @@ Date:   Mon Sep 28 15:50:33 2020 +0200
 
     Tweak
 
-diff --git a/src/vendor/sqlite3/regexp.c b/src/vendor/sqlite3/regexp.c
+diff --git a/src/vendor/extensions/regexp.c b/src/vendor/extensions/regexp.c
 index 03bbeb9..a1517c8 100644
---- a/src/vendor/sqlite3/regexp.c
-+++ b/src/vendor/sqlite3/regexp.c
+--- a/src/vendor/extensions/regexp.c
++++ b/src/vendor/extensions/regexp.c
 @@ -747,7 +747,8 @@ static void re_sql_func(
  #ifdef _WIN32
  __declspec(dllexport)

@@ -49,20 +49,20 @@
       <h1>Updates</h1>
     </div>
 
-<div class="section level1">
+<div id="updates" class="section level1">
 
 <p>Two components are shipped with the package that can be updated:</p>
 <ul><li>SQLite library</li>
 <li>Datasets database</li>
 </ul><p>Ideally the update should happen right <em>after</em> each CRAN release, so that a new SQLite version is tested for some time before it’s released to CRAN.</p>
 <div class="section level2">
-<h2 id="datasets-database">SQLite library<a class="anchor" aria-label="anchor" href="#updates"></a></h2>
+<h2 id="sqlite-library">SQLite library<a class="anchor" aria-label="anchor" href="#sqlite-library"></a></h2>
 <ol style="list-style-type: decimal"><li><p>Download latest SQLite source by running <code>data-raw/upgrade.R</code></p></li>
 <li><p>Update <code>DESCRIPTION</code> for included version of SQLite</p></li>
 <li><p>Update <code>NEWS</code></p></li>
 </ol></div>
 <div class="section level2">
-<h2 id="sqlite-library">Datasets database<a class="anchor" aria-label="anchor" href="#sqlite-library"></a></h2>
+<h2 id="datasets-database">Datasets database<a class="anchor" aria-label="anchor" href="#datasets-database"></a></h2>
 <p>RSQLite includes one SQLite database (accessible from <code><a href="reference/datasetsDb.html">datasetsDb()</a></code> that contains all data frames in the datasets package. The code that created it is located in <code>data-raw/datasets.R</code>.</p>
 </div>
 </div>

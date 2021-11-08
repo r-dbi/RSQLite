@@ -1,3 +1,6 @@
+#define STRICT_R_HEADERS
+#define R_NO_REMAP
+
 #ifndef DB_COLUMNSTORAGE_H
 #define DB_COLUMNSTORAGE_H
 

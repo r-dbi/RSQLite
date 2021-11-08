@@ -1,3 +1,6 @@
+#define STRICT_R_HEADERS
+#define R_NO_REMAP
+
 #ifndef __RSQLITE_SQLITE_CONNECTION__
 #define __RSQLITE_SQLITE_CONNECTION__
 

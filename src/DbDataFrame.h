@@ -1,3 +1,6 @@
+#define STRICT_R_HEADERS
+#define R_NO_REMAP
+
 #ifndef DB_DATAFRAME_H
 #define DB_DATAFRAME_H
 

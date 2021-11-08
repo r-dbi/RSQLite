@@ -1,3 +1,7 @@
+#define STRICT_R_HEADERS
+#define R_NO_REMAP
+#include <cpp11/R.hpp>
+
 #include "pch.h"
 #include "sqlite3.h"
 
@@ -8,7 +12,7 @@
 //' @export
 //' @examples
 //' RSQLite::rsqliteVersion()
-// [[Rcpp::export]]
+[[cpp11::register]]
 CharacterVector rsqliteVersion() {
   return
     CharacterVector::create(
@@ -17,7 +21,7 @@ CharacterVector rsqliteVersion() {
     );
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 void init_logging(const std::string& log_level) {
   plog::init_r(log_level);
 }

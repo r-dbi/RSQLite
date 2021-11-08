@@ -1,3 +1,7 @@
+#define STRICT_R_HEADERS
+#define R_NO_REMAP
+
+
 #ifndef __RDBI_DB_RESULT__
 #define __RDBI_DB_RESULT__
 

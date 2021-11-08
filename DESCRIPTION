@@ -56,20 +56,22 @@ Suggests:
     xml2
 LinkingTo: 
     plogr (>= 0.2.0),
-    Rcpp
+    Rcpp,
+    cpp11
+SystemRequirements: C++11
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1.9001
+RoxygenNote: 7.1.2
 Collate: 
-    'RcppExports.R'
     'SQLiteConnection.R'
     'SQLiteDriver.R'
     'SQLiteResult.R'
     'coerce.R'
     'connect.R'
     'copy.R'
+    'cpp11.R'
     'datasetsDb.R'
     'deprecated.R'
     'export.R'

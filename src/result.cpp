@@ -1,78 +1,66 @@
+#define STRICT_R_HEADERS
+#define R_NO_REMAP
+
 #include "pch.h"
 #include "RSQLite_types.h"
+
+
+#include "cpp11.hpp"
+#include <cpp11/R.hpp>
+
 
 //#include "DbResult.h"
 
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 XPtr<DbResult> result_create(XPtr<DbConnectionPtr> con, std::string sql) {
   (*con)->check_connection();
   DbResult* res = SqliteResult::create_and_send_query(*con, sql);
   return XPtr<DbResult>(res, true);
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 void result_release(XPtr<DbResult> res) {
   res.release();
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 bool result_valid(XPtr<DbResult> res_) {
   DbResult* res = res_.get();
   return res != NULL && res->is_active();
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 List result_fetch(DbResult* res, const int n) {
   return res->fetch(n);
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 void result_bind(DbResult* res, List params) {
   res->bind(params);
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 bool result_has_completed(DbResult* res) {
   return res->complete();
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 int result_rows_fetched(DbResult* res) {
   return res->n_rows_fetched();
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 int result_rows_affected(DbResult* res) {
   return res->n_rows_affected();
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 List result_column_info(DbResult* res) {
   return res->get_column_info();
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 CharacterVector result_get_placeholder_names(SqliteResult* res) {
   return res->get_placeholder_names();
-}
-
-namespace Rcpp {
-
-template<>
-DbResult* as(SEXP x) {
-  DbResult* result = (DbResult*)(R_ExternalPtrAddr(x));
-  if (!result)
-    stop("Invalid result set");
-  return result;
-}
-
-template<>
-SqliteResult* as(SEXP x) {
-  SqliteResult* result = (SqliteResult*)(R_ExternalPtrAddr(x));
-  if (!result)
-    stop("Invalid result set");
-  return result;
-}
-
 }

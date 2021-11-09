@@ -9,8 +9,6 @@
 #include "integer64.h"
 
 
-// using namespace Rcpp;
-
 DbColumnStorage::DbColumnStorage(DATA_TYPE dt_, const R_xlen_t capacity_, const int n_max_,
                                  const DbColumnDataSource& source_)
   :

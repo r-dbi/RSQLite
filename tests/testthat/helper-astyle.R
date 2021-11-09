@@ -29,6 +29,7 @@ astyle <- function(extra_args = character()) {
     }
   )
   src_files <- dir(src_path, "[.](?:cpp|h)$", recursive = FALSE, full.names = TRUE)
+  # TODO
   astyle_files <- grep("(?:RcppExports[.]cpp)", src_files, value = TRUE, invert = TRUE)
   output <- system2(astyle_cmd, c(astyle_args, astyle_files, extra_args), stdout = TRUE, stderr = TRUE)
   unchanged <- grepl("^Unchanged", output)

@@ -42,8 +42,7 @@ Imports:
     DBI (>= 1.1.0),
     memoise,
     methods,
-    pkgconfig,
-    Rcpp (>= 1.0.7)
+    pkgconfig
 Suggests: 
     DBItest (>= 1.7.0),
     gert,
@@ -56,7 +55,6 @@ Suggests:
     xml2
 LinkingTo: 
     plogr (>= 0.2.0),
-    Rcpp,
     cpp11
 SystemRequirements: C++11
 VignetteBuilder: 

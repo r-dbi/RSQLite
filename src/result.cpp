@@ -4,8 +4,6 @@
 #include "pch.h"
 #include "RSQLite_types.h"
 
-
-// using namespace Rcpp;
 //#include "DbResult.h"
 
 
@@ -16,9 +14,44 @@ cpp11::external_pointer<DbResult> result_create(cpp11::external_pointer<DbConnec
   return cpp11::external_pointer<DbResult>(res, true);
 }
 
+template <typename T, void Finalizer(T*) >
+void finalizer_wrapper(SEXP p) {
+    if (TYPEOF(p) != EXTPTRSXP)
+        return;
+
+    T* ptr = (T*) R_ExternalPtrAddr(p);
+    // RCPP_DEBUG_3("finalizer_wrapper<%s>(SEXP p = <%p>). ptr = %p", DEMANGLE(T), p, ptr)
+
+    if (ptr == NULL)
+        return;
+
+    // Clear before finalizing to avoid behavior like access of freed memory
+    R_ClearExternalPtr(p);
+
+    Finalizer(ptr);
+}
+
+template <typename T>
+void standard_delete_finalizer(T* obj) {												// #nocov start
+    delete obj;
+}
+
+template <typename T>
+void release(SEXP x) {
+  if (x != NULL) {
+    // Call the finalizer -- note that this implies that finalizers
+    // need to be ready for a NULL external pointer value (our
+    // default C++ finalizer is since delete NULL is a no-op).
+    // This clears the external pointer just before calling the finalizer,
+    // to avoid interesting behavior with co-dependent finalizers.
+    finalizer_wrapper<T,standard_delete_finalizer<T>>(x);
+  }
+}
+
 [[cpp11::register]]
-void result_release(Rcpp::XPtr<DbResult> res) {
-  res.release();
+void result_release(cpp11::sexp res) {
+  // TODO
+  release<DbResult>(res);
 }
 
 [[cpp11::register]]

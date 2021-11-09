@@ -2,6 +2,7 @@
 #define R_NO_REMAP
 
 #include <cpp11.hpp>
+#include <set>
 
 #ifndef DB_COLUMN_H
 #define DB_COLUMN_H

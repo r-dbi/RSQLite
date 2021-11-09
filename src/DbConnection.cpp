@@ -139,7 +139,7 @@ int DbConnection::busy_callback_helper(void *data, int num)
     }
     catch (...)
     {
-      Rcpp::message(Rcpp::StringVector::create("Busy callback failed, aborting transaction"));
+      cpp11::message("Busy callback failed, aborting transaction");
       return 0;
     }
   }

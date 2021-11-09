@@ -170,7 +170,10 @@ cpp11::list SqliteResultImpl::fetch(const int n_max) {
 cpp11::list SqliteResultImpl::get_column_info() {
   peek_first_row();
 
-  Rcpp::CharacterVector names(cache.names_.begin(), cache.names_.end());
+  cpp11::writable::strings names(cache.names_.size());
+  auto it = cache.names_.begin();
+  for (int i = 0; i < names.size(); i++, it++)
+    names[i] = *it;
 
   cpp11::writable::strings types(cache.ncols_);
   for (size_t i = 0; i < cache.ncols_; i++) {

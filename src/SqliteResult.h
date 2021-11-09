@@ -4,6 +4,7 @@
 #ifndef __RSQLITE_SQLITE_RESULT__
 #define __RSQLITE_SQLITE_RESULT__
 
+#include <cpp11.hpp>
 #include "DbResult.h"
 
 // DbResult --------------------------------------------------------------------
@@ -16,7 +17,7 @@ public:
   static DbResult* create_and_send_query(const DbConnectionPtr& con, const std::string& sql);
 
 public:
-  Rcpp::CharacterVector get_placeholder_names() const;
+  cpp11::strings get_placeholder_names() const;
 };
 
 #endif

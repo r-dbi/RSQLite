@@ -4,7 +4,7 @@
 #ifndef RSQLITE_SQLITERESULTIMPL_H
 #define RSQLITE_SQLITERESULTIMPL_H
 
-
+#include <cpp11.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include "sqlite3.h"
@@ -60,7 +60,7 @@ public:
   Rcpp::List get_column_info();
 
 public:
-  Rcpp::CharacterVector get_placeholder_names() const;
+  cpp11::strings get_placeholder_names() const;
 
 private:
   void set_params(const Rcpp::List& params);

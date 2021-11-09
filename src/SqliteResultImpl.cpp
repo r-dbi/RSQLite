@@ -2,6 +2,7 @@
 #define R_NO_REMAP
 
 
+#include <cpp11.hpp>
 #include "pch.h"
 #include "SqliteResultImpl.h"
 #include "SqliteDataFrame.h"
@@ -170,7 +171,7 @@ Rcpp::List SqliteResultImpl::get_column_info() {
 
   Rcpp::CharacterVector names(cache.names_.begin(), cache.names_.end());
 
-  Rcpp::CharacterVector types(cache.ncols_);
+  cpp11::writable::strings types(cache.ncols_);
   for (size_t i = 0; i < cache.ncols_; i++) {
     switch(types_[i]) {
     case DT_DATE:
@@ -195,10 +196,10 @@ Rcpp::List SqliteResultImpl::get_column_info() {
 
 // Publics (custom) ////////////////////////////////////////////////////////////
 
-Rcpp::CharacterVector SqliteResultImpl::get_placeholder_names() const {
+cpp11::strings SqliteResultImpl::get_placeholder_names() const {
   int n = sqlite3_bind_parameter_count(stmt);
 
-  Rcpp::CharacterVector res(n);
+  cpp11::writable::strings res(n);
 
   for (int i = 0; i < n; ++i) {
     const char* placeholder_name = sqlite3_bind_parameter_name(stmt, i + 1);
@@ -206,7 +207,7 @@ Rcpp::CharacterVector SqliteResultImpl::get_placeholder_names() const {
       placeholder_name = "";
     else
       ++placeholder_name;
-    res[i] = Rcpp::String(placeholder_name, CE_UTF8);
+    res[i] = placeholder_name;
   }
 
   return res;

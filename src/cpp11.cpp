@@ -127,7 +127,7 @@ extern "C" SEXP _RSQLite_result_column_info(SEXP res) {
   END_CPP11
 }
 // result.cpp
-Rcpp::CharacterVector result_get_placeholder_names(SqliteResult* res);
+cpp11::strings result_get_placeholder_names(SqliteResult* res);
 extern "C" SEXP _RSQLite_result_get_placeholder_names(SEXP res) {
   BEGIN_CPP11
     return cpp11::as_sexp(result_get_placeholder_names(cpp11::as_cpp<cpp11::decay_t<SqliteResult*>>(res)));

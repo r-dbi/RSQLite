@@ -58,6 +58,6 @@ Rcpp::List result_column_info(DbResult* res) {
 }
 
 [[cpp11::register]]
-Rcpp::CharacterVector result_get_placeholder_names(SqliteResult* res) {
+cpp11::strings result_get_placeholder_names(SqliteResult* res) {
   return res->get_placeholder_names();
 }

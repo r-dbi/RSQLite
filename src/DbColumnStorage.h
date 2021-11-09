@@ -1,9 +1,9 @@
 #define STRICT_R_HEADERS
 #define R_NO_REMAP
+#include <cpp11.hpp>
 
 #ifndef DB_COLUMNSTORAGE_H
 #define DB_COLUMNSTORAGE_H
-
 
 #include "DbColumnDataType.h"
 
@@ -11,7 +11,7 @@
 class DbColumnDataSource;
 
 class DbColumnStorage {
-  Rcpp::RObject data;
+  cpp11::sexp data;
   int i;
   DATA_TYPE dt;
   const int n_max;
@@ -45,7 +45,7 @@ private:
   void fetch_value();
 
   // allocate()
-  static Rcpp::RObject class_from_datatype(DATA_TYPE dt);
+  static cpp11::sexp class_from_datatype(DATA_TYPE dt);
   static SEXP set_attribs_from_datatype(SEXP x, DATA_TYPE dt);
   static SEXP new_blob(SEXP x);
   static SEXP new_hms(SEXP x);

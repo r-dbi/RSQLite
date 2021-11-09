@@ -41,7 +41,7 @@ DATA_TYPE DbColumnStorage::get_data_type() const {
 
 SEXP DbColumnStorage::allocate(const R_xlen_t length, DATA_TYPE dt) {
   SEXPTYPE type = sexptype_from_datatype(dt);
-  Rcpp::RObject class_ = class_from_datatype(dt);
+  cpp11::sexp class_ = class_from_datatype(dt);
 
   SEXP ret = PROTECT(Rf_allocVector(type, length));
   if (!Rf_isNull(class_)) Rf_setAttrib(ret, R_ClassSymbol, class_);
@@ -189,17 +189,17 @@ SEXPTYPE DbColumnStorage::sexptype_from_datatype(DATA_TYPE dt) {
   }
 }
 
-Rcpp::RObject DbColumnStorage::class_from_datatype(DATA_TYPE dt) {
+cpp11::sexp DbColumnStorage::class_from_datatype(DATA_TYPE dt) {
   switch (dt) {
   case DT_INT64:
-    return Rcpp::CharacterVector::create("integer64");
+    return cpp11::strings({"integer64"});
 
   case DT_DATE:
-    return Rcpp::CharacterVector::create("Date");
+    return cpp11::strings({"Date"});
 
   case DT_DATETIME:
   case DT_DATETIMETZ:
-    return Rcpp::CharacterVector::create("POSIXct", "POSIXt");
+    return cpp11::strings({"POSIXct", "POSIXt"});
 
   default:
     return R_NilValue;
@@ -215,7 +215,7 @@ SEXP DbColumnStorage::set_attribs_from_datatype(SEXP x, DATA_TYPE dt) {
     return new_hms(x);
 
   case DT_DATETIME: {
-      Rcpp::RObject ro = Rcpp::RObject(x);
+      cpp11::sexp ro = x;
       ro.attr("tzone") = "UTC";
       return ro;
     }

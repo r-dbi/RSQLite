@@ -13,7 +13,7 @@ using namespace cpp11::literals;
 #define Rcpp_XPtr_h
 #endif
 
-#include <Rcpp.h>
+// #include <Rcpp.h>
 #include <plogr.h>
 
 // Included here because they need -Wno-error,

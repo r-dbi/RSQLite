@@ -96,7 +96,10 @@ sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
   if (tail) {
     while (isspace(*tail)) ++tail;
     if (*tail) {
-      Rcpp::warningcall(R_NilValue, std::string("Ignoring remaining part of query: ") + tail);
+      // TODO
+      // Rcpp::warningcall(R_NilValue, std::string("Ignoring remaining part of query: ") + tail);
+      auto warning = cpp11::package("base")["warning"];
+      warning(std::string("Ignoring remaining part of query: ") + tail);
     }
   }
 

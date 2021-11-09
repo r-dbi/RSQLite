@@ -125,18 +125,19 @@ int DbConnection::busy_callback_helper(void *data, int num)
       int ret = cpp11::as_integers(rfun(num))[0];
       return ret;
     }
-    catch (Rcpp::eval_error &e)
-    {
-      std::string msg = std::string("Busy callback failed, aborting transaction: ") + e.what();
-
-      cpp11::message(msg);
-      return 0;
-    }
-    catch (Rcpp::internal::InterruptedException &e)
-    {
-      // Not warning on explicit interrupt
-      return 0;
-    }
+    // TODO
+    // catch (Rcpp::eval_error &e)
+    // {
+    //   std::string msg = std::string("Busy callback failed, aborting transaction: ") + e.what();
+    //
+    //   cpp11::message(msg);
+    //   return 0;
+    // }
+    // catch (Rcpp::internal::InterruptedException &e)
+    // {
+    //   // Not warning on explicit interrupt
+    //   return 0;
+    // }
     catch (...)
     {
       cpp11::message("Busy callback failed, aborting transaction");

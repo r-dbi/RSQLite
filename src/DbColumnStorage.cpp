@@ -225,12 +225,12 @@ SEXP DbColumnStorage::set_attribs_from_datatype(SEXP x, DATA_TYPE dt) {
 }
 
 SEXP DbColumnStorage::new_blob(SEXP x) {
-  static Rcpp::Function new_blob = Rcpp::Function("new_blob", Rcpp::Environment::namespace_env("blob"));
+  static cpp11::function new_blob = cpp11::package("blob")["new_blob"];
   return new_blob(x);
 }
 
 SEXP DbColumnStorage::new_hms(SEXP x) {
-  static Rcpp::Function new_hms = Rcpp::Function("new_hms", Rcpp::Environment::namespace_env("hms"));
+  static cpp11::function new_hms = cpp11::package("hms")["new_hms"];
   return new_hms(x);
 }
 

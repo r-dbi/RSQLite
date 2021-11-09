@@ -121,9 +121,9 @@ int DbConnection::busy_callback_helper(void *data, int num)
   {
     try
     {
-      Rcpp::Function rfun = r_callback;
-      Rcpp::IntegerVector ret = rfun(num);
-      return Rcpp::as<int>(ret);
+      cpp11::function rfun = r_callback;
+      int ret = cpp11::as_integers(rfun(num))[0];
+      return ret;
     }
     catch (Rcpp::eval_error &e)
     {

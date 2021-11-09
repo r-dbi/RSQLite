@@ -1,6 +1,7 @@
 #define STRICT_R_HEADERS
 #define R_NO_REMAP
 
+#include <cpp11.hpp>
 
 #ifndef __RDBI_DB_RESULT__
 #define __RDBI_DB_RESULT__
@@ -38,9 +39,9 @@ public:
   int n_rows_affected();
 
   void bind(const Rcpp::List& params);
-  Rcpp::List fetch(int n_max = -1);
+  cpp11::list fetch(int n_max = -1);
 
-  Rcpp::List get_column_info();
+  cpp11::list get_column_info();
 
 private:
   void validate_params(const Rcpp::List& params) const;

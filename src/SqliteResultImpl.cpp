@@ -151,22 +151,23 @@ void SqliteResultImpl::bind(const Rcpp::List& params) {
   after_bind(has_params);
 }
 
-Rcpp::List SqliteResultImpl::fetch(const int n_max) {
+cpp11::list SqliteResultImpl::fetch(const int n_max) {
   if (!ready_)
     Rcpp::stop("Query needs to be bound before fetching");
 
   int n = 0;
-  Rcpp::List out;
+  cpp11::list out;
 
-  if (n_max != 0)
+  if (n_max != 0) {
     out = fetch_rows(n_max, n);
+  }
   else
     out = peek_first_row();
 
   return out;
 }
 
-Rcpp::List SqliteResultImpl::get_column_info() {
+cpp11::list SqliteResultImpl::get_column_info() {
   peek_first_row();
 
   Rcpp::CharacterVector names(cache.names_.begin(), cache.names_.end());
@@ -189,7 +190,7 @@ Rcpp::List SqliteResultImpl::get_column_info() {
     }
   }
 
-  return Rcpp::List::create(Rcpp::_["name"] = names, Rcpp::_["type"] = types);
+  return cpp11::list({"name"_nm = names, "type"_nm = types});
 }
 
 
@@ -305,7 +306,7 @@ void SqliteResultImpl::after_bind(bool params_have_rows) {
     step();
 }
 
-Rcpp::List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
+cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
   SqliteDataFrame data(stmt, cache.names_, n_max, types_, with_alt_types_);
@@ -360,7 +361,7 @@ bool SqliteResultImpl::step_done() {
   return more_params;
 }
 
-Rcpp::List SqliteResultImpl::peek_first_row() {
+cpp11::list SqliteResultImpl::peek_first_row() {
   SqliteDataFrame data(stmt, cache.names_, 1, types_, with_alt_types_);
 
   if (!complete_)

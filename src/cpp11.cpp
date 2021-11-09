@@ -84,7 +84,7 @@ extern "C" SEXP _RSQLite_result_valid(SEXP res_) {
   END_CPP11
 }
 // result.cpp
-Rcpp::List result_fetch(DbResult* res, const int n);
+cpp11::list result_fetch(DbResult* res, const int n);
 extern "C" SEXP _RSQLite_result_fetch(SEXP res, SEXP n) {
   BEGIN_CPP11
     return cpp11::as_sexp(result_fetch(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<const int>>(n)));
@@ -120,7 +120,7 @@ extern "C" SEXP _RSQLite_result_rows_affected(SEXP res) {
   END_CPP11
 }
 // result.cpp
-Rcpp::List result_column_info(DbResult* res);
+cpp11::list result_column_info(DbResult* res);
 extern "C" SEXP _RSQLite_result_column_info(SEXP res) {
   BEGIN_CPP11
     return cpp11::as_sexp(result_column_info(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res)));

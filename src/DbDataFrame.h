@@ -1,6 +1,8 @@
 #define STRICT_R_HEADERS
 #define R_NO_REMAP
 
+#include <cpp11.hpp>
+
 #ifndef DB_DATAFRAME_H
 #define DB_DATAFRAME_H
 
@@ -29,8 +31,8 @@ public:
   void set_col_values();
   bool advance();
 
-  Rcpp::List get_data();
-  Rcpp::List get_data(std::vector<DATA_TYPE>& types);
+  cpp11::list get_data();
+  cpp11::list get_data(std::vector<DATA_TYPE>& types);
   size_t get_ncols() const;
 
 private:

@@ -42,13 +42,13 @@ bool DbDataFrame::advance() {
   return (n_max < 0 || i < n_max);
 }
 
-Rcpp::List DbDataFrame::get_data() {
+cpp11::list DbDataFrame::get_data() {
   // Throws away new data types
   std::vector<DATA_TYPE> types_;
   return get_data(types_);
 }
 
-Rcpp::List DbDataFrame::get_data(std::vector<DATA_TYPE>& types_) {
+cpp11::list DbDataFrame::get_data(std::vector<DATA_TYPE>& types_) {
   // Trim back to what we actually used
   finalize_cols();
 
@@ -57,14 +57,16 @@ Rcpp::List DbDataFrame::get_data(std::vector<DATA_TYPE>& types_) {
 
   boost::for_each(data, names, boost::bind(&DbColumn::warn_type_conflicts, _1, _2));
 
-  Rcpp::List out(data.begin(), data.end());
-  Rcpp::StringVector names_utf8 = Rcpp::wrap(names);
-  for (int j = 0; j < names_utf8.size(); ++j) {
-    names_utf8[j] = Rf_mkCharCE(names_utf8[j], CE_UTF8);
+  cpp11::writable::list out(data.size());
+  auto it = data.begin();
+  for (int i = 0; i < data.size(); i++) {
+    out[i] = *it;
+    it++;
   }
-  out.attr("names") = names_utf8;
+
+  out.attr("names") = cpp11::as_sexp(names);
   out.attr("class") = "data.frame";
-  out.attr("row.names") = Rcpp::IntegerVector::create(NA_INTEGER, -i);
+  out.attr("row.names") = cpp11::integers({NA_INTEGER, -i});
   return out;
 }
 

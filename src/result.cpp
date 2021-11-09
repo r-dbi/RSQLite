@@ -28,7 +28,7 @@ bool result_valid(Rcpp::XPtr<DbResult> res_) {
 }
 
 [[cpp11::register]]
-Rcpp::List result_fetch(DbResult* res, const int n) {
+cpp11::list result_fetch(DbResult* res, const int n) {
   return res->fetch(n);
 }
 
@@ -53,7 +53,7 @@ int result_rows_affected(DbResult* res) {
 }
 
 [[cpp11::register]]
-Rcpp::List result_column_info(DbResult* res) {
+cpp11::list result_column_info(DbResult* res) {
   return res->get_column_info();
 }
 

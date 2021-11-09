@@ -1,7 +1,6 @@
 #define STRICT_R_HEADERS
 #define R_NO_REMAP
 
-
 #include "pch.h"
 #include "DbResult.h"
 #include "DbConnection.h"
@@ -53,17 +52,17 @@ void DbResult::bind(const Rcpp::List& params) {
   impl->bind(params);
 }
 
-Rcpp::List DbResult::fetch(const int n_max) {
+cpp11::list DbResult::fetch(const int n_max) {
   if (!is_active())
     Rcpp::stop("Inactive result set");
 
   return impl->fetch(n_max);
 }
 
-Rcpp::List DbResult::get_column_info() {
-  Rcpp::List out = impl->get_column_info();
+cpp11::list DbResult::get_column_info() {
+  cpp11::writable::list out = impl->get_column_info();
 
-  out.attr("row.names") = Rcpp::IntegerVector::create(NA_INTEGER, -Rf_length(out[0]));
+  out.attr("row.names") = cpp11::integers({NA_INTEGER, -Rf_length(out[0])});
   out.attr("class") = "data.frame";
 
   return out;

@@ -55,9 +55,9 @@ public:
   int n_rows_fetched();
   int n_rows_affected();
   void bind(const Rcpp::List& params);
-  Rcpp::List fetch(const int n_max);
+  cpp11::list fetch(const int n_max);
 
-  Rcpp::List get_column_info();
+  cpp11::list get_column_info();
 
 public:
   cpp11::strings get_placeholder_names() const;
@@ -68,11 +68,11 @@ private:
   void bind_parameter_pos(int j, SEXP value_);
   void after_bind(bool params_have_rows);
 
-  Rcpp::List fetch_rows(int n_max, int& n);
+  cpp11::list fetch_rows(int n_max, int& n);
   void step();
   bool step_run();
   bool step_done();
-  Rcpp::List peek_first_row();
+  cpp11::list peek_first_row();
 
 private:
   void NORET raise_sqlite_exception() const;

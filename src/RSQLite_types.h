@@ -22,7 +22,7 @@ template <typename T>
 enable_if_dbres_ptr<T> as_cpp(SEXP x) {
   DbResult* result = (DbResult*)(R_ExternalPtrAddr(x));
   if (!result)
-    Rcpp::stop("Invalid result set");
+    cpp11::stop("Invalid result set");
   return result;
 }
 
@@ -34,7 +34,7 @@ template <typename T>
 enable_if_sqliteres_ptr<T> as_cpp(SEXP x) {
   SqliteResult* result = (SqliteResult*)(R_ExternalPtrAddr(x));
   if (!result)
-    Rcpp::stop("Invalid result set");
+    cpp11::stop("Invalid result set");
   return result;
 }
 

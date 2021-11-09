@@ -13,6 +13,6 @@ void extension_load(Rcpp::XPtr<DbConnectionPtr> con, const std::string& file, co
   if (rc != SQLITE_OK) {
     std::string err_msg = zErrMsg;
     sqlite3_free(zErrMsg);
-    Rcpp::stop("Failed to load extension: %s", err_msg.c_str());
+    cpp11::stop("Failed to load extension: %s", err_msg.c_str());
   }
 }

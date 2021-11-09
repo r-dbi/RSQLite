@@ -14,7 +14,7 @@ template <typename T>
 enable_if_dbconnection_ptr<T> as_cpp(SEXP x) {
   DbConnectionPtr* result = (DbConnectionPtr*)(R_ExternalPtrAddr(x));
   if (!result)
-    Rcpp::stop("Invalid result set");
+    cpp11::stop("Invalid result set");
   return result;
 }
 

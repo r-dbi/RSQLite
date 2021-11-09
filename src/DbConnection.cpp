@@ -15,7 +15,7 @@ DbConnection::DbConnection(const std::string& path, const bool allow_ext, const 
   // Get the underlying database connection
   int rc = sqlite3_open_v2(path.c_str(), &pConn_, flags, vfs.size() ? vfs.c_str() : NULL);
   if (rc != SQLITE_OK) {
-    Rcpp::stop("Could not connect to database:\n%s", getException());
+    cpp11::stop("Could not connect to database:\n%s", getException().c_str());
   }
   if (allow_ext) {
     sqlite3_enable_load_extension(pConn_, 1);
@@ -31,7 +31,7 @@ DbConnection::~DbConnection() {
 }
 
 sqlite3* DbConnection::conn() const {
-  if (!is_valid()) Rcpp::stop("disconnected");
+  if (!is_valid()) cpp11::stop("disconnected");
   return pConn_;
 }
 
@@ -51,7 +51,7 @@ bool DbConnection::is_current_result(const DbResult*) const {
 
 void DbConnection::check_connection() const {
   if (!is_valid()) {
-    Rcpp::stop("Invalid or closed connection");
+    cpp11::stop("Invalid or closed connection");
   }
 }
 
@@ -68,11 +68,11 @@ void DbConnection::copy_to(const DbConnectionPtr& pDest) {
 
   int rc = sqlite3_backup_step(backup, -1);
   if (rc != SQLITE_DONE) {
-    Rcpp::stop("Failed to copy all data:\n%s", getException());
+    cpp11::stop("Failed to copy all data:\n%s", getException().c_str());
   }
   rc = sqlite3_backup_finish(backup);
   if (rc != SQLITE_OK) {
-    Rcpp::stop("Could not finish copy:\n%s", getException());
+    cpp11::stop("Could not finish copy:\n%s", getException().c_str());
   }
 }
 

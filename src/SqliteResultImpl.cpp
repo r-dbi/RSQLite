@@ -131,11 +131,11 @@ int SqliteResultImpl::n_rows_affected() {
 
 void SqliteResultImpl::bind(const cpp11::list& params) {
   if (cache.nparams_ == 0) {
-    Rcpp::stop("Query does not require parameters.");
+    cpp11::stop("Query does not require parameters.");
   }
 
   if (params.size() != cache.nparams_) {
-    Rcpp::stop("Query requires %i params; %i supplied.",
+    cpp11::stop("Query requires %i params; %i supplied.",
          cache.nparams_, params.size());
   }
 
@@ -153,7 +153,7 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
 
 cpp11::list SqliteResultImpl::fetch(const int n_max) {
   if (!ready_)
-    Rcpp::stop("Query needs to be bound before fetching");
+    cpp11::stop("Query needs to be bound before fetching");
 
   int n = 0;
   cpp11::list out;
@@ -291,11 +291,11 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
       sqlite3_bind_blob(stmt, j, RAW(value), Rf_length(value), SQLITE_TRANSIENT);
     }
     else {
-      Rcpp::stop("Can only bind lists of raw vectors (or NULL)");
+      cpp11::stop("Can only bind lists of raw vectors (or NULL)");
     }
   }
   else {
-    Rcpp::stop("Don't know how to handle parameter of type %s.",
+    cpp11::stop("Don't know how to handle parameter of type %s.",
          Rf_type2char(TYPEOF(value_)));
   }
 }
@@ -376,5 +376,5 @@ void SqliteResultImpl::raise_sqlite_exception() const {
 }
 
 void SqliteResultImpl::raise_sqlite_exception(sqlite3* conn) {
-  Rcpp::stop(sqlite3_errmsg(conn));
+  cpp11::stop(sqlite3_errmsg(conn));
 }

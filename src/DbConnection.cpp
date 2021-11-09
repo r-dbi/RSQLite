@@ -1,20 +1,21 @@
 #define STRICT_R_HEADERS
 #define R_NO_REMAP
 
-
+#include <cpp11/R.hpp>
+#include "cpp11.hpp"
 #include "pch.h"
 #include "DbConnection.h"
 
 
 DbConnection::DbConnection(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs, bool with_alt_types)
-  : pConn_(NULL), 
+  : pConn_(NULL),
     with_alt_types_(with_alt_types),
     busy_callback_(NULL) {
 
   // Get the underlying database connection
   int rc = sqlite3_open_v2(path.c_str(), &pConn_, flags, vfs.size() ? vfs.c_str() : NULL);
   if (rc != SQLITE_OK) {
-    stop("Could not connect to database:\n%s", getException());
+    Rcpp::stop("Could not connect to database:\n%s", getException());
   }
   if (allow_ext) {
     sqlite3_enable_load_extension(pConn_, 1);
@@ -30,7 +31,7 @@ DbConnection::~DbConnection() {
 }
 
 sqlite3* DbConnection::conn() const {
-  if (!is_valid()) stop("disconnected");
+  if (!is_valid()) Rcpp::stop("disconnected");
   return pConn_;
 }
 
@@ -50,7 +51,7 @@ bool DbConnection::is_current_result(const DbResult*) const {
 
 void DbConnection::check_connection() const {
   if (!is_valid()) {
-    stop("Invalid or closed connection");
+    Rcpp::stop("Invalid or closed connection");
   }
 }
 
@@ -67,11 +68,11 @@ void DbConnection::copy_to(const DbConnectionPtr& pDest) {
 
   int rc = sqlite3_backup_step(backup, -1);
   if (rc != SQLITE_DONE) {
-    stop("Failed to copy all data:\n%s", getException());
+    Rcpp::stop("Failed to copy all data:\n%s", getException());
   }
   rc = sqlite3_backup_finish(backup);
   if (rc != SQLITE_OK) {
-    stop("Could not finish copy:\n%s", getException());
+    Rcpp::stop("Could not finish copy:\n%s", getException());
   }
 }
 
@@ -120,14 +121,15 @@ int DbConnection::busy_callback_helper(void *data, int num)
   {
     try
     {
-      Function rfun = r_callback;
-      IntegerVector ret = rfun(num);
-      return as<int>(ret);
+      Rcpp::Function rfun = r_callback;
+      Rcpp::IntegerVector ret = rfun(num);
+      return Rcpp::as<int>(ret);
     }
-    catch (eval_error &e)
+    catch (Rcpp::eval_error &e)
     {
       std::string msg = std::string("Busy callback failed, aborting transaction: ") + e.what();
-      Rcpp::message(Rcpp::StringVector::create(msg));
+
+      cpp11::message(msg);
       return 0;
     }
     catch (Rcpp::internal::InterruptedException &e)

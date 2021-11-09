@@ -16,7 +16,7 @@ public:
   static DbResult* create_and_send_query(const DbConnectionPtr& con, const std::string& sql);
 
 public:
-  CharacterVector get_placeholder_names() const;
+  Rcpp::CharacterVector get_placeholder_names() const;
 };
 
 #endif

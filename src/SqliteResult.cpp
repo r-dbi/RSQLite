@@ -23,6 +23,6 @@ DbResult* SqliteResult::create_and_send_query(const DbConnectionPtr& con, const 
 
 // Publics /////////////////////////////////////////////////////////////////////
 
-CharacterVector SqliteResult::get_placeholder_names() const {
+Rcpp::CharacterVector SqliteResult::get_placeholder_names() const {
   return impl->get_placeholder_names();
 }

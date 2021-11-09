@@ -9,92 +9,92 @@ using namespace Rcpp;
 #include <R_ext/Visibility.h>
 
 // connection.cpp
-XPtr<DbConnectionPtr> connection_connect(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs, bool with_alt_types);
+Rcpp::XPtr<DbConnectionPtr> connection_connect(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs, bool with_alt_types);
 extern "C" SEXP _RSQLite_connection_connect(SEXP path, SEXP allow_ext, SEXP flags, SEXP vfs, SEXP with_alt_types) {
   BEGIN_CPP11
     return cpp11::as_sexp(connection_connect(cpp11::as_cpp<cpp11::decay_t<const std::string&>>(path), cpp11::as_cpp<cpp11::decay_t<const bool>>(allow_ext), cpp11::as_cpp<cpp11::decay_t<const int>>(flags), cpp11::as_cpp<cpp11::decay_t<const std::string&>>(vfs), cpp11::as_cpp<cpp11::decay_t<bool>>(with_alt_types)));
   END_CPP11
 }
 // connection.cpp
-bool connection_valid(XPtr<DbConnectionPtr> con_);
+bool connection_valid(Rcpp::XPtr<DbConnectionPtr> con_);
 extern "C" SEXP _RSQLite_connection_valid(SEXP con_) {
   BEGIN_CPP11
-    return cpp11::as_sexp(connection_valid(cpp11::as_cpp<cpp11::decay_t<XPtr<DbConnectionPtr>>>(con_)));
+    return cpp11::as_sexp(connection_valid(cpp11::as_cpp<cpp11::decay_t<Rcpp::XPtr<DbConnectionPtr>>>(con_)));
   END_CPP11
 }
 // connection.cpp
-void connection_release(XPtr<DbConnectionPtr> con_);
+void connection_release(Rcpp::XPtr<DbConnectionPtr> con_);
 extern "C" SEXP _RSQLite_connection_release(SEXP con_) {
   BEGIN_CPP11
-    connection_release(cpp11::as_cpp<cpp11::decay_t<XPtr<DbConnectionPtr>>>(con_));
+    connection_release(cpp11::as_cpp<cpp11::decay_t<Rcpp::XPtr<DbConnectionPtr>>>(con_));
     return R_NilValue;
   END_CPP11
 }
 // connection.cpp
-void connection_copy_database(const XPtr<DbConnectionPtr>& from, const XPtr<DbConnectionPtr>& to);
+void connection_copy_database(const Rcpp::XPtr<DbConnectionPtr>& from, const Rcpp::XPtr<DbConnectionPtr>& to);
 extern "C" SEXP _RSQLite_connection_copy_database(SEXP from, SEXP to) {
   BEGIN_CPP11
-    connection_copy_database(cpp11::as_cpp<cpp11::decay_t<const XPtr<DbConnectionPtr>&>>(from), cpp11::as_cpp<cpp11::decay_t<const XPtr<DbConnectionPtr>&>>(to));
+    connection_copy_database(cpp11::as_cpp<cpp11::decay_t<const Rcpp::XPtr<DbConnectionPtr>&>>(from), cpp11::as_cpp<cpp11::decay_t<const Rcpp::XPtr<DbConnectionPtr>&>>(to));
     return R_NilValue;
   END_CPP11
 }
 // connection.cpp
-bool connection_import_file(const XPtr<DbConnectionPtr>& con, const std::string& name, const std::string& value, const std::string& sep, const std::string& eol, const int skip);
+bool connection_import_file(const Rcpp::XPtr<DbConnectionPtr>& con, const std::string& name, const std::string& value, const std::string& sep, const std::string& eol, const int skip);
 extern "C" SEXP _RSQLite_connection_import_file(SEXP con, SEXP name, SEXP value, SEXP sep, SEXP eol, SEXP skip) {
   BEGIN_CPP11
-    return cpp11::as_sexp(connection_import_file(cpp11::as_cpp<cpp11::decay_t<const XPtr<DbConnectionPtr>&>>(con), cpp11::as_cpp<cpp11::decay_t<const std::string&>>(name), cpp11::as_cpp<cpp11::decay_t<const std::string&>>(value), cpp11::as_cpp<cpp11::decay_t<const std::string&>>(sep), cpp11::as_cpp<cpp11::decay_t<const std::string&>>(eol), cpp11::as_cpp<cpp11::decay_t<const int>>(skip)));
+    return cpp11::as_sexp(connection_import_file(cpp11::as_cpp<cpp11::decay_t<const Rcpp::XPtr<DbConnectionPtr>&>>(con), cpp11::as_cpp<cpp11::decay_t<const std::string&>>(name), cpp11::as_cpp<cpp11::decay_t<const std::string&>>(value), cpp11::as_cpp<cpp11::decay_t<const std::string&>>(sep), cpp11::as_cpp<cpp11::decay_t<const std::string&>>(eol), cpp11::as_cpp<cpp11::decay_t<const int>>(skip)));
   END_CPP11
 }
 // connection.cpp
-void set_busy_handler(const XPtr<DbConnectionPtr>& con, SEXP r_callback);
+void set_busy_handler(const Rcpp::XPtr<DbConnectionPtr>& con, SEXP r_callback);
 extern "C" SEXP _RSQLite_set_busy_handler(SEXP con, SEXP r_callback) {
   BEGIN_CPP11
-    set_busy_handler(cpp11::as_cpp<cpp11::decay_t<const XPtr<DbConnectionPtr>&>>(con), cpp11::as_cpp<cpp11::decay_t<SEXP>>(r_callback));
+    set_busy_handler(cpp11::as_cpp<cpp11::decay_t<const Rcpp::XPtr<DbConnectionPtr>&>>(con), cpp11::as_cpp<cpp11::decay_t<SEXP>>(r_callback));
     return R_NilValue;
   END_CPP11
 }
 // extensions.cpp
-void extension_load(XPtr<DbConnectionPtr> con, const std::string& file, const std::string& entry_point);
+void extension_load(Rcpp::XPtr<DbConnectionPtr> con, const std::string& file, const std::string& entry_point);
 extern "C" SEXP _RSQLite_extension_load(SEXP con, SEXP file, SEXP entry_point) {
   BEGIN_CPP11
-    extension_load(cpp11::as_cpp<cpp11::decay_t<XPtr<DbConnectionPtr>>>(con), cpp11::as_cpp<cpp11::decay_t<const std::string&>>(file), cpp11::as_cpp<cpp11::decay_t<const std::string&>>(entry_point));
+    extension_load(cpp11::as_cpp<cpp11::decay_t<Rcpp::XPtr<DbConnectionPtr>>>(con), cpp11::as_cpp<cpp11::decay_t<const std::string&>>(file), cpp11::as_cpp<cpp11::decay_t<const std::string&>>(entry_point));
     return R_NilValue;
   END_CPP11
 }
 // result.cpp
-XPtr<DbResult> result_create(XPtr<DbConnectionPtr> con, std::string sql);
+Rcpp::XPtr<DbResult> result_create(Rcpp::XPtr<DbConnectionPtr> con, std::string sql);
 extern "C" SEXP _RSQLite_result_create(SEXP con, SEXP sql) {
   BEGIN_CPP11
-    return cpp11::as_sexp(result_create(cpp11::as_cpp<cpp11::decay_t<XPtr<DbConnectionPtr>>>(con), cpp11::as_cpp<cpp11::decay_t<std::string>>(sql)));
+    return cpp11::as_sexp(result_create(cpp11::as_cpp<cpp11::decay_t<Rcpp::XPtr<DbConnectionPtr>>>(con), cpp11::as_cpp<cpp11::decay_t<std::string>>(sql)));
   END_CPP11
 }
 // result.cpp
-void result_release(XPtr<DbResult> res);
+void result_release(Rcpp::XPtr<DbResult> res);
 extern "C" SEXP _RSQLite_result_release(SEXP res) {
   BEGIN_CPP11
-    result_release(cpp11::as_cpp<cpp11::decay_t<XPtr<DbResult>>>(res));
+    result_release(cpp11::as_cpp<cpp11::decay_t<Rcpp::XPtr<DbResult>>>(res));
     return R_NilValue;
   END_CPP11
 }
 // result.cpp
-bool result_valid(XPtr<DbResult> res_);
+bool result_valid(Rcpp::XPtr<DbResult> res_);
 extern "C" SEXP _RSQLite_result_valid(SEXP res_) {
   BEGIN_CPP11
-    return cpp11::as_sexp(result_valid(cpp11::as_cpp<cpp11::decay_t<XPtr<DbResult>>>(res_)));
+    return cpp11::as_sexp(result_valid(cpp11::as_cpp<cpp11::decay_t<Rcpp::XPtr<DbResult>>>(res_)));
   END_CPP11
 }
 // result.cpp
-List result_fetch(DbResult* res, const int n);
+Rcpp::List result_fetch(DbResult* res, const int n);
 extern "C" SEXP _RSQLite_result_fetch(SEXP res, SEXP n) {
   BEGIN_CPP11
     return cpp11::as_sexp(result_fetch(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<const int>>(n)));
   END_CPP11
 }
 // result.cpp
-void result_bind(DbResult* res, List params);
+void result_bind(DbResult* res, Rcpp::List params);
 extern "C" SEXP _RSQLite_result_bind(SEXP res, SEXP params) {
   BEGIN_CPP11
-    result_bind(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<List>>(params));
+    result_bind(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<Rcpp::List>>(params));
     return R_NilValue;
   END_CPP11
 }
@@ -120,21 +120,21 @@ extern "C" SEXP _RSQLite_result_rows_affected(SEXP res) {
   END_CPP11
 }
 // result.cpp
-List result_column_info(DbResult* res);
+Rcpp::List result_column_info(DbResult* res);
 extern "C" SEXP _RSQLite_result_column_info(SEXP res) {
   BEGIN_CPP11
     return cpp11::as_sexp(result_column_info(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res)));
   END_CPP11
 }
 // result.cpp
-CharacterVector result_get_placeholder_names(SqliteResult* res);
+Rcpp::CharacterVector result_get_placeholder_names(SqliteResult* res);
 extern "C" SEXP _RSQLite_result_get_placeholder_names(SEXP res) {
   BEGIN_CPP11
     return cpp11::as_sexp(result_get_placeholder_names(cpp11::as_cpp<cpp11::decay_t<SqliteResult*>>(res)));
   END_CPP11
 }
 // rsqlite.cpp
-CharacterVector rsqliteVersion();
+Rcpp::CharacterVector rsqliteVersion();
 extern "C" SEXP _RSQLite_rsqliteVersion() {
   BEGIN_CPP11
     return cpp11::as_sexp(rsqliteVersion());

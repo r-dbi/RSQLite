@@ -1,6 +1,8 @@
 #define STRICT_R_HEADERS
 #define R_NO_REMAP
 
+#include "cpp11.hpp"
+#include <cpp11/R.hpp>
 
 #ifndef RSQLite_RSQLite_H
 #define RSQLite_RSQLite_H
@@ -18,6 +20,6 @@
 #include <boost/container/stable_vector.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 
-using namespace Rcpp;
+// using namespace Rcpp;
 
 #endif

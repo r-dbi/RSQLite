@@ -13,11 +13,11 @@
 //' @examples
 //' RSQLite::rsqliteVersion()
 [[cpp11::register]]
-CharacterVector rsqliteVersion() {
+Rcpp::CharacterVector rsqliteVersion() {
   return
-    CharacterVector::create(
-      _["header"] = SQLITE_VERSION,
-      _["library"] = sqlite3_libversion()
+    Rcpp::CharacterVector::create(
+      Rcpp::_["header"] = SQLITE_VERSION,
+      Rcpp::_["library"] = sqlite3_libversion()
     );
 }
 

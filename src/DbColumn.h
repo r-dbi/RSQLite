@@ -28,7 +28,7 @@ public:
 public:
   void set_col_value();
   void finalize(const int n_);
-  void warn_type_conflicts(const String& name) const;
+  void warn_type_conflicts(const Rcpp::String& name) const;
 
   operator SEXP() const;
   DATA_TYPE get_type() const;

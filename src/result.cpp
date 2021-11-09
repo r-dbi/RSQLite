@@ -5,38 +5,35 @@
 #include "RSQLite_types.h"
 
 
-#include "cpp11.hpp"
-#include <cpp11/R.hpp>
-
-
+// using namespace Rcpp;
 //#include "DbResult.h"
 
 
 [[cpp11::register]]
-XPtr<DbResult> result_create(XPtr<DbConnectionPtr> con, std::string sql) {
+Rcpp::XPtr<DbResult> result_create(Rcpp::XPtr<DbConnectionPtr> con, std::string sql) {
   (*con)->check_connection();
   DbResult* res = SqliteResult::create_and_send_query(*con, sql);
-  return XPtr<DbResult>(res, true);
+  return Rcpp::XPtr<DbResult>(res, true);
 }
 
 [[cpp11::register]]
-void result_release(XPtr<DbResult> res) {
+void result_release(Rcpp::XPtr<DbResult> res) {
   res.release();
 }
 
 [[cpp11::register]]
-bool result_valid(XPtr<DbResult> res_) {
+bool result_valid(Rcpp::XPtr<DbResult> res_) {
   DbResult* res = res_.get();
   return res != NULL && res->is_active();
 }
 
 [[cpp11::register]]
-List result_fetch(DbResult* res, const int n) {
+Rcpp::List result_fetch(DbResult* res, const int n) {
   return res->fetch(n);
 }
 
 [[cpp11::register]]
-void result_bind(DbResult* res, List params) {
+void result_bind(DbResult* res, Rcpp::List params) {
   res->bind(params);
 }
 
@@ -56,11 +53,11 @@ int result_rows_affected(DbResult* res) {
 }
 
 [[cpp11::register]]
-List result_column_info(DbResult* res) {
+Rcpp::List result_column_info(DbResult* res) {
   return res->get_column_info();
 }
 
 [[cpp11::register]]
-CharacterVector result_get_placeholder_names(SqliteResult* res) {
+Rcpp::CharacterVector result_get_placeholder_names(SqliteResult* res) {
   return res->get_placeholder_names();
 }

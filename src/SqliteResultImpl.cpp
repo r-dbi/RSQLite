@@ -128,13 +128,13 @@ int SqliteResultImpl::n_rows_affected() {
   return sqlite3_total_changes(conn) - total_changes_start_;
 }
 
-void SqliteResultImpl::bind(const List& params) {
+void SqliteResultImpl::bind(const Rcpp::List& params) {
   if (cache.nparams_ == 0) {
-    stop("Query does not require parameters.");
+    Rcpp::stop("Query does not require parameters.");
   }
 
   if (params.size() != cache.nparams_) {
-    stop("Query requires %i params; %i supplied.",
+    Rcpp::stop("Query requires %i params; %i supplied.",
          cache.nparams_, params.size());
   }
 
@@ -150,12 +150,12 @@ void SqliteResultImpl::bind(const List& params) {
   after_bind(has_params);
 }
 
-List SqliteResultImpl::fetch(const int n_max) {
+Rcpp::List SqliteResultImpl::fetch(const int n_max) {
   if (!ready_)
-    stop("Query needs to be bound before fetching");
+    Rcpp::stop("Query needs to be bound before fetching");
 
   int n = 0;
-  List out;
+  Rcpp::List out;
 
   if (n_max != 0)
     out = fetch_rows(n_max, n);
@@ -165,12 +165,12 @@ List SqliteResultImpl::fetch(const int n_max) {
   return out;
 }
 
-List SqliteResultImpl::get_column_info() {
+Rcpp::List SqliteResultImpl::get_column_info() {
   peek_first_row();
 
-  CharacterVector names(cache.names_.begin(), cache.names_.end());
+  Rcpp::CharacterVector names(cache.names_.begin(), cache.names_.end());
 
-  CharacterVector types(cache.ncols_);
+  Rcpp::CharacterVector types(cache.ncols_);
   for (size_t i = 0; i < cache.ncols_; i++) {
     switch(types_[i]) {
     case DT_DATE:
@@ -188,17 +188,17 @@ List SqliteResultImpl::get_column_info() {
     }
   }
 
-  return List::create(_["name"] = names, _["type"] = types);
+  return Rcpp::List::create(Rcpp::_["name"] = names, Rcpp::_["type"] = types);
 }
 
 
 
 // Publics (custom) ////////////////////////////////////////////////////////////
 
-CharacterVector SqliteResultImpl::get_placeholder_names() const {
+Rcpp::CharacterVector SqliteResultImpl::get_placeholder_names() const {
   int n = sqlite3_bind_parameter_count(stmt);
 
-  CharacterVector res(n);
+  Rcpp::CharacterVector res(n);
 
   for (int i = 0; i < n; ++i) {
     const char* placeholder_name = sqlite3_bind_parameter_name(stmt, i + 1);
@@ -206,7 +206,7 @@ CharacterVector SqliteResultImpl::get_placeholder_names() const {
       placeholder_name = "";
     else
       ++placeholder_name;
-    res[i] = String(placeholder_name, CE_UTF8);
+    res[i] = Rcpp::String(placeholder_name, CE_UTF8);
   }
 
   return res;
@@ -216,7 +216,7 @@ CharacterVector SqliteResultImpl::get_placeholder_names() const {
 
 // Privates ////////////////////////////////////////////////////////////////////
 
-void SqliteResultImpl::set_params(const List& params) {
+void SqliteResultImpl::set_params(const Rcpp::List& params) {
   params_ = params;
 }
 
@@ -289,11 +289,11 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
       sqlite3_bind_blob(stmt, j, RAW(value), Rf_length(value), SQLITE_TRANSIENT);
     }
     else {
-      stop("Can only bind lists of raw vectors (or NULL)");
+      Rcpp::stop("Can only bind lists of raw vectors (or NULL)");
     }
   }
   else {
-    stop("Don't know how to handle parameter of type %s.",
+    Rcpp::stop("Don't know how to handle parameter of type %s.",
          Rf_type2char(TYPEOF(value_)));
   }
 }
@@ -304,13 +304,13 @@ void SqliteResultImpl::after_bind(bool params_have_rows) {
     step();
 }
 
-List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
+Rcpp::List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
   SqliteDataFrame data(stmt, cache.names_, n_max, types_, with_alt_types_);
 
   if (complete_ && data.get_ncols() == 0) {
-    warning("SQL statements must be issued with dbExecute() or dbSendStatement() instead of dbGetQuery() or dbSendQuery().");
+    Rcpp::warning("SQL statements must be issued with dbExecute() or dbSendStatement() instead of dbGetQuery() or dbSendQuery().");
   }
 
   while (!complete_) {
@@ -359,7 +359,7 @@ bool SqliteResultImpl::step_done() {
   return more_params;
 }
 
-List SqliteResultImpl::peek_first_row() {
+Rcpp::List SqliteResultImpl::peek_first_row() {
   SqliteDataFrame data(stmt, cache.names_, 1, types_, with_alt_types_);
 
   if (!complete_)
@@ -374,5 +374,5 @@ void SqliteResultImpl::raise_sqlite_exception() const {
 }
 
 void SqliteResultImpl::raise_sqlite_exception(sqlite3* conn) {
-  stop(sqlite3_errmsg(conn));
+  Rcpp::stop(sqlite3_errmsg(conn));
 }

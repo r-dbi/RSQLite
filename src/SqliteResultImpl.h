@@ -35,7 +35,7 @@ private:
   bool ready_;
   int nrows_;
   int total_changes_start_;
-  List params_;
+  Rcpp::List params_;
   int group_, groups_;
   std::vector<DATA_TYPE> types_;
   bool with_alt_types_;
@@ -54,25 +54,25 @@ public:
   bool complete() const;
   int n_rows_fetched();
   int n_rows_affected();
-  void bind(const List& params);
-  List fetch(const int n_max);
+  void bind(const Rcpp::List& params);
+  Rcpp::List fetch(const int n_max);
 
-  List get_column_info();
+  Rcpp::List get_column_info();
 
 public:
-  CharacterVector get_placeholder_names() const;
+  Rcpp::CharacterVector get_placeholder_names() const;
 
 private:
-  void set_params(const List& params);
+  void set_params(const Rcpp::List& params);
   bool bind_row();
   void bind_parameter_pos(int j, SEXP value_);
   void after_bind(bool params_have_rows);
 
-  List fetch_rows(int n_max, int& n);
+  Rcpp::List fetch_rows(int n_max, int& n);
   void step();
   bool step_run();
   bool step_done();
-  List peek_first_row();
+  Rcpp::List peek_first_row();
 
 private:
   void NORET raise_sqlite_exception() const;

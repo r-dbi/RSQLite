@@ -8,7 +8,7 @@
 #include "integer64.h"
 
 
-using namespace Rcpp;
+// using namespace Rcpp;
 
 DbColumnStorage::DbColumnStorage(DATA_TYPE dt_, const R_xlen_t capacity_, const int n_max_,
                                  const DbColumnDataSource& source_)
@@ -40,7 +40,7 @@ DATA_TYPE DbColumnStorage::get_data_type() const {
 
 SEXP DbColumnStorage::allocate(const R_xlen_t length, DATA_TYPE dt) {
   SEXPTYPE type = sexptype_from_datatype(dt);
-  RObject class_ = class_from_datatype(dt);
+  Rcpp::RObject class_ = class_from_datatype(dt);
 
   SEXP ret = PROTECT(Rf_allocVector(type, length));
   if (!Rf_isNull(class_)) Rf_setAttrib(ret, R_ClassSymbol, class_);
@@ -152,7 +152,7 @@ void DbColumnStorage::fetch_value() {
     break;
 
   default:
-    stop("NYI");
+    cpp11::stop("NYI");
   }
 }
 
@@ -184,21 +184,21 @@ SEXPTYPE DbColumnStorage::sexptype_from_datatype(DATA_TYPE dt) {
     return VECSXP;
 
   default:
-    stop("Unknown type %d", dt);
+    cpp11::stop("Unknown type %d", dt);
   }
 }
 
 Rcpp::RObject DbColumnStorage::class_from_datatype(DATA_TYPE dt) {
   switch (dt) {
   case DT_INT64:
-    return CharacterVector::create("integer64");
+    return Rcpp::CharacterVector::create("integer64");
 
   case DT_DATE:
-    return CharacterVector::create("Date");
+    return Rcpp::CharacterVector::create("Date");
 
   case DT_DATETIME:
   case DT_DATETIMETZ:
-    return CharacterVector::create("POSIXct", "POSIXt");
+    return Rcpp::CharacterVector::create("POSIXct", "POSIXt");
 
   default:
     return R_NilValue;
@@ -224,12 +224,12 @@ SEXP DbColumnStorage::set_attribs_from_datatype(SEXP x, DATA_TYPE dt) {
 }
 
 SEXP DbColumnStorage::new_blob(SEXP x) {
-  static Function new_blob = Function("new_blob", Rcpp::Environment::namespace_env("blob"));
+  static Rcpp::Function new_blob = Rcpp::Function("new_blob", Rcpp::Environment::namespace_env("blob"));
   return new_blob(x);
 }
 
 SEXP DbColumnStorage::new_hms(SEXP x) {
-  static Function new_hms = Function("new_hms", Rcpp::Environment::namespace_env("hms"));
+  static Rcpp::Function new_hms = Rcpp::Function("new_hms", Rcpp::Environment::namespace_env("hms"));
   return new_hms(x);
 }
 
@@ -264,7 +264,7 @@ void DbColumnStorage::fill_default_value(SEXP data, DATA_TYPE dt, R_xlen_t i) {
     break;
 
   case DT_UNKNOWN:
-    stop("Not setting value for unknown data type");
+    cpp11::stop("Not setting value for unknown data type");
   }
 }
 
@@ -337,7 +337,7 @@ void DbColumnStorage::copy_value(SEXP x, DATA_TYPE dt, const int tgt, const int 
       break;
 
     default:
-      stop("NYI: default");
+      cpp11::stop("NYI: default");
     }
   }
 }

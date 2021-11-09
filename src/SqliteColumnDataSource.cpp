@@ -1,7 +1,8 @@
 #define STRICT_R_HEADERS
 #define R_NO_REMAP
 
-
+#include <cpp11/R.hpp>
+#include "cpp11.hpp"
 #include "pch.h"
 #include "SqliteColumnDataSource.h"
 #include "integer64.h"

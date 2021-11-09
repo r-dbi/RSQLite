@@ -33,7 +33,7 @@ void DbColumn::finalize(const int n_) {
   n = n_;
 }
 
-void DbColumn::warn_type_conflicts(const String& name) const {
+void DbColumn::warn_type_conflicts(const Rcpp::String& name) const {
   std::set<DATA_TYPE> my_data_types_seen = data_types_seen;
   DATA_TYPE dt = get_last_storage()->get_data_type();
 
@@ -56,7 +56,7 @@ void DbColumn::warn_type_conflicts(const String& name) const {
 
   if (my_data_types_seen.size() == 0) return;
 
-  String name_utf8 = name;
+  Rcpp::String name_utf8 = name;
   name_utf8.set_encoding(CE_UTF8);
 
   std::stringstream ss;
@@ -71,7 +71,7 @@ void DbColumn::warn_type_conflicts(const String& name) const {
     ss << format_data_type(*it);
   }
 
-  warning(ss.str());
+  Rcpp::warning(ss.str());
 }
 
 DbColumn::operator SEXP() const {

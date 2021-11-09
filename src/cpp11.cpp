@@ -134,7 +134,7 @@ extern "C" SEXP _RSQLite_result_get_placeholder_names(SEXP res) {
   END_CPP11
 }
 // rsqlite.cpp
-Rcpp::CharacterVector rsqliteVersion();
+cpp11::strings rsqliteVersion();
 extern "C" SEXP _RSQLite_rsqliteVersion() {
   BEGIN_CPP11
     return cpp11::as_sexp(rsqliteVersion());

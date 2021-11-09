@@ -34,7 +34,7 @@ extern "C" {
 }
 
 [[cpp11::register]]
-Rcpp::XPtr<DbConnectionPtr> connection_connect(
+cpp11::external_pointer<DbConnectionPtr> connection_connect(
   const std::string& path, const bool allow_ext, const int flags, const std::string& vfs = "", bool with_alt_types = false
 ) {
   LOG_VERBOSE;
@@ -43,17 +43,17 @@ Rcpp::XPtr<DbConnectionPtr> connection_connect(
     new DbConnection(path, allow_ext, flags, vfs, with_alt_types)
   );
 
-  return Rcpp::XPtr<DbConnectionPtr>(pConn, true);
+  return cpp11::external_pointer<DbConnectionPtr>(pConn, true);
 }
 
 [[cpp11::register]]
-bool connection_valid(Rcpp::XPtr<DbConnectionPtr> con_) {
+bool connection_valid(cpp11::external_pointer<DbConnectionPtr> con_) {
   DbConnectionPtr* con = con_.get();
   return con && con->get()->is_valid();
 }
 
 [[cpp11::register]]
-void connection_release(Rcpp::XPtr<DbConnectionPtr> con_) {
+void connection_release(cpp11::external_pointer<DbConnectionPtr> con_) {
   if (!connection_valid(con_)) {
     Rcpp::warning("Already disconnected");
     return;
@@ -81,13 +81,13 @@ void connection_release(Rcpp::XPtr<DbConnectionPtr> con_) {
 // Specific functions
 
 [[cpp11::register]]
-void connection_copy_database(const Rcpp::XPtr<DbConnectionPtr>& from,
-                              const Rcpp::XPtr<DbConnectionPtr>& to) {
-  (*from)->copy_to((*to));
+void connection_copy_database(const cpp11::external_pointer<DbConnectionPtr>& from,
+                              const cpp11::external_pointer<DbConnectionPtr>& to) {
+  (*from.get())->copy_to(*to.get());
 }
 
 [[cpp11::register]]
-bool connection_import_file(const Rcpp::XPtr<DbConnectionPtr>& con,
+bool connection_import_file(const cpp11::external_pointer<DbConnectionPtr>& con,
                             const std::string& name, const std::string& value,
                             const std::string& sep, const std::string& eol,
                             const int skip) {
@@ -96,6 +96,6 @@ bool connection_import_file(const Rcpp::XPtr<DbConnectionPtr>& con,
 }
 
 [[cpp11::register]]
-void set_busy_handler(const Rcpp::XPtr<DbConnectionPtr>& con, SEXP r_callback) {
+void set_busy_handler(const cpp11::external_pointer<DbConnectionPtr>& con, SEXP r_callback) {
   con->get()->set_busy_handler(r_callback);
 }

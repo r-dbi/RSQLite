@@ -10,10 +10,10 @@
 
 
 [[cpp11::register]]
-Rcpp::XPtr<DbResult> result_create(Rcpp::XPtr<DbConnectionPtr> con, std::string sql) {
+cpp11::external_pointer<DbResult> result_create(cpp11::external_pointer<DbConnectionPtr> con, std::string sql) {
   (*con)->check_connection();
   DbResult* res = SqliteResult::create_and_send_query(*con, sql);
-  return Rcpp::XPtr<DbResult>(res, true);
+  return cpp11::external_pointer<DbResult>(res, true);
 }
 
 [[cpp11::register]]
@@ -22,7 +22,7 @@ void result_release(Rcpp::XPtr<DbResult> res) {
 }
 
 [[cpp11::register]]
-bool result_valid(Rcpp::XPtr<DbResult> res_) {
+bool result_valid(cpp11::external_pointer<DbResult> res_) {
   DbResult* res = res_.get();
   return res != NULL && res->is_active();
 }

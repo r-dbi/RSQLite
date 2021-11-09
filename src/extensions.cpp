@@ -7,7 +7,7 @@
 
 
 [[cpp11::register]]
-void extension_load(Rcpp::XPtr<DbConnectionPtr> con, const std::string& file, const std::string& entry_point) {
+void extension_load(cpp11::external_pointer<DbConnectionPtr> con, const std::string& file, const std::string& entry_point) {
   char* zErrMsg = NULL;
   int rc = sqlite3_load_extension((*con)->conn(), file.c_str(), entry_point.c_str(), &zErrMsg);
   if (rc != SQLITE_OK) {

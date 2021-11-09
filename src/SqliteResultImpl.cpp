@@ -129,7 +129,7 @@ int SqliteResultImpl::n_rows_affected() {
   return sqlite3_total_changes(conn) - total_changes_start_;
 }
 
-void SqliteResultImpl::bind(const Rcpp::List& params) {
+void SqliteResultImpl::bind(const cpp11::list& params) {
   if (cache.nparams_ == 0) {
     Rcpp::stop("Query does not require parameters.");
   }
@@ -141,7 +141,7 @@ void SqliteResultImpl::bind(const Rcpp::List& params) {
 
   set_params(params);
 
-  SEXP first_col = params[0];
+  SEXP first_col = cpp11::as_sexp(params[0]);
   groups_ = Rf_length(first_col);
   group_ = 0;
 
@@ -218,7 +218,7 @@ cpp11::strings SqliteResultImpl::get_placeholder_names() const {
 
 // Privates ////////////////////////////////////////////////////////////////////
 
-void SqliteResultImpl::set_params(const Rcpp::List& params) {
+void SqliteResultImpl::set_params(const cpp11::list& params) {
   params_ = params;
 }
 

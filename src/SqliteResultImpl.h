@@ -35,7 +35,7 @@ private:
   bool ready_;
   int nrows_;
   int total_changes_start_;
-  Rcpp::List params_;
+  cpp11::list params_;
   int group_, groups_;
   std::vector<DATA_TYPE> types_;
   bool with_alt_types_;
@@ -54,7 +54,7 @@ public:
   bool complete() const;
   int n_rows_fetched();
   int n_rows_affected();
-  void bind(const Rcpp::List& params);
+  void bind(const cpp11::list& params);
   cpp11::list fetch(const int n_max);
 
   cpp11::list get_column_info();
@@ -63,7 +63,7 @@ public:
   cpp11::strings get_placeholder_names() const;
 
 private:
-  void set_params(const Rcpp::List& params);
+  void set_params(const cpp11::list& params);
   bool bind_row();
   void bind_parameter_pos(int j, SEXP value_);
   void after_bind(bool params_have_rows);

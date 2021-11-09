@@ -91,10 +91,10 @@ extern "C" SEXP _RSQLite_result_fetch(SEXP res, SEXP n) {
   END_CPP11
 }
 // result.cpp
-void result_bind(DbResult* res, Rcpp::List params);
+void result_bind(DbResult* res, cpp11::list params);
 extern "C" SEXP _RSQLite_result_bind(SEXP res, SEXP params) {
   BEGIN_CPP11
-    result_bind(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<Rcpp::List>>(params));
+    result_bind(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<cpp11::list>>(params));
     return R_NilValue;
   END_CPP11
 }

@@ -47,7 +47,7 @@ int DbResult::n_rows_affected() {
   return impl->n_rows_affected();
 }
 
-void DbResult::bind(const Rcpp::List& params) {
+void DbResult::bind(const cpp11::list& params) {
   validate_params(params);
   impl->bind(params);
 }
@@ -75,13 +75,13 @@ void DbResult::close() {
 
 // Privates ///////////////////////////////////////////////////////////////////
 
-void DbResult::validate_params(const Rcpp::List& params) const {
+void DbResult::validate_params(const cpp11::list& params) const {
   if (params.size() != 0) {
-    SEXP first_col = params[0];
+    SEXP first_col = cpp11::as_sexp(params[0]);
     int n = Rf_length(first_col);
 
     for (int j = 1; j < params.size(); ++j) {
-      SEXP col = params[j];
+      SEXP col = cpp11::as_sexp(params[j]);
       if (Rf_length(col) != n)
         Rcpp::stop("Parameter %i does not have length %d.", j + 1, n);
     }

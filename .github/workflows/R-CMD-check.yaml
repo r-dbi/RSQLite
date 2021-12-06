@@ -57,7 +57,6 @@ jobs:
           # End custom: R 3.4
 
           # Begin custom: matrix elements
-          - { os: ubuntu-, os-version: 16.04,   r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/xenial/latest" }
           # End custom: matrix elements
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.9</span>
       </span>
     </div>
 
@@ -51,6 +51,28 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="2.2.9" id="rsqlite-229-2021-12-06">RSQLite 2.2.9 (2021-12-06)<a class="anchor" aria-label="anchor" href="#rsqlite-229-2021-12-06"></a></h2>
+<ul><li>Enable all DBItest tests, passing now.</li>
+<li>
+<code><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbBegin()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbCommit()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbRollback()</a></code> support keywords in savepoint names (<a href="https://github.com/r-dbi/RSQLite/issues/386" class="external-link">#386</a>).</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.2.8.9001" id="rsqlite-2289001-2021-12-06">RSQLite 2.2.8.9001 (2021-12-06)<a class="anchor" aria-label="anchor" href="#rsqlite-2289001-2021-12-06"></a></h2>
+<ul><li>Upgrade bundled SQLite to version 3.37.0 (<a href="https://github.com/r-dbi/RSQLite/issues/392" class="external-link">#392</a>).</li>
+<li>
+<code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect()</a></code> now supports URIs that start with <code>file://</code> for the <code>dbname</code> argument. The SQLite code is now built with the <code>SQLITE_USE_URI</code> (<a href="https://github.com/r-dbi/RSQLite/issues/390" class="external-link">#390</a>, <a href="https://github.com/tschoonj" class="external-link">@tschoonj</a>).</li>
+<li>Reduce parallelism</li>
+<li>Also check dev on cran-* branches</li>
+<li>Update hash key for dev</li>
+<li>Remove R 3.3</li>
+<li>Update 3.36.0 code with trivial internal change (<a href="https://github.com/r-dbi/RSQLite/issues/387" class="external-link">#387</a>).</li>
+<li>Adapt to DBItest 1.7.2 (<a href="https://github.com/r-dbi/RSQLite/issues/385" class="external-link">#385</a>).</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.2.8.9000" id="rsqlite-2289000-2021-08-21">RSQLite 2.2.8.9000 (2021-08-21)<a class="anchor" aria-label="anchor" href="#rsqlite-2289000-2021-08-21"></a></h2>
+<ul><li>Same as previous version.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="2.2.8" id="rsqlite-228-2021-08-21">RSQLite 2.2.8 (2021-08-21)<a class="anchor" aria-label="anchor" href="#rsqlite-228-2021-08-21"></a></h2>
 <ul><li>Upgrade bundled SQLite to version 3.36.0 (<a href="https://github.com/r-dbi/RSQLite/issues/374" class="external-link">#374</a>).</li>
 <li>Fix build on CentOS 7 (<a href="https://github.com/r-dbi/RSQLite/issues/367" class="external-link">#367</a>).</li>
@@ -83,6 +105,9 @@
 <h3 id="features-2-2-4">Features<a class="anchor" aria-label="anchor" href="#features-2-2-4"></a></h3>
 <ul><li>Improve concurrency behavior with multiple writers (<a href="https://github.com/r-dbi/RSQLite/issues/280" class="external-link">#280</a>, <a href="https://github.com/gaborcsardi" class="external-link">@gaborcsardi</a>).</li>
 <li>New <code><a href="../reference/sqliteSetBusyHandler.html">sqliteSetBusyHandler()</a></code> helps configure what SQLite should do when the database is locked (<a href="https://github.com/r-dbi/RSQLite/issues/280" class="external-link">#280</a>, <a href="https://github.com/gaborcsardi" class="external-link">@gaborcsardi</a>).</li>
+<li>
+<code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect()</a></code> gains an <code>extended_types</code> argument that adds support for date, time and timestamp columns. If a column has a declared type <code>DATE</code>, <code>TIME</code> or <code>TIMESTAMP</code>, it is returned as <code>Date</code>, <code>hms</code> or <code>POSIXct</code> value, respectively (<a href="https://github.com/r-dbi/RSQLite/issues/333" class="external-link">#333</a>, <a href="https://github.com/anderic1" class="external-link">@anderic1</a>).</li>
+<li>Upgrade bundled SQLite to version 3.34.1 (<a href="https://github.com/r-dbi/RSQLite/issues/342" class="external-link">#342</a>).</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -627,7 +652,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.9000.</p>
 </div>
 
       </footer></div>

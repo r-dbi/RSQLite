@@ -28,7 +28,7 @@ sets the busy timeout to three seconds."><!-- mathjax --><script src="https://cd
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.9</span>
       </span>
     </div>
 
@@ -72,14 +72,14 @@ the same database.</p>
 events. When setting a timeout, SQLite will try the transaction multiple
 times within this timeout. To set a timeout, pass an integer scalar to
 <code>sqliteSetBusyHandler()</code>.</p>
-<p>Another way to set a timeout is to use a <code>PRAGMA</code>, e.g. the SQL query</p><div class="sql"><pre><code>PRAGMA busy_timeout=3000
-</code></pre><p></p></div>
+<p>Another way to set a timeout is to use a <code>PRAGMA</code>, e.g. the SQL query</p><div class="sourceCode sql"><pre><code><span id="cb1-1"><a href="#cb1-1"></a>PRAGMA busy_timeout<span class="op">=</span><span class="dv">3000</span></span></code></pre><p></p></div>
 <p>sets the busy timeout to three seconds.</p>
     </div>
 
-    <div class="ref-usage sourceCode"><pre class="sourceCode r"><code><span class="fu">sqliteSetBusyHandler</span><span class="op">(</span><span class="va">dbObj</span>, <span class="va">handler</span><span class="op">)</span></code></pre></div>
+    <div id="ref-usage">
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">sqliteSetBusyHandler</span><span class="op">(</span><span class="va">dbObj</span>, <span class="va">handler</span><span class="op">)</span></code></pre></div>
+    </div>
 
-    <div id="ref-sections">
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>dbObj</dt>
@@ -126,7 +126,6 @@ is an error.</p>
     <h2>See also</h2>
     <div class="dont-index"><p><a href="https://www.sqlite.org/c3ref/busy_handler.html" class="external-link">https://www.sqlite.org/c3ref/busy_handler.html</a></p></div>
     </div>
-    </div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -140,7 +139,7 @@ is an error.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.9000.</p>
 </div>
 
       </footer></div>

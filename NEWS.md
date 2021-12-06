@@ -1,5 +1,11 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
+# RSQLite 2.2.9 (2021-12-06)
+
+- Enable all DBItest tests, passing now.
+- `dbBegin()`, `dbCommit()` and `dbRollback()` support keywords in savepoint names (#386).
+
+
 # RSQLite 2.2.8.9001 (2021-12-06)
 
 - Upgrade bundled SQLite to version 3.37.0 (#392).

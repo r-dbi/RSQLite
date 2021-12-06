@@ -310,3 +310,32 @@ test_that("nested named transactions (rollback - rollback)", {
   expect_equal(dbListTables(con), "c")
   expect_equal(dbListTables(con2), "c")
 })
+
+test_that("named transactions with keywords", {
+  db_file <- tempfile("transactions", fileext = ".sqlite")
+  con <- dbConnect(SQLite(), db_file)
+  con2 <- dbConnect(SQLite(), db_file)
+  on.exit(
+    {
+      dbDisconnect(con)
+      dbDisconnect(con2)
+    },
+    add = TRUE
+  )
+
+  dbBegin(con, name = "SELECT")
+  dbWriteTable(con, "a", data.frame(a = 1))
+  expect_equal(dbListTables(con), "a")
+  expect_equal(dbListTables(con2), character())
+  dbCommit(con, name = "SELECT")
+  expect_equal(dbListTables(con), "a")
+  expect_equal(dbListTables(con2), "a")
+
+  dbBegin(con, name = "WHERE")
+  dbWriteTable(con, "b", data.frame(b = 1))
+  expect_equal(dbListTables(con), c("a", "b"))
+  expect_equal(dbListTables(con2), "a")
+  dbRollback(con, name = "WHERE")
+  expect_equal(dbListTables(con), "a")
+  expect_equal(dbListTables(con2), "a")
+})

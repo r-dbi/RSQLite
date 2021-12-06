@@ -52,26 +52,23 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.2.9" id="rsqlite-229-2021-12-06">RSQLite 2.2.9 (2021-12-06)<a class="anchor" aria-label="anchor" href="#rsqlite-229-2021-12-06"></a></h2>
-<ul><li>Enable all DBItest tests, passing now.</li>
-<li>
-<code><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbBegin()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbCommit()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbRollback()</a></code> support keywords in savepoint names (<a href="https://github.com/r-dbi/RSQLite/issues/386" class="external-link">#386</a>).</li>
-</ul></div>
-    <div class="section level2">
-<h2 class="page-header" data-toc-text="2.2.8.9001" id="rsqlite-2289001-2021-12-06">RSQLite 2.2.8.9001 (2021-12-06)<a class="anchor" aria-label="anchor" href="#rsqlite-2289001-2021-12-06"></a></h2>
+<div class="section level3">
+<h3 id="features-2-2-9">Features<a class="anchor" aria-label="anchor" href="#features-2-2-9"></a></h3>
 <ul><li>Upgrade bundled SQLite to version 3.37.0 (<a href="https://github.com/r-dbi/RSQLite/issues/392" class="external-link">#392</a>).</li>
 <li>
 <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect()</a></code> now supports URIs that start with <code>file://</code> for the <code>dbname</code> argument. The SQLite code is now built with the <code>SQLITE_USE_URI</code> (<a href="https://github.com/r-dbi/RSQLite/issues/390" class="external-link">#390</a>, <a href="https://github.com/tschoonj" class="external-link">@tschoonj</a>).</li>
-<li>Reduce parallelism</li>
-<li>Also check dev on cran-* branches</li>
-<li>Update hash key for dev</li>
-<li>Remove R 3.3</li>
-<li>Update 3.36.0 code with trivial internal change (<a href="https://github.com/r-dbi/RSQLite/issues/387" class="external-link">#387</a>).</li>
-<li>Adapt to DBItest 1.7.2 (<a href="https://github.com/r-dbi/RSQLite/issues/385" class="external-link">#385</a>).</li>
 </ul></div>
-    <div class="section level2">
-<h2 class="page-header" data-toc-text="2.2.8.9000" id="rsqlite-2289000-2021-08-21">RSQLite 2.2.8.9000 (2021-08-21)<a class="anchor" aria-label="anchor" href="#rsqlite-2289000-2021-08-21"></a></h2>
-<ul><li>Same as previous version.</li>
+<div class="section level3">
+<h3 id="bug-fixes-2-2-9">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-2-9"></a></h3>
+<ul><li>
+<code><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbBegin()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbCommit()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbRollback()</a></code> support keywords in savepoint names (<a href="https://github.com/r-dbi/RSQLite/issues/386" class="external-link">#386</a>).</li>
 </ul></div>
+<div class="section level3">
+<h3 id="internal-2-2-9">Internal<a class="anchor" aria-label="anchor" href="#internal-2-2-9"></a></h3>
+<ul><li>Adapt to DBItest 1.7.2 (<a href="https://github.com/r-dbi/RSQLite/issues/385" class="external-link">#385</a>).</li>
+<li>Enable all DBItest tests, passing now.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.2.8" id="rsqlite-228-2021-08-21">RSQLite 2.2.8 (2021-08-21)<a class="anchor" aria-label="anchor" href="#rsqlite-228-2021-08-21"></a></h2>
 <ul><li>Upgrade bundled SQLite to version 3.36.0 (<a href="https://github.com/r-dbi/RSQLite/issues/374" class="external-link">#374</a>).</li>

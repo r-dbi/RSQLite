@@ -190,10 +190,10 @@ SEXPTYPE DbColumnStorage::sexptype_from_datatype(DATA_TYPE dt) {
 cpp11::sexp DbColumnStorage::class_from_datatype(DATA_TYPE dt) {
   switch (dt) {
   case DT_INT64:
-    return cpp11::strings({"integer64"});
+    return cpp11::r_string("integer64");
 
   case DT_DATE:
-    return cpp11::strings({"Date"});
+    return cpp11::r_string("Date");
 
   case DT_DATETIME:
   case DT_DATETIMETZ:

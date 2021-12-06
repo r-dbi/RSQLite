@@ -2,25 +2,19 @@
 
 # RSQLite 2.2.9 (2021-12-06)
 
-- Enable all DBItest tests, passing now.
-- `dbBegin()`, `dbCommit()` and `dbRollback()` support keywords in savepoint names (#386).
-
-
-# RSQLite 2.2.8.9001 (2021-12-06)
+## Features
 
 - Upgrade bundled SQLite to version 3.37.0 (#392).
 - `dbConnect()` now supports URIs that start with `file://` for the `dbname` argument. The SQLite code is now built with the `SQLITE_USE_URI` (#390, @tschoonj).
-- Reduce parallelism
-- Also check dev on cran-* branches
-- Update hash key for dev
-- Remove R 3.3
-- Update 3.36.0 code with trivial internal change (#387).
+
+## Bug fixes
+
+- `dbBegin()`, `dbCommit()` and `dbRollback()` support keywords in savepoint names (#386).
+
+## Internal
+
 - Adapt to DBItest 1.7.2 (#385).
-
-
-# RSQLite 2.2.8.9000 (2021-08-21)
-
-- Same as previous version.
+- Enable all DBItest tests, passing now.
 
 
 # RSQLite 2.2.8 (2021-08-21)

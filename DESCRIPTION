@@ -129,3 +129,5 @@ Collate:
     'transactions.R'
     'utils.R'
     'zzz.R'
+Config/autostyle/scope: line_breaks
+Config/autostyle/strict: false

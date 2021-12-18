@@ -94,6 +94,7 @@ isIdCurrent <- function(obj) {
 #'
 #' @keywords internal
 #' @export
+#' @rdname keywords-dep
 setMethod("make.db.names",
   signature(dbObj = "SQLiteConnection", snames = "character"),
   function(dbObj, snames, keywords, unique, allow.keywords, ...) {
@@ -103,13 +104,13 @@ setMethod("make.db.names",
 )
 
 #' @export
-#' @rdname make.db.names-SQLiteConnection-character-method
+#' @rdname keywords-dep
 setMethod("SQLKeywords", "SQLiteConnection", function(dbObj, ...) {
   .SQL92Keywords
 })
 
 #' @export
-#' @rdname make.db.names-SQLiteConnection-character-method
+#' @rdname keywords-dep
 setMethod("isSQLKeyword",
   signature(dbObj = "SQLiteConnection", name = "character"),
   function(dbObj, name, keywords, case, ...) {

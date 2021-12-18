@@ -16,3 +16,4 @@ warningc <- function(...) {
 
 # memoise is used in .onLoad()
 warning_once <- warningc
+

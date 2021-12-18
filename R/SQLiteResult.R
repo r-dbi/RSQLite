@@ -22,9 +22,3 @@ setClass("SQLiteResult",
     bigint = "character"
   )
 )
-
-#' @rdname SQLiteResult-class
-#' @export
-setMethod("dbIsValid", "SQLiteResult", function(dbObj, ...) {
-  result_valid(dbObj@ptr)
-})

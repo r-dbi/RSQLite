@@ -1,44 +1,6 @@
 #' @include SQLiteResult.R
 NULL
 
-#' @rdname SQLiteConnection-class
-#' @export
-setMethod("dbSendQuery", c("SQLiteConnection", "character"),
-  function(conn, statement, params = NULL, ...) {
-    statement <- enc2utf8(statement)
-
-    if (!is.null(conn@ref$result)) {
-      warning("Closing open result set, pending rows", call. = FALSE)
-      dbClearResult(conn@ref$result)
-      stopifnot(is.null(conn@ref$result))
-    }
-
-    rs <- new("SQLiteResult",
-      sql = statement,
-      ptr = result_create(conn@ptr, statement),
-      conn = conn,
-      bigint = conn@bigint
-    )
-    on.exit(dbClearResult(rs), add = TRUE)
-
-    if (!is.null(params)) {
-      dbBind(rs, params)
-    }
-    on.exit(NULL, add = FALSE)
-
-    conn@ref$result <- rs
-    rs
-  }
-)
-
-
-#' @rdname SQLiteResult-class
-#' @export
-setMethod("dbBind", "SQLiteResult", function(res, params, ...) {
-  db_bind(res, as.list(params), ..., allow_named_superset = FALSE)
-})
-
-
 db_bind <- function(res, params, ..., allow_named_superset) {
   placeholder_names <- result_get_placeholder_names(res@ptr)
   empty <- placeholder_names == ""
@@ -89,22 +51,6 @@ db_bind <- function(res, params, ..., allow_named_superset) {
   invisible(res)
 }
 
-
-#' @export
-#' @rdname SQLiteResult-class
-setMethod("dbFetch", "SQLiteResult", function(res, n = -1, ...,
-                                              row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE)) {
-  row.names <- compatRowNames(row.names)
-  if (length(n) != 1) stopc("`n` must be scalar")
-  if (n < -1) stopc("`n` must be nonnegative or -1")
-  if (is.infinite(n)) n <- -1
-  if (trunc(n) != n) stopc("`n` must be a whole number")
-  ret <- result_fetch(res@ptr, n = n)
-  ret <- convert_bigint(ret, res@bigint)
-  ret <- sqlColumnToRownames(ret, row.names)
-  set_tidy_names(ret)
-})
-
 convert_bigint <- function(df, bigint) {
   if (bigint == "integer64") {
     return(df)
@@ -123,47 +69,3 @@ convert_bigint <- function(df, bigint) {
   df[is_int64] <- suppressWarnings(lapply(df[is_int64], as_bigint))
   df
 }
-
-#' @export
-#' @rdname SQLiteResult-class
-setMethod("dbClearResult", "SQLiteResult", function(res, ...) {
-  if (!dbIsValid(res)) {
-    warningc("Expired, result set already closed")
-    return(invisible(TRUE))
-  }
-  result_release(res@ptr)
-  res@conn@ref$result <- NULL
-  invisible(TRUE)
-})
-
-#' @export
-#' @rdname SQLiteResult-class
-setMethod("dbColumnInfo", "SQLiteResult", function(res, ...) {
-  df <- result_column_info(res@ptr)
-  df$name <- tidy_names(df$name)
-  df
-})
-
-#' @export
-#' @rdname SQLiteResult-class
-setMethod("dbGetRowsAffected", "SQLiteResult", function(res, ...) {
-  result_rows_affected(res@ptr)
-})
-#' @export
-#' @rdname SQLiteResult-class
-setMethod("dbGetRowCount", "SQLiteResult", function(res, ...) {
-  result_rows_fetched(res@ptr)
-})
-#' @export
-#' @rdname SQLiteResult-class
-setMethod("dbHasCompleted", "SQLiteResult", function(res, ...) {
-  result_has_completed(res@ptr)
-})
-#' @rdname SQLiteResult-class
-#' @export
-setMethod("dbGetStatement", "SQLiteResult", function(res, ...) {
-  if (!dbIsValid(res)) {
-    stopc("Expired, result set already closed")
-  }
-  res@sql
-})

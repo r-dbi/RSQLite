@@ -1,36 +1,6 @@
 #' @include SQLiteConnection.R
 NULL
 
-#' @rdname query-dep
-#'
-#' @param conn A `DBIConnection` object.
-#' @param statement A SQL string
-#' @param bind.data A data frame
-#' @param ... Other arguments used by methods
-#' @export
-setGeneric("dbSendPreparedQuery", function(conn, statement, bind.data, ...) {
-  standardGeneric("dbSendPreparedQuery")
-})
-
-#' @rdname query-dep
-#' @export
-setGeneric("dbGetPreparedQuery", function(conn, statement, bind.data, ...) {
-  standardGeneric("dbGetPreparedQuery")
-})
-
-#' Generic for creating a new transaction
-#'
-#' See method documentation for details.
-#'
-#' @export
-#' @param conn A `DBIConnection` object.
-#' @param ... Other arguments used by methods
-#' @keywords internal
-setGeneric("dbBeginTransaction", function(conn, ...) {
-  .Deprecated("dbBegin", old = "dbBeginTransaction")
-  dbBegin(conn, ...)
-})
-
 #' Build the SQL CREATE TABLE definition as a string
 #'
 #' The output SQL statement is a simple `CREATE TABLE` suitable for
@@ -88,37 +58,6 @@ isIdCurrent <- function(obj) {
   dbIsValid(obj)
 }
 
-#' Make R/S-Plus identifiers into legal SQL identifiers
-#'
-#' Deprecated. Please use [dbQuoteIdentifier()] instead.
-#'
-#' @keywords internal
-#' @export
-#' @rdname keywords-dep
-setMethod("make.db.names",
-  signature(dbObj = "SQLiteConnection", snames = "character"),
-  function(dbObj, snames, keywords, unique, allow.keywords, ...) {
-    warning_once("RSQLite::make.db.names() is deprecated, please switch to DBI::dbQuoteIdentifier().")
-    make.db.names.default(snames, keywords, unique, allow.keywords)
-  }
-)
-
-#' @export
-#' @rdname keywords-dep
-setMethod("SQLKeywords", "SQLiteConnection", function(dbObj, ...) {
-  .SQL92Keywords
-})
-
-#' @export
-#' @rdname keywords-dep
-setMethod("isSQLKeyword",
-  signature(dbObj = "SQLiteConnection", name = "character"),
-  function(dbObj, name, keywords, case, ...) {
-    warning_once("RSQLite::isSQLKeyword() is deprecated, please switch to DBI::dbQuoteIdentifier().")
-    isSQLKeyword.default(name, keywords = .SQL92Keywords, case)
-  }
-)
-
 #' Deprecated querying tools
 #'
 #' These functions have been deprecated. Please switch to using
@@ -128,48 +67,6 @@ setMethod("isSQLKeyword",
 #' @keywords internal
 #' @name query-dep
 NULL
-
-#' @rdname query-dep
-#' @param bind.data A data frame of data to be bound.
-#' @export
-setMethod("dbSendPreparedQuery",
-  c("SQLiteConnection", "character", "data.frame"),
-  function(conn, statement, bind.data, ...) {
-    warning_once("RSQLite::dbSendPreparedQuery() is deprecated, please switch to DBI::dbSendQuery(params = bind.data).")
-
-    res <- dbSendQuery(conn, statement)
-
-    tryCatch(
-      db_bind(res, unclass(bind.data), allow_named_superset = TRUE),
-      error = function(e) {
-        db_bind(res, unclass(unname(bind.data)), allow_named_superset = FALSE)
-      }
-    )
-    res
-  }
-)
-
-#' @rdname query-dep
-#' @export
-setMethod("dbGetPreparedQuery",
-  c("SQLiteConnection", "character", "data.frame"),
-  function(conn, statement, bind.data, ...) {
-    warning_once("RSQLite::dbGetPreparedQuery() is deprecated, please switch to DBI::dbGetQuery(params = bind.data).")
-
-    res <- dbSendQuery(conn, statement)
-    on.exit(dbClearResult(res), add = TRUE)
-
-    bind.data <- as.list(bind.data)
-
-    tryCatch(
-      db_bind(res, bind.data, allow_named_superset = TRUE),
-      error = function(e) {
-        db_bind(res, unname(bind.data), allow_named_superset = FALSE)
-      }
-    )
-    dbFetch(res)
-  }
-)
 
 #' Return an entire column from a SQLite database
 #'
@@ -182,32 +79,3 @@ setMethod("dbGetPreparedQuery",
 sqliteQuickColumn <- function(con, table, column) {
   dbGetQuery(con, paste("SELECT ", column, " FROM ", table), row.names = FALSE)[[1]]
 }
-
-#' dbListResults
-#'
-#' DEPRECATED
-#'
-#' @keywords internal
-#' @export
-setMethod("dbListResults", "SQLiteConnection", function(conn, ...) {
-  warning("Querying the results associated with a connection is no longer supported",
-    call. = FALSE
-  )
-  if (is.null(conn@ref$result)) {
-    list()
-  } else {
-    list(conn@ref$result)
-  }
-})
-
-
-#' Fetch
-#'
-#' A shortcut for \code{\link[DBI]{dbFetch}(res, n = n, row.names = FALSE)},
-#' kept for compatibility reasons.
-#'
-#' @keywords internal
-#' @export
-setMethod("fetch", "SQLiteResult", function(res, n = -1, ...) {
-  dbFetch(res, n = n, row.names = FALSE)
-})

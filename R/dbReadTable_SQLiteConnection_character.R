@@ -20,6 +20,7 @@
 #' @param select.cols  Deprecated, do not use.
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @inheritParams DBI::sqlRownamesToColumn
+#' @rdname dbReadTable
 #' @examples
 #' library(DBI)
 #' db <- RSQLite::datasetsDb()
@@ -62,5 +63,6 @@ dbReadTable_SQLiteConnection_character <- function(conn, name, ...,
   out
 }
 
+#' @rdname dbReadTable
 #' @export
 setMethod("dbReadTable", c("SQLiteConnection", "character"), dbReadTable_SQLiteConnection_character)

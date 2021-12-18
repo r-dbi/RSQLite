@@ -2,6 +2,7 @@
 #'
 #' DEPRECATED
 #'
+#' @rdname dbListResults
 #' @keywords internal
 #' @usage NULL
 dbListResults_SQLiteConnection <- function(conn, ...) {
@@ -15,5 +16,7 @@ dbListResults_SQLiteConnection <- function(conn, ...) {
   }
 }
 
+#' @rdname dbListResults
+#' @keywords internal
 #' @export
 setMethod("dbListResults", "SQLiteConnection", dbListResults_SQLiteConnection)

@@ -2,7 +2,18 @@
 % Please edit documentation in R/dbReadTable_SQLiteConnection_character.R
 \name{dbReadTable_SQLiteConnection_character}
 \alias{dbReadTable_SQLiteConnection_character}
+\alias{dbReadTable,SQLiteConnection,character-method}
 \title{Read a database table}
+\usage{
+\S4method{dbReadTable}{SQLiteConnection,character}(
+  conn,
+  name,
+  ...,
+  row.names = pkgconfig::get_config("RSQLite::row.names.table", FALSE),
+  check.names = TRUE,
+  select.cols = NULL
+)
+}
 \arguments{
 \item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
 \code{\link[DBI:dbConnect]{DBI::dbConnect()}}}

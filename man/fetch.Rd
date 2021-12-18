@@ -2,7 +2,11 @@
 % Please edit documentation in R/fetch_SQLiteResult.R
 \name{fetch_SQLiteResult}
 \alias{fetch_SQLiteResult}
+\alias{fetch,SQLiteResult-method}
 \title{Fetch}
+\usage{
+\S4method{fetch}{SQLiteResult}(res, n = -1, ...)
+}
 \description{
 A shortcut for \code{\link[DBI]{dbFetch}(res, n = n, row.names = FALSE)},
 kept for compatibility reasons.

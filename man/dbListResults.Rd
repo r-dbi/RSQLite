@@ -2,7 +2,11 @@
 % Please edit documentation in R/dbListResults_SQLiteConnection.R
 \name{dbListResults_SQLiteConnection}
 \alias{dbListResults_SQLiteConnection}
+\alias{dbListResults,SQLiteConnection-method}
 \title{dbListResults}
+\usage{
+\S4method{dbListResults}{SQLiteConnection}(conn, ...)
+}
 \description{
 DEPRECATED
 }

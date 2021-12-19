@@ -49,16 +49,16 @@
     <loc>https://rsqlite.r-dbi.org/reference/dbBeginTransaction.html</loc>
   </url>
   <url>
-    <loc>https://rsqlite.r-dbi.org/reference/dbListResults-SQLiteConnection-method.html</loc>
+    <loc>https://rsqlite.r-dbi.org/reference/dbListResults.html</loc>
   </url>
   <url>
-    <loc>https://rsqlite.r-dbi.org/reference/dbReadTable-SQLiteConnection-character-method.html</loc>
+    <loc>https://rsqlite.r-dbi.org/reference/dbReadTable.html</loc>
   </url>
   <url>
     <loc>https://rsqlite.r-dbi.org/reference/dbWriteTable.html</loc>
   </url>
   <url>
-    <loc>https://rsqlite.r-dbi.org/reference/fetch-SQLiteResult-method.html</loc>
+    <loc>https://rsqlite.r-dbi.org/reference/fetch.html</loc>
   </url>
   <url>
     <loc>https://rsqlite.r-dbi.org/reference/index.html</loc>
@@ -73,7 +73,7 @@
     <loc>https://rsqlite.r-dbi.org/reference/isIdCurrent.html</loc>
   </url>
   <url>
-    <loc>https://rsqlite.r-dbi.org/reference/make.db.names-SQLiteConnection-character-method.html</loc>
+    <loc>https://rsqlite.r-dbi.org/reference/keywords-dep.html</loc>
   </url>
   <url>
     <loc>https://rsqlite.r-dbi.org/reference/query-dep.html</loc>

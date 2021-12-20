@@ -1,9 +1,13 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
+# RSQLite 2.2.9.9001 (2021-12-19)
+
+- Make method definition more similar to S3. All `setMethod()` calls refer to top-level functions (#396).
+
+
 # RSQLite 2.2.9.9000 (2021-12-06)
 
-- Enable all DBItest tests, passing now.
-- `dbBegin()`, `dbCommit()` and `dbRollback()` support keywords in savepoint names (#386).
+- Internal.
 
 
 # RSQLite 2.2.9 (2021-12-06)

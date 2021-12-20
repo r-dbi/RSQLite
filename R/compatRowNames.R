@@ -8,3 +8,4 @@ compatRowNames <- function(row.names) {
 
   row.names
 }
+

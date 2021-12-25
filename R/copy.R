@@ -39,4 +39,3 @@ sqliteCopyDatabase <- function(from, to) {
   connection_copy_database(from@ptr, to@ptr)
   invisible(NULL)
 }
-

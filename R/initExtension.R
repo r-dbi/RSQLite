@@ -40,4 +40,3 @@ get_lib_path <- function() {
   lib_path <- getLoadedDLLs()[["RSQLite"]][["path"]]
   enc2utf8(lib_path)
 }
-

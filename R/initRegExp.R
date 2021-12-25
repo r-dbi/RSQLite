@@ -33,4 +33,3 @@ initRegExp <- function(db) {
   # always return TRUE after loading
   invisible(TRUE)
 }
-

@@ -39,4 +39,3 @@ string_to_utf8 <- function(value) {
   value[is_char] <- lapply(value[is_char], enc2utf8)
   value
 }
-

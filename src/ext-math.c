@@ -3,4 +3,4 @@
 #include <R_ext/Visibility.h>
 // File obtained from https://www.sqlite.org/contrib and tweaked
 // Not integrated into upgrade.R yet because upstream hasn't changed for a long time
-#include "vendor/sqlite3/extension-functions.c"
+#include "vendor/extensions/extension-functions.c"

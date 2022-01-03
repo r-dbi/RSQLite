@@ -36,7 +36,7 @@ void DbDataFrame::set_col_values() {
 bool DbDataFrame::advance() {
   ++i;
 
-  if (i % 1000 == 0)
+  if (i % 1024 == 0)
     cpp11::check_user_interrupt();
 
   return (n_max < 0 || i < n_max);

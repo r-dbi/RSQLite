@@ -52,52 +52,6 @@ NULL
 #' @name sqlite-transaction
 NULL
 
-#' @export
-#' @rdname sqlite-transaction
-setMethod("dbBegin", "SQLiteConnection", function(conn, .name = NULL, ..., name = NULL) {
-  name <- compat_name(name, .name)
-  if (is.null(name)) {
-    dbExecute(conn, "BEGIN")
-  } else {
-    dbExecute(conn, paste("SAVEPOINT ", name))
-  }
-
-  invisible(TRUE)
-})
-
-#' @export
-#' @rdname sqlite-transaction
-setMethod("dbCommit", "SQLiteConnection", function(conn, .name = NULL, ..., name = NULL) {
-  name <- compat_name(name, .name)
-  if (is.null(name)) {
-    dbExecute(conn, "COMMIT")
-  } else {
-    dbExecute(conn, paste("RELEASE SAVEPOINT ", name))
-  }
-
-  invisible(TRUE)
-})
-
-#' @export
-#' @rdname sqlite-transaction
-setMethod("dbRollback", "SQLiteConnection", function(conn, .name = NULL, ..., name = NULL) {
-  name <- compat_name(name, .name)
-  if (is.null(name)) {
-    dbExecute(conn, "ROLLBACK")
-  } else {
-    # The ROLLBACK TO command reverts the state of the database back to what it
-    # was just after the corresponding SAVEPOINT. Note that unlike that plain
-    # ROLLBACK command (without the TO keyword) the ROLLBACK TO command does not
-    # cancel the transaction. Instead of cancelling the transaction, the
-    # ROLLBACK TO command restarts the transaction again at the beginning. All
-    # intervening SAVEPOINTs are canceled, however.
-    dbExecute(conn, paste("ROLLBACK TO ", name))
-    dbExecute(conn, paste("RELEASE SAVEPOINT ", name))
-  }
-
-  invisible(TRUE)
-})
-
 compat_name <- function(name, .name) {
   if (!is.null(.name)) {
     warning("Please use `dbBegin(..., name = \"<savepoint>\")` to specify the name of the savepoint.",

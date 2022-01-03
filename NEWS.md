@@ -1,8 +1,30 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
-# RSQLite 2.2.8.9000 (2021-08-21)
+# RSQLite 2.2.9.9001 (2021-12-19)
 
-- Same as previous version.
+- Make method definition more similar to S3. All `setMethod()` calls refer to top-level functions (#396).
+
+
+# RSQLite 2.2.9.9000 (2021-12-06)
+
+- Internal.
+
+
+# RSQLite 2.2.9 (2021-12-06)
+
+## Features
+
+- Upgrade bundled SQLite to version 3.37.0 (#392).
+- `dbConnect()` now supports URIs that start with `file://` for the `dbname` argument. The SQLite code is now built with the `SQLITE_USE_URI` (#390, @tschoonj).
+
+## Bug fixes
+
+- `dbBegin()`, `dbCommit()` and `dbRollback()` support keywords in savepoint names (#386).
+
+## Internal
+
+- Adapt to DBItest 1.7.2 (#385).
+- Enable all DBItest tests, passing now.
 
 
 # RSQLite 2.2.8 (2021-08-21)

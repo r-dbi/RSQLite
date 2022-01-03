@@ -56,11 +56,10 @@ register_misc_extension <- function(name) {
   )
 
   writeLines(lines, paste0("src/ext-", name, ".c"))
-  # stopifnot(system2("patch", "-p1", stdin = paste0("data-raw/", name, ".patch")) == 0)
+  stopifnot(system2("patch", "-p1", stdin = paste0("data-raw/", name, ".patch")) == 0)
 }
 
 register_misc_extension("regexp")
-stopifnot(system2("patch", "-p1", stdin = "data-raw/regexp.patch") == 0)
 register_misc_extension("series")
 register_misc_extension("csv")
 

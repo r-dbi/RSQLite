@@ -1,0 +1,20 @@
+commit b17ae4ae64fc12d0dd0fb8579d2bb746e095af61
+Author: Kirill Müller <krlmlr+r@mailbox.org>
+Date:   Mon Jan 3 06:37:25 2022 +0100
+
+    Add attribute_vidsible so that function can be called on Linux
+
+diff --git a/src/vendor/extensions/series.c b/src/vendor/extensions/series.c
+index a4e92ace..22898bae 100644
+--- a/src/vendor/extensions/series.c
++++ b/src/vendor/extensions/series.c
+@@ -426,7 +426,8 @@ static sqlite3_module seriesModule = {
+ #ifdef _WIN32
+ __declspec(dllexport)
+ #endif
+-int sqlite3_series_init(
++// Keep attribute_visible when upgrading
++attribute_visible int sqlite3_series_init(
+   sqlite3 *db, 
+   char **pzErrMsg, 
+   const sqlite3_api_routines *pApi

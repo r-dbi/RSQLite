@@ -936,7 +936,8 @@ __declspec(dllexport)
 ** CSV virtual table module is registered with the calling database
 ** connection.
 */
-int sqlite3_csv_init(
+// Keep attribute_visible when upgrading
+attribute_visible int sqlite3_csv_init(
   sqlite3 *db, 
   char **pzErrMsg, 
   const sqlite3_api_routines *pApi

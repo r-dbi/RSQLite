@@ -188,7 +188,7 @@ test_that("interrupt in busy handler", {
   expect_equal(session$poll_process(2000), "ready")
   out <- session$read()
   expect_equal(out$code, 200)
-  expect_equal(out$stdout, "caught error\ndone\n")
+  expect_equal(gsub("\r", "", out$stdout), "caught error\ndone\n")
   expect_equal(session$get_state(), "idle")
 
   # con1 is still fine of course

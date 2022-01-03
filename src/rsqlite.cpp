@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "sqlite3.hpp"
+#include "sqlite3-cpp.h"
 
 //' RSQLite version
 //'

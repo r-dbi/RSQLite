@@ -148,6 +148,64 @@ test_that("error in busy handler", {
   dbExecute(con2, "COMMIT")
 })
 
+test_that("interrupt in busy handler", {
+  dbfile <- tempfile()
+  con1 <- dbConnect(SQLite(), dbfile)
+  on.exit(dbDisconnect(con1), add = TRUE)
+
+  # This test makes use of the installed package!
+  session <- callr::r_session$new()
+  session$run(args = list(dbfile = dbfile), function(dbfile) {
+    .GlobalEnv$con2 <- DBI::dbConnect(RSQLite::SQLite(), dbfile)
+
+    cb <- function(n) {
+      message(n)
+      Sys.sleep(10)
+      1L
+    }
+    RSQLite::sqliteSetBusyHandler(.GlobalEnv$con2, cb)
+  })
+
+  dbExecute(con1, "BEGIN IMMEDIATE")
+
+  expect_equal(session$get_state(), "idle")
+
+  session$call(function() {
+    tryCatch(
+      DBI::dbExecute(.GlobalEnv$con2, "BEGIN IMMEDIATE"),
+      error = function(e) {
+        writeLines("caught error")
+      }
+    )
+    writeLines("done")
+  })
+
+  expect_equal(session$poll_process(200), "timeout")
+  expect_equal(session$get_state(), "busy")
+
+  expect_true(session$interrupt())
+
+  expect_equal(session$poll_process(2000), "ready")
+  out <- session$read()
+  expect_equal(out$code, 200)
+  expect_equal(out$stdout, "caught error\ndone\n")
+  expect_equal(session$get_state(), "idle")
+
+  # con1 is still fine of course
+  dbWriteTable(con1, "trees", trees)
+  dbExecute(con1, "COMMIT")
+
+  # but con2 is fine as well
+  trees_out <- expect_silent(session$run(function() {
+    DBI::dbExecute(.GlobalEnv$con2, "BEGIN IMMEDIATE")
+    out <- DBI::dbGetQuery(.GlobalEnv$con2, "SELECT * FROM trees")
+    DBI::dbExecute(.GlobalEnv$con2, "COMMIT")
+    out
+  }))
+
+  expect_equal(trees, trees_out)
+})
+
 test_that("busy_handler timeout", {
   skip_on_cran()
 

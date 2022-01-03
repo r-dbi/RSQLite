@@ -1,7 +1,7 @@
 #ifndef RSQLITE_SQLITEDATAFRAME_H
 #define RSQLITE_SQLITEDATAFRAME_H
 
-#include "sqlite3.h"
+#include "sqlite3.hpp"
 #include "DbDataFrame.h"
 
 class SqliteDataFrame : public DbDataFrame {

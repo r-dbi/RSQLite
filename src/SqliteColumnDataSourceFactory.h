@@ -1,7 +1,7 @@
 #ifndef RSQLITE_SQLITECOLUMNFACTORY_H
 #define RSQLITE_SQLITECOLUMNFACTORY_H
 
-#include "sqlite3.h"
+#include "sqlite3.hpp"
 #include "DbColumnDataSourceFactory.h"
 
 class SqliteColumnDataSourceFactory : public DbColumnDataSourceFactory {

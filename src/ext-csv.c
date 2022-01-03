@@ -1,3 +1,3 @@
 #define SQLITE_CORE
 #include <R_ext/Visibility.h>
-#include "csv.c"
+#include "vendor/extensions/csv.c"

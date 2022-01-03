@@ -55,7 +55,7 @@ register_misc_extension <- function(name) {
     paste0('#include "vendor/extensions/', name, '.c"')
   )
 
-  writeLines(lines, paste0("src/vendor/extensions/ext-", name, ".c"))
+  writeLines(lines, paste0("src/ext-", name, ".c"))
   # stopifnot(system2("patch", "-p1", stdin = paste0("data-raw/", name, ".patch")) == 0)
 }
 

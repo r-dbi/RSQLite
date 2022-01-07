@@ -83,10 +83,7 @@ bool DbConnection::with_alt_types() const {
 
 void DbConnection::set_busy_handler(SEXP r_callback) {
   check_connection();
-  if (busy_callback_) {
-    R_ReleaseObject(busy_callback_);
-    busy_callback_ = NULL;
-  }
+  release_callback_data();
 
   if (! Rf_isNull(r_callback)) {
     R_PreserveObject(r_callback);

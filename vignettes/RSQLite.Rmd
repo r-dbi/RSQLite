@@ -27,6 +27,9 @@ To create a new SQLite database, you simply supply the filename to `dbConnect()`
 ```{r}
 mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
 dbDisconnect(mydb)
+```
+
+```{r echo = FALSE}
 unlink("my-db.sqlite")
 ```
 

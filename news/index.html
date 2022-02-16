@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.10</span>
       </span>
     </div>
 
@@ -50,6 +50,26 @@
       <small>Source: <a href="https://github.com/r-dbi/RSQLite/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.2.10" id="rsqlite-2210-2022-02-16">RSQLite 2.2.10 (2022-02-16)<a class="anchor" aria-label="anchor" href="#rsqlite-2210-2022-02-16"></a></h2>
+<ul><li>Same as previous version.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.2.9.9002" id="rsqlite-2299002-2022-02-16">RSQLite 2.2.9.9002 (2022-02-16)<a class="anchor" aria-label="anchor" href="#rsqlite-2299002-2022-02-16"></a></h2>
+<ul><li>Explain reason for bundling SQLite sources.</li>
+<li>Add known SQLite authors to DESCRIPTION.</li>
+<li>Add test for interrupt behavior in <code><a href="../reference/sqliteSetBusyHandler.html">sqliteSetBusyHandler()</a></code> (<a href="https://github.com/r-dbi/RSQLite/issues/401" class="external-link">#401</a>).</li>
+<li>Upgrade bundled SQLite to version 3.37.2 (<a href="https://github.com/r-dbi/RSQLite/issues/403" class="external-link">#403</a>).</li>
+<li>Upgrade bundled SQLite to version 3.37.1 (<a href="https://github.com/r-dbi/RSQLite/issues/399" class="external-link">#399</a>).</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.2.9.9001" id="rsqlite-2299001-2021-12-19">RSQLite 2.2.9.9001 (2021-12-19)<a class="anchor" aria-label="anchor" href="#rsqlite-2299001-2021-12-19"></a></h2>
+<ul><li>Make method definition more similar to S3. All <code><a href="https://rdrr.io/r/methods/setMethod.html" class="external-link">setMethod()</a></code> calls refer to top-level functions (<a href="https://github.com/r-dbi/RSQLite/issues/396" class="external-link">#396</a>).</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.2.9.9000" id="rsqlite-2299000-2021-12-06">RSQLite 2.2.9.9000 (2021-12-06)<a class="anchor" aria-label="anchor" href="#rsqlite-2299000-2021-12-06"></a></h2>
+<ul><li>Internal.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.2.9" id="rsqlite-229-2021-12-06">RSQLite 2.2.9 (2021-12-06)<a class="anchor" aria-label="anchor" href="#rsqlite-229-2021-12-06"></a></h2>
 <div class="section level3">
@@ -318,7 +338,7 @@
 <li><p>Queries (<a href="https://github.com/r-dbi/RSQLite/issues/69" class="external-link">#69</a>), query parameters and table data are always converted to UTF-8 before being sent to the database.</p></li>
 <li><p>Adapted to <code>DBI</code> 0.5, new code should use <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">dbExecute()</a></code> instead of <code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery()</a></code>, and <code><a href="https://dbi.r-dbi.org/reference/dbSendStatement.html" class="external-link">dbSendStatement()</a></code> instead of <code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery()</a></code> where appropriate.</p></li>
 <li><p>New strategy for prepared queries. Create a prepared query with <code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery()</a></code> or <code><a href="https://dbi.r-dbi.org/reference/dbSendStatement.html" class="external-link">dbSendStatement()</a></code> and bind values with <code><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind()</a></code>. The same query/statement can be executed efficiently multiple times by passing a data-frame-like object (<a href="https://github.com/r-dbi/RSQLite/issues/168" class="external-link">#168</a>, <a href="https://github.com/r-dbi/RSQLite/issues/178" class="external-link">#178</a>, <a href="https://github.com/r-dbi/RSQLite/issues/181" class="external-link">#181</a>).</p></li>
-<li><p><code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbSendStatement.html" class="external-link">dbSendStatement()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">dbExecute()</a></code> also support inline parameterised queries, like <code>dbGetQuery(datasetsDb(), "SELECT * FROM mtcars WHERE cyl = :cyl", params = list(cyl = 4))</code>. This has no performance benefits but protects you from SQL injection attacks.</p></li>
+<li><p><code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbSendStatement.html" class="external-link">dbSendStatement()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">dbExecute()</a></code> also support inline parameterised queries, like <code>dbGetQuery(datasetsDb(), "SELECT * FROM mtcars WHERE cyl = :cyl",   params = list(cyl = 4))</code>. This has no performance benefits but protects you from SQL injection attacks.</p></li>
 <li><p>Improve column type inference: the first non-<code>NULL</code> value decides the type of a column (<a href="https://github.com/r-dbi/RSQLite/issues/111" class="external-link">#111</a>). If there are no non-<code>NULL</code> values, the column affinity is used, determined according to sqlite3 rules (<a href="https://github.com/r-dbi/RSQLite/issues/160" class="external-link">#160</a>).</p></li>
 <li><p><code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch()</a></code> uses the same row name strategy as <code><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable()</a></code> (<a href="https://github.com/r-dbi/RSQLite/issues/53" class="external-link">#53</a>).</p></li>
 <li><p><code><a href="https://dbi.r-dbi.org/reference/dbColumnInfo.html" class="external-link">dbColumnInfo()</a></code> will now return information even before you’ve retrieved any data.</p></li>
@@ -645,11 +665,11 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by <a href="https://krlmlr.info" class="external-link">Kirill Müller</a>, <a href="http://hadley.nz" class="external-link">Hadley Wickham</a>, David A. James, Seth Falcon, <a href="https://www.r-consortium.org" class="external-link">R Consortium</a>.</p>
+  <p></p><p>Developed by <a href="https://krlmlr.info" class="external-link">Kirill Müller</a>, Hadley Wickham, David A. James, Seth Falcon, R Consortium.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
 </div>
 
       </footer></div>

@@ -2,26 +2,19 @@
 
 # RSQLite 2.2.10 (2022-02-16)
 
-- Same as previous version.
+## Features
 
+- Upgrade bundled SQLite to version 3.37.2 (#403).
 
-# RSQLite 2.2.9.9002 (2022-02-16)
+## Documentation
 
 - Explain reason for bundling SQLite sources.
-- Add known SQLite authors to DESCRIPTION.
+- Add known SQLite authors to `DESCRIPTION`.
+
+## Internal
+
 - Add test for interrupt behavior in `sqliteSetBusyHandler()` (#401).
-- Upgrade bundled SQLite to version 3.37.2 (#403).
-- Upgrade bundled SQLite to version 3.37.1 (#399).
-
-
-# RSQLite 2.2.9.9001 (2021-12-19)
-
 - Make method definition more similar to S3. All `setMethod()` calls refer to top-level functions (#396).
-
-
-# RSQLite 2.2.9.9000 (2021-12-06)
-
-- Internal.
 
 
 # RSQLite 2.2.9 (2021-12-06)

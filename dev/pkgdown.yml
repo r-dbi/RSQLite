@@ -3,7 +3,7 @@ pkgdown: 2.0.2.9000
 pkgdown_sha: ae7363faac9040a473a54fb3d770decdfb8dfec1
 articles:
   RSQLite: RSQLite.html
-last_built: 2022-02-17T04:27Z
+last_built: 2022-02-17T21:01Z
 urls:
   reference: https://rsqlite.r-dbi.org/reference
   article: https://rsqlite.r-dbi.org/articles

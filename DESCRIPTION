@@ -43,8 +43,9 @@ Authors@R:
 Description: Embeds the SQLite database engine in R and
     provides an interface compliant with the DBI package. The source for
     the SQLite engine and for various extensions in a recent version is
-    included; system versions will never be consulted to ensure a consistent
-    experience across all installations.
+    included. System libraries will never be consulted because
+    this package relies on static linking for the plugins it includes;
+    this also ensures a consistent experience across all installations.
 License: LGPL (>= 2.1)
 URL: https://rsqlite.r-dbi.org, https://github.com/r-dbi/RSQLite
 BugReports: https://github.com/r-dbi/RSQLite/issues

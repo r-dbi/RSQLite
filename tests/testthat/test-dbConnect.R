@@ -149,6 +149,8 @@ test_that("error in busy handler", {
 })
 
 test_that("interrupt in busy handler", {
+  skip_on_cran()
+
   dbfile <- tempfile()
   con1 <- dbConnect(SQLite(), dbfile)
   on.exit(dbDisconnect(con1), add = TRUE)

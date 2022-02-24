@@ -1,13 +1,25 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
-# RSQLite 2.2.9.9001 (2021-12-19)
+# RSQLite 2.2.10.9000 (2022-02-16)
 
+- Same as previous version.
+
+
+# RSQLite 2.2.10 (2022-02-16)
+
+## Features
+
+- Upgrade bundled SQLite to version 3.37.2 (#403).
+
+## Documentation
+
+- Explain reason for bundling SQLite sources.
+- Add known SQLite authors to `DESCRIPTION`.
+
+## Internal
+
+- Add test for interrupt behavior in `sqliteSetBusyHandler()` (#401).
 - Make method definition more similar to S3. All `setMethod()` calls refer to top-level functions (#396).
-
-
-# RSQLite 2.2.9.9000 (2021-12-06)
-
-- Internal.
 
 
 # RSQLite 2.2.9 (2021-12-06)

@@ -26,6 +26,7 @@ tryCatch(
 
 unzip(tmp, exdir = "src/vendor/sqlite3", junkpaths = TRUE)
 unlink("src/vendor/sqlite3/shell.c")
+file.rename("src/vendor/sqlite3/sqlite3ext.h", "src/vendor/extensions/sqlite3ext.h")
 
 
 tmp_source_zip <- tempfile()

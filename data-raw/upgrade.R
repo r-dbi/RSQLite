@@ -42,21 +42,20 @@ register_misc_extension <- function(name) {
   if (!dir.exists(ext_dir))
     dir.create(ext_dir, recursive = TRUE)
 
-  file.copy(
-    paste0(tmp_source_dir, "/sqlite/ext/misc/", name, ".c"),
-    paste0(ext_dir, name, ".c"),
-    overwrite = TRUE
-  )
+  text <- readLines(paste0(tmp_source_dir, "/sqlite/ext/misc/", name, ".c"))
+  text <- gsub(" +$", "", text)
+  writeLines(text, paste0(ext_dir, name, ".c"))
 
   # TODO compile as shared library? see https://www.sqlite.org/loadext.html
   lines <- c(
     "#define SQLITE_CORE",
     "#include <R_ext/Visibility.h>",
+    paste0("#define sqlite3_", name, "_init attribute_visible sqlite3_", name, "_init"),
+    "",
     paste0('#include "vendor/extensions/', name, '.c"')
   )
 
   writeLines(lines, paste0("src/ext-", name, ".c"))
-  stopifnot(system2("patch", "-p1", stdin = paste0("data-raw/", name, ".patch")) == 0)
 }
 
 register_misc_extension("regexp")

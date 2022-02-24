@@ -1,6 +1,31 @@
 #include "pch.h"
 #include "DbConnection.h"
 
+attribute_visible int sqlite3_extension_init(
+    sqlite3 *db,
+    char **pzErrMsg,
+    const sqlite3_api_routines *pApi
+);
+
+attribute_visible int sqlite3_regexp_init(
+    sqlite3 *db,
+    char **pzErrMsg,
+    const sqlite3_api_routines *pApi
+);
+
+attribute_visible int sqlite3_series_init(
+    sqlite3 *db,
+    char **pzErrMsg,
+    const sqlite3_api_routines *pApi
+);
+
+attribute_visible int sqlite3_csv_init(
+    sqlite3 *db,
+    char **pzErrMsg,
+    const sqlite3_api_routines *pApi
+);
+
+
 
 // [[Rcpp::export]]
 void extension_load(XPtr<DbConnectionPtr> con, const std::string& file, const std::string& entry_point) {

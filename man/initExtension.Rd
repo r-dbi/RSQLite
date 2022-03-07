@@ -4,16 +4,42 @@
 \alias{initExtension}
 \title{Add useful extension functions}
 \usage{
-initExtension(db)
+initExtension(db, extension = c("math", "regexp", "series", "csv"))
 }
 \arguments{
 \item{db}{A \code{\linkS4class{SQLiteConnection}} object to load these extensions into.}
+
+\item{extension}{The extension to load.}
 }
 \description{
-These extension functions are written by Liam Healy and made available
-through the SQLite website (\url{https://www.sqlite.org/contrib}).
+Several extension functions are included in the \pkg{RSQLite} package.
+When enabled via \code{initExtension()}, these extension functions can be used in
+SQL queries.
+Extensions must be enabled separately for each connection.
 }
-\section{Available extension functions}{
+\details{
+The \code{"math"} extension functions are written by Liam Healy and made available
+through the SQLite website (\url{https://www.sqlite.org/contrib}).
+This package contains a slightly modified version of the original code.
+See the section "Available functions in the math extension" for details.
+
+The \code{"regexp"} extension provides a regular-expression matcher for POSIX
+extended regular expressions,
+as available through the SQLite source code repository
+(\url{https://sqlite.org/src/file?filename=ext/misc/regexp.c}).
+SQLite will then implement the \verb{A regexp B} operator,
+where \code{A} is the string to be matched and \code{B} is the regular expression.
+
+The \code{"series"} extension loads the table-valued function \code{generate_series()},
+as available through the SQLite source code repository
+(\url{https://sqlite.org/src/file?filename=ext/misc/series.c}).
+
+The \code{"csv"} extension loads the function \code{csv()} that can be used to create
+virtual tables,
+as available through the SQLite source code repository
+(\url{https://sqlite.org/src/file?filename=ext/misc/csv.c}).
+}
+\section{Available functions in the math extension}{
 
 
 \describe{
@@ -30,9 +56,26 @@ upper_quartile}
 \examples{
 library(DBI)
 db <- RSQLite::datasetsDb()
-RSQLite::initExtension(db)
 
+# math
+RSQLite::initExtension(db)
 dbGetQuery(db, "SELECT stdev(mpg) FROM mtcars")
 sd(mtcars$mpg)
+
+# regexp
+RSQLite::initExtension(db, "regexp")
+dbGetQuery(db, "SELECT * FROM mtcars WHERE carb REGEXP '[12]'")
+
+# series
+RSQLite::initExtension(db, "series")
+dbGetQuery(db, "SELECT value FROM generate_series(0, 20, 5);")
+
 dbDisconnect(db)
+
+# csv
+db <- dbConnect(RSQLite::SQLite())
+RSQLite::initExtension(db, "csv")
+# use the filename argument to mount CSV files from disk
+dbExecute(db, "CREATE VIRTUAL TABLE tbl USING csv(data='1,2', schema='CREATE TABLE x(a INT, b INT)')")
+dbGetQuery(db, "SELECT * FROM tbl")
 }

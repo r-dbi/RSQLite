@@ -14,21 +14,6 @@ regular expression operator into the connection.}
 Always \code{TRUE}, invisibly.
 }
 \description{
-This loads a regular-expression matcher for posix extended regular
-expressions, as available through the SQLite source code repository
-(\url{https://sqlite.org/src/raw?filename=ext/misc/regexp.c}).
+Forwarded to \code{initExtension(db, "regexp")} .
 }
-\details{
-SQLite will then implement the "A regexp B" operator,
-where A is the string to be matched and B is the regular expression.
-
-Note this only affects the specified connection.
-}
-\examples{
-library(DBI)
-db <- RSQLite::datasetsDb()
-RSQLite::initRegExp(db)
-
-dbGetQuery(db, "SELECT * FROM mtcars WHERE carb REGEXP '[12]'")
-dbDisconnect(db)
-}
+\keyword{internal}

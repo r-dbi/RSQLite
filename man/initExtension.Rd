@@ -76,6 +76,10 @@ dbDisconnect(db)
 db <- dbConnect(RSQLite::SQLite())
 RSQLite::initExtension(db, "csv")
 # use the filename argument to mount CSV files from disk
-dbExecute(db, "CREATE VIRTUAL TABLE tbl USING csv(data='1,2', schema='CREATE TABLE x(a INT, b INT)')")
+sql <- paste0(
+  "CREATE VIRTUAL TABLE tbl USING ",
+  "csv(data='1,2', schema='CREATE TABLE x(a INT, b INT)')"
+)
+dbExecute(db, sql)
 dbGetQuery(db, "SELECT * FROM tbl")
 }

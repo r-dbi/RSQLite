@@ -50,7 +50,7 @@ void DbColumn::warn_type_conflicts(const String& name) const {
   my_data_types_seen.erase(DT_BOOL);
   my_data_types_seen.erase(dt);
 
-  if (my_data_types_seen.size() == 0) return;
+  if (my_data_types_seen.empty()) return;
 
   String name_utf8 = name;
   name_utf8.set_encoding(CE_UTF8);

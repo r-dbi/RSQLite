@@ -19,10 +19,7 @@ Or install the latest development version from GitHub with:
 
 <pre class='chroma'>
 <span class='c'># install.packages("devtools")</span>
-<span class='nf'>devtools</span><span class='nf'>::</span><span class='nf'><a href='https://devtools.r-lib.org//reference/remote-reexports.html'>install_github</a></span><span class='o'>(</span><span class='s'>"r-dbi/RSQLite"</span><span class='o'>)</span></pre>
-<!-- https://www.rstudio.com/ide/docs/packages/prerequisites -->
-
-To install from GitHub, you’ll need a [development environment](https://support.rstudio.com/hc/en-us/articles/200486498-Package-Development-Prerequisites).
+<span class='nf'>devtools</span><span class='nf'>::</span><span class='nf'><a href='https://devtools.r-lib.org/reference/remote-reexports.html'>install_github</a></span><span class='o'>(</span><span class='s'>"r-dbi/RSQLite"</span><span class='o'>)</span></pre>
 
 Discussions associated with DBI and related database packages take place on [R-SIG-DB](https://stat.ethz.ch/mailman/listinfo/r-sig-db). The website [Databases using R](https://db.rstudio.com/) describes the tools and best practices in this ecosystem.
 

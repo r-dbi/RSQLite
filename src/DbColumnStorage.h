@@ -27,7 +27,7 @@ public:
   int copy_to(SEXP x, DATA_TYPE dt, const int pos) const;
 
   // allocate()
-  static SEXPTYPE sexptype_from_datatype(DATA_TYPE type);
+  static SEXPTYPE sexptype_from_datatype(DATA_TYPE dt);
 
 private:
   // append_col()

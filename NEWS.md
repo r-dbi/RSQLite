@@ -7,20 +7,15 @@
 
 # RSQLite 2.2.11 (2022-03-07)
 
-- Same as previous version.
+## Features
 
-
-# RSQLite 2.2.10.9001 (2022-03-07)
-
-- `initExtension()` gains `extension` argument (#407, #408).
-- New `initSeries()` (#274, #389).
+- `initExtension()` gains `extension` argument (#407, #408) with options
+  `"math"`, `"regexp"`, `"series"` and `"csv"` (#274, #389, @mgirlich).
 - Upgrade bundled SQLite to version 3.38.0 (#405).
+
+## Bug fixes
+
 - Skip failing test on CRAN.
-
-
-# RSQLite 2.2.10.9000 (2022-02-16)
-
-- Same as previous version.
 
 
 # RSQLite 2.2.10 (2022-02-16)

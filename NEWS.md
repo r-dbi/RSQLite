@@ -1,8 +1,15 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
-# RSQLite 2.2.11.9000 (2022-03-07)
+# RSQLite 2.2.11.9001 (2022-04-02)
 
-- Same as previous version.
+## Features
+
+- Upgrade bundled SQLite to version 3.38.2 (#415).
+
+## Internal
+
+- Prefer `empty()` over `size() == 0` (#410, @MichaelChirico).
+- Refactor to improve code consistency (#411, @MichaelChirico).
 
 
 # RSQLite 2.2.11 (2022-03-07)

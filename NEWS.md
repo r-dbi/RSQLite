@@ -1,13 +1,8 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
-# RSQLite 2.2.14.9000 (2022-05-05)
-
-- Same as previous version.
-
-
 # RSQLite 2.2.14 (2022-05-05)
 
-- Upgrade bundled SQLite to version 3.38.4 (#421).
+- Upgrade bundled SQLite to version 3.38.5 (#421, #423).
 
 
 # RSQLite 2.2.13 (2022-04-29)

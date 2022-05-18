@@ -34,7 +34,9 @@ events. When setting a timeout, SQLite will try the transaction multiple
 times within this timeout. To set a timeout, pass an integer scalar to
 \code{sqliteSetBusyHandler()}.
 
-Another way to set a timeout is to use a \code{PRAGMA}, e.g. the SQL query\if{html}{\out{<div class="sourceCode sql">}}\preformatted{PRAGMA busy_timeout=3000
+Another way to set a timeout is to use a \code{PRAGMA}, e.g. the SQL query
+
+\if{html}{\out{<div class="sourceCode sql">}}\preformatted{PRAGMA busy_timeout=3000
 }\if{html}{\out{</div>}}
 
 sets the busy timeout to three seconds.

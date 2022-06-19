@@ -220,7 +220,8 @@ test_that("busy_handler timeout", {
   sqliteSetBusyHandler(con2, 200L)
   dbExecute(con1, "BEGIN IMMEDIATE")
 
-  { # {} is to not mess up the timing when copy-pasting this interactively
+  {
+    # {} is to not mess up the timing when copy-pasting this interactively
     tic <- Sys.time()
     err <- tryCatch(dbExecute(con2, "BEGIN IMMEDIATE"), error = identity)
     time <- Sys.time() - tic

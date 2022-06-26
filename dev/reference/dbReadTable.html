@@ -72,12 +72,18 @@
     <dl><dt>conn</dt>
 <dd><p>a <code><a href="SQLiteConnection-class.html">SQLiteConnection</a></code> object, produced by
 <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">DBI::dbConnect()</a></code></p></dd>
+
+
 <dt>name</dt>
 <dd><p>a character string specifying a table name. SQLite table names
 are <em>not</em> case sensitive, e.g., table names <code>ABC</code> and <code>abc</code>
 are considered equal.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Needed for compatibility with generic. Otherwise ignored.</p></dd>
+
+
 <dt>row.names</dt>
 <dd><p>Either <code>TRUE</code>, <code>FALSE</code>, <code>NA</code> or a string.</p>
 <p>If <code>TRUE</code>, always translate row names to a column called "row_names".
@@ -86,15 +92,22 @@ rownames only if they're a character vector.</p>
 <p>A string is equivalent to <code>TRUE</code>, but allows you to override the
 default name.</p>
 <p>For backward compatibility, <code>NULL</code> is equivalent to <code>FALSE</code>.</p></dd>
+
+
 <dt>check.names</dt>
 <dd><p>If <code>TRUE</code>, the default, column names will be
 converted to valid R identifiers.</p></dd>
+
+
 <dt>select.cols</dt>
 <dd><p>Deprecated, do not use.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data frame.</p>
+    
+
+<p>A data frame.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -193,7 +206,7 @@ primitive data, e.g., it does not coerce character data to factors.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.9000.</p>
 </div>
 
       </footer></div>

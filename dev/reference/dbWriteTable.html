@@ -58,37 +58,37 @@ to database tables.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for SQLiteConnection,character,character</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable</a></span><span class="op">(</span>
-  <span class="va">conn</span>,
-  <span class="va">name</span>,
-  <span class="va">value</span>,
-  <span class="va">...</span>,
-  field.types <span class="op">=</span> <span class="cn">NULL</span>,
-  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,
-  append <span class="op">=</span> <span class="cn">FALSE</span>,
-  header <span class="op">=</span> <span class="cn">TRUE</span>,
-  colClasses <span class="op">=</span> <span class="cn">NA</span>,
-  row.names <span class="op">=</span> <span class="cn">FALSE</span>,
-  nrows <span class="op">=</span> <span class="fl">50</span>,
-  sep <span class="op">=</span> <span class="st">","</span>,
-  eol <span class="op">=</span> <span class="st">"\n"</span>,
-  skip <span class="op">=</span> <span class="fl">0</span>,
-  temporary <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for SQLiteConnection,character,data.frame</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable</a></span><span class="op">(</span>
-  <span class="va">conn</span>,
-  <span class="va">name</span>,
-  <span class="va">value</span>,
-  <span class="va">...</span>,
-  row.names <span class="op">=</span> <span class="fu">pkgconfig</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pkgconfig/man/get_config.html" class="external-link">get_config</a></span><span class="op">(</span><span class="st">"RSQLite::row.names.table"</span>, <span class="cn">FALSE</span><span class="op">)</span>,
-  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,
-  append <span class="op">=</span> <span class="cn">FALSE</span>,
-  field.types <span class="op">=</span> <span class="cn">NULL</span>,
-  temporary <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for SQLiteConnection,character,character</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable</a></span><span class="op">(</span></span>
+<span>  <span class="va">conn</span>,</span>
+<span>  <span class="va">name</span>,</span>
+<span>  <span class="va">value</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  field.types <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  append <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  header <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  colClasses <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  nrows <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  sep <span class="op">=</span> <span class="st">","</span>,</span>
+<span>  eol <span class="op">=</span> <span class="st">"\n"</span>,</span>
+<span>  skip <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  temporary <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for SQLiteConnection,character,data.frame</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable</a></span><span class="op">(</span></span>
+<span>  <span class="va">conn</span>,</span>
+<span>  <span class="va">name</span>,</span>
+<span>  <span class="va">value</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="fu">pkgconfig</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pkgconfig/man/get_config.html" class="external-link">get_config</a></span><span class="op">(</span><span class="st">"RSQLite::row.names.table"</span>, <span class="cn">FALSE</span><span class="op">)</span>,</span>
+<span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  append <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  field.types <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  temporary <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -192,9 +192,9 @@ elements are automatically assigned a value.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu"><a href="SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span>, <span class="va">mtcars</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu"><a href="SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span>, <span class="va">mtcars</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     mpg cyl  disp  hp drat    wt  qsec vs am gear carb</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1  21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2  21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4</span>
@@ -228,14 +228,14 @@ elements are automatically assigned a value.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 30 19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 31 15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 32 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># A zero row data frame just creates a table definition.</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars2"</span>, <span class="va">mtcars</span><span class="op">[</span><span class="fl">0</span>, <span class="op">]</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars2"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># A zero row data frame just creates a table definition.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars2"</span>, <span class="va">mtcars</span><span class="op">[</span><span class="fl">0</span>, <span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars2"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] mpg  cyl  disp hp   drat wt   qsec vs   am   gear carb</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;0 rows&gt; (or 0-length row.names)</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </div>

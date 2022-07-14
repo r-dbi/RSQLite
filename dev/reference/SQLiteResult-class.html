@@ -62,37 +62,37 @@ The "Usage" section lists the class methods overridden by <span class="pkg">RSQL
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">params</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html" class="external-link">dbClearResult</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbColumnInfo.html" class="external-link">dbColumnInfo</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch</a></span><span class="op">(</span>
-  <span class="va">res</span>,
-  n <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,
-  <span class="va">...</span>,
-  row.names <span class="op">=</span> <span class="fu">pkgconfig</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pkgconfig/man/get_config.html" class="external-link">get_config</a></span><span class="op">(</span><span class="st">"RSQLite::row.names.query"</span>, <span class="cn">FALSE</span><span class="op">)</span>
-<span class="op">)</span>
-
-<span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetRowCount.html" class="external-link">dbGetRowCount</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetRowsAffected.html" class="external-link">dbGetRowsAffected</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetStatement.html" class="external-link">dbGetStatement</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html" class="external-link">dbHasCompleted</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S4 method for SQLiteResult</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbIsValid.html" class="external-link">dbIsValid</a></span><span class="op">(</span><span class="va">dbObj</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for SQLiteResult</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">params</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for SQLiteResult</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html" class="external-link">dbClearResult</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for SQLiteResult</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbColumnInfo.html" class="external-link">dbColumnInfo</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for SQLiteResult</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch</a></span><span class="op">(</span></span>
+<span>  <span class="va">res</span>,</span>
+<span>  n <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="fu">pkgconfig</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pkgconfig/man/get_config.html" class="external-link">get_config</a></span><span class="op">(</span><span class="st">"RSQLite::row.names.query"</span>, <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for SQLiteResult</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetRowCount.html" class="external-link">dbGetRowCount</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for SQLiteResult</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetRowsAffected.html" class="external-link">dbGetRowsAffected</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for SQLiteResult</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetStatement.html" class="external-link">dbGetStatement</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for SQLiteResult</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html" class="external-link">dbHasCompleted</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for SQLiteResult</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbIsValid.html" class="external-link">dbIsValid</a></span><span class="op">(</span><span class="va">dbObj</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="see-also">

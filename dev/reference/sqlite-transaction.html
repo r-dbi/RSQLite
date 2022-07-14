@@ -66,14 +66,14 @@ auto-commit on.
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for SQLiteConnection</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbBegin</a></span><span class="op">(</span><span class="va">conn</span>, .name <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, name <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="co"># S4 method for SQLiteConnection</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbCommit</a></span><span class="op">(</span><span class="va">conn</span>, .name <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, name <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="co"># S4 method for SQLiteConnection</span>
-<span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbRollback</a></span><span class="op">(</span><span class="va">conn</span>, .name <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, name <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for SQLiteConnection</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbBegin</a></span><span class="op">(</span><span class="va">conn</span>, .name <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, name <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for SQLiteConnection</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbCommit</a></span><span class="op">(</span><span class="va">conn</span>, .name <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, name <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for SQLiteConnection</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbRollback</a></span><span class="op">(</span><span class="va">conn</span>, .name <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, name <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -104,41 +104,41 @@ and <code><a href="https://dbi.r-dbi.org/reference/transactions.html" class="ext
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu"><a href="SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"arrests"</span>, <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/USArrests.html" class="external-link">USArrests</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"select count(*) from arrests"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu"><a href="SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"arrests"</span>, <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/USArrests.html" class="external-link">USArrests</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"select count(*) from arrests"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   count(*)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       50</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbBegin</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">rs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbSendStatement.html" class="external-link">dbSendStatement</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"DELETE from arrests WHERE Murder &gt; 1"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetRowsAffected.html" class="external-link">dbGetRowsAffected</a></span><span class="op">(</span><span class="va">rs</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbBegin</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">rs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbSendStatement.html" class="external-link">dbSendStatement</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"DELETE from arrests WHERE Murder &gt; 1"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetRowsAffected.html" class="external-link">dbGetRowsAffected</a></span><span class="op">(</span><span class="va">rs</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 49</span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html" class="external-link">dbClearResult</a></span><span class="op">(</span><span class="va">rs</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"select count(*) from arrests"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html" class="external-link">dbClearResult</a></span><span class="op">(</span><span class="va">rs</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"select count(*) from arrests"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   count(*)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1        1</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbRollback</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"select count(*) from arrests"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbRollback</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"select count(*) from arrests"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 50</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbBegin</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">rs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbSendStatement.html" class="external-link">dbSendStatement</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"DELETE FROM arrests WHERE Murder &gt; 5"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html" class="external-link">dbClearResult</a></span><span class="op">(</span><span class="va">rs</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbCommit</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"SELECT count(*) FROM arrests"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbBegin</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">rs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbSendStatement.html" class="external-link">dbSendStatement</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"DELETE FROM arrests WHERE Murder &gt; 5"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html" class="external-link">dbClearResult</a></span><span class="op">(</span><span class="va">rs</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbCommit</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"SELECT count(*) FROM arrests"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 16</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Named savepoints can be nested --------------------------------------------</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbBegin</a></span><span class="op">(</span><span class="va">con</span>, name <span class="op">=</span> <span class="st">"a"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbBegin</a></span><span class="op">(</span><span class="va">con</span>, name <span class="op">=</span> <span class="st">"b"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbRollback</a></span><span class="op">(</span><span class="va">con</span>, name <span class="op">=</span> <span class="st">"b"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbCommit</a></span><span class="op">(</span><span class="va">con</span>, name <span class="op">=</span> <span class="st">"a"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Named savepoints can be nested --------------------------------------------</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbBegin</a></span><span class="op">(</span><span class="va">con</span>, name <span class="op">=</span> <span class="st">"a"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbBegin</a></span><span class="op">(</span><span class="va">con</span>, name <span class="op">=</span> <span class="st">"b"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbRollback</a></span><span class="op">(</span><span class="va">con</span>, name <span class="op">=</span> <span class="st">"b"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/transactions.html" class="external-link">dbCommit</a></span><span class="op">(</span><span class="va">con</span>, name <span class="op">=</span> <span class="st">"a"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </div>

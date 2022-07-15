@@ -20,7 +20,7 @@ Extensions must be enabled separately for each connection."><!-- mathjax --><scr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.14</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.15</span>
       </span>
     </div>
 
@@ -62,15 +62,18 @@ Extensions must be enabled separately for each connection.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">initExtension</span><span class="op">(</span><span class="va">db</span>, extension <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"math"</span>, <span class="st">"regexp"</span>, <span class="st">"series"</span>, <span class="st">"csv"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">initExtension</span><span class="op">(</span><span class="va">db</span>, extension <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"math"</span>, <span class="st">"regexp"</span>, <span class="st">"series"</span>, <span class="st">"csv"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>db</dt>
 <dd><p>A <code><a href="SQLiteConnection-class.html">SQLiteConnection</a></code> object to load these extensions into.</p></dd>
+
+
 <dt>extension</dt>
 <dd><p>The extension to load.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -115,20 +118,20 @@ upper_quartile</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="datasetsDb.html">datasetsDb</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># math</span></span>
-<span class="r-in"><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu">initExtension</span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"SELECT stdev(mpg) FROM mtcars"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="datasetsDb.html">datasetsDb</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># math</span></span></span>
+<span class="r-in"><span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu">initExtension</span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"SELECT stdev(mpg) FROM mtcars"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   stdev(mpg)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1   6.026948</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6.026948</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># regexp</span></span>
-<span class="r-in"><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu">initExtension</span><span class="op">(</span><span class="va">db</span>, <span class="st">"regexp"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"SELECT * FROM mtcars WHERE carb REGEXP '[12]'"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># regexp</span></span></span>
+<span class="r-in"><span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu">initExtension</span><span class="op">(</span><span class="va">db</span>, <span class="st">"regexp"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"SELECT * FROM mtcars WHERE carb REGEXP '[12]'"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            row_names  mpg cyl  disp  hp drat    wt  qsec vs am gear carb</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1         Datsun 710 22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2     Hornet 4 Drive 21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1</span>
@@ -147,30 +150,30 @@ upper_quartile</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 15     Porsche 914-2 26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 16      Lotus Europa 30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 17        Volvo 142E 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># series</span></span>
-<span class="r-in"><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu">initExtension</span><span class="op">(</span><span class="va">db</span>, <span class="st">"series"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"SELECT value FROM generate_series(0, 20, 5);"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># series</span></span></span>
+<span class="r-in"><span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu">initExtension</span><span class="op">(</span><span class="va">db</span>, <span class="st">"series"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"SELECT value FROM generate_series(0, 20, 5);"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1     0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2     5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3    10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4    15</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5    20</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># csv</span></span>
-<span class="r-in"><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu">initExtension</span><span class="op">(</span><span class="va">db</span>, <span class="st">"csv"</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># use the filename argument to mount CSV files from disk</span></span>
-<span class="r-in"><span class="va">sql</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="st">"CREATE VIRTUAL TABLE tbl USING "</span>,</span>
-<span class="r-in">  <span class="st">"csv(data='1,2', schema='CREATE TABLE x(a INT, b INT)')"</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">dbExecute</a></span><span class="op">(</span><span class="va">db</span>, <span class="va">sql</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># csv</span></span></span>
+<span class="r-in"><span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu">initExtension</span><span class="op">(</span><span class="va">db</span>, <span class="st">"csv"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># use the filename argument to mount CSV files from disk</span></span></span>
+<span class="r-in"><span><span class="va">sql</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"CREATE VIRTUAL TABLE tbl USING "</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"csv(data='1,2', schema='CREATE TABLE x(a INT, b INT)')"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">dbExecute</a></span><span class="op">(</span><span class="va">db</span>, <span class="va">sql</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"SELECT * FROM tbl"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"SELECT * FROM tbl"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   a b</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 1 2</span>
 </code></pre></div>
@@ -187,7 +190,7 @@ upper_quartile</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.9000.</p>
 </div>
 
       </footer></div>

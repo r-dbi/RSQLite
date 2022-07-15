@@ -21,7 +21,7 @@ a copy of another database.'><!-- mathjax --><script src="https://cdnjs.cloudfla
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.14</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.15</span>
       </span>
     </div>
 
@@ -64,7 +64,7 @@ a copy of another database.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">sqliteCopyDatabase</span><span class="op">(</span><span class="va">from</span>, <span class="va">to</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sqliteCopyDatabase</span><span class="op">(</span><span class="va">from</span>, <span class="va">to</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -72,8 +72,11 @@ a copy of another database.</p>
     <dl><dt>from</dt>
 <dd><p>A <code>SQLiteConnection</code> object. The main database in
 <code>from</code> will be copied to <code>to</code>.</p></dd>
+
+
 <dt>to</dt>
 <dd><p>A <code>SQLiteConnection</code> object pointing to an empty database.</p></dd>
+
 </dl></div>
     <div id="references">
     <h2>References</h2>
@@ -86,16 +89,16 @@ a copy of another database.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># Copy the built in databaseDb() to an in-memory database</span></span>
-<span class="r-in"><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Copy the built in databaseDb() to an in-memory database</span></span></span>
+<span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> character(0)</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="datasetsDb.html">datasetsDb</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu">sqliteCopyDatabase</span><span class="op">(</span><span class="va">db</span>, <span class="va">con</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="datasetsDb.html">datasetsDb</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu">sqliteCopyDatabase</span><span class="op">(</span><span class="va">db</span>, <span class="va">con</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "BOD"              "CO2"              "ChickWeight"      "DNase"           </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [5] "Formaldehyde"     "Indometh"         "InsectSprays"     "LifeCycleSavings"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [9] "Loblolly"         "Orange"           "OrchardSprays"    "PlantGrowth"     </span>
@@ -107,8 +110,8 @@ a copy of another database.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [33] "pressure"         "quakes"           "randu"            "rock"            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [37] "sleep"            "stackloss"        "swiss"            "trees"           </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [41] "warpbreaks"       "women"           </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -123,7 +126,7 @@ a copy of another database.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.9000.</p>
 </div>
 
       </footer></div>

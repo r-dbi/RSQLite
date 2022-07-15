@@ -18,7 +18,7 @@ dbGetQuery"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.14</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.15</span>
       </span>
     </div>
 
@@ -58,33 +58,44 @@ dbGetQuery"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">sqliteBuildTableDefinition</span><span class="op">(</span>
-  <span class="va">con</span>,
-  <span class="va">name</span>,
-  <span class="va">value</span>,
-  field.types <span class="op">=</span> <span class="cn">NULL</span>,
-  row.names <span class="op">=</span> <span class="fu">pkgconfig</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pkgconfig/man/get_config.html" class="external-link">get_config</a></span><span class="op">(</span><span class="st">"RSQLite::row.names.query"</span>, <span class="cn">FALSE</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sqliteBuildTableDefinition</span><span class="op">(</span></span>
+<span>  <span class="va">con</span>,</span>
+<span>  <span class="va">name</span>,</span>
+<span>  <span class="va">value</span>,</span>
+<span>  field.types <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="fu">pkgconfig</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pkgconfig/man/get_config.html" class="external-link">get_config</a></span><span class="op">(</span><span class="st">"RSQLite::row.names.query"</span>, <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>con</dt>
 <dd><p>A database connection.</p></dd>
+
+
 <dt>name</dt>
 <dd><p>Name of the new SQL table</p></dd>
+
+
 <dt>value</dt>
 <dd><p>A data.frame, for which we want to create a table.</p></dd>
+
+
 <dt>field.types</dt>
 <dd><p>Optional, named character vector of the types for each
 field in <code>value</code></p></dd>
+
+
 <dt>row.names</dt>
 <dd><p>Logical. Should row.name of <code>value</code> be exported as a
 <code>row_names</code> field? Default is <code>TRUE</code></p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An SQL string</p>
+    
+
+<p>An SQL string</p>
     </div>
 
   </div>
@@ -99,7 +110,7 @@ field in <code>value</code></p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.9000.</p>
 </div>
 
       </footer></div>

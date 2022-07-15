@@ -1,5 +1,10 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
+# RSQLite 2.2.15.9000 (2022-07-15)
+
+- Internal changes only.
+
+
 # RSQLite 2.2.15 (2022-07-15)
 
 - Same as previous version.

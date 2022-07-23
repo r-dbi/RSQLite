@@ -7,23 +7,7 @@
 
 # RSQLite 2.2.15 (2022-07-15)
 
-- Same as previous version.
-
-
-# RSQLite 2.2.14.9001 (2022-07-15)
-
-## Features
-
 - Upgrade bundled SQLite to 3.39.1 (#429).
-
-## vendor
-
-- Upgrade bundled SQLite to 3.39.0 (#428).
-
-
-# RSQLite 2.2.14.9000 (2022-05-05)
-
-- Same as previous version.
 
 
 # RSQLite 2.2.14 (2022-05-05)

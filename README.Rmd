@@ -58,7 +58,7 @@ dbClearResult(res)
 
 # Or a chunk at a time
 res <- dbSendQuery(con, "SELECT * FROM mtcars WHERE cyl = 4")
-while(!dbHasCompleted(res)){
+while (!dbHasCompleted(res)) {
   chunk <- dbFetch(res, n = 5)
   print(nrow(chunk))
 }

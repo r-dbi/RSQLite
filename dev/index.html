@@ -39,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">RSQLite</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">2.2.15.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">2.2.16.9000</span>
       </span>
     </div>
 
@@ -143,7 +143,7 @@
 
 <span class="c"># Or a chunk at a time</span>
 <span class="nv">res</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"SELECT * FROM mtcars WHERE cyl = 4"</span><span class="o">)</span>
-<span class="kr">while</span><span class="o">(</span><span class="o">!</span><span class="nf"><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html" class="external-link">dbHasCompleted</a></span><span class="o">(</span><span class="nv">res</span><span class="o">)</span><span class="o">)</span><span class="o">{</span>
+<span class="kr">while</span> <span class="o">(</span><span class="o">!</span><span class="nf"><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html" class="external-link">dbHasCompleted</a></span><span class="o">(</span><span class="nv">res</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
   <span class="nv">chunk</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch</a></span><span class="o">(</span><span class="nv">res</span>, n <span class="o">=</span> <span class="m">5</span><span class="o">)</span>
   <span class="nf"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="o">(</span><span class="nf"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="o">(</span><span class="nv">chunk</span><span class="o">)</span><span class="o">)</span>
 <span class="o">}</span></pre>

@@ -78,7 +78,7 @@ Discussions associated with DBI and related database packages take place on [R-S
 
 <span class='c'># Or a chunk at a time</span>
 <span class='nv'>res</span> <span class='o'>&lt;-</span> <span class='nf'><a href='https://dbi.r-dbi.org/reference/dbSendQuery.html'>dbSendQuery</a></span><span class='o'>(</span><span class='nv'>con</span>, <span class='s'>"SELECT * FROM mtcars WHERE cyl = 4"</span><span class='o'>)</span>
-<span class='kr'>while</span><span class='o'>(</span><span class='o'>!</span><span class='nf'><a href='https://dbi.r-dbi.org/reference/dbHasCompleted.html'>dbHasCompleted</a></span><span class='o'>(</span><span class='nv'>res</span><span class='o'>)</span><span class='o'>)</span><span class='o'>{</span>
+<span class='kr'>while</span> <span class='o'>(</span><span class='o'>!</span><span class='nf'><a href='https://dbi.r-dbi.org/reference/dbHasCompleted.html'>dbHasCompleted</a></span><span class='o'>(</span><span class='nv'>res</span><span class='o'>)</span><span class='o'>)</span> <span class='o'>{</span>
   <span class='nv'>chunk</span> <span class='o'>&lt;-</span> <span class='nf'><a href='https://dbi.r-dbi.org/reference/dbFetch.html'>dbFetch</a></span><span class='o'>(</span><span class='nv'>res</span>, n <span class='o'>=</span> <span class='m'>5</span><span class='o'>)</span>
   <span class='nf'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='o'>(</span><span class='nf'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='o'>(</span><span class='nv'>chunk</span><span class='o'>)</span><span class='o'>)</span>
 <span class='o'>}</span></pre>

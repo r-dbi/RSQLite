@@ -76,9 +76,11 @@ if (any(grepl("^src/", gert::git_status()$file))) {
   gert::git_branch_create(branch)
   gert::git_add("src")
 
-  title <- paste0("Upgrade bundled SQLite to ", version)
-  message("Commit message: ", title)
-  gert::git_commit(title)
+  commit_msg <- paste0("Upgrade bundled SQLite to ", version)
+  message("Commit message: ", commit_msg)
+  gert::git_commit(commit_msg)
+
+  title <- paste0("feat: ", commit_msg)
 
   # Force-pushing: this job is run daily, will give a daily notification
   # and still succeed
@@ -109,7 +111,7 @@ if (any(grepl("^src/", gert::git_status()$file))) {
     )
 
     message("Tweaking PR body")
-    body <- paste0("NEWS entry:\n\n```\n- Upgrade bundled SQLite to version ", version, " (#", pr$number, ").\n```")
+    body <- paste0("NEWS entry will be picked up by fledge from the PR title.")
 
     gh::gh(
       paste0("/repos/r-dbi/RSQLite/pulls/", pr$number),

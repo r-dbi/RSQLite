@@ -3,7 +3,11 @@ test_that("write tables whose colnames or contents are BIG5 encoded (#277)", {
   skip_on_os("mac")
   skip_on_os("solaris")
 
-  withr::local_collate("cht")
+  .loc <- Sys.getlocale("LC_COLLATE")
+  Sys.setlocale(locale = "cht")
+  withr::defer({
+    Sys.setlocale(locale = .loc)
+  })
 
   con <- dbConnect(SQLite())
   withr::defer({

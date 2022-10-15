@@ -70,6 +70,7 @@ Suggests:
     hms,
     rvest,
     testthat (>= 3.0.0),
+    withr,
     xml2
 LinkingTo: 
     plogr (>= 0.2.0),

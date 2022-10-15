@@ -33,15 +33,13 @@ test_that("write tables whose colnames or contents are BIG5 encoded (#277)", {
 })
 
 test_that("write tables whose colnames and contents are UTF-8 encoded (#277)", {
-  .loc <- Sys.getlocale("LC_COLLATE")
   if (.Platform$OS.type == "windows") {
-    Sys.setlocale(locale = "cht")
+    withr::local_collate("cht")
   } else {
-    Sys.setlocale(locale = "zh_TW.UTF-8")
+    withr::local_collate("zh_TW.UTF-8")
   }
   con <- dbConnect(SQLite())
   on.exit({
-    Sys.setlocale(locale = .loc)
     dbDisconnect(con)
   })
 
@@ -72,15 +70,13 @@ test_that("list the field of tables whose colnames are BIG5 encoded (#277)", {
   skip_on_os("linux")
   skip_on_os("mac")
   skip_on_os("solaris")
-  .loc <- Sys.getlocale("LC_COLLATE")
   if (.Platform$OS.type == "windows") {
-    Sys.setlocale(locale = "cht")
+    withr::local_collate("cht")
   } else {
-    Sys.setlocale(locale = "zh_TW.UTF-8")
+    withr::local_collate("zh_TW.UTF-8")
   }
   con <- dbConnect(SQLite())
   on.exit({
-    Sys.setlocale(locale = .loc)
     dbDisconnect(con)
   })
 
@@ -104,15 +100,13 @@ test_that("list the field of tables whose colnames are BIG5 encoded (#277)", {
 })
 
 test_that("list the field of tables whose colnames are UTF-8 encoded (#277)", {
-  .loc <- Sys.getlocale("LC_COLLATE")
   if (.Platform$OS.type == "windows") {
-    Sys.setlocale(locale = "cht")
+    withr::local_collate("cht")
   } else {
-    Sys.setlocale(locale = "zh_TW.UTF-8")
+    withr::local_collate("zh_TW.UTF-8")
   }
   con <- dbConnect(SQLite())
   on.exit({
-    Sys.setlocale(locale = .loc)
     dbDisconnect(con)
   })
 
@@ -137,15 +131,13 @@ test_that("list the field of tables whose colnames are UTF-8 encoded (#277)", {
 })
 
 test_that("append tables whose colnames are UTF-8 encoded (#277)", {
-  .loc <- Sys.getlocale("LC_COLLATE")
   if (.Platform$OS.type == "windows") {
-    Sys.setlocale(locale = "cht")
+    withr::local_collate("cht")
   } else {
-    Sys.setlocale(locale = "zh_TW.UTF-8")
+    withr::local_collate("zh_TW.UTF-8")
   }
   con <- dbConnect(SQLite())
   on.exit({
-    Sys.setlocale(locale = .loc)
     dbDisconnect(con)
   })
 

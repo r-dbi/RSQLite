@@ -4,5 +4,6 @@ ctx <- get_default_context()
 
 test_that("can_disconnect", {
   con <- connect(ctx)
+  #' `dbDisconnect()` returns `TRUE`, invisibly.
   expect_invisible_true(dbDisconnect(con))
 })

@@ -17,7 +17,7 @@ test_that("constructor", {
 })
 
 test_that("data_type_driver", {
-  test_data_type(ctx, `$`(ctx, drv))
+  test_data_type(ctx, ctx$drv)
 })
 
 test_that("get_info_driver", {
@@ -32,24 +32,29 @@ test_that("get_info_driver", {
 
 test_that("connect_can_connect", {
   con <- expect_visible(connect(ctx))
+  #' `dbConnect()` returns an S4 object that inherits from [DBIConnection-class].
   expect_s4_class(con, "DBIConnection")
   dbDisconnect(con)
+  #' This object is used to communicate with the database engine.
 })
 
 test_that("connect_bigint_integer", {
+  #' - `"integer"`: always return as `integer`, silently overflow
   con <- local_connection(ctx, bigint = "integer")
   res <- dbGetQuery(con, "SELECT 10000000000")
   expect_type(res[[1]], "integer")
 })
 
 test_that("connect_bigint_numeric", {
+  #' - `"numeric"`: always return as `numeric`, silently round
   con <- local_connection(ctx, bigint = "numeric")
   res <- dbGetQuery(con, "SELECT 10000000000")
   expect_type(res[[1]], "double")
-  expect_equal(res[[1]], 1e+10)
+  expect_equal(res[[1]], 1e10)
 })
 
 test_that("connect_bigint_character", {
+  #' - `"character"`: always return the decimal representation as `character`
   con <- local_connection(ctx, bigint = "character")
   res <- dbGetQuery(con, "SELECT 10000000000")
   expect_type(res[[1]], "character")
@@ -57,9 +62,12 @@ test_that("connect_bigint_character", {
 })
 
 test_that("connect_bigint_integer64", {
+  #' - `"integer64"`: return as a data type that can be coerced using
+  #'   [as.integer()] (with warning on overflow), [as.numeric()]
+  #'   and [as.character()]
   con <- local_connection(ctx, bigint = "integer64")
   res <- dbGetQuery(con, "SELECT 10000000000")
   expect_warning(expect_true(is.na(as.integer(res[[1]]))))
-  expect_equal(as.numeric(res[[1]]), 1e+10)
+  expect_equal(as.numeric(res[[1]]), 1e10)
   expect_equal(as.character(res[[1]]), "10000000000")
 })

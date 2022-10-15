@@ -16,6 +16,11 @@ test_that("constructor", {
   }
 })
 
+test_that("data_type_formals", {
+  # <establish formals of described function>
+  expect_equal(names(formals(dbDataType)), c("dbObj", "obj", "..."))
+})
+
 test_that("data_type_driver", {
   test_data_type(ctx, ctx$drv)
 })
@@ -28,6 +33,11 @@ test_that("get_info_driver", {
   for (name in necessary_names) {
     eval(bquote(expect_true(.(name) %in% info_names)))
   }
+})
+
+test_that("connect_formals", {
+  # <establish formals of described functions>
+  expect_equal(names(formals(dbConnect)), c("drv", "..."))
 })
 
 test_that("connect_can_connect", {

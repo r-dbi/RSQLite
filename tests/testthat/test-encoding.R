@@ -1,5 +1,6 @@
 test_that("write tables whose colnames and contents are UTF-8 encoded (#277)", {
   if (.Platform$OS.type == "windows") {
+    skip_if_not(getRversion() >= "4.0")
     withr::local_collate("cht")
   } else {
     withr::local_collate("zh_TW.UTF-8")

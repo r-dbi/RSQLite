@@ -65,6 +65,7 @@ Suggests:
     gert,
     gh,
     knitr,
+    magrittr,
     rmarkdown,
     hms,
     rvest,

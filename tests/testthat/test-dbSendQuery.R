@@ -39,46 +39,49 @@ test_that("simple position binding works", {
   dbWriteTable(con, "t1", data.frame(x = 1, y = 2))
 
   expect_warning(
-    dbGetPreparedQuery(con, "INSERT INTO t1 VALUES (?, ?)",
-      bind.data = data.frame(x = 2, y = 1)
+    expect_warning(
+      dbGetPreparedQuery(con, "INSERT INTO t1 VALUES (?, ?)",
+        bind.data = data.frame(x = 2, y = 1)
+      ),
+      "deprecated"
     ),
-    "deprecated"
+    "SQL statements"
   )
 
   expect_equal(dbReadTable(con, "t1")$x, c(1, 2))
 })
 
 test_that("simple named binding works", {
+  `%>%` <- magrittr::`%>%`
+
   memoise::forget(warning_once)
   con <- dbConnect(SQLite(), ":memory:")
   on.exit(dbDisconnect(con), add = TRUE)
 
   dbWriteTable(con, "t1", data.frame(x = 1, y = 2))
 
-  expect_warning(
-    dbGetPreparedQuery(con, "INSERT INTO t1 VALUES (:x, :y)",
-      bind.data = data.frame(y = 1, x = 2)
-    ),
-    "deprecated"
-  )
+  dbGetPreparedQuery(con, "INSERT INTO t1 VALUES (:x, :y)",
+    bind.data = data.frame(y = 1, x = 2)
+  ) %>%
+    expect_warning("deprecated") %>%
+    expect_warning("SQL statements")
 
   expect_equal(dbReadTable(con, "t1")$x, c(1, 2))
 })
 
 test_that("named binding errors if missing name", {
+  `%>%` <- magrittr::`%>%`
+
   con <- dbConnect(SQLite(), ":memory:")
   dbWriteTable(con, "t1", data.frame(x = 1, y = 2))
   on.exit(dbDisconnect(con), add = TRUE)
 
-  expect_error(
-    expect_warning(
-      dbGetPreparedQuery(con, "INSERT INTO t1 VALUES (:x, :y)",
-        bind.data = data.frame(y = 1)
-      ),
-      "deprecated"
-    ),
-    "No value given for placeholder"
-  )
+  dbGetPreparedQuery(con, "INSERT INTO t1 VALUES (:x, :y)",
+    bind.data = data.frame(y = 1)
+  ) %>%
+    expect_warning("deprecated") %>%
+    expect_warning("SQL statements") %>%
+    expect_error("No value given for placeholder")
 })
 
 test_that("one row per bound select, with factor", {

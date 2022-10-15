@@ -1,5 +1,3 @@
-context("affinity")
-
 create_affinity_test_table <- function(con, affinity) {
   dbExecute(con, paste0("CREATE TABLE a (a ", affinity, ")"))
   dbWriteTable(con, "a", data.frame(a = NA_integer_), append = TRUE)

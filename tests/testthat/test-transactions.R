@@ -1,5 +1,3 @@
-context("transactions")
-
 test_that("autocommit", {
   db_file <- tempfile("transactions", fileext = ".sqlite")
   con <- dbConnect(SQLite(), db_file)

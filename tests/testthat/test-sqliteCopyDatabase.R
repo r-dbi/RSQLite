@@ -1,5 +1,3 @@
-context("sqliteCopyDatabase")
-
 # Specific to RSQLite
 test_that("fails with bad arguments", {
   dbfile <- tempfile()

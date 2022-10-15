@@ -1,5 +1,3 @@
-context("extendedTypes")
-
 test_that("Can read dates", {
   con <- dbConnect(SQLite(), extended_types = TRUE)
   on.exit(dbDisconnect(con), add = TRUE)

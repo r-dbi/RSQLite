@@ -1,5 +1,3 @@
-context("dbWriteTable autoincrement")
-
 # Helper variable and function
 sql_ddl <- "CREATE TABLE `tbl` (
   `id`    INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,

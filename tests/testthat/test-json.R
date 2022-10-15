@@ -1,5 +1,3 @@
-context("dbJson")
-
 test_that("JSON types function", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)

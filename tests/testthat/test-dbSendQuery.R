@@ -1,5 +1,3 @@
-context("dbSendQuery")
-
 bind_select_setup <- function() {
   con <- dbConnect(SQLite())
 

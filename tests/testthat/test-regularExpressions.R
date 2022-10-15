@@ -1,5 +1,3 @@
-context("regexp")
-
 test_that("adding support for regular expressions (#296)", {
   con <- dbConnect(
     SQLite()

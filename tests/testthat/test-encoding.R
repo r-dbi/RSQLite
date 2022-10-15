@@ -1,5 +1,3 @@
-context("encoding")
-
 test_that("write tables whose colnames or contents are BIG5 encoded (#277)", {
   skip_on_os("linux")
   skip_on_os("mac")

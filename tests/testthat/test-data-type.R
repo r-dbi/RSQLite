@@ -1,5 +1,3 @@
-context("Data type convertion")
-
 sqliteDataType <- function(x) {
   dbDataType(SQLite(), x)
 }

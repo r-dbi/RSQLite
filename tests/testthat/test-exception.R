@@ -1,5 +1,3 @@
-context("exception")
-
 test_that("no exception upon start", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)

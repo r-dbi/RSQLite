@@ -48,6 +48,16 @@ test_that("connect_can_connect", {
   #' This object is used to communicate with the database engine.
 })
 
+test_that("connect_format", {
+  #'
+  #' A [format()] method is defined for the connection object.
+  desc <- format(con)
+  #' It returns a string that consists of a single line of text.
+  expect_type(desc, "character")
+  expect_length(desc, 1)
+  expect_false(grepl("\n", desc, fixed = TRUE))
+})
+
 test_that("connect_bigint_integer", {
   #' - `"integer"`: always return as `integer`, silently overflow
   con <- local_connection(ctx, bigint = "integer")

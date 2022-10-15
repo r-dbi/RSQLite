@@ -7,7 +7,7 @@ test_that("package_dependencies", {
   pkg_path <- get_pkg_path(ctx)
 
   pkg_deps_df <- desc::desc_get_deps(pkg_path)
-  pkg_imports <- pkg_deps_df[pkg_deps_df[["type"]] == "Imports", ][["package"]]
+  pkg_imports <- pkg_deps_df$package[pkg_deps_df$type == "Imports"]
 
   #' which imports the \pkg{DBI}
   expect_true("DBI" %in% pkg_imports)

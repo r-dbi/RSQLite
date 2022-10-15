@@ -2,11 +2,9 @@ test_that("write tables whose colnames or contents are BIG5 encoded (#277)", {
   skip_on_os("linux")
   skip_on_os("mac")
   skip_on_os("solaris")
-  .loc <- Sys.getlocale("LC_COLLATE")
-  Sys.setlocale(locale = "cht")
-  con <- dbConnect(SQLite())
-  on.exit({
-    Sys.setlocale(locale = .loc)
+
+  withr::local_collate("cht")
+  withr::defer({
     dbDisconnect(con)
   })
 
@@ -39,7 +37,7 @@ test_that("write tables whose colnames and contents are UTF-8 encoded (#277)", {
     withr::local_collate("zh_TW.UTF-8")
   }
   con <- dbConnect(SQLite())
-  on.exit({
+  withr::defer({
     dbDisconnect(con)
   })
 
@@ -76,7 +74,7 @@ test_that("list the field of tables whose colnames are BIG5 encoded (#277)", {
     withr::local_collate("zh_TW.UTF-8")
   }
   con <- dbConnect(SQLite())
-  on.exit({
+  withr::defer({
     dbDisconnect(con)
   })
 
@@ -106,7 +104,7 @@ test_that("list the field of tables whose colnames are UTF-8 encoded (#277)", {
     withr::local_collate("zh_TW.UTF-8")
   }
   con <- dbConnect(SQLite())
-  on.exit({
+  withr::defer({
     dbDisconnect(con)
   })
 
@@ -137,7 +135,7 @@ test_that("append tables whose colnames are UTF-8 encoded (#277)", {
     withr::local_collate("zh_TW.UTF-8")
   }
   con <- dbConnect(SQLite())
-  on.exit({
+  withr::defer({
     dbDisconnect(con)
   })
 

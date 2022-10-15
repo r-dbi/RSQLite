@@ -2,6 +2,8 @@
 
 ctx <- get_default_context()
 
+con <- local_connection(ctx)
+
 test_that("package_dependencies", {
   #' A DBI backend is an R package
   pkg_path <- get_pkg_path(ctx)

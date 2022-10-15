@@ -2,6 +2,8 @@
 
 ctx <- get_default_context()
 
+con <- local_connection(ctx)
+
 test_that("compliance", {
   key_methods <- get_key_methods()
   expect_identical(names(key_methods), c("Driver", "Connection", "Result"))

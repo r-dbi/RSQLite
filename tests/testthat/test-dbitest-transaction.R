@@ -2,6 +2,8 @@
 
 ctx <- get_default_context()
 
+con <- local_connection(ctx)
+
 test_that("begin_formals", {
   # <establish formals of described functions>
   expect_equal(names(formals(dbBegin)), c("conn", "..."))
@@ -93,11 +95,14 @@ test_that("with_transaction_formals", {
 })
 
 test_that("with_transaction_return_value", {
+  #' @return
+  #' `dbWithTransaction()` returns the value of the executed code.
   name <- random_table_name()
   expect_identical(dbWithTransaction(con, name), name)
 })
 
 test_that("with_transaction_error_nested", {
+  #' of if [dbBegin()] has been called already)
   dbBegin(con)
   #' gives an error.
   expect_error(dbWithTransaction(con, NULL))
@@ -105,6 +110,7 @@ test_that("with_transaction_error_nested", {
 })
 
 test_that("with_transaction_side_effects", {
+  #' All side effects caused by the code
   expect_false(exists("a", inherits = FALSE))
   #' (such as the creation of new variables)
   dbWithTransaction(con, a <- 42)

@@ -2,6 +2,8 @@
 
 ctx <- get_default_context()
 
+con <- local_connection(ctx)
+
 test_that("constructor", {
   pkg_name <- package_name(ctx)
   default_constructor_name <- gsub("^R", "", pkg_name)
@@ -41,6 +43,7 @@ test_that("connect_formals", {
 })
 
 test_that("connect_can_connect", {
+  #' @return
   con <- expect_visible(connect(ctx))
   #' `dbConnect()` returns an S4 object that inherits from [DBIConnection-class].
   expect_s4_class(con, "DBIConnection")
@@ -59,6 +62,8 @@ test_that("connect_format", {
 })
 
 test_that("connect_bigint_integer", {
+  #' In addition, DBI supports the `bigint` argument that governs how
+  #' 64-bit integer data is returned.  The following values are supported:
   #' - `"integer"`: always return as `integer`, silently overflow
   con <- local_connection(ctx, bigint = "integer")
   res <- dbGetQuery(con, "SELECT 10000000000")

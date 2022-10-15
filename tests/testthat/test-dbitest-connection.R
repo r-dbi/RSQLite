@@ -2,12 +2,15 @@
 
 ctx <- get_default_context()
 
+con <- local_connection(ctx)
+
 test_that("disconnect_formals", {
   # <establish formals of described functions>
   expect_equal(names(formals(dbDisconnect)), c("conn", "..."))
 })
 
 test_that("can_disconnect", {
+  #' @return
   con <- connect(ctx)
   #' `dbDisconnect()` returns `TRUE`, invisibly.
   expect_invisible_true(dbDisconnect(con))

@@ -2,12 +2,16 @@
 
 ctx <- get_default_context()
 
+con <- local_connection(ctx)
+
 test_that("send_query_formals", {
   # <establish formals of described functions>
   expect_equal(names(formals(dbSendQuery)), c("conn", "statement", "..."))
 })
 
 test_that("send_query_trivial", {
+  #' @return
+  #' `dbSendQuery()` returns
   res <- expect_visible(dbSendQuery(con, trivial_query()))
   #' an S4 object that inherits from [DBIResult-class].
   expect_s4_class(res, "DBIResult")
@@ -19,17 +23,20 @@ test_that("send_query_trivial", {
 })
 
 test_that("send_query_non_string", {
+  #' or if the query is not a non-`NA` string.
   expect_error(dbSendQuery(con, character()))
   expect_error(dbSendQuery(con, letters))
   expect_error(dbSendQuery(con, NA_character_))
 })
 
 test_that("send_query_syntax_error", {
+  #' @section Failure modes:
   expect_error(dbSendQuery(con, "SELLECT", params = list()))
   expect_error(dbSendQuery(con, "SELLECT", immediate = TRUE))
 })
 
 test_that("send_query_result_valid", {
+  #' @section Specification:
   #' No warnings occur under normal conditions.
   expect_warning(res <- dbSendQuery(con, trivial_query()), NA)
   #' When done, the DBIResult object must be cleared with a call to
@@ -49,6 +56,7 @@ test_that("send_query_stale_warning", {
 })
 
 test_that("send_query_only_one_result_set", {
+  #' If the backend supports only one open result set per connection,
   res1 <- dbSendQuery(con, trivial_query())
   #' issuing a second query invalidates an already open result set
   #' and raises a warning.
@@ -80,6 +88,11 @@ test_that("fetch_formals", {
 })
 
 test_that("fetch_atomic", {
+  #' @return
+  #' `dbFetch()` always returns a [data.frame]
+  #' with as many rows as records were fetched and as many
+  #' columns as fields in the result set,
+  #' even if the result is a single value
   query <- trivial_query()
   res <- local_result(dbSendQuery(con, query))
   rows <- check_df(dbFetch(res))
@@ -87,6 +100,7 @@ test_that("fetch_atomic", {
 })
 
 test_that("fetch_one_row", {
+  #' or has one
   query <- trivial_query(3, letters[1:3])
   result <- trivial_df(3, letters[1:3])
   res <- local_result(dbSendQuery(con, query))
@@ -95,6 +109,7 @@ test_that("fetch_one_row", {
 })
 
 test_that("fetch_zero_rows", {
+  #' or zero rows.
   query <-
     "SELECT * FROM (SELECT 1 as a, 2 as b, 3 as c) AS x WHERE (1 = 0)"
   res <- local_result(dbSendQuery(con, query))
@@ -103,6 +118,8 @@ test_that("fetch_zero_rows", {
 })
 
 test_that("fetch_closed", {
+  #' @section Failure modes:
+  #' An attempt to fetch from a closed result set raises an error.
   query <- trivial_query()
 
   res <- dbSendQuery(con, query)
@@ -112,6 +129,8 @@ test_that("fetch_closed", {
 })
 
 test_that("fetch_n_bad", {
+  #' If the `n` argument is not an atomic whole number
+  #' greater or equal to -1 or Inf, an error is raised,
   query <- trivial_query()
   res <- local_result(dbSendQuery(con, query))
   expect_error(dbFetch(res, -2))
@@ -122,6 +141,7 @@ test_that("fetch_n_bad", {
 })
 
 test_that("fetch_n_good_after_bad", {
+  #' but a subsequent call to `dbFetch()` with proper `n` argument succeeds.
   query <- trivial_query()
   res <- local_result(dbSendQuery(con, query))
   expect_error(dbFetch(res, NA_integer_))
@@ -130,6 +150,8 @@ test_that("fetch_n_good_after_bad", {
 })
 
 test_that("fetch_multi_row_single_column", {
+  #' @section Specification:
+  #' Fetching multi-row queries with one
   query <- trivial_query(3, .ctx = ctx, .order_by = "a")
   result <- trivial_df(3)
 
@@ -139,7 +161,8 @@ test_that("fetch_multi_row_single_column", {
 })
 
 test_that("fetch_multi_row_multi_column", {
-  query <- union(
+  #' or more columns by default returns the entire result.
+  query <- sql_union(
     .ctx = ctx, paste("SELECT", 1:5 + 0.5, "AS a,", 4:0 + 0.5, "AS b"), .order_by = "a"
   )
 
@@ -149,6 +172,7 @@ test_that("fetch_multi_row_multi_column", {
 })
 
 test_that("fetch_n_progressive", {
+  #' Multi-row queries can also be fetched progressively
   query <- trivial_query(25, .ctx = ctx, .order_by = "a")
   result <- trivial_df(25)
 
@@ -167,6 +191,8 @@ test_that("fetch_n_progressive", {
 })
 
 test_that("fetch_n_multi_row_inf", {
+  #' A value of [Inf] for the `n` argument is supported
+  #' and also returns the full result.
   query <- trivial_query(3, .ctx = ctx, .order_by = "a")
   result <- trivial_df(3)
 
@@ -176,6 +202,8 @@ test_that("fetch_n_multi_row_inf", {
 })
 
 test_that("fetch_n_more_rows", {
+  #' If more rows than available are fetched, the result is returned in full
+  #' without warning.
   query <- trivial_query(3, .ctx = ctx, .order_by = "a")
   result <- trivial_df(3)
 
@@ -189,6 +217,8 @@ test_that("fetch_n_more_rows", {
 })
 
 test_that("fetch_n_zero_rows", {
+  #' If zero rows are fetched, the columns of the data frame are still fully
+  #' typed.
   query <- trivial_query(3, .ctx = ctx, .order_by = "a")
   result <- trivial_df(0)
 
@@ -198,6 +228,8 @@ test_that("fetch_n_zero_rows", {
 })
 
 test_that("fetch_n_premature_close", {
+  #' Fetching fewer rows than available is permitted,
+  #' no warning is issued when clearing the result set.
   query <- trivial_query(3, .ctx = ctx, .order_by = "a")
   result <- trivial_df(2)
 
@@ -207,6 +239,7 @@ test_that("fetch_n_premature_close", {
 })
 
 test_that("fetch_row_names", {
+  #' A column named `row_names` is treated like any other column.
   query <- trivial_query(column = "row_names")
   result <- trivial_df(column = "row_names")
 
@@ -222,11 +255,16 @@ test_that("clear_result_formals", {
 })
 
 test_that("clear_result_return_query", {
+  #' @return
+  #' `dbClearResult()` returns `TRUE`, invisibly, for result sets obtained from
+  #' both `dbSendQuery()`
   res <- dbSendQuery(con, trivial_query())
   expect_invisible_true(dbClearResult(res))
 })
 
 test_that("cannot_clear_result_twice_query", {
+  #' @section Failure modes:
+  #' An attempt to close an already closed result set issues a warning
   res <- dbSendQuery(con, trivial_query())
   dbClearResult(res)
   expect_warning(expect_invisible_true(dbClearResult(res)))
@@ -238,6 +276,11 @@ test_that("get_query_formals", {
 })
 
 test_that("get_query_atomic", {
+  #' @return
+  #' `dbGetQuery()` always returns a [data.frame]
+  #' with as many rows as records were fetched and as many
+  #' columns as fields in the result set,
+  #' even if the result is a single value
   query <- trivial_query()
 
   rows <- check_df(dbGetQuery(con, query))
@@ -245,6 +288,7 @@ test_that("get_query_atomic", {
 })
 
 test_that("get_query_one_row", {
+  #' or has one
   query <- trivial_query(3, letters[1:3])
   result <- trivial_df(3, letters[1:3])
 
@@ -253,6 +297,7 @@ test_that("get_query_one_row", {
 })
 
 test_that("get_query_zero_rows", {
+  #' or zero rows.
   # Not all SQL dialects seem to support the query used here.
   query <-
     "SELECT * FROM (SELECT 1 as a, 2 as b, 3 as c) AS x WHERE (1 = 0)"
@@ -263,16 +308,20 @@ test_that("get_query_zero_rows", {
 })
 
 test_that("get_query_syntax_error", {
+  #' if the syntax of the query is invalid,
   expect_error(dbGetQuery(con, "SELLECT"))
 })
 
 test_that("get_query_non_string", {
+  #' or if the query is not a non-`NA` string.
   expect_error(dbGetQuery(con, character()))
   expect_error(dbGetQuery(con, letters))
   expect_error(dbGetQuery(con, NA_character_))
 })
 
 test_that("get_query_n_bad", {
+  #' If the `n` argument is not an atomic whole number
+  #' greater or equal to -1 or Inf, an error is raised,
   query <- trivial_query()
   expect_error(dbGetQuery(con, query, n = -2))
   expect_error(dbGetQuery(con, query, n = 1.5))
@@ -282,6 +331,7 @@ test_that("get_query_n_bad", {
 })
 
 test_that("get_query_good_after_bad_n", {
+  #' but a subsequent call to `dbGetQuery()` with proper `n` argument succeeds.
   query <- trivial_query()
   expect_error(dbGetQuery(con, query, n = NA_integer_))
   rows <- check_df(dbGetQuery(con, query))
@@ -289,6 +339,7 @@ test_that("get_query_good_after_bad_n", {
 })
 
 test_that("get_query_row_names", {
+  #' A column named `row_names` is treated like any other column.
   query <- trivial_query(column = "row_names")
   result <- trivial_df(column = "row_names")
 
@@ -298,6 +349,8 @@ test_that("get_query_row_names", {
 })
 
 test_that("get_query_multi_row_single_column", {
+  #' The `n` argument specifies the number of rows to be fetched.
+  #' If omitted, fetching multi-row queries with one
   query <- trivial_query(3, .ctx = ctx, .order_by = "a")
   result <- trivial_df(3)
 
@@ -306,7 +359,8 @@ test_that("get_query_multi_row_single_column", {
 })
 
 test_that("get_query_multi_row_multi_column", {
-  query <- union(
+  #' or more columns returns the entire result.
+  query <- sql_union(
     .ctx = ctx, paste("SELECT", 1:5 + 0.5, "AS a,", 4:0 + 0.5, "AS b"), .order_by = "a"
   )
 
@@ -315,6 +369,8 @@ test_that("get_query_multi_row_multi_column", {
 })
 
 test_that("get_query_n_multi_row_inf", {
+  #' A value of [Inf] for the `n` argument is supported
+  #' and also returns the full result.
   query <- trivial_query(3, .ctx = ctx, .order_by = "a")
   result <- trivial_df(3)
 
@@ -323,6 +379,8 @@ test_that("get_query_n_multi_row_inf", {
 })
 
 test_that("get_query_n_more_rows", {
+  #' If more rows than available are fetched (by passing a too large value for
+  #' `n`), the result is returned in full without warning.
   query <- trivial_query(3, .ctx = ctx, .order_by = "a")
   result <- trivial_df(3)
 
@@ -331,6 +389,8 @@ test_that("get_query_n_more_rows", {
 })
 
 test_that("get_query_n_zero_rows", {
+  #' If zero rows are requested, the columns of the data frame are still fully
+  #' typed.
   query <- trivial_query(3, .ctx = ctx, .order_by = "a")
   result <- trivial_df(0)
 
@@ -339,6 +399,8 @@ test_that("get_query_n_zero_rows", {
 })
 
 test_that("get_query_n_incomplete", {
+  #' Fetching fewer rows than available is permitted,
+  #' no warning is issued.
   query <- trivial_query(3, .ctx = ctx, .order_by = "a")
   result <- trivial_df(2)
 
@@ -364,12 +426,14 @@ test_that("send_statement_formals", {
 })
 
 test_that("send_statement_non_string", {
+  #' or if the statement is not a non-`NA` string.
   expect_error(dbSendStatement(con, character()))
   expect_error(dbSendStatement(con, letters))
   expect_error(dbSendStatement(con, NA_character_))
 })
 
 test_that("send_statement_syntax_error", {
+  #' @section Failure modes:
   expect_error(dbSendStatement(con, "CREATTE", params = list()))
   expect_error(dbSendStatement(con, "CREATTE", immediate = TRUE))
 })
@@ -407,10 +471,12 @@ test_that("execute_formals", {
 })
 
 test_that("execute_syntax_error", {
+  #' if the syntax of the statement is invalid,
   expect_error(dbExecute(con, "CREATTE"))
 })
 
 test_that("execute_non_string", {
+  #' or if the statement is not a non-`NA` string.
   expect_error(dbExecute(con, character()))
   expect_error(dbExecute(con, letters))
   expect_error(dbExecute(con, NA_character_))
@@ -453,16 +519,21 @@ test_that("data_type_create_table", {
 })
 
 test_that("data_integer", {
+  #' @section Specification:
+  #' The column types of the returned data frame depend on the data returned:
+  #' - [integer] (or coercible to an integer) for integer values between -2^31 and 2^31 - 1,
   #' with [NA] for SQL `NULL` values
   test_select_with_null(.ctx = ctx, con, 1L ~ equals_one, -100L ~ equals_minus_100)
 })
 
 test_that("data_numeric", {
+  #' - [numeric] for numbers with a fractional component,
   #' with NA for SQL `NULL` values
   test_select_with_null(.ctx = ctx, con, 1.5, -100.5)
 })
 
 test_that("data_logical", {
+  #' - [logical] for Boolean values (some backends may return an integer);
   int_values <- 1:0
   values <- ctx$tweaks$logical_return(as.logical(int_values))
 
@@ -473,7 +544,8 @@ test_that("data_logical", {
 })
 
 test_that("data_character", {
-  values <- texts
+  #' - [character] for text,
+  values <- get_texts()
   test_funs <- rep(list(has_utf8_or_ascii_encoding), length(values))
   sql_names <- as.character(dbQuoteString(con, values))
 
@@ -486,21 +558,28 @@ test_that("data_raw", {
   if (isTRUE(`$`(`$`(ctx, tweaks), omit_blob_tests))) {
     skip("tweak: omit_blob_tests")
   }
+  is_raw_list <- function(x) {
+    is.list(x) && is.raw(x[[1L]])
+  }
   values <- list(is_raw_list)
-  sql_names <- `$`(`$`(ctx, tweaks), blob_cast)(quote_literal(con, list(raw(1))))
+  sql_names <- `$`(`$`(ctx, tweaks), blob_cast)(`::`(DBI, dbQuoteLiteral)(con, list(raw(1))))
   test_select_with_null(.ctx = ctx, con, .dots = setNames(values, sql_names))
 })
 
 test_that("data_date", {
+  as_date_equals_to <- function(x) {
+    lapply(x, function(xx) {
+      function(value) as.Date(value) == xx
+    })
+  }
   char_values <- paste0("2015-01-", sprintf("%.2d", 1:12))
   values <- as_date_equals_to(as.Date(char_values))
-  sql_names <- ctx$tweaks$date_cast(char_values)
-
-  #' with NA for SQL `NULL` values
+  sql_names <- `$`(`$`(ctx, tweaks), date_cast)(char_values)
   test_select_with_null(.ctx = ctx, con, .dots = setNames(values, sql_names))
 })
 
 test_that("data_date_current", {
+  #'   (also applies to the return value of the SQL function `current_date`)
   test_select_with_null(
     .ctx = ctx, con,
     "current_date" ~ is_roughly_current_date
@@ -508,15 +587,19 @@ test_that("data_date_current", {
 })
 
 test_that("data_time", {
+  as_hms_equals_to <- function(x) {
+    lapply(x, function(xx) {
+      function(value) `::`(hms, as_hms)(value) == xx
+    })
+  }
   char_values <- c("00:00:00", "12:34:56")
-  time_values <- as_hms_equals_to(hms::as_hms(char_values))
-  sql_names <- ctx$tweaks$time_cast(char_values)
-
-  #' with NA for SQL `NULL` values
+  time_values <- as_hms_equals_to(`::`(hms, as_hms)(char_values))
+  sql_names <- `$`(`$`(ctx, tweaks), time_cast)(char_values)
   test_select_with_null(.ctx = ctx, con, .dots = setNames(time_values, sql_names))
 })
 
 test_that("data_time_current", {
+  #'   (also applies to the return value of the SQL function `current_time`)
   test_select_with_null(
     .ctx = ctx, con,
     "current_time" ~ coercible_to_time
@@ -524,19 +607,25 @@ test_that("data_time_current", {
 })
 
 test_that("data_timestamp", {
+  coercible_to_timestamp <- function(x) {
+    x_timestamp <- try_silent(as.POSIXct(x))
+    !is.null(x_timestamp) && all(is.na(x) == is.na(x_timestamp))
+  }
   char_values <- c("2015-10-11 00:00:00", "2015-10-11 12:34:56")
   time_values <- rep(list(coercible_to_timestamp), 2L)
-  sql_names <- ctx$tweaks$timestamp_cast(char_values)
-
-  #' with NA for SQL `NULL` values
+  sql_names <- `$`(`$`(ctx, tweaks), timestamp_cast)(char_values)
   test_select_with_null(.ctx = ctx, con, .dots = setNames(time_values, sql_names))
 })
 
 test_that("data_timestamp_current", {
-  test_select_with_null(
-    .ctx = ctx, con,
-    "current_timestamp" ~ is_roughly_current_timestamp
-  )
+  coercible_to_timestamp <- function(x) {
+    x_timestamp <- try_silent(as.POSIXct(x))
+    !is.null(x_timestamp) && all(is.na(x) == is.na(x_timestamp))
+  }
+  is_roughly_current_timestamp <- function(x) {
+    coercible_to_timestamp(x) && (Sys.time() - as.POSIXct(x, tz = "UTC") <= `::`(hms, hms)(2))
+  }
+  test_select_with_null(.ctx = ctx, con, "current_timestamp" ~ is_roughly_current_timestamp)
 })
 
 test_that("data_date_typed", {
@@ -574,17 +663,28 @@ test_that("data_timestamp_current_typed", {
 })
 
 test_that("data_64_bit_numeric", {
+  as_numeric_identical_to <- function(x) {
+    lapply(x, function(xx) {
+      function(value) as.numeric(value) == xx
+    })
+  }
   char_values <- c("10000000000", "-10000000000")
   test_values <- as_numeric_identical_to(as.numeric(char_values))
-
   test_select_with_null(.ctx = ctx, con, .dots = setNames(test_values, char_values))
 })
 
 test_that("data_64_bit_numeric_warning", {
+  as_numeric_equals_to <- function(x) {
+    lapply(
+      x,
+      function(xx) {
+        function(value) isTRUE(all.equal(as.numeric(value), xx))
+      }
+    )
+  }
   char_values <- c(" 1234567890123456789", "-1234567890123456789")
   num_values <- as.numeric(char_values)
   test_values <- as_numeric_equals_to(num_values)
-
   suppressWarnings(
     expect_warning(
       test_select(.ctx = ctx, con, .dots = setNames(test_values, char_values), .add_null = "none")
@@ -603,8 +703,12 @@ test_that("data_64_bit_numeric_warning", {
 })
 
 test_that("data_64_bit_lossless", {
+  as_character_equals_to <- function(x) {
+    lapply(x, function(xx) {
+      function(value) as.character(value) == xx
+    })
+  }
   char_values <- c("1234567890123456789", "-1234567890123456789")
   test_values <- as_character_equals_to(char_values)
-
   test_select_with_null(.ctx = ctx, con, .dots = setNames(test_values, char_values))
 })

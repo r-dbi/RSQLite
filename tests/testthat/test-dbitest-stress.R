@@ -2,6 +2,8 @@
 
 ctx <- get_default_context()
 
+con <- local_connection(ctx)
+
 test_that("simultaneous_connections", {
   cons <- list()
   on.exit(try_silent(lapply(cons, dbDisconnect)), add = TRUE)

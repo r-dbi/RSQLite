@@ -2,6 +2,8 @@
 
 ctx <- get_default_context()
 
+con <- local_connection(ctx)
+
 test_that("bind_formals", {
   # <establish formals of described functions>
   expect_equal(names(formals(dbBind)), c("res", "params", "..."))
@@ -19,6 +21,7 @@ test_that("bind_return_value", {
 })
 
 test_that("bind_empty", {
+  #' @section Failure modes:
   #' Calling `dbBind()` for a query without parameters
   res <- local_result(dbSendQuery(con, trivial_query()))
   #' raises an error.
@@ -118,6 +121,8 @@ test_that("bind_premature_clear", {
 })
 
 test_that("bind_multi_row", {
+  #' @section Specification:
+  #' The elements of the `params` argument do not need to be scalars,
   #' vectors of arbitrary length
   test_select_bind(con, ctx, list(1:3))
 })
@@ -160,32 +165,39 @@ test_that("bind_named_param_shuffle", {
 })
 
 test_that("bind_integer", {
+  #' At least the following data types are accepted on input (including [NA]):
+  #' - [integer]
   test_select_bind(con, ctx, c(1:3, NA))
 })
 
 test_that("bind_numeric", {
+  #' - [numeric]
   test_select_bind(con, ctx, c(1:3 + 0.5, NA))
 })
 
 test_that("bind_logical", {
+  #' - [logical] for Boolean values
   test_select_bind(con, ctx, c(TRUE, FALSE, NA))
 })
 
 test_that("bind_character", {
-  test_select_bind(con, ctx, c(texts, NA))
+  #' - [character]
+  test_select_bind(con, ctx, c(get_texts(), NA))
 })
 
 test_that("bind_character_escape", {
+  #'   (also with special characters such as spaces, newlines, quotes, and backslashes)
   test_select_bind(con, ctx, c(" ", "\n", "\r", "\b", "'", '"', "[", "]", "\\", NA))
 })
 
 test_that("bind_factor", {
+  #' - [factor] (bound as character,
   #' with warning)
   suppressWarnings(expect_warning(
     test_select_bind(
       con,
       ctx,
-      lapply(c(texts, NA_character_), factor)
+      lapply(c(get_texts(), NA_character_), factor)
     )
   ))
 })
@@ -269,6 +281,10 @@ test_that("is_valid_formals", {
 })
 
 test_that("is_valid_connection", {
+  #' @return
+  #' `dbIsValid()` returns a logical scalar,
+  #' `TRUE` if the object specified by `dbObj` is valid,
+  #' `FALSE` otherwise.
   con <- connect(ctx)
   #' A [DBIConnection-class] object is initially valid,
   expect_true(expect_visible(dbIsValid(con)))
@@ -298,6 +314,8 @@ test_that("has_completed_formals", {
 })
 
 test_that("has_completed_query", {
+  #' @return
+  #' `dbHasCompleted()` returns a logical scalar.
   #' For a query initiated by [dbSendQuery()] with non-empty result set,
   res <- local_result(dbSendQuery(con, trivial_query()))
   #' `dbHasCompleted()` returns `FALSE` initially
@@ -308,6 +326,7 @@ test_that("has_completed_query", {
 })
 
 test_that("has_completed_error", {
+  #' @section Failure modes:
   res <- dbSendQuery(con, trivial_query())
   dbClearResult(res)
   #' Attempting to query completion status for a result set cleared with
@@ -316,6 +335,7 @@ test_that("has_completed_error", {
 })
 
 test_that("has_completed_query_spec", {
+  #' @section Specification:
   #' The completion status for a query is only guaranteed to be set to
   #' `FALSE` after attempting to fetch past the end of the entire result.
   #' Therefore, for a query with an empty result set,
@@ -327,6 +347,7 @@ test_that("has_completed_query_spec", {
 })
 
 test_that("has_completed_query_spec_partial", {
+  #' @section Specification:
   #' Similarly, for a query with a result set of length n,
   res <- local_result(dbSendQuery(con, trivial_query()))
   #' the return value is unspecified after fetching n rows,
@@ -343,6 +364,8 @@ test_that("get_statement_formals", {
 })
 
 test_that("get_statement_query", {
+  #' @return
+  #' `dbGetStatement()` returns a string, the query used in
   query <- trivial_query()
   #' either [dbSendQuery()]
   res <- local_result(dbSendQuery(con, query))
@@ -352,6 +375,7 @@ test_that("get_statement_query", {
 })
 
 test_that("get_statement_error", {
+  #' @section Failure modes:
   res <- dbSendQuery(con, trivial_query())
   dbClearResult(res)
   #' Attempting to query the statement for a result set cleared with
@@ -365,6 +389,8 @@ test_that("column_info_formals", {
 })
 
 test_that("column_info_closed", {
+  #' @section Failure modes:
+  #' An attempt to query columns for a closed result set raises an error.
   query <- trivial_query()
 
   res <- dbSendQuery(con, query)
@@ -410,6 +436,9 @@ test_that("get_row_count_formals", {
 })
 
 test_that("row_count_query", {
+  #' @return
+  #' `dbGetRowCount()` returns a scalar number (integer or numeric),
+  #' the number of rows fetched so far.
   query <- trivial_query()
   #' After calling [dbSendQuery()],
   res <- local_result(dbSendQuery(con, query))
@@ -424,7 +453,7 @@ test_that("row_count_query", {
 })
 
 test_that("row_count_query_limited", {
-  query <- union(.ctx = ctx, trivial_query(), "SELECT 2", "SELECT 3")
+  query <- sql_union(.ctx = ctx, trivial_query(), "SELECT 2", "SELECT 3")
   res <- local_result(dbSendQuery(con, query))
   rc1 <- dbGetRowCount(res)
   expect_equal(rc1, 0L)
@@ -441,7 +470,7 @@ test_that("row_count_query_limited", {
 
 test_that("row_count_query_empty", {
   #' For queries with an empty result set,
-  query <- union(
+  query <- sql_union(
     .ctx = ctx, "SELECT * FROM (SELECT 1 as a) a WHERE (0 = 1)"
   )
   res <- local_result(dbSendQuery(con, query))
@@ -455,6 +484,7 @@ test_that("row_count_query_empty", {
 })
 
 test_that("get_row_count_error", {
+  #' @section Failure modes:
   res <- dbSendQuery(con, trivial_query())
   dbClearResult(res)
   #' Attempting to get the row count for a result set cleared with

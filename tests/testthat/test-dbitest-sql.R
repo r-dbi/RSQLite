@@ -2,12 +2,15 @@
 
 ctx <- get_default_context()
 
+con <- local_connection(ctx)
+
 test_that("quote_string_formals", {
   # <establish formals of described functions>
   expect_equal(names(formals(dbQuoteString)), c("conn", "x", "..."))
 })
 
 test_that("quote_string_return", {
+  #' @return
   #' `dbQuoteString()` returns an object that can be coerced to [character],
   simple <- "simple"
   simple_out <- dbQuoteString(con, simple)
@@ -58,6 +61,10 @@ test_that("quote_string_roundtrip", {
     expect_equal(nrow(x_out), 1L)
     expect_identical(unlist(unname(x_out)), x)
   }
+  expand_char <- function(...) {
+    df <- expand.grid(..., stringsAsFactors = FALSE)
+    do.call(paste0, df)
+  }
   test_chars <- c("", " ", "\t", "'", "\"", "`", "\n")
   test_strings_0 <- expand_char(test_chars, "a", test_chars, "b", test_chars)
   test_strings_1 <- as.character(dbQuoteString(con, test_strings_0))
@@ -100,6 +107,7 @@ test_that("quote_string_na_is_null", {
 })
 
 test_that("quote_string_error", {
+  #' @section Failure modes:
   #'
   #' Passing a numeric,
   expect_error(dbQuoteString(con, c(1, 2, 3)))
@@ -120,6 +128,7 @@ test_that("quote_literal_formals", {
 })
 
 test_that("quote_literal_return", {
+  #' @return
   #' `dbQuoteLiteral()` returns an object that can be coerced to [character],
   simple <- "simple"
   simple_out <- dbQuoteLiteral(con, simple)
@@ -222,6 +231,7 @@ test_that("quote_literal_na_is_null", {
 })
 
 test_that("quote_literal_error", {
+  #' @section Failure modes:
   #'
   #' Passing a list
   expect_error(dbQuoteString(con, as.list(1:3)))
@@ -234,6 +244,7 @@ test_that("quote_identifier_formals", {
 })
 
 test_that("quote_identifier_return", {
+  #' @return
   #' `dbQuoteIdentifier()` returns an object that can be coerced to [character],
   simple_out <- dbQuoteIdentifier(con, "simple")
   expect_error(as.character(simple_out), NA)
@@ -278,6 +289,7 @@ test_that("quote_identifier_vectorized", {
 })
 
 test_that("quote_identifier_error", {
+  #' @section Failure modes:
   #'
   #' An error is raised if the input contains `NA`,
   expect_error(dbQuoteIdentifier(con, NA))
@@ -288,6 +300,9 @@ test_that("quote_identifier_error", {
 })
 
 test_that("quote_identifier", {
+  #' @section Specification:
+  #' Calling [dbGetQuery()] for a query of the format `SELECT 1 AS ...`
+  #' returns a data frame with the identifier, unquoted, as column name.
   #' Quoted identifiers can be used as table and column names in SQL queries,
   simple <- dbQuoteIdentifier(con, "simple")
 
@@ -304,6 +319,8 @@ test_that("quote_identifier", {
 })
 
 test_that("quote_identifier_string", {
+  #' The method must use a quoting mechanism that is unambiguously different
+  #' from the quoting mechanism used for strings, so that a query like
   #' `SELECT ... FROM (SELECT 1 AS ...)`
   query <- paste0(
     "SELECT ", dbQuoteIdentifier(con, "b"), " FROM (",
@@ -348,6 +365,7 @@ test_that("unquote_identifier_formals", {
 })
 
 test_that("unquote_identifier_return", {
+  #' @return
   #' `dbUnquoteIdentifier()` returns a list of objects
   simple_in <- dbQuoteIdentifier(con, "simple")
   simple_out <- dbUnquoteIdentifier(con, simple_in)
@@ -391,6 +409,7 @@ test_that("unquote_identifier_vectorized", {
 })
 
 test_that("unquote_identifier_error", {
+  #' @section Failure modes:
   #'
   #' An error is raised if plain character vectors are passed as the `x`
   #' argument.
@@ -400,6 +419,9 @@ test_that("unquote_identifier_error", {
 })
 
 test_that("unquote_identifier_roundtrip", {
+  #' @section Specification:
+  #' For any character vector of length one, quoting (with [dbQuoteIdentifier()])
+  #' then unquoting then quoting the first element is identical to just quoting.
   simple_in <- dbQuoteIdentifier(con, "simple")
   simple_out <- dbUnquoteIdentifier(con, simple_in)
   simple_roundtrip <- dbQuoteIdentifier(con, simple_out[[1]])
@@ -445,6 +467,9 @@ test_that("unquote_identifier_special", {
 })
 
 test_that("unquote_identifier_simple", {
+  #' Unquoting simple strings (consisting of only letters) wrapped with [SQL()]
+  #' and then quoting via [dbQuoteIdentifier()] gives the same result as just
+  #' quoting the string.
   simple_in <- "simple"
   simple_quoted <- dbQuoteIdentifier(con, simple_in)
   simple_out <- dbUnquoteIdentifier(con, SQL(simple_in))
@@ -453,6 +478,9 @@ test_that("unquote_identifier_simple", {
 })
 
 test_that("unquote_identifier_table_schema", {
+  #' Similarly, unquoting expressions of the form `SQL("schema.table")`
+  #' and then quoting gives the same result as quoting the identifier
+  #' constructed by `Id(schema = "schema", table = "table")`.
   schema_in <- "schema"
   table_in <- "table"
   simple_quoted <- dbQuoteIdentifier(con, Id(schema = schema_in, table = table_in))
@@ -550,6 +578,7 @@ test_that("create_table_visible_in_other_connection", {
 })
 
 test_that("create_roundtrip_keywords", {
+  #' SQL keywords can be used freely in table names, column names, and data.
   tbl_in <- data.frame(
     select = "unique", from = "join", where = "order",
     stringsAsFactors = FALSE
@@ -575,6 +604,8 @@ test_that("append_table_formals", {
 })
 
 test_that("append_roundtrip_keywords", {
+  #' @section Specification:
+  #' SQL keywords can be used freely in table names, column names, and data.
   tbl_in <- data.frame(
     select = "unique", from = "join", where = "order",
     stringsAsFactors = FALSE
@@ -603,17 +634,22 @@ test_that("append_roundtrip_quotes_column_names", {
 })
 
 test_that("append_roundtrip_integer", {
+  #' The following data types must be supported at least,
+  #' and be read identically with [dbReadTable()]:
+  #' - integer
   tbl_in <- data.frame(a = c(1:5))
   test_table_roundtrip(use_append = TRUE, con, tbl_in)
 })
 
 test_that("append_roundtrip_numeric", {
+  #' - numeric
   tbl_in <- data.frame(a = c(seq(1, 3, by = 0.5)))
   test_table_roundtrip(use_append = TRUE, con, tbl_in)
   #'   (the behavior for `Inf` and `NaN` is not specified)
 })
 
 test_that("append_roundtrip_logical", {
+  #' - logical
   tbl_in <- data.frame(a = c(TRUE, FALSE, NA))
   tbl_exp <- tbl_in
   tbl_exp$a <- ctx$tweaks$logical_return(tbl_exp$a)
@@ -665,23 +701,26 @@ test_that("append_roundtrip_64_bit_character", {
 })
 
 test_that("append_roundtrip_character", {
+  #' - character (in both UTF-8
   tbl_in <- data.frame(
-    id = seq_along(texts),
-    a = c(texts),
+    id = seq_along(get_texts()),
+    a = get_texts(),
     stringsAsFactors = FALSE
   )
   test_table_roundtrip(use_append = TRUE, con, tbl_in)
 })
 
 test_that("append_roundtrip_character_native", {
+  #'   and native encodings),
   tbl_in <- data.frame(
-    a = c(enc2native(texts)),
+    a = c(enc2native(get_texts())),
     stringsAsFactors = FALSE
   )
   test_table_roundtrip(use_append = TRUE, con, tbl_in)
 })
 
 test_that("append_roundtrip_character_empty", {
+  #'   supporting empty strings
   tbl_in <- data.frame(
     a = c("", "a"),
     stringsAsFactors = FALSE
@@ -690,6 +729,7 @@ test_that("append_roundtrip_character_empty", {
 })
 
 test_that("append_roundtrip_character_empty_after", {
+  #'   (before and after non-empty strings)
   tbl_in <- data.frame(
     a = c("a", ""),
     stringsAsFactors = FALSE
@@ -698,8 +738,9 @@ test_that("append_roundtrip_character_empty_after", {
 })
 
 test_that("append_roundtrip_factor", {
+  #' - factor (returned as character,
   tbl_in <- data.frame(
-    a = factor(c(texts))
+    a = factor(get_texts())
   )
   tbl_exp <- tbl_in
   tbl_exp$a <- as.character(tbl_exp$a)
@@ -961,6 +1002,7 @@ test_that("table_visible_in_other_connection", {
 })
 
 test_that("roundtrip_keywords", {
+  #' SQL keywords can be used freely in table names, column names, and data.
   tbl_in <- data.frame(
     select = "unique", from = "join", where = "order",
     stringsAsFactors = FALSE
@@ -992,17 +1034,22 @@ test_that("roundtrip_quotes_column_names", {
 })
 
 test_that("roundtrip_integer", {
+  #' The following data types must be supported at least,
+  #' and be read identically with [dbReadTable()]:
+  #' - integer
   tbl_in <- data.frame(a = c(1:5))
   test_table_roundtrip(con, tbl_in)
 })
 
 test_that("roundtrip_numeric", {
+  #' - numeric
   tbl_in <- data.frame(a = c(seq(1, 3, by = 0.5)))
   test_table_roundtrip(con, tbl_in)
   #'   (the behavior for `Inf` and `NaN` is not specified)
 })
 
 test_that("roundtrip_logical", {
+  #' - logical
   tbl_in <- data.frame(a = c(TRUE, FALSE, NA))
   tbl_exp <- tbl_in
   tbl_exp$a <- ctx$tweaks$logical_return(tbl_exp$a)
@@ -1051,23 +1098,26 @@ test_that("roundtrip_64_bit_character", {
 })
 
 test_that("roundtrip_character", {
+  #' - character (in both UTF-8
   tbl_in <- data.frame(
-    id = seq_along(texts),
-    a = c(texts),
+    id = seq_along(get_texts()),
+    a = get_texts(),
     stringsAsFactors = FALSE
   )
   test_table_roundtrip(con, tbl_in)
 })
 
 test_that("roundtrip_character_native", {
+  #'   and native encodings),
   tbl_in <- data.frame(
-    a = c(enc2native(texts)),
+    a = c(enc2native(get_texts())),
     stringsAsFactors = FALSE
   )
   test_table_roundtrip(con, tbl_in)
 })
 
 test_that("roundtrip_character_empty", {
+  #'   supporting empty strings
   tbl_in <- data.frame(
     a = c("", "a"),
     stringsAsFactors = FALSE
@@ -1076,6 +1126,7 @@ test_that("roundtrip_character_empty", {
 })
 
 test_that("roundtrip_character_empty_after", {
+  #'   before and after a non-empty string
   tbl_in <- data.frame(
     a = c("a", ""),
     stringsAsFactors = FALSE
@@ -1084,8 +1135,9 @@ test_that("roundtrip_character_empty_after", {
 })
 
 test_that("roundtrip_factor", {
+  #' - factor (returned as character)
   tbl_in <- data.frame(
-    a = factor(c(texts))
+    a = factor(get_texts())
   )
   tbl_exp <- tbl_in
   tbl_exp$a <- as.character(tbl_exp$a)
@@ -1246,6 +1298,9 @@ test_that("roundtrip_mixed", {
 })
 
 test_that("roundtrip_field_types", {
+  #' The `field.types` argument must be a named character vector with at most
+  #' one entry for each column.
+  #' It indicates the SQL data type to be used for a new column.
   tbl_in <- data.frame(a = numeric(), b = character())
   #' If a column is missed from `field.types`, the type is inferred
   #' from the input data with [dbDataType()].
@@ -1426,6 +1481,8 @@ test_that("list_fields_formals", {
 })
 
 test_that("list_fields_wrong_table", {
+  #' @section Failure modes:
+  #' If the table does not exist, an error is raised.
   name <- "missing"
 
   expect_false(dbExistsTable(con, name))
@@ -1433,6 +1490,7 @@ test_that("list_fields_wrong_table", {
 })
 
 test_that("list_fields_invalid_type", {
+  #' Invalid types for the `name` argument
   #' (e.g., `character` of length not equal to one,
   expect_error(dbListFields(con, character()))
   expect_error(dbListFields(con, letters))

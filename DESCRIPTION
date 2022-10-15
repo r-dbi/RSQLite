@@ -55,20 +55,21 @@ Imports:
     bit64,
     blob (>= 1.2.0),
     DBI (>= 1.1.0),
+    DBItest,
     memoise,
     methods,
     pkgconfig,
-    Rcpp (>= 1.0.7)
+    Rcpp (>= 1.0.7),
+    rlang
 Suggests: 
     callr,
-    DBItest (>= 1.7.0),
     gert,
     gh,
     knitr,
     rmarkdown,
     hms,
     rvest,
-    testthat,
+    testthat (>= 2.0.0),
     xml2
 LinkingTo: 
     plogr (>= 0.2.0),
@@ -79,6 +80,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Collate: 
+    'RSQLite-package.R'
     'RcppExports.R'
     'SQLiteConnection.R'
     'SQLKeywords_SQLiteConnection.R'
@@ -147,3 +149,4 @@ Collate:
     'zzz.R'
 Config/autostyle/scope: line_breaks
 Config/autostyle/strict: false
+Config/testthat/edition: 2

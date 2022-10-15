@@ -1,5 +1,3 @@
-context("dbClearResult")
-
 test_that("warning on dbFetch if result set open", {
   con <- dbConnect(SQLite(), ":memory:")
   on.exit(dbDisconnect(con))

@@ -1,5 +1,3 @@
-context("sd")
-
 test_that("sd for multiple and single values", {
   con <- dbConnect(SQLite(), ":memory:")
   on.exit(dbDisconnect(con))

@@ -1,5 +1,3 @@
-context("column-info")
-
 test_that("can extract column info", {
   db <- memory_db()
   on.exit(dbDisconnect(db))

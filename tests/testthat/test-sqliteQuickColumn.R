@@ -1,5 +1,3 @@
-context("sqliteQuickColumn")
-
 set.seed(0x977)
 
 test_that("sqliteQuickColumn round trips cleanly", {

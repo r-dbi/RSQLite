@@ -1,5 +1,3 @@
-context("dbConnect")
-
 os <- function() {
   ostype <- .Platform[["OS.type"]]
   if (ostype == "windows") {

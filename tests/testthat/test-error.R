@@ -1,5 +1,3 @@
-context("error")
-
 test_that("parameters with length != 1 (#89)", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)

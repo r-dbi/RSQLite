@@ -1,5 +1,3 @@
-context("affinity")
-
 create_affinity_test_table <- function(con, affinity) {
   dbExecute(con, paste0("CREATE TABLE a (a ", affinity, ")"))
   dbWriteTable(con, "a", data.frame(a = NA_integer_), append = TRUE)
@@ -68,6 +66,8 @@ check_affinity_fetch <- function(affinity, type,
 }
 
 test_that("affinity checks for dbGetQuery()", {
+  `%>%` <- magrittr::`%>%`
+
   check_affinity_get("INTEGER", "integer")
   check_affinity_get("TEXT", "character", "character")
   check_affinity_get("REAL", "numeric")
@@ -77,13 +77,15 @@ test_that("affinity checks for dbGetQuery()", {
   check_affinity_get("FLOA", "numeric")
   check_affinity_get("DOUB", "numeric")
   check_affinity_get("NUMERIC", "numeric", "numeric", "integer")
-  expect_warning(
-    check_affinity_get("BLOB", class(blob()), "numeric", "integer", "numeric"),
-    "coercing"
-  )
+  check_affinity_get("BLOB", class(blob()), "numeric", "integer", "numeric") %>%
+    expect_warning("coercing") %>%
+    expect_warning("coercing") %>%
+    expect_warning("coercing")
 })
 
 test_that("affinity checks for dbFetch()", {
+  `%>%` <- magrittr::`%>%`
+
   check_affinity_fetch("INTEGER", "integer")
   check_affinity_fetch("TEXT", "character", "character")
   check_affinity_fetch("REAL", "numeric")
@@ -93,10 +95,15 @@ test_that("affinity checks for dbFetch()", {
   check_affinity_fetch("FLOA", "numeric")
   check_affinity_fetch("DOUB", "numeric")
   check_affinity_fetch("NUMERIC", "numeric", "numeric", "integer")
-  expect_warning(
-    check_affinity_fetch("BLOB", class(blob()), class(blob())),
-    "coercing"
-  )
+  check_affinity_fetch("BLOB", class(blob()), class(blob())) %>%
+    expect_warning("coercing") %>%
+    expect_warning("coercing") %>%
+    expect_warning("coercing") %>%
+    expect_warning("coercing") %>%
+    expect_warning("coercing") %>%
+    expect_warning("coercing") %>%
+    expect_warning("coercing") %>%
+    expect_warning("coercing")
 })
 
 test_that("affinity checks for inline queries", {

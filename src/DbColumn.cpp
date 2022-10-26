@@ -54,7 +54,7 @@ void DbColumn::warn_type_conflicts(const cpp11::r_string& name) const {
   my_data_types_seen.erase(DT_BOOL);
   my_data_types_seen.erase(dt);
 
-  if (my_data_types_seen.size() == 0) return;
+  if (my_data_types_seen.empty()) return;
 
   cpp11::r_string name_utf8 = name;
 

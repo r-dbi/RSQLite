@@ -3,7 +3,7 @@
 #include <cpp11/R.hpp>
 
 #include "pch.h"
-#include "sqlite3.h"
+#include "sqlite3-cpp.h"
 
 //' RSQLite version
 //'

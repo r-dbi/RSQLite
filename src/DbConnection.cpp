@@ -13,7 +13,7 @@ DbConnection::DbConnection(const std::string& path, const bool allow_ext, const 
     busy_callback_(NULL) {
 
   // Get the underlying database connection
-  int rc = sqlite3_open_v2(path.c_str(), &pConn_, flags, vfs.size() ? vfs.c_str() : NULL);
+  int rc = sqlite3_open_v2(path.c_str(), &pConn_, flags, vfs.empty() ? NULL : vfs.c_str());
   if (rc != SQLITE_OK) {
     cpp11::stop("Could not connect to database:\n%s", getException().c_str());
   }
@@ -88,10 +88,7 @@ bool DbConnection::with_alt_types() const {
 
 void DbConnection::set_busy_handler(SEXP r_callback) {
   check_connection();
-  if (busy_callback_) {
-    R_ReleaseObject(busy_callback_);
-    busy_callback_ = NULL;
-  }
+  release_callback_data();
 
   if (! Rf_isNull(r_callback)) {
     R_PreserveObject(r_callback);

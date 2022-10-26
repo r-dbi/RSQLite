@@ -1,5 +1,3 @@
-context("extendedTypes")
-
 test_that("Can read dates", {
   con <- dbConnect(SQLite(), extended_types = TRUE)
   on.exit(dbDisconnect(con), add = TRUE)
@@ -9,7 +7,7 @@ test_that("Can read dates", {
   dbExecute(con, "insert into t1 values (1), (18612.2), ('2020-01-10') , ('not a date'), (?)", params = as.Date("2021-12-11"))
 
   expect_warning(resdf <- dbGetQuery(con, "SELECT * from t1"), "Unknown string format, NA is returned.")
-  expect_that(resdf[[1]], equals(as.Date(c("1970-01-02", "2020-12-16", "2020-01-10", NA, "2021-12-11"))))
+  expect_equal(resdf[[1]], as.Date(c("1970-01-02", "2020-12-16", "2020-01-10", NA, "2021-12-11")))
 })
 
 test_that("Can read datetime", {
@@ -23,7 +21,7 @@ test_that("Can read datetime", {
   )
 
   expect_warning(resdf <- dbGetQuery(con, "SELECT * from t1"), "Unknown string format, NA is returned.")
-  expect_that(resdf[[1]], equals(as.POSIXct(c("1970-01-01 00:00:01", "2020-12-16 09:18:27.2", "2020-01-10 12:13:14", NA, "2021-11-12 13:12:11"), tz = "UTC")))
+  expect_equal(resdf[[1]], as.POSIXct(c("1970-01-01 00:00:01", "2020-12-16 09:18:27.2", "2020-01-10 12:13:14", NA, "2021-11-12 13:12:11"), tz = "UTC"))
 })
 
 
@@ -40,7 +38,7 @@ test_that("Can read time", {
 
   expect_warning(resdf <- dbGetQuery(con, "SELECT * from t1"), "Unknown string format, NA is returned.")
   expected_times <- structure(c(1, -90000.2, 90733.123, NA, 123), units = "secs", class = c("hms", "difftime"))
-  expect_that(resdf[[1]], equals(expected_times))
+  expect_equal(resdf[[1]], expected_times)
 })
 
 
@@ -55,7 +53,7 @@ test_that("Columninfo dates", {
   on.exit(dbClearResult(stmt), add = TRUE, after = FALSE)
 
   col_info <- dbColumnInfo(stmt)
-  expect_that(col_info$type, equals("Date"))
+  expect_equal(col_info$type, "Date")
 })
 
 test_that("Columninfo datetime", {
@@ -69,7 +67,7 @@ test_that("Columninfo datetime", {
   on.exit(dbClearResult(stmt), add = TRUE, after = FALSE)
 
   col_info <- dbColumnInfo(stmt)
-  expect_that(col_info$type, equals("POSIXct"))
+  expect_equal(col_info$type, "POSIXct")
 })
 
 
@@ -85,7 +83,7 @@ test_that("Columninfo time", {
   on.exit(dbClearResult(stmt), add = TRUE, after = FALSE)
 
   col_info <- dbColumnInfo(stmt)
-  expect_that(col_info$type, equals("hms"))
+  expect_equal(col_info$type, "hms")
 })
 
 
@@ -99,7 +97,7 @@ test_that("Blob as dates", {
   dbExecute(con, "insert into t1 values (?)", params = list(blob::as_blob(as.raw(7))))
 
   expect_warning(resdf <- dbGetQuery(con, "SELECT * from t1"), "Cannot convert blob, NA is returned.")
-  expect_that(resdf[[1]], equals(as.Date(NA)))
+  expect_equal(resdf[[1]], as.Date(NA))
 })
 
 test_that("Blob as datetime", {
@@ -111,7 +109,7 @@ test_that("Blob as datetime", {
   dbExecute(con, "insert into t1 values (?)", params = list(blob::as_blob(as.raw(7))))
 
   expect_warning(resdf <- dbGetQuery(con, "SELECT * from t1"), "Cannot convert blob, NA is returned.")
-  expect_that(resdf[[1]], equals(as.POSIXct(NA_real_, origin = "1970-01-01", tz = "UTC")))
+  expect_equal(resdf[[1]], as.POSIXct(NA_real_, origin = "1970-01-01", tz = "UTC"))
 })
 
 
@@ -124,7 +122,7 @@ test_that("Blob as time", {
   dbExecute(con, "insert into t1 values (?)", params = list(blob::as_blob(as.raw(7))))
 
   expect_warning(resdf <- dbGetQuery(con, "SELECT * from t1"), "Cannot convert blob, NA is returned.")
-  expect_that(resdf[[1]], equals(structure(NA_real_, units = "secs", class = c("hms", "difftime"))))
+  expect_equal(resdf[[1]], structure(NA_real_, units = "secs", class = c("hms", "difftime")))
 })
 
 

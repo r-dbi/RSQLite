@@ -27,6 +27,9 @@ To create a new SQLite database, you simply supply the filename to `dbConnect()`
 ```{r}
 mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
 dbDisconnect(mydb)
+```
+
+```{r echo = FALSE}
 unlink("my-db.sqlite")
 ```
 
@@ -65,7 +68,7 @@ dbGetQuery(mydb, 'SELECT * FROM iris WHERE "Sepal.Length" < 4.6')
 If you need to insert the value from a user into a query, don't use `paste()`! That makes it easy for a malicious attacker to insert SQL that might damage your database or reveal sensitive information. Instead, use a parameterised query:
 
 ```{r}
-dbGetQuery(mydb, 'SELECT * FROM iris WHERE "Sepal.Length" < :x', 
+dbGetQuery(mydb, 'SELECT * FROM iris WHERE "Sepal.Length" < :x',
   params = list(x = 4.6))
 ```
 

@@ -19,10 +19,7 @@ Or install the latest development version from GitHub with:
 
 <pre class='chroma'>
 <span class='c'># install.packages("devtools")</span>
-<span class='nf'>devtools</span><span class='nf'>::</span><span class='nf'><a href='https://devtools.r-lib.org//reference/remote-reexports.html'>install_github</a></span><span class='o'>(</span><span class='s'>"r-dbi/RSQLite"</span><span class='o'>)</span></pre>
-<!-- https://www.rstudio.com/ide/docs/packages/prerequisites -->
-
-To install from GitHub, you’ll need a [development environment](https://support.rstudio.com/hc/en-us/articles/200486498-Package-Development-Prerequisites).
+<span class='nf'>devtools</span><span class='nf'>::</span><span class='nf'><a href='https://devtools.r-lib.org/reference/remote-reexports.html'>install_github</a></span><span class='o'>(</span><span class='s'>"r-dbi/RSQLite"</span><span class='o'>)</span></pre>
 
 Discussions associated with DBI and related database packages take place on [R-SIG-DB](https://stat.ethz.ch/mailman/listinfo/r-sig-db). The website [Databases using R](https://db.rstudio.com/) describes the tools and best practices in this ecosystem.
 
@@ -81,7 +78,7 @@ Discussions associated with DBI and related database packages take place on [R-S
 
 <span class='c'># Or a chunk at a time</span>
 <span class='nv'>res</span> <span class='o'>&lt;-</span> <span class='nf'><a href='https://dbi.r-dbi.org/reference/dbSendQuery.html'>dbSendQuery</a></span><span class='o'>(</span><span class='nv'>con</span>, <span class='s'>"SELECT * FROM mtcars WHERE cyl = 4"</span><span class='o'>)</span>
-<span class='kr'>while</span><span class='o'>(</span><span class='o'>!</span><span class='nf'><a href='https://dbi.r-dbi.org/reference/dbHasCompleted.html'>dbHasCompleted</a></span><span class='o'>(</span><span class='nv'>res</span><span class='o'>)</span><span class='o'>)</span><span class='o'>{</span>
+<span class='kr'>while</span> <span class='o'>(</span><span class='o'>!</span><span class='nf'><a href='https://dbi.r-dbi.org/reference/dbHasCompleted.html'>dbHasCompleted</a></span><span class='o'>(</span><span class='nv'>res</span><span class='o'>)</span><span class='o'>)</span> <span class='o'>{</span>
   <span class='nv'>chunk</span> <span class='o'>&lt;-</span> <span class='nf'><a href='https://dbi.r-dbi.org/reference/dbFetch.html'>dbFetch</a></span><span class='o'>(</span><span class='nv'>res</span>, n <span class='o'>=</span> <span class='m'>5</span><span class='o'>)</span>
   <span class='nf'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='o'>(</span><span class='nf'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='o'>(</span><span class='nv'>chunk</span><span class='o'>)</span><span class='o'>)</span>
 <span class='o'>}</span></pre>

@@ -1,5 +1,3 @@
-context("blob")
-
 test_that("adding large blob to table survives valgrind check (#192)", {
   # Requires 64-bit system
   skip_on_appveyor()

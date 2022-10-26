@@ -5,7 +5,7 @@
 #ifndef RSQLITE_SQLITECOLUMNDATASOURCE_H
 #define RSQLITE_SQLITECOLUMNDATASOURCE_H
 
-#include "sqlite3.h"
+#include "sqlite3-cpp.h"
 #include "DbColumnDataSource.h"
 
 class SqliteColumnDataSource : public DbColumnDataSource {

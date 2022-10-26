@@ -6,7 +6,7 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
-#include "sqlite3.h"
+#include "sqlite3-cpp.h"
 
 class DbResult;
 

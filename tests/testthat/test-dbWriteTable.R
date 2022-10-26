@@ -1,5 +1,3 @@
-context("dbWriteTable")
-
 # Not generic enough for DBItest
 test_that("throws error if constraint violated", {
   con <- dbConnect(SQLite())

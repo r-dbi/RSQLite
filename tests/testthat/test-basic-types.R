@@ -1,5 +1,3 @@
-context("Basic types")
-
 basicDf <- data.frame(
   name = c("Alice", "Bob", "Carl", "NA", NA),
   fldInt = as.integer(c(as.integer(1:4), NA)),
@@ -44,7 +42,7 @@ test_that("row-by-row fetch is equivalent", {
   )
   for (i in 1:5) {
     row <- dbFetch(rs, 1L)
-    expect_equal(row, basicDf[i, ], check.attributes = FALSE)
+    expect_equal(row, basicDf[i, ], ignore_attr = TRUE)
   }
 
   row <- dbFetch(rs, 1L)
@@ -60,11 +58,11 @@ test_that("column types as expected in presence of NULLs", {
   dbWriteTable(db, "t1", datasets::USArrests)
 
   a1 <- dbGetQuery(db, "SELECT Murder/(Murder - 8.1) FROM t1 LIMIT 10")
-  expect_is(a1[[1]], "numeric")
+  expect_type(a1[[1]], "double")
 
   # Type inference now works properly in presence of NULL values (#74)
   a2 <- dbGetQuery(db, "SELECT Murder/(Murder - 13.2) FROM t1 LIMIT 10")
-  expect_is(a2[[1]], "numeric")
+  expect_type(a2[[1]], "double")
 })
 
 test_that("correct number of columns, even if 0 rows", {

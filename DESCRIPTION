@@ -1,36 +1,32 @@
 Package: RSQLite
 Title: SQLite Interface for R
-Version: 2.2.9.9001
-Date: 2021-12-19
-Authors@R: 
-    c(person(given = "Kirill",
-             family = "M\u00fcller",
-             role = c("aut", "cre"),
-             email = "krlmlr+r@mailbox.org",
-             comment = c(ORCID = "0000-0002-1416-3412")),
-      person(given = "Hadley",
-             family = "Wickham",
-             role = "aut"),
-      person(given = c("David", "A."),
-             family = "James",
-             role = "aut"),
-      person(given = "Seth",
-             family = "Falcon",
-             role = "aut"),
-      person(family = "SQLite Authors",
-             role = "ctb",
-             comment = "for the included SQLite sources"),
-      person(given = "Liam",
-             family = "Healy",
-             role = "ctb",
-             comment = "for the included SQLite sources"),
-      person(given = "R Consortium",
-             role = "fnd"),
-      person(family = "RStudio",
-             role = "cph"))
-Description: Embeds the SQLite database engine in R and
-    provides an interface compliant with the DBI package. The source for
-    the SQLite engine is included.
+Version: 2.2.18.9000
+Date: 2022-10-04
+Authors@R: c(
+    person("Kirill", "Müller", , "kirill@cynkra.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-1416-3412")),
+    person("Hadley", "Wickham", role = "aut"),
+    person(c("David", "A."), "James", role = "aut"),
+    person("Seth", "Falcon", role = "aut"),
+    person("D. Richard", "Hipp", role = "ctb",
+           comment = "for the included SQLite sources"),
+    person("Dan", "Kennedy", role = "ctb",
+           comment = "for the included SQLite sources"),
+    person("Joe", "Mistachkin", role = "ctb",
+           comment = "for the included SQLite sources"),
+    person(, "SQLite Authors", role = "ctb",
+           comment = "for the included SQLite sources"),
+    person("Liam", "Healy", role = "ctb",
+           comment = "for the included SQLite sources"),
+    person("R Consortium", role = "fnd"),
+    person(, "RStudio", role = "cph")
+  )
+Description: Embeds the SQLite database engine in R and provides an
+    interface compliant with the DBI package. The source for the SQLite
+    engine and for various extensions in a recent version is included.
+    System libraries will never be consulted because this package relies
+    on static linking for the plugins it includes; this also ensures a
+    consistent experience across all installations.
 License: LGPL (>= 2.1)
 URL: https://rsqlite.r-dbi.org, https://github.com/r-dbi/RSQLite
 BugReports: https://github.com/r-dbi/RSQLite/issues
@@ -44,14 +40,17 @@ Imports:
     methods,
     pkgconfig
 Suggests: 
-    DBItest (>= 1.7.0),
+    callr,
+    DBItest (>= 1.7.2.9001),
     gert,
     gh,
-    knitr,
-    rmarkdown,
     hms,
+    knitr,
+    magrittr,
+    rmarkdown,
     rvest,
-    testthat,
+    testthat (>= 3.0.0),
+    withr,
     xml2
 LinkingTo: 
     plogr (>= 0.2.0),
@@ -59,9 +58,12 @@ LinkingTo:
 SystemRequirements: C++11
 VignetteBuilder: 
     knitr
+Config/autostyle/scope: line_breaks
+Config/autostyle/strict: false
+Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 Collate: 
     'SQLiteConnection.R'
     'SQLKeywords_SQLiteConnection.R'
@@ -129,5 +131,3 @@ Collate:
     'transactions.R'
     'utils.R'
     'zzz.R'
-Config/autostyle/scope: line_breaks
-Config/autostyle/strict: false

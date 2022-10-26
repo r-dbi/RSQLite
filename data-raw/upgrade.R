@@ -26,16 +26,43 @@ tryCatch(
 
 unzip(tmp, exdir = "src/vendor/sqlite3", junkpaths = TRUE)
 unlink("src/vendor/sqlite3/shell.c")
+file.rename("src/vendor/sqlite3/sqlite3ext.h", "src/vendor/extensions/sqlite3ext.h")
+
+
+tmp_source_zip <- tempfile()
+latest_code <- "https://www.sqlite.org/src/zip/sqlite.zip?r=release"
+download.file(latest_code, tmp_source_zip)
+
+tmp_source_dir <- tempdir()
+unzip(tmp_source_zip, exdir = tmp_source_dir)
+
 
 # Regular expression source code
-download.file(
-  url = "https://sqlite.org/src/raw?filename=ext/misc/regexp.c&ci=trunk",
-  destfile = "src/vendor/sqlite3/regexp.c",
-  quiet = TRUE,
-  mode = "w"
-)
+register_misc_extension <- function(name) {
+  ext_dir <- "src/vendor/extensions/"
+  if (!dir.exists(ext_dir))
+    dir.create(ext_dir, recursive = TRUE)
 
-stopifnot(system2("patch", "-p1", stdin = "data-raw/regexp.patch") == 0)
+  text <- readLines(paste0(tmp_source_dir, "/sqlite/ext/misc/", name, ".c"))
+  text <- gsub(" +$", "", text)
+  writeLines(text, paste0(ext_dir, name, ".c"))
+
+  # TODO compile as shared library? see https://www.sqlite.org/loadext.html
+  lines <- c(
+    "#define SQLITE_CORE",
+    "#include <R_ext/Visibility.h>",
+    paste0("#define sqlite3_", name, "_init attribute_visible sqlite3_", name, "_init"),
+    "",
+    paste0('#include "vendor/extensions/', name, '.c"')
+  )
+
+  writeLines(lines, paste0("src/ext-", name, ".c"))
+}
+
+register_misc_extension("regexp")
+register_misc_extension("series")
+register_misc_extension("csv")
+
 
 if (any(grepl("^src/", gert::git_status()$file))) {
   branch <- paste0("f-", sub("[.][^.]*$", "", latest_name))
@@ -49,9 +76,11 @@ if (any(grepl("^src/", gert::git_status()$file))) {
   gert::git_branch_create(branch)
   gert::git_add("src")
 
-  title <- paste0("Upgrade bundled SQLite to ", version)
-  message("Commit message: ", title)
-  gert::git_commit(title)
+  commit_msg <- paste0("Upgrade bundled SQLite to ", version)
+  message("Commit message: ", commit_msg)
+  gert::git_commit(commit_msg)
+
+  title <- paste0("feat: ", commit_msg)
 
   # Force-pushing: this job is run daily, will give a daily notification
   # and still succeed
@@ -82,7 +111,7 @@ if (any(grepl("^src/", gert::git_status()$file))) {
     )
 
     message("Tweaking PR body")
-    body <- paste0("NEWS entry:\n\n```\n- Upgrade bundled SQLite to version ", version, " (#", pr$number, ").\n```")
+    body <- paste0("NEWS entry will be picked up by fledge from the PR title.")
 
     gh::gh(
       paste0("/repos/r-dbi/RSQLite/pulls/", pr$number),

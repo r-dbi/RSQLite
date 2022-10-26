@@ -10,7 +10,7 @@
 #include <boost/limits.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 
 SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_, bool with_alt_types_) :

@@ -1,8 +1,4 @@
 // Extracted from sqlite3.c
-#define STRICT_R_HEADERS
-#define R_NO_REMAP
-
-
 #include "affinity.h"
 
 #ifndef UINT32_TYPE

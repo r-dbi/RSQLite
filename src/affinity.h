@@ -1,6 +1,3 @@
-#define STRICT_R_HEADERS
-#define R_NO_REMAP
-
 #ifndef __AFFINITY_H__
 #define __AFFINITY_H__
 

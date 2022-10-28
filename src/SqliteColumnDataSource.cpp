@@ -112,14 +112,12 @@ double SqliteColumnDataSource::fetch_date() const {
           bg::date_duration delta = dt - bg::date(1970, 1, 1);
           dateval = static_cast<double>(delta.days());
       } catch (...) {
-          auto warning = cpp11::package("base")["warning"];
-          warning("Unknown string format, NA is returned.");
+          cpp11::warning("Unknown string format, NA is returned.");
           dateval = NA_REAL;
       }
       return dateval;
   } else if (dt == SQLITE_BLOB) {
-    auto warning = cpp11::package("base")["warning"];
-    warning("Cannot convert blob, NA is returned.");
+    cpp11::warning("Cannot convert blob, NA is returned.");
     return NA_REAL;
   } else {
       return static_cast<double>(sqlite3_column_int(get_stmt(), get_j()));
@@ -142,14 +140,12 @@ double SqliteColumnDataSource::fetch_datetime_local() const {
           bp::time_duration delta = dttm - bp::ptime(bg::date(1970, 1, 1), bp::seconds(0));
           dateval = delta.total_microseconds() * 1e-6;
       } catch (...) {
-          auto warning = cpp11::package("base")["warning"];
-          warning("Unknown string format, NA is returned.");
+          cpp11::warning("Unknown string format, NA is returned.");
           dateval = NA_REAL;
       }
       return dateval;
   } else if (dt == SQLITE_BLOB) {
-    auto warning = cpp11::package("base")["warning"];
-    warning("Cannot convert blob, NA is returned.");
+    cpp11::warning("Cannot convert blob, NA is returned.");
     return NA_REAL;
   } else {
     return sqlite3_column_double(get_stmt(), get_j());
@@ -176,14 +172,12 @@ double SqliteColumnDataSource::fetch_time() const {
         bp::time_duration secs(bp::duration_from_string(tmstr));
         dateval = secs.total_microseconds() * 1e-6;
     } catch (...) {
-        auto warning = cpp11::package("base")["warning"];
-        warning("Unknown string format, NA is returned.");
+        cpp11::warning("Unknown string format, NA is returned.");
         dateval = NA_REAL;
     }
     return dateval;
   } else if (dt == SQLITE_BLOB) {
-    auto warning = cpp11::package("base")["warning"];
-    warning("Cannot convert blob, NA is returned.");
+    cpp11::warning("Cannot convert blob, NA is returned.");
     return NA_REAL;
   } else {
     return sqlite3_column_double(get_stmt(), get_j());

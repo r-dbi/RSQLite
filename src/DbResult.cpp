@@ -1,6 +1,3 @@
-#define STRICT_R_HEADERS
-#define R_NO_REMAP
-
 #include "pch.h"
 #include "DbResult.h"
 #include "DbConnection.h"

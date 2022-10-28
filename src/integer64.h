@@ -1,6 +1,3 @@
-#define STRICT_R_HEADERS
-#define R_NO_REMAP
-
 #ifndef RPOSTGRES_INTEGER64_H
 #define RPOSTGRES_INTEGER64_H
 

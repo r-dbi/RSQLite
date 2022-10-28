@@ -16,9 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#define STRICT_R_HEADERS
-#define R_NO_REMAP
-
 #include <R.h>
 #include <Rinternals.h>
 #include "vendor/sqlite3/sqlite3.h"

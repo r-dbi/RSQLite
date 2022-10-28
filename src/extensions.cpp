@@ -1,7 +1,3 @@
-#define STRICT_R_HEADERS
-#define R_NO_REMAP
-#include <cpp11/R.hpp>
-
 #include "pch.h"
 #include "DbConnection.h"
 

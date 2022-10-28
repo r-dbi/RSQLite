@@ -1,8 +1,3 @@
-#define STRICT_R_HEADERS
-#define R_NO_REMAP
-
-#include "pch.h"
-
 #ifndef __RSQLITE_TYPES__
 #define __RSQLITE_TYPES__
 

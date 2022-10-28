@@ -55,16 +55,14 @@ bool connection_valid(cpp11::external_pointer<DbConnectionPtr> con_) {
 [[cpp11::register]]
 void connection_release(cpp11::external_pointer<DbConnectionPtr> con_) {
   if (!connection_valid(con_)) {
-    auto warning = cpp11::package("base")["warning"];
-    warning("Already disconnected");
+    cpp11::warning("Already disconnected");
     return;
   }
 
   DbConnectionPtr* con = con_.get();
   long n = con_->use_count();
   if (n > 1) {
-    auto warning = cpp11::package("base")["warning"];
-    warning(
+    cpp11::warning(
       "There are %i result in use. The connection will be released when they are closed",
       n - 1
     );

@@ -1,7 +1,3 @@
-#define STRICT_R_HEADERS
-#define R_NO_REMAP
-#include <cpp11.hpp>
-
 #ifndef DB_COLUMNSTORAGE_H
 #define DB_COLUMNSTORAGE_H
 

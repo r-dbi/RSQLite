@@ -1,7 +1,3 @@
-#define STRICT_R_HEADERS
-#define R_NO_REMAP
-
-
 #include "pch.h"
 #include "SqliteResult.h"
 #include "SqliteResultImpl.h"

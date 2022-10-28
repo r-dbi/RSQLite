@@ -1,6 +1,3 @@
-#define STRICT_R_HEADERS
-#define R_NO_REMAP
-
 #ifndef __RSQLITE_SQLITE_RESULT__
 #define __RSQLITE_SQLITE_RESULT__
 

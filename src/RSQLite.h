@@ -1,12 +1,8 @@
-#define STRICT_R_HEADERS
-#define R_NO_REMAP
+#ifndef RSQLite_RSQLite_H
+#define RSQLite_RSQLite_H
 
 #include "cpp11.hpp"
 #include <cpp11/R.hpp>
-using namespace cpp11::literals;
-
-#ifndef RSQLite_RSQLite_H
-#define RSQLite_RSQLite_H
 
 #include <plogr.h>
 

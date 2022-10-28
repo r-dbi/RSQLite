@@ -12,6 +12,7 @@
 //' RSQLite::rsqliteVersion()
 [[cpp11::register]]
 cpp11::strings rsqliteVersion() {
+  using namespace cpp11::literals;
   return
     cpp11::strings({
       "header"_nm = SQLITE_VERSION,

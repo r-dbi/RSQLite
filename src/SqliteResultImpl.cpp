@@ -164,6 +164,7 @@ cpp11::list SqliteResultImpl::fetch(const int n_max) {
 }
 
 cpp11::list SqliteResultImpl::get_column_info() {
+  using namespace cpp11::literals;
   peek_first_row();
 
   cpp11::writable::strings names(cache.names_.size());

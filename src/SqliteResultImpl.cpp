@@ -312,7 +312,7 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   SqliteDataFrame data(stmt, cache.names_, n_max, types_, with_alt_types_);
 
   if (complete_ && data.get_ncols() == 0) {
-    cpp11::warning("SQL statements must be issued with dbExecute() or dbSendStatement() instead of dbGetQuery() or dbSendQuery().");
+    Rf_warning("SQL statements must be issued with dbExecute() or dbSendStatement() instead of dbGetQuery() or dbSendQuery().");
   }
 
   while (!complete_) {

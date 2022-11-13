@@ -1,5 +1,16 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
+# RSQLite 2.2.18.9001 (2022-11-13)
+
+## Bug fixes
+
+- Add missing boost headers for icpc compiler (@lolow, #442, #443).
+
+## Features
+
+- Use testthat edition 3 (#438).
+
+
 # RSQLite 2.2.18.9000 (2022-10-04)
 
 - Internal changes only.

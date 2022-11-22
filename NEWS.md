@@ -2,30 +2,17 @@
 
 # RSQLite 2.2.19 (2022-11-22)
 
-- Same as previous version.
-
-
-# RSQLite 2.2.18.9002 (2022-11-22)
-
 ## Features
 
 - Upgrade bundled SQLite to 3.40.0 (#444).
-
-
-# RSQLite 2.2.18.9001 (2022-11-13)
 
 ## Bug fixes
 
 - Add missing boost headers for icpc compiler (@lolow, #442, #443).
 
-## Features
+## Internal
 
 - Use testthat edition 3 (#438).
-
-
-# RSQLite 2.2.18.9000 (2022-10-04)
-
-- Internal changes only.
 
 
 # RSQLite 2.2.18 (2022-10-04)

@@ -12,12 +12,12 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="SQLite Interface for R">
-<meta property="og:description" content="Embeds the SQLite database engine in R and
-    provides an interface compliant with the DBI package. The source for
-    the SQLite engine and for various extensions in a recent version is
-    included. System libraries will never be consulted because
-    this package relies on static linking for the plugins it includes;
-    this also ensures a consistent experience across all installations.">
+<meta property="og:description" content="Embeds the SQLite database engine in R and provides an
+    interface compliant with the DBI package. The source for the SQLite
+    engine and for various extensions in a recent version is included.
+    System libraries will never be consulted because this package relies
+    on static linking for the plugins it includes; this also ensures a
+    consistent experience across all installations.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">RSQLite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.18</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.19</span>
       </span>
     </div>
 
@@ -77,7 +77,9 @@
 <div class="page-header"><h1 id="rsqlite">RSQLite<a class="anchor" aria-label="anchor" href="#rsqlite"></a>
 </h1></div>
 <!-- badges: start -->
-<!-- badges: end --><p>Embeds the SQLite database engine in R, providing a DBI-compliant interface. <a href="https://www.sqlite.org/index.html" class="external-link">SQLite</a> is a public-domain, single-user, very light-weight database engine that implements a decent subset of the SQL 92 standard, including the core table creation, updating, insertion, and selection operations, plus transaction management.</p>
+
+<!-- badges: end -->
+<p>Embeds the SQLite database engine in R, providing a DBI-compliant interface. <a href="https://www.sqlite.org/index.html" class="external-link">SQLite</a> is a public-domain, single-user, very light-weight database engine that implements a decent subset of the SQL 92 standard, including the core table creation, updating, insertion, and selection operations, plus transaction management.</p>
 <p>You can install the latest released version from CRAN with:</p>
 <pre class="chroma">
 <span class="nf"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="o">(</span><span class="s">"RSQLite"</span><span class="o">)</span></pre>

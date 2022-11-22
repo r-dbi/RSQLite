@@ -53,6 +53,9 @@ test_that("list the field of tables whose colnames are BIG5 encoded (#277)", {
     class = "data.frame",
     row.names = c(NA, -3L)
   )
+
+  skip_on_os("windows")
+
   colnames(df) <- big5_string
   dbWriteTable(con, "a", df)
   expect_identical(dbListFields(con, "a"), colnames(df))

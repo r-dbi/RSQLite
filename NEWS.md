@@ -1,15 +1,18 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
+# RSQLite 2.2.19.9001 (2022-11-24)
+
+## Features
+
+- Upgrade bundled SQLite to 3.40.0 (#446).
+
+
 # RSQLite 2.2.19.9000 (2022-11-22)
 
 - Internal changes only.
 
 
 # RSQLite 2.2.19 (2022-11-22)
-
-## Features
-
-- Upgrade bundled SQLite to 3.40.0 (#444).
 
 ## Bug fixes
 

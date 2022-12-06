@@ -37,3 +37,5 @@ a.out.dSYM
 ^CODE_OF_CONDUCT\.md$
 ^tests/testthat/testthat-problems\.rds$
 ^CRAN-SUBMISSION$
+^\.gitpod\.Dockerfile$
+^\.gitpod\.yml$

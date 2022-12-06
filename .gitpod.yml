@@ -6,6 +6,15 @@
 tasks:
   - name: dependencies
     init: |
+      # Set up rig
+      curl -Ls https://github.com/r-lib/rig/releases/download/latest/rig-linux-latest.tar.gz | sudo tar xz -C /usr/local
+
+      # Set up R
+      rig install
+      rig system add-pak
+      rig system make-links
+      rig system setup-user-lib
+
       # Deps
       sudo apt install -y ccache cmake
 
@@ -22,15 +31,6 @@ tasks:
       # Set up Makevars
       mkdir -p ~/.R
       echo -e "MAKEFLAGS = -j8\nCXXFLAGS = -O0 -g" > ~/.R/Makevars
-
-      # Set up rig
-      curl -Ls https://github.com/r-lib/rig/releases/download/latest/rig-linux-latest.tar.gz | sudo tar xz -C /usr/local
-
-      # Set up R
-      rig install
-      rig system add-pak
-      rig system make-links
-      rig system setup-user-lib
 
       ## Work around glitch with non-systemd systems
       ln -s $(which true) ~/bin/timedatectl

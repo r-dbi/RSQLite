@@ -51,8 +51,7 @@ add_library(RSQLite
 )
 
 execute_process(COMMAND bash "-c" "Rscript -e 'cat(R.home(\"include\"))'" OUTPUT_VARIABLE R_INCLUDE)
-execute_process(COMMAND bash "-c" "Rscript -e 'x <- read.dcf(\"../DESCRIPTION\"); if (\"LinkingTo\" %in% colnames(x)) { pkgs <- strsplit(x[, \"LinkingTo\"], \"(?: +[(][^)]+[)]) *,[\n\t ]*\")[[1]]; paths <- file.path(.libPaths()[[1]], pkgs, \"include\"); writeLines(paste0(paths, collapse = \";\")) }
-'" OUTPUT_VARIABLE R_LIBRARIES_INCLUDES)
+execute_process(COMMAND bash "-c" "Rscript -e 'x <- read.dcf(\"../DESCRIPTION\"); if (\"LinkingTo\" %in% colnames(x)) { pkgs <- strsplit(x[, \"LinkingTo\"], \"(?: +[(][^)]+[)]) *,[\\n\\t ]*\")[[1]]; paths <- file.path(.libPaths()[[1]], pkgs, \"include\"); writeLines(paste0(paths, collapse = \";\")) }'" OUTPUT_VARIABLE R_LIBRARIES_INCLUDES)
 
 target_include_directories(RSQLite PUBLIC
   ${R_INCLUDE}

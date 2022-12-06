@@ -41,6 +41,9 @@ tasks:
       ## Install devtools and R dependencies
       R -q -e 'pak::pak(c("devtools", "languageserver", "styler")); pak::pak("deps::.", dependencies = TRUE)'
 
+      # Install radian
+      sudo pip install radian
+
 vscode:
   extensions:
     - ms-vscode.cpptools-extension-pack

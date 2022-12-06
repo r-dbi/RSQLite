@@ -32,6 +32,7 @@ tasks:
       ln -s $(which true) ~/bin/timedatectl
 
       ## Define PATH
+      # FIXME: Why is this necessary? This doesn't work in Radian.
       echo 'export PATH='${HOME}'/bin:${PATH}' >> ~/.bashrc
 
       # Set up Makevars

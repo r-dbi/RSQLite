@@ -51,11 +51,14 @@ add_library(RSQLite
 )
 
 execute_process(COMMAND bash "-c" "Rscript -e 'cat(R.home(\"include\"))'" OUTPUT_VARIABLE R_INCLUDE)
-execute_process(COMMAND bash "-c" "Rscript -e 'x <- desc::desc_get_deps(); pkgs <- x$package[x$type == \"LinkingTo\"]; paths <- file.path(.libPaths()[[1]], pkgs, \"include\"); cat(paths, sep = \";\")'" OUTPUT_VARIABLE R_LIBRARIES_INCLUDES)
+execute_process(COMMAND bash "-c" "Rscript -e 'x <- desc::desc_get_deps(); pkgs <- x$package[x$type == \"LinkingTo\"]; paths <- file.path(.libPaths()[[1]], pkgs, \"include\"); writeLines(paste0(paths, collapse = \";\"))'" OUTPUT_VARIABLE R_LIBRARIES_INCLUDES)
 
 target_include_directories(RSQLite PUBLIC
   ${R_INCLUDE}
   ${R_LIBRARIES_INCLUDES}
+  # Included by default
+  "."
+  "vendor"
 )
 
 include(./custom.cmake OPTIONAL)

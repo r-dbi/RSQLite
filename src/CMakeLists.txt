@@ -50,8 +50,15 @@ add_library(RSQLite
   sqlite3-cpp.h
 )
 
+set(R_DEPENDENCIES Rcpp plogr)
+
 execute_process(COMMAND bash "-c" "Rscript -e 'cat(R.home(\"include\"))'" OUTPUT_VARIABLE R_INCLUDE)
-execute_process(COMMAND bash "-c" "Rscript -e 'x <- read.dcf(\"../DESCRIPTION\"); if (\"LinkingTo\" %in% colnames(x)) { pkgs <- strsplit(x[, \"LinkingTo\"], \"(?: +[(][^)]+[)]) *,[\\n\\t ]*\")[[1]]; paths <- file.path(.libPaths()[[1]], pkgs, \"include\"); writeLines(paste0(paths, collapse = \";\")) }'" OUTPUT_VARIABLE R_LIBRARIES_INCLUDES)
+execute_process(COMMAND bash "-c" "Rscript -e 'cat(.libPaths()[[1]])'" OUTPUT_VARIABLE R_LIB)
+
+foreach(LIB_NAME IN LISTS R_DEPENDENCIES)
+  list(APPEND R_LIBRARIES_INCLUDES "\"${R_LIB}/${LIB_NAME}/include\"")
+endforeach()
+string(REPLACE ";" "," R_LIBRARIES "${R_LIBRARIES_INCLUDES}")
 
 target_include_directories(RSQLite PUBLIC
   ${R_INCLUDE}

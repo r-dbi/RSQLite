@@ -53,19 +53,22 @@ add_library(RSQLite
 set(R_DEPENDENCIES Rcpp plogr)
 
 execute_process(COMMAND bash "-c" "Rscript -e 'cat(R.home(\"include\"))'" OUTPUT_VARIABLE R_INCLUDE)
-execute_process(COMMAND bash "-c" "Rscript -e 'cat(.libPaths()[[1]])'" OUTPUT_VARIABLE R_LIB)
+execute_process(COMMAND bash "-c" "Rscript -e 'cat(.libPaths()[[1]])'" OUTPUT_VARIABLE R_LIBDIR)
 
-foreach(LIB_NAME IN LISTS R_DEPENDENCIES)
-  list(APPEND R_LIBRARIES_INCLUDES "\"${R_LIB}/${LIB_NAME}/include\"")
+foreach(PKG_NAME IN LISTS R_DEPENDENCIES)
+  list(APPEND R_PKG_INCLUDE_LIST "${R_LIBDIR}/${PKG_NAME}/include")
 endforeach()
-string(REPLACE ";" "," R_LIBRARIES "${R_LIBRARIES_INCLUDES}")
+message("${R_PKG_INCLUDE_LIST}")
 
 target_include_directories(RSQLite PUBLIC
+  ${R_PKG_INCLUDE_LIST}
   ${R_INCLUDE}
-  ${R_LIBRARIES_INCLUDES}
   # Included by default
   "."
   "vendor"
 )
+
+get_target_property(include_dirs RSQLite INTERFACE_INCLUDE_DIRECTORIES)
+message("${include_dirs}")
 
 include(./custom.cmake OPTIONAL)

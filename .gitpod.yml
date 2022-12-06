@@ -32,10 +32,7 @@ tasks:
       ln -s $(which true) ~/bin/timedatectl
 
       ## Define PATH
-      echo 'export PATH='${HOME}'/bin:${PATH}' >> .bashrc
-
-      ## Debug
-      tail ~/.bashrc
+      echo 'export PATH='${HOME}'/bin:${PATH}' >> ~/.bashrc
 
       # Set up Makevars
       mkdir -p ~/.R
@@ -47,14 +44,8 @@ tasks:
       ## Install devtools and R dependencies
       R -q -e 'pak::pak(c("devtools", "languageserver", "styler")); pak::pak("deps::.", dependencies = TRUE)'
 
-      ## Debug
-      tail ~/.bashrc
-
       # Install radian
       sudo pip install radian
-
-      ## Debug
-      tail ~/.bashrc
 
 vscode:
   extensions:

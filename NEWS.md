@@ -1,5 +1,16 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
+# RSQLite 2.2.19.9002 (2022-12-21)
+
+## Bug fixes
+
+- Fix test on non-UTF-8 locales.
+
+## Features
+
+- GitPod and cmake integration.
+
+
 # RSQLite 2.2.19.9001 (2022-11-24)
 
 ## Features

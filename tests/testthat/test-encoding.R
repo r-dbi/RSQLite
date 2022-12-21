@@ -19,7 +19,7 @@ test_that("write tables whose colnames and contents are UTF-8 encoded (#277)", {
   )
   colnames(df) <- utf8_string
   dbWriteTable(con, "a", df)
-  res <- dbReadTable(con, "a")
+  res <- dbReadTable(con, "a", check.names = FALSE)
   expect_identical(res, df)
 
   df <- structure(
@@ -29,7 +29,7 @@ test_that("write tables whose colnames and contents are UTF-8 encoded (#277)", {
   )
   colnames(df) <- paste(utf8_string, 1:2, sep = "")
   dbWriteTable(con, "b", df)
-  res <- dbReadTable(con, "b")
+  res <- dbReadTable(con, "b", check.names = FALSE)
   expect_identical(res, df)
 })
 

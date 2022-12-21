@@ -15,11 +15,6 @@
 - GitPod and cmake integration.
 
 
-# RSQLite 2.2.19.9000 (2022-11-22)
-
-- Internal changes only.
-
-
 # RSQLite 2.2.19 (2022-11-22)
 
 ## Bug fixes

@@ -39,3 +39,4 @@ a.out.dSYM
 ^CRAN-SUBMISSION$
 ^\.gitpod\.Dockerfile$
 ^\.gitpod\.yml$
+^src/CMakeLists\.txt$

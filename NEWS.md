@@ -1,5 +1,17 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
+# RSQLite 2.2.20.9002 (2022-12-30)
+
+## Features
+
+- Upgrade bundled SQLite to 3.40.1 (#448).
+
+## Uncategorized
+
+- Merge remote-tracking branch 'refs/remotes/origin/main'.
+
+
+
 # RSQLite 2.2.20.9001 (2022-12-24)
 
 - Internal changes only.

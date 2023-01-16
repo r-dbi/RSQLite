@@ -1,8 +1,56 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
-# RSQLite 2.2.18.9000 (2022-10-04)
+# RSQLite 2.2.20.9003 (2022-12-30)
 
 - Internal changes only.
+
+
+# RSQLite 2.2.20.9002 (2022-12-30)
+
+## Features
+
+- Upgrade bundled SQLite to 3.40.1 (#448).
+
+## Uncategorized
+
+- Merge remote-tracking branch 'refs/remotes/origin/main'.
+
+
+
+# RSQLite 2.2.20.9001 (2022-12-24)
+
+- Internal changes only.
+
+
+# RSQLite 2.2.20.9000 (2022-12-21)
+
+- Internal changes only.
+
+
+# RSQLite 2.2.20 (2022-12-21)
+
+## Features
+
+- Upgrade bundled SQLite to 3.40.0 (#446).
+
+## Tests
+
+- Fix test on non-UTF-8 locales.
+
+## Internal
+
+- GitPod and cmake integration.
+
+
+# RSQLite 2.2.19 (2022-11-22)
+
+## Bug fixes
+
+- Add missing boost headers for icpc compiler (@lolow, #442, #443).
+
+## Internal
+
+- Use testthat edition 3 (#438).
 
 
 # RSQLite 2.2.18 (2022-10-04)

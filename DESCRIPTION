@@ -1,7 +1,7 @@
 Package: RSQLite
 Title: SQLite Interface for R
-Version: 2.2.18.9000
-Date: 2022-10-04
+Version: 2.2.20.9003
+Date: 2022-12-30
 Authors@R: c(
     person("Kirill", "Müller", , "kirill@cynkra.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1416-3412")),
@@ -63,7 +63,7 @@ Config/autostyle/strict: false
 Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Collate: 
     'SQLiteConnection.R'
     'SQLKeywords_SQLiteConnection.R'

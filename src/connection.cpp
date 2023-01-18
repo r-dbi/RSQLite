@@ -17,8 +17,6 @@ enable_if_dbconnection_ptr<T> as_cpp(SEXP x) {
 
 }  // namespace cpp11
 
-#include <cpp11/R.hpp>
-
 extern "C" {
   int RS_sqlite_import(
     sqlite3* db,

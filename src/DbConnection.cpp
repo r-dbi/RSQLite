@@ -1,5 +1,3 @@
-#include <cpp11/R.hpp>
-#include "cpp11.hpp"
 #include "pch.h"
 #include "DbConnection.h"
 

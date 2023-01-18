@@ -23,7 +23,6 @@ add_library(RSQLite
   DbResultImplDecl.h
   RSQLite.h
   RSQLite_types.h
-  RcppExports.cpp
   SqliteColumnDataSource.cpp
   SqliteColumnDataSource.h
   SqliteColumnDataSourceFactory.cpp

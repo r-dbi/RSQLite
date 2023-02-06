@@ -127,6 +127,9 @@ sqliteSetBusyHandler <- function(dbObj, handler) {
     raw_handler <- function(...) {
       tryCatch(
         handler(...),
+        interrupt = function(e) {
+          0L
+        },
         error = function(e) {
           0L
         }

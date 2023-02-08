@@ -55,7 +55,6 @@ Suggests:
 LinkingTo: 
     plogr (>= 0.2.0),
     cpp11
-SystemRequirements: C++11
 VignetteBuilder: 
     knitr
 Config/autostyle/scope: line_breaks

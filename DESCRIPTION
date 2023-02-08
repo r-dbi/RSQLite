@@ -129,4 +129,5 @@ Collate:
     'table.R'
     'transactions.R'
     'utils.R'
+    'version.R'
     'zzz.R'

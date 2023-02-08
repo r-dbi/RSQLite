@@ -3,13 +3,6 @@
 #include "pch.h"
 #include "sqlite3-cpp.h"
 
-//' RSQLite version
-//'
-//' @return A character vector containing header and library versions of
-//'   RSQLite.
-//' @export
-//' @examples
-//' RSQLite::rsqliteVersion()
 [[cpp11::register]]
 cpp11::strings rsqliteVersion() {
   using namespace cpp11::literals;

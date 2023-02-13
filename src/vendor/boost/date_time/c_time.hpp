@@ -92,7 +92,7 @@ namespace date_time {
 
 #if defined(__clang__) // Clang has to be checked before MSVC
 #pragma clang diagnostic push
-//#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    //#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #elif (defined(_MSC_VER) && (_MSC_VER >= 1400))
 #pragma warning(push) // preserve warning settings
 #pragma warning(disable : 4996) // disable depricated localtime/gmtime warning on vc8

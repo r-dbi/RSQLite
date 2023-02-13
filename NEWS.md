@@ -1,5 +1,16 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.0.9000 (2023-02-13)
+
+## Chore
+
+- Upgrade boost to 1.81.0-1 (#450).
+
+- Clean up GitPod configuration.
+
+- Replace Rcpp by cpp11 (@Antonov548, #441).
+
+
 # RSQLite 2.3.0 (2023-02-13)
 
 ## Chore

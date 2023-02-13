@@ -1,3 +1,4 @@
+#include <cpp11.hpp>
 #include "pch.h"
 #include "SqliteResultImpl.h"
 #include "SqliteDataFrame.h"
@@ -91,7 +92,7 @@ sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
   if (tail) {
     while (isspace(*tail)) ++tail;
     if (*tail) {
-      Rcpp::warningcall(R_NilValue, std::string("Ignoring remaining part of query: ") + tail);
+      cpp11::warning(std::string("Ignoring remaining part of query: ") + tail);
     }
   }
 
@@ -124,19 +125,19 @@ int SqliteResultImpl::n_rows_affected() {
   return sqlite3_total_changes(conn) - total_changes_start_;
 }
 
-void SqliteResultImpl::bind(const List& params) {
+void SqliteResultImpl::bind(const cpp11::list& params) {
   if (cache.nparams_ == 0) {
-    stop("Query does not require parameters.");
+    cpp11::stop("Query does not require parameters.");
   }
 
   if (params.size() != cache.nparams_) {
-    stop("Query requires %i params; %i supplied.",
+    cpp11::stop("Query requires %i params; %i supplied.",
          cache.nparams_, params.size());
   }
 
   set_params(params);
 
-  SEXP first_col = params[0];
+  SEXP first_col = cpp11::as_sexp(params[0]);
   groups_ = Rf_length(first_col);
   group_ = 0;
 
@@ -146,27 +147,32 @@ void SqliteResultImpl::bind(const List& params) {
   after_bind(has_params);
 }
 
-List SqliteResultImpl::fetch(const int n_max) {
+cpp11::list SqliteResultImpl::fetch(const int n_max) {
   if (!ready_)
-    stop("Query needs to be bound before fetching");
+    cpp11::stop("Query needs to be bound before fetching");
 
   int n = 0;
-  List out;
+  cpp11::list out;
 
-  if (n_max != 0)
+  if (n_max != 0) {
     out = fetch_rows(n_max, n);
+  }
   else
     out = peek_first_row();
 
   return out;
 }
 
-List SqliteResultImpl::get_column_info() {
+cpp11::list SqliteResultImpl::get_column_info() {
+  using namespace cpp11::literals;
   peek_first_row();
 
-  CharacterVector names(cache.names_.begin(), cache.names_.end());
+  cpp11::writable::strings names(cache.names_.size());
+  auto it = cache.names_.begin();
+  for (int i = 0; i < names.size(); i++, it++)
+    names[i] = *it;
 
-  CharacterVector types(cache.ncols_);
+  cpp11::writable::strings types(cache.ncols_);
   for (size_t i = 0; i < cache.ncols_; i++) {
     switch(types_[i]) {
     case DT_DATE:
@@ -184,17 +190,17 @@ List SqliteResultImpl::get_column_info() {
     }
   }
 
-  return List::create(_["name"] = names, _["type"] = types);
+  return cpp11::list({"name"_nm = names, "type"_nm = types});
 }
 
 
 
 // Publics (custom) ////////////////////////////////////////////////////////////
 
-CharacterVector SqliteResultImpl::get_placeholder_names() const {
+cpp11::strings SqliteResultImpl::get_placeholder_names() const {
   int n = sqlite3_bind_parameter_count(stmt);
 
-  CharacterVector res(n);
+  cpp11::writable::strings res(n);
 
   for (int i = 0; i < n; ++i) {
     const char* placeholder_name = sqlite3_bind_parameter_name(stmt, i + 1);
@@ -202,7 +208,7 @@ CharacterVector SqliteResultImpl::get_placeholder_names() const {
       placeholder_name = "";
     else
       ++placeholder_name;
-    res[i] = String(placeholder_name, CE_UTF8);
+    res[i] = placeholder_name;
   }
 
   return res;
@@ -212,7 +218,7 @@ CharacterVector SqliteResultImpl::get_placeholder_names() const {
 
 // Privates ////////////////////////////////////////////////////////////////////
 
-void SqliteResultImpl::set_params(const List& params) {
+void SqliteResultImpl::set_params(const cpp11::list& params) {
   params_ = params;
 }
 
@@ -285,11 +291,11 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
       sqlite3_bind_blob(stmt, j, RAW(value), Rf_length(value), SQLITE_TRANSIENT);
     }
     else {
-      stop("Can only bind lists of raw vectors (or NULL)");
+      cpp11::stop("Can only bind lists of raw vectors (or NULL)");
     }
   }
   else {
-    stop("Don't know how to handle parameter of type %s.",
+    cpp11::stop("Don't know how to handle parameter of type %s.",
          Rf_type2char(TYPEOF(value_)));
   }
 }
@@ -300,13 +306,13 @@ void SqliteResultImpl::after_bind(bool params_have_rows) {
     step();
 }
 
-List SqliteResultImpl::fetch_rows(const int n_max, int& n) {
+cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
   SqliteDataFrame data(stmt, cache.names_, n_max, types_, with_alt_types_);
 
   if (complete_ && data.get_ncols() == 0) {
-    warning("SQL statements must be issued with dbExecute() or dbSendStatement() instead of dbGetQuery() or dbSendQuery().");
+    Rf_warning("SQL statements must be issued with dbExecute() or dbSendStatement() instead of dbGetQuery() or dbSendQuery().");
   }
 
   while (!complete_) {
@@ -355,7 +361,7 @@ bool SqliteResultImpl::step_done() {
   return more_params;
 }
 
-List SqliteResultImpl::peek_first_row() {
+cpp11::list SqliteResultImpl::peek_first_row() {
   SqliteDataFrame data(stmt, cache.names_, 1, types_, with_alt_types_);
 
   if (!complete_)
@@ -370,5 +376,5 @@ void SqliteResultImpl::raise_sqlite_exception() const {
 }
 
 void SqliteResultImpl::raise_sqlite_exception(sqlite3* conn) {
-  stop(sqlite3_errmsg(conn));
+  cpp11::stop(sqlite3_errmsg(conn));
 }

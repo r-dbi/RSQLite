@@ -1,6 +1,22 @@
 #include "pch.h"
 #include "DbConnection.h"
 
+namespace cpp11 {
+
+template <typename T>
+using enable_if_dbconnection_ptr = typename std::enable_if<
+    std::is_same<DbConnectionPtr*, T>::value, T>::type;
+
+template <typename T>
+enable_if_dbconnection_ptr<T> as_cpp(SEXP x) {
+  DbConnectionPtr* result = (DbConnectionPtr*)(R_ExternalPtrAddr(x));
+  if (!result)
+    cpp11::stop("Invalid result set");
+  return result;
+}
+
+}  // namespace cpp11
+
 extern "C" {
   int RS_sqlite_import(
     sqlite3* db,
@@ -12,8 +28,8 @@ extern "C" {
   );
 }
 
-// [[Rcpp::export]]
-XPtr<DbConnectionPtr> connection_connect(
+[[cpp11::register]]
+cpp11::external_pointer<DbConnectionPtr> connection_connect(
   const std::string& path, const bool allow_ext, const int flags, const std::string& vfs = "", bool with_alt_types = false
 ) {
   LOG_VERBOSE;
@@ -22,26 +38,26 @@ XPtr<DbConnectionPtr> connection_connect(
     new DbConnection(path, allow_ext, flags, vfs, with_alt_types)
   );
 
-  return XPtr<DbConnectionPtr>(pConn, true);
+  return cpp11::external_pointer<DbConnectionPtr>(pConn, true);
 }
 
-// [[Rcpp::export]]
-bool connection_valid(XPtr<DbConnectionPtr> con_) {
+[[cpp11::register]]
+bool connection_valid(cpp11::external_pointer<DbConnectionPtr> con_) {
   DbConnectionPtr* con = con_.get();
   return con && con->get()->is_valid();
 }
 
-// [[Rcpp::export]]
-void connection_release(XPtr<DbConnectionPtr> con_) {
+[[cpp11::register]]
+void connection_release(cpp11::external_pointer<DbConnectionPtr> con_) {
   if (!connection_valid(con_)) {
-    warning("Already disconnected");
+    Rf_warning("Already disconnected");
     return;
   }
 
   DbConnectionPtr* con = con_.get();
   long n = con_->use_count();
   if (n > 1) {
-    warning(
+    Rf_warning(
       "There are %i result in use. The connection will be released when they are closed",
       n - 1
     );
@@ -59,14 +75,14 @@ void connection_release(XPtr<DbConnectionPtr> con_) {
 
 // Specific functions
 
-// [[Rcpp::export]]
-void connection_copy_database(const XPtr<DbConnectionPtr>& from,
-                              const XPtr<DbConnectionPtr>& to) {
-  (*from)->copy_to((*to));
+[[cpp11::register]]
+void connection_copy_database(const cpp11::external_pointer<DbConnectionPtr>& from,
+                              const cpp11::external_pointer<DbConnectionPtr>& to) {
+  (*from.get())->copy_to(*to.get());
 }
 
-// [[Rcpp::export]]
-bool connection_import_file(const XPtr<DbConnectionPtr>& con,
+[[cpp11::register]]
+bool connection_import_file(const cpp11::external_pointer<DbConnectionPtr>& con,
                             const std::string& name, const std::string& value,
                             const std::string& sep, const std::string& eol,
                             const int skip) {
@@ -74,21 +90,7 @@ bool connection_import_file(const XPtr<DbConnectionPtr>& con,
                             sep.c_str(), eol.c_str(), skip);
 }
 
-// as() override
-
-namespace Rcpp {
-
-template<>
-DbConnection* as(SEXP x) {
-  DbConnectionPtr* connection = (DbConnectionPtr*)(R_ExternalPtrAddr(x));
-  if (!connection)
-    stop("Invalid connection");
-  return connection->get();
-}
-
-}
-
-// [[Rcpp::export]]
-void set_busy_handler(const XPtr<DbConnectionPtr>& con, SEXP r_callback) {
+[[cpp11::register]]
+void set_busy_handler(const cpp11::external_pointer<DbConnectionPtr>& con, SEXP r_callback) {
   con->get()->set_busy_handler(r_callback);
 }

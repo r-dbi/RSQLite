@@ -1,5 +1,4 @@
 #' @useDynLib RSQLite, .registration = TRUE
-#' @importFrom Rcpp sourceCpp
 #' @importFrom bit64 integer64 is.integer64
 #' @importFrom blob blob
 NULL

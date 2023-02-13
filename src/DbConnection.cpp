@@ -3,14 +3,14 @@
 
 
 DbConnection::DbConnection(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs, bool with_alt_types)
-  : pConn_(NULL), 
+  : pConn_(NULL),
     with_alt_types_(with_alt_types),
     busy_callback_(NULL) {
 
   // Get the underlying database connection
   int rc = sqlite3_open_v2(path.c_str(), &pConn_, flags, vfs.empty() ? NULL : vfs.c_str());
   if (rc != SQLITE_OK) {
-    stop("Could not connect to database:\n%s", getException());
+    cpp11::stop("Could not connect to database:\n%s", getException().c_str());
   }
   if (allow_ext) {
     sqlite3_enable_load_extension(pConn_, 1);
@@ -26,7 +26,7 @@ DbConnection::~DbConnection() {
 }
 
 sqlite3* DbConnection::conn() const {
-  if (!is_valid()) stop("disconnected");
+  if (!is_valid()) cpp11::stop("disconnected");
   return pConn_;
 }
 
@@ -46,7 +46,7 @@ bool DbConnection::is_current_result(const DbResult*) const {
 
 void DbConnection::check_connection() const {
   if (!is_valid()) {
-    stop("Invalid or closed connection");
+    cpp11::stop("Invalid or closed connection");
   }
 }
 
@@ -63,11 +63,11 @@ void DbConnection::copy_to(const DbConnectionPtr& pDest) {
 
   int rc = sqlite3_backup_step(backup, -1);
   if (rc != SQLITE_DONE) {
-    stop("Failed to copy all data:\n%s", getException());
+    cpp11::stop("Failed to copy all data:\n%s", getException().c_str());
   }
   rc = sqlite3_backup_finish(backup);
   if (rc != SQLITE_OK) {
-    stop("Could not finish copy:\n%s", getException());
+    cpp11::stop("Could not finish copy:\n%s", getException().c_str());
   }
 }
 
@@ -107,35 +107,7 @@ void DbConnection::release_callback_data() {
 int DbConnection::busy_callback_helper(void *data, int num)
 {
   SEXP r_callback = reinterpret_cast<SEXP>(data);
-
-  // Overarching safety net
-  try
-  {
-    try
-    {
-      Function rfun = r_callback;
-      IntegerVector ret = rfun(num);
-      return as<int>(ret);
-    }
-    catch (eval_error &e)
-    {
-      std::string msg = std::string("Busy callback failed, aborting transaction: ") + e.what();
-      Rcpp::message(Rcpp::StringVector::create(msg));
-      return 0;
-    }
-    catch (Rcpp::internal::InterruptedException &e)
-    {
-      // Not warning on explicit interrupt
-      return 0;
-    }
-    catch (...)
-    {
-      Rcpp::message(Rcpp::StringVector::create("Busy callback failed, aborting transaction"));
-      return 0;
-    }
-  }
-  catch (...)
-  {
-    return 0;
-  }
+  cpp11::function rfun = r_callback;
+  int ret = cpp11::as_integers(rfun(num))[0];
+  return ret;
 }

@@ -1,5 +1,4 @@
 // Extracted from sqlite3.c
-
 #include "affinity.h"
 
 #ifndef UINT32_TYPE

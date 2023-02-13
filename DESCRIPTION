@@ -38,8 +38,7 @@ Imports:
     DBI (>= 1.1.0),
     memoise,
     methods,
-    pkgconfig,
-    Rcpp (>= 1.0.7)
+    pkgconfig
 Suggests: 
     callr,
     DBItest (>= 1.7.2.9001),
@@ -55,7 +54,7 @@ Suggests:
     xml2
 LinkingTo: 
     plogr (>= 0.2.0),
-    Rcpp
+    cpp11
 VignetteBuilder: 
     knitr
 Config/autostyle/scope: line_breaks
@@ -65,7 +64,6 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Collate: 
-    'RcppExports.R'
     'SQLiteConnection.R'
     'SQLKeywords_SQLiteConnection.R'
     'SQLiteDriver.R'
@@ -74,6 +72,7 @@ Collate:
     'coerce.R'
     'compatRowNames.R'
     'copy.R'
+    'cpp11.R'
     'datasetsDb.R'
     'dbAppendTable_SQLiteConnection.R'
     'dbBeginTransaction.R'
@@ -130,4 +129,5 @@ Collate:
     'table.R'
     'transactions.R'
     'utils.R'
+    'version.R'
     'zzz.R'

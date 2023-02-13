@@ -1,23 +1,19 @@
+#include <cpp11/R.hpp>
+
 #include "pch.h"
 #include "sqlite3-cpp.h"
 
-//' RSQLite version
-//'
-//' @return A character vector containing header and library versions of
-//'   RSQLite.
-//' @export
-//' @examples
-//' RSQLite::rsqliteVersion()
-// [[Rcpp::export]]
-CharacterVector rsqliteVersion() {
+[[cpp11::register]]
+cpp11::strings rsqliteVersion() {
+  using namespace cpp11::literals;
   return
-    CharacterVector::create(
-      _["header"] = SQLITE_VERSION,
-      _["library"] = sqlite3_libversion()
-    );
+    cpp11::strings({
+      "header"_nm = SQLITE_VERSION,
+      "library"_nm = sqlite3_libversion()
+    });
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 void init_logging(const std::string& log_level) {
   plog::init_r(log_level);
 }

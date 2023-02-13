@@ -23,7 +23,6 @@ add_library(RSQLite
   DbResultImplDecl.h
   RSQLite.h
   RSQLite_types.h
-  RcppExports.cpp
   SqliteColumnDataSource.cpp
   SqliteColumnDataSource.h
   SqliteColumnDataSourceFactory.cpp
@@ -50,7 +49,7 @@ add_library(RSQLite
   sqlite3-cpp.h
 )
 
-set(R_DEPENDENCIES Rcpp plogr)
+set(R_DEPENDENCIES cpp11 plogr)
 
 execute_process(COMMAND bash "-c" "Rscript -e 'cat(R.home(\"include\"))'" OUTPUT_VARIABLE R_INCLUDE)
 execute_process(COMMAND bash "-c" "Rscript -e 'cat(.libPaths()[[1]])'" OUTPUT_VARIABLE R_LIBDIR)

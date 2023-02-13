@@ -1,5 +1,22 @@
-RSQLite 2.2.20
+RSQLite 2.3.0
 
-- [x] Checked on 2022-12-21, problems found: https://cran.r-project.org/web/checks/check_results_RSQLite.html
-- [x] ERROR: r-devel-linux-x86_64-debian-clang, r-oldrel-windows-ix86+x86_64, r-oldrel-windows-ix86+x86_64: fixed.
-- [x] NOTE: r-release-macos-arm64, r-release-macos-x86_64, r-oldrel-macos-arm64, r-oldrel-macos-x86_64, r-oldrel-windows-ix86+x86_64: Large binary.
+## Cran Repository Policy
+
+- [x] Reviewed CRP last edited 2022-07-26.
+
+## R CMD check results
+
+- [x] Checked locally, R 4.2.2
+- [ ] Checked on CI system, R 4.2.2
+- [ ] Checked on win-builder, R devel
+
+Check the boxes above after successful execution and remove this line. Then run `fledge::release()`.
+
+## Current CRAN check results
+
+- [x] Checked on 2023-02-13, problems found: https://cran.r-project.org/web/checks/check_results_RSQLite.html
+- [ ] NOTE: r-release-macos-arm64, r-release-macos-x86_64, r-oldrel-macos-arm64, r-oldrel-macos-x86_64, r-oldrel-windows-ix86+x86_64
+- [ ] other_issue: NA
+- [ ] other_issue: NA
+
+Check results at: https://cran.r-project.org/web/checks/check_results_RSQLite.html

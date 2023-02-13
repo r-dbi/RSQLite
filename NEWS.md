@@ -2,6 +2,10 @@
 
 # RSQLite 2.3.0 (2023-02-13)
 
+## Features
+
+- Upgrade bundled SQLite to 3.40.1 (#448).
+
 ## Chore
 
 - Upgrade boost to 1.81.0-1 (#450).
@@ -9,33 +13,6 @@
 - Clean up GitPod configuration.
 
 - Replace Rcpp by cpp11 (@Antonov548, #441).
-
-
-# RSQLite 2.2.20.9003 (2022-12-30)
-
-- Internal changes only.
-
-
-# RSQLite 2.2.20.9002 (2022-12-30)
-
-## Features
-
-- Upgrade bundled SQLite to 3.40.1 (#448).
-
-## Uncategorized
-
-- Merge remote-tracking branch 'refs/remotes/origin/main'.
-
-
-
-# RSQLite 2.2.20.9001 (2022-12-24)
-
-- Internal changes only.
-
-
-# RSQLite 2.2.20.9000 (2022-12-21)
-
-- Internal changes only.
 
 
 # RSQLite 2.2.20 (2022-12-21)

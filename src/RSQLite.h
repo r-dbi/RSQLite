@@ -11,6 +11,4 @@
 #include <boost/container/stable_vector.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 
-// using namespace Rcpp;
-
 #endif

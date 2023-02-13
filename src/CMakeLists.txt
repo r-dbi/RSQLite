@@ -36,6 +36,7 @@ add_library(RSQLite
   affinity.c
   affinity.h
   connection.cpp
+  cpp11.cpp
   ext-csv.c
   ext-math.c
   ext-regexp.c

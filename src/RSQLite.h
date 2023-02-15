@@ -6,6 +6,8 @@
 
 #include <plogr.h>
 
+#define BOOST_NO_AUTO_PTR
+
 // Included here because they need -Wno-error,
 // which is active only for precompiled headers on my system
 #include <boost/container/stable_vector.hpp>

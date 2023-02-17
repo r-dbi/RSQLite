@@ -9,7 +9,6 @@ PKG_CPPFLAGS=-I. -Ivendor -Ivendor/extensions -Ivendor/sqlite3 \
              -DSQLITE_ENABLE_STAT4 \
              -DSQLITE_SOUNDEX \
              -DSQLITE_USE_URI=1 \
-             -DBOOST_NO_AUTO_PTR \
              -DSQLITE_MAX_LENGTH=2147483647 \
              -DHAVE_USLEEP=1
 

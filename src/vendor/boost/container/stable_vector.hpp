@@ -2119,7 +2119,7 @@ class stable_vector
       }
       BOOST_CATCH(...) {
          praw->destroy_header();
-         this->priv_node_alloc().deallocate(p, 1);
+         // this->priv_node_alloc().deallocate(p, 1); // -Wuse-after-delete
          BOOST_RETHROW
       }
       BOOST_CATCH_END

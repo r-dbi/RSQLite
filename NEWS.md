@@ -1,5 +1,14 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.1 (2023-04-03)
+
+## Chore
+
+- Require cpp11 \>= 0.4.0 (#456).
+
+Closes #456.
+
+
 # RSQLite 2.3.0.9006 (2023-03-31)
 
 ## Features

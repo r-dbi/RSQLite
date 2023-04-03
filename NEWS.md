@@ -2,58 +2,13 @@
 
 # RSQLite 2.3.1 (2023-04-03)
 
-## Chore
-
-- Require cpp11 \>= 0.4.0 (#456).
-
-Closes #456.
-
-
-# RSQLite 2.3.0.9006 (2023-03-31)
-
 ## Features
 
 - Upgrade bundled SQLite to 3.41.2 (#455).
 
-
-# RSQLite 2.3.0.9005 (2023-03-24)
-
-- Internal changes only.
-
-
-# RSQLite 2.3.0.9004 (2023-03-12)
-
-## Features
-
-- Upgrade bundled SQLite to 3.41.1 (#454).
-
-
-# RSQLite 2.3.0.9003 (2023-02-24)
-
-## Features
-
-- Upgrade bundled SQLite to 3.41.0 (#452).
-
-
-# RSQLite 2.3.0.9002 (2023-02-18)
-
-- Merged cran-2.3.0 into main.
-
-
-# RSQLite 2.3.0.9001 (2023-02-17)
-
-- Internal changes only.
-
-
-# RSQLite 2.3.0.9000 (2023-02-13)
-
 ## Chore
 
-- Upgrade boost to 1.81.0-1 (#450).
-
-- Clean up GitPod configuration.
-
-- Replace Rcpp by cpp11 (@Antonov548, #441).
+- Require cpp11 \>= 0.4.0 in `DESCRIPTION` (#456).
 
 
 # RSQLite 2.3.0 (2023-02-13)

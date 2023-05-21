@@ -17,7 +17,6 @@ class DbConnection;
 typedef boost::shared_ptr<DbConnection> DbConnectionPtr;
 
 class DbConnection : boost::noncopyable {
-  int transaction_;
 
 public:
   // Create a new connection handle
@@ -63,6 +62,7 @@ private:
   SEXP busy_callback_;
   void release_callback_data();
   static int busy_callback_helper(void *data, int num);
+  int transaction_;
 };
 
 #endif // __RSQLITE_SQLITE_CONNECTION__

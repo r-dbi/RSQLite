@@ -36,6 +36,8 @@ a SQLite transaction and turns auto-commit off. \code{dbCommit()} and
 auto-commit on.
 \code{\link[DBI:dbWithTransaction]{DBI::dbWithTransaction()}} is a convenient wrapper that makes sure that
 \code{dbCommit()} or \code{dbRollback()} is called.
+An helper function \code{sqliteIsTransacting()} is available to check the current
+transaction status of the connection.
 }
 \examples{
 library(DBI)
@@ -62,6 +64,7 @@ dbGetQuery(con, "SELECT count(*) FROM arrests")[1, ]
 # Named savepoints can be nested --------------------------------------------
 dbBegin(con, name = "a")
 dbBegin(con, name = "b")
+sqliteIsTransacting(con)
 dbRollback(con, name = "b")
 dbCommit(con, name = "a")
 

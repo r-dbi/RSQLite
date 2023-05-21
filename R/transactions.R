@@ -71,6 +71,8 @@ get_savepoint_id <- function(name) {
   paste0(name, "_", Sys.getpid(), "_", random_string)
 }
 
+#' @export
+#' @name sqlite-transaction
 sqliteIsTransacting <- function(conn) {
   return(connection_in_transaction(conn@ptr))
 }

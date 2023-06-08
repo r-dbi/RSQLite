@@ -67,6 +67,22 @@ void connection_release(cpp11::external_pointer<DbConnectionPtr> con_) {
   // don't release here to make sure a nice error message is delivered
 }
 
+[[cpp11::register]]
+bool connection_in_transaction(cpp11::external_pointer<DbConnectionPtr> con_){
+  DbConnectionPtr* con = con_.get();
+  return (con->get()->in_transaction() != 0);
+}
+[[cpp11::register]]
+void connection_add_transaction(cpp11::external_pointer<DbConnectionPtr> con_){
+  DbConnectionPtr* con = con_.get();
+  con->get()->add_transaction();
+}
+[[cpp11::register]]
+void connection_rem_transaction(cpp11::external_pointer<DbConnectionPtr> con_){
+  DbConnectionPtr* con = con_.get();
+  con->get()->rem_transaction();
+}
+
 
 // Quoting
 

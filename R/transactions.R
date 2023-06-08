@@ -9,6 +9,8 @@ NULL
 #' auto-commit on.
 #' [DBI::dbWithTransaction()] is a convenient wrapper that makes sure that
 #' `dbCommit()` or `dbRollback()` is called.
+#' A helper function `sqliteIsTransacting()` is available to check the current
+#' transaction status of the connection.
 #'
 #' @seealso
 #' The corresponding generic functions [DBI::dbBegin()], [DBI::dbCommit()],
@@ -45,6 +47,7 @@ NULL
 #' # Named savepoints can be nested --------------------------------------------
 #' dbBegin(con, name = "a")
 #' dbBegin(con, name = "b")
+#' sqliteIsTransacting(con)
 #' dbRollback(con, name = "b")
 #' dbCommit(con, name = "a")
 #'
@@ -66,4 +69,10 @@ compat_name <- function(name, .name) {
 get_savepoint_id <- function(name) {
   random_string <- paste(sample(letters, 10, replace = TRUE), collapse = "")
   paste0(name, "_", Sys.getpid(), "_", random_string)
+}
+
+#' @export
+#' @name sqlite-transaction
+sqliteIsTransacting <- function(conn) {
+  return(connection_in_transaction(conn@ptr))
 }

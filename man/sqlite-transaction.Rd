@@ -10,6 +10,7 @@
 \alias{dbRollback_SQLiteConnection}
 \alias{dbRollback,SQLiteConnection-method}
 \alias{sqlite-transaction}
+\alias{sqliteIsTransacting}
 \title{SQLite transaction management}
 \usage{
 \S4method{dbBegin}{SQLiteConnection}(conn, .name = NULL, ..., name = NULL)
@@ -17,6 +18,8 @@
 \S4method{dbCommit}{SQLiteConnection}(conn, .name = NULL, ..., name = NULL)
 
 \S4method{dbRollback}{SQLiteConnection}(conn, .name = NULL, ..., name = NULL)
+
+sqliteIsTransacting(conn)
 }
 \arguments{
 \item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
@@ -36,6 +39,8 @@ a SQLite transaction and turns auto-commit off. \code{dbCommit()} and
 auto-commit on.
 \code{\link[DBI:dbWithTransaction]{DBI::dbWithTransaction()}} is a convenient wrapper that makes sure that
 \code{dbCommit()} or \code{dbRollback()} is called.
+An helper function \code{sqliteIsTransacting()} is available to check the current
+transaction status of the connection.
 }
 \examples{
 library(DBI)
@@ -62,6 +67,7 @@ dbGetQuery(con, "SELECT count(*) FROM arrests")[1, ]
 # Named savepoints can be nested --------------------------------------------
 dbBegin(con, name = "a")
 dbBegin(con, name = "b")
+sqliteIsTransacting(con)
 dbRollback(con, name = "b")
 dbCommit(con, name = "a")
 

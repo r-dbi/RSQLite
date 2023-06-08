@@ -28,6 +28,29 @@ extern "C" SEXP _RSQLite_connection_release(SEXP con_) {
   END_CPP11
 }
 // connection.cpp
+bool connection_in_transaction(cpp11::external_pointer<DbConnectionPtr> con_);
+extern "C" SEXP _RSQLite_connection_in_transaction(SEXP con_) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(connection_in_transaction(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbConnectionPtr>>>(con_)));
+  END_CPP11
+}
+// connection.cpp
+void connection_add_transaction(cpp11::external_pointer<DbConnectionPtr> con_);
+extern "C" SEXP _RSQLite_connection_add_transaction(SEXP con_) {
+  BEGIN_CPP11
+    connection_add_transaction(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbConnectionPtr>>>(con_));
+    return R_NilValue;
+  END_CPP11
+}
+// connection.cpp
+void connection_rem_transaction(cpp11::external_pointer<DbConnectionPtr> con_);
+extern "C" SEXP _RSQLite_connection_rem_transaction(SEXP con_) {
+  BEGIN_CPP11
+    connection_rem_transaction(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbConnectionPtr>>>(con_));
+    return R_NilValue;
+  END_CPP11
+}
+// connection.cpp
 void connection_copy_database(const cpp11::external_pointer<DbConnectionPtr>& from, const cpp11::external_pointer<DbConnectionPtr>& to);
 extern "C" SEXP _RSQLite_connection_copy_database(SEXP from, SEXP to) {
   BEGIN_CPP11
@@ -148,10 +171,13 @@ extern "C" SEXP _RSQLite_init_logging(SEXP log_level) {
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
+    {"_RSQLite_connection_add_transaction",   (DL_FUNC) &_RSQLite_connection_add_transaction,   1},
     {"_RSQLite_connection_connect",           (DL_FUNC) &_RSQLite_connection_connect,           5},
     {"_RSQLite_connection_copy_database",     (DL_FUNC) &_RSQLite_connection_copy_database,     2},
     {"_RSQLite_connection_import_file",       (DL_FUNC) &_RSQLite_connection_import_file,       6},
+    {"_RSQLite_connection_in_transaction",    (DL_FUNC) &_RSQLite_connection_in_transaction,    1},
     {"_RSQLite_connection_release",           (DL_FUNC) &_RSQLite_connection_release,           1},
+    {"_RSQLite_connection_rem_transaction",   (DL_FUNC) &_RSQLite_connection_rem_transaction,   1},
     {"_RSQLite_connection_valid",             (DL_FUNC) &_RSQLite_connection_valid,             1},
     {"_RSQLite_extension_load",               (DL_FUNC) &_RSQLite_extension_load,               3},
     {"_RSQLite_init_logging",                 (DL_FUNC) &_RSQLite_init_logging,                 1},

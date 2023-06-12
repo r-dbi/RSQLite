@@ -85,7 +85,7 @@ if the file does not already exist; \code{SQLITE_RO}: open the database in
 read only mode.  Raise an error if the file does not already exist}
 
 \item{vfs}{Select the SQLite3 OS interface. See
-\url{https://www.sqlite.org/vfs.html} for details. Allowed values are
+https://www.sqlite.org/vfs.html for details. Allowed values are
 \code{"unix-posix"}, \code{"unix-unix-afp"},
 \code{"unix-unix-flock"}, \code{"unix-dotfile"}, and
 \code{"unix-none"}.}

@@ -128,5 +128,7 @@ void DbConnection::add_transaction() {
 void DbConnection::rem_transaction() {
   if (transaction_ > 0) {
     transaction_ -= 1;
+  } else {
+    cpp11::warning("No transaction(s). Using DBI::dbCommit() or DBI::dbRollback() without a corresponding DBI::dbBegin().");
   }
 }

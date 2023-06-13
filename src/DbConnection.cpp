@@ -128,7 +128,5 @@ void DbConnection::add_transaction() {
 void DbConnection::rem_transaction() {
   if (transaction_ > 0) {
     transaction_ -= 1;
-  } else {
-    cpp11::stop("Cannot remove non-existent transactions");
   }
 }

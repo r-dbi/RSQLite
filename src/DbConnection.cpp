@@ -114,10 +114,12 @@ int DbConnection::busy_callback_helper(void *data, int num)
 }
 
 bool DbConnection::in_transaction() const {
-  if (transaction_ > 0) {
-    return true;
-  } else {
+  int status = sqlite3_txn_state(pConn_, NULL);
+
+  if (status == SQLITE_TXN_NONE) {
     return false;
+  } else {
+    return true;
   }
 }
 

@@ -15,7 +15,6 @@ dbRollback_SQLiteConnection <- function(conn, .name = NULL, ..., name = NULL) {
     dbExecute(conn, paste0("ROLLBACK TO ", name_quoted))
     dbExecute(conn, paste0("RELEASE SAVEPOINT ", name_quoted))
   }
-  connection_rem_transaction(conn@ptr)
   invisible(TRUE)
 }
 #' @rdname sqlite-transaction

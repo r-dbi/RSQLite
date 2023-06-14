@@ -10,7 +10,8 @@ NULL
 #' [DBI::dbWithTransaction()] is a convenient wrapper that makes sure that
 #' `dbCommit()` or `dbRollback()` is called.
 #' A helper function `sqliteIsTransacting()` is available to check the current
-#' transaction status of the connection.
+#' transaction status of the connection. Note that a transaction will not be
+#' reported until a read/write is attempted after starting a transaction.
 #'
 #' @seealso
 #' The corresponding generic functions [DBI::dbBegin()], [DBI::dbCommit()],

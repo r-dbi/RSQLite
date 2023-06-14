@@ -39,8 +39,9 @@ a SQLite transaction and turns auto-commit off. \code{dbCommit()} and
 auto-commit on.
 \code{\link[DBI:dbWithTransaction]{DBI::dbWithTransaction()}} is a convenient wrapper that makes sure that
 \code{dbCommit()} or \code{dbRollback()} is called.
-An helper function \code{sqliteIsTransacting()} is available to check the current
-transaction status of the connection.
+A helper function \code{sqliteIsTransacting()} is available to check the current
+transaction status of the connection. Note that a transaction will not be
+reported until a read/write is attempted after starting a transaction.
 }
 \examples{
 library(DBI)

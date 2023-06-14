@@ -28,8 +28,8 @@ test_that("commit unnamed transactions", {
 
   expect_false(sqliteIsTransacting(con))
   dbBegin(con)
-  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "a", data.frame(a = 1))
+  expect_true(sqliteIsTransacting(con))
   expect_equal(dbListTables(con), "a")
   expect_equal(dbListTables(con2), character())
   dbCommit(con)
@@ -56,8 +56,8 @@ test_that("rollback unnamed transactions", {
 
   expect_false(sqliteIsTransacting(con))
   dbBegin(con)
-  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "a", data.frame(a = 1))
+  expect_true(sqliteIsTransacting(con))
   expect_equal(dbListTables(con), "a")
   expect_equal(dbListTables(con2), character())
   dbRollback(con)
@@ -83,8 +83,9 @@ test_that("no nested unnamed transactions (commit after error)", {
   )
   expect_false(sqliteIsTransacting(con))
   dbBegin(con)
-  expect_true(sqliteIsTransacting(con))
+  expect_false(sqliteIsTransacting(con))
   expect_error(dbBegin(con))
+  expect_false(sqliteIsTransacting(con))
   dbCommit(con)
   expect_false(sqliteIsTransacting(con))
 
@@ -107,8 +108,9 @@ test_that("no nested unnamed transactions (rollback after error)", {
 
   expect_false(sqliteIsTransacting(con))
   dbBegin(con)
-  expect_true(sqliteIsTransacting(con))
+  expect_false(sqliteIsTransacting(con))
   expect_error(dbBegin(con))
+  expect_false(sqliteIsTransacting(con))
   dbRollback(con)
   expect_false(sqliteIsTransacting(con))
 
@@ -131,8 +133,8 @@ test_that("commit named transactions", {
 
   expect_false(sqliteIsTransacting(con))
   dbBegin(con, name = "tx")
-  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "a", data.frame(a = 1))
+  expect_true(sqliteIsTransacting(con))
   expect_equal(dbListTables(con), "a")
   expect_equal(dbListTables(con2), character())
   dbCommit(con, name = "tx")
@@ -159,8 +161,8 @@ test_that("rollback named transactions", {
 
   expect_false(sqliteIsTransacting(con))
   dbBegin(con, name = "tx")
-  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "a", data.frame(a = 1))
+  expect_true(sqliteIsTransacting(con))
   expect_equal(dbListTables(con), "a")
   expect_equal(dbListTables(con2), character())
 
@@ -188,8 +190,8 @@ test_that("nested named transactions (commit - commit)", {
 
   expect_false(sqliteIsTransacting(con))
   dbBegin(con, name = "tx")
-  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "a", data.frame(a = 1))
+  expect_true(sqliteIsTransacting(con))
   expect_equal(dbListTables(con), "a")
   expect_equal(dbListTables(con2), character())
 
@@ -231,8 +233,8 @@ test_that("nested named transactions (commit - rollback)", {
 
   expect_false(sqliteIsTransacting(con))
   dbBegin(con, name = "tx")
-  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "a", data.frame(a = 1))
+  expect_true(sqliteIsTransacting(con))
   expect_equal(dbListTables(con), "a")
   expect_equal(dbListTables(con2), character())
 
@@ -274,8 +276,8 @@ test_that("nested named transactions (rollback - commit)", {
 
   expect_false(sqliteIsTransacting(con))
   dbBegin(con, name = "tx")
-  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "a", data.frame(a = 1))
+  expect_true(sqliteIsTransacting(con))
   expect_equal(dbListTables(con), "a")
   expect_equal(dbListTables(con2), character())
 
@@ -317,8 +319,8 @@ test_that("nested named transactions (rollback - rollback)", {
 
   expect_false(sqliteIsTransacting(con))
   dbBegin(con, name = "tx")
-  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "a", data.frame(a = 1))
+  expect_true(sqliteIsTransacting(con))
   expect_equal(dbListTables(con), "a")
   expect_equal(dbListTables(con2), character())
 
@@ -360,8 +362,8 @@ test_that("named transactions with keywords", {
 
   expect_false(sqliteIsTransacting(con))
   dbBegin(con, name = "SELECT")
-  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "a", data.frame(a = 1))
+  expect_true(sqliteIsTransacting(con))
   expect_equal(dbListTables(con), "a")
   expect_equal(dbListTables(con2), character())
   dbCommit(con, name = "SELECT")
@@ -370,8 +372,8 @@ test_that("named transactions with keywords", {
   expect_equal(dbListTables(con2), "a")
 
   dbBegin(con, name = "WHERE")
-  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "b", data.frame(b = 1))
+  expect_true(sqliteIsTransacting(con))
   expect_equal(dbListTables(con), c("a", "b"))
   expect_equal(dbListTables(con2), "a")
   dbRollback(con, name = "WHERE")

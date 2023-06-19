@@ -83,9 +83,9 @@ test_that("no nested unnamed transactions (commit after error)", {
   )
   expect_false(sqliteIsTransacting(con))
   dbBegin(con)
-  expect_false(sqliteIsTransacting(con))
+  expect_true(sqliteIsTransacting(con))
   expect_error(dbBegin(con))
-  expect_false(sqliteIsTransacting(con))
+  expect_true(sqliteIsTransacting(con))
   dbCommit(con)
   expect_false(sqliteIsTransacting(con))
 
@@ -108,9 +108,9 @@ test_that("no nested unnamed transactions (rollback after error)", {
 
   expect_false(sqliteIsTransacting(con))
   dbBegin(con)
-  expect_false(sqliteIsTransacting(con))
+  expect_true(sqliteIsTransacting(con))
   expect_error(dbBegin(con))
-  expect_false(sqliteIsTransacting(con))
+  expect_true(sqliteIsTransacting(con))
   dbRollback(con)
   expect_false(sqliteIsTransacting(con))
 
@@ -389,14 +389,14 @@ test_that("transactions managed without dbBegin+dbCommit", {
 
   expect_false(sqliteIsTransacting(con))
   dbExecute(con, "BEGIN")
-  expect_false(sqliteIsTransacting(con))
+  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "a", data.frame(a = 1))
   expect_true(sqliteIsTransacting(con))
   dbExecute(con, "END")
   expect_false(sqliteIsTransacting(con))
 
   dbExecute(con, "BEGIN")
-  expect_false(sqliteIsTransacting(con))
+  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "b", data.frame(b = 1))
   expect_true(sqliteIsTransacting(con))
   dbExecute(con, "COMMIT")
@@ -425,7 +425,7 @@ test_that("transactions managed without dbBegin+dbRollback", {
 
   expect_false(sqliteIsTransacting(con))
   dbExecute(con, "BEGIN")
-  expect_false(sqliteIsTransacting(con))
+  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "a", data.frame(a = 1))
   expect_true(sqliteIsTransacting(con))
   dbExecute(con, "ROLLBACK")
@@ -446,7 +446,7 @@ test_that("mixed management of transactions", {
 
   expect_false(sqliteIsTransacting(con))
   dbExecute(con, "BEGIN")
-  expect_false(sqliteIsTransacting(con))
+  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "a", data.frame(a = 1))
   expect_true(sqliteIsTransacting(con))
   dbCommit(con)
@@ -461,7 +461,7 @@ test_that("mixed management of transactions", {
 
   expect_false(sqliteIsTransacting(con))
   dbExecute(con, "BEGIN")
-  expect_false(sqliteIsTransacting(con))
+  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "c", data.frame(c = 1))
   expect_true(sqliteIsTransacting(con))
   dbRollback(con)
@@ -475,21 +475,21 @@ test_that("mixed management of transactions", {
   expect_false(sqliteIsTransacting(con))
 
   dbBegin(con)
-  expect_false(sqliteIsTransacting(con))
+  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "e", data.frame(e = 1))
   expect_true(sqliteIsTransacting(con))
   dbExecute(con, "COMMIT")
   expect_false(sqliteIsTransacting(con))
 
   dbBegin(con)
-  expect_false(sqliteIsTransacting(con))
+  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "f", data.frame(f = 1))
   expect_true(sqliteIsTransacting(con))
   dbExecute(con, "END")
   expect_false(sqliteIsTransacting(con))
 
   dbBegin(con)
-  expect_false(sqliteIsTransacting(con))
+  expect_true(sqliteIsTransacting(con))
   dbWriteTable(con, "g", data.frame(g = 1))
   expect_true(sqliteIsTransacting(con))
   dbExecute(con, "ROLLBACK")

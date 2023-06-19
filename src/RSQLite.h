@@ -1,6 +1,7 @@
 #define STRICT_R_HEADERS
 #define R_NO_REMAP
 
+#include "cpp11/protect.hpp"  // for stop, protect, safe, protect::function
 
 #ifndef RSQLite_RSQLite_H
 #define RSQLite_RSQLite_H

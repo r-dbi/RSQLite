@@ -35,11 +35,6 @@
 - Internal changes only.
 
 
-# RSQLite 2.3.2 (2023-06-12)
-
-- Same as previous version.
-
-
 # RSQLite 2.3.1.9003 (2023-06-08)
 
 ## Features
@@ -54,18 +49,15 @@
 - Upgrade bundled SQLite to 3.42.0 (#461).
 
 
-# RSQLite 2.3.1.9001 (2023-04-23)
+# RSQLite 2.3.2 (2023-10-27)
 
-- Merged cran-2.3.1 into main.
+## Features
 
+- Upgrade bundled SQLite to 3.42.0 (#461).
 
-# RSQLite 2.3.1.9000 (2023-04-03)
-
-## Chore
+## Internal
 
 - Require cpp11 \>= 0.4.0 (#456).
-
-Closes #456.
 
 
 # RSQLite 2.3.1 (2023-04-03)

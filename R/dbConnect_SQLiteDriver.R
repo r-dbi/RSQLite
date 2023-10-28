@@ -36,7 +36,7 @@
 #'   function will be called on the new connection.Setting this value to `FALSE`
 #'   requires calling `initExtension()` manually.
 #' @param vfs Select the SQLite3 OS interface. See
-#'   \url{https://www.sqlite.org/vfs.html} for details. Allowed values are
+#'   https://www.sqlite.org/vfs.html for details. Allowed values are
 #'   `"unix-posix"`, `"unix-unix-afp"`,
 #'   `"unix-unix-flock"`, `"unix-dotfile"`, and
 #'   `"unix-none"`.

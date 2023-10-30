@@ -5,8 +5,7 @@
 DbConnection::DbConnection(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs, bool with_alt_types)
   : pConn_(NULL),
     with_alt_types_(with_alt_types),
-    busy_callback_(NULL),
-    transaction_(0) {
+    busy_callback_(NULL) {
 
   // Get the underlying database connection
   int rc = sqlite3_open_v2(path.c_str(), &pConn_, flags, vfs.empty() ? NULL : vfs.c_str());
@@ -114,21 +113,11 @@ int DbConnection::busy_callback_helper(void *data, int num)
 }
 
 bool DbConnection::in_transaction() const {
-  if (transaction_ > 0) {
+  int status = sqlite3_get_autocommit(pConn_);
+
+  if (status == 0) {
     return true;
   } else {
     return false;
-  }
-}
-
-void DbConnection::add_transaction() {
-  transaction_ += 1;
-}
-
-void DbConnection::rem_transaction() {
-  if (transaction_ > 0) {
-    transaction_ -= 1;
-  } else {
-    cpp11::stop("Cannot remove non-existent transactions");
   }
 }

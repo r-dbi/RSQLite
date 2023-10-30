@@ -7,7 +7,6 @@ dbCommit_SQLiteConnection <- function(conn, .name = NULL, ..., name = NULL) {
   } else {
     dbExecute(conn, paste0("RELEASE SAVEPOINT ", dbQuoteIdentifier(conn, name)))
   }
-  connection_rem_transaction(conn@ptr)
   invisible(TRUE)
 }
 #' @rdname sqlite-transaction

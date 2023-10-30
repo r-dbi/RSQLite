@@ -53,8 +53,6 @@ public:
   void set_busy_handler(SEXP r_callback);
 
   bool in_transaction() const;
-  void add_transaction();
-  void rem_transaction();
 
 private:
   sqlite3* pConn_;
@@ -62,7 +60,6 @@ private:
   SEXP busy_callback_;
   void release_callback_data();
   static int busy_callback_helper(void *data, int num);
-  int transaction_;
 };
 
 #endif // __RSQLITE_SQLITE_CONNECTION__

@@ -1,3 +1,5 @@
+skip_if_not_installed("DBItest")
+
 if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   if (packageVersion("DBItest") >= "1.6.0") {
     DBItest::test_all()

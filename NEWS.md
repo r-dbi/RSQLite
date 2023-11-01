@@ -1,5 +1,16 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.2.9007 (2023-11-01)
+
+## Chore
+
+- Update revdepcheck results.
+
+## Testing
+
+- Skip DBItest tests if not installed.
+
+
 # RSQLite 2.3.2.9006 (2023-10-31)
 
 ## Bug fixes

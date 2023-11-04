@@ -2,31 +2,14 @@
 
 # RSQLite 2.3.3 (2023-11-04)
 
-## Bug fixes
-
-- Fix errors on transaction status (@bpvgoncalves, #464).
-
 ## Features
 
 - Upgrade bundled SQLite to 3.43.2 (#473).
-- Upgrade bundled SQLite to 3.43.1 (#470).
-- Upgrade bundled SQLite to 3.43.0 (#468).
-- New `sqliteIsTransacting()` that returns if a transaction is active on the current connection (@bpvgoncalves, #462).
-- Upgrade bundled SQLite to 3.42.0 (#461).
-
-## Chore
-
-- Update revdepcheck results.
-- Bump action.
+- New `sqliteIsTransacting()` that returns if a transaction is active on the current connection (@bpvgoncalves, #462, #464).
 
 ## Testing
 
 - Skip DBItest tests if not installed.
-
-## Uncategorized
-
-- Merge branch 'cran-2.3.2'.
-- Internal changes only.
 
 
 # RSQLite 2.3.2 (2023-10-27)

@@ -47,6 +47,7 @@ Suggests:
     hms,
     knitr,
     magrittr,
+    rlang,
     rmarkdown,
     rvest,
     testthat (>= 3.0.0),

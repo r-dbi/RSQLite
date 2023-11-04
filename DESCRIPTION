@@ -1,6 +1,6 @@
 Package: RSQLite
 Title: SQLite Interface for R
-Version: 2.3.2.9007
+Version: 2.3.3
 Date: 2023-11-01
 Authors@R: c(
     person("Kirill", "Müller", , "kirill@cynkra.com", role = c("aut", "cre"),
@@ -47,6 +47,7 @@ Suggests:
     hms,
     knitr,
     magrittr,
+    rlang,
     rmarkdown,
     rvest,
     testthat (>= 3.0.0),

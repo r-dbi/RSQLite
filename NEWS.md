@@ -1,75 +1,15 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 2.3.2.9007 (2023-11-01)
-
-## Chore
-
-- Update revdepcheck results.
-
-## Testing
-
-- Skip DBItest tests if not installed.
-
-
-# RSQLite 2.3.2.9006 (2023-10-31)
-
-## Bug fixes
-
-- Fix errors on transaction status (@bpvgoncalves, #464).
-
-
-# RSQLite 2.3.2.9005 (2023-10-29)
-
-- Merge branch 'cran-2.3.2'.
-
-
-# RSQLite 2.3.2.9004 (2023-10-13)
+# RSQLite 2.3.3 (2023-11-04)
 
 ## Features
 
 - Upgrade bundled SQLite to 3.43.2 (#473).
+- New `sqliteIsTransacting()` that returns if a transaction is active on the current connection (@bpvgoncalves, #462, #464).
 
-## Chore
+## Testing
 
-- Bump action.
-
-
-# RSQLite 2.3.2.9003 (2023-10-09)
-
-- Internal changes only.
-
-
-# RSQLite 2.3.2.9002 (2023-09-14)
-
-## Features
-
-- Upgrade bundled SQLite to 3.43.1 (#470).
-
-
-# RSQLite 2.3.2.9001 (2023-08-27)
-
-## Features
-
-- Upgrade bundled SQLite to 3.43.0 (#468).
-
-
-# RSQLite 2.3.2.9000 (2023-06-12)
-
-- Internal changes only.
-
-
-# RSQLite 2.3.1.9003 (2023-06-08)
-
-## Features
-
-- New `sqliteIsTransacting()` that returns if a transaction is active on the current connection (@bpvgoncalves, #462).
-
-
-# RSQLite 2.3.1.9002 (2023-05-18)
-
-## Features
-
-- Upgrade bundled SQLite to 3.42.0 (#461).
+- Skip DBItest tests if not installed.
 
 
 # RSQLite 2.3.2 (2023-10-27)

@@ -106,9 +106,7 @@ dbConnect_SQLiteDriver <- function(drv, dbname = "", ..., loadable.extensions = 
 
   extended_types <- isTRUE(extended_types)
   if (extended_types) {
-    if (!requireNamespace("hms", quietly = TRUE)) {
-      stopc("Install the hms package for `extended_types = TRUE`.")
-    }
+    check_suggested("hms", "dbConnect")
   }
   conn <- new("SQLiteConnection",
     ptr = connection_connect(dbname, loadable.extensions, flags, vfs, extended_types),

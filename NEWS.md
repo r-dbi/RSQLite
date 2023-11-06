@@ -1,5 +1,18 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.3.9001 (2023-11-06)
+
+## Features
+
+- Upgrade bundled SQLite to 3.44.0 (#475).
+
+## Chore
+
+- Use `check_suggested()` standalone for hms package (#477).
+
+- Add Aviator configuration.
+
+
 # RSQLite 2.3.3.9000 (2023-11-05)
 
 - Merge branch 'cran-2.3.3'.

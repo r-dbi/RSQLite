@@ -58,7 +58,7 @@ void connection_release(cpp11::external_pointer<DbConnectionPtr> con_) {
   long n = con_->use_count();
   if (n > 1) {
     Rf_warning(
-      "There are %i result in use. The connection will be released when they are closed",
+      "There are %ld result in use. The connection will be released when they are closed",
       n - 1
     );
   }

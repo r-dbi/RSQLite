@@ -1,5 +1,20 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.3.9002 (2023-11-29)
+
+## Bug fixes
+
+- Fix compiler warning regarding formatting specifier used in `Rf_warning()` (#482).
+
+## Features
+
+- Upgrade bundled SQLite to 3.44.1 (#478).
+
+## Chore
+
+- Bump to trigger CI/CD.
+
+
 # RSQLite 2.3.3.9001 (2023-11-06)
 
 ## Features

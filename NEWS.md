@@ -6,21 +6,11 @@
 
 - Fix compiler warning regarding formatting specifier used in `Rf_warning()` (#482).
 
-## Features
-
 - Upgrade bundled SQLite to 3.44.2 (#479).
-- Upgrade bundled SQLite to 3.44.1 (#478).
-- Upgrade bundled SQLite to 3.44.0 (#475).
 
 ## Chore
 
-- Bump to trigger CI/CD.
 - Use `check_suggested()` standalone for hms package (#477).
-- Add Aviator configuration.
-
-## Uncategorized
-
-- Merge branch 'cran-2.3.3'.
 
 
 # RSQLite 2.3.3 (2023-11-04)

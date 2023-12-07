@@ -1,47 +1,16 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 2.3.3.9003 (2023-11-30)
-
-## Features
-
-- Upgrade bundled SQLite to 3.44.2 (#479).
-
-## Chore
-
-- Bump to trigger CI/CD.
-
-
-# RSQLite 2.3.3.9002 (2023-11-29)
+# RSQLite 2.3.4 (2023-12-07)
 
 ## Bug fixes
 
 - Fix compiler warning regarding formatting specifier used in `Rf_warning()` (#482).
 
-## Features
-
-- Upgrade bundled SQLite to 3.44.1 (#478).
-
-## Chore
-
-- Bump to trigger CI/CD.
-
-
-# RSQLite 2.3.3.9001 (2023-11-06)
-
-## Features
-
-- Upgrade bundled SQLite to 3.44.0 (#475).
+- Upgrade bundled SQLite to 3.44.2 (#479).
 
 ## Chore
 
 - Use `check_suggested()` standalone for hms package (#477).
-
-- Add Aviator configuration.
-
-
-# RSQLite 2.3.3.9000 (2023-11-05)
-
-- Merge branch 'cran-2.3.3'.
 
 
 # RSQLite 2.3.3 (2023-11-04)

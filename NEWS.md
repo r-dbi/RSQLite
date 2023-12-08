@@ -1,5 +1,10 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.4.9000 (2023-12-08)
+
+- Merge branch 'cran-2.3.4'.
+
+
 # RSQLite 2.3.4 (2023-12-07)
 
 ## Bug fixes

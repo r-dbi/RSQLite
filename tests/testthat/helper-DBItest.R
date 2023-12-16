@@ -18,6 +18,7 @@ if (rlang::is_installed("DBItest")) {
         time_cast = function(x) paste0("'", x, "'"),
         timestamp_cast = function(x) paste0("'", x, "'"),
         logical_return = function(x) as.integer(x),
+        allow_na_rows_affected = TRUE,
         date_typed = FALSE,
         time_typed = FALSE,
         timestamp_typed = FALSE

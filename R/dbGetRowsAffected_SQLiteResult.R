@@ -1,7 +1,11 @@
 #' @rdname SQLiteResult-class
 #' @usage NULL
 dbGetRowsAffected_SQLiteResult <- function(res, ...) {
-  result_rows_affected(res@ptr)
+  out <- result_rows_affected(res@ptr)
+  if (out > 0) {
+    out <- NA_integer_
+  }
+  out
 }
 #' @rdname SQLiteResult-class
 #' @export

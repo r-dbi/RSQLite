@@ -1936,7 +1936,9 @@ class slist_impl
          BOOST_INTRUSIVE_INVARIANT_ASSERT(!constant_time_size || this->priv_size_traits().get_size() == 0);
          return;
       }
+      #ifndef BOOST_ASSERT_IS_VOID
       size_t node_count = 0;
+      #endif
       const_node_ptr p = header_ptr;
       while (true)
       {
@@ -1955,7 +1957,9 @@ class slist_impl
             break;
          }
          p = next_p;
+         #ifndef BOOST_ASSERT_IS_VOID
          ++node_count;
+         #endif
       }
       BOOST_INTRUSIVE_INVARIANT_ASSERT(!constant_time_size || this->priv_size_traits().get_size() == node_count);
    }

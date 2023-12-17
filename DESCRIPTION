@@ -42,7 +42,7 @@ Imports:
     rlang
 Suggests: 
     callr,
-    DBItest (>= 1.7.2.9001),
+    DBItest (>= 1.7.3),
     gert,
     gh,
     hms,

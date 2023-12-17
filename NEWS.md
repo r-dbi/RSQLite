@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.4.9001 (2023-12-17)
+
+## Chore
+
+- Remove compiler warning about unused variable (#486).
+
+
 # RSQLite 2.3.4.9000 (2023-12-08)
 
 - Merge branch 'cran-2.3.4'.

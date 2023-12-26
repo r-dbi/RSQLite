@@ -16,7 +16,7 @@ db_bind <- function(res, params, ..., allow_named_superset) {
   }
 
   if (any(empty) || any(numbers)) {
-    if (!is.null(names(params))) {
+    if (!is.null(names(params)) || any(names(params) != "")) {
       stopc("Cannot use named parameters for anonymous/numbered placeholders")
     }
   } else {

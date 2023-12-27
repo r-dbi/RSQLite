@@ -70,3 +70,7 @@ check_vfs <- function(vfs) {
 #
 # This function checks for known protocols, or for a colon at the beginning.
 is_url_or_special_filename <- function(x) grepl("^(?:file|http|ftp|https|):", x)
+
+
+#' @import rlang
+NULL

@@ -35,14 +35,14 @@ Depends:
 Imports: 
     bit64,
     blob (>= 1.2.0),
-    DBI (>= 1.1.0),
+    DBI (>= 1.2.0),
     memoise,
     methods,
     pkgconfig,
     rlang
 Suggests: 
     callr,
-    DBItest (>= 1.7.3),
+    DBItest (>= 1.8.0),
     gert,
     gh,
     hms,
@@ -58,6 +58,9 @@ LinkingTo:
     cpp11 (>= 0.4.0)
 VignetteBuilder: 
     knitr
+Remotes: 
+    r-dbi/DBI,
+    r-dbi/DBItest
 Config/autostyle/scope: line_breaks
 Config/autostyle/strict: false
 Config/testthat/edition: 3

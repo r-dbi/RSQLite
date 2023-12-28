@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.4.9003 (2023-12-28)
+
+## Chore
+
+- Update to DBItest 1.8.0 (#488).
+
+
 # RSQLite 2.3.4.9002 (2023-12-18)
 
 ## Chore

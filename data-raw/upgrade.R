@@ -128,7 +128,7 @@ if (any(grepl("^src/", gert::git_status()$file))) {
 
     message("Bumping main branch to run CI/CD")
     gert::git_branch_checkout(old_branch)
-    system2("git", c("commit", "-m", "chore: Bump main branch for CI/CD", "--allow-empty"))
+    system2("git", c("commit", "-m", "'chore: Bump main branch for CI/CD'", "--allow-empty"))
     gert::git_push(force = FALSE)
   }
 }

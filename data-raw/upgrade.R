@@ -118,5 +118,17 @@ if (any(grepl("^src/", gert::git_status()$file))) {
       body = body,
       .method = "PATCH"
     )
+
+    message("Adding label")
+    gh::gh(
+      paste0("/repos/r-dbi/RSQLite/issues/", pr$number),
+      labels = c("mergequeue", "mergequeue"),
+      .method = "PATCH"
+    )
+
+    message("Bumping main branch to run CI/CD")
+    gert::git_branch_checkout(old_branch)
+    system2("git", c("commit", "-m", "chore: Bump main branch for CI/CD", "--allow-empty"))
+    gert::git_push(force = FALSE)
   }
 }

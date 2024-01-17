@@ -1,5 +1,24 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.4.9005 (2024-01-17)
+
+## Features
+
+- Upgrade bundled SQLite to 3.45.0 (#491).
+
+## Chore
+
+- Bump main branch for CI/CD.
+
+- Bump to trigger CI/CD.
+
+## Continuous integration
+
+- Quotes.
+
+- Auto-merge for upgrade workflow.
+
+
 # RSQLite 2.3.4.9004 (2024-01-15)
 
 - Internal changes only.

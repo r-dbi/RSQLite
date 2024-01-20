@@ -1,5 +1,9 @@
 RSQLite 2.3.5
 
+## Cran Repository Policy
+
+- [x] Reviewed CRP last edited 2023-08-15.
+
 ## R CMD check results
 
 - [x] Checked locally, R 4.3.2

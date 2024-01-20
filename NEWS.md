@@ -8,26 +8,8 @@
 
 ## Chore
 
-- Add Aviator configuration.
-- Bump main branch for CI/CD.
-- Bump to trigger CI/CD.
-- Update to DBItest 1.8.0 (#488).
-- Clean up DBItest call (#487).
+- Update to upcoming DBItest 1.8.1 (#488, #492).
 - Remove compiler warning about unused variable (#486).
-
-## Continuous integration
-
-- Quotes.
-- Auto-merge for upgrade workflow.
-
-## Testing
-
-- Include all recent DBItest tests (#492).
-
-## Uncategorized
-
-- Internal changes only.
-- Merge branch 'cran-2.3.4'.
 
 
 # RSQLite 2.3.4 (2023-12-07)

@@ -1,17 +1,6 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 2.3.4.9006 (2024-01-20)
-
-## Chore
-
-- Add Aviator configuration.
-
-## Testing
-
-- Include all recent DBItest tests (#492).
-
-
-# RSQLite 2.3.4.9005 (2024-01-17)
+# RSQLite 2.3.5 (2024-01-20)
 
 ## Features
 
@@ -19,45 +8,25 @@
 
 ## Chore
 
+- Add Aviator configuration.
 - Bump main branch for CI/CD.
-
 - Bump to trigger CI/CD.
+- Update to DBItest 1.8.0 (#488).
+- Clean up DBItest call (#487).
+- Remove compiler warning about unused variable (#486).
 
 ## Continuous integration
 
 - Quotes.
-
 - Auto-merge for upgrade workflow.
 
+## Testing
 
-# RSQLite 2.3.4.9004 (2024-01-15)
+- Include all recent DBItest tests (#492).
+
+## Uncategorized
 
 - Internal changes only.
-
-
-# RSQLite 2.3.4.9003 (2023-12-28)
-
-## Chore
-
-- Update to DBItest 1.8.0 (#488).
-
-
-# RSQLite 2.3.4.9002 (2023-12-18)
-
-## Chore
-
-- Clean up DBItest call (#487).
-
-
-# RSQLite 2.3.4.9001 (2023-12-17)
-
-## Chore
-
-- Remove compiler warning about unused variable (#486).
-
-
-# RSQLite 2.3.4.9000 (2023-12-08)
-
 - Merge branch 'cran-2.3.4'.
 
 

@@ -1,5 +1,16 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.4.9006 (2024-01-20)
+
+## Chore
+
+- Add Aviator configuration.
+
+## Testing
+
+- Include all recent DBItest tests (#492).
+
+
 # RSQLite 2.3.4.9005 (2024-01-17)
 
 ## Features

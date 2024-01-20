@@ -58,9 +58,6 @@ LinkingTo:
     cpp11 (>= 0.4.0)
 VignetteBuilder: 
     knitr
-Remotes: 
-    r-dbi/DBI,
-    r-dbi/DBItest
 Config/autostyle/scope: line_breaks
 Config/autostyle/strict: false
 Config/testthat/edition: 3

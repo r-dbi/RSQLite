@@ -1,3 +1,5 @@
+Resubmission.
+
 RSQLite 2.3.5
 
 ## Cran Repository Policy

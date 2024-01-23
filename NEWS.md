@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.5.9001 (2024-01-23)
+
+## Documentation
+
+- Use dbitemplate (@maelle, #496).
+
+
 # RSQLite 2.3.5.9000 (2024-01-21)
 
 - Merge branch 'cran-2.3.5'.

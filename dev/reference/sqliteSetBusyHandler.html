@@ -30,11 +30,11 @@ sets the busy timeout to three seconds."><meta name="robots" content="noindex"><
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary" data-bs-theme="dark"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">RSQLite</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.3.5.9002</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.3.5.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,7 +83,7 @@ events. When setting a timeout, SQLite will try the transaction multiple
 times within this timeout. To set a timeout, pass an integer scalar to
 <code>sqliteSetBusyHandler()</code>.</p>
 <p>Another way to set a timeout is to use a <code>PRAGMA</code>, e.g. the SQL query</p>
-<p></p><div class="sourceCode sql"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>PRAGMA busy_timeout<span class="op">=</span><span class="dv">3000</span></span></code></pre><p></p></div>
+<p></p><div class="sourceCode sql"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>PRAGMA busy_timeout<span class="op">=</span><span class="dv">3000</span></span></code></pre><p></p></div>
 <p>sets the busy timeout to three seconds.</p>
     </div>
 

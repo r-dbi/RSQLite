@@ -5,20 +5,10 @@
 ## Features
 
 - Upgrade bundled SQLite to 3.45.2 (#500).
-- Upgrade bundled SQLite to 3.45.1 (#497).
-
-## Chore
-
-- Bump main branch for CI/CD.
 
 ## Documentation
 
 - Use dbitemplate (@maelle, #496).
-
-## Uncategorized
-
-- Internal changes only.
-- Merge branch 'cran-2.3.5'.
 
 
 # RSQLite 2.3.5 (2024-01-20)

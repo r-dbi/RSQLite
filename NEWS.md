@@ -1,41 +1,23 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 2.3.5.9004 (2024-03-14)
+# RSQLite 2.3.6 (2024-03-31)
 
 ## Features
 
 - Upgrade bundled SQLite to 3.45.2 (#500).
-
-## Chore
-
-- Bump main branch for CI/CD.
-
-
-# RSQLite 2.3.5.9003 (2024-02-01)
-
-## Features
-
 - Upgrade bundled SQLite to 3.45.1 (#497).
 
 ## Chore
 
 - Bump main branch for CI/CD.
 
-
-# RSQLite 2.3.5.9002 (2024-01-24)
-
-- Internal changes only.
-
-
-# RSQLite 2.3.5.9001 (2024-01-23)
-
 ## Documentation
 
 - Use dbitemplate (@maelle, #496).
 
+## Uncategorized
 
-# RSQLite 2.3.5.9000 (2024-01-21)
-
+- Internal changes only.
 - Merge branch 'cran-2.3.5'.
 
 

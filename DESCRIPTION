@@ -127,7 +127,6 @@ Collate:
     'initRegExp.R'
     'isSQLKeyword_SQLiteConnection_character.R'
     'make.db.names_SQLiteConnection_character.R'
-    'names.R'
     'pkgconfig.R'
     'show_SQLiteConnection.R'
     'sqlData_SQLiteConnection.R'

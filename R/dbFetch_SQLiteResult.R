@@ -14,7 +14,7 @@ dbFetch_SQLiteResult <- function(res, n = -1, ...,
   ret <- result_fetch(res@ptr, n = n)
   ret <- convert_bigint(ret, res@bigint)
   ret <- sqlColumnToRownames(ret, row.names)
-  set_tidy_names(ret)
+  ret
 }
 #' @rdname SQLiteResult-class
 #' @export

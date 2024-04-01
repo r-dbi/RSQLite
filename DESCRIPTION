@@ -89,6 +89,7 @@ Collate:
     'dbDataType_SQLiteConnection.R'
     'dbDataType_SQLiteDriver.R'
     'dbDisconnect_SQLiteConnection.R'
+    'dbExistsTable_SQLiteConnection_Id.R'
     'dbExistsTable_SQLiteConnection_character.R'
     'dbFetch_SQLiteResult.R'
     'dbGetException_SQLiteConnection.R'

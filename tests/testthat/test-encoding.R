@@ -34,9 +34,7 @@ test_that("write tables whose colnames and contents are UTF-8 encoded (#277)", {
 })
 
 test_that("list the field of tables whose colnames are BIG5 encoded (#277)", {
-  skip_on_os("linux")
-  skip_on_os("mac")
-  skip_on_os("solaris")
+  skip_if_not(.Platform$OS.type == "windows")
   if (.Platform$OS.type == "windows") {
     withr::local_collate("cht")
   } else {
@@ -133,9 +131,7 @@ test_that("append tables whose colnames are UTF-8 encoded (#277)", {
 })
 
 test_that("write tables whose colnames or contents are BIG5 encoded (#277)", {
-  skip_on_os("linux")
-  skip_on_os("mac")
-  skip_on_os("solaris")
+  skip_if_not(.Platform$OS.type == "windows")
 
   .loc <- Sys.getlocale("LC_COLLATE")
   suppressWarnings(Sys.setlocale(locale = "cht"))

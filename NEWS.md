@@ -1,5 +1,18 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.6.9001 (2024-04-02)
+
+## Features
+
+- Add `Id` method to `dbExistsTable()` (@kjellpk, #498, #499).
+
+- Breaking change: Avoid appending a numeric suffix to duplicate column names (#503).
+
+## Breaking changes
+
+- Breaking change: Avoid appending a numeric suffix to duplicate column names (#503).
+
+
 # RSQLite 2.3.6.9000 (2024-03-31)
 
 - Merge branch 'cran-2.3.6'.

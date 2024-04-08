@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.6.9002 (2024-04-08)
+
+## Testing
+
+- Fix test on FreeBSD (@nunotexbsd, #502, #504).
+
+
 # RSQLite 2.3.6.9001 (2024-04-02)
 
 ## Features

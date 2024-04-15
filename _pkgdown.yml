@@ -2,6 +2,7 @@ url: https://rsqlite.r-dbi.org
 
 template:
   package: dbitemplate
+  bootstrap: 5
 
 home:
   links:

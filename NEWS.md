@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.6.9003 (2024-04-16)
+
+## Documentation
+
+- Set BS version explicitly for now (@maelle, #506).
+
+
 # RSQLite 2.3.6.9002 (2024-04-08)
 
 ## Testing

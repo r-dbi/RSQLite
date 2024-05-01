@@ -9,19 +9,12 @@ RSQLite 2.3.7
 ## Current CRAN check results
 
 - [x] Checked on 2024-05-01, problems found: https://cran.r-project.org/web/checks/check_results_RSQLite.html
-- [ ] NOTE: r-devel-linux-x86_64-debian-clang, r-devel-linux-x86_64-debian-gcc, r-devel-linux-x86_64-fedora-clang, r-devel-linux-x86_64-fedora-gcc
+- [x] NOTE: r-devel-linux-x86_64-debian-clang, r-devel-linux-x86_64-debian-gcc, r-devel-linux-x86_64-fedora-clang, r-devel-linux-x86_64-fedora-gcc, r-devel-windows-x86_64
      File ‘RSQLite/libs/RSQLite.so’:
      Found non-API calls to R: ‘SETLENGTH’, ‘SET_TRUELENGTH’
      
      Compiled code should not call non-API entry points in R.
      
      See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
-- [ ] NOTE: r-devel-windows-x86_64
-     File 'RSQLite/libs/x64/RSQLite.dll':
-     Found non-API calls to R: 'SETLENGTH', 'SET_TRUELENGTH'
      
-     Compiled code should not call non-API entry points in R.
-     
-     See 'Writing portable packages' in the 'Writing R Extensions' manual.
-
-Check results at: https://cran.r-project.org/web/checks/check_results_RSQLite.html
+     Let's see what happens.

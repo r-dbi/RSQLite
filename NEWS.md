@@ -12,10 +12,6 @@
 - Add `Id` method to `dbExistsTable()` (@kjellpk, #498, #499).
 - Breaking change: Avoid appending a numeric suffix to duplicate column names (#503).
 
-## Chore
-
-- Bump main branch for CI/CD.
-
 ## Documentation
 
 - Set BS version explicitly for now (@maelle, #506).
@@ -23,10 +19,6 @@
 ## Testing
 
 - Fix test on FreeBSD (@nunotexbsd, #502, #504).
-
-## Uncategorized
-
-- Merge branch 'cran-2.3.6'.
 
 
 # RSQLite 2.3.6 (2024-03-31)

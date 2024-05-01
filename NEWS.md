@@ -1,44 +1,30 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 2.3.6.9004 (2024-04-17)
-
-## Features
-
-- Upgrade bundled SQLite to 3.45.3 (#507).
-
-## Chore
-
-- Bump main branch for CI/CD.
-
-
-# RSQLite 2.3.6.9003 (2024-04-16)
-
-## Documentation
-
-- Set BS version explicitly for now (@maelle, #506).
-
-
-# RSQLite 2.3.6.9002 (2024-04-08)
-
-## Testing
-
-- Fix test on FreeBSD (@nunotexbsd, #502, #504).
-
-
-# RSQLite 2.3.6.9001 (2024-04-02)
-
-## Features
-
-- Add `Id` method to `dbExistsTable()` (@kjellpk, #498, #499).
-
-- Breaking change: Avoid appending a numeric suffix to duplicate column names (#503).
+# RSQLite 2.3.7 (2024-05-01)
 
 ## Breaking changes
 
 - Breaking change: Avoid appending a numeric suffix to duplicate column names (#503).
 
+## Features
 
-# RSQLite 2.3.6.9000 (2024-03-31)
+- Upgrade bundled SQLite to 3.45.3 (#507).
+- Add `Id` method to `dbExistsTable()` (@kjellpk, #498, #499).
+- Breaking change: Avoid appending a numeric suffix to duplicate column names (#503).
+
+## Chore
+
+- Bump main branch for CI/CD.
+
+## Documentation
+
+- Set BS version explicitly for now (@maelle, #506).
+
+## Testing
+
+- Fix test on FreeBSD (@nunotexbsd, #502, #504).
+
+## Uncategorized
 
 - Merge branch 'cran-2.3.6'.
 

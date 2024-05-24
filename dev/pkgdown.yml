@@ -1,9 +1,9 @@
 pandoc: 3.1.11
 pkgdown: 2.0.9.9000
-pkgdown_sha: 9a6bbfc6ecf3aaf94406783beb0154fec0f3e87c
+pkgdown_sha: 69f7e6b8db1b9d13234b3ac28bb779bebc332610
 articles:
   RSQLite: RSQLite.html
-last_built: 2024-05-01T18:43Z
+last_built: 2024-05-24T13:08Z
 urls:
   reference: https://rsqlite.r-dbi.org/reference
   article: https://rsqlite.r-dbi.org/articles

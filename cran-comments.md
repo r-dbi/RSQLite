@@ -1,3 +1,5 @@
+Resubmission.
+
 RSQLite 2.3.7
 
 ## R CMD check results

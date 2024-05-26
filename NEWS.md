@@ -16,7 +16,7 @@
 - Merge branch 'cran-2.3.7'.
 
 
-# RSQLite 2.3.7 (2024-05-01)
+# RSQLite 2.3.7 (2024-05-26)
 
 ## Breaking changes
 
@@ -24,7 +24,7 @@
 
 ## Features
 
-- Upgrade bundled SQLite to 3.45.3 (#507).
+- Upgrade bundled SQLite to 3.46.0 (#510).
 - Add `Id` method to `dbExistsTable()` (@kjellpk, #498, #499).
 - Breaking change: Avoid appending a numeric suffix to duplicate column names (#503).
 

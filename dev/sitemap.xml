@@ -1,105 +1,37 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/CODE_OF_CONDUCT.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/CONTRIBUTING.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/ISSUE_TEMPLATE.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/UPDATE.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/articles/RSQLite.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/SQLite.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/SQLiteConnection-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/SQLiteDriver-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/SQLiteResult-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/datasetsDb.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/dbBeginTransaction.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/dbListResults.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/dbReadTable.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/dbWriteTable.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/fetch.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/initExtension.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/initRegExp.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/isIdCurrent.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/keywords-dep.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/query-dep.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/reexports.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/rsqliteVersion.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/sqlite-transaction.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/sqliteBuildTableDefinition.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/sqliteCopyDatabase.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/sqliteQuickColumn.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/reference/sqliteSetBusyHandler.html</loc>
-  </url>
-  <url>
-    <loc>https://rsqlite.r-dbi.org/dev/security.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://rsqlite.r-dbi.org/dev/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/CONTRIBUTING.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/ISSUE_TEMPLATE.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/LICENSE.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/UPDATE.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/articles/RSQLite.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/articles/index.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/authors.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/index.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/news/index.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/SQLite.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/SQLiteConnection-class.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/SQLiteDriver-class.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/SQLiteResult-class.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/datasetsDb.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/dbBeginTransaction.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/dbListResults.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/dbReadTable.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/dbWriteTable.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/fetch.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/index.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/initExtension.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/initRegExp.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/isIdCurrent.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/keywords-dep.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/query-dep.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/reexports.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/rsqliteVersion.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/sqlite-transaction.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/sqliteBuildTableDefinition.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/sqliteCopyDatabase.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/sqliteQuickColumn.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/sqliteSetBusyHandler.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/security.html</loc></url>
 </urlset>
+

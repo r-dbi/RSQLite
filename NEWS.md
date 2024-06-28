@@ -1,5 +1,26 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.7.9003 (2024-06-28)
+
+## Chore
+
+- Auto-update from GitHub Actions.
+
+  Run: https://github.com/r-dbi/RSQLite/actions/runs/9691621408
+
+## Continuous integration
+
+- Allow NOTEs on R-devel.
+
+- Avoid checking bashisms on Windows.
+
+- Better commit message.
+
+- Bump versions, better default, consume custom matrix.
+
+- Recent updates.
+
+
 # RSQLite 2.3.7.9002 (2024-05-27)
 
 - Merge branch 'cran-2.3.7'.

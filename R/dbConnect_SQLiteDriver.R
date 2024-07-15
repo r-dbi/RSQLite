@@ -106,7 +106,7 @@ dbConnect_SQLiteDriver <- function(drv, dbname = "", ..., loadable.extensions = 
 
   extended_types <- isTRUE(extended_types)
   if (extended_types) {
-    check_suggested("hms")
+    check_suggested("hms", "dbConnect")
   }
   conn <- new("SQLiteConnection",
     ptr = connection_connect(dbname, loadable.extensions, flags, vfs, extended_types),

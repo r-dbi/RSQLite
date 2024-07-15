@@ -1,3 +1,1 @@
-options(package_name = "RSQLite")
-
-withr::defer(options(package_name = NULL), teardown_env())
+rlang::local_options(test_package_name = "RSQLite", .frame = teardown_env())

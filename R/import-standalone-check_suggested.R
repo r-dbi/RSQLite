@@ -58,9 +58,9 @@ check_suggested <- function(packages, top_level_fun, use = TRUE) {
 
   # Skip if some packages are not installed when testing
   # And say which package was not installed.
-  if (identical(Sys.getenv("TESTTHAT"), "true")) {
+  if (identical(Sys.getenv("TESTTHAT"), "true") && identical(getOption("test_package_name"), "RSQLite")) {
     pkgs_not_installed <- packages[!installed]
-    message <- "{.fn {top_level_fun}} needs the {.pkg {.val {pkgs_not_installed}}} package{?s}."
+    message <- cli::cli_li("{.fn {top_level_fun}} needs the {.pkg {.val {pkgs_not_installed}}} package{?s}.")
     testthat::skip(message)
   }
 

@@ -42,6 +42,7 @@ Imports:
     rlang
 Suggests: 
     callr,
+    cli,
     DBItest (>= 1.8.0),
     gert,
     gh,

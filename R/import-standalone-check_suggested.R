@@ -6,7 +6,7 @@
 # ---
 # repo: cynkra/dm
 # file: standalone-check_suggested.R
-# last-updated: 2024-07-16
+# last-updated: 2024-07-17
 # license: https://unlicense.org
 # imports: rlang, cli
 # ---
@@ -20,6 +20,8 @@
 #
 # 2023-10-19:
 # * Initial
+# 2024-07-17:
+# * Skip tests only when the test env is for this package, and correctly format the message
 
 # nocov start
 
@@ -58,7 +60,7 @@ check_suggested <- function(packages, top_level_fun, use = TRUE) {
 
   # Skip if some packages are not installed when testing
   # And say which package was not installed.
-  if (identical(Sys.getenv("TESTTHAT"), "true") && identical(getOption("test_package_name"), getPackageName())) {
+  if (identical(Sys.getenv("TESTTHAT"), "true") && identical(getOption("test_package_name"), environmentName(topenv()))) {
     pkgs_not_installed <- packages[!installed]
     message <- cli::cli_li("{.fn {top_level_fun}} needs the {.pkg {.val {pkgs_not_installed}}} package{?s}.")
     testthat::skip(message)

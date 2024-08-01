@@ -33,7 +33,7 @@ dbSendPreparedQuery(conn, statement, bind.data, ...)
 }
 \description{
 These functions have been deprecated. Please switch to using
-\code{\link[=dbSendQuery]{dbSendQuery()}}/\code{\link[=dbGetQuery]{dbGetQuery()}} with the \code{params} argument
-or with calling \code{\link[=dbBind]{dbBind()}} instead.
+\code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}}/\code{\link[DBI:dbGetQuery]{DBI::dbGetQuery()}} with the \code{params} argument
+or with calling \code{\link[DBI:dbBind]{DBI::dbBind()}} instead.
 }
 \keyword{internal}

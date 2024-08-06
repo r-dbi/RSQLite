@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.7.9008 (2024-08-06)
+
+## Continuous integration
+
+- Inline action.
+
+
 # RSQLite 2.3.7.9007 (2024-08-02)
 
 ## Chore

@@ -13,7 +13,7 @@ Extensions must be enabled separately for each connection."><meta name="robots" 
 
     <a class="navbar-brand me-2" href="../index.html">RSQLite</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.3.7.9007</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.3.7.9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,7 +49,7 @@ Extensions must be enabled separately for each connection.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">initExtension</span><span class="op">(</span><span class="va">db</span>, extension <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"math"</span>, <span class="st">"regexp"</span>, <span class="st">"series"</span>, <span class="st">"csv"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">initExtension</span><span class="op">(</span><span class="va">db</span>, extension <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"math"</span>, <span class="st">"regexp"</span>, <span class="st">"series"</span>, <span class="st">"csv"</span>, <span class="st">"uuid"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -83,6 +83,10 @@ as available through the SQLite source code repository
 virtual tables,
 as available through the SQLite source code repository
 (<a href="https://sqlite.org/src/file?filename=ext/misc/csv.c" class="external-link">https://sqlite.org/src/file?filename=ext/misc/csv.c</a>).</p>
+<p>The <code>"uuid"</code> extension loads the functions <code>uuid()</code>, <code>uuid_str(X)</code> and
+<code>uuid_blob(X)</code> that can be used to create universally unique identifiers,
+as available through the SQLite source code repository
+(<a href="https://sqlite.org/src/file?filename=ext/misc/uuid.c" class="external-link">https://sqlite.org/src/file?filename=ext/misc/uuid.c</a>).</p>
     </div>
     <div class="section level2">
     <h2 id="available-functions-in-the-math-extension">Available functions in the math extension<a class="anchor" aria-label="anchor" href="#available-functions-in-the-math-extension"></a></h2>
@@ -165,6 +169,14 @@ upper_quartile</p></dd>
 <span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"SELECT * FROM tbl"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   a b</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 1 2</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># uuid</span></span></span>
+<span class="r-in"><span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu">initExtension</span><span class="op">(</span><span class="va">db</span>, <span class="st">"uuid"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"SELECT uuid();"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                 uuid()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 4bc6da2e-eb0a-4836-a05c-d5ffe75b3888</span>
+<span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

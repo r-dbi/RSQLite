@@ -62,6 +62,7 @@ register_misc_extension <- function(name) {
 register_misc_extension("regexp")
 register_misc_extension("series")
 register_misc_extension("csv")
+register_misc_extension("uuid")
 
 
 if (any(grepl("^src/", gert::git_status()$file))) {

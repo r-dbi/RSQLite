@@ -26,6 +26,11 @@
 #' as available through the SQLite source code repository
 #' (\url{https://sqlite.org/src/file?filename=ext/misc/csv.c}).
 #'
+#' The `"uuid"` extension loads the functions `uuid()`, `uuid_str(X)` and
+#' `uuid_blob(X)` that can be used to create universally unique identifiers,
+#' as available through the SQLite source code repository
+#' (\url{https://sqlite.org/src/file?filename=ext/misc/uuid.c}).
+#'
 #' @section Available functions in the math extension:
 #'
 #' \describe{
@@ -71,7 +76,13 @@
 #' )
 #' dbExecute(db, sql)
 #' dbGetQuery(db, "SELECT * FROM tbl")
-initExtension <- function(db, extension = c("math", "regexp", "series", "csv")) {
+#'
+#' # uuid
+#' db <- dbConnect(RSQLite::SQLite())
+#' RSQLite::initExtension(db, "uuid")
+#' dbGetQuery(db, "SELECT uuid();")
+#' dbDisconnect(db)
+initExtension <- function(db, extension = c("math", "regexp", "series", "csv", "uuid")) {
   extension <- match.arg(extension)
 
   if (!db@loadable.extensions) {

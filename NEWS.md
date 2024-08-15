@@ -1,5 +1,16 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.7.9011 (2024-08-15)
+
+## Features
+
+- Upgrade bundled SQLite to 3.46.1 (#518).
+
+## Chore
+
+- Bump main branch for CI/CD.
+
+
 # RSQLite 2.3.7.9010 (2024-08-10)
 
 ## Continuous integration

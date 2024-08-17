@@ -1,5 +1,18 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.7.9012 (2024-08-17)
+
+## Chore
+
+- Auto-update from GitHub Actions.
+
+  Run: https://github.com/r-dbi/RSQLite/actions/runs/10425484283
+
+## Continuous integration
+
+- Import from actions-sync, check carefully.
+
+
 # RSQLite 2.3.7.9011 (2024-08-15)
 
 ## Features

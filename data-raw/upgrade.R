@@ -1,5 +1,7 @@
 library(magrittr)
 
+#### get SQLite amalgamation ####
+
 html <- xml2::read_html("https://www.sqlite.org/download.html")
 
 latest_name <- html %>%
@@ -26,8 +28,11 @@ tryCatch(
 
 unzip(tmp, exdir = "src/vendor/sqlite3", junkpaths = TRUE)
 unlink("src/vendor/sqlite3/shell.c")
-file.rename("src/vendor/sqlite3/sqlite3ext.h", "src/vendor/extensions/sqlite3ext.h")
 
+
+#### extensions from SQLite repository ####
+
+file.rename("src/vendor/sqlite3/sqlite3ext.h", "src/vendor/extensions/sqlite3ext.h")
 
 tmp_source_zip <- tempfile()
 latest_code <- "https://www.sqlite.org/src/zip/sqlite.zip?r=release"
@@ -36,8 +41,6 @@ download.file(latest_code, tmp_source_zip)
 tmp_source_dir <- tempdir()
 unzip(tmp_source_zip, exdir = tmp_source_dir)
 
-
-# Regular expression source code
 register_misc_extension <- function(name) {
   ext_dir <- "src/vendor/extensions/"
   if (!dir.exists(ext_dir))
@@ -65,11 +68,71 @@ register_misc_extension("csv")
 register_misc_extension("uuid")
 
 
-if (any(grepl("^src/", gert::git_status()$file))) {
+#### extensions from other sources ####
+
+## https://github.com/asg017/sqlite-lines/
+if (TRUE) {
+  #
+  ghf <- httr::GET("https://api.github.com/repos/asg017/sqlite-lines/contents/?recursive=1")
+  ghf <- jsonlite::fromJSON(httr::content(ghf, as = "text"))
+  #
+  # define sources and target folders
+  files <- read.table(
+    header = TRUE,
+    text = paste(
+      'source target',
+      '/main/sqlite-lines.c src/vendor',
+      '/main/sqlite-lines.h src/vendor',
+      sep = "\n")
+  )
+  files$name <- sub("^.*/(.+?)$", "\\1", files[, "source"])
+  #
+  # clean
+  for (i in seq_len(nrow(files))) {
+    unlink(file.path(files[i, "target"], files[i, "name"]))
+  }
+  unlink("src/ext-lines.c")
+  #
+  # get
+  for (i in seq_len(nrow(files))) {
+    dir.create(
+      file.path(files[i, "target"]),
+      showWarnings = FALSE,
+      recursive = TRUE)
+    download.file(
+      url = paste0("https://raw.githubusercontent.com/asg017/sqlite-lines", files[i, "source"]),
+      destfile = file.path(files[i, "target"], files[i, "name"]),
+      quiet = TRUE
+    )
+  }
+  #
+  # write include file
+  cat(paste0(
+    '#define SQLITE_CORE\n',
+    '#include <R_ext/Visibility.h>\n',
+    'char const SQLITE_LINES_VERSION[] = "',
+    httr::content(httr::GET(ghf$download_url[ghf$name == "VERSION"])), '";\n',
+    'char const SQLITE_LINES_DATE[] = "',
+    Sys.Date(), '";\n',
+    'char const SQLITE_LINES_SOURCE[] = "',
+    ghf$sha[ghf$name == "VERSION"], '";\n',
+    '#include "vendor/sqlite-lines.c"\n'
+  ), file = "src/ext-lines.c"
+  )
+  #
+  # tests are in
+  # tests/testthat/test-lines.R
+}
+
+
+#### update CI ####
+
+if (F & any(grepl("^src/", gert::git_status()$file))) {
   branch <- paste0("f-", sub("[.][^.]*$", "", latest_name))
   message("Changes detected, creating branch: ", branch)
 
-  version <- sub("^.*-([0-9])([0-9][0-9])(?:0([0-9])|([1-9][0-9]))[0-9]+[.].*$", "\\1.\\2.\\3\\4", latest_name)
+  version <- sub("^.*-([0-9])([0-9][0-9])(?:0([0-9])|([1-9][0-9]))[0-9]+[.].*$",
+                 "\\1.\\2.\\3\\4", latest_name)
 
   old_branch <- gert::git_branch()
   message("Old branch: ", old_branch)

@@ -31,6 +31,11 @@
 #' as available through the SQLite source code repository
 #' (\url{https://sqlite.org/src/file?filename=ext/misc/uuid.c}).
 #'
+#' The `"lines"` extension loads the function `lines_read(<filename>)` that
+#' can be used to line-oriented datasets, like ndjson or JSON Lines,
+#' as available through the SQLite source code repository
+#' (\url{https://github.com/asg017/sqlite-lines}).
+#'
 #' @section Available functions in the math extension:
 #'
 #' \describe{
@@ -52,12 +57,12 @@
 #' db <- RSQLite::datasetsDb()
 #'
 #' # math
-#' RSQLite::initExtension(db)
+#' (RSQLite::initExtension(db))
 #' dbGetQuery(db, "SELECT stdev(mpg) FROM mtcars")
 #' sd(mtcars$mpg)
 #'
 #' # regexp
-#' RSQLite::initExtension(db, "regexp")
+#' (RSQLite::initExtension(db, "regexp"))
 #' dbGetQuery(db, "SELECT * FROM mtcars WHERE carb REGEXP '[12]'")
 #'
 #' # series
@@ -68,7 +73,7 @@
 #'
 #' # csv
 #' db <- dbConnect(RSQLite::SQLite())
-#' RSQLite::initExtension(db, "csv")
+#' (RSQLite::initExtension(db, "csv"))
 #' # use the filename argument to mount CSV files from disk
 #' sql <- paste0(
 #'   "CREATE VIRTUAL TABLE tbl USING ",
@@ -79,10 +84,18 @@
 #'
 #' # uuid
 #' db <- dbConnect(RSQLite::SQLite())
-#' RSQLite::initExtension(db, "uuid")
+#' (RSQLite::initExtension(db, "uuid"))
 #' dbGetQuery(db, "SELECT uuid();")
 #' dbDisconnect(db)
-initExtension <- function(db, extension = c("math", "regexp", "series", "csv", "uuid")) {
+#'
+#' # lines
+#' db <- dbConnect(RSQLite::SQLite())
+#' (RSQLite::initExtension(db, "lines"))
+#' tf <- tempfile()
+#' cat("This could be an NDJSON line\nOr another type of data", file = tf)
+#' dbGetQuery(db, paste0("SELECT * from lines_read('", tf, "');"))
+#' dbDisconnect(db)
+initExtension <- function(db, extension = c("math", "regexp", "series", "csv", "uuid", "lines")) {
   extension <- match.arg(extension)
 
   if (!db@loadable.extensions) {

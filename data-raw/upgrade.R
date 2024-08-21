@@ -110,6 +110,7 @@ if (TRUE) {
   cat(paste0(
     '#define SQLITE_CORE\n',
     '#include <R_ext/Visibility.h>\n',
+    '#define sqlite3_lines_init attribute_visible sqlite3_lines_init',
     'char const SQLITE_LINES_VERSION[] = "',
     httr::content(httr::GET(ghf$download_url[ghf$name == "VERSION"])), '";\n',
     'char const SQLITE_LINES_DATE[] = "',
@@ -127,7 +128,7 @@ if (TRUE) {
 
 #### update repo ####
 
-if (any(grepl("^src/", gert::git_status()$file))) {
+if (F & any(grepl("^src/", gert::git_status()$file))) {
   branch <- paste0("f-", sub("[.][^.]*$", "", latest_name))
   message("Changes detected, creating branch: ", branch)
 

@@ -125,9 +125,9 @@ if (TRUE) {
 }
 
 
-#### update CI ####
+#### update repo ####
 
-if (F & any(grepl("^src/", gert::git_status()$file))) {
+if (any(grepl("^src/", gert::git_status()$file))) {
   branch <- paste0("f-", sub("[.][^.]*$", "", latest_name))
   message("Changes detected, creating branch: ", branch)
 

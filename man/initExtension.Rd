@@ -4,7 +4,10 @@
 \alias{initExtension}
 \title{Add useful extension functions}
 \usage{
-initExtension(db, extension = c("math", "regexp", "series", "csv", "uuid"))
+initExtension(
+  db,
+  extension = c("math", "regexp", "series", "csv", "uuid", "lines")
+)
 }
 \arguments{
 \item{db}{A \code{\linkS4class{SQLiteConnection}} object to load these extensions into.}
@@ -43,6 +46,11 @@ The \code{"uuid"} extension loads the functions \code{uuid()}, \code{uuid_str(X)
 \code{uuid_blob(X)} that can be used to create universally unique identifiers,
 as available through the SQLite source code repository
 (\url{https://sqlite.org/src/file?filename=ext/misc/uuid.c}).
+
+The \code{"lines"} extension loads the function \verb{lines_read(<filename>)} that
+can be used to line-oriented datasets, like ndjson or JSON Lines,
+as available through the SQLite source code repository
+(\url{https://github.com/asg017/sqlite-lines}).
 }
 \section{Available functions in the math extension}{
 
@@ -63,12 +71,12 @@ library(DBI)
 db <- RSQLite::datasetsDb()
 
 # math
-RSQLite::initExtension(db)
+(RSQLite::initExtension(db))
 dbGetQuery(db, "SELECT stdev(mpg) FROM mtcars")
 sd(mtcars$mpg)
 
 # regexp
-RSQLite::initExtension(db, "regexp")
+(RSQLite::initExtension(db, "regexp"))
 dbGetQuery(db, "SELECT * FROM mtcars WHERE carb REGEXP '[12]'")
 
 # series
@@ -79,7 +87,7 @@ dbDisconnect(db)
 
 # csv
 db <- dbConnect(RSQLite::SQLite())
-RSQLite::initExtension(db, "csv")
+(RSQLite::initExtension(db, "csv"))
 # use the filename argument to mount CSV files from disk
 sql <- paste0(
   "CREATE VIRTUAL TABLE tbl USING ",
@@ -90,7 +98,15 @@ dbGetQuery(db, "SELECT * FROM tbl")
 
 # uuid
 db <- dbConnect(RSQLite::SQLite())
-RSQLite::initExtension(db, "uuid")
+(RSQLite::initExtension(db, "uuid"))
 dbGetQuery(db, "SELECT uuid();")
+dbDisconnect(db)
+
+# lines
+db <- dbConnect(RSQLite::SQLite())
+(RSQLite::initExtension(db, "lines"))
+tf <- tempfile()
+cat("This could be an NDJSON line\nOr another type of data", file = tf)
+dbGetQuery(db, paste0("SELECT * from lines_read('", tf, "');"))
 dbDisconnect(db)
 }

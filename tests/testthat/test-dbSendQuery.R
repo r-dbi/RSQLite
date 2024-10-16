@@ -173,3 +173,15 @@ test_that("mark UTF-8 encoding on non-ASCII colnames", {
   expect_equal(Encoding(got), "UTF-8")
   expect_equal(got, cn_field)
 })
+
+test_that("dbFetch with statement other than SELECT warns reasonably (#523)", {
+  memoise::forget(warning_once)
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "t1", data.frame(x = 1, y = 2))
+  res <- dbSendStatement(con, "INSERT INTO t1 VALUES (2, 1)")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  expect_warning(dbFetch(res), "dbGetRowsAffected")
+})

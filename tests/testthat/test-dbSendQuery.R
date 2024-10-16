@@ -45,7 +45,7 @@ test_that("simple position binding works", {
       ),
       "deprecated"
     ),
-    "SQL statements"
+    "`SELECT` queries"
   )
 
   expect_equal(dbReadTable(con, "t1")$x, c(1, 2))
@@ -64,7 +64,7 @@ test_that("simple named binding works", {
     bind.data = data.frame(y = 1, x = 2)
   ) %>%
     expect_warning("deprecated") %>%
-    expect_warning("SQL statements")
+    expect_warning("`SELECT` queries")
 
   expect_equal(dbReadTable(con, "t1")$x, c(1, 2))
 })

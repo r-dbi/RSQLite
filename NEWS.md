@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.7.9015 (2024-10-23)
+
+## Chore
+
+  - Bump main branch for CI/CD.
+
+
 # RSQLite 2.3.7.9014 (2024-09-15)
 
 ## Continuous integration

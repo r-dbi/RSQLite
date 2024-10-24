@@ -45,7 +45,7 @@ test_that("simple position binding works", {
       ),
       "deprecated"
     ),
-    "SQL statements"
+    "`SELECT` queries"
   )
 
   expect_equal(dbReadTable(con, "t1")$x, c(1, 2))
@@ -64,7 +64,7 @@ test_that("simple named binding works", {
     bind.data = data.frame(y = 1, x = 2)
   ) %>%
     expect_warning("deprecated") %>%
-    expect_warning("SQL statements")
+    expect_warning("`SELECT` queries")
 
   expect_equal(dbReadTable(con, "t1")$x, c(1, 2))
 })
@@ -172,4 +172,16 @@ test_that("mark UTF-8 encoding on non-ASCII colnames", {
   got <- dbListFields(con, "test")
   expect_equal(Encoding(got), "UTF-8")
   expect_equal(got, cn_field)
+})
+
+test_that("dbFetch with statement other than SELECT warns reasonably (#523)", {
+  memoise::forget(warning_once)
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "t1", data.frame(x = 1, y = 2))
+  res <- dbSendStatement(con, "INSERT INTO t1 VALUES (2, 1)")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  expect_warning(dbFetch(res), "dbGetRowsAffected")
 })

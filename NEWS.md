@@ -9,39 +9,7 @@
 ## Features
 
 - Upgrade bundled SQLite to 3.47.0 (#525).
-- Upgrade bundled SQLite to 3.46.1 (#518).
 - Add uuid extension (@rfhb, #517).
-- Upgrade bundled SQLite to 3.46.0 (#510).
-
-## Chore
-
-- Bump main branch for CI/CD.
-- Auto-update from GitHub Actions.
-  Run: https://github.com/r-dbi/RSQLite/actions/runs/10425484283
-  Run: https://github.com/r-dbi/RSQLite/actions/runs/10200117162
-  Run: https://github.com/r-dbi/RSQLite/actions/runs/9985920040
-  Run: https://github.com/r-dbi/RSQLite/actions/runs/9728432835
-  Run: https://github.com/r-dbi/RSQLite/actions/runs/9691621408
-
-## Continuous integration
-
-- Import from actions-sync, check carefully (#527).
-- Import from actions-sync, check carefully (#526).
-- Import from actions-sync, check carefully (#521).
-- Import from actions-sync, check carefully.
-- Inline action.
-- Use dev roxygen2 and decor.
-- Add decor to support auto-document.
-- Fix on Windows, tweak lock workflow.
-- Allow NOTEs on R-devel.
-- Avoid checking bashisms on Windows.
-- Better commit message.
-- Bump versions, better default, consume custom matrix.
-- Recent updates.
-
-## Uncategorized
-
-- Merge branch 'cran-2.3.7'.
 
 
 # RSQLite 2.3.7 (2024-05-26)

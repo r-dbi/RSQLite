@@ -1,5 +1,10 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.7.9901 (2024-11-17)
+
+- Only internal changes.
+
+
 # RSQLite 2.3.7.9900 (2024-11-17)
 
 ## Bug fixes
@@ -58,6 +63,7 @@
 ## Chore
 
 - Update to upcoming DBItest 1.8.1 (#488, #492).
+
 - Remove compiler warning about unused variable (#486).
 
 
@@ -79,6 +85,7 @@
 ## Features
 
 - Upgrade bundled SQLite to 3.43.2 (#473).
+
 - New `sqliteIsTransacting()` that returns if a transaction is active on the current connection (@bpvgoncalves, #462, #464).
 
 ## Testing
@@ -188,7 +195,9 @@
 ## Internal
 
 - Prefer `empty()` over `size() == 0` (#410, @MichaelChirico).
+
 - Refactor to improve code consistency (#411, @MichaelChirico).
+
 - Use more parsimonious header to avoid CRAN warnings.
 
 
@@ -198,6 +207,7 @@
 
 - `initExtension()` gains `extension` argument (#407, #408) with options
   `"math"`, `"regexp"`, `"series"` and `"csv"` (#274, #389, @mgirlich).
+
 - Upgrade bundled SQLite to version 3.38.0 (#405).
 
 ## Bug fixes

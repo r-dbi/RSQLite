@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.7.9019 (2024-11-17)
+
+## Documentation
+
+- Reword warning message for misuse of `dbGetQuery()`/`dbSendQuery()`/`dbFetch()` (#524, @mikmart).
+
+
 # RSQLite 2.3.7.9018 (2024-11-11)
 
 ## Continuous integration

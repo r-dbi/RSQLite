@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RSQLite</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.3.7.9900</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.3.7.9901</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,10 @@
       <small>Source: <a href="https://github.com/r-dbi/RSQLite/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.3.7.9901" id="rsqlite-2379901-2024-11-17">RSQLite 2.3.7.9901 (2024-11-17)<a class="anchor" aria-label="anchor" href="#rsqlite-2379901-2024-11-17"></a></h2>
+<ul><li>Only internal changes.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.3.7.9900" id="rsqlite-2379900-2024-11-17">RSQLite 2.3.7.9900 (2024-11-17)<a class="anchor" aria-label="anchor" href="#rsqlite-2379900-2024-11-17"></a></h2>
 <div class="section level3">
@@ -89,8 +93,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="chore-2-3-5">Chore<a class="anchor" aria-label="anchor" href="#chore-2-3-5"></a></h3>
-<ul><li>Update to upcoming DBItest 1.8.1 (<a href="https://github.com/r-dbi/RSQLite/issues/488" class="external-link">#488</a>, <a href="https://github.com/r-dbi/RSQLite/issues/492" class="external-link">#492</a>).</li>
-<li>Remove compiler warning about unused variable (<a href="https://github.com/r-dbi/RSQLite/issues/486" class="external-link">#486</a>).</li>
+<ul><li><p>Update to upcoming DBItest 1.8.1 (<a href="https://github.com/r-dbi/RSQLite/issues/488" class="external-link">#488</a>, <a href="https://github.com/r-dbi/RSQLite/issues/492" class="external-link">#492</a>).</p></li>
+<li><p>Remove compiler warning about unused variable (<a href="https://github.com/r-dbi/RSQLite/issues/486" class="external-link">#486</a>).</p></li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -109,8 +113,8 @@
 <h2 class="pkg-version" data-toc-text="2.3.3" id="rsqlite-233-2023-11-04">RSQLite 2.3.3 (2023-11-04)<a class="anchor" aria-label="anchor" href="#rsqlite-233-2023-11-04"></a></h2>
 <div class="section level3">
 <h3 id="features-2-3-3">Features<a class="anchor" aria-label="anchor" href="#features-2-3-3"></a></h3>
-<ul><li>Upgrade bundled SQLite to 3.43.2 (<a href="https://github.com/r-dbi/RSQLite/issues/473" class="external-link">#473</a>).</li>
-<li>New <code><a href="../reference/sqlite-transaction.html">sqliteIsTransacting()</a></code> that returns if a transaction is active on the current connection (<a href="https://github.com/bpvgoncalves" class="external-link">@bpvgoncalves</a>, <a href="https://github.com/r-dbi/RSQLite/issues/462" class="external-link">#462</a>, <a href="https://github.com/r-dbi/RSQLite/issues/464" class="external-link">#464</a>).</li>
+<ul><li><p>Upgrade bundled SQLite to 3.43.2 (<a href="https://github.com/r-dbi/RSQLite/issues/473" class="external-link">#473</a>).</p></li>
+<li><p>New <code><a href="../reference/sqlite-transaction.html">sqliteIsTransacting()</a></code> that returns if a transaction is active on the current connection (<a href="https://github.com/bpvgoncalves" class="external-link">@bpvgoncalves</a>, <a href="https://github.com/r-dbi/RSQLite/issues/462" class="external-link">#462</a>, <a href="https://github.com/r-dbi/RSQLite/issues/464" class="external-link">#464</a>).</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="testing-2-3-3">Testing<a class="anchor" aria-label="anchor" href="#testing-2-3-3"></a></h3>
@@ -210,18 +214,17 @@
 </ul></div>
 <div class="section level3">
 <h3 id="internal-2-2-12">Internal<a class="anchor" aria-label="anchor" href="#internal-2-2-12"></a></h3>
-<ul><li>Prefer <code>empty()</code> over <code>size() == 0</code> (<a href="https://github.com/r-dbi/RSQLite/issues/410" class="external-link">#410</a>, <a href="https://github.com/MichaelChirico" class="external-link">@MichaelChirico</a>).</li>
-<li>Refactor to improve code consistency (<a href="https://github.com/r-dbi/RSQLite/issues/411" class="external-link">#411</a>, <a href="https://github.com/MichaelChirico" class="external-link">@MichaelChirico</a>).</li>
-<li>Use more parsimonious header to avoid CRAN warnings.</li>
+<ul><li><p>Prefer <code>empty()</code> over <code>size() == 0</code> (<a href="https://github.com/r-dbi/RSQLite/issues/410" class="external-link">#410</a>, <a href="https://github.com/MichaelChirico" class="external-link">@MichaelChirico</a>).</p></li>
+<li><p>Refactor to improve code consistency (<a href="https://github.com/r-dbi/RSQLite/issues/411" class="external-link">#411</a>, <a href="https://github.com/MichaelChirico" class="external-link">@MichaelChirico</a>).</p></li>
+<li><p>Use more parsimonious header to avoid CRAN warnings.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.2.11" id="rsqlite-2211-2022-03-07">RSQLite 2.2.11 (2022-03-07)<a class="anchor" aria-label="anchor" href="#rsqlite-2211-2022-03-07"></a></h2>
 <div class="section level3">
 <h3 id="features-2-2-11">Features<a class="anchor" aria-label="anchor" href="#features-2-2-11"></a></h3>
-<ul><li>
-<code><a href="../reference/initExtension.html">initExtension()</a></code> gains <code>extension</code> argument (<a href="https://github.com/r-dbi/RSQLite/issues/407" class="external-link">#407</a>, <a href="https://github.com/r-dbi/RSQLite/issues/408" class="external-link">#408</a>) with options <code>"math"</code>, <code>"regexp"</code>, <code>"series"</code> and <code>"csv"</code> (<a href="https://github.com/r-dbi/RSQLite/issues/274" class="external-link">#274</a>, <a href="https://github.com/r-dbi/RSQLite/issues/389" class="external-link">#389</a>, <a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</li>
-<li>Upgrade bundled SQLite to version 3.38.0 (<a href="https://github.com/r-dbi/RSQLite/issues/405" class="external-link">#405</a>).</li>
+<ul><li><p><code><a href="../reference/initExtension.html">initExtension()</a></code> gains <code>extension</code> argument (<a href="https://github.com/r-dbi/RSQLite/issues/407" class="external-link">#407</a>, <a href="https://github.com/r-dbi/RSQLite/issues/408" class="external-link">#408</a>) with options <code>"math"</code>, <code>"regexp"</code>, <code>"series"</code> and <code>"csv"</code> (<a href="https://github.com/r-dbi/RSQLite/issues/274" class="external-link">#274</a>, <a href="https://github.com/r-dbi/RSQLite/issues/389" class="external-link">#389</a>, <a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</p></li>
+<li><p>Upgrade bundled SQLite to version 3.38.0 (<a href="https://github.com/r-dbi/RSQLite/issues/405" class="external-link">#405</a>).</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-2-2-11">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-2-11"></a></h3>

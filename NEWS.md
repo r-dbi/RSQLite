@@ -1,11 +1,6 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 2.3.7.9901 (2024-11-17)
-
-- Only internal changes.
-
-
-# RSQLite 2.3.7.9900 (2024-11-17)
+# RSQLite 2.3.8 (2024-11-17)
 
 ## Bug fixes
 
@@ -14,12 +9,15 @@
 ## Features
 
 - Upgrade bundled SQLite to 3.47.0 (#525).
-
 - Add uuid extension (@rfhb, #517).
 
 ## Documentation
 
 - Reword warning message for misuse of `dbGetQuery()`/`dbSendQuery()`/`dbFetch()` (#524, @mikmart).
+
+## Uncategorized
+
+- Only internal changes.
 
 
 # RSQLite 2.3.7 (2024-05-26)

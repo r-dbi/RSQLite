@@ -9,15 +9,12 @@
 ## Features
 
 - Upgrade bundled SQLite to 3.47.0 (#525).
+
 - Add uuid extension (@rfhb, #517).
 
 ## Documentation
 
 - Reword warning message for misuse of `dbGetQuery()`/`dbSendQuery()`/`dbFetch()` (#524, @mikmart).
-
-## Uncategorized
-
-- Only internal changes.
 
 
 # RSQLite 2.3.7 (2024-05-26)

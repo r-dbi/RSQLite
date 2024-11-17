@@ -9,6 +9,7 @@
 ## Features
 
 - Upgrade bundled SQLite to 3.47.0 (#525).
+
 - Add uuid extension (@rfhb, #517).
 
 

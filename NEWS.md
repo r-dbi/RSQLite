@@ -1,185 +1,49 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 2.3.7.9019 (2024-11-17)
-
-## Documentation
-
-- Reword warning message for misuse of `dbGetQuery()`/`dbSendQuery()`/`dbFetch()` (#524, @mikmart).
-
-
-# RSQLite 2.3.7.9018 (2024-11-11)
-
-## Continuous integration
-
-  - Import from actions-sync, check carefully (#527).
-
-
-# RSQLite 2.3.7.9017 (2024-10-28)
-
-## Continuous integration
-
-  - Import from actions-sync, check carefully (#526).
-
-
-# RSQLite 2.3.7.9016 (2024-10-24)
-
-## Features
-
-  - Upgrade bundled SQLite to 3.47.0 (#525).
-
-
-# RSQLite 2.3.7.9015 (2024-10-23)
-
-## Chore
-
-  - Bump main branch for CI/CD.
-
-
-# RSQLite 2.3.7.9014 (2024-09-15)
-
-## Continuous integration
-
-  - Import from actions-sync, check carefully (#521).
-
-
-# RSQLite 2.3.7.9013 (2024-08-31)
-
-## Continuous integration
-
-  - Import from actions-sync, check carefully.
-
-  - Import from actions-sync, check carefully.
-
-
-# RSQLite 2.3.7.9012 (2024-08-17)
-
-## Chore
-
-- Auto-update from GitHub Actions.
-
-  Run: https://github.com/r-dbi/RSQLite/actions/runs/10425484283
-
-## Continuous integration
-
-- Import from actions-sync, check carefully.
-
-
-# RSQLite 2.3.7.9011 (2024-08-15)
-
-## Features
-
-- Upgrade bundled SQLite to 3.46.1 (#518).
-
-## Chore
-
-- Bump main branch for CI/CD.
-
-
-# RSQLite 2.3.7.9010 (2024-08-10)
-
-## Continuous integration
-
-- Import from actions-sync, check carefully.
-
-
-# RSQLite 2.3.7.9009 (2024-08-08)
-
-## Features
-
-- Add uuid extension (@rfhb, #517).
-
-
-# RSQLite 2.3.7.9008 (2024-08-06)
-
-## Continuous integration
-
-- Inline action.
-
-
-# RSQLite 2.3.7.9007 (2024-08-02)
-
-## Chore
-
-- Auto-update from GitHub Actions.
-
-  Run: https://github.com/r-dbi/RSQLite/actions/runs/10200117162
-
-## Continuous integration
-
-- Use dev roxygen2 and decor.
-
-
-# RSQLite 2.3.7.9006 (2024-07-19)
+# RSQLite 2.3.7.9900 (2024-11-17)
 
 ## Bug fixes
 
 - Ensure that `testthat::skip()` is only called in RSQLite's own tests, never in the tests for other packages (@jeanetteclark, #515, #516).
 
-## Chore
-
-- Auto-update from GitHub Actions.
-
-  Run: https://github.com/r-dbi/RSQLite/actions/runs/9985920040
-
-## Continuous integration
-
-- Add decor to support auto-document.
-
-
-# RSQLite 2.3.7.9005 (2024-07-02)
-
-## Continuous integration
-
-- Fix on Windows, tweak lock workflow.
-
-
-# RSQLite 2.3.7.9004 (2024-06-30)
-
-## Chore
-
-- Auto-update from GitHub Actions.
-
-  Run: https://github.com/r-dbi/RSQLite/actions/runs/9728432835
-
-
-# RSQLite 2.3.7.9003 (2024-06-28)
-
-## Chore
-
-- Auto-update from GitHub Actions.
-
-  Run: https://github.com/r-dbi/RSQLite/actions/runs/9691621408
-
-## Continuous integration
-
-- Allow NOTEs on R-devel.
-
-- Avoid checking bashisms on Windows.
-
-- Better commit message.
-
-- Bump versions, better default, consume custom matrix.
-
-- Recent updates.
-
-
-# RSQLite 2.3.7.9002 (2024-05-27)
-
-- Merge branch 'cran-2.3.7'.
-
-
-# RSQLite 2.3.7.9001 (2024-05-25)
-
 ## Features
 
+- Upgrade bundled SQLite to 3.47.0 (#525).
+- Upgrade bundled SQLite to 3.46.1 (#518).
+- Add uuid extension (@rfhb, #517).
 - Upgrade bundled SQLite to 3.46.0 (#510).
 
 ## Chore
 
 - Bump main branch for CI/CD.
+- Auto-update from GitHub Actions.
+  Run: https://github.com/r-dbi/RSQLite/actions/runs/10425484283
+  Run: https://github.com/r-dbi/RSQLite/actions/runs/10200117162
+  Run: https://github.com/r-dbi/RSQLite/actions/runs/9985920040
+  Run: https://github.com/r-dbi/RSQLite/actions/runs/9728432835
+  Run: https://github.com/r-dbi/RSQLite/actions/runs/9691621408
 
+## Continuous integration
 
-# RSQLite 2.3.7.9000 (2024-05-01)
+- Import from actions-sync, check carefully (#527).
+- Import from actions-sync, check carefully (#526).
+- Import from actions-sync, check carefully (#521).
+- Import from actions-sync, check carefully.
+- Inline action.
+- Use dev roxygen2 and decor.
+- Add decor to support auto-document.
+- Fix on Windows, tweak lock workflow.
+- Allow NOTEs on R-devel.
+- Avoid checking bashisms on Windows.
+- Better commit message.
+- Bump versions, better default, consume custom matrix.
+- Recent updates.
+
+## Documentation
+
+- Reword warning message for misuse of `dbGetQuery()`/`dbSendQuery()`/`dbFetch()` (#524, @mikmart).
+
+## Uncategorized
 
 - Merge branch 'cran-2.3.7'.
 

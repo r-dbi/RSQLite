@@ -1,5 +1,20 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.8.9002 (2024-11-26)
+
+## Continuous integration
+
+- Import from actions-sync, check carefully (#540).
+
+- Import from actions-sync, check carefully (#538).
+
+- Import from actions-sync, check carefully (#537).
+
+- Import from actions-sync, check carefully (#536).
+
+- Import from actions-sync, check carefully (#532).
+
+
 # RSQLite 2.3.8.9001 (2024-11-25)
 
 ## Continuous integration

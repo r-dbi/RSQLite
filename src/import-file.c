@@ -92,7 +92,11 @@ RS_sqlite_import(
 
   while ((zLine = RS_sqlite_getline(in, eol)) != NULL) {
     lineno++;
-    if (lineno <= skip) continue;
+    if (lineno <= skip) {
+      free(zLine);
+      zLine = NULL;
+      continue;
+    }
     i = 0;
     azCol[0] = zLine;
     for (i = 0, z = zLine; *z && *z != '\n' && *z != '\r'; z++) {

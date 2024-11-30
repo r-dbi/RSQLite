@@ -1,0 +1,26 @@
+From 3a9012f07d9f7da290809d89549b663a75fd4e6b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Kirill=20M=C3=BCller?= <kirill@cynkra.com>
+Date: Sat, 30 Nov 2024 20:04:14 +0100
+Subject: [PATCH] Function pointer safety
+
+---
+ src/vendor/extensions/regexp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/vendor/extensions/regexp.c b/src/vendor/extensions/regexp.c
+index 18266493..340357ea 100644
+--- a/src/vendor/extensions/regexp.c
++++ b/src/vendor/extensions/regexp.c
+@@ -656,7 +656,8 @@ static const char *re_subcompile_string(ReCompiled *p){
+ ** regular expression.  Applications should invoke this routine once
+ ** for every call to re_compile() to avoid memory leaks.
+ */
+-static void re_free(ReCompiled *pRe){
++static void re_free(void *pRe_){
++  ReCompiled *pRe = (ReCompiled*)pRe_;
+   if( pRe ){
+     sqlite3_free(pRe->aOp);
+     sqlite3_free(pRe->aArg);
+-- 
+2.43.0
+

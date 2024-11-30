@@ -64,6 +64,11 @@ register_misc_extension("series")
 register_misc_extension("csv")
 register_misc_extension("uuid")
 
+for (f in dir("patch", full.names = TRUE)) {
+  message("Applying ", f)
+  stopifnot(system(paste0("patch -p1 -i ", f)) == 0)
+}
+
 if (any(grepl("^src/", gert::git_status()$file))) {
   gert::git_add("src")
 

@@ -41,3 +41,4 @@ a.out.dSYM
 ^\.gitpod\.yml$
 ^src/CMakeLists\.txt$
 ^\.aviator/config\.yml$
+^patch$

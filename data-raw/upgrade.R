@@ -64,25 +64,10 @@ register_misc_extension("series")
 register_misc_extension("csv")
 register_misc_extension("uuid")
 
-
 if (any(grepl("^src/", gert::git_status()$file))) {
-  branch <- paste0("f-", sub("[.][^.]*$", "", latest_name))
-  message("Changes detected, creating branch: ", branch)
-
-  version <- sub("^.*-([0-9])([0-9][0-9])(?:0([0-9])|([1-9][0-9]))[0-9]+[.].*$", "\\1.\\2.\\3\\4", latest_name)
-
-  old_branch <- gert::git_branch()
-  message("Old branch: ", old_branch)
-
-  gert::git_branch_create(branch)
   gert::git_add("src")
 
   commit_msg <- paste0("feat: Upgrade bundled SQLite to ", version)
   message("Commit message: ", commit_msg)
   gert::git_commit(commit_msg)
-
-  # Force-pushing: this job is run daily, will give a daily notification
-  # and still succeed
-  message("Pushing branch")
-  gert::git_push(force = TRUE)
 }

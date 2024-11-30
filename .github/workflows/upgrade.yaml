@@ -7,13 +7,14 @@ on:
       - main
     paths:
       - "data-raw/upgrade.R"
+      - ".github/workflows/upgrade.yaml"
   workflow_dispatch:
 
 name: upgrade
 
 jobs:
   upgrade:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     name: Upgrade bundled SQLite
 
@@ -84,8 +85,29 @@ jobs:
         shell: bash
 
       - name: Run preparation
+        id: vendor
         run: |
           R -q -f data-raw/upgrade.R
+          # Check if ahead of upstream branch
+          # If yes, set a step output
+          if [ $(git rev-list HEAD...origin/main --count) -gt 0 ]; then
+            # Avoid set-output, it's deprecated
+            echo "vendor=ok" >> "$GITHUB_OUTPUT"
+          fi
+        shell: bash
+
+      - name: Create PR
+        if: steps.vendor.outputs.vendor != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -x
+          git checkout -b vendor
+          if git push -u origin HEAD; then
+            gh pr create --fill-first
+            gh workflow run rcc -f ref=vendor
+            gh pr merge --auto --squash
+          fi
 
       - name: Check rate limits
         if: always()

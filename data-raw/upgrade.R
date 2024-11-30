@@ -87,49 +87,4 @@ if (any(grepl("^src/", gert::git_status()$file))) {
   # and still succeed
   message("Pushing branch")
   gert::git_push(force = TRUE)
-
-  message("Checking if PR exists")
-  existing_pr <- gh::gh(
-    "/repos/r-dbi/RSQLite/pulls",
-    head = paste0("r-dbi:", branch), base = old_branch,
-    state = "open"
-  )
-
-  if (length(existing_pr) > 0) {
-    message("Nudging")
-    gh::gh(
-      paste0("/repos/r-dbi/RSQLite/issues/", existing_pr[[1]]$number, "/comments"),
-      body = "PR updated.",
-      .method = "POST"
-    )
-  } else {
-    message("Opening PR")
-    pr <- gh::gh(
-      "/repos/r-dbi/RSQLite/pulls",
-      head = branch, base = old_branch,
-      title = title, body = ".",
-      .method = "POST"
-    )
-
-    message("Tweaking PR body")
-    body <- paste0("NEWS entry will be picked up by fledge from the PR title.")
-
-    gh::gh(
-      paste0("/repos/r-dbi/RSQLite/pulls/", pr$number),
-      body = body,
-      .method = "PATCH"
-    )
-
-    message("Adding label")
-    gh::gh(
-      paste0("/repos/r-dbi/RSQLite/issues/", pr$number),
-      labels = c("mergequeue", "mergequeue"),
-      .method = "PATCH"
-    )
-
-    message("Bumping main branch to run CI/CD")
-    gert::git_branch_checkout(old_branch)
-    system2("git", c("commit", "-m", "'chore: Bump main branch for CI/CD'", "--allow-empty"))
-    gert::git_push(force = FALSE)
-  }
 }

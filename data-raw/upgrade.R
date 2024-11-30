@@ -67,6 +67,7 @@ register_misc_extension("uuid")
 if (any(grepl("^src/", gert::git_status()$file))) {
   gert::git_add("src")
 
+  version <- sub("^.*-([0-9])([0-9][0-9])(?:0([0-9])|([1-9][0-9]))[0-9]+[.].*$", "\\1.\\2.\\3\\4", latest_name)
   commit_msg <- paste0("feat: Upgrade bundled SQLite to ", version)
   message("Commit message: ", commit_msg)
   gert::git_commit(commit_msg)

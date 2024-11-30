@@ -77,11 +77,9 @@ if (any(grepl("^src/", gert::git_status()$file))) {
   gert::git_branch_create(branch)
   gert::git_add("src")
 
-  commit_msg <- paste0("Upgrade bundled SQLite to ", version)
+  commit_msg <- paste0("feat: Upgrade bundled SQLite to ", version)
   message("Commit message: ", commit_msg)
   gert::git_commit(commit_msg)
-
-  title <- paste0("feat: ", commit_msg)
 
   # Force-pushing: this job is run daily, will give a daily notification
   # and still succeed

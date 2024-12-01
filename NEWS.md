@@ -1,5 +1,14 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.8.9901 (2024-12-01)
+
+## Bug fixes
+
+- Avoid memory leak (#553).
+
+- Fix valgrind error (#552).
+
+
 # RSQLite 2.3.8.9900 (2024-11-30)
 
 ## Features

@@ -71,6 +71,7 @@ test_that("adding support for regular expressions (#296)", {
 
 test_that("regular expressions can be initialized twice without harm", {
   con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
 
   expect_true(initRegExp(db = con))
   expect_true(initRegExp(db = con))

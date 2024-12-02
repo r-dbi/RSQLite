@@ -1,5 +1,16 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.8.9902 (2024-12-02)
+
+## Continuous integration
+
+- Don't need patch for internal file.
+
+## Testing
+
+- Fix memory leak.
+
+
 # RSQLite 2.3.8.9901 (2024-12-01)
 
 ## Bug fixes

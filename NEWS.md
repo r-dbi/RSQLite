@@ -2,23 +2,15 @@
 
 # RSQLite 2.3.9 (2024-12-03)
 
+## Features
+
+- Upgrade bundled SQLite to 3.47.1 (#550).
+
 ## Bug fixes
 
 - Avoid memory leak (#553).
 
 - Fix valgrind error (#552).
-
-## Features
-
-- Upgrade bundled SQLite to 3.47.1 (#550).
-
-## Continuous integration
-
-- Don't need patch for internal file.
-
-## Testing
-
-- Fix memory leak.
 
 
 # RSQLite 2.3.8 (2024-11-17)

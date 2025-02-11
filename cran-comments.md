@@ -1,4 +1,4 @@
-RSQLite 2.3.9
+RSQLite 2.3.9.9900
 
 ## Cran Repository Policy
 

@@ -10,47 +10,9 @@
 
 - Upgrade bundled SQLite to 3.49.1 (#571).
 
-- Upgrade bundled SQLite to 3.49.1 (#569).
-
-- Upgrade bundled SQLite to 3.49.0 (#566).
-
-- Upgrade bundled SQLite to 3.48.0.
-
-- Upgrade bundled SQLite to 3.47.2 (#562).
-
 ## Chore
 
 - Track dependencies between sources and headers (#586).
-
-- Support compilation database.
-
-- IDE.
-
-## Continuous integration
-
-- Import from actions-sync, check carefully (#584).
-
-- Import from actions-sync, check carefully (#581).
-
-- Import from actions-sync, check carefully (#580).
-
-- Import from actions-sync, check carefully (#577).
-
-- Import from actions-sync, check carefully (#575).
-
-- Import from actions-sync, check carefully (#574).
-
-- Import from actions-sync, check carefully (#573).
-
-- Look at the first three links for upgrading.
-
-- Import from actions-sync, check carefully (#561).
-
-- Remove Aviator.
-
-- Import from actions-sync, check carefully (#559).
-
-- Import from actions-sync, check carefully (#557).
 
 ## Testing
 

@@ -1,5 +1,18 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.9.9008 (2025-05-01)
+
+## Bug fixes
+
+- Avoid unnecessary `-I` switches (#512, #587).
+
+## Chore
+
+- Track dependencies between sources and headers (#586).
+
+- Support compilation database.
+
+
 # RSQLite 2.3.9.9007 (2025-04-30)
 
 ## Continuous integration

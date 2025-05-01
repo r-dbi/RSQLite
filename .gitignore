@@ -22,3 +22,5 @@ inst/doc
 CRAN-RELEASE
 tests/testthat/testthat-problems.rds
 CRAN-SUBMISSION
+/compile_commands.json
+/.cache/

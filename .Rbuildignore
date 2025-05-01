@@ -41,3 +41,5 @@ a.out.dSYM
 ^\.gitpod\.yml$
 ^src/CMakeLists\.txt$
 ^patch$
+^compile_commands\.json$
+^\.cache$

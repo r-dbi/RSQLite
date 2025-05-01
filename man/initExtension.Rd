@@ -19,7 +19,7 @@ Extensions must be enabled separately for each connection.
 }
 \details{
 The \code{"math"} extension functions are written by Liam Healy and made available
-through the SQLite website (\url{https://www.sqlite.org/contrib}).
+through the SQLite website (\url{https://www.sqlite.org/src/ext/contrib}).
 This package contains a slightly modified version of the original code.
 See the section "Available functions in the math extension" for details.
 

@@ -1,102 +1,22 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 2.3.9.9008 (2025-05-01)
+# RSQLite 2.3.9.9900 (2025-05-01)
 
 ## Bug fixes
 
 - Avoid unnecessary `-I` switches (#512, #587).
 
-## Chore
-
-- Track dependencies between sources and headers (#586).
-
-- Support compilation database.
-
-
-# RSQLite 2.3.9.9007 (2025-04-30)
-
-## Continuous integration
-
-- Import from actions-sync, check carefully (#584).
-
-- Import from actions-sync, check carefully (#581).
-
-- Import from actions-sync, check carefully (#580).
-
-- Import from actions-sync, check carefully (#577).
-
-- Import from actions-sync, check carefully (#575).
-
-- Import from actions-sync, check carefully (#574).
-
-- Import from actions-sync, check carefully (#573).
-
-
-# RSQLite 2.3.9.9006 (2025-03-30)
-
 ## Features
 
 - Upgrade bundled SQLite to 3.49.1 (#571).
 
-
-# RSQLite 2.3.9.9005 (2025-02-20)
-
-## Features
-
-- Upgrade bundled SQLite to 3.49.1 (#569).
-
-
-# RSQLite 2.3.9.9004 (2025-02-08)
-
-## Features
-
-- Upgrade bundled SQLite to 3.49.0 (#566).
-
-
-# RSQLite 2.3.9.9003 (2025-02-05)
-
-## Features
-
-- Upgrade bundled SQLite to 3.48.0.
-
 ## Chore
 
-- IDE.
-
-## Continuous integration
-
-- Look at the first three links for upgrading.
-
-
-# RSQLite 2.3.9.9002 (2024-12-09)
-
-## Features
-
-- Upgrade bundled SQLite to 3.47.2 (#562).
-
-## Continuous integration
-
-- Import from actions-sync, check carefully (#561).
-
-- Remove Aviator.
-
-
-# RSQLite 2.3.9.9001 (2024-12-08)
-
-## Continuous integration
-
-- Import from actions-sync, check carefully (#559).
+- Track dependencies between sources and headers (#586).
 
 ## Testing
 
 - Bump DBItest version.
-
-
-# RSQLite 2.3.9.9000 (2024-12-07)
-
-## Continuous integration
-
-- Import from actions-sync, check carefully (#557).
 
 
 # RSQLite 2.3.9 (2024-12-03)

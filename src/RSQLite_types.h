@@ -1,7 +1,7 @@
 #ifndef __RSQLITE_TYPES__
 #define __RSQLITE_TYPES__
 
-#include <RSQLite.h>
+#include "RSQLite.h"
 
 #include "DbConnection.h"
 #include "DbResult.h"

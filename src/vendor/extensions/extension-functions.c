@@ -124,7 +124,7 @@ Original code 2006 June 05 by relicoder.
 #include "sqlite3ext.h"
 SQLITE_EXTENSION_INIT1
 #else
-#include "sqlite3.h"
+#include "vendor/sqlite3/sqlite3.h"
 #endif
 
 #include <ctype.h>

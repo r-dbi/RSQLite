@@ -1,5 +1,6 @@
 # BOOST_NO_AUTO_PTR: https://github.com/eddelbuettel/bh/issues/57#issuecomment-406261595
-PKG_CPPFLAGS=-DRSQLITE_USE_BUNDLED_SQLITE \
+PKG_CPPFLAGS=-Ivendor \
+             -DRSQLITE_USE_BUNDLED_SQLITE \
              -DSQLITE_ENABLE_RTREE \
              -DSQLITE_ENABLE_FTS3 \
              -DSQLITE_ENABLE_FTS3_PARENTHESIS \

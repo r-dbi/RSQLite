@@ -43,3 +43,5 @@ a.out.dSYM
 ^patch$
 ^compile_commands\.json$
 ^\.cache$
+^src/deps\.mk$
+^src/.*\.dd

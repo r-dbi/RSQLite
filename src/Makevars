@@ -22,3 +22,10 @@ PKG_LIBS = vendor/sqlite3/sqlite3.o
 all: $(SHLIB)
 
 $(SHLIB): $(PKG_LIBS)
+
+# This file is available only during development.
+# For the tarball, we create an empty file.
+deps.mk:
+	touch -r $$(ls -t *.cpp | head -n 1) "$@"
+
+include deps.mk

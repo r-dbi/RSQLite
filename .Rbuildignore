@@ -44,3 +44,4 @@ a.out.dSYM
 ^compile_commands\.json$
 ^\.cache$
 ^src/deps\.mk$
+^src/.*\.dd

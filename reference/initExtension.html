@@ -13,7 +13,7 @@ Extensions must be enabled separately for each connection."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">RSQLite</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.3.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.3.10</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,7 @@ Extensions must be enabled separately for each connection."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Add useful extension functions</h1>
-      <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/main/R/initExtension.R" class="external-link"><code>R/initExtension.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/r-dbi/RSQLite/blob/cran-2.3.10/R/initExtension.R" class="external-link"><code>R/initExtension.R</code></a></small>
       <div class="d-none name"><code>initExtension.Rd</code></div>
     </div>
 
@@ -67,7 +67,7 @@ Extensions must be enabled separately for each connection.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The <code>"math"</code> extension functions are written by Liam Healy and made available
-through the SQLite website (<a href="https://www.sqlite.org/contrib" class="external-link">https://www.sqlite.org/contrib</a>).
+through the SQLite website (<a href="https://www.sqlite.org/src/ext/contrib" class="external-link">https://www.sqlite.org/src/ext/contrib</a>).
 This package contains a slightly modified version of the original code.
 See the section "Available functions in the math extension" for details.</p>
 <p>The <code>"regexp"</code> extension provides a regular-expression matcher for POSIX
@@ -175,7 +175,7 @@ upper_quartile</p></dd>
 <span class="r-in"><span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu">initExtension</span><span class="op">(</span><span class="va">db</span>, <span class="st">"uuid"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="st">"SELECT uuid();"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 uuid()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 00bf4ba9-73b6-4a61-9e88-3c8b37c6d5ba</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 28ae4a5f-d8f8-42f9-b059-8aa95243baf1</span>
 <span class="r-in"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
@@ -188,7 +188,7 @@ upper_quartile</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.9000.</p>
 </div>
 
     </footer></div>

@@ -12,8 +12,6 @@
 
 ## Chore
 
-- Revdepcheck results.
-
 - Track dependencies between sources and headers (#586).
 
 ## Testing

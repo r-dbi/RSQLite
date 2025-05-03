@@ -1,0 +1,39 @@
+From 816b2a1bef8e089f95800b24d54d727f8583bee0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Kirill=20M=C3=BCller?= <kirill@cynkra.com>
+Date: Sat, 3 May 2025 17:24:24 +0200
+Subject: [PATCH] Adapt include paths
+
+---
+ src/vendor/extensions/csv.c        | 2 +-
+ src/vendor/extensions/sqlite3ext.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/vendor/extensions/csv.c b/src/vendor/extensions/csv.c
+index d390a558..4ff0d198 100644
+--- a/src/vendor/extensions/csv.c
++++ b/src/vendor/extensions/csv.c
+@@ -39,7 +39,7 @@
+ ** Some extra debugging features (used for testing virtual tables) are available
+ ** if this module is compiled with -DSQLITE_TEST.
+ */
+-#include <sqlite3ext.h>
++#include "../extensions/sqlite3ext.h"
+ SQLITE_EXTENSION_INIT1
+ #include <string.h>
+ #include <stdlib.h>
+diff --git a/src/vendor/extensions/sqlite3ext.h b/src/vendor/extensions/sqlite3ext.h
+index ae0949ba..afa677a1 100644
+--- a/src/vendor/extensions/sqlite3ext.h
++++ b/src/vendor/extensions/sqlite3ext.h
+@@ -17,7 +17,7 @@
+ */
+ #ifndef SQLITE3EXT_H
+ #define SQLITE3EXT_H
+-#include "sqlite3.h"
++#include "../sqlite3/sqlite3.h"
+ 
+ /*
+ ** The following structure holds pointers to all of the SQLite API
+-- 
+2.48.1
+

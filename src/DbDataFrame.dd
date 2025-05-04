@@ -9,3 +9,4 @@ DbDataFrame.o: \
   DbDataFrame.h \
   RSQLite.h \
   pch.h \
+  .Rconfig

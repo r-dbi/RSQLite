@@ -2,3 +2,4 @@
 affinity.o: \
   affinity.c \
   affinity.h \
+  .Rconfig

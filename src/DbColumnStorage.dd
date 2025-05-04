@@ -7,3 +7,4 @@ DbColumnStorage.o: \
   RSQLite.h \
   integer64.h \
   pch.h \
+  .Rconfig

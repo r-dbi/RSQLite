@@ -9,3 +9,4 @@ result.o: \
   pch.h \
   result.cpp \
   sqlite3-cpp.h \
+  .Rconfig

@@ -5,3 +5,4 @@ DbConnection.o: \
   RSQLite.h \
   pch.h \
   sqlite3-cpp.h \
+  .Rconfig

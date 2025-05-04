@@ -5,3 +5,4 @@ connection.o: \
   connection.cpp \
   pch.h \
   sqlite3-cpp.h \
+  .Rconfig

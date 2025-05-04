@@ -6,14 +6,6 @@
 
 - Compilation with `gcc` works again (#592, #594).
 
-## Features
-
-- Upgrade bundled SQLite to 3.49.1 (#590).
-
-## Continuous integration
-
-- Import from actions-sync, check carefully (#593).
-
 
 # RSQLite 2.3.10 (2025-05-02)
 

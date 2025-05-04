@@ -1,21 +1,18 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 2.3.10.9001 (2025-05-04)
+# RSQLite 2.3.11 (2025-05-04)
 
 ## Bug fixes
 
 - Compilation with `gcc` works again (#592, #594).
 
-## Continuous integration
-
-- Import from actions-sync, check carefully (#593).
-
-
-# RSQLite 2.3.10.9000 (2025-05-03)
-
 ## Features
 
 - Upgrade bundled SQLite to 3.49.1 (#590).
+
+## Continuous integration
+
+- Import from actions-sync, check carefully (#593).
 
 
 # RSQLite 2.3.10 (2025-05-02)

@@ -8,3 +8,4 @@ DbColumn.o: \
   DbColumnStorage.h \
   RSQLite.h \
   pch.h \
+  .Rconfig

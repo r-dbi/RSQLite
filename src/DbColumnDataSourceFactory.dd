@@ -4,3 +4,4 @@ DbColumnDataSourceFactory.o: \
   DbColumnDataSourceFactory.h \
   RSQLite.h \
   pch.h \
+  .Rconfig

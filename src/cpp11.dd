@@ -8,3 +8,4 @@ cpp11.o: \
   SqliteResult.h \
   cpp11.cpp \
   sqlite3-cpp.h \
+  .Rconfig

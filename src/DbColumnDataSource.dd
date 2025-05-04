@@ -5,3 +5,4 @@ DbColumnDataSource.o: \
   DbColumnDataType.h \
   RSQLite.h \
   pch.h \
+  .Rconfig

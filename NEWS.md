@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.3.11.9000 (2025-05-05)
+
+## Features
+
+- Rebuild in case of configuration changes (#597).
+
+
 # RSQLite 2.3.11 (2025-05-04)
 
 ## Bug fixes

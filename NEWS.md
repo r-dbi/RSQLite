@@ -6,8 +6,6 @@
 
 - Upgrade bundled SQLite to 3.50.0 (#602).
 
-- Upgrade bundled SQLite to 3.49.2 (#600).
-
 - Rebuild in case of configuration changes (#597).
 
 

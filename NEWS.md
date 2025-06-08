@@ -6,10 +6,6 @@
 
 - Upgrade bundled SQLite to 3.50.1 (#606).
 
-## Uncategorized
-
-- Switching to development version.
-
 
 # RSQLite 2.4.0 (2025-05-31)
 

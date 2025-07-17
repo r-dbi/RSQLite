@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.4.1.9002 (2025-07-17)
+
+## Continuous integration
+
+- Stabilize upgrade routine.
+
+
 # RSQLite 2.4.1.9001 (2025-06-30)
 
 ## Features

@@ -71,10 +71,14 @@ for (f in dir("patch", full.names = TRUE)) {
   stopifnot(system(paste0("patch -p1 -i ", f)) == 0)
 }
 
-if (any(grepl("^src/", gert::git_status()$file))) {
-  gert::git_add("src")
+version <- sub("^.*-([0-9])([0-9][0-9])(?:0([0-9])|([1-9][0-9]))[0-9]+[.].*$", "\\1.\\2.\\3\\4", latest_name)
+descr <- desc::desc_get_field("Description", trim_ws = FALSE)
+new_descr <- gsub("version [0-9]+\\.[0-9]+\\.[0-9]+", paste0("version ", version), descr)
+desc::desc_set(Description = new_descr)
 
-  version <- sub("^.*-([0-9])([0-9][0-9])(?:0([0-9])|([1-9][0-9]))[0-9]+[.].*$", "\\1.\\2.\\3\\4", latest_name)
+if (any(grepl("^src/|^DESCRIPTION", gert::git_status()$file))) {
+  gert::git_add(c("src", "DESCRIPTION"))
+
   commit_msg <- paste0("feat: Upgrade bundled SQLite to ", version)
   message("Commit message: ", commit_msg)
   gert::git_commit(commit_msg)

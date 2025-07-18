@@ -6,19 +6,9 @@
 
 - Upgrade bundled SQLite to 3.50.3 (#613).
 
-- Upgrade bundled SQLite to 3.50.2 (#610).
-
-## Continuous integration
-
-- Stabilize upgrade routine.
-
 ## Documentation
 
-- Document vendored version in `DESCRIPTION`.
-
-## Uncategorized
-
-- Switching to development version.
+- Mentioned version of bundled SQLite in `DESCRIPTION`.
 
 
 # RSQLite 2.4.1 (2025-06-08)

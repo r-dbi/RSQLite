@@ -1,6 +1,6 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 2.4.2.9001 (2025-08-01)
+# RSQLite 2.4.3 (2025-08-01)
 
 ## Features
 
@@ -10,8 +10,7 @@
 
 - Import from actions-sync, check carefully (#617).
 
-
-# RSQLite 2.4.2.9000 (2025-07-19)
+## Uncategorized
 
 - Switching to development version.
 

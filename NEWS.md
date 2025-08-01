@@ -6,14 +6,6 @@
 
 - Upgrade bundled SQLite to 3.50.4 (#616).
 
-## Continuous integration
-
-- Import from actions-sync, check carefully (#617).
-
-## Uncategorized
-
-- Switching to development version.
-
 
 # RSQLite 2.4.2 (2025-07-18)
 

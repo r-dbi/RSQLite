@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.4.3.9002 (2025-09-05)
+
+## Chore
+
+- Auto-update from GitHub Actions (#623).
+
+
 # RSQLite 2.4.3.9001 (2025-08-05)
 
 ## Continuous integration

@@ -31,22 +31,17 @@ unlink("src/vendor/sqlite3/shell.c")
 file.rename("src/vendor/sqlite3/sqlite3ext.h", "src/vendor/extensions/sqlite3ext.h")
 
 
-tmp_source_zip <- tempfile()
-latest_code <- "https://www.sqlite.org/src/zip/sqlite.zip?r=release"
-download.file(latest_code, tmp_source_zip)
-
-tmp_source_dir <- tempdir()
-unzip(tmp_source_zip, exdir = tmp_source_dir)
-
-
 # Regular expression source code
 register_misc_extension <- function(name) {
   ext_dir <- "src/vendor/extensions/"
   if (!dir.exists(ext_dir))
     dir.create(ext_dir, recursive = TRUE)
 
-  text <- readLines(paste0(tmp_source_dir, "/sqlite/ext/misc/", name, ".c"))
-  text <- gsub(" +$", "", text)
+  url <- paste0("https://github.com/sqlite/sqlite/raw/refs/heads/master/ext/misc/", name, ".c")
+  data <- curl::curl_fetch_memory(url)
+
+  text <- rawToChar(data$content)
+  text <- gsub(" +($|\n)|\n$", "\\1", text)
   writeLines(text, paste0(ext_dir, name, ".c"))
 
   # TODO compile as shared library? see https://www.sqlite.org/loadext.html

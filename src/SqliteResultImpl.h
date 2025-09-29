@@ -72,8 +72,8 @@ private:
   cpp11::list peek_first_row();
 
 private:
-  void NORET raise_sqlite_exception() const;
-  static void NORET raise_sqlite_exception(sqlite3* conn);
+  NORET void raise_sqlite_exception() const;
+  NORET static void raise_sqlite_exception(sqlite3 *conn);
 };
 
 

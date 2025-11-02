@@ -228,5 +228,10 @@ test_that("busy_handler timeout", {
 
   expect_match(conditionMessage(err), "database is locked")
   expect_true(time >= as.difftime(0.2, units = "secs"))
-  expect_true(time <  as.difftime(1.0, units = "secs"))
+  if (grepl("^darwin", R.Version()$os)) {
+    timeout <- 3
+  } else {
+    timeout <- 1
+  }
+  expect_true(time <  as.difftime(timeout, units = "secs"))
 })

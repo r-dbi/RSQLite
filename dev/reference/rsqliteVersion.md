@@ -1,0 +1,21 @@
+# RSQLite version
+
+Return the version of RSQLite.
+
+## Usage
+
+``` r
+rsqliteVersion()
+```
+
+## Value
+
+A character vector containing header and library versions of RSQLite.
+
+## Examples
+
+``` r
+RSQLite::rsqliteVersion()
+#>   header  library 
+#> "3.50.4" "3.50.4" 
+```

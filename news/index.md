@@ -2,62 +2,16 @@
 
 ## RSQLite 2.4.4 (2025-11-05)
 
-### fledge
-
-- Bump version to 2.4.3.9004
-  ([\#627](https://github.com/r-dbi/RSQLite/issues/627))
-  ([\#633](https://github.com/r-dbi/RSQLite/issues/633),
-  [\#636](https://github.com/r-dbi/RSQLite/issues/636)).
-
 ### Features
 
 - Upgrade bundled SQLite to 3.51.0
   ([\#648](https://github.com/r-dbi/RSQLite/issues/648)).
-
-- Upgrade bundled SQLite to 3.50.4
-  ([\#645](https://github.com/r-dbi/RSQLite/issues/645)).
-
-- Upgrade bundled SQLite to 3.50.4
-  ([\#643](https://github.com/r-dbi/RSQLite/issues/643)).
-
-- Upgrade bundled SQLite to 3.50.4
-  ([\#641](https://github.com/r-dbi/RSQLite/issues/641)).
-
-- Upgrade bundled SQLite to 3.50.4
-  ([\#639](https://github.com/r-dbi/RSQLite/issues/639)).
-
-- Upgrade bundled SQLite to 3.50.4
-  ([\#637](https://github.com/r-dbi/RSQLite/issues/637)).
-
-- Upgrade bundled SQLite to 3.50.4
-  ([\#632](https://github.com/r-dbi/RSQLite/issues/632)).
-
-- Upgrade bundled SQLite to 3.50.4
-  ([\#630](https://github.com/r-dbi/RSQLite/issues/630)).
-
-- Upgrade bundled SQLite to 3.50.4
-  ([\#628](https://github.com/r-dbi/RSQLite/issues/628)).
-
-### Chore
-
-- Auto-update from GitHub Actions
-  ([\#623](https://github.com/r-dbi/RSQLite/issues/623)).
 
 ### Continuous integration
 
 - Loosen timeout on macOS.
 
 - Avoid accessing Fossil for upgrade.
-
-- Import from actions-sync, check carefully
-  ([\#625](https://github.com/r-dbi/RSQLite/issues/625)).
-
-- Import from actions-sync, check carefully
-  ([\#621](https://github.com/r-dbi/RSQLite/issues/621)).
-
-### Uncategorized
-
-- Switching to development version.
 
 ## RSQLite 2.4.3 (2025-08-01)
 

@@ -2,47 +2,15 @@
 
 # RSQLite 2.4.4 (2025-11-05)
 
-## fledge
-
-- Bump version to 2.4.3.9004 (#627) (#633, #636).
-
 ## Features
 
 - Upgrade bundled SQLite to 3.51.0 (#648).
-
-- Upgrade bundled SQLite to 3.50.4 (#645).
-
-- Upgrade bundled SQLite to 3.50.4 (#643).
-
-- Upgrade bundled SQLite to 3.50.4 (#641).
-
-- Upgrade bundled SQLite to 3.50.4 (#639).
-
-- Upgrade bundled SQLite to 3.50.4 (#637).
-
-- Upgrade bundled SQLite to 3.50.4 (#632).
-
-- Upgrade bundled SQLite to 3.50.4 (#630).
-
-- Upgrade bundled SQLite to 3.50.4 (#628).
-
-## Chore
-
-- Auto-update from GitHub Actions (#623).
 
 ## Continuous integration
 
 - Loosen timeout on macOS.
 
 - Avoid accessing Fossil for upgrade.
-
-- Import from actions-sync, check carefully (#625).
-
-- Import from actions-sync, check carefully (#621).
-
-## Uncategorized
-
-- Switching to development version.
 
 
 # RSQLite 2.4.3 (2025-08-01)

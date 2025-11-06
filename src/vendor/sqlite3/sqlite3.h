@@ -148,9 +148,9 @@ extern "C" {
 */
 #define SQLITE_VERSION        "3.51.0"
 #define SQLITE_VERSION_NUMBER 3051000
-#define SQLITE_SOURCE_ID      "2025-11-04 19:38:17 fb2c931ae597f8d00a37574ff67aeed3eced4e5547f9120744a-experimental"
-#define SQLITE_SCM_BRANCH     "unknown"
-#define SQLITE_SCM_TAGS       "unknown"
+#define SQLITE_SOURCE_ID      "2025-11-04 19:38:17 fb2c931ae597f8d00a37574ff67aeed3eced4e5547f9120744ae4bfa8e74527b"
+#define SQLITE_SCM_BRANCH     "trunk"
+#define SQLITE_SCM_TAGS       "release major-release version-3.51.0"
 #define SQLITE_SCM_DATETIME   "2025-11-04T19:38:17.314Z"
 
 /*

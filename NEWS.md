@@ -1,5 +1,10 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.4.4.9000 (2025-11-06)
+
+- Switching to development version.
+
+
 # RSQLite 2.4.4 (2025-11-05)
 
 ## Features

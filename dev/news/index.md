@@ -1,5 +1,12 @@
 # Changelog
 
+## RSQLite 2.4.4.9002 (2025-11-08)
+
+### Continuous integration
+
+- Import from actions-sync, check carefully
+  ([\#653](https://github.com/r-dbi/RSQLite/issues/653)).
+
 ## RSQLite 2.4.4.9001 (2025-11-07)
 
 ### Features

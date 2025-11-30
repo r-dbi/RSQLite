@@ -6,22 +6,6 @@
 
 - Upgrade bundled SQLite to 3.51.1 (#661).
 
-- Upgrade bundled SQLite to 3.51.0 (#651).
-
-## Continuous integration
-
-- Import from actions-sync, check carefully (#659).
-
-- Import from actions-sync, check carefully (#657).
-
-- Import from actions-sync, check carefully (#655).
-
-- Import from actions-sync, check carefully (#653).
-
-## Uncategorized
-
-- Switching to development version.
-
 
 # RSQLite 2.4.4 (2025-11-05)
 

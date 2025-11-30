@@ -33,7 +33,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/r-dbi/RSQLite/blob/cran-2.4.5/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/r-dbi/RSQLite/blob/main/DESCRIPTION)
 
 Müller K, Wickham H, James DA, Falcon S (2025). *RSQLite: SQLite
 Interface for R*. R package version 2.4.5, <https://rsqlite.r-dbi.org>.

@@ -1,5 +1,33 @@
 # Changelog
 
+## RSQLite 2.4.5 (2025-11-30)
+
+### Features
+
+- Upgrade bundled SQLite to 3.51.1
+  ([\#661](https://github.com/r-dbi/RSQLite/issues/661)).
+
+- Upgrade bundled SQLite to 3.51.0
+  ([\#651](https://github.com/r-dbi/RSQLite/issues/651)).
+
+### Continuous integration
+
+- Import from actions-sync, check carefully
+  ([\#659](https://github.com/r-dbi/RSQLite/issues/659)).
+
+- Import from actions-sync, check carefully
+  ([\#657](https://github.com/r-dbi/RSQLite/issues/657)).
+
+- Import from actions-sync, check carefully
+  ([\#655](https://github.com/r-dbi/RSQLite/issues/655)).
+
+- Import from actions-sync, check carefully
+  ([\#653](https://github.com/r-dbi/RSQLite/issues/653)).
+
+### Uncategorized
+
+- Switching to development version.
+
 ## RSQLite 2.4.4 (2025-11-05)
 
 ### Features

@@ -33,15 +33,15 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/r-dbi/RSQLite/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/r-dbi/RSQLite/blob/cran-2.4.5/DESCRIPTION)
 
 Müller K, Wickham H, James DA, Falcon S (2025). *RSQLite: SQLite
-Interface for R*. R package version 2.4.4, <https://rsqlite.r-dbi.org>.
+Interface for R*. R package version 2.4.5, <https://rsqlite.r-dbi.org>.
 
     @Manual{,
       title = {RSQLite: SQLite Interface for R},
       author = {Kirill Müller and Hadley Wickham and David A. James and Seth Falcon},
       year = {2025},
-      note = {R package version 2.4.4},
+      note = {R package version 2.4.5},
       url = {https://rsqlite.r-dbi.org},
     }

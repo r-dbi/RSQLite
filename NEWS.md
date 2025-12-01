@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.4.5.9000 (2025-12-01)
+
+## fledge
+
+- CRAN release v2.4.5 (#663).
+
+
 # RSQLite 2.4.5 (2025-11-30)
 
 ## Features

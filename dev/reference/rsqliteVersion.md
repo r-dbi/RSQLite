@@ -17,5 +17,5 @@ A character vector containing header and library versions of RSQLite.
 ``` r
 RSQLite::rsqliteVersion()
 #>   header  library 
-#> "3.51.0" "3.51.0" 
+#> "3.51.2" "3.51.2" 
 ```

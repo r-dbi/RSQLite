@@ -65,6 +65,27 @@ extern "C" SEXP _RSQLite_extension_load(SEXP con, SEXP file, SEXP entry_point) {
     return R_NilValue;
   END_CPP11
 }
+// has_http_vfs.cpp
+bool sqlite_has_http_vfs();
+extern "C" SEXP _RSQLite_sqlite_has_http_vfs() {
+  BEGIN_CPP11
+    return cpp11::as_sexp(sqlite_has_http_vfs());
+  END_CPP11
+}
+// has_http_vfs.cpp
+bool sqlite_httpvfs_compiled();
+extern "C" SEXP _RSQLite_sqlite_httpvfs_compiled() {
+  BEGIN_CPP11
+    return cpp11::as_sexp(sqlite_httpvfs_compiled());
+  END_CPP11
+}
+// httpvfs_stats.cpp
+cpp11::writable::list sqlite_http_stats();
+extern "C" SEXP _RSQLite_sqlite_http_stats() {
+  BEGIN_CPP11
+    return cpp11::as_sexp(sqlite_http_stats());
+  END_CPP11
+}
 // result.cpp
 cpp11::external_pointer<DbResult> result_create(cpp11::external_pointer<DbConnectionPtr> con, std::string sql);
 extern "C" SEXP _RSQLite_result_create(SEXP con, SEXP sql) {
@@ -175,6 +196,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_result_valid",                 (DL_FUNC) &_RSQLite_result_valid,                 1},
     {"_RSQLite_rsqliteVersion",               (DL_FUNC) &_RSQLite_rsqliteVersion,               0},
     {"_RSQLite_set_busy_handler",             (DL_FUNC) &_RSQLite_set_busy_handler,             2},
+    {"_RSQLite_sqlite_has_http_vfs",          (DL_FUNC) &_RSQLite_sqlite_has_http_vfs,          0},
+    {"_RSQLite_sqlite_http_stats",            (DL_FUNC) &_RSQLite_sqlite_http_stats,            0},
+    {"_RSQLite_sqlite_httpvfs_compiled",      (DL_FUNC) &_RSQLite_sqlite_httpvfs_compiled,      0},
     {NULL, NULL, 0}
 };
 }

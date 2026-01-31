@@ -8,7 +8,8 @@ DbConnection::DbConnection(const std::string& path, const bool allow_ext, const 
     busy_callback_(NULL) {
 
   // Get the underlying database connection
-  int rc = sqlite3_open_v2(path.c_str(), &pConn_, flags, vfs.empty() ? NULL : vfs.c_str());
+  // Always ensure URI filenames are enabled so that parameters like vfs= and immutable= work.
+  int rc = sqlite3_open_v2(path.c_str(), &pConn_, flags | SQLITE_OPEN_URI, vfs.empty() ? NULL : vfs.c_str());
   if (rc != SQLITE_OK) {
     cpp11::stop("Could not connect to database:\n%s", getException().c_str());
   }

@@ -2,12 +2,34 @@
 
 # RSQLite 2.4.5.9006 (2026-01-14)
 
-## Continuous integration
+## Features
 
 - Import from actions-sync, check carefully (#676).
 
 - Import from actions-sync, check carefully (#675).
 
+- Experimental: optional HTTP/HTTPS virtual file system (VFS) support. When built
+  with `RSQLITE_ENABLE_HTTPVFS` (libcurl detected) you can open remote databases using
+  URI filenames like `"https://host/path/db.sqlite?vfs=http&immutable=1"`.
+  The initial implementation downloaded the entire database eagerly; it now performs
+  on-demand page access via HTTP Range requests backed by an in-memory LRU page cache,
+  with a configurable prefetch and an optional full-download fallback when Range is
+  unsupported. A conservative configuration interface `sqlite_http_config()` exposes
+  cache size, prefetch pages, and fallback toggle; `sqlite_remote()` is a convenience
+  helper that ensures lazy registration and read-only connection semantics.
+  Capability probing (`sqliteHasHttpVFS()`) now auto-registers the extension so that
+  it reports availability immediately on supported builds. A lightweight statistics
+  API (`sqliteHttpStats()`) surfaces bytes fetched, range request count, and whether
+  a full download occurred. The feature is intended for small immutable databases;
+  API and behavior are subject to change while experimental.
+
+## Internal
+
+- Eager HTTP VFS registration is now gated at compile time: it only runs when
+  libcurl was detected during build (defining `RSQLITE_ENABLE_HTTPVFS`). A small
+  helper is available for diagnostics: `RSQLite:::sqlite_httpvfs_compiled()`
+  returns `TRUE` if the package was compiled with HTTP VFS enabled. The
+  user-facing capability probe remains `sqliteHasHttpVFS()`.
 
 # RSQLite 2.4.5.9005 (2026-01-11)
 
@@ -15,13 +37,11 @@
 
 - Upgrade bundled SQLite to 3.51.2 (#673).
 
-
 # RSQLite 2.4.5.9004 (2026-01-07)
 
 ## Features
 
 - Upgrade bundled SQLite to 3.51.1 (#671).
-
 
 # RSQLite 2.4.5.9003 (2026-01-02)
 
@@ -29,13 +49,11 @@
 
 - Upgrade bundled SQLite to 3.51.1 (#669).
 
-
 # RSQLite 2.4.5.9002 (2025-12-18)
 
 ## Features
 
 - Upgrade bundled SQLite to 3.51.1 (#667).
-
 
 # RSQLite 2.4.5.9001 (2025-12-10)
 
@@ -43,20 +61,17 @@
 
 - Upgrade bundled SQLite to 3.51.1 (#665).
 
-
 # RSQLite 2.4.5.9000 (2025-12-01)
 
 ## fledge
 
 - CRAN release v2.4.5 (#663).
 
-
 # RSQLite 2.4.5 (2025-11-30)
 
 ## Features
 
 - Upgrade bundled SQLite to 3.51.1 (#661).
-
 
 # RSQLite 2.4.4 (2025-11-05)
 
@@ -70,13 +85,11 @@
 
 - Avoid accessing Fossil for upgrade.
 
-
 # RSQLite 2.4.3 (2025-08-01)
 
 ## Features
 
 - Upgrade bundled SQLite to 3.50.4 (#616).
-
 
 # RSQLite 2.4.2 (2025-07-18)
 
@@ -88,13 +101,11 @@
 
 - Mentioned version of bundled SQLite in `DESCRIPTION`.
 
-
 # RSQLite 2.4.1 (2025-06-08)
 
 ## Features
 
 - Upgrade bundled SQLite to 3.50.1 (#606).
-
 
 # RSQLite 2.4.0 (2025-05-31)
 
@@ -104,13 +115,11 @@
 
 - Rebuild in case of configuration changes (#597).
 
-
 # RSQLite 2.3.11 (2025-05-04)
 
 ## Bug fixes
 
 - Compilation with `gcc` works again (#592, #594).
-
 
 # RSQLite 2.3.10 (2025-05-02)
 
@@ -130,7 +139,6 @@
 
 - Bump DBItest version.
 
-
 # RSQLite 2.3.9 (2024-12-03)
 
 ## Features
@@ -142,7 +150,6 @@
 - Avoid memory leak (#553).
 
 - Fix valgrind error (#552).
-
 
 # RSQLite 2.3.8 (2024-11-17)
 
@@ -159,7 +166,6 @@
 ## Documentation
 
 - Reword warning message for misuse of `dbGetQuery()`/`dbSendQuery()`/`dbFetch()` (#524, @mikmart).
-
 
 # RSQLite 2.3.7 (2024-05-26)
 
@@ -181,7 +187,6 @@
 
 - Fix test on FreeBSD (@nunotexbsd, #502, #504).
 
-
 # RSQLite 2.3.6 (2024-03-31)
 
 ## Features
@@ -191,7 +196,6 @@
 ## Documentation
 
 - Use dbitemplate (@maelle, #496).
-
 
 # RSQLite 2.3.5 (2024-01-20)
 
@@ -205,7 +209,6 @@
 
 - Remove compiler warning about unused variable (#486).
 
-
 # RSQLite 2.3.4 (2023-12-07)
 
 ## Bug fixes
@@ -217,7 +220,6 @@
 ## Chore
 
 - Use `check_suggested()` standalone for hms package (#477).
-
 
 # RSQLite 2.3.3 (2023-11-04)
 
@@ -231,7 +233,6 @@
 
 - Skip DBItest tests if not installed.
 
-
 # RSQLite 2.3.2 (2023-10-27)
 
 ## Features
@@ -242,7 +243,6 @@
 
 - Require cpp11 \>= 0.4.0 (#456).
 
-
 # RSQLite 2.3.1 (2023-04-03)
 
 ## Features
@@ -252,7 +252,6 @@
 ## Chore
 
 - Require cpp11 \>= 0.4.0 in `DESCRIPTION` (#456).
-
 
 # RSQLite 2.3.0 (2023-02-13)
 
@@ -268,7 +267,6 @@
 
 - Replace Rcpp by cpp11 (@Antonov548, #441).
 
-
 # RSQLite 2.2.20 (2022-12-21)
 
 ## Features
@@ -283,7 +281,6 @@
 
 - GitPod and cmake integration.
 
-
 # RSQLite 2.2.19 (2022-11-22)
 
 ## Bug fixes
@@ -294,36 +291,29 @@
 
 - Use testthat edition 3 (#438).
 
-
 # RSQLite 2.2.18 (2022-10-04)
 
 - Upgrade bundled SQLite to 3.39.4 (#435).
-
 
 # RSQLite 2.2.17 (2022-09-09)
 
 - Upgrade bundled SQLite to 3.39.3 (#433).
 
-
 # RSQLite 2.2.16 (2022-08-16)
 
 - Upgrade bundled SQLite to 3.39.2 (#431).
-
 
 # RSQLite 2.2.15 (2022-07-15)
 
 - Upgrade bundled SQLite to 3.39.1 (#429).
 
-
 # RSQLite 2.2.14 (2022-05-05)
 
 - Upgrade bundled SQLite to version 3.38.5 (#421, #423).
 
-
 # RSQLite 2.2.13 (2022-04-29)
 
 - Upgrade bundled SQLite to version 3.38.3 (#418).
-
 
 # RSQLite 2.2.12 (2022-04-02)
 
@@ -339,7 +329,6 @@
 
 - Use more parsimonious header to avoid CRAN warnings.
 
-
 # RSQLite 2.2.11 (2022-03-07)
 
 ## Features
@@ -352,7 +341,6 @@
 ## Bug fixes
 
 - Skip failing test on CRAN.
-
 
 # RSQLite 2.2.10 (2022-02-16)
 
@@ -370,7 +358,6 @@
 - Add test for interrupt behavior in `sqliteSetBusyHandler()` (#401).
 - Make method definition more similar to S3. All `setMethod()` calls refer to top-level functions (#396).
 
-
 # RSQLite 2.2.9 (2021-12-06)
 
 ## Features
@@ -387,7 +374,6 @@
 - Adapt to DBItest 1.7.2 (#385).
 - Enable all DBItest tests, passing now.
 
-
 # RSQLite 2.2.8 (2021-08-21)
 
 - Upgrade bundled SQLite to version 3.36.0 (#374).
@@ -395,12 +381,10 @@
 - Busy callback emits message instead of warning (#355).
 - Avoid using memoise at build time (#371).
 
-
 # RSQLite 2.2.7 (2021-04-22)
 
 - Remove RStudio Connection pane support due to problems reported by users (#352).
 - Upgrade bundled SQLite to version 3.35.5 (#368).
-
 
 # RSQLite 2.2.6 (2021-04-11)
 
@@ -410,12 +394,10 @@
 - `dbWriteTable()` creates tables with extended types for connections created with `extended_types = TRUE` (#360, @ablack3).
 - Remove BH dependency by inlining the header files (#362).
 
-
 # RSQLite 2.2.5 (2021-03-25)
 
 - Upgrade bundled SQLite to version 3.35.2 (#357).
 - If the busy handler fails, the transaction is aborted explicitly (#348, @gaborcsardi).
-
 
 # RSQLite 2.2.4 (2021-03-12)
 
@@ -426,14 +408,12 @@
 - `dbConnect()` gains an `extended_types` argument that adds support for date, time and timestamp columns. If a column has a declared type `DATE`, `TIME` or `TIMESTAMP`, it is returned as `Date`, `hms` or `POSIXct` value, respectively (#333, @anderic1).
 - Upgrade bundled SQLite to version 3.34.1 (#342).
 
-
 # RSQLite 2.2.3 (2021-01-24)
 
 ## Features
 
 - Upgrade bundled SQLite to version 3.34.1 (#342).
 - `dbConnect()` gains an `extended_types` argument that adds support for date, time and timestamp columns. If a column has a declared type `DATE`, `TIME` or `TIMESTAMP`, it is returned as `Date`, `hms` or `POSIXct` value, respectively (#333, @anderic1).
-
 
 # RSQLite 2.2.2 (2021-01-04)
 
@@ -451,7 +431,6 @@
 - Implement automatic upgrade of bundled SQLite via GitHub Actions (#335).
 - Switch to GitHub Actions (#331).
 
-
 # RSQLite 2.2.1 (2020-09-28)
 
 - Upgrade to SQLite 3.33.0 (#321).
@@ -459,11 +438,9 @@
 - Strings and blobs now can have a size of up to 2 GB (#314, @shutinet).
 - Multipart queries now give a warning (#313).
 
-
 # RSQLite 2.2.0 (2020-01-07)
 
 - Avoid mangling column names (#259).
-
 
 # RSQLite 2.1.5 (2019-12-18)
 
@@ -473,16 +450,13 @@
 - Only export relevant symbols to the shared library (#303, @troels).
 - Fulfill requirements for CII badge (#300, @TSchiefer).
 
-
 # RSQLite 2.1.4 (2019-12-04)
 
 - Replace `std::mem_fn()` by `boost::mem_fn()` which works for older compilers.
 
-
 # RSQLite 2.1.3 (2019-12-03)
 
 - Replace `std::mem_fun_ref()` by `std::mem_fn()`.
-
 
 # RSQLite 2.1.2 (2019-07-24)
 
@@ -490,13 +464,11 @@
 
 - Upgrade bundled sqlite version to 3.29.0.
 
-
 ## Compatibility fixes
 
 - Compatibility with new releases of blob and hms.
 
 - `dbUnquoteIdentifier()` also handles unquoted identifiers of the form `table` or `schema.table`, for compatibility with dbplyr.
-
 
 ## Bug fixes
 
@@ -512,11 +484,9 @@
 
 - Fix segmentation fault when an open connection is garbage-collected with `options(warn = 2)` (#245).
 
-
 ## New features
 
 - Add regular expression operator (#296, @rfhb).
-
 
 ## Internal
 
@@ -534,7 +504,6 @@
 
 - Avoid including the call in errors.
 
-
 # RSQLite 2.1.1 (2018-05-05)
 
 - Breaking change: The `field.types` argument to `dbWriteTable()` no longer takes precedence when defining the order of the columns in the new table.
@@ -545,7 +514,6 @@
 - Implement `format()` method for `SqliteConnection` (r-dbi/DBI#163).
 - Reexporting `Id()`, `DBI::dbIsReadOnly()` and `DBI::dbCanConnect()`.
 - Now imports DBI 1.0.0.
-
 
 # RSQLite 2.1.0 (2018-03-29)
 
@@ -569,11 +537,9 @@
 - Now raising error if `dbBind()` is called with too many named arguments, according to spec.
 - Refactor connection and result handling to be more similar to other backends.
 
-
 # RSQLite 2.0 (2017-06-18)
 
-API changes
------------
+## API changes
 
 - Updated embedded SQLite to 3.19.3.
 - 64-bit integers are returned as `integer64` vectors. The `bit64` package is imported to support this data type (#65).
@@ -593,8 +559,7 @@ API changes
 - Improve warning message if named parameters are not used in `dbGetPreparedQuery()` or `dbSendPreparedQuery()` (#193).
 - SQLite collects additional histogram data during `ANALYZE`, which may lead to faster executions of queries (#124).
 
-Bug fixes
----------
+## Bug fixes
 
 - Identifiers are now escaped with backticks, to avoid ambiguous handling of double quotes in the context of strings (#123).
 - Fix `dbBind()` behavior and tests. Attempting to bind to a query without parameters throws an error (#114).
@@ -602,13 +567,11 @@ Bug fixes
 - The `variance()` and `stdev()` extension functions now return `NULL` for input of length 1 (#201).
 - Fix roundtrip of `raw` columns (#116).
 
-Documentation
--------------
+## Documentation
 
 - Remove redundant documentation, link to `DBI` more prominently (#186).
 
-Internal
---------
+## Internal
 
 - Most DBItest tests now pass. Reduced number of skips shown for tests.
 - C++ code now compiles with strict compiler settings `-Wall -Wextra -pedantic -Wconversion`.
@@ -621,17 +584,14 @@ Internal
 - Calling `dbFetch(n = 0)` instead of `dbFetch(n = 1)` in `dbListFields()`.
 - Exclude SQLite3 source code from coverage computation again (#204).
 
-
 # RSQLite 1.1-2 (2017-01-07)
 
 - Check reverse dependencies.
 - Check and warn if the `name` argument is quoted in `dbReadTable()` and `dbRemoveTable()`, for compatibility with `sqldf` (#196).
 
-
 # RSQLite 1.1-1 (2016-12-10)
 
 - Fix protection issue that could lead to memory access errors when fetching `BLOB` data (#192, #194, @MikeBadescu).
-
 
 # RSQLite 1.1 (2016-11-25)
 
@@ -684,7 +644,7 @@ Internal
 - `dbSendQuery()`, `dbGetQuery()`, `dbSendStatement()` and `dbExecute()`
   also support inline parameterised queries,
   like `dbGetQuery(datasetsDb(), "SELECT * FROM mtcars WHERE cyl = :cyl",
-  params = list(cyl = 4))`. This has no performance benefits but protects you
+params = list(cyl = 4))`. This has no performance benefits but protects you
   from SQL injection attacks.
 
 - Improve column type inference: the first non-`NULL` value decides the type of a column (#111). If there are no non-`NULL` values, the column affinity is used, determined according to sqlite3 rules (#160).
@@ -786,7 +746,6 @@ Internal
 
 - Added upgrade script for sqlite3 sources and creation script for the datasets database to the `data-raw` directory.
 
-
 # RSQLite 1.0.0 (2014-10-25)
 
 ## New features
@@ -806,30 +765,29 @@ Internal
   after yourself, but you don't have to.
 
 - `dbBegin()`, `dbCommit()`, `dbRollback()` throw errors on failure, rather than
-  return `FALSE`.  They all gain a `name` argument to specify named savepoints.
+  return `FALSE`. They all gain a `name` argument to specify named savepoints.
 
 - `dbFetch()` method added (`fetch()` will be deprecated in the future)
 
 - `dbRemoveTable()` throws errors on failure, rather than returning `FALSE`.
 
 - `dbWriteTable()` has been rewritten:
+  - It quotes field names using `dbQuoteIdentifier()`, rather
+    than use a flawed black-list based approach with name munging.
 
-    * It quotes field names using `dbQuoteIdentifier()`, rather
-      than use a flawed black-list based approach with name munging.
+  - It now throws errors on failure, rather than returning FALSE.
 
-    * It now throws errors on failure, rather than returning FALSE.
+  - It will automatically add row names only if they are character, not integer.
 
-    * It will automatically add row names only if they are character, not integer.
+  - When loading a file from disk, `dbWriteTable()` will no longer
+    attempt to guess the correct values for `row.names` and `header` - instead
+    supply them explicitly if the defaults are incorrect.
 
-    * When loading a file from disk, `dbWriteTable()` will no longer
-      attempt to guess the correct values for `row.names` and `header` - instead
-      supply them explicitly if the defaults are incorrect.
+  - It uses named save points so it can be nested inside other
+    transactions (#41).
 
-    * It uses named save points so it can be nested inside other
-      transactions (#41).
-
-    * When given a zero-row data frame it will just creates the table
-      definition (#35).
+  - When given a zero-row data frame it will just creates the table
+    definition (#35).
 
 ## Changes to objects
 
@@ -901,7 +859,7 @@ Internal
   detection. Prior to this patch, all vectors with class other than
   numeric or logical were mapped to a TEXT column. This patch uses the
   output of storage.mode to map to integer and double vectors to
-  INTEGER and REAL columns, respectively.  All other modes are mapped
+  INTEGER and REAL columns, respectively. All other modes are mapped
   to a TEXT column.
 
 - Detection of BLOBs was narrowed slightly. The code now treats only
@@ -932,16 +890,16 @@ Internal
 # Version 0.9-4
 
 - Fix incorrect handling of NA's for character data in the code that
-  binds parameters to a SQL query.  The string "NA" was incorrectly
+  binds parameters to a SQL query. The string "NA" was incorrectly
   interpreted as a missing value.
 
 # Version 0.9-3
 
-- Upgrade SQLite to 3.7.3.  See https://www.sqlite.org/changes.html
+- Upgrade SQLite to 3.7.3. See https://www.sqlite.org/changes.html
   for release notes for SQLite.
 
 - Enable the sounder(X) function via the SQLITE_SOUNDEX compile time
-  flag.  See https://www.sqlite.org/lang_corefunc.html#soundex for
+  flag. See https://www.sqlite.org/lang_corefunc.html#soundex for
   details.
 
 # Version 0.9-2
@@ -952,11 +910,11 @@ Internal
 # Version 0.9-1
 
 - SQLite header files needed to compile SQLite extension functions are
-  now made available by RSQLite.  Packages can bundle SQLite extension
+  now made available by RSQLite. Packages can bundle SQLite extension
   functions and use LinkingTo: RSQLite in the DESCRIPTION file.
 
 - SQLite loadable extensions are now enabled by default for new
-  connections.  If you wish to disallow loadable extensions for a
+  connections. If you wish to disallow loadable extensions for a
   given connection, loadable.extensions=FALSE to dbConnect.
 
 # Version 0.9-0
@@ -966,54 +924,53 @@ Internal
   SQLite supports multiple processes accessing the same SQLite file
   via locking (however, results are known to be unreliable on NFS).
   This change should make using RSQLite with the multicore package
-  easier.  For an example of the issue that the PID check causes see:
+  easier. For an example of the issue that the PID check causes see:
   https://stat.ethz.ch/pipermail/r-sig-hpc/2009-August/000335.html
 
 - Refactor to use external pointers to wrap handle IDs; remove handle
-  ID coerce code (e.g. as(obj@Id, "integer")).  For now, the old
+  ID coerce code (e.g. as(obj@Id, "integer")). For now, the old
   scheme of storing handle IDs in an integer vector is mostly
   maintained only these integer vectors are stored in the protection
-  slot of an external pointer.  Using external pointers will allow the
+  slot of an external pointer. Using external pointers will allow the
   use of finalizer code so that, for example, unreferenced result sets
   can be cleaned up.
 
 - Upgrade to SQLite 3.6.23.1.
 
 - The memory management code for keeping track of database connections
-  was significantly refactored.  Instead of tracking connections in a
+  was significantly refactored. Instead of tracking connections in a
   pre-allocated array attached to the driver manager, connections are
   now managed dynamically using R's external pointers and finalizers.
   Consequences of this change are as follows:
+  - There is no longer a maximum connection limit (values specified
+    using the max.con argument to SQLite() are now ignored).
 
-    * There is no longer a maximum connection limit (values specified
-      using the max.con argument to SQLite() are now ignored).
+  - The dbGetInfo(mgr) method no longer lists open connections and
+    dbListConnections will now always return an empty list. This
+    functionality was only needed because one needed a reference to
+    a connection in order to finalize the resource via
+    dbDisconnect(). While calling dbDisconnect() is still the
+    recommended approach, database connections that are no longer
+    referenced by any R variables will be finalized by R's garbage
+    collector.
 
-    * The dbGetInfo(mgr) method no longer lists open connections and
-      dbListConnections will now always return an empty list.  This
-      functionality was only needed because one needed a reference to
-      a connection in order to finalize the resource via
-      dbDisconnect().  While calling dbDisconnect() is still the
-      recommended approach, database connections that are no longer
-      referenced by any R variables will be finalized by R's garbage
-      collector.
+  - The behavior of SQLiteConnection objects now follows typical R
+    semantics. If no R variables reference a given connection, it
+    will be finalized by R's garbage collector.
 
-    * The behavior of SQLiteConnection objects now follows typical R
-      semantics.  If no R variables reference a given connection, it
-      will be finalized by R's garbage collector.
-
-- Add support for SQLite BLOBs.  You can now insert and retrieve BLOBs
-  using raw vectors.  For parameterized queries using
-  dbSendPreparedQuery, the BLOB column must be a list.  When a query
+- Add support for SQLite BLOBs. You can now insert and retrieve BLOBs
+  using raw vectors. For parameterized queries using
+  dbSendPreparedQuery, the BLOB column must be a list. When a query
   returns a result set with a BLOB column, that column will be a list
-  of raw vectors.  Lists as columns in data.frames work for simple
+  of raw vectors. Lists as columns in data.frames work for simple
   access, but may break some code that expects columns to be atomic
-  vectors.  A database NULL value is mapped to an R NULL value for
-  BLOBs.  This differs from the mapping of database NULL to NA used
+  vectors. A database NULL value is mapped to an R NULL value for
+  BLOBs. This differs from the mapping of database NULL to NA used
   for other datatypes (there is no notion of NA for a raw vector).
 
 - The behavior of dbDataType, sqliteDataType, and as a consequence,
   dbWriteTable has been changed to support BLOBs represented as a
-  column of type list in a data.frame.  Such columns were previously
+  column of type list in a data.frame. Such columns were previously
   mapped to a TEXT column in SQLite and are not mapped to BLOB.
 
 - RSQLite now depends on R >= 2.10.0.
@@ -1024,9 +981,9 @@ Internal
   missing PROTECT bug that caused spurious crashes when performing
   many prepared queries.
 
-- Improve internal memory handling for prepared queries.  Use
+- Improve internal memory handling for prepared queries. Use
   R_PreserveObject/R_ReleaseObject instead of the protection stack to
-  manage parameter binding.  Logical vectors are now properly coerced
+  manage parameter binding. Logical vectors are now properly coerced
   to integer vectors and Rf_asCharacterFactor is used to convert
   factors in bind data.
 
@@ -1042,19 +999,19 @@ Internal
 
 - Add name space unload hook to unload RSQLite.so.
 
-- Enable full-text search module by default.  See
+- Enable full-text search module by default. See
   https://www.sqlite.org/fts3.html for details on this SQLite
   module.
 
-- Add support for prepared queries that involve a SELECT.  This was
-  previously unsupported.  SELECT queries can now be used with
-  dbSendPreparedQuery.  The return value is the same as rbind'ing the
-  results of the individual queries.  This means that parameters that
+- Add support for prepared queries that involve a SELECT. This was
+  previously unsupported. SELECT queries can now be used with
+  dbSendPreparedQuery. The return value is the same as rbind'ing the
+  results of the individual queries. This means that parameters that
   return no results are ignored in the result.
 
 # Version 0.8-3
 
-- Enable RTree module for the Windows build.  The configure script is
+- Enable RTree module for the Windows build. The configure script is
   not run on Windows, options are set directly in src/Makevars.win.
 
 # Version 0.8-2
@@ -1064,18 +1021,18 @@ Internal
 # Version 0.8-1
 
 - sqliteFetch now returns a data.frame with the expected number of
-  columns when a query returns zero rows.  Before, a 0 x 0 data.frame
+  columns when a query returns zero rows. Before, a 0 x 0 data.frame
   was returned regardless of the number of columns in the original
-  query.  The change will be seen in calls to fetch and dbGetQuery for
+  query. The change will be seen in calls to fetch and dbGetQuery for
   queries that return no result rows.
 
 - sqliteCopyDatabase has been refactored to support copying to either
-  a file or an open and empty database connection.  This makes it
+  a file or an open and empty database connection. This makes it
   possible to transfer a disk based database to an in-memory based
-  database.  The changes to sqliteCopyDatabase are NOT BACKWARDS
+  database. The changes to sqliteCopyDatabase are NOT BACKWARDS
   COMPATIBLE: the return value is now NULL (an error is raised if the
   copying fails) and the argument names have been changed to 'from'
-  and 'to'.  As this was a newly added feature that uses an
+  and 'to'. As this was a newly added feature that uses an
   experimental SQLite API, I decided to disregards compatibility.
 
 - Calling dbSendPreparedQuery with a non-NULL bind.data that has zero
@@ -1090,13 +1047,13 @@ Internal
   improve Rd markup.
 
 - Integrate RUnit unit tests so that they run during R CMD check.
-  Small improvements to make the tests run more quietly.  You can run
+  Small improvements to make the tests run more quietly. You can run
   the unit tests by calling RSQLite:::.test_RSQLite() (require latest
-  version of the RUnit package).  Also had to disable some unit tests
-  on Windows.  Investigation of details is on the TODO list.
+  version of the RUnit package). Also had to disable some unit tests
+  on Windows. Investigation of details is on the TODO list.
 
 - Add sqliteCopyDatabase, a function that uses SQLite's online backup
-  API to allow a specified database to be copied to a file.  This can
+  API to allow a specified database to be copied to a file. This can
   be used to create a file copy of an in memory database.
 
 - Increase the default max connections from 16 to 200 in SQLite().
@@ -1108,34 +1065,33 @@ Internal
 
 - sqliteTransactionStatement, which is used by dbCommit, dbRollback,
   and dbBeginTransaction, now passes silent=TRUE to try() to suppress
-  error messages.  Without this, code that could otherwise handle a
+  error messages. Without this, code that could otherwise handle a
   failed commit gracefully had no way to suppress the error message.
   You can use dbGetException to see the error when
   sqliteTransactionStatement returns FALSE.
 
 - dbConnect/sqliteNewConnection now throws an error if dbname argument
-  is NA.  Previously, if as.character(NA) was provided, a database
+  is NA. Previously, if as.character(NA) was provided, a database
   with filename "NA" was created.
 
 - dbConnect/sqliteNewConnection now accepts two new arguments:
 
   flags:
-      provides additional control over connetion details.  For
-      convenience, you can specify one of SQLITE_RWC (default),
-      SQLITE_RW, or SQLITE_RO to obtain a connection in
-      read/write/create, read/write, or read only mode, respectively.
-      See http://sqlite.org/c3ref/open.html for details.
+  provides additional control over connetion details. For
+  convenience, you can specify one of SQLITE_RWC (default),
+  SQLITE_RW, or SQLITE_RO to obtain a connection in
+  read/write/create, read/write, or read only mode, respectively.
+  See http://sqlite.org/c3ref/open.html for details.
   vfs:
-      controls the virtual filesystem used by SQLite.  The default,
-      NULL, lets SQLite select the appropriate vfs for the system.
-      You can specify one of "unix-posix", "unix-afp", "unix-flock",
-      "unix-dotfile", or "unix-none".  For details, see
-      https://www.sqlite.org/compile.html.  This functionality is only
-      fully available on OSX.  On non-OSX Unix, you can use
-      unix-dotfile and unix-none.  None of these modules are available
-      on Windows where a non-NULL values of the vfs argument will be
-      ignored with a warning.
-
+  controls the virtual filesystem used by SQLite. The default,
+  NULL, lets SQLite select the appropriate vfs for the system.
+  You can specify one of "unix-posix", "unix-afp", "unix-flock",
+  "unix-dotfile", or "unix-none". For details, see
+  https://www.sqlite.org/compile.html. This functionality is only
+  fully available on OSX. On non-OSX Unix, you can use
+  unix-dotfile and unix-none. None of these modules are available
+  on Windows where a non-NULL values of the vfs argument will be
+  ignored with a warning.
 
 # Version 0.7-3
 
@@ -1147,7 +1103,7 @@ Internal
 
 # Version 0.7-2
 
-- Fixed some partial argument matching warnings.  Thanks to Matthias
+- Fixed some partial argument matching warnings. Thanks to Matthias
   Burger for reporting and sending a patch.
 
 - Added dbBuildTableDefinition to exports per user request.
@@ -1156,7 +1112,7 @@ Internal
 
 - Upgraded included SQLite from 3.6.0 to 3.6.4
 
-- Old news is now in ONEWS.  Taking a fresh start with this NEWS file
+- Old news is now in ONEWS. Taking a fresh start with this NEWS file
   to keep better track of changes on a per-release basis.
 
 - Added a HACKING file where we will add notes about how to do
@@ -1164,19 +1120,19 @@ Internal
 
 # Version 0.4-12
 
-* Fix bug in dbListTables for empty databases
+- Fix bug in dbListTables for empty databases
 
 # Version 0.4-11
 
-* Implemented dbCommit() and dbRollback(). There is also a new
+- Implemented dbCommit() and dbRollback(). There is also a new
   generic method dbBeginTransaction(), which begins a transaction.
   Note that this is an extension to the DBI interface.
 
-* Update to the SQLite 3 API for fetching records. This means that
+- Update to the SQLite 3 API for fetching records. This means that
   the records are pulled from the database as required, and not
   cached in memory as was previously done.
 
-* Added generic methods dbSendPreparedQuery() and dbGetPreparedQuery()
+- Added generic methods dbSendPreparedQuery() and dbGetPreparedQuery()
   which are similar to dbSendQuery() and dbGetQuery(), but take an
   extra "bind.data" parameter, which is a data frame. The statement
   is assumed to contain bind variables. Bind variables are either
@@ -1184,7 +1140,7 @@ Internal
   in the data frame. See http://sqlite.org/capi3ref.html for more details.
 
   dbGetPreparedQuery(con, "INSERT INTO table1 VALUES (:col1)",
-                           data.frame(col1=c(1, 2)) )
+  data.frame(col1=c(1, 2)) )
 
   Each bind variable in the query has to be bound only once, either via
   named or positional parameters. If it is not bound or is bound more
@@ -1192,141 +1148,141 @@ Internal
   thrown. Any extra columns in the data frame are ignored.
 
   If you are having a lot of string parameters, use stringsAsFactors=FALSE
-  when creating the bind.data data.frame instance.  You can also use I().
+  when creating the bind.data data.frame instance. You can also use I().
 
-* Added experimental sqliteQuickColumn function that retrieves an entire
+- Added experimental sqliteQuickColumn function that retrieves an entire
   column from a specified table as quickly as possible.
 
-* The SQLite driver has a new logical parameter "shared.cache" to
+- The SQLite driver has a new logical parameter "shared.cache" to
   enable the shared-cache mode, which allows multiple connections
   to share a single data and schema cache. See
   https://www.sqlite.org/sharedcache.html
 
 # Version 0.4-9
 
-* Upgraded to SQLite 3.3.8
+- Upgraded to SQLite 3.3.8
 
-* Use .SQLitePkgName instead of hard-coding the package name when
+- Use .SQLitePkgName instead of hard-coding the package name when
   using .Call
 
-* dbConnect() now has a logical parameter "loadable.extensions"
+- dbConnect() now has a logical parameter "loadable.extensions"
   which will allow loading of extensions. See the Loadable
   Extensions documentation:
   https://www.sqlite.org/cvstrac/wiki?p=LoadableExtensions
 
 # Version 0.4-4
 
-* Upgraded to SQLite 3.3.7
+- Upgraded to SQLite 3.3.7
 
-* Default when building from source is now to compile the included
+- Default when building from source is now to compile the included
   version of SQLite and link to it statically
 
-* Fixed unclosed textConnections
+- Fixed unclosed textConnections
 
 # Version 0.4-1
 
-* Added a method for dbWriteTable to write table from a text file, e.g.,
+- Added a method for dbWriteTable to write table from a text file, e.g.,
   dbWriteTable(con, "tablename", "filename")
 
-* Fixed problems exporting/importing NA's (thanks to Ronggui Huang for
+- Fixed problems exporting/importing NA's (thanks to Ronggui Huang for
   a very clear bug report).
 
-* Fixed double free() in the C code, a tiny memory leak, and configure now
+- Fixed double free() in the C code, a tiny memory leak, and configure now
   builds sqlite properly on 64-bit linux (thanks to Seth Falcon for these).
 
-* dbConnect() now accepts values for the "cache_size" and "synchronous"
+- dbConnect() now accepts values for the "cache_size" and "synchronous"
   PRAGMAs ("synchronous" defaults to 0 or "off") to improve
   performance (thanks to Charles Loboz for pointing these out, see the
   file "rsqlitePerf.txt").
 
 # Version 0.4-0
 
-* First attempt at using the new SQLite Version 3 API.  This version
+- First attempt at using the new SQLite Version 3 API. This version
   is a bridge to the new API, but it does not make available the new
   capabilities (e.g., prepared statements, data bindings, etc.) but
   prepares us for those new features.
 
-* Clean up some installation code (mainly to make it easy to automatically
+- Clean up some installation code (mainly to make it easy to automatically
   build on Windows, as per Kurt Hornik and Uwe Ligges suggestions).
 
-* Fixed bug that ignored "fetch.default.rec" in SQLite()/dbDriver()
+- Fixed bug that ignored "fetch.default.rec" in SQLite()/dbDriver()
   (as reported by Duncan Murdoch)
 
-* Fixed bug in dbReadTable() that was not recognizing "row.names" in its
+- Fixed bug in dbReadTable() that was not recognizing "row.names" in its
   default, thus it now re-creates a data.frame that has been exported
   with dbWriteTable().
 
-* Fixed bug where dbListTables was not listing views (as reported by
+- Fixed bug where dbListTables was not listing views (as reported by
   Doug Bates).
 
-* Added code in "configure.in" to determine CC/CFLAGS used in compiling R
+- Added code in "configure.in" to determine CC/CFLAGS used in compiling R
   (as suggested by Brian D. Ripley to get it to compile on 64-bit machines).
   As of today, I can't test this myself.
 
 # Version 0.3-5
 
-* Documentation typos, trivial packaging changes, as per CRAN maintainer
+- Documentation typos, trivial packaging changes, as per CRAN maintainer
   request.
 
 # Version 0.3-4
 
-* Fixed documentation typos.
+- Fixed documentation typos.
 
 # Version 0.3-3
 
-* Minor fixes to accommodate R 1.8.0 changes to data.frame subsetting.
+- Minor fixes to accommodate R 1.8.0 changes to data.frame subsetting.
 
-* Updated the documentation to use 1.8.0 new S4-style method documentation.
+- Updated the documentation to use 1.8.0 new S4-style method documentation.
 
-* Updated to SQLite to the latest 2.8.6 (included with RSQLite).
+- Updated to SQLite to the latest 2.8.6 (included with RSQLite).
 
-* Added file NAMESPACE.future to prepare for namespace implementation
+- Added file NAMESPACE.future to prepare for namespace implementation
   at some future release.
 
 # Version 0.3-2
 
-* Ported to Windows.  It now installs fine under Windows with
+- Ported to Windows. It now installs fine under Windows with
 
-    Rcmd INSTALL RSQLite_0.3-2.tar.gz
+  Rcmd INSTALL RSQLite_0.3-2.tar.gz
 
   (there's also a binary RSQLite_0.3-2.zip)
 
-* Added code to verify that the SQLite library versions used for
+- Added code to verify that the SQLite library versions used for
   compilation and at runtime agree.
 
-* Added source sqlite-2.8.3.
+- Added source sqlite-2.8.3.
 
-* Fixed minor documentation errors and removed the DBI.pdf documentation
+- Fixed minor documentation errors and removed the DBI.pdf documentation
   file, which is included in the required DBI package.
 
-* The package now installs as a binary image by default (use the --no-save
+- The package now installs as a binary image by default (use the --no-save
   argument to R CMD INSTALL to override this).
 
 # Version 0.3-1
 
-* Moved the implementation to version 4 style classes, and it now
+- Moved the implementation to version 4 style classes, and it now
   it is fully compliant with the DBI 0.1-3.
 
-* Simplified the core helper R/SQLite functions (w. prefix "sqlite")
+- Simplified the core helper R/SQLite functions (w. prefix "sqlite")
   following the ROracle model.
 
-* Updated to sqlite version 2.7.1 (note that if you have an sqlite
+- Updated to sqlite version 2.7.1 (note that if you have an sqlite
   database file from a version prior to 2.6 you'll need to update
   it -- for details see https://www.hwaic.com/sw/sqlite).
 
 # Version 0.2-1
 
-* Worked mostly in the configuration;  added the --enable-sqlite and
+- Worked mostly in the configuration; added the --enable-sqlite and
   --with-sqlite arguments to have the RSQLite configuration also install
   SQLite or locate it, respectively.
 
 # Version 0.1-1
 
-* First implementation -- used the RS-DBI.[ch] code (which is the core
+- First implementation -- used the RS-DBI.[ch] code (which is the core
   connection/cursor manager) "as is" and modified the RS-MySQL.[hc],
   (which sits directly on top of the MySQL C API) and replace the
-  MySQL API calls with SQLite API calls.  This was pretty easy, except
+  MySQL API calls with SQLite API calls. This was pretty easy, except
   for the fact that the SQLite API is so minimal (3, yes, 3 C functions)
   with no support for connections, result set (cursors), data types,
-  meta-data -- nothing.  So I had to simulate all this. (Actually it
+  meta-data -- nothing. So I had to simulate all this. (Actually it
   wasn't too bad).

@@ -26,7 +26,10 @@ Description: Embeds the SQLite database engine in R and provides an
     engine (version 3.51.2) and for various extensions is included.
     System libraries will never be consulted because this package relies
     on static linking for the plugins it includes; this also ensures a
-    consistent experience across all installations.
+    consistent experience across all installations. Optionally, when
+    libcurl is available at build time, an experimental HTTP/HTTPS
+    virtual file system (VFS) can be enabled to allow read-only access
+    to remote immutable SQLite database files via URIs.
 License: LGPL (>= 2.1)
 URL: https://rsqlite.r-dbi.org, https://github.com/r-dbi/RSQLite
 BugReports: https://github.com/r-dbi/RSQLite/issues
@@ -48,6 +51,7 @@ Suggests:
     gert,
     gh,
     hms,
+    httpuv,
     knitr,
     magrittr,
     rmarkdown,
@@ -124,6 +128,8 @@ Collate:
     'deprecated.R'
     'export.R'
     'fetch_SQLiteResult.R'
+    'httpvfs.R'
+    'httpvfs_config.R'
     'import-standalone-check_suggested.R'
     'import-standalone-purrr.R'
     'initExtension.R'

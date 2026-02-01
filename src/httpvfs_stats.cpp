@@ -14,8 +14,8 @@ cpp11::writable::list sqlite_http_stats() {
   sqlite3_http_stats(&bytes, &ranges, &fulldl);
 #endif
   cpp11::writable::list out;
-  out.push_back(cpp11::as_sexp(bytes));   // bytes_fetched
-  out.push_back(cpp11::as_sexp(ranges));  // range_requests
+  out.push_back(cpp11::as_sexp(bytes));        // bytes_fetched
+  out.push_back(cpp11::as_sexp(ranges));       // range_requests
   out.push_back(cpp11::as_sexp(fulldl != 0));  // full_download (logical flag)
   out.names() = { "bytes_fetched", "range_requests", "full_download" };
   return out;

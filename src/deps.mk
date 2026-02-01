@@ -1,6 +1,6 @@
 # Dependencies
 include $(OBJECTS:.o=.dd)
-include $(PKG_LIBS:.o=.dd)
+include $(PKG_OBJECTS:.o=.dd)
 
 # Include only local dependencies for smaller footprint
 # Add trailing backslash and sort

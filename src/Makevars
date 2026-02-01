@@ -28,12 +28,14 @@ RSQLITE_CFLAGS=
 PKG_CXXFLAGS=$(CXX_VISIBILITY) $(RSQLITE_CXXFLAGS)
 PKG_CFLAGS=$(C_VISIBILITY) $(RSQLITE_CFLAGS)
 
-PKG_LIBS= vendor/sqlite3/sqlite3.o $(CURL_LIBS)
+PKG_OBJECTS= vendor/sqlite3/sqlite3.o
+
+PKG_LIBS= $(PKG_OBJECTS) $(CURL_LIBS)
 
 .PHONY: all
 all: $(SHLIB)
 
-$(SHLIB): $(PKG_LIBS)
+$(SHLIB): $(PKG_OBJECTS)
 
 # Development-only dependency stamping. Empty in release tarball.
 deps.mk:

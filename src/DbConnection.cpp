@@ -1,15 +1,22 @@
 #include "pch.h"
 #include "DbConnection.h"
 
-
-DbConnection::DbConnection(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs, bool with_alt_types)
-  : pConn_(NULL),
-    with_alt_types_(with_alt_types),
-    busy_callback_(NULL) {
-
+DbConnection::DbConnection(
+  const std::string& path,
+  const bool allow_ext,
+  const int flags,
+  const std::string& vfs,
+  bool with_alt_types
+)
+    : pConn_(NULL), with_alt_types_(with_alt_types), busy_callback_(NULL) {
   // Get the underlying database connection
   // Always ensure URI filenames are enabled so that parameters like vfs= and immutable= work.
-  int rc = sqlite3_open_v2(path.c_str(), &pConn_, flags | SQLITE_OPEN_URI, vfs.empty() ? NULL : vfs.c_str());
+  int rc = sqlite3_open_v2(
+    path.c_str(),
+    &pConn_,
+    flags | SQLITE_OPEN_URI,
+    vfs.empty() ? NULL : vfs.c_str()
+  );
   if (rc != SQLITE_OK) {
     cpp11::stop("Could not connect to database:\n%s", getException().c_str());
   }
@@ -27,7 +34,9 @@ DbConnection::~DbConnection() {
 }
 
 sqlite3* DbConnection::conn() const {
-  if (!is_valid()) cpp11::stop("disconnected");
+  if (!is_valid()) {
+    cpp11::stop("disconnected");
+  }
   return pConn_;
 }
 
@@ -35,11 +44,9 @@ bool DbConnection::is_valid() const {
   return (pConn_ != NULL);
 }
 
-void DbConnection::set_current_result(const DbResult*) const {
-}
+void DbConnection::set_current_result(const DbResult*) const {}
 
-void DbConnection::reset_current_result(const DbResult*) const {
-}
+void DbConnection::reset_current_result(const DbResult*) const {}
 
 bool DbConnection::is_current_result(const DbResult*) const {
   return true;
@@ -52,10 +59,11 @@ void DbConnection::check_connection() const {
 }
 
 std::string DbConnection::getException() const {
-  if (is_valid())
+  if (is_valid()) {
     return std::string(sqlite3_errmsg(pConn_));
-  else
+  } else {
     return std::string();
+  }
 }
 
 void DbConnection::copy_to(const DbConnectionPtr& pDest) {
@@ -86,7 +94,7 @@ void DbConnection::set_busy_handler(SEXP r_callback) {
   check_connection();
   release_callback_data();
 
-  if (! Rf_isNull(r_callback)) {
+  if (!Rf_isNull(r_callback)) {
     R_PreserveObject(r_callback);
     busy_callback_ = r_callback;
   }
@@ -105,8 +113,7 @@ void DbConnection::release_callback_data() {
   }
 }
 
-int DbConnection::busy_callback_helper(void *data, int num)
-{
+int DbConnection::busy_callback_helper(void* data, int num) {
   SEXP r_callback = reinterpret_cast<SEXP>(data);
   cpp11::function rfun = r_callback;
   int ret = cpp11::as_integers(rfun(num))[0];

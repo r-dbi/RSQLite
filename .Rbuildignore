@@ -45,3 +45,4 @@ a.out.dSYM
 ^\.cache$
 ^src/deps\.mk$
 ^src/.*\.dd
+^\.clang-format$

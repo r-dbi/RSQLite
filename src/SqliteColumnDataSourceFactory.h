@@ -16,4 +16,4 @@ public:
   DbColumnDataSource* create(const int j);
 };
 
-#endif //RSQLITE_SQLITECOLUMNFACTORY_H
+#endif  // RSQLITE_SQLITECOLUMNFACTORY_H

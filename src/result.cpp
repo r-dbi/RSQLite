@@ -1,11 +1,13 @@
 #include "pch.h"
 #include "RSQLite_types.h"
 
-//#include "DbResult.h"
-
+// #include "DbResult.h"
 
 [[cpp11::register]]
-cpp11::external_pointer<DbResult> result_create(cpp11::external_pointer<DbConnectionPtr> con, std::string sql) {
+cpp11::external_pointer<DbResult> result_create(
+  cpp11::external_pointer<DbConnectionPtr> con,
+  std::string sql
+) {
   (*con)->check_connection();
   DbResult* res = SqliteResult::create_and_send_query(*con, sql);
   return cpp11::external_pointer<DbResult>(res, true);

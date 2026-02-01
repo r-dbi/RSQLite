@@ -7,7 +7,8 @@ extern "C" {
 // Return true if an HTTP-related VFS has been registered.
 [[cpp11::register]]
 bool sqlite_has_http_vfs() {
-  return sqlite3_vfs_find("http") || sqlite3_vfs_find("httpvfs") || sqlite3_vfs_find("httpfs");
+  return sqlite3_vfs_find("http") || sqlite3_vfs_find("httpvfs") ||
+         sqlite3_vfs_find("httpfs");
 }
 
 // Return true iff package was compiled with HTTP VFS enabled.

@@ -10,7 +10,8 @@ DbConnection::DbConnection(
 )
     : pConn_(NULL), with_alt_types_(with_alt_types), busy_callback_(NULL) {
   // Get the underlying database connection
-  // Always ensure URI filenames are enabled so that parameters like vfs= and immutable= work.
+  // Always ensure URI filenames are enabled so that parameters like vfs= and
+  // immutable= work.
   int rc = sqlite3_open_v2(
     path.c_str(),
     &pConn_,

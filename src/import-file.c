@@ -25,26 +25,25 @@ char* RS_sqlite_getline(FILE* in, const char* eol);
 /* The following code comes directly from SQLite's shell.c, with
  * obvious minor changes.
  */
-int
-RS_sqlite_import(
-    sqlite3* db,
-    const char* zTable,          /* table must already exist */
-    const char* zFile,
-    const char* separator,
-    const char* eol,
-    int skip
+int RS_sqlite_import(
+  sqlite3* db,
+  const char* zTable, /* table must already exist */
+  const char* zFile,
+  const char* separator,
+  const char* eol,
+  int skip
 ) {
-  sqlite3_stmt* pStmt;        /* A statement */
-  int rc;                     /* Result code */
-  int nCol;                   /* Number of columns in the table */
-  int nByte;                  /* Number of bytes in an SQL string */
-  int i, j;                   /* Loop counters */
-  int nSep;                   /* Number of bytes in separator[] */
-  char* zSql;                 /* An SQL statement */
-  char* zLine = NULL;         /* A single line of input from the file */
-  char** azCol;               /* zLine[] broken up into columns */
-  FILE* in;                   /* The input file */
-  int lineno = 0;             /* Line number of input file */
+  sqlite3_stmt* pStmt; /* A statement */
+  int rc;              /* Result code */
+  int nCol;            /* Number of columns in the table */
+  int nByte;           /* Number of bytes in an SQL string */
+  int i, j;            /* Loop counters */
+  int nSep;            /* Number of bytes in separator[] */
+  char* zSql;          /* An SQL statement */
+  char* zLine = NULL;  /* A single line of input from the file */
+  char** azCol;        /* zLine[] broken up into columns */
+  FILE* in;            /* The input file */
+  int lineno = 0;      /* Line number of input file */
   char* z;
 
   nSep = strlen(separator);
@@ -52,7 +51,9 @@ RS_sqlite_import(
     Rf_error("RS_sqlite_import: non-null separator required for import");
   }
   zSql = sqlite3_mprintf("SELECT * FROM '%q'", zTable);
-  if (zSql == 0) return 0;
+  if (zSql == 0) {
+    return 0;
+  }
   nByte = strlen(zSql);
   rc = sqlite3_prepare_v2(db, zSql, -1, &pStmt, 0);
   sqlite3_free(zSql);
@@ -64,9 +65,13 @@ RS_sqlite_import(
     nCol = sqlite3_column_count(pStmt);
   }
   sqlite3_finalize(pStmt);
-  if (nCol == 0) return 0;
+  if (nCol == 0) {
+    return 0;
+  }
   zSql = malloc(nByte + 20 + nCol * 2);
-  if (zSql == 0) return 0;
+  if (zSql == 0) {
+    return 0;
+  }
   sqlite3_snprintf(nByte + 20, zSql, "INSERT INTO '%q' VALUES(?", zTable);
   j = strlen(zSql);
   for (i = 1; i < nCol; i++) {
@@ -88,7 +93,9 @@ RS_sqlite_import(
     Rf_error("RS_sqlite_import: cannot open file %s", zFile);
   }
   azCol = malloc(sizeof(azCol[0]) * (nCol + 1));
-  if (azCol == 0) return 0;
+  if (azCol == 0) {
+    return 0;
+  }
 
   while ((zLine = RS_sqlite_getline(in, eol)) != NULL) {
     lineno++;
@@ -114,15 +121,19 @@ RS_sqlite_import(
       free(azCol);
       fclose(in);
       sqlite3_finalize(pStmt);
-      Rf_error("RS_sqlite_import: %s line %d expected %d columns of data but found %d",
-          zFile, lineno, nCol, i + 1);
+      Rf_error(
+        "RS_sqlite_import: %s line %d expected %d columns of data but found %d",
+        zFile,
+        lineno,
+        nCol,
+        i + 1
+      );
     }
 
     for (i = 0; i < nCol; i++) {
-      if (azCol[i][0] == '\\' && azCol[i][1] == 'N') {   /* insert NULL for NA */
+      if (azCol[i][0] == '\\' && azCol[i][1] == 'N') { /* insert NULL for NA */
         sqlite3_bind_null(pStmt, i + 1);
-      }
-      else {
+      } else {
         sqlite3_bind_text(pStmt, i + 1, azCol[i], -1, SQLITE_STATIC);
       }
     }
@@ -157,10 +168,9 @@ RS_sqlite_import(
  * eol = '\n' even on Windows.
  */
 
-char*
-RS_sqlite_getline(FILE* in, const char* eol) {
+char* RS_sqlite_getline(FILE* in, const char* eol) {
   /* caller must free memory */
-  char* buf, ceol;
+  char *buf, ceol;
   size_t nc, i;
   int c, j, neol;
   int found_eol = 0;
@@ -168,20 +178,24 @@ RS_sqlite_getline(FILE* in, const char* eol) {
   nc = 1024;
   i = 0;
   buf = malloc(nc);
-  if (!buf) Rf_error("RS_sqlite_getline could not malloc");
+  if (!buf) {
+    Rf_error("RS_sqlite_getline could not malloc");
+  }
 
-  neol = strlen(eol);  /* num of eol chars */
-  ceol = eol[neol - 1];  /* last char in eol */
+  neol = strlen(eol);   /* num of eol chars */
+  ceol = eol[neol - 1]; /* last char in eol */
   while (TRUE) {
     c = fgetc(in);
     if (i == nc) {
       nc = 2 * nc;
-      buf = (char*) realloc((void*) buf, nc);
-      if (!buf)
+      buf = (char*)realloc((void*)buf, nc);
+      if (!buf) {
         Rf_error("RS_sqlite_getline could not realloc");
+      }
     }
-    if (c == EOF)
+    if (c == EOF) {
       break;
+    }
     buf[i++] = c;
     if (c == ceol) {
       /* see if we've got eol */
@@ -193,13 +207,13 @@ RS_sqlite_getline(FILE* in, const char* eol) {
         }
       }
       if (found_eol) {
-        buf[i - neol] = '\0';   /* drop the newline char(s) */
+        buf[i - neol] = '\0'; /* drop the newline char(s) */
         break;
       }
     }
   }
 
-  if (i == 0 || strlen(buf) == 0) {    /* empty line */
+  if (i == 0 || strlen(buf) == 0) { /* empty line */
     free(buf);
     buf = NULL;
   }

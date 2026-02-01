@@ -18,6 +18,12 @@
 sqlite_remote <- function(url, immutable = TRUE, ...) {
 	stopifnot(is.character(url), length(url) == 1L)
 	if (!grepl("^https?://", url)) stop("url must begin with http:// or https://", call. = FALSE)
+	# SQLite URI parameters are introduced after '?'. If we appended them directly
+	# to the HTTP URL, they would become part of the HTTP request and can cause
+	# a 404 on static hosts. Instead, wrap the URL in a SQLite file: URI.
+	if (grepl("[?#]", url)) {
+		stop("url must not contain a query string or fragment", call. = FALSE)
+	}
 	# Ensure the HTTP VFS is registered in this process; try to lazily init if needed
 	if (!sqliteHasHttpVFS()) {
 		# Register via initExtension() using a throwaway in-memory connection
@@ -26,11 +32,9 @@ sqlite_remote <- function(url, immutable = TRUE, ...) {
 		try(initExtension(tmp, "http"), silent = TRUE)
 	}
 	if (!sqliteHasHttpVFS()) stop("HTTP VFS not available in this build", call. = FALSE)
-	sep <- if (grepl("\\?", url)) "&" else "?"
-	if (!grepl("[?&]vfs=", url)) url <- paste0(url, sep, "vfs=http")
-	if (isTRUE(immutable) && !grepl("[?&]immutable=", url)) {
-		sep <- if (grepl("\\?", url)) "&" else "?"
-		url <- paste0(url, sep, "immutable=1")
-	}
-	DBI::dbConnect(SQLite(), url, flags = SQLITE_RO, ...)
+	uri <- paste0("file:", url)
+	params <- c("vfs=http")
+	if (isTRUE(immutable)) params <- c(params, "immutable=1")
+	uri <- paste0(uri, "?", paste(params, collapse = "&"))
+	DBI::dbConnect(SQLite(), uri, flags = SQLITE_RO, ...)
 }

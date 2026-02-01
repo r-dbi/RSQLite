@@ -3,12 +3,12 @@
 \alias{sqlite_remote}
 \alias{sqliteHasHttpVFS}
 \title{Open a remote SQLite database over HTTP/HTTPS}
-\description{Convenience helper that constructs a URI filename for a remote SQLite database and ensures the HTTP VFS and immutable flags are set when available.}
+\description{Convenience helper that constructs a SQLite URI filename for a remote SQLite database and ensures the HTTP VFS and immutable flags are set when available.}
 \usage{sqlite_remote(url, immutable = TRUE, ...)
 sqliteHasHttpVFS()}
 \arguments{
   \item{url}{Character scalar; HTTP or HTTPS URL pointing to a SQLite database file.}
-  \item{immutable}{Logical; if TRUE (default) appends \code{immutable=1} parameter to the URI to hint the database is read-only and unchanging.}
+  \item{immutable}{Logical; if TRUE (default) appends \code{immutable=1} parameter to the SQLite URI to hint the database is read-only and unchanging.}
   \item{...}{Passed through to \code{DBI::dbConnect()}.}
 }
 \value{A \link{SQLiteConnection-class} object (for \code{sqlite_remote}); logical for \code{sqliteHasHttpVFS}.}

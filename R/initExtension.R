@@ -28,7 +28,7 @@
 #'
 #' The `"http"` extension registers an HTTP/HTTPS virtual file system (VFS)
 #' that allows opening remote databases via URI filenames, e.g.,
-#' `"https://host/path/db.sqlite?vfs=http&immutable=1"`. This implementation
+#' "file:https://host/path/db.sqlite?vfs=http&immutable=1". This implementation
 #' is experimental and not an official SQLite extension; it currently downloads
 #' the entire remote file into memory and serves reads from that buffer.
 #' It is intended for read-only access to small, immutable databases.

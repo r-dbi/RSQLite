@@ -17,20 +17,56 @@
 #' old <- sqlite_http_config(cache_size_mb = 8, prefetch_pages = 1, fallback_full_download = TRUE)
 #' on.exit(do.call(sqlite_http_config, old), add = TRUE)
 #' # ... connect with sqlite_remote() ...
-sqlite_http_config <- function(cache_size_mb = NULL, prefetch_pages = NULL, fallback_full_download = NULL) {
-	stopifnot(is.null(cache_size_mb) || (is.numeric(cache_size_mb) && length(cache_size_mb) == 1L))
-	stopifnot(is.null(prefetch_pages) || (is.numeric(prefetch_pages) && length(prefetch_pages) == 1L))
-	stopifnot(is.null(fallback_full_download) || is.logical(fallback_full_download))
+sqlite_http_config <- function(
+  cache_size_mb = NULL,
+  prefetch_pages = NULL,
+  fallback_full_download = NULL
+) {
+  stopifnot(
+    is.null(cache_size_mb) ||
+      (is.numeric(cache_size_mb) && length(cache_size_mb) == 1L)
+  )
+  stopifnot(
+    is.null(prefetch_pages) ||
+      (is.numeric(prefetch_pages) && length(prefetch_pages) == 1L)
+  )
+  stopifnot(
+    is.null(fallback_full_download) || is.logical(fallback_full_download)
+  )
 
-	prev <- list(
-		cache_size_mb = as.integer(Sys.getenv("RSQLITE_HTTP_CACHE_MB", unset = "4")),
-		prefetch_pages = as.integer(Sys.getenv("RSQLITE_HTTP_PREFETCH_PAGES", unset = "0")),
-		fallback_full_download = as.logical(tolower(Sys.getenv("RSQLITE_HTTP_FALLBACK_FULLDL", unset = "1")) %in% c("1","true","yes"))
-	)
+  prev <- list(
+    cache_size_mb = as.integer(Sys.getenv(
+      "RSQLITE_HTTP_CACHE_MB",
+      unset = "4"
+    )),
+    prefetch_pages = as.integer(Sys.getenv(
+      "RSQLITE_HTTP_PREFETCH_PAGES",
+      unset = "0"
+    )),
+    fallback_full_download = as.logical(
+      tolower(Sys.getenv(
+        "RSQLITE_HTTP_FALLBACK_FULLDL",
+        unset = "1"
+      )) %in%
+        c("1", "true", "yes")
+    )
+  )
 
-	if (!is.null(cache_size_mb)) Sys.setenv(RSQLITE_HTTP_CACHE_MB = as.integer(cache_size_mb))
-	if (!is.null(prefetch_pages)) Sys.setenv(RSQLITE_HTTP_PREFETCH_PAGES = as.integer(prefetch_pages))
-	if (!is.null(fallback_full_download)) Sys.setenv(RSQLITE_HTTP_FALLBACK_FULLDL = if (isTRUE(fallback_full_download)) "1" else "0")
+  if (!is.null(cache_size_mb)) {
+    Sys.setenv(RSQLITE_HTTP_CACHE_MB = as.integer(cache_size_mb))
+  }
+  if (!is.null(prefetch_pages)) {
+    Sys.setenv(RSQLITE_HTTP_PREFETCH_PAGES = as.integer(prefetch_pages))
+  }
+  if (!is.null(fallback_full_download)) {
+    Sys.setenv(
+      RSQLITE_HTTP_FALLBACK_FULLDL = if (isTRUE(fallback_full_download)) {
+        "1"
+      } else {
+        "0"
+      }
+    )
+  }
 
-	prev
+  prev
 }

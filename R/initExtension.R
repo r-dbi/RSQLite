@@ -29,9 +29,13 @@
 #' The `"http"` extension registers an HTTP/HTTPS virtual file system (VFS)
 #' that allows opening remote databases via URI filenames, e.g.,
 #' "file:https://host/path/db.sqlite?vfs=http&immutable=1". This implementation
-#' is experimental and not an official SQLite extension; it currently downloads
-#' the entire remote file into memory and serves reads from that buffer.
-#' It is intended for read-only access to small, immutable databases.
+#' is experimental and not an official SQLite extension; it fetches pages on
+#' demand using HTTP Range requests and serves reads from an in-memory page
+#' cache, with an optional full-download fallback depending on server support
+#' and configuration.
+#' It is primarily intended for read-only access to small, immutable databases;
+#' see [sqlite_http_config()] and [sqlite_remote()] for configuration options
+#' and usage examples.
 #' Building this extension may require libcurl and is optional in RSQLite.
 #'
 #' The `"uuid"` extension loads the functions `uuid()`, `uuid_str(X)` and
@@ -90,17 +94,22 @@
 #' RSQLite::initExtension(db, "uuid")
 #' dbGetQuery(db, "SELECT uuid();")
 #' dbDisconnect(db)
-initExtension <- function(db, extension = c("math", "regexp", "series", "csv", "uuid", "http")) {
+initExtension <- function(
+  db,
+  extension = c("math", "regexp", "series", "csv", "uuid", "http")
+) {
   extension <- match.arg(extension)
 
   if (!db@loadable.extensions) {
-    stop("Loadable extensions are not enabled for this db connection",
+    stop(
+      "Loadable extensions are not enabled for this db connection",
       call. = FALSE
     )
   }
 
   # Map R name to actual init symbol (http extension upstream uses sqlite3_http_init)
-  init_symbol <- switch(extension,
+  init_symbol <- switch(
+    extension,
     http = "sqlite3_http_init",
     paste0("sqlite3_", extension, "_init")
   )

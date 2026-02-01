@@ -9,7 +9,7 @@ CURL_LIBS=""
 update_makevars_var() {
   var="$1"
   val="$2"
-  file="src/Makevars"
+  file="src/Makevars.local"
   tmp="${file}.tmp"
 
   awk -v var="$var" -v val="$val" '

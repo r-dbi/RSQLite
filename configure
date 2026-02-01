@@ -12,6 +12,10 @@ update_makevars_var() {
   file="src/Makevars.local"
   tmp="${file}.tmp"
 
+  if [ ! -f "$file" ]; then
+    : > "$file"
+  fi
+
   # Replace the first matching VAR= line; append if missing.
   awk -v var="$var" -v val="$val" '
     BEGIN{done=0}

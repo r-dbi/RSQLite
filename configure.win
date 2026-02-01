@@ -12,6 +12,10 @@ update_makevars_var() {
   file="src/Makevars.local"
   tmp="${file}.tmp"
 
+  if [ ! -f "$file" ]; then
+    : > "$file"
+  fi
+
   awk -v var="$var" -v val="$val" '
     BEGIN{done=0}
     $0 ~ ("^" var "=") {

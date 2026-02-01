@@ -4,33 +4,38 @@
 namespace cpp11 {
 
 template <typename T>
-using enable_if_dbconnection_ptr = typename std::enable_if<
-    std::is_same<DbConnectionPtr*, T>::value, T>::type;
+using enable_if_dbconnection_ptr =
+  typename std::enable_if<std::is_same<DbConnectionPtr*, T>::value, T>::type;
 
 template <typename T>
 enable_if_dbconnection_ptr<T> as_cpp(SEXP x) {
   DbConnectionPtr* result = (DbConnectionPtr*)(R_ExternalPtrAddr(x));
-  if (!result)
+  if (!result) {
     cpp11::stop("Invalid result set");
+  }
   return result;
 }
 
 }  // namespace cpp11
 
 extern "C" {
-  int RS_sqlite_import(
-    sqlite3* db,
-    const char* zTable,          /* table must already exist */
-    const char* zFile,
-    const char* separator,
-    const char* eol,
-    int skip
-  );
+int RS_sqlite_import(
+  sqlite3* db,
+  const char* zTable, /* table must already exist */
+  const char* zFile,
+  const char* separator,
+  const char* eol,
+  int skip
+);
 }
 
 [[cpp11::register]]
 cpp11::external_pointer<DbConnectionPtr> connection_connect(
-  const std::string& path, const bool allow_ext, const int flags, const std::string& vfs = "", bool with_alt_types = false
+  const std::string& path,
+  const bool allow_ext,
+  const int flags,
+  const std::string& vfs = "",
+  bool with_alt_types = false
 ) {
   LOG_VERBOSE;
 
@@ -58,7 +63,8 @@ void connection_release(cpp11::external_pointer<DbConnectionPtr> con_) {
   long n = con_->use_count();
   if (n > 1) {
     Rf_warning(
-      "There are %ld result in use. The connection will be released when they are closed",
+      "There are %ld result in use. The connection will be released when they "
+      "are closed",
       n - 1
     );
   }
@@ -68,34 +74,48 @@ void connection_release(cpp11::external_pointer<DbConnectionPtr> con_) {
 }
 
 [[cpp11::register]]
-bool connection_in_transaction(cpp11::external_pointer<DbConnectionPtr> con_){
+bool connection_in_transaction(cpp11::external_pointer<DbConnectionPtr> con_) {
   DbConnectionPtr* con = con_.get();
   return (con->get()->in_transaction() != 0);
 }
 
 // Quoting
 
-
 // Transactions
 
 // Specific functions
 
 [[cpp11::register]]
-void connection_copy_database(const cpp11::external_pointer<DbConnectionPtr>& from,
-                              const cpp11::external_pointer<DbConnectionPtr>& to) {
+void connection_copy_database(
+  const cpp11::external_pointer<DbConnectionPtr>& from,
+  const cpp11::external_pointer<DbConnectionPtr>& to
+) {
   (*from.get())->copy_to(*to.get());
 }
 
 [[cpp11::register]]
-bool connection_import_file(const cpp11::external_pointer<DbConnectionPtr>& con,
-                            const std::string& name, const std::string& value,
-                            const std::string& sep, const std::string& eol,
-                            const int skip) {
-  return !!RS_sqlite_import(con->get()->conn(), name.c_str(), value.c_str(),
-                            sep.c_str(), eol.c_str(), skip);
+bool connection_import_file(
+  const cpp11::external_pointer<DbConnectionPtr>& con,
+  const std::string& name,
+  const std::string& value,
+  const std::string& sep,
+  const std::string& eol,
+  const int skip
+) {
+  return !!RS_sqlite_import(
+    con->get()->conn(),
+    name.c_str(),
+    value.c_str(),
+    sep.c_str(),
+    eol.c_str(),
+    skip
+  );
 }
 
 [[cpp11::register]]
-void set_busy_handler(const cpp11::external_pointer<DbConnectionPtr>& con, SEXP r_callback) {
+void set_busy_handler(
+  const cpp11::external_pointer<DbConnectionPtr>& con,
+  SEXP r_callback
+) {
   con->get()->set_busy_handler(r_callback);
 }

@@ -8,9 +8,9 @@
 //
 // patch -p1 < src-raw/sqlite3.patch
 
-#define SQLITE_INT64_TYPE int64_t
+#define SQLITE_INT64_TYPE  int64_t
 #define SQLITE_UINT64_TYPE uint64_t
 
 #include "vendor/sqlite3/sqlite3.h"
 
-#endif // #ifndef __RSQLITE_SQLITE_H
+#endif  // #ifndef __RSQLITE_SQLITE_H

@@ -7,21 +7,19 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
-
-SqliteColumnDataSource::SqliteColumnDataSource(sqlite3_stmt* stmt_, const int j_, bool with_alt_types_) :
-  DbColumnDataSource(j_),
-  stmt(stmt_),
-  with_alt_types(with_alt_types_)
-{
-}
+SqliteColumnDataSource::SqliteColumnDataSource(
+  sqlite3_stmt* stmt_,
+  const int j_,
+  bool with_alt_types_
+)
+    : DbColumnDataSource(j_), stmt(stmt_), with_alt_types(with_alt_types_) {}
 
 DATA_TYPE SqliteColumnDataSource::get_data_type() const {
-
   if (with_alt_types) {
-      DATA_TYPE decl_dt = get_decl_data_type();
-      if (decl_dt == DT_DATE || decl_dt == DT_DATETIME || decl_dt == DT_TIME) {
-          return decl_dt;
-      }
+    DATA_TYPE decl_dt = get_decl_data_type();
+    if (decl_dt == DT_DATE || decl_dt == DT_DATETIME || decl_dt == DT_TIME) {
+      return decl_dt;
+    }
   }
 
   const int field_type = get_column_type();
@@ -29,10 +27,11 @@ DATA_TYPE SqliteColumnDataSource::get_data_type() const {
   case SQLITE_INTEGER:
     {
       int64_t ret = sqlite3_column_int64(get_stmt(), get_j());
-      if (needs_64_bit(ret))
+      if (needs_64_bit(ret)) {
         return DT_INT64;
-      else
+      } else {
         return DT_INT;
+      }
     }
 
   case SQLITE_FLOAT:
@@ -52,7 +51,10 @@ DATA_TYPE SqliteColumnDataSource::get_data_type() const {
 }
 
 DATA_TYPE SqliteColumnDataSource::get_decl_data_type() const {
-  return datatype_from_decltype(sqlite3_column_decltype(get_stmt(), get_j()), with_alt_types);
+  return datatype_from_decltype(
+    sqlite3_column_decltype(get_stmt(), get_j()),
+    with_alt_types
+  );
 }
 
 bool SqliteColumnDataSource::is_null() const {
@@ -78,7 +80,8 @@ double SqliteColumnDataSource::fetch_real() const {
 
 SEXP SqliteColumnDataSource::fetch_string() const {
   LOG_VERBOSE;
-  const char* const text = reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
+  const char* const text =
+    reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
   return Rf_mkCharCE(text, CE_UTF8);
 }
 
@@ -93,34 +96,33 @@ SEXP SqliteColumnDataSource::fetch_blob() const {
 }
 
 double SqliteColumnDataSource::fetch_date() const {
-
   namespace bg = boost::gregorian;
 
   int dt = get_column_type();
 
   if (dt == SQLITE_TEXT) {
-      const char* dtstr = reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
-      double dateval;
+    const char* dtstr =
+      reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
+    double dateval;
 
-      try {
-          bg::date dt(bg::from_simple_string(dtstr));
-          bg::date_duration delta = dt - bg::date(1970, 1, 1);
-          dateval = static_cast<double>(delta.days());
-      } catch (...) {
-          cpp11::warning(std::string("Unknown string format, NA is returned."));
-          dateval = NA_REAL;
-      }
-      return dateval;
+    try {
+      bg::date dt(bg::from_simple_string(dtstr));
+      bg::date_duration delta = dt - bg::date(1970, 1, 1);
+      dateval = static_cast<double>(delta.days());
+    } catch (...) {
+      cpp11::warning(std::string("Unknown string format, NA is returned."));
+      dateval = NA_REAL;
+    }
+    return dateval;
   } else if (dt == SQLITE_BLOB) {
     cpp11::warning(std::string("Cannot convert blob, NA is returned."));
     return NA_REAL;
   } else {
-      return static_cast<double>(sqlite3_column_int(get_stmt(), get_j()));
+    return static_cast<double>(sqlite3_column_int(get_stmt(), get_j()));
   }
 }
 
 double SqliteColumnDataSource::fetch_datetime_local() const {
-
   namespace bp = boost::posix_time;
   namespace bg = boost::gregorian;
   namespace bd = boost::date_time;
@@ -128,47 +130,17 @@ double SqliteColumnDataSource::fetch_datetime_local() const {
   int dt = get_column_type();
 
   if (dt == SQLITE_TEXT) {
-      const char* dtstr = reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
-      double dateval;
-      try {
-          bp::ptime dttm(bd::parse_delimited_time<bp::ptime>(dtstr, ' '));
-          bp::time_duration delta = dttm - bp::ptime(bg::date(1970, 1, 1), bp::seconds(0));
-          dateval = delta.total_microseconds() * 1e-6;
-      } catch (...) {
-          cpp11::warning(std::string("Unknown string format, NA is returned."));
-          dateval = NA_REAL;
-      }
-      return dateval;
-  } else if (dt == SQLITE_BLOB) {
-    cpp11::warning(std::string("Cannot convert blob, NA is returned."));
-    return NA_REAL;
-  } else {
-    return sqlite3_column_double(get_stmt(), get_j());
-  }
-
-}
-
-double SqliteColumnDataSource::fetch_datetime() const {
-  // No such data type
-  return 0.0;
-}
-
-double SqliteColumnDataSource::fetch_time() const {
-
-
-  namespace bp = boost::posix_time;
-
-  int dt = get_column_type();
-
-  if (dt == SQLITE_TEXT) {
-    const char *tmstr = reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
+    const char* dtstr =
+      reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
     double dateval;
     try {
-        bp::time_duration secs(bp::duration_from_string(tmstr));
-        dateval = secs.total_microseconds() * 1e-6;
+      bp::ptime dttm(bd::parse_delimited_time<bp::ptime>(dtstr, ' '));
+      bp::time_duration delta =
+        dttm - bp::ptime(bg::date(1970, 1, 1), bp::seconds(0));
+      dateval = delta.total_microseconds() * 1e-6;
     } catch (...) {
-        cpp11::warning(std::string("Unknown string format, NA is returned."));
-        dateval = NA_REAL;
+      cpp11::warning(std::string("Unknown string format, NA is returned."));
+      dateval = NA_REAL;
     }
     return dateval;
   } else if (dt == SQLITE_BLOB) {
@@ -179,19 +151,53 @@ double SqliteColumnDataSource::fetch_time() const {
   }
 }
 
+double SqliteColumnDataSource::fetch_datetime() const {
+  // No such data type
+  return 0.0;
+}
 
-DATA_TYPE SqliteColumnDataSource::datatype_from_decltype(const char* decl_type, bool with_alt_types) {
-  if (decl_type == NULL)
+double SqliteColumnDataSource::fetch_time() const {
+  namespace bp = boost::posix_time;
+
+  int dt = get_column_type();
+
+  if (dt == SQLITE_TEXT) {
+    const char* tmstr =
+      reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
+    double dateval;
+    try {
+      bp::time_duration secs(bp::duration_from_string(tmstr));
+      dateval = secs.total_microseconds() * 1e-6;
+    } catch (...) {
+      cpp11::warning(std::string("Unknown string format, NA is returned."));
+      dateval = NA_REAL;
+    }
+    return dateval;
+  } else if (dt == SQLITE_BLOB) {
+    cpp11::warning(std::string("Cannot convert blob, NA is returned."));
+    return NA_REAL;
+  } else {
+    return sqlite3_column_double(get_stmt(), get_j());
+  }
+}
+
+DATA_TYPE SqliteColumnDataSource::datatype_from_decltype(
+  const char* decl_type,
+  bool with_alt_types
+) {
+  if (decl_type == NULL) {
     return DT_BOOL;
+  }
 
   if (with_alt_types) {
-      if (boost::iequals(decl_type, "datetime") || boost::iequals(decl_type, "timestamp")) {
-          return DT_DATETIME;
-      } else if (boost::iequals(decl_type, "date")) {
-          return DT_DATE;
-      } else if (boost::iequals(decl_type, "time")) {
-          return DT_TIME;
-      }
+    if (boost::iequals(decl_type, "datetime") ||
+        boost::iequals(decl_type, "timestamp")) {
+      return DT_DATETIME;
+    } else if (boost::iequals(decl_type, "date")) {
+      return DT_DATE;
+    } else if (boost::iequals(decl_type, "time")) {
+      return DT_TIME;
+    }
   }
 
   char affinity = sqlite3AffinityType(decl_type);
@@ -224,5 +230,6 @@ int SqliteColumnDataSource::get_column_type() const {
 }
 
 bool SqliteColumnDataSource::needs_64_bit(const int64_t ret) {
-  return ret < std::numeric_limits<int32_t>::min() || ret > std::numeric_limits<int32_t>::max();
+  return ret < std::numeric_limits<int32_t>::min() ||
+         ret > std::numeric_limits<int32_t>::max();
 }

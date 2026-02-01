@@ -17,11 +17,15 @@ class DbConnection;
 typedef boost::shared_ptr<DbConnection> DbConnectionPtr;
 
 class DbConnection : boost::noncopyable {
-
 public:
   // Create a new connection handle
-  DbConnection(const std::string& path, bool allow_ext,
-               int flags, const std::string& vfs = "", bool with_alt_types = false);
+  DbConnection(
+    const std::string& path,
+    bool allow_ext,
+    int flags,
+    const std::string& vfs = "",
+    bool with_alt_types = false
+  );
   ~DbConnection();
 
 public:
@@ -59,7 +63,7 @@ private:
   const bool with_alt_types_;
   SEXP busy_callback_;
   void release_callback_data();
-  static int busy_callback_helper(void *data, int num);
+  static int busy_callback_helper(void* data, int num);
 };
 
-#endif // __RSQLITE_SQLITE_CONNECTION__
+#endif  // __RSQLITE_SQLITE_CONNECTION__

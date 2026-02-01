@@ -10,30 +10,31 @@
 namespace cpp11 {
 
 template <typename T>
-using enable_if_dbres_ptr = typename std::enable_if<
-    std::is_same<DbResult*, T>::value, T>::type;
+using enable_if_dbres_ptr =
+  typename std::enable_if<std::is_same<DbResult*, T>::value, T>::type;
 
 template <typename T>
 enable_if_dbres_ptr<T> as_cpp(SEXP x) {
   DbResult* result = (DbResult*)(R_ExternalPtrAddr(x));
-  if (!result)
+  if (!result) {
     cpp11::stop("Invalid result set");
+  }
   return result;
 }
 
 template <typename T>
-using enable_if_sqliteres_ptr = typename std::enable_if<
-    std::is_same<SqliteResult*, T>::value, T>::type;
+using enable_if_sqliteres_ptr =
+  typename std::enable_if<std::is_same<SqliteResult*, T>::value, T>::type;
 
 template <typename T>
 enable_if_sqliteres_ptr<T> as_cpp(SEXP x) {
   SqliteResult* result = (SqliteResult*)(R_ExternalPtrAddr(x));
-  if (!result)
+  if (!result) {
     cpp11::stop("Invalid result set");
+  }
   return result;
 }
 
 }  // namespace cpp11
-
 
 #endif

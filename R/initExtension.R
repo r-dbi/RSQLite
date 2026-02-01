@@ -34,8 +34,9 @@
 #' cache, with an optional full-download fallback depending on server support
 #' and configuration.
 #' It is primarily intended for read-only access to small, immutable databases;
-#' see [sqlite_http_config()] and [sqlite_remote()] for configuration options
-#' and usage examples.
+#' see \code{\link[=sqlite_http_config]{sqlite_http_config()}} and
+#' \code{\link[=sqlite_remote]{sqlite_remote()}} for configuration options and
+#' usage examples.
 #' Building this extension may require libcurl and is optional in RSQLite.
 #'
 #' The `"uuid"` extension loads the functions `uuid()`, `uuid_str(X)` and

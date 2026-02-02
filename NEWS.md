@@ -1,5 +1,18 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.4.5.9007 (2026-02-02)
+
+## Chore
+
+- Build-ignore.
+
+- Cleanup .dd files.
+
+- Auto-update from GitHub Actions (#681).
+
+- Format C++ code with clang-format.
+
+
 # RSQLite 2.4.5.9006 (2026-01-14)
 
 ## Continuous integration

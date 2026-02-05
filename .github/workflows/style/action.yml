@@ -32,6 +32,7 @@ runs:
     - name: Run clang-format
       if: ${{ steps.check.outputs.clang_format_enabled == 'true' }}
       run: |
+        clang-format --version
         shopt -s nullglob
         clang-format -i src/*.{c,cc,cpp,h,hpp}
       shell: bash

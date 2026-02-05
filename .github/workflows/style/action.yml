@@ -32,13 +32,13 @@ runs:
     - name: Install clang-format-21
       if: ${{ steps.check.outputs.clang_format_enabled == 'true' }}
       run: |
-        apt-get update
-        apt-get install -y --no-install-recommends wget gnupg lsb-release ca-certificates software-properties-common
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends wget gnupg lsb-release ca-certificates software-properties-common
         wget -O /tmp/llvm.sh https://apt.llvm.org/llvm.sh
         chmod +x /tmp/llvm.sh
-        /tmp/llvm.sh 21
-        apt-get update
-        apt-get install -y --no-install-recommends clang-format-21
+        sudo /tmp/llvm.sh 21
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends clang-format-21
         clang-format-21 --version
       shell: bash
 

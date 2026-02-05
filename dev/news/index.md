@@ -1,5 +1,22 @@
 # Changelog
 
+## RSQLite 2.4.5.9008 (2026-02-05)
+
+### Chore
+
+- Remove plogr ([\#683](https://github.com/r-dbi/RSQLite/issues/683)).
+
+- Auto-update from GitHub Actions
+  ([\#684](https://github.com/r-dbi/RSQLite/issues/684)).
+
+### Continuous integration
+
+- Please.
+
+- Install clang-format-21.
+
+- Show version of clang-format.
+
 ## RSQLite 2.4.5.9007 (2026-02-02)
 
 ### Chore

@@ -13,6 +13,7 @@ inst/doc
 /.settings
 /src/.*
 /src/*.h.gch
+/src/Makevars.local
 /*.pro*
 /Debug/
 .RData

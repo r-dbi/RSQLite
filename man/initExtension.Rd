@@ -4,7 +4,10 @@
 \alias{initExtension}
 \title{Add useful extension functions}
 \usage{
-initExtension(db, extension = c("math", "regexp", "series", "csv", "uuid"))
+initExtension(
+  db,
+  extension = c("math", "regexp", "series", "csv", "uuid", "http")
+)
 }
 \arguments{
 \item{db}{A \code{\linkS4class{SQLiteConnection}} object to load these extensions into.}
@@ -38,6 +41,19 @@ The \code{"csv"} extension loads the function \code{csv()} that can be used to c
 virtual tables,
 as available through the SQLite source code repository
 (\url{https://sqlite.org/src/file?filename=ext/misc/csv.c}).
+
+The \code{"http"} extension registers an HTTP/HTTPS virtual file system (VFS)
+that allows opening remote databases via URI filenames, e.g.,
+"file:https://host/path/db.sqlite?vfs=http&immutable=1". This implementation
+is experimental and not an official SQLite extension; it fetches pages on
+demand using HTTP Range requests and serves reads from an in-memory page
+cache, with an optional full-download fallback depending on server support
+and configuration.
+It is primarily intended for read-only access to small, immutable databases;
+see \code{\link[=sqlite_http_config]{sqlite_http_config()}} and
+\code{\link[=sqlite_remote]{sqlite_remote()}} for configuration options and
+usage examples.
+Building this extension may require libcurl and is optional in RSQLite.
 
 The \code{"uuid"} extension loads the functions \code{uuid()}, \code{uuid_str(X)} and
 \code{uuid_blob(X)} that can be used to create universally unique identifiers,

@@ -49,6 +49,11 @@ dbWriteTable
 Detlef
 dotfile
 filesystem
+http
+https
+httpuv
+immutable
+libcurl
 finalizer
 finalizers
 FTS
@@ -146,3 +151,10 @@ unreferenced
 Uwe
 ValidHandle
 vfs
+httpvfs
+httpfs
+libcurl
+immutable
+http
+https
+URI

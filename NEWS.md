@@ -1,84 +1,16 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 2.4.5.9008 (2026-02-05)
+# RSQLite 2.4.6 (2026-02-05)
+
+## Features
+
+- Upgrade bundled SQLite to 3.51.2, upgrade extensions (#673).
 
 ## Chore
 
 - Remove plogr (#683).
 
-- Auto-update from GitHub Actions (#684).
-
-## Continuous integration
-
-- Please.
-
-- Install clang-format-21.
-
-- Show version of clang-format.
-
-
-# RSQLite 2.4.5.9007 (2026-02-02)
-
-## Chore
-
-- Build-ignore.
-
-- Cleanup .dd files.
-
-- Auto-update from GitHub Actions (#681).
-
 - Format C++ code with clang-format.
-
-
-# RSQLite 2.4.5.9006 (2026-01-14)
-
-## Continuous integration
-
-- Import from actions-sync, check carefully (#676).
-
-- Import from actions-sync, check carefully (#675).
-
-
-# RSQLite 2.4.5.9005 (2026-01-11)
-
-## Features
-
-- Upgrade bundled SQLite to 3.51.2 (#673).
-
-
-# RSQLite 2.4.5.9004 (2026-01-07)
-
-## Features
-
-- Upgrade bundled SQLite to 3.51.1 (#671).
-
-
-# RSQLite 2.4.5.9003 (2026-01-02)
-
-## Features
-
-- Upgrade bundled SQLite to 3.51.1 (#669).
-
-
-# RSQLite 2.4.5.9002 (2025-12-18)
-
-## Features
-
-- Upgrade bundled SQLite to 3.51.1 (#667).
-
-
-# RSQLite 2.4.5.9001 (2025-12-10)
-
-## Features
-
-- Upgrade bundled SQLite to 3.51.1 (#665).
-
-
-# RSQLite 2.4.5.9000 (2025-12-01)
-
-## fledge
-
-- CRAN release v2.4.5 (#663).
 
 
 # RSQLite 2.4.5 (2025-11-30)

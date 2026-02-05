@@ -79,7 +79,6 @@ double SqliteColumnDataSource::fetch_real() const {
 }
 
 SEXP SqliteColumnDataSource::fetch_string() const {
-  LOG_VERBOSE;
   const char* const text =
     reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
   return Rf_mkCharCE(text, CE_UTF8);

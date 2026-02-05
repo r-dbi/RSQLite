@@ -56,7 +56,6 @@ Suggests:
     withr,
     xml2
 LinkingTo: 
-    plogr (>= 0.2.0),
     cpp11 (>= 0.4.0)
 VignetteBuilder: 
     knitr

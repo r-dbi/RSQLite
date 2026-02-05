@@ -23,8 +23,6 @@ SqliteResultImpl::SqliteResultImpl(
       groups_(0),
       types_(get_initial_field_types(cache.ncols_)),
       with_alt_types_(conn_->with_alt_types()) {
-  LOG_DEBUG << sql;
-
   try {
     if (cache.nparams_ == 0) {
       after_bind(true);
@@ -37,8 +35,6 @@ SqliteResultImpl::SqliteResultImpl(
 }
 
 SqliteResultImpl::~SqliteResultImpl() {
-  LOG_VERBOSE;
-
   try {
     sqlite3_finalize(stmt);
   } catch (...) {}
@@ -228,8 +224,6 @@ void SqliteResultImpl::set_params(const cpp11::list& params) {
 }
 
 bool SqliteResultImpl::bind_row() {
-  LOG_VERBOSE << "groups: " << group_ << "/" << groups_;
-
   if (group_ >= groups_) {
     return false;
   }
@@ -246,8 +240,6 @@ bool SqliteResultImpl::bind_row() {
 }
 
 void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
-  LOG_VERBOSE << "TYPEOF(value_): " << TYPEOF(value_);
-
   if (TYPEOF(value_) == LGLSXP) {
     int value = LOGICAL(value_)[group_];
     if (value == NA_LOGICAL) {
@@ -327,8 +319,6 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   }
 
   while (!complete_) {
-    LOG_VERBOSE << nrows_ << "/" << n;
-
     data.set_col_values();
     step();
     nrows_++;
@@ -336,8 +326,6 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
       break;
     }
   }
-
-  LOG_VERBOSE << nrows_;
 
   return data.get_data(types_);
 }
@@ -348,8 +336,6 @@ void SqliteResultImpl::step() {
 }
 
 bool SqliteResultImpl::step_run() {
-  LOG_VERBOSE;
-
   int rc = sqlite3_step(stmt);
 
   switch (rc) {
@@ -370,7 +356,6 @@ bool SqliteResultImpl::step_done() {
     complete_ = true;
   }
 
-  LOG_VERBOSE << "group: " << group_ << ", more_params: " << more_params;
   return more_params;
 }
 

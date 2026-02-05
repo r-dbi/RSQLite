@@ -37,8 +37,6 @@ cpp11::external_pointer<DbConnectionPtr> connection_connect(
   const std::string& vfs = "",
   bool with_alt_types = false
 ) {
-  LOG_VERBOSE;
-
   DbConnectionPtr* pConn = new DbConnectionPtr(
     new DbConnection(path, allow_ext, flags, vfs, with_alt_types)
   );

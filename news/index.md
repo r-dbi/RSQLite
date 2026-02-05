@@ -2,16 +2,57 @@
 
 ## RSQLite 2.4.6 (2026-02-05)
 
+### fledge
+
+- CRAN release v2.4.5
+  ([\#663](https://github.com/r-dbi/RSQLite/issues/663)).
+
 ### Features
 
-- Upgrade bundled SQLite to 3.51.2, upgrade extensions
+- Upgrade bundled SQLite to 3.51.2
   ([\#673](https://github.com/r-dbi/RSQLite/issues/673)).
+
+- Upgrade bundled SQLite to 3.51.1
+  ([\#671](https://github.com/r-dbi/RSQLite/issues/671)).
+
+- Upgrade bundled SQLite to 3.51.1
+  ([\#669](https://github.com/r-dbi/RSQLite/issues/669)).
+
+- Upgrade bundled SQLite to 3.51.1
+  ([\#667](https://github.com/r-dbi/RSQLite/issues/667)).
+
+- Upgrade bundled SQLite to 3.51.1
+  ([\#665](https://github.com/r-dbi/RSQLite/issues/665)).
 
 ### Chore
 
 - Remove plogr ([\#683](https://github.com/r-dbi/RSQLite/issues/683)).
 
+- Auto-update from GitHub Actions
+  ([\#684](https://github.com/r-dbi/RSQLite/issues/684)).
+
+- Build-ignore.
+
+- Cleanup .dd files.
+
+- Auto-update from GitHub Actions
+  ([\#681](https://github.com/r-dbi/RSQLite/issues/681)).
+
 - Format C++ code with clang-format.
+
+### Continuous integration
+
+- Please.
+
+- Install clang-format-21.
+
+- Show version of clang-format.
+
+- Import from actions-sync, check carefully
+  ([\#676](https://github.com/r-dbi/RSQLite/issues/676)).
+
+- Import from actions-sync, check carefully
+  ([\#675](https://github.com/r-dbi/RSQLite/issues/675)).
 
 ## RSQLite 2.4.5 (2025-11-30)
 

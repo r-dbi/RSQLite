@@ -4,8 +4,6 @@
 #include "cpp11.hpp"
 #include <cpp11/R.hpp>
 
-#include <plogr.h>
-
 // CRAN request
 #ifndef BOOST_NO_AUTO_PTR
 #define BOOST_NO_AUTO_PTR

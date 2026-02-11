@@ -26,6 +26,19 @@
 #' as available through the SQLite source code repository
 #' (\url{https://sqlite.org/src/file?filename=ext/misc/csv.c}).
 #'
+#' The `"http"` extension registers an HTTP/HTTPS virtual file system (VFS)
+#' that allows opening remote databases via URI filenames, e.g.,
+#' "file:https://host/path/db.sqlite?vfs=http&immutable=1". This implementation
+#' is experimental and not an official SQLite extension; it fetches pages on
+#' demand using HTTP Range requests and serves reads from an in-memory page
+#' cache, with an optional full-download fallback depending on server support
+#' and configuration.
+#' It is primarily intended for read-only access to small, immutable databases;
+#' see \code{\link[=sqlite_http_config]{sqlite_http_config()}} and
+#' \code{\link[=sqlite_remote]{sqlite_remote()}} for configuration options and
+#' usage examples.
+#' Building this extension may require libcurl and is optional in RSQLite.
+#'
 #' The `"uuid"` extension loads the functions `uuid()`, `uuid_str(X)` and
 #' `uuid_blob(X)` that can be used to create universally unique identifiers,
 #' as available through the SQLite source code repository
@@ -82,16 +95,27 @@
 #' RSQLite::initExtension(db, "uuid")
 #' dbGetQuery(db, "SELECT uuid();")
 #' dbDisconnect(db)
-initExtension <- function(db, extension = c("math", "regexp", "series", "csv", "uuid")) {
+initExtension <- function(
+  db,
+  extension = c("math", "regexp", "series", "csv", "uuid", "http")
+) {
   extension <- match.arg(extension)
 
   if (!db@loadable.extensions) {
-    stop("Loadable extensions are not enabled for this db connection",
+    stop(
+      "Loadable extensions are not enabled for this db connection",
       call. = FALSE
     )
   }
 
-  extension_load(db@ptr, get_lib_path(), paste0("sqlite3_", extension, "_init"))
+  # Map R name to actual init symbol (http extension upstream uses sqlite3_http_init)
+  init_symbol <- switch(
+    extension,
+    http = "sqlite3_http_init",
+    paste0("sqlite3_", extension, "_init")
+  )
+
+  extension_load(db@ptr, get_lib_path(), init_symbol)
 
   invisible(TRUE)
 }

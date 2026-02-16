@@ -6,6 +6,7 @@ PKG_CPPFLAGS=-Ivendor \
              -DSQLITE_ENABLE_FTS3_PARENTHESIS \
              -DSQLITE_ENABLE_FTS5 \
              -DSQLITE_ENABLE_JSON1 \
+             -DSQLITE_ENABLE_PERCENTILE \
              -DSQLITE_ENABLE_STAT4 \
              -DSQLITE_SOUNDEX \
              -DSQLITE_USE_URI=1 \

@@ -8,17 +8,21 @@ dbListObjects_SQLiteConnection <- function(conn, prefix = NULL, ...) {
     schema <- id[["schema"]] %||% id[["table"]]
 
     sql <- sqliteListTablesQuery(conn, schema)
-    rs <- dbSendQuery(conn, sql)
-    on.exit(dbClearResult(rs), add = TRUE)
-    names <- dbFetch(rs)$name
+    rs <- dbSendQuery_SQLiteConnection_character(conn, sql)
+    on.exit(dbClearResult_SQLiteResult(rs), add = TRUE)
+    names <- dbFetch_SQLiteResult(rs)$name
 
     tables <- lapply(names, function(t) Id(schema = schema, table = t))
     is_prefix <- rep(FALSE, length(tables))
   } else {
-    schemas <- dbGetQuery(conn, "SELECT name FROM pragma_database_list;")$name
+    rs <- dbSendQuery_SQLiteConnection_character(conn, "SELECT name FROM pragma_database_list;")
+    on.exit(dbClearResult_SQLiteResult(rs), add = TRUE)
+    schemas <- dbFetch_SQLiteResult(rs)$name
+    dbClearResult_SQLiteResult(rs)
+    on.exit(NULL, add = FALSE)
     schema_ids <- lapply(schemas, function(s) Id(schema = s))
 
-    table_names <- dbListTables(conn)
+    table_names <- dbListTables_SQLiteConnection(conn)
     table_ids <- lapply(table_names, function(t) Id(table = t))
 
     tables <- c(schema_ids, table_ids)

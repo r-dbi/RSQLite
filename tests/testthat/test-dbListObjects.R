@@ -17,6 +17,23 @@ test_that("dbListObjects returns schemas as prefixes and tables directly", {
   expect_true("mytable" %in% table_names)
 })
 
+test_that("dbListObjects snapshot - empty memory db", {
+  con <- memory_db()
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  expect_snapshot(dbListObjects(con))
+})
+
+test_that("dbListObjects snapshot - with prefix", {
+  con <- memory_db()
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbWriteTable(con, "foo", data.frame(x = 1))
+  dbWriteTable(con, "bar", data.frame(y = 2))
+
+  expect_snapshot(dbListObjects(con, prefix = Id(schema = "main")))
+})
+
 test_that("dbListObjects with schema prefix lists objects in that schema", {
   db1 <- tempfile(fileext = ".sqlite")
   db2 <- tempfile(fileext = ".sqlite")

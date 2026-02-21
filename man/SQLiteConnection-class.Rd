@@ -3,8 +3,9 @@
 %   R/dbAppendTable_SQLiteConnection.R, R/dbDataType_SQLiteConnection.R,
 %   R/dbExistsTable_SQLiteConnection_Id.R,
 %   R/dbExistsTable_SQLiteConnection_character.R,
-%   R/dbGetException_SQLiteConnection.R, R/dbGetInfo_SQLiteConnection.R,
-%   R/dbIsValid_SQLiteConnection.R, R/dbListTables_SQLiteConnection.R,
+%   R/dbGetException_SQLiteConnection.R,
+%   R/dbGetInfo_SQLiteConnection.R, R/dbIsValid_SQLiteConnection.R,
+%   R/dbListObjects_SQLiteConnection.R, R/dbListTables_SQLiteConnection.R,
 %   R/dbQuoteIdentifier_SQLiteConnection_SQL.R,
 %   R/dbQuoteIdentifier_SQLiteConnection_character.R,
 %   R/dbRemoveTable_SQLiteConnection_character.R,
@@ -29,6 +30,8 @@
 \alias{dbGetInfo,SQLiteConnection-method}
 \alias{dbIsValid_SQLiteConnection}
 \alias{dbIsValid,SQLiteConnection-method}
+\alias{dbListObjects_SQLiteConnection}
+\alias{dbListObjects,SQLiteConnection-method}
 \alias{dbListTables_SQLiteConnection}
 \alias{dbListTables,SQLiteConnection-method}
 \alias{dbQuoteIdentifier_SQLiteConnection_SQL}
@@ -62,6 +65,8 @@
 \S4method{dbGetInfo}{SQLiteConnection}(dbObj, ...)
 
 \S4method{dbIsValid}{SQLiteConnection}(dbObj, ...)
+
+\S4method{dbListObjects}{SQLiteConnection}(conn, prefix = NULL, ...)
 
 \S4method{dbListTables}{SQLiteConnection}(conn, ...)
 

@@ -25,8 +25,8 @@ dbListObjects_SQLiteConnection <- function(conn, prefix = NULL, ...) {
     table_names <- dbListTables_SQLiteConnection(conn)
     table_ids <- lapply(table_names, function(t) Id(table = t))
 
-    tables <- c(schema_ids, table_ids)
-    is_prefix <- c(rep(TRUE, length(schema_ids)), rep(FALSE, length(table_ids)))
+    tables <- c(table_ids, schema_ids)
+    is_prefix <- c(rep(FALSE, length(table_ids)), rep(TRUE, length(schema_ids)))
   }
 
   data.frame(

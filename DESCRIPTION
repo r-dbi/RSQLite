@@ -105,6 +105,7 @@ Collate:
     'dbIsValid_SQLiteConnection.R'
     'dbIsValid_SQLiteDriver.R'
     'dbIsValid_SQLiteResult.R'
+    'dbListObjects_SQLiteConnection.R'
     'dbListResults_SQLiteConnection.R'
     'dbListTables_SQLiteConnection.R'
     'dbQuoteIdentifier_SQLiteConnection_SQL.R'

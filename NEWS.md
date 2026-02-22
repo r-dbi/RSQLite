@@ -1,5 +1,14 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.4.6.9001 (2026-02-22)
+
+## Features
+
+- Implement `dbListObjects()` for attached SQLite databases with schema prefix support (#689, #690).
+
+- Enable the percentile extension.
+
+
 # RSQLite 2.4.6.9000 (2026-02-06)
 
 ## fledge

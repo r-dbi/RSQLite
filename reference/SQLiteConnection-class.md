@@ -37,6 +37,9 @@ dbGetInfo(dbObj, ...)
 dbIsValid(dbObj, ...)
 
 # S4 method for class 'SQLiteConnection'
+dbListObjects(conn, prefix = NULL, ...)
+
+# S4 method for class 'SQLiteConnection'
 dbListTables(conn, ...)
 
 # S4 method for class 'SQLiteConnection,SQL'

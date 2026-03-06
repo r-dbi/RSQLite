@@ -1,5 +1,9 @@
 #' Class SQLiteConnection (and methods)
-#'
+#'@examples
+#'library(RSQLite)
+#'con <- dbConnect(SQLite(), ":memory")
+#'dbListTables(con)
+#'dbDisconnect(con)
 #' SQLiteConnection objects are created by passing [SQLite()] as first
 #' argument to [DBI::dbConnect()].
 #' They are a superclass of the [DBIConnection-class] class.

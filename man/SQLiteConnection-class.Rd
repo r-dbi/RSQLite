@@ -98,7 +98,7 @@ table doesn't exist.}
 \description{
 SQLiteConnection objects are created by passing \code{\link[=SQLite]{SQLite()}} as first
 argument to \code{\link[DBI:dbConnect]{DBI::dbConnect()}}.
-They are a superclass of the \link[DBI:DBIConnection-class]{DBI::DBIConnection} class.
+They are a superclass of the \link[DBI:DBIConnection-class]{DBIConnection} class.
 The "Usage" section lists the class methods overridden by \pkg{RSQLite}.
 }
 \seealso{

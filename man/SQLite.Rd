@@ -99,9 +99,9 @@ integers.}
 for details. Defaults to \code{FALSE}.}
 }
 \value{
-\code{SQLite()} returns an object of class \linkS4class{SQLiteDriver}.
+\code{SQLite()} returns an object of class \link[=SQLiteDriver-class]{SQLiteDriver}.
 
-\code{dbConnect()} returns an object of class \linkS4class{SQLiteConnection}.
+\code{dbConnect()} returns an object of class \link[=SQLiteConnection-class]{SQLiteConnection}.
 }
 \description{
 Together, \code{SQLite()} and \code{dbConnect()} allow you to connect to

@@ -91,9 +91,25 @@ Discussions associated with DBI and related database packages take place on [R-S
 <span class='nf'><a href='https://dbi.r-dbi.org/reference/dbClearResult.html'>dbClearResult</a></span><span class='o'>(</span><span class='nv'>res</span><span class='o'>)</span>
 
 <span class='c'># Disconnect from the database</span>
-<span class='nf'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span><span class='o'>(</span><span class='nv'>con</span><span class='o'>)</span></pre>
+<span class='nf'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span><span class='o'>(</span><span class='nv'>con</span><span class='o'>)</span></p
+  ## Import a csv file
+  you can import a csv file into the database using the import functionality
 
-## Acknowledgements
+  steps:
+  1. open the application.
+  2. Navigate to the "Import Data" selection.
+  3. select a csv file from your system.
+  4. chhose the target table or create a new one.
+  5. click on "import".
+
+  Example:
+  data <- read.csv("your_file.csv")
+  head(data)
+    ## Notes:
+    - Ensure the csv file has proper column names.
+    - Handle missing values before importing.
+    - Large files may take time to load.
+    ## Acknowledgements
 
 Many thanks to Doug Bates, Seth Falcon, Detlef Groth, Ronggui Huang, Kurt Hornik, Uwe Ligges, Charles Loboz, Duncan Murdoch, and Brian D. Ripley for comments, suggestions, bug reports, and/or patches.
 

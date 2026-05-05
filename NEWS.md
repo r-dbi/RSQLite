@@ -1,5 +1,42 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 2.4.7.9005 (2026-05-04)
+
+## Chore
+
+- Auto-update from GitHub Actions (#707).
+
+
+# RSQLite 2.4.7.9004 (2026-03-22)
+
+## Chore
+
+- Auto-update from GitHub Actions (#705).
+
+
+# RSQLite 2.4.7.9003 (2026-03-14)
+
+## Chore
+
+- Auto-update from GitHub Actions (#702).
+
+
+# RSQLite 2.4.7.9002 (2026-03-13)
+
+## Chore
+
+- Auto-update from GitHub Actions (#700).
+
+- Auto-update from GitHub Actions (#698).
+
+
+# RSQLite 2.4.7.9001 (2026-03-08)
+
+## Chore
+
+- Auto-update from GitHub Actions (#695).
+
+
 # RSQLite 2.4.7.9000 (2026-02-27)
 
 - Switching to development version.

@@ -10,12 +10,14 @@ transaction management.
 You can install the latest released version from CRAN with:
 
 ``` chroma
+
 install.packages("RSQLite")
 ```
 
 Or install the latest development version from GitHub with:
 
 ``` chroma
+
 # install.packages("devtools")
 devtools::install_github("r-dbi/RSQLite")
 ```
@@ -28,6 +30,7 @@ and best practices in this ecosystem.
 ## Basic usage
 
 ``` chroma
+
 library(DBI)
 # Create an ephemeral in-memory RSQLite database
 con <- dbConnect(RSQLite::SQLite(), ":memory:")
@@ -36,32 +39,39 @@ dbListTables(con)
 ```
 
 ``` chroma
+
 ## character(0)
 ```
 
 ``` chroma
+
 dbWriteTable(con, "mtcars", mtcars)
 dbListTables(con)
 ```
 
 ``` chroma
+
 ## [1] "mtcars"
 ```
 
 ``` chroma
+
 dbListFields(con, "mtcars")
 ```
 
 ``` chroma
+
 ##  [1] "mpg"  "cyl"  "disp" "hp"   "drat" "wt"   "qsec" "vs"   "am"   "gear"
 ## [11] "carb"
 ```
 
 ``` chroma
+
 dbReadTable(con, "mtcars")
 ```
 
 ``` chroma
+
 ##    mpg cyl  disp  hp drat    wt  qsec vs am gear carb
 ## 1 21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
 ## 2 21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
@@ -76,12 +86,14 @@ dbReadTable(con, "mtcars")
 ```
 
 ``` chroma
+
 # You can fetch all results:
 res <- dbSendQuery(con, "SELECT * FROM mtcars WHERE cyl = 4")
 dbFetch(res)
 ```
 
 ``` chroma
+
 ##    mpg cyl  disp hp drat    wt  qsec vs am gear carb
 ## 1 22.8   4 108.0 93 3.85 2.320 18.61  1  1    4    1
 ## 2 24.4   4 146.7 62 3.69 3.190 20.00  1  0    4    2
@@ -96,6 +108,7 @@ dbFetch(res)
 ```
 
 ``` chroma
+
 dbClearResult(res)
 
 # Or a chunk at a time
@@ -107,12 +120,14 @@ while (!dbHasCompleted(res)) {
 ```
 
 ``` chroma
+
 ## [1] 5
 ## [1] 5
 ## [1] 1
 ```
 
 ``` chroma
+
 # Clear the result
 dbClearResult(res)
 

@@ -1,14 +1,12 @@
 # Class SQLiteResult (and methods)
 
 SQLiteDriver objects are created by
-[`DBI::dbSendQuery()`](https://dbi.r-dbi.org/reference/dbSendQuery.html)
-or
-[`DBI::dbSendStatement()`](https://dbi.r-dbi.org/reference/dbSendStatement.html),
+[`dbSendQuery()`](https://dbi.r-dbi.org/reference/dbSendQuery.html) or
+[`dbSendStatement()`](https://dbi.r-dbi.org/reference/dbSendStatement.html),
 and encapsulate the result of an SQL statement (either `SELECT` or not).
 They are a superclass of the
-[DBI::DBIResult](https://dbi.r-dbi.org/reference/DBIResult-class.html)
-class. The "Usage" section lists the class methods overridden by
-RSQLite.
+[DBIResult](https://dbi.r-dbi.org/reference/DBIResult-class.html) class.
+The "Usage" section lists the class methods overridden by RSQLite.
 
 ## Usage
 

@@ -1,12 +1,48 @@
 # Changelog
 
-## RSQLite 2.4.6.9002 (2026-02-26)
+## RSQLite 2.4.7.9005 (2026-05-04)
 
 ### Chore
 
-- Revdepcheck results.
+- Auto-update from GitHub Actions
+  ([\#707](https://github.com/r-dbi/RSQLite/issues/707)).
 
-## RSQLite 2.4.6.9001 (2026-02-22)
+## RSQLite 2.4.7.9004 (2026-03-22)
+
+### Chore
+
+- Auto-update from GitHub Actions
+  ([\#705](https://github.com/r-dbi/RSQLite/issues/705)).
+
+## RSQLite 2.4.7.9003 (2026-03-14)
+
+### Chore
+
+- Auto-update from GitHub Actions
+  ([\#702](https://github.com/r-dbi/RSQLite/issues/702)).
+
+## RSQLite 2.4.7.9002 (2026-03-13)
+
+### Chore
+
+- Auto-update from GitHub Actions
+  ([\#700](https://github.com/r-dbi/RSQLite/issues/700)).
+
+- Auto-update from GitHub Actions
+  ([\#698](https://github.com/r-dbi/RSQLite/issues/698)).
+
+## RSQLite 2.4.7.9001 (2026-03-08)
+
+### Chore
+
+- Auto-update from GitHub Actions
+  ([\#695](https://github.com/r-dbi/RSQLite/issues/695)).
+
+## RSQLite 2.4.7.9000 (2026-02-27)
+
+- Switching to development version.
+
+## RSQLite 2.4.7 (2026-02-26)
 
 ### Features
 
@@ -17,13 +53,6 @@
   [\#690](https://github.com/r-dbi/RSQLite/issues/690)).
 
 - Enable the percentile extension.
-
-## RSQLite 2.4.6.9000 (2026-02-06)
-
-### fledge
-
-- CRAN release v2.4.6
-  ([\#685](https://github.com/r-dbi/RSQLite/issues/685)).
 
 ## RSQLite 2.4.6 (2026-02-05)
 

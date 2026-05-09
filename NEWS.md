@@ -6,34 +6,6 @@
 
 - Upgrade bundled SQLite to 3.52.0 (#696).
 
-## Chore
-
-- Auto-update from GitHub Actions (#707).
-
-- Auto-update from GitHub Actions (#705).
-
-- Auto-update from GitHub Actions (#702).
-
-- Auto-update from GitHub Actions (#700).
-
-- Auto-update from GitHub Actions (#698).
-
-- Auto-update from GitHub Actions (#695).
-
-## Continuous integration
-
-- Cosmetics.
-
-- Bump action versions.
-
-- Align fledge workflow.
-
-- Harmonize.
-
-## Uncategorized
-
-- Switching to development version.
-
 
 # RSQLite 2.4.7 (2026-02-26)
 

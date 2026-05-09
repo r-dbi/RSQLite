@@ -1,15 +1,10 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 2.4.8 (2026-05-09)
+# RSQLite 3.51.99.9000 (2026-05-09)
 
 ## Features
 
 - Upgrade bundled SQLite to 3.52.0 (#696).
-
-
-# RSQLite 2.4.7 (2026-02-26)
-
-## Features
 
 - Implement `dbListObjects()` for attached SQLite databases with schema prefix support (#689, #690).
 

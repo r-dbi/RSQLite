@@ -18,7 +18,6 @@
 
 - CRAN release v2.4.8 (#709).
 
-
 # RSQLite 3.51.99.9000 (2026-05-09)
 
 ## Features
@@ -36,32 +35,6 @@
 - Cleanup .dd files.
 
 - Auto-update from GitHub Actions (#681).
-
-## Features
-
-- Experimental: optional HTTP/HTTPS virtual file system (VFS) support. When built
-  with `RSQLITE_ENABLE_HTTPVFS` (libcurl detected) you can open remote databases using
-  URI filenames like `"https://host/path/db.sqlite?vfs=http&immutable=1"`.
-  The initial implementation downloaded the entire database eagerly; it now performs
-  on-demand page access via HTTP Range requests backed by an in-memory LRU page cache,
-  with a configurable prefetch and an optional full-download fallback when Range is
-  unsupported. A conservative configuration interface `sqlite_http_config()` exposes
-  cache size, prefetch pages, and fallback toggle; `sqlite_remote()` is a convenience
-  helper that ensures lazy registration and read-only connection semantics.
-  Capability probing (`sqliteHasHttpVFS()`) now auto-registers the extension so that
-  it reports availability immediately on supported builds. A lightweight statistics
-  API (`sqliteHttpStats()`) surfaces bytes fetched, range request count, and whether
-  a full download occurred. The feature is intended for small immutable databases;
-  API and behavior are subject to change while experimental.
-
-## Internal
-
-- Eager HTTP VFS registration is now gated at compile time: it only runs when
-  libcurl was detected during build (defining `RSQLITE_ENABLE_HTTPVFS`). A small
-  helper is available for diagnostics: `RSQLite:::sqlite_httpvfs_compiled()`
-  returns `TRUE` if the package was compiled with HTTP VFS enabled. The
-  user-facing capability probe remains `sqliteHasHttpVFS()`.
-
 
 # RSQLite 2.4.6 (2026-02-05)
 

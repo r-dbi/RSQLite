@@ -1,15 +1,21 @@
 # Changelog
 
-## RSQLite 2.4.8 (2026-05-09)
+## RSQLite 3.52.0 (2026-05-09)
+
+### fledge
+
+- CRAN release v2.4.8
+  ([\#709](https://github.com/r-dbi/RSQLite/issues/709)).
+
+### Bug fixes
+
+- [`dbListObjects()`](https://dbi.r-dbi.org/reference/dbListObjects.html)
+  returns empty instead of throwing an error if database not known.
 
 ### Features
 
 - Upgrade bundled SQLite to 3.52.0
   ([\#696](https://github.com/r-dbi/RSQLite/issues/696)).
-
-## RSQLite 2.4.7 (2026-02-26)
-
-### Features
 
 - Implement
   [`dbListObjects()`](https://dbi.r-dbi.org/reference/dbListObjects.html)
@@ -18,6 +24,14 @@
   [\#690](https://github.com/r-dbi/RSQLite/issues/690)).
 
 - Enable the percentile extension.
+
+### Chore
+
+- Deps.
+
+### Documentation
+
+- Align with SQLite version.
 
 ## RSQLite 2.4.6 (2026-02-05)
 

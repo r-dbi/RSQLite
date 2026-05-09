@@ -2,29 +2,13 @@
 
 # RSQLite 3.52.0 (2026-05-09)
 
-## fledge
-
-- CRAN release v2.4.8 (#709).
-
-## Bug fixes
-
-- `dbListObjects()` returns empty instead of throwing an error if database not known.
-
 ## Features
 
-- Upgrade bundled SQLite to 3.52.0 (#696).
+- Upgrade bundled SQLite to 3.52.0 (#696), the package version is now aligned with the SQLite version.
 
 - Implement `dbListObjects()` for attached SQLite databases with schema prefix support (#689, #690).
 
 - Enable the percentile extension.
-
-## Chore
-
-- Deps.
-
-## Documentation
-
-- Align with SQLite version.
 
 
 # RSQLite 2.4.6 (2026-02-05)

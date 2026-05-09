@@ -1,9 +1,9 @@
 # Deprecated querying tools
 
 These functions have been deprecated. Please switch to using
-[`DBI::dbSendQuery()`](https://dbi.r-dbi.org/reference/dbSendQuery.html)/[`DBI::dbGetQuery()`](https://dbi.r-dbi.org/reference/dbGetQuery.html)
+[`dbSendQuery()`](https://dbi.r-dbi.org/reference/dbSendQuery.html)/[`dbGetQuery()`](https://dbi.r-dbi.org/reference/dbGetQuery.html)
 with the `params` argument or with calling
-[`DBI::dbBind()`](https://dbi.r-dbi.org/reference/dbBind.html) instead.
+[`dbBind()`](https://dbi.r-dbi.org/reference/dbBind.html) instead.
 
 ## Usage
 

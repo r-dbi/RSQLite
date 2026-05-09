@@ -10,6 +10,7 @@ functions defined in the DBI package, so you should always start by
 loading DBI, not RSQLite:
 
 ``` r
+
 library(DBI)
 ```
 
@@ -19,6 +20,7 @@ To create a new SQLite database, you simply supply the filename to
 [`dbConnect()`](https://dbi.r-dbi.org/reference/dbConnect.html):
 
 ``` r
+
 mydb <- dbConnect(RSQLite::SQLite(), "my-db.sqlite")
 dbDisconnect(mydb)
 ```
@@ -29,6 +31,7 @@ database). This database will be automatically deleted when you
 disconnect from it.
 
 ``` r
+
 mydb <- dbConnect(RSQLite::SQLite(), "")
 dbDisconnect(mydb)
 ```
@@ -39,6 +42,7 @@ You can easily copy an R data frame into a SQLite database with
 [`dbWriteTable()`](https://dbi.r-dbi.org/reference/dbWriteTable.html):
 
 ``` r
+
 mydb <- dbConnect(RSQLite::SQLite(), "")
 dbWriteTable(mydb, "mtcars", mtcars)
 dbWriteTable(mydb, "iris", iris)
@@ -52,6 +56,7 @@ Issue a query with
 [`dbGetQuery()`](https://dbi.r-dbi.org/reference/dbGetQuery.html):
 
 ``` r
+
 dbGetQuery(mydb, 'SELECT * FROM mtcars LIMIT 5')
 #>    mpg cyl disp  hp drat    wt  qsec vs am gear carb
 #> 1 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
@@ -65,6 +70,7 @@ Not all R variable names are valid SQL variable names, so you may need
 to escape them with `"`:
 
 ``` r
+
 dbGetQuery(mydb, 'SELECT * FROM iris WHERE "Sepal.Length" < 4.6')
 #>   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
 #> 1          4.4         2.9          1.4         0.2  setosa
@@ -80,6 +86,7 @@ malicious attacker to insert SQL that might damage your database or
 reveal sensitive information. Instead, use a parameterised query:
 
 ``` r
+
 dbGetQuery(mydb, 'SELECT * FROM iris WHERE "Sepal.Length" < :x',
   params = list(x = 4.6))
 #>   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
@@ -103,6 +110,7 @@ retrieve all available rows: use `n` to set the maximum number of rows
 to return.
 
 ``` r
+
 rs <- dbSendQuery(mydb, 'SELECT * FROM mtcars')
 while (!dbHasCompleted(rs)) {
   df <- dbFetch(rs, n = 10)
@@ -123,6 +131,7 @@ different parameters. Call
 parameters:
 
 ``` r
+
 rs <- dbSendQuery(mydb, 'SELECT * FROM iris WHERE "Sepal.Length" < :x')
 dbBind(rs, params = list(x = 4.5))
 nrow(dbFetch(rs))
@@ -137,6 +146,7 @@ You can also pass multiple parameters in one call to
 [`dbBind()`](https://dbi.r-dbi.org/reference/dbBind.html):
 
 ``` r
+
 rs <- dbSendQuery(mydb, 'SELECT * FROM iris WHERE "Sepal.Length" = :x')
 dbBind(rs, params = list(x = seq(4, 4.4, by = 0.1)))
 nrow(dbFetch(rs))
@@ -158,6 +168,7 @@ is good practice, although currently not enforced, to use the new
 functions when you don’t expect a result.
 
 ``` r
+
 dbExecute(mydb, 'DELETE FROM iris WHERE "Sepal.Length" < 4')
 #> [1] 0
 rs <- dbSendStatement(mydb, 'DELETE FROM iris WHERE "Sepal.Length" < :x')

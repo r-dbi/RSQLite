@@ -38,8 +38,8 @@ dbDisconnect(conn, ...)
 
   In previous versions, `SQLite()` took arguments. These have now all
   been moved to
-  [`DBI::dbConnect()`](https://dbi.r-dbi.org/reference/dbConnect.html),
-  and any arguments here will be ignored with a warning.
+  [`dbConnect()`](https://dbi.r-dbi.org/reference/dbConnect.html), and
+  any arguments here will be ignored with a warning.
 
 - drv, conn:
 
@@ -108,7 +108,7 @@ dbDisconnect(conn, ...)
 - bigint:
 
   The R type that 64-bit integer types should be mapped to, default is
-  [bit64::integer64](https://rdrr.io/pkg/bit64/man/bit64-package.html),
+  [bit64::integer64](https://bit64.r-lib.org/reference/bit64-package.html),
   which allows the full range of 64 bit integers.
 
 - extended_types:
@@ -141,11 +141,11 @@ When parameter `extended_types = TRUE` date and time columns are
 directly mapped to corresponding R-types. How exactly depends on whether
 the actual value is a number or a string:
 
-|                      |                                                             |                                             |                              |
-|----------------------|-------------------------------------------------------------|---------------------------------------------|------------------------------|
-| *Column type*        | *Value is numeric*                                          | *Value is Text*                             | *R-class*                    |
-| DATE                 | Count of days since 1970-01-01                              | YMD formatted string (e.g. 2020-01-23)      | `Date`                       |
-| TIME                 | Count of (fractional) seconds                               | HMS formatted string (e.g. 12:34:56)        | `hms` (and `difftime`)       |
+|  |  |  |  |
+|----|----|----|----|
+| *Column type* | *Value is numeric* | *Value is Text* | *R-class* |
+| DATE | Count of days since 1970-01-01 | YMD formatted string (e.g. 2020-01-23) | `Date` |
+| TIME | Count of (fractional) seconds | HMS formatted string (e.g. 12:34:56) | `hms` (and `difftime`) |
 | DATETIME / TIMESTAMP | Count of (fractional) seconds since midnight 1970-01-01 UTC | DATE and TIME as above separated by a space | `POSIXct` with time zone UTC |
 
 If a value cannot be mapped an `NA` is returned in its place with a

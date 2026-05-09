@@ -1,7 +1,7 @@
 # Make R/S-Plus identifiers into legal SQL identifiers
 
 Deprecated. Please use
-[`DBI::dbQuoteIdentifier()`](https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html)
+[`dbQuoteIdentifier()`](https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html)
 instead.
 
 ## Usage

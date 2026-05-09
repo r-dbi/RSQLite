@@ -5,7 +5,7 @@ SQLiteConnection objects are created by passing
 argument to
 [`DBI::dbConnect()`](https://dbi.r-dbi.org/reference/dbConnect.html).
 They are a superclass of the
-[DBI::DBIConnection](https://dbi.r-dbi.org/reference/DBIConnection-class.html)
+[DBIConnection](https://dbi.r-dbi.org/reference/DBIConnection-class.html)
 class. The "Usage" section lists the class methods overridden by
 RSQLite.
 

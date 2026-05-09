@@ -1,5 +1,22 @@
 # Changelog
 
+## RSQLite 2.4.7.9006 (2026-05-09)
+
+### Features
+
+- Upgrade bundled SQLite to 3.52.0
+  ([\#696](https://github.com/r-dbi/RSQLite/issues/696)).
+
+### Continuous integration
+
+- Cosmetics.
+
+- Bump action versions.
+
+- Align fledge workflow.
+
+- Harmonize.
+
 ## RSQLite 2.4.7.9005 (2026-05-04)
 
 ### Chore

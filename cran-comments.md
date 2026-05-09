@@ -1,7 +1,5 @@
-RSQLite 2.4.8
+RSQLite 3.52.0
 
 ## Cran Repository Policy
 
 - [x] Reviewed CRP last edited 2026-04-21.
-
-See changes at https://github.com/eddelbuettel/crp/compare/master@%7B2026-02-20%7D...master@%7B2026-04-21%7D

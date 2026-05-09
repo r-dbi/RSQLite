@@ -1,6 +1,6 @@
 Package: RSQLite
 Title: SQLite Interface for R
-Version: 3.51.99.9001
+Version: 3.52.0
 Date: 2026-05-09
 Authors@R: c(
     person("Kirill", "Müller", , "kirill@cynkra.com", role = c("aut", "cre"),
@@ -23,7 +23,7 @@ Authors@R: c(
   )
 Description: Embeds the SQLite database engine in R and provides an
     interface compliant with the DBI package. The source for the SQLite
-    engine (version 3.52.0) and for various extensions is included.
+    engine and for various extensions is included.
     System libraries will never be consulted because this package relies
     on static linking for the plugins it includes; this also ensures a
     consistent experience across all installations. Optionally, when

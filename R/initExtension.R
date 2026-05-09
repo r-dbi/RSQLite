@@ -34,8 +34,8 @@
 #' cache, with an optional full-download fallback depending on server support
 #' and configuration.
 #' It is primarily intended for read-only access to small, immutable databases;
-#' see \code{\link[=sqlite_http_config]{sqlite_http_config()}} and
-#' \code{\link[=sqlite_remote]{sqlite_remote()}} for configuration options and
+#' see \code{\link[=sqliteHttpConfig]{sqliteHttpConfig()}} and
+#' \code{\link[=sqliteRemote]{sqliteRemote()}} for configuration options and
 #' usage examples.
 #' Building this extension may require libcurl and is optional in RSQLite.
 #'

@@ -29,9 +29,9 @@ If the HTTP VFS was not compiled in, all zeros (and \code{FALSE}) are returned.
 \examples{
 if (sqliteHasHttpVFS()) {
   # Hypothetical remote DB (replace with a real URL for actual use):
-  # old <- sqlite_http_config(cache_size_mb = 8, prefetch_pages = 1)
-  # on.exit(do.call(sqlite_http_config, old), add = TRUE)
-  # con <- sqlite_remote("https://example.org/db.sqlite")
+  # old <- sqliteHttpConfig(cache_size_mb = 8, prefetch_pages = 1)
+  # on.exit(do.call(sqliteHttpConfig, old), add = TRUE)
+  # con <- sqliteRemote("https://example.org/db.sqlite")
   # dbGetQuery(con, "SELECT name FROM sqlite_master WHERE type='table'")
   stats <- sqliteHttpStats()
   str(stats)
@@ -39,5 +39,5 @@ if (sqliteHasHttpVFS()) {
 
 }
 \seealso{
-\code{\link[=sqlite_http_config]{sqlite_http_config()}}, \code{\link[=sqlite_remote]{sqlite_remote()}}, \code{\link[=sqliteHasHttpVFS]{sqliteHasHttpVFS()}}
+\code{\link[=sqliteHttpConfig]{sqliteHttpConfig()}}, \code{\link[=sqliteRemote]{sqliteRemote()}}, \code{\link[=sqliteHasHttpVFS]{sqliteHasHttpVFS()}}
 }

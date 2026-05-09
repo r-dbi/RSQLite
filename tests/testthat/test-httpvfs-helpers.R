@@ -1,4 +1,4 @@
-test_that("sqlite_http_config sets env vars and returns previous values", {
+test_that("sqliteHttpConfig sets env vars and returns previous values", {
   skip_on_cran()
 
   env_names <- c(
@@ -28,7 +28,7 @@ test_that("sqlite_http_config sets env vars and returns previous values", {
     RSQLITE_HTTP_FALLBACK_FULLDL = "1"
   )
 
-  prev <- sqlite_http_config(
+  prev <- sqliteHttpConfig(
     cache_size_mb = 8,
     prefetch_pages = 2,
     fallback_full_download = FALSE
@@ -42,7 +42,7 @@ test_that("sqlite_http_config sets env vars and returns previous values", {
   expect_identical(Sys.getenv("RSQLITE_HTTP_PREFETCH_PAGES"), "2")
   expect_identical(Sys.getenv("RSQLITE_HTTP_FALLBACK_FULLDL"), "0")
 
-  prev2 <- sqlite_http_config()
+  prev2 <- sqliteHttpConfig()
   expect_identical(Sys.getenv("RSQLITE_HTTP_CACHE_MB"), "8")
   expect_identical(Sys.getenv("RSQLITE_HTTP_PREFETCH_PAGES"), "2")
   expect_identical(Sys.getenv("RSQLITE_HTTP_FALLBACK_FULLDL"), "0")
@@ -51,23 +51,23 @@ test_that("sqlite_http_config sets env vars and returns previous values", {
   expect_identical(prev2$prefetch_pages, 2L)
   expect_identical(prev2$fallback_full_download, FALSE)
 
-  do.call(sqlite_http_config, prev)
+  do.call(sqliteHttpConfig, prev)
   expect_identical(Sys.getenv("RSQLITE_HTTP_CACHE_MB"), "4")
   expect_identical(Sys.getenv("RSQLITE_HTTP_PREFETCH_PAGES"), "0")
   expect_identical(Sys.getenv("RSQLITE_HTTP_FALLBACK_FULLDL"), "1")
 })
 
-test_that("sqlite_remote validates url", {
+test_that("sqliteRemote validates url", {
   expect_error(
-    sqlite_remote("ftp://example.org/db.sqlite"),
+    sqliteRemote("ftp://example.org/db.sqlite"),
     "url must begin with http:// or https://"
   )
   expect_error(
-    sqlite_remote("http://example.org/db.sqlite?x=1"),
+    sqliteRemote("http://example.org/db.sqlite?x=1"),
     "url must not contain a query string or fragment"
   )
   expect_error(
-    sqlite_remote("http://example.org/db.sqlite#frag"),
+    sqliteRemote("http://example.org/db.sqlite#frag"),
     "url must not contain a query string or fragment"
   )
 })
@@ -104,17 +104,17 @@ test_that("initExtension supports http extension selector", {
   expect_true(inherits(res, "try-error") || isTRUE(res))
 })
 
-test_that("sqlite_remote exercises URI construction branches", {
+test_that("sqliteRemote exercises URI construction branches", {
   skip_on_cran()
 
   if (isTRUE(sqliteHasHttpVFS())) {
     # Use an invalid-but-well-formed URL that should fail quickly without
     # making a real network request (empty host).
-    expect_error(sqlite_remote("https://"), ".*")
-    expect_error(sqlite_remote("https://", immutable = FALSE), ".*")
+    expect_error(sqliteRemote("https://"), ".*")
+    expect_error(sqliteRemote("https://", immutable = FALSE), ".*")
   } else {
     expect_error(
-      sqlite_remote("https://example.org/db.sqlite"),
+      sqliteRemote("https://example.org/db.sqlite"),
       "HTTP VFS not available"
     )
   }

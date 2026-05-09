@@ -14,10 +14,10 @@
 #' @return A named list of previous values (in R types).
 #' @export
 #' @examples
-#' old <- sqlite_http_config(cache_size_mb = 8, prefetch_pages = 1, fallback_full_download = TRUE)
-#' on.exit(do.call(sqlite_http_config, old), add = TRUE)
-#' # ... connect with sqlite_remote() ...
-sqlite_http_config <- function(
+#' old <- sqliteHttpConfig(cache_size_mb = 8, prefetch_pages = 1, fallback_full_download = TRUE)
+#' on.exit(do.call(sqliteHttpConfig, old), add = TRUE)
+#' # ... connect with sqliteRemote() ...
+sqliteHttpConfig <- function(
   cache_size_mb = NULL,
   prefetch_pages = NULL,
   fallback_full_download = NULL

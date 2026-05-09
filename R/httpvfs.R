@@ -11,11 +11,11 @@
 #' @examples
 #' if (sqliteHasHttpVFS()) {
 #'   # Example (will fail unless URL points to a real SQLite file, shown for syntax only):
-#'   # con <- sqlite_remote("https://example.org/db.sqlite")
+#'   # con <- sqliteRemote("https://example.org/db.sqlite")
 #'   # dbGetQuery(con, "SELECT name FROM sqlite_master WHERE type='table'")
 #'   # dbDisconnect(con)
 #' }
-sqlite_remote <- function(url, immutable = TRUE, ...) {
+sqliteRemote <- function(url, immutable = TRUE, ...) {
   stopifnot(is.character(url), length(url) == 1L)
 
   if (!grepl("^https?://", url)) {

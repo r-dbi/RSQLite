@@ -17,9 +17,9 @@ unusual platforms, in which case \code{sqliteHasHttpVFS()} is the definitive
 runtime capability probe.
 }
 \details{
-The eager registration performed in \code{.onLoad()} only runs when this
-function returns TRUE. If FALSE, calls to \code{\link[=sqlite_remote]{sqlite_remote()}} will error unless
-a supported build is installed.
+\code{sqliteHasHttpVFS()} performs a lazy registration attempt when the VFS
+is compiled in but not yet registered. If the HTTP VFS was not compiled in,
+calls to \code{\link[=sqliteRemote]{sqliteRemote()}} will error.
 }
 \examples{
 sqliteHttpVfsCompiled()

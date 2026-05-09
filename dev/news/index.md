@@ -1,67 +1,11 @@
 # Changelog
 
-## RSQLite 2.4.7.9006 (2026-05-09)
+## RSQLite 3.51.99.9000 (2026-05-09)
 
 ### Features
 
 - Upgrade bundled SQLite to 3.52.0
   ([\#696](https://github.com/r-dbi/RSQLite/issues/696)).
-
-### Continuous integration
-
-- Cosmetics.
-
-- Bump action versions.
-
-- Align fledge workflow.
-
-- Harmonize.
-
-## RSQLite 2.4.7.9005 (2026-05-04)
-
-### Chore
-
-- Auto-update from GitHub Actions
-  ([\#707](https://github.com/r-dbi/RSQLite/issues/707)).
-
-## RSQLite 2.4.7.9004 (2026-03-22)
-
-### Chore
-
-- Auto-update from GitHub Actions
-  ([\#705](https://github.com/r-dbi/RSQLite/issues/705)).
-
-## RSQLite 2.4.7.9003 (2026-03-14)
-
-### Chore
-
-- Auto-update from GitHub Actions
-  ([\#702](https://github.com/r-dbi/RSQLite/issues/702)).
-
-## RSQLite 2.4.7.9002 (2026-03-13)
-
-### Chore
-
-- Auto-update from GitHub Actions
-  ([\#700](https://github.com/r-dbi/RSQLite/issues/700)).
-
-- Auto-update from GitHub Actions
-  ([\#698](https://github.com/r-dbi/RSQLite/issues/698)).
-
-## RSQLite 2.4.7.9001 (2026-03-08)
-
-### Chore
-
-- Auto-update from GitHub Actions
-  ([\#695](https://github.com/r-dbi/RSQLite/issues/695)).
-
-## RSQLite 2.4.7.9000 (2026-02-27)
-
-- Switching to development version.
-
-## RSQLite 2.4.7 (2026-02-26)
-
-### Features
 
 - Implement
   [`dbListObjects()`](https://dbi.r-dbi.org/reference/dbListObjects.html)

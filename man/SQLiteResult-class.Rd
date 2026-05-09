@@ -51,9 +51,9 @@
 \S4method{dbIsValid}{SQLiteResult}(dbObj, ...)
 }
 \description{
-SQLiteDriver objects are created by \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}} or \code{\link[DBI:dbSendStatement]{DBI::dbSendStatement()}},
+SQLiteDriver objects are created by \code{\link[DBI:dbSendQuery]{dbSendQuery()}} or \code{\link[DBI:dbSendStatement]{dbSendStatement()}},
 and encapsulate the result of an SQL statement (either \code{SELECT} or not).
-They are a superclass of the \link[DBI:DBIResult-class]{DBI::DBIResult} class.
+They are a superclass of the \link[DBI:DBIResult-class]{DBIResult} class.
 The "Usage" section lists the class methods overridden by \pkg{RSQLite}.
 }
 \seealso{

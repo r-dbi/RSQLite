@@ -7,7 +7,7 @@
 sqliteSetBusyHandler(dbObj, handler)
 }
 \arguments{
-\item{dbObj}{A \linkS4class{SQLiteConnection} object.}
+\item{dbObj}{A \link[=SQLiteConnection-class]{SQLiteConnection} object.}
 
 \item{handler}{Specifies what to do when the database is locked by
 another transaction. It can be:

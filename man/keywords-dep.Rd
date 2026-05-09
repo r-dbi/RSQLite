@@ -31,6 +31,6 @@
 )
 }
 \description{
-Deprecated. Please use \code{\link[DBI:dbQuoteIdentifier]{DBI::dbQuoteIdentifier()}} instead.
+Deprecated. Please use \code{\link[DBI:dbQuoteIdentifier]{dbQuoteIdentifier()}} instead.
 }
 \keyword{internal}

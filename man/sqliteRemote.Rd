@@ -14,7 +14,7 @@ sqliteRemote(url, immutable = TRUE, ...)
 \item{...}{Passed through to \code{\link[DBI:dbConnect]{DBI::dbConnect()}}.}
 }
 \value{
-A \linkS4class{SQLiteConnection} object.
+A \link[=SQLiteConnection-class]{SQLiteConnection} object.
 }
 \description{
 Constructs a URI filename and sets the appropriate VFS and immutable flags.

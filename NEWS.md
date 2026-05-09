@@ -1,5 +1,24 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.51.99.9001 (2026-05-09)
+
+## Bug fixes
+
+- `dbListObjects()` returns empty instead of throwing an error if database not known.
+
+## Chore
+
+- Deps.
+
+## Documentation
+
+- Align with SQLite version.
+
+## fledge
+
+- CRAN release v2.4.8 (#709).
+
+
 # RSQLite 3.51.99.9000 (2026-05-09)
 
 ## Features

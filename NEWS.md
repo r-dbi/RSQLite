@@ -1,25 +1,14 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 3.51.99.9001 (2026-05-09)
-
-## Bug fixes
-
-- `dbListObjects()` returns empty instead of throwing an error if database not known.
-
-## Chore
-
-- Deps.
-
-## Documentation
-
-- Align with SQLite version.
+# RSQLite 3.52.0 (2026-05-09)
 
 ## fledge
 
 - CRAN release v2.4.8 (#709).
 
+## Bug fixes
 
-# RSQLite 3.51.99.9000 (2026-05-09)
+- `dbListObjects()` returns empty instead of throwing an error if database not known.
 
 ## Features
 
@@ -28,6 +17,14 @@
 - Implement `dbListObjects()` for attached SQLite databases with schema prefix support (#689, #690).
 
 - Enable the percentile extension.
+
+## Chore
+
+- Deps.
+
+## Documentation
+
+- Align with SQLite version.
 
 
 # RSQLite 2.4.6 (2026-02-05)

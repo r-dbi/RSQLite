@@ -676,7 +676,7 @@ static const char *re_compile(
   int i, j;
 
   *ppRe = 0;
-  pRe = sqlite3_malloc( sizeof(*pRe) );
+  pRe = sqlite3_malloc64( sizeof(*pRe) );
   if( pRe==0 ){
     return "out of memory";
   }
@@ -828,7 +828,6 @@ static void re_bytecode_func(
   int i;
   int n;
   char *z;
-  (void)argc;
   static const char *ReOpName[] = {
     "EOF",
     "MATCH",
@@ -851,6 +850,7 @@ static void re_bytecode_func(
     "ATSTART",
   };
 
+  (void)argc;
   zPattern = (const char*)sqlite3_value_text(argv[0]);
   if( zPattern==0 ) return;
   zErr = re_compile(&pRe, zPattern, re_maxnfa(re_maxlen(context)),
@@ -865,7 +865,6 @@ static void re_bytecode_func(
     return;
   }
   pStr = sqlite3_str_new(0);
-  if( pStr==0 ) goto re_bytecode_func_err;
   if( pRe->nInit>0 ){
     sqlite3_str_appendf(pStr, "INIT     ");
     for(i=0; i<pRe->nInit; i++){
@@ -877,15 +876,15 @@ static void re_bytecode_func(
     sqlite3_str_appendf(pStr, "%-8s %4d\n",
          ReOpName[(unsigned char)pRe->aOp[i]], pRe->aArg[i]);
   }
+  if( sqlite3_str_errcode(pStr)==SQLITE_NOMEM ){
+    sqlite3_str_finish(pStr);
+    re_free(pRe);
+    sqlite3_result_error_nomem(context);
+    return;
+  }
   n = sqlite3_str_length(pStr);
   z = sqlite3_str_finish(pStr);
-  if( n==0 ){
-    sqlite3_free(z);
-  }else{
-    sqlite3_result_text(context, z, n-1, sqlite3_free);
-  }
-
-re_bytecode_func_err:
+  sqlite3_result_text(context, z, n-1, sqlite3_free);
   re_free(pRe);
 }
 

@@ -42,12 +42,12 @@ jobs:
           fi
 
           # Special case: duckdb and igraph
-          if [[ "${{ github.repository }}" == "krlmlr/duckdb-r" ]]; then
+          if [[ "${{ github.repository }}" == 'krlmlr/duckdb-r' ]]; then
             echo "Repository is krlmlr/duckdb-r. Skipping fledge workflow."
             exit 0
           fi
 
-          if [[ "${{ github.repository }}" == "krlmlr/rigraph" ]]; then
+          if [[ "${{ github.repository }}" == 'krlmlr/rigraph' ]]; then
             echo "Repository is krlmlr/rigraph. Skipping fledge workflow."
             exit 0
           fi

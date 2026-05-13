@@ -1,5 +1,34 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.52.0.9000 (2026-05-13)
+
+## Features
+
+- Upgrade bundled SQLite to 3.53.1 (#711).
+
+## Chore
+
+- Add ccache to `.gitignore` and `.Rbuildignore`.
+
+## Continuous integration
+
+- Create snapshot update PR against correct branch.
+
+- Add reference to `/apply-patch` workflow in commit message.
+
+- Clarify rationale for not deploying on schedule.
+
+- Only run fledge on pushes to main.
+
+- Prettier.
+
+- Tweak fledge and ccache workflows.
+
+## fledge
+
+- CRAN release v3.52.0 (#710).
+
+
 # RSQLite 3.52.0 (2026-05-09)
 
 ## Features

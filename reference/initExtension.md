@@ -134,6 +134,6 @@ db <- dbConnect(RSQLite::SQLite())
 RSQLite::initExtension(db, "uuid")
 dbGetQuery(db, "SELECT uuid();")
 #>                                 uuid()
-#> 1 ae118086-c179-445a-8c03-58803e7ecbf1
+#> 1 21873e7e-5de9-4eef-8f92-399b9c912c27
 dbDisconnect(db)
 ```

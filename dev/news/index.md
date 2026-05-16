@@ -1,31 +1,42 @@
 # Changelog
 
-## RSQLite 3.51.99.9001 (2026-05-09)
+## RSQLite 3.52.0.9000 (2026-05-13)
 
-### Bug fixes
+### Features
 
-- [`dbListObjects()`](https://dbi.r-dbi.org/reference/dbListObjects.html)
-  returns empty instead of throwing an error if database not known.
+- Upgrade bundled SQLite to 3.53.1
+  ([\#711](https://github.com/r-dbi/RSQLite/issues/711)).
 
 ### Chore
 
-- Deps.
+- Add ccache to `.gitignore` and `.Rbuildignore`.
 
-### Documentation
+### Continuous integration
 
-- Align with SQLite version.
+- Create snapshot update PR against correct branch.
+
+- Add reference to `/apply-patch` workflow in commit message.
+
+- Clarify rationale for not deploying on schedule.
+
+- Only run fledge on pushes to main.
+
+- Prettier.
+
+- Tweak fledge and ccache workflows.
 
 ### fledge
 
-- CRAN release v2.4.8
-  ([\#709](https://github.com/r-dbi/RSQLite/issues/709)).
+- CRAN release v3.52.0
+  ([\#710](https://github.com/r-dbi/RSQLite/issues/710)).
 
-## RSQLite 3.51.99.9000 (2026-05-09)
+## RSQLite 3.52.0 (2026-05-09)
 
 ### Features
 
 - Upgrade bundled SQLite to 3.52.0
-  ([\#696](https://github.com/r-dbi/RSQLite/issues/696)).
+  ([\#696](https://github.com/r-dbi/RSQLite/issues/696)), the package
+  version is now aligned with the SQLite version.
 
 - Implement
   [`dbListObjects()`](https://dbi.r-dbi.org/reference/dbListObjects.html)

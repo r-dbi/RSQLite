@@ -1,6 +1,6 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 3.53.0.9000 (2026-05-22)
+# RSQLite 3.53.1 (2026-05-22)
 
 ## fledge
 

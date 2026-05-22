@@ -1,11 +1,10 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 3.52.0.9001 (2026-05-16)
+# RSQLite 3.53.0 (2026-05-22)
 
-- Ci: Unify fledge.yaml across cynkratemplate and fledge (#86).
+## fledge
 
-
-# RSQLite 3.52.0.9000 (2026-05-13)
+- CRAN release v3.52.0 (#710).
 
 ## Features
 
@@ -29,9 +28,9 @@
 
 - Tweak fledge and ccache workflows.
 
-## fledge
+## Uncategorized
 
-- CRAN release v3.52.0 (#710).
+- Ci: Unify fledge.yaml across cynkratemplate and fledge (#86).
 
 
 # RSQLite 3.52.0 (2026-05-09)

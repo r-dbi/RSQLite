@@ -1,5 +1,40 @@
 # Changelog
 
+## RSQLite 3.53.0 (2026-05-22)
+
+### fledge
+
+- CRAN release v3.52.0
+  ([\#710](https://github.com/r-dbi/RSQLite/issues/710)).
+
+### Features
+
+- Upgrade bundled SQLite to 3.53.1
+  ([\#711](https://github.com/r-dbi/RSQLite/issues/711)).
+
+### Chore
+
+- Add ccache to `.gitignore` and `.Rbuildignore`.
+
+### Continuous integration
+
+- Create snapshot update PR against correct branch.
+
+- Add reference to `/apply-patch` workflow in commit message.
+
+- Clarify rationale for not deploying on schedule.
+
+- Only run fledge on pushes to main.
+
+- Prettier.
+
+- Tweak fledge and ccache workflows.
+
+### Uncategorized
+
+- Ci: Unify fledge.yaml across cynkratemplate and fledge
+  ([\#86](https://github.com/r-dbi/RSQLite/issues/86)).
+
 ## RSQLite 3.52.0 (2026-05-09)
 
 ### Features

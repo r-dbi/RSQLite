@@ -1,5 +1,12 @@
 # Changelog
 
+## RSQLite 3.53.1 (2026-05-22)
+
+### fledge
+
+- CRAN release v3.53.0
+  ([\#724](https://github.com/r-dbi/RSQLite/issues/724)).
+
 ## RSQLite 3.53.0 (2026-05-22)
 
 ### Features

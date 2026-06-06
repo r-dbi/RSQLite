@@ -76,6 +76,7 @@
 #' )
 #' dbExecute(db, sql)
 #' dbGetQuery(db, "SELECT * FROM tbl")
+#' dbDisconnect(db)
 #'
 #' # uuid
 #' db <- dbConnect(RSQLite::SQLite())

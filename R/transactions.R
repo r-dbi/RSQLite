@@ -20,7 +20,7 @@ NULL
 #'   [DBI::dbConnect()]
 #' @param ... Needed for compatibility with generic. Otherwise ignored.
 #' @param name Supply a name to use a named savepoint. This allows you to
-#'   nest multiple transaction
+#'   nest multiple transactions.
 #' @param .name For backward compatibility, do not use.
 #' @examples
 #' library(DBI)

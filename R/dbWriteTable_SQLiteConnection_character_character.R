@@ -1,7 +1,7 @@
 #' @param header is a logical indicating whether the first data line (but see
-#'   `skip`) has a header or not.  If missing, it value is determined
+#'   `skip`) has a header or not.  If missing, its value is determined
 #'   following [read.table()] convention, namely, it is set to TRUE if
-#'   and only if the first row has one fewer field that the number of columns.
+#'   and only if the first row has one fewer field than the number of columns.
 #' @param sep The field separator, defaults to `','`.
 #' @param eol The end-of-line delimiter, defaults to `'\n'`.
 #' @param skip number of lines to skip before reading the data. Defaults to 0.

@@ -33,7 +33,7 @@ dbDisconnect(mydb)
 unlink("my-db.sqlite")
 ```
 
-If you just need a temporary database, use either `""` (for an on-disk database) or `":memory:"` or `"file::memory:"` (for a in-memory database). This database will be automatically deleted when you disconnect from it.
+If you just need a temporary database, use either `""` (for an on-disk database) or `":memory:"` or `"file::memory:"` (for an in-memory database). This database will be automatically deleted when you disconnect from it.
 
 ```{r}
 mydb <- dbConnect(RSQLite::SQLite(), "")
@@ -76,7 +76,7 @@ This is a little more typing, but much much safer.
 
 ## Batched queries
 
-If you run a query and the results don't fit in memory, you can use `dbSendQuery()`, `dbFetch()` and `dbClearResults()` to retrieve the results in batches. By default `dbFetch()` will retrieve all available rows: use `n` to set the maximum number of rows to return.
+If you run a query and the results don't fit in memory, you can use `dbSendQuery()`, `dbFetch()` and `dbClearResult()` to retrieve the results in batches. By default `dbFetch()` will retrieve all available rows: use `n` to set the maximum number of rows to return.
 
 ```{r}
 rs <- dbSendQuery(mydb, 'SELECT * FROM mtcars')

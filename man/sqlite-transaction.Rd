@@ -30,7 +30,7 @@ sqliteIsTransacting(conn)
 \item{...}{Needed for compatibility with generic. Otherwise ignored.}
 
 \item{name}{Supply a name to use a named savepoint. This allows you to
-nest multiple transaction}
+nest multiple transactions.}
 }
 \description{
 By default, SQLite is in auto-commit mode. \code{dbBegin()} starts

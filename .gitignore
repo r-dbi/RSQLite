@@ -25,3 +25,5 @@ CRAN-SUBMISSION
 /compile_commands.json
 /.cache/
 .ccache/
+RSQLite.Rcheck/
+RSQLite_*.tar.gz

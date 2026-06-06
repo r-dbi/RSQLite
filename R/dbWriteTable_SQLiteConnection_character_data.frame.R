@@ -28,7 +28,7 @@
 #'   in the DBMS.  Its default is `FALSE`.
 #' @param field.types character vector of named  SQL field types where
 #'   the names are the names of new table's columns. If missing, types inferred
-#'   with [DBI::dbDataType()]).
+#'   with [DBI::dbDataType()].
 #' @param temporary a logical specifying whether the new table should be
 #'   temporary. Its default is `FALSE`.
 #' @param ... Needed for compatibility with generic. Otherwise ignored.

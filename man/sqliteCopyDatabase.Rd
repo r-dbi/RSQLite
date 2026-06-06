@@ -21,7 +21,7 @@ a copy of another database.
 }
 \examples{
 library(DBI)
-# Copy the built in databaseDb() to an in-memory database
+# Copy the built-in datasetsDb() to an in-memory database
 con <- dbConnect(RSQLite::SQLite(), ":memory:")
 dbListTables(con)
 

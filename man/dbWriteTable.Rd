@@ -104,6 +104,13 @@ passed to the \code{value} argument,
 the \code{NA} elements are overwritten.
 Similarly, if the key column is not present in the data frame, all
 elements are automatically assigned a value.
+
+When \code{value} is a character string, it is interpreted as the path to a local
+delimiter-separated text file and imported directly into SQLite. Use \code{sep} to
+set the field separator, for example \code{sep = "\\t"} for tab-separated files,
+and \code{header}, \code{skip}, \code{eol}, \code{nrows}, and \code{colClasses} to control parsing and
+type inference. Files are read from the local filesystem; compressed files
+are not decompressed automatically.
 }
 \examples{
 con <- dbConnect(SQLite())
@@ -113,6 +120,30 @@ dbReadTable(con, "mtcars")
 # A zero row data frame just creates a table definition.
 dbWriteTable(con, "mtcars2", mtcars[0, ])
 dbReadTable(con, "mtcars2")
+
+# Import a CSV file without first reading it into R.
+csv <- tempfile(fileext = ".csv")
+write.table(
+  data.frame(id = 1:2, name = c("Ada", "Grace")),
+  csv,
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+dbWriteTable(con, "people_csv", csv, overwrite = TRUE)
+dbReadTable(con, "people_csv")
+
+# Import a tab-separated file by setting sep = "\t".
+tsv <- tempfile(fileext = ".tsv")
+write.table(
+  data.frame(id = 1:2, score = c(10, 20)),
+  tsv,
+  sep = "\t",
+  row.names = FALSE,
+  quote = FALSE
+)
+dbWriteTable(con, "scores_tsv", tsv, sep = "\t", overwrite = TRUE)
+dbReadTable(con, "scores_tsv")
 
 dbDisconnect(con)
 }

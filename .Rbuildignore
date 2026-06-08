@@ -46,3 +46,4 @@ a.out.dSYM
 ^src/deps\.mk$
 ^src/.*\.dd
 ^\.clang-format$
+^\.ccache$

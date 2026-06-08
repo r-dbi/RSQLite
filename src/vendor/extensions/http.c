@@ -5,7 +5,7 @@
 
   Related work (more advanced capabilities, not bundled here):
     - sqlite_web_vfs (C/C++): https://github.com/mlin/sqlite_web_vfs
-    - sqlite-vfs-http (Rust crate): see crates.io
+    - sqlite-vfs-http (Rust crate): https://crates.io/crates/sqlite-vfs-http
     - sqlite-wasm-http (JavaScript/WASM): https://www.npmjs.com/package/sqlite-wasm-http
 
   Design (current):

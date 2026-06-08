@@ -1,5 +1,35 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.53.0.9003 (2026-06-06)
+
+## Features
+
+- Upgrade bundled SQLite to 3.53.2 (#729).
+
+
+# RSQLite 3.53.0.9002 (2026-06-05)
+
+## Features
+
+- Upgrade bundled SQLite to 3.53.2 (#727).
+
+
+# RSQLite 3.53.0.9001 (2026-05-24)
+
+## Continuous integration
+
+- Update ccache-action reference.
+
+- Bump action version.
+
+
+# RSQLite 3.53.0.9000 (2026-05-22)
+
+## fledge
+
+- CRAN release v3.53.0 (#724).
+
+
 # RSQLite 3.53.1 (2026-05-22)
 
 ## Features

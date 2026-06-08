@@ -1,5 +1,8 @@
 #' Convenience helper for opening remote SQLite databases over HTTP/HTTPS
 #'
+#' @description
+#' lifecycle::badge("experimental")
+#'
 #' Constructs a URI filename and sets the appropriate VFS and immutable flags.
 #' Requires the optional http extension to be available; see [sqliteHasHttpVFS()].
 #'
@@ -8,12 +11,11 @@
 #' @param ... Passed through to [DBI::dbConnect()].
 #' @return A [SQLiteConnection-class] object.
 #' @export
-#' @examples
+#' @examplesIf FALSE
 #' if (sqliteHasHttpVFS()) {
-#'   # Example (will fail unless URL points to a real SQLite file, shown for syntax only):
-#'   # con <- sqliteRemote("https://example.org/db.sqlite")
-#'   # dbGetQuery(con, "SELECT name FROM sqlite_master WHERE type='table'")
-#'   # dbDisconnect(con)
+#'   con <- sqliteRemote("https://example.org/db.sqlite")
+#'   dbGetQuery(con, "SELECT name FROM sqlite_master WHERE type='table'")
+#'   dbDisconnect(con)
 #' }
 sqliteRemote <- function(url, immutable = TRUE, ...) {
   stopifnot(is.character(url), length(url) == 1L)

@@ -17,14 +17,17 @@ sqliteRemote(url, immutable = TRUE, ...)
 A \link[=SQLiteConnection-class]{SQLiteConnection} object.
 }
 \description{
+lifecycle::badge("experimental")
+
 Constructs a URI filename and sets the appropriate VFS and immutable flags.
 Requires the optional http extension to be available; see \code{\link[=sqliteHasHttpVFS]{sqliteHasHttpVFS()}}.
 }
 \examples{
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
 if (sqliteHasHttpVFS()) {
-  # Example (will fail unless URL points to a real SQLite file, shown for syntax only):
-  # con <- sqliteRemote("https://example.org/db.sqlite")
-  # dbGetQuery(con, "SELECT name FROM sqlite_master WHERE type='table'")
-  # dbDisconnect(con)
+  con <- sqliteRemote("https://example.org/db.sqlite")
+  dbGetQuery(con, "SELECT name FROM sqlite_master WHERE type='table'")
+  dbDisconnect(con)
 }
+\dontshow{\}) # examplesIf}
 }

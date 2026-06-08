@@ -1,8 +1,12 @@
 #' Configure experimental HTTP VFS behavior (optional)
 #'
+#' @description
+#' lifecycle::badge("experimental")
+#'
 #' Set conservative, process-wide options for the experimental HTTP/HTTPS VFS.
 #' These values are read on first open of a remote database in the current process.
 #'
+#' @details
 #' Options are stored in environment variables so they also affect C-level code:
 #' - `RSQLITE_HTTP_CACHE_MB`: In-memory page cache size in megabytes (default 4).
 #' - `RSQLITE_HTTP_PREFETCH_PAGES`: Prefetch this many pages ahead (default 0).

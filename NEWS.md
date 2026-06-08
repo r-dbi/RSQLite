@@ -30,7 +30,7 @@
 - CRAN release v3.53.0 (#724).
 
 
-# RSQLite 3.53.0 (2026-05-22)
+# RSQLite 3.53.1 (2026-05-22)
 
 ## Features
 

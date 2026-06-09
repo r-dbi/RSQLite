@@ -1,5 +1,12 @@
 # Changelog
 
+## RSQLite 3.53.1.9005 (2026-06-09)
+
+### Chore
+
+- Rename `deps.mk` to `Makevars.deps` for `R CMD check` compatibility
+  ([\#734](https://github.com/r-dbi/RSQLite/issues/734)).
+
 ## RSQLite 3.53.1.9004 (2026-06-08)
 
 ### Features

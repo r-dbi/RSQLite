@@ -1,0 +1,5 @@
+#!/bin/sh
+# Windows counterpart of 'cleanup': remove vendored build artifacts so they do
+# not leak into the source tarball. Run via `sh` by R CMD build / R CMD INSTALL.
+# See 'cleanup' for the full explanation.
+rm -f src/vendor/sqlite3/*.o src/vendor/sqlite3/*.a

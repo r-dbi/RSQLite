@@ -35,13 +35,14 @@ $(SHLIB): vendor/sqlite3/sqlite3.o
 
 # This file is available only during development.
 # For the tarball, we create an empty file.
-deps.mk:
+#
+# The fragment is named "Makevars.deps" (not "deps.mk") on purpose: R CMD build
+# can regenerate this empty file during cleanup and pack it into the tarball, and
+# R CMD check only accepts src/ file names matching "^Makevars" (among others) --
+# a "*.mk" name is reported as an "unlikely file name" WARNING.
+# Use a plain (portable) "include"; "-include" is a GNU make extension that CRAN
+# flags as non-portable.
+Makevars.deps:
 	touch -r $$(ls -t *.cpp | head -n 1) "$@"
 
-include deps.mk
-
-# Development-only dependency stamping. Empty in release tarball.
-deps.mk:
-	touch -r $$(ls -t *.cpp | head -n 1) "$@"
-
-include deps.mk
+include Makevars.deps

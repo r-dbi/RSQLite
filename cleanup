@@ -1,0 +1,10 @@
+#!/bin/sh
+# Remove vendored build artifacts so they do not leak into the source tarball.
+#
+# src/vendor/sqlite3/sqlite3.o (listed in PKG_LIBS) and any *.a are excluded
+# via .Rbuildignore, but a vignette-triggered installation during R CMD build
+# recompiles them *after* the sources have been copied to the build directory.
+# R CMD build's own cleanup only removes top-level src/*.o, not files in the
+# vendored subdirectory, so without this script the object file ends up in the
+# tarball and R CMD check reports it ("checking if this is a source package").
+rm -f src/vendor/sqlite3/*.o src/vendor/sqlite3/*.a

@@ -87,13 +87,6 @@
 
 - Enable the percentile extension.
 
-## Chore
-
-- Build-ignore.
-
-- Cleanup .dd files.
-
-- Auto-update from GitHub Actions (#681).
 
 # RSQLite 2.4.6 (2026-02-05)
 

@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.53.1.9006 (2026-06-10)
+
+## Chore
+
+- Remove vendored object files from the source tarball via cleanup scripts (#736).
+
+
 # RSQLite 3.53.1.9005 (2026-06-09)
 
 ## Chore

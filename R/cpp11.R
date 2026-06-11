@@ -32,6 +32,18 @@ extension_load <- function(con, file, entry_point) {
   invisible(.Call(`_RSQLite_extension_load`, con, file, entry_point))
 }
 
+sqlite_has_http_vfs <- function() {
+  .Call(`_RSQLite_sqlite_has_http_vfs`)
+}
+
+sqlite_httpvfs_compiled <- function() {
+  .Call(`_RSQLite_sqlite_httpvfs_compiled`)
+}
+
+sqlite_http_stats <- function() {
+  .Call(`_RSQLite_sqlite_http_stats`)
+}
+
 result_create <- function(con, sql) {
   .Call(`_RSQLite_result_create`, con, sql)
 }

@@ -47,17 +47,25 @@ check_vfs <- function(vfs) {
   }
 
   if (.Platform[["OS.type"]] == "windows") {
-    warning("vfs customization not available on this platform.",
-      " Ignoring value: vfs = ", vfs,
+    warning(
+      "vfs customization not available on this platform.",
+      " Ignoring value: vfs = ",
+      vfs,
       call. = FALSE
     )
     return("")
   }
 
-  match.arg(vfs, c(
-    "unix-posix", "unix-afp", "unix-flock", "unix-dotfile",
-    "unix-none"
-  ))
+  match.arg(
+    vfs,
+    c(
+      "unix-posix",
+      "unix-afp",
+      "unix-flock",
+      "unix-dotfile",
+      "unix-none"
+    )
+  )
 }
 
 # From the SQLite docs: If the filename is ":memory:", then a private,
@@ -70,6 +78,97 @@ check_vfs <- function(vfs) {
 #
 # This function checks for known protocols, or for a colon at the beginning.
 is_url_or_special_filename <- function(x) grepl("^(?:file|http|ftp|https|):", x)
+
+#' Check for HTTP VFS support
+#'
+#' @description Capability query for optional HTTP VFS support.
+#' @export
+sqliteHasHttpVFS <- function() {
+  # Call C++ helper if registered by cpp11, else FALSE.
+  if (!exists("sqlite_has_http_vfs")) {
+    return(FALSE)
+  }
+  ok <- sqlite_has_http_vfs()
+  if (isTRUE(ok)) {
+    return(TRUE)
+  }
+  # Try lazy registration via initExtension() on a throwaway connection
+  # so that capability can reflect build availability.
+  tmp <- NULL
+  try(
+    {
+      tmp <- DBI::dbConnect(SQLite(), ":memory:")
+      initExtension(tmp, "http")
+    },
+    silent = TRUE
+  )
+  if (!is.null(tmp)) {
+    try(DBI::dbDisconnect(tmp), silent = TRUE)
+  }
+  sqlite_has_http_vfs()
+}
+
+#' Experimental HTTP VFS statistics
+#'
+#' Returns counters collected for HTTP VFS operations in the current process.
+#' These values are best-effort and may currently report zeros until
+#' global aggregation is implemented.
+#'
+#' @details Statistics are maintained per R process and reset when the process
+#' terminates. Values:
+#' * `bytes_fetched`: Total bytes transferred via HTTP GET/Range requests.
+#' * `range_requests`: Count of HTTP Range requests performed.
+#' * `full_download`: Logical flag; `TRUE` if a fallback full download occurred
+#'   for any open in this process.
+#'
+#' If the HTTP VFS was not compiled in, all zeros (and `FALSE`) are returned.
+#'
+#' @examples
+#' if (sqliteHasHttpVFS()) {
+#'   # Hypothetical remote DB (replace with a real URL for actual use):
+#'   # old <- sqliteHttpConfig(cache_size_mb = 8, prefetch_pages = 1)
+#'   # on.exit(do.call(sqliteHttpConfig, old), add = TRUE)
+#'   # con <- sqliteRemote("https://example.org/db.sqlite")
+#'   # dbGetQuery(con, "SELECT name FROM sqlite_master WHERE type='table'")
+#'   stats <- sqliteHttpStats()
+#'   str(stats)
+#' }
+#'
+#' @seealso [sqliteHttpConfig()], [sqliteRemote()], [sqliteHasHttpVFS()]
+#'
+#' @return A list with elements `bytes_fetched`, `range_requests`, `full_download`.
+#' @export
+sqliteHttpStats <- function() {
+  if (!exists("sqlite_http_stats")) {
+    return(list(bytes_fetched = 0L, range_requests = 0L, full_download = FALSE))
+  }
+  sqlite_http_stats()
+}
+
+#' Was HTTP VFS compiled into this build?
+#'
+#' Returns TRUE if the experimental HTTP/HTTPS virtual file system was compiled
+#' in (libcurl detected at build time), FALSE otherwise. This is a compile-time
+#' indicator; even if TRUE the VFS might still fail to register at runtime on
+#' unusual platforms, in which case `sqliteHasHttpVFS()` is the definitive
+#' runtime capability probe.
+#'
+#' @details `sqliteHasHttpVFS()` performs a lazy registration attempt when the VFS
+#' is compiled in but not yet registered. If the HTTP VFS was not compiled in,
+#' calls to [sqliteRemote()] will error.
+#'
+#' @return A logical scalar.
+#' @examples
+#' sqliteHttpVfsCompiled()
+#' @export
+sqliteHttpVfsCompiled <- function() {
+  isTRUE(tryCatch(
+    {
+      exists("sqlite_httpvfs_compiled") && sqlite_httpvfs_compiled()
+    },
+    error = function(e) FALSE
+  ))
+}
 
 
 #' @import rlang

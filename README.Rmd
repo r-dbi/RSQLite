@@ -34,6 +34,13 @@ Or install the latest development version from GitHub with:
 devtools::install_github("r-dbi/RSQLite")
 ```
 
+## Extensions
+
+RSQLite supports loadable extensions. An experimental HTTP/HTTPS VFS is available
+when the package is built with libcurl support, enabling read-only access to remote
+SQLite databases. See the help pages for `initExtension()`, `sqliteHttpConfig()`,
+`sqliteRemote()`, and `sqliteHasHttpVFS()`.
+
 Discussions associated with DBI and related database packages take place on [R-SIG-DB](https://stat.ethz.ch/mailman/listinfo/r-sig-db).
 The website [Databases using R](https://db.rstudio.com/) describes the tools and best practices in this ecosystem.
 

@@ -60,10 +60,17 @@ hc
 hms
 Hornik
 hpp
+http
+httpfs
+https
+httpuv
+httpvfs
+immutable
 Inlined
 isIdCurrent
 JSON
 leftstr
+libcurl
 Lifecycle
 Ligges
 LinkingTo
@@ -143,6 +150,7 @@ tanh
 textConnections
 unclosed
 unreferenced
+URI
 Uwe
 ValidHandle
 vfs

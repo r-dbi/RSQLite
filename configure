@@ -1,0 +1,79 @@
+#!/usr/bin/env sh
+# Minimal configure to detect libcurl for optional HTTP VFS
+
+set -e
+
+CURL_CFLAGS=""
+CURL_LIBS=""
+
+update_makevars_var() {
+  var="$1"
+  val="$2"
+  file="src/Makevars.local"
+  tmp="${file}.tmp"
+
+  if [ ! -f "$file" ]; then
+    : > "$file"
+  fi
+
+  # Replace the first matching VAR= line; append if missing.
+  awk -v var="$var" -v val="$val" '
+    BEGIN{done=0}
+    $0 ~ ("^" var "=") {
+      if(!done){ print var "=" val; done=1 }
+      next
+    }
+    { print }
+    END{ if(!done) print var "=" val }
+  ' "$file" > "$tmp"
+  mv "$tmp" "$file"
+}
+
+# Try pkg-config first
+if command -v pkg-config >/dev/null 2>&1; then
+  if pkg-config --exists libcurl; then
+    CURL_CFLAGS="$(pkg-config --cflags libcurl)"
+    CURL_LIBS="$(pkg-config --libs libcurl)"
+  fi
+fi
+
+# Fallback: curl-config
+if [ -z "$CURL_LIBS" ] && command -v curl-config >/dev/null 2>&1; then
+  CURL_CFLAGS="$(curl-config --cflags 2>/dev/null || true)"
+  CURL_LIBS="$(curl-config --libs 2>/dev/null || true)"
+fi
+
+# If found, enable the build-time macro for httpvfs
+dedup_libs() {
+  # Deduplicate space-separated libs/flags while preserving first occurrence order.
+  out=""
+  for tok in $1; do
+    case " $out " in
+      *" $tok "*) ;; # already present
+      *) out="$out $tok" ;;
+    esac
+  done
+  echo "$out" | sed -e 's/^ *//' -e 's/  */ /g'
+}
+
+if [ -n "$CURL_LIBS" ] && [ -f "src/vendor/extensions/http.c" ]; then
+  CURL_LIBS_DEDUP=$(dedup_libs "$CURL_LIBS")
+  echo "Found libcurl (deduped): $CURL_LIBS_DEDUP"
+  update_makevars_var "HTTPVFS_CPPFLAGS" "-DRSQLITE_ENABLE_HTTPVFS"
+  update_makevars_var "CURL_CFLAGS" "$CURL_CFLAGS"
+  update_makevars_var "CURL_LIBS" "$CURL_LIBS_DEDUP"
+else
+  echo "libcurl not found; building without httpvfs (ok)"
+  update_makevars_var "HTTPVFS_CPPFLAGS" ""
+  update_makevars_var "CURL_CFLAGS" ""
+  update_makevars_var "CURL_LIBS" ""
+fi
+
+# Optional suppression of noisy third-party warnings (off by default).
+# Enable by exporting RSQLITE_SILENCE_WARNINGS=1 before install.
+case "${RSQLITE_SILENCE_WARNINGS:-}" in
+  1|yes|YES|true|TRUE)
+    update_makevars_var "RSQLITE_CXXFLAGS" "-Wno-parentheses -Wno-unused-but-set-variable"
+    update_makevars_var "RSQLITE_CFLAGS" "-Wno-unused-but-set-variable"
+    ;;
+esac

@@ -1,5 +1,11 @@
 # Changelog
 
+## RSQLite 3.53.1.9007 (2026-06-11)
+
+### Documentation
+
+- Normalize `NEWS.md`.
+
 ## RSQLite 3.53.1.9006 (2026-06-10)
 
 ### Chore

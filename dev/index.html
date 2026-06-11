@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="SQLite Interface for R">
-<meta name="description" content="Embeds the SQLite database engine in R and provides an interface compliant with the DBI package. The source for the SQLite engine and for various extensions is included. System libraries will never be consulted because this package relies on static linking for the plugins it includes; this also ensures a consistent experience across all installations.">
-<meta property="og:description" content="Embeds the SQLite database engine in R and provides an interface compliant with the DBI package. The source for the SQLite engine and for various extensions is included. System libraries will never be consulted because this package relies on static linking for the plugins it includes; this also ensures a consistent experience across all installations.">
+<meta name="description" content="Embeds the SQLite database engine in R and provides an interface compliant with the DBI package. The source for the SQLite engine and for various extensions is included. System libraries will never be consulted because this package relies on static linking for the plugins it includes; this also ensures a consistent experience across all installations. Optionally, when libcurl is available at build time, an experimental HTTP/HTTPS virtual file system (VFS) can be enabled to allow read-only access to remote immutable SQLite database files via URIs.">
+<meta property="og:description" content="Embeds the SQLite database engine in R and provides an interface compliant with the DBI package. The source for the SQLite engine and for various extensions is included. System libraries will never be consulted because this package relies on static linking for the plugins it includes; this also ensures a consistent experience across all installations. Optionally, when libcurl is available at build time, an experimental HTTP/HTTPS virtual file system (VFS) can be enabled to allow read-only access to remote immutable SQLite database files via URIs.">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">RSQLite</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">3.53.1.9006</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">3.53.1.9007</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,93 +53,164 @@
 </h1></div>
 <!-- badges: start -->
 
-<!-- badges: end -->
 <p>Embeds the SQLite database engine in R, providing a DBI-compliant interface. <a href="https://www.sqlite.org/index.html" class="external-link">SQLite</a> is a public-domain, single-user, very light-weight database engine that implements a decent subset of the SQL 92 standard, including the core table creation, updating, insertion, and selection operations, plus transaction management.</p>
 <p>You can install the latest released version from CRAN with:</p>
-<pre class="chroma">
-<span class="nf"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="o">(</span><span class="s">"RSQLite"</span><span class="o">)</span></pre>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"RSQLite"</span><span class="op">)</span></span></code></pre></div>
 <p>Or install the latest development version from GitHub with:</p>
-<pre class="chroma">
-<span class="c"># install.packages("devtools")</span>
-<span class="nf">devtools</span><span class="nf">::</span><span class="nf"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="o">(</span><span class="s">"r-dbi/RSQLite"</span><span class="o">)</span></pre>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"r-dbi/RSQLite"</span><span class="op">)</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="experimental-httphttps-vfs">Experimental: HTTP/HTTPS VFS<a class="anchor" aria-label="anchor" href="#experimental-httphttps-vfs"></a>
+</h2>
+<p>RSQLite can optionally be built with an experimental HTTP virtual file system (VFS) that allows opening remote (read-only, immutable) SQLite database files directly via URI filenames.</p>
+<p>When enabled (libcurl detected at build time), the HTTP VFS fetches database pages on demand using HTTP Range requests and stores them in a small in-memory LRU cache. Only needed pages are transferred; an optional prefetch can read a few pages ahead. If the server does not advertise Range support (<code>Accept-Ranges: bytes</code>), you can choose between a one-time full download fallback or failing the open.</p>
+<p>Related projects with more advanced capabilities (different environments / languages):</p>
+<ul>
+<li>C/C++ SQLite extension: <code>sqlite_web_vfs</code> (<a href="https://github.com/mlin/sqlite_web_vfs" class="external-link uri">https://github.com/mlin/sqlite_web_vfs</a>) – performs adaptive range GET requests, read-ahead, optional helper <code>.dbi</code> sidecar file, logging &amp; tuning controls.</li>
+<li>Rust crate: <code>sqlite-vfs-http</code> – provides an HTTP VFS in Rust (see crates.io) with asynchronous networking (not bundled here).</li>
+<li>JavaScript/WASM: <code>sqlite-wasm-http</code> (<a href="https://www.npmjs.com/package/sqlite-wasm-http" class="external-link uri">https://www.npmjs.com/package/sqlite-wasm-http</a>) – supports HTTP range requests in browser/Node environments, optional shared cache via <code>SharedArrayBuffer</code>, worker pool APIs.</li>
+</ul>
+<p>RSQLite’s bundled HTTP VFS purpose is narrow: simple, synchronous, read-only access to immutable databases over HTTP/HTTPS in environments where libcurl is available at build time. For large databases or high-latency workloads consider the above specialized projects or downloading the database locally first.</p>
+<p>Configuration (process-wide, via environment variables or helper):</p>
+<ul>
+<li>
+<code>sqlite_http_config(cache_size_mb = ..., prefetch_pages = ..., fallback_full_download = ...)</code> adjusts settings and returns previous values.</li>
+<li>Env vars: <code>RSQLITE_HTTP_CACHE_MB</code> (default <code>4</code> MB), <code>RSQLITE_HTTP_PREFETCH_PAGES</code> (default <code>0</code>), <code>RSQLITE_HTTP_FALLBACK_FULLDL</code> (<code>1</code> or <code>0</code>).</li>
+</ul>
+<p>Introspection:</p>
+<ul>
+<li>Compile-time presence: <code>RSQLite:::sqlite_httpvfs_compiled()</code> returns <code>TRUE</code> iff the package was built with libcurl (and thus defined <code>RSQLITE_ENABLE_HTTPVFS</code>). This is an internal diagnostic helper.</li>
+<li>Runtime capability: <code><a href="reference/sqliteHasHttpVFS.html">sqliteHasHttpVFS()</a></code> returns TRUE on supported builds; it performs a lazy registration attempt if not already registered.</li>
+<li>Statistics: <code><a href="reference/sqliteHttpStats.html">sqliteHttpStats()</a></code> returns a list: <code>bytes_fetched</code>, <code>range_requests</code>, <code>full_download</code> (TRUE if any connection fell back to full download).</li>
+</ul>
+<p>Limitations (current scope):</p>
+<ul>
+<li>Read-only, assumes immutability (use <code>immutable=1</code> URI parameter)</li>
+<li>Cache is in-memory only; no persistence across processes</li>
+<li>Minimal prefetch and no advanced concurrency optimizations</li>
+</ul>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rsqlite.r-dbi.org">RSQLite</a></span><span class="op">)</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="reference/sqliteHasHttpVFS.html">sqliteHasHttpVFS</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Adjust config (optional)</span></span>
+<span>  <span class="co"># old &lt;- sqlite_http_config(cache_size_mb = 8, prefetch_pages = 1, fallback_full_download = TRUE)</span></span>
+<span>  <span class="co"># on.exit(do.call(sqlite_http_config, old), add = TRUE)</span></span>
+<span></span>
+<span>  <span class="co"># Open remote immutable database (example URL must point to a real SQLite file)</span></span>
+<span>  <span class="co"># con &lt;- sqlite_remote("https://example.org/db.sqlite")</span></span>
+<span>  <span class="co"># dbGetQuery(con, "SELECT name FROM sqlite_master WHERE type='table'")</span></span>
+<span>  <span class="co"># print(sqliteHttpStats())</span></span>
+<span>  <span class="co"># dbDisconnect(con)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Notes: * Requires build-time libcurl detection (configured automatically when available). Eager registration only runs when compiled with <code>RSQLITE_ENABLE_HTTPVFS</code>; otherwise capability checks return FALSE immediately. * Uses HTTP Range when supported; fallback full download is configurable. * Statistics are best-effort and reset per process. * Write operations are not supported. * API and behavior are experimental and may change; validate memory usage before deploying.</p>
+<div class="section level3">
+<h3 id="advanced-build-flags">Advanced build flags<a class="anchor" aria-label="anchor" href="#advanced-build-flags"></a>
+</h3>
+<p>For advanced users building from source:</p>
+<ul>
+<li>Set <code>RSQLITE_SILENCE_WARNINGS=1</code> in the environment before installation to apply conservative warning-suppression flags to certain third-party/vendor code paths. This is optional and off by default.</li>
+<li>On platforms with libcurl available, the configure step defines <code>RSQLITE_ENABLE_HTTPVFS</code> and wires the necessary <code>CURL_CFLAGS</code>/<code>CURL_LIBS</code> automatically; otherwise the HTTP VFS is omitted cleanly.</li>
+</ul>
 <p>Discussions associated with DBI and related database packages take place on <a href="https://stat.ethz.ch/mailman/listinfo/r-sig-db" class="external-link">R-SIG-DB</a>. The website <a href="https://db.rstudio.com/" class="external-link">Databases using R</a> describes the tools and best practices in this ecosystem.</p>
+</div>
+</div>
 <div class="section level2">
 <h2 id="basic-usage">Basic usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
 </h2>
-<pre class="chroma">
-<span class="kr"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="o">(</span><span class="nv"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="o">)</span>
-<span class="c"># Create an ephemeral in-memory RSQLite database</span>
-<span class="nv">con</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="o">(</span><span class="nf">RSQLite</span><span class="nf">::</span><span class="nf"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span><span class="o">(</span><span class="o">)</span>, <span class="s">":memory:"</span><span class="o">)</span>
-
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables</a></span><span class="o">(</span><span class="nv">con</span><span class="o">)</span></pre>
-<pre class="chroma">
-<span class="c">## character(0)</span></pre>
-<pre class="chroma">
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"mtcars"</span>, <span class="nv">mtcars</span><span class="o">)</span>
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables</a></span><span class="o">(</span><span class="nv">con</span><span class="o">)</span></pre>
-<pre class="chroma">
-<span class="c">## [1] "mtcars"</span></pre>
-<pre class="chroma">
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbListFields.html" class="external-link">dbListFields</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"mtcars"</span><span class="o">)</span></pre>
-<pre class="chroma">
-<span class="c">##  [1] "mpg"  "cyl"  "disp" "hp"   "drat" "wt"   "qsec" "vs"   "am"   "gear"</span>
-<span class="c">## [11] "carb"</span></pre>
-<pre class="chroma">
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"mtcars"</span><span class="o">)</span></pre>
-<pre class="chroma">
-<span class="c">##    mpg cyl  disp  hp drat    wt  qsec vs am gear carb</span>
-<span class="c">## 1 21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4</span>
-<span class="c">## 2 21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4</span>
-<span class="c">## 3 22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1</span>
-<span class="c">## 4 21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1</span>
-<span class="c">## 5 18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2</span>
-<span class="c">## 6 18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1</span>
-<span class="c">## 7 14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4</span>
-<span class="c">## 8 24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2</span>
-<span class="c">## 9 22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2</span>
-<span class="c">##  [ reached 'max' / getOption("max.print") -- omitted 23 rows ]</span></pre>
-<pre class="chroma">
-<span class="c"># You can fetch all results:</span>
-<span class="nv">res</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"SELECT * FROM mtcars WHERE cyl = 4"</span><span class="o">)</span>
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch</a></span><span class="o">(</span><span class="nv">res</span><span class="o">)</span></pre>
-<pre class="chroma">
-<span class="c">##    mpg cyl  disp hp drat    wt  qsec vs am gear carb</span>
-<span class="c">## 1 22.8   4 108.0 93 3.85 2.320 18.61  1  1    4    1</span>
-<span class="c">## 2 24.4   4 146.7 62 3.69 3.190 20.00  1  0    4    2</span>
-<span class="c">## 3 22.8   4 140.8 95 3.92 3.150 22.90  1  0    4    2</span>
-<span class="c">## 4 32.4   4  78.7 66 4.08 2.200 19.47  1  1    4    1</span>
-<span class="c">## 5 30.4   4  75.7 52 4.93 1.615 18.52  1  1    4    2</span>
-<span class="c">## 6 33.9   4  71.1 65 4.22 1.835 19.90  1  1    4    1</span>
-<span class="c">## 7 21.5   4 120.1 97 3.70 2.465 20.01  1  0    3    1</span>
-<span class="c">## 8 27.3   4  79.0 66 4.08 1.935 18.90  1  1    4    1</span>
-<span class="c">## 9 26.0   4 120.3 91 4.43 2.140 16.70  0  1    5    2</span>
-<span class="c">##  [ reached 'max' / getOption("max.print") -- omitted 2 rows ]</span></pre>
-<pre class="chroma">
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html" class="external-link">dbClearResult</a></span><span class="o">(</span><span class="nv">res</span><span class="o">)</span>
-
-<span class="c"># Or a chunk at a time</span>
-<span class="nv">res</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery</a></span><span class="o">(</span><span class="nv">con</span>, <span class="s">"SELECT * FROM mtcars WHERE cyl = 4"</span><span class="o">)</span>
-<span class="kr">while</span> <span class="o">(</span><span class="o">!</span><span class="nf"><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html" class="external-link">dbHasCompleted</a></span><span class="o">(</span><span class="nv">res</span><span class="o">)</span><span class="o">)</span> <span class="o">{</span>
-  <span class="nv">chunk</span> <span class="o">&lt;-</span> <span class="nf"><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch</a></span><span class="o">(</span><span class="nv">res</span>, n <span class="o">=</span> <span class="m">5</span><span class="o">)</span>
-  <span class="nf"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="o">(</span><span class="nf"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="o">(</span><span class="nv">chunk</span><span class="o">)</span><span class="o">)</span>
-<span class="o">}</span></pre>
-<pre class="chroma">
-<span class="c">## [1] 5</span>
-<span class="c">## [1] 5</span>
-<span class="c">## [1] 1</span></pre>
-<pre class="chroma">
-<span class="c"># Clear the result</span>
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html" class="external-link">dbClearResult</a></span><span class="o">(</span><span class="nv">res</span><span class="o">)</span>
-
-<span class="c"># Disconnect from the database</span>
-<span class="nf"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="o">(</span><span class="nv">con</span><span class="o">)</span></pre>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="op">)</span></span>
+<span><span class="co"># Create an ephemeral in-memory RSQLite database</span></span>
+<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="reference/SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="do">## character(0)</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">dbWriteTable</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span>, <span class="va">mtcars</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="do">## [1] "mtcars"</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListFields.html" class="external-link">dbListFields</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="do">##  [1] "mpg"  "cyl"  "disp" "hp"   "drat" "wt"   "qsec" "vs"   "am"   "gear"</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="do">## [11] "carb"</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="do">##     mpg cyl  disp  hp drat    wt  qsec vs am gear carb</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="do">## 1  21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="do">## 2  21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="do">## 3  22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1</span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="do">## 4  21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="do">## 5  18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="do">## 6  18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1</span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="do">## 7  14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4</span></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="do">## 8  24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2</span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="do">## 9  22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2</span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="do">## 10 19.2   6 167.6 123 3.92 3.440 18.30  1  0    4    4</span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a><span class="do">## 11 17.8   6 167.6 123 3.92 3.440 18.90  1  0    4    4</span></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a><span class="do">## 12 16.4   8 275.8 180 3.07 4.070 17.40  0  0    3    3</span></span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a><span class="do">## 13 17.3   8 275.8 180 3.07 3.730 17.60  0  0    3    3</span></span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a><span class="do">## 14 15.2   8 275.8 180 3.07 3.780 18.00  0  0    3    3</span></span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a><span class="do">## 15 10.4   8 472.0 205 2.93 5.250 17.98  0  0    3    4</span></span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a><span class="do">## 16 10.4   8 460.0 215 3.00 5.424 17.82  0  0    3    4</span></span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a><span class="do">## 17 14.7   8 440.0 230 3.23 5.345 17.42  0  0    3    4</span></span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a><span class="do">## 18 32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1</span></span>
+<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a><span class="do">## 19 30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2</span></span>
+<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a><span class="do">## 20 33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1</span></span>
+<span id="cb11-22"><a href="#cb11-22" tabindex="-1"></a><span class="do">## 21 21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1</span></span>
+<span id="cb11-23"><a href="#cb11-23" tabindex="-1"></a><span class="do">## 22 15.5   8 318.0 150 2.76 3.520 16.87  0  0    3    2</span></span>
+<span id="cb11-24"><a href="#cb11-24" tabindex="-1"></a><span class="do">## 23 15.2   8 304.0 150 3.15 3.435 17.30  0  0    3    2</span></span>
+<span id="cb11-25"><a href="#cb11-25" tabindex="-1"></a><span class="do">## 24 13.3   8 350.0 245 3.73 3.840 15.41  0  0    3    4</span></span>
+<span id="cb11-26"><a href="#cb11-26" tabindex="-1"></a><span class="do">## 25 19.2   8 400.0 175 3.08 3.845 17.05  0  0    3    2</span></span>
+<span id="cb11-27"><a href="#cb11-27" tabindex="-1"></a><span class="do">## 26 27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1</span></span>
+<span id="cb11-28"><a href="#cb11-28" tabindex="-1"></a><span class="do">## 27 26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2</span></span>
+<span id="cb11-29"><a href="#cb11-29" tabindex="-1"></a><span class="do">## 28 30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2</span></span>
+<span id="cb11-30"><a href="#cb11-30" tabindex="-1"></a><span class="do">## 29 15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4</span></span>
+<span id="cb11-31"><a href="#cb11-31" tabindex="-1"></a><span class="do">## 30 19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6</span></span>
+<span id="cb11-32"><a href="#cb11-32" tabindex="-1"></a><span class="do">## 31 15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8</span></span>
+<span id="cb11-33"><a href="#cb11-33" tabindex="-1"></a><span class="do">## 32 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># You can fetch all results:</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"SELECT * FROM mtcars WHERE cyl = 4"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="do">##     mpg cyl  disp  hp drat    wt  qsec vs am gear carb</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="do">## 1  22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="do">## 2  24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="do">## 3  22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="do">## 4  32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="do">## 5  30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="do">## 6  33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1</span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="do">## 7  21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1</span></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="do">## 8  27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1</span></span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="do">## 9  26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2</span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="do">## 10 30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2</span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="do">## 11 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html" class="external-link">dbClearResult</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Or a chunk at a time</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"SELECT * FROM mtcars WHERE cyl = 4"</span><span class="op">)</span></span>
+<span><span class="kw">while</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbHasCompleted.html" class="external-link">dbHasCompleted</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">chunk</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch</a></span><span class="op">(</span><span class="va">res</span>, n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">chunk</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="do">## [1] 5</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="do">## [1] 5</span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="do">## [1] 1</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Clear the result</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbClearResult.html" class="external-link">dbClearResult</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Disconnect from the database</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="acknowledgements">Acknowledgements<a class="anchor" aria-label="anchor" href="#acknowledgements"></a>
 </h2>
 <p>Many thanks to Doug Bates, Seth Falcon, Detlef Groth, Ronggui Huang, Kurt Hornik, Uwe Ligges, Charles Loboz, Duncan Murdoch, and Brian D. Ripley for comments, suggestions, bug reports, and/or patches.</p>
 <hr>
-<p>Please note that the ‘RSQLite’ project is released with a <a href="https://rsqlite.r-dbi.org/CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
+<p>Please note that the ‘RSQLite’ project is released with a <a href="https://rsqlite.r-dbi.org/code_of_conduct">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

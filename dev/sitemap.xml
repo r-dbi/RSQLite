@@ -30,7 +30,12 @@
 <url><loc>https://rsqlite.r-dbi.org/dev/reference/sqlite-transaction.html</loc></url>
 <url><loc>https://rsqlite.r-dbi.org/dev/reference/sqliteBuildTableDefinition.html</loc></url>
 <url><loc>https://rsqlite.r-dbi.org/dev/reference/sqliteCopyDatabase.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/sqliteHasHttpVFS.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/sqliteHttpConfig.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/sqliteHttpStats.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/sqliteHttpVfsCompiled.html</loc></url>
 <url><loc>https://rsqlite.r-dbi.org/dev/reference/sqliteQuickColumn.html</loc></url>
+<url><loc>https://rsqlite.r-dbi.org/dev/reference/sqliteRemote.html</loc></url>
 <url><loc>https://rsqlite.r-dbi.org/dev/reference/sqliteSetBusyHandler.html</loc></url>
 <url><loc>https://rsqlite.r-dbi.org/dev/security.html</loc></url>
 </urlset>

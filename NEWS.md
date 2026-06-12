@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.53.1.9008 (2026-06-12)
+
+## Features
+
+- Optional HTTP/HTTPS VFS for read-only remote databases (@davidrsch, #680).
+
+
 # RSQLite 3.53.1.9007 (2026-06-11)
 
 ## Documentation

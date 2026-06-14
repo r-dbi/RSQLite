@@ -39,7 +39,7 @@ and receive results."></head><body>
     </div>
 
     <div class="ref-description section level2">
-    <p>Together, <code>SQLite()</code> and <code>dbConnect()</code> allow you to connect to
+    <p>Together, <code>SQLite()</code> and <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect()</a></code> allow you to connect to
 a SQLite database file. See <code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">DBI::dbSendQuery()</a></code> for how to issue queries
 and receive results.</p>
     </div>
@@ -49,10 +49,10 @@ and receive results.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">SQLite</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'SQLiteConnection'</span></span>
-<span><span class="fu">dbConnect</span><span class="op">(</span><span class="va">drv</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="va">drv</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'SQLiteDriver'</span></span>
-<span><span class="fu">dbConnect</span><span class="op">(</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span></span>
 <span>  <span class="va">drv</span>,</span>
 <span>  dbname <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  <span class="va">...</span>,</span>
@@ -67,7 +67,7 @@ and receive results.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'SQLiteConnection'</span></span>
-<span><span class="fu">dbDisconnect</span><span class="op">(</span><span class="va">conn</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">conn</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">

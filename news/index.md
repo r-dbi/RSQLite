@@ -1,6 +1,6 @@
 # Changelog
 
-## RSQLite 3.53.2 (2026-06-08)
+## RSQLite 3.53.2 (2026-06-14)
 
 ### fledge
 
@@ -9,17 +9,33 @@
 
 ### Features
 
+- Optional HTTP/HTTPS VFS for read-only remote databases
+  ([@davidrsch](https://github.com/davidrsch),
+  [\#680](https://github.com/r-dbi/RSQLite/issues/680)).
+
 - Upgrade bundled SQLite to 3.53.2
   ([\#729](https://github.com/r-dbi/RSQLite/issues/729)).
 
 - Upgrade bundled SQLite to 3.53.2
   ([\#727](https://github.com/r-dbi/RSQLite/issues/727)).
 
+### Chore
+
+- Remove vendored object files from the source tarball via cleanup
+  scripts ([\#736](https://github.com/r-dbi/RSQLite/issues/736)).
+
+- Rename `deps.mk` to `Makevars.deps` for `R CMD check` compatibility
+  ([\#734](https://github.com/r-dbi/RSQLite/issues/734)).
+
 ### Continuous integration
 
 - Update ccache-action reference.
 
 - Bump action version.
+
+### Documentation
+
+- Normalize `NEWS.md`.
 
 ### Uncategorized
 

@@ -25,5 +25,16 @@
   : SQLite transaction management
 - [`sqliteCopyDatabase()`](https://rsqlite.r-dbi.org/reference/sqliteCopyDatabase.md)
   : Copy a SQLite database
+- [`sqliteHasHttpVFS()`](https://rsqlite.r-dbi.org/reference/sqliteHasHttpVFS.md)
+  : Check for HTTP VFS support
+- [`sqliteHttpConfig()`](https://rsqlite.r-dbi.org/reference/sqliteHttpConfig.md)
+  : Configure experimental HTTP VFS behavior (optional)
+- [`sqliteHttpStats()`](https://rsqlite.r-dbi.org/reference/sqliteHttpStats.md)
+  : Experimental HTTP VFS statistics
+- [`sqliteHttpVfsCompiled()`](https://rsqlite.r-dbi.org/reference/sqliteHttpVfsCompiled.md)
+  : Was HTTP VFS compiled into this build?
+- [`sqliteRemote()`](https://rsqlite.r-dbi.org/reference/sqliteRemote.md)
+  : Convenience helper for opening remote SQLite databases over
+  HTTP/HTTPS
 - [`sqliteSetBusyHandler()`](https://rsqlite.r-dbi.org/reference/sqliteSetBusyHandler.md)
   : Configure what SQLite should do when the database is locked

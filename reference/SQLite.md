@@ -1,7 +1,8 @@
 # Connect to an SQLite database
 
-Together, `SQLite()` and `dbConnect()` allow you to connect to a SQLite
-database file. See
+Together, `SQLite()` and
+[`dbConnect()`](https://dbi.r-dbi.org/reference/dbConnect.html) allow
+you to connect to a SQLite database file. See
 [`DBI::dbSendQuery()`](https://dbi.r-dbi.org/reference/dbSendQuery.html)
 for how to issue queries and receive results.
 

@@ -1,80 +1,19 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 3.53.1.9008 (2026-06-12)
+# RSQLite 3.53.2 (2026-06-14)
+
 
 ## Features
 
+- Upgrade bundled SQLite to 3.53.2 (#729).
+
 - Optional HTTP/HTTPS VFS for read-only remote databases (@davidrsch, #680).
-
-
-# RSQLite 3.53.1.9007 (2026-06-11)
-
-## Documentation
-
-- Normalize `NEWS.md`.
-
-
-# RSQLite 3.53.1.9006 (2026-06-10)
 
 ## Chore
 
 - Remove vendored object files from the source tarball via cleanup scripts (#736).
 
-
-# RSQLite 3.53.1.9005 (2026-06-09)
-
-## Chore
-
 - Rename `deps.mk` to `Makevars.deps` for `R CMD check` compatibility (#734).
-
-
-# RSQLite 3.53.1.9004 (2026-06-08)
-
-## Features
-
-- Upgrade bundled SQLite to 3.53.2 (#729).
-
-- Upgrade bundled SQLite to 3.53.2 (#727).
-
-## Continuous integration
-
-- Update ccache-action reference.
-
-- Bump action version.
-
-## Uncategorized
-
-- Merge branch 'cran-3.53.1'.
-
-
-# RSQLite 3.53.0.9003 (2026-06-06)
-
-## Features
-
-- Upgrade bundled SQLite to 3.53.2 (#729).
-
-
-# RSQLite 3.53.0.9002 (2026-06-05)
-
-## Features
-
-- Upgrade bundled SQLite to 3.53.2 (#727).
-
-
-# RSQLite 3.53.0.9001 (2026-05-24)
-
-## Continuous integration
-
-- Update ccache-action reference.
-
-- Bump action version.
-
-
-# RSQLite 3.53.0.9000 (2026-05-22)
-
-## fledge
-
-- CRAN release v3.53.0 (#724).
 
 
 # RSQLite 3.53.1 (2026-05-22)

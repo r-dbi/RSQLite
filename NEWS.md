@@ -2,37 +2,18 @@
 
 # RSQLite 3.53.2 (2026-06-14)
 
-## fledge
-
-- CRAN release v3.53.0 (#724).
 
 ## Features
 
-- Optional HTTP/HTTPS VFS for read-only remote databases (@davidrsch, #680).
-
 - Upgrade bundled SQLite to 3.53.2 (#729).
 
-- Upgrade bundled SQLite to 3.53.2 (#727).
+- Optional HTTP/HTTPS VFS for read-only remote databases (@davidrsch, #680).
 
 ## Chore
 
 - Remove vendored object files from the source tarball via cleanup scripts (#736).
 
 - Rename `deps.mk` to `Makevars.deps` for `R CMD check` compatibility (#734).
-
-## Continuous integration
-
-- Update ccache-action reference.
-
-- Bump action version.
-
-## Documentation
-
-- Normalize `NEWS.md`.
-
-## Uncategorized
-
-- Merge branch 'cran-3.53.1'.
 
 
 # RSQLite 3.53.1 (2026-05-22)

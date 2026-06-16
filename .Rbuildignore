@@ -47,3 +47,4 @@ a.out.dSYM
 ^src/.*\.dd
 ^\.clang-format$
 ^\.ccache$
+^\.aspell/DBI\.txt$

@@ -8,3 +8,7 @@ Rcpp
 SQLite
 sqlite
 RSQLite
+HTTPS
+URIs
+VFS
+libcurl

@@ -252,5 +252,5 @@ Ripley for comments, suggestions, bug reports, and/or patches.
 ------------------------------------------------------------------------
 
 Please note that the ‘RSQLite’ project is released with a [Contributor
-Code of Conduct](https://rsqlite.r-dbi.org/code_of_conduct). By
+Code of Conduct](https://rsqlite.r-dbi.org/CODE_OF_CONDUCT.html). By
 contributing to this project, you agree to abide by its terms.

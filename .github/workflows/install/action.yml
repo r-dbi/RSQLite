@@ -168,7 +168,9 @@ runs:
         done
         rm -f "$empty_makevars"
         echo 'MAKEFLAGS = -j2' >> ~/.R/Makevars
+        echo "===== generated ~/.R/Makevars ====="
         cat ~/.R/Makevars
+        echo "==================================="
 
         echo 'CCACHE_SLOPPINESS=locale,time_macros' | tee -a $GITHUB_ENV
 

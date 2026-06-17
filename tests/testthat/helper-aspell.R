@@ -1,5 +1,5 @@
 local(
-  if (basename(dirname(getwd())) == "tests") {
+  if (all(dir.exists(file.path("../..", c("R", "man", "tests"))))) {
     withr::local_dir("../..")
     rds_files <- list.files(".aspell", pattern = "\\.rds$", full.names = TRUE)
     stopifnot(length(rds_files) == 1)

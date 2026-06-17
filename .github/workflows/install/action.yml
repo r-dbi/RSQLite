@@ -154,6 +154,11 @@ runs:
         # them and silently downgrade the standard across the version matrix.
         # Inference uses an empty user Makevars so we always read the pristine
         # Makeconf defaults, never a value we just wrote.
+        # Note: the versioned switches (CXX11..CXX23) intentionally come out as
+        # bare "g++" with no -std flag. R keeps the standard in a separate
+        # CXXnnSTD variable (CXX17STD = -std=gnu++17, ...) and applies it on top
+        # at compile time, so wrapping only CXXnn with ccache is correct and we
+        # must NOT pin -std here ourselves.
         empty_makevars="$(mktemp)"
         for var in CC CXX CXX11 CXX14 CXX17 CXX20 CXX23; do
           val="$(R_MAKEVARS_USER="$empty_makevars" R CMD config "$var" 2>/dev/null || true)"

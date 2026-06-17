@@ -147,11 +147,21 @@ runs:
     - name: Use ccache for compiling R code, and parallelize
       run: |
         mkdir -p ~/.R
-        echo 'CC      :=  ccache $(CC)' >> ~/.R/Makevars
-        echo 'CXX     :=  ccache $(CXX)' >> ~/.R/Makevars
-        echo 'CXX11   :=  ccache $(CXX11)' >> ~/.R/Makevars
-        echo 'CXX14   :=  ccache $(CXX14)' >> ~/.R/Makevars
-        echo 'CXX17   :=  ccache $(CXX17)' >> ~/.R/Makevars
+        # Infer each compiler default for the active R version from R CMD config,
+        # then prepend ccache. Reading the resolved defaults preserves the
+        # standard flags R selects per version (e.g. -std=gnu2x for C, -std=gnu++17
+        # / -std=gnu++20 for C++); a plain "CC = ccache gcc" override would drop
+        # them and silently downgrade the standard across the version matrix.
+        # Inference uses an empty user Makevars so we always read the pristine
+        # Makeconf defaults, never a value we just wrote.
+        empty_makevars="$(mktemp)"
+        for var in CC CXX CXX11 CXX14 CXX17 CXX20 CXX23; do
+          val="$(R_MAKEVARS_USER="$empty_makevars" R CMD config "$var" 2>/dev/null || true)"
+          if [ -n "$val" ]; then
+            echo "$var = ccache $val" >> ~/.R/Makevars
+          fi
+        done
+        rm -f "$empty_makevars"
         echo 'MAKEFLAGS = -j2' >> ~/.R/Makevars
         cat ~/.R/Makevars
 

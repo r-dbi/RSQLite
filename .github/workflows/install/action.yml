@@ -161,8 +161,12 @@ runs:
         # must NOT pin -std here ourselves.
         empty_makevars="$(mktemp)"
         for var in CC CXX CXX11 CXX14 CXX17 CXX20 CXX23; do
-          val="$(R_MAKEVARS_USER="$empty_makevars" R CMD config "$var" 2>/dev/null || true)"
-          if [ -n "$val" ]; then
+          # Skip switches this R version doesn't provide. R CMD config signals an
+          # unknown variable with a non-zero exit, but the message lands on
+          # stdout for some versions (e.g. CXX23 on R 4.2) and on stderr for
+          # others (the defunct CXX11/CXX14 on R 4.6), so gate on the exit
+          # status rather than on non-empty output to avoid writing a bogus line.
+          if val="$(R_MAKEVARS_USER="$empty_makevars" R CMD config "$var" 2>/dev/null)" && [ -n "$val" ]; then
             echo "$var = ccache $val" >> ~/.R/Makevars
           fi
         done

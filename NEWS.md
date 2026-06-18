@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.53.2.9003 (2026-06-18)
+
+## Continuous integration
+
+- Infer compiler defaults for ccache across R version matrix (#746).
+
+
 # RSQLite 3.53.2.9002 (2026-06-17)
 
 ## Features

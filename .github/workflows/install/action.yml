@@ -27,6 +27,14 @@ inputs:
     description: Passed on to r-lib/actions/setup-r-dependencies@v2
     required: false
     default: 1
+  lang:
+    description: "Compile-only standard jobs: 'c' or 'cxx', selecting which compiler to pin a standard on"
+    required: false
+    default: ""
+  std:
+    description: "Compile-only standard jobs: the -std value to pin, e.g. gnu90 or gnu++23 (empty = use R's defaults)"
+    required: false
+    default: ""
 
 runs:
   using: "composite"
@@ -161,11 +169,29 @@ runs:
         # must NOT pin -std here ourselves.
         empty_makevars="$(mktemp)"
         for var in CC CXX CXX11 CXX14 CXX17 CXX20 CXX23; do
-          val="$(R_MAKEVARS_USER="$empty_makevars" R CMD config "$var" 2>/dev/null || true)"
-          if [ -n "$val" ]; then
+          # Skip switches this R version doesn't provide. R CMD config signals an
+          # unknown variable with a non-zero exit, but the message lands on
+          # stdout for some versions (e.g. CXX23 on R 4.2) and on stderr for
+          # others (the defunct CXX11/CXX14 on R 4.6), so gate on the exit
+          # status rather than on non-empty output to avoid writing a bogus line.
+          if val="$(R_MAKEVARS_USER="$empty_makevars" R CMD config "$var" 2>/dev/null)" && [ -n "$val" ]; then
             echo "$var = ccache $val" >> ~/.R/Makevars
           fi
         done
+        # Compile-only standard jobs pin a non-default C/C++ standard. Reuse the
+        # same base-compiler inference as the loop above (so there is no second
+        # copy of the Makevars logic) and append an override: a later assignment
+        # wins in make, so this swaps the standard while keeping the ccache
+        # wrapper. With no std requested this is a no-op and R's defaults stand.
+        if [ -n "${{ inputs.std }}" ]; then
+          if [ "${{ inputs.lang }}" = "cxx" ]; then
+            std_base="$(R_MAKEVARS_USER="$empty_makevars" R CMD config CXX | awk '{print $1}')"
+            echo "CXX = ccache $std_base -std=${{ inputs.std }}" >> ~/.R/Makevars
+          else
+            std_base="$(R_MAKEVARS_USER="$empty_makevars" R CMD config CC | awk '{print $1}')"
+            echo "CC = ccache $std_base -std=${{ inputs.std }}" >> ~/.R/Makevars
+          fi
+        fi
         rm -f "$empty_makevars"
         echo 'MAKEFLAGS = -j2' >> ~/.R/Makevars
         echo "===== generated ~/.R/Makevars ====="

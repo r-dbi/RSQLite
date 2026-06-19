@@ -84,7 +84,7 @@ runs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y aspell
+        sudo apt-get install -y aspell libcurl4-openssl-dev
         echo "_R_CHECK_CRAN_INCOMING_USE_ASPELL_=true" | tee -a $GITHUB_ENV
       shell: bash
 

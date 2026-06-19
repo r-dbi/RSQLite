@@ -209,6 +209,7 @@ static size_t curl_header_cb(char *buffer, size_t size, size_t nitems, void *use
 }
 
 static int http_probe_meta(HttpFile *hf){
+  int i;
   if(hf->have_meta) return SQLITE_OK;
   hf->content_length = -1;
   hf->accept_ranges = 0;
@@ -268,7 +269,7 @@ static int http_probe_meta(HttpFile *hf){
   hf->cache_page_no = (sqlite3_int64*)sqlite3_malloc64(sizeof(sqlite3_int64)*cap);
   hf->cache_data = (unsigned char**)sqlite3_malloc64(sizeof(unsigned char*)*cap);
   if(!hf->cache_page_no || !hf->cache_data) return SQLITE_NOMEM;
-  for(int i=0;i<cap;i++){ hf->cache_page_no[i] = -1; hf->cache_data[i] = 0; }
+  for(i=0;i<cap;i++){ hf->cache_page_no[i] = -1; hf->cache_data[i] = 0; }
 
   hf->have_meta = 1;
   return SQLITE_OK;
@@ -320,6 +321,7 @@ static int http_fetch_range(HttpFile *hf, sqlite3_int64 off, int len, unsigned c
 
 /* Cache lookup or fetch page; returns pointer to cached page (owned by hf) */
 static int http_get_page(HttpFile *hf, sqlite3_int64 pageNo, unsigned char **pageOut){
+  int i, k, hit;
   if(pageNo <= 0) return SQLITE_CORRUPT;
   /* Full download path */
   if(hf->data){
@@ -332,7 +334,7 @@ static int http_get_page(HttpFile *hf, sqlite3_int64 pageNo, unsigned char **pag
   int rc = http_probe_meta(hf);
   if(rc!=SQLITE_OK) return rc;
   /* Lookup */
-  for(int i=0;i<hf->cache_count;i++){
+  for(i=0;i<hf->cache_count;i++){
     if(hf->cache_page_no[i] == pageNo){
       unsigned char *p = hf->cache_data[i];
       /* Move-to-front for LRU */
@@ -371,7 +373,7 @@ static int http_get_page(HttpFile *hf, sqlite3_int64 pageNo, unsigned char **pag
 
   /* Optional light prefetch */
   if(hf->prefetch_pages > 0){
-    for(int k=1; k<=hf->prefetch_pages; k++){
+    for(k=1; k<=hf->prefetch_pages; k++){
       sqlite3_int64 pn2 = pageNo + k;
       /* Don't prefetch beyond file end if content_length known */
       if(hf->content_length > 0){
@@ -379,7 +381,7 @@ static int http_get_page(HttpFile *hf, sqlite3_int64 pageNo, unsigned char **pag
         if(off2 >= hf->content_length) break;
       }
       /* Only prefetch if not cached */
-      int hit = 0; for(int i=0;i<hf->cache_count;i++){ if(hf->cache_page_no[i]==pn2){ hit=1; break; } }
+      hit = 0; for(i=0;i<hf->cache_count;i++){ if(hf->cache_page_no[i]==pn2){ hit=1; break; } }
       if(hit) continue;
       unsigned char *buf2 = 0;
       if(http_fetch_range(hf, (pn2-1)*(sqlite3_int64)hf->page_size, hf->page_size, &buf2)==SQLITE_OK){
@@ -441,18 +443,20 @@ static int httpOpen(sqlite3_vfs *pVfs, const char *zName, sqlite3_file *pFile, i
 }
 
 static int httpClose(sqlite3_file *pFile){
+  int i;
   HttpFile *hf = (HttpFile*)pFile;
   if(hf->data) sqlite3_free(hf->data);
   if(hf->url) sqlite3_free(hf->url);
   if(hf->curl) curl_easy_cleanup(hf->curl);
   if(hf->cache_page_no){ sqlite3_free(hf->cache_page_no); }
-  if(hf->cache_data){ for(int i=0;i<hf->cache_capacity;i++){ if(hf->cache_data[i]) sqlite3_free(hf->cache_data[i]); } sqlite3_free(hf->cache_data); }
+  if(hf->cache_data){ for(i=0;i<hf->cache_capacity;i++){ if(hf->cache_data[i]) sqlite3_free(hf->cache_data[i]); } sqlite3_free(hf->cache_data); }
   hf->data = 0; hf->size = 0;
   hf->base.pMethods = 0;
   return SQLITE_OK;
 }
 
 static int httpRead(sqlite3_file *pFile, void *zBuf, int iAmt, sqlite3_int64 iOfst){
+  sqlite3_int64 pn;
   HttpFile *hf = (HttpFile*)pFile;
   /* Full-download path */
   if(hf->data){
@@ -480,7 +484,7 @@ static int httpRead(sqlite3_file *pFile, void *zBuf, int iAmt, sqlite3_int64 iOf
   sqlite3_int64 pageStart = (start / ps) + 1;
   sqlite3_int64 pageEnd = ((end - 1) / ps) + 1;
   sqlite3_int64 pos = start;
-  for(sqlite3_int64 pn = pageStart; pn <= pageEnd; pn++){
+  for(pn = pageStart; pn <= pageEnd; pn++){
     unsigned char *pPage = 0;
     rc = http_get_page(hf, pn, &pPage);
     if(rc!=SQLITE_OK) return rc;

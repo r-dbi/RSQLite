@@ -41,13 +41,21 @@ covr <- data.frame(os = "ubuntu-24.04", r = r_versions[2], covr = "true", desc =
 #     (it is compared against the C floor below). Drop a standard once it is no
 #     longer worth testing (e.g. once it becomes R's default and is covered by
 #     the regular check jobs).
-#   * `flags` carries extra compiler flags for an entry. It is used to replicate
-#     an old toolchain on a modern compiler without installing it: the "C11
-#     (RHEL 8 gcc 8)" entry pins gnu11 (gcc 8's default) and turns the C11->C23
-#     compatibility warnings into errors (-Werror=c11-c2x-compat), so a modern
-#     gcc rejects C23-only constructs the way RHEL 8's gcc does, instead of
-#     silently accepting them as extensions. (gcc 14+ spells the flag
-#     -Wc11-c23-compat; the c2x alias still works.)
+#   * `flags` carries extra compiler flags for an entry. It is used to forbid
+#     constructs newer than the targeted standard, which a modern gcc otherwise
+#     accepts as silent extensions: -Werror=c11-c2x-compat makes gcc reject
+#     C23-only constructs. Two entries carry it, for distinct reasons:
+#       - "C11 (RHEL 8 gcc 8)" is platform-motivated: gnu11 is gcc 8's default,
+#         so this reproduces what RHEL 8 actually does. It tracks one distro's
+#         compiler and may be rebased or retired as platforms move on.
+#       - "C17" is standard-motivated and platform-agnostic: it states that the
+#         package's C compiles as C17 without relying on C23 features, a durable
+#         portability contract independent of any single toolchain (C17 is R's
+#         default on 4.4 and the floor of most current toolchains). C17 added no
+#         features over C11, so today it catches the same code as the RHEL 8
+#         lane; keeping it independent means the C23 guard survives if the RHEL 8
+#         entry is ever changed.
+#     (gcc 14+ spells the flag -Wc11-c23-compat; the c2x alias still works.)
 #   * The C entries honor a C-standard floor declared in DESCRIPTION's
 #     SystemRequirements: any standard older than the declared minimum is
 #     dropped, since the package does not claim to support it. To change which
@@ -67,7 +75,7 @@ has_cxx_sources <- any(grepl("[.](cc|cpp|cxx)$", native_sources))
 c_stds <- data.frame(
   label = c("C90", "C99", "C11 (RHEL 8 gcc 8)", "C17"),
   std = c("gnu90", "gnu99", "gnu11", "gnu17"),
-  flags = c("", "", "-Werror=c11-c2x-compat", ""),
+  flags = c("", "", "-Werror=c11-c2x-compat", "-Werror=c11-c2x-compat"),
   year = c(1990, 1999, 2011, 2017)
 )
 # Newest C++ standard to compile under (columns parallel c_stds).

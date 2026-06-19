@@ -60,14 +60,12 @@ has_cxx_sources <- any(grepl("[.](cc|cpp|cxx)$", native_sources))
 c_stds <- data.frame(
   label = c("C90", "C99", "C17"),
   std = c("gnu90", "gnu99", "gnu17"),
-  year = c(1990, 1999, 2017),
-  stringsAsFactors = FALSE
+  year = c(1990, 1999, 2017)
 )
 # Newest C++ standard to compile under.
 cxx_stds <- data.frame(
   label = "C++23",
-  std = "gnu++23",
-  stringsAsFactors = FALSE
+  std = "gnu++23"
 )
 
 # Honor a C-standard floor from SystemRequirements and drop the C standards the
@@ -95,16 +93,14 @@ if (has_c_sources && nrow(c_stds) > 0) {
   std_list <- c(std_list, list(data.frame(
     os = "ubuntu-24.04", r = std_r, lang = "c",
     std = c_stds$std,
-    desc = paste0("compile-only ", c_stds$label),
-    stringsAsFactors = FALSE
+    desc = paste0("compile-only ", c_stds$label)
   )))
 }
 if (has_cxx_sources && nrow(cxx_stds) > 0) {
   std_list <- c(std_list, list(data.frame(
     os = "ubuntu-24.04", r = std_r, lang = "cxx",
     std = cxx_stds$std,
-    desc = paste0("compile-only ", cxx_stds$label),
-    stringsAsFactors = FALSE
+    desc = paste0("compile-only ", cxx_stds$label)
   )))
 }
 

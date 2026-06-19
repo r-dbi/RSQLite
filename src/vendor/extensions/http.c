@@ -105,30 +105,30 @@ struct HttpFile {
 /* Forward declarations */
 static int httpClose(sqlite3_file*);
 static int httpRead(sqlite3_file*, void*, int iAmt, sqlite3_int64 iOfst);
-static int httpWrite(sqlite3_file*, const void*, int, sqlite3_int64){ return SQLITE_READONLY; }
-static int httpTruncate(sqlite3_file*, sqlite3_int64){ return SQLITE_READONLY; }
-static int httpSync(sqlite3_file*, int){ return SQLITE_OK; }
+static int httpWrite(sqlite3_file *pFile, const void *zBuf, int iAmt, sqlite3_int64 iOfst){ (void)pFile; (void)zBuf; (void)iAmt; (void)iOfst; return SQLITE_READONLY; }
+static int httpTruncate(sqlite3_file *pFile, sqlite3_int64 nByte){ (void)pFile; (void)nByte; return SQLITE_READONLY; }
+static int httpSync(sqlite3_file *pFile, int flags){ (void)pFile; (void)flags; return SQLITE_OK; }
 static int httpFileSize(sqlite3_file*, sqlite3_int64 *pSize);
-static int httpLock(sqlite3_file*, int){ return SQLITE_OK; }
-static int httpUnlock(sqlite3_file*, int){ return SQLITE_OK; }
-static int httpCheckReservedLock(sqlite3_file*, int *pRes){ *pRes = 0; return SQLITE_OK; }
-static int httpFileControl(sqlite3_file*, int op, void *pArg){ (void)op; (void)pArg; return SQLITE_NOTFOUND; }
-static int httpSectorSize(sqlite3_file*){ return 0; }
-static int httpDeviceCharacteristics(sqlite3_file*){ return SQLITE_IOCAP_IMMUTABLE; }
+static int httpLock(sqlite3_file *pFile, int eLock){ (void)pFile; (void)eLock; return SQLITE_OK; }
+static int httpUnlock(sqlite3_file *pFile, int eLock){ (void)pFile; (void)eLock; return SQLITE_OK; }
+static int httpCheckReservedLock(sqlite3_file *pFile, int *pRes){ (void)pFile; *pRes = 0; return SQLITE_OK; }
+static int httpFileControl(sqlite3_file *pFile, int op, void *pArg){ (void)pFile; (void)op; (void)pArg; return SQLITE_NOTFOUND; }
+static int httpSectorSize(sqlite3_file *pFile){ (void)pFile; return 0; }
+static int httpDeviceCharacteristics(sqlite3_file *pFile){ (void)pFile; return SQLITE_IOCAP_IMMUTABLE; }
 
 static int httpOpen(sqlite3_vfs*, const char *zName, sqlite3_file *pFile, int flags, int *pOutFlags);
-static int httpDelete(sqlite3_vfs*, const char *zName, int syncDir){ (void)zName; (void)syncDir; return SQLITE_READONLY; }
-static int httpAccess(sqlite3_vfs*, const char *zName, int flags, int *pResOut){ (void)flags; /* Stat not reliable; assume exists */ *pResOut = 1; return  SQLITE_OK; }
-static int httpFullPathname(sqlite3_vfs*, const char *zName, int nOut, char *zOut){ sqlite3_snprintf(nOut, zOut, "%s", zName); return SQLITE_OK; }
-static void *httpDlOpen(sqlite3_vfs*, const char *z){ (void)z; return 0; }
-static void httpDlError(sqlite3_vfs*, int nOut, char *zOut){ if(nOut>0) zOut[0] = 0; }
-static void (*httpDlSym(sqlite3_vfs*, void*, const char*)) (void){ return 0; }
-static void httpDlClose(sqlite3_vfs*, void*){}
-static int httpRandomness(sqlite3_vfs*, int nByte, char *zOut){ /* delegate to default vfs */ sqlite3_vfs *pParent = sqlite3_vfs_find(0); return pParent && pParent->xRandomness ? pParent->xRandomness(pParent, nByte, zOut) : SQLITE_ERROR; }
-static int httpSleep(sqlite3_vfs*, int micro){ sqlite3_vfs *pParent = sqlite3_vfs_find(0); return pParent->xSleep(pParent, micro); }
-static int httpCurrentTime(sqlite3_vfs*, double *pTime){ sqlite3_vfs *pParent = sqlite3_vfs_find(0); return pParent->xCurrentTime(pParent, pTime); }
-static int httpGetLastError(sqlite3_vfs*, int, char*){ return 0; }
-static int httpCurrentTimeInt64(sqlite3_vfs*, sqlite3_int64 *p){ sqlite3_vfs *pParent = sqlite3_vfs_find(0); return pParent->xCurrentTimeInt64(pParent, p); }
+static int httpDelete(sqlite3_vfs *pVfs, const char *zName, int syncDir){ (void)pVfs; (void)zName; (void)syncDir; return SQLITE_READONLY; }
+static int httpAccess(sqlite3_vfs *pVfs, const char *zName, int flags, int *pResOut){ (void)pVfs; (void)zName; (void)flags; /* Stat not reliable; assume exists */ *pResOut = 1; return  SQLITE_OK; }
+static int httpFullPathname(sqlite3_vfs *pVfs, const char *zName, int nOut, char *zOut){ (void)pVfs; sqlite3_snprintf(nOut, zOut, "%s", zName); return SQLITE_OK; }
+static void *httpDlOpen(sqlite3_vfs *pVfs, const char *z){ (void)pVfs; (void)z; return 0; }
+static void httpDlError(sqlite3_vfs *pVfs, int nOut, char *zOut){ (void)pVfs; if(nOut>0) zOut[0] = 0; }
+static void (*httpDlSym(sqlite3_vfs *pVfs, void *pH, const char *zSymbol)) (void){ (void)pVfs; (void)pH; (void)zSymbol; return 0; }
+static void httpDlClose(sqlite3_vfs *pVfs, void *pH){ (void)pVfs; (void)pH; }
+static int httpRandomness(sqlite3_vfs *pVfs, int nByte, char *zOut){ (void)pVfs; /* delegate to default vfs */ sqlite3_vfs *pParent = sqlite3_vfs_find(0); return pParent && pParent->xRandomness ? pParent->xRandomness(pParent, nByte, zOut) : SQLITE_ERROR; }
+static int httpSleep(sqlite3_vfs *pVfs, int micro){ (void)pVfs; sqlite3_vfs *pParent = sqlite3_vfs_find(0); return pParent->xSleep(pParent, micro); }
+static int httpCurrentTime(sqlite3_vfs *pVfs, double *pTime){ (void)pVfs; sqlite3_vfs *pParent = sqlite3_vfs_find(0); return pParent->xCurrentTime(pParent, pTime); }
+static int httpGetLastError(sqlite3_vfs *pVfs, int nBuf, char *zBuf){ (void)pVfs; (void)nBuf; (void)zBuf; return 0; }
+static int httpCurrentTimeInt64(sqlite3_vfs *pVfs, sqlite3_int64 *p){ (void)pVfs; sqlite3_vfs *pParent = sqlite3_vfs_find(0); return pParent->xCurrentTimeInt64(pParent, p); }
 
 /* Curl write callback for growable buffer */
 typedef struct Buf { unsigned char *data; sqlite3_int64 sz; } Buf;

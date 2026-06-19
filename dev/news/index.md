@@ -1,5 +1,19 @@
 # Changelog
 
+## RSQLite 3.53.2.9004 (2026-06-19)
+
+### Features
+
+- Upgrade bundled SQLite to 3.53.2
+  ([\#748](https://github.com/r-dbi/RSQLite/issues/748)).
+
+## RSQLite 3.53.2.9003 (2026-06-18)
+
+### Continuous integration
+
+- Infer compiler defaults for ccache across R version matrix
+  ([\#746](https://github.com/r-dbi/RSQLite/issues/746)).
+
 ## RSQLite 3.53.2.9002 (2026-06-17)
 
 ### Features

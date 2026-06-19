@@ -324,6 +324,7 @@ jobs:
         if: hashFiles('.github/workflows/custom/after-install/action.yml') != ''
 
       - name: Must allow NOTEs if packages are missing, even with _R_CHECK_FORCE_SUGGESTS_
+        if: ${{ ! matrix.std }}
         run: |
           if (Sys.getenv("RCMDCHECK_ERROR_ON") %in% c("", "note")) {
             pkgs <- setdiff(desc::desc_get_deps()$package, "R")
@@ -336,12 +337,20 @@ jobs:
         shell: Rscript {0}
 
       - uses: ./.github/workflows/update-snapshots
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        if: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && ! matrix.std }}
         with:
           base: ${{ github.head_ref }}
 
+      # Compile-only standard checks: build the package's native code under a
+      # pinned C/C++ standard, without running R CMD check.
+      - uses: ./.github/workflows/compile
+        if: ${{ matrix.std }}
+        with:
+          lang: ${{ matrix.lang }}
+          std: ${{ matrix.std }}
+
       - uses: ./.github/workflows/check
-        if: ${{ ! matrix.covr }}
+        if: ${{ ! matrix.covr && ! matrix.std }}
         with:
           results: ${{ runner.os }}-r${{ matrix.r }}
 

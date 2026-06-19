@@ -26,7 +26,44 @@ linux_devel <- data.frame(os = "ubuntu-24.04", r = r_versions[1], `http-user-age
 linux <- data.frame(os = "ubuntu-24.04", r = r_versions[-1])
 covr <- data.frame(os = "ubuntu-24.04", r = r_versions[2], covr = "true", desc = "with covr")
 
-include_list <- list(macos, windows, linux_devel, linux, covr)
+# Compile-only builds of the package's native code under non-default language
+# standards, to catch portability problems ahead of R changing its defaults.
+# These only build the package (no R CMD check), and are added only when the
+# package actually ships the relevant C or C++ sources.
+native_sources <- if (dir.exists("src")) {
+  list.files("src", pattern = "[.](c|cc|cpp|cxx)$", recursive = TRUE)
+} else {
+  character()
+}
+has_c_sources <- any(grepl("[.]c$", native_sources))
+has_cxx_sources <- any(grepl("[.](cc|cpp|cxx)$", native_sources))
+
+# Build these against the newest released R (widest standard support).
+std_r <- r_versions[2]
+std_list <- list()
+if (has_c_sources) {
+  # Older C standards than the current default (C17 on R 4.4, C23 on R 4.5+).
+  # C90 is intentionally excluded: the package's C floor is C99 (the bundled
+  # SQLite HTTP VFS extension uses C99 for-loop declarations), which is also
+  # R's own minimum, so testing C90 would only ever fail.
+  std_list <- c(std_list, list(data.frame(
+    os = "ubuntu-24.04", r = std_r, lang = "c",
+    std = c("gnu99", "gnu17"),
+    desc = paste0("compile-only C", c("99", "17")),
+    stringsAsFactors = FALSE
+  )))
+}
+if (has_cxx_sources) {
+  # Newest C++ standard.
+  std_list <- c(std_list, list(data.frame(
+    os = "ubuntu-24.04", r = std_r, lang = "cxx",
+    std = "gnu++23",
+    desc = "compile-only C++23",
+    stringsAsFactors = FALSE
+  )))
+}
+
+include_list <- c(list(macos, windows, linux_devel, linux, covr), std_list)
 
 if (file.exists(".github/versions-matrix.R")) {
   custom <- source(".github/versions-matrix.R")$value

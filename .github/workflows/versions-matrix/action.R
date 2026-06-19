@@ -33,14 +33,21 @@ covr <- data.frame(os = "ubuntu-24.04", r = r_versions[2], covr = "true", desc =
 #
 # Maintaining these as standards evolve:
 #   * `c_stds` / `cxx_stds` below list the standards to compile under, as
-#     (human label, `-std` value). Use the GNU dialect ("gnu*") so they match
-#     the standards R itself uses, not strict ISO ("c*").
-#   * When compilers gain a newer standard, add it here, e.g. append
-#     list("C++26", "gnu++26") to `cxx_stds`, or list("C23", "gnu2x") /
-#     list("C2Y", "gnu2y") to `c_stds`. Keep `c_stds` ordered oldest-first and
-#     keep each entry's `year` accurate (it is compared against the C floor
-#     below). Drop a standard once it is no longer worth testing (e.g. once it
-#     becomes R's default and is covered by the regular check jobs).
+#     (human label, `-std` value, extra `flags`). Use the GNU dialect ("gnu*")
+#     so they match the standards R itself uses, not strict ISO ("c*").
+#   * When compilers gain a newer standard, add a row, e.g. C++26 as
+#     ("C++26", "gnu++26", "") to `cxx_stds`, or C23 as ("C23", "gnu2x", "") to
+#     `c_stds`. Keep `c_stds` ordered oldest-first and keep each `year` accurate
+#     (it is compared against the C floor below). Drop a standard once it is no
+#     longer worth testing (e.g. once it becomes R's default and is covered by
+#     the regular check jobs).
+#   * `flags` carries extra compiler flags for an entry. It is used to replicate
+#     an old toolchain on a modern compiler without installing it: the "C11
+#     (RHEL 8 gcc 8)" entry pins gnu11 (gcc 8's default) and turns the C11->C23
+#     compatibility warnings into errors (-Werror=c11-c2x-compat), so a modern
+#     gcc rejects C23-only constructs the way RHEL 8's gcc does, instead of
+#     silently accepting them as extensions. (gcc 14+ spells the flag
+#     -Wc11-c23-compat; the c2x alias still works.)
 #   * The C entries honor a C-standard floor declared in DESCRIPTION's
 #     SystemRequirements: any standard older than the declared minimum is
 #     dropped, since the package does not claim to support it. To change which
@@ -55,17 +62,19 @@ native_sources <- if (dir.exists("src")) {
 has_c_sources <- any(grepl("[.]c$", native_sources))
 has_cxx_sources <- any(grepl("[.](cc|cpp|cxx)$", native_sources))
 
-# Older C standards to compile under, oldest first. `year` is used only to
-# compare against the SystemRequirements floor.
+# C standards to compile under, oldest first. `year` is compared against the
+# SystemRequirements floor; `flags` adds any extra compiler flags (see above).
 c_stds <- data.frame(
-  label = c("C90", "C99", "C17"),
-  std = c("gnu90", "gnu99", "gnu17"),
-  year = c(1990, 1999, 2017)
+  label = c("C90", "C99", "C11 (RHEL 8 gcc 8)", "C17"),
+  std = c("gnu90", "gnu99", "gnu11", "gnu17"),
+  flags = c("", "", "-Werror=c11-c2x-compat", ""),
+  year = c(1990, 1999, 2011, 2017)
 )
-# Newest C++ standard to compile under.
+# Newest C++ standard to compile under (columns parallel c_stds).
 cxx_stds <- data.frame(
   label = "C++23",
-  std = "gnu++23"
+  std = "gnu++23",
+  flags = ""
 )
 
 # Honor a C-standard floor from SystemRequirements and drop the C standards the
@@ -93,6 +102,7 @@ if (has_c_sources && nrow(c_stds) > 0) {
   std_list <- c(std_list, list(data.frame(
     os = "ubuntu-24.04", r = std_r, lang = "c",
     std = c_stds$std,
+    flags = c_stds$flags,
     desc = paste0("compile-only ", c_stds$label)
   )))
 }
@@ -100,6 +110,7 @@ if (has_cxx_sources && nrow(cxx_stds) > 0) {
   std_list <- c(std_list, list(data.frame(
     os = "ubuntu-24.04", r = std_r, lang = "cxx",
     std = cxx_stds$std,
+    flags = cxx_stds$flags,
     desc = paste0("compile-only ", cxx_stds$label)
   )))
 }

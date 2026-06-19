@@ -35,6 +35,10 @@ inputs:
     description: "Compile-only standard jobs: the -std value to pin, e.g. gnu90 or gnu++23 (empty = use R's defaults)"
     required: false
     default: ""
+  flags:
+    description: "Compile-only standard jobs: extra compiler flags appended after -std, e.g. -Werror=c11-c2x-compat"
+    required: false
+    default: ""
 
 runs:
   using: "composite"
@@ -178,18 +182,20 @@ runs:
             echo "$var = ccache $val" >> ~/.R/Makevars
           fi
         done
-        # Compile-only standard jobs pin a non-default C/C++ standard. Reuse the
-        # same base-compiler inference as the loop above (so there is no second
-        # copy of the Makevars logic) and append an override: a later assignment
-        # wins in make, so this swaps the standard while keeping the ccache
-        # wrapper. With no std requested this is a no-op and R's defaults stand.
+        # Compile-only standard jobs pin a non-default C/C++ standard (and may
+        # add extra flags, e.g. -Werror=c11-c2x-compat to reject C23 code the
+        # way an old gcc would). Reuse the same base-compiler inference as the
+        # loop above (so there is no second copy of the Makevars logic) and
+        # append an override: a later assignment wins in make, so this swaps the
+        # standard while keeping the ccache wrapper. With no std requested this
+        # is a no-op and R's defaults stand.
         if [ -n "${{ inputs.std }}" ]; then
           if [ "${{ inputs.lang }}" = "cxx" ]; then
             std_base="$(R_MAKEVARS_USER="$empty_makevars" R CMD config CXX | awk '{print $1}')"
-            echo "CXX = ccache $std_base -std=${{ inputs.std }}" >> ~/.R/Makevars
+            echo "CXX = ccache $std_base -std=${{ inputs.std }} ${{ inputs.flags }}" >> ~/.R/Makevars
           else
             std_base="$(R_MAKEVARS_USER="$empty_makevars" R CMD config CC | awk '{print $1}')"
-            echo "CC = ccache $std_base -std=${{ inputs.std }}" >> ~/.R/Makevars
+            echo "CC = ccache $std_base -std=${{ inputs.std }} ${{ inputs.flags }}" >> ~/.R/Makevars
           fi
         fi
         rm -f "$empty_makevars"

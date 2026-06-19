@@ -319,6 +319,8 @@ jobs:
           cache-version: rcc-full-1
           token: ${{ secrets.GITHUB_TOKEN }}
           needs: build, check
+          lang: ${{ matrix.lang }}
+          std: ${{ matrix.std }}
 
       - uses: ./.github/workflows/custom/after-install
         if: hashFiles('.github/workflows/custom/after-install/action.yml') != ''
@@ -341,13 +343,14 @@ jobs:
         with:
           base: ${{ github.head_ref }}
 
-      # Compile-only standard checks: build the package's native code under a
-      # pinned C/C++ standard, without running R CMD check.
-      - uses: ./.github/workflows/compile
+      # Compile-only standard jobs: build the package under the standard pinned
+      # in the install step's Makevars, without running R CMD check (same plain
+      # install as the smoke test).
+      - name: Install package
         if: ${{ matrix.std }}
-        with:
-          lang: ${{ matrix.lang }}
-          std: ${{ matrix.std }}
+        run: |
+          _R_SHLIB_STRIP_=true R CMD INSTALL .
+        shell: bash
 
       - uses: ./.github/workflows/check
         if: ${{ ! matrix.covr && ! matrix.std }}

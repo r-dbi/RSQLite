@@ -43,13 +43,10 @@ std_r <- r_versions[2]
 std_list <- list()
 if (has_c_sources) {
   # Older C standards than the current default (C17 on R 4.4, C23 on R 4.5+).
-  # C90 is intentionally excluded: the package's C floor is C99 (the bundled
-  # SQLite HTTP VFS extension uses C99 for-loop declarations), which is also
-  # R's own minimum, so testing C90 would only ever fail.
   std_list <- c(std_list, list(data.frame(
     os = "ubuntu-24.04", r = std_r, lang = "c",
-    std = c("gnu99", "gnu17"),
-    desc = paste0("compile-only C", c("99", "17")),
+    std = c("gnu90", "gnu99", "gnu17"),
+    desc = paste0("compile-only C", c("90", "99", "17")),
     stringsAsFactors = FALSE
   )))
 }

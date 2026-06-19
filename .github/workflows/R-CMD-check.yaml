@@ -321,6 +321,7 @@ jobs:
           needs: build, check
           lang: ${{ matrix.lang }}
           std: ${{ matrix.std }}
+          flags: ${{ matrix.flags }}
 
       - uses: ./.github/workflows/custom/after-install
         if: hashFiles('.github/workflows/custom/after-install/action.yml') != ''

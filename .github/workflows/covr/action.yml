@@ -8,6 +8,16 @@ inputs:
 runs:
   using: "composite"
   steps:
+    # covr::to_cobertura() builds the report by appending one XML node per
+    # covered source line. With released xml2, xml_add_child() re-scans all
+    # existing siblings on every append (O(n^2)), which makes coverage for
+    # packages with large sources (e.g. bundled sqlite3.c, ~67k lines) take
+    # hours. r-lib/xml2#479 makes the default append O(1). Install it here so
+    # the fast path is used only for coverage runs.
+    - name: Install xml2 with O(1) xml_add_child() (r-lib/xml2#479)
+      run: pak::pak("r-lib/xml2#479")
+      shell: Rscript {0}
+
     - name: Run coverage check
       run: |
         if (dir.exists("tests/testthat")) {

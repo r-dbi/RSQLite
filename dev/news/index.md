@@ -1,5 +1,18 @@
 # Changelog
 
+## RSQLite 3.53.2.9005 (2026-06-20)
+
+### Continuous integration
+
+- Also reject C23 constructs on the C17 lane
+  ([\#753](https://github.com/r-dbi/RSQLite/issues/753)).
+
+- Add RHEL 8 (old gcc) lane that rejects C23 code
+  ([\#752](https://github.com/r-dbi/RSQLite/issues/752)).
+
+- Compile-only matrix for non-default C/C++ standards
+  ([\#751](https://github.com/r-dbi/RSQLite/issues/751)).
+
 ## RSQLite 3.53.2.9004 (2026-06-19)
 
 ### Features

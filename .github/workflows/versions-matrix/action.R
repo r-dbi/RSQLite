@@ -53,8 +53,8 @@ covr <- data.frame(os = "ubuntu-24.04", r = r_versions[2], covr = "true", desc =
 #   * The C entries honor a C-standard floor declared in DESCRIPTION's
 #     SystemRequirements: any standard older than the declared minimum is
 #     dropped, since the package does not claim to support it. To change which
-#     C standards are tested, edit SystemRequirements (e.g. add "USE_C11" to
-#     stop testing C99), not this file. There is no analogous C++ gate; add one
+#     C standards are tested, edit SystemRequirements (e.g. add "USE_C99" to
+#     stop testing C90), not this file. There is no analogous C++ gate; add one
 #     the same way if you start honoring a declared "C++NN" minimum.
 native_sources <- if (dir.exists("src")) {
   list.files("src", pattern = "[.](c|cc|cpp|cxx)$", recursive = TRUE)
@@ -68,11 +68,11 @@ has_cxx_sources <- any(grepl("[.](cc|cpp|cxx)$", native_sources))
 # release. `year` is compared against the SystemRequirements floor; `flags`
 # adds any extra compiler flags (see above).
 c_stds <- data.frame(
-  label = c("C99", "C11", "C17"),
-  std = c("gnu99", "gnu11", "gnu17"),
-  r = c("oldrel-4", "oldrel-3", "oldrel-2"),
-  flags = c("", "-Werror=c11-c2x-compat", "-Werror=c11-c2x-compat"),
-  year = c(1999, 2011, 2017)
+  label = c("C90", "C99", "C11", "C17"),
+  std = c("gnu90", "gnu99", "gnu11", "gnu17"),
+  r = c("oldrel-4", "oldrel-3", "oldrel-2", "oldrel-2"),
+  flags = c("", "", "-Werror=c11-c2x-compat", "-Werror=c11-c2x-compat"),
+  year = c(1990, 1999, 2011, 2017)
 )
 # Newest C++ standard to compile under (columns parallel c_stds).
 cxx_stds <- data.frame(

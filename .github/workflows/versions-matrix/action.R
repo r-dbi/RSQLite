@@ -32,35 +32,29 @@ covr <- data.frame(os = "ubuntu-24.04", r = r_versions[2], covr = "true", desc =
 # package actually ships the relevant C or C++ sources.
 #
 # Maintaining these as standards evolve:
-#   * `c_stds` / `cxx_stds` below list the standards to compile under, as
-#     (human label, `-std` value, extra `flags`). Use the GNU dialect ("gnu*")
-#     so they match the standards R itself uses, not strict ISO ("c*").
+#   * `c_stds` / `cxx_stds` list the standards to compile under, as (human
+#     label, `-std` value, the R release to build against, extra `flags`). Use
+#     the GNU dialect ("gnu*") so they match the standards R itself uses, not
+#     strict ISO ("c*").
+#   * Each older C standard is paired with a correspondingly older R release
+#     (oldrel-N), so the matrix exercises an old standard together with an old
+#     R C API -- the combination people actually hit on long-lived systems.
+#     C++ stays on the newest release. Bump the `r` values as releases age.
 #   * When compilers gain a newer standard, add a row, e.g. C++26 as
-#     ("C++26", "gnu++26", "") to `cxx_stds`, or C23 as ("C23", "gnu2x", "") to
-#     `c_stds`. Keep `c_stds` ordered oldest-first and keep each `year` accurate
-#     (it is compared against the C floor below). Drop a standard once it is no
-#     longer worth testing (e.g. once it becomes R's default and is covered by
-#     the regular check jobs).
-#   * `flags` carries extra compiler flags for an entry. It is used to forbid
-#     constructs newer than the targeted standard, which a modern gcc otherwise
-#     accepts as silent extensions: -Werror=c11-c2x-compat makes gcc reject
-#     C23-only constructs. Two entries carry it, for distinct reasons:
-#       - "C11 (RHEL 8 gcc 8)" is platform-motivated: gnu11 is gcc 8's default,
-#         so this reproduces what RHEL 8 actually does. It tracks one distro's
-#         compiler and may be rebased or retired as platforms move on.
-#       - "C17" is standard-motivated and platform-agnostic: it states that the
-#         package's C compiles as C17 without relying on C23 features, a durable
-#         portability contract independent of any single toolchain (C17 is R's
-#         default on 4.4 and the floor of most current toolchains). C17 added no
-#         features over C11, so today it catches the same code as the RHEL 8
-#         lane; keeping it independent means the C23 guard survives if the RHEL 8
-#         entry is ever changed.
-#     (gcc 14+ spells the flag -Wc11-c23-compat; the c2x alias still works.)
+#     ("C++26", "gnu++26", <r>, "") to `cxx_stds`. Keep `c_stds` ordered
+#     oldest-first and keep each `year` accurate (it is compared against the C
+#     floor below). Drop a standard once it is no longer worth testing.
+#   * `flags` carries extra compiler flags. -Werror=c11-c2x-compat makes a
+#     modern gcc reject C23-only constructs it would otherwise accept as silent
+#     extensions, holding the package to a "no C23 features" contract on the C11
+#     and C17 lanes (what old toolchains such as RHEL 8's gcc 8, whose C default
+#     is gnu11, enforce in practice). gcc 14+ spells the flag -Wc11-c23-compat;
+#     the c2x alias still works.
 #   * The C entries honor a C-standard floor declared in DESCRIPTION's
 #     SystemRequirements: any standard older than the declared minimum is
 #     dropped, since the package does not claim to support it. To change which
-#     C standards are tested, edit SystemRequirements (e.g. add "USE_C99" to
-#     stop testing C90), not this file. There is no analogous C++ gate; add one
+#     C standards are tested, edit SystemRequirements (e.g. add "USE_C11" to
+#     stop testing C99), not this file. There is no analogous C++ gate; add one
 #     the same way if you start honoring a declared "C++NN" minimum.
 native_sources <- if (dir.exists("src")) {
   list.files("src", pattern = "[.](c|cc|cpp|cxx)$", recursive = TRUE)
@@ -70,13 +64,15 @@ native_sources <- if (dir.exists("src")) {
 has_c_sources <- any(grepl("[.]c$", native_sources))
 has_cxx_sources <- any(grepl("[.](cc|cpp|cxx)$", native_sources))
 
-# C standards to compile under, oldest first. `year` is compared against the
-# SystemRequirements floor; `flags` adds any extra compiler flags (see above).
+# C standards to compile under, oldest first, each on a matching older R
+# release. `year` is compared against the SystemRequirements floor; `flags`
+# adds any extra compiler flags (see above).
 c_stds <- data.frame(
-  label = c("C90", "C99", "C11 (RHEL 8 gcc 8)", "C17"),
-  std = c("gnu90", "gnu99", "gnu11", "gnu17"),
-  flags = c("", "", "-Werror=c11-c2x-compat", "-Werror=c11-c2x-compat"),
-  year = c(1990, 1999, 2011, 2017)
+  label = c("C99", "C11", "C17"),
+  std = c("gnu99", "gnu11", "gnu17"),
+  r = c("oldrel-4", "oldrel-3", "oldrel-2"),
+  flags = c("", "-Werror=c11-c2x-compat", "-Werror=c11-c2x-compat"),
+  year = c(1999, 2011, 2017)
 )
 # Newest C++ standard to compile under (columns parallel c_stds).
 cxx_stds <- data.frame(
@@ -103,12 +99,13 @@ if (!is.na(sysreq)) {
 }
 c_stds <- c_stds[c_stds$year >= c_floor_year, , drop = FALSE]
 
-# Build these against the newest released R (widest standard support).
+# C++ builds against the newest released R; each C standard uses its own
+# (older) release from c_stds$r above.
 std_r <- r_versions[2]
 std_list <- list()
 if (has_c_sources && nrow(c_stds) > 0) {
   std_list <- c(std_list, list(data.frame(
-    os = "ubuntu-24.04", r = std_r, lang = "c",
+    os = "ubuntu-24.04", r = c_stds$r, lang = "c",
     std = c_stds$std,
     flags = c_stds$flags,
     desc = paste0("compile-only ", c_stds$label)

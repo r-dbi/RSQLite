@@ -1,5 +1,57 @@
 # Changelog
 
+## RSQLite 3.53.2.9006 (2026-06-21)
+
+### Features
+
+- Upgrade bundled SQLite to 3.44.2
+  ([\#479](https://github.com/r-dbi/RSQLite/issues/479)).
+
+### Continuous integration
+
+- Restore the C90 lane and regroup C standards by R release
+  ([\#756](https://github.com/r-dbi/RSQLite/issues/756)).
+
+- Pair C standards with older R releases; drop C90
+  ([\#755](https://github.com/r-dbi/RSQLite/issues/755)).
+
+### Uncategorized
+
+- Fix: add parameter names to http.c for C17 compatibility
+  ([\#745](https://github.com/r-dbi/RSQLite/issues/745))
+  ([\#750](https://github.com/r-dbi/RSQLite/issues/750)).
+
+- Feat: Upgrade bundled SQLite to 3.53.2
+  ([\#1](https://github.com/r-dbi/RSQLite/issues/1)).
+
+- Fix: add parameter names to http.c VFS functions for C17
+  compatibility.
+
+- Sqlite3_file\* → pFile.
+
+- Sqlite3_vfs\* → pVfs.
+
+- Const void\* → zBuf (buffer, matching httpRead).
+
+- Int amounts → iAmt (matching httpRead).
+
+- Sqlite3_int64 → iOfst (offset, matching httpRead) / nByte (size).
+
+- Int flags → flags (matching httpOpen).
+
+- Int lock type → eLock (SQLite convention).
+
+- Void\* handle → pH.
+
+- Const char\* → zSymbol (SQLite convention).
+
+- Int buffer sz → nBuf / char\* → zBuf.
+
+- Fix: C90-compatible for-loop declarations in http.c, enable libcurl in
+  CI.
+
+- Std=gnu90). Affected functions: http_probe_meta, http_get_page,.
+
 ## RSQLite 3.53.2.9005 (2026-06-20)
 
 ### Continuous integration

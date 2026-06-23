@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RSQLite</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">3.53.2.9005</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">3.53.2.9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,36 @@
       <small>Source: <a href="https://github.com/r-dbi/RSQLite/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="3.53.2.9006" id="rsqlite-35329006-2026-06-21">RSQLite 3.53.2.9006 (2026-06-21)<a class="anchor" aria-label="anchor" href="#rsqlite-35329006-2026-06-21"></a></h2>
+<div class="section level3">
+<h3 id="features-3-53-2-9006">Features<a class="anchor" aria-label="anchor" href="#features-3-53-2-9006"></a></h3>
+<ul><li>Upgrade bundled SQLite to 3.44.2 (<a href="https://github.com/r-dbi/RSQLite/issues/479" class="external-link">#479</a>).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="continuous-integration-3-53-2-9006">Continuous integration<a class="anchor" aria-label="anchor" href="#continuous-integration-3-53-2-9006"></a></h3>
+<ul><li><p>Restore the C90 lane and regroup C standards by R release (<a href="https://github.com/r-dbi/RSQLite/issues/756" class="external-link">#756</a>).</p></li>
+<li><p>Pair C standards with older R releases; drop C90 (<a href="https://github.com/r-dbi/RSQLite/issues/755" class="external-link">#755</a>).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="uncategorized-3-53-2-9006">Uncategorized<a class="anchor" aria-label="anchor" href="#uncategorized-3-53-2-9006"></a></h3>
+<ul><li><p>Fix: add parameter names to http.c for C17 compatibility (<a href="https://github.com/r-dbi/RSQLite/issues/745" class="external-link">#745</a>) (<a href="https://github.com/r-dbi/RSQLite/issues/750" class="external-link">#750</a>).</p></li>
+<li><p>Feat: Upgrade bundled SQLite to 3.53.2 (<a href="https://github.com/r-dbi/RSQLite/issues/1" class="external-link">#1</a>).</p></li>
+<li><p>Fix: add parameter names to http.c VFS functions for C17 compatibility.</p></li>
+<li><p>Sqlite3_file* → pFile.</p></li>
+<li><p>Sqlite3_vfs* → pVfs.</p></li>
+<li><p>Const void* → zBuf (buffer, matching httpRead).</p></li>
+<li><p>Int amounts → iAmt (matching httpRead).</p></li>
+<li><p>Sqlite3_int64 → iOfst (offset, matching httpRead) / nByte (size).</p></li>
+<li><p>Int flags → flags (matching httpOpen).</p></li>
+<li><p>Int lock type → eLock (SQLite convention).</p></li>
+<li><p>Void* handle → pH.</p></li>
+<li><p>Const char* → zSymbol (SQLite convention).</p></li>
+<li><p>Int buffer sz → nBuf / char* → zBuf.</p></li>
+<li><p>Fix: C90-compatible for-loop declarations in http.c, enable libcurl in CI.</p></li>
+<li><p>Std=gnu90). Affected functions: http_probe_meta, http_get_page,.</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="3.53.2.9005" id="rsqlite-35329005-2026-06-20">RSQLite 3.53.2.9005 (2026-06-20)<a class="anchor" aria-label="anchor" href="#rsqlite-35329005-2026-06-20"></a></h2>
 <div class="section level3">

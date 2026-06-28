@@ -7,6 +7,13 @@
 - Upgrade bundled SQLite to 3.53.3
   ([\#761](https://github.com/r-dbi/RSQLite/issues/761)).
 
+### Bug fixes
+
+- Restore C90 and C17 compatibility of the bundled HTTP VFS sources
+  (`http.c`), fixing builds with stricter system compilers
+  ([@davidrsch](https://github.com/davidrsch),
+  [\#750](https://github.com/r-dbi/RSQLite/issues/750)).
+
 ## RSQLite 3.53.2 (2026-06-14)
 
 ### Features

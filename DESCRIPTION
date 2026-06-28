@@ -1,7 +1,7 @@
 Package: RSQLite
 Title: SQLite Interface for R
-Version: 3.53.2.9007
-Date: 2026-06-23
+Version: 3.53.2.9008
+Date: 2026-06-28
 Authors@R: c(
     person("Kirill", "Müller", , "kirill@cynkra.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1416-3412")),

@@ -55,6 +55,11 @@ platform. There are two exceptions:
 will be deleted when the connection is closed.
 \item \code{":memory:"} or \code{"file::memory:"} will create a temporary
 in-memory database.
+\item If the optional HTTP VFS is available, remote read-only SQLite
+databases can be opened with \code{\link[=sqliteRemote]{sqliteRemote()}} or with a SQLite URI
+filename such as
+\code{"file:https://example.org/db.sqlite?vfs=http&immutable=1"} and
+\code{flags = SQLITE_RO}.
 }}
 
 \item{loadable.extensions}{When \code{TRUE} (default) SQLite3

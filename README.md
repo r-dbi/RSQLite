@@ -1,4 +1,3 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # RSQLite
@@ -36,101 +35,37 @@ Or install the latest development version from GitHub with:
 devtools::install_github("r-dbi/RSQLite")
 ```
 
-## Experimental: HTTP/HTTPS VFS
+## Extensions
 
-RSQLite can optionally be built with an experimental HTTP virtual file
-system (VFS) that allows opening remote (read-only, immutable) SQLite
-database files directly via URI filenames.
+RSQLite supports loadable extensions. An experimental HTTP/HTTPS VFS is
+available when the package is built with libcurl support, enabling
+read-only access to remote SQLite databases. See the help pages for
+`initExtension()`, `sqliteHttpConfig()`, `sqliteRemote()`, and
+`sqliteHasHttpVFS()`.
 
-When enabled (libcurl detected at build time), the HTTP VFS fetches
-database pages on demand using HTTP Range requests and stores them in a
-small in-memory LRU cache. Only needed pages are transferred; an
-optional prefetch can read a few pages ahead. If the server does not
-advertise Range support (`Accept-Ranges: bytes`), you can choose between
-a one-time full download fallback or failing the open.
-
-Related projects with more advanced capabilities (different environments
-/ languages):
-
-- C/C++ SQLite extension: `sqlite_web_vfs`
-  (<https://github.com/mlin/sqlite_web_vfs>) – performs adaptive range
-  GET requests, read-ahead, optional helper `.dbi` sidecar file, logging
-  & tuning controls.
-- Rust crate: `sqlite-vfs-http` – provides an HTTP VFS in Rust (see
-  crates.io) with asynchronous networking (not bundled here).
-- JavaScript/WASM: `sqlite-wasm-http`
-  (<https://www.npmjs.com/package/sqlite-wasm-http>) – supports HTTP
-  range requests in browser/Node environments, optional shared cache via
-  `SharedArrayBuffer`, worker pool APIs.
-
-RSQLite’s bundled HTTP VFS purpose is narrow: simple, synchronous,
-read-only access to immutable databases over HTTP/HTTPS in environments
-where libcurl is available at build time. For large databases or
-high-latency workloads consider the above specialized projects or
-downloading the database locally first.
-
-Configuration (process-wide, via environment variables or helper):
-
-- `sqlite_http_config(cache_size_mb = ..., prefetch_pages = ..., fallback_full_download = ...)`
-  adjusts settings and returns previous values.
-- Env vars: `RSQLITE_HTTP_CACHE_MB` (default `4` MB),
-  `RSQLITE_HTTP_PREFETCH_PAGES` (default `0`),
-  `RSQLITE_HTTP_FALLBACK_FULLDL` (`1` or `0`).
-
-Introspection:
-
-- Compile-time presence: `RSQLite:::sqlite_httpvfs_compiled()` returns
-  `TRUE` iff the package was built with libcurl (and thus defined
-  `RSQLITE_ENABLE_HTTPVFS`). This is an internal diagnostic helper.
-- Runtime capability: `sqliteHasHttpVFS()` returns TRUE on supported
-  builds; it performs a lazy registration attempt if not already
-  registered.
-- Statistics: `sqliteHttpStats()` returns a list: `bytes_fetched`,
-  `range_requests`, `full_download` (TRUE if any connection fell back to
-  full download).
-
-Limitations (current scope):
-
-- Read-only, assumes immutability (use `immutable=1` URI parameter)
-- Cache is in-memory only; no persistence across processes
-- Minimal prefetch and no advanced concurrency optimizations
+If HTTP VFS support is available, `sqliteRemote()` is the easiest way to
+open a remote database:
 
 ``` r
-library(DBI)
-library(RSQLite)
 if (sqliteHasHttpVFS()) {
-  # Adjust config (optional)
-  # old <- sqlite_http_config(cache_size_mb = 8, prefetch_pages = 1, fallback_full_download = TRUE)
-  # on.exit(do.call(sqlite_http_config, old), add = TRUE)
-
-  # Open remote immutable database (example URL must point to a real SQLite file)
-  # con <- sqlite_remote("https://example.org/db.sqlite")
-  # dbGetQuery(con, "SELECT name FROM sqlite_master WHERE type='table'")
-  # print(sqliteHttpStats())
-  # dbDisconnect(con)
+  con <- sqliteRemote("https://example.org/db.sqlite")
+  dbDisconnect(con)
 }
 ```
 
-Notes: \* Requires build-time libcurl detection (configured
-automatically when available). Eager registration only runs when
-compiled with `RSQLITE_ENABLE_HTTPVFS`; otherwise capability checks
-return FALSE immediately. \* Uses HTTP Range when supported; fallback
-full download is configurable. \* Statistics are best-effort and reset
-per process. \* Write operations are not supported. \* API and behavior
-are experimental and may change; validate memory usage before deploying.
+For cases where you need the explicit SQLite URI filename, use
+`dbConnect()` with `flags = SQLITE_RO`:
 
-### Advanced build flags
-
-For advanced users building from source:
-
-- Set `RSQLITE_SILENCE_WARNINGS=1` in the environment before
-  installation to apply conservative warning-suppression flags to
-  certain third-party/vendor code paths. This is optional and off by
-  default.
-- On platforms with libcurl available, the configure step defines
-  `RSQLITE_ENABLE_HTTPVFS` and wires the necessary
-  `CURL_CFLAGS`/`CURL_LIBS` automatically; otherwise the HTTP VFS is
-  omitted cleanly.
+``` r
+if (sqliteHasHttpVFS()) {
+  con <- dbConnect(
+    RSQLite::SQLite(),
+    "file:https://example.org/db.sqlite?vfs=http&immutable=1",
+    flags = SQLITE_RO
+  )
+  dbDisconnect(con)
+}
+```
 
 Discussions associated with DBI and related database packages take place
 on [R-SIG-DB](https://stat.ethz.ch/mailman/listinfo/r-sig-db). The
@@ -251,6 +186,6 @@ Ripley for comments, suggestions, bug reports, and/or patches.
 
 ------------------------------------------------------------------------
 
-Please note that the ‘RSQLite’ project is released with a [Contributor
+Please note that the 'RSQLite' project is released with a [Contributor
 Code of Conduct](https://rsqlite.r-dbi.org/code_of_conduct). By
 contributing to this project, you agree to abide by its terms.

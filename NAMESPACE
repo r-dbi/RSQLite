@@ -90,7 +90,9 @@ import(DBI)
 import(methods)
 import(rlang)
 importFrom(DBI,Id)
-importFrom(bit64,integer64)
-importFrom(bit64,is.integer64)
+importFrom(bit64,
+  integer64,
+  is.integer64
+)
 importFrom(blob,blob)
 useDynLib(RSQLite, .registration = TRUE)

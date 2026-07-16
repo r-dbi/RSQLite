@@ -1,122 +1,14 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
-# RSQLite 3.53.2.9010 (2026-07-02)
-
-## Chore
-
-- Auto-update from GitHub Actions (#766).
-
-
-# RSQLite 3.53.2.9009 (2026-06-29)
-
-## Features
-
-- Upgrade bundled SQLite to 3.53.3 (#764).
-
-
-# RSQLite 3.53.2.9008 (2026-06-28)
+# RSQLite 3.53.3 (2026-06-28)
 
 ## Features
 
 - Upgrade bundled SQLite to 3.53.3 (#761).
 
+## Bug fixes
 
-# RSQLite 3.53.2.9007 (2026-06-23)
-
-## Features
-
-- Upgrade bundled SQLite to 3.44.2 (#479).
-
-
-# RSQLite 3.53.2.9006 (2026-06-21)
-
-## Features
-
-- Upgrade bundled SQLite to 3.44.2 (#479).
-
-## Continuous integration
-
-- Restore the C90 lane and regroup C standards by R release (#756).
-
-- Pair C standards with older R releases; drop C90 (#755).
-
-## Uncategorized
-
-- Fix: add parameter names to http.c for C17 compatibility (#745) (#750).
-
-- Feat: Upgrade bundled SQLite to 3.53.2 (#1).
-
-- Fix: add parameter names to http.c VFS functions for C17 compatibility.
-
-- Sqlite3_file\* → pFile.
-
-- Sqlite3_vfs\* → pVfs.
-
-- Const void\* → zBuf (buffer, matching httpRead).
-
-- Int amounts → iAmt (matching httpRead).
-
-- Sqlite3_int64 → iOfst (offset, matching httpRead) / nByte (size).
-
-- Int flags → flags (matching httpOpen).
-
-- Int lock type → eLock (SQLite convention).
-
-- Void\* handle → pH.
-
-- Const char\* → zSymbol (SQLite convention).
-
-- Int buffer sz → nBuf / char\* → zBuf.
-
-- Fix: C90-compatible for-loop declarations in http.c, enable libcurl in CI.
-
-- Std=gnu90). Affected functions: http_probe_meta, http_get_page,.
-
-
-# RSQLite 3.53.2.9005 (2026-06-20)
-
-## Continuous integration
-
-- Also reject C23 constructs on the C17 lane (#753).
-
-- Add RHEL 8 (old gcc) lane that rejects C23 code (#752).
-
-- Compile-only matrix for non-default C/C++ standards (#751).
-
-
-# RSQLite 3.53.2.9004 (2026-06-19)
-
-## Features
-
-- Upgrade bundled SQLite to 3.53.2 (#748).
-
-
-# RSQLite 3.53.2.9003 (2026-06-18)
-
-## Continuous integration
-
-- Infer compiler defaults for ccache across R version matrix (#746).
-
-
-# RSQLite 3.53.2.9002 (2026-06-17)
-
-## Features
-
-- Upgrade bundled SQLite to 3.53.2 (#743).
-
-
-# RSQLite 3.53.2.9001 (2026-06-16)
-
-## Features
-
-- Upgrade bundled SQLite to 3.53.2 (#741).
-
-
-# RSQLite 3.53.2.9000 (2026-06-15)
-
-## fledge
-
-- CRAN release v3.53.2 (#733).
+- Restore C90 and C17 compatibility of the bundled HTTP VFS sources (`http.c`), fixing builds with stricter system compilers (@davidrsch, #750).
 
 
 # RSQLite 3.53.2 (2026-06-14)

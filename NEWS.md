@@ -1,5 +1,16 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.53.3.9000 (2026-07-17)
+
+## Chore
+
+- Auto-update from GitHub Actions (#766).
+
+## Uncategorized
+
+- Merge branch 'cran-3.53.3'.
+
+
 # RSQLite 3.53.3 (2026-06-28)
 
 ## Features

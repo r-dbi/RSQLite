@@ -54,6 +54,7 @@ Suggests:
     httpuv,
     knitr,
     magrittr,
+    purrr,
     rmarkdown,
     rvest,
     testthat (>= 3.0.0),

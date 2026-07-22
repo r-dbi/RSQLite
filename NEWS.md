@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.53.3.9001 (2026-07-22)
+
+## Continuous integration
+
+- Run on Ubuntu 26.04.
+
+
 # RSQLite 3.53.3.9000 (2026-07-17)
 
 ## Chore

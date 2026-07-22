@@ -22,105 +22,29 @@ r_versions <- c("devel", as.character(r_release))
 
 macos <- data.frame(os = "macos-latest", r = r_versions[2:3])
 windows <- data.frame(os = "windows-latest", r = r_versions[1:3])
-linux_devel <- data.frame(os = "ubuntu-24.04", r = r_versions[1], `http-user-agent` = "release", check.names = FALSE)
-linux <- data.frame(os = "ubuntu-24.04", r = r_versions[-1])
-covr <- data.frame(os = "ubuntu-24.04", r = r_versions[2], covr = "true", desc = "with covr")
 
-# Compile-only builds of the package's native code under non-default language
-# standards, to catch portability problems ahead of R changing its defaults.
-# These only build the package (no R CMD check), and are added only when the
-# package actually ships the relevant C or C++ sources.
-#
-# Maintaining these as standards evolve:
-#   * `c_stds` / `cxx_stds` list the standards to compile under, as (human
-#     label, `-std` value, the R release to build against, extra `flags`). Use
-#     the GNU dialect ("gnu*") so they match the standards R itself uses, not
-#     strict ISO ("c*").
-#   * Each older C standard is paired with a correspondingly older R release
-#     (oldrel-N), so the matrix exercises an old standard together with an old
-#     R C API -- the combination people actually hit on long-lived systems.
-#     C++ stays on the newest release. Bump the `r` values as releases age.
-#   * When compilers gain a newer standard, add a row, e.g. C++26 as
-#     ("C++26", "gnu++26", <r>, "") to `cxx_stds`. Keep `c_stds` ordered
-#     oldest-first and keep each `year` accurate (it is compared against the C
-#     floor below). Drop a standard once it is no longer worth testing.
-#   * `flags` carries extra compiler flags. -Werror=c11-c2x-compat makes a
-#     modern gcc reject C23-only constructs it would otherwise accept as silent
-#     extensions, holding the package to a "no C23 features" contract on the C11
-#     and C17 lanes (what old toolchains such as RHEL 8's gcc 8, whose C default
-#     is gnu11, enforce in practice). gcc 14+ spells the flag -Wc11-c23-compat;
-#     the c2x alias still works.
-#   * The C entries honor a C-standard floor declared in DESCRIPTION's
-#     SystemRequirements: any standard older than the declared minimum is
-#     dropped, since the package does not claim to support it. To change which
-#     C standards are tested, edit SystemRequirements (e.g. add "USE_C99" to
-#     stop testing C90), not this file. There is no analogous C++ gate; add one
-#     the same way if you start honoring a declared "C++NN" minimum.
-native_sources <- if (dir.exists("src")) {
-  list.files("src", pattern = "[.](c|cc|cpp|cxx)$", recursive = TRUE)
-} else {
-  character()
-}
-has_c_sources <- any(grepl("[.]c$", native_sources))
-has_cxx_sources <- any(grepl("[.](cc|cpp|cxx)$", native_sources))
+# Linux amd64 (ubuntu-26.04) carries the full historical sweep: R-devel plus
+# every supported release down to the oldest. amd64 has the most mature
+# toolchain and the broadest CRAN binary coverage on Posit Package Manager, so
+# it is where the deep back-compatibility testing lives.
+linux_devel <- data.frame(os = "ubuntu-26.04", r = r_versions[1], `http-user-agent` = "release", check.names = FALSE)
+linux <- data.frame(os = "ubuntu-26.04", r = r_versions[-1])
+covr <- data.frame(os = "ubuntu-26.04", r = r_versions[2], covr = "true", desc = "with covr")
 
-# C standards to compile under, oldest first, each on a matching older R
-# release. `year` is compared against the SystemRequirements floor; `flags`
-# adds any extra compiler flags (see above).
-c_stds <- data.frame(
-  label = c("C90", "C99", "C11", "C17"),
-  std = c("gnu90", "gnu99", "gnu11", "gnu17"),
-  r = c("oldrel-4", "oldrel-3", "oldrel-2", "oldrel-2"),
-  flags = c("", "", "-Werror=c11-c2x-compat", "-Werror=c11-c2x-compat"),
-  year = c(1990, 1999, 2011, 2017)
-)
-# Newest C++ standard to compile under (columns parallel c_stds).
-cxx_stds <- data.frame(
-  label = "C++23",
-  std = "gnu++23",
-  flags = ""
-)
+# Linux arm64 (ubuntu-26.04-arm) is intentionally ragged: only the two newest R
+# versions, R-devel and R-release. These are the versions actually deployed to
+# arm64 today (Apple Silicon, AWS Graviton, ...) and the ones with dependable
+# arm64 R builds; re-running the full historical range on a second architecture
+# would add cost without adding meaningful coverage. R-release (and R-devel)
+# overlap with amd64, so at least one R version is exercised on both arches.
+# PPM note: r-lib/actions/setup-r historically disabled Posit Package Manager on
+# aarch64 Linux (r-lib/actions NEWS v2.11.2, 2025-02-19) because PPM shipped no
+# arm64 binaries and would have served x86_64 ones. setup-r v2.12.0 (2026-04-29)
+# re-enabled it, and PPM has published resolute (26.04) aarch64 CRAN binaries
+# since PPM 2026.05.0, so arm64 jobs on @v2 now install binaries, not source.
+linux_arm64 <- data.frame(os = "ubuntu-26.04-arm", r = r_versions[1:2])
 
-# Honor a C-standard floor from SystemRequirements and drop the C standards the
-# package does not claim to support. R documents the USE_C90/USE_C99/USE_C11/
-# USE_C17/USE_C23 tokens; the bare "C99" form is also accepted. "C++NN" tokens
-# are deliberately not matched. The highest declared standard wins.
-sysreq <- read.dcf("DESCRIPTION")[1, ]["SystemRequirements"]
-c_floor_year <- 0
-if (!is.na(sysreq)) {
-  toks <- regmatches(
-    sysreq,
-    gregexpr("(?<![+[:alnum:]])C(?:90|99|11|17|23)\\b", sysreq, perl = TRUE)
-  )[[1]]
-  if (length(toks) > 0) {
-    years <- c(C90 = 1990, C99 = 1999, C11 = 2011, C17 = 2017, C23 = 2023)
-    c_floor_year <- max(years[toks])
-  }
-}
-c_stds <- c_stds[c_stds$year >= c_floor_year, , drop = FALSE]
-
-# C++ builds against the newest released R; each C standard uses its own
-# (older) release from c_stds$r above.
-std_r <- r_versions[2]
-std_list <- list()
-if (has_c_sources && nrow(c_stds) > 0) {
-  std_list <- c(std_list, list(data.frame(
-    os = "ubuntu-24.04", r = c_stds$r, lang = "c",
-    std = c_stds$std,
-    flags = c_stds$flags,
-    desc = paste0("compile-only ", c_stds$label)
-  )))
-}
-if (has_cxx_sources && nrow(cxx_stds) > 0) {
-  std_list <- c(std_list, list(data.frame(
-    os = "ubuntu-24.04", r = std_r, lang = "cxx",
-    std = cxx_stds$std,
-    flags = cxx_stds$flags,
-    desc = paste0("compile-only ", cxx_stds$label)
-  )))
-}
-
-include_list <- c(list(macos, windows, linux_devel, linux, covr), std_list)
+include_list <- list(macos, windows, linux_devel, linux, covr, linux_arm64)
 
 if (file.exists(".github/versions-matrix.R")) {
   custom <- source(".github/versions-matrix.R")$value

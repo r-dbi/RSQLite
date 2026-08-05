@@ -1,5 +1,24 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.53.3.9006 (2026-08-05)
+
+## Chore
+
+- Auto-update from GitHub Actions (#777).
+
+## Continuous integration
+
+- Remove unused pr-commands workflow.
+
+## Uncategorized
+
+- Ci: Give every workflow and job an explicit `permissions` block (#103).
+
+- Ci: Pass workflow context through the environment, not into script text (#102).
+
+- Ci: Add a Windows arm64 (`windows-11-arm`) check on R-release (#99).
+
+
 # RSQLite 3.53.3.9005 (2026-07-29)
 
 - Ci: Apply matrix `env` vars in the workflow, not in custom actions (#95).

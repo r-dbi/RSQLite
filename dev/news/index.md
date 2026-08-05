@@ -1,5 +1,13 @@
 # Changelog
 
+## RSQLite 3.53.3.9005 (2026-07-29)
+
+- Ci: Apply matrix `env` vars in the workflow, not in custom actions
+  ([\#95](https://github.com/r-dbi/RSQLite/issues/95)).
+
+- Ci: Link the responsible workflow run in snapshot update PRs
+  ([\#96](https://github.com/r-dbi/RSQLite/issues/96)).
+
 ## RSQLite 3.53.3.9004 (2026-07-26)
 
 ### Features

@@ -1,5 +1,16 @@
 # Changelog
 
+## RSQLite 3.53.3.9007 (2026-08-06)
+
+### Continuous integration
+
+- Add sharded `revdep2` workflow.
+
+### Uncategorized
+
+- Ci: Harden `workflow_run` workflows against untrusted pull requests
+  ([\#106](https://github.com/r-dbi/RSQLite/issues/106)).
+
 ## RSQLite 3.53.3.9006 (2026-08-05)
 
 ### Chore

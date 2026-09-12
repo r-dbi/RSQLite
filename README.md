@@ -32,8 +32,8 @@ install.packages("RSQLite")
 Or install the latest development version from GitHub with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("r-dbi/RSQLite")
+# install.packages("pak")
+pak::pak("r-dbi/RSQLite")
 ```
 
 ## Extensions

@@ -20,17 +20,16 @@ sqliteBuildTableDefinition(
 
 \item{value}{A data.frame, for which we want to create a table.}
 
-\item{field.types}{Optional, named character vector of the types for each
-field in \code{value}}
+\item{field.types}{Optional, named character vector of the types for each field in \code{value}}
 
-\item{row.names}{Logical. Should row.name of \code{value} be exported as a
-\code{row_names} field? Default is \code{TRUE}}
+\item{row.names}{Logical.
+Should row.name of \code{value} be exported as a \code{row_names} field?
+Default is \code{TRUE}}
 }
 \value{
 An SQL string
 }
 \description{
-The output SQL statement is a simple \verb{CREATE TABLE} suitable for
-\code{dbGetQuery}
+The output SQL statement is a simple \verb{CREATE TABLE} suitable for \code{dbGetQuery}
 }
 \keyword{internal}

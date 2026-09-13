@@ -11,11 +11,14 @@ sqliteHttpConfig(
 )
 }
 \arguments{
-\item{cache_size_mb}{Integer megabytes for in-memory page cache. \code{NULL} leaves unchanged.}
+\item{cache_size_mb}{Integer megabytes for in-memory page cache.
+\code{NULL} leaves unchanged.}
 
-\item{prefetch_pages}{Integer pages to prefetch ahead. \code{NULL} leaves unchanged.}
+\item{prefetch_pages}{Integer pages to prefetch ahead.
+\code{NULL} leaves unchanged.}
 
-\item{fallback_full_download}{Logical; if \code{TRUE}, allow full-download fallback when Range is not available. \code{NULL} leaves unchanged.}
+\item{fallback_full_download}{Logical; if \code{TRUE}, allow full-download fallback when Range is not available.
+\code{NULL} leaves unchanged.}
 }
 \value{
 A named list of previous values (in R types).
@@ -31,7 +34,8 @@ Options are stored in environment variables so they also affect C-level code:
 \itemize{
 \item \code{RSQLITE_HTTP_CACHE_MB}: In-memory page cache size in megabytes (default 4).
 \item \code{RSQLITE_HTTP_PREFETCH_PAGES}: Prefetch this many pages ahead (default 0).
-\item \code{RSQLITE_HTTP_FALLBACK_FULLDL}: If \code{TRUE} (default), fall back to full download when the server does not support HTTP Range; if \code{FALSE}, open will fail.
+\item \code{RSQLITE_HTTP_FALLBACK_FULLDL}: If \code{TRUE} (default), fall back to full download when the server does not support HTTP Range;
+if \code{FALSE}, open will fail.
 }
 }
 \examples{

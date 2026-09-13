@@ -92,12 +92,10 @@
 \arguments{
 \item{temporary}{If \code{TRUE}, only temporary tables are considered.}
 
-\item{fail_if_missing}{If \code{FALSE}, \code{dbRemoveTable()} succeeds if the
-table doesn't exist.}
+\item{fail_if_missing}{If \code{FALSE}, \code{dbRemoveTable()} succeeds if the table doesn't exist.}
 }
 \description{
-SQLiteConnection objects are created by passing \code{\link[=SQLite]{SQLite()}} as first
-argument to \code{\link[DBI:dbConnect]{DBI::dbConnect()}}.
+SQLiteConnection objects are created by passing \code{\link[=SQLite]{SQLite()}} as first argument to \code{\link[DBI:dbConnect]{DBI::dbConnect()}}.
 They are a superclass of the \link[DBI:DBIConnection-class]{DBIConnection} class.
 The "Usage" section lists the class methods overridden by \pkg{RSQLite}.
 }

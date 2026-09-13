@@ -58,15 +58,18 @@ These values are read on first open of a remote database in the current process.
 
 
 <dl><dt id="arg-cache-size-mb">cache_size_mb<a class="anchor" aria-label="anchor" href="#arg-cache-size-mb"></a></dt>
-<dd><p>Integer megabytes for in-memory page cache. <code>NULL</code> leaves unchanged.</p></dd>
+<dd><p>Integer megabytes for in-memory page cache.
+<code>NULL</code> leaves unchanged.</p></dd>
 
 
 <dt id="arg-prefetch-pages">prefetch_pages<a class="anchor" aria-label="anchor" href="#arg-prefetch-pages"></a></dt>
-<dd><p>Integer pages to prefetch ahead. <code>NULL</code> leaves unchanged.</p></dd>
+<dd><p>Integer pages to prefetch ahead.
+<code>NULL</code> leaves unchanged.</p></dd>
 
 
 <dt id="arg-fallback-full-download">fallback_full_download<a class="anchor" aria-label="anchor" href="#arg-fallback-full-download"></a></dt>
-<dd><p>Logical; if <code>TRUE</code>, allow full-download fallback when Range is not available. <code>NULL</code> leaves unchanged.</p></dd>
+<dd><p>Logical; if <code>TRUE</code>, allow full-download fallback when Range is not available.
+<code>NULL</code> leaves unchanged.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -77,7 +80,8 @@ These values are read on first open of a remote database in the current process.
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Options are stored in environment variables so they also affect C-level code:</p><ul><li><p><code>RSQLITE_HTTP_CACHE_MB</code>: In-memory page cache size in megabytes (default 4).</p></li>
 <li><p><code>RSQLITE_HTTP_PREFETCH_PAGES</code>: Prefetch this many pages ahead (default 0).</p></li>
-<li><p><code>RSQLITE_HTTP_FALLBACK_FULLDL</code>: If <code>TRUE</code> (default), fall back to full download when the server does not support HTTP Range; if <code>FALSE</code>, open will fail.</p></li>
+<li><p><code>RSQLITE_HTTP_FALLBACK_FULLDL</code>: If <code>TRUE</code> (default), fall back to full download when the server does not support HTTP Range;
+if <code>FALSE</code>, open will fail.</p></li>
 </ul></div>
 
     <div class="section level2">

@@ -18,8 +18,8 @@ Or install the latest development version from GitHub with:
 
 ``` r
 
-# install.packages("devtools")
-devtools::install_github("r-dbi/RSQLite")
+# install.packages("pak")
+pak::pak("r-dbi/RSQLite")
 ```
 
 ## Extensions
@@ -145,9 +145,3 @@ dbDisconnect(con)
 Many thanks to Doug Bates, Seth Falcon, Detlef Groth, Ronggui Huang,
 Kurt Hornik, Uwe Ligges, Charles Loboz, Duncan Murdoch, and Brian D.
 Ripley for comments, suggestions, bug reports, and/or patches.
-
-------------------------------------------------------------------------
-
-Please note that the ‘RSQLite’ project is released with a [Contributor
-Code of Conduct](https://rsqlite.r-dbi.org/CODE_OF_CONDUCT.html). By
-contributing to this project, you agree to abide by its terms.

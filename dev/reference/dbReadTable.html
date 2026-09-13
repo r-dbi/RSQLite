@@ -56,18 +56,18 @@
 
 
 <dl><dt id="arg-conn">conn<a class="anchor" aria-label="anchor" href="#arg-conn"></a></dt>
-<dd><p>a <code><a href="SQLiteConnection-class.html">SQLiteConnection</a></code> object, produced by
-<code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">DBI::dbConnect()</a></code></p></dd>
+<dd><p>a <code><a href="SQLiteConnection-class.html">SQLiteConnection</a></code> object, produced by <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">DBI::dbConnect()</a></code></p></dd>
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
-<dd><p>a character string specifying a table name. SQLite table names
-are <em>not</em> case sensitive, e.g., table names <code>ABC</code> and <code>abc</code>
-are considered equal.</p></dd>
+<dd><p>a character string specifying a table name.
+SQLite table names are <em>not</em> case sensitive,
+e.g., table names <code>ABC</code> and <code>abc</code> are considered equal.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Needed for compatibility with generic. Otherwise ignored.</p></dd>
+<dd><p>Needed for compatibility with generic.
+Otherwise ignored.</p></dd>
 
 
 <dt id="arg-row-names">row.names<a class="anchor" aria-label="anchor" href="#arg-row-names"></a></dt>
@@ -81,8 +81,7 @@ default name.</p>
 
 
 <dt id="arg-check-names">check.names<a class="anchor" aria-label="anchor" href="#arg-check-names"></a></dt>
-<dd><p>If <code>TRUE</code>, the default, column names will be
-converted to valid R identifiers.</p></dd>
+<dd><p>If <code>TRUE</code>, the default, column names will be converted to valid R identifiers.</p></dd>
 
 
 <dt id="arg-select-cols">select.cols<a class="anchor" aria-label="anchor" href="#arg-select-cols"></a></dt>
@@ -95,8 +94,8 @@ converted to valid R identifiers.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Note that the data frame returned by <code><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable()</a></code> only has
-primitive data, e.g., it does not coerce character data to factors.</p>
+    <p>Note that the data frame returned by <code><a href="https://dbi.r-dbi.org/reference/dbReadTable.html" class="external-link">dbReadTable()</a></code> only has primitive data,
+e.g., it does not coerce character data to factors.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

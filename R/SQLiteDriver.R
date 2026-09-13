@@ -5,8 +5,8 @@ NULL
 
 #' Class SQLiteDriver (and methods)
 #'
-#' SQLiteDriver objects are created by [SQLite()], and used to select the
-#' correct method in [dbConnect()].
+#' SQLiteDriver objects are created by [SQLite()],
+#' and used to select the correct method in [dbConnect()].
 #' They are a superclass of the [DBIDriver-class] class,
 #' and used purely for dispatch.
 #' The "Usage" section lists the class methods overridden by \pkg{RSQLite}.

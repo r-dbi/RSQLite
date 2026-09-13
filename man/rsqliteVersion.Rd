@@ -7,8 +7,7 @@
 rsqliteVersion()
 }
 \value{
-A character vector containing header and library versions of
-RSQLite.
+A character vector containing header and library versions of RSQLite.
 }
 \description{
 Return the version of RSQLite.

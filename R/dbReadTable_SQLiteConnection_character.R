@@ -2,23 +2,22 @@
 #'
 #' Returns the contents of a database table given by name as a data frame.
 #'
-#' Note that the data frame returned by `dbReadTable()` only has
-#' primitive data, e.g., it does not coerce character data to factors.
+#' Note that the data frame returned by `dbReadTable()` only has primitive data,
+#' e.g., it does not coerce character data to factors.
 #'
 #' @seealso
 #' The corresponding generic function [DBI::dbReadTable()].
 #'
 #' @return A data frame.
 #'
-#' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
-#'   [DBI::dbConnect()]
-#' @param name a character string specifying a table name. SQLite table names
-#'   are \emph{not} case sensitive, e.g., table names `ABC` and `abc`
-#'   are considered equal.
-#' @param check.names If `TRUE`, the default, column names will be
-#'   converted to valid R identifiers.
+#' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by [DBI::dbConnect()]
+#' @param name a character string specifying a table name.
+#'   SQLite table names are \emph{not} case sensitive,
+#'   e.g., table names `ABC` and `abc` are considered equal.
+#' @param check.names If `TRUE`, the default, column names will be converted to valid R identifiers.
 #' @param select.cols  Deprecated, do not use.
-#' @param ... Needed for compatibility with generic. Otherwise ignored.
+#' @param ... Needed for compatibility with generic.
+#'   Otherwise ignored.
 #' @inheritParams DBI::sqlRownamesToColumn
 #' @rdname dbReadTable
 #' @examples

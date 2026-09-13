@@ -11,17 +11,15 @@ A list with elements \code{bytes_fetched}, \code{range_requests}, \code{full_dow
 }
 \description{
 Returns counters collected for HTTP VFS operations in the current process.
-These values are best-effort and may currently report zeros until
-global aggregation is implemented.
+These values are best-effort and may currently report zeros until global aggregation is implemented.
 }
 \details{
-Statistics are maintained per R process and reset when the process
-terminates. Values:
+Statistics are maintained per R process and reset when the process terminates.
+Values:
 \itemize{
 \item \code{bytes_fetched}: Total bytes transferred via HTTP GET/Range requests.
 \item \code{range_requests}: Count of HTTP Range requests performed.
-\item \code{full_download}: Logical flag; \code{TRUE} if a fallback full download occurred
-for any open in this process.
+\item \code{full_download}: Logical flag; \code{TRUE} if a fallback full download occurred for any open in this process.
 }
 
 If the HTTP VFS was not compiled in, all zeros (and \code{FALSE}) are returned.

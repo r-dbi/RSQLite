@@ -3,8 +3,8 @@
 dbListObjects_SQLiteConnection <- function(conn, prefix = NULL, ...) {
   if (!is.null(prefix)) {
     id <- as.list(dbUnquoteIdentifier(conn, dbQuoteIdentifier(conn, prefix))[[1]]@name)
-    # `Id(schema = "mydb")` round-trips through dbQuoteIdentifier/dbUnquoteIdentifier
-    # as a single-component identifier (table slot), so fall back to table if schema is absent.
+    # `Id(schema = "mydb")` round-trips through dbQuoteIdentifier/dbUnquoteIdentifier as a single-component identifier (table slot),
+    # so fall back to table if schema is absent.
     schema <- id[["schema"]] %||% id[["table"]]
 
     sql <- sqliteListTablesQuery(conn, schema)

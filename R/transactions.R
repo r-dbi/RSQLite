@@ -3,24 +3,21 @@ NULL
 
 #' SQLite transaction management
 #'
-#' By default, SQLite is in auto-commit mode. `dbBegin()` starts
-#' a SQLite transaction and turns auto-commit off. `dbCommit()` and
-#' `dbRollback()` commit and rollback the transaction, respectively and turn
-#' auto-commit on.
-#' [DBI::dbWithTransaction()] is a convenient wrapper that makes sure that
-#' `dbCommit()` or `dbRollback()` is called.
-#' A helper function `sqliteIsTransacting()` is available to check the current
-#' transaction status of the connection.
+#' By default, SQLite is in auto-commit mode.
+#' `dbBegin()` starts a SQLite transaction and turns auto-commit off.
+#' `dbCommit()` and `dbRollback()` commit and rollback the transaction, respectively and turn auto-commit on.
+#' [DBI::dbWithTransaction()] is a convenient wrapper that makes sure that `dbCommit()` or `dbRollback()` is called.
+#' A helper function `sqliteIsTransacting()` is available to check the current transaction status of the connection.
 #'
 #' @seealso
 #' The corresponding generic functions [DBI::dbBegin()], [DBI::dbCommit()],
 #' and [DBI::dbRollback()].
 #'
-#' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
-#'   [DBI::dbConnect()]
-#' @param ... Needed for compatibility with generic. Otherwise ignored.
-#' @param name Supply a name to use a named savepoint. This allows you to
-#'   nest multiple transaction
+#' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by [DBI::dbConnect()]
+#' @param ... Needed for compatibility with generic.
+#'   Otherwise ignored.
+#' @param name Supply a name to use a named savepoint.
+#'   This allows you to nest multiple transaction
 #' @param .name For backward compatibility, do not use.
 #' @examples
 #' library(DBI)

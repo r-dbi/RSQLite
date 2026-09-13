@@ -15,7 +15,10 @@
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3234/badge)](https://bestpractices.coreinfrastructure.org/projects/3234)
 <!-- badges: end -->
 
-Embeds the SQLite database engine in R, providing a DBI-compliant interface. [SQLite](https://www.sqlite.org/index.html) is a public-domain, single-user, very light-weight database engine that implements a decent subset of the SQL 92 standard, including the core table creation, updating, insertion, and selection operations, plus transaction management.
+Embeds the SQLite database engine in R, providing a DBI-compliant interface.
+[SQLite](https://www.sqlite.org/index.html) is a public-domain, single-user, very light-weight database engine
+that implements a decent subset of the SQL 92 standard,
+including the core table creation, updating, insertion, and selection operations, plus transaction management.
 
 You can install the latest released version from CRAN with:
 
@@ -32,10 +35,10 @@ pak::pak("r-dbi/RSQLite")
 
 ## Extensions
 
-RSQLite supports loadable extensions. An experimental HTTP/HTTPS VFS is available
-when the package is built with libcurl support, enabling read-only access to remote
-SQLite databases. See the help pages for `initExtension()`, `sqliteHttpConfig()`,
-`sqliteRemote()`, and `sqliteHasHttpVFS()`.
+RSQLite supports loadable extensions.
+An experimental HTTP/HTTPS VFS is available when the package is built with libcurl support,
+enabling read-only access to remote SQLite databases.
+See the help pages for `initExtension()`, `sqliteHttpConfig()`, `sqliteRemote()`, and `sqliteHasHttpVFS()`.
 
 Discussions associated with DBI and related database packages take place on [R-SIG-DB](https://stat.ethz.ch/mailman/listinfo/r-sig-db).
 The website [Databases using R](https://db.rstudio.com/) describes the tools and best practices in this ecosystem.
@@ -125,10 +128,11 @@ dbDisconnect(con)
 
 ## Acknowledgements
 
-Many thanks to Doug Bates, Seth Falcon, Detlef Groth, Ronggui Huang, Kurt Hornik, Uwe Ligges, Charles Loboz, Duncan Murdoch, and Brian D. Ripley for comments, suggestions, bug reports, and/or patches.
+Many thanks to Doug Bates, Seth Falcon, Detlef Groth, Ronggui Huang, Kurt Hornik,
+Uwe Ligges, Charles Loboz, Duncan Murdoch, and Brian D. Ripley
+for comments, suggestions, bug reports, and/or patches.
 
 ------------------------------------------------------------------------
 
-Please note that the 'RSQLite' project is released with a
-[Contributor Code of Conduct](https://rsqlite.r-dbi.org/CODE_OF_CONDUCT.html).
+Please note that the 'RSQLite' project is released with a [Contributor Code of Conduct](https://rsqlite.r-dbi.org/CODE_OF_CONDUCT.html).
 By contributing to this project, you agree to abide by its terms.

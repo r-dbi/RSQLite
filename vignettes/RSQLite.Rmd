@@ -12,9 +12,12 @@ vignette: >
 knitr::opts_chunk$set(comment = "#>", collapse = TRUE)
 ```
 
-RSQLite is the easiest way to use a database from R because the package itself contains [SQLite](https://www.sqlite.org/index.html); no external software is needed. This vignette will walk you through the basics of using a SQLite database.
+RSQLite is the easiest way to use a database from R because the package itself contains [SQLite](https://www.sqlite.org/index.html);
+no external software is needed.
+This vignette will walk you through the basics of using a SQLite database.
 
-RSQLite is a DBI-compatible interface which means you primarily use functions defined in the DBI package, so you should always start by loading DBI, not RSQLite:
+RSQLite is a DBI-compatible interface which means you primarily use functions defined in the DBI package,
+so you should always start by loading DBI, not RSQLite:
 
 ```{r}
 library(DBI)
@@ -33,7 +36,9 @@ dbDisconnect(mydb)
 unlink("my-db.sqlite")
 ```
 
-If you just need a temporary database, use either `""` (for an on-disk database) or `":memory:"` or `"file::memory:"` (for a in-memory database). This database will be automatically deleted when you disconnect from it.
+If you just need a temporary database,
+use either `""` (for an on-disk database) or `":memory:"` or `"file::memory:"` (for a in-memory database).
+This database will be automatically deleted when you disconnect from it.
 
 ```{r}
 mydb <- dbConnect(RSQLite::SQLite(), "")
@@ -59,13 +64,16 @@ Issue a query with `dbGetQuery()`:
 dbGetQuery(mydb, 'SELECT * FROM mtcars LIMIT 5')
 ```
 
-Not all R variable names are valid SQL variable names, so you may need to escape them with `"`:
+Not all R variable names are valid SQL variable names,
+so you may need to escape them with `"`:
 
 ```{r}
 dbGetQuery(mydb, 'SELECT * FROM iris WHERE "Sepal.Length" < 4.6')
 ```
 
-If you need to insert the value from a user into a query, don't use `paste()`! That makes it easy for a malicious attacker to insert SQL that might damage your database or reveal sensitive information. Instead, use a parameterised query:
+If you need to insert the value from a user into a query, don't use `paste()`!
+That makes it easy for a malicious attacker to insert SQL that might damage your database or reveal sensitive information.
+Instead, use a parameterised query:
 
 ```{r}
 dbGetQuery(mydb, 'SELECT * FROM iris WHERE "Sepal.Length" < :x',
@@ -76,7 +84,9 @@ This is a little more typing, but much much safer.
 
 ## Batched queries
 
-If you run a query and the results don't fit in memory, you can use `dbSendQuery()`, `dbFetch()` and `dbClearResults()` to retrieve the results in batches. By default `dbFetch()` will retrieve all available rows: use `n` to set the maximum number of rows to return.
+If you run a query and the results don't fit in memory,
+you can use `dbSendQuery()`, `dbFetch()` and `dbClearResults()` to retrieve the results in batches.
+By default `dbFetch()` will retrieve all available rows: use `n` to set the maximum number of rows to return.
 
 ```{r}
 rs <- dbSendQuery(mydb, 'SELECT * FROM mtcars')
@@ -89,7 +99,8 @@ dbClearResult(rs)
 
 ## Multiple parameterised queries
 
-You can use the same approach to run the same parameterised query with different parameters. Call `dbBind()` to set the parameters:
+You can use the same approach to run the same parameterised query with different parameters.
+Call `dbBind()` to set the parameters:
 
 ```{r}
 rs <- dbSendQuery(mydb, 'SELECT * FROM iris WHERE "Sepal.Length" < :x')

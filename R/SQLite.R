@@ -4,22 +4,20 @@ NULL
 
 #' Connect to an SQLite database
 #'
-#' Together, `SQLite()` and `dbConnect()` allow you to connect to
-#' a SQLite database file. See [DBI::dbSendQuery()] for how to issue queries
-#' and receive results.
+#' Together, `SQLite()` and `dbConnect()` allow you to connect to a SQLite database file.
+#' See [DBI::dbSendQuery()] for how to issue queries and receive results.
 #'
-#' Connections are automatically cleaned-up after they're deleted and
-#' reclaimed by the GC. You can use [DBI::dbDisconnect()] to terminate the
-#' connection early, but it will not actually close until all open result
-#' sets have been closed (and you'll get a warning message to this effect).
+#' Connections are automatically cleaned-up after they're deleted and reclaimed by the GC.
+#' You can use [DBI::dbDisconnect()] to terminate the connection early,
+#' but it will not actually close until all open result sets have been closed (and you'll get a warning message to this effect).
 #'
 #' @seealso
 #' The corresponding generic functions [DBI::dbConnect()] and [DBI::dbDisconnect()].
 #'
 #' @export
-#' @param ... In previous versions, `SQLite()` took arguments. These
-#'   have now all been moved to [dbConnect()], and any arguments here
-#'   will be ignored with a warning.
+#' @param ... In previous versions, `SQLite()` took arguments.
+#'   These have now all been moved to [dbConnect()],
+#'   and any arguments here will be ignored with a warning.
 #'
 #' @return `SQLite()` returns an object of class [SQLiteDriver-class].
 #' @import methods DBI
@@ -68,13 +66,11 @@ check_vfs <- function(vfs) {
   )
 }
 
-# From the SQLite docs: If the filename is ":memory:", then a private,
-# temporary in-memory database is created for the connection. This in-memory
-# database will vanish when the database connection is closed. Future versions
-# of SQLite might make use of additional special filenames that begin with the
-# ":" character. It is recommended that when a database filename actually does
-# begin with a ":" character you should prefix the filename with a pathname
-# such as "./" to avoid ambiguity.
+# From the SQLite docs: If the filename is ":memory:", then a private, temporary in-memory database is created for the connection.
+# This in-memory database will vanish when the database connection is closed.
+# Future versions of SQLite might make use of additional special filenames that begin with the ":" character.
+# It is recommended that when a database filename actually does begin with a ":" character
+# you should prefix the filename with a pathname such as "./" to avoid ambiguity.
 #
 # This function checks for known protocols, or for a colon at the beginning.
 is_url_or_special_filename <- function(x) grepl("^(?:file|http|ftp|https|):", x)
@@ -111,15 +107,13 @@ sqliteHasHttpVFS <- function() {
 #' Experimental HTTP VFS statistics
 #'
 #' Returns counters collected for HTTP VFS operations in the current process.
-#' These values are best-effort and may currently report zeros until
-#' global aggregation is implemented.
+#' These values are best-effort and may currently report zeros until global aggregation is implemented.
 #'
-#' @details Statistics are maintained per R process and reset when the process
-#' terminates. Values:
+#' @details Statistics are maintained per R process and reset when the process terminates.
+#' Values:
 #' * `bytes_fetched`: Total bytes transferred via HTTP GET/Range requests.
 #' * `range_requests`: Count of HTTP Range requests performed.
-#' * `full_download`: Logical flag; `TRUE` if a fallback full download occurred
-#'   for any open in this process.
+#' * `full_download`: Logical flag; `TRUE` if a fallback full download occurred for any open in this process.
 #'
 #' If the HTTP VFS was not compiled in, all zeros (and `FALSE`) are returned.
 #'
@@ -147,15 +141,13 @@ sqliteHttpStats <- function() {
 
 #' Was HTTP VFS compiled into this build?
 #'
-#' Returns TRUE if the experimental HTTP/HTTPS virtual file system was compiled
-#' in (libcurl detected at build time), FALSE otherwise. This is a compile-time
-#' indicator; even if TRUE the VFS might still fail to register at runtime on
-#' unusual platforms, in which case `sqliteHasHttpVFS()` is the definitive
-#' runtime capability probe.
+#' Returns TRUE if the experimental HTTP/HTTPS virtual file system was compiled in (libcurl detected at build time), FALSE otherwise.
+#' This is a compile-time indicator;
+#' even if TRUE the VFS might still fail to register at runtime on unusual platforms,
+#' in which case `sqliteHasHttpVFS()` is the definitive runtime capability probe.
 #'
-#' @details `sqliteHasHttpVFS()` performs a lazy registration attempt when the VFS
-#' is compiled in but not yet registered. If the HTTP VFS was not compiled in,
-#' calls to [sqliteRemote()] will error.
+#' @details `sqliteHasHttpVFS()` performs a lazy registration attempt when the VFS is compiled in but not yet registered.
+#' If the HTTP VFS was not compiled in, calls to [sqliteRemote()] will error.
 #'
 #' @return A logical scalar.
 #' @examples

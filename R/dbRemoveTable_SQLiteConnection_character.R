@@ -1,7 +1,6 @@
 #' @rdname SQLiteConnection-class
 #' @param temporary If `TRUE`, only temporary tables are considered.
-#' @param fail_if_missing If `FALSE`, `dbRemoveTable()` succeeds if the
-#'   table doesn't exist.
+#' @param fail_if_missing If `FALSE`, `dbRemoveTable()` succeeds if the table doesn't exist.
 #' @usage NULL
 dbRemoveTable_SQLiteConnection_character <- function(conn, name, ..., temporary = FALSE, fail_if_missing = TRUE) {
   name <- check_quoted_identifier(name)

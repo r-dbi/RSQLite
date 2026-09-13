@@ -3,16 +3,15 @@ NULL
 
 #' Build the SQL CREATE TABLE definition as a string
 #'
-#' The output SQL statement is a simple `CREATE TABLE` suitable for
-#' `dbGetQuery`
+#' The output SQL statement is a simple `CREATE TABLE` suitable for `dbGetQuery`
 #'
 #' @param con A database connection.
 #' @param name Name of the new SQL table
 #' @param value A data.frame, for which we want to create a table.
-#' @param field.types Optional, named character vector of the types for each
-#'   field in `value`
-#' @param row.names Logical. Should row.name of `value` be exported as a
-#'   `row_names` field? Default is `TRUE`
+#' @param field.types Optional, named character vector of the types for each field in `value`
+#' @param row.names Logical.
+#'   Should row.name of `value` be exported as a `row_names` field?
+#'   Default is `TRUE`
 #' @return An SQL string
 #' @keywords internal
 #' @aliases dbBuildTableDefinition
@@ -60,8 +59,8 @@ isIdCurrent <- function(obj) {
 
 #' Deprecated querying tools
 #'
-#' These functions have been deprecated. Please switch to using
-#' [dbSendQuery()]/[dbGetQuery()] with the `params` argument
+#' These functions have been deprecated.
+#' Please switch to using [dbSendQuery()]/[dbGetQuery()] with the `params` argument
 #' or with calling [dbBind()] instead.
 #'
 #' @keywords internal

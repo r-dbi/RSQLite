@@ -16,10 +16,16 @@
 #'   A positive integer to change the maximum number of disk pages that SQLite holds in memory (SQLite's default is 2000 pages).
 #'   See \url{https://www.sqlite.org/pragma.html#pragma_cache_size} for details.
 #' @param synchronous Advanced options.
-#'   Possible values for `synchronous` are "off" (the default), "normal", or  "full".  Users have reported significant speed ups using `sychronous = "off"`, and the SQLite documentation itself implies considerable improved performance at the very modest risk of database corruption in the unlikely case of the operating system (\emph{not} the R application) crashing.
+#'   Possible values for `synchronous` are "off" (the default), "normal", or  "full".
+#'   Users have reported significant speed ups using `sychronous = "off"`,
+#'   and the SQLite documentation itself implies considerable improved performance at the very modest risk of database corruption
+#'   in the unlikely case of the operating system (\emph{not} the R application) crashing.
 #'   See \url{https://www.sqlite.org/pragma.html#pragma_synchronous} for details.
-#' @param flags `SQLITE_RWC`: open the database in read/write mode and create the database file if it does not already exist; `SQLITE_RW`: open the database in read/write mode.
-#'   Raise an error if the file does not already exist; `SQLITE_RO`: open the database in read only mode.  Raise an error if the file does not already exist
+#' @param flags `SQLITE_RWC`: open the database in read/write mode and create the database file if it does not already exist;
+#'   `SQLITE_RW`: open the database in read/write mode.
+#'   Raise an error if the file does not already exist;
+#'   `SQLITE_RO`: open the database in read only mode.
+#'   Raise an error if the file does not already exist
 #' @param loadable.extensions When `TRUE` (default) SQLite3 loadable extensions are enabled.
 #'   Setting this value to `FALSE` prevents extensions from being loaded.
 #' @param default.extensions When `TRUE` (default) the [initExtension()]

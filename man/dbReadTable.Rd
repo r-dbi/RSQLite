@@ -18,11 +18,11 @@
 \item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by \code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
 
 \item{name}{a character string specifying a table name.
-SQLite table names are \emph{not} case sensitive,
+ SQLite table names are \emph{not} case sensitive,
 e.g., table names \code{ABC} and \code{abc} are considered equal.}
 
 \item{...}{Needed for compatibility with generic.
-Otherwise ignored.}
+ Otherwise ignored.}
 
 \item{row.names}{Either \code{TRUE}, \code{FALSE}, \code{NA} or a string.
 

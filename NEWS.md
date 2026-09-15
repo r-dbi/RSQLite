@@ -1,5 +1,12 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.53.3.9012 (2026-09-15)
+
+## Chore
+
+- Update revdep report from revdep4 run (most, depth 1) (#793).
+
+
 # RSQLite 3.53.3.9011 (2026-09-13)
 
 ## Chore

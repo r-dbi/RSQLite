@@ -54,6 +54,20 @@
 #' Nested types raise an error.
 #' Named placeholders are matched to the names of the columns, like [DBI::dbBind()] does it.
 #'
+#' @section Data frames:
+#' With `dbConnect(arrow = TRUE)`, data frames travel through this interface:
+#' [DBI::dbFetch()] converts the arrays filled by [DBI::dbFetchArrowChunk()],
+#' and [DBI::dbAppendTable()] writes the data frame as an Arrow stream through [DBI::dbAppendTableArrow()].
+#' The conversion follows nanoarrow's rules, with these additions:
+#' an `int64` column becomes an `integer` if all its values fit,
+#' and follows the `bigint` argument of [DBI::dbConnect()] otherwise;
+#' a `null` column becomes a `logical`.
+#' `date32`, `time64` and `timestamp` columns become `Date`, `hms` and `POSIXct` in UTC,
+#' and `binary` columns become [blob::blob] objects,
+#' as on the default path.
+#' The first chunk of a result decides the types of all its chunks.
+#' Before writing, factors become strings and lists of raw vectors become blobs.
+#'
 #' @section Chunking:
 #' [DBI::dbFetchArrow()] returns a nanoarrow array stream that is read lazily:
 #' each array holds at most `chunk_size` rows,

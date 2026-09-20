@@ -39,6 +39,11 @@
 #' @param extended_types When `TRUE` columns of type `DATE`, `DATETIME` / `TIMESTAMP`, and `TIME` are mapped to corresponding R-classes,
 #' c.f. below for details.
 #' Defaults to `FALSE`.
+#' @param arrow When `TRUE`, data frames travel through the Arrow interface:
+#'   [DBI::dbFetch()] converts the Arrow arrays that [DBI::dbFetchArrowChunk()] fills straight from the SQLite statement,
+#'   and [DBI::dbAppendTable()] binds the data frame as an Arrow stream through [DBI::dbAppendTableArrow()].
+#'   The data frames are the same as with the default path, see [sqlite-arrow] for the rules.
+#'   Experimental, defaults to `FALSE`.
 #'
 #' @return `dbConnect()` returns an object of class [SQLiteConnection-class].
 #'
@@ -82,7 +87,7 @@ dbConnect_SQLiteDriver <- function(drv, dbname = "", ..., loadable.extensions = 
                                    default.extensions = loadable.extensions, cache_size = NULL,
                                    synchronous = "off", flags = SQLITE_RWC, vfs = NULL,
                                    bigint = c("integer64", "integer", "numeric", "character"),
-                                   extended_types = FALSE) {
+                                   extended_types = FALSE, arrow = FALSE) {
   stopifnot(length(dbname) == 1, !is.na(dbname))
 
   if (!is_url_or_special_filename(dbname)) {
@@ -100,6 +105,11 @@ dbConnect_SQLiteDriver <- function(drv, dbname = "", ..., loadable.extensions = 
   if (extended_types) {
     check_suggested("hms", "dbConnect")
   }
+
+  if (!is.logical(arrow) || length(arrow) != 1L || is.na(arrow)) {
+    stopc("`arrow` must be `TRUE` or `FALSE`")
+  }
+
   conn <- new("SQLiteConnection",
     ptr = connection_connect(dbname, loadable.extensions, flags, vfs, extended_types),
     dbname = dbname,
@@ -108,7 +118,8 @@ dbConnect_SQLiteDriver <- function(drv, dbname = "", ..., loadable.extensions = 
     loadable.extensions = loadable.extensions,
     ref = new.env(parent = emptyenv()),
     bigint = bigint,
-    extended_types = extended_types
+    extended_types = extended_types,
+    arrow = arrow
   )
 
   ## experimental PRAGMAs

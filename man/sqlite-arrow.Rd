@@ -62,6 +62,22 @@ Nested types raise an error.
 Named placeholders are matched to the names of the columns, like \code{\link[DBI:dbBind]{DBI::dbBind()}} does it.
 }
 
+\section{Data frames}{
+
+With \code{dbConnect(arrow = TRUE)}, data frames travel through this interface:
+\code{\link[DBI:dbFetch]{DBI::dbFetch()}} converts the arrays filled by \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}},
+and \code{\link[DBI:dbAppendTable]{DBI::dbAppendTable()}} writes the data frame as an Arrow stream through \code{\link[DBI:dbAppendTableArrow]{DBI::dbAppendTableArrow()}}.
+The conversion follows nanoarrow's rules, with these additions:
+an \code{int64} column becomes an \code{integer} if all its values fit,
+and follows the \code{bigint} argument of \code{\link[DBI:dbConnect]{DBI::dbConnect()}} otherwise;
+a \code{null} column becomes a \code{logical}.
+\code{date32}, \code{time64} and \code{timestamp} columns become \code{Date}, \code{hms} and \code{POSIXct} in UTC,
+and \code{binary} columns become \link[blob:blob]{blob::blob} objects,
+as on the default path.
+The first chunk of a result decides the types of all its chunks.
+Before writing, factors become strings and lists of raw vectors become blobs.
+}
+
 \section{Chunking}{
 
 \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} returns a nanoarrow array stream that is read lazily:

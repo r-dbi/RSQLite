@@ -60,6 +60,7 @@ Suggests:
     rmarkdown,
     rvest,
     testthat (>= 3.0.0),
+    vctrs,
     withr,
     xml2
 LinkingTo: 

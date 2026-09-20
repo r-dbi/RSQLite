@@ -27,6 +27,10 @@ bool DbResult::complete() const {
   return (impl == NULL) || impl->complete();
 }
 
+bool DbResult::ready() const {
+  return impl && impl->ready();
+}
+
 bool DbResult::is_active() const {
   return pConn_->is_current_result(this);
 }
@@ -66,6 +70,33 @@ void DbResult::close() {
   if (impl) {
     impl->close();
   }
+}
+
+// Arrow ///////////////////////////////////////////////////////////////////////
+
+void DbResult::arrow_schema(struct ArrowSchema* out, int64_t infer_rows) {
+  if (!is_active()) {
+    throw std::runtime_error("Inactive result set");
+  }
+
+  impl->arrow_schema(out, infer_rows);
+}
+
+int64_t DbResult::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
+  if (!is_active()) {
+    throw std::runtime_error(
+      "Result set was closed before the Arrow stream was consumed"
+    );
+  }
+
+  return impl->fetch_arrow(out, n_max);
+}
+
+void DbResult::bind_arrow(
+  struct ArrowArrayStream* stream,
+  const std::vector<int>& param_indexes
+) {
+  impl->bind_arrow(stream, param_indexes);
 }
 
 // Privates ///////////////////////////////////////////////////////////////////

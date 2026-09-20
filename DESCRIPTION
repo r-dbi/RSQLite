@@ -19,7 +19,9 @@ Authors@R: c(
     person("Liam", "Healy", role = "ctb",
            comment = "for the included SQLite sources"),
     person("R Consortium", role = "fnd"),
-    person(, "RStudio", role = "cph")
+    person(, "RStudio", role = "cph"),
+    person("Apache Software Foundation", role = "cph",
+           comment = "for the included nanoarrow sources")
   )
 Description: Embeds the SQLite database engine in R and provides an
     interface compliant with the DBI package. The source for the SQLite
@@ -41,6 +43,7 @@ Imports:
     DBI (>= 1.2.0),
     memoise,
     methods,
+    nanoarrow (>= 0.6.0),
     pkgconfig,
     rlang
 Suggests: 
@@ -60,7 +63,8 @@ Suggests:
     withr,
     xml2
 LinkingTo: 
-    cpp11 (>= 0.4.0)
+    cpp11 (>= 0.4.0),
+    nanoarrow
 VignetteBuilder: 
     knitr
 Config/Needs/website: 
@@ -76,38 +80,57 @@ Collate:
     'SQLiteDriver.R'
     'SQLite.R'
     'SQLiteResult.R'
+    'SQLiteResultArrow.R'
+    'arrow.R'
     'coerce.R'
     'compatRowNames.R'
     'copy.R'
     'cpp11.R'
     'datasetsDb.R'
+    'dbAppendTableArrow_SQLiteConnection.R'
     'dbAppendTable_SQLiteConnection.R'
     'dbBeginTransaction.R'
     'dbBegin_SQLiteConnection.R'
+    'dbBindArrow_SQLiteResult.R'
+    'dbBindArrow_SQLiteResultArrow.R'
     'dbBind_SQLiteResult.R'
+    'dbBind_SQLiteResultArrow.R'
     'dbClearResult_SQLiteResult.R'
+    'dbClearResult_SQLiteResultArrow.R'
     'dbColumnInfo_SQLiteResult.R'
+    'dbColumnInfo_SQLiteResultArrow.R'
     'dbCommit_SQLiteConnection.R'
     'dbConnect_SQLiteConnection.R'
     'dbConnect_SQLiteDriver.R'
+    'dbCreateTableArrow_SQLiteConnection.R'
     'dbDataType_SQLiteConnection.R'
     'dbDataType_SQLiteDriver.R'
     'dbDisconnect_SQLiteConnection.R'
     'dbExistsTable_SQLiteConnection_Id.R'
     'dbExistsTable_SQLiteConnection_character.R'
+    'dbFetchArrowChunk_SQLiteResult.R'
+    'dbFetchArrowChunk_SQLiteResultArrow.R'
+    'dbFetchArrow_SQLiteResult.R'
+    'dbFetchArrow_SQLiteResultArrow.R'
     'dbFetch_SQLiteResult.R'
+    'dbFetch_SQLiteResultArrow.R'
     'dbGetException_SQLiteConnection.R'
     'dbGetInfo_SQLiteConnection.R'
     'dbGetInfo_SQLiteDriver.R'
     'dbGetPreparedQuery.R'
     'dbGetPreparedQuery_SQLiteConnection_character_data.frame.R'
     'dbGetRowCount_SQLiteResult.R'
+    'dbGetRowCount_SQLiteResultArrow.R'
     'dbGetRowsAffected_SQLiteResult.R'
+    'dbGetRowsAffected_SQLiteResultArrow.R'
     'dbGetStatement_SQLiteResult.R'
+    'dbGetStatement_SQLiteResultArrow.R'
     'dbHasCompleted_SQLiteResult.R'
+    'dbHasCompleted_SQLiteResultArrow.R'
     'dbIsValid_SQLiteConnection.R'
     'dbIsValid_SQLiteDriver.R'
     'dbIsValid_SQLiteResult.R'
+    'dbIsValid_SQLiteResultArrow.R'
     'dbListObjects_SQLiteConnection.R'
     'dbListResults_SQLiteConnection.R'
     'dbListTables_SQLiteConnection.R'
@@ -118,9 +141,11 @@ Collate:
     'dbRollback_SQLiteConnection.R'
     'dbSendPreparedQuery.R'
     'dbSendPreparedQuery_SQLiteConnection_character_data.frame.R'
+    'dbSendQueryArrow_SQLiteConnection.R'
     'dbSendQuery_SQLiteConnection_character.R'
     'dbUnloadDriver_SQLiteDriver.R'
     'dbUnquoteIdentifier_SQLiteConnection_SQL.R'
+    'dbWriteTableArrow_SQLiteConnection.R'
     'dbWriteTable_SQLiteConnection_character_character.R'
     'dbWriteTable_SQLiteConnection_character_data.frame.R'
     'db_bind.R'
@@ -137,6 +162,7 @@ Collate:
     'make.db.names_SQLiteConnection_character.R'
     'pkgconfig.R'
     'show_SQLiteConnection.R'
+    'show_SQLiteResultArrow.R'
     'sqlData_SQLiteConnection.R'
     'table.R'
     'transactions.R'

@@ -97,6 +97,8 @@ Defaults to \code{FALSE}.}
 and \code{\link[DBI:dbAppendTable]{DBI::dbAppendTable()}} binds the data frame as an Arrow stream through \code{\link[DBI:dbAppendTableArrow]{DBI::dbAppendTableArrow()}}.
 The data frames are the same as with the default path, see \link{sqlite-arrow} for the rules,
 and the \code{ptype} argument of \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}} can fix the types of the columns up front.
+When this was measured, fetching a large table took less time through Arrow than on the default path,
+and fetching it in chunks much less.
 Experimental, defaults to \code{FALSE}.}
 }
 \value{

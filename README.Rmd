@@ -8,6 +8,12 @@ output: cynkratemplate::readme_document
 
 ```{r setup, include = FALSE}
 pkgload::load_all()
+
+# Pin `max.print` so the rendered output does not depend on the renderer's own
+# option. R's default is 99999, which prints all 32 rows of the `dbReadTable()`
+# result below; the committed README shows the truncated form. Without this, the
+# file changes for whoever re-renders it next, depending on their `.Rprofile`.
+options(max.print = 99)
 ```
 
 

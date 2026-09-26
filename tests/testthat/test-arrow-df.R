@@ -140,3 +140,32 @@ test_that("dbGetQuery() with parameters works through Arrow", {
     data.frame(a = 1:2)
   )
 })
+
+test_that("dbFetch() through Arrow handles results larger than one chunk", {
+  con <- local_arrow_con()
+  n <- 70000L # more than the 65536 rows of a chunk
+  df_in <- data.frame(
+    a = seq_len(n),
+    b = c(letters, NA)[seq_len(n) %% 27 + 1],
+    stringsAsFactors = FALSE
+  )
+  dbWriteTable(con, "t", df_in)
+  expect_equal(dbReadTable(con, "t"), df_in)
+  expect_equal(dbGetQuery(con, "SELECT * FROM t WHERE 0"), df_in[0, ])
+
+  rs <- dbSendQuery(con, "SELECT * FROM t")
+  expect_equal(dbFetch(rs, 3), df_in[1:3, ])
+  expect_equal(nrow(dbFetch(rs)), n - 3L)
+  dbClearResult(rs)
+})
+
+test_that("data frames fetched in chunks through Arrow own their strings", {
+  con <- local_arrow_con()
+  dbWriteTable(con, "t", data.frame(s = c("a", "b", "c"), stringsAsFactors = FALSE))
+  rs <- dbSendQuery(con, "SELECT s FROM t")
+  chunks <- list(dbFetch(rs, 2), dbFetch(rs, 2))
+  dbClearResult(rs)
+  gc()
+  expect_equal(chunks[[1]]$s, c("a", "b"))
+  expect_equal(chunks[[2]]$s, "c")
+})

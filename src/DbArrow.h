@@ -55,4 +55,16 @@ inline struct ArrowBufferView arrow_buffer_view(
   return view;
 }
 
+// The bytes held by the buffers of an array built by nanoarrow, children included
+inline int64_t arrow_array_bytes(struct ArrowArray* array) {
+  int64_t bytes = 0;
+  for (int i = 0; i < NANOARROW_MAX_FIXED_BUFFERS; ++i) {
+    bytes += ArrowArrayBuffer(array, i)->size_bytes;
+  }
+  for (int64_t j = 0; j < array->n_children; ++j) {
+    bytes += arrow_array_bytes(array->children[j]);
+  }
+  return bytes;
+}
+
 #endif  // RSQLITE_DBARROW_H

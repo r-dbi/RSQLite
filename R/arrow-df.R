@@ -10,11 +10,17 @@ ARROW_DF_CHUNK_SIZE <- 65536
 # dbFetch() through Arrow: `n` rows as a data frame, all rows for `n < 0`
 arrow_fetch_df <- function(res, n) {
   if (n < 0) {
-    x <- result_fetch_arrow(res@ptr, ARROW_DF_CHUNK_SIZE)
+    # All chunks are fetched first, so that the columns are allocated once
+    fetched <- result_fetch_arrow_all(res@ptr, ARROW_DF_CHUNK_SIZE)
+    df <- arrow_to_df(fetched$stream, res@conn, size = fetched$n)
   } else {
-    x <- result_fetch_arrow_chunk(res@ptr, n)
+    chunk <- result_fetch_arrow_chunk(res@ptr, n)
+    df <- arrow_to_df(chunk$array, res@conn)
+    # nanoarrow's character vectors read from the array until they are touched:
+    # copy them, so that the array can be freed right away
+    df[] <- lapply(df, function(col) if (is.character(col)) c(col) else col)
+    nanoarrow::nanoarrow_pointer_release(chunk$array)
   }
-  df <- arrow_to_df(x, res@conn)
 
   if (length(df) == 0L) {
     # Same warning as the default path
@@ -29,18 +35,56 @@ arrow_fetch_df <- function(res, n) {
   df
 }
 
-# The unified conversion of Arrow data to a data frame
-arrow_to_df <- function(x, conn) {
+# The unified conversion of Arrow data to a data frame,
+# `size` is the row count of a stream
+arrow_to_df <- function(x, conn, size = NULL) {
   schema <- nanoarrow::infer_nanoarrow_schema(x)
   ptype <- arrow_df_ptype(schema)
 
   if (inherits(x, "nanoarrow_array_stream")) {
-    df <- nanoarrow::convert_array_stream(x, to = ptype)
+    df <- arrow_stream_to_df(x, ptype, size)
   } else {
     df <- nanoarrow::convert_array(x, to = ptype)
   }
 
   arrow_df_int64(df, conn@bigint)
+}
+
+# All rows of a stream with a known row count as a data frame:
+# the columns are allocated once, each array is converted and copied into
+# them and freed before the next one is requested, so that the arrays go
+# as the data frame fills up
+arrow_stream_to_df <- function(stream, ptype, size) {
+  size <- as.integer(size)
+  columns <- lapply(ptype, function(col) vector(typeof(col), size))
+  offset <- 0L
+  repeat {
+    array <- stream$get_next(validate = FALSE)
+    if (is.null(array)) {
+      break
+    }
+    n <- as.integer(array$length)
+    if (n > 0L) {
+      chunk <- nanoarrow::convert_array(array, to = ptype)
+      idx <- offset + seq_len(n)
+      for (j in seq_along(columns)) {
+        values <- chunk[[j]]
+        attributes(values) <- NULL
+        columns[[j]][idx] <- values
+      }
+      offset <- offset + n
+    }
+    nanoarrow::nanoarrow_pointer_release(array)
+  }
+  stream$release()
+
+  for (j in seq_along(columns)) {
+    attributes(columns[[j]]) <- attributes(ptype[[j]])
+  }
+  names(columns) <- names(ptype)
+  attr(columns, "row.names") <- .set_row_names(size)
+  class(columns) <- "data.frame"
+  columns
 }
 
 # The R types that Arrow columns are converted to:
@@ -63,9 +107,9 @@ arrow_df_ptype <- function(schema) {
 arrow_df_int64 <- function(df, bigint) {
   is_int64 <- which(vlapply(df, inherits, "integer64"))
   for (i in is_int64) {
-    x <- df[[i]]
-    if (all(is.na(x) | (x >= -.Machine$integer.max & x <= .Machine$integer.max))) {
-      df[[i]] <- as.integer(x)
+    as_int <- integer64_to_integer(df[[i]])
+    if (!is.null(as_int)) {
+      df[[i]] <- as_int
     }
   }
   convert_bigint(df, bigint)

@@ -1,4 +1,6 @@
 #include "pch.h"
+#include <climits>
+#include "integer64.h"
 #include "RSQLite_types.h"
 #include "DbArrow.h"
 #include "DbArrowStream.h"
@@ -87,9 +89,41 @@ SEXP result_fetch_arrow(
   return stream_xptr;
 }
 
-// The next chunk of at most `chunk_size` rows as a nanoarrow_array
+// All remaining rows, fetched up front as arrays of at most `chunk_size` rows:
+// a nanoarrow_array_stream that hands them out one by one, and the row count
 [[cpp11::register]]
-SEXP result_fetch_arrow_chunk(DbResult* res, double chunk_size) {
+cpp11::list result_fetch_arrow_all(
+  cpp11::external_pointer<DbResultPtr> res_,
+  double chunk_size
+) {
+  DbResultPtr* res = res_.get();
+  if (res == NULL || res->get() == NULL) {
+    cpp11::stop("Invalid result set");
+  }
+  if (!(*res)->ready()) {
+    cpp11::stop("Query needs to be bound before fetching");
+  }
+
+  cpp11::sexp stream_xptr(nanoarrow_array_stream_owning_xptr());
+  struct ArrowArrayStream* stream =
+    nanoarrow_output_array_stream_from_xptr(stream_xptr);
+  int64_t n = db_arrow_buffered_stream_init(
+    stream,
+    *res,
+    static_cast<int64_t>(chunk_size)
+  );
+
+  using namespace cpp11::literals;
+  return cpp11::writable::list({
+    "stream"_nm = stream_xptr,
+    "n"_nm = cpp11::as_sexp(static_cast<double>(n))
+  });
+}
+
+// The next chunk of at most `chunk_size` rows as a nanoarrow_array,
+// with the bytes its buffers hold
+[[cpp11::register]]
+cpp11::list result_fetch_arrow_chunk(DbResult* res, double chunk_size) {
   cpp11::sexp array_xptr(nanoarrow_array_owning_xptr());
   struct ArrowArray* array = nanoarrow_output_array_from_xptr(array_xptr);
   res->fetch_arrow(array, static_cast<int64_t>(chunk_size));
@@ -101,7 +135,12 @@ SEXP result_fetch_arrow_chunk(DbResult* res, double chunk_size) {
     static_cast<int64_t>(chunk_size)
   );
   R_SetExternalPtrTag(array_xptr, schema_xptr);
-  return array_xptr;
+
+  using namespace cpp11::literals;
+  return cpp11::writable::list({
+    "array"_nm = array_xptr,
+    "bytes"_nm = cpp11::as_sexp(static_cast<double>(arrow_array_bytes(array)))
+  });
 }
 
 // Binds all rows of a nanoarrow_array_stream, `param_indexes` gives the
@@ -123,4 +162,25 @@ void result_bind_arrow(
 
   std::vector<int> indexes(param_indexes.begin(), param_indexes.end());
   res->bind_arrow(stream, indexes);
+}
+
+// The values of an integer64 vector as an integer vector,
+// or NULL if one of them does not fit
+[[cpp11::register]]
+SEXP integer64_to_integer(cpp11::doubles x) {
+  const R_xlen_t n = x.size();
+  const int64_t* values = reinterpret_cast<const int64_t*>(REAL(x));
+  for (R_xlen_t i = 0; i < n; ++i) {
+    const int64_t value = values[i];
+    if (value != NA_INTEGER64 && (value < -INT_MAX || value > INT_MAX)) {
+      return R_NilValue;
+    }
+  }
+
+  cpp11::writable::integers out(n);
+  for (R_xlen_t i = 0; i < n; ++i) {
+    const int64_t value = values[i];
+    out[i] = (value == NA_INTEGER64) ? NA_INTEGER : static_cast<int>(value);
+  }
+  return out;
 }

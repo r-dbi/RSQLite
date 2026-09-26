@@ -81,6 +81,12 @@ and \code{binary} columns become \link[blob:blob]{blob::blob} objects,
 as on the default path.
 The first chunk of a result decides the types of all its chunks.
 Before writing, factors become strings and lists of raw vectors become blobs.
+
+A fetch of all rows reads the result into Arrow arrays first,
+so that the data frame is allocated once with the row count known,
+and frees each array as soon as it is converted:
+at its peak, the memory holds the arrays and the part of the data frame filled so far.
+A fetch of \code{n} rows copies the strings out of its array and frees the array right away.
 }
 
 \section{Chunking}{
@@ -91,6 +97,14 @@ fetched from the result when the array is requested,
 so the memory footprint is that of one chunk, not of the result set.
 The stream stays readable after the result has been cleared with \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}},
 it is invalidated when another query is sent on the same connection.
+
+An array returned by \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} is freed
+when the garbage collector finds it unreachable,
+and the collector does not see the memory that nanoarrow allocated for it.
+After every 64 MB of arrays, RSQLite triggers a collection of the young generation,
+so that a loop that discards its chunks holds at most that much garbage.
+A loop that needs to be tighter releases each array
+with \code{nanoarrow::nanoarrow_pointer_release()} once done with it.
 \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} returns one such array per call,
 and an empty array once all rows are fetched.
 A chunk is also cut once a string or binary column holds one gigabyte.

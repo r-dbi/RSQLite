@@ -82,6 +82,7 @@ Collate:
     'SQLite.R'
     'SQLiteResult.R'
     'SQLiteResultArrow.R'
+    'arrow-df.R'
     'arrow.R'
     'coerce.R'
     'compatRowNames.R'

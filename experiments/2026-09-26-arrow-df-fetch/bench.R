@@ -27,6 +27,11 @@
 #   default_chunked   dbSendQuery() + dbFetch(n = chunk) loop, batches
 #                     discarded: the bounded-memory consumer, default path
 #   arrow_df_chunked  the same loop on dbConnect(arrow = TRUE)
+#   arrow_df_lazy, arrow_df_lazy_chunked
+#                     dbGetQuery() and the loop on dbConnect(arrow = TRUE,
+#                     lazy_strings = TRUE): character columns stay views into
+#                     their arrays, nothing materializes them (builds with the
+#                     option only; the cells are skipped otherwise)
 #   arrow_drain       dbSendQueryArrow() + dbFetchArrowChunk() loop without
 #                     converting to R: the cost of filling the arrays alone
 #
@@ -54,7 +59,8 @@ db <- arg("db", tempfile(fileext = ".sqlite"))
 
 STRATEGIES <- c(
   "baseline", "default", "arrow_df", "arrow_stream",
-  "default_chunked", "arrow_df_chunked", "arrow_drain"
+  "default_chunked", "arrow_df_chunked", "arrow_drain",
+  "arrow_df_lazy", "arrow_df_lazy_chunked"
 )
 QUERIES <- c(
   all = "SELECT * FROM t",
@@ -119,8 +125,13 @@ run_cell <- function(strategy, sql, db, chunk) {
     as.numeric(sub("^VmHWM:\\s+(\\d+) kB", "\\1", line)) / 1024
   }
 
-  arrow <- strategy %in% c("arrow_df", "arrow_df_chunked")
-  con <- dbConnect(SQLite(), db, arrow = arrow)
+  lazy <- strategy %in% c("arrow_df_lazy", "arrow_df_lazy_chunked")
+  arrow <- lazy || strategy %in% c("arrow_df", "arrow_df_chunked")
+  if (lazy) {
+    con <- dbConnect(SQLite(), db, arrow = TRUE, lazy_strings = TRUE)
+  } else {
+    con <- dbConnect(SQLite(), db, arrow = arrow)
+  }
   on.exit(dbDisconnect(con))
 
   n_rows <- 0
@@ -132,7 +143,8 @@ run_cell <- function(strategy, sql, db, chunk) {
       n_rows <- nrow(df)
     },
     default = ,
-    arrow_df = {
+    arrow_df = ,
+    arrow_df_lazy = {
       df <- dbGetQuery(con, sql)
       n_rows <- nrow(df)
       df_mb <- as.numeric(object.size(df)) / 2^20
@@ -143,7 +155,8 @@ run_cell <- function(strategy, sql, db, chunk) {
       df_mb <- as.numeric(object.size(df)) / 2^20
     },
     default_chunked = ,
-    arrow_df_chunked = {
+    arrow_df_chunked = ,
+    arrow_df_lazy_chunked = {
       rs <- dbSendQuery(con, sql)
       while (!dbHasCompleted(rs)) {
         n_rows <- n_rows + nrow(dbFetch(rs, chunk))
@@ -175,6 +188,15 @@ run_cell <- function(strategy, sql, db, chunk) {
 if (!file.exists(db)) {
   cat("Creating", format(rows, big.mark = ","), "rows in", db, "\n")
   make_table(db, rows)
+}
+
+has_lazy <- "lazy_strings" %in% names(formals(RSQLite:::dbConnect_SQLiteDriver))
+if (!has_lazy) {
+  dropped <- intersect(strategies, c("arrow_df_lazy", "arrow_df_lazy_chunked"))
+  if (length(dropped) > 0) {
+    cat("Skipping", paste(dropped, collapse = ", "), ": this build has no lazy_strings\n")
+    strategies <- setdiff(strategies, dropped)
+  }
 }
 
 results <- list()

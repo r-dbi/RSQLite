@@ -188,6 +188,27 @@ extern "C" SEXP _RSQLite_result_fetch_arrow_all(SEXP res_, SEXP chunk_size) {
   END_CPP11
 }
 // result.cpp
+cpp11::list result_fetch_arrow_columns(cpp11::external_pointer<DbResultPtr> res_, double chunk_size);
+extern "C" SEXP _RSQLite_result_fetch_arrow_columns(SEXP res_, SEXP chunk_size) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(result_fetch_arrow_columns(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResultPtr>>>(res_), cpp11::as_cpp<cpp11::decay_t<double>>(chunk_size)));
+  END_CPP11
+}
+// result.cpp
+cpp11::list result_fetch_arrow_chunk_columns(DbResult* res, double chunk_size);
+extern "C" SEXP _RSQLite_result_fetch_arrow_chunk_columns(SEXP res, SEXP chunk_size) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(result_fetch_arrow_chunk_columns(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<double>>(chunk_size)));
+  END_CPP11
+}
+// result.cpp
+SEXP arrow_concat_strings(cpp11::sexp stream_xptr);
+extern "C" SEXP _RSQLite_arrow_concat_strings(SEXP stream_xptr) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(arrow_concat_strings(cpp11::as_cpp<cpp11::decay_t<cpp11::sexp>>(stream_xptr)));
+  END_CPP11
+}
+// result.cpp
 cpp11::list result_fetch_arrow_chunk(DbResult* res, double chunk_size);
 extern "C" SEXP _RSQLite_result_fetch_arrow_chunk(SEXP res, SEXP chunk_size) {
   BEGIN_CPP11
@@ -219,35 +240,38 @@ extern "C" SEXP _RSQLite_rsqliteVersion() {
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
-    {"_RSQLite_connection_connect",           (DL_FUNC) &_RSQLite_connection_connect,           5},
-    {"_RSQLite_connection_copy_database",     (DL_FUNC) &_RSQLite_connection_copy_database,     2},
-    {"_RSQLite_connection_import_file",       (DL_FUNC) &_RSQLite_connection_import_file,       6},
-    {"_RSQLite_connection_in_transaction",    (DL_FUNC) &_RSQLite_connection_in_transaction,    1},
-    {"_RSQLite_connection_release",           (DL_FUNC) &_RSQLite_connection_release,           1},
-    {"_RSQLite_connection_valid",             (DL_FUNC) &_RSQLite_connection_valid,             1},
-    {"_RSQLite_extension_load",               (DL_FUNC) &_RSQLite_extension_load,               3},
-    {"_RSQLite_integer64_to_integer",         (DL_FUNC) &_RSQLite_integer64_to_integer,         1},
-    {"_RSQLite_result_bind",                  (DL_FUNC) &_RSQLite_result_bind,                  2},
-    {"_RSQLite_result_bind_arrow",            (DL_FUNC) &_RSQLite_result_bind_arrow,            3},
-    {"_RSQLite_result_column_info",           (DL_FUNC) &_RSQLite_result_column_info,           1},
-    {"_RSQLite_result_column_names",          (DL_FUNC) &_RSQLite_result_column_names,          1},
-    {"_RSQLite_result_create",                (DL_FUNC) &_RSQLite_result_create,                2},
-    {"_RSQLite_result_fetch",                 (DL_FUNC) &_RSQLite_result_fetch,                 2},
-    {"_RSQLite_result_fetch_arrow",           (DL_FUNC) &_RSQLite_result_fetch_arrow,           2},
-    {"_RSQLite_result_fetch_arrow_all",       (DL_FUNC) &_RSQLite_result_fetch_arrow_all,       2},
-    {"_RSQLite_result_fetch_arrow_chunk",     (DL_FUNC) &_RSQLite_result_fetch_arrow_chunk,     2},
-    {"_RSQLite_result_get_placeholder_names", (DL_FUNC) &_RSQLite_result_get_placeholder_names, 1},
-    {"_RSQLite_result_has_completed",         (DL_FUNC) &_RSQLite_result_has_completed,         1},
-    {"_RSQLite_result_release",               (DL_FUNC) &_RSQLite_result_release,               1},
-    {"_RSQLite_result_rows_affected",         (DL_FUNC) &_RSQLite_result_rows_affected,         1},
-    {"_RSQLite_result_rows_fetched",          (DL_FUNC) &_RSQLite_result_rows_fetched,          1},
-    {"_RSQLite_result_set_arrow_schema",      (DL_FUNC) &_RSQLite_result_set_arrow_schema,      3},
-    {"_RSQLite_result_valid",                 (DL_FUNC) &_RSQLite_result_valid,                 1},
-    {"_RSQLite_rsqliteVersion",               (DL_FUNC) &_RSQLite_rsqliteVersion,               0},
-    {"_RSQLite_set_busy_handler",             (DL_FUNC) &_RSQLite_set_busy_handler,             2},
-    {"_RSQLite_sqlite_has_http_vfs",          (DL_FUNC) &_RSQLite_sqlite_has_http_vfs,          0},
-    {"_RSQLite_sqlite_http_stats",            (DL_FUNC) &_RSQLite_sqlite_http_stats,            0},
-    {"_RSQLite_sqlite_httpvfs_compiled",      (DL_FUNC) &_RSQLite_sqlite_httpvfs_compiled,      0},
+    {"_RSQLite_arrow_concat_strings",             (DL_FUNC) &_RSQLite_arrow_concat_strings,             1},
+    {"_RSQLite_connection_connect",               (DL_FUNC) &_RSQLite_connection_connect,               5},
+    {"_RSQLite_connection_copy_database",         (DL_FUNC) &_RSQLite_connection_copy_database,         2},
+    {"_RSQLite_connection_import_file",           (DL_FUNC) &_RSQLite_connection_import_file,           6},
+    {"_RSQLite_connection_in_transaction",        (DL_FUNC) &_RSQLite_connection_in_transaction,        1},
+    {"_RSQLite_connection_release",               (DL_FUNC) &_RSQLite_connection_release,               1},
+    {"_RSQLite_connection_valid",                 (DL_FUNC) &_RSQLite_connection_valid,                 1},
+    {"_RSQLite_extension_load",                   (DL_FUNC) &_RSQLite_extension_load,                   3},
+    {"_RSQLite_integer64_to_integer",             (DL_FUNC) &_RSQLite_integer64_to_integer,             1},
+    {"_RSQLite_result_bind",                      (DL_FUNC) &_RSQLite_result_bind,                      2},
+    {"_RSQLite_result_bind_arrow",                (DL_FUNC) &_RSQLite_result_bind_arrow,                3},
+    {"_RSQLite_result_column_info",               (DL_FUNC) &_RSQLite_result_column_info,               1},
+    {"_RSQLite_result_column_names",              (DL_FUNC) &_RSQLite_result_column_names,              1},
+    {"_RSQLite_result_create",                    (DL_FUNC) &_RSQLite_result_create,                    2},
+    {"_RSQLite_result_fetch",                     (DL_FUNC) &_RSQLite_result_fetch,                     2},
+    {"_RSQLite_result_fetch_arrow",               (DL_FUNC) &_RSQLite_result_fetch_arrow,               2},
+    {"_RSQLite_result_fetch_arrow_all",           (DL_FUNC) &_RSQLite_result_fetch_arrow_all,           2},
+    {"_RSQLite_result_fetch_arrow_chunk",         (DL_FUNC) &_RSQLite_result_fetch_arrow_chunk,         2},
+    {"_RSQLite_result_fetch_arrow_chunk_columns", (DL_FUNC) &_RSQLite_result_fetch_arrow_chunk_columns, 2},
+    {"_RSQLite_result_fetch_arrow_columns",       (DL_FUNC) &_RSQLite_result_fetch_arrow_columns,       2},
+    {"_RSQLite_result_get_placeholder_names",     (DL_FUNC) &_RSQLite_result_get_placeholder_names,     1},
+    {"_RSQLite_result_has_completed",             (DL_FUNC) &_RSQLite_result_has_completed,             1},
+    {"_RSQLite_result_release",                   (DL_FUNC) &_RSQLite_result_release,                   1},
+    {"_RSQLite_result_rows_affected",             (DL_FUNC) &_RSQLite_result_rows_affected,             1},
+    {"_RSQLite_result_rows_fetched",              (DL_FUNC) &_RSQLite_result_rows_fetched,              1},
+    {"_RSQLite_result_set_arrow_schema",          (DL_FUNC) &_RSQLite_result_set_arrow_schema,          3},
+    {"_RSQLite_result_valid",                     (DL_FUNC) &_RSQLite_result_valid,                     1},
+    {"_RSQLite_rsqliteVersion",                   (DL_FUNC) &_RSQLite_rsqliteVersion,                   0},
+    {"_RSQLite_set_busy_handler",                 (DL_FUNC) &_RSQLite_set_busy_handler,                 2},
+    {"_RSQLite_sqlite_has_http_vfs",              (DL_FUNC) &_RSQLite_sqlite_has_http_vfs,              0},
+    {"_RSQLite_sqlite_http_stats",                (DL_FUNC) &_RSQLite_sqlite_http_stats,                0},
+    {"_RSQLite_sqlite_httpvfs_compiled",          (DL_FUNC) &_RSQLite_sqlite_httpvfs_compiled,          0},
     {NULL, NULL, 0}
 };
 }

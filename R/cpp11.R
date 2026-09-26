@@ -100,6 +100,18 @@ result_fetch_arrow_all <- function(res_, chunk_size) {
   .Call(`_RSQLite_result_fetch_arrow_all`, res_, chunk_size)
 }
 
+result_fetch_arrow_columns <- function(res_, chunk_size) {
+  .Call(`_RSQLite_result_fetch_arrow_columns`, res_, chunk_size)
+}
+
+result_fetch_arrow_chunk_columns <- function(res, chunk_size) {
+  .Call(`_RSQLite_result_fetch_arrow_chunk_columns`, res, chunk_size)
+}
+
+arrow_concat_strings <- function(stream_xptr) {
+  .Call(`_RSQLite_arrow_concat_strings`, stream_xptr)
+}
+
 result_fetch_arrow_chunk <- function(res, chunk_size) {
   .Call(`_RSQLite_result_fetch_arrow_chunk`, res, chunk_size)
 }

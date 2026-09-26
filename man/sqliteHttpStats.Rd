@@ -11,11 +11,11 @@ A list with elements \code{bytes_fetched}, \code{range_requests}, \code{full_dow
 }
 \description{
 Returns counters collected for HTTP VFS operations in the current process.
-These values are best-effort and may currently report zeros until global aggregation is implemented.
+ These values are best-effort and may currently report zeros until global aggregation is implemented.
 }
 \details{
 Statistics are maintained per R process and reset when the process terminates.
-Values:
+ Values:
 \itemize{
 \item \code{bytes_fetched}: Total bytes transferred via HTTP GET/Range requests.
 \item \code{range_requests}: Count of HTTP Range requests performed.

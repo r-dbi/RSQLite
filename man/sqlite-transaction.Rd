@@ -27,17 +27,17 @@ sqliteIsTransacting(conn)
 \item{.name}{For backward compatibility, do not use.}
 
 \item{...}{Needed for compatibility with generic.
-Otherwise ignored.}
+ Otherwise ignored.}
 
 \item{name}{Supply a name to use a named savepoint.
-This allows you to nest multiple transaction}
+ This allows you to nest multiple transaction}
 }
 \description{
 By default, SQLite is in auto-commit mode.
-\code{dbBegin()} starts a SQLite transaction and turns auto-commit off.
-\code{dbCommit()} and \code{dbRollback()} commit and rollback the transaction, respectively and turn auto-commit on.
-\code{\link[DBI:dbWithTransaction]{DBI::dbWithTransaction()}} is a convenient wrapper that makes sure that \code{dbCommit()} or \code{dbRollback()} is called.
-A helper function \code{sqliteIsTransacting()} is available to check the current transaction status of the connection.
+ \code{dbBegin()} starts a SQLite transaction and turns auto-commit off.
+ \code{dbCommit()} and \code{dbRollback()} commit and rollback the transaction, respectively and turn auto-commit on.
+ \code{\link[DBI:dbWithTransaction]{DBI::dbWithTransaction()}} is a convenient wrapper that makes sure that \code{dbCommit()} or \code{dbRollback()} is called.
+ A helper function \code{sqliteIsTransacting()} is available to check the current transaction status of the connection.
 }
 \examples{
 library(DBI)

@@ -12,13 +12,13 @@ sqliteHttpConfig(
 }
 \arguments{
 \item{cache_size_mb}{Integer megabytes for in-memory page cache.
-\code{NULL} leaves unchanged.}
+ \code{NULL} leaves unchanged.}
 
 \item{prefetch_pages}{Integer pages to prefetch ahead.
-\code{NULL} leaves unchanged.}
+ \code{NULL} leaves unchanged.}
 
 \item{fallback_full_download}{Logical; if \code{TRUE}, allow full-download fallback when Range is not available.
-\code{NULL} leaves unchanged.}
+ \code{NULL} leaves unchanged.}
 }
 \value{
 A named list of previous values (in R types).
@@ -27,7 +27,7 @@ A named list of previous values (in R types).
 lifecycle::badge("experimental")
 
 Set conservative, process-wide options for the experimental HTTP/HTTPS VFS.
-These values are read on first open of a remote database in the current process.
+ These values are read on first open of a remote database in the current process.
 }
 \details{
 Options are stored in environment variables so they also affect C-level code:

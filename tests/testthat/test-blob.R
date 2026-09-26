@@ -45,3 +45,33 @@ test_that("blob class", {
     data
   )
 })
+
+test_that("a blob in a text column is read as text only if it is valid UTF-8", {
+  con <- memory_db()
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES ('a'), (X'6162'), (X'00ff'), (X'ff'), (X'C3A4')")
+
+  expect_warning(
+    expect_warning(
+      out <- dbGetQuery(con, "SELECT x FROM t"),
+      "coercing other values of type blob"
+    ),
+    "2 blob values are not valid UTF-8 text, NA is returned"
+  )
+  expect_identical(out$x, c("a", "ab", NA, NA, "ä"))
+  expect_identical(Encoding(out$x[[5]]), "UTF-8")
+
+  # A blob in a declared TEXT column takes the same route
+  dbExecute(con, "CREATE TABLE u (x TEXT)")
+  dbExecute(con, "INSERT INTO u VALUES ('a'), (X'00')")
+  expect_warning(
+    expect_warning(
+      out <- dbGetQuery(con, "SELECT x FROM u"),
+      "coercing other values of type blob"
+    ),
+    "1 blob value is not valid UTF-8 text, NA is returned"
+  )
+  expect_identical(out$x, c("a", NA))
+})

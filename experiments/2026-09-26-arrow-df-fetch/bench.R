@@ -147,12 +147,10 @@ run_cell <- function(strategy, sql, db, chunk) {
     arrow_df_lazy = {
       df <- dbGetQuery(con, sql)
       n_rows <- nrow(df)
-      df_mb <- as.numeric(object.size(df)) / 2^20
     },
     arrow_stream = {
       df <- as.data.frame(dbGetQueryArrow(con, sql))
       n_rows <- nrow(df)
-      df_mb <- as.numeric(object.size(df)) / 2^20
     },
     default_chunked = ,
     arrow_df_chunked = ,
@@ -172,6 +170,11 @@ run_cell <- function(strategy, sql, db, chunk) {
     }
   )
   elapsed <- proc.time()[["elapsed"]] - start
+  # Outside the timing: object.size() reads every string, which materializes
+  # a lazy column
+  if (exists("df", inherits = FALSE)) {
+    df_mb <- as.numeric(object.size(df)) / 2^20
+  }
 
   data.frame(
     elapsed = elapsed,

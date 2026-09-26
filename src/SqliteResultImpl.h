@@ -41,8 +41,10 @@ private:
   std::vector<DATA_TYPE> types_;
   bool with_alt_types_;
 
-  // Arrow state: the column types, decided once per execution, and a chunk
+  // Arrow state: the types requested for the columns, which outlive an
+  // execution, the column types, decided once per execution, and a chunk
   // that had to be fetched to decide them before the schema was requested
+  std::vector<ArrowTarget> arrow_targets_;
   boost::ptr_vector<SqliteArrowColumn> arrow_columns_;
   bool arrow_frozen_;
   nanoarrow::UniqueArray pending_chunk_;
@@ -66,8 +68,13 @@ public:
   cpp11::list fetch(const int n_max);
 
   cpp11::list get_column_info();
+  cpp11::strings get_column_names() const;
 
   // Arrow
+  void set_arrow_schema(
+    const struct ArrowSchema* schema,
+    const std::vector<int>& positions
+  );
   void arrow_schema(struct ArrowSchema* out, int64_t infer_rows);
   int64_t fetch_arrow(struct ArrowArray* out, int64_t n_max);
   void bind_arrow(

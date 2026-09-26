@@ -82,12 +82,7 @@
 
 \S4method{show}{SQLiteConnection}(object)
 
-\S4method{sqlData}{SQLiteConnection}(
-  con,
-  value,
-  row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE),
-  ...
-)
+\S4method{sqlData}{SQLiteConnection}(con, value, row.names = FALSE, ...)
 }
 \arguments{
 \item{temporary}{If \code{TRUE}, only temporary tables are considered.}

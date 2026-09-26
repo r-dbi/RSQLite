@@ -17,9 +17,12 @@ NULL
 #' @aliases dbBuildTableDefinition
 #' @export
 sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL,
-                                       row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE)) {
+                                       row.names = FALSE) {
 
   warning_once("RSQLite::sqliteBuildTableDefinition() is deprecated, please switch to DBI::sqlCreateTable().")
+  if (missing(row.names)) {
+    row.names <- row_names_default("RSQLite::row.names.query")
+  }
   row.names <- compatRowNames(row.names)
 
   if (!is.data.frame(value)) {

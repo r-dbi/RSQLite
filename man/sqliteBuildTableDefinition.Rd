@@ -10,7 +10,7 @@ sqliteBuildTableDefinition(
   name,
   value,
   field.types = NULL,
-  row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE)
+  row.names = FALSE
 )
 }
 \arguments{

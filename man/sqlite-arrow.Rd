@@ -22,13 +22,21 @@ and integers are widened to \code{double} if a real number turns up in the first
 A column whose first chunk holds only \code{NULL} values takes the type of its declaration,
 and a column without a declaration that only ever holds \code{NULL} is of the Arrow null type.
 Once the first chunk has been fetched the types are fixed;
-later values of another storage class are converted by SQLite's own rules,
-with one warning per column.
+later values of another storage class are converted by SQLite's own rules.
+Such values are reported with one warning per fetched chunk,
+of class \code{RSQLite_warning_coercion},
+that lists the affected columns with the 1-based row numbers in the result,
+for a lazy stream at the time the chunk is read.
+The warning carries the details in its \code{coercions} field.
+A blob in a text column is kept only if it is valid UTF-8 without NUL bytes,
+and a date, time or timestamp that cannot be parsed is dropped;
+both become \code{NULL} and are listed in the same warning.
 The types can therefore depend on \code{chunk_size}:
 a real number in a later chunk is truncated to fit an \code{int64} column decided from integers,
 and a column whose first chunk holds only \code{NULL} keeps its declared type,
 or the null type without a declaration, for the whole result.
-The default chunk size makes this rare, a small \code{chunk_size} makes it likely.\tabular{ll}{
+The default chunk size makes this rare, a small \code{chunk_size} makes it likely,
+and a \code{schema} fixes the types up front, see the section on requesting types.\tabular{ll}{
    \emph{SQLite value or declared type} \tab \emph{Arrow type} \cr
    integer, or INTEGER affinity \tab \code{int64} \cr
    real, or REAL and NUMERIC affinity \tab \code{double} \cr
@@ -46,6 +54,45 @@ nanoarrow converts these to \code{double} by default,
 use \code{bit64::integer64()} as the target type to keep the full range.
 Dates, times and timestamps are parsed like the data frame path does it
 when \code{extended_types = TRUE}, see \code{\link[=SQLite]{SQLite()}}.
+}
+
+\section{Requesting types}{
+
+The \code{schema} argument of \code{\link[DBI:dbSendQueryArrow]{DBI::dbSendQueryArrow()}}, \code{\link[DBI:dbGetQueryArrow]{DBI::dbGetQueryArrow()}}
+and \code{\link[DBI:dbReadTableArrow]{DBI::dbReadTableArrow()}} fixes the Arrow types of some or all result columns
+before the first row is read:
+a struct \code{nanoarrow_schema}, an arrow \code{Schema},
+or a named list of column types such as
+\code{list(id = nanoarrow::na_int32(), when = nanoarrow::na_timestamp("ms", "UTC"))}.
+The entries are matched to the result columns by name, exactly.
+A name that is not in the result, a name the result carries twice,
+and an unnamed entry are errors.
+A column with a requested type is typed without looking at its values,
+with no widening and no dependence on \code{chunk_size},
+and its declared type and \code{extended_types} play no part;
+the other columns are typed as described above.
+The requested types are kept when the query is executed again with \code{\link[DBI:dbBind]{DBI::dbBind()}}.
+
+The types that can be requested are
+\code{null}, \code{bool}, \code{int8} to \code{int64}, \code{uint8} to \code{uint64}, \code{float}, \code{double},
+\code{utf8} and \code{large_utf8}, \code{binary} and \code{large_binary}, \code{date32} and \code{date64},
+\code{time32} and \code{time64} in any unit, and \code{timestamp} in any unit and time zone.
+Dates, times and timestamps are parsed from their text form like \code{extended_types = TRUE} does it,
+a timestamp is read as UTC and only labelled with the requested time zone.
+Dictionary, decimal, nested and extension types are an error.
+
+Values of another storage class than the column's type follow these rules,
+whether the type was requested or decided from the values:
+\itemize{
+\item silently: integers into a floating point type,
+integers and reals into a text type, where SQLite renders them,
+and text into a binary type, as its bytes;
+\item converted by SQLite, with the warning described above:
+text and blobs into a numeric type, and reals into an integer type, truncated;
+\item \code{NULL}, with the warning: a blob into a text type unless it is valid UTF-8,
+a number outside the range of an integer type,
+and a date or time that cannot be parsed.
+}
 }
 
 \section{Parameters}{

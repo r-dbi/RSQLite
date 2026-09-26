@@ -152,10 +152,25 @@ extern "C" SEXP _RSQLite_result_column_info(SEXP res) {
   END_CPP11
 }
 // result.cpp
+cpp11::strings result_column_names(DbResult* res);
+extern "C" SEXP _RSQLite_result_column_names(SEXP res) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(result_column_names(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res)));
+  END_CPP11
+}
+// result.cpp
 cpp11::strings result_get_placeholder_names(SqliteResult* res);
 extern "C" SEXP _RSQLite_result_get_placeholder_names(SEXP res) {
   BEGIN_CPP11
     return cpp11::as_sexp(result_get_placeholder_names(cpp11::as_cpp<cpp11::decay_t<SqliteResult*>>(res)));
+  END_CPP11
+}
+// result.cpp
+void result_set_arrow_schema(DbResult* res, cpp11::sexp schema, cpp11::integers positions);
+extern "C" SEXP _RSQLite_result_set_arrow_schema(SEXP res, SEXP schema, SEXP positions) {
+  BEGIN_CPP11
+    result_set_arrow_schema(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<cpp11::sexp>>(schema), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(positions));
+    return R_NilValue;
   END_CPP11
 }
 // result.cpp
@@ -200,6 +215,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_result_bind",                  (DL_FUNC) &_RSQLite_result_bind,                  2},
     {"_RSQLite_result_bind_arrow",            (DL_FUNC) &_RSQLite_result_bind_arrow,            3},
     {"_RSQLite_result_column_info",           (DL_FUNC) &_RSQLite_result_column_info,           1},
+    {"_RSQLite_result_column_names",          (DL_FUNC) &_RSQLite_result_column_names,          1},
     {"_RSQLite_result_create",                (DL_FUNC) &_RSQLite_result_create,                2},
     {"_RSQLite_result_fetch",                 (DL_FUNC) &_RSQLite_result_fetch,                 2},
     {"_RSQLite_result_fetch_arrow",           (DL_FUNC) &_RSQLite_result_fetch_arrow,           2},
@@ -209,6 +225,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_result_release",               (DL_FUNC) &_RSQLite_result_release,               1},
     {"_RSQLite_result_rows_affected",         (DL_FUNC) &_RSQLite_result_rows_affected,         1},
     {"_RSQLite_result_rows_fetched",          (DL_FUNC) &_RSQLite_result_rows_fetched,          1},
+    {"_RSQLite_result_set_arrow_schema",      (DL_FUNC) &_RSQLite_result_set_arrow_schema,      3},
     {"_RSQLite_result_valid",                 (DL_FUNC) &_RSQLite_result_valid,                 1},
     {"_RSQLite_rsqliteVersion",               (DL_FUNC) &_RSQLite_rsqliteVersion,               0},
     {"_RSQLite_set_busy_handler",             (DL_FUNC) &_RSQLite_set_busy_handler,             2},

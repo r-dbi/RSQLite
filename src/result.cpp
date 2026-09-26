@@ -60,11 +60,32 @@ cpp11::list result_column_info(DbResult* res) {
 }
 
 [[cpp11::register]]
+cpp11::strings result_column_names(DbResult* res) {
+  return res->get_column_names();
+}
+
+[[cpp11::register]]
 cpp11::strings result_get_placeholder_names(SqliteResult* res) {
   return res->get_placeholder_names();
 }
 
 // Arrow ///////////////////////////////////////////////////////////////////////
+
+// Requests the Arrow types of the children of `schema` for the result columns
+// at the zero-based `positions`, before the first row is fetched
+[[cpp11::register]]
+void result_set_arrow_schema(
+  DbResult* res,
+  cpp11::sexp schema,
+  cpp11::integers positions
+) {
+  if (!Rf_inherits(schema, "nanoarrow_schema")) {
+    cpp11::stop("`schema` must be a nanoarrow_schema.");
+  }
+  const struct ArrowSchema* schema_ptr = nanoarrow_schema_from_xptr(schema);
+  std::vector<int> pos(positions.begin(), positions.end());
+  res->set_arrow_schema(schema_ptr, pos);
+}
 
 // A lazy nanoarrow_array_stream over the remaining rows of the result
 [[cpp11::register]]

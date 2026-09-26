@@ -44,8 +44,13 @@ public:
   cpp11::list fetch(int n_max = -1);
 
   cpp11::list get_column_info();
+  cpp11::strings get_column_names() const;
 
   // Arrow
+  void set_arrow_schema(
+    const struct ArrowSchema* schema,
+    const std::vector<int>& positions
+  );
   void arrow_schema(struct ArrowSchema* out, int64_t infer_rows);
   int64_t fetch_arrow(struct ArrowArray* out, int64_t n_max);
   void bind_arrow(

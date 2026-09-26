@@ -95,7 +95,8 @@ Defaults to \code{FALSE}.}
 \item{arrow}{When \code{TRUE}, data frames travel through the Arrow interface:
 \code{\link[DBI:dbFetch]{DBI::dbFetch()}} converts the Arrow arrays that \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} fills straight from the SQLite statement,
 and \code{\link[DBI:dbAppendTable]{DBI::dbAppendTable()}} binds the data frame as an Arrow stream through \code{\link[DBI:dbAppendTableArrow]{DBI::dbAppendTableArrow()}}.
-The data frames are the same as with the default path, see \link{sqlite-arrow} for the rules.
+The data frames are the same as with the default path, see \link{sqlite-arrow} for the rules,
+and the \code{ptype} argument of \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}} can fix the types of the columns up front.
 Experimental, defaults to \code{FALSE}.}
 }
 \value{

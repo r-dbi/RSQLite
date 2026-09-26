@@ -39,8 +39,34 @@ An experimental HTTP/HTTPS VFS is available when the package is built with libcu
 enabling read-only access to remote SQLite databases.
 See the help pages for `initExtension()`, `sqliteHttpConfig()`, `sqliteRemote()`, and `sqliteHasHttpVFS()`.
 
-Discussions associated with DBI and related database packages take place on [R-SIG-DB](https://stat.ethz.ch/mailman/listinfo/r-sig-db).
-The website [Databases using R](https://db.rstudio.com/) describes the tools and best practices in this ecosystem.
+If HTTP VFS support is available, `sqliteRemote()` is the easiest way to
+open a remote database:
+
+``` r
+if (sqliteHasHttpVFS()) {
+  con <- sqliteRemote("https://example.org/db.sqlite")
+  dbDisconnect(con)
+}
+```
+
+For cases where you need the explicit SQLite URI filename, use
+`dbConnect()` with `flags = SQLITE_RO`:
+
+``` r
+if (sqliteHasHttpVFS()) {
+  con <- dbConnect(
+    RSQLite::SQLite(),
+    "file:https://example.org/db.sqlite?vfs=http&immutable=1",
+    flags = SQLITE_RO
+  )
+  dbDisconnect(con)
+}
+```
+
+Discussions associated with DBI and related database packages take place
+on [R-SIG-DB](https://stat.ethz.ch/mailman/listinfo/r-sig-db). The
+website [Databases using R](https://db.rstudio.com/) describes the tools
+and best practices in this ecosystem.
 
 ## Basic usage
 

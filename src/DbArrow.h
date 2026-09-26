@@ -55,7 +55,8 @@ inline struct ArrowBufferView arrow_buffer_view(
   return view;
 }
 
-// The bytes held by the buffers of an array built by nanoarrow, children included
+// The bytes held by the buffers of an array built by nanoarrow, children
+// included
 inline int64_t arrow_array_bytes(struct ArrowArray* array) {
   int64_t bytes = 0;
   for (int i = 0; i < NANOARROW_MAX_FIXED_BUFFERS; ++i) {

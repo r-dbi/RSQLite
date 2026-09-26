@@ -114,10 +114,10 @@ cpp11::list result_fetch_arrow_all(
   );
 
   using namespace cpp11::literals;
-  return cpp11::writable::list({
-    "stream"_nm = stream_xptr,
-    "n"_nm = cpp11::as_sexp(static_cast<double>(n))
-  });
+  return cpp11::writable::list(
+    { "stream"_nm = stream_xptr,
+      "n"_nm = cpp11::as_sexp(static_cast<double>(n)) }
+  );
 }
 
 // The next chunk of at most `chunk_size` rows as a nanoarrow_array,
@@ -137,10 +137,11 @@ cpp11::list result_fetch_arrow_chunk(DbResult* res, double chunk_size) {
   R_SetExternalPtrTag(array_xptr, schema_xptr);
 
   using namespace cpp11::literals;
-  return cpp11::writable::list({
-    "array"_nm = array_xptr,
-    "bytes"_nm = cpp11::as_sexp(static_cast<double>(arrow_array_bytes(array)))
-  });
+  return cpp11::writable::list(
+    { "array"_nm = array_xptr,
+      "bytes"_nm =
+        cpp11::as_sexp(static_cast<double>(arrow_array_bytes(array))) }
+  );
 }
 
 // Binds all rows of a nanoarrow_array_stream, `param_indexes` gives the

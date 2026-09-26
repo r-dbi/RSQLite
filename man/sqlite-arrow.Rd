@@ -23,7 +23,12 @@ A column whose first chunk holds only \code{NULL} values takes the type of its d
 and a column without a declaration that only ever holds \code{NULL} is of the Arrow null type.
 Once the first chunk has been fetched the types are fixed;
 later values of another storage class are converted by SQLite's own rules,
-with one warning per column.\tabular{ll}{
+with one warning per column.
+The types can therefore depend on \code{chunk_size}:
+a real number in a later chunk is truncated to fit an \code{int64} column decided from integers,
+and a column whose first chunk holds only \code{NULL} keeps its declared type,
+or the null type without a declaration, for the whole result.
+The default chunk size makes this rare, a small \code{chunk_size} makes it likely.\tabular{ll}{
    \emph{SQLite value or declared type} \tab \emph{Arrow type} \cr
    integer, or INTEGER affinity \tab \code{int64} \cr
    real, or REAL and NUMERIC affinity \tab \code{double} \cr

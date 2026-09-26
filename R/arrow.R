@@ -19,6 +19,11 @@
 #' Once the first chunk has been fetched the types are fixed;
 #' later values of another storage class are converted by SQLite's own rules,
 #' with one warning per column.
+#' The types can therefore depend on `chunk_size`:
+#' a real number in a later chunk is truncated to fit an `int64` column decided from integers,
+#' and a column whose first chunk holds only `NULL` keeps its declared type,
+#' or the null type without a declaration, for the whole result.
+#' The default chunk size makes this rare, a small `chunk_size` makes it likely.
 #'
 #' | *SQLite value or declared type* | *Arrow type* |
 #' | ------------------------------- | ------------ |

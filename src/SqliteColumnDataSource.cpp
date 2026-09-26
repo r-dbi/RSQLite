@@ -95,8 +95,27 @@ SEXP SqliteColumnDataSource::fetch_blob() const {
 }
 
 double SqliteColumnDataSource::fetch_date() const {
+  bool ok;
+  double value = parse_date(ok);
+  if (!ok) {
+    warn_unparsable();
+  }
+  return value;
+}
+
+double SqliteColumnDataSource::fetch_datetime_local() const {
+  bool ok;
+  double value = parse_datetime_local(ok);
+  if (!ok) {
+    warn_unparsable();
+  }
+  return value;
+}
+
+double SqliteColumnDataSource::parse_date(bool& ok) const {
   namespace bg = boost::gregorian;
 
+  ok = true;
   int dt = get_column_type();
 
   if (dt == SQLITE_TEXT) {
@@ -109,23 +128,24 @@ double SqliteColumnDataSource::fetch_date() const {
       bg::date_duration delta = dt - bg::date(1970, 1, 1);
       dateval = static_cast<double>(delta.days());
     } catch (...) {
-      cpp11::warning(std::string("Unknown string format, NA is returned."));
+      ok = false;
       dateval = NA_REAL;
     }
     return dateval;
   } else if (dt == SQLITE_BLOB) {
-    cpp11::warning(std::string("Cannot convert blob, NA is returned."));
+    ok = false;
     return NA_REAL;
   } else {
     return static_cast<double>(sqlite3_column_int(get_stmt(), get_j()));
   }
 }
 
-double SqliteColumnDataSource::fetch_datetime_local() const {
+double SqliteColumnDataSource::parse_datetime_local(bool& ok) const {
   namespace bp = boost::posix_time;
   namespace bg = boost::gregorian;
   namespace bd = boost::date_time;
 
+  ok = true;
   int dt = get_column_type();
 
   if (dt == SQLITE_TEXT) {
@@ -138,12 +158,12 @@ double SqliteColumnDataSource::fetch_datetime_local() const {
         dttm - bp::ptime(bg::date(1970, 1, 1), bp::seconds(0));
       dateval = delta.total_microseconds() * 1e-6;
     } catch (...) {
-      cpp11::warning(std::string("Unknown string format, NA is returned."));
+      ok = false;
       dateval = NA_REAL;
     }
     return dateval;
   } else if (dt == SQLITE_BLOB) {
-    cpp11::warning(std::string("Cannot convert blob, NA is returned."));
+    ok = false;
     return NA_REAL;
   } else {
     return sqlite3_column_double(get_stmt(), get_j());
@@ -156,8 +176,18 @@ double SqliteColumnDataSource::fetch_datetime() const {
 }
 
 double SqliteColumnDataSource::fetch_time() const {
+  bool ok;
+  double value = parse_time(ok);
+  if (!ok) {
+    warn_unparsable();
+  }
+  return value;
+}
+
+double SqliteColumnDataSource::parse_time(bool& ok) const {
   namespace bp = boost::posix_time;
 
+  ok = true;
   int dt = get_column_type();
 
   if (dt == SQLITE_TEXT) {
@@ -168,15 +198,24 @@ double SqliteColumnDataSource::fetch_time() const {
       bp::time_duration secs(bp::duration_from_string(tmstr));
       dateval = secs.total_microseconds() * 1e-6;
     } catch (...) {
-      cpp11::warning(std::string("Unknown string format, NA is returned."));
+      ok = false;
       dateval = NA_REAL;
     }
     return dateval;
   } else if (dt == SQLITE_BLOB) {
-    cpp11::warning(std::string("Cannot convert blob, NA is returned."));
+    ok = false;
     return NA_REAL;
   } else {
     return sqlite3_column_double(get_stmt(), get_j());
+  }
+}
+
+void SqliteColumnDataSource::warn_unparsable() const {
+  // The parsers only convert text values, so the storage class is intact
+  if (get_column_type() == SQLITE_BLOB) {
+    cpp11::warning(std::string("Cannot convert blob, NA is returned."));
+  } else {
+    cpp11::warning(std::string("Unknown string format, NA is returned."));
   }
 }
 

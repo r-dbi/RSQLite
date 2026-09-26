@@ -22,8 +22,15 @@ and integers are widened to \code{double} if a real number turns up in the first
 A column whose first chunk holds only \code{NULL} values takes the type of its declaration,
 and a column without a declaration that only ever holds \code{NULL} is of the Arrow null type.
 Once the first chunk has been fetched the types are fixed;
-later values of another storage class are converted by SQLite's own rules,
-with one warning per column.
+later values of another storage class are converted by SQLite's own rules.
+Such values are reported with one warning per fetched chunk,
+of class \code{RSQLite_warning_coercion},
+that lists the affected columns with the 1-based row numbers in the result,
+for a lazy stream at the time the chunk is read.
+The warning carries the details in its \code{coercions} field.
+A blob in a text column is kept only if it is valid UTF-8 without NUL bytes,
+and a date, time or timestamp that cannot be parsed is dropped;
+both become \code{NULL} and are listed in the same warning.
 The types can therefore depend on \code{chunk_size}:
 a real number in a later chunk is truncated to fit an \code{int64} column decided from integers,
 and a column whose first chunk holds only \code{NULL} keeps its declared type,

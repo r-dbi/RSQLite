@@ -32,8 +32,8 @@ dbSendPreparedQuery(conn, statement, bind.data, ...)
 \item{...}{Other arguments used by methods}
 }
 \description{
-These functions have been deprecated. Please switch to using
-\code{\link[DBI:dbSendQuery]{dbSendQuery()}}/\code{\link[DBI:dbGetQuery]{dbGetQuery()}} with the \code{params} argument
+These functions have been deprecated.
+Please switch to using \code{\link[DBI:dbSendQuery]{dbSendQuery()}}/\code{\link[DBI:dbGetQuery]{dbGetQuery()}} with the \code{params} argument
 or with calling \code{\link[DBI:dbBind]{dbBind()}} instead.
 }
 \keyword{internal}

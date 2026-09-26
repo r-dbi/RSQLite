@@ -1,13 +1,13 @@
-#' @param header is a logical indicating whether the first data line (but see
-#'   `skip`) has a header or not.  If missing, it value is determined
-#'   following [read.table()] convention, namely, it is set to TRUE if
-#'   and only if the first row has one fewer field that the number of columns.
+#' @param header is a logical indicating whether the first data line (but see `skip`) has a header or not.
+#'   If missing, it value is determined following [read.table()] convention,
+#'   namely, it is set to TRUE if and only if the first row has one fewer field that the number of columns.
 #' @param sep The field separator, defaults to `','`.
 #' @param eol The end-of-line delimiter, defaults to `'\n'`.
-#' @param skip number of lines to skip before reading the data. Defaults to 0.
+#' @param skip number of lines to skip before reading the data.
+#'   Defaults to 0.
 #' @param nrows Number of rows to read to determine types.
-#' @param colClasses Character vector of R type names, used to override
-#'   defaults when imputing classes from on-disk file.
+#' @param colClasses Character vector of R type names,
+#'   used to override defaults when imputing classes from on-disk file.
 #' @rdname dbWriteTable
 #' @usage NULL
 dbWriteTable_SQLiteConnection_character_character <- function(conn, name, value, ..., field.types = NULL, overwrite = FALSE,

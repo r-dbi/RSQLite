@@ -40,44 +40,38 @@
 )
 }
 \arguments{
-\item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
-\code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
+\item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by \code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
 
-\item{name}{a character string specifying a table name. SQLite table names
-are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc}
-are considered equal.}
+\item{name}{a character string specifying a table name.
+SQLite table names are \emph{not} case sensitive,
+e.g., table names \code{ABC} and \code{abc} are considered equal.}
 
-\item{value}{a data.frame (or coercible to data.frame) object or a
-file name (character).  In the first case, the data.frame is
-written to a temporary file and then imported to SQLite; when \code{value}
-is a character, it is interpreted as a file name and its contents imported
-to SQLite.}
+\item{value}{a data.frame (or coercible to data.frame) object or a file name (character).
+In the first case, the data.frame is written to a temporary file and then imported to SQLite;
+when \code{value} is a character, it is interpreted as a file name and its contents imported to SQLite.}
 
-\item{...}{Needed for compatibility with generic. Otherwise ignored.}
+\item{...}{Needed for compatibility with generic.
+Otherwise ignored.}
 
-\item{field.types}{character vector of named  SQL field types where
-the names are the names of new table's columns. If missing, types inferred
-with \code{\link[DBI:dbDataType]{DBI::dbDataType()}}).}
+\item{field.types}{character vector of named  SQL field types where the names are the names of new table's columns.
+If missing, types inferred with \code{\link[DBI:dbDataType]{DBI::dbDataType()}}).}
 
-\item{overwrite}{a logical specifying whether to overwrite an existing table
-or not. Its default is \code{FALSE}.}
+\item{overwrite}{a logical specifying whether to overwrite an existing table or not.
+Its default is \code{FALSE}.}
 
-\item{append}{a logical specifying whether to append to an existing table
-in the DBMS.  Its default is \code{FALSE}.}
+\item{append}{a logical specifying whether to append to an existing table in the DBMS.
+Its default is \code{FALSE}.}
 
-\item{header}{is a logical indicating whether the first data line (but see
-\code{skip}) has a header or not.  If missing, it value is determined
-following \code{\link[=read.table]{read.table()}} convention, namely, it is set to TRUE if
-and only if the first row has one fewer field that the number of columns.}
+\item{header}{is a logical indicating whether the first data line (but see \code{skip}) has a header or not.
+If missing, it value is determined following \code{\link[=read.table]{read.table()}} convention,
+namely, it is set to TRUE if and only if the first row has one fewer field that the number of columns.}
 
-\item{colClasses}{Character vector of R type names, used to override
-defaults when imputing classes from on-disk file.}
+\item{colClasses}{Character vector of R type names,
+used to override defaults when imputing classes from on-disk file.}
 
-\item{row.names}{A logical specifying whether the \code{row.names} should be
-output to the output DBMS table; if \code{TRUE}, an extra field whose name
-will be whatever the R identifier \code{"row.names"} maps to the DBMS (see
-\code{\link[DBI:make.db.names]{DBI::make.db.names()}}). If \code{NA} will add rows names if
-they are characters, otherwise will ignore.}
+\item{row.names}{A logical specifying whether the \code{row.names} should be output to the output DBMS table;
+if \code{TRUE}, an extra field whose name will be whatever the R identifier \code{"row.names"} maps to the DBMS (see \code{\link[DBI:make.db.names]{DBI::make.db.names()}}).
+If \code{NA} will add rows names if they are characters, otherwise will ignore.}
 
 \item{nrows}{Number of rows to read to determine types.}
 
@@ -85,25 +79,21 @@ they are characters, otherwise will ignore.}
 
 \item{eol}{The end-of-line delimiter, defaults to \code{'\\n'}.}
 
-\item{skip}{number of lines to skip before reading the data. Defaults to 0.}
+\item{skip}{number of lines to skip before reading the data.
+Defaults to 0.}
 
-\item{temporary}{a logical specifying whether the new table should be
-temporary. Its default is \code{FALSE}.}
+\item{temporary}{a logical specifying whether the new table should be temporary.
+Its default is \code{FALSE}.}
 }
 \description{
-Functions for writing data frames or delimiter-separated files
-to database tables.
+Functions for writing data frames or delimiter-separated files to database tables.
 }
 \details{
-In a primary key column qualified with
-\href{https://www.sqlite.org/autoinc.html}{\code{AUTOINCREMENT}}, missing
-values will be assigned the next largest positive integer,
-while nonmissing elements/cells retain their value.  If the
-autoincrement column exists in the data frame
-passed to the \code{value} argument,
-the \code{NA} elements are overwritten.
-Similarly, if the key column is not present in the data frame, all
-elements are automatically assigned a value.
+In a primary key column qualified with \href{https://www.sqlite.org/autoinc.html}{\code{AUTOINCREMENT}},
+missing values will be assigned the next largest positive integer,
+while nonmissing elements/cells retain their value.
+If the autoincrement column exists in the data frame passed to the \code{value} argument, the \code{NA} elements are overwritten.
+Similarly, if the key column is not present in the data frame, all elements are automatically assigned a value.
 }
 \examples{
 con <- dbConnect(SQLite())

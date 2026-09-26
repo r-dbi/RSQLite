@@ -7,8 +7,7 @@
 initRegExp(db)
 }
 \arguments{
-\item{db}{A \code{\linkS4class{SQLiteConnection}} object to add the
-regular expression operator into the connection.}
+\item{db}{A \code{\linkS4class{SQLiteConnection}} object to add the regular expression operator into the connection.}
 }
 \value{
 Always \code{TRUE}, invisibly.

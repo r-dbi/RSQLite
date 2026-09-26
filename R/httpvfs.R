@@ -24,15 +24,14 @@ sqliteRemote <- function(url, immutable = TRUE, ...) {
     stop("url must begin with http:// or https://", call. = FALSE)
   }
 
-  # SQLite URI parameters are introduced after '?'. If we appended them directly
-  # to the HTTP URL, they would become part of the HTTP request and can cause
-  # a 404 on static hosts. Instead, wrap the URL in a SQLite file: URI.
+  # SQLite URI parameters are introduced after '?'.
+  # If we appended them directly to the HTTP URL, they would become part of the HTTP request and can cause a 404 on static hosts.
+  # Instead, wrap the URL in a SQLite file: URI.
   if (grepl("[?#]", url)) {
     stop("url must not contain a query string or fragment", call. = FALSE)
   }
 
-  # Ensure the HTTP VFS is registered in this process; try to lazily init if
-  # needed.
+  # Ensure the HTTP VFS is registered in this process; try to lazily init if needed.
   if (!sqliteHasHttpVFS()) {
     # Register via initExtension() using a throwaway in-memory connection
     tmp <- DBI::dbConnect(SQLite(), ":memory:")

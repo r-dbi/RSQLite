@@ -10,11 +10,15 @@
 #' Options are stored in environment variables so they also affect C-level code:
 #' - `RSQLITE_HTTP_CACHE_MB`: In-memory page cache size in megabytes (default 4).
 #' - `RSQLITE_HTTP_PREFETCH_PAGES`: Prefetch this many pages ahead (default 0).
-#' - `RSQLITE_HTTP_FALLBACK_FULLDL`: If `TRUE` (default), fall back to full download when the server does not support HTTP Range; if `FALSE`, open will fail.
+#' - `RSQLITE_HTTP_FALLBACK_FULLDL`: If `TRUE` (default), fall back to full download when the server does not support HTTP Range;
+#'   if `FALSE`, open will fail.
 #'
-#' @param cache_size_mb Integer megabytes for in-memory page cache. `NULL` leaves unchanged.
-#' @param prefetch_pages Integer pages to prefetch ahead. `NULL` leaves unchanged.
-#' @param fallback_full_download Logical; if `TRUE`, allow full-download fallback when Range is not available. `NULL` leaves unchanged.
+#' @param cache_size_mb Integer megabytes for in-memory page cache.
+#'   `NULL` leaves unchanged.
+#' @param prefetch_pages Integer pages to prefetch ahead.
+#'   `NULL` leaves unchanged.
+#' @param fallback_full_download Logical; if `TRUE`, allow full-download fallback when Range is not available.
+#'   `NULL` leaves unchanged.
 #' @return A named list of previous values (in R types).
 #' @export
 #' @examples

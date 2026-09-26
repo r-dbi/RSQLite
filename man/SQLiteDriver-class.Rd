@@ -24,8 +24,8 @@
 \S4method{dbUnloadDriver}{SQLiteDriver}(drv, ...)
 }
 \description{
-SQLiteDriver objects are created by \code{\link[=SQLite]{SQLite()}}, and used to select the
-correct method in \code{\link[DBI:dbConnect]{dbConnect()}}.
+SQLiteDriver objects are created by \code{\link[=SQLite]{SQLite()}},
+and used to select the correct method in \code{\link[DBI:dbConnect]{dbConnect()}}.
 They are a superclass of the \link[DBI:DBIDriver-class]{DBIDriver} class,
 and used purely for dispatch.
 The "Usage" section lists the class methods overridden by \pkg{RSQLite}.

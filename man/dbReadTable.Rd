@@ -15,14 +15,14 @@
 )
 }
 \arguments{
-\item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
-\code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
+\item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by \code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
 
-\item{name}{a character string specifying a table name. SQLite table names
-are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc}
-are considered equal.}
+\item{name}{a character string specifying a table name.
+SQLite table names are \emph{not} case sensitive,
+e.g., table names \code{ABC} and \code{abc} are considered equal.}
 
-\item{...}{Needed for compatibility with generic. Otherwise ignored.}
+\item{...}{Needed for compatibility with generic.
+Otherwise ignored.}
 
 \item{row.names}{Either \code{TRUE}, \code{FALSE}, \code{NA} or a string.
 
@@ -35,8 +35,7 @@ default name.
 
 For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
 
-\item{check.names}{If \code{TRUE}, the default, column names will be
-converted to valid R identifiers.}
+\item{check.names}{If \code{TRUE}, the default, column names will be converted to valid R identifiers.}
 
 \item{select.cols}{Deprecated, do not use.}
 }
@@ -47,8 +46,8 @@ A data frame.
 Returns the contents of a database table given by name as a data frame.
 }
 \details{
-Note that the data frame returned by \code{dbReadTable()} only has
-primitive data, e.g., it does not coerce character data to factors.
+Note that the data frame returned by \code{dbReadTable()} only has primitive data,
+e.g., it does not coerce character data to factors.
 }
 \examples{
 library(DBI)

@@ -1,5 +1,47 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.53.3.9012 (2026-09-15)
+
+## Chore
+
+- Update revdep report from revdep4 run (most, depth 1) (#793).
+
+
+# RSQLite 3.53.3.9011 (2026-09-13)
+
+## Chore
+
+- Remove Copilot setup steps.
+
+## Documentation
+
+- Break lines at meaning boundaries (#787).
+
+- Drop the branch from the coverage badge (#785).
+
+- Harmonize README and pkgdown front page rendering (#786).
+
+- Use `pak::pak()` for the development install (#783).
+
+## Uncategorized
+
+- Refactor(ci): Serve the actions from this repository instead of copying them (cynkra/cynkratemplate#121).
+
+- Refactor(ci): Move every script out of the workflows and into a named action (cynkra/cynkratemplate#120).
+
+- Refactor(ci): Make an action of what the workflows say more than once.
+
+- Refactor(ci): Move every script that could change out of the workflows.
+
+- Refactor(ci): Extract the last three scripts, which only a named action can hold.
+
+- Fix(fledge): Push the bump to the default branch wherever that is allowed (cynkra/cynkratemplate#117).
+
+- Fix(ci): Make a failing `rcc` run say what failed, and link to it (cynkra/cynkratemplate#115).
+
+- Fix(ci): Exempt deprecation warnings from the roxygenize warning gate (cynkra/cynkratemplate#114).
+
+
 # RSQLite 3.53.3.9010 (2026-09-13)
 
 ## Features

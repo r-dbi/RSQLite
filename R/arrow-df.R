@@ -7,15 +7,16 @@
 # The number of rows per array when a whole result is fetched
 ARROW_DF_CHUNK_SIZE <- 65536
 
-# dbFetch() through Arrow: `n` rows as a data frame, all rows for `n < 0`
-arrow_fetch_df <- function(res, n) {
+# dbFetch() through Arrow: `n` rows as a data frame, all rows for `n < 0`,
+# with the columns of `ptype` converted to its types
+arrow_fetch_df <- function(res, n, ptype = NULL) {
   if (n < 0) {
     # All chunks are fetched first, so that the columns are allocated once
     fetched <- result_fetch_arrow_all(res@ptr, ARROW_DF_CHUNK_SIZE)
-    df <- arrow_to_df(fetched$stream, res@conn, size = fetched$n)
+    df <- arrow_to_df(fetched$stream, res@conn, ptype, size = fetched$n)
   } else {
     chunk <- result_fetch_arrow_chunk(res@ptr, n)
-    df <- arrow_to_df(chunk$array, res@conn)
+    df <- arrow_to_df(chunk$array, res@conn, ptype)
     # nanoarrow's character vectors read from the array until they are touched:
     # copy them, so that the array can be freed right away
     df[] <- lapply(df, function(col) if (is.character(col)) c(col) else col)
@@ -35,19 +36,84 @@ arrow_fetch_df <- function(res, n) {
   df
 }
 
-# The unified conversion of Arrow data to a data frame,
-# `size` is the row count of a stream
-arrow_to_df <- function(x, conn, size = NULL) {
+# The unified conversion of Arrow data to a data frame:
+# the columns of `ptype` become its types, the others follow arrow_df_ptype(),
+# and `size` is the row count of a stream
+arrow_to_df <- function(x, conn, ptype = NULL, size = NULL) {
   schema <- nanoarrow::infer_nanoarrow_schema(x)
-  ptype <- arrow_df_ptype(schema)
+  to <- arrow_df_ptype(schema)
 
-  if (inherits(x, "nanoarrow_array_stream")) {
-    df <- arrow_stream_to_df(x, ptype, size)
-  } else {
-    df <- nanoarrow::convert_array(x, to = ptype)
+  # nanoarrow builds factors only from given levels, the others come from the values
+  factors <- character()
+  for (name in names(ptype)) {
+    col <- ptype[[name]]
+    if (is.factor(col) && length(levels(col)) == 0) {
+      factors <- c(factors, name)
+      col <- character()
+    }
+    to[[name]] <- col
   }
 
-  arrow_df_int64(df, conn@bigint)
+  if (inherits(x, "nanoarrow_array_stream")) {
+    df <- arrow_stream_to_df(x, to, size)
+  } else {
+    df <- nanoarrow::convert_array(x, to = to)
+  }
+  for (name in factors) {
+    df[[name]] <- factor(df[[name]])
+  }
+
+  arrow_df_int64(df, conn@bigint, keep = names(ptype))
+}
+
+# A data frame prototype from a data frame or a named list of vectors:
+# zero rows, POSIXlt as POSIXct
+arrow_check_ptype <- function(ptype) {
+  if (is.data.frame(ptype)) {
+    columns <- as.list(ptype[0, , drop = FALSE])
+  } else if (is.list(ptype)) {
+    columns <- ptype
+  } else {
+    stopc("`ptype` must be a data frame or a named list of vectors")
+  }
+  if (length(columns) == 0 || is.null(names(columns)) || any(names(columns) == "")) {
+    stopc("All columns of `ptype` must be named")
+  }
+  if (anyDuplicated(names(columns))) {
+    stopc(
+      "Duplicate column names in `ptype`: ",
+      paste0("`", unique(names(columns)[duplicated(names(columns))]), "`", collapse = ", ")
+    )
+  }
+  columns <- lapply(columns, function(col) {
+    if (is.data.frame(col)) {
+      stopc("The columns of `ptype` must be vectors, not data frames")
+    }
+    if (is.raw(col)) {
+      stopc("A raw vector in `ptype` does not describe a column, use `blob::blob()` for binary columns")
+    }
+    if (inherits(col, "POSIXlt")) {
+      col <- as.POSIXct(col)
+    }
+    col[0]
+  })
+  structure(columns, class = "data.frame", row.names = integer())
+}
+
+# The Arrow types to request for the columns of a prototype:
+# nanoarrow's inference, except that hms columns take the time64 type the
+# result path fills, and factors are read as strings
+arrow_ptype_schema <- function(ptype) {
+  children <- lapply(ptype, function(col) {
+    if (inherits(col, "hms")) {
+      nanoarrow::na_time64("us")
+    } else if (is.factor(col)) {
+      nanoarrow::na_string()
+    } else {
+      nanoarrow::infer_nanoarrow_schema(col)
+    }
+  })
+  nanoarrow::na_struct(children)
 }
 
 # All rows of a stream with a known row count as a data frame:
@@ -103,16 +169,20 @@ arrow_df_ptype <- function(schema) {
 }
 
 # SQLite integers are 64-bit: a column whose values all fit is an integer,
-# the others follow the `bigint` connection argument, like the default path
-arrow_df_int64 <- function(df, bigint) {
-  is_int64 <- which(vlapply(df, inherits, "integer64"))
+# the others follow the `bigint` connection argument, like the default path;
+# the columns in `keep` have their requested type already
+arrow_df_int64 <- function(df, bigint, keep = character()) {
+  is_int64 <- which(vlapply(df, inherits, "integer64") & !(names(df) %in% keep))
   for (i in is_int64) {
     as_int <- integer64_to_integer(df[[i]])
     if (!is.null(as_int)) {
       df[[i]] <- as_int
     }
   }
-  convert_bigint(df, bigint)
+  kept <- df[keep]
+  df <- convert_bigint(df, bigint)
+  df[keep] <- kept
+  df
 }
 
 # dbAppendTable() through Arrow: the data frame is written as an Arrow stream

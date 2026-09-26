@@ -126,8 +126,29 @@ a \code{null} column becomes a \code{logical}.
 \code{date32}, \code{time64} and \code{timestamp} columns become \code{Date}, \code{hms} and \code{POSIXct} in UTC,
 and \code{binary} columns become \link[blob:blob]{blob::blob} objects,
 as on the default path.
-The first chunk of a result decides the types of all its chunks.
+The first chunk of a result decides the types of all its chunks,
+unless the types are given up front with \code{ptype}.
 Before writing, factors become strings and lists of raw vectors become blobs.
+
+The \code{ptype} argument of \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}}, \code{\link[DBI:dbGetQuery]{DBI::dbGetQuery()}} and \code{\link[DBI:dbReadTable]{DBI::dbReadTable()}}
+names the R types of some or all result columns:
+a data frame, or a named list of vectors whose values are ignored, such as
+\code{list(id = bit64::integer64(), when = as.POSIXct(character(), tz = "UTC"))}.
+The columns are matched to the result by name, exactly, like \code{schema} above,
+and the other columns are converted as described.
+A column of the prototype is requested from SQLite as the Arrow type that
+\code{nanoarrow::infer_nanoarrow_schema()} gives for it:
+\code{integer} as \code{int32}, so that values outside its range become \code{NA} with a warning,
+\code{bit64::integer64} as \code{int64}, and it stays an \code{integer64} whatever the values,
+\code{logical} as \code{bool}, \code{Date} as \code{date32}, and \code{blob} as \code{binary}.
+A \code{POSIXct} column is requested as a timestamp in the time zone of the prototype,
+the session's time zone for an empty one:
+the values are read as UTC, like on both paths, and displayed in that zone.
+An \code{hms} column is requested as \code{time64} in microseconds,
+and a factor is read as text and converted to its levels,
+or to the levels found in the values of each fetch if it has none.
+The prototype then drives the conversion to R, so the columns come back exactly as described,
+and \code{bigint} applies only to the other columns.
 
 A fetch of all rows reads the result into Arrow arrays first,
 so that the data frame is allocated once with the row count known,

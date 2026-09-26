@@ -11,7 +11,7 @@ NULL
 #' @param field.types Optional, named character vector of the types for each field in `value`
 #' @param row.names Logical.
 #'   Should row.name of `value` be exported as a `row_names` field?
-#'   Default is `TRUE`
+#'   Default is `FALSE`.
 #' @return An SQL string
 #' @keywords internal
 #' @aliases dbBuildTableDefinition

@@ -12,9 +12,9 @@ row_names_default <- function(key) {
   }
 
   warning_once(
-    "RSQLite: Setting the default for `row.names` via `pkgconfig::set_config(\"", key, "\" = ...)` is deprecated ",
-    "and will be ignored in a future version. ",
-    "Pass `row.names = ", deparse(value), "` explicitly instead."
+    "RSQLite: Setting the default for `row.names` via `pkgconfig::set_config(\"", key, "\" = ...)`, ",
+    "in your code or in a package you use, is deprecated and will be ignored in a future version. ",
+    "Remove the `pkgconfig::set_config()` call and pass `row.names = ", deparse(value), "` explicitly instead."
   )
   value
 }

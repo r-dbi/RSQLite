@@ -2,6 +2,7 @@
 #include "SqliteColumnDataSource.h"
 #include "integer64.h"
 #include "affinity.h"
+#include "utf8.h"
 #include <boost/limits.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -12,7 +13,10 @@ SqliteColumnDataSource::SqliteColumnDataSource(
   const int j_,
   bool with_alt_types_
 )
-    : DbColumnDataSource(j_), stmt(stmt_), with_alt_types(with_alt_types_) {}
+    : DbColumnDataSource(j_),
+      stmt(stmt_),
+      with_alt_types(with_alt_types_),
+      n_invalid_strings(0) {}
 
 DATA_TYPE SqliteColumnDataSource::get_data_type() const {
   if (with_alt_types) {
@@ -79,9 +83,27 @@ double SqliteColumnDataSource::fetch_real() const {
 }
 
 SEXP SqliteColumnDataSource::fetch_string() const {
+  // The storage class must be read before sqlite3_column_text() converts the
+  // value, after that sqlite3_column_type() is undefined
+  const bool is_blob = (get_column_type() == SQLITE_BLOB);
   const char* const text =
     reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
-  return Rf_mkCharCE(text, CE_UTF8);
+  if (!is_blob) {
+    return Rf_mkCharCE(text, CE_UTF8);
+  }
+
+  // A blob read as text keeps all its bytes, but only well-formed UTF-8
+  // without NUL bytes can be an R string
+  const int size = sqlite3_column_bytes(get_stmt(), get_j());
+  if (!rsqlite_is_utf8_string(text, static_cast<size_t>(size))) {
+    ++n_invalid_strings;
+    return NA_STRING;
+  }
+  return Rf_mkCharLenCE(text, size, CE_UTF8);
+}
+
+int64_t SqliteColumnDataSource::get_n_invalid_strings() const {
+  return n_invalid_strings;
 }
 
 SEXP SqliteColumnDataSource::fetch_blob() const {

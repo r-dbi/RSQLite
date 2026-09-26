@@ -80,6 +80,12 @@
 #' The first chunk of a result decides the types of all its chunks.
 #' Before writing, factors become strings and lists of raw vectors become blobs.
 #'
+#' A fetch of all rows reads the result into Arrow arrays first,
+#' so that the data frame is allocated once with the row count known,
+#' and frees each array as soon as it is converted:
+#' at its peak, the memory holds the arrays and the part of the data frame filled so far.
+#' A fetch of `n` rows copies the strings out of its array and frees the array right away.
+#'
 #' @section Chunking:
 #' [DBI::dbFetchArrow()] returns a nanoarrow array stream that is read lazily:
 #' each array holds at most `chunk_size` rows,
@@ -87,6 +93,14 @@
 #' so the memory footprint is that of one chunk, not of the result set.
 #' The stream stays readable after the result has been cleared with [DBI::dbClearResult()],
 #' it is invalidated when another query is sent on the same connection.
+#'
+#' An array returned by [DBI::dbFetchArrowChunk()] is freed
+#' when the garbage collector finds it unreachable,
+#' and the collector does not see the memory that nanoarrow allocated for it.
+#' After every 64 MB of arrays, RSQLite triggers a collection of the young generation,
+#' so that a loop that discards its chunks holds at most that much garbage.
+#' A loop that needs to be tighter releases each array
+#' with `nanoarrow::nanoarrow_pointer_release()` once done with it.
 #' [DBI::dbFetchArrowChunk()] returns one such array per call,
 #' and an empty array once all rows are fetched.
 #' A chunk is also cut once a string or binary column holds one gigabyte.
@@ -94,6 +108,32 @@
 #' @name sqlite-arrow
 #' @aliases arrow
 NULL
+
+# An array that dbFetchArrowChunk() handed out is freed when the garbage
+# collector finds it unreachable, and the collector does not see the memory
+# that nanoarrow allocated for it: a loop that discards its chunks could pile
+# up the whole result as garbage before a collection happens on its own.
+# A collection of the young generation every ARROW_GC_BYTES of arrays bounds that.
+ARROW_GC_BYTES <- 64 * 1024^2
+
+arrow_gc_state <- new.env(parent = emptyenv())
+arrow_gc_state$bytes <- 0
+
+arrow_chunk_handed_out <- function(bytes) {
+  arrow_gc_state$bytes <- arrow_gc_state$bytes + bytes
+  if (arrow_gc_state$bytes >= ARROW_GC_BYTES) {
+    arrow_gc_state$bytes <- 0
+    arrow_gc()
+  }
+  invisible()
+}
+
+# R < 3.5.0 has no partial collection
+arrow_gc <- if ("full" %in% names(formals(gc))) {
+  function() gc(full = FALSE)
+} else {
+  function() gc()
+}
 
 check_chunk_size <- function(chunk_size) {
   if (!is.numeric(chunk_size) || length(chunk_size) != 1L || is.na(chunk_size) ||

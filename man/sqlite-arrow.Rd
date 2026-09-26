@@ -22,8 +22,15 @@ and integers are widened to \code{double} if a real number turns up in the first
 A column whose first chunk holds only \code{NULL} values takes the type of its declaration,
 and a column without a declaration that only ever holds \code{NULL} is of the Arrow null type.
 Once the first chunk has been fetched the types are fixed;
-later values of another storage class are converted by SQLite's own rules,
-with one warning per column.
+later values of another storage class are converted by SQLite's own rules.
+Such values are reported with one warning per fetched chunk,
+of class \code{RSQLite_warning_coercion},
+that lists the affected columns with the 1-based row numbers in the result,
+for a lazy stream at the time the chunk is read.
+The warning carries the details in its \code{coercions} field.
+A blob in a text column is kept only if it is valid UTF-8 without NUL bytes,
+and a date, time or timestamp that cannot be parsed is dropped;
+both become \code{NULL} and are listed in the same warning.
 The types can therefore depend on \code{chunk_size}:
 a real number in a later chunk is truncated to fit an \code{int64} column decided from integers,
 and a column whose first chunk holds only \code{NULL} keeps its declared type,
@@ -81,6 +88,12 @@ and \code{binary} columns become \link[blob:blob]{blob::blob} objects,
 as on the default path.
 The first chunk of a result decides the types of all its chunks.
 Before writing, factors become strings and lists of raw vectors become blobs.
+
+A fetch of all rows reads the result into Arrow arrays first,
+so that the data frame is allocated once with the row count known,
+and frees each array as soon as it is converted:
+at its peak, the memory holds the arrays and the part of the data frame filled so far.
+A fetch of \code{n} rows copies the strings out of its array and frees the array right away.
 }
 
 \section{Chunking}{
@@ -91,6 +104,14 @@ fetched from the result when the array is requested,
 so the memory footprint is that of one chunk, not of the result set.
 The stream stays readable after the result has been cleared with \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}},
 it is invalidated when another query is sent on the same connection.
+
+An array returned by \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} is freed
+when the garbage collector finds it unreachable,
+and the collector does not see the memory that nanoarrow allocated for it.
+After every 64 MB of arrays, RSQLite triggers a collection of the young generation,
+so that a loop that discards its chunks holds at most that much garbage.
+A loop that needs to be tighter releases each array
+with \code{nanoarrow::nanoarrow_pointer_release()} once done with it.
 \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} returns one such array per call,
 and an empty array once all rows are fetched.
 A chunk is also cut once a string or binary column holds one gigabyte.

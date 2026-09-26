@@ -90,6 +90,7 @@ exportMethods(sqlData)
 import(DBI)
 import(methods)
 import(rlang)
+importFrom(DBI,Id)
 importFrom(bit64,
   integer64,
   is.integer64

@@ -1,0 +1,13 @@
+name: 'Custom steps to run after R packages are installed'
+
+runs:
+  using: "composite"
+  steps:
+    # Must happen after R is installed...
+    - name: Define R CMD check error condition
+      # Allow NOTEs on R 4.5 due to SET_TRUELENGTH, SET_GROWABLE_BIT and SETLENGTH from cpp11
+      run: |
+        if (getRversion() >= "4.5" && getRversion() < "4.6") {
+          cat('RCMDCHECK_ERROR_ON="warning"\n', file = Sys.getenv("GITHUB_ENV"), append = TRUE)
+        }
+      shell: Rscript {0}

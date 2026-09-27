@@ -10,7 +10,7 @@ sqliteSetBusyHandler(dbObj, handler)
 \item{dbObj}{A \link[=SQLiteConnection-class]{SQLiteConnection} object.}
 
 \item{handler}{Specifies what to do when the database is locked by another transaction.
-It can be:
+ It can be:
 \itemize{
 \item \code{NULL}: fail immediately,
 \item an integer scalar: this is a timeout in milliseconds that corresponds to \verb{PRAGMA busy_timeout},
@@ -23,12 +23,12 @@ Invisible \code{NULL}.
 \description{
 When a transaction cannot lock the database, because it is already locked by another one,
 SQLite by default throws an error: \verb{database is locked}.
-This behavior is usually not appropriate when concurrent access is needed,
+ This behavior is usually not appropriate when concurrent access is needed,
 typically when multiple processes write to the same database.
 
 \code{sqliteSetBusyHandler()} lets you set a timeout or a handler for these events.
-When setting a timeout, SQLite will try the transaction multiple times within this timeout.
-To set a timeout, pass an integer scalar to \code{sqliteSetBusyHandler()}.
+ When setting a timeout, SQLite will try the transaction multiple times within this timeout.
+ To set a timeout, pass an integer scalar to \code{sqliteSetBusyHandler()}.
 
 Another way to set a timeout is to use a \code{PRAGMA},
 e.g. the SQL query
@@ -40,21 +40,21 @@ sets the busy timeout to three seconds.
 }
 \details{
 Note that SQLite currently does \emph{not} schedule concurrent transactions fairly.
-If multiple transactions are waiting on the same database, any one of them can be granted access next.
-Moreover, SQLite does not currently ensure that access is granted as soon as the database is available.
-Make sure that you set the busy timeout to a high enough value for applications with high concurrency and many writes.
+ If multiple transactions are waiting on the same database, any one of them can be granted access next.
+ Moreover, SQLite does not currently ensure that access is granted as soon as the database is available.
+ Make sure that you set the busy timeout to a high enough value for applications with high concurrency and many writes.
 
 If the \code{handler} argument is a function, then it is used as a callback function.
-When the database is locked, this will be called with a single integer,
+ When the database is locked, this will be called with a single integer,
 which is the number of calls for same locking event.
-The callback function must return an integer scalar.
-If it returns \code{0L}, then no additional attempts are made to access the database, and an error is thrown.
-Otherwise another attempt is made to access the database and the cycle repeats.
+ The callback function must return an integer scalar.
+ If it returns \code{0L}, then no additional attempts are made to access the database, and an error is thrown.
+ Otherwise another attempt is made to access the database and the cycle repeats.
 
 Handler callbacks are useful for debugging concurrent behavior,
 or to implement a more sophisticated busy algorithm.
-The latter is currently considered experimental in RSQLite.
-If the callback function fails, then RSQLite will print a warning,
+ The latter is currently considered experimental in RSQLite.
+ If the callback function fails, then RSQLite will print a warning,
 and the transaction is aborted with a "database is locked" error.
 
 Note that every database connection has its own busy timeout or handler function.

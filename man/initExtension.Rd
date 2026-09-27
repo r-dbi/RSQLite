@@ -16,20 +16,20 @@ initExtension(
 }
 \description{
 Several extension functions are included in the \pkg{RSQLite} package.
-When enabled via \code{initExtension()}, these extension functions can be used in SQL queries.
-Extensions must be enabled separately for each connection.
+ When enabled via \code{initExtension()}, these extension functions can be used in SQL queries.
+ Extensions must be enabled separately for each connection.
 }
 \details{
 The \code{"math"} extension functions are written by Liam Healy
 and made available through the SQLite website (\url{https://www.sqlite.org/src/ext/contrib}).
-This package contains a slightly modified version of the original code.
-See the section "Available functions in the math extension" for details.
+ This package contains a slightly modified version of the original code.
+ See the section "Available functions in the math extension" for details.
 
 The \code{"regexp"} extension provides a regular-expression matcher for POSIX
 extended regular expressions,
 as available through the SQLite source code repository
 (\url{https://sqlite.org/src/file?filename=ext/misc/regexp.c}).
-SQLite will then implement the \verb{A regexp B} operator,
+ SQLite will then implement the \verb{A regexp B} operator,
 where \code{A} is the string to be matched and \code{B} is the regular expression.
 
 The \code{"series"} extension loads the table-valued function \code{generate_series()},
@@ -43,13 +43,13 @@ as available through the SQLite source code repository
 The \code{"http"} extension registers an HTTP/HTTPS virtual file system (VFS)
 that allows opening remote databases via URI filenames,
 e.g., "file:https://host/path/db.sqlite?vfs=http&immutable=1".
-This implementation is experimental and not an official SQLite extension;
+ This implementation is experimental and not an official SQLite extension;
 it fetches pages on demand using HTTP Range requests and serves reads from an in-memory page cache,
 with an optional full-download fallback depending on server support and configuration.
-It is primarily intended for read-only access to small, immutable databases;
+ It is primarily intended for read-only access to small, immutable databases;
 see \code{\link[=sqliteHttpConfig]{sqliteHttpConfig()}} and \code{\link[=sqliteRemote]{sqliteRemote()}}
 for configuration options and usage examples.
-Building this extension may require libcurl and is optional in RSQLite.
+ Building this extension may require libcurl and is optional in RSQLite.
 
 The \code{"uuid"} extension loads the functions \code{uuid()}, \code{uuid_str(X)} and \code{uuid_blob(X)}
 that can be used to create universally unique identifiers,

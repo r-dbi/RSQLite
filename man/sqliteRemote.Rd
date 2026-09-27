@@ -20,7 +20,7 @@ A \link[=SQLiteConnection-class]{SQLiteConnection} object.
 lifecycle::badge("experimental")
 
 Constructs a URI filename and sets the appropriate VFS and immutable flags.
-Requires the optional http extension to be available; see \code{\link[=sqliteHasHttpVFS]{sqliteHasHttpVFS()}}.
+ Requires the optional http extension to be available; see \code{\link[=sqliteHasHttpVFS]{sqliteHasHttpVFS()}}.
 }
 \examples{
 \dontshow{if (FALSE) withAutoprint(\{ # examplesIf}

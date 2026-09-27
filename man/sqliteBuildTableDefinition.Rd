@@ -23,8 +23,8 @@ sqliteBuildTableDefinition(
 \item{field.types}{Optional, named character vector of the types for each field in \code{value}}
 
 \item{row.names}{Logical.
-Should row.name of \code{value} be exported as a \code{row_names} field?
-Default is \code{TRUE}}
+ Should row.name of \code{value} be exported as a \code{row_names} field?
+ Default is \code{TRUE}}
 }
 \value{
 An SQL string

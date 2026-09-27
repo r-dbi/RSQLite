@@ -191,9 +191,11 @@ cpp11::sexp SqliteArrowColumn::coercions() {
   if (log.empty()) {
     return R_NilValue;
   }
-  cpp11::writable::list out({ "column"_nm = cpp11::r_string(name),
-                              "type"_nm = cpp11::r_string(format_kind(kind)),
-                              "values"_nm = log.as_list() });
+  cpp11::writable::list out(
+    { "column"_nm = cpp11::r_string(name),
+      "type"_nm = cpp11::r_string(format_kind(kind)),
+      "values"_nm = log.as_list() }
+  );
   log.clear();
   return out;
 }

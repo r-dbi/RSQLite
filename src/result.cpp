@@ -263,7 +263,10 @@ SEXP arrow_concat_strings(cpp11::sexp stream_xptr) {
   );
   if (schema_view.type != NANOARROW_TYPE_STRING &&
       schema_view.type != NANOARROW_TYPE_LARGE_STRING) {
-    cpp11::stop("Can't concatenate arrays of Arrow type %s", ArrowTypeString(schema_view.type));
+    cpp11::stop(
+      "Can't concatenate arrays of Arrow type %s",
+      ArrowTypeString(schema_view.type)
+    );
   }
 
   cpp11::sexp out_xptr(nanoarrow_array_owning_xptr());
@@ -296,10 +299,16 @@ SEXP arrow_concat_strings(cpp11::sexp stream_xptr) {
     );
     for (int64_t i = 0; i < array->length; ++i) {
       if (ArrowArrayViewIsNull(view.get(), i)) {
-        check_arrow(ArrowArrayAppendNull(out, 1), "Can't append to Arrow array");
+        check_arrow(
+          ArrowArrayAppendNull(out, 1),
+          "Can't append to Arrow array"
+        );
       } else {
         check_arrow(
-          ArrowArrayAppendString(out, ArrowArrayViewGetStringUnsafe(view.get(), i)),
+          ArrowArrayAppendString(
+            out,
+            ArrowArrayViewGetStringUnsafe(view.get(), i)
+          ),
           "Can't append to Arrow array"
         );
       }
@@ -314,7 +323,10 @@ SEXP arrow_concat_strings(cpp11::sexp stream_xptr) {
 
   cpp11::sexp schema_xptr(nanoarrow_schema_owning_xptr());
   check_arrow(
-    ArrowSchemaDeepCopy(schema.get(), nanoarrow_output_schema_from_xptr(schema_xptr)),
+    ArrowSchemaDeepCopy(
+      schema.get(),
+      nanoarrow_output_schema_from_xptr(schema_xptr)
+    ),
     "Can't copy Arrow schema"
   );
   R_SetExternalPtrTag(out_xptr, schema_xptr);

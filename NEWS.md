@@ -1,5 +1,39 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.53.3.9013 (2026-09-26)
+
+## Documentation
+
+- Pin `max.print` so rendering `README.md` is reproducible (#804).
+
+- Fix the typos in the `dbConnect()` roxygen (#790).
+
+## Testing
+
+- Drop the astyle formatting test (#798).
+
+## Uncategorized
+
+- Refactor(ci): Serve the revdep scripts with the actions instead of copying them (cynkra/cynkratemplate#149).
+
+- Feat(ci): Report coverage on pull requests from this repository (cynkra/cynkratemplate#146).
+
+- Ci: Bound every job with `timeout-minutes` (cynkra/cynkratemplate#144).
+
+- Fix(revdep2): Let a slice with no packages check nothing instead of failing (cynkra/cynkratemplate#150).
+
+- Feat: Build a binary package in every check job and share it as an artifact (cynkra/cynkratemplate#141).
+
+- Fix(ci): Collect the fleet's workflow fixes after the move to central actions (cynkra/cynkratemplate#139).
+
+
+# RSQLite 3.53.3.9012 (2026-09-15)
+
+## Chore
+
+- Update revdep report from revdep4 run (most, depth 1) (#793).
+
+
 # RSQLite 3.53.3.9011 (2026-09-13)
 
 ## Chore

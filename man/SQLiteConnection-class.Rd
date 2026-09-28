@@ -6,10 +6,12 @@
 %   R/dbExistsTable_SQLiteConnection_Id.R,
 %   R/dbExistsTable_SQLiteConnection_character.R,
 %   R/dbGetException_SQLiteConnection.R, R/dbGetInfo_SQLiteConnection.R,
+%   R/dbGetQueryArrow_SQLiteConnection_character.R,
 %   R/dbIsValid_SQLiteConnection.R, R/dbListObjects_SQLiteConnection.R,
 %   R/dbListTables_SQLiteConnection.R,
 %   R/dbQuoteIdentifier_SQLiteConnection_SQL.R,
 %   R/dbQuoteIdentifier_SQLiteConnection_character.R,
+%   R/dbReadTableArrow_SQLiteConnection_character.R,
 %   R/dbRemoveTable_SQLiteConnection_character.R,
 %   R/dbSendQueryArrow_SQLiteConnection.R,
 %   R/dbSendQuery_SQLiteConnection_character.R,
@@ -36,6 +38,8 @@
 \alias{dbGetException,SQLiteConnection-method}
 \alias{dbGetInfo_SQLiteConnection}
 \alias{dbGetInfo,SQLiteConnection-method}
+\alias{dbGetQueryArrow_SQLiteConnection_character}
+\alias{dbGetQueryArrow,SQLiteConnection,character-method}
 \alias{dbIsValid_SQLiteConnection}
 \alias{dbIsValid,SQLiteConnection-method}
 \alias{dbListObjects_SQLiteConnection}
@@ -46,6 +50,8 @@
 \alias{dbQuoteIdentifier,SQLiteConnection,SQL-method}
 \alias{dbQuoteIdentifier_SQLiteConnection_character}
 \alias{dbQuoteIdentifier,SQLiteConnection,character-method}
+\alias{dbReadTableArrow_SQLiteConnection_character}
+\alias{dbReadTableArrow,SQLiteConnection,character-method}
 \alias{dbRemoveTable_SQLiteConnection_character}
 \alias{dbRemoveTable,SQLiteConnection,character-method}
 \alias{dbSendQueryArrow_SQLiteConnection}
@@ -87,6 +93,8 @@
 
 \S4method{dbGetInfo}{SQLiteConnection}(dbObj, ...)
 
+\S4method{dbGetQueryArrow}{SQLiteConnection,character}(conn, statement, ..., schema = NULL)
+
 \S4method{dbIsValid}{SQLiteConnection}(dbObj, ...)
 
 \S4method{dbListObjects}{SQLiteConnection}(conn, prefix = NULL, ...)
@@ -97,9 +105,11 @@
 
 \S4method{dbQuoteIdentifier}{SQLiteConnection,character}(conn, x, ...)
 
+\S4method{dbReadTableArrow}{SQLiteConnection,character}(conn, name, ..., schema = NULL)
+
 \S4method{dbRemoveTable}{SQLiteConnection,character}(conn, name, ..., temporary = FALSE, fail_if_missing = TRUE)
 
-\S4method{dbSendQueryArrow}{SQLiteConnection}(conn, statement, params = NULL, ...)
+\S4method{dbSendQueryArrow}{SQLiteConnection}(conn, statement, params = NULL, ..., schema = NULL)
 
 \S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement, params = NULL, ...)
 
@@ -147,6 +157,12 @@ given verbatim, e.g. \code{SQL('"my_schema"."table_name"')}
 If missing, types inferred with \code{\link[DBI:dbDataType]{DBI::dbDataType()}}).}
 
 \item{temporary}{If \code{TRUE}, only temporary tables are considered.}
+
+\item{schema}{The Arrow types of some or all result columns,
+as a struct \code{nanoarrow_schema}, an arrow \code{Schema},
+or a named list of column types such as \code{list(id = nanoarrow::na_int32())},
+matched to the result columns by name, see \link{sqlite-arrow}.
+The default \code{NULL} decides the types from the values.}
 
 \item{fail_if_missing}{If \code{FALSE}, \code{dbRemoveTable()} succeeds if the table doesn't exist.}
 }

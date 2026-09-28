@@ -30,8 +30,8 @@ inline void check_arrow(
 }
 
 inline std::string arrow_type_name(const struct ArrowSchema* schema) {
-  char buffer[128];
-  ArrowSchemaToString(schema, buffer, sizeof(buffer), 0);
+  char buffer[256];
+  ArrowSchemaToString(schema, buffer, sizeof(buffer), 1);
   return std::string(buffer);
 }
 

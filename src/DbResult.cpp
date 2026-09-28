@@ -72,7 +72,22 @@ void DbResult::close() {
   }
 }
 
+cpp11::strings DbResult::get_column_names() const {
+  return impl->get_column_names();
+}
+
 // Arrow ///////////////////////////////////////////////////////////////////////
+
+void DbResult::set_arrow_schema(
+  const struct ArrowSchema* schema,
+  const std::vector<int>& positions
+) {
+  if (!is_active()) {
+    throw std::runtime_error("Inactive result set");
+  }
+
+  impl->set_arrow_schema(schema, positions);
+}
 
 void DbResult::arrow_schema(struct ArrowSchema* out, int64_t infer_rows) {
   if (!is_active()) {

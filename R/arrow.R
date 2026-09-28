@@ -30,7 +30,8 @@
 #' a real number in a later chunk is truncated to fit an `int64` column decided from integers,
 #' and a column whose first chunk holds only `NULL` keeps its declared type,
 #' or the null type without a declaration, for the whole result.
-#' The default chunk size makes this rare, a small `chunk_size` makes it likely.
+#' The default chunk size makes this rare, a small `chunk_size` makes it likely,
+#' and a `schema` fixes the types up front, see the section on requesting types.
 #'
 #' | *SQLite value or declared type* | *Arrow type* |
 #' | ------------------------------- | ------------ |
@@ -48,6 +49,42 @@
 #' use `bit64::integer64()` as the target type to keep the full range.
 #' Dates, times and timestamps are parsed like the data frame path does it
 #' when `extended_types = TRUE`, see [SQLite()].
+#'
+#' @section Requesting types:
+#' The `schema` argument of [DBI::dbSendQueryArrow()], [DBI::dbGetQueryArrow()]
+#' and [DBI::dbReadTableArrow()] fixes the Arrow types of some or all result columns
+#' before the first row is read:
+#' a struct `nanoarrow_schema`, an arrow `Schema`,
+#' or a named list of column types such as
+#' `list(id = nanoarrow::na_int32(), when = nanoarrow::na_timestamp("ms", "UTC"))`.
+#' The entries are matched to the result columns by name, exactly.
+#' A name that is not in the result, a name the result carries twice,
+#' and an unnamed entry are errors.
+#' A column with a requested type is typed without looking at its values,
+#' with no widening and no dependence on `chunk_size`,
+#' and its declared type and `extended_types` play no part;
+#' the other columns are typed as described above.
+#' The requested types are kept when the query is executed again with [DBI::dbBind()].
+#'
+#' The types that can be requested are
+#' `null`, `bool`, `int8` to `int64`, `uint8` to `uint64`, `float`, `double`,
+#' `utf8` and `large_utf8`, `binary` and `large_binary`, `date32` and `date64`,
+#' `time32` and `time64` in any unit, and `timestamp` in any unit and time zone.
+#' Dates, times and timestamps are parsed from their text form like `extended_types = TRUE` does it,
+#' a timestamp is read as UTC and only labelled with the requested time zone.
+#' Dictionary, decimal, nested and extension types are an error.
+#'
+#' Values of another storage class than the column's type follow these rules,
+#' whether the type was requested or decided from the values:
+#'
+#' * silently: integers into a floating point type,
+#'   integers and reals into a text type, where SQLite renders them,
+#'   and text into a binary type, as its bytes;
+#' * converted by SQLite, with the warning described above:
+#'   text and blobs into a numeric type, and reals into an integer type, truncated;
+#' * `NULL`, with the warning: a blob into a text type unless it is valid UTF-8,
+#'   a number outside the range of an integer type,
+#'   and a date or time that cannot be parsed.
 #'
 #' @section Parameters:
 #' The columns of the parameter stream are bound like this:
@@ -108,6 +145,63 @@
 #' @name sqlite-arrow
 #' @aliases arrow
 NULL
+
+# Requests the Arrow types of `schema` for the columns of a result:
+# a struct nanoarrow_schema, an arrow Schema, or a named list of column types
+arrow_set_schema <- function(res, schema) {
+  schema <- arrow_check_schema(schema)
+  requested <- arrow_schema_names(schema)
+  if (any(requested == "")) {
+    stopc("All entries of `schema` must be named")
+  }
+  if (anyDuplicated(requested)) {
+    stopc(
+      "Duplicate names in `schema`: ",
+      paste0("`", unique(requested[duplicated(requested)]), "`", collapse = ", ")
+    )
+  }
+
+  columns <- result_column_names(res@ptr)
+  positions <- match(requested, columns)
+  if (anyNA(positions)) {
+    stopc(
+      "Columns of `schema` not in the result: ",
+      paste0("`", requested[is.na(positions)], "`", collapse = ", ")
+    )
+  }
+  ambiguous <- requested[tabulate(positions, length(columns))[positions] > 0 &
+    vapply(requested, function(x) sum(columns == x) > 1, logical(1))]
+  if (length(ambiguous) > 0) {
+    stopc(
+      "Columns of `schema` that the result carries more than once: ",
+      paste0("`", ambiguous, "`", collapse = ", ")
+    )
+  }
+
+  result_set_arrow_schema(res@ptr, schema, positions - 1L)
+  invisible(res)
+}
+
+arrow_check_schema <- function(schema) {
+  if (is.data.frame(schema)) {
+    stopc(
+      "`schema` must describe Arrow types, ",
+      "use `nanoarrow::infer_nanoarrow_schema()` for a data frame prototype"
+    )
+  }
+  if (is.list(schema) && !inherits(schema, "nanoarrow_schema")) {
+    if (length(schema) == 0 || is.null(names(schema)) || any(names(schema) == "")) {
+      stopc("A list passed as `schema` must have named entries")
+    }
+    schema <- nanoarrow::na_struct(lapply(schema, nanoarrow::as_nanoarrow_schema))
+  } else {
+    schema <- nanoarrow::as_nanoarrow_schema(schema)
+  }
+  if (schema$format != "+s") {
+    stopc("`schema` must be a struct schema, not ", schema$format)
+  }
+  schema
+}
 
 # An array that dbFetchArrowChunk() handed out is freed when the garbage
 # collector finds it unreachable, and the collector does not see the memory

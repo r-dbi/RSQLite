@@ -10,10 +10,12 @@ can carry the data frames of RSQLite without a cost in time or memory.
 
 *When and on what:* 2026-09-26, an Ubuntu 24.04 container (x86_64, 4 cores),
 R 4.5.3, the vendored SQLite 3.53.4, nanoarrow 0.9.0,
-on two states of [#796](https://github.com/r-dbi/RSQLite/pull/796):
-`83bb24e`, the head before the fixes it motivated, and `75ea617`, the commit with them.
+on two states of [#796](https://github.com/r-dbi/RSQLite/pull/796),
+`83bb24e`, the head before the fixes it motivated, and `75ea617`, the commit with them,
+and on `1ad5ac0`, the head of the stacked pull request that converts column by column
+and adds `lazy_strings`.
 A synthetic table of one million rows (three repetitions) and of five million rows (two), medians reported.
-The harness is [`bench.R`](bench.R), and the runs are the four CSV files beside it.
+The harness is [`bench.R`](bench.R), and the runs are the CSV files beside it.
 
 *What it supports:* the `arrow` argument of `dbConnect()` in
 [`R/dbConnect_SQLiteDriver.R`](/R/dbConnect_SQLiteDriver.R),
@@ -58,6 +60,12 @@ The build under test is the RSQLite installed in the library the script runs wit
 * [`results-pr796-75ea617-1e6.csv`](results-pr796-75ea617-1e6.csv) and
   [`results-pr796-75ea617-5e6.csv`](results-pr796-75ea617-5e6.csv):
   the commit with the fixes.
+* [`results-lazy-1ad5ac0-5e6.csv`](results-lazy-1ad5ac0-5e6.csv):
+  the column-by-column conversion with and without `lazy_strings = TRUE`,
+  five million rows only, six strategies.
+  Run with the harness as of `d8bb43f`, which measures the size of the data frame outside the timing:
+  `object.size()` reads every string, which materializes a lazy column,
+  and cost the eager cells of the earlier runs a fraction of a second too.
 
 Timings move by about 10 % between repetitions on this shared container:
 read them as shape, not to two decimals.
@@ -126,6 +134,33 @@ The one-million-row run has the same shape at a fifth of the size.
 At one million rows, the full fetch of `all` takes 1.9 s against 2.8 s on the default path,
 at 180 against 150 MB above the floor, and the other cells scale the same way.
 
+### Five million rows, column by column, with and without lazy strings (`1ad5ac0`)
+
+| query | strategy | seconds | peak RSS MB | above floor MB | data frame MB |
+|---|---|---:|---:|---:|---:|
+| all | default | 17.07 | 781 | 678 | 411 |
+| all | arrow_df | 9.97 | 936 | 833 | 411 |
+| all | arrow_df_chunked | 8.20 | 200 | 97 | |
+| all | arrow_df_lazy | 5.68 | 844 | 741 | 411 |
+| all | arrow_df_lazy_chunked | 4.43 | 276 | 173 | |
+| numbers | default | 4.74 | 258 | 154 | 76 |
+| numbers | arrow_df | 2.70 | 378 | 274 | 76 |
+| numbers | arrow_df_chunked | 2.63 | 182 | 79 | |
+| numbers | arrow_df_lazy | 2.59 | 378 | 274 | 76 |
+| numbers | arrow_df_lazy_chunked | 2.57 | 182 | 79 | |
+| strings | default | 10.73 | 637 | 534 | 334 |
+| strings | arrow_df | 7.44 | 754 | 650 | 334 |
+| strings | arrow_df_chunked | 6.07 | 189 | 86 | |
+| strings | arrow_df_lazy | 2.55 | 674 | 571 | 334 |
+| strings | arrow_df_lazy_chunked | 2.54 | 221 | 117 | |
+| filtered | default | 4.91 | 318 | 215 | 141 |
+| filtered | arrow_df | 3.54 | 414 | 311 | 141 |
+| filtered | arrow_df_chunked | 2.86 | 189 | 86 | |
+| filtered | arrow_df_lazy | 1.86 | 354 | 251 | 141 |
+| filtered | arrow_df_lazy_chunked | 1.90 | 227 | 124 | |
+
+The floor is 103 MB in this run.
+
 ## What the numbers say
 
 * **A full fetch through Arrow takes about a third less time than on the default path**,
@@ -157,6 +192,18 @@ at 180 against 150 MB above the floor, and the other cells scale the same way.
   nanoarrow's own conversion collects the arrays first (949 MB above the floor for `all`)
   and turns `int64` columns into doubles, which lose precision above 2^53 without a warning,
   where RSQLite's conversion gives integers where they fit and `integer64` otherwise.
+* **Converting column by column made the eager path faster and the chunked fetch leaner.**
+  With each column handed to nanoarrow's converter on its own, with the row count known,
+  the full fetch of `all` takes 10.0 s against 12.1 s on `75ea617`,
+  and the chunked fetch peaks at 97 MB against 131 MB, since the arrays of a column go as soon as it is converted.
+* **`lazy_strings = TRUE` removes the string conversion from the fetch.**
+  The full fetch of `all` takes 5.7 s against 10.0 s eager and 17.1 s on the default path,
+  the strings alone 2.6 against 7.4 and 10.7 s, and the numbers cells do not move.
+  The peak is lower too, 741 against 833 MB above the floor for `all` and 571 against 650 for the strings,
+  because a column stays in Arrow form, about 26 MB per million of the 30-character strings against
+  some 64 MB as R strings, and the chunked loop that discards its data frames runs at 4.4 s and 173 MB.
+  The price is paid later: until nanoarrow caches the strings of a view,
+  every vectorised use of the column converts it again, at about the cost of the conversion the fetch skipped.
 * **The floor is 100 MB** in every cell: R, the packages and an open connection, before the first row.
   Peak RSS repeats to the MB between repetitions of the same cell; timings move by about 10 %.
 

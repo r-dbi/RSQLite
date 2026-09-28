@@ -215,3 +215,49 @@ int64_t db_arrow_buffered_stream_init(
   out->private_data = state.release();
   return total;
 }
+
+int64_t db_arrow_column_streams_init(
+  std::vector<struct ArrowArrayStream*>& outs,
+  const DbResultPtr& result,
+  const struct ArrowSchema* schema,
+  int64_t chunk_size
+) {
+  const size_t ncols = static_cast<size_t>(schema->n_children);
+  if (outs.size() != ncols) {
+    throw std::runtime_error("Internal error: column count mismatch");
+  }
+
+  std::vector<std::unique_ptr<BufferedState>> states(ncols);
+  for (size_t j = 0; j < ncols; ++j) {
+    states[j].reset(new BufferedState());
+    check_arrow(
+      ArrowSchemaDeepCopy(schema->children[j], states[j]->schema.get()),
+      "Can't copy Arrow schema"
+    );
+  }
+
+  int64_t total = 0;
+  while (true) {
+    nanoarrow::UniqueArray chunk;
+    int64_t n = result->fetch_arrow(chunk.get(), chunk_size);
+    if (n == 0) {
+      break;
+    }
+    total += n;
+    // The children move out of the struct, which releases only what is left
+    for (size_t j = 0; j < ncols; ++j) {
+      nanoarrow::UniqueArray column;
+      ArrowArrayMove(chunk->children[j], column.get());
+      states[j]->arrays.push_back(std::move(column));
+    }
+  }
+
+  for (size_t j = 0; j < ncols; ++j) {
+    outs[j]->get_schema = &buffered_get_schema;
+    outs[j]->get_next = &buffered_get_next;
+    outs[j]->get_last_error = &buffered_get_last_error;
+    outs[j]->release = &buffered_release;
+    outs[j]->private_data = states[j].release();
+  }
+  return total;
+}

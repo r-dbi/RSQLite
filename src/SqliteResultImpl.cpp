@@ -419,8 +419,10 @@ int64_t SqliteResultImpl::fetch_arrow_rows(
 
   int64_t n = 0;
   while (!complete_ && n < n_max) {
+    // The 1-based row number in the result, for the coercion log
+    const int64_t row = static_cast<int64_t>(nrows_) + 1;
     for (size_t j = 0; j < ncols; ++j) {
-      arrow_columns_[j].append_row();
+      arrow_columns_[j].append_row(row);
     }
     step();
     ++nrows_;
@@ -471,8 +473,29 @@ int64_t SqliteResultImpl::fetch_arrow_rows(
     &error
   );
 
+  // Before the chunk is handed out: if the warning is turned into an error,
+  // the chunk is released by the unwinding
+  warn_coercions();
+
   chunk.move(out);
   return n;
+}
+
+// One warning per chunk for all values that were not of their column's type
+void SqliteResultImpl::warn_coercions() {
+  cpp11::writable::list entries;
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    cpp11::sexp coercions = arrow_columns_[j].coercions();
+    if (coercions != R_NilValue) {
+      entries.push_back(coercions);
+    }
+  }
+  if (entries.size() == 0) {
+    return;
+  }
+
+  cpp11::function warn_coercion = cpp11::package("RSQLite")["warn_coercion"];
+  warn_coercion(entries);
 }
 
 void SqliteResultImpl::raise_sqlite_exception() const {

@@ -1,11 +1,5 @@
 # dbConnect(arrow = TRUE): data frames travel through Arrow
 
-local_arrow_con <- function(..., envir = parent.frame()) {
-  con <- dbConnect(SQLite(), ":memory:", arrow = TRUE, ...)
-  withr::defer(dbDisconnect(con), envir = envir)
-  con
-}
-
 test_that("the arrow argument is validated and recorded", {
   con <- local_arrow_con()
   expect_true(con@arrow)

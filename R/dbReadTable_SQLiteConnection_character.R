@@ -16,6 +16,9 @@
 #'   e.g., table names `ABC` and `abc` are considered equal.
 #' @param check.names If `TRUE`, the default, column names will be converted to valid R identifiers.
 #' @param select.cols  Deprecated, do not use.
+#' @param ptype The R types of some or all columns, passed on to [DBI::dbSendQuery()],
+#'   see the section on data frames in [sqlite-arrow].
+#'   Requires a connection with `arrow = TRUE`.
 #' @param ... Needed for compatibility with generic.
 #'   Otherwise ignored.
 #' @inheritParams DBI::sqlRownamesToColumn
@@ -29,7 +32,7 @@
 #' @usage NULL
 dbReadTable_SQLiteConnection_character <- function(conn, name, ...,
                                                    row.names = pkgconfig::get_config("RSQLite::row.names.table", FALSE),
-                                                   check.names = TRUE, select.cols = NULL) {
+                                                   check.names = TRUE, select.cols = NULL, ptype = NULL) {
   name <- check_quoted_identifier(name)
 
   row.names <- compatRowNames(row.names)
@@ -52,7 +55,7 @@ dbReadTable_SQLiteConnection_character <- function(conn, name, ...,
 
   name <- dbQuoteIdentifier(conn, name)
   out <- dbGetQuery(conn, paste("SELECT", select.cols, "FROM", name),
-    row.names = row.names
+    row.names = row.names, ptype = ptype
   )
 
   if (check.names) {

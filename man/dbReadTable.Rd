@@ -11,7 +11,8 @@
   ...,
   row.names = pkgconfig::get_config("RSQLite::row.names.table", FALSE),
   check.names = TRUE,
-  select.cols = NULL
+  select.cols = NULL,
+  ptype = NULL
 )
 }
 \arguments{
@@ -38,6 +39,10 @@ For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
 \item{check.names}{If \code{TRUE}, the default, column names will be converted to valid R identifiers.}
 
 \item{select.cols}{Deprecated, do not use.}
+
+\item{ptype}{The R types of some or all columns, passed on to \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}},
+see the section on data frames in \link{sqlite-arrow}.
+Requires a connection with \code{arrow = TRUE}.}
 }
 \value{
 A data frame.

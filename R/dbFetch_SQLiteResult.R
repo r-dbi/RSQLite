@@ -12,7 +12,7 @@ dbFetch_SQLiteResult <- function(res, n = -1, ...,
   if (is.infinite(n)) n <- -1
   if (trunc(n) != n) stopc("`n` must be a whole number")
   if (res@conn@arrow) {
-    ret <- arrow_fetch_df(res, n)
+    ret <- arrow_fetch_df(res, n, res@ptype)
   } else {
     ret <- result_fetch(res@ptr, n = n)
     ret <- convert_bigint(ret, res@bigint)

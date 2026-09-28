@@ -19,6 +19,7 @@ setClass("SQLiteResult",
     sql = "character",
     ptr = "externalptr",
     conn = "SQLiteConnection",
-    bigint = "character"
+    bigint = "character",
+    ptype = "ANY"
   )
 )

@@ -43,9 +43,12 @@
 #' dbDisconnect(con)
 #' @usage NULL
 dbWriteTable_SQLiteConnection_character_data.frame <- function(conn, name, value, ...,
-                                                               row.names = pkgconfig::get_config("RSQLite::row.names.table", FALSE),
+                                                               row.names = FALSE,
                                                                overwrite = FALSE, append = FALSE,
                                                                field.types = NULL, temporary = FALSE) {
+  if (missing(row.names)) {
+    row.names <- row_names_default("RSQLite::row.names.table")
+  }
   row.names <- compatRowNames(row.names)
 
   if ((!is.logical(row.names) && !is.character(row.names)) || length(row.names) != 1L) {

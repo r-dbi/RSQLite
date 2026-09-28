@@ -10,7 +10,7 @@ sqliteBuildTableDefinition(
   name,
   value,
   field.types = NULL,
-  row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE)
+  row.names = FALSE
 )
 }
 \arguments{
@@ -24,7 +24,7 @@ sqliteBuildTableDefinition(
 
 \item{row.names}{Logical.
 Should row.name of \code{value} be exported as a \code{row_names} field?
-Default is \code{TRUE}}
+Default is \code{FALSE}.}
 }
 \value{
 An SQL string

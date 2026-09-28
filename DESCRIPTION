@@ -41,7 +41,6 @@ Imports:
     DBI (>= 1.2.0),
     memoise,
     methods,
-    pkgconfig,
     rlang
 Suggests: 
     callr,
@@ -54,6 +53,7 @@ Suggests:
     httpuv,
     knitr,
     magrittr,
+    pkgconfig,
     rmarkdown,
     rvest,
     testthat (>= 3.0.0),

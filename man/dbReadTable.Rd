@@ -9,7 +9,7 @@
   conn,
   name,
   ...,
-  row.names = pkgconfig::get_config("RSQLite::row.names.table", FALSE),
+  row.names = FALSE,
   check.names = TRUE,
   select.cols = NULL
 )

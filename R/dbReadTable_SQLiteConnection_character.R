@@ -28,10 +28,13 @@
 #' dbDisconnect(db)
 #' @usage NULL
 dbReadTable_SQLiteConnection_character <- function(conn, name, ...,
-                                                   row.names = pkgconfig::get_config("RSQLite::row.names.table", FALSE),
+                                                   row.names = FALSE,
                                                    check.names = TRUE, select.cols = NULL) {
   name <- check_quoted_identifier(name)
 
+  if (missing(row.names)) {
+    row.names <- row_names_default("RSQLite::row.names.table")
+  }
   row.names <- compatRowNames(row.names)
 
   if ((!is.logical(row.names) && !is.character(row.names)) || length(row.names) != 1L) {

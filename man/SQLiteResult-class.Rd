@@ -33,12 +33,7 @@
 
 \S4method{dbColumnInfo}{SQLiteResult}(res, ...)
 
-\S4method{dbFetch}{SQLiteResult}(
-  res,
-  n = -1,
-  ...,
-  row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE)
-)
+\S4method{dbFetch}{SQLiteResult}(res, n = -1, ..., row.names = FALSE)
 
 \S4method{dbGetRowCount}{SQLiteResult}(res, ...)
 

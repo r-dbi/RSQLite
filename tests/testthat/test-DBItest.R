@@ -4,6 +4,8 @@ skip_if_not_installed("DBItest")
 
 DBItest::test_all(
   skip = c(
-    if (getRversion() < "4.0") "stream_bind_too_many"
+    if (getRversion() < "4.0") "stream_bind_too_many",
+    # See helper-DBItest.R
+    ARROW_ROUNDTRIP_SKIPS
   )
 )

@@ -84,6 +84,18 @@ result_get_placeholder_names <- function(res) {
   .Call(`_RSQLite_result_get_placeholder_names`, res)
 }
 
+result_fetch_arrow <- function(res_, chunk_size) {
+  .Call(`_RSQLite_result_fetch_arrow`, res_, chunk_size)
+}
+
+result_fetch_arrow_chunk <- function(res, chunk_size) {
+  .Call(`_RSQLite_result_fetch_arrow_chunk`, res, chunk_size)
+}
+
+result_bind_arrow <- function(res, params, param_indexes) {
+  invisible(.Call(`_RSQLite_result_bind_arrow`, res, params, param_indexes))
+}
+
 rsqliteVersion <- function() {
   .Call(`_RSQLite_rsqliteVersion`)
 }

@@ -31,7 +31,8 @@ SQLite(...)
   flags = SQLITE_RWC,
   vfs = NULL,
   bigint = c("integer64", "integer", "numeric", "character"),
-  extended_types = FALSE
+  extended_types = FALSE,
+  arrow = FALSE
 )
 
 \S4method{dbDisconnect}{SQLiteConnection}(conn, ...)
@@ -90,6 +91,14 @@ default is \link[bit64:integer64]{bit64::integer64}, which allows the full range
 \item{extended_types}{When \code{TRUE} columns of type \code{DATE}, \code{DATETIME} / \code{TIMESTAMP}, and \code{TIME} are mapped to corresponding R-classes,
 c.f. below for details.
 Defaults to \code{FALSE}.}
+
+\item{arrow}{When \code{TRUE}, data frames travel through the Arrow interface:
+\code{\link[DBI:dbFetch]{DBI::dbFetch()}} converts the Arrow arrays that \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} fills straight from the SQLite statement,
+and \code{\link[DBI:dbAppendTable]{DBI::dbAppendTable()}} binds the data frame as an Arrow stream through \code{\link[DBI:dbAppendTableArrow]{DBI::dbAppendTableArrow()}}.
+The data frames are the same as with the default path, see \link{sqlite-arrow} for the rules.
+When this was measured, fetching a large table took less time through Arrow than on the default path,
+and fetching it in chunks much less.
+Experimental, defaults to \code{FALSE}.}
 }
 \value{
 \code{SQLite()} returns an object of class \link[=SQLiteDriver-class]{SQLiteDriver}.

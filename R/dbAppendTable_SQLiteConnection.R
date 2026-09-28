@@ -6,7 +6,15 @@ dbAppendTable_SQLiteConnection <- function(conn, name, value, ...,
   dbBegin(conn, name = savepoint_id)
   on.exit(dbRollback(conn, name = savepoint_id))
 
-  out <- callNextMethod()
+  if (conn@arrow) {
+    if (!is.null(row.names)) {
+      stopc("Can't pass `row.names` to `dbAppendTable()`")
+    }
+    stopifnot(is.data.frame(value))
+    out <- arrow_append_df(conn, name, value)
+  } else {
+    out <- callNextMethod()
+  }
 
   on.exit(NULL)
   dbCommit(conn, name = savepoint_id)

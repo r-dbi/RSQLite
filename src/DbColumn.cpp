@@ -37,6 +37,8 @@ void DbColumn::finalize(const int n_) {
 }
 
 void DbColumn::warn_type_conflicts(const cpp11::r_string& name) const {
+  warn_invalid_strings(name);
+
   std::set<DATA_TYPE> my_data_types_seen = data_types_seen;
   DATA_TYPE dt = get_last_storage()->get_data_type();
 
@@ -79,6 +81,26 @@ void DbColumn::warn_type_conflicts(const cpp11::r_string& name) const {
     }
     ss << format_data_type(*it);
   }
+
+  cpp11::warning(ss.str());
+}
+
+void DbColumn::warn_invalid_strings(const cpp11::r_string& name) const {
+  const int64_t n_invalid = source->get_n_invalid_strings();
+  if (n_invalid == 0) {
+    return;
+  }
+
+  cpp11::r_string name_utf8 = name;
+
+  std::stringstream ss;
+  ss << "Column `" << static_cast<std::string>(name_utf8) << "`: ";
+  if (n_invalid == 1) {
+    ss << "1 blob value is";
+  } else {
+    ss << n_invalid << " blob values are";
+  }
+  ss << " not valid UTF-8 text, NA is returned";
 
   cpp11::warning(ss.str());
 }

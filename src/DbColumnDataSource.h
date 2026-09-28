@@ -29,6 +29,9 @@ public:
   virtual double fetch_datetime() const = 0;
   virtual double fetch_time() const = 0;
 
+  // The number of values that fetch_string() replaced by NA
+  virtual int64_t get_n_invalid_strings() const;
+
 protected:
   int get_j() const;
 };

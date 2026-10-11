@@ -150,11 +150,18 @@ or to the levels found in the values of each fetch if it has none.
 The prototype then drives the conversion to R, so the columns come back exactly as described,
 and \code{bigint} applies only to the other columns.
 
-A fetch of all rows reads the result into Arrow arrays first,
-so that the data frame is allocated once with the row count known,
-and frees each array as soon as it is converted:
-at its peak, the memory holds the arrays and the part of the data frame filled so far.
-A fetch of \code{n} rows copies the strings out of its array and frees the array right away.
+A fetch of all rows reads the result into Arrow arrays first and splits them by column,
+so that each column is allocated once with the row count known
+and its arrays are freed as soon as it is converted;
+a fetch of \code{n} rows converts its chunk column by column the same way.
+Character columns are copied out of their arrays,
+unless the connection was opened with \code{lazy_strings = TRUE}:
+then a character column stays a view into its Arrow array,
+which holds the strings in less memory than R does and is freed when the column is dropped,
+while the other columns are converted and freed as before.
+Until nanoarrow caches the strings of such a view,
+every vectorised use of the column converts it again,
+so a column that is used more than once is better copied with \code{c()} first.
 }
 
 \section{Chunking}{

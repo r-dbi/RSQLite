@@ -1,7 +1,10 @@
 #' @rdname SQLiteResult-class
 #' @usage NULL
 dbFetch_SQLiteResult <- function(res, n = -1, ...,
-                                 row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE)) {
+                                 row.names = FALSE) {
+  if (missing(row.names)) {
+    row.names <- row_names_default("RSQLite::row.names.query")
+  }
   row.names <- compatRowNames(row.names)
   if (length(n) != 1) stopc("`n` must be scalar")
   if (is.na(n)) {

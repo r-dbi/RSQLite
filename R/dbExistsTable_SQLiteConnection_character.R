@@ -5,7 +5,7 @@ dbExistsTable_SQLiteConnection_character <- function(conn, name, ...) {
   rs <- sqliteListTablesWithName(conn, name)
   on.exit(dbClearResult(rs), add = TRUE)
 
-  nrow(dbFetch(rs, 1L)) > 0
+  nrow(dbFetch(rs, 1L, row.names = FALSE)) > 0
 }
 #' @rdname SQLiteConnection-class
 #' @export

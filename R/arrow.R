@@ -114,8 +114,29 @@
 #' `date32`, `time64` and `timestamp` columns become `Date`, `hms` and `POSIXct` in UTC,
 #' and `binary` columns become [blob::blob] objects,
 #' as on the default path.
-#' The first chunk of a result decides the types of all its chunks.
+#' The first chunk of a result decides the types of all its chunks,
+#' unless the types are given up front with `ptype`.
 #' Before writing, factors become strings and lists of raw vectors become blobs.
+#'
+#' The `ptype` argument of [DBI::dbSendQuery()], [DBI::dbGetQuery()] and [DBI::dbReadTable()]
+#' names the R types of some or all result columns:
+#' a data frame, or a named list of vectors whose values are ignored, such as
+#' `list(id = bit64::integer64(), when = as.POSIXct(character(), tz = "UTC"))`.
+#' The columns are matched to the result by name, exactly, like `schema` above,
+#' and the other columns are converted as described.
+#' A column of the prototype is requested from SQLite as the Arrow type that
+#' `nanoarrow::infer_nanoarrow_schema()` gives for it:
+#' `integer` as `int32`, so that values outside its range become `NA` with a warning,
+#' `bit64::integer64` as `int64`, and it stays an `integer64` whatever the values,
+#' `logical` as `bool`, `Date` as `date32`, and `blob` as `binary`.
+#' A `POSIXct` column is requested as a timestamp in the time zone of the prototype,
+#' the session's time zone for an empty one:
+#' the values are read as UTC, like on both paths, and displayed in that zone.
+#' An `hms` column is requested as `time64` in microseconds,
+#' and a factor is read as text and converted to its levels,
+#' or to the levels found in the values of each fetch if it has none.
+#' The prototype then drives the conversion to R, so the columns come back exactly as described,
+#' and `bigint` applies only to the other columns.
 #'
 #' A fetch of all rows reads the result into Arrow arrays first,
 #' so that the data frame is allocated once with the row count known,
@@ -147,16 +168,17 @@
 NULL
 
 # Requests the Arrow types of `schema` for the columns of a result:
-# a struct nanoarrow_schema, an arrow Schema, or a named list of column types
-arrow_set_schema <- function(res, schema) {
+# a struct nanoarrow_schema, an arrow Schema, or a named list of column types;
+# `arg` names the argument in error messages
+arrow_set_schema <- function(res, schema, arg = "schema") {
   schema <- arrow_check_schema(schema)
   requested <- arrow_schema_names(schema)
   if (any(requested == "")) {
-    stopc("All entries of `schema` must be named")
+    stopc("All entries of `", arg, "` must be named")
   }
   if (anyDuplicated(requested)) {
     stopc(
-      "Duplicate names in `schema`: ",
+      "Duplicate names in `", arg, "`: ",
       paste0("`", unique(requested[duplicated(requested)]), "`", collapse = ", ")
     )
   }
@@ -165,7 +187,7 @@ arrow_set_schema <- function(res, schema) {
   positions <- match(requested, columns)
   if (anyNA(positions)) {
     stopc(
-      "Columns of `schema` not in the result: ",
+      "Columns of `", arg, "` not in the result: ",
       paste0("`", requested[is.na(positions)], "`", collapse = ", ")
     )
   }
@@ -173,7 +195,7 @@ arrow_set_schema <- function(res, schema) {
     vapply(requested, function(x) sum(columns == x) > 1, logical(1))]
   if (length(ambiguous) > 0) {
     stopc(
-      "Columns of `schema` that the result carries more than once: ",
+      "Columns of `", arg, "` that the result carries more than once: ",
       paste0("`", ambiguous, "`", collapse = ", ")
     )
   }

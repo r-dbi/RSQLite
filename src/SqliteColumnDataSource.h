@@ -28,6 +28,15 @@ public:
   virtual double fetch_datetime() const;
   virtual double fetch_time() const;
 
+  // The parsing behind fetch_date(), fetch_datetime_local() and fetch_time()
+  // without the warning: `ok` is false when the value could not be parsed
+  double parse_date(bool& ok) const;
+  double parse_datetime_local(bool& ok) const;
+  double parse_time(bool& ok) const;
+
+private:
+  void warn_unparsable() const;
+
 private:
   static DATA_TYPE datatype_from_decltype(
     const char* decl_type,

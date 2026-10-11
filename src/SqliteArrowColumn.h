@@ -4,6 +4,7 @@
 #include <string>
 
 #include "sqlite3-cpp.h"
+#include "CoercionLog.h"
 #include "DbArrow.h"
 #include "SqliteColumnDataSource.h"
 
@@ -41,7 +42,8 @@ class SqliteArrowColumn {
   nanoarrow::UniqueArray array;
   // Rows of the current chunk seen while undecided (all NULL)
   int64_t pending_nulls;
-  bool warned;
+  // Values of the current chunk that were not of the column's type
+  CoercionLog log;
 
 public:
   SqliteArrowColumn(
@@ -61,23 +63,27 @@ public:
 
   void set_schema(struct ArrowSchema* schema) const;
 
-  // Chunk building
+  // Chunk building, `row` is the 1-based row number in the result
   void start_chunk();
-  void append_row();
+  void append_row(int64_t row);
   void finish_chunk(int64_t n);
   void move_chunk_to(struct ArrowArray* out);
   int64_t variable_bytes();
+
+  // The values of the chunk that were not of the column's type, as an R list
+  // with the column name, the type and the entries of the log, which is
+  // cleared; NULL if there were none
+  cpp11::sexp coercions();
 
 private:
   static ARROW_KIND kind_from_column_type(int column_type);
   ARROW_KIND kind_from_decltype() const;
 
   void init_array();
-  void append_value(int column_type);
+  void append_value(int column_type, int64_t row);
+  void append_null();
   void promote_to_double();
-  void warn_mixed(int column_type);
   static const char* format_kind(ARROW_KIND kind);
-  static const char* format_column_type(int column_type);
 };
 
 #endif  // RSQLITE_SQLITEARROWCOLUMN_H

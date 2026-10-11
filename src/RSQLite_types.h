@@ -9,17 +9,20 @@
 
 namespace cpp11 {
 
+// The external pointer of a result owns a shared pointer, so that a lazy
+// Arrow stream can keep the result alive after the R object has been cleared.
+
 template <typename T>
 using enable_if_dbres_ptr =
   typename std::enable_if<std::is_same<DbResult*, T>::value, T>::type;
 
 template <typename T>
 enable_if_dbres_ptr<T> as_cpp(SEXP x) {
-  DbResult* result = (DbResult*)(R_ExternalPtrAddr(x));
-  if (!result) {
+  DbResultPtr* result = (DbResultPtr*)(R_ExternalPtrAddr(x));
+  if (!result || !result->get()) {
     cpp11::stop("Invalid result set");
   }
-  return result;
+  return result->get();
 }
 
 template <typename T>
@@ -28,11 +31,11 @@ using enable_if_sqliteres_ptr =
 
 template <typename T>
 enable_if_sqliteres_ptr<T> as_cpp(SEXP x) {
-  SqliteResult* result = (SqliteResult*)(R_ExternalPtrAddr(x));
-  if (!result) {
+  DbResultPtr* result = (DbResultPtr*)(R_ExternalPtrAddr(x));
+  if (!result || !result->get()) {
     cpp11::stop("Invalid result set");
   }
-  return result;
+  return static_cast<SqliteResult*>(result->get());
 }
 
 }  // namespace cpp11

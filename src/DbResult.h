@@ -10,6 +10,13 @@
 class DbConnection;
 typedef boost::shared_ptr<DbConnection> DbConnectionPtr;
 
+class DbResult;
+typedef boost::shared_ptr<DbResult> DbResultPtr;
+
+struct ArrowSchema;
+struct ArrowArray;
+struct ArrowArrayStream;
+
 // DbResult --------------------------------------------------------------------
 
 class DbResult : boost::noncopyable {
@@ -28,6 +35,7 @@ public:
   void close();
 
   bool complete() const;
+  bool ready() const;
   bool is_active() const;
   int n_rows_fetched();
   int n_rows_affected();
@@ -36,6 +44,14 @@ public:
   cpp11::list fetch(int n_max = -1);
 
   cpp11::list get_column_info();
+
+  // Arrow
+  void arrow_schema(struct ArrowSchema* out, int64_t infer_rows);
+  int64_t fetch_arrow(struct ArrowArray* out, int64_t n_max);
+  void bind_arrow(
+    struct ArrowArrayStream* stream,
+    const std::vector<int>& param_indexes
+  );
 
 private:
   void validate_params(const cpp11::list& params) const;

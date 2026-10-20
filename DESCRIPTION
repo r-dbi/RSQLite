@@ -1,7 +1,7 @@
 Package: RSQLite
 Title: SQLite Interface for R
-Version: 3.53.3.9012
-Date: 2026-09-15
+Version: 3.53.3.9017
+Date: 2026-10-18
 Authors@R: c(
     person("Kirill", "Müller", , "kirill@cynkra.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1416-3412")),
@@ -143,4 +143,4 @@ Collate:
     'utils.R'
     'version.R'
     'zzz.R'
-Config/roxygen2/version: 8.1.0.9000
+Config/roxygen2/version: 8.1.1.9000

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Copied from duckdb/duckdb-r's scripts/cran-submit-test.sh at 86ac17f6b.
-# Check scripts/cran-submit.sh offline, against a fake CRAN submission form on 127.0.0.1: nothing reaches CRAN.
+# Check .github/actions/cran-submit/cran-submit.sh offline, against a fake CRAN submission form on 127.0.0.1: nothing reaches CRAN.
 # Process: the header of .github/workflows/cran-submission.yaml
 #
 #   1. `upload` sends the two POSTs of `devtools:::upload_cran()`, field for field and in order,
@@ -21,7 +21,7 @@
 # the confirmation to `index2.php?submit=1`, and the server records every field it receives.
 #
 # Usage:
-#   scripts/cran-submit-test.sh
+#   .github/actions/cran-submit/cran-submit-test.sh
 #
 # Environment variables:
 #   KEEP - if non-empty, do not delete the scratch directory
@@ -150,7 +150,7 @@ export no_proxy=127.0.0.1 NO_PROXY=127.0.0.1
 # What a run on GitHub sets. The commit is this checkout's HEAD,
 # as in a job that checked out the commit the run was started on.
 export GITHUB_SERVER_URL=https://github.example GITHUB_REPOSITORY=r-dbi/RSQLite GITHUB_REF_NAME=release-x
-GITHUB_SHA=$(git -C "$HERE/.." rev-parse HEAD 2>/dev/null || echo 0123456789abcdef0123456789abcdef01234567)
+GITHUB_SHA=$(git -C "$HERE/../../.." rev-parse HEAD 2>/dev/null || echo 0123456789abcdef0123456789abcdef01234567)
 export GITHUB_SHA
 LINK="Commit [\`${GITHUB_SHA:0:10}\`](https://github.example/r-dbi/RSQLite/commit/$GITHUB_SHA) on \`release-x\`."
 
@@ -178,7 +178,7 @@ cat >"$SCRATCH/pkg/fakepkg/DESCRIPTION" <<'EOF'
 Package: fakepkg
 Version: 1.0.1
 Title: A Package That Is Never Submitted
-Description: Stands in for the package in scripts/cran-submit-test.sh,
+Description: Stands in for the package in .github/actions/cran-submit/cran-submit-test.sh,
     against a fake submission form.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -339,7 +339,7 @@ else
 Package: zpkg
 Version: 0.2.0
 Title: A Package That Is Never Submitted Either
-Description: Built by scripts/cran-submit-test.sh.
+Description: Built by .github/actions/cran-submit/cran-submit-test.sh.
 Authors@R: person("Jane", "Müller", , "jane@example.org", role = c("aut", "cre"))
 License: GPL-3
 Encoding: UTF-8

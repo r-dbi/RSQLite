@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Copied from duckdb/duckdb-r's scripts/cran-lib.sh at 86ac17f6b.
-# Shared helpers for scripts/cran-submit.sh and scripts/cran-release.sh: the log, the annotations, the report.
+# Shared helpers for .github/actions/cran-submit/cran-submit.sh and .github/actions/cran-release/cran-release.sh: the log, the annotations, the report.
 # Process: the header of .github/workflows/cran-submission.yaml
 #
 # Sourced, not run. The log folds each stage into a group and annotates outcomes

@@ -3,7 +3,7 @@
 #
 # cran-submission.yaml drafts a release for every submission, and ends its notes with the marker
 # `<!-- cran-submission: <package> <version> -->`.
-# Every night this workflow runs scripts/cran-release.sh, which checks each such draft
+# Every night this workflow runs .github/actions/cran-release/cran-release.sh, which checks each such draft
 # against the source index of https://packagemanager.posit.co/cran/latest,
 # as `fledge:::release_after_cran_built_binaries()` did in fledge.yaml,
 # and publishes the drafts whose version that index lists, as the latest release,
@@ -45,15 +45,8 @@ jobs:
           persist-credentials: false
 
       - name: Check the drafts against P3M, and publish what it serves
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
+        uses: ./.github/actions/cran-release
+        with:
+          token: ${{ github.token }}
           # Empty on a scheduled run, which publishes.
-          DRY_RUN: ${{ inputs.dry-run }}
-        run: |
-          if [ "$DRY_RUN" = true ]; then
-            scripts/cran-release.sh --dry-run
-          else
-            scripts/cran-release.sh
-          fi
-        shell: bash
+          dry-run: ${{ inputs.dry-run || 'false' }}

@@ -54,7 +54,7 @@
 # is retried on the same version, by dispatching with the input `retag`:
 # the job then prints the commit the tag pointed to and moves the tag to this commit.
 #
-# The `cran-submission` job runs scripts/cran-submit.sh twice.
+# The `cran-submission` job runs .github/actions/cran-submit/cran-submit.sh twice.
 # `tarball` builds the package with `R CMD build`, recompresses it with zopfli (`pigz -11`)
 # and verifies the result; the run keeps that tarball as an artifact named `<package>_<version>`.
 # `upload` then posts it to CRAN's submission form as `devtools:::upload_cran()` does,
@@ -238,7 +238,7 @@ jobs:
           # The release carries the section without its heading, as the earlier releases do;
           # its title is the heading.
           # The marker at the end, which GitHub does not render, is how cran-release.yaml
-          # finds the drafts to publish once P3M serves the version (scripts/cran-release.sh).
+          # finds the drafts to publish once P3M serves the version (.github/actions/cran-release/cran-release.sh).
           notes="$RUNNER_TEMP/release-notes.md"
           {
             # Without the heading, and without blank lines before and after the section.
@@ -498,8 +498,10 @@ jobs:
 
       - name: Build, recompress with zopfli, and verify the source package
         id: tarball
-        run: scripts/cran-submit.sh tarball "$RUNNER_TEMP/cran"
-        shell: bash
+        uses: ./.github/actions/cran-submit
+        with:
+          stage: tarball
+          out-dir: ${{ runner.temp }}/cran
 
       # Before the upload, so that the run keeps what it submitted, or tried to.
       - name: Keep the tarball to submit
@@ -523,16 +525,11 @@ jobs:
         shell: bash
 
       - name: Upload to CRAN and confirm the submission, or show what would be sent
-        env:
-          TARBALL: ${{ steps.tarball.outputs.tarball }}
-          DRY_RUN: ${{ inputs.dry-run }}
-        run: |
-          if [ "$DRY_RUN" = true ]; then
-            scripts/cran-submit.sh upload --dry-run "$TARBALL"
-          else
-            scripts/cran-submit.sh upload "$TARBALL"
-          fi
-        shell: bash
+        uses: ./.github/actions/cran-submit
+        with:
+          stage: upload
+          tarball: ${{ steps.tarball.outputs.tarball }}
+          dry-run: ${{ inputs.dry-run }}
 
       - name: Point to the draft release
         if: success() && !inputs.dry-run

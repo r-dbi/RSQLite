@@ -1,6 +1,6 @@
 #!/bin/bash
 # Copied from duckdb/duckdb-r's scripts/cran-release-test.sh at 86ac17f6b.
-# Check scripts/cran-release.sh offline, against a fake P3M on 127.0.0.1 and a `gh` stub: nothing reaches GitHub.
+# Check .github/actions/cran-release/cran-release.sh offline, against a fake P3M on 127.0.0.1 and a `gh` stub: nothing reaches GitHub.
 # Process: the header of .github/workflows/cran-submission.yaml
 #
 #   1. A draft whose version P3M does not list yet is one line in the report, and success.
@@ -15,7 +15,7 @@
 # over a JSON file named after the path, and records every call; `gh release edit` only records.
 #
 # Usage:
-#   scripts/cran-release-test.sh
+#   .github/actions/cran-release/cran-release-test.sh
 #
 # Environment variables:
 #   KEEP - if non-empty, do not delete the scratch directory

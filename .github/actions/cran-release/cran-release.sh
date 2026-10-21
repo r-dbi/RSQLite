@@ -20,25 +20,25 @@
 # so a nightly run stays green while it waits.
 #
 # Usage:
-#   scripts/cran-release.sh [--dry-run]
+#   .github/actions/cran-release/cran-release.sh [--dry-run]
 #
 # --dry-run checks everything and publishes nothing, saying what it would publish.
 # Exit status: 0 when nothing failed, 1 when a draft could not be published, 2 on a usage error.
 #
 # Environment:
 #   GH_REPO              the repository, owner/name; defaults to GITHUB_REPOSITORY
-#   GH                   the gh command, default `gh`; scripts/cran-release-test.sh stubs it
+#   GH                   the gh command, default `gh`; .github/actions/cran-release/cran-release-test.sh stubs it
 #   P3M_REPO_URL         the CRAN repository to check, default https://packagemanager.posit.co/cran/latest;
 #                        the test points it at a local server
 #   GITHUB_ACTIONS, GITHUB_STEP_SUMMARY, GITHUB_SERVER_URL, GITHUB_REPOSITORY
 #                        the log's groups and annotations, the report, and the commit links
-#                        (scripts/cran-lib.sh)
+#                        (.github/actions/cran-lib/cran-lib.sh)
 
 set -euo pipefail
 
 # shellcheck source-path=SCRIPTDIR
-# shellcheck source=cran-lib.sh
-. "$(dirname "$0")/cran-lib.sh"
+# shellcheck source=../cran-lib/cran-lib.sh
+. "$(dirname "$0")/../cran-lib/cran-lib.sh"
 
 dry_run=''
 case "${1:-}" in

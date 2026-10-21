@@ -38,13 +38,13 @@
 # Exit status: 0 on success, 1 on a failed stage, 2 on a usage error.
 #
 # Usage:
-#   scripts/cran-submit.sh tarball "$RUNNER_TEMP/cran"
-#   scripts/cran-submit.sh upload "$RUNNER_TEMP/cran/RSQLite_2.4.6.tar.gz"
-#   scripts/cran-submit.sh upload --dry-run "$RUNNER_TEMP/cran/RSQLite_2.4.6.tar.gz"
+#   .github/actions/cran-submit/cran-submit.sh tarball "$RUNNER_TEMP/cran"
+#   .github/actions/cran-submit/cran-submit.sh upload "$RUNNER_TEMP/cran/RSQLite_2.4.6.tar.gz"
+#   .github/actions/cran-submit/cran-submit.sh upload --dry-run "$RUNNER_TEMP/cran/RSQLite_2.4.6.tar.gz"
 #
 # Environment:
 #   CRAN_SUBMISSION_URL  the form to post to, default https://xmpalantir.wu.ac.at/cransubmit/index2.php
-#                        (`devtools:::cran_submission_url`); scripts/cran-submit-test.sh points it
+#                        (`devtools:::cran_submission_url`); .github/actions/cran-submit/cran-submit-test.sh points it
 #                        at a local server
 #   GITHUB_ACTIONS       `true` turns on the workflow commands (groups, annotations)
 #   GITHUB_STEP_SUMMARY  the file the Markdown report is appended to; unset, no report is written
@@ -60,8 +60,8 @@ default_submission_url=https://xmpalantir.wu.ac.at/cransubmit/index2.php
 cran_submit_page=https://cran.r-project.org/submit.html
 
 # shellcheck source-path=SCRIPTDIR
-# shellcheck source=cran-lib.sh
-. "$(dirname "$0")/cran-lib.sh"
+# shellcheck source=../cran-lib/cran-lib.sh
+. "$(dirname "$0")/../cran-lib/cran-lib.sh"
 
 # What a page from CRAN says, in a few lines of text: devtools' extract_cran_msg(),
 # which drops the page titles, the tags and the tabs, plus a cap on the length.
@@ -113,7 +113,7 @@ read_description() { # <tarball> <scratch dir>
 
 cmd_tarball() {
   local out=${1:-.} pkgdir=${2:-}
-  [ -n "$pkgdir" ] || pkgdir=$(cd "$(dirname "$0")/.." && pwd)
+  [ -n "$pkgdir" ] || pkgdir=$(cd "$(dirname "$0")/../../.." && pwd)
   mkdir -p "$out"
   out=$(cd "$out" && pwd)
   pkgdir=$(cd "$pkgdir" && pwd)
@@ -184,7 +184,7 @@ cmd_tarball() {
     rm -f "$target.tmp"
     fail "Recompress" "Zopfli recompression failed" "\`gzip -dc | pigz -11\` exited with status $rc." "$work/pigz.err" -- \
       "Read pigz's message, under Details here and in the log; a full disk or a killed process are the usual causes." \
-      "Rerun this workflow. The gzip tarball \`R CMD build\` writes is just as valid for CRAN, only larger: if zopfli keeps failing, build it locally and submit it with \`scripts/cran-submit.sh upload <tarball>\` or at $cran_submit_page."
+      "Rerun this workflow. The gzip tarball \`R CMD build\` writes is just as valid for CRAN, only larger: if zopfli keeps failing, build it locally and submit it with \`.github/actions/cran-submit/cran-submit.sh upload <tarball>\` or at $cran_submit_page."
   fi
   mv "$target.tmp" "$target"
   local zsize sizes
@@ -329,12 +329,12 @@ cmd_upload() {
   base=$(basename "$tarball")
 
   # The tarball names no commit, so only CI, which builds it in the same job, can tell one.
-  commit_of "${GITHUB_SHA:+$(cd "$(dirname "$0")/.." && pwd)}"
+  commit_of "${GITHUB_SHA:+$(cd "$(dirname "$0")/../../.." && pwd)}"
 
   group "Upload: what is submitted"
   if ! gzip -t "$tarball" 2>"$work/gzip.err" || ! tar -tzf "$tarball" >/dev/null 2>>"$work/gzip.err"; then
     fail "Upload" "The tarball cannot be read" "\`$base\` is no gzip-compressed tar archive." "$work/gzip.err" -- \
-      "Upload the tarball \`scripts/cran-submit.sh tarball\` writes; this run keeps it as an artifact."
+      "Upload the tarball \`.github/actions/cran-submit/cran-submit.sh tarball\` writes; this run keeps it as an artifact."
   fi
   read_description "$tarball" "$work"
   local comment="$pkg $version" size sha
@@ -360,7 +360,7 @@ cmd_upload() {
 
   if [ "$base" != "${pkg}_${version}.tar.gz" ]; then
     fail "Upload" "The tarball is misnamed" "CRAN expects \`${pkg}_${version}.tar.gz\` for the package inside, and the file is \`$base\`." -- \
-      "Upload the tarball \`scripts/cran-submit.sh tarball\` writes, under the name \`R CMD build\` gave it."
+      "Upload the tarball \`.github/actions/cran-submit/cran-submit.sh tarball\` writes, under the name \`R CMD build\` gave it."
   fi
   if [ -z "$pkg" ] || [ -z "$version" ] || [ -z "$maint_name" ] || [ -z "$maint_email" ]; then
     fail "Upload" "DESCRIPTION is incomplete" "The tarball's DESCRIPTION gives package \`$pkg\`, version \`$version\`, maintainer \`$maint_name\` <\`$maint_email\`>, and all four are needed." -- \

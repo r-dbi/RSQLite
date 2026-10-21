@@ -111,7 +111,7 @@
 
 \S4method{dbSendQueryArrow}{SQLiteConnection}(conn, statement, params = NULL, ..., schema = NULL)
 
-\S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement, params = NULL, ...)
+\S4method{dbSendQuery}{SQLiteConnection,character}(conn, statement, params = NULL, ..., ptype = NULL)
 
 \S4method{dbUnquoteIdentifier}{SQLiteConnection,SQL}(conn, x, ...)
 
@@ -165,6 +165,13 @@ matched to the result columns by name, see \link{sqlite-arrow}.
 The default \code{NULL} decides the types from the values.}
 
 \item{fail_if_missing}{If \code{FALSE}, \code{dbRemoveTable()} succeeds if the table doesn't exist.}
+
+\item{ptype}{The R types of some or all result columns,
+as a data frame or a named list of vectors whose values are ignored,
+such as \code{list(id = bit64::integer64(), when = as.POSIXct(character(), tz = "UTC"))},
+matched to the result columns by name.
+Requires a connection with \code{arrow = TRUE}, see the section on data frames in \link{sqlite-arrow}.
+The default \code{NULL} decides the types from the values.}
 }
 \description{
 SQLiteConnection objects are created by passing \code{\link[=SQLite]{SQLite()}} as first argument to \code{\link[DBI:dbConnect]{DBI::dbConnect()}}.

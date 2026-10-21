@@ -7,6 +7,8 @@
 class SqliteColumnDataSource : public DbColumnDataSource {
   sqlite3_stmt* stmt;
   const bool with_alt_types;
+  // Blobs that could not be read as text, see fetch_string()
+  mutable int64_t n_invalid_strings;
 
 public:
   SqliteColumnDataSource(sqlite3_stmt* stmt, const int j, bool with_alt_types);
@@ -27,6 +29,8 @@ public:
   virtual double fetch_datetime_local() const;
   virtual double fetch_datetime() const;
   virtual double fetch_time() const;
+
+  virtual int64_t get_n_invalid_strings() const;
 
 private:
   static DATA_TYPE datatype_from_decltype(

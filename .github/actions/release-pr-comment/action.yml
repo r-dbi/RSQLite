@@ -1,0 +1,41 @@
+name: "Report to the release pull request"
+description: >
+  Posts a workflow's result to the open release pull request,
+  as one comment per workflow that later runs update in place,
+  with release-pr-comment.sh beside this file.
+  The job that uses it needs `pull-requests: write`.
+
+inputs:
+  key:
+    description: "Identifies the workflow's comment, for instance the workflow file's name"
+    required: true
+  title:
+    description: "The comment's heading"
+    required: true
+  results:
+    description: "One `<job>=<result>` per line"
+    required: true
+  details:
+    description: "Markdown appended below the job results"
+    default: ""
+  pr-label:
+    description: "The label of the pull request to report to when none has the run's ref as its head"
+    default: ""
+  token:
+    description: "A token with `pull-requests: write`"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - env:
+        GH_TOKEN: ${{ inputs.token }}
+        GH_REPO: ${{ github.repository }}
+        RESULTS: ${{ inputs.results }}
+        DETAILS: ${{ inputs.details }}
+        PR_LABEL: ${{ inputs.pr-label }}
+        KEY: ${{ inputs.key }}
+        TITLE: ${{ inputs.title }}
+      run: |
+        "$GITHUB_ACTION_PATH/release-pr-comment.sh" "$KEY" "$TITLE"
+      shell: bash

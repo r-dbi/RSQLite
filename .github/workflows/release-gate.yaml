@@ -1,8 +1,10 @@
 # Copied from duckdb/duckdb-r's .github/workflows/release-gate.yaml at 86ac17f6b.
 # Derived from igraph/rigraph's .github/workflows/release-gate.yaml at fe3538b925.
 #
-# Mechanical release checks for `cran-*` branches, as discussed in cynkra/cynkratemplate#147.
-# They run on every push, so that the result describes the commit that will be submitted,
+# Mechanical release checks for a release branch, as discussed in cynkra/cynkratemplate#147.
+# They run when started by hand on the release branch, from the Actions tab or with
+# `gh workflow run release-gate.yaml --repo r-dbi/RSQLite --ref <branch>`,
+# and again after every change to it, so that the result describes the commit that will be submitted,
 # not a box ticked a few commits earlier.
 #
 # The checks are the actions of BristolMyersSquibb/blockr.ci,
@@ -14,11 +16,9 @@
 #   and for a README.md that matches its README.Rmd.
 # - `soft` reports spelling, URLs and the NOTEs of R CMD check --as-cran --run-donttest
 #   with the CRAN incoming checks turned on, and never fails on a finding.
-# Each job writes its findings to the job summary.
+# Each job writes its findings to the job summary,
+# and the `report` job posts the results to the open release pull request.
 on:
-  push:
-    branches:
-      - cran-*
   workflow_dispatch:
 
 name: release-gate
@@ -114,3 +114,34 @@ jobs:
 
       - name: Run the soft checks
         uses: BristolMyersSquibb/blockr.ci/.github/actions/release-soft@5ee8e2be16e71e96628c6c5c60c20c03f1b35155
+
+  # Posts the result to the open release pull request, one comment per workflow, updated in place.
+  report:
+    needs: [gate, docs, soft]
+    if: always()
+
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+
+    name: "Report to the release pull request"
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/actions
+
+      - name: Post or update the comment
+        uses: ./.github/actions/release-pr-comment
+        with:
+          key: release-gate
+          title: "Release gate"
+          results: |
+            gate=${{ needs.gate.result }}
+            docs=${{ needs.docs.result }} (reports only)
+            soft=${{ needs.soft.result }}
+          token: ${{ github.token }}

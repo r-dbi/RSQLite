@@ -6,15 +6,11 @@
 # 15 to 30 minutes later.
 # This is devtools::check_win_devel(), with the tarball built in CI instead of locally.
 #
-# A push to a `cran-*` branch uploads only when this file changes,
-# so that adding the workflow to a release branch submits once.
-# Every other upload is started by hand, because each one sends an email.
+# Every upload is started by hand, because each one sends an email:
+# `gh workflow run winbuilder.yaml --repo r-dbi/RSQLite --ref <branch> [-f queues="R-devel R-release"]`.
+# The `report` job posts what was uploaded to the open release pull request;
+# win-builder's verdict arrives only by e-mail.
 on:
-  push:
-    branches:
-      - cran-*
-    paths:
-      - .github/workflows/winbuilder.yaml
   workflow_dispatch:
     inputs:
       queues:
@@ -38,8 +34,10 @@ jobs:
 
     name: "Upload to win-builder"
 
+    outputs:
+      tarball: ${{ steps.build.outputs.tarball }}
+
     env:
-      # A push carries no inputs.
       QUEUES: ${{ inputs.queues || 'R-devel' }}
 
     steps:
@@ -101,3 +99,35 @@ jobs:
         with:
           name: winbuilder-source-package
           path: ${{ steps.build.outputs.tarball }}
+
+  # Posts the result to the open release pull request, one comment per workflow, updated in place.
+  report:
+    needs: [winbuilder]
+    if: always()
+
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+
+    name: "Report to the release pull request"
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/actions
+
+      - name: Post or update the comment
+        uses: ./.github/actions/release-pr-comment
+        with:
+          key: winbuilder
+          title: "win-builder upload"
+          results: |
+            upload=${{ needs.winbuilder.result }}
+          details: |
+            Uploaded `${{ needs.winbuilder.outputs.tarball }}` to: ${{ inputs.queues }}.
+            win-builder mails its results to the maintainer in `DESCRIPTION`, 15 to 30 minutes after the upload.
+          token: ${{ github.token }}

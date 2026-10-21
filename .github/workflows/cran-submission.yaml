@@ -69,6 +69,9 @@
 # It is a job of its own, after the upload, so that only it and the `tag` job hold `contents: write`;
 # a run dispatched with `retag` replaces the asset of the earlier attempt.
 #
+# The `report` job posts the outcome to the open release pull request,
+# one comment that the dry run and the real run update in turn.
+#
 # The input `dry-run` (`-f dry-run=true` for `gh workflow run`) tags, drafts and sends nothing:
 # the `tag` job prints the release and the tag it would write, and whether it would update a draft,
 # move a tag (with `retag`) or stop at an existing one (a dry run carries on and reports it),
@@ -593,3 +596,41 @@ jobs:
             echo "Attached \`$(basename "$tarball")\`, sha256 \`$actual\`, to the [draft release]($URL)."
           } >> "$GITHUB_STEP_SUMMARY"
         shell: bash
+
+  # Posts the result to the open release pull request, one comment per workflow, updated in place.
+  report:
+    needs: [check-version, tag, cran-submission, attach-tarball]
+    if: always()
+
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+
+    name: "Report to the release pull request"
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/actions
+
+      - name: Post or update the comment
+        uses: ./.github/actions/release-pr-comment
+        with:
+          key: cran-submission
+          title: "CRAN submission"
+          results: |
+            check-version=${{ needs.check-version.result }}
+            tag=${{ needs.tag.result }}
+            cran-submission=${{ needs.cran-submission.result }}
+            attach-tarball=${{ needs.attach-tarball.result }}
+          details: |
+            ${{ inputs.dry-run && '**Dry run:** nothing was tagged, drafted or sent to CRAN.' || '**Real run:** if the upload succeeded, CRAN has e-mailed the maintainer; the submission counts once the link in that e-mail is followed.' }}
+
+            - Tarball: `${{ needs.cran-submission.outputs.artifact }}.tar.gz`, sha256 `${{ needs.cran-submission.outputs.sha256 }}`
+            - Tag: `${{ needs.tag.outputs.tag }}`
+            - Draft release: ${{ needs.tag.outputs.release-url || 'none written' }}
+          token: ${{ github.token }}

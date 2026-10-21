@@ -13,6 +13,7 @@
 # `gh workflow run cran-release.yaml --repo r-dbi/RSQLite`, it does the same;
 # the input `dry-run` (`-f dry-run=true`) reports what it would publish and changes nothing
 # (the release process: the header of cran-submission.yaml).
+# The `report` job posts the result to the open pull request labelled "CRAN release", if there is one.
 on:
   schedule:
     - cron: "43 5 * * *"
@@ -50,3 +51,35 @@ jobs:
           token: ${{ github.token }}
           # Empty on a scheduled run, which publishes.
           dry-run: ${{ inputs.dry-run || 'false' }}
+
+  # Posts the result to the open release pull request, one comment per workflow, updated in place.
+  report:
+    needs: [publish]
+    if: always()
+
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+
+    name: "Report to the release pull request"
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/actions
+
+      - name: Post or update the comment
+        uses: ./.github/actions/release-pr-comment
+        with:
+          key: cran-release
+          title: "CRAN release"
+          results: |
+            publish=${{ needs.publish.result }}
+          details: |
+            ${{ inputs.dry-run && 'Dry run: nothing was published.' || 'Drafts whose version P3M serves are published as the latest release; see the summary page.' }}
+          pr-label: "CRAN release"
+          token: ${{ github.token }}

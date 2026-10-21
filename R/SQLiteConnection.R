@@ -24,7 +24,8 @@ setClass("SQLiteConnection",
     ref = "environment",
     bigint = "character",
     extended_types = "logical",
-    arrow = "logical"
+    arrow = "logical",
+    lazy_strings = "logical"
   )
 )
 

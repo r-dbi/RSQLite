@@ -3,7 +3,10 @@
 
 #include "DbResult.h"
 
+#include <vector>
+
 struct ArrowArrayStream;
+struct ArrowSchema;
 
 // Initializes `out` as a lazy Arrow stream over `result`: every get_next()
 // fetches the next chunk of at most `chunk_size` rows from the live result.
@@ -23,6 +26,17 @@ void db_arrow_stream_init(
 int64_t db_arrow_buffered_stream_init(
   struct ArrowArrayStream* out,
   const DbResultPtr& result,
+  int64_t chunk_size
+);
+
+// Initializes one stream per column of `schema` over all remaining rows of
+// `result`, fetched up front as chunks of at most `chunk_size` rows and split
+// by column, so that the arrays of each column can be converted and freed on
+// their own; returns the row count. `outs` holds one stream per column.
+int64_t db_arrow_column_streams_init(
+  std::vector<struct ArrowArrayStream*>& outs,
+  const DbResultPtr& result,
+  const struct ArrowSchema* schema,
   int64_t chunk_size
 );
 

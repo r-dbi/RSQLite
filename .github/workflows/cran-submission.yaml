@@ -63,6 +63,12 @@
 # and the submission only counts once that link has been followed.
 # Both steps print what they do and write a report with advice on failure to the run's summary page.
 #
+# The `attach-tarball` job then attaches the submitted tarball to the draft release as an asset,
+# after checking its sha256 against the one the upload used,
+# so that the record of what went to CRAN does not expire with the run's artifact.
+# It is a job of its own, after the upload, so that only it and the `tag` job hold `contents: write`;
+# a run dispatched with `retag` replaces the asset of the earlier attempt.
+#
 # The input `dry-run` (`-f dry-run=true` for `gh workflow run`) tags, drafts and sends nothing:
 # the `tag` job prints the release and the tag it would write, and whether it would update a draft,
 # move a tag (with `retag`) or stop at an existing one (a dry run carries on and reports it),
@@ -193,6 +199,7 @@ jobs:
 
     outputs:
       release-url: ${{ steps.release.outputs.url }}
+      tag: ${{ steps.tag.outputs.tag }}
 
     steps:
       # The same commit as the submission: both jobs check out `github.sha`.
@@ -443,6 +450,11 @@ jobs:
     permissions:
       contents: read
 
+    outputs:
+      artifact: ${{ steps.tarball.outputs.package }}_${{ steps.tarball.outputs.version }}
+      tarball: ${{ steps.tarball.outputs.tarball }}
+      sha256: ${{ steps.tarball.outputs.sha256 }}
+
     steps:
       - name: Announce the dry run
         if: inputs.dry-run
@@ -528,4 +540,59 @@ jobs:
           URL: ${{ needs.tag.outputs.release-url }}
         run: |
           echo "**Once CRAN has accepted the package:** the nightly \`cran-release.yaml\` publishes the [draft release]($URL) when Posit's package manager serves the version." >> "$GITHUB_STEP_SUMMARY"
+        shell: bash
+
+  # After the upload, so that the release carries exactly what went to CRAN,
+  # and in a job of its own, so that the steps that build and upload never hold a token that can write.
+  attach-tarball:
+    needs: [tag, cran-submission]
+    if: ${{ !inputs.dry-run }}
+
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+
+    name: "Attach the tarball to the draft release"
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download the submitted tarball
+        uses: actions/download-artifact@v7
+        with:
+          name: ${{ needs.cran-submission.outputs.artifact }}
+          path: ${{ runner.temp }}/cran
+
+      - name: Attach it to the draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.tag.outputs.tag }}
+          URL: ${{ needs.tag.outputs.release-url }}
+          SUBMITTED: ${{ needs.cran-submission.outputs.tarball }}
+          SHA256: ${{ needs.cran-submission.outputs.sha256 }}
+        run: |
+          tarball="$RUNNER_TEMP/cran/$(basename "$SUBMITTED")"
+          actual="$(sha256sum "$tarball" | cut -d' ' -f1)"
+          echo "Tarball: $tarball"
+          echo "  sha256:    $actual"
+          echo "  submitted: $SHA256"
+          if [ "$actual" != "$SHA256" ]; then
+            echo "::error title=Tarball mismatch::The artifact's sha256 $actual is not the submitted tarball's $SHA256; nothing was attached."
+            {
+              echo "### Release asset: failed"
+              echo
+              echo "The artifact's sha256 \`$actual\` is not the submitted tarball's \`$SHA256\`; nothing was attached."
+              echo "The submission itself went through: attach the tarball by hand once its sha256 is confirmed."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          # --clobber: a run dispatched with `retag` replaces the earlier attempt's tarball.
+          gh release upload "$TAG" "$tarball" --clobber
+          echo "::notice title=Release asset::Attached $(basename "$tarball") (sha256 $actual) to the draft release $URL."
+          {
+            echo "### Release asset"
+            echo
+            echo "Attached \`$(basename "$tarball")\`, sha256 \`$actual\`, to the [draft release]($URL)."
+          } >> "$GITHUB_STEP_SUMMARY"
         shell: bash

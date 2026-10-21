@@ -1,0 +1,59 @@
+# Copied from duckdb/duckdb-r's .github/workflows/cran-release.yaml at 86ac17f6b.
+# Publishes the draft GitHub release of a CRAN submission once Posit's package manager serves it.
+#
+# cran-submission.yaml drafts a release for every submission, and ends its notes with the marker
+# `<!-- cran-submission: <package> <version> -->`.
+# Every night this workflow runs scripts/cran-release.sh, which checks each such draft
+# against the source index of https://packagemanager.posit.co/cran/latest,
+# as `fledge:::release_after_cran_built_binaries()` did in fledge.yaml,
+# and publishes the drafts whose version that index lists, as the latest release,
+# once their tag points at the commit they target.
+# A version that is not listed yet leaves the run green; the next night checks again.
+# Started by hand, from the Actions tab or with
+# `gh workflow run cran-release.yaml --repo duckdb/duckdb-r`, it does the same;
+# the input `dry-run` (`-f dry-run=true`) reports what it would publish and changes nothing
+# (handbook/operations/releases/cran/README.md).
+on:
+  schedule:
+    - cron: "43 5 * * *"
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: "Dry run: check the drafts and P3M, but publish nothing"
+        type: boolean
+        default: false
+
+name: CRAN release
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+
+    name: "Publish the drafts P3M serves"
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Check the drafts against P3M, and publish what it serves
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          # Empty on a scheduled run, which publishes.
+          DRY_RUN: ${{ inputs.dry-run }}
+        run: |
+          if [ "$DRY_RUN" = true ]; then
+            scripts/cran-release.sh --dry-run
+          else
+            scripts/cran-release.sh
+          fi
+        shell: bash

@@ -4,7 +4,7 @@ dbListTables_SQLiteConnection <- function(conn, ...) {
   rs <- sqliteListTables(conn)
   on.exit(dbClearResult(rs), add = TRUE)
 
-  dbFetch(rs)$name
+  dbFetch(rs, row.names = FALSE)$name
 }
 #' @rdname SQLiteConnection-class
 #' @export

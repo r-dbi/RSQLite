@@ -68,7 +68,7 @@ sqliteListTablesQuery <- function(conn, schema = NULL, name = NULL) {
   if (is.null(schema)) {
     info_sql <- "(SELECT * FROM sqlite_master UNION ALL SELECT * FROM sqlite_temp_master)"
   } else {
-    schemas <- dbGetQuery(conn, "SELECT name FROM pragma_database_list")$name
+    schemas <- dbGetQuery(conn, "SELECT name FROM pragma_database_list", row.names = FALSE)$name
     if (!schema %in% schemas) {
       return(SQL("SELECT '' AS name WHERE 0"))
     }

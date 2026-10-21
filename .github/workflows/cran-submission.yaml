@@ -48,7 +48,11 @@
 # by which cran-release.yaml publishes the draft once Posit's package manager serves the version.
 # The job then tags the commit as `v<version>`,
 # with the NEWS.md section as the message, like the tags fledge creates.
-# An existing tag of that name is printed and then moved to this commit.
+# An existing tag of that name is never moved: the job prints it and its commit, and stops the run.
+# Every resubmission after a CRAN rejection is a new patch version instead.
+# Only a submission that CRAN never received, such as an upload that failed,
+# is retried on the same version, by dispatching with the input `retag`:
+# the job then prints the commit the tag pointed to and moves the tag to this commit.
 #
 # The `cran-submission` job runs scripts/cran-submit.sh twice.
 # `tarball` builds the package with `R CMD build`, recompresses it with zopfli (`pigz -11`)
@@ -60,7 +64,8 @@
 # Both steps print what they do and write a report with advice on failure to the run's summary page.
 #
 # The input `dry-run` (`-f dry-run=true` for `gh workflow run`) tags, drafts and sends nothing:
-# the `tag` job prints the release and the tag it would write, and whether it would update a draft or move a tag,
+# the `tag` job prints the release and the tag it would write, and whether it would update a draft,
+# move a tag (with `retag`) or stop at an existing one (a dry run carries on and reports it),
 # and the `cran-submission` job builds, verifies and keeps the tarball as a real run does,
 # then prints and reports every field the upload would post.
 # The version check runs on a dry run too.
@@ -73,6 +78,10 @@ on:
         default: false
       allow-dev-version:
         description: "Submit even when DESCRIPTION carries a development version, one with more than three components"
+        type: boolean
+        default: false
+      retag:
+        description: "Move an existing v<version> tag to this commit: only for a submission CRAN never received"
         type: boolean
         default: false
 
@@ -196,6 +205,7 @@ jobs:
         id: tag
         env:
           DRY_RUN: ${{ inputs.dry-run }}
+          RETAG: ${{ inputs.retag }}
         run: |
           # The commit this job checked out, which is `github.sha`, as the other jobs check out.
           commit="$(git rev-parse HEAD)"
@@ -230,18 +240,51 @@ jobs:
             echo "<!-- cran-submission: $pkg_name $pkg_version -->"
           } > "$notes"
 
+          # An existing tag is never moved, unless the run was dispatched with `retag`:
+          # a version CRAN has received is never submitted again.
           moves=""
+          stops=""
           if git ls-remote --exit-code --tags origin "refs/tags/$tag" > /dev/null; then
             git fetch --depth=1 origin "refs/tags/$tag:refs/tags/$tag"
-            moves="$(git rev-parse "$tag^{commit}")"
-            if [ "$DRY_RUN" = true ]; then
-              echo "::notice::A real run would move the existing tag $tag, which points to $moves."
-            else
-              echo "::warning::Moving the existing tag $tag, which points to $moves."
-            fi
+            existing="$(git rev-parse "$tag^{commit}")"
+            echo "Existing tag: $tag at $existing"
             echo "::group::Existing tag $tag"
             git cat-file -p "$tag"
             echo "::endgroup::"
+            if [ "$RETAG" = true ]; then
+              moves="$existing"
+              if [ "$DRY_RUN" = true ]; then
+                echo "::notice::A real run would move the existing tag $tag from $moves to $commit, because the run was dispatched with retag."
+              else
+                echo "::warning::Moving the existing tag $tag from $moves to $commit, because the run was dispatched with retag."
+              fi
+              {
+                echo "### Tag: \`$tag\` exists, moved with \`retag\`"
+                echo
+                echo "The tag \`$tag\` points to \`$existing\`; this run moves it to \`$commit\`."
+                echo
+              } >> "$GITHUB_STEP_SUMMARY"
+            else
+              rerun="gh workflow run cran-submission.yaml --repo $GITHUB_REPOSITORY --ref $GITHUB_REF_NAME"
+              {
+                echo "### Tag: \`$tag\` exists"
+                echo
+                echo "The tag \`$tag\` exists and points to \`$existing\`, and this workflow never moves a tag by itself."
+                echo
+                echo "#### How to proceed"
+                echo
+                echo "- If CRAN received $pkg_name $pkg_version, a new submission is a new version: bump \`DESCRIPTION\` and \`NEWS.md\` to the next patch version, and dispatch on the commit that carries it."
+                echo "- Only if CRAN never received this version, for instance because the upload failed, dispatch again with \`retag\` on: \`$rerun -f retag=true\`."
+                echo
+              } >> "$GITHUB_STEP_SUMMARY"
+              if [ "$DRY_RUN" = true ]; then
+                echo "::error title=Tag $tag exists::The tag $tag exists and points to $existing; a real run stops here without retag. The dry run carries on."
+                stops="$existing"
+              else
+                echo "::error title=Tag $tag exists::The tag $tag exists and points to $existing, and this workflow never moves a tag without retag. Nothing was drafted, tagged or uploaded."
+                exit 1
+              fi
+            fi
           fi
 
           {
@@ -251,6 +294,7 @@ jobs:
             echo "message=$message"
             echo "notes=$notes"
             echo "moves=$moves"
+            echo "stops=$stops"
           } | tee -a "$GITHUB_OUTPUT"
         shell: bash
 
@@ -350,7 +394,13 @@ jobs:
           TAG: ${{ steps.tag.outputs.tag }}
           MESSAGE: ${{ steps.tag.outputs.message }}
           MOVES: ${{ steps.tag.outputs.moves }}
+          STOPS: ${{ steps.tag.outputs.stops }}
         run: |
+          if [ "$DRY_RUN" = true ] && [ -n "$STOPS" ]; then
+            echo "::notice title=Dry run::A real run stops before tagging: $TAG exists at $STOPS."
+            printf '### Tag\n\n%s\n' "Dry run: a real run stops before drafting or tagging, because \`$TAG\` exists at \`$STOPS\`." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           if [ "$DRY_RUN" = true ]; then
             echo "::group::Message of the tag $TAG"
             cat "$MESSAGE"
@@ -369,8 +419,15 @@ jobs:
           fi
 
           # The default cleanup would drop the "## ..." subheadings as comment lines.
-          git tag -a -f "$TAG" --cleanup=whitespace -F "$MESSAGE"
-          git push --force origin "refs/tags/$TAG"
+          # Only a run dispatched with `retag` gets here with an existing tag, which it moves.
+          if [ -n "$MOVES" ]; then
+            echo "Moving $TAG from $MOVES to $(git rev-parse HEAD)."
+            git tag -a -f "$TAG" --cleanup=whitespace -F "$MESSAGE"
+            git push --force origin "refs/tags/$TAG"
+          else
+            git tag -a "$TAG" --cleanup=whitespace -F "$MESSAGE"
+            git push origin "refs/tags/$TAG"
+          fi
           printf '### Tag\n\n' >> "$GITHUB_STEP_SUMMARY"
           echo "Tagged $(git rev-parse HEAD) as $TAG." | tee -a "$GITHUB_STEP_SUMMARY"
         shell: bash

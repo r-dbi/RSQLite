@@ -12,10 +12,16 @@ inputs:
     description: "`true` publishes nothing and reports what would be published"
     default: "false"
 
+outputs:
+  published:
+    description: "One `<package> <version>` per line for each release published by this run"
+    value: ${{ steps.run.outputs.published }}
+
 runs:
   using: "composite"
   steps:
-    - env:
+    - id: run
+      env:
         GH_TOKEN: ${{ inputs.token }}
         GH_REPO: ${{ github.repository }}
         DRY_RUN: ${{ inputs.dry-run }}

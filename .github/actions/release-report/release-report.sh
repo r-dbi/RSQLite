@@ -1,23 +1,24 @@
 #!/usr/bin/env bash
-# Post a workflow's result to the open release pull request,
+# Post a workflow's result to the open release pull request, or to the release's checklist issue,
 # as one comment per workflow that later runs update in place.
 # Process: the header of .github/workflows/cran-submission.yaml
 #
-# The pull request is the open one whose head is the ref the run was started on;
-# without one, the open pull request carrying the label PR_LABEL, when that is set.
-# Without either, the script says so and succeeds: there is nothing to report to.
+# The target is the open pull request whose head is the ref the run was started on,
+# or, when ISSUE_MARKER is set, the open issue whose body carries that text instead:
+# the checklist issue, which stays open from the cut until the release is published.
+# Without a target, the script says so and succeeds: there is nothing to report to.
 # The comment is found by the hidden marker `<!-- release-report: <key> -->`
 # among the comments of github-actions[bot].
 #
 # Usage:
-#   release-pr-comment.sh <key> <title>
+#   release-report.sh <key> <title>
 #
 # Environment:
 #   GH_TOKEN, GH_REPO     the token and the repository, owner/name
-#   GH                    the gh command, default `gh`; release-pr-comment-test.sh stubs it
+#   GH                    the gh command, default `gh`; release-report-test.sh stubs it
 #   RESULTS               one `<job>=<result>` per line, as `needs.<job>.result` gives it
 #   DETAILS               Markdown appended below the job results, may be empty
-#   PR_LABEL              the label of the fallback pull request, may be empty
+#   ISSUE_MARKER          report to the open issue whose body carries this text, not to a pull request
 #   GITHUB_SERVER_URL, GITHUB_RUN_ID, GITHUB_RUN_NUMBER, GITHUB_RUN_ATTEMPT,
 #   GITHUB_REF_NAME, GITHUB_SHA, GITHUB_EVENT_NAME
 #                         the run that is reported
@@ -34,13 +35,17 @@ repo=${GH_REPO:?}
 gh=${GH:-gh}
 owner=${repo%%/*}
 
-pr=$("$gh" api "repos/$repo/pulls?state=open&head=$owner:$GITHUB_REF_NAME&per_page=1" --jq '.[0].number // empty')
-if [ -z "$pr" ] && [ -n "${PR_LABEL:-}" ]; then
-  pr=$("$gh" api --paginate "repos/$repo/pulls?state=open&per_page=100" \
-    --jq "[.[] | select(any(.labels[]; .name == \"$PR_LABEL\"))][0].number // empty" | head -n 1)
+if [ -n "${ISSUE_MARKER:-}" ]; then
+  # The issues endpoint lists pull requests too; they carry `pull_request`.
+  pr=$("$gh" api --paginate "repos/$repo/issues?state=open&per_page=100" \
+    --jq ".[] | select((.pull_request | not) and ((.body // \"\") | contains(\"$ISSUE_MARKER\"))) | .number" | head -n 1)
+  what="issue whose body carries $ISSUE_MARKER"
+else
+  pr=$("$gh" api "repos/$repo/pulls?state=open&head=$owner:$GITHUB_REF_NAME&per_page=1" --jq '.[0].number // empty')
+  what="pull request has the head $GITHUB_REF_NAME"
 fi
 if [ -z "$pr" ]; then
-  echo "::notice title=No release pull request::No open pull request has the head $GITHUB_REF_NAME${PR_LABEL:+ or the label "$PR_LABEL"}; nothing was posted."
+  echo "::notice title=Nothing to report to::No open $what; nothing was posted."
   exit 0
 fi
 

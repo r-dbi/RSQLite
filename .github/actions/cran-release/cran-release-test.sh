@@ -9,6 +9,7 @@
 #      and publish nothing.
 #   4. No draft with the marker is nothing to do: no request to P3M, and success.
 #   5. A dry run publishes nothing, and says what it would publish.
+#      The step output `published` names each release that was published, and only those.
 #   6. Only drafts carrying the marker of cran-submission.yaml, with the tag `v<version>`, count.
 #
 # The `gh` stub answers `gh api <path> --jq <program>` by running the program with jq
@@ -166,7 +167,8 @@ run() {
   : >"$SUMMARY"
   : >"$SCRATCH/gh.log"
   : >"$SCRATCH/p3m.log"
-  out=$(GITHUB_ACTIONS=true GITHUB_STEP_SUMMARY=$SUMMARY GH=$SCRATCH/bin/gh GH_REPO=r-dbi/RSQLite \
+  : >"$SCRATCH/output"
+  out=$(GITHUB_ACTIONS=true GITHUB_STEP_SUMMARY=$SUMMARY GITHUB_OUTPUT=$SCRATCH/output GH=$SCRATCH/bin/gh GH_REPO=r-dbi/RSQLite \
     GITHUB_REPOSITORY=r-dbi/RSQLite GITHUB_SERVER_URL=https://github.example P3M_REPO_URL=$P3M \
     "$HERE/cran-release.sh" "$@" 2>&1) || rc=$?
   printf '%s\nexit %s\n' "$out" "$rc"
@@ -182,10 +184,12 @@ tag_at "$TARGET"
 serve "RSQLite 1.5.6" "other 2.0.0"
 out=$(run)
 has "it succeeds" "$out" "exit 0"
+is "and names nothing as published" "$(cat "$SCRATCH/output")" ""
 is "the report is one line" "$(cat "$SUMMARY")" "## CRAN release
 
 - RSQLite 2.0.0 is not on P3M yet; checked $INDEX, which lists RSQLite 1.5.6."
 is "nothing is published" "$(edits)" ""
+is "and names nothing as published" "$(cat "$SCRATCH/output")" ""
 has "the index was read" "$(cat "$SCRATCH/p3m.log")" "GET /cran/latest/src/contrib/PACKAGES.gz"
 has "the log says what P3M serves" "$out" "$(printf '  %-20s %s' 'P3M serves:' 1.5.6)"
 has "and skips the draft whose marker disagrees with its tag" "$out" "skipped: https://github.example/odd, tag v3.0.0"
@@ -210,6 +214,9 @@ has "the report links the release" "$summary" "- Draft release: [RSQLite 2.0.0](
 has "and the commit" "$summary" "- Commit [\`${TARGET:0:10}\`](https://github.example/r-dbi/RSQLite/commit/$TARGET), the draft's target"
 has "and what P3M said" "$summary" "- P3M: checked $INDEX, which lists RSQLite 2.0.0"
 has "and the outcome" "$summary" "- Published as the latest release."
+is "the step output names what was published" "$(cat "$SCRATCH/output")" "published<<EOF_PUBLISHED
+RSQLite 2.0.0
+EOF_PUBLISHED"
 
 # --- 3: the tag ------------------------------------------------------------------
 
@@ -220,6 +227,7 @@ out=$(run)
 has "it fails" "$out" "exit 1"
 has "naming the tag" "$out" "::error title=The tag v2.0.0 is missing::"
 is "nothing is published" "$(edits)" ""
+is "and names nothing as published" "$(cat "$SCRATCH/output")" ""
 summary=$(cat "$SUMMARY")
 has "the report says so" "$summary" "### RSQLite 2.0.0: failed"
 has "and how to resolve it" "$summary" "git tag -a v2.0.0 $TARGET"
@@ -231,6 +239,7 @@ out=$(run)
 has "it fails" "$out" "exit 1"
 has "naming both commits" "$out" "::error title=The tag v2.0.0 points elsewhere::The tag v2.0.0 points to $OTHER, and the draft release targets $TARGET"
 is "nothing is published" "$(edits)" ""
+is "and names nothing as published" "$(cat "$SCRATCH/output")" ""
 has "the report says how to resolve it" "$(cat "$SUMMARY")" "#### How to resolve"
 
 # --- 4: no draft -------------------------------------------------------------------
@@ -256,6 +265,7 @@ serve "RSQLite 2.0.0"
 out=$(run --dry-run)
 has "it succeeds" "$out" "exit 0"
 is "nothing is published" "$(edits)" ""
+is "and names nothing as published" "$(cat "$SCRATCH/output")" ""
 has "it says what it would publish" "$out" "::notice title=Dry run::Would publish RSQLite 2.0.0 ($URL) as the latest release; nothing was published."
 summary=$(cat "$SUMMARY")
 has "the report says it is a dry run" "$summary" "## CRAN release: dry run"

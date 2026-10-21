@@ -1,14 +1,15 @@
 #!/bin/bash
-# Check release-pr-comment.sh offline, against a `gh` stub: nothing reaches GitHub.
+# Check release-report.sh offline, against a `gh` stub: nothing reaches GitHub.
 #
 #   1. Without an earlier comment, the run posts one on the pull request whose head is the ref.
 #   2. With one, carrying the marker and written by github-actions[bot], the run updates it.
 #   3. A comment with the marker by someone else is left alone.
-#   4. Without a pull request for the ref, the labelled one is used; without either, nothing is posted.
+#   4. With ISSUE_MARKER, the open issue carrying it is used, never a pull request;
+#      without a target, nothing is posted.
 #   5. The overall result is failure when any job failed, and the body lists every job.
 #
 # Usage:
-#   .github/actions/release-pr-comment/release-pr-comment-test.sh
+#   .github/actions/release-report/release-report-test.sh
 
 set -euo pipefail
 
@@ -59,7 +60,7 @@ chmod +x "$SCRATCH/bin/gh"
 export SCRATCH API
 
 head_prs() { cat >"$API/repos_o_r_pulls_state_open_head_o_release-1.0.0_per_page_1.json"; }
-all_prs() { cat >"$API/repos_o_r_pulls_state_open_per_page_100.json"; }
+issues() { cat >"$API/repos_o_r_issues_state_open_per_page_100.json"; }
 comments() { cat >"$API/repos_o_r_issues_${1}_comments_per_page_100.json"; }
 
 run() {
@@ -67,7 +68,7 @@ run() {
   rm -f "$SCRATCH/body"
   GH=$SCRATCH/bin/gh GH_REPO=o/r GITHUB_SERVER_URL=https://github.example GITHUB_RUN_ID=42 GITHUB_RUN_NUMBER=7 \
     GITHUB_RUN_ATTEMPT=1 GITHUB_REF_NAME=release-1.0.0 GITHUB_SHA=0123456789abcdef GITHUB_EVENT_NAME=workflow_dispatch \
-    "$HERE/release-pr-comment.sh" "$@" 2>&1
+    "$HERE/release-report.sh" "$@" 2>&1
 }
 
 echo "== a first run posts a comment"
@@ -90,17 +91,19 @@ out=$(RESULTS=gate=success run release-gate "Release gate")
 is "it patches the bot's comment, not the other one" "$(cat "$SCRATCH/writes")" "PATCH repos/o/r/issues/comments/12"
 has "the overall result is success" "$(cat "$SCRATCH/body")" "### ✅ Release gate: success"
 
-echo "== the labelled pull request stands in for one of the ref"
-head_prs <<<'[]'
-all_prs <<<'[{"number": 3, "labels": [{"name": "other"}]}, {"number": 9, "labels": [{"name": "CRAN release"}]}]'
+echo "== with an issue marker, the checklist issue is the target"
+issues <<<'[{"number": 3, "body": "<!-- release-checklist: RSQLite 1.0.0 -->", "pull_request": {}},
+            {"number": 4, "body": null},
+            {"number": 9, "body": "Checklist\n<!-- release-checklist: RSQLite 1.0.0 -->"}]'
 comments 9 <<<'[]'
-out=$(RESULTS=publish=success PR_LABEL="CRAN release" run cran-release "CRAN release")
-is "it posts on the labelled one" "$(cat "$SCRATCH/writes")" "POST repos/o/r/issues/9/comments"
+out=$(RESULTS=publish=success ISSUE_MARKER="<!-- release-checklist: " run cran-release "CRAN release")
+is "it posts on the issue, not on the pull request" "$(cat "$SCRATCH/writes")" "POST repos/o/r/issues/9/comments"
 
-echo "== without either, nothing is posted"
+echo "== without a target, nothing is posted"
+head_prs <<<'[]'
 out=$(RESULTS=publish=success run cran-release "CRAN release")
 is "no write" "$(cat "$SCRATCH/writes")" ""
-has "a notice says so" "$out" "::notice title=No release pull request::"
+has "a notice says so" "$out" "::notice title=Nothing to report to::"
 
 echo
 echo "$pass passed, $fail failed"

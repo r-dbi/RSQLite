@@ -121,7 +121,7 @@ jobs:
           sparse-checkout: .github/actions
 
       - name: Post or update the comment
-        uses: ./.github/actions/release-pr-comment
+        uses: ./.github/actions/release-report
         with:
           key: winbuilder
           title: "win-builder upload"

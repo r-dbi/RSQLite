@@ -23,6 +23,8 @@
 #   .github/actions/cran-release/cran-release.sh [--dry-run]
 #
 # --dry-run checks everything and publishes nothing, saying what it would publish.
+# With GITHUB_OUTPUT set, the script writes `published`, one `<package> <version>` per line
+# for each release it published, which cran-release.yaml uses to close the checklist issue.
 # Exit status: 0 when nothing failed, 1 when a draft could not be published, 2 on a usage error.
 #
 # Environment:
@@ -213,7 +215,11 @@ while IFS=$'\t' read -r tag pkg version target url <&3; do
   fi
   endgroup
   notice "Published" "$title is on P3M; published the release $url."
+  printf '%s\n' "$title" >>"$work/published"
   summary "- Published as the latest release." ""
 done 3<"$work/matching"
 
+if [ -n "${GITHUB_OUTPUT:-}" ] && [ -s "$work/published" ]; then
+  { echo "published<<EOF_PUBLISHED"; cat "$work/published"; echo "EOF_PUBLISHED"; } >>"$GITHUB_OUTPUT"
+fi
 exit "$failed"

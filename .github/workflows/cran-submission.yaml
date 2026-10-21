@@ -27,7 +27,8 @@
 #    Fold the development sections into one section headed exactly `# RSQLite X.Y.Z`, without a date,
 #    because the `tag` job looks for that heading; one bullet per change,
 #    grouped as the tidyverse style guide does (https://style.tidyverse.org/news.html), breaking changes first.
-#    Open the release pull request into `main` and the checklist issue.
+#    Open the release pull request into `main`,
+#    and the checklist issue, whose body carries `<!-- release-checklist: RSQLite X.Y.Z -->`.
 # 3. Check: dispatch R-CMD-check.yaml, rhub.yaml, release-gate.yaml, winbuilder.yaml and revdep.yaml
 #    on the release branch.
 #    The release workflows post their results to the release pull request;
@@ -44,7 +45,8 @@
 #    Then set `main` to `X.Y.Z.9000`, with NEWS.md starting with `# RSQLite (development version)`
 #    and the line `Changes since vX.Y.Z: <https://github.com/r-dbi/RSQLite/compare/vX.Y.Z...main>`:
 #    fledge is off once its marker is gone, and nothing else bumps the version.
-# 7. Publish: cran-release.yaml publishes the draft release once Posit's package manager serves the version.
+# 7. Publish: cran-release.yaml publishes the draft release once Posit's package manager serves the version,
+#    reports each night to the checklist issue, and closes it once the release is published.
 #
 # Acceptance is asynchronous and can take days.
 # A rejection is fixed on the release branch and resubmitted as a new patch version, never rolled back.
@@ -630,7 +632,7 @@ jobs:
           sparse-checkout: .github/actions
 
       - name: Post or update the comment
-        uses: ./.github/actions/release-pr-comment
+        uses: ./.github/actions/release-report
         with:
           key: cran-submission
           title: "CRAN submission"

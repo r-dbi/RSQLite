@@ -4,10 +4,38 @@
 # Tags the commit and submits the package to CRAN.
 # It runs only when started by hand, on the ref it is started on:
 # from the Actions tab, or with
-# `gh workflow run cran-submission.yaml --repo duckdb/duckdb-r --ref <ref>`.
+# `gh workflow run cran-submission.yaml --repo r-dbi/RSQLite --ref <ref>`.
 # Nothing here checks the package or asks for a confirmation:
-# a release is green before it is submitted, and CRAN's confirmation e-mail is the manual step
-# (handbook/operations/releases/cran/README.md).
+# a release is green before it is submitted, and CRAN's confirmation e-mail is the manual step.
+#
+# The release process, adapted from duckdb/duckdb-r's handbook
+# (handbook/operations/releases/cran/README.md and process/README.md at 86ac17f6b):
+#
+# 1. Preflight: read CRAN's check results,
+#    https://cran.r-project.org/web/checks/check_results_RSQLite.html,
+#    and the CRAN Repository Policy, https://cran.r-project.org/web/packages/policies.html.
+#    Anything in red, and every WARNING or NOTE, is addressed or explained.
+#    CRAN asks for about a week between two releases of a package.
+# 2. Cut: create the release branch `cran-X.Y.Z` from the chosen commit of `main`,
+#    set the version with `fledge::bump_version("X.Y.Z")` or by hand,
+#    polish the NEWS.md section, which removes fledge's first-line marker,
+#    write cran-comments.md, and open a pull request into `main`.
+# 3. Check: a push to a `cran-*` branch runs R-CMD-check.yaml, rhub.yaml for R-hub's platforms,
+#    release-gate.yaml for the mechanical release checks,
+#    and, when the push adds or changes it, winbuilder.yaml, which uploads the tarball to win-builder against R-devel.
+#    Run by hand, winbuilder.yaml also takes R-release and R-oldrelease; every upload mails the maintainer.
+#    The reverse dependencies are checked on the candidate with revdep.yaml.
+#    Every error, warning and note is a blocker unless cran-comments.md explains it.
+# 4. Submit: dispatch this workflow on `cran-X.Y.Z`, first as a dry run, then for real;
+#    the maintainer follows the confirmation link CRAN mails.
+# 5. Merge back: merge the release pull request into `main` with a merge commit, never a squash,
+#    so that the tag `vX.Y.Z` is reachable from `main`.
+#    Then bump `main` to `X.Y.Z.9000` with a `# RSQLite (development version)` heading in NEWS.md:
+#    fledge is off once its marker is gone, and nothing else bumps it.
+# 6. Publish: cran-release.yaml publishes the draft release once Posit's package manager serves the version.
+#
+# Acceptance is asynchronous and can take days.
+# A rejection is fixed on the release branch and resubmitted as a new patch version, never rolled back.
 #
 # The `check-version` job stops the run before anything else happens
 # when DESCRIPTION carries a development version, one with more than three components;
@@ -376,10 +404,21 @@ jobs:
         with:
           persist-credentials: false
 
-      # R CMD build needs R and nothing else: there are no vignettes to build.
-      - uses: r-lib/actions/setup-r@v2
+      # R CMD build builds the vignette, which needs the package and its dependencies.
+      - name: Run the repository-specific before-install steps
+        uses: ./.github/workflows/custom/before-install
+        if: hashFiles('.github/workflows/custom/before-install/action.yml') != ''
+
+      - name: Install R and the package dependencies
+        uses: cynkra/cynkratemplate/.github/actions/install@main
         with:
-          use-public-rspm: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          cache-version: cran-submission-1
+          needs: build
+
+      - name: Run the repository-specific after-install steps
+        uses: ./.github/workflows/custom/after-install
+        if: hashFiles('.github/workflows/custom/after-install/action.yml') != ''
 
       # pigz -11 is zopfli, run block by block on every core.
       - name: Install pigz

@@ -76,7 +76,7 @@ jobs:
         id: build
         run: |
           R CMD build .
-          tarball="$(ls -1 *.tar.gz)"
+          tarball="$(ls -1 -- *.tar.gz)"
           echo "tarball=$tarball" | tee -a "$GITHUB_OUTPUT"
         shell: bash
 

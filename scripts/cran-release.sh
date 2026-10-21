@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Copied from duckdb/duckdb-r's scripts/cran-release.sh at 86ac17f6b.
 # Publish the draft GitHub releases of CRAN submissions once Posit's package manager serves their version.
-# Handbook: handbook/operations/releases/cran/README.md
+# Process: the header of .github/workflows/cran-submission.yaml
 #
 # .github/workflows/cran-submission.yaml drafts a release for every submission,
 # and ends its notes with a marker that GitHub does not render:

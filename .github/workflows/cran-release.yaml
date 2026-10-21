@@ -10,9 +10,9 @@
 # once their tag points at the commit they target.
 # A version that is not listed yet leaves the run green; the next night checks again.
 # Started by hand, from the Actions tab or with
-# `gh workflow run cran-release.yaml --repo duckdb/duckdb-r`, it does the same;
+# `gh workflow run cran-release.yaml --repo r-dbi/RSQLite`, it does the same;
 # the input `dry-run` (`-f dry-run=true`) reports what it would publish and changes nothing
-# (handbook/operations/releases/cran/README.md).
+# (the release process: the header of cran-submission.yaml).
 on:
   schedule:
     - cron: "43 5 * * *"

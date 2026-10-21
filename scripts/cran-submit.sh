@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Copied from duckdb/duckdb-r's scripts/cran-submit.sh at 86ac17f6b.
 # Build the source package, recompress it with zopfli, and upload it to CRAN the way `devtools:::upload_cran()` does.
-# Handbook: handbook/operations/releases/cran/README.md
+# Process: the header of .github/workflows/cran-submission.yaml
 #
 # Two subcommands, one per step of .github/workflows/cran-submission.yaml,
 # which keeps the tarball as an artifact of the run between them.
 #
 #   tarball [<out dir> [<package dir>]]
-#     Build with `R CMD build` (which runs `cleanup` and packs src/duckdb.tar),
+#     Build with `R CMD build` (which builds the vignette and runs `cleanup`),
 #     recompress the result with zopfli (`gzip -dc | pigz -11`),
 #     and verify that the recompressed tarball passes `gzip -t`
 #     and holds the same tar stream, entry for entry, as the one R built.
@@ -39,8 +39,8 @@
 #
 # Usage:
 #   scripts/cran-submit.sh tarball "$RUNNER_TEMP/cran"
-#   scripts/cran-submit.sh upload "$RUNNER_TEMP/cran/duckdb_2.0.0.tar.gz"
-#   scripts/cran-submit.sh upload --dry-run "$RUNNER_TEMP/cran/duckdb_2.0.0.tar.gz"
+#   scripts/cran-submit.sh upload "$RUNNER_TEMP/cran/RSQLite_2.4.6.tar.gz"
+#   scripts/cran-submit.sh upload --dry-run "$RUNNER_TEMP/cran/RSQLite_2.4.6.tar.gz"
 #
 # Environment:
 #   CRAN_SUBMISSION_URL  the form to post to, default https://xmpalantir.wu.ac.at/cransubmit/index2.php
@@ -161,19 +161,6 @@ cmd_tarball() {
       "\`R CMD build\` wrote \`$name\` with package \`$pkg\`, version \`$version\` and maintainer \`$maint_name\` <\`$maint_email\`>; CRAN needs all four, and the name \`<package>_<version>.tar.gz\`." \
       "$work/excerpt" -- \
       "Check DESCRIPTION: \`Package:\`, \`Version:\`, and exactly one person in \`Authors@R\` with the role \`cre\` and an e-mail address, from which \`R CMD build\` writes \`Maintainer:\`."
-  fi
-  # R CMD build carries on when `cleanup` fails, and then ships the tree unpacked.
-  if [ -d "$pkgdir/src/duckdb" ]; then
-    if grep -qx "$pkg/src/duckdb.tar" "$work/plain/listing" && ! grep -q "^$pkg/src/duckdb/" "$work/plain/listing"; then
-      val "vendored tree" "packed as src/duckdb.tar by cleanup"
-    else
-      grep "^$pkg/src/duckdb" "$work/plain/listing" | sed -n 1,20p >"$work/excerpt" || true
-      fail "Build" "Cleanup did not pack the vendored tree" \
-        "The tarball carries no \`src/duckdb.tar\`, or still carries \`src/duckdb/\`: \`cleanup\` failed, and \`R CMD build\` does not stop when it does." \
-        "$work/excerpt" -- \
-        "Reproduce it with \`R CMD build .\` in a fresh checkout of the commit this run was started on, and check that \`tar -tzf\` lists \`$pkg/src/duckdb.tar\`." \
-        "\`R CMD build\` does not show what \`cleanup\` prints: run \`sh -x ./cleanup\` in a throwaway copy of the checkout to see it, because it deletes \`src/duckdb/\`."
-    fi
   fi
   endgroup
   summary "Package **$pkg** version **$version**, built by \`R CMD build\`${commit_sha:+ from \`${commit_sha:0:10}\`}." ""
@@ -447,7 +434,7 @@ cmd_upload() {
 
 # What a real run would post, printed and reported; sends nothing.
 dry_run_report() {
-  local ref=${GITHUB_REF_NAME:-<ref>} repo=${GITHUB_REPOSITORY:-duckdb/duckdb-r}
+  local ref=${GITHUB_REF_NAME:-<ref>} repo=${GITHUB_REPOSITORY:-r-dbi/RSQLite}
   group "Dry run: what a real run would post to $url"
   say "POST 1, the upload, multipart:"
   val "pkg_id" "(empty)"

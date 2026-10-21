@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Copied from duckdb/duckdb-r's scripts/cran-lib.sh at 86ac17f6b.
 # Shared helpers for scripts/cran-submit.sh and scripts/cran-release.sh: the log, the annotations, the report.
-# Handbook: handbook/operations/releases/cran/README.md
+# Process: the header of .github/workflows/cran-submission.yaml
 #
 # Sourced, not run. The log folds each stage into a group and annotates outcomes
 # when GITHUB_ACTIONS is true, and prints plain lines otherwise.
@@ -9,7 +9,7 @@
 # the advice on a failure goes to stderr either way.
 # A commit is linked when GITHUB_REPOSITORY is set, with GITHUB_SERVER_URL defaulting to github.com.
 
-handbook_page=handbook/operations/releases/cran/README.md
+process_page=.github/workflows/cran-submission.yaml
 
 # --- output ---------------------------------------------------------------
 
@@ -84,7 +84,7 @@ failure() {
     echo
     echo "How to resolve:"
     printf '  - %s\n' "$@"
-    echo "  (handbook: $handbook_page)"
+    echo "  (the release process: $process_page)"
   } >&2
   summary "" "### $stage: failed" "" "**$title.** $message" ""
   if [ -n "$excerpt" ] && [ -s "$excerpt" ]; then
@@ -94,9 +94,9 @@ failure() {
   local b
   for b in "$@"; do summary "- $b"; done
   if [ -n "${GITHUB_REPOSITORY:-}" ] && [ -n "${GITHUB_SHA:-}" ]; then
-    summary "- The release process: [\`$handbook_page\`](${GITHUB_SERVER_URL:-https://github.com}/$GITHUB_REPOSITORY/blob/$GITHUB_SHA/$handbook_page)." ""
+    summary "- The release process: [\`$process_page\`](${GITHUB_SERVER_URL:-https://github.com}/$GITHUB_REPOSITORY/blob/$GITHUB_SHA/$process_page)." ""
   else
-    summary "- The release process: \`$handbook_page\`." ""
+    summary "- The release process: \`$process_page\`." ""
   fi
 }
 

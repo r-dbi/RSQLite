@@ -48,3 +48,4 @@ a.out.dSYM
 ^\.clang-format$
 ^\.ccache$
 ^index\.md$
+^scripts$

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copied from duckdb/duckdb-r's scripts/cran-release-test.sh at 86ac17f6b.
 # Check scripts/cran-release.sh offline, against a fake P3M on 127.0.0.1 and a `gh` stub: nothing reaches GitHub.
-# Handbook: handbook/operations/releases/cran/README.md
+# Process: the header of .github/workflows/cran-submission.yaml
 #
 #   1. A draft whose version P3M does not list yet is one line in the report, and success.
 #   2. A draft whose version P3M lists is published, once its tag points at its target.
@@ -127,10 +127,10 @@ export SCRATCH API
 
 TARGET=1111111111111111111111111111111111111111
 OTHER=2222222222222222222222222222222222222222
-URL=https://github.example/duckdb/duckdb-r/releases/tag/untagged-abc
+URL=https://github.example/r-dbi/RSQLite/releases/tag/untagged-abc
 
-releases() { # JSON for repos/duckdb/duckdb-r/releases?per_page=100
-  cat >"$API/repos_duckdb_duckdb-r_releases_per_page_100.json"
+releases() { # JSON for repos/r-dbi/RSQLite/releases?per_page=100
+  cat >"$API/repos_r-dbi_RSQLite_releases_per_page_100.json"
 }
 # The draft cran-submission.yaml writes, a draft without the marker, a published release
 # with it, and a draft whose marker disagrees with its tag.
@@ -138,24 +138,24 @@ with_draft() {
   releases <<EOF
 [
   {"draft": true, "tag_name": "v2.0.0", "target_commitish": "$TARGET", "html_url": "$URL",
-   "body": "## Breaking changes\n\n- Update to DuckDB v2.0.0.\n\n<!-- cran-submission: duckdb 2.0.0 -->\n"},
+   "body": "## Breaking changes\n\n- Upgrade bundled SQLite.\n\n<!-- cran-submission: RSQLite 2.0.0 -->\n"},
   {"draft": true, "tag_name": "v9.9.9", "target_commitish": "main", "html_url": "https://github.example/x",
    "body": "A draft written by hand."},
   {"draft": false, "tag_name": "v1.5.6", "target_commitish": "main", "html_url": "https://github.example/v1.5.6",
-   "body": "<!-- cran-submission: duckdb 1.5.6 -->"},
+   "body": "<!-- cran-submission: RSQLite 1.5.6 -->"},
   {"draft": true, "tag_name": "v3.0.0", "target_commitish": "main", "html_url": "https://github.example/odd",
-   "body": "<!-- cran-submission: duckdb 2.9.0 -->"}
+   "body": "<!-- cran-submission: RSQLite 2.9.0 -->"}
 ]
 EOF
 }
 tag_at() { # <commit>, or nothing for no tag
   if [ $# -eq 0 ]; then
-    echo '[]' >"$API/repos_duckdb_duckdb-r_git_matching-refs_tags_v2.0.0.json"
-    rm -f "$API/repos_duckdb_duckdb-r_commits_refs_tags_v2.0.0.json"
+    echo '[]' >"$API/repos_r-dbi_RSQLite_git_matching-refs_tags_v2.0.0.json"
+    rm -f "$API/repos_r-dbi_RSQLite_commits_refs_tags_v2.0.0.json"
   else
     echo '[{"ref": "refs/tags/v2.0.0", "object": {"type": "tag", "sha": "3333333333333333333333333333333333333333"}}]' \
-      >"$API/repos_duckdb_duckdb-r_git_matching-refs_tags_v2.0.0.json"
-    echo "{\"sha\": \"$1\"}" >"$API/repos_duckdb_duckdb-r_commits_refs_tags_v2.0.0.json"
+      >"$API/repos_r-dbi_RSQLite_git_matching-refs_tags_v2.0.0.json"
+    echo "{\"sha\": \"$1\"}" >"$API/repos_r-dbi_RSQLite_commits_refs_tags_v2.0.0.json"
   fi
 }
 
@@ -166,8 +166,8 @@ run() {
   : >"$SUMMARY"
   : >"$SCRATCH/gh.log"
   : >"$SCRATCH/p3m.log"
-  out=$(GITHUB_ACTIONS=true GITHUB_STEP_SUMMARY=$SUMMARY GH=$SCRATCH/bin/gh GH_REPO=duckdb/duckdb-r \
-    GITHUB_REPOSITORY=duckdb/duckdb-r GITHUB_SERVER_URL=https://github.example P3M_REPO_URL=$P3M \
+  out=$(GITHUB_ACTIONS=true GITHUB_STEP_SUMMARY=$SUMMARY GH=$SCRATCH/bin/gh GH_REPO=r-dbi/RSQLite \
+    GITHUB_REPOSITORY=r-dbi/RSQLite GITHUB_SERVER_URL=https://github.example P3M_REPO_URL=$P3M \
     "$HERE/cran-release.sh" "$@" 2>&1) || rc=$?
   printf '%s\nexit %s\n' "$out" "$rc"
 }
@@ -179,12 +179,12 @@ echo
 echo "== a version P3M does not list yet waits"
 with_draft
 tag_at "$TARGET"
-serve "duckdb 1.5.6" "other 2.0.0"
+serve "RSQLite 1.5.6" "other 2.0.0"
 out=$(run)
 has "it succeeds" "$out" "exit 0"
 is "the report is one line" "$(cat "$SUMMARY")" "## CRAN release
 
-- duckdb 2.0.0 is not on P3M yet; checked $INDEX, which lists duckdb 1.5.6."
+- RSQLite 2.0.0 is not on P3M yet; checked $INDEX, which lists RSQLite 1.5.6."
 is "nothing is published" "$(edits)" ""
 has "the index was read" "$(cat "$SCRATCH/p3m.log")" "GET /cran/latest/src/contrib/PACKAGES.gz"
 has "the log says what P3M serves" "$out" "$(printf '  %-20s %s' 'P3M serves:' 1.5.6)"
@@ -192,23 +192,23 @@ has "and skips the draft whose marker disagrees with its tag" "$out" "skipped: h
 hasnt "and ignores the draft without the marker" "$out" "v9.9.9"
 serve "other 2.0.0"
 out=$(run)
-has "a package P3M does not list waits too" "$(cat "$SUMMARY")" "which lists no duckdb."
+has "a package P3M does not list waits too" "$(cat "$SUMMARY")" "which lists no RSQLite."
 has "and succeeds" "$out" "exit 0"
 
 # --- 2: on P3M -------------------------------------------------------------------
 
 echo
 echo "== a version P3M lists is published"
-serve "duckdb 2.0.0"
+serve "RSQLite 2.0.0"
 out=$(run)
 has "it succeeds" "$out" "exit 0"
-is "the draft is published as the latest release" "$(edits)" "gh release edit v2.0.0 --repo duckdb/duckdb-r --draft=false --latest"
-has "after reading the tag" "$(cat "$SCRATCH/gh.log")" "gh api repos/duckdb/duckdb-r/commits/refs/tags/v2.0.0 --jq .sha"
-has "with a notice" "$out" "::notice title=Published::duckdb 2.0.0 is on P3M; published the release $URL."
+is "the draft is published as the latest release" "$(edits)" "gh release edit v2.0.0 --repo r-dbi/RSQLite --draft=false --latest"
+has "after reading the tag" "$(cat "$SCRATCH/gh.log")" "gh api repos/r-dbi/RSQLite/commits/refs/tags/v2.0.0 --jq .sha"
+has "with a notice" "$out" "::notice title=Published::RSQLite 2.0.0 is on P3M; published the release $URL."
 summary=$(cat "$SUMMARY")
-has "the report links the release" "$summary" "- Draft release: [duckdb 2.0.0]($URL), tag \`v2.0.0\`"
-has "and the commit" "$summary" "- Commit [\`${TARGET:0:10}\`](https://github.example/duckdb/duckdb-r/commit/$TARGET), the draft's target"
-has "and what P3M said" "$summary" "- P3M: checked $INDEX, which lists duckdb 2.0.0"
+has "the report links the release" "$summary" "- Draft release: [RSQLite 2.0.0]($URL), tag \`v2.0.0\`"
+has "and the commit" "$summary" "- Commit [\`${TARGET:0:10}\`](https://github.example/r-dbi/RSQLite/commit/$TARGET), the draft's target"
+has "and what P3M said" "$summary" "- P3M: checked $INDEX, which lists RSQLite 2.0.0"
 has "and the outcome" "$summary" "- Published as the latest release."
 
 # --- 3: the tag ------------------------------------------------------------------
@@ -221,7 +221,7 @@ has "it fails" "$out" "exit 1"
 has "naming the tag" "$out" "::error title=The tag v2.0.0 is missing::"
 is "nothing is published" "$(edits)" ""
 summary=$(cat "$SUMMARY")
-has "the report says so" "$summary" "### duckdb 2.0.0: failed"
+has "the report says so" "$summary" "### RSQLite 2.0.0: failed"
 has "and how to resolve it" "$summary" "git tag -a v2.0.0 $TARGET"
 
 echo
@@ -252,11 +252,11 @@ is "or publishing" "$(edits)" ""
 echo
 echo "== a dry run publishes nothing"
 with_draft
-serve "duckdb 2.0.0"
+serve "RSQLite 2.0.0"
 out=$(run --dry-run)
 has "it succeeds" "$out" "exit 0"
 is "nothing is published" "$(edits)" ""
-has "it says what it would publish" "$out" "::notice title=Dry run::Would publish duckdb 2.0.0 ($URL) as the latest release; nothing was published."
+has "it says what it would publish" "$out" "::notice title=Dry run::Would publish RSQLite 2.0.0 ($URL) as the latest release; nothing was published."
 summary=$(cat "$SUMMARY")
 has "the report says it is a dry run" "$summary" "## CRAN release: dry run"
 has "and what a real run does" "$summary" "- Dry run: a real run publishes the draft as the latest release."

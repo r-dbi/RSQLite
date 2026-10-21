@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copied from duckdb/duckdb-r's scripts/cran-submit-test.sh at 86ac17f6b.
 # Check scripts/cran-submit.sh offline, against a fake CRAN submission form on 127.0.0.1: nothing reaches CRAN.
-# Handbook: handbook/operations/releases/cran/README.md
+# Process: the header of .github/workflows/cran-submission.yaml
 #
 #   1. `upload` sends the two POSTs of `devtools:::upload_cran()`, field for field and in order,
 #      with the tarball's own bytes, the maintainer from DESCRIPTION and the comment `<package> <version>`,
@@ -149,10 +149,10 @@ export no_proxy=127.0.0.1 NO_PROXY=127.0.0.1
 
 # What a run on GitHub sets. The commit is this checkout's HEAD,
 # as in a job that checked out the commit the run was started on.
-export GITHUB_SERVER_URL=https://github.example GITHUB_REPOSITORY=duckdb/duckdb-r GITHUB_REF_NAME=release-x
+export GITHUB_SERVER_URL=https://github.example GITHUB_REPOSITORY=r-dbi/RSQLite GITHUB_REF_NAME=release-x
 GITHUB_SHA=$(git -C "$HERE/.." rev-parse HEAD 2>/dev/null || echo 0123456789abcdef0123456789abcdef01234567)
 export GITHUB_SHA
-LINK="Commit [\`${GITHUB_SHA:0:10}\`](https://github.example/duckdb/duckdb-r/commit/$GITHUB_SHA) on \`release-x\`."
+LINK="Commit [\`${GITHUB_SHA:0:10}\`](https://github.example/r-dbi/RSQLite/commit/$GITHUB_SHA) on \`release-x\`."
 
 SUMMARY=$SCRATCH/summary.md
 # Runs the script as a workflow step would, against the fake form;
@@ -321,7 +321,7 @@ has "with every upload field" "$summary" "   - \`pkg_id\`: empty
 has "the comment" "$summary" "   - \`comment\`: \`fakepkg 1.0.1\`"
 has "and every confirmation field" "$summary" "   - \`policy_check\`: \`1/\`
    - \`submit\`: \`Submit package\`"
-has "and how to dispatch the real run" "$summary" "\`gh workflow run cran-submission.yaml --repo duckdb/duckdb-r --ref release-x\`"
+has "and how to dispatch the real run" "$summary" "\`gh workflow run cran-submission.yaml --repo r-dbi/RSQLite --ref release-x\`"
 hasnt "and no next step of a real submission" "$summary" "click the confirmation link"
 out=$(run upload --dry-run "$SCRATCH/pkg/fakepkg.tar.gz")
 has "a misnamed tarball still fails" "$out" "::error title=The tarball is misnamed::"
@@ -409,7 +409,7 @@ Commit \`${ZHEAD:0:10}\`."
   echo "== a checkout at another commit than the run's is named, with a warning"
   out=$(run tarball "$SCRATCH/out5" "$SCRATCH/src/zpkg")
   has "it warns" "$out" "::warning title=Another commit::The checkout is at $ZHEAD, not at $GITHUB_SHA"
-  has "and links the checkout" "$(cat "$SUMMARY")" "Commit [\`${ZHEAD:0:10}\`](https://github.example/duckdb/duckdb-r/commit/$ZHEAD) on \`release-x\`."
+  has "and links the checkout" "$(cat "$SUMMARY")" "Commit [\`${ZHEAD:0:10}\`](https://github.example/r-dbi/RSQLite/commit/$ZHEAD) on \`release-x\`."
 
   echo
   echo "== a package that does not build fails with advice"

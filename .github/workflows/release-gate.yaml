@@ -55,7 +55,7 @@ jobs:
 
     name: "Documentation"
 
-    # Six help pages of duckdb document no return value,
+    # Sixteen help pages of RSQLite, mostly classes and deprecated functions, document no return value,
     # so this job reports without holding up a release.
     continue-on-error: true
 
@@ -64,8 +64,7 @@ jobs:
         with:
           persist-credentials: false
 
-      # devtools::build_readme() installs the package,
-      # and this links it against the prebuilt libduckdb instead of compiling the engine.
+      # devtools::build_readme() installs the package.
       - name: Run the repository-specific before-install steps
         uses: ./.github/workflows/custom/before-install
         if: hashFiles('.github/workflows/custom/before-install/action.yml') != ''

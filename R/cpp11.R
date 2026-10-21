@@ -80,8 +80,16 @@ result_column_info <- function(res) {
   .Call(`_RSQLite_result_column_info`, res)
 }
 
+result_column_names <- function(res) {
+  .Call(`_RSQLite_result_column_names`, res)
+}
+
 result_get_placeholder_names <- function(res) {
   .Call(`_RSQLite_result_get_placeholder_names`, res)
+}
+
+result_set_arrow_schema <- function(res, schema, positions) {
+  invisible(.Call(`_RSQLite_result_set_arrow_schema`, res, schema, positions))
 }
 
 result_fetch_arrow <- function(res_, chunk_size) {

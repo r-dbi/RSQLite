@@ -15,16 +15,48 @@
 // column: the date and time types when `extended_types` is set, otherwise the
 // affinity, which only matters when every value of the first chunk is NULL.
 // Columns without a declared type that never see a value are of the null type.
+// A type requested up front, see ArrowTarget, skips the decision.
 enum ARROW_KIND {
   AK_UNDECIDED,
   AK_NA,
+  AK_BOOL,
+  AK_INT8,
+  AK_INT16,
+  AK_INT32,
   AK_INT64,
+  AK_UINT8,
+  AK_UINT16,
+  AK_UINT32,
+  AK_UINT64,
+  AK_FLOAT,
   AK_DOUBLE,
   AK_STRING,
+  AK_LARGE_STRING,
   AK_BINARY,
-  AK_DATE,
-  AK_TIME,
+  AK_LARGE_BINARY,
+  AK_DATE32,
+  AK_DATE64,
+  AK_TIME32,
+  AK_TIME64,
   AK_TIMESTAMP
+};
+
+// An Arrow type requested for a column: the kind, and for the time types the
+// unit and the time zone
+struct ArrowTarget {
+  bool set;
+  ARROW_KIND kind;
+  enum ArrowTimeUnit unit;
+  std::string timezone;
+
+  ArrowTarget()
+      : set(false), kind(AK_UNDECIDED), unit(NANOARROW_TIME_UNIT_MICRO) {}
+
+  // Reads the target from a schema, throws for a type that can't be filled
+  static ArrowTarget from_schema(
+    const struct ArrowSchema* schema,
+    const std::string& name
+  );
 };
 
 class SqliteArrowColumn {
@@ -35,7 +67,10 @@ class SqliteArrowColumn {
   SqliteColumnDataSource source;
 
   ARROW_KIND kind;
-  // Set when the schema has been handed out: the kind is final from then on
+  enum ArrowTimeUnit unit;
+  std::string timezone;
+  // Set when the schema has been handed out or the type was requested:
+  // the kind is final from then on
   bool frozen;
 
   // Child array of the chunk under construction
@@ -50,11 +85,13 @@ public:
     sqlite3_stmt* stmt_,
     const int j_,
     const std::string& name_,
-    bool with_alt_types_
+    bool with_alt_types_,
+    const ArrowTarget& target
   );
 
 public:
   bool decided() const;
+  bool is_frozen() const;
   // Decides the kind from the value of the current row, if there is one
   void decide_from_row(bool has_row);
   // Decides the kind from the declared type, falling back to the null type
@@ -81,7 +118,13 @@ private:
 
   void init_array();
   void append_value(int column_type, int64_t row);
+  void append_integer(int column_type, int64_t row);
+  void append_string(int column_type, int64_t row);
+  void append_binary(int column_type, int64_t row);
+  void append_date(int column_type, int64_t row);
+  void append_time(int column_type, int64_t row);
   void append_null();
+  bool in_range(int64_t value) const;
   void promote_to_double();
   static const char* format_kind(ARROW_KIND kind);
 };

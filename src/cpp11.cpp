@@ -87,25 +87,25 @@ extern "C" SEXP _RSQLite_sqlite_http_stats() {
   END_CPP11
 }
 // result.cpp
-cpp11::external_pointer<DbResult> result_create(cpp11::external_pointer<DbConnectionPtr> con, std::string sql);
+cpp11::external_pointer<DbResultPtr> result_create(cpp11::external_pointer<DbConnectionPtr> con, std::string sql);
 extern "C" SEXP _RSQLite_result_create(SEXP con, SEXP sql) {
   BEGIN_CPP11
     return cpp11::as_sexp(result_create(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbConnectionPtr>>>(con), cpp11::as_cpp<cpp11::decay_t<std::string>>(sql)));
   END_CPP11
 }
 // result.cpp
-void result_release(cpp11::external_pointer<DbResult> res);
+void result_release(cpp11::external_pointer<DbResultPtr> res);
 extern "C" SEXP _RSQLite_result_release(SEXP res) {
   BEGIN_CPP11
-    result_release(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResult>>>(res));
+    result_release(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResultPtr>>>(res));
     return R_NilValue;
   END_CPP11
 }
 // result.cpp
-bool result_valid(cpp11::external_pointer<DbResult> res_);
+bool result_valid(cpp11::external_pointer<DbResultPtr> res_);
 extern "C" SEXP _RSQLite_result_valid(SEXP res_) {
   BEGIN_CPP11
-    return cpp11::as_sexp(result_valid(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResult>>>(res_)));
+    return cpp11::as_sexp(result_valid(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResultPtr>>>(res_)));
   END_CPP11
 }
 // result.cpp
@@ -158,6 +158,28 @@ extern "C" SEXP _RSQLite_result_get_placeholder_names(SEXP res) {
     return cpp11::as_sexp(result_get_placeholder_names(cpp11::as_cpp<cpp11::decay_t<SqliteResult*>>(res)));
   END_CPP11
 }
+// result.cpp
+SEXP result_fetch_arrow(cpp11::external_pointer<DbResultPtr> res_, double chunk_size);
+extern "C" SEXP _RSQLite_result_fetch_arrow(SEXP res_, SEXP chunk_size) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(result_fetch_arrow(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResultPtr>>>(res_), cpp11::as_cpp<cpp11::decay_t<double>>(chunk_size)));
+  END_CPP11
+}
+// result.cpp
+SEXP result_fetch_arrow_chunk(DbResult* res, double chunk_size);
+extern "C" SEXP _RSQLite_result_fetch_arrow_chunk(SEXP res, SEXP chunk_size) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(result_fetch_arrow_chunk(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<double>>(chunk_size)));
+  END_CPP11
+}
+// result.cpp
+void result_bind_arrow(DbResult* res, cpp11::sexp params, cpp11::integers param_indexes);
+extern "C" SEXP _RSQLite_result_bind_arrow(SEXP res, SEXP params, SEXP param_indexes) {
+  BEGIN_CPP11
+    result_bind_arrow(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<cpp11::sexp>>(params), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(param_indexes));
+    return R_NilValue;
+  END_CPP11
+}
 // rsqlite.cpp
 cpp11::strings rsqliteVersion();
 extern "C" SEXP _RSQLite_rsqliteVersion() {
@@ -176,9 +198,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_connection_valid",             (DL_FUNC) &_RSQLite_connection_valid,             1},
     {"_RSQLite_extension_load",               (DL_FUNC) &_RSQLite_extension_load,               3},
     {"_RSQLite_result_bind",                  (DL_FUNC) &_RSQLite_result_bind,                  2},
+    {"_RSQLite_result_bind_arrow",            (DL_FUNC) &_RSQLite_result_bind_arrow,            3},
     {"_RSQLite_result_column_info",           (DL_FUNC) &_RSQLite_result_column_info,           1},
     {"_RSQLite_result_create",                (DL_FUNC) &_RSQLite_result_create,                2},
     {"_RSQLite_result_fetch",                 (DL_FUNC) &_RSQLite_result_fetch,                 2},
+    {"_RSQLite_result_fetch_arrow",           (DL_FUNC) &_RSQLite_result_fetch_arrow,           2},
+    {"_RSQLite_result_fetch_arrow_chunk",     (DL_FUNC) &_RSQLite_result_fetch_arrow_chunk,     2},
     {"_RSQLite_result_get_placeholder_names", (DL_FUNC) &_RSQLite_result_get_placeholder_names, 1},
     {"_RSQLite_result_has_completed",         (DL_FUNC) &_RSQLite_result_has_completed,         1},
     {"_RSQLite_result_release",               (DL_FUNC) &_RSQLite_result_release,               1},

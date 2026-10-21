@@ -1,17 +1,6 @@
 # Native Arrow interface: results are filled straight from the SQLite
 # statement, parameters are bound straight from Arrow arrays.
 
-local_con <- function(..., envir = parent.frame()) {
-  con <- dbConnect(SQLite(), ":memory:", ...)
-  withr::defer(dbDisconnect(con), envir = envir)
-  con
-}
-
-schema_formats <- function(x) {
-  schema <- nanoarrow::infer_nanoarrow_schema(x)
-  vapply(schema$children, function(child) child$format, character(1))
-}
-
 test_that("dbSendQueryArrow() returns a SQLiteResultArrow", {
   con <- local_con()
   rs <- dbSendQueryArrow(con, "SELECT 1 AS a, 'x' AS b, 1.5 AS c, x'0102' AS d, NULL AS e")
@@ -83,7 +72,7 @@ test_that("mixed types after the first chunk are coerced with a warning", {
   expect_equal(as.data.frame(chunk)$x, c(1, 2))
   expect_warning(
     chunk <- dbFetchArrowChunk(rs, chunk_size = 2),
-    "mixed type"
+    class = "RSQLite_warning_coercion"
   )
   expect_equal(nanoarrow::infer_nanoarrow_schema(chunk)$children$x$format, "l")
 })

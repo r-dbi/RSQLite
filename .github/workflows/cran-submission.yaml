@@ -9,30 +9,42 @@
 # a release is green before it is submitted, and CRAN's confirmation e-mail is the manual step.
 #
 # The release process, adapted from duckdb/duckdb-r's handbook
-# (handbook/operations/releases/cran/README.md and process/README.md at 86ac17f6b):
+# (handbook/operations/releases/cran/README.md and process/README.md at 86ac17f6b).
+# Every run below is dispatched by hand on r-dbi/RSQLite itself, never on a fork,
+# where a run would tag and draft in the fork.
 #
-# 1. Preflight: read CRAN's check results,
+# 1. Review: before the cut, go through the open issues and pull requests,
+#    the CI history on `main` (scheduled runs and R-devel included),
+#    CRAN's check results with their additional issues,
 #    https://cran.r-project.org/web/checks/check_results_RSQLite.html,
+#    the r-universe build, https://r-dbi.r-universe.dev/RSQLite, the last reverse-dependency results,
 #    and the CRAN Repository Policy, https://cran.r-project.org/web/packages/policies.html.
-#    Anything in red, and every WARNING or NOTE, is addressed or explained.
+#    Record the findings in the release's checklist issue.
 #    CRAN asks for about a week between two releases of a package.
-# 2. Cut: create the release branch `cran-X.Y.Z` from the chosen commit of `main`,
-#    set the version with `fledge::bump_version("X.Y.Z")` or by hand,
-#    polish the NEWS.md section, which removes fledge's first-line marker,
-#    write cran-comments.md, and open a pull request into `main`.
-# 3. Check: a push to a `cran-*` branch runs R-CMD-check.yaml, rhub.yaml for R-hub's platforms,
-#    release-gate.yaml for the mechanical release checks,
-#    and, when the push adds or changes it, winbuilder.yaml, which uploads the tarball to win-builder against R-devel.
-#    Run by hand, winbuilder.yaml also takes R-release and R-oldrelease; every upload mails the maintainer.
-#    The reverse dependencies are checked on the candidate with revdep.yaml.
-#    Every error, warning and note is a blocker unless cran-comments.md explains it.
-# 4. Submit: dispatch this workflow on `cran-X.Y.Z`, first as a dry run, then for real;
+# 2. Cut: create the release branch, for instance `release-X.Y.Z`, from the chosen commit of `main`.
+#    Remove fledge's marker line from the top of NEWS.md, and never run `fledge::bump_version()` afterwards.
+#    Set `Version: X.Y.Z` in DESCRIPTION by hand.
+#    Fold the development sections into one section headed exactly `# RSQLite X.Y.Z`, without a date,
+#    because the `tag` job looks for that heading; one bullet per change,
+#    grouped as the tidyverse style guide does (https://style.tidyverse.org/news.html), breaking changes first.
+#    Open the release pull request into `main` and the checklist issue.
+# 3. Check: dispatch R-CMD-check.yaml, rhub.yaml, release-gate.yaml, winbuilder.yaml and revdep.yaml
+#    on the release branch.
+#    The release workflows post their results to the release pull request;
+#    win-builder mails its verdict to the maintainer.
+#    Every error, warning and note is a blocker unless the checklist issue explains it.
+# 4. Dry run: dispatch this workflow with `dry-run` on the final commit.
+#    Its summary shows the tarball, the fields it would post and the draft release's notes;
+#    any later change to the branch, NEWS.md included, means another dry run.
+# 5. Submit: dispatch this workflow without `dry-run`,
+#    only once R-CMD-check, the release gate and the reverse-dependency run on that commit are finished and green;
 #    the maintainer follows the confirmation link CRAN mails.
-# 5. Merge back: merge the release pull request into `main` with a merge commit, never a squash,
+# 6. Merge back: merge the release pull request into `main` with a merge commit, never a squash,
 #    so that the tag `vX.Y.Z` is reachable from `main`.
-#    Then bump `main` to `X.Y.Z.9000` with a `# RSQLite (development version)` heading in NEWS.md:
-#    fledge is off once its marker is gone, and nothing else bumps it.
-# 6. Publish: cran-release.yaml publishes the draft release once Posit's package manager serves the version.
+#    Then set `main` to `X.Y.Z.9000`, with NEWS.md starting with `# RSQLite (development version)`
+#    and the line `Changes since vX.Y.Z: <https://github.com/r-dbi/RSQLite/compare/vX.Y.Z...main>`:
+#    fledge is off once its marker is gone, and nothing else bumps the version.
+# 7. Publish: cran-release.yaml publishes the draft release once Posit's package manager serves the version.
 #
 # Acceptance is asynchronous and can take days.
 # A rejection is fixed on the release branch and resubmitted as a new patch version, never rolled back.
@@ -181,7 +193,7 @@ jobs:
             echo
             echo "#### How to proceed"
             echo
-            echo "- Bump \`DESCRIPTION\` to a release version, with \`fledge::bump_version(\"X.Y.Z\")\` or by hand, and dispatch this workflow on the commit that carries it."
+            echo "- Set \`Version:\` in \`DESCRIPTION\` to a release version by hand, and dispatch this workflow on the commit that carries it."
             echo "- If submitting this version is really intended, dispatch again with \`allow-dev-version\` on: \`$rerun -f allow-dev-version=true\`."
           } >> "$GITHUB_STEP_SUMMARY"
           exit 1

@@ -96,6 +96,10 @@ result_bind_arrow <- function(res, params, param_indexes) {
   invisible(.Call(`_RSQLite_result_bind_arrow`, res, params, param_indexes))
 }
 
+arrow_set_bytes_limits <- function(cut_bytes, max_bytes) {
+  .Call(`_RSQLite_arrow_set_bytes_limits`, cut_bytes, max_bytes)
+}
+
 rsqliteVersion <- function() {
   .Call(`_RSQLite_rsqliteVersion`)
 }

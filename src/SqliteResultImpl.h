@@ -6,6 +6,8 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
+#include <utility>
+#include <vector>
 #include "sqlite3-cpp.h"
 #include "DbArrow.h"
 #include "DbColumnDataType.h"
@@ -78,6 +80,14 @@ public:
 public:
   cpp11::strings get_placeholder_names() const;
 
+  // Sets the bytes of a utf8 or binary column after which, or beyond which,
+  // fetch_arrow_rows() ends a chunk, and returns the previous values;
+  // for the tests
+  static std::pair<int64_t, int64_t> set_arrow_bytes_limits(
+    int64_t cut_bytes,
+    int64_t max_bytes
+  );
+
 private:
   void after_set_params();
   bool bind_row();
@@ -92,6 +102,8 @@ private:
   void ensure_arrow_columns();
   void freeze_arrow_columns();
   int64_t fetch_arrow_rows(struct ArrowArray* out, int64_t n_max);
+  bool arrow_row_fits(const std::vector<int>& column_types);
+  bool arrow_chunk_full();
 
 private:
   NORET void raise_sqlite_exception() const;

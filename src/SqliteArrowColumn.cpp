@@ -5,9 +5,6 @@
 #include <cmath>
 #include <sstream>
 
-// Variable-width columns end a chunk once they hold this many bytes
-static const int64_t ARROW_MAX_VAR_BYTES = int64_t(1) << 30;
-
 SqliteArrowColumn::SqliteArrowColumn(
   sqlite3_stmt* stmt_,
   const int j_,
@@ -133,9 +130,30 @@ void SqliteArrowColumn::start_chunk() {
   }
 }
 
-void SqliteArrowColumn::append_row() {
-  int column_type = sqlite3_column_type(stmt, j);
+int SqliteArrowColumn::column_type() const {
+  return sqlite3_column_type(stmt, j);
+}
 
+int64_t SqliteArrowColumn::value_bytes(int column_type) {
+  if (column_type == SQLITE_NULL) {
+    return 0;
+  }
+  // The same calls as in append_value(), which then reuses the conversion:
+  // sqlite3_column_text() or sqlite3_column_blob() before
+  // sqlite3_column_bytes()
+  switch (kind) {
+  case AK_STRING:
+    sqlite3_column_text(stmt, j);
+    return sqlite3_column_bytes(stmt, j);
+  case AK_BINARY:
+    sqlite3_column_blob(stmt, j);
+    return sqlite3_column_bytes(stmt, j);
+  default:
+    return 0;
+  }
+}
+
+void SqliteArrowColumn::append_row(int column_type) {
   if (!decided()) {
     if (column_type == SQLITE_NULL) {
       ++pending_nulls;

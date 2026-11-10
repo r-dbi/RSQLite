@@ -2,12 +2,18 @@
 result.o: \
   DbArrow.h \
   DbArrowStream.h \
+  DbColumnDataSource.h \
+  DbColumnDataType.h \
   DbConnection.h \
   DbResult.h \
   DbResultImplDecl.h \
   RSQLite.h \
   RSQLite_types.h \
+  SqliteArrowColumn.h \
+  SqliteColumnDataSource.h \
+  SqliteParamSource.h \
   SqliteResult.h \
+  SqliteResultImpl.h \
   pch.h \
   result.cpp \
   sqlite3-cpp.h \

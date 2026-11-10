@@ -7,8 +7,12 @@
 #include "integer64.h"
 #include <sstream>
 
-// Variable-width columns end a chunk once one of them holds this many bytes
-static const int64_t ARROW_MAX_VAR_BYTES = int64_t(1) << 30;
+// The data of a utf8 or binary column ends a chunk: after the row that takes
+// it to `arrow_cut_bytes`, and before a row that would take it past
+// `arrow_max_bytes`, the most that the 32-bit offsets of these types address.
+// The tests lower both, see set_arrow_bytes_limits().
+static int64_t arrow_cut_bytes = int64_t(1) << 30;
+static int64_t arrow_max_bytes = INT32_MAX;
 
 // Construction ////////////////////////////////////////////////////////////////
 
@@ -417,10 +421,22 @@ int64_t SqliteResultImpl::fetch_arrow_rows(
     arrow_columns_[j].start_chunk();
   }
 
+  std::vector<int> column_types(ncols);
   int64_t n = 0;
   while (!complete_ && n < n_max) {
+    // The storage classes are read once per row, before any conversion
     for (size_t j = 0; j < ncols; ++j) {
-      arrow_columns_[j].append_row();
+      column_types[j] = arrow_columns_[j].column_type();
+    }
+    // A row that would overflow a column starts the next chunk.
+    // An empty chunk takes any row: sqlite3_column_bytes() returns an int,
+    // so a single value never overflows.
+    if (n > 0 && !arrow_row_fits(column_types)) {
+      break;
+    }
+
+    for (size_t j = 0; j < ncols; ++j) {
+      arrow_columns_[j].append_row(column_types[j]);
     }
     step();
     ++nrows_;
@@ -428,17 +444,9 @@ int64_t SqliteResultImpl::fetch_arrow_rows(
 
     if (n % 1024 == 0) {
       cpp11::check_user_interrupt();
-
-      bool full = false;
-      for (size_t j = 0; j < ncols; ++j) {
-        if (arrow_columns_[j].variable_bytes() >= ARROW_MAX_VAR_BYTES) {
-          full = true;
-          break;
-        }
-      }
-      if (full) {
-        break;
-      }
+    }
+    if (arrow_chunk_full()) {
+      break;
     }
   }
 
@@ -473,6 +481,36 @@ int64_t SqliteResultImpl::fetch_arrow_rows(
 
   chunk.move(out);
   return n;
+}
+
+bool SqliteResultImpl::arrow_row_fits(const std::vector<int>& column_types) {
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    SqliteArrowColumn& column = arrow_columns_[j];
+    int64_t bytes = column.value_bytes(column_types[j]);
+    if (bytes > 0 && column.variable_bytes() + bytes > arrow_max_bytes) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool SqliteResultImpl::arrow_chunk_full() {
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    if (arrow_columns_[j].variable_bytes() >= arrow_cut_bytes) {
+      return true;
+    }
+  }
+  return false;
+}
+
+std::pair<int64_t, int64_t> SqliteResultImpl::set_arrow_bytes_limits(
+  int64_t cut_bytes,
+  int64_t max_bytes
+) {
+  std::pair<int64_t, int64_t> old(arrow_cut_bytes, arrow_max_bytes);
+  arrow_cut_bytes = cut_bytes;
+  arrow_max_bytes = max_bytes;
+  return old;
 }
 
 void SqliteResultImpl::raise_sqlite_exception() const {

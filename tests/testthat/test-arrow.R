@@ -12,6 +12,27 @@ schema_formats <- function(x) {
   vapply(schema$children, function(child) child$format, character(1))
 }
 
+# The lengths of the arrays a stream yields, which are released on the way
+chunk_lengths <- function(stream) {
+  lengths <- numeric()
+  repeat {
+    array <- stream$get_next()
+    if (is.null(array)) {
+      break
+    }
+    lengths <- c(lengths, array$length)
+    nanoarrow::nanoarrow_pointer_release(array)
+  }
+  lengths
+}
+
+# Lowers the bytes of a string or binary column after which, or beyond which,
+# a chunk ends, from 1 GiB and 2^31 - 1
+local_arrow_bytes_limits <- function(cut_bytes, max_bytes, envir = parent.frame()) {
+  old <- arrow_set_bytes_limits(cut_bytes, max_bytes)
+  withr::defer(arrow_set_bytes_limits(old[[1]], old[[2]]), envir = envir)
+}
+
 test_that("dbSendQueryArrow() returns a SQLiteResultArrow", {
   con <- local_con()
   rs <- dbSendQueryArrow(con, "SELECT 1 AS a, 'x' AS b, 1.5 AS c, x'0102' AS d, NULL AS e")
@@ -167,6 +188,47 @@ test_that("dbFetchArrowChunk() returns one chunk per call", {
   chunk <- dbFetchArrowChunk(rs)
   expect_equal(chunk$length, 0L)
   expect_equal(names(as.data.frame(chunk)), "a")
+})
+
+test_that("string and binary columns end a chunk before their offsets overflow", {
+  # 100 bytes end a chunk after the row that reaches them,
+  # a row that would go past 150 bytes starts the next chunk
+  local_arrow_bytes_limits(100, 150)
+  sizes <- c(60, 60, 80, 80, 200, 10, 10)
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(
+    i = seq_along(sizes),
+    s = strrep("x", sizes),
+    b = blob::as_blob(lapply(sizes, function(size) as.raw(rep(1, size))))
+  ))
+
+  for (column in c("s", "b")) {
+    sql <- paste0("SELECT ", column, " FROM t ORDER BY i")
+    # 60 + 60 reaches 100; 80 + 80 and 80 + 200 would go past 150;
+    # a single value fills an empty chunk whatever its size
+    expect_equal(chunk_lengths(dbGetQueryArrow(con, sql)), c(2, 1, 1, 1, 2))
+    # No row is lost or repeated at the cuts
+    values <- as.data.frame(dbGetQueryArrow(con, sql))[[column]]
+    expect_equal(if (is.character(values)) nchar(values) else lengths(values), sizes)
+  }
+})
+
+test_that("chunks of large blobs stay within the 32-bit offsets", {
+  skip_on_cran()
+  skip_if_not(
+    identical(Sys.getenv("RSQLITE_TEST_LARGE_ARROW"), "true"),
+    "Set RSQLITE_TEST_LARGE_ARROW=true to run, needs about 3 GB of memory"
+  )
+
+  con <- local_con()
+  # 1e9 bytes stay below 1 GiB, 1e9 + 1.2e9 bytes would overflow,
+  # 1.2e9 bytes reach 1 GiB
+  sql <- paste(
+    "SELECT zeroblob(1000000000) AS b",
+    "UNION ALL SELECT zeroblob(1200000000)",
+    "UNION ALL SELECT zeroblob(1)"
+  )
+  expect_equal(chunk_lengths(dbGetQueryArrow(con, sql)), c(1, 1, 1))
 })
 
 test_that("dbFetch() and dbFetchArrow() can be mixed on one result", {

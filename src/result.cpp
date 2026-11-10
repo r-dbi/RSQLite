@@ -2,6 +2,7 @@
 #include "RSQLite_types.h"
 #include "DbArrow.h"
 #include "DbArrowStream.h"
+#include "SqliteResultImpl.h"
 // After DbArrow.h, so that the Arrow C structs are defined once
 #include <nanoarrow/r.h>
 
@@ -123,4 +124,16 @@ void result_bind_arrow(
 
   std::vector<int> indexes(param_indexes.begin(), param_indexes.end());
   res->bind_arrow(stream, indexes);
+}
+
+// For the tests: sets the bytes of a utf8 or binary column after which, or
+// beyond which, an Arrow chunk ends, and returns the previous values
+[[cpp11::register]]
+cpp11::doubles arrow_set_bytes_limits(double cut_bytes, double max_bytes) {
+  std::pair<int64_t, int64_t> old = SqliteResultImpl::set_arrow_bytes_limits(
+    static_cast<int64_t>(cut_bytes),
+    static_cast<int64_t>(max_bytes)
+  );
+  return cpp11::writable::doubles({ static_cast<double>(old.first),
+                                    static_cast<double>(old.second) });
 }

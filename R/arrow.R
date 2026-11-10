@@ -68,7 +68,9 @@
 #' it is invalidated when another query is sent on the same connection.
 #' [DBI::dbFetchArrowChunk()] returns one such array per call,
 #' and an empty array once all rows are fetched.
-#' A chunk is also cut once a string or binary column holds one gigabyte.
+#' A chunk also ends after the row at which a string or binary column reaches 1 GiB,
+#' and before a row that would take such a column past the `2^31 - 1` bytes
+#' that the 32-bit offsets of the `utf8` and `binary` types can address.
 #'
 #' @name sqlite-arrow
 #' @aliases arrow

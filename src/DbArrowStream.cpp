@@ -1,6 +1,81 @@
 #include "pch.h"
 #include "DbArrow.h"
 #include "DbArrowStream.h"
+#include "main_thread.h"
+
+#include <mutex>
+#include <thread>
+#include <vector>
+
+// R's main thread /////////////////////////////////////////////////////////////
+
+namespace {
+
+std::thread::id main_thread;
+
+}  // namespace
+
+// Records R's main thread, R_init_RSQLite() runs on it
+[[cpp11::init]]
+void rsqlite_init_main_thread(DllInfo* dll) {
+  (void)dll;
+  main_thread = std::this_thread::get_id();
+}
+
+bool rsqlite_on_main_thread() {
+  return std::this_thread::get_id() == main_thread;
+}
+
+void rsqlite_warning(const std::string& message) {
+  if (rsqlite_on_main_thread()) {
+    cpp11::warning(message);
+    return;
+  }
+  throw std::runtime_error(
+    message +
+    " (an error instead of a warning, because R can't warn on the thread that "
+    "reads the Arrow stream)"
+  );
+}
+
+// Results released off R's main thread ////////////////////////////////////////
+
+namespace {
+
+// A share of a result dropped by a stream on another thread waits here for
+// R's main thread: the result can hold R objects, such as its parameters,
+// that only R's main thread may release. Dropping the share right away could
+// destroy the result there, should R's main thread drop the other share at the
+// same time.
+std::mutex deferred_mutex;
+std::vector<DbResultPtr> deferred_results;
+
+// Drops the stream's share of its result, on any thread
+void drop_result(DbResultPtr& result) {
+  if (!result || rsqlite_on_main_thread()) {
+    result.reset();
+    return;
+  }
+  if (result.use_count() == 1) {
+    // No other share can appear: closes the statement and its read
+    // transaction right away, without R
+    result->finalize_statement();
+  }
+  std::lock_guard<std::mutex> lock(deferred_mutex);
+  deferred_results.push_back(result);
+  result.reset();
+}
+
+}  // namespace
+
+void db_arrow_release_deferred() {
+  std::vector<DbResultPtr> results;
+  {
+    std::lock_guard<std::mutex> lock(deferred_mutex);
+    results.swap(deferred_results);
+  }
+  // Destroyed here, on R's main thread
+}
 
 namespace {
 
@@ -70,7 +145,7 @@ int get_next_impl(StreamState* state, struct ArrowArray* out) {
   int64_t n = state->result->fetch_arrow(array.get(), state->chunk_size);
   if (n == 0 && state->result->complete()) {
     // Release the result as early as possible
-    state->result.reset();
+    drop_result(state->result);
     out->release = NULL;
     return NANOARROW_OK;
   }
@@ -79,7 +154,10 @@ int get_next_impl(StreamState* state, struct ArrowArray* out) {
   return NANOARROW_OK;
 }
 
-// The callbacks below run inside the C code of the stream consumer.
+// The callbacks below run inside the C code of the stream consumer, on R's
+// main thread or, for consumers such as arrow's Acero engine, on a worker
+// thread while R's main thread waits: there, no R API is called at all, and
+// what would be an R warning or error becomes the error of the stream.
 // C++ exceptions are turned into stream errors.
 // An R error or interrupt raised through cpp11 arrives as a
 // cpp11::unwind_exception; its unwind is continued after leaving the try block
@@ -99,6 +177,9 @@ int stream_get_schema(
   StreamState* state = get_state(stream);
   SEXP token = R_NilValue;
   try {
+    if (rsqlite_on_main_thread()) {
+      db_arrow_release_deferred();
+    }
     return get_schema_impl(state, out);
   } catch (const cpp11::unwind_exception& e) {
     if (state->rethrow_unwind) {
@@ -123,6 +204,9 @@ int stream_get_next(struct ArrowArrayStream* stream, struct ArrowArray* out) {
   StreamState* state = get_state(stream);
   SEXP token = R_NilValue;
   try {
+    if (rsqlite_on_main_thread()) {
+      db_arrow_release_deferred();
+    }
     return get_next_impl(state, out);
   } catch (const cpp11::unwind_exception& e) {
     if (state->rethrow_unwind) {
@@ -148,7 +232,12 @@ const char* stream_get_last_error(struct ArrowArrayStream* stream) {
 }
 
 void stream_release(struct ArrowArrayStream* stream) {
-  delete get_state(stream);
+  StreamState* state = get_state(stream);
+  drop_result(state->result);
+  delete state;
+  if (rsqlite_on_main_thread()) {
+    db_arrow_release_deferred();
+  }
   stream->private_data = NULL;
   stream->release = NULL;
 }
@@ -160,6 +249,7 @@ void db_arrow_stream_init(
   const DbResultPtr& result,
   int64_t chunk_size
 ) {
+  db_arrow_release_deferred();
   out->get_schema = &stream_get_schema;
   out->get_next = &stream_get_next;
   out->get_last_error = &stream_get_last_error;

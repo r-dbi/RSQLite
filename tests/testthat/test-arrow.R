@@ -599,6 +599,54 @@ test_that("an R error while the stream is read unwinds cleanly", {
   expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 3L)
 })
 
+test_that("arrow's Acero engine reads a stream on its worker threads", {
+  skip_if_not_installed("arrow")
+  skip_if_not_installed("dplyr")
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:200000))
+
+  # Many chunks, read on a worker thread while R's main thread waits
+  reader <- arrow::as_record_batch_reader(dbGetQueryArrow(con, "SELECT a FROM t"))
+  out <- dplyr::collect(dplyr::filter(reader, a > 100000))
+  expect_equal(nrow(out), 100000)
+  expect_equal(range(out$a), c(100001L, 200000L))
+  expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 200000L)
+})
+
+test_that("arrow::write_dataset() reads a stream on its worker threads", {
+  skip_if_not_installed("arrow")
+  skip_if_not_installed("dplyr")
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:200000))
+
+  dir <- withr::local_tempfile()
+  arrow::write_dataset(arrow::as_record_batch_reader(dbGetQueryArrow(con, "SELECT a FROM t")), dir)
+  expect_equal(nrow(arrow::open_dataset(dir)), 200000)
+})
+
+test_that("a coercion on a worker thread fails the stream instead of warning", {
+  # Which thread reads the stream is up to arrow
+  skip_on_cran()
+  skip_if_not_installed("arrow")
+  skip_if_not_installed("dplyr")
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (a)")
+  dbWriteTable(con, "t", data.frame(a = 1:300), append = TRUE)
+  dbExecute(con, "UPDATE t SET a = 'x' WHERE rowid = 250")
+
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t")
+  withr::defer(if (dbIsValid(rs)) dbClearResult(rs))
+  reader <- arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 100))
+  expect_error(
+    dplyr::collect(dplyr::filter(reader, a > 0)),
+    "mixed type.*an error instead of a warning"
+  )
+
+  # The session and the connection go on
+  expect_silent(dbClearResult(rs))
+  expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 300L)
+})
+
 test_that("an error of the statement after dbDisconnect() keeps its result code", {
   con <- dbConnect(SQLite(), ":memory:")
   dbExecute(con, "CREATE TABLE t (a)")

@@ -92,6 +92,20 @@
 #' that the 32-bit offsets of the `utf8` and `binary` types can address.
 #' Such a row waits for the next Arrow fetch, and [DBI::dbFetch()] fails until then.
 #'
+#' @section Threads:
+#' A stream can be read on any thread, one call at a time, as the Arrow C stream interface allows.
+#' Some consumers read it on a worker thread while R waits,
+#' such as the Acero engine behind the dplyr verbs of the arrow package and `arrow::write_dataset()`.
+#' R can't be called on such a thread.
+#' A value that is converted with a warning on R's main thread, see above,
+#' fails the stream there with an error that gives the warning's message.
+#' The stream can't be interrupted from R there,
+#' a busy handler that is an R function, see [sqliteSetBusyHandler()], is not called,
+#' so that a locked database fails the statement,
+#' and the second row of parameters bound with [DBI::dbBind()] fails the stream,
+#' unlike parameters bound with [DBI::dbBindArrow()].
+#' A consumer that reads on R's main thread, such as `arrow::as_arrow_table()`, has none of these limits.
+#'
 #' @name sqlite-arrow
 #' @aliases arrow
 NULL

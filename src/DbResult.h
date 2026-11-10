@@ -43,6 +43,8 @@ public:
   bool ready() const;
   bool is_active() const;
   bool busy() const;
+  // Finalizes the statement, which needs no R; on any thread
+  void finalize_statement();
   void count_rethrown_unwind();
   int64_t rethrown_unwinds() const;
   // Counts the executions of the statement with new parameters:

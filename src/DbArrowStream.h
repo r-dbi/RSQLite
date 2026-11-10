@@ -31,4 +31,9 @@ bool db_arrow_stream_reads(
 // skip the destructors of the reading code.
 void db_arrow_stream_read_from_cpp(struct ArrowArrayStream* stream);
 
+// Drops the shares of results that streams let go of on threads other than
+// R's main thread, destroying the results nothing else holds; to be called on
+// R's main thread
+void db_arrow_release_deferred();
+
 #endif  // RSQLITE_DBARROWSTREAM_H

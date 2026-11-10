@@ -64,6 +64,8 @@ private:
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);
   ~SqliteResultImpl();
+  // Finalizes the statement early, on any thread
+  void finalize_statement();
 
 private:
   static sqlite3_stmt* prepare(sqlite3* conn, const std::string& sql);

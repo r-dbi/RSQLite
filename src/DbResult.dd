@@ -14,6 +14,7 @@ DbResult.o: \
   SqliteColumnDataSource.h \
   SqliteParamSource.h \
   SqliteResultImpl.h \
+  main_thread.h \
   pch.h \
   sqlite3-cpp.h \
   .Rconfig

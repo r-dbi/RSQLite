@@ -6,5 +6,6 @@ DbArrowStream.o: \
   DbResult.h \
   DbResultImplDecl.h \
   RSQLite.h \
+  main_thread.h \
   pch.h \
   .Rconfig

@@ -278,8 +278,11 @@ static const R_CallMethodDef CallEntries[] = {
 };
 }
 
+void rsqlite_init_main_thread(DllInfo* dll);
+
 extern "C" attribute_visible void R_init_RSQLite(DllInfo* dll){
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
+  rsqlite_init_main_thread(dll);
   R_forceSymbols(dll, TRUE);
 }

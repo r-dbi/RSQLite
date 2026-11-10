@@ -15,6 +15,7 @@ SqliteResultImpl.o: \
   SqliteResultImpl.cpp \
   SqliteResultImpl.h \
   integer64.h \
+  main_thread.h \
   pch.h \
   sqlite3-cpp.h \
   .Rconfig

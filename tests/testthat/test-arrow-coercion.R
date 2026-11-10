@@ -259,3 +259,41 @@ test_that("no warning without mixed types", {
   con <- local_con()
   expect_no_warning(as.data.frame(dbGetQueryArrow(con, "SELECT 1 AS a UNION ALL SELECT 2")))
 })
+
+test_that("a stream read on a worker thread fails with the text of the warning", {
+  # Which thread reads the stream is up to arrow
+  skip_on_cran()
+  skip_if_not_installed("arrow")
+  skip_if_not(arrow::arrow_with_dataset())
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (a, b)")
+  dbExecute(con, paste(
+    "WITH RECURSIVE s(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM s WHERE i < 300)",
+    "INSERT INTO t SELECT i, 'v' || i FROM s"
+  ))
+  # Two columns, two reasons and a truncated list of rows, all in the third
+  # chunk: the first one is read for the schema, on R's main thread
+  dbExecute(con, "UPDATE t SET a = 'x' WHERE rowid BETWEEN 201 AND 225")
+  dbExecute(con, "UPDATE t SET b = x'00' WHERE rowid = 250")
+  dbExecute(con, "UPDATE t SET b = 7 WHERE rowid IN (260, 270)")
+  sql <- "SELECT a, b FROM t"
+
+  # The warning on R's main thread, without cli and with plain bullets
+  local_mocked_bindings(has_cli = function() FALSE)
+  w <- coercion_warnings(as.data.frame(dbGetQueryArrow(con, sql, chunk_size = 100)))
+  expect_length(w, 1)
+  text <- gsub("\n• ", "\n* ", conditionMessage(w[[1]]), fixed = TRUE)
+
+  rs <- dbSendQueryArrow(con, sql)
+  withr::defer(if (dbIsValid(rs)) dbClearResult(rs))
+  reader <- arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 100))
+  expect_error(
+    arrow::Scanner$create(reader)$ToTable(),
+    paste0(text, " (an error instead of a warning"),
+    fixed = TRUE
+  )
+  # The stream goes with its reader
+  dbClearResult(rs)
+  rm(reader)
+  gc_until_stable()
+})

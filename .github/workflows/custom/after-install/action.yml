@@ -12,8 +12,10 @@ runs:
         }
       shell: Rscript {0}
 
-    # The Arrow test with real 1 GiB and 2 GiB column sizes peaks at about 2.5 GB of memory,
-    # so it runs only when RSQLITE_TEST_LARGE_ARROW is true.
+    # The Arrow tests with real column sizes of 1 and 2 GiB peak at about 2.5 GB each
+    # and release their memory before the next test;
+    # with them, the test process peaks at about 3.3 GB, in the ungated blob test of `test-blob.R`.
+    # They run only when RSQLITE_TEST_LARGE_ARROW is true.
     # The hosted runners of the jobs that call this action afford that.
     # The R-hub containers of rhub.yaml call no custom action, so the test stays off there.
     # A value set before this step, for instance in a matrix entry's `env`, wins.

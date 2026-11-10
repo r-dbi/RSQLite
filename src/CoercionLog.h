@@ -3,6 +3,7 @@
 
 #include <cpp11.hpp>
 #include <stdint.h>
+#include <string>
 #include <vector>
 
 // What happened to a value that was not of the type of its column
@@ -43,8 +44,13 @@ public:
   // first rows) and last (the last two rows, NULL unless rows were left out)
   cpp11::writable::list as_list() const;
 
+  // The entries as warn_coercion() in R words them without cli, joined by
+  // "; ", for a thread that can't call R; no R API is called
+  std::string format() const;
+
   static const char* format_column_type(int column_type);
   static const char* format_reason(COERCION_REASON reason);
+  static const char* format_outcome(COERCION_REASON reason);
 
 private:
   std::vector<Entry> entries;

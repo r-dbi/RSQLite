@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "DbConnection.h"
+#include "main_thread.h"
 
 DbConnection::DbConnection(
   const std::string& path,
@@ -115,6 +116,11 @@ void DbConnection::release_callback_data() {
 }
 
 int DbConnection::busy_callback_helper(void* data, int num) {
+  if (!rsqlite_on_main_thread()) {
+    // An Arrow stream read on another thread can't call R: give up, the step
+    // fails with SQLITE_BUSY
+    return 0;
+  }
   SEXP r_callback = reinterpret_cast<SEXP>(data);
   cpp11::function rfun = r_callback;
   int ret = cpp11::as_integers(rfun(num))[0];

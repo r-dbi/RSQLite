@@ -11,3 +11,22 @@ runs:
           cat('RCMDCHECK_ERROR_ON="warning"\n', file = Sys.getenv("GITHUB_ENV"), append = TRUE)
         }
       shell: Rscript {0}
+
+    # Patched roxygen2, for the sentence gap in man/. This runs before the
+    # Roxygenize step, which is why it lives in this hook and not in the shared
+    # workflow. The step must not stop the job: a failed install costs the
+    # documentation step and nothing else. The outcome goes into the job's
+    # environment because the workflow reads it to skip Roxygenize and to report
+    # the failure; a composite action cannot hand a step outcome to its caller
+    # otherwise.
+    - name: Install roxygen2 from the fork branch
+      id: roxygen2-fork
+      continue-on-error: true
+      uses: ./.github/workflows/roxygen2-fork
+
+    - name: Record the outcome of the roxygen2 fork install
+      if: always()
+      env:
+        OUTCOME: ${{ steps.roxygen2-fork.outcome }}
+      run: echo "ROXYGEN2_FORK_OUTCOME=${OUTCOME}" >> "$GITHUB_ENV"
+      shell: bash

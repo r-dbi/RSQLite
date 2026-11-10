@@ -192,9 +192,13 @@ jobs:
         with:
           base: ${{ inputs.ref || github.head_ref }}
 
+      # The patched roxygen2 is installed by the custom after-install hook,
+      # which sets ROXYGEN2_FORK_OUTCOME. Documenting with stock roxygen2 would
+      # drop the sentence gap from every man/ file, so skip rather than do that.
       - name: Roxygenize the documentation
         id: roxygenize
         continue-on-error: true
+        if: env.ROXYGEN2_FORK_OUTCOME != 'failure'
         uses: cynkra/cynkratemplate/.github/actions/roxygenize@main
 
       # After roxygenize, so a README rendering against the installed package
@@ -311,6 +315,7 @@ jobs:
           # how the job listing names it and the only handle on its number. This
           # stays here because only this workflow can read `steps.<id>.outcome`.
           checks: |
+            Run the repository-specific after-install steps|roxygen2 fork|${{ env.ROXYGEN2_FORK_OUTCOME }}
             Collect the R versions into a matrix|R versions matrix|${{ steps.versions-matrix.outcome }}
             Collect the suggested dependencies into a matrix|Suggested dependencies matrix|${{ steps.dep-suggests-matrix.outcome }}
             Style the R sources|Style|${{ steps.style.outcome }}

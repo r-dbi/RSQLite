@@ -801,8 +801,13 @@ test_that("data frame fetches convert every type that can be requested", {
 
   # One array, and an array per two rows
   rs <- dbSendQueryArrow(con, sql, schema = types)
+  info <- dbColumnInfo(rs)
   one <- suppressWarnings(dbFetch(rs))
   dbClearResult(rs)
+  # dbColumnInfo() names the R types like the default path
+  expect_identical(info$name, names(types))
+  expect_identical(info$type, unname(vapply(one, arrow_column_type_name, "")))
+  expect_identical(info$type[c(1, 9, 14, 17, 19, 21)], c("logical", "integer", "list", "POSIXct", "hms", "logical"))
   rs <- dbSendQueryArrow(con, sql, schema = types)
   several <- suppressWarnings(arrow_fetch_df(rs@result, -1, chunk_size = 2))
   dbClearResult(rs)

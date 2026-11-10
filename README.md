@@ -31,7 +31,7 @@ RSQLite aims to:
   by compiling the included SQLite sources into the package rather than linking a SQLite from the system.
   The only system library `configure` looks for is libcurl, and only for the optional HTTP VFS.
 - Make the SQLite-specific features that DBI does not cover available,
-  such as loadable extensions through `initExtension()`,
+  such as loadable extensions through [`initExtension()`](https://rsqlite.r-dbi.org/reference/initExtension.html),
   and read-only access to remote database files when libcurl is present at build time.
 
 It is explicitly not trying to:
@@ -43,7 +43,7 @@ It is explicitly not trying to:
 - Make up for what SQLite does not do.
   It is a single-user, light-weight engine covering a subset of SQL 92, and RSQLite exposes it as it is.
 - Keep the pre-DBI API alive.
-  Functions such as `dbGetPreparedQuery()`, `sqliteBuildTableDefinition()` and `make.db.names()` remain only as deprecated shims for existing code.
+  Functions such as [`dbGetPreparedQuery()`](https://rsqlite.r-dbi.org/reference/query-dep.html), [`sqliteBuildTableDefinition()`](https://rsqlite.r-dbi.org/reference/sqliteBuildTableDefinition.html) and `make.db.names()` remain only as deprecated shims for existing code.
 
 ## Installation
 

@@ -39,6 +39,7 @@ jobs:
 
     outputs:
       tarball: ${{ steps.build.outputs.tarball }}
+      uploaded: ${{ steps.upload.outputs.uploaded }}
 
     env:
       QUEUES: ${{ inputs.queues || 'R-devel' }}
@@ -81,20 +82,36 @@ jobs:
           echo "tarball=$tarball" | tee -a "$GITHUB_OUTPUT"
         shell: bash
 
+      # `uploaded` names the queues that took the tarball, also when a later one failed.
       - name: Upload the source package to win-builder
+        id: upload
         env:
           TARBALL: ${{ steps.build.outputs.tarball }}
         run: |
+          uploaded=""
+          failed=""
           for queue in $QUEUES; do
-            curl --fail --silent --show-error --retry 3 -T "$TARBALL" "ftp://win-builder.r-project.org/$queue/"
+            if ! curl --fail --silent --show-error --retry 3 -T "$TARBALL" "ftp://win-builder.r-project.org/$queue/"; then
+              echo "::error::Uploading $TARBALL to $queue failed; the queues after it were not tried."
+              failed="$queue"
+              break
+            fi
             echo "Uploaded $TARBALL to $queue."
+            uploaded="${uploaded:+$uploaded }$queue"
           done
+          echo "uploaded=$uploaded" >> "$GITHUB_OUTPUT"
           {
             echo "### win-builder"
             echo
-            echo "Uploaded \`$TARBALL\` to: $QUEUES."
-            echo "The results are mailed to the maintainer in \`DESCRIPTION\`."
+            if [ -n "$uploaded" ]; then
+              echo "Uploaded \`$TARBALL\` to: $uploaded."
+              echo "The results are mailed to the maintainer in \`DESCRIPTION\`."
+            fi
+            if [ -n "$failed" ]; then
+              echo "Uploading to $failed failed, and the queues after it were not tried."
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
+          [ -z "$failed" ]
         shell: bash
 
       - name: Keep the uploaded source package
@@ -131,6 +148,6 @@ jobs:
           results: |
             upload=${{ needs.winbuilder.result }}
           details: |
-            Uploaded `${{ needs.winbuilder.outputs.tarball }}` to: ${{ inputs.queues }}.
-            win-builder mails its results to the maintainer in `DESCRIPTION`, 15 to 30 minutes after the upload.
+            ${{ needs.winbuilder.outputs.uploaded && format('Uploaded `{0}` to: {1}.', needs.winbuilder.outputs.tarball, needs.winbuilder.outputs.uploaded) || 'Nothing was uploaded to win-builder.' }}
+            ${{ needs.winbuilder.outputs.uploaded && 'win-builder mails its results to the maintainer in `DESCRIPTION`, 15 to 30 minutes after the upload.' || '' }}
           token: ${{ github.token }}

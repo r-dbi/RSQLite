@@ -24,7 +24,8 @@
 #
 # <package dir> defaults to the root of this repository; it is a checkout whose `origin` the tag is pushed to,
 # with a Git identity for the annotated tag.
-# With GITHUB_OUTPUT set, the script writes `tag`, and on a real run `release-id` and `release-url` once the draft is written.
+# With GITHUB_OUTPUT set, the script writes `tag`, and on a real run `release-id` and `release-url` once the draft is written,
+# and `tagged`, the commit, once the tag is pushed.
 # Exit status: 0 on success, 1 when a check stops the run or a write fails, 2 on a usage error.
 #
 # Environment:
@@ -300,5 +301,6 @@ else
   git push origin "refs/tags/$tag" 2>"$work/git.err" || push_failed
 fi
 endgroup
+output tagged "$commit"
 notice "Tagged" "Tagged $commit as $tag."
 summary "### Tag" "" "Tagged \`$commit\` as \`$tag\`." ""

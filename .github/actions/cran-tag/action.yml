@@ -26,6 +26,9 @@ outputs:
   release-url:
     description: "The draft release's URL, once a real run has written it"
     value: ${{ steps.run.outputs.release-url }}
+  tagged:
+    description: "The commit the tag points to, once a real run has pushed it"
+    value: ${{ steps.run.outputs.tagged }}
 
 runs:
   using: "composite"

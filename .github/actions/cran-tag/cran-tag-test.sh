@@ -226,9 +226,10 @@ is "for the tag, targeting the commit, titled after the version" "$(grep -v '^-F
 is "with the section as notes, and the marker" "$(cat "$SCRATCH/notes")" "$NOTES"
 is "the tag is on origin, at the commit" "$(remote_tag)" "$HEAD"
 is "annotated with the section" "$(remote_tag_message)" "$MESSAGE"
-is "the outputs name the tag and the draft" "$(cat "$SCRATCH/output")" "tag=v2.0.0
+is "the outputs name the tag, the draft and the tagged commit" "$(cat "$SCRATCH/output")" "tag=v2.0.0
 release-id=77
-release-url=$NEW"
+release-url=$NEW
+tagged=$HEAD"
 summary=$(cat "$SUMMARY")
 has "the report links the draft" "$summary" "Created the draft release [RSQLite 2.0.0]($NEW), for the tag \`v2.0.0\` at \`$HEAD\`."
 has "and names the tag" "$summary" "Tagged \`$HEAD\` as \`v2.0.0\`."

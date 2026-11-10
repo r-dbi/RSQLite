@@ -229,6 +229,7 @@ jobs:
       release-id: ${{ steps.tag.outputs.release-id }}
       release-url: ${{ steps.tag.outputs.release-url }}
       tag: ${{ steps.tag.outputs.tag }}
+      tagged: ${{ steps.tag.outputs.tagged }}
 
     steps:
       # The same commit as the submission: both jobs check out `github.sha`.
@@ -447,7 +448,7 @@ jobs:
           details: |
             ${{ inputs.dry-run && '**Dry run:** nothing was tagged, drafted or sent to CRAN.' || '**Real run:** if the upload succeeded, CRAN has e-mailed the maintainer; the submission counts once the link in that e-mail is followed.' }}
 
-            - Tarball: `${{ needs.cran-submission.outputs.artifact }}.tar.gz`, sha256 `${{ needs.cran-submission.outputs.sha256 }}`
-            - Tag: `${{ needs.tag.outputs.tag }}`
+            - Tarball: ${{ needs.cran-submission.outputs.sha256 && format('`{0}.tar.gz`, sha256 `{1}`', needs.cran-submission.outputs.artifact, needs.cran-submission.outputs.sha256) || 'none built' }}
+            - Tag: ${{ needs.tag.outputs.tagged && format('`{0}` at `{1}`', needs.tag.outputs.tag, needs.tag.outputs.tagged) || 'none written' }}
             - Draft release: ${{ needs.tag.outputs.release-url || 'none written' }}
           token: ${{ github.token }}

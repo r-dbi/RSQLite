@@ -201,6 +201,25 @@ test_that("dbAppendTable() through Arrow writes difftime in its own units", {
   expect_identical(out$w, c(1, 2, NA, 3))
 })
 
+test_that("dbAppendTable() through Arrow writes POSIXlt like POSIXct", {
+  df <- data.frame(id = 1:3)
+  df$ts <- as.POSIXct(c("2020-01-02 03:04:05.25", NA, "1960-06-07 08:09:10"), tz = "UTC")
+  df_lt <- df
+  df_lt$ts <- as.POSIXlt(df$ts)
+
+  con_default <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con_default))
+  con <- local_arrow_con()
+  for (conn in list(con_default, con)) {
+    dbExecute(conn, "CREATE TABLE t (id INTEGER, ts REAL)")
+  }
+  # The default path can only write it as POSIXct
+  dbAppendTable(con_default, "t", df)
+  expect_identical(dbAppendTable(con, "t", df_lt), 3L)
+  expect_identical(dbReadTable(con, "t"), dbReadTable(con_default, "t"))
+  expect_identical(dbReadTable(con, "t")$ts, as.numeric(df$ts))
+})
+
 test_that("dbWriteTable() and row names work through Arrow", {
   con <- local_arrow_con()
   dbWriteTable(con, "mtcars", mtcars, row.names = TRUE)
@@ -256,13 +275,17 @@ test_that("data frames fetched in chunks through Arrow own their strings", {
 })
 
 # The data frames of a sequence of fetches, and the number of warnings of each
-# fetch; `chunk_size` sets the rows per Arrow array of a fetch through Arrow
-fetch_sequence <- function(con, sql, ns, chunk_size = NULL) {
+# fetch; `chunk_size` sets the rows per Arrow array of a fetch through Arrow.
+# `info` asks dbColumnInfo() before each fetch, which decides the types of the
+# next fetch on the default path, and pairs its answer with each data frame.
+# Only the warnings of the fetches are counted.
+fetch_sequence <- function(con, sql, ns, chunk_size = NULL, info = FALSE) {
   rs <- dbSendQuery(con, sql)
   on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
   warnings <- integer(length(ns))
   data <- lapply(seq_along(ns), function(i) {
-    withCallingHandlers(
+    column_info <- if (info) suppressWarnings(dbColumnInfo(rs))
+    df <- withCallingHandlers(
       if (is.null(chunk_size)) {
         dbFetch(rs, ns[[i]])
       } else {
@@ -273,6 +296,7 @@ fetch_sequence <- function(con, sql, ns, chunk_size = NULL) {
         invokeRestart("muffleWarning")
       }
     )
+    if (info) list(info = column_info, df = df) else df
   })
   list(data = data, warnings = warnings)
 }
@@ -311,17 +335,24 @@ test_that("each fetch through Arrow is typed like on the default path", {
     c(0, 1, 0, 2, 0, -1), c(3, 0, 1, 1, 1), c(-1, 0, 1)
   )
   for (ns in sequences) {
-    expected <- fetch_sequence(con, "SELECT * FROM t", ns)
-    info <- paste("n =", paste(ns, collapse = ", "))
-    expect_same_fetches(fetch_sequence(con_arrow, "SELECT * FROM t", ns), expected, ns, info)
-    # Several arrays per fetch
-    for (chunk_size in 1:2) {
+    for (with_info in c(FALSE, TRUE)) {
+      expected <- fetch_sequence(con, "SELECT * FROM t", ns, info = with_info)
+      info <- paste("n =", paste(ns, collapse = ", "), "dbColumnInfo():", with_info)
       expect_same_fetches(
-        fetch_sequence(con_arrow, "SELECT * FROM t", ns, chunk_size = chunk_size),
+        fetch_sequence(con_arrow, "SELECT * FROM t", ns, info = with_info),
         expected,
         ns,
-        paste(info, "chunk_size =", chunk_size)
+        info
       )
+      # Several arrays per fetch
+      for (chunk_size in 1:2) {
+        expect_same_fetches(
+          fetch_sequence(con_arrow, "SELECT * FROM t", ns, chunk_size = chunk_size, info = with_info),
+          expected,
+          ns,
+          paste(info, "chunk_size =", chunk_size)
+        )
+      }
     }
   }
   # The values of other storage classes are in columns x and b
@@ -486,6 +517,50 @@ test_that("the coercion warning counts the rows of each binding through Arrow", 
   expect_length(actual$warnings, 2)
   expect_equal(actual$warnings[[1]]$coercions[[1]]$values[[1]]$rows, 1)
   expect_equal(actual$warnings[[2]]$coercions[[1]]$values[[1]]$rows, 3)
+})
+
+test_that("dbColumnInfo() through Arrow answers like the data frames", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con))
+  con_arrow <- local_arrow_con()
+  for (conn in list(con, con_arrow)) {
+    dbExecute(conn, "CREATE TABLE t (a, b TEXT)")
+    dbExecute(conn, "INSERT INTO t VALUES (1, 'x'), (2.5, 'y'), ('z', NULL)")
+    dbExecute(conn, "CREATE TABLE u (a INTEGER)")
+    dbExecute(conn, "INSERT INTO u VALUES (NULL), ('12abc')")
+    dbExecute(conn, "CREATE TABLE v (a TEXT)")
+    dbExecute(conn, "INSERT INTO v VALUES ('x'), (x'410042'), (x'ff')")
+  }
+  steps <- function(conn, sql, steps) {
+    rs <- dbSendQuery(conn, sql)
+    on.exit(dbClearResult(rs))
+    lapply(steps, function(n) suppressWarnings(if (is.na(n)) dbColumnInfo(rs) else dbFetch(rs, n)))
+  }
+
+  # The type of the fetched rows, not of the next row
+  out <- steps(con_arrow, "SELECT * FROM t", c(2, NA, -1))
+  expect_identical(out[[2]]$type, c("double", "character"))
+  expect_identical(out, steps(con, "SELECT * FROM t", c(2, NA, -1)))
+
+  # Asked before the first fetch, it decides the types like on the default path
+  out <- steps(con_arrow, "SELECT * FROM u", c(NA, -1))
+  expect_identical(out[[2]]$a, c(NA, 12L))
+  expect_identical(out, steps(con, "SELECT * FROM u", c(NA, -1)))
+
+  # It leaves the waiting row as it is: the blobs are not converted to text
+  out <- steps(con_arrow, "SELECT * FROM v", c(NA, 1, NA, -1))
+  expect_identical(out[[4]]$a, c(NA_character_, NA_character_))
+  expect_identical(out[c(1, 3)], steps(con, "SELECT * FROM v", c(NA, 1, NA, -1))[c(1, 3)])
+
+  # Before the parameters are bound, and for a statement
+  for (sql in c("SELECT a FROM u WHERE a = ?", "UPDATE u SET a = 1")) {
+    rs <- dbSendQuery(con, sql)
+    expected <- dbColumnInfo(rs)
+    dbClearResult(rs)
+    rs <- dbSendQuery(con_arrow, sql)
+    expect_identical(dbColumnInfo(rs), expected)
+    dbClearResult(rs)
+  }
 })
 
 test_that("a NULL-first column is typed by its first value through Arrow", {

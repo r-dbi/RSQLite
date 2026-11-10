@@ -151,6 +151,35 @@ arrow_df_column_ptype <- function(format) {
   ptype
 }
 
+# dbColumnInfo() through Arrow: the types of a fetch of no rows, named like
+# the default path names them. Like the peek of the default path, the fetch
+# reads the next row without converting it, and the next fetch starts from the
+# types it decides.
+arrow_column_info <- function(res) {
+  fetched <- result_fetch_arrow_df(res@ptr, 0, ARROW_DF_CHUNK_SIZE)
+  formats <- fetched$formats
+  type <- character(length(formats))
+  for (j in seq_along(formats)) {
+    type[[j]] <- switch(formats[[j]],
+      n = "logical",
+      # The default path names the type of storage of integer64
+      l = if (fetched$wide_ints[[j]]) "double" else "integer",
+      g = if (nzchar(fetched$seconds[[j]])) fetched$seconds[[j]] else "double",
+      u = "character",
+      z = "list",
+      tdD = "Date",
+      ttu = "hms",
+      "tsu:UTC" = "POSIXct",
+      stopc("Internal error: unexpected Arrow format ", formats[[j]])
+    )
+  }
+  structure(
+    list(name = fetched$names, type = type),
+    row.names = .set_row_names(length(type)),
+    class = "data.frame"
+  )
+}
+
 # dbAppendTable() through Arrow: the data frame is written as an Arrow stream
 arrow_append_df <- function(conn, name, value) {
   value <- arrow_prepare_df(value)
@@ -163,6 +192,11 @@ arrow_append_df <- function(conn, name, value) {
 arrow_prepare_df <- function(value) {
   value <- factor_to_string(value, warn = TRUE)
 
+  # A POSIXlt column is a list, which the default path can't bind:
+  # it is written as POSIXct, before the check of the lists
+  is_posixlt <- vlapply(value, inherits, "POSIXlt")
+  value[is_posixlt] <- lapply(value[is_posixlt], as.POSIXct)
+
   is_list <- vlapply(value, function(x) is.list(x) && !is.data.frame(x) && !inherits(x, "blob"))
   value[is_list] <- lapply(value[is_list], function(x) {
     x <- unclass(x)
@@ -171,9 +205,6 @@ arrow_prepare_df <- function(value) {
     }
     blob::as_blob(x)
   })
-
-  is_posixlt <- vlapply(value, inherits, "POSIXlt")
-  value[is_posixlt] <- lapply(value[is_posixlt], as.POSIXct)
 
   # nanoarrow would write a duration in seconds, and times, timestamps and
   # dates in whole units, microseconds or days

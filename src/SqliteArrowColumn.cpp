@@ -8,6 +8,7 @@
 #include <cfloat>
 #include <climits>
 #include <cmath>
+#include <cstring>
 
 using namespace cpp11::literals;
 
@@ -109,6 +110,24 @@ ArrowTarget ArrowTarget::from_schema(
   return target;
 }
 
+// Whether `size` bytes of text are valid UTF-8 without NUL bytes.
+// Most text is ASCII: eight bytes at a time, a word whose bytes are all in
+// 1..127 needs no further check, the rest goes to rsqlite_is_utf8_string().
+static bool is_utf8_text(const char* text, size_t size) {
+  const uint64_t ones = UINT64_C(0x0101010101010101);
+  const uint64_t highs = UINT64_C(0x8080808080808080);
+  size_t i = 0;
+  for (; i + 8 <= size; i += 8) {
+    uint64_t word;
+    memcpy(&word, text + i, 8);
+    // A NUL byte borrows in `word - ones`, a byte above 127 has its high bit
+    if (((word - ones) | word) & highs) {
+      break;
+    }
+  }
+  return rsqlite_is_utf8_string(text + i, size - i);
+}
+
 SqliteArrowColumn::SqliteArrowColumn(
   sqlite3_stmt* stmt_,
   const int j_,
@@ -125,6 +144,8 @@ SqliteArrowColumn::SqliteArrowColumn(
       unit(NANOARROW_TIME_UNIT_MICRO),
       timezone("UTC"),
       frozen(false),
+      requested(false),
+      data_frame(false),
       array_kind(AK_UNDECIDED),
       pending_nulls(0),
       wide_ints(false),
@@ -138,6 +159,7 @@ SqliteArrowColumn::SqliteArrowColumn(
     unit = target.unit;
     timezone = target.timezone;
     frozen = true;
+    requested = true;
     return;
   }
   if (with_alt_types) {
@@ -154,6 +176,17 @@ bool SqliteArrowColumn::decided() const {
 
 bool SqliteArrowColumn::is_frozen() const {
   return frozen;
+}
+
+ARROW_KIND SqliteArrowColumn::get_kind() const {
+  return kind;
+}
+
+void SqliteArrowColumn::carry_over(ARROW_KIND kind_, bool wide_ints_) {
+  if (kind_ != AK_UNDECIDED && !requested) {
+    kind = kind_;
+  }
+  wide_ints = wide_ints || wide_ints_;
 }
 
 void SqliteArrowColumn::decide_from_row(bool has_row) {
@@ -201,8 +234,35 @@ void SqliteArrowColumn::reopen() {
   }
 }
 
+void SqliteArrowColumn::set_data_frame(bool data_frame_) {
+  data_frame = data_frame_;
+}
+
+const char* SqliteArrowColumn::seconds_class() const {
+  if (storage_kind() != AK_DOUBLE) {
+    return "";
+  }
+  switch (kind) {
+  case AK_TIME64:
+    return "hms";
+  case AK_TIMESTAMP:
+    return "POSIXct";
+  default:
+    return "";
+  }
+}
+
+ARROW_KIND SqliteArrowColumn::storage_kind() const {
+  // Decided from `extended_types`, these are a time64[us] or a timestamp[us]:
+  // a requested type is built as requested
+  if (data_frame && !requested && (kind == AK_TIME64 || kind == AK_TIMESTAMP)) {
+    return AK_DOUBLE;
+  }
+  return kind;
+}
+
 void SqliteArrowColumn::set_schema(struct ArrowSchema* schema) const {
-  set_type(schema, kind);
+  set_type(schema, storage_kind());
   check_arrow(ArrowSchemaSetName(schema, name.c_str()), "Can't set Arrow name");
 }
 
@@ -387,23 +447,24 @@ void SqliteArrowColumn::conform_chunk(
   struct ArrowArray* chunk,
   ARROW_KIND chunk_kind
 ) const {
-  if (chunk_kind == kind) {
+  const ARROW_KIND target = storage_kind();
+  if (chunk_kind == target) {
     return;
   }
 
   nanoarrow::UniqueArray out;
-  init_array(out.get(), kind);
+  init_array(out.get(), target);
   if (chunk_kind == AK_NA) {
     check_arrow(
       ArrowArrayAppendNull(out.get(), chunk->length),
       "Can't append to Arrow array"
     );
-  } else if (chunk_kind == AK_INT64 && kind == AK_DOUBLE) {
+  } else if (chunk_kind == AK_INT64 && target == AK_DOUBLE) {
     append_ints_as_doubles(out.get(), chunk);
   } else {
     throw std::runtime_error(
       std::string("Internal error: can't convert an Arrow chunk of type ") +
-      format_kind(chunk_kind) + " to " + format_kind(kind)
+      format_kind(chunk_kind) + " to " + format_kind(target)
     );
   }
 
@@ -440,6 +501,10 @@ cpp11::sexp SqliteArrowColumn::coercions() {
   );
   log.clear();
   return out;
+}
+
+void SqliteArrowColumn::discard_coercions() {
+  log.clear();
 }
 
 // Privates ////////////////////////////////////////////////////////////////////
@@ -502,8 +567,8 @@ ARROW_KIND SqliteArrowColumn::kind_from_decltype() const {
 
 void SqliteArrowColumn::init_array() {
   array.reset();
-  init_array(array.get(), kind);
-  array_kind = kind;
+  array_kind = storage_kind();
+  init_array(array.get(), array_kind);
 }
 
 void SqliteArrowColumn::init_array(
@@ -784,18 +849,28 @@ bool SqliteArrowColumn::in_range(int64_t value) const {
 void SqliteArrowColumn::append_string(int column_type, int64_t row) {
   fetch_bytes();
   const char* text = static_cast<const char*>(value_data);
-  if (column_type == SQLITE_BLOB) {
-    // A blob keeps all its bytes, but only well-formed UTF-8 without NUL
-    // bytes is text
-    if (!rsqlite_is_utf8_string(text, static_cast<size_t>(value_size))) {
-      log.record(column_type, CR_INVALID_UTF8, row);
-      append_null();
-      return;
+  int64_t size = value_size;
+  if (data_frame && column_type == SQLITE_TEXT) {
+    // R strings end at the first NUL, like those of the default path,
+    // which passes text through unchecked; an Arrow stream checks it
+    const void* nul = memchr(text, '\0', static_cast<size_t>(size));
+    if (nul != NULL) {
+      size = static_cast<const char*>(nul) - text;
     }
+  } else if ((column_type == SQLITE_TEXT || column_type == SQLITE_BLOB) &&
+             !is_utf8_text(text, static_cast<size_t>(size))) {
+    // SQLite doesn't enforce UTF-8 for text, and a blob keeps all its bytes:
+    // only well-formed UTF-8 without NUL bytes is text.
+    // Numbers convert to ASCII.
+    log.record(column_type, CR_INVALID_UTF8, row);
+    append_null();
+    return;
+  }
+  if (column_type == SQLITE_BLOB) {
     log.record(column_type, CR_CONVERTED, row);
   }
   check_arrow(
-    ArrowArrayAppendString(array.get(), arrow_string_view(text, value_size)),
+    ArrowArrayAppendString(array.get(), arrow_string_view(text, size)),
     "Can't append to Arrow array"
   );
 }
@@ -914,6 +989,24 @@ bool SqliteArrowColumn::parse_micros(int column_type, int64_t& micros) const {
 }
 
 void SqliteArrowColumn::append_time(int column_type, int64_t row) {
+  if (array_kind == AK_DOUBLE) {
+    // For a data frame, unless the type was requested: the seconds of the
+    // default path, all of them
+    bool ok;
+    double seconds = (kind == AK_TIMESTAMP) ? source.parse_datetime_local(ok)
+                                            : source.parse_time(ok);
+    if (!ok || ISNAN(seconds)) {
+      log.record(column_type, CR_UNPARSABLE, row);
+      append_null();
+      return;
+    }
+    check_arrow(
+      ArrowArrayAppendDouble(array.get(), seconds),
+      "Can't append to Arrow array"
+    );
+    return;
+  }
+
   const int64_t per_second = ticks_per_second(unit);
   int64_t value = 0;
   bool fits;

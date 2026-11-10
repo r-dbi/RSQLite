@@ -4,9 +4,37 @@
 #include "DbResultImpl.h"
 #include "DbArrowStream.h"
 
+namespace {
+
+// Marks a result busy while one of its fetches or binds runs.
+// R code can run meanwhile, a handler of a warning raised by the fetch, and
+// must not use the statement under it: a step or a bind would free the values
+// that the fetch is reading.
+// The flag is reset by the destructor, also when a C++ exception leaves the
+// fetch; R errors raised through cpp11 arrive as such exceptions.
+class BusyScope : boost::noncopyable {
+  bool& busy;
+
+public:
+  explicit BusyScope(bool& busy_) : busy(busy_) {
+    if (busy) {
+      throw std::runtime_error(
+        "Can't use a result while one of its fetches or binds is running, "
+        "as from a handler of a warning that it raised."
+      );
+    }
+    busy = true;
+  }
+  ~BusyScope() {
+    busy = false;
+  }
+};
+
+}  // namespace
+
 // Construction ////////////////////////////////////////////////////////////////
 
-DbResult::DbResult(const DbConnectionPtr& pConn) : pConn_(pConn) {
+DbResult::DbResult(const DbConnectionPtr& pConn) : pConn_(pConn), busy_(false) {
   pConn_->check_connection();
 
   // subclass constructor can throw, the destructor will remove the
@@ -36,6 +64,10 @@ bool DbResult::is_active() const {
   return pConn_->is_current_result(this);
 }
 
+bool DbResult::busy() const {
+  return busy_;
+}
+
 int64_t DbResult::executions() const {
   return impl->executions();
 }
@@ -49,11 +81,13 @@ int DbResult::n_rows_affected() {
 }
 
 void DbResult::bind(const cpp11::list& params) {
+  BusyScope busy(busy_);
   validate_params(params);
   impl->bind(params);
 }
 
 cpp11::list DbResult::fetch(const int n_max) {
+  BusyScope busy(busy_);
   if (!is_active()) {
     cpp11::stop("Inactive result set");
   }
@@ -62,6 +96,7 @@ cpp11::list DbResult::fetch(const int n_max) {
 }
 
 cpp11::list DbResult::get_column_info() {
+  BusyScope busy(busy_);
   cpp11::writable::list out = impl->get_column_info();
 
   out.attr("row.names") = cpp11::integers({ NA_INTEGER, -Rf_length(out[0]) });
@@ -77,7 +112,8 @@ void DbResult::close() {
   }
 }
 
-cpp11::strings DbResult::get_column_names() const {
+cpp11::strings DbResult::get_column_names() {
+  BusyScope busy(busy_);
   return impl->get_column_names();
 }
 
@@ -87,6 +123,7 @@ void DbResult::set_arrow_schema(
   const struct ArrowSchema* schema,
   const std::vector<int>& positions
 ) {
+  BusyScope busy(busy_);
   if (!is_active()) {
     throw std::runtime_error("Inactive result set");
   }
@@ -99,23 +136,26 @@ void DbResult::set_arrow_schema(
 // connection, see db_arrow_stream_init()
 
 void DbResult::arrow_schema(struct ArrowSchema* out, int64_t infer_rows) {
+  BusyScope busy(busy_);
   impl->arrow_schema(out, infer_rows);
 }
 
 int64_t DbResult::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
+  BusyScope busy(busy_);
   return impl->fetch_arrow(out, n_max);
 }
 
 int64_t DbResult::fetch_arrow_df(
   struct ArrowArrayStream* out,
-  std::vector<bool>& wide_ints,
+  ArrowDfColumns& columns,
   int64_t n_max,
   int64_t chunk_size
 ) {
+  BusyScope busy(busy_);
   nanoarrow::UniqueSchema schema;
   std::vector<nanoarrow::UniqueArray> chunks;
   int64_t n =
-    impl->fetch_arrow_df(schema.get(), chunks, wide_ints, n_max, chunk_size);
+    impl->fetch_arrow_df(schema.get(), chunks, columns, n_max, chunk_size);
   db_arrow_buffered_stream_init(out, schema, chunks);
   return n;
 }
@@ -124,6 +164,7 @@ void DbResult::bind_arrow(
   struct ArrowArrayStream* stream,
   const std::vector<int>& param_indexes
 ) {
+  BusyScope busy(busy_);
   // The stream would hold a share of the result that keeps it as parameters,
   // and could never be read: the new execution invalidates it
   if (db_arrow_stream_reads(stream, this)) {

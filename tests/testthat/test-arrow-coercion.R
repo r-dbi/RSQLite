@@ -127,6 +127,61 @@ test_that("values in a column of the null type are reported as dropped", {
   }
 })
 
+test_that("a data frame fetch through Arrow that exits on its warning leaves the types open", {
+  # The default path, then the Arrow path
+  rest <- lapply(c(FALSE, TRUE), function(arrow) {
+    con <- local_con(arrow = arrow)
+    dbExecute(con, "CREATE TABLE t (x, y)")
+    dbExecute(con, "INSERT INTO t VALUES (1, NULL), ('a', NULL), (2, 5), (3, 'z')")
+    rs <- dbSendQuery(con, "SELECT * FROM t")
+    # The first fetch warns about x, y has seen only NULL
+    expect_equal(tryCatch(dbFetch(rs, 2), warning = function(w) "exited"), "exited")
+    rest <- suppressWarnings(dbFetch(rs))
+    dbClearResult(rs)
+    rest
+  })
+  expect_identical(rest[[2]], rest[[1]])
+  expect_identical(rest[[2]]$y, c(5L, 0L))
+})
+
+test_that("a schema request that exits on its warning keeps the first chunk", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1), ('a'), (2), (3), (4)")
+  rs <- dbSendQueryArrow(con, "SELECT x FROM t")
+  stream <- dbFetchArrow(rs, chunk_size = 2)
+
+  # The first chunk is fetched for the schema and warns about row 2
+  expect_equal(tryCatch(stream$get_schema(), warning = function(w) "exited"), "exited")
+  expect_identical(dbGetRowCount(rs), 0L)
+  # The retry returns the schema without warning again, and all rows follow
+  expect_no_warning(schema <- stream$get_schema())
+  expect_identical(schema$children$x$format, "l")
+  expect_no_warning(df <- as.data.frame(stream))
+  expect_equal(df$x, c(1, 0, 2, 3, 4))
+  dbClearResult(rs)
+})
+
+test_that("the values of a failed fetch are not reported by the next one", {
+  for (arrow in c(FALSE, TRUE)) {
+    con <- local_con(arrow = arrow)
+    dbExecute(con, "CREATE TABLE t (i, x)")
+    dbExecute(con, "INSERT INTO t VALUES (1, 1), (2, 'a'), (3, 2), (4, NULL), (5, 3), (6, 4)")
+    # Row 4 fails with an integer overflow after row 2 has been logged
+    sql <- "SELECT CASE WHEN i = 4 THEN abs(-9223372036854775804 - i) ELSE x END AS x FROM t"
+    rs <- dbSendQuery(con, sql)
+    # SQLite decides what a fetch after the error reads, here no string
+    if (arrow) {
+      expect_error(dbFetch(rs, 10), "integer overflow")
+      expect_no_warning(dbFetch(rs, 2))
+    } else {
+      expect_error(dbFetchArrowChunk(rs, chunk_size = 10), "integer overflow")
+      expect_no_warning(dbFetchArrowChunk(rs, chunk_size = 2))
+    }
+    dbClearResult(rs)
+  }
+})
+
 test_that("long lists of rows are truncated", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x)")
@@ -143,6 +198,29 @@ test_that("long lists of rows are truncated", {
     conditionMessage(w[[1]]),
     "30 string values converted \\(rows 2, 3, 4, .*, 18, 19, \\.\\.\\., 30, and 31\\)"
   )
+})
+
+test_that("large row numbers are printed in full", {
+  con <- local_con()
+  sql <- paste(
+    "WITH RECURSIVE cnt(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM cnt WHERE i < 100000)",
+    "SELECT CASE WHEN i = 100000 THEN 'x' ELSE i END AS a FROM cnt"
+  )
+  w <- coercion_warnings(as.data.frame(dbGetQueryArrow(con, sql)))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values[[1]]
+  expect_identical(values$rows, 100000)
+  expect_match(conditionMessage(w[[1]]), "1 string value converted (row 100000)", fixed = TRUE)
+
+  # A truncated list, with and without cli
+  values <- list(count = 30, rows = (1:20) * 1e5, last = c(29e5, 3e6))
+  for (cli in c(TRUE, FALSE)) {
+    local_mocked_bindings(has_cli = function() cli)
+    expect_match(
+      format_coercion_rows(values),
+      "^rows 100000, 200000, 300000, .*, 1800000, .{1,3}, 2900000, and 3000000$"
+    )
+  }
 })
 
 test_that("a blob in a text column is text only if it is valid UTF-8", {

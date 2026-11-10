@@ -604,8 +604,11 @@ test_that("data frame fetches through Arrow keep the requested types", {
   dbClearResult(rs)
   # The arrays behind such a fetch
   rs <- dbSendQueryArrow(con, sql, schema = schema)
-  fetched <- suppressWarnings(result_fetch_arrow_df(rs@result@ptr, -1, 1))
-  expect_equal(chunk_lengths(arrow_validated(fetched$stream)), c(1, 1, 1))
+  fetched <- result_fetch_arrow_df(rs@result@ptr, -1, 1)
+  expect_equal(fetched$lengths, c(1, 1, 1))
+  for (array in fetched$arrays) {
+    arrow_validated(array)
+  }
   dbClearResult(rs)
 
   # Like the default path, a 64-bit integer keeps a column as integer64 for

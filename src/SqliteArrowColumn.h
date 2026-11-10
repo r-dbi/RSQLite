@@ -19,9 +19,14 @@
 // An Arrow stream fixes the type with its first chunk, its schema is a
 // contract. A data frame fetch keeps it open, like the default path does:
 // columns stay undecided while they see only NULL, integers widen to double,
-// and the null type is decided again by the next fetch.
+// and the null type is decided again by the next fetch. It also stores times
+// and timestamps as doubles in seconds, which keep the default path's
+// precision and range, where an Arrow stream has microseconds, and ends text
+// at its first NUL without checking it for UTF-8, as the default path does.
 // A type requested up front, see ArrowTarget, skips the decision and is final
-// for streams and data frame fetches alike.
+// for streams and data frame fetches alike: a data frame fetch builds arrays
+// of that type, also for times and timestamps, and carries no type over to it
+// from an earlier execution.
 enum ARROW_KIND {
   AK_UNDECIDED,
   AK_NA,
@@ -78,6 +83,10 @@ class SqliteArrowColumn {
   // Set when the schema has been handed out or the type was requested:
   // the kind is final from then on
   bool frozen;
+  // Set when the type was requested
+  bool requested;
+  // Set while the column builds arrays for a data frame fetch
+  bool data_frame;
 
   // Child array of the chunk under construction, and its type: the null type
   // for an undecided column whose chunk ends while it is open
@@ -113,6 +122,11 @@ public:
 public:
   bool decided() const;
   bool is_frozen() const;
+  ARROW_KIND get_kind() const;
+  // Starts a data frame fetch of a new execution from the type and the 64-bit
+  // flag of the last one, like the default path; an undecided type keeps the
+  // decision from the first row, a requested type is kept
+  void carry_over(ARROW_KIND kind_, bool wide_ints_);
   // Decides the kind from the value of the current row, if there is one
   void decide_from_row(bool has_row);
   // Types the column from the value read by read_row() for a data frame
@@ -124,6 +138,11 @@ public:
   void freeze();
   // Lets the next data frame fetch decide a column of the null type again
   void reopen();
+  // Selects the arrays of a data frame fetch or of an Arrow stream
+  void set_data_frame(bool data_frame_);
+  // For a data frame fetch: the R class of a column of times or timestamps,
+  // which are stored as doubles in seconds, or an empty string
+  const char* seconds_class() const;
 
   void set_schema(struct ArrowSchema* schema) const;
   bool wide_integers() const;
@@ -157,6 +176,8 @@ public:
   // as an R list with the column name, its current type and the entries of
   // the log, which is cleared; NULL if there were none
   cpp11::sexp coercions();
+  // Clears the log without reporting it
+  void discard_coercions();
 
 private:
   static ARROW_KIND kind_from_column_type(int column_type);
@@ -164,6 +185,9 @@ private:
   void note_integer(int64_t value);
   ARROW_KIND kind_from_decltype() const;
 
+  // The type of the arrays: a time or timestamp is a double in seconds for a
+  // data frame, unless the type was requested
+  ARROW_KIND storage_kind() const;
   // The time types take the column's unit and time zone
   void set_type(struct ArrowSchema* schema, ARROW_KIND kind) const;
   void init_array(struct ArrowArray* out, ARROW_KIND kind) const;

@@ -19,6 +19,7 @@ SqliteArrowColumn::SqliteArrowColumn(
       source(stmt_, j_, with_alt_types_),
       kind(AK_UNDECIDED),
       frozen(false),
+      data_frame(false),
       array_kind(AK_UNDECIDED),
       pending_nulls(0),
       warned(false),
@@ -82,8 +83,33 @@ void SqliteArrowColumn::reopen() {
   }
 }
 
+void SqliteArrowColumn::set_data_frame(bool data_frame_) {
+  data_frame = data_frame_;
+}
+
+const char* SqliteArrowColumn::seconds_class() const {
+  if (storage_kind() != AK_DOUBLE) {
+    return "";
+  }
+  switch (kind) {
+  case AK_TIME:
+    return "hms";
+  case AK_TIMESTAMP:
+    return "POSIXct";
+  default:
+    return "";
+  }
+}
+
+ARROW_KIND SqliteArrowColumn::storage_kind() const {
+  if (data_frame && (kind == AK_TIME || kind == AK_TIMESTAMP)) {
+    return AK_DOUBLE;
+  }
+  return kind;
+}
+
 void SqliteArrowColumn::set_schema(struct ArrowSchema* schema) const {
-  set_type(schema, kind);
+  set_type(schema, storage_kind());
   check_arrow(ArrowSchemaSetName(schema, name.c_str()), "Can't set Arrow name");
 }
 
@@ -242,23 +268,24 @@ void SqliteArrowColumn::conform_chunk(
   struct ArrowArray* chunk,
   ARROW_KIND chunk_kind
 ) const {
-  if (chunk_kind == kind) {
+  const ARROW_KIND target = storage_kind();
+  if (chunk_kind == target) {
     return;
   }
 
   nanoarrow::UniqueArray out;
-  init_array(out.get(), kind);
+  init_array(out.get(), target);
   if (chunk_kind == AK_NA) {
     check_arrow(
       ArrowArrayAppendNull(out.get(), chunk->length),
       "Can't append to Arrow array"
     );
-  } else if (chunk_kind == AK_INT64 && kind == AK_DOUBLE) {
+  } else if (chunk_kind == AK_INT64 && target == AK_DOUBLE) {
     append_ints_as_doubles(out.get(), chunk);
   } else {
     throw std::runtime_error(
       std::string("Internal error: can't convert an Arrow chunk of type ") +
-      format_kind(chunk_kind) + " to " + format_kind(kind)
+      format_kind(chunk_kind) + " to " + format_kind(target)
     );
   }
 
@@ -342,8 +369,8 @@ ARROW_KIND SqliteArrowColumn::kind_from_decltype() const {
 
 void SqliteArrowColumn::init_array() {
   array.reset();
-  init_array(array.get(), kind);
-  array_kind = kind;
+  array_kind = storage_kind();
+  init_array(array.get(), array_kind);
 }
 
 void SqliteArrowColumn::init_array(struct ArrowArray* out, ARROW_KIND kind) {
@@ -467,6 +494,12 @@ void SqliteArrowColumn::append_value(int column_type) {
       if (ISNAN(seconds)) {
         check_arrow(
           ArrowArrayAppendNull(array.get(), 1),
+          "Can't append to Arrow array"
+        );
+      } else if (array_kind == AK_DOUBLE) {
+        // For a data frame, like the default path
+        check_arrow(
+          ArrowArrayAppendDouble(array.get(), seconds),
           "Can't append to Arrow array"
         );
       } else {

@@ -85,7 +85,7 @@ public:
   int64_t fetch_arrow_df(
     struct ArrowSchema* schema,
     std::vector<nanoarrow::UniqueArray>& chunks,
-    std::vector<bool>& wide_ints,
+    ArrowDfColumns& columns,
     int64_t n_max,
     int64_t chunk_size
   );
@@ -116,7 +116,7 @@ private:
   bool step_done();
   cpp11::list peek_first_row();
 
-  void ensure_arrow_columns();
+  void ensure_arrow_columns(bool data_frame);
   void freeze_arrow_columns();
   int64_t fetch_arrow_rows(
     struct ArrowArray* out,

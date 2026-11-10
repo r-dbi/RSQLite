@@ -76,9 +76,11 @@ The conversion follows nanoarrow's rules, with these additions:
 an \code{int64} column becomes an \code{integer} if all its values fit,
 and follows the \code{bigint} argument of \code{\link[DBI:dbConnect]{DBI::dbConnect()}} otherwise, also in the later fetches of the result;
 a \code{null} column becomes a \code{logical}.
-\code{date32}, \code{time64} and \code{timestamp} columns become \code{Date}, \code{hms} and \code{POSIXct} in UTC,
-and \code{binary} columns become \link[blob:blob]{blob::blob} objects,
+\code{date32} columns become \code{Date} and \code{binary} columns become \link[blob:blob]{blob::blob} objects,
 as on the default path.
+Times and timestamps become \code{hms} and \code{POSIXct} in UTC,
+and travel as doubles in seconds in both directions,
+so they keep the default path's precision, where a stream has microseconds.
 
 Unlike a stream, each fetch decides the types of its columns, the way the default path does it:
 the first value that is not \code{NULL} decides,
@@ -88,10 +90,11 @@ The next fetch starts from these types, except that it decides a \code{logical} 
 The default path truncates a real number that follows an integer too large for an \code{integer},
 here the column becomes a \code{double}.
 Once \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} or \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} has fixed the types of a result,
-later fetches keep them,
+later fetches keep them, with times and timestamps in microseconds,
 and they hand out the rows kept for a schema, where the default path fails.
 Before writing, factors become strings, lists of raw vectors become blobs,
-and \code{difftime} columns become their numbers in their own units, as on the default path.
+and \code{difftime}, \code{POSIXct} and \code{Date} columns become their numbers in their own units,
+as on the default path.
 
 Each fetch reads its rows into Arrow arrays first,
 so that the data frame is allocated once with the row count known,

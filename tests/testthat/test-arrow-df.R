@@ -88,6 +88,43 @@ test_that("extended types come back as Date, hms and POSIXct on the Arrow path",
   expect_equal(dbFetch(rs, n = 1), df[1, ])
 })
 
+test_that("times and timestamps keep their precision through Arrow", {
+  # Like values of Sys.time(), whose fractions need more than microseconds
+  df <- data.frame(id = 1:200)
+  df$ts <- withr::with_seed(1, .POSIXct(1.79e9 + runif(200), tz = "UTC"))
+  df$t <- withr::with_seed(2, hms::hms(runif(200) * 86400))
+  df$ts[3] <- NA
+  df$t[4] <- NA
+
+  con_default <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
+  on.exit(dbDisconnect(con_default))
+  con <- local_arrow_con(extended_types = TRUE)
+  dbWriteTable(con_default, "t", df)
+  dbWriteTable(con, "t", df)
+
+  # The same numbers are stored
+  numbers <- "SELECT ts + 0 AS ts, t + 0 AS t FROM t"
+  expect_identical(dbGetQuery(con, numbers), dbGetQuery(con_default, numbers))
+  expect_identical(dbGetQuery(con, numbers)$ts, as.numeric(df$ts))
+
+  # and read back as they were written
+  expect_identical(dbReadTable(con_default, "t"), df)
+  expect_identical(dbReadTable(con, "t"), df)
+  rs <- dbSendQuery(con, "SELECT * FROM t")
+  expect_identical(arrow_fetch_df(rs, 150, chunk_size = 7), df[1:150, ])
+  rest <- df[151:200, ]
+  rownames(rest) <- NULL
+  expect_identical(dbFetch(rs), rest)
+  dbClearResult(rs)
+
+  # A stream keeps microseconds
+  stream <- dbGetQueryArrow(con, "SELECT ts, t FROM t")
+  schema <- nanoarrow::infer_nanoarrow_schema(stream)
+  expect_identical(schema$children$ts$format, "tsu:UTC")
+  expect_identical(schema$children$t$format, "ttu")
+  stream$release()
+})
+
 test_that("untyped NULL columns are logical on the Arrow path", {
   con <- local_arrow_con()
   expect_equal(dbGetQuery(con, "SELECT NULL AS a"), data.frame(a = NA))

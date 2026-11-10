@@ -15,7 +15,7 @@ arrow_fetch_df <- function(res, n, chunk_size = ARROW_DF_CHUNK_SIZE) {
   # The C++ code takes a 64-bit integer, doubles are whole numbers up to 2^53
   n <- min(n, 2^53)
   fetched <- result_fetch_arrow_df(res@ptr, n, chunk_size)
-  df <- arrow_to_df(fetched$stream, res@conn, fetched$n, fetched$wide_ints)
+  df <- arrow_to_df(fetched$stream, res@conn, fetched$n, fetched$wide_ints, fetched$seconds)
 
   if (length(df) == 0L) {
     # Same warning as the default path, which gives none for `n = 0`
@@ -34,11 +34,18 @@ arrow_fetch_df <- function(res, n, chunk_size = ARROW_DF_CHUNK_SIZE) {
 
 # The unified conversion of an Arrow stream of `size` rows to a data frame,
 # `wide_ints` tells which columns have needed 64-bit integers in this fetch or
-# an earlier one
-arrow_to_df <- function(stream, conn, size, wide_ints) {
+# an earlier one, `seconds` the class of the columns of times and timestamps,
+# which come as doubles in seconds like on the default path
+arrow_to_df <- function(stream, conn, size, wide_ints, seconds) {
   schema <- nanoarrow::infer_nanoarrow_schema(stream)
   ptype <- arrow_df_ptype(schema)
   df <- arrow_stream_to_df(stream, ptype, size)
+  for (j in which(seconds == "hms")) {
+    df[[j]] <- hms::new_hms(df[[j]])
+  }
+  for (j in which(seconds == "POSIXct")) {
+    df[[j]] <- .POSIXct(df[[j]], tz = "UTC")
+  }
   arrow_df_int64(df, conn@bigint, wide_ints)
 }
 
@@ -129,7 +136,7 @@ arrow_append_df <- function(conn, name, value) {
 
 # What the default path does in sqlData() and dbBind() before writing:
 # factors become strings, lists of raw vectors become blobs,
-# and a difftime is written as its number in its own units
+# and difftime, POSIXct and Date columns are written as their numbers
 arrow_prepare_df <- function(value) {
   value <- factor_to_string(value, warn = TRUE)
 
@@ -145,9 +152,10 @@ arrow_prepare_df <- function(value) {
   is_posixlt <- vlapply(value, inherits, "POSIXlt")
   value[is_posixlt] <- lapply(value[is_posixlt], as.POSIXct)
 
-  # nanoarrow would write a duration in seconds
-  is_difftime <- vlapply(value, inherits, "difftime")
-  value[is_difftime] <- lapply(value[is_difftime], as.numeric)
+  # nanoarrow would write a duration in seconds, and times, timestamps and
+  # dates in whole units, microseconds or days
+  is_number <- vlapply(value, inherits, c("difftime", "POSIXct", "Date"))
+  value[is_number] <- lapply(value[is_number], as.numeric)
 
   value
 }

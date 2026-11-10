@@ -67,9 +67,11 @@
 #' an `int64` column becomes an `integer` if all its values fit,
 #' and follows the `bigint` argument of [DBI::dbConnect()] otherwise, also in the later fetches of the result;
 #' a `null` column becomes a `logical`.
-#' `date32`, `time64` and `timestamp` columns become `Date`, `hms` and `POSIXct` in UTC,
-#' and `binary` columns become [blob::blob] objects,
+#' `date32` columns become `Date` and `binary` columns become [blob::blob] objects,
 #' as on the default path.
+#' Times and timestamps become `hms` and `POSIXct` in UTC,
+#' and travel as doubles in seconds in both directions,
+#' so they keep the default path's precision, where a stream has microseconds.
 #'
 #' Unlike a stream, each fetch decides the types of its columns, the way the default path does it:
 #' the first value that is not `NULL` decides,
@@ -79,10 +81,11 @@
 #' The default path truncates a real number that follows an integer too large for an `integer`,
 #' here the column becomes a `double`.
 #' Once [DBI::dbFetchArrow()] or [DBI::dbFetchArrowChunk()] has fixed the types of a result,
-#' later fetches keep them,
+#' later fetches keep them, with times and timestamps in microseconds,
 #' and they hand out the rows kept for a schema, where the default path fails.
 #' Before writing, factors become strings, lists of raw vectors become blobs,
-#' and `difftime` columns become their numbers in their own units, as on the default path.
+#' and `difftime`, `POSIXct` and `Date` columns become their numbers in their own units,
+#' as on the default path.
 #'
 #' Each fetch reads its rows into Arrow arrays first,
 #' so that the data frame is allocated once with the row count known,

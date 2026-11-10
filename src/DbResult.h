@@ -17,6 +17,7 @@ typedef boost::shared_ptr<DbResult> DbResultPtr;
 struct ArrowSchema;
 struct ArrowArray;
 struct ArrowArrayStream;
+struct ArrowDfColumns;
 
 // DbResult --------------------------------------------------------------------
 
@@ -53,11 +54,11 @@ public:
   void arrow_schema(struct ArrowSchema* out, int64_t infer_rows);
   int64_t fetch_arrow(struct ArrowArray* out, int64_t n_max);
   // At most `n_max` rows, all for a negative `n_max`, typed for a data frame,
-  // as a stream of arrays of at most `chunk_size` rows; returns the row count.
-  // `wide_ints` tells which columns have seen an integer that needs 64 bits.
+  // as a stream of arrays of at most `chunk_size` rows; returns the row count
+  // and describes the columns in `columns`
   int64_t fetch_arrow_df(
     struct ArrowArrayStream* out,
-    std::vector<bool>& wide_ints,
+    ArrowDfColumns& columns,
     int64_t n_max,
     int64_t chunk_size
   );

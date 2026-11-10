@@ -232,7 +232,7 @@ void SqliteResultImpl::arrow_schema(
     throw std::runtime_error("Query needs to be bound before fetching");
   }
 
-  ensure_arrow_columns();
+  ensure_arrow_columns(false);
 
   if (!arrow_frozen_) {
     // The first chunk decides the types, from the first value of each column
@@ -257,7 +257,7 @@ int64_t SqliteResultImpl::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
     throw std::runtime_error("Query needs to be bound before fetching");
   }
 
-  ensure_arrow_columns();
+  ensure_arrow_columns(false);
 
   if (pending_chunk_->release != NULL) {
     int64_t n = std::min(
@@ -291,12 +291,14 @@ int64_t SqliteResultImpl::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
 // chunk, and the chunks are conformed to the final types at the end.
 // A column without a value takes its declared type, or the null type, which
 // the next fetch decides again; the other types carry over to the next fetch.
-// `wide_ints` tells which columns have seen an integer that needs 64 bits,
-// in this fetch or an earlier one.
+// Times and timestamps are doubles in seconds, which keep the precision of
+// the default path, unless an Arrow stream or chunk has fixed the types.
+// `columns` tells which columns have seen an integer that needs 64 bits, in
+// this fetch or an earlier one, and which hold seconds.
 int64_t SqliteResultImpl::fetch_arrow_df(
   struct ArrowSchema* schema,
   std::vector<nanoarrow::UniqueArray>& chunks,
-  std::vector<bool>& wide_ints,
+  ArrowDfColumns& columns,
   int64_t n_max,
   int64_t chunk_size
 ) {
@@ -304,9 +306,9 @@ int64_t SqliteResultImpl::fetch_arrow_df(
     throw std::runtime_error("Query needs to be bound before fetching");
   }
 
-  ensure_arrow_columns();
-  const size_t ncols = arrow_columns_.size();
   const bool open = !arrow_frozen_;
+  ensure_arrow_columns(open);
+  const size_t ncols = arrow_columns_.size();
 
   if (open && n_max == 0 && !complete_) {
     // A fetch of no rows types the columns from the next row,
@@ -370,9 +372,11 @@ int64_t SqliteResultImpl::fetch_arrow_df(
     }
   }
 
-  wide_ints.clear();
+  columns.wide_ints.clear();
+  columns.seconds_classes.clear();
   for (size_t j = 0; j < ncols; ++j) {
-    wide_ints.push_back(arrow_columns_[j].wide_integers());
+    columns.wide_ints.push_back(arrow_columns_[j].wide_integers());
+    columns.seconds_classes.push_back(arrow_columns_[j].seconds_class());
   }
 
   return total;
@@ -523,7 +527,12 @@ cpp11::list SqliteResultImpl::peek_first_row() {
   return data.get_data(types_);
 }
 
-void SqliteResultImpl::ensure_arrow_columns() {
+// Creates the columns if needed, and selects the arrays they build: for a
+// data frame fetch or for an Arrow stream
+void SqliteResultImpl::ensure_arrow_columns(bool data_frame) {
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    arrow_columns_[j].set_data_frame(data_frame);
+  }
   if (!arrow_columns_.empty() || cache.ncols_ == 0) {
     return;
   }
@@ -538,6 +547,7 @@ void SqliteResultImpl::ensure_arrow_columns() {
       with_alt_types_
     );
     column->decide_from_row(has_row);
+    column->set_data_frame(data_frame);
     arrow_columns_.push_back(column);
   }
 }

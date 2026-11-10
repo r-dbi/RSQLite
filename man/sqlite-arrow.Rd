@@ -82,7 +82,7 @@ a \code{null} column becomes a \code{logical}.
 as on the default path.
 Times and timestamps become \code{hms} and \code{POSIXct} in UTC,
 and travel as doubles in seconds in both directions,
-so they keep the default path's precision, where a stream has microseconds.
+so they keep the default path's precision and range, where a stream has microseconds.
 A text value ends at its first NUL character, as on the default path,
 where a stream keeps all its bytes.
 
@@ -100,7 +100,8 @@ The default path reads \code{-2147483648} as a 32-bit integer, which is \code{NA
 here it is a value that needs 64 bits.
 Once \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} or \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} has fixed the types of a result,
 later fetches keep them, with times and timestamps in microseconds,
-and they hand out the rows kept for a schema, where the default path fails.
+and they hand out the rows kept for a schema and a row held back by the byte limits,
+where the default path fails.
 Before writing, factors become strings, lists of raw vectors become blobs,
 and \code{difftime}, \code{POSIXct} and \code{Date} columns become their numbers in their own units,
 as on the default path.

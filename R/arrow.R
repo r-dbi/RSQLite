@@ -73,7 +73,7 @@
 #' as on the default path.
 #' Times and timestamps become `hms` and `POSIXct` in UTC,
 #' and travel as doubles in seconds in both directions,
-#' so they keep the default path's precision, where a stream has microseconds.
+#' so they keep the default path's precision and range, where a stream has microseconds.
 #' A text value ends at its first NUL character, as on the default path,
 #' where a stream keeps all its bytes.
 #'
@@ -91,7 +91,8 @@
 #' here it is a value that needs 64 bits.
 #' Once [DBI::dbFetchArrow()] or [DBI::dbFetchArrowChunk()] has fixed the types of a result,
 #' later fetches keep them, with times and timestamps in microseconds,
-#' and they hand out the rows kept for a schema, where the default path fails.
+#' and they hand out the rows kept for a schema and a row held back by the byte limits,
+#' where the default path fails.
 #' Before writing, factors become strings, lists of raw vectors become blobs,
 #' and `difftime`, `POSIXct` and `Date` columns become their numbers in their own units,
 #' as on the default path.

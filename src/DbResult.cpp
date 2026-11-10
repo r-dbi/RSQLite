@@ -134,6 +134,7 @@ int64_t DbResult::fetch_arrow_df(
   int64_t n_max,
   int64_t chunk_size
 ) {
+  BusyScope busy(busy_);
   nanoarrow::UniqueSchema schema;
   std::vector<nanoarrow::UniqueArray> chunks;
   int64_t n =

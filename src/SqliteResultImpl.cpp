@@ -330,12 +330,13 @@ int64_t SqliteResultImpl::fetch_arrow_df(
 
   if (open && n_max == 0 && !complete_) {
     // A fetch of no rows types the columns from the next row,
-    // like the default path does it
+    // like the default path does it. Reading the storage classes converts
+    // no value, so the row is not marked as held back: the next fetch reads
+    // them again, and the default path may fetch the row.
     if (!arrow_row_read_) {
       for (size_t j = 0; j < ncols; ++j) {
         arrow_columns_[j].read_row();
       }
-      arrow_row_read_ = true;
     }
     for (size_t j = 0; j < ncols; ++j) {
       arrow_columns_[j].peek_value();

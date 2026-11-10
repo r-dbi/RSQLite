@@ -125,6 +125,24 @@ test_that("times and timestamps keep their precision through Arrow", {
   stream$release()
 })
 
+test_that("times and timestamps keep their range through Arrow", {
+  sql <- c(
+    "CREATE TABLE t (t TIME, ts TIMESTAMP)",
+    "INSERT INTO t VALUES (9223372036855, 1e19), (-1e300, 1.5), (NULL, NULL)"
+  )
+  con_default <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
+  on.exit(dbDisconnect(con_default))
+  con <- local_arrow_con(extended_types = TRUE)
+  for (s in sql) {
+    dbExecute(con_default, s)
+    dbExecute(con, s)
+  }
+
+  expect_silent(out <- dbReadTable(con, "t"))
+  expect_identical(out, dbReadTable(con_default, "t"))
+  expect_identical(as.numeric(out$ts), c(1e19, 1.5, NA))
+})
+
 test_that("text through Arrow ends at its first NUL like on the default path", {
   sql <- "SELECT CAST(x'610062' AS TEXT) AS s UNION ALL SELECT 'c' UNION ALL SELECT NULL"
   con <- dbConnect(SQLite(), ":memory:")
@@ -402,4 +420,35 @@ test_that("dbFetch() through Arrow hands out the rows kept for a schema", {
   expect_identical(dbFetch(rs), data.frame(a = 3:5))
   expect_true(dbHasCompleted(rs))
   stream$release()
+})
+
+test_that("a handler of a fetch through Arrow can't use its result", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE u (i INTEGER, x)")
+  dbExecute(con, "INSERT INTO u VALUES (1, 1), (2, 'two'), (3, 3)")
+  busy <- "while one of its fetches or binds is running"
+
+  uses <- list(
+    function(rs) dbFetch(rs),
+    function(rs) dbFetch(rs, 0),
+    function(rs) dbBind(rs, list(i = 2)),
+    function(rs) dbClearResult(rs),
+    function(rs) dbColumnInfo(rs),
+    function(rs) dbFetchArrowChunk(rs)
+  )
+  for (use in uses) {
+    rs <- dbSendQuery(con, "SELECT x FROM u WHERE i >= $i ORDER BY i", params = list(i = 1))
+    # The mixed-type warning runs the handler in the middle of the fetch
+    expect_error(
+      withCallingHandlers(dbFetch(rs), warning = function(w) {
+        use(rs)
+        invokeRestart("muffleWarning")
+      }),
+      busy
+    )
+    # The result is usable again
+    dbBind(rs, list(i = 3))
+    expect_identical(dbFetch(rs), data.frame(x = 3L))
+    dbClearResult(rs)
+  }
 })

@@ -4,8 +4,8 @@
 #
 # The package and its version come from DESCRIPTION in <package dir>, the commit is its HEAD,
 # and the tag is `v<version>`.
-# The NEWS.md section of the version, from the heading `# <package> <version>` to the next level-one heading,
-# is the tag's message, without the leading `# `.
+# The NEWS.md section of the version, from the heading `# <package> <version>` to the next level-one heading
+# outside a fenced code block, is the tag's message, without the leading `# `.
 # The release is a draft titled `<package> <version>`, with the section without its heading as notes,
 # ended by the marker `<!-- cran-submission: <package> <version> -->`,
 # by which .github/actions/cran-release/cran-release.sh publishes it once Posit's package manager serves the version.
@@ -97,10 +97,32 @@ message=$work/tag-message.md
 : >"$message"
 if [ -f NEWS.md ]; then
   # The section from the version's heading to the next one, without the leading "# ".
+  # A line starting with "# " inside a fenced code block, such as an R comment, is code, not a heading:
+  # a fence opens with three or more backticks or tildes, and closes with at least as many of the same.
   awk -v heading="# $title" '
-    $0 == heading { found = 1; print substr($0, 3); next }
-    found && /^# / { exit }
-    found { print }
+    # The run of backticks or tildes that makes the line a fence, or ""; sets after to the rest of the line.
+    function fence(line,   c, n) {
+      sub(/^[ \t]+/, "", line)
+      c = substr(line, 1, 1)
+      if (c != "`" && c != "~") return ""
+      n = 1
+      while (substr(line, n + 1, 1) == c) n++
+      if (n < 3) return ""
+      after = substr(line, n + 1)
+      return substr(line, 1, n)
+    }
+    !found && $0 == heading { found = 1; print substr($0, 3); next }
+    !found { next }
+    {
+      f = fence($0)
+      if (open == "") {
+        if (f != "") open = f
+        else if (/^# /) exit
+      } else if (f != "" && substr(f, 1, 1) == substr(open, 1, 1) && length(f) >= length(open) && after !~ /[^ \t]/) {
+        open = ""
+      }
+      print
+    }
   ' NEWS.md >"$message"
 fi
 if [ ! -s "$message" ]; then

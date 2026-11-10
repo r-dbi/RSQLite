@@ -12,6 +12,7 @@
 #   4. A published release of the tag stops the run before anything is written.
 #   5. A dry run writes nothing, and reports the release and the tag a real run would write.
 #   6. A version without a NEWS.md section stops the run before anything is written.
+#   7. A line starting with `# ` inside a fenced code block does not end the section.
 #
 # The `gh` stub answers `gh api <path> --jq <program>` by running the program with jq
 # over a JSON file named after the path, and records every call;
@@ -334,6 +335,51 @@ has "it fails" "$out" "exit 1"
 has "naming the heading it looked for" "$out" "NEWS.md has no section headed \`# RSQLite 2.0.1\`"
 is "without asking GitHub" "$(cat "$SCRATCH/gh.log")" ""
 is "and nothing is tagged" "$(git -C "$REMOTE" tag -l)" ""
+
+# --- 7: a code block in the section ------------------------------------------------------
+
+echo
+echo "== a code block with a comment line does not end the section"
+cp "$PKG/NEWS.md" "$SCRATCH/NEWS.md.orig"
+cat >"$PKG/NEWS.md" <<'EOF'
+# RSQLite 2.0.0
+
+- Connect like this:
+
+```r
+# connect
+con <- dbConnect(RSQLite::SQLite())
+```
+
+- After the backticks.
+
+~~~~
+# a shell comment
+```
+# still in the block
+~~~~
+
+- After the tildes.
+
+# RSQLite 1.9.0
+
+- Old.
+EOF
+out=$(run --dry-run)
+mv "$SCRATCH/NEWS.md.orig" "$PKG/NEWS.md"
+has "it succeeds" "$out" "exit 0"
+summary=$(cat "$SUMMARY")
+# shellcheck disable=SC2016  # Markdown backticks, no command substitution
+has "the notes keep the code block" "$summary" '```r
+# connect
+con <- dbConnect(RSQLite::SQLite())
+```'
+has "and the bullet after it" "$summary" "- After the backticks."
+has "a shorter fence of the other kind does not close a block" "$summary" "# still in the block"
+has "and the section goes on after the block" "$summary" "- After the tildes.
+
+<!-- cran-submission: RSQLite 2.0.0 -->"
+hasnt "up to the next heading" "$summary" "RSQLite 1.9.0"
 
 echo
 echo "$pass passed, $fail failed"

@@ -374,13 +374,41 @@ test_that("times and timestamps outside the range of their unit are NULL", {
   expect_equal(lapply(coercions, function(x) x$values[[1]]$rows), list(2:3, 2:3))
   expect_match(conditionMessage(w[[1]]), "2 string values out of range, NA", fixed = TRUE)
 
-  # Within the range of a coarser unit
-  expect_length(
-    coercion_warnings(df <- fetch(list(ts = nanoarrow::na_timestamp("us", "UTC"), tm = nanoarrow::na_time64("us")))),
-    0
-  )
+  # Within the range of a coarser unit, but not within a time of day
+  w <- coercion_warnings(df <- fetch(list(ts = nanoarrow::na_timestamp("us", "UTC"), tm = nanoarrow::na_time64("us"))))
   expect_equal(format(df$ts, "%Y"), c("2020", "3000", "1600"))
-  expect_equal(as.numeric(df$tm), c(3600, 1e10, -1e10))
+  expect_equal(as.numeric(df$tm), c(3600, NA, NA))
+  expect_equal(vapply(w[[1]]$coercions, `[[`, "", "column"), "tm")
+})
+
+test_that("times outside a time of day are NULL", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES ('00:00:00'), ('23:59:59.6'), ('24:00:00'), ('-01:00:00'), ('2020-02-03'),",
+    "(3600), (86400), (-1), (0.4), (86399.6)"
+  ))
+  units <- c(s = 1, ms = 1e3, us = 1e6, ns = 1e9)
+  for (unit in names(units)) {
+    type <- if (unit %in% c("s", "ms")) nanoarrow::na_time32(unit) else nanoarrow::na_time64(unit)
+    w <- coercion_warnings(
+      array <- arrow_validated(nanoarrow::as_nanoarrow_array(
+        dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type))
+      ))
+    )
+    # The last tick of the day stops the rounding
+    last <- if (unit == "s") 86399 else 86399.6
+    expect_equal(
+      as.numeric(nanoarrow::convert_array(array$children$x, double())) / units[[unit]],
+      c(0, last, NA, NA, NA, 3600, NA, NA, if (unit == "s") 0 else 0.4, last),
+      info = unit
+    )
+    expect_equal(
+      lapply(w[[1]]$coercions[[1]]$values, function(v) paste(v$class, v$reason, paste(v$rows, collapse = " "))),
+      list("string out_of_range 3 4 5", "integer out_of_range 7 8"),
+      info = unit
+    )
+  }
 })
 
 test_that("requested types survive dbBind() and apply to dbReadTableArrow()", {

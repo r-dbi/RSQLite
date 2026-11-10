@@ -862,11 +862,21 @@ void SqliteArrowColumn::append_time(int column_type, int64_t row) {
     scale = 1e9;
     break;
   }
-  // A number, or a timestamp in nanoseconds outside the years 1677 to 2262,
-  // may not fit
   double value = std::floor(seconds * scale + 0.5);
-  double limit = (kind == AK_TIME32) ? 2147483648.0 : 9223372036854775808.0;
-  if (!(value >= -limit && value < limit)) {
+  bool fits;
+  if (kind == AK_TIMESTAMP) {
+    // A number, or a timestamp in nanoseconds outside the years 1677 to 2262,
+    // may not fit
+    fits = value >= -9223372036854775808.0 && value < 9223372036854775808.0;
+  } else {
+    // A time of day, which rounding doesn't take past its last tick
+    const double day = 86400 * scale;
+    if (value == day && seconds < 86400) {
+      value = day - 1;
+    }
+    fits = value >= 0 && value < day;
+  }
+  if (!fits) {
     log.record(column_type, CR_OUT_OF_RANGE, row);
     append_null();
     return;

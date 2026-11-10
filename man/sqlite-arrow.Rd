@@ -91,5 +91,6 @@ and \code{\link[DBI:dbFetch]{DBI::dbFetch()}} fails while they wait.
 A chunk also ends after the row at which a string or binary column reaches 1 GiB,
 and before a row that would take such a column past the \code{2^31 - 1} bytes
 that the 32-bit offsets of the \code{utf8} and \code{binary} types can address.
+Such a row waits for the next Arrow fetch, and \code{\link[DBI:dbFetch]{DBI::dbFetch()}} fails until then.
 }
 

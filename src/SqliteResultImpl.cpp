@@ -177,6 +177,14 @@ cpp11::list SqliteResultImpl::fetch(const int n_max) {
       "fetch them with `dbFetchArrowChunk()` or `dbFetchArrow()`."
     );
   }
+  if (n_max != 0 && arrow_row_read_) {
+    // The byte check of the Arrow fetch has converted some of its values,
+    // only the Arrow path kept their storage classes
+    cpp11::stop(
+      "A row held back from the last Arrow chunk is waiting, "
+      "fetch it with `dbFetchArrowChunk()` or `dbFetchArrow()`."
+    );
+  }
 
   int n = 0;
   cpp11::list out;

@@ -226,6 +226,26 @@ test_that("a row held back by the byte limits keeps its storage classes", {
   expect_equal(lengths, c(1, 1))
 })
 
+test_that("a row held back by the byte limits is for the Arrow path only", {
+  local_arrow_bytes_limits(100, 150)
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
+  # A 127-byte blob with a NUL byte would take the utf8 column past 150 bytes
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, hex(zeroblob(45))),",
+    "(2, CAST(x'41424300444546' || zeroblob(120) AS BLOB)), (3, 'z')"
+  ))
+
+  rs <- dbSendQuery(con, "SELECT x FROM t ORDER BY i")
+  withr::defer(dbClearResult(rs))
+  expect_equal(dbFetchArrowChunk(rs)$length, 1)
+  # The byte check has converted the blob to text, a data frame would show that
+  expect_error(dbFetch(rs, n = 1), "held back")
+  expect_warning(chunk <- dbFetchArrowChunk(rs, chunk_size = 1), "coercing values of type blob")
+  expect_equal(chunk$length, 1)
+  expect_equal(dbFetch(rs)$x, "z")
+})
+
 test_that("chunks of large blobs stay within the 32-bit offsets", {
   skip_on_cran()
   skip_if_not(

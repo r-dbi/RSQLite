@@ -82,6 +82,7 @@
 #' A chunk also ends after the row at which a string or binary column reaches 1 GiB,
 #' and before a row that would take such a column past the `2^31 - 1` bytes
 #' that the 32-bit offsets of the `utf8` and `binary` types can address.
+#' Such a row waits for the next Arrow fetch, and [DBI::dbFetch()] fails until then.
 #'
 #' @name sqlite-arrow
 #' @aliases arrow

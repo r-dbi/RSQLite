@@ -2,6 +2,7 @@
 #include "SqliteColumnDataSource.h"
 #include "integer64.h"
 #include "affinity.h"
+#include "main_thread.h"
 #include <boost/limits.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -213,9 +214,9 @@ double SqliteColumnDataSource::parse_time(bool& ok) const {
 void SqliteColumnDataSource::warn_unparsable() const {
   // The parsers only convert text values, so the storage class is intact
   if (get_column_type() == SQLITE_BLOB) {
-    cpp11::warning(std::string("Cannot convert blob, NA is returned."));
+    rsqlite_warning("Cannot convert blob, NA is returned.");
   } else {
-    cpp11::warning(std::string("Unknown string format, NA is returned."));
+    rsqlite_warning("Unknown string format, NA is returned.");
   }
 }
 

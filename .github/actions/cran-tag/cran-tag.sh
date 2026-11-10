@@ -5,7 +5,7 @@
 # The package and its version come from DESCRIPTION in <package dir>, the commit is its HEAD,
 # and the tag is `v<version>`.
 # The NEWS.md section of the version, from the heading `# <package> <version>` to the next level-one heading
-# outside a fenced code block, is the tag's message, without the leading `# `.
+# outside a fenced code block (as CommonMark delimits one), is the tag's message, without the leading `# `.
 # The release is a draft titled `<package> <version>`, with the section without its heading as notes,
 # ended by the marker `<!-- cran-submission: <package> <version> -->`,
 # by which .github/actions/cran-release/cran-release.sh publishes it once Posit's package manager serves the version.
@@ -99,18 +99,23 @@ message=$work/tag-message.md
 : >"$message"
 if [ -f NEWS.md ]; then
   # The section from the version's heading to the next one, without the leading "# ".
-  # A line starting with "# " inside a fenced code block, such as an R comment, is code, not a heading:
-  # a fence opens with three or more backticks or tildes, and closes with at least as many of the same.
+  # A line starting with "# " inside a fenced code block, such as an R comment, is code, not a heading.
+  # As in CommonMark, a fence is three or more backticks or tildes, indented by at most three spaces,
+  # and a backtick fence has no backtick after the run, which makes a line like "``` `x` ```" a code span;
+  # a block closes at a fence of the same character, at least as long as the opening one, with nothing after it.
   awk -v heading="# $title" '
     # The run of backticks or tildes that makes the line a fence, or ""; sets after to the rest of the line.
-    function fence(line,   c, n) {
-      sub(/^[ \t]+/, "", line)
+    function fence(line,   c, i, n) {
+      i = 0
+      while (i < 3 && substr(line, i + 1, 1) == " ") i++
+      line = substr(line, i + 1)
       c = substr(line, 1, 1)
       if (c != "`" && c != "~") return ""
       n = 1
       while (substr(line, n + 1, 1) == c) n++
       if (n < 3) return ""
       after = substr(line, n + 1)
+      if (c == "`" && index(after, "`")) return ""
       return substr(line, 1, n)
     }
     !found && $0 == heading { found = 1; print substr($0, 3); next }

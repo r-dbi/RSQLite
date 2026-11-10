@@ -15,6 +15,9 @@
 #   5. A dry run writes nothing, and reports the release and the tag a real run would write.
 #   6. A version without a NEWS.md section stops the run before anything is written.
 #   7. A line starting with `# ` inside a fenced code block does not end the section.
+#      Each rule of CommonMark that decides where a block opens and closes has a case that fails without it:
+#      a block closes only at a fence of the same character, at least as long, with nothing after it;
+#      a line that starts with an inline code span of three backticks, or a fence indented by four spaces, opens none.
 #
 # The `gh` stub answers `gh api [-X <method>] <path> --jq <program>` by running the program with jq
 # over a JSON file named after the method and the path, and records every call;
@@ -436,6 +439,39 @@ has "and the section goes on after the block" "$summary" "- After the tildes.
 
 <!-- cran-submission: RSQLite 2.0.0 -->"
 hasnt "up to the next heading" "$summary" "RSQLite 1.9.0"
+
+# What a dry run reports when the section of 2.0.0 holds <lines>, followed by a last bullet and the section of 1.9.0.
+section_with() { # <lines>
+  cp "$PKG/NEWS.md" "$SCRATCH/NEWS.md.orig"
+  printf '# RSQLite 2.0.0\n\n%s\n\n- Last bullet.\n\n# RSQLite 1.9.0\n\n- Old.\n' "$1" >"$PKG/NEWS.md"
+  run --dry-run >/dev/null
+  mv "$SCRATCH/NEWS.md.orig" "$PKG/NEWS.md"
+  cat "$SUMMARY"
+}
+# The section kept <line>, and ended at the heading of 1.9.0.
+kept() { # <description> <summary> <line>
+  has "$1" "$2" "$3"
+  has "  and the section goes on after it" "$2" "- Last bullet."
+  hasnt "  up to the next heading" "$2" "RSQLite 1.9.0"
+}
+
+echo
+echo "== where a code block opens and closes"
+# shellcheck disable=SC2016  # Markdown backticks, no command substitution
+{
+  summary=$(section_with $'````\n```\n# kept: a shorter fence\n````')
+  kept "a shorter fence of the same character does not close a block" "$summary" "# kept: a shorter fence"
+  summary=$(section_with $'~~~\n````\n# kept: a fence of the other character\n~~~')
+  kept "a longer fence of the other character does not close a block" "$summary" "# kept: a fence of the other character"
+  summary=$(section_with $'```\n```r\n# kept: a fence with text after it\n```')
+  kept "a fence with text after it does not close a block" "$summary" "# kept: a fence with text after it"
+  summary=$(section_with $'   ```\n# kept: a block indented by three spaces\n   ```')
+  kept "a fence indented by three spaces opens and closes a block" "$summary" "# kept: a block indented by three spaces"
+  summary=$(section_with '``` `dbConnect()` ``` is a code span.')
+  kept "a line starting with an inline code span of three backticks opens no block" "$summary" '``` `dbConnect()` ``` is a code span.'
+  summary=$(section_with $'    ```\n    an indented code block')
+  kept "a fence indented by four spaces opens no block" "$summary" "    an indented code block"
+}
 
 echo
 echo "$pass passed, $fail failed"

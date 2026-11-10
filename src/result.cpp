@@ -241,9 +241,40 @@ cpp11::list arrow_split_columns(cpp11::sexp first, cpp11::sexp stream_xptr) {
   return columns;
 }
 
+namespace {
+
+// The bytes of string data above which concatenated strings take the
+// large_utf8 type: the 32-bit offsets of utf8 address at most this many
+int64_t concat_utf8_max_bytes = INT32_MAX;
+
+// The bytes of string data that an array view holds
+int64_t string_data_bytes(const struct ArrowArrayView* view) {
+  const int64_t first = view->offset;
+  const int64_t last = view->offset + view->length;
+  if (view->storage_type == NANOARROW_TYPE_LARGE_STRING) {
+    const int64_t* offsets = view->buffer_views[1].data.as_int64;
+    return offsets[last] - offsets[first];
+  }
+  const int32_t* offsets = view->buffer_views[1].data.as_int32;
+  return static_cast<int64_t>(offsets[last]) - offsets[first];
+}
+
+// The bytes that the buffers of an array view span
+int64_t view_bytes(const struct ArrowArrayView* view) {
+  int64_t bytes = 0;
+  for (int i = 0; i < NANOARROW_MAX_FIXED_BUFFERS; ++i) {
+    bytes += view->buffer_views[i].size_bytes;
+  }
+  return bytes;
+}
+
+}  // namespace
+
 // One nanoarrow_array with the values of every array of a stream of strings,
-// with the bytes its buffers hold; the stream is consumed, and each of its
-// arrays is freed once copied
+// with the bytes its buffers hold; the stream is consumed.
+// A single array is handed on as it is. Several arrays are copied into a new
+// one, each freed once copied, which takes the large_utf8 type when their
+// strings need more bytes than the 32-bit offsets of utf8 can address.
 [[cpp11::register]]
 cpp11::list arrow_concat_strings(cpp11::sexp stream_xptr) {
   if (!Rf_inherits(stream_xptr, "nanoarrow_array_stream")) {
@@ -285,19 +316,8 @@ cpp11::list arrow_concat_strings(cpp11::sexp stream_xptr) {
     );
   }
 
-  check_arrow(
-    ArrowArrayInitFromType(out, schema_view.type),
-    "Can't allocate Arrow array"
-  );
-  check_arrow(ArrowArrayStartAppending(out), "Can't allocate Arrow array");
-
-  nanoarrow::UniqueArrayView view;
-  check_arrow(
-    ArrowArrayViewInitFromSchema(view.get(), schema.get(), &error),
-    "Can't read Arrow schema",
-    &error
-  );
-
+  // All arrays first, so that the sizes are known before the copy
+  std::vector<nanoarrow::UniqueArray> arrays;
   while (true) {
     nanoarrow::UniqueArray array;
     if (ArrowArrayStreamGetNext(stream, array.get(), &error) != NANOARROW_OK) {
@@ -309,29 +329,27 @@ cpp11::list arrow_concat_strings(cpp11::sexp stream_xptr) {
     if (array->release == NULL) {
       break;
     }
+    arrays.push_back(std::move(array));
+  }
+  ArrowArrayStreamRelease(stream);
+
+  nanoarrow::UniqueArrayView view;
+  check_arrow(
+    ArrowArrayViewInitFromSchema(view.get(), schema.get(), &error),
+    "Can't read Arrow schema",
+    &error
+  );
+  int64_t length = 0;
+  int64_t data_bytes = 0;
+  for (size_t i = 0; i < arrays.size(); ++i) {
     check_arrow(
-      ArrowArrayViewSetArray(view.get(), array.get(), &error),
+      ArrowArrayViewSetArray(view.get(), arrays[i].get(), &error),
       "Can't read Arrow array",
       &error
     );
-    for (int64_t i = 0; i < array->length; ++i) {
-      if (ArrowArrayViewIsNull(view.get(), i)) {
-        check_arrow(ArrowArrayAppendNull(out, 1), "Can't append to Arrow array");
-      } else {
-        check_arrow(
-          ArrowArrayAppendString(out, ArrowArrayViewGetStringUnsafe(view.get(), i)),
-          "Can't append to Arrow array"
-        );
-      }
-    }
-    cpp11::check_user_interrupt();
+    length += arrays[i]->length;
+    data_bytes += string_data_bytes(view.get());
   }
-  ArrowArrayStreamRelease(stream);
-  check_arrow(
-    ArrowArrayFinishBuildingDefault(out, &error),
-    "Can't finish Arrow array",
-    &error
-  );
 
   check_arrow(
     ArrowSchemaDeepCopy(schema.get(), out_schema),
@@ -340,10 +358,83 @@ cpp11::list arrow_concat_strings(cpp11::sexp stream_xptr) {
   R_SetExternalPtrTag(out_xptr, schema_xptr);
 
   using namespace cpp11::literals;
+  if (arrays.size() == 1) {
+    ArrowArrayMove(arrays[0].get(), out);
+    check_arrow(
+      ArrowArrayViewSetArray(view.get(), out, &error),
+      "Can't read Arrow array",
+      &error
+    );
+    return cpp11::writable::list(
+      { "array"_nm = out_xptr,
+        "bytes"_nm =
+          cpp11::as_sexp(static_cast<double>(view_bytes(view.get()))) }
+    );
+  }
+
+  enum ArrowType type = schema_view.type;
+  if (data_bytes > concat_utf8_max_bytes) {
+    type = NANOARROW_TYPE_LARGE_STRING;
+  }
+  if (type != schema_view.type) {
+    check_arrow(
+      ArrowSchemaSetFormat(out_schema, "U"),
+      "Can't set the Arrow format"
+    );
+  }
+
+  check_arrow(ArrowArrayInitFromType(out, type), "Can't allocate Arrow array");
+  check_arrow(ArrowArrayStartAppending(out), "Can't allocate Arrow array");
+  check_arrow(ArrowArrayReserve(out, length), "Can't allocate Arrow array");
+  check_arrow(
+    ArrowBufferReserve(ArrowArrayBuffer(out, 2), data_bytes),
+    "Can't allocate Arrow array"
+  );
+
+  for (size_t i = 0; i < arrays.size(); ++i) {
+    check_arrow(
+      ArrowArrayViewSetArray(view.get(), arrays[i].get(), &error),
+      "Can't read Arrow array",
+      &error
+    );
+    for (int64_t j = 0; j < arrays[i]->length; ++j) {
+      if (ArrowArrayViewIsNull(view.get(), j)) {
+        check_arrow(
+          ArrowArrayAppendNull(out, 1),
+          "Can't append to Arrow array"
+        );
+      } else {
+        check_arrow(
+          ArrowArrayAppendString(
+            out,
+            ArrowArrayViewGetStringUnsafe(view.get(), j)
+          ),
+          "Can't append to Arrow array"
+        );
+      }
+    }
+    arrays[i].reset();
+    cpp11::check_user_interrupt();
+  }
+  check_arrow(
+    ArrowArrayFinishBuildingDefault(out, &error),
+    "Can't finish Arrow array",
+    &error
+  );
+
   return cpp11::writable::list(
     { "array"_nm = out_xptr,
       "bytes"_nm = cpp11::as_sexp(static_cast<double>(arrow_array_bytes(out))) }
   );
+}
+
+// For the tests: sets the bytes of string data above which concatenated
+// strings take the large_utf8 type, and returns the previous value
+[[cpp11::register]]
+double arrow_set_concat_utf8_max_bytes(double max_bytes) {
+  const int64_t old = concat_utf8_max_bytes;
+  concat_utf8_max_bytes = static_cast<int64_t>(max_bytes);
+  return static_cast<double>(old);
 }
 
 // The next chunk of at most `chunk_size` rows as a nanoarrow_array,

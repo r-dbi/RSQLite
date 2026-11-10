@@ -108,6 +108,10 @@ arrow_concat_strings <- function(stream_xptr) {
   .Call(`_RSQLite_arrow_concat_strings`, stream_xptr)
 }
 
+arrow_set_concat_utf8_max_bytes <- function(max_bytes) {
+  .Call(`_RSQLite_arrow_set_concat_utf8_max_bytes`, max_bytes)
+}
+
 result_fetch_arrow_chunk <- function(res, chunk_size) {
   .Call(`_RSQLite_result_fetch_arrow_chunk`, res, chunk_size)
 }

@@ -83,3 +83,65 @@ test_that("lazy strings follow ptype", {
   df <- dbGetQuery(con, "SELECT txt FROM t", ptype = list(txt = factor(levels = c("b", "a"))))
   expect_equal(df$txt, factor(c("a", "b"), levels = c("b", "a")))
 })
+
+# Lowers the bytes of string data above which concatenated strings take the
+# large_utf8 type, from 2^31 - 1
+local_concat_utf8_max_bytes <- function(max_bytes, envir = parent.frame()) {
+  old <- arrow_set_concat_utf8_max_bytes(max_bytes)
+  withr::defer(arrow_set_concat_utf8_max_bytes(old), envir = envir)
+}
+
+test_that("concatenated strings take large_utf8 beyond the 32-bit offsets", {
+  concat <- function(...) {
+    arrays <- lapply(list(...), nanoarrow::as_nanoarrow_array)
+    out <- arrow_concat_strings(nanoarrow::basic_array_stream(arrays))
+    list(
+      format = nanoarrow::infer_nanoarrow_schema(out$array)$format,
+      values = nanoarrow::convert_array(out$array, character())
+    )
+  }
+  values <- c("ab", NA, "cde", "")
+
+  expect_equal(concat(c("ab", NA), c("cde", "")), list(format = "u", values = values))
+  local_concat_utf8_max_bytes(4)
+  # Five bytes of strings, and four with the second array shorter
+  expect_equal(concat(c("ab", NA), c("cde", "")), list(format = "U", values = values))
+  expect_equal(concat(c("ab", NA), c("c", ""))$format, "u")
+  # A single array is handed on as it is
+  expect_equal(concat(c("ab", NA, "cde", "")), list(format = "u", values = values))
+})
+
+test_that("lazy strings beyond the 32-bit offsets give the same data frames", {
+  local_concat_utf8_max_bytes(100)
+  path <- withr::local_tempfile(fileext = ".sqlite")
+  eager <- dbConnect(SQLite(), path, arrow = TRUE)
+  withr::defer(dbDisconnect(eager))
+  lazy <- dbConnect(SQLite(), path, arrow = TRUE, lazy_strings = TRUE)
+  withr::defer(dbDisconnect(lazy))
+  dbWriteTable(eager, "t", data.frame(i = 1:50, s = ifelse(1:50 %% 7 == 0, NA, strrep("x", 1:50))))
+
+  rs <- dbSendQuery(lazy, "SELECT * FROM t")
+  df <- arrow_fetch_df(rs, -1, chunk_size = 8)
+  dbClearResult(rs)
+  expect_true(is_lazy(df$s))
+  expect_equal(df, dbReadTable(eager, "t"))
+})
+
+test_that("lazy strings beyond 2 GiB take large_utf8", {
+  skip_on_cran()
+  skip_if_not(
+    identical(Sys.getenv("RSQLITE_TEST_LARGE_ARROW"), "true"),
+    "Set RSQLITE_TEST_LARGE_ARROW=true to run, needs about 3.5 GB of memory"
+  )
+
+  con <- local_arrow_con(lazy_strings = TRUE)
+  # 2100 strings of 1 MiB: the chunks end at 1 GiB, the column needs 2100 MiB
+  sql <- paste(
+    "WITH RECURSIVE s(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM s WHERE i < 2100)",
+    "SELECT i, hex(zeroblob(524288)) AS s FROM s"
+  )
+  df <- dbGetQuery(con, sql)
+  expect_equal(df$i, 1:2100)
+  expect_true(is_lazy(df$s))
+  expect_equal(nchar(df$s[c(1, 1024, 1025, 2048, 2049, 2100)]), rep(2^20, 6))
+})

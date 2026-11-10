@@ -730,15 +730,18 @@ test_that("a result stays usable after an R error leaves its fetch by a longjmp"
   skip_if_not(exists("mem.maxVSize", baseenv()), "mem.maxVSize() not available")
 
   # A vector heap limit with at least 30 MB to spare, which R accepts only
-  # above the size the heap already has, and a blob 50 MB beyond the limit
+  # above the size the heap already has, and a small row before a blob 50 MB
+  # beyond the limit
   old <- mem.maxVSize()
   withr::defer(mem.maxVSize(old))
   invisible(gc())
   heap <- gc()["Vcells", ]
   limit <- ceiling(max(heap[[4]], heap[[2]] + 30))
   con <- local_con()
-  dbExecute(con, paste0("CREATE TABLE t AS SELECT zeroblob(", (limit + 50) * 2^20, ") AS b"))
-  rs <- dbSendQuery(con, "SELECT b FROM t")
+  dbExecute(con, "CREATE TABLE t (i INTEGER PRIMARY KEY, b BLOB)")
+  dbExecute(con, "INSERT INTO t VALUES (1, x'01')")
+  dbExecute(con, paste0("INSERT INTO t VALUES (2, zeroblob(", (limit + 50) * 2^20, "))"))
+  rs <- dbSendQuery(con, "SELECT i, b FROM t ORDER BY i")
   withr::defer(if (dbIsValid(rs)) dbClearResult(rs))
 
   # The data frame path allocates the blob with a raw R call, so the fetch
@@ -754,8 +757,15 @@ test_that("a result stays usable after an R error leaves its fetch by a longjmp"
   )
   invisible(mem.maxVSize(old))
 
+  # The rows read before the error are lost with the data frame of the fetch,
+  # but counted: the small row does not come again
+  expect_equal(dbGetRowCount(rs), 1L)
+
   # The result is not left marked busy: it fetches, and it clears
-  expect_equal(lengths(dbFetch(rs)$b), (limit + 50) * 2^20)
+  out <- dbFetch(rs)
+  expect_equal(out$i, 2L)
+  expect_equal(lengths(out$b), (limit + 50) * 2^20)
+  expect_equal(dbGetRowCount(rs), 2L)
   expect_silent(dbClearResult(rs))
 })
 

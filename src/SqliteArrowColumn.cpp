@@ -172,8 +172,10 @@ void SqliteArrowColumn::peek_value() {
   } else if (kind == AK_INT64 && value_type == SQLITE_FLOAT && !frozen) {
     kind = AK_DOUBLE;
   }
-  if ((kind == AK_INT64 || kind == AK_UINT64) && value_type == SQLITE_INTEGER) {
-    note_integer(sqlite3_column_int64(stmt, j));
+  int64_t value;
+  if ((kind == AK_INT64 || kind == AK_UINT64) &&
+      integer_value(value_type, value)) {
+    note_integer(value);
   }
 }
 
@@ -654,7 +656,8 @@ void SqliteArrowColumn::append_integer(int column_type, int64_t row) {
   }
   if (column_type != SQLITE_INTEGER) {
     log.record(column_type, CR_CONVERTED, row);
-  } else if (kind == AK_INT64 || kind == AK_UINT64) {
+  }
+  if (kind == AK_INT64 || kind == AK_UINT64) {
     note_integer(value);
   }
 

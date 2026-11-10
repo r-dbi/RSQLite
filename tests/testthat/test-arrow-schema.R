@@ -587,14 +587,19 @@ test_that("data frame fetches through Arrow keep the requested types", {
   dbClearResult(rs)
 
   # Like the default path, a 64-bit integer keeps a column as integer64 for
-  # the later fetches, also in a fetch of no rows
-  sql <- "SELECT 4294967296 AS x UNION ALL SELECT 1"
-  for (type in list(nanoarrow::na_int64(), nanoarrow::na_uint64())) {
-    rs <- dbSendQueryArrow(con, sql, schema = list(x = type))
-    expect_s3_class(dbFetch(rs, 0)$x, "integer64")
-    expect_s3_class(dbFetch(rs, 1)$x, "integer64")
-    expect_s3_class(dbFetch(rs)$x, "integer64")
-    dbClearResult(rs)
+  # the later fetches, also in a fetch of no rows, and also from a real or text
+  for (wide in c("4294967296", "4294967296.0", "'4294967296'")) {
+    sql <- paste("SELECT", wide, "AS x UNION ALL SELECT 1 UNION ALL SELECT 2")
+    for (type in list(nanoarrow::na_int64(), nanoarrow::na_uint64())) {
+      rs <- dbSendQueryArrow(con, sql, schema = list(x = type))
+      w <- coercion_warnings({
+        expect_s3_class(dbFetch(rs, 0)$x, "integer64")
+        expect_s3_class(dbFetch(rs, 1)$x, "integer64")
+        expect_s3_class(dbFetch(rs, 1)$x, "integer64")
+        expect_s3_class(dbFetch(rs)$x, "integer64")
+      })
+      dbClearResult(rs)
+    }
   }
 })
 

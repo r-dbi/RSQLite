@@ -129,6 +129,9 @@ void SqliteArrowColumn::set_schema(struct ArrowSchema* schema) const {
 void SqliteArrowColumn::start_chunk() {
   array.reset();
   pending_nulls = 0;
+  // The bytes of a row held back from the previous chunk are read again,
+  // in case another fetch has converted the value since
+  value_fetched = false;
   if (decided()) {
     init_array();
   }

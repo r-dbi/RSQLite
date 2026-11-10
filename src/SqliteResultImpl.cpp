@@ -31,7 +31,8 @@ SqliteResultImpl::SqliteResultImpl(
       types_(get_initial_field_types(cache.ncols_)),
       with_alt_types_(conn_->with_alt_types()),
       arrow_frozen_(false),
-      pending_offset_(0) {
+      pending_offset_(0),
+      arrow_row_read_(false) {
   try {
     if (cache.nparams_ == 0) {
       after_bind(true);
@@ -316,6 +317,7 @@ void SqliteResultImpl::after_set_params() {
   arrow_frozen_ = false;
   pending_chunk_.reset();
   pending_offset_ = 0;
+  arrow_row_read_ = false;
 
   total_changes_start_ = sqlite3_total_changes(conn);
 
@@ -364,6 +366,8 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
 }
 
 void SqliteResultImpl::step() {
+  // The next row has storage classes of its own
+  arrow_row_read_ = false;
   while (step_run())
     ;
 }
@@ -440,9 +444,14 @@ int64_t SqliteResultImpl::fetch_arrow_rows(
 
   int64_t n = 0;
   while (!complete_ && n < n_max) {
-    // The storage classes are read once per row, before any conversion
-    for (size_t j = 0; j < ncols; ++j) {
-      arrow_columns_[j].read_row();
+    // The storage classes are read once per row, before any conversion.
+    // A row that a byte limit held back from the previous chunk keeps them:
+    // the check converted some of its values.
+    if (!arrow_row_read_) {
+      for (size_t j = 0; j < ncols; ++j) {
+        arrow_columns_[j].read_row();
+      }
+      arrow_row_read_ = true;
     }
     // A row that would overflow a column starts the next chunk.
     // An empty chunk takes any row: sqlite3_column_bytes() returns an int,

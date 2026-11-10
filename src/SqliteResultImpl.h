@@ -52,6 +52,9 @@ private:
   bool arrow_frozen_;
   nanoarrow::UniqueArray pending_chunk_;
   int64_t pending_offset_;
+  // Set while the columns hold the storage classes of the current row,
+  // also when a byte limit ended the chunk before it
+  bool arrow_row_read_;
 
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);

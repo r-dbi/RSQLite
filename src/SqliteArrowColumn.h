@@ -71,7 +71,8 @@ public:
 
   // Chunk building
   void start_chunk();
-  // Reads the storage class of the value of the current row
+  // Reads the storage class of the value of the current row; a row held
+  // back from the previous chunk keeps it for the next one
   void read_row();
   // The bytes that the value of the current row adds to the data buffer of a
   // utf8 or binary column, zero for the other types

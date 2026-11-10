@@ -213,6 +213,19 @@ test_that("string and binary columns end a chunk before their offsets overflow",
   }
 })
 
+test_that("a row held back by the byte limits keeps its storage classes", {
+  local_arrow_bytes_limits(100, 150)
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
+  # A 90-byte string decides utf8, a 120-byte blob would take the column past 150
+  dbExecute(con, "INSERT INTO t VALUES (1, hex(zeroblob(45))), (2, zeroblob(120))")
+
+  # The size check converts the blob to text, the warning still names a blob
+  stream <- dbGetQueryArrow(con, "SELECT x FROM t ORDER BY i")
+  expect_warning(lengths <- chunk_lengths(stream), "coercing values of type blob")
+  expect_equal(lengths, c(1, 1))
+})
+
 test_that("chunks of large blobs stay within the 32-bit offsets", {
   skip_on_cran()
   skip_if_not(

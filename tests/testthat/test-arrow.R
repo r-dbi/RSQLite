@@ -178,6 +178,21 @@ test_that("times outside a day are NULL", {
   expect_equal(as.numeric(dbGetQuery(con, sql)$tm)[5:9], c(86400, 100000, -1, 86400, 108000))
 })
 
+test_that("text in a binary column is UTF-8, also in a UTF-16 database", {
+  con <- local_con()
+  dbExecute(con, "PRAGMA encoding = 'UTF-16'")
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
+  dbExecute(con, "INSERT INTO t VALUES (1, x'01'), (2, 'ab'), (3, 'caf\u00e9')")
+  sql <- "SELECT x FROM t ORDER BY i"
+
+  expect_warning(df <- as.data.frame(dbGetQueryArrow(con, sql)), "coercing values of type string")
+  expected <- list(as.raw(1), charToRaw("ab"), charToRaw("caf\u00e9"))
+  expect_equal(unclass(df$x), expected, ignore_attr = TRUE)
+  # The data frame path returns the same bytes
+  expect_warning(default <- dbGetQuery(con, sql), "mixed type")
+  expect_equal(unclass(default$x), expected, ignore_attr = TRUE)
+})
+
 test_that("text that is not valid UTF-8 is NULL", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (i INTEGER, s TEXT)")

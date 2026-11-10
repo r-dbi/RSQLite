@@ -178,3 +178,145 @@ test_that("dbReadTable() passes ptype on", {
     data.frame(a = c(1, 2), b = factor(c("x", "y")))
   )
 })
+
+test_that("the columns without a prototype are typed like the default path", {
+  con <- local_arrow_con()
+  con_default <- local_con()
+  for (cc in list(con, con_default)) {
+    dbExecute(cc, "CREATE TABLE t (x, y INTEGER, z)")
+    dbExecute(cc, "INSERT INTO t VALUES (NULL, NULL, 1), (1, 2.5, 2), ('a', 3, 3)")
+  }
+
+  for (ns in list(c(0, -1), c(1, -1), c(1, 1, 1, 1), c(2, -1))) {
+    rs <- dbSendQuery(con, "SELECT * FROM t", ptype = list(z = bit64::integer64()))
+    rs_default <- dbSendQuery(con_default, "SELECT x, y FROM t")
+    for (n in ns) {
+      df <- suppressWarnings(dbFetch(rs, n))
+      expect_equal(df[c("x", "y")], suppressWarnings(dbFetch(rs_default, n)), info = paste(ns, collapse = ", "))
+      expect_s3_class(df$z, "integer64")
+    }
+    dbClearResult(rs)
+    dbClearResult(rs_default)
+  }
+})
+
+test_that("ptype columns keep their types in every fetch", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (a, b, c)")
+  dbExecute(con, "INSERT INTO t VALUES (NULL, NULL, NULL), (1, 2.5, 'x'), (2, 3, NULL)")
+  ptype <- list(a = bit64::integer64(), b = integer(), c = factor(levels = "x"))
+
+  rs <- dbSendQuery(con, "SELECT * FROM t", ptype = ptype)
+  expect_equal(dbFetch(rs, 0), as.data.frame(ptype))
+  expect_equal(
+    dbFetch(rs, 1),
+    data.frame(a = bit64::NA_integer64_, b = NA_integer_, c = factor(NA, levels = "x"))
+  )
+  expect_warning(df <- dbFetch(rs, 1), class = "RSQLite_warning_coercion")
+  expect_equal(df, data.frame(a = bit64::as.integer64(1), b = 2L, c = factor("x")))
+  expect_equal(dbFetch(rs), data.frame(a = bit64::as.integer64(2), b = 3L, c = factor(NA, levels = "x")))
+  expect_equal(dbFetch(rs), as.data.frame(ptype))
+  dbClearResult(rs)
+})
+
+test_that("ptype applies to the rows kept for a schema", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (a, b)")
+  dbExecute(con, "INSERT INTO t VALUES (NULL, 1), (1, 2), (2, 3)")
+
+  rs <- dbSendQuery(con, "SELECT * FROM t", ptype = list(a = bit64::integer64()))
+  stream <- dbFetchArrow(rs, chunk_size = 2)
+  expect_equal(schema_formats(stream), c(a = "l", b = "l"))
+  expect_equal(
+    dbFetch(rs, 1),
+    data.frame(a = bit64::NA_integer64_, b = 1L)
+  )
+  expect_equal(
+    dbFetch(rs),
+    data.frame(a = bit64::as.integer64(1:2), b = 2:3)
+  )
+  stream$release()
+  dbClearResult(rs)
+})
+
+test_that("an integer64 prototype stays integer64 whatever bigint says", {
+  for (bigint in c("integer64", "integer", "numeric", "character")) {
+    con <- local_arrow_con(bigint = bigint)
+    dbExecute(con, "CREATE TABLE t (a, b)")
+    dbExecute(con, "INSERT INTO t VALUES (1, 1099511627776), (NULL, 2)")
+    ptype <- list(a = bit64::integer64(), b = bit64::integer64())
+    expect_equal(
+      dbGetQuery(con, "SELECT * FROM t", ptype = ptype),
+      data.frame(a = bit64::as.integer64(c(1, NA)), b = bit64::as.integer64(c(2^40, 2))),
+      info = bigint
+    )
+
+    rs <- dbSendQuery(con, "SELECT * FROM t", ptype = ptype["a"])
+    expect_s3_class(dbFetch(rs, 0)$a, "integer64")
+    expect_s3_class(dbFetch(rs, 1)$a, "integer64")
+    expect_s3_class(dbFetch(rs)$a, "integer64")
+    dbClearResult(rs)
+  }
+})
+
+test_that("logical and factor prototypes", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (b, f)")
+  dbExecute(con, "INSERT INTO t VALUES (0, 'b'), (1, 'a'), (NULL, 'c'), (2, NULL)")
+
+  expect_equal(
+    dbGetQuery(con, "SELECT b FROM t", ptype = list(b = logical())),
+    data.frame(b = c(FALSE, TRUE, NA, TRUE))
+  )
+
+  # Values outside the levels become NA, as with factor()
+  expect_equal(
+    dbGetQuery(con, "SELECT f FROM t", ptype = list(f = factor(levels = c("b", "a")))),
+    data.frame(f = factor(c("b", "a", NA, NA), levels = c("b", "a")))
+  )
+  expect_equal(
+    dbGetQuery(con, "SELECT f FROM t", ptype = list(f = factor(levels = c("c", "b", "a"), ordered = TRUE))),
+    data.frame(f = factor(c("b", "a", "c", NA), levels = c("c", "b", "a"), ordered = TRUE))
+  )
+  # Without levels, the levels come from the values of each fetch
+  expect_equal(
+    dbGetQuery(con, "SELECT f FROM t", ptype = list(f = ordered(character()))),
+    data.frame(f = ordered(c("b", "a", "c", NA)))
+  )
+  rs <- dbSendQuery(con, "SELECT f FROM t", ptype = list(f = factor()))
+  expect_equal(dbFetch(rs, 1), data.frame(f = factor("b")))
+  expect_equal(dbFetch(rs), data.frame(f = factor(c("a", "c", NA))))
+  dbClearResult(rs)
+})
+
+test_that("ptype rejects prototypes it can't request or convert back to", {
+  con <- local_arrow_con()
+  expect_error(
+    dbGetQuery(con, "SELECT 1 AS a", ptype = list(a = complex())),
+    "Can't request a type for column `a` of `ptype`",
+    fixed = TRUE
+  )
+  expect_error(
+    dbGetQuery(con, "SELECT 1 AS a, 2 AS b", ptype = list(a = integer(), b = NULL)),
+    "Can't request a type for column `b` of `ptype`",
+    fixed = TRUE
+  )
+  expect_error(
+    dbGetQuery(con, "SELECT 1 AS a", ptype = list(a = I(numeric()))),
+    "Can't convert the values of column `a` of `ptype` to its class <AsIs>",
+    fixed = TRUE
+  )
+  expect_error(
+    dbGetQuery(con, "SELECT 1 AS a", ptype = list(a = list())),
+    "column `a` of `ptype`",
+    fixed = TRUE
+  )
+
+  # A rejected prototype leaves an open result alone
+  rs <- dbSendQuery(con, "SELECT 1 AS a")
+  expect_error(dbSendQuery(con, "SELECT 1 AS a", ptype = list(a = I(numeric()))))
+  expect_error(dbSendQuery(con, "SELECT 1 AS a", ptype = list(a = complex())))
+  expect_true(dbIsValid(rs))
+  expect_equal(dbFetch(rs), data.frame(a = 1L))
+  dbClearResult(rs)
+})

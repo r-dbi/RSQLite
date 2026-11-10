@@ -11,7 +11,7 @@
 %   R/dbListTables_SQLiteConnection.R,
 %   R/dbQuoteIdentifier_SQLiteConnection_SQL.R,
 %   R/dbQuoteIdentifier_SQLiteConnection_character.R,
-%   R/dbReadTableArrow_SQLiteConnection_character.R,
+%   R/dbReadTableArrow_SQLiteConnection.R,
 %   R/dbRemoveTable_SQLiteConnection_character.R,
 %   R/dbSendQueryArrow_SQLiteConnection.R,
 %   R/dbSendQuery_SQLiteConnection_character.R,
@@ -50,8 +50,8 @@
 \alias{dbQuoteIdentifier,SQLiteConnection,SQL-method}
 \alias{dbQuoteIdentifier_SQLiteConnection_character}
 \alias{dbQuoteIdentifier,SQLiteConnection,character-method}
-\alias{dbReadTableArrow_SQLiteConnection_character}
-\alias{dbReadTableArrow,SQLiteConnection,character-method}
+\alias{dbReadTableArrow_SQLiteConnection}
+\alias{dbReadTableArrow,SQLiteConnection-method}
 \alias{dbRemoveTable_SQLiteConnection_character}
 \alias{dbRemoveTable,SQLiteConnection,character-method}
 \alias{dbSendQueryArrow_SQLiteConnection}
@@ -105,7 +105,7 @@
 
 \S4method{dbQuoteIdentifier}{SQLiteConnection,character}(conn, x, ...)
 
-\S4method{dbReadTableArrow}{SQLiteConnection,character}(conn, name, ..., schema = NULL)
+\S4method{dbReadTableArrow}{SQLiteConnection}(conn, name, ..., schema = NULL)
 
 \S4method{dbRemoveTable}{SQLiteConnection,character}(conn, name, ..., temporary = FALSE, fail_if_missing = TRUE)
 

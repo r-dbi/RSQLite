@@ -2,6 +2,7 @@
 DbResult.o: \
   CoercionLog.h \
   DbArrow.h \
+  DbArrowStream.h \
   DbColumnDataSource.h \
   DbColumnDataType.h \
   DbConnection.h \

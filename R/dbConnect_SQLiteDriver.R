@@ -41,16 +41,15 @@
 #' c.f. below for details.
 #' Defaults to `FALSE`.
 #' @param arrow When `TRUE`, data frames travel through the Arrow interface:
-#'   [DBI::dbFetch()] converts the Arrow arrays that [DBI::dbFetchArrowChunk()] fills straight from the SQLite statement,
+#'   [DBI::dbFetch()] converts Arrow arrays filled straight from the SQLite statement,
 #'   and [DBI::dbAppendTable()] binds the data frame as an Arrow stream through [DBI::dbAppendTableArrow()].
-#'   The data frames are the same as with the default path, see [sqlite-arrow] for the rules,
+#'   The data frames are the same as with the default path, see [sqlite-arrow] for the rules and the exceptions,
 #'   and the `ptype` argument of [DBI::dbSendQuery()] can fix the types of the columns up front.
 #'   When this was measured, fetching a large table took less time through Arrow than on the default path,
 #'   and fetching it in chunks much less.
 #'   Experimental, defaults to `FALSE`.
 #' @param lazy_strings When `TRUE`, with `arrow = TRUE`, the character columns of a fetched data frame
-#'   stay views into their Arrow arrays until they are used,
-#'   and the memory of a result is freed column by column,
+#'   stay views into Arrow arrays instead of being copied into R's strings,
 #'   see the section on data frames in [sqlite-arrow] for what that costs.
 #'   Experimental, defaults to `FALSE`.
 #'

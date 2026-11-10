@@ -5,6 +5,7 @@
 #include "RSQLite_types.h"
 #include "DbArrow.h"
 #include "DbArrowStream.h"
+#include "SqliteResultImpl.h"
 // After DbArrow.h, so that the Arrow C structs are defined once
 #include <nanoarrow/r.h>
 
@@ -111,134 +112,140 @@ SEXP result_fetch_arrow(
   return stream_xptr;
 }
 
-// All remaining rows, fetched up front as arrays of at most `chunk_size` rows:
-// a nanoarrow_array_stream that hands them out one by one, and the row count
+// The rows of one dbFetch() through Arrow, at most `n_max` or all for a
+// negative `n_max`, typed for a data frame and fetched up front as arrays of at
+// most `chunk_size` rows: a nanoarrow_array_stream that hands them out one by
+// one, the row count, and which columns have seen an integer that needs
+// 64 bits
 [[cpp11::register]]
-cpp11::list result_fetch_arrow_all(
-  cpp11::external_pointer<DbResultPtr> res_,
+cpp11::list result_fetch_arrow_df(
+  DbResult* res,
+  double n_max,
   double chunk_size
 ) {
-  DbResultPtr* res = res_.get();
-  if (res == NULL || res->get() == NULL) {
-    cpp11::stop("Invalid result set");
-  }
-  if (!(*res)->ready()) {
-    cpp11::stop("Query needs to be bound before fetching");
-  }
-
   cpp11::sexp stream_xptr(nanoarrow_array_stream_owning_xptr());
   struct ArrowArrayStream* stream =
     nanoarrow_output_array_stream_from_xptr(stream_xptr);
-  int64_t n = db_arrow_buffered_stream_init(
+  std::vector<bool> wide_ints;
+  int64_t n = res->fetch_arrow_df(
     stream,
-    *res,
+    wide_ints,
+    static_cast<int64_t>(n_max),
     static_cast<int64_t>(chunk_size)
   );
+
+  cpp11::writable::logicals wide(static_cast<R_xlen_t>(wide_ints.size()));
+  for (size_t j = 0; j < wide_ints.size(); ++j) {
+    wide[static_cast<R_xlen_t>(j)] = wide_ints[j] ? TRUE : FALSE;
+  }
 
   using namespace cpp11::literals;
   return cpp11::writable::list(
     { "stream"_nm = stream_xptr,
-      "n"_nm = cpp11::as_sexp(static_cast<double>(n)) }
+      "n"_nm = cpp11::as_sexp(static_cast<double>(n)),
+      "wide_ints"_nm = wide }
   );
 }
 
-// All remaining rows, fetched up front as chunks of at most `chunk_size` rows
-// and split by column: one nanoarrow_array_stream per column, the column
-// names, and the row count
+// The columns of a stream of struct arrays, such as the one of
+// result_fetch_arrow_df(), as one nanoarrow_array_stream per column, so that
+// each column can be converted on its own and its arrays released with it.
+// `first` is the stream's first array if it has been read already, or NULL.
+// The children move out of the arrays, which are released with what is left,
+// and the stream is consumed.
 [[cpp11::register]]
-cpp11::list result_fetch_arrow_columns(
-  cpp11::external_pointer<DbResultPtr> res_,
-  double chunk_size
-) {
-  DbResultPtr* res = res_.get();
-  if (res == NULL || res->get() == NULL) {
-    cpp11::stop("Invalid result set");
+cpp11::list arrow_split_columns(cpp11::sexp first, cpp11::sexp stream_xptr) {
+  if (!Rf_inherits(stream_xptr, "nanoarrow_array_stream")) {
+    cpp11::stop("`stream` must be a nanoarrow_array_stream.");
   }
-  if (!(*res)->ready()) {
-    cpp11::stop("Query needs to be bound before fetching");
+  struct ArrowArrayStream* stream =
+    static_cast<struct ArrowArrayStream*>(R_ExternalPtrAddr(stream_xptr));
+  if (stream == NULL || stream->release == NULL) {
+    cpp11::stop("The nanoarrow_array_stream has already been released.");
+  }
+  struct ArrowArray* first_array = NULL;
+  if (first != R_NilValue) {
+    if (!Rf_inherits(first, "nanoarrow_array")) {
+      cpp11::stop("`first` must be a nanoarrow_array or NULL.");
+    }
+    first_array = static_cast<struct ArrowArray*>(R_ExternalPtrAddr(first));
+    if (first_array == NULL || first_array->release == NULL) {
+      cpp11::stop("The nanoarrow_array has already been released.");
+    }
   }
 
+  struct ArrowError error;
+  ArrowErrorInit(&error);
   nanoarrow::UniqueSchema schema;
-  (*res)->arrow_schema(schema.get(), static_cast<int64_t>(chunk_size));
+  if (ArrowArrayStreamGetSchema(stream, schema.get(), &error) != NANOARROW_OK) {
+    cpp11::stop(
+      "Can't read the schema of the Arrow stream: %s",
+      ArrowArrayStreamGetLastError(stream)
+    );
+  }
   const R_xlen_t ncols = static_cast<R_xlen_t>(schema->n_children);
+  const size_t ncols_ = static_cast<size_t>(ncols);
 
+  // The R objects first, an allocation error leaves no C++ object behind
   cpp11::writable::list columns(ncols);
-  cpp11::writable::strings names(ncols);
-  std::vector<struct ArrowArrayStream*> outs(static_cast<size_t>(ncols));
   for (R_xlen_t j = 0; j < ncols; ++j) {
-    cpp11::sexp stream_xptr(nanoarrow_array_stream_owning_xptr());
-    outs[static_cast<size_t>(j)] =
-      nanoarrow_output_array_stream_from_xptr(stream_xptr);
-    columns[j] = stream_xptr;
-    const char* name = schema->children[j]->name;
-    names[j] = name == NULL ? "" : name;
+    columns[j] = nanoarrow_array_stream_owning_xptr();
   }
 
-  int64_t n = db_arrow_column_streams_init(
-    outs,
-    *res,
-    schema.get(),
-    static_cast<int64_t>(chunk_size)
-  );
-
-  using namespace cpp11::literals;
-  return cpp11::writable::list(
-    { "n"_nm = cpp11::as_sexp(static_cast<double>(n)),
-      "names"_nm = names,
-      "columns"_nm = columns }
-  );
-}
-
-// The next chunk of at most `chunk_size` rows split by column: one
-// nanoarrow_array per column, each owning its buffers, the column names,
-// the row count, and the bytes each column holds
-[[cpp11::register]]
-cpp11::list result_fetch_arrow_chunk_columns(DbResult* res, double chunk_size) {
-  nanoarrow::UniqueArray chunk;
-  res->fetch_arrow(chunk.get(), static_cast<int64_t>(chunk_size));
-
-  nanoarrow::UniqueSchema schema;
-  res->arrow_schema(schema.get(), static_cast<int64_t>(chunk_size));
-  const R_xlen_t ncols = static_cast<R_xlen_t>(schema->n_children);
-
-  cpp11::writable::list columns(ncols);
-  cpp11::writable::strings names(ncols);
-  cpp11::writable::doubles bytes(ncols);
-  for (R_xlen_t j = 0; j < ncols; ++j) {
-    cpp11::sexp array_xptr(nanoarrow_array_owning_xptr());
-    struct ArrowArray* array = nanoarrow_output_array_from_xptr(array_xptr);
-    ArrowArrayMove(chunk->children[j], array);
-
-    // The schema of a nanoarrow_array lives in the tag of the external pointer
-    cpp11::sexp schema_xptr(nanoarrow_schema_owning_xptr());
+  std::vector<nanoarrow::UniqueSchema> schemas(ncols_);
+  for (size_t j = 0; j < ncols_; ++j) {
     check_arrow(
-      ArrowSchemaDeepCopy(
-        schema->children[j],
-        nanoarrow_output_schema_from_xptr(schema_xptr)
-      ),
+      ArrowSchemaDeepCopy(schema->children[j], schemas[j].get()),
       "Can't copy Arrow schema"
     );
-    R_SetExternalPtrTag(array_xptr, schema_xptr);
-
-    columns[j] = array_xptr;
-    const char* name = schema->children[j]->name;
-    names[j] = name == NULL ? "" : name;
-    bytes[j] = static_cast<double>(arrow_array_bytes(array));
   }
 
-  using namespace cpp11::literals;
-  return cpp11::writable::list(
-    { "n"_nm = cpp11::as_sexp(static_cast<double>(chunk->length)),
-      "names"_nm = names,
-      "columns"_nm = columns,
-      "bytes"_nm = bytes }
-  );
+  std::vector<std::vector<nanoarrow::UniqueArray> > arrays(ncols_);
+  nanoarrow::UniqueArray chunk;
+  if (first_array != NULL) {
+    ArrowArrayMove(first_array, chunk.get());
+  } else if (ArrowArrayStreamGetNext(stream, chunk.get(), &error) !=
+             NANOARROW_OK) {
+    cpp11::stop(
+      "Can't read the Arrow stream: %s",
+      ArrowArrayStreamGetLastError(stream)
+    );
+  }
+  while (chunk->release != NULL) {
+    if (chunk->n_children != schema->n_children) {
+      cpp11::stop("Internal error: column count mismatch");
+    }
+    // The struct releases only the children that are left
+    for (size_t j = 0; j < ncols_; ++j) {
+      nanoarrow::UniqueArray column;
+      ArrowArrayMove(chunk->children[j], column.get());
+      arrays[j].push_back(std::move(column));
+    }
+    chunk.reset();
+    if (ArrowArrayStreamGetNext(stream, chunk.get(), &error) != NANOARROW_OK) {
+      cpp11::stop(
+        "Can't read the Arrow stream: %s",
+        ArrowArrayStreamGetLastError(stream)
+      );
+    }
+  }
+  ArrowArrayStreamRelease(stream);
+
+  for (R_xlen_t j = 0; j < ncols; ++j) {
+    db_arrow_buffered_stream_init(
+      nanoarrow_output_array_stream_from_xptr(columns[j]),
+      schemas[static_cast<size_t>(j)],
+      arrays[static_cast<size_t>(j)]
+    );
+  }
+  return columns;
 }
 
-// One nanoarrow_array with the values of every array of a stream of strings;
-// the stream is consumed, and each of its arrays is freed once copied
+// One nanoarrow_array with the values of every array of a stream of strings,
+// with the bytes its buffers hold; the stream is consumed, and each of its
+// arrays is freed once copied
 [[cpp11::register]]
-SEXP arrow_concat_strings(cpp11::sexp stream_xptr) {
+cpp11::list arrow_concat_strings(cpp11::sexp stream_xptr) {
   if (!Rf_inherits(stream_xptr, "nanoarrow_array_stream")) {
     cpp11::stop("`stream` must be a nanoarrow_array_stream.");
   }
@@ -248,12 +255,21 @@ SEXP arrow_concat_strings(cpp11::sexp stream_xptr) {
     cpp11::stop("The nanoarrow_array_stream has already been released.");
   }
 
+  cpp11::sexp out_xptr(nanoarrow_array_owning_xptr());
+  cpp11::sexp schema_xptr(nanoarrow_schema_owning_xptr());
+  struct ArrowArray* out = nanoarrow_output_array_from_xptr(out_xptr);
+  struct ArrowSchema* out_schema =
+    nanoarrow_output_schema_from_xptr(schema_xptr);
+
   struct ArrowError error;
   ArrowErrorInit(&error);
 
   nanoarrow::UniqueSchema schema;
   if (ArrowArrayStreamGetSchema(stream, schema.get(), &error) != NANOARROW_OK) {
-    cpp11::stop("Can't read the schema of the Arrow stream: %s", error.message);
+    cpp11::stop(
+      "Can't read the schema of the Arrow stream: %s",
+      ArrowArrayStreamGetLastError(stream)
+    );
   }
   struct ArrowSchemaView schema_view;
   check_arrow(
@@ -269,8 +285,6 @@ SEXP arrow_concat_strings(cpp11::sexp stream_xptr) {
     );
   }
 
-  cpp11::sexp out_xptr(nanoarrow_array_owning_xptr());
-  struct ArrowArray* out = nanoarrow_output_array_from_xptr(out_xptr);
   check_arrow(
     ArrowArrayInitFromType(out, schema_view.type),
     "Can't allocate Arrow array"
@@ -287,7 +301,10 @@ SEXP arrow_concat_strings(cpp11::sexp stream_xptr) {
   while (true) {
     nanoarrow::UniqueArray array;
     if (ArrowArrayStreamGetNext(stream, array.get(), &error) != NANOARROW_OK) {
-      cpp11::stop("Can't read the Arrow stream: %s", error.message);
+      cpp11::stop(
+        "Can't read the Arrow stream: %s",
+        ArrowArrayStreamGetLastError(stream)
+      );
     }
     if (array->release == NULL) {
       break;
@@ -299,38 +316,34 @@ SEXP arrow_concat_strings(cpp11::sexp stream_xptr) {
     );
     for (int64_t i = 0; i < array->length; ++i) {
       if (ArrowArrayViewIsNull(view.get(), i)) {
-        check_arrow(
-          ArrowArrayAppendNull(out, 1),
-          "Can't append to Arrow array"
-        );
+        check_arrow(ArrowArrayAppendNull(out, 1), "Can't append to Arrow array");
       } else {
         check_arrow(
-          ArrowArrayAppendString(
-            out,
-            ArrowArrayViewGetStringUnsafe(view.get(), i)
-          ),
+          ArrowArrayAppendString(out, ArrowArrayViewGetStringUnsafe(view.get(), i)),
           "Can't append to Arrow array"
         );
       }
     }
     cpp11::check_user_interrupt();
   }
+  ArrowArrayStreamRelease(stream);
   check_arrow(
     ArrowArrayFinishBuildingDefault(out, &error),
     "Can't finish Arrow array",
     &error
   );
 
-  cpp11::sexp schema_xptr(nanoarrow_schema_owning_xptr());
   check_arrow(
-    ArrowSchemaDeepCopy(
-      schema.get(),
-      nanoarrow_output_schema_from_xptr(schema_xptr)
-    ),
+    ArrowSchemaDeepCopy(schema.get(), out_schema),
     "Can't copy Arrow schema"
   );
   R_SetExternalPtrTag(out_xptr, schema_xptr);
-  return out_xptr;
+
+  using namespace cpp11::literals;
+  return cpp11::writable::list(
+    { "array"_nm = out_xptr,
+      "bytes"_nm = cpp11::as_sexp(static_cast<double>(arrow_array_bytes(out))) }
+  );
 }
 
 // The next chunk of at most `chunk_size` rows as a nanoarrow_array,
@@ -397,4 +410,24 @@ SEXP integer64_to_integer(cpp11::doubles x) {
     out[i] = (value == NA_INTEGER64) ? NA_INTEGER : static_cast<int>(value);
   }
   return out;
+}
+
+// For the tests: sets the bytes of a utf8 or binary column after which, or
+// beyond which, an Arrow chunk ends, and returns the previous values
+[[cpp11::register]]
+cpp11::doubles arrow_set_bytes_limits(double cut_bytes, double max_bytes) {
+  std::pair<int64_t, int64_t> old = SqliteResultImpl::set_arrow_bytes_limits(
+    static_cast<int64_t>(cut_bytes),
+    static_cast<int64_t>(max_bytes)
+  );
+  return cpp11::writable::doubles(
+    { static_cast<double>(old.first), static_cast<double>(old.second) }
+  );
+}
+
+// For the tests: how often an R condition raised while RSQLite's own C++ code
+// read one of its Arrow streams has been rethrown as a C++ exception
+[[cpp11::register]]
+double arrow_rethrown_unwinds() {
+  return static_cast<double>(db_arrow_stream_rethrown_unwinds());
 }

@@ -94,17 +94,16 @@ c.f. below for details.
 Defaults to \code{FALSE}.}
 
 \item{arrow}{When \code{TRUE}, data frames travel through the Arrow interface:
-\code{\link[DBI:dbFetch]{DBI::dbFetch()}} converts the Arrow arrays that \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} fills straight from the SQLite statement,
+\code{\link[DBI:dbFetch]{DBI::dbFetch()}} converts Arrow arrays filled straight from the SQLite statement,
 and \code{\link[DBI:dbAppendTable]{DBI::dbAppendTable()}} binds the data frame as an Arrow stream through \code{\link[DBI:dbAppendTableArrow]{DBI::dbAppendTableArrow()}}.
-The data frames are the same as with the default path, see \link{sqlite-arrow} for the rules,
+The data frames are the same as with the default path, see \link{sqlite-arrow} for the rules and the exceptions,
 and the \code{ptype} argument of \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}} can fix the types of the columns up front.
 When this was measured, fetching a large table took less time through Arrow than on the default path,
 and fetching it in chunks much less.
 Experimental, defaults to \code{FALSE}.}
 
 \item{lazy_strings}{When \code{TRUE}, with \code{arrow = TRUE}, the character columns of a fetched data frame
-stay views into their Arrow arrays until they are used,
-and the memory of a result is freed column by column,
+stay views into Arrow arrays instead of being copied into R's strings,
 see the section on data frames in \link{sqlite-arrow} for what that costs.
 Experimental, defaults to \code{FALSE}.}
 }

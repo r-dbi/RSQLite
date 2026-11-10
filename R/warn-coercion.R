@@ -1,7 +1,8 @@
 # The warning for values that were not of the type of their column.
 #
-# The C++ code logs such values per column and chunk (see CoercionLog) and
-# calls warn_coercion() once per fetched chunk with the entries:
+# The C++ code logs such values per column (see CoercionLog) and calls
+# warn_coercion() once per Arrow chunk, or once per dbFetch() for a data frame
+# through Arrow, with the entries:
 # a list with one element per column, each a list with the column name,
 # its Arrow type and the values grouped by storage class and reason,
 # with their 1-based row numbers in the result.
@@ -33,8 +34,7 @@ warn_coercion <- function(entries) {
   rlang::warn(
     c(header, rlang::set_names(bullets, "*")),
     class = "RSQLite_warning_coercion",
-    coercions = entries,
-    call = NULL
+    coercions = entries
   )
 }
 
@@ -54,6 +54,7 @@ format_coercion_values <- function(values) {
     invalid_utf8 = "not valid UTF-8, NA",
     unparsable = "not in the expected format, NA",
     out_of_range = "out of range, NA",
+    null_type = "dropped by the null type, NA",
     values$reason
   )
   paste0(what, " ", outcome, " (", format_coercion_rows(values), ")")

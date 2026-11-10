@@ -4,6 +4,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <vector>
 
 #include "DbResultImplDecl.h"
 
@@ -37,6 +38,9 @@ public:
   bool complete() const;
   bool ready() const;
   bool is_active() const;
+  // Counts the executions of the statement with new parameters:
+  // bind() and bind_arrow() start a new one
+  int64_t executions() const;
   int n_rows_fetched();
   int n_rows_affected();
 
@@ -53,6 +57,15 @@ public:
   );
   void arrow_schema(struct ArrowSchema* out, int64_t infer_rows);
   int64_t fetch_arrow(struct ArrowArray* out, int64_t n_max);
+  // At most `n_max` rows, all for a negative `n_max`, typed for a data frame,
+  // as a stream of arrays of at most `chunk_size` rows; returns the row count.
+  // `wide_ints` tells which columns have seen an integer that needs 64 bits.
+  int64_t fetch_arrow_df(
+    struct ArrowArrayStream* out,
+    std::vector<bool>& wide_ints,
+    int64_t n_max,
+    int64_t chunk_size
+  );
   void bind_arrow(
     struct ArrowArrayStream* stream,
     const std::vector<int>& param_indexes

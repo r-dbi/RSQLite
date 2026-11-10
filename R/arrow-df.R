@@ -4,49 +4,43 @@
 # data frames are written as Arrow streams; the data frames are the same as on
 # the default path.
 
-# The number of rows per array when a whole result is fetched
+# The number of rows per array of a fetch
 ARROW_DF_CHUNK_SIZE <- 65536
 
-# dbFetch() through Arrow: `n` rows as a data frame, all rows for `n < 0`,
-# with the columns of `ptype` converted to its types
-arrow_fetch_df <- function(res, n, ptype = NULL) {
-  if (n < 0) {
-    # All chunks are fetched first and split by column, so that each column
-    # is allocated once and its arrays go as soon as it is converted
-    fetched <- result_fetch_arrow_columns(res@ptr, ARROW_DF_CHUNK_SIZE)
-  } else {
-    fetched <- result_fetch_arrow_chunk_columns(res@ptr, n)
-  }
-  df <- arrow_columns_to_df(fetched, res@conn, ptype)
+# dbFetch() through Arrow: `n` rows as a data frame, all rows for `n < 0`.
+# The rows are fetched first, as arrays typed for this fetch the way the
+# default path types it, so that the columns are allocated once with the row
+# count known; the columns of the result's `ptype` have their requested types.
+arrow_fetch_df <- function(res, n, chunk_size = ARROW_DF_CHUNK_SIZE) {
+  # The C++ code takes a 64-bit integer, doubles are whole numbers up to 2^53
+  n <- min(n, 2^53)
+  fetched <- result_fetch_arrow_df(res@ptr, n, chunk_size)
+  df <- arrow_to_df(fetched$stream, res@conn, fetched$n, fetched$wide_ints, res@ptype)
 
   if (length(df) == 0L) {
-    # Same warning as the default path
-    warningc(
-      "`dbGetQuery()`, `dbSendQuery()` and `dbFetch()` should only be used ",
-      "with `SELECT` queries. Did you mean `dbExecute()`, `dbSendStatement()` ",
-      "or `dbGetRowsAffected()`?"
-    )
+    # Same warning as the default path, which gives none for `n = 0`
+    if (n != 0) {
+      warningc(
+        "`dbGetQuery()`, `dbSendQuery()` and `dbFetch()` should only be used ",
+        "with `SELECT` queries. Did you mean `dbExecute()`, `dbSendStatement()` ",
+        "or `dbGetRowsAffected()`?"
+      )
+    }
     df <- data.frame()
   }
 
   df
 }
 
-# The unified conversion of the columns of a result to a data frame.
-# `fetched` holds one nanoarrow_array (a chunk) or one nanoarrow_array_stream
-# (all rows) per column, the column names and the row count.
-# The columns of `ptype` become its types, the others follow arrow_df_ptype().
-# Each array is freed as soon as its column is converted, except that on a
-# connection with `lazy_strings = TRUE` a character column stays a view into
-# its array, which goes when the column does.
-arrow_columns_to_df <- function(fetched, conn, ptype = NULL) {
-  columns <- fetched$columns
-  names <- fetched$names
-  size <- as.integer(fetched$n)
-
-  schemas <- lapply(columns, nanoarrow::infer_nanoarrow_schema)
-  to <- lapply(schemas, arrow_df_ptype)
-  names(to) <- names
+# The unified conversion of an Arrow stream of `size` rows to a data frame:
+# the columns of `ptype` become its types, the others follow arrow_df_ptype(),
+# and `wide_ints` tells which columns have needed 64-bit integers in this fetch
+# or an earlier one.
+# On a connection with `lazy_strings = TRUE`, a character column without a
+# prototype, or with a plain `character()` one, stays a view into its array.
+arrow_to_df <- function(stream, conn, size, wide_ints, ptype = NULL) {
+  schema <- nanoarrow::infer_nanoarrow_schema(stream)
+  to <- arrow_df_ptype(schema)
 
   # nanoarrow builds factors only from given levels, the others come from the values
   factors <- character()
@@ -59,45 +53,20 @@ arrow_columns_to_df <- function(fetched, conn, ptype = NULL) {
     to[[name]] <- col
   }
 
-  out <- vector("list", length(columns))
-  for (j in seq_along(columns)) {
-    x <- columns[[j]]
-    target <- to[[j]]
-    lazy <- conn@lazy_strings && is.character(target) &&
-      schemas[[j]]$format %in% c("u", "U") && !(names[[j]] %in% factors)
-
-    if (inherits(x, "nanoarrow_array_stream")) {
-      if (lazy) {
-        # One array for the whole column, the chunks go as they are copied
-        out[[j]] <- nanoarrow::convert_array(arrow_concat_strings(x), to = target)
-      } else {
-        out[[j]] <- nanoarrow::convert_array_stream(x, to = target, size = size)
-        nanoarrow::nanoarrow_pointer_release(x)
-      }
-    } else {
-      out[[j]] <- nanoarrow::convert_array(x, to = target)
-      if (lazy) {
-        # Freed by the garbage collector, which does not see its memory
-        arrow_chunk_handed_out(fetched$bytes[[j]])
-      } else {
-        if (is.character(out[[j]])) {
-          # nanoarrow's character vectors read from the array until they are
-          # touched: copy them, so that the array can be freed right away
-          out[[j]] <- c(out[[j]])
-        }
-        nanoarrow::nanoarrow_pointer_release(x)
-      }
-    }
+  lazy <- logical(length(to))
+  if (conn@lazy_strings) {
+    formats <- vapply(schema$children, function(child) child$format, character(1))
+    lazy <- formats %in% c("u", "U") &
+      vlapply(to, function(col) is.character(col) && is.null(attributes(col))) &
+      !(names(to) %in% factors)
   }
+
+  df <- arrow_stream_to_df(stream, to, size, lazy)
   for (name in factors) {
-    j <- match(name, names)
-    out[[j]] <- factor(out[[j]])
+    df[[name]] <- factor(df[[name]], ordered = is.ordered(ptype[[name]]))
   }
 
-  names(out) <- names
-  attr(out, "row.names") <- .set_row_names(size)
-  class(out) <- "data.frame"
-  arrow_df_int64(out, conn@bigint, keep = names(ptype))
+  arrow_df_int64(df, conn@bigint, wide_ints, keep = names(df) %in% names(ptype))
 }
 
 # A data frame prototype from a data frame or a named list of vectors:
@@ -138,44 +107,110 @@ arrow_check_ptype <- function(ptype) {
 # nanoarrow's inference, except that hms columns take the time64 type the
 # result path fills, and factors are read as strings
 arrow_ptype_schema <- function(ptype) {
-  children <- lapply(ptype, function(col) {
-    if (inherits(col, "hms")) {
-      nanoarrow::na_time64("us")
-    } else if (is.factor(col)) {
-      nanoarrow::na_string()
-    } else {
-      nanoarrow::infer_nanoarrow_schema(col)
-    }
-  })
-  nanoarrow::na_struct(children)
+  nanoarrow::na_struct(Map(arrow_ptype_column_schema, ptype, names(ptype)))
 }
 
-# The R type that an Arrow column is converted to:
+# A column that nanoarrow finds no type for, or can't convert back to,
+# is an error that names it before the query is sent
+arrow_ptype_column_schema <- function(col, name) {
+  if (inherits(col, "hms")) {
+    return(nanoarrow::na_time64("us"))
+  }
+  if (is.factor(col)) {
+    return(nanoarrow::na_string())
+  }
+  schema <- tryCatch(
+    nanoarrow::infer_nanoarrow_schema(col),
+    error = function(e) {
+      stopc("Can't request a type for column `", name, "` of `ptype`: ", conditionMessage(e))
+    }
+  )
+  # nanoarrow infers a type for some classes it cannot convert back to, such as AsIs
+  back <- tryCatch(
+    nanoarrow::convert_array(nanoarrow::nanoarrow_array_init(schema), to = col),
+    error = function(e) NULL
+  )
+  if (!identical(class(back), class(col))) {
+    stopc(
+      "Can't convert the values of column `", name, "` of `ptype` ",
+      "to its class <", paste(class(col), collapse = "/"), ">"
+    )
+  }
+  schema
+}
+
+# All rows of a stream with a known row count as a data frame.
+# One array is converted at once, the strings are copied out of it before it is
+# released; several arrays are split by column, and each column is allocated
+# once and filled by nanoarrow, its arrays released as it is converted.
+# The columns in `lazy` stay views into one array each, with all their strings.
+arrow_stream_to_df <- function(stream, ptype, size, lazy = logical(length(ptype))) {
+  array <- stream$get_next(validate = FALSE)
+  if (!any(lazy) && !is.null(array) && array$length == size) {
+    # One array holds all rows, such as a fetch of fewer rows than a chunk:
+    # nanoarrow's columns are the data frame, except that its character
+    # vectors read from the array until they are touched, so these are copied
+    # before the array is released
+    df <- nanoarrow::convert_array(array, to = ptype)
+    df[] <- lapply(df, function(col) if (is.character(col)) c(col) else col)
+    nanoarrow::nanoarrow_pointer_release(array)
+    stream$release()
+    return(df)
+  }
+
+  # One stream per column, the arrays move out of the stream and of `array`
+  streams <- arrow_split_columns(array, stream)
+  size <- as.integer(size)
+  columns <- vector("list", length(streams))
+  for (j in seq_along(streams)) {
+    if (lazy[[j]]) {
+      # Freed by the garbage collector, which does not see its memory
+      strings <- arrow_concat_strings(streams[[j]])
+      columns[[j]] <- nanoarrow::convert_array(strings$array, to = ptype[[j]])
+      arrow_chunk_handed_out(strings$bytes)
+    } else {
+      # nanoarrow fills the column in one vector, whose strings are copies
+      col <- nanoarrow::convert_array_stream(streams[[j]], to = ptype[[j]], size = size)
+      nanoarrow::nanoarrow_pointer_release(streams[[j]])
+      attributes(col) <- attributes(ptype[[j]])
+      columns[[j]] <- col
+    }
+  }
+
+  names(columns) <- names(ptype)
+  attr(columns, "row.names") <- .set_row_names(size)
+  class(columns) <- "data.frame"
+  columns
+}
+
+# The R types that Arrow columns are converted to:
 # nanoarrow's own rules, except that 64-bit integers keep their range
 # and null columns are logical
 arrow_df_ptype <- function(schema) {
-  switch(schema$format,
-    l = ,
-    L = bit64::integer64(),
-    n = logical(),
-    nanoarrow::infer_nanoarrow_ptype(schema)
-  )
+  ptype <- nanoarrow::infer_nanoarrow_ptype(schema)
+  formats <- vapply(schema$children, function(child) child$format, character(1))
+  for (i in which(formats %in% c("l", "L"))) {
+    ptype[[i]] <- bit64::integer64()
+  }
+  for (i in which(formats == "n")) {
+    ptype[[i]] <- logical()
+  }
+  ptype
 }
 
 # SQLite integers are 64-bit: a column whose values all fit is an integer,
-# the others follow the `bigint` connection argument, like the default path;
-# the columns in `keep` have their requested type already
-arrow_df_int64 <- function(df, bigint, keep = character()) {
-  is_int64 <- which(vlapply(df, inherits, "integer64") & !(names(df) %in% keep))
+# the others follow the `bigint` connection argument, like the default path,
+# which also keeps a column that needed 64 bits in an earlier fetch;
+# the columns in `keep` have their requested types already
+arrow_df_int64 <- function(df, bigint, wide_ints, keep = logical(length(df))) {
+  is_int64 <- which(vlapply(df, inherits, "integer64") & !wide_ints & !keep)
   for (i in is_int64) {
     as_int <- integer64_to_integer(df[[i]])
     if (!is.null(as_int)) {
       df[[i]] <- as_int
     }
   }
-  kept <- df[keep]
-  df <- convert_bigint(df, bigint)
-  df[keep] <- kept
+  df[!keep] <- convert_bigint(df[!keep], bigint)
   df
 }
 
@@ -186,7 +221,8 @@ arrow_append_df <- function(conn, name, value) {
 }
 
 # What the default path does in sqlData() and dbBind() before writing:
-# factors become strings, lists of raw vectors become blobs
+# factors become strings, lists of raw vectors become blobs,
+# and a difftime is written as its number in its own units
 arrow_prepare_df <- function(value) {
   value <- factor_to_string(value, warn = TRUE)
 
@@ -201,6 +237,10 @@ arrow_prepare_df <- function(value) {
 
   is_posixlt <- vlapply(value, inherits, "POSIXlt")
   value[is_posixlt] <- lapply(value[is_posixlt], as.POSIXct)
+
+  # nanoarrow would write a duration in seconds
+  is_difftime <- vlapply(value, inherits, "difftime")
+  value[is_difftime] <- lapply(value[is_difftime], as.numeric)
 
   value
 }

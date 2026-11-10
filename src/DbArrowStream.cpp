@@ -7,18 +7,39 @@
 
 namespace {
 
+// Counts the R conditions rethrown as C++ exceptions, for the tests
+int64_t rethrown_unwinds = 0;
+
 struct StreamState {
   DbResultPtr result;
   int64_t chunk_size;
+  // The execution of the statement whose rows the stream reads
+  int64_t executions;
+  // Set when C++ code of this package reads the stream, see below
+  bool rethrow_unwind;
   nanoarrow::UniqueSchema schema;
   std::string last_error;
 
   StreamState(const DbResultPtr& result_, int64_t chunk_size_)
-      : result(result_), chunk_size(chunk_size_) {}
+      : result(result_),
+        chunk_size(chunk_size_),
+        executions(result_->executions()),
+        rethrow_unwind(false) {}
 };
 
 StreamState* get_state(struct ArrowArrayStream* stream) {
   return static_cast<StreamState*>(stream->private_data);
+}
+
+// New parameters execute the statement again, with new rows and possibly
+// other types than those of the schema handed out
+void check_executions(StreamState* state) {
+  if (state->result->executions() != state->executions) {
+    throw std::runtime_error(
+      "The result was bound to new parameters after the Arrow stream was "
+      "created, call dbFetchArrow() again"
+    );
+  }
 }
 
 void ensure_schema(StreamState* state) {
@@ -28,6 +49,7 @@ void ensure_schema(StreamState* state) {
   if (!state->result) {
     throw std::runtime_error("The Arrow stream has already been consumed");
   }
+  check_executions(state);
   state->result->arrow_schema(state->schema.get(), state->chunk_size);
 }
 
@@ -48,6 +70,7 @@ int get_next_impl(StreamState* state, struct ArrowArray* out) {
   }
 
   ensure_schema(state);
+  check_executions(state);
 
   nanoarrow::UniqueArray array;
   int64_t n = state->result->fetch_arrow(array.get(), state->chunk_size);
@@ -67,6 +90,13 @@ int get_next_impl(StreamState* state, struct ArrowArray* out) {
 // An R error or interrupt raised through cpp11 arrives as a
 // cpp11::unwind_exception; its unwind is continued after leaving the try block
 // with no C++ objects alive, exactly like cpp11's entry-point wrapper does.
+// When C++ code of this package is the consumer, the exception is rethrown
+// instead, so that the unwind is continued at the entry point after the
+// consumer's C++ objects have been destroyed.
+// A C++ consumer of another package, such as arrow, still sees the longjmp:
+// the C stream interface has no other way to carry an R condition.
+// The conditions are interrupts, and warnings that a handler or
+// `options(warn = 2)` turns into a jump.
 
 int stream_get_schema(
   struct ArrowArrayStream* stream,
@@ -77,6 +107,10 @@ int stream_get_schema(
   try {
     return get_schema_impl(state, out);
   } catch (const cpp11::unwind_exception& e) {
+    if (state->rethrow_unwind) {
+      ++rethrown_unwinds;
+      throw;
+    }
     token = e.token;
   } catch (const std::exception& e) {
     state->last_error = e.what();
@@ -95,6 +129,10 @@ int stream_get_next(struct ArrowArrayStream* stream, struct ArrowArray* out) {
   try {
     return get_next_impl(state, out);
   } catch (const cpp11::unwind_exception& e) {
+    if (state->rethrow_unwind) {
+      ++rethrown_unwinds;
+      throw;
+    }
     token = e.token;
   } catch (const std::exception& e) {
     state->last_error = e.what();
@@ -189,75 +227,36 @@ void db_arrow_stream_init(
   out->private_data = new StreamState(result, chunk_size);
 }
 
-int64_t db_arrow_buffered_stream_init(
+void db_arrow_buffered_stream_init(
   struct ArrowArrayStream* out,
-  const DbResultPtr& result,
-  int64_t chunk_size
+  nanoarrow::UniqueSchema& schema,
+  std::vector<nanoarrow::UniqueArray>& arrays
 ) {
   std::unique_ptr<BufferedState> state(new BufferedState());
-  result->arrow_schema(state->schema.get(), chunk_size);
-
-  int64_t total = 0;
-  while (true) {
-    nanoarrow::UniqueArray array;
-    int64_t n = result->fetch_arrow(array.get(), chunk_size);
-    if (n == 0) {
-      break;
-    }
-    total += n;
-    state->arrays.push_back(std::move(array));
-  }
+  schema.move(state->schema.get());
+  state->arrays.swap(arrays);
 
   out->get_schema = &buffered_get_schema;
   out->get_next = &buffered_get_next;
   out->get_last_error = &buffered_get_last_error;
   out->release = &buffered_release;
   out->private_data = state.release();
-  return total;
 }
 
-int64_t db_arrow_column_streams_init(
-  std::vector<struct ArrowArrayStream*>& outs,
-  const DbResultPtr& result,
-  const struct ArrowSchema* schema,
-  int64_t chunk_size
+bool db_arrow_stream_reads(
+  struct ArrowArrayStream* stream,
+  const DbResult* result
 ) {
-  const size_t ncols = static_cast<size_t>(schema->n_children);
-  if (outs.size() != ncols) {
-    throw std::runtime_error("Internal error: column count mismatch");
-  }
+  return stream->release == &stream_release &&
+         get_state(stream)->result.get() == result;
+}
 
-  std::vector<std::unique_ptr<BufferedState>> states(ncols);
-  for (size_t j = 0; j < ncols; ++j) {
-    states[j].reset(new BufferedState());
-    check_arrow(
-      ArrowSchemaDeepCopy(schema->children[j], states[j]->schema.get()),
-      "Can't copy Arrow schema"
-    );
+void db_arrow_stream_read_from_cpp(struct ArrowArrayStream* stream) {
+  if (stream->release == &stream_release) {
+    get_state(stream)->rethrow_unwind = true;
   }
+}
 
-  int64_t total = 0;
-  while (true) {
-    nanoarrow::UniqueArray chunk;
-    int64_t n = result->fetch_arrow(chunk.get(), chunk_size);
-    if (n == 0) {
-      break;
-    }
-    total += n;
-    // The children move out of the struct, which releases only what is left
-    for (size_t j = 0; j < ncols; ++j) {
-      nanoarrow::UniqueArray column;
-      ArrowArrayMove(chunk->children[j], column.get());
-      states[j]->arrays.push_back(std::move(column));
-    }
-  }
-
-  for (size_t j = 0; j < ncols; ++j) {
-    outs[j]->get_schema = &buffered_get_schema;
-    outs[j]->get_next = &buffered_get_next;
-    outs[j]->get_last_error = &buffered_get_last_error;
-    outs[j]->release = &buffered_release;
-    outs[j]->private_data = states[j].release();
-  }
-  return total;
+int64_t db_arrow_stream_rethrown_unwinds() {
+  return rethrown_unwinds;
 }

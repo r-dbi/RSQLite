@@ -21,16 +21,19 @@ the first value that is not \code{NULL} decides,
 and integers are widened to \code{double} if a real number turns up in the first chunk.
 A column whose first chunk holds only \code{NULL} values takes the type of its declaration,
 and a column without a declaration that only ever holds \code{NULL} is of the Arrow null type.
-Once the first chunk has been fetched the types are fixed;
-later values of another storage class are converted by SQLite's own rules.
-Such values are reported with one warning per fetched chunk,
-of class \code{RSQLite_warning_coercion},
-that lists the affected columns with the 1-based row numbers in the result,
-for a lazy stream at the time the chunk is read.
-The warning carries the details in its \code{coercions} field.
+Once the first chunk has been fetched the types are fixed.
+A value of another storage class is converted by SQLite's own rules,
+and becomes \code{NULL} in a column of the null type.
 A blob in a text column is kept only if it is valid UTF-8 without NUL bytes,
 and a date, time or timestamp that cannot be parsed is dropped;
-both become \code{NULL} and are listed in the same warning.
+both become \code{NULL}.
+Such values are reported with one warning per chunk, of class \code{RSQLite_warning_coercion},
+that lists the affected columns with their types and the 1-based row numbers in the result.
+It is raised when the chunk is fetched from the result:
+for a lazy stream when the array is requested,
+and for the first chunk when the schema is requested before it
+and a column has no requested type, see the sections on chunking and on requesting types.
+The warning carries the details in its \code{coercions} field.
 The types can therefore depend on \code{chunk_size}:
 a real number in a later chunk is truncated to fit an \code{int64} column decided from integers,
 and a column whose first chunk holds only \code{NULL} keeps its declared type,
@@ -71,7 +74,9 @@ A column with a requested type is typed without looking at its values,
 with no widening and no dependence on \code{chunk_size},
 and its declared type and \code{extended_types} play no part;
 the other columns are typed as described above.
-The requested types are kept when the query is executed again with \code{\link[DBI:dbBind]{DBI::dbBind()}}.
+The requested types are kept when the query is executed again with \code{\link[DBI:dbBind]{DBI::dbBind()}},
+and by the data frame fetches of a connection with \code{arrow = TRUE},
+where nanoarrow converts them to R types.
 
 The types that can be requested are
 \code{null}, \code{bool}, \code{int8} to \code{int64}, \code{uint8} to \code{uint64}, \code{float}, \code{double},
@@ -91,7 +96,9 @@ and text into a binary type, as its bytes;
 text and blobs into a numeric type, and reals into an integer type, truncated;
 \item \code{NULL}, with the warning: a blob into a text type unless it is valid UTF-8,
 a number outside the range of an integer type,
-and a date or time that cannot be parsed.
+a time or timestamp outside the range of its unit, such as a timestamp in nanoseconds after 2262,
+a date or time that cannot be parsed,
+and any value into the null type.
 }
 }
 
@@ -117,50 +124,74 @@ Named placeholders are matched to the names of the columns, like \code{\link[DBI
 \section{Data frames}{
 
 With \code{dbConnect(arrow = TRUE)}, data frames travel through this interface:
-\code{\link[DBI:dbFetch]{DBI::dbFetch()}} converts the arrays filled by \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}},
+\code{\link[DBI:dbFetch]{DBI::dbFetch()}} converts Arrow arrays filled straight from the SQLite statement,
 and \code{\link[DBI:dbAppendTable]{DBI::dbAppendTable()}} writes the data frame as an Arrow stream through \code{\link[DBI:dbAppendTableArrow]{DBI::dbAppendTableArrow()}}.
 The conversion follows nanoarrow's rules, with these additions:
 an \code{int64} column becomes an \code{integer} if all its values fit,
-and follows the \code{bigint} argument of \code{\link[DBI:dbConnect]{DBI::dbConnect()}} otherwise;
+and follows the \code{bigint} argument of \code{\link[DBI:dbConnect]{DBI::dbConnect()}} otherwise, also in the later fetches of the result;
 a \code{null} column becomes a \code{logical}.
 \code{date32}, \code{time64} and \code{timestamp} columns become \code{Date}, \code{hms} and \code{POSIXct} in UTC,
 and \code{binary} columns become \link[blob:blob]{blob::blob} objects,
 as on the default path.
-The first chunk of a result decides the types of all its chunks,
-unless the types are given up front with \code{ptype}.
-Before writing, factors become strings and lists of raw vectors become blobs.
+
+Unlike a stream, each fetch decides the types of its columns without a requested type,
+the way the default path does it:
+the first value that is not \code{NULL} decides,
+integers become doubles when a real number follows in the same fetch,
+and a column without a value takes its declared type, or \code{logical} without one.
+The next fetch starts from these types, except that it decides a \code{logical} column again.
+The default path truncates a real number that follows an integer too large for an \code{integer},
+with a warning, here the column becomes a \code{double}.
+Once \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} or \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} has fixed the types of a result,
+later fetches keep them,
+and they hand out the rows kept for a schema, where the default path fails.
+Values that are not of their column's type are converted or dropped as in a stream,
+and reported with one warning of class \code{RSQLite_warning_coercion} per \code{\link[DBI:dbFetch]{DBI::dbFetch()}},
+which names the Arrow types the columns have at the end of the fetch.
+The default path warns on the same fetches,
+apart from the real numbers it truncates
+and the values converted silently, as listed in the section on requesting types,
+but once per column with values of another storage class,
+and once per date, time or timestamp that cannot be parsed.
+Before writing, factors become strings, lists of raw vectors become blobs,
+and \code{difftime} columns become their numbers in their own units, as on the default path.
 
 The \code{ptype} argument of \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}}, \code{\link[DBI:dbGetQuery]{DBI::dbGetQuery()}} and \code{\link[DBI:dbReadTable]{DBI::dbReadTable()}}
-names the R types of some or all result columns:
+fixes the R types of some or all result columns before the first row is read:
 a data frame, or a named list of vectors whose values are ignored, such as
 \code{list(id = bit64::integer64(), when = as.POSIXct(character(), tz = "UTC"))}.
-The columns are matched to the result by name, exactly, like \code{schema} above,
-and the other columns are converted as described.
+The columns are matched to the result by name, exactly, with the errors of \code{schema}.
 A column of the prototype is requested from SQLite as the Arrow type that
-\code{nanoarrow::infer_nanoarrow_schema()} gives for it:
+\code{nanoarrow::infer_nanoarrow_schema()} gives for it, see the section on requesting types:
 \code{integer} as \code{int32}, so that values outside its range become \code{NA} with a warning,
-\code{bit64::integer64} as \code{int64}, and it stays an \code{integer64} whatever the values,
-\code{logical} as \code{bool}, \code{Date} as \code{date32}, and \code{blob} as \code{binary}.
-A \code{POSIXct} column is requested as a timestamp in the time zone of the prototype,
+\code{bit64::integer64} as \code{int64}, \code{logical} as \code{bool}, \code{Date} as \code{date32}, and \code{blob} as \code{binary}.
+A \code{POSIXct} or \code{POSIXlt} column is requested as a timestamp in the time zone of the prototype,
 the session's time zone for an empty one:
 the values are read as UTC, like on both paths, and displayed in that zone.
 An \code{hms} column is requested as \code{time64} in microseconds,
-and a factor is read as text and converted to its levels,
+and a factor is read as text and converted to its levels, where other values become \code{NA} as with \code{\link[base:factor]{base::factor()}},
 or to the levels found in the values of each fetch if it has none.
-The prototype then drives the conversion to R, so the columns come back exactly as described,
-and \code{bigint} applies only to the other columns.
+A prototype that nanoarrow finds no type for, one of a type that cannot be requested, such as a \code{difftime},
+and one that nanoarrow cannot convert back to, such as an \link[base:I]{AsIs} vector, are errors that name the column.
+These columns keep their types in every fetch, whatever the values,
+and come back exactly as described:
+an \code{integer64} column stays one whatever the values and whatever \code{bigint} says.
+The other columns are typed and converted as described above.
 
-A fetch of all rows reads the result into Arrow arrays first and splits them by column,
-so that each column is allocated once with the row count known
-and its arrays are freed as soon as it is converted;
-a fetch of \code{n} rows converts its chunk column by column the same way.
+Each fetch reads its rows into Arrow arrays first,
+so that the data frame is allocated once with the row count known.
+The rows of one array are converted at once, and the array is released right away;
+the arrays of a larger fetch are split by column,
+so that nanoarrow fills each column in one go and releases its arrays as it goes,
+for the garbage collector to free:
+at its peak, the memory holds the arrays and the part of the data frame filled so far.
 Character columns are copied out of their arrays,
 unless the connection was opened with \code{lazy_strings = TRUE}:
-then a character column stays a view into its Arrow array,
-which holds the strings in less memory than R does and is freed when the column is dropped,
-while the other columns are converted and freed as before.
-Until nanoarrow caches the strings of such a view,
-every vectorised use of the column converts it again,
+then a character column, without a prototype or with a \code{character()} one,
+stays a view into one Arrow array that holds all its strings and is freed with the column,
+while the other columns are converted as before.
+Unless they repeat, the strings take less memory in the array than in R.
+Most vectorised uses of such a view convert its strings again, one by one,
 so a column that is used more than once is better copied with \code{c()} first.
 }
 
@@ -170,8 +201,25 @@ so a column that is used more than once is better copied with \code{c()} first.
 each array holds at most \code{chunk_size} rows,
 fetched from the result when the array is requested,
 so the memory footprint is that of one chunk, not of the result set.
-The stream stays readable after the result has been cleared with \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}},
-it is invalidated when another query is sent on the same connection.
+The stream holds on to the statement of the result:
+it stays readable after \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}}, while other queries run on the same connection,
+and even after \code{\link[DBI:dbDisconnect]{DBI::dbDisconnect()}},
+when an error of the statement can only report SQLite's generic message for its result code.
+Until it has been read to the end or released, with \code{stream$release()} or by the garbage collector,
+it keeps the statement open, and with it a read transaction and the database file.
+It reads the rows of the parameters bound when it was created:
+once \code{\link[DBI:dbBind]{DBI::dbBind()}} or \code{\link[DBI:dbBindArrow]{DBI::dbBindArrow()}} binds new parameters, reading it fails,
+and \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} returns a stream for the new rows.
+\code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} returns one such array per call,
+and an empty array once all rows are fetched.
+When the schema of a stream is requested before its first array,
+and a column has no requested type,
+the first chunk is fetched to decide the types and kept for the next fetch:
+\code{\link[DBI:dbGetRowCount]{DBI::dbGetRowCount()}} and \code{\link[DBI:dbHasCompleted]{DBI::dbHasCompleted()}} count its rows once they have been handed out,
+and \code{\link[DBI:dbFetch]{DBI::dbFetch()}} fails while they wait.
+A chunk also ends after the row at which a string or binary column reaches 1 GiB,
+and before a row that would take such a column past the \code{2^31 - 1} bytes
+that the 32-bit offsets of the \code{utf8} and \code{binary} types can address.
 
 An array returned by \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} is freed
 when the garbage collector finds it unreachable,
@@ -180,8 +228,5 @@ After every 64 MB of arrays, RSQLite triggers a collection of the young generati
 so that a loop that discards its chunks holds at most that much garbage.
 A loop that needs to be tighter releases each array
 with \code{nanoarrow::nanoarrow_pointer_release()} once done with it.
-\code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} returns one such array per call,
-and an empty array once all rows are fetched.
-A chunk is also cut once a string or binary column holds one gigabyte.
 }
 

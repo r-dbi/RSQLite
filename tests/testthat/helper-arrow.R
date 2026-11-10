@@ -16,3 +16,37 @@ schema_formats <- function(x) {
   schema <- nanoarrow::infer_nanoarrow_schema(x)
   vapply(schema$children, function(child) child$format, character(1))
 }
+
+# The lengths of the arrays a stream yields, which are released on the way
+chunk_lengths <- function(stream) {
+  lengths <- numeric()
+  repeat {
+    array <- stream$get_next()
+    if (is.null(array)) {
+      break
+    }
+    lengths <- c(lengths, array$length)
+    nanoarrow::nanoarrow_pointer_release(array)
+  }
+  lengths
+}
+
+# Lowers the bytes of a string or binary column after which, or beyond which,
+# a chunk ends, from 1 GiB and 2^31 - 1
+local_arrow_bytes_limits <- function(cut_bytes, max_bytes, envir = parent.frame()) {
+  old <- arrow_set_bytes_limits(cut_bytes, max_bytes)
+  withr::defer(arrow_set_bytes_limits(old[[1]], old[[2]]), envir = envir)
+}
+
+# The coercion warnings that `expr` raises, muffled
+coercion_warnings <- function(expr) {
+  out <- list()
+  withCallingHandlers(
+    expr,
+    RSQLite_warning_coercion = function(w) {
+      out[[length(out) + 1]] <<- w
+      invokeRestart("muffleWarning")
+    }
+  )
+  out
+}

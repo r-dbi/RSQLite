@@ -130,7 +130,9 @@
 #' Values that are not of their column's type are converted or dropped as in a stream,
 #' and reported with one warning of class `RSQLite_warning_coercion` per [DBI::dbFetch()],
 #' which names the Arrow types the columns have at the end of the fetch.
-#' The default path warns on the same fetches, apart from the real numbers it truncates,
+#' The default path warns on the same fetches,
+#' apart from the real numbers it truncates
+#' and the values converted silently, as listed in the section on requesting types,
 #' but once per column with values of another storage class,
 #' and once per date, time or timestamp that cannot be parsed.
 #' Before writing, factors become strings, lists of raw vectors become blobs,

@@ -220,7 +220,7 @@ test_that("each fetch through Arrow is typed like on the default path", {
     "INSERT INTO t VALUES (1, 2.5, NULL, 1, NULL, 1099511627776, NULL)",
     "INSERT INTO t VALUES ('a', 3, 4, NULL, x'01', 1, NULL)",
     "INSERT INTO t VALUES (NULL, NULL, 'c', 2.5, NULL, 2, NULL)",
-    "INSERT INTO t VALUES (2.5, 4, NULL, NULL, 'd', NULL, NULL)",
+    "INSERT INTO t VALUES (2.5, 4, NULL, NULL, 4, NULL, NULL)",
     "INSERT INTO t VALUES (NULL, NULL, NULL, NULL, NULL, 3, 'e')"
   )
   con <- dbConnect(SQLite(), ":memory:")
@@ -250,6 +250,28 @@ test_that("each fetch through Arrow is typed like on the default path", {
   }
   # The values of other storage classes are in columns x and b
   expect_identical(fetch_sequence(con, "SELECT * FROM t", -1)$warnings, 2L)
+})
+
+test_that("values that SQLite converts exactly are silent through Arrow", {
+  # Unlike the default path, see ?"sqlite-arrow"
+  setup <- c(
+    "CREATE TABLE t (s, b)",
+    "INSERT INTO t VALUES ('a', x'01'), (1, 'b'), (2.5, NULL)"
+  )
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con))
+  con_arrow <- local_arrow_con()
+  for (sql in setup) {
+    dbExecute(con, sql)
+    dbExecute(con_arrow, sql)
+  }
+
+  expected <- fetch_sequence(con, "SELECT * FROM t", -1)
+  actual <- fetch_sequence(con_arrow, "SELECT * FROM t", -1)
+  expect_identical(actual$data, expected$data)
+  expect_identical(actual$data[[1]]$s, c("a", "1", "2.5"))
+  expect_identical(expected$warnings, 2L)
+  expect_identical(actual$warnings, 0L)
 })
 
 test_that("a NULL-first column is typed by its first value through Arrow", {

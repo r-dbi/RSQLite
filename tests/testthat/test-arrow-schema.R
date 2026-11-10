@@ -438,3 +438,27 @@ test_that("only the requested types with 32-bit offsets end chunks at the byte l
     }
   }
 })
+
+test_that("the warning names each requested type", {
+  con <- local_con()
+  types <- list(
+    bool = nanoarrow::na_bool(), int8 = nanoarrow::na_int8(), int16 = nanoarrow::na_int16(),
+    int32 = nanoarrow::na_int32(), int64 = nanoarrow::na_int64(), uint8 = nanoarrow::na_uint8(),
+    uint16 = nanoarrow::na_uint16(), uint32 = nanoarrow::na_uint32(), uint64 = nanoarrow::na_uint64(),
+    float = nanoarrow::na_float(), double = nanoarrow::na_double(),
+    utf8 = nanoarrow::na_string(), large_utf8 = nanoarrow::na_large_string(),
+    binary = nanoarrow::na_binary(), large_binary = nanoarrow::na_large_binary(),
+    date32 = nanoarrow::na_date32(), date64 = nanoarrow::na_date64(),
+    time32 = nanoarrow::na_time32("ms"), time64 = nanoarrow::na_time64("us"),
+    timestamp = nanoarrow::na_timestamp("us", "UTC"), null = nanoarrow::na_na()
+  )
+  # A value of another storage class that each type reports
+  values <- c(utf8 = "x'ff'", large_utf8 = "x'ff'", binary = "1", large_binary = "1", null = "1")
+  for (type in names(types)) {
+    value <- if (type %in% names(values)) values[[type]] else "'abc'"
+    stream <- dbGetQueryArrow(con, paste("SELECT", value, "AS x"), schema = list(x = types[[type]]))
+    w <- coercion_warnings(chunk_lengths(stream))
+    expect_length(w, 1)
+    expect_equal(w[[1]]$coercions[[1]]$type, type, info = type)
+  }
+})

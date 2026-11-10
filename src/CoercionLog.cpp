@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "CoercionLog.h"
 #include "sqlite3-cpp.h"
+#include <algorithm>
+#include <sstream>
 
 using namespace cpp11::literals;
 
@@ -68,6 +70,41 @@ cpp11::writable::list CoercionLog::as_list() const {
   return out;
 }
 
+// Like format_coercion_values() and format_coercion_rows() in R, with the
+// ellipsis and the joins that they use without cli
+std::string CoercionLog::format() const {
+  std::ostringstream ss;
+  for (size_t i = 0; i < entries.size(); ++i) {
+    const Entry& entry = entries[i];
+    if (i > 0) {
+      ss << "; ";
+    }
+    ss << entry.count << " " << format_column_type(entry.column_type)
+       << (entry.count == 1 ? " value " : " values ")
+       << format_outcome(entry.reason) << " ("
+       << (entry.count == 1 ? "row " : "rows ");
+
+    const std::vector<int64_t>& rows = entry.head;
+    if (static_cast<size_t>(entry.count) <= rows.size()) {
+      const size_t n = rows.size();
+      for (size_t k = 0; k < n; ++k) {
+        if (k > 0) {
+          ss << (n == 2 ? " and " : (k == n - 1 ? ", and " : ", "));
+        }
+        ss << rows[k];
+      }
+    } else {
+      const size_t n = std::min(rows.size(), static_cast<size_t>(18));
+      for (size_t k = 0; k < n; ++k) {
+        ss << rows[k] << ", ";
+      }
+      ss << "..., " << entry.last[0] << ", and " << entry.last[1];
+    }
+    ss << ")";
+  }
+  return ss.str();
+}
+
 const char* CoercionLog::format_column_type(int column_type) {
   switch (column_type) {
   case SQLITE_INTEGER:
@@ -95,6 +132,22 @@ const char* CoercionLog::format_reason(COERCION_REASON reason) {
     return "out_of_range";
   case CR_NULL_TYPE:
     return "null_type";
+  }
+  return "converted";
+}
+
+const char* CoercionLog::format_outcome(COERCION_REASON reason) {
+  switch (reason) {
+  case CR_CONVERTED:
+    return "converted";
+  case CR_INVALID_UTF8:
+    return "not valid UTF-8, NA";
+  case CR_UNPARSABLE:
+    return "not in the expected format, NA";
+  case CR_OUT_OF_RANGE:
+    return "out of range, NA";
+  case CR_NULL_TYPE:
+    return "dropped by the null type, NA";
   }
   return "converted";
 }

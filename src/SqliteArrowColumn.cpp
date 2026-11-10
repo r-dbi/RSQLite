@@ -504,6 +504,16 @@ cpp11::sexp SqliteArrowColumn::coercions() {
   return out;
 }
 
+std::string SqliteArrowColumn::coercions_text() {
+  if (log.empty()) {
+    return std::string();
+  }
+  std::string out = std::string("Column `") + name + "` (" + format_kind(kind) +
+                    "): " + log.format();
+  log.clear();
+  return out;
+}
+
 void SqliteArrowColumn::discard_coercions() {
   log.clear();
 }

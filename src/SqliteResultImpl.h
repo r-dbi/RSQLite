@@ -71,6 +71,8 @@ private:
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);
   ~SqliteResultImpl();
+  // Finalizes the statement early, on any thread
+  void finalize_statement();
 
 private:
   static sqlite3_stmt* prepare(sqlite3* conn, const std::string& sql);
@@ -143,6 +145,7 @@ private:
   bool arrow_chunk_full();
   cpp11::sexp collect_coercions();
   void warn_coercions();
+  std::string coercions_text();
   void discard_coercions();
 
 private:

@@ -87,9 +87,13 @@ a \code{null} column becomes a \code{logical}.
 as on the default path.
 Times and timestamps become \code{hms} and \code{POSIXct} in UTC,
 and travel as doubles in seconds in both directions,
-so they keep the default path's precision and range, where a stream has microseconds.
-A text value ends at its first NUL character, as on the default path,
-where a stream keeps all its bytes.
+so they keep the default path's precision and range, times outside a day included,
+where a stream has microseconds and only times of day.
+Text ends at its first NUL character and is not checked for UTF-8, as on the default path,
+where a stream makes text \code{NULL} unless it is valid UTF-8 without NUL bytes.
+A blob in a text column is text only if it is valid UTF-8 without NUL bytes, as in a stream,
+and \code{NA} with a warning otherwise,
+where the default path ends it at its first NUL byte and does not check it.
 
 Unlike a stream, each fetch decides the types of its columns, the way the default path does it:
 the first value that is not \code{NULL} decides,
@@ -104,7 +108,8 @@ which keeps the real number but rounds the integers beyond \code{2^53}.
 The default path reads \code{-2147483648} as a 32-bit integer, which is \code{NA} in R,
 here it is a value that needs 64 bits.
 Once \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} or \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} has fixed the types of a result,
-later fetches keep them, with times and timestamps in microseconds,
+later fetches keep them and the rules of a stream,
+with times and timestamps in microseconds, and text checked like a blob,
 and they hand out the rows kept for a schema and a row held back by the byte limits,
 where the default path fails.
 Before writing, factors become strings, lists of raw vectors become blobs,

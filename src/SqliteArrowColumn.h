@@ -20,7 +20,8 @@
 // columns stay undecided while they see only NULL, integers widen to double,
 // and the null type is decided again by the next fetch. It also stores times
 // and timestamps as doubles in seconds, which keep the default path's
-// precision, where an Arrow stream has microseconds.
+// precision and range, where an Arrow stream has microseconds, and ends text
+// at its first NUL without checking it for UTF-8, as the default path does.
 enum ARROW_KIND {
   AK_UNDECIDED,
   AK_NA,

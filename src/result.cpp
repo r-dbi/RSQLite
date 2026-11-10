@@ -55,9 +55,14 @@ bool result_has_completed(DbResult* res) {
   return res->complete();
 }
 
+// An integer while it fits, a double beyond INT_MAX, where R integers end
 [[cpp11::register]]
-int result_rows_fetched(DbResult* res) {
-  return res->n_rows_fetched();
+SEXP result_rows_fetched(DbResult* res) {
+  int64_t n = res->n_rows_fetched();
+  if (n <= INT_MAX) {
+    return cpp11::as_sexp(static_cast<int>(n));
+  }
+  return cpp11::as_sexp(static_cast<double>(n));
 }
 
 [[cpp11::register]]
@@ -252,4 +257,10 @@ cpp11::doubles arrow_set_bytes_limits(double cut_bytes, double max_bytes) {
 [[cpp11::register]]
 double arrow_rethrown_unwinds() {
   return static_cast<double>(db_arrow_stream_rethrown_unwinds());
+}
+
+// For the tests: sets the number of rows fetched from the statement
+[[cpp11::register]]
+void result_set_rows_fetched(SqliteResult* res, double n) {
+  res->set_rows_fetched(static_cast<int64_t>(n));
 }

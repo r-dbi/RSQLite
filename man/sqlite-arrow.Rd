@@ -21,26 +21,27 @@ the first value that is not \code{NULL} decides,
 and integers are widened to \code{double} if a real number turns up in the first chunk.
 A column whose first chunk holds only \code{NULL} values takes the type of its declaration,
 and a column without a declaration that only ever holds \code{NULL} is of the Arrow null type.
-Once the first chunk has been fetched the types are fixed.
-A value of another storage class is converted by SQLite's own rules,
-and becomes \code{NULL} in a column of the null type.
-Text and blobs in a text column are kept only if they are valid UTF-8 without NUL bytes,
+Once the first chunk has been fetched the types are fixed,
+and a value of another storage class is converted by SQLite's own rules.
+The types can therefore depend on \code{chunk_size}:
+a real number in a later chunk is truncated to fit an \code{int64} column decided from integers,
+and a column whose first chunk holds only \code{NULL} keeps its declared type,
+or the null type without a declaration, for the whole result.
+The default chunk size makes this rare, a small \code{chunk_size} makes it likely.
+A value in a column of the null type becomes \code{NULL}.
+Text and blobs in a \code{utf8} column are kept only if they are valid UTF-8 without NUL bytes,
 which SQLite does not enforce,
 and a date, time or timestamp that cannot be parsed is dropped;
 both become \code{NULL}.
-Such values are reported with one warning per chunk, of class \code{RSQLite_warning_coercion},
+Text in a \code{binary} column is its UTF-8 bytes, also in a UTF-16 database, as on the data frame path.
+Converted and dropped values are reported with one warning per chunk, of class \code{RSQLite_warning_coercion},
 that lists the affected columns with their types and the 1-based row numbers in the result.
 It is raised when the chunk is fetched from the result:
 for a lazy stream when the array is requested,
 and for the first chunk when the schema is requested before it, see the section on chunking.
 The warning carries the details in its \code{coercions} field.
 A handler of the warning runs while the result is still busy with the chunk:
-it gets an error if it fetches from, binds, inspects or clears that result.
-The types can therefore depend on \code{chunk_size}:
-a real number in a later chunk is truncated to fit an \code{int64} column decided from integers,
-and a column whose first chunk holds only \code{NULL} keeps its declared type,
-or the null type without a declaration, for the whole result.
-The default chunk size makes this rare, a small \code{chunk_size} makes it likely.\tabular{ll}{
+it gets an error if it fetches from, binds, inspects or clears that result.\tabular{ll}{
    \emph{SQLite value or declared type} \tab \emph{Arrow type} \cr
    integer, or INTEGER affinity \tab \code{int64} \cr
    real, or REAL and NUMERIC affinity \tab \code{double} \cr

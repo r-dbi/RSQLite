@@ -440,8 +440,10 @@ void SqliteArrowColumn::fetch_bytes() {
     return;
   }
   // sqlite3_column_text() or sqlite3_column_blob() converts the value,
-  // and must be called before sqlite3_column_bytes()
-  if (kind == AK_STRING) {
+  // and must be called before sqlite3_column_bytes().
+  // Text in a binary column is read as UTF-8 too, like the data frame path
+  // does it: sqlite3_column_blob() keeps the encoding of the database.
+  if (kind == AK_STRING || value_type == SQLITE_TEXT) {
     value_data = sqlite3_column_text(stmt, j);
   } else {
     value_data = sqlite3_column_blob(stmt, j);

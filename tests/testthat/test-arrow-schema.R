@@ -707,3 +707,72 @@ test_that("the warning names each requested type", {
     expect_equal(w[[1]]$coercions[[1]]$type, type, info = type)
   }
 })
+
+test_that("data frame fetches build requested times and timestamps as requested", {
+  setup <- c(
+    "CREATE TABLE t (tm TIME, ts TIMESTAMP)",
+    "INSERT INTO t VALUES ('01:02:03.5', '2020-01-02 03:04:05.25'), ('25:00:00', '1960-01-01 00:00:00')"
+  )
+  con <- local_arrow_con(extended_types = TRUE)
+  for (sql in setup) {
+    dbExecute(con, sql)
+  }
+  sql <- "SELECT tm, ts FROM t"
+  ts <- as.numeric(as.POSIXct(c("2020-01-02 03:04:05.25", "1960-01-01 00:00:00"), tz = "UTC"))
+
+  # Decided: the seconds of the default path, a time outside a day included
+  df <- dbGetQuery(con, sql)
+  expect_s3_class(df$tm, "hms")
+  expect_equal(as.numeric(df$tm), c(3723.5, 90000))
+  expect_equal(attr(df$ts, "tzone"), "UTC")
+  expect_equal(as.numeric(df$ts), ts)
+
+  # Requested: the unit, the time zone and the time of day of the type
+  schema <- list(tm = nanoarrow::na_time32("s"), ts = nanoarrow::na_timestamp("ms", "Europe/Zurich"))
+  rs <- dbSendQueryArrow(con, sql, schema = schema)
+  w <- coercion_warnings(df <- dbFetch(rs))
+  dbClearResult(rs)
+  expect_s3_class(df$tm, "hms")
+  expect_equal(as.numeric(df$tm), c(3724, NA))
+  expect_s3_class(df$ts, "POSIXct")
+  expect_equal(attr(df$ts, "tzone"), "Europe/Zurich")
+  expect_equal(as.numeric(df$ts), ts)
+  expect_length(w, 1)
+  expect_equal(w[[1]]$coercions[[1]]$column, "tm")
+  expect_equal(w[[1]]$coercions[[1]]$type, "time32")
+  expect_equal(w[[1]]$coercions[[1]]$values[[1]]$reason, "out_of_range")
+
+  # The arrays of the fetch are of the requested types
+  rs <- dbSendQueryArrow(con, sql, schema = schema)
+  fetched <- suppressWarnings(result_fetch_arrow_df(rs@result@ptr, -1, 1))
+  dbClearResult(rs)
+  expect_equal(fetched$formats, c("tts", "tsm:Europe/Zurich"))
+  expect_equal(fetched$seconds, c("", ""))
+  for (array in fetched$arrays) {
+    arrow_validated(array)
+  }
+})
+
+test_that("a requested type wins over the type a data frame fetch carries to a new binding", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (k INTEGER, v)")
+  dbExecute(con, "INSERT INTO t VALUES (1, 'a'), (1, 'b'), (2, 1), (2, 2)")
+  sql <- "SELECT v FROM t WHERE k = ? ORDER BY rowid"
+  fetch_bindings <- function(...) {
+    rs <- dbSendQueryArrow(con, sql, ...)
+    on.exit(dbClearResult(rs))
+    lapply(1:2, function(k) {
+      dbBind(rs, list(k))
+      w <- coercion_warnings(df <- dbFetch(rs))
+      list(v = df$v, warnings = length(w))
+    })
+  }
+
+  # Like the default path, the second binding starts from text
+  expect_equal(fetch_bindings(), list(list(v = c("a", "b"), warnings = 0L), list(v = c("1", "2"), warnings = 0L)))
+  # A requested type holds for every binding
+  expect_equal(
+    fetch_bindings(schema = list(v = nanoarrow::na_int32())),
+    list(list(v = c(0L, 0L), warnings = 1L), list(v = 1:2, warnings = 0L))
+  )
+})

@@ -3,6 +3,7 @@
 #include "DbConnection.h"
 #include "DbResultImpl.h"
 #include "DbArrowStream.h"
+#include "main_thread.h"
 
 #include <exception>
 #include <type_traits>
@@ -50,6 +51,18 @@ void run_guarded(bool& busy, F&& body) {
   }
   typedef typename std::remove_reference<F>::type Body;
   busy = true;
+  if (!rsqlite_on_main_thread()) {
+    // An Arrow stream read on another thread calls no R API, nothing can
+    // longjmp: a scoped reset is enough, and R_ExecWithCleanup() is not allowed
+    struct Reset {
+      bool& busy;
+      ~Reset() {
+        busy = false;
+      }
+    } reset = { busy };
+    body();
+    return;
+  }
   GuardedCall call = { [](void* f) { (*static_cast<Body*>(f))(); },
                        &body,
                        std::exception_ptr() };
@@ -96,6 +109,12 @@ bool DbResult::is_active() const {
 
 bool DbResult::busy() const {
   return busy_;
+}
+
+void DbResult::finalize_statement() {
+  if (impl) {
+    impl->finalize_statement();
+  }
 }
 
 void DbResult::count_rethrown_unwind() {

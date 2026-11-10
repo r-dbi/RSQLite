@@ -2,6 +2,7 @@
 #include "SqliteArrowColumn.h"
 #include "affinity.h"
 #include "utf8.h"
+#include "main_thread.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <algorithm>
 #include <climits>
@@ -655,7 +656,7 @@ void SqliteArrowColumn::warn_mixed(int column_type) {
   ss << "Column `" << name << "`: mixed type, Arrow type " << format_kind(kind)
      << " decided from the first values, coercing values of type "
      << format_column_type(column_type);
-  cpp11::warning(ss.str());
+  rsqlite_warning(ss.str());
   // A handler of the warning may have converted the value: read it again
   value_fetched = false;
 }
@@ -670,7 +671,7 @@ void SqliteArrowColumn::warn_invalid_utf8(int column_type) {
   ss << "Column `" << name << "`: values of type "
      << format_column_type(column_type)
      << " that are not valid UTF-8, or hold a NUL byte, are NULL";
-  cpp11::warning(ss.str());
+  rsqlite_warning(ss.str());
 }
 
 void SqliteArrowColumn::warn_out_of_range(int column_type) {
@@ -683,7 +684,7 @@ void SqliteArrowColumn::warn_out_of_range(int column_type) {
   ss << "Column `" << name << "`: values of type "
      << format_column_type(column_type) << " outside the range of Arrow type "
      << format_kind(kind) << " are NULL";
-  cpp11::warning(ss.str());
+  rsqlite_warning(ss.str());
 }
 
 const char* SqliteArrowColumn::format_kind(ARROW_KIND kind) {

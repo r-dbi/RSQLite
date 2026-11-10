@@ -162,3 +162,19 @@ A loop that needs to be tighter releases each array
 with \code{nanoarrow::nanoarrow_pointer_release()} once done with it.
 }
 
+\section{Threads}{
+
+A stream can be read on any thread, one call at a time, as the Arrow C stream interface allows.
+Some consumers read it on a worker thread while R waits,
+such as the scanner of the arrow package, the Acero engine behind its dplyr verbs, and \code{arrow::write_dataset()}.
+R can't be called on such a thread.
+A value that is converted with a warning on R's main thread, see above,
+fails the stream there with an error that gives the warning's message.
+The stream can't be interrupted from R there,
+a busy handler that is an R function, see \code{\link[=sqliteSetBusyHandler]{sqliteSetBusyHandler()}}, is not called,
+so that a locked database fails the statement,
+and the second row of parameters bound with \code{\link[DBI:dbBind]{DBI::dbBind()}} fails the stream,
+unlike parameters bound with \code{\link[DBI:dbBindArrow]{DBI::dbBindArrow()}}.
+A consumer that reads on R's main thread, such as \code{arrow::as_arrow_table()}, has none of these limits.
+}
+

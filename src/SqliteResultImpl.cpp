@@ -136,12 +136,16 @@ int64_t SqliteResultImpl::executions() const {
   return executions_;
 }
 
-int SqliteResultImpl::n_rows_fetched() {
+int64_t SqliteResultImpl::n_rows_fetched() {
   int64_t kept = 0;
   if (pending_chunk_->release != NULL) {
     kept = pending_chunk_->length - pending_offset_;
   }
-  return nrows_ - static_cast<int>(kept);
+  return nrows_ - kept;
+}
+
+void SqliteResultImpl::set_rows_fetched(int64_t n) {
+  nrows_ = n;
 }
 
 int SqliteResultImpl::n_rows_affected() {
@@ -470,6 +474,18 @@ int64_t SqliteResultImpl::fetch_arrow_df(
     }
     for (size_t j = 0; j < ncols; ++j) {
       arrow_columns_[j].reopen();
+    }
+  }
+
+  // A data frame holds a uint64 as integer64, which ends at 2^63 - 1: a column
+  // with a larger value is a double from then on, in streamed rows kept for
+  // a schema too
+  for (size_t j = 0; j < ncols; ++j) {
+    if (arrow_columns_[j].conform_unsigned(chunks, j)) {
+      check_arrow(
+        ArrowSchemaSetType(schema->children[j], NANOARROW_TYPE_DOUBLE),
+        "Can't set Arrow type"
+      );
     }
   }
 

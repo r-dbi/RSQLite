@@ -67,6 +67,7 @@ private:
     int64_t row
   );
   static double units_per_second(enum ArrowTimeUnit unit);
+  static void check_bind(int rc, int pos);
 };
 
 #endif  // RSQLITE_SQLITEPARAMSOURCE_H

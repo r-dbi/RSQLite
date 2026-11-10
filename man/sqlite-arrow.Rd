@@ -173,7 +173,7 @@ integers become doubles when a real number follows in the same fetch,
 and a column without a value takes its declared type, or \code{logical} without one.
 The next fetch starts from these types, also after \code{\link[DBI:dbBind]{DBI::dbBind()}},
 except that it decides a \code{logical} column again.
-Three differences remain.
+Four differences remain.
 The default path truncates a real number that follows an integer too large for an \code{integer},
 with a warning, here the column becomes a \code{double},
 which keeps the real number but rounds the integers beyond \code{2^53}.
@@ -181,6 +181,10 @@ It also truncates a string or blob converted to an integer too large for an \cod
 here the column follows \code{bigint} from then on, as for such an integer.
 The default path reads \code{-2147483648} as a 32-bit integer, which is \code{NA} in R,
 here it is a value that needs 64 bits.
+With \code{extended_types = TRUE}, the default path reads a number in a \code{DATE} column as days in 32 bits
+and wraps a larger one into another date without a warning,
+here such a number is \code{NA} and reported as out of range;
+numbers in \code{TIME} and \code{TIMESTAMP} columns are seconds on both paths.
 Once \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} or \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} has fixed the types of a result,
 later fetches keep them and the rules of a stream,
 with times and timestamps in microseconds, and text checked like a blob,
@@ -194,6 +198,7 @@ so a handler of the warning can use the result,
 where the default path warns while it fetches and a handler that uses the result raises an error.
 The default path warns on the same fetches,
 apart from the values converted silently, as listed in the section on requesting types,
+and the numbers of days beyond 32 bits, which it wraps,
 but once per column with values of another storage class,
 and once per date, time or timestamp that cannot be parsed.
 It also warns about the real numbers it truncates,

@@ -19,6 +19,34 @@ Embeds the SQLite database engine in R, providing a DBI-compliant interface.
 that implements a decent subset of the SQL 92 standard,
 including the core table creation, updating, insertion, and selection operations, plus transaction management.
 
+## Goals and non-goals
+
+RSQLite aims to:
+
+- Embed SQLite in R.
+  The engine's sources and the bundled extensions ship with the package, so no external database software is needed.
+- Implement the DBI specification for SQLite,
+  with the full DBItest suite running as part of the package's own tests.
+- Run the same SQLite engine, with the same build options, on every installation,
+  by compiling the included SQLite sources into the package rather than linking a SQLite from the system.
+  The only system library `configure` looks for is libcurl, and only for the optional HTTP VFS.
+- Make the SQLite-specific features that DBI does not cover available,
+  such as the bundled extension functions enabled by [`initExtension()`](https://rsqlite.r-dbi.org/reference/initExtension.html),
+  and read-only access to remote database files when libcurl is present at build time.
+
+It is explicitly not trying to:
+
+- Use a SQLite installed on the system.
+  The version and the build options are those of the sources included here.
+- Define the database interface.
+  That is DBI's part, which is why the vignette tells you to load DBI rather than RSQLite.
+- Make up for what SQLite does not do.
+  It is a single-user, light-weight engine covering a subset of SQL 92, and RSQLite exposes it as it is.
+- Keep the pre-DBI API alive.
+  Functions such as [`dbGetPreparedQuery()`](https://rsqlite.r-dbi.org/reference/query-dep.html), [`sqliteBuildTableDefinition()`](https://rsqlite.r-dbi.org/reference/sqliteBuildTableDefinition.html) and `make.db.names()` remain only as deprecated shims for existing code.
+
+## Installation
+
 You can install the latest released version from CRAN with:
 
 ``` r

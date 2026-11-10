@@ -235,6 +235,8 @@ jobs:
       # The same commit as the submission: both jobs check out `github.sha`.
       - uses: actions/checkout@v6
 
+      # At @main, like every cynkratemplate action in this repository's workflows,
+      # R-CMD-check.yaml's job that commits included; pinning them is one decision for all of them.
       - name: Configure the Git identity
         uses: cynkra/cynkratemplate/.github/actions/git-identity@main
 

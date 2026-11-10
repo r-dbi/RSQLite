@@ -11,7 +11,7 @@ test_that("the arrow argument is validated and recorded", {
   expect_true(con@arrow)
 
   con2 <- dbConnect(SQLite(), ":memory:")
-  on.exit(dbDisconnect(con2))
+  on.exit(dbDisconnect(con2), add = TRUE, after = FALSE)
   expect_false(con2@arrow)
 
   expect_error(dbConnect(SQLite(), ":memory:", arrow = NA), "arrow")
@@ -36,7 +36,7 @@ test_that("dbFetch() converts Arrow chunks to the same data frames", {
   expect_equal(out, expected)
 
   rs <- dbSendQuery(con, "SELECT * FROM t")
-  on.exit(dbClearResult(rs))
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
   expect_equal(dbFetch(rs, n = 0), expected[0, ])
   expect_equal(dbFetch(rs, n = 2), expected[1:2, ])
   expect_false(dbHasCompleted(rs))
@@ -84,7 +84,7 @@ test_that("extended types come back as Date, hms and POSIXct on the Arrow path",
   expect_equal(out, df)
 
   rs <- dbSendQuery(con, "SELECT * FROM t")
-  on.exit(dbClearResult(rs))
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
   expect_equal(dbFetch(rs, n = 1), df[1, ])
 })
 
@@ -265,7 +265,7 @@ test_that("data frames fetched in chunks through Arrow own their strings", {
 # Arrow array of a fetch through Arrow
 fetch_sequence <- function(con, sql, ns, chunk_size = NULL) {
   rs <- dbSendQuery(con, sql)
-  on.exit(dbClearResult(rs))
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
   lapply(ns, function(n) {
     suppressWarnings(
       if (is.null(chunk_size)) {
@@ -388,7 +388,7 @@ test_that("dbFetch() through Arrow returns `n` rows across arrays cut short", {
   dbWriteTable(con, "t", df)
 
   rs <- dbSendQuery(con, "SELECT s FROM t")
-  on.exit(dbClearResult(rs))
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
   expect_identical(dbFetch(rs, 5)$s, df$s[1:5])
   expect_false(dbHasCompleted(rs))
   expect_identical(dbFetch(rs, 5)$s, df$s[6:7])
@@ -409,7 +409,7 @@ test_that("dbFetch() through Arrow hands out the rows kept for a schema", {
   con <- local_arrow_con()
   dbWriteTable(con, "t", data.frame(a = 1:5))
   rs <- dbSendQuery(con, "SELECT a FROM t")
-  on.exit(dbClearResult(rs))
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
 
   # The schema fetches the first chunk and keeps it, which fixes the types
   stream <- dbFetchArrow(rs, chunk_size = 3)

@@ -141,6 +141,10 @@
 #' The conversion follows nanoarrow's rules, with these additions:
 #' an `int64` column becomes an `integer` if all its values fit,
 #' and follows the `bigint` argument of [DBI::dbConnect()] otherwise, also in the later fetches of the result;
+#' a requested `uint64` column does the same,
+#' but becomes a `double` once a value is beyond `2^63 - 1`, which `integer64` cannot hold,
+#' also in the later fetches until the query is bound again,
+#' where nanoarrow would wrap such a value to a negative `integer64` and the stream holds it exactly;
 #' a `null` column becomes a `logical`.
 #' `date32` columns become `Date` and `binary` columns become [blob::blob] objects,
 #' as on the default path.

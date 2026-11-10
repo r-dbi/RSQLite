@@ -831,3 +831,40 @@ test_that("data frame fetches convert every type that can be requested", {
   expect_equal(as.numeric(one$ts), values)
   expect_identical(one$n, rep(NA, 5))
 })
+
+test_that("a requested uint64 beyond 2^63 - 1 is a double in data frames", {
+  for (bigint in c("integer64", "numeric")) {
+    con <- local_arrow_con(bigint = bigint)
+    dbExecute(con, "CREATE TABLE t (x)")
+    dbExecute(con, "INSERT INTO t VALUES (1), (2), (1e19), ('18446744073709551615'), (NULL), (5)")
+    sql <- "SELECT x FROM t ORDER BY rowid"
+    schema <- list(x = nanoarrow::na_uint64())
+    # integer64 would wrap these to negative numbers, a double rounds them
+    big <- c(1e19, 2^64)
+
+    rs <- dbSendQueryArrow(con, sql, schema = schema)
+    expect_identical(dbFetch(rs, 2)$x, 1:2, info = bigint)
+    expect_identical(suppressWarnings(dbFetch(rs, 2))$x, big, info = bigint)
+    # From then on
+    expect_identical(dbFetch(rs)$x, c(NA, 5), info = bigint)
+    expect_identical(dbColumnInfo(rs)$type, "double", info = bigint)
+    dbClearResult(rs)
+
+    # Also in one fetch of several arrays, and for the rows kept for a schema
+    rs <- dbSendQueryArrow(con, sql, schema = schema)
+    expect_identical(suppressWarnings(arrow_fetch_df(rs@result, -1, chunk_size = 2))$x, c(1, 2, big, NA, 5), info = bigint)
+    dbClearResult(rs)
+    # A column without a requested type makes the schema read the rows
+    rs <- dbSendQueryArrow(con, "SELECT x, x AS y FROM t ORDER BY rowid", schema = schema)
+    stream <- dbFetchArrow(rs)
+    expect_identical(suppressWarnings(schema_formats(stream)), c(x = "L", y = "g"))
+    expect_identical(dbGetRowCount(rs), 0L)
+    expect_identical(suppressWarnings(dbFetch(rs))$x, c(1, 2, big, NA, 5), info = bigint)
+    stream$release()
+    dbClearResult(rs)
+
+    # A stream holds the exact values
+    array <- suppressWarnings(single_array(dbGetQueryArrow(con, sql, schema = schema)))
+    expect_int64_bits(array$children$x, c("1", "2", "-8446744073709551616", "-1", NA, "5"))
+  }
+})

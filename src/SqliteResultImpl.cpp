@@ -463,6 +463,18 @@ int64_t SqliteResultImpl::fetch_arrow_df(
     }
   }
 
+  // A data frame holds a uint64 as integer64, which ends at 2^63 - 1: a column
+  // with a larger value is a double from then on, in streamed rows kept for
+  // a schema too
+  for (size_t j = 0; j < ncols; ++j) {
+    if (arrow_columns_[j].conform_unsigned(chunks, j)) {
+      check_arrow(
+        ArrowSchemaSetType(schema->children[j], NANOARROW_TYPE_DOUBLE),
+        "Can't set Arrow type"
+      );
+    }
+  }
+
   columns.wide_ints.clear();
   columns.seconds_classes.clear();
   df_kinds_.clear();

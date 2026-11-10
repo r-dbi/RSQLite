@@ -153,6 +153,10 @@ and \code{\link[DBI:dbAppendTable]{DBI::dbAppendTable()}} writes the data frame 
 The conversion follows nanoarrow's rules, with these additions:
 an \code{int64} column becomes an \code{integer} if all its values fit,
 and follows the \code{bigint} argument of \code{\link[DBI:dbConnect]{DBI::dbConnect()}} otherwise, also in the later fetches of the result;
+a requested \code{uint64} column does the same,
+but becomes a \code{double} once a value is beyond \code{2^63 - 1}, which \code{integer64} cannot hold,
+also in the later fetches until the query is bound again,
+where nanoarrow would wrap such a value to a negative \code{integer64} and the stream holds it exactly;
 a \code{null} column becomes a \code{logical}.
 \code{date32} columns become \code{Date} and \code{binary} columns become \link[blob:blob]{blob::blob} objects,
 as on the default path.

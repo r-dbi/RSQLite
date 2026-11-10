@@ -272,7 +272,9 @@ arrow_column_info <- function(res) {
       tdD = "Date",
       ttu = "hms",
       "tsu:UTC" = "POSIXct",
-      stopc("Internal error: unexpected Arrow format ", formats[[j]])
+      L = if (fetched$wide_ints[[j]]) "double" else "integer",
+      # The other types come from a `schema` of dbSendQueryArrow()
+      arrow_column_type_name(arrow_df_column_ptype(formats[[j]]))
     )
   }
   structure(
@@ -286,6 +288,19 @@ arrow_column_info <- function(res) {
 # such as a factor or a Date, the storage type of the others
 arrow_type_name <- function(x) {
   if (is.object(x)) class(x)[[1L]] else typeof(x)
+}
+
+# The name of the R type of a prototype, like the default path names it
+arrow_column_type_name <- function(ptype) {
+  for (class in c("POSIXct", "hms", "Date")) {
+    if (inherits(ptype, class)) {
+      return(class)
+    }
+  }
+  if (inherits(ptype, "blob")) {
+    return("list")
+  }
+  typeof(ptype)
 }
 
 # dbAppendTable() through Arrow: the data frame is written as an Arrow stream

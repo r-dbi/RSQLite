@@ -150,6 +150,7 @@ SqliteArrowColumn::SqliteArrowColumn(
       array_kind(AK_UNDECIDED),
       pending_nulls(0),
       wide_ints(false),
+      unsigned_doubles(false),
       value_type(SQLITE_NULL),
       value_data(NULL),
       value_size(0),
@@ -598,8 +599,11 @@ void SqliteArrowColumn::fetch_bytes() {
     return;
   }
   // sqlite3_column_text() or sqlite3_column_blob() converts the value,
-  // and must be called before sqlite3_column_bytes()
-  if (kind == AK_STRING || kind == AK_LARGE_STRING) {
+  // and must be called before sqlite3_column_bytes().
+  // Text in a binary column is read as UTF-8 too, like the data frame path
+  // does it: sqlite3_column_blob() keeps the encoding of the database.
+  if (kind == AK_STRING || kind == AK_LARGE_STRING ||
+      value_type == SQLITE_TEXT) {
     value_data = sqlite3_column_text(stmt, j);
   } else {
     value_data = sqlite3_column_blob(stmt, j);
@@ -1077,11 +1081,12 @@ void SqliteArrowColumn::promote_to_double() {
   append_ints_as_doubles(array.get(), ints.get());
 }
 
-// Appends the values of `ints`, an int64 array built by nanoarrow, finished or
-// not, to the double array `out`
+// Appends the values of `ints`, an int64 or for `is_unsigned` a uint64 array
+// built by nanoarrow, finished or not, to the double array `out`
 void SqliteArrowColumn::append_ints_as_doubles(
   struct ArrowArray* out,
-  struct ArrowArray* ints
+  struct ArrowArray* ints,
+  bool is_unsigned
 ) {
   int64_t n = ints->length;
   const int64_t* values =
@@ -1093,12 +1098,60 @@ void SqliteArrowColumn::append_ints_as_doubles(
     if (has_nulls && !ArrowBitGet(validity->buffer.data, i)) {
       check_arrow(ArrowArrayAppendNull(out, 1), "Can't append to Arrow array");
     } else {
+      double value = is_unsigned
+                       ? static_cast<double>(static_cast<uint64_t>(values[i]))
+                       : static_cast<double>(values[i]);
       check_arrow(
-        ArrowArrayAppendDouble(out, static_cast<double>(values[i])),
+        ArrowArrayAppendDouble(out, value),
         "Can't append to Arrow array"
       );
     }
   }
+}
+
+bool SqliteArrowColumn::conform_unsigned(
+  std::vector<nanoarrow::UniqueArray>& chunks,
+  size_t j
+) {
+  if (kind != AK_UINT64) {
+    return false;
+  }
+
+  for (size_t i = 0; i < chunks.size() && !unsigned_doubles; ++i) {
+    struct ArrowArray* values = chunks[i]->children[j];
+    const uint64_t* data =
+      reinterpret_cast<const uint64_t*>(ArrowArrayBuffer(values, 1)->data);
+    const struct ArrowBitmap* validity = ArrowArrayValidityBitmap(values);
+    bool has_nulls = validity->buffer.size_bytes > 0;
+    for (int64_t k = 0; k < values->length; ++k) {
+      if ((!has_nulls || ArrowBitGet(validity->buffer.data, k)) &&
+          data[k] > static_cast<uint64_t>(INT64_MAX)) {
+        unsigned_doubles = true;
+        break;
+      }
+    }
+  }
+  if (!unsigned_doubles) {
+    return false;
+  }
+
+  for (size_t i = 0; i < chunks.size(); ++i) {
+    struct ArrowArray* values = chunks[i]->children[j];
+    nanoarrow::UniqueArray out;
+    init_array(out.get(), AK_DOUBLE);
+    append_ints_as_doubles(out.get(), values, true);
+
+    struct ArrowError error;
+    ArrowErrorInit(&error);
+    check_arrow(
+      ArrowArrayFinishBuildingDefault(out.get(), &error),
+      "Can't finish Arrow array",
+      &error
+    );
+    values->release(values);
+    ArrowArrayMove(out.get(), values);
+  }
+  return true;
 }
 
 const char* SqliteArrowColumn::format_kind(ARROW_KIND kind) {

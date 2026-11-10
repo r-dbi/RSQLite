@@ -106,6 +106,9 @@ class SqliteArrowColumn {
   // Set once an integer has needed 64 bits: like the default path, a data
   // frame keeps the column as integer64 from then on
   bool wide_ints;
+  // Set once a data frame fetch has seen a uint64 beyond 2^63 - 1, which
+  // integer64 can't hold: the column is a double in data frames from then on
+  bool unsigned_doubles;
 
   // The value of the current row: its storage class, read before any
   // conversion, and for a column of a string or binary type its bytes, read
@@ -155,6 +158,10 @@ public:
 
   void set_schema(struct ArrowSchema* schema) const;
   bool wide_integers() const;
+  // For a data frame fetch of a uint64 column: rebuilds the chunks, child `j`
+  // of each, as doubles if a value of them or of an earlier fetch is beyond
+  // 2^63 - 1; returns whether the column is a double in this fetch
+  bool conform_unsigned(std::vector<nanoarrow::UniqueArray>& chunks, size_t j);
 
   // Chunk building
   void start_chunk();
@@ -202,7 +209,8 @@ private:
   void init_array(struct ArrowArray* out, ARROW_KIND kind) const;
   static void append_ints_as_doubles(
     struct ArrowArray* out,
-    struct ArrowArray* ints
+    struct ArrowArray* ints,
+    bool is_unsigned = false
   );
   void init_array();
   void fetch_bytes();

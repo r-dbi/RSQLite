@@ -16,14 +16,21 @@
 #' and integers are widened to `double` if a real number turns up in the first chunk.
 #' A column whose first chunk holds only `NULL` values takes the type of its declaration,
 #' and a column without a declaration that only ever holds `NULL` is of the Arrow null type.
-#' Once the first chunk has been fetched the types are fixed.
-#' A value of another storage class is converted by SQLite's own rules,
-#' and becomes `NULL` in a column of the null type.
-#' Text and blobs in a text column are kept only if they are valid UTF-8 without NUL bytes,
+#' Once the first chunk has been fetched the types are fixed,
+#' and a value of another storage class is converted by SQLite's own rules.
+#' The types can therefore depend on `chunk_size`:
+#' a real number in a later chunk is truncated to fit an `int64` column decided from integers,
+#' and a column whose first chunk holds only `NULL` keeps its declared type,
+#' or the null type without a declaration, for the whole result.
+#' The default chunk size makes this rare, a small `chunk_size` makes it likely,
+#' and a `schema` fixes the types up front, see the section on requesting types.
+#' A value in a column of the null type becomes `NULL`.
+#' Text and blobs in a `utf8` column are kept only if they are valid UTF-8 without NUL bytes,
 #' which SQLite does not enforce,
 #' and a date, time or timestamp that cannot be parsed is dropped;
 #' both become `NULL`.
-#' Such values are reported with one warning per chunk, of class `RSQLite_warning_coercion`,
+#' Text in a `binary` column is its UTF-8 bytes, also in a UTF-16 database, as on the data frame path.
+#' Converted and dropped values are reported with one warning per chunk, of class `RSQLite_warning_coercion`,
 #' that lists the affected columns with their types and the 1-based row numbers in the result.
 #' It is raised when the chunk is fetched from the result:
 #' for a lazy stream when the array is requested,
@@ -32,12 +39,6 @@
 #' The warning carries the details in its `coercions` field.
 #' A handler of the warning runs while the result is still busy with the chunk:
 #' it gets an error if it fetches from, binds, inspects or clears that result.
-#' The types can therefore depend on `chunk_size`:
-#' a real number in a later chunk is truncated to fit an `int64` column decided from integers,
-#' and a column whose first chunk holds only `NULL` keeps its declared type,
-#' or the null type without a declaration, for the whole result.
-#' The default chunk size makes this rare, a small `chunk_size` makes it likely,
-#' and a `schema` fixes the types up front, see the section on requesting types.
 #'
 #' | *SQLite value or declared type* | *Arrow type* |
 #' | ------------------------------- | ------------ |
@@ -141,6 +142,10 @@
 #' The conversion follows nanoarrow's rules, with these additions:
 #' an `int64` column becomes an `integer` if all its values fit,
 #' and follows the `bigint` argument of [DBI::dbConnect()] otherwise, also in the later fetches of the result;
+#' a requested `uint64` column does the same,
+#' but becomes a `double` once a value is beyond `2^63 - 1`, which `integer64` cannot hold,
+#' also in the later fetches until the query is bound again,
+#' where nanoarrow would wrap such a value to a negative `integer64` and the stream holds it exactly;
 #' a `null` column becomes a `logical`.
 #' `date32` columns become `Date` and `binary` columns become [blob::blob] objects,
 #' as on the default path.

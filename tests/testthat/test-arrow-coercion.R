@@ -1,17 +1,5 @@
 # One warning per chunk for values that are not of their column's type
 
-coercion_warnings <- function(expr) {
-  out <- list()
-  withCallingHandlers(
-    expr,
-    RSQLite_warning_coercion = function(w) {
-      out[[length(out) + 1]] <<- w
-      invokeRestart("muffleWarning")
-    }
-  )
-  out
-}
-
 test_that("coercions are reported once per chunk with row numbers", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x, y)")
@@ -62,6 +50,81 @@ test_that("row numbers count from the first row of the result", {
   w <- coercion_warnings(chunk <- dbFetchArrowChunk(rs, chunk_size = 2))
   expect_equal(w[[1]]$coercions[[1]]$values[[1]]$rows, 5)
   expect_no_warning(dbFetchArrowChunk(rs, chunk_size = 2))
+})
+
+test_that("a data frame fetch through Arrow warns once, with the final types", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1), ('a'), (2), ('b'), (2.5), ('c')")
+
+  rs <- dbSendQuery(con, "SELECT x FROM t")
+  # Three arrays: the column is int64 in the first two, double in the third
+  w <- coercion_warnings(df <- arrow_fetch_df(rs, -1, chunk_size = 2))
+  dbClearResult(rs)
+  expect_equal(df$x, c(1, 0, 2, 0, 2.5, 0))
+  expect_length(w, 1)
+  coercions <- w[[1]]$coercions
+  expect_length(coercions, 1)
+  expect_equal(coercions[[1]]$type, "double")
+  expect_equal(coercions[[1]]$values[[1]]$rows, c(2, 4, 6))
+
+  # The arrays of 65536 rows of a fetch
+  sql <- paste(
+    "WITH RECURSIVE cnt(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM cnt WHERE i < 70000)",
+    "SELECT CASE WHEN i IN (2, 70000) THEN 'x' ELSE i END AS a FROM cnt"
+  )
+  w <- coercion_warnings(df <- dbGetQuery(con, sql))
+  expect_length(w, 1)
+  expect_equal(w[[1]]$coercions[[1]]$values[[1]]$rows, c(2, 70000))
+
+  # A stream warns per chunk, with the types fixed by the first one,
+  # and for the first chunk when it fetches it for the schema
+  rs <- dbSendQueryArrow(con, "SELECT x FROM t")
+  on.exit(dbClearResult(rs))
+  stream <- dbFetchArrow(rs, chunk_size = 2)
+  w <- coercion_warnings(stream$get_schema())
+  expect_length(w, 1)
+  expect_equal(w[[1]]$coercions[[1]]$values[[1]]$rows, 2)
+  w <- coercion_warnings(df <- as.data.frame(stream))
+  expect_equal(df$x, c(1, 0, 2, 0, 2, 0))
+  expect_length(w, 2)
+  expect_equal(w[[1]]$coercions[[1]]$values[[1]]$rows, 4)
+  expect_equal(w[[2]]$coercions[[1]]$type, "int64")
+  expect_equal(vapply(w[[2]]$coercions[[1]]$values, `[[`, "", "class"), c("real", "string"))
+})
+
+test_that("values in a column of the null type are reported as dropped", {
+  for (arrow in c(FALSE, TRUE)) {
+    con <- local_con(arrow = arrow)
+    dbExecute(con, "CREATE TABLE t (x)")
+    dbExecute(con, "INSERT INTO t VALUES (NULL), (NULL), (1), ('a')")
+
+    # The first chunk fixes the null type
+    rs <- dbSendQuery(con, "SELECT x FROM t")
+    expect_no_warning(chunk <- dbFetchArrowChunk(rs, chunk_size = 2))
+    expect_equal(nanoarrow::infer_nanoarrow_schema(chunk)$children$x$format, "n")
+    # Later chunks, and a data frame fetch through Arrow, drop the values
+    if (arrow) {
+      w <- coercion_warnings(rest <- dbFetch(rs))
+      expect_equal(rest$x, c(NA, NA))
+    } else {
+      w <- coercion_warnings(rest <- dbFetchArrowChunk(rs, chunk_size = 2))
+      expect_equal(rest$length, 2)
+    }
+    dbClearResult(rs)
+
+    expect_length(w, 1)
+    coercions <- w[[1]]$coercions[[1]]
+    expect_equal(coercions$type, "null")
+    expect_equal(vapply(coercions$values, `[[`, "", "class"), c("integer", "string"))
+    expect_equal(vapply(coercions$values, `[[`, "", "reason"), c("null_type", "null_type"))
+    expect_equal(vapply(coercions$values, `[[`, 1, "rows"), c(3, 4))
+    expect_match(
+      conditionMessage(w[[1]]),
+      "1 integer value dropped by the null type, NA (row 3); 1 string value dropped by the null type, NA (row 4)",
+      fixed = TRUE
+    )
+  }
 })
 
 test_that("long lists of rows are truncated", {

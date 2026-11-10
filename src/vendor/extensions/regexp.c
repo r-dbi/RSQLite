@@ -421,7 +421,10 @@ static unsigned re_esc_char(ReCompiled *p){
   static const char zTrans[] = "\a\f\n\r\t\v";
   int i, v = 0;
   char c;
-  if( p->sIn.i>=p->sIn.mx ) return 0;
+  if( p->sIn.i>=p->sIn.mx ){
+    p->zErr = "unknown \\ escape";
+    return 0;
+  }
   c = p->sIn.z[p->sIn.i];
   if( c=='u' && p->sIn.i+4<p->sIn.mx ){
     const unsigned char *zIn = p->sIn.z + p->sIn.i;
@@ -688,11 +691,7 @@ static const char *re_compile(
     re_free(pRe);
     return zErr;
   }
-  if( zIn[0]=='^' ){
-    zIn++;
-  }else{
-    re_append(pRe, RE_OP_ANYSTAR, 0);
-  }
+  re_append(pRe, RE_OP_ANYSTAR, 0);
   pRe->sIn.z = (unsigned char*)zIn;
   pRe->sIn.i = 0;
   pRe->sIn.mx = (int)strlen(zIn);
@@ -707,6 +706,19 @@ static const char *re_compile(
   }else{
     re_free(pRe);
     return "unrecognized character";
+  }
+
+  /* If the regex begins with "^" and has no "|" at the top level, then
+  ** the whole regex is anchored at the start of the input and the
+  ** initial ".*" is not needed.  Convert it into a no-op so that
+  ** re_match() can stop as soon as the start of the input fails to
+  ** match.  A "|" at the top level would have caused a FORK to be
+  ** inserted at aOp[1], so aOp[1]==RE_OP_ATSTART is sufficient.  Do
+  ** not remove the initial "^" itself, as there might be jumps back
+  ** to it, as in "^+". */
+  if( pRe->aOp[1]==RE_OP_ATSTART ){
+    pRe->aOp[0] = RE_OP_GOTO;
+    pRe->aArg[0] = 1;
   }
 
   /* The following is a performance optimization.  If the regex begins with

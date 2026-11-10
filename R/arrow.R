@@ -16,16 +16,18 @@
 #' and integers are widened to `double` if a real number turns up in the first chunk.
 #' A column whose first chunk holds only `NULL` values takes the type of its declaration,
 #' and a column without a declaration that only ever holds `NULL` is of the Arrow null type.
-#' Once the first chunk has been fetched the types are fixed;
-#' later values of another storage class are converted by SQLite's own rules.
-#' Such values are reported with one warning per fetched chunk,
-#' of class `RSQLite_warning_coercion`,
-#' that lists the affected columns with the 1-based row numbers in the result,
-#' for a lazy stream at the time the chunk is read.
-#' The warning carries the details in its `coercions` field.
+#' Once the first chunk has been fetched the types are fixed.
+#' A value of another storage class is converted by SQLite's own rules,
+#' and becomes `NULL` in a column of the null type.
 #' A blob in a text column is kept only if it is valid UTF-8 without NUL bytes,
 #' and a date, time or timestamp that cannot be parsed is dropped;
-#' both become `NULL` and are listed in the same warning.
+#' both become `NULL`.
+#' Such values are reported with one warning per chunk, of class `RSQLite_warning_coercion`,
+#' that lists the affected columns with their types and the 1-based row numbers in the result.
+#' It is raised when the chunk is fetched from the result:
+#' for a lazy stream when the array is requested,
+#' and for the first chunk when the schema is requested before it, see the section on chunking.
+#' The warning carries the details in its `coercions` field.
 #' The types can therefore depend on `chunk_size`:
 #' a real number in a later chunk is truncated to fit an `int64` column decided from integers,
 #' and a column whose first chunk holds only `NULL` keeps its declared type,
@@ -105,31 +107,63 @@
 #'
 #' @section Data frames:
 #' With `dbConnect(arrow = TRUE)`, data frames travel through this interface:
-#' [DBI::dbFetch()] converts the arrays filled by [DBI::dbFetchArrowChunk()],
+#' [DBI::dbFetch()] converts Arrow arrays filled straight from the SQLite statement,
 #' and [DBI::dbAppendTable()] writes the data frame as an Arrow stream through [DBI::dbAppendTableArrow()].
 #' The conversion follows nanoarrow's rules, with these additions:
 #' an `int64` column becomes an `integer` if all its values fit,
-#' and follows the `bigint` argument of [DBI::dbConnect()] otherwise;
+#' and follows the `bigint` argument of [DBI::dbConnect()] otherwise, also in the later fetches of the result;
 #' a `null` column becomes a `logical`.
 #' `date32`, `time64` and `timestamp` columns become `Date`, `hms` and `POSIXct` in UTC,
 #' and `binary` columns become [blob::blob] objects,
 #' as on the default path.
-#' The first chunk of a result decides the types of all its chunks.
-#' Before writing, factors become strings and lists of raw vectors become blobs.
 #'
-#' A fetch of all rows reads the result into Arrow arrays first,
+#' Unlike a stream, each fetch decides the types of its columns, the way the default path does it:
+#' the first value that is not `NULL` decides,
+#' integers become doubles when a real number follows in the same fetch,
+#' and a column without a value takes its declared type, or `logical` without one.
+#' The next fetch starts from these types, except that it decides a `logical` column again.
+#' The default path truncates a real number that follows an integer too large for an `integer`,
+#' with a warning, here the column becomes a `double`.
+#' Once [DBI::dbFetchArrow()] or [DBI::dbFetchArrowChunk()] has fixed the types of a result,
+#' later fetches keep them,
+#' and they hand out the rows kept for a schema, where the default path fails.
+#' Values that are not of their column's type are converted or dropped as in a stream,
+#' and reported with one warning of class `RSQLite_warning_coercion` per [DBI::dbFetch()],
+#' which names the Arrow types the columns have at the end of the fetch.
+#' The default path warns on the same fetches, apart from the real numbers it truncates,
+#' but once per column with values of another storage class,
+#' and once per date, time or timestamp that cannot be parsed.
+#' Before writing, factors become strings, lists of raw vectors become blobs,
+#' and `difftime` columns become their numbers in their own units, as on the default path.
+#'
+#' Each fetch reads its rows into Arrow arrays first,
 #' so that the data frame is allocated once with the row count known,
-#' and frees each array as soon as it is converted:
+#' and releases each array as soon as it is converted:
 #' at its peak, the memory holds the arrays and the part of the data frame filled so far.
-#' A fetch of `n` rows copies the strings out of its array and frees the array right away.
 #'
 #' @section Chunking:
 #' [DBI::dbFetchArrow()] returns a nanoarrow array stream that is read lazily:
 #' each array holds at most `chunk_size` rows,
 #' fetched from the result when the array is requested,
 #' so the memory footprint is that of one chunk, not of the result set.
-#' The stream stays readable after the result has been cleared with [DBI::dbClearResult()],
-#' it is invalidated when another query is sent on the same connection.
+#' The stream holds on to the statement of the result:
+#' it stays readable after [DBI::dbClearResult()], while other queries run on the same connection,
+#' and even after [DBI::dbDisconnect()],
+#' when an error of the statement can only report SQLite's generic message for its result code.
+#' Until it has been read to the end or released, with `stream$release()` or by the garbage collector,
+#' it keeps the statement open, and with it a read transaction and the database file.
+#' It reads the rows of the parameters bound when it was created:
+#' once [DBI::dbBind()] or [DBI::dbBindArrow()] binds new parameters, reading it fails,
+#' and [DBI::dbFetchArrow()] returns a stream for the new rows.
+#' [DBI::dbFetchArrowChunk()] returns one such array per call,
+#' and an empty array once all rows are fetched.
+#' When the schema of a stream is requested before its first array,
+#' the first chunk is fetched to decide the types and kept for the next fetch:
+#' [DBI::dbGetRowCount()] and [DBI::dbHasCompleted()] count its rows once they have been handed out,
+#' and [DBI::dbFetch()] fails while they wait.
+#' A chunk also ends after the row at which a string or binary column reaches 1 GiB,
+#' and before a row that would take such a column past the `2^31 - 1` bytes
+#' that the 32-bit offsets of the `utf8` and `binary` types can address.
 #'
 #' An array returned by [DBI::dbFetchArrowChunk()] is freed
 #' when the garbage collector finds it unreachable,
@@ -138,9 +172,6 @@
 #' so that a loop that discards its chunks holds at most that much garbage.
 #' A loop that needs to be tighter releases each array
 #' with `nanoarrow::nanoarrow_pointer_release()` once done with it.
-#' [DBI::dbFetchArrowChunk()] returns one such array per call,
-#' and an empty array once all rows are fetched.
-#' A chunk is also cut once a string or binary column holds one gigabyte.
 #'
 #' @name sqlite-arrow
 #' @aliases arrow
@@ -230,11 +261,12 @@ arrow_gc <- if ("full" %in% names(formals(gc))) {
 }
 
 check_chunk_size <- function(chunk_size) {
-  if (!is.numeric(chunk_size) || length(chunk_size) != 1L || is.na(chunk_size) ||
+  if (!is.numeric(chunk_size) || length(chunk_size) != 1L || !is.finite(chunk_size) ||
     chunk_size < 1 || trunc(chunk_size) != chunk_size) {
     stopc("`chunk_size` must be a positive whole number")
   }
-  as.numeric(chunk_size)
+  # The C++ code takes a 64-bit integer, doubles are whole numbers up to 2^53
+  min(as.numeric(chunk_size), 2^53)
 }
 
 # The names of the columns of a struct schema, "" for unnamed columns

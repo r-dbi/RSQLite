@@ -63,18 +63,24 @@ format_coercion_values <- function(values) {
 # The row numbers, truncated like cli does it: the first rows, an ellipsis,
 # and the last two
 format_coercion_rows <- function(values) {
-  rows <- values$rows
+  rows <- format_row_numbers(values$rows)
   last <- values$last
   label <- if (values$count == 1) "row " else "rows "
   if (is.null(last)) {
     return(paste0(label, collapse_rows(rows)))
   }
+  last <- format_row_numbers(last)
   paste0(
     label,
     paste(rows[seq_len(min(length(rows), 18L))], collapse = ", "),
     ", ", ellipsis(), ", ",
     last[[1]], ", and ", last[[2]]
   )
+}
+
+# The row numbers arrive as doubles, which print 100000 as 1e+05
+format_row_numbers <- function(x) {
+  sprintf("%.0f", x)
 }
 
 collapse_rows <- function(x) {

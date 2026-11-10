@@ -199,6 +199,29 @@ test_that("long lists of rows are truncated", {
   )
 })
 
+test_that("large row numbers are printed in full", {
+  con <- local_con()
+  sql <- paste(
+    "WITH RECURSIVE cnt(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM cnt WHERE i < 100000)",
+    "SELECT CASE WHEN i = 100000 THEN 'x' ELSE i END AS a FROM cnt"
+  )
+  w <- coercion_warnings(as.data.frame(dbGetQueryArrow(con, sql)))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values[[1]]
+  expect_identical(values$rows, 100000)
+  expect_match(conditionMessage(w[[1]]), "1 string value converted (row 100000)", fixed = TRUE)
+
+  # A truncated list, with and without cli
+  values <- list(count = 30, rows = (1:20) * 1e5, last = c(29e5, 3e6))
+  for (cli in c(TRUE, FALSE)) {
+    local_mocked_bindings(has_cli = function() cli)
+    expect_match(
+      format_coercion_rows(values),
+      "^rows 100000, 200000, 300000, .*, 1800000, .{1,3}, 2900000, and 3000000$"
+    )
+  }
+})
+
 test_that("a blob in a text column is text only if it is valid UTF-8", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x)")

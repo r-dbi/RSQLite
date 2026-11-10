@@ -249,6 +249,9 @@ int64_t concat_utf8_max_bytes = INT32_MAX;
 
 // The bytes of string data that an array view holds
 int64_t string_data_bytes(const struct ArrowArrayView* view) {
+  if (view->length == 0) {
+    return 0;
+  }
   const int64_t first = view->offset;
   const int64_t last = view->offset + view->length;
   if (view->storage_type == NANOARROW_TYPE_LARGE_STRING) {

@@ -109,6 +109,9 @@ test_that("concatenated strings take large_utf8 beyond the 32-bit offsets", {
   expect_equal(concat(c("ab", NA), c("c", ""))$format, "u")
   # A single array is handed on as it is
   expect_equal(concat(c("ab", NA, "cde", "")), list(format = "u", values = values))
+  # An empty array may come without offsets
+  empty <- nanoarrow::nanoarrow_array_init(nanoarrow::na_string())
+  expect_equal(concat(empty, c("ab", NA)), list(format = "u", values = c("ab", NA)))
 })
 
 test_that("lazy strings beyond the 32-bit offsets give the same data frames", {

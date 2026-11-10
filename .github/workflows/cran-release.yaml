@@ -100,21 +100,5 @@ jobs:
           GH_REPO: ${{ github.repository }}
           PUBLISHED: ${{ needs.publish.outputs.published }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          while read -r pkg version; do
-            [ -n "$pkg" ] || continue
-            marker="<!-- release-checklist: $pkg $version -->"
-            issues="$(gh api --paginate "repos/$GH_REPO/issues?state=open&per_page=100" \
-              --jq ".[] | select((.pull_request | not) and ((.body // \"\") | contains(\"$marker\"))) | .number")"
-            if [ -z "$issues" ]; then
-              echo "::notice title=No checklist issue::No open issue carries $marker; nothing to close."
-              continue
-            fi
-            for n in $issues; do
-              gh api "repos/$GH_REPO/issues/$n/comments" \
-                -f body="$pkg $version is on Posit's package manager, and the [run]($RUN_URL) published its release. Closing the checklist." --jq .html_url
-              gh api -X PATCH "repos/$GH_REPO/issues/$n" -f state=closed -f state_reason=completed --jq .html_url
-              echo "::notice title=Checklist closed::Closed #$n for $pkg $version."
-            done
-          done <<< "$PUBLISHED"
+        run: .github/actions/release-report/close-checklist.sh
         shell: bash

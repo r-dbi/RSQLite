@@ -1,5 +1,5 @@
 #!/bin/bash
-# Check release-report.sh offline, against a `gh` stub: nothing reaches GitHub.
+# Check release-report.sh and close-checklist.sh offline, against a `gh` stub: nothing reaches GitHub.
 #
 #   1. Without an earlier comment, the run posts one on the pull request whose head is the ref.
 #   2. With one, carrying the marker and written by github-actions[bot], the run updates it.
@@ -7,6 +7,8 @@
 #   4. With ISSUE_MARKER, the open issue carrying it is used, never a pull request;
 #      without a target, nothing is posted.
 #   5. The overall result is failure when any job failed, and the body lists every job.
+#   6. close-checklist.sh comments on and closes the open issue carrying the exact marker of a published release,
+#      and no pull request or issue of another version; without such an issue, it writes nothing.
 #
 # Usage:
 #   .github/actions/release-report/release-report-test.sh
@@ -43,6 +45,11 @@ while [ $# -gt 0 ]; do
     --jq) jq=$2; shift 2 ;;
     -X) method=$2; shift 2 ;;
     -F) method=${method/GET/POST}; cp "${2#body=@}" "$SCRATCH/body"; shift 2 ;;
+    -f)
+      method=${method/GET/POST}
+      case "$2" in body=*) printf '%s\n' "${2#body=}" >"$SCRATCH/body" ;; esac
+      shift 2
+      ;;
     --paginate) shift ;;
     *) path=$1; shift ;;
   esac
@@ -104,6 +111,27 @@ head_prs <<<'[]'
 out=$(RESULTS=publish=success run cran-release "CRAN release")
 is "no write" "$(cat "$SCRATCH/writes")" ""
 has "a notice says so" "$out" "::notice title=Nothing to report to::"
+
+close_run() {
+  : >"$SCRATCH/writes"
+  rm -f "$SCRATCH/body"
+  GH=$SCRATCH/bin/gh GH_REPO=o/r RUN_URL=https://github.example/o/r/actions/runs/42 "$HERE/close-checklist.sh" 2>&1
+}
+
+echo "== close-checklist.sh closes the checklist issue of a published release"
+issues <<<'[{"number": 3, "body": "<!-- release-checklist: RSQLite 1.0.0 -->", "pull_request": {}},
+            {"number": 8, "body": "<!-- release-checklist: RSQLite 0.9.0 -->"},
+            {"number": 9, "body": "Checklist\n<!-- release-checklist: RSQLite 1.0.0 -->"}]'
+out=$(PUBLISHED="RSQLite 1.0.0" close_run)
+is "it comments on that issue and closes it, and nothing else" "$(cat "$SCRATCH/writes")" "POST repos/o/r/issues/9/comments
+PATCH repos/o/r/issues/9"
+has "the comment links the run" "$(cat "$SCRATCH/body")" "the [run](https://github.example/o/r/actions/runs/42) published its release"
+has "the log says so" "$out" "::notice title=Checklist closed::Closed #9 for RSQLite 1.0.0."
+
+echo "== without a checklist issue, nothing is closed"
+out=$(PUBLISHED="RSQLite 2.0.0" close_run)
+is "no write" "$(cat "$SCRATCH/writes")" ""
+has "a notice says so" "$out" "::notice title=No checklist issue::"
 
 echo
 echo "$pass passed, $fail failed"

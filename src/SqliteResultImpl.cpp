@@ -755,8 +755,18 @@ cpp11::sexp SqliteResultImpl::collect_coercions() {
 }
 
 // One warning for the values logged since the last call that were not of
-// their column's type
+// their column's type.
+// An Arrow stream read on a worker thread can't call R: there, the text of the
+// warning becomes the error of the stream, see rsqlite_warning().
 void SqliteResultImpl::warn_coercions() {
+  if (!rsqlite_on_main_thread()) {
+    std::string text = coercions_text();
+    if (!text.empty()) {
+      rsqlite_warning(text);
+    }
+    return;
+  }
+
   cpp11::sexp entries = collect_coercions();
   if (entries == R_NilValue) {
     return;
@@ -764,6 +774,31 @@ void SqliteResultImpl::warn_coercions() {
 
   cpp11::function warn_coercion = cpp11::package("RSQLite")["warn_coercion"];
   warn_coercion(entries);
+}
+
+// The text that warn_coercion() in R shows without cli for the values logged
+// since the last call, empty if there were none; no R API is called
+std::string SqliteResultImpl::coercions_text() {
+  std::vector<std::string> lines;
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    std::string line = arrow_columns_[j].coercions_text();
+    if (!line.empty()) {
+      lines.push_back(line);
+    }
+  }
+  if (lines.empty()) {
+    return std::string();
+  }
+
+  const size_t n = lines.size();
+  std::ostringstream ss;
+  ss << "Mixed types in " << n << (n == 1 ? " column" : " columns")
+     << ", values converted to the column " << (n == 1 ? "type" : "types")
+     << ":";
+  for (size_t k = 0; k < n; ++k) {
+    ss << "\n* " << lines[k];
+  }
+  return ss.str();
 }
 
 // A fetch that failed, by an error or an interrupt, leaves the values it

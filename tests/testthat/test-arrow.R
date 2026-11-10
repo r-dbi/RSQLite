@@ -609,9 +609,14 @@ test_that("a coercion on a worker thread fails the stream instead of warning", {
   rs <- dbSendQueryArrow(con, "SELECT a FROM t")
   withr::defer(if (dbIsValid(rs)) dbClearResult(rs))
   reader <- arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 100))
+  # The text of the coercion warning, as R shows it without cli
   expect_error(
     arrow::Scanner$create(reader)$ToTable(),
-    "mixed type.*an error instead of a warning"
+    paste0(
+      "Mixed types in 1 column, values converted to the column type:\n",
+      "\\* Column `a` \\(int64\\): 1 string value converted \\(row 250\\) ",
+      "\\(an error instead of a warning"
+    )
   )
 
   # The session and the connection go on, the stream goes with its reader

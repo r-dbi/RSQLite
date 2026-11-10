@@ -179,7 +179,7 @@
 #' such as the scanner of the arrow package, the Acero engine behind its dplyr verbs, and `arrow::write_dataset()`.
 #' R can't be called on such a thread.
 #' A value that is converted with a warning on R's main thread, see above,
-#' fails the stream there with an error that gives the warning's message.
+#' fails the stream there with an error that gives the warning's message as R shows it without cli.
 #' The stream can't be interrupted from R there,
 #' a busy handler that is an R function, see [sqliteSetBusyHandler()], is not called,
 #' so that a locked database fails the statement,

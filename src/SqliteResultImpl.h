@@ -138,6 +138,7 @@ private:
   bool arrow_chunk_full();
   cpp11::sexp collect_coercions();
   void warn_coercions();
+  std::string coercions_text();
   void discard_coercions();
 
 private:

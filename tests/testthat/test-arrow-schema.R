@@ -307,6 +307,45 @@ test_that("numbers beyond 64 bits are out of range, not saturated", {
   ))
 })
 
+test_that("numbers of days outside the range of a date type are NULL", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (18000), (18000.9), (-0.5), (2147483647), (2147483648), (4294985296),",
+    "(106751991167), (106751991168), (9007199254740993), (1e30), (-1e30), ('2020-01-02'), ('abc')"
+  ))
+  fetch <- function(type) {
+    w <- coercion_warnings(
+      array <- nanoarrow::as_nanoarrow_array(dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type)))
+    )
+    values <- w[[1]]$coercions[[1]]$values
+    list(
+      array = array$children$x,
+      reasons = vapply(values, function(v) paste(v$class, v$reason, paste(v$rows, collapse = " ")), "")
+    )
+  }
+
+  date32 <- fetch(nanoarrow::na_date32())
+  expect_equal(
+    as.numeric(nanoarrow::convert_array(date32$array)),
+    c(18000, 18000, 0, 2147483647, NA, NA, NA, NA, NA, NA, NA, 18263, NA)
+  )
+  expect_equal(date32$reasons, c(
+    "integer out_of_range 5 6 7 8 9", "real out_of_range 10 11", "string unparsable 13"
+  ))
+
+  # Milliseconds, exactly
+  date64 <- fetch(nanoarrow::na_date64())
+  ms <- function(days) format(bit64::as.integer64(days) * 86400000L, scientific = FALSE)
+  expect_int64_bits(date64$array, c(
+    ms(18000), ms(18000), "0", ms(2147483647), ms(2147483648), ms(4294985296),
+    ms(106751991167), NA, NA, NA, NA, ms(18263), NA
+  ))
+  expect_equal(date64$reasons, c(
+    "integer out_of_range 8 9", "real out_of_range 10 11", "string unparsable 13"
+  ))
+})
+
 test_that("times and timestamps outside the range of their unit are NULL", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (ts, tm)")

@@ -549,8 +549,8 @@ void SqliteArrowColumn::append_null() {
 // - converted by SQLite, logged: text and blobs into a numeric type, reals
 //   into an integer type (truncated);
 // - NULL, logged: a blob into a text type unless it is valid UTF-8, a value
-//   outside the range of an integer, time or timestamp type, a date or time
-//   that can't be parsed, any value into the null type.
+//   outside the range of an integer, date, time or timestamp type, a date or
+//   time that can't be parsed, any value into the null type.
 void SqliteArrowColumn::append_value(int column_type, int64_t row) {
   switch (kind) {
   case AK_BOOL:
@@ -795,14 +795,39 @@ void SqliteArrowColumn::append_binary(int column_type, int64_t row) {
 }
 
 void SqliteArrowColumn::append_date(int column_type, int64_t row) {
-  bool ok;
-  double days = source.parse_date(ok);
-  if (!ok || ISNAN(days)) {
-    log.record(column_type, CR_UNPARSABLE, row);
+  // A number is a count of days, truncated toward zero. It is read here in
+  // full: parse_date() reads 32 bits of it, like the default path does.
+  int64_t days;
+  bool fits = true;
+  if (column_type == SQLITE_INTEGER) {
+    days = sqlite3_column_int64(stmt, j);
+  } else if (column_type == SQLITE_FLOAT) {
+    double real = std::trunc(sqlite3_column_double(stmt, j));
+    fits = real >= -9223372036854775808.0 && real < 9223372036854775808.0;
+    days = fits ? static_cast<int64_t>(real) : 0;
+  } else {
+    bool ok;
+    double parsed = source.parse_date(ok);
+    if (!ok || ISNAN(parsed)) {
+      log.record(column_type, CR_UNPARSABLE, row);
+      append_null();
+      return;
+    }
+    days = static_cast<int64_t>(parsed);
+  }
+
+  // The days of a date32, or their milliseconds for a date64, fit 32 or 64 bits
+  const int64_t max_days =
+    (kind == AK_DATE64) ? INT64_MAX / INT64_C(86400000) : INT32_MAX;
+  const int64_t min_days =
+    (kind == AK_DATE64) ? -(INT64_MAX / INT64_C(86400000)) : INT32_MIN;
+  if (!fits || days < min_days || days > max_days) {
+    log.record(column_type, CR_OUT_OF_RANGE, row);
     append_null();
     return;
   }
-  int64_t value = static_cast<int64_t>(days);
+
+  int64_t value = days;
   if (kind == AK_DATE64) {
     value *= INT64_C(86400000);
   }

@@ -77,6 +77,7 @@
 #' `time32` and `time64` in any unit, and `timestamp` in any unit and time zone.
 #' Dates, times and timestamps are parsed from their text form like `extended_types = TRUE` does it,
 #' a timestamp is read as UTC and only labelled with the requested time zone.
+#' A number is a count of days for a date, truncated, and of seconds for a time or timestamp.
 #' Dictionary, decimal, nested and extension types are an error.
 #'
 #' Values of another storage class than the column's type follow these rules,
@@ -90,6 +91,7 @@
 #' * `NULL`, with the warning: a blob into a text type unless it is valid UTF-8,
 #'   a number outside the range of an integer type,
 #'   including a real or the integer at the start of a text beyond 64 bits, which SQLite would saturate,
+#'   a date outside the range of its type, such as a number of days beyond `2^31 - 1` for `date32`,
 #'   a time or timestamp outside the range of its unit, such as a timestamp in nanoseconds after 2262,
 #'   a date or time that cannot be parsed,
 #'   and any value into the null type.

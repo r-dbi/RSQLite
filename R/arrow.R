@@ -66,6 +66,9 @@
 #' so the memory footprint is that of one chunk, not of the result set.
 #' The stream stays readable after the result has been cleared with [DBI::dbClearResult()],
 #' it is invalidated when another query is sent on the same connection.
+#' It reads the rows of the parameters bound when it was created:
+#' once [DBI::dbBind()] or [DBI::dbBindArrow()] binds new parameters, reading it fails,
+#' and [DBI::dbFetchArrow()] returns a stream for the new rows.
 #' [DBI::dbFetchArrowChunk()] returns one such array per call,
 #' and an empty array once all rows are fetched.
 #' A chunk also ends after the row at which a string or binary column reaches 1 GiB,

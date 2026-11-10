@@ -26,6 +26,7 @@ SqliteResultImpl::SqliteResultImpl(
       complete_(false),
       ready_(false),
       nrows_(0),
+      executions_(0),
       total_changes_start_(sqlite3_total_changes(conn)),
       types_(get_initial_field_types(cache.ncols_)),
       with_alt_types_(conn_->with_alt_types()),
@@ -121,6 +122,10 @@ bool SqliteResultImpl::complete() const {
 
 bool SqliteResultImpl::ready() const {
   return ready_;
+}
+
+int64_t SqliteResultImpl::executions() const {
+  return executions_;
 }
 
 int SqliteResultImpl::n_rows_fetched() {
@@ -295,6 +300,8 @@ cpp11::strings SqliteResultImpl::get_placeholder_names() const {
 // Privates ////////////////////////////////////////////////////////////////////
 
 void SqliteResultImpl::after_set_params() {
+  ++executions_;
+
   // A new execution may see other values in the first row
   arrow_columns_.clear();
   arrow_frozen_ = false;

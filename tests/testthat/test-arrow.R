@@ -256,6 +256,33 @@ test_that("the stream stays readable after the result is cleared", {
   expect_equal(as.data.frame(stream)$a, c(1, 2, 3))
 })
 
+test_that("a stream fails once its result is bound to new parameters", {
+  con <- local_con()
+  rs <- dbSendQueryArrow(con, "SELECT ? AS a")
+  on.exit(dbClearResult(rs))
+
+  dbBind(rs, list(1L))
+  stream <- dbFetchArrow(rs)
+  expect_equal(schema_formats(stream), c(a = "l"))
+  # The int64 schema handed out does not fit the new value
+  dbBind(rs, list(2.5))
+  expect_error(stream$get_next(), "bound to new parameters")
+  expect_equal(as.data.frame(dbFetchArrow(rs))$a, 2.5)
+
+  # Also when the schema has not been requested yet, and with dbBindArrow()
+  stream <- dbFetchArrow(rs)
+  dbBindArrow(rs, structure(data.frame("text"), names = ""))
+  expect_error(stream$get_next(), "bound to new parameters")
+  expect_error(nanoarrow::infer_nanoarrow_schema(stream), "bound to new parameters")
+  expect_equal(as.data.frame(dbFetchArrow(rs))$a, "text")
+
+  # A stream read to the end has released the result and stays at its end
+  stream <- dbFetchArrow(rs)
+  expect_null(stream$get_next())
+  dbBind(rs, list(3L))
+  expect_null(stream$get_next())
+})
+
 test_that("dbGetQueryArrow() reads the whole result", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:3, b = letters[1:3]))

@@ -7,15 +7,30 @@ namespace {
 struct StreamState {
   DbResultPtr result;
   int64_t chunk_size;
+  // The execution of the statement whose rows the stream reads
+  int64_t executions;
   nanoarrow::UniqueSchema schema;
   std::string last_error;
 
   StreamState(const DbResultPtr& result_, int64_t chunk_size_)
-      : result(result_), chunk_size(chunk_size_) {}
+      : result(result_),
+        chunk_size(chunk_size_),
+        executions(result_->executions()) {}
 };
 
 StreamState* get_state(struct ArrowArrayStream* stream) {
   return static_cast<StreamState*>(stream->private_data);
+}
+
+// New parameters execute the statement again, with new rows and possibly
+// other types than those of the schema handed out
+void check_executions(StreamState* state) {
+  if (state->result->executions() != state->executions) {
+    throw std::runtime_error(
+      "The result was bound to new parameters after the Arrow stream was "
+      "created, call dbFetchArrow() again"
+    );
+  }
 }
 
 void ensure_schema(StreamState* state) {
@@ -25,6 +40,7 @@ void ensure_schema(StreamState* state) {
   if (!state->result) {
     throw std::runtime_error("The Arrow stream has already been consumed");
   }
+  check_executions(state);
   state->result->arrow_schema(state->schema.get(), state->chunk_size);
 }
 
@@ -45,6 +61,7 @@ int get_next_impl(StreamState* state, struct ArrowArray* out) {
   }
 
   ensure_schema(state);
+  check_executions(state);
 
   nanoarrow::UniqueArray array;
   int64_t n = state->result->fetch_arrow(array.get(), state->chunk_size);

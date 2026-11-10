@@ -75,6 +75,9 @@ fetched from the result when the array is requested,
 so the memory footprint is that of one chunk, not of the result set.
 The stream stays readable after the result has been cleared with \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}},
 it is invalidated when another query is sent on the same connection.
+It reads the rows of the parameters bound when it was created:
+once \code{\link[DBI:dbBind]{DBI::dbBind()}} or \code{\link[DBI:dbBindArrow]{DBI::dbBindArrow()}} binds new parameters, reading it fails,
+and \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} returns a stream for the new rows.
 \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} returns one such array per call,
 and an empty array once all rows are fetched.
 A chunk also ends after the row at which a string or binary column reaches 1 GiB,

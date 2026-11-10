@@ -35,6 +35,10 @@ bool DbResult::is_active() const {
   return pConn_->is_current_result(this);
 }
 
+int64_t DbResult::executions() const {
+  return impl->executions();
+}
+
 int DbResult::n_rows_fetched() {
   return impl->n_rows_fetched();
 }

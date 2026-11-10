@@ -38,6 +38,8 @@ private:
   bool complete_;
   bool ready_;
   int nrows_;
+  // Counts the executions with new parameters, see executions()
+  int64_t executions_;
   int total_changes_start_;
   boost::scoped_ptr<SqliteParamSource> params_;
   std::vector<DATA_TYPE> types_;
@@ -62,6 +64,7 @@ public:
   void close();
   bool complete() const;
   bool ready() const;
+  int64_t executions() const;
   int n_rows_fetched();
   int n_rows_affected();
   void bind(const cpp11::list& params);

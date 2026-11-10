@@ -343,3 +343,70 @@ test_that("a requested null type drops the values with a reason of their own", {
   )
   expect_match(conditionMessage(w[[1]]), "1 integer value dropped by the null type, NA (row 1)", fixed = TRUE)
 })
+
+test_that("data frame fetches through Arrow keep the requested types", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (n, i, d)")
+  dbExecute(con, "INSERT INTO t VALUES (NULL, 1, NULL), (1, 2.5, 3), (NULL, 3, NULL)")
+  sql <- "SELECT * FROM t"
+  schema <- list(n = nanoarrow::na_na(), i = nanoarrow::na_int64())
+
+  # Without a schema, the second fetch decides `n` and widens `i`
+  rs <- dbSendQueryArrow(con, sql)
+  expect_equal(dbFetch(rs, 1), data.frame(n = NA, i = 1L, d = NA))
+  expect_equal(dbFetch(rs), data.frame(n = c(1L, NA), i = c(2.5, 3), d = c(3L, NA)))
+  dbClearResult(rs)
+
+  # With one, `n` stays of the null type and `i` an integer, `d` is decided
+  rs <- dbSendQueryArrow(con, sql, schema = schema)
+  expect_equal(dbFetch(rs, 1), data.frame(n = NA, i = 1L, d = NA))
+  w <- coercion_warnings(df <- dbFetch(rs))
+  expect_equal(df, data.frame(n = c(NA, NA), i = c(2L, 3L), d = c(3L, NA)))
+  expect_length(w, 1)
+  expect_equal(
+    lapply(w[[1]]$coercions, function(x) vapply(x$values, function(v) paste(v$class, v$reason), "")),
+    list("integer null_type", "real converted")
+  )
+  dbClearResult(rs)
+
+  # The same with one chunk per row, which rebuilds earlier chunks without a schema
+  rs <- dbSendQueryArrow(con, sql)
+  expect_equal(
+    suppressWarnings(arrow_fetch_df(rs@result, -1, chunk_size = 1)),
+    data.frame(n = c(NA, 1L, NA), i = c(1, 2.5, 3), d = c(NA, 3L, NA))
+  )
+  dbClearResult(rs)
+  rs <- dbSendQueryArrow(con, sql, schema = schema)
+  expect_equal(
+    suppressWarnings(arrow_fetch_df(rs@result, -1, chunk_size = 1)),
+    data.frame(n = rep(NA, 3), i = 1:3, d = c(NA, 3L, NA))
+  )
+  dbClearResult(rs)
+})
+
+test_that("the schema reads no rows when every column has a requested type", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x, y)")
+  dbExecute(con, "INSERT INTO t VALUES (1, 'a'), ('b', 'c')")
+  sql <- "SELECT x, y FROM t"
+
+  # The warning for the first chunk comes with the array, not with the schema
+  rs <- dbSendQueryArrow(con, sql, schema = list(x = nanoarrow::na_int32(), y = nanoarrow::na_string()))
+  on.exit(dbClearResult(rs))
+  stream <- dbFetchArrow(rs)
+  expect_length(coercion_warnings(stream$get_schema()), 0)
+  expect_equal(dbGetRowCount(rs), 0)
+  expect_length(coercion_warnings(array <- stream$get_next()), 1)
+  expect_equal(array$length, 2)
+  expect_equal(dbGetRowCount(rs), 2)
+  stream$release()
+  dbClearResult(rs)
+
+  # A column without a requested type needs the first chunk
+  rs <- dbSendQueryArrow(con, sql, schema = list(x = nanoarrow::na_int32()))
+  stream <- dbFetchArrow(rs)
+  expect_length(coercion_warnings(stream$get_schema()), 1)
+  expect_length(coercion_warnings(array <- stream$get_next()), 0)
+  expect_equal(array$length, 2)
+  stream$release()
+})

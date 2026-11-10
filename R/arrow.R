@@ -26,7 +26,8 @@
 #' that lists the affected columns with their types and the 1-based row numbers in the result.
 #' It is raised when the chunk is fetched from the result:
 #' for a lazy stream when the array is requested,
-#' and for the first chunk when the schema is requested before it, see the section on chunking.
+#' and for the first chunk when the schema is requested before it
+#' and a column has no requested type, see the sections on chunking and on requesting types.
 #' The warning carries the details in its `coercions` field.
 #' The types can therefore depend on `chunk_size`:
 #' a real number in a later chunk is truncated to fit an `int64` column decided from integers,
@@ -66,7 +67,9 @@
 #' with no widening and no dependence on `chunk_size`,
 #' and its declared type and `extended_types` play no part;
 #' the other columns are typed as described above.
-#' The requested types are kept when the query is executed again with [DBI::dbBind()].
+#' The requested types are kept when the query is executed again with [DBI::dbBind()],
+#' and by the data frame fetches of a connection with `arrow = TRUE`,
+#' where nanoarrow converts them to R types.
 #'
 #' The types that can be requested are
 #' `null`, `bool`, `int8` to `int64`, `uint8` to `uint64`, `float`, `double`,
@@ -87,7 +90,8 @@
 #' * `NULL`, with the warning: a blob into a text type unless it is valid UTF-8,
 #'   a number outside the range of an integer type,
 #'   a time or timestamp outside the range of its unit, such as a timestamp in nanoseconds after 2262,
-#'   and a date or time that cannot be parsed.
+#'   a date or time that cannot be parsed,
+#'   and any value into the null type.
 #'
 #' @section Parameters:
 #' The columns of the parameter stream are bound like this:
@@ -118,7 +122,8 @@
 #' and `binary` columns become [blob::blob] objects,
 #' as on the default path.
 #'
-#' Unlike a stream, each fetch decides the types of its columns, the way the default path does it:
+#' Unlike a stream, each fetch decides the types of its columns without a requested type,
+#' the way the default path does it:
 #' the first value that is not `NULL` decides,
 #' integers become doubles when a real number follows in the same fetch,
 #' and a column without a value takes its declared type, or `logical` without one.
@@ -161,6 +166,7 @@
 #' [DBI::dbFetchArrowChunk()] returns one such array per call,
 #' and an empty array once all rows are fetched.
 #' When the schema of a stream is requested before its first array,
+#' and a column has no requested type,
 #' the first chunk is fetched to decide the types and kept for the next fetch:
 #' [DBI::dbGetRowCount()] and [DBI::dbHasCompleted()] count its rows once they have been handed out,
 #' and [DBI::dbFetch()] fails while they wait.

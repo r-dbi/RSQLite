@@ -31,7 +31,8 @@ Such values are reported with one warning per chunk, of class \code{RSQLite_warn
 that lists the affected columns with their types and the 1-based row numbers in the result.
 It is raised when the chunk is fetched from the result:
 for a lazy stream when the array is requested,
-and for the first chunk when the schema is requested before it, see the section on chunking.
+and for the first chunk when the schema is requested before it
+and a column has no requested type, see the sections on chunking and on requesting types.
 The warning carries the details in its \code{coercions} field.
 The types can therefore depend on \code{chunk_size}:
 a real number in a later chunk is truncated to fit an \code{int64} column decided from integers,
@@ -73,7 +74,9 @@ A column with a requested type is typed without looking at its values,
 with no widening and no dependence on \code{chunk_size},
 and its declared type and \code{extended_types} play no part;
 the other columns are typed as described above.
-The requested types are kept when the query is executed again with \code{\link[DBI:dbBind]{DBI::dbBind()}}.
+The requested types are kept when the query is executed again with \code{\link[DBI:dbBind]{DBI::dbBind()}},
+and by the data frame fetches of a connection with \code{arrow = TRUE},
+where nanoarrow converts them to R types.
 
 The types that can be requested are
 \code{null}, \code{bool}, \code{int8} to \code{int64}, \code{uint8} to \code{uint64}, \code{float}, \code{double},
@@ -94,7 +97,8 @@ text and blobs into a numeric type, and reals into an integer type, truncated;
 \item \code{NULL}, with the warning: a blob into a text type unless it is valid UTF-8,
 a number outside the range of an integer type,
 a time or timestamp outside the range of its unit, such as a timestamp in nanoseconds after 2262,
-and a date or time that cannot be parsed.
+a date or time that cannot be parsed,
+and any value into the null type.
 }
 }
 
@@ -130,7 +134,8 @@ a \code{null} column becomes a \code{logical}.
 and \code{binary} columns become \link[blob:blob]{blob::blob} objects,
 as on the default path.
 
-Unlike a stream, each fetch decides the types of its columns, the way the default path does it:
+Unlike a stream, each fetch decides the types of its columns without a requested type,
+the way the default path does it:
 the first value that is not \code{NULL} decides,
 integers become doubles when a real number follows in the same fetch,
 and a column without a value takes its declared type, or \code{logical} without one.
@@ -175,6 +180,7 @@ and \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} returns a stream for the
 \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} returns one such array per call,
 and an empty array once all rows are fetched.
 When the schema of a stream is requested before its first array,
+and a column has no requested type,
 the first chunk is fetched to decide the types and kept for the next fetch:
 \code{\link[DBI:dbGetRowCount]{DBI::dbGetRowCount()}} and \code{\link[DBI:dbHasCompleted]{DBI::dbHasCompleted()}} count its rows once they have been handed out,
 and \code{\link[DBI:dbFetch]{DBI::dbFetch()}} fails while they wait.

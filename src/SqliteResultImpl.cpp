@@ -33,7 +33,8 @@ SqliteResultImpl::SqliteResultImpl(
       with_alt_types_(conn_->with_alt_types()),
       arrow_frozen_(false),
       pending_offset_(0),
-      arrow_row_read_(false) {
+      arrow_row_read_(false),
+      df_carry_(false) {
   try {
     if (cache.nparams_ == 0) {
       after_bind(true);
@@ -177,6 +178,14 @@ cpp11::list SqliteResultImpl::fetch(const int n_max) {
       "fetch them with `dbFetchArrowChunk()` or `dbFetchArrow()`."
     );
   }
+  if (n_max != 0 && arrow_row_read_) {
+    // The byte check of the Arrow fetch has converted some of its values,
+    // only the Arrow path kept their storage classes
+    cpp11::stop(
+      "A row held back from the last Arrow chunk is waiting, "
+      "fetch it with `dbFetchArrowChunk()` or `dbFetchArrow()`."
+    );
+  }
 
   int n = 0;
   cpp11::list out;
@@ -232,7 +241,7 @@ void SqliteResultImpl::arrow_schema(
     throw std::runtime_error("Query needs to be bound before fetching");
   }
 
-  ensure_arrow_columns();
+  ensure_arrow_columns(false);
 
   if (!arrow_frozen_) {
     // The first chunk decides the types, from the first value of each column
@@ -280,7 +289,7 @@ int64_t SqliteResultImpl::fetch_arrow_chunk(
     throw std::runtime_error("Query needs to be bound before fetching");
   }
 
-  ensure_arrow_columns();
+  ensure_arrow_columns(false);
 
   if (pending_chunk_->release != NULL) {
     int64_t n = std::min(
@@ -316,12 +325,14 @@ int64_t SqliteResultImpl::fetch_arrow_chunk(
 // chunk, and the chunks are conformed to the final types at the end.
 // A column without a value takes its declared type, or the null type, which
 // the next fetch decides again; the other types carry over to the next fetch.
-// `wide_ints` tells which columns have seen an integer that needs 64 bits,
-// in this fetch or an earlier one.
+// Times and timestamps are doubles in seconds, which keep the precision of
+// the default path, unless an Arrow stream or chunk has fixed the types.
+// `columns` tells which columns have seen an integer that needs 64 bits, in
+// this fetch or an earlier one, and which hold seconds.
 int64_t SqliteResultImpl::fetch_arrow_df(
   struct ArrowSchema* schema,
   std::vector<nanoarrow::UniqueArray>& chunks,
-  std::vector<bool>& wide_ints,
+  ArrowDfColumns& columns,
   int64_t n_max,
   int64_t chunk_size
 ) {
@@ -329,19 +340,29 @@ int64_t SqliteResultImpl::fetch_arrow_df(
     throw std::runtime_error("Query needs to be bound before fetching");
   }
 
-  ensure_arrow_columns();
+  const bool open = !arrow_frozen_;
+  ensure_arrow_columns(open);
   discard_coercions();
   const size_t ncols = arrow_columns_.size();
-  const bool open = !arrow_frozen_;
+
+  if (open && df_carry_) {
+    // The first fetch of a new execution, as long as no Arrow stream has
+    // started afresh
+    for (size_t j = 0; j < ncols; ++j) {
+      arrow_columns_[j].carry_over(df_kinds_[j], df_wide_ints_[j]);
+    }
+  }
+  df_carry_ = false;
 
   if (open && n_max == 0 && !complete_) {
     // A fetch of no rows types the columns from the next row,
-    // like the default path does it
+    // like the default path does it. Reading the storage classes converts
+    // no value, so the row is not marked as held back: the next fetch reads
+    // them again, and the default path may fetch the row.
     if (!arrow_row_read_) {
       for (size_t j = 0; j < ncols; ++j) {
         arrow_columns_[j].read_row();
       }
-      arrow_row_read_ = true;
     }
     for (size_t j = 0; j < ncols; ++j) {
       arrow_columns_[j].peek_value();
@@ -396,9 +417,17 @@ int64_t SqliteResultImpl::fetch_arrow_df(
     }
   }
 
-  wide_ints.clear();
+  columns.wide_ints.clear();
+  columns.seconds_classes.clear();
+  df_kinds_.clear();
+  df_wide_ints_.clear();
   for (size_t j = 0; j < ncols; ++j) {
-    wide_ints.push_back(arrow_columns_[j].wide_integers());
+    columns.wide_ints.push_back(arrow_columns_[j].wide_integers());
+    columns.seconds_classes.push_back(arrow_columns_[j].seconds_class());
+    // The null type of a stream is decided again, like an open one
+    ARROW_KIND kind = arrow_columns_[j].get_kind();
+    df_kinds_.push_back(kind == AK_NA ? AK_UNDECIDED : kind);
+    df_wide_ints_.push_back(arrow_columns_[j].wide_integers());
   }
 
   // One warning for the whole fetch, with the final types: a column logged
@@ -432,8 +461,10 @@ void SqliteResultImpl::bind_arrow(
     after_set_params();
   } catch (...) {
     // A stream that fails on its first row is not kept: it may hold a share
-    // of this result, through a stream that wraps one of its Arrow streams
+    // of this result, through a stream that wraps one of its Arrow streams.
+    // The statement has lost its bindings: it must be bound again.
     params_.reset();
+    ready_ = false;
     throw;
   }
 }
@@ -463,8 +494,10 @@ cpp11::strings SqliteResultImpl::get_placeholder_names() const {
 void SqliteResultImpl::after_set_params() {
   ++executions_;
 
-  // A new execution may see other values in the first row
+  // A new execution may see other values in the first row: an Arrow stream
+  // decides its types afresh, a data frame fetch starts from the last one's
   arrow_columns_.clear();
+  df_carry_ = !df_kinds_.empty();
   arrow_frozen_ = false;
   pending_chunk_.reset();
   pending_offset_ = 0;
@@ -497,7 +530,8 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   SqliteDataFrame data(stmt, cache.names_, n_max, types_, with_alt_types_);
 
   if (complete_ && data.get_ncols() == 0) {
-    Rf_warning(
+    // Through cpp11, so that an error made of it unwinds the C++ frames
+    cpp11::warning(
       "`dbGetQuery()`, `dbSendQuery()` and `dbFetch()` should only be used "
       "with `SELECT` queries. Did you mean `dbExecute()`, `dbSendStatement()` "
       "or `dbGetRowsAffected()`?"
@@ -537,7 +571,16 @@ bool SqliteResultImpl::step_run() {
 }
 
 bool SqliteResultImpl::step_done() {
-  bool more_params = bind_row();
+  bool more_params;
+  try {
+    more_params = bind_row();
+  } catch (...) {
+    // Parameters that fail to bind end the execution and are not kept:
+    // an Arrow stream may hold a share of a result bound to this one's stream
+    params_.reset();
+    complete_ = true;
+    throw;
+  }
 
   if (!more_params) {
     complete_ = true;
@@ -557,7 +600,12 @@ cpp11::list SqliteResultImpl::peek_first_row() {
   return data.get_data(types_);
 }
 
-void SqliteResultImpl::ensure_arrow_columns() {
+// Creates the columns if needed, and selects the arrays they build: for a
+// data frame fetch or for an Arrow stream
+void SqliteResultImpl::ensure_arrow_columns(bool data_frame) {
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    arrow_columns_[j].set_data_frame(data_frame);
+  }
   if (!arrow_columns_.empty() || cache.ncols_ == 0) {
     return;
   }
@@ -572,6 +620,7 @@ void SqliteResultImpl::ensure_arrow_columns() {
       with_alt_types_
     );
     column->decide_from_row(has_row);
+    column->set_data_frame(data_frame);
     arrow_columns_.push_back(column);
   }
 }

@@ -57,6 +57,11 @@ private:
   // Set while the columns hold the storage classes of the current row,
   // also when a byte limit ended the chunk before it
   bool arrow_row_read_;
+  // The types and 64-bit flags that the last data frame fetch left, which the
+  // first one of a new execution starts from, like the default path does
+  std::vector<ARROW_KIND> df_kinds_;
+  std::vector<bool> df_wide_ints_;
+  bool df_carry_;
 
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);
@@ -85,7 +90,7 @@ public:
   int64_t fetch_arrow_df(
     struct ArrowSchema* schema,
     std::vector<nanoarrow::UniqueArray>& chunks,
-    std::vector<bool>& wide_ints,
+    ArrowDfColumns& columns,
     int64_t n_max,
     int64_t chunk_size
   );
@@ -116,7 +121,7 @@ private:
   bool step_done();
   cpp11::list peek_first_row();
 
-  void ensure_arrow_columns();
+  void ensure_arrow_columns(bool data_frame);
   void freeze_arrow_columns();
   int64_t fetch_arrow_chunk(struct ArrowArray* out, int64_t n_max);
   int64_t fetch_arrow_rows(

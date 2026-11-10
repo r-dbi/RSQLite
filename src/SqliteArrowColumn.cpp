@@ -3,10 +3,30 @@
 #include "affinity.h"
 #include "utf8.h"
 #include <boost/algorithm/string/predicate.hpp>
+#include <algorithm>
 #include <climits>
 #include <cmath>
+#include <cstring>
 
 using namespace cpp11::literals;
+
+// Whether `size` bytes of text are valid UTF-8 without NUL bytes.
+// Most text is ASCII: eight bytes at a time, a word whose bytes are all in
+// 1..127 needs no further check, the rest goes to rsqlite_is_utf8_string().
+static bool is_utf8_text(const char* text, size_t size) {
+  const uint64_t ones = UINT64_C(0x0101010101010101);
+  const uint64_t highs = UINT64_C(0x8080808080808080);
+  size_t i = 0;
+  for (; i + 8 <= size; i += 8) {
+    uint64_t word;
+    memcpy(&word, text + i, 8);
+    // A NUL byte borrows in `word - ones`, a byte above 127 has its high bit
+    if (((word - ones) | word) & highs) {
+      break;
+    }
+  }
+  return rsqlite_is_utf8_string(text + i, size - i);
+}
 
 SqliteArrowColumn::SqliteArrowColumn(
   sqlite3_stmt* stmt_,
@@ -21,6 +41,7 @@ SqliteArrowColumn::SqliteArrowColumn(
       source(stmt_, j_, with_alt_types_),
       kind(AK_UNDECIDED),
       frozen(false),
+      data_frame(false),
       array_kind(AK_UNDECIDED),
       pending_nulls(0),
       wide_ints(false),
@@ -38,6 +59,17 @@ SqliteArrowColumn::SqliteArrowColumn(
 
 bool SqliteArrowColumn::decided() const {
   return kind != AK_UNDECIDED;
+}
+
+ARROW_KIND SqliteArrowColumn::get_kind() const {
+  return kind;
+}
+
+void SqliteArrowColumn::carry_over(ARROW_KIND kind_, bool wide_ints_) {
+  if (kind_ != AK_UNDECIDED) {
+    kind = kind_;
+  }
+  wide_ints = wide_ints || wide_ints_;
 }
 
 void SqliteArrowColumn::decide_from_row(bool has_row) {
@@ -83,8 +115,33 @@ void SqliteArrowColumn::reopen() {
   }
 }
 
+void SqliteArrowColumn::set_data_frame(bool data_frame_) {
+  data_frame = data_frame_;
+}
+
+const char* SqliteArrowColumn::seconds_class() const {
+  if (storage_kind() != AK_DOUBLE) {
+    return "";
+  }
+  switch (kind) {
+  case AK_TIME:
+    return "hms";
+  case AK_TIMESTAMP:
+    return "POSIXct";
+  default:
+    return "";
+  }
+}
+
+ARROW_KIND SqliteArrowColumn::storage_kind() const {
+  if (data_frame && (kind == AK_TIME || kind == AK_TIMESTAMP)) {
+    return AK_DOUBLE;
+  }
+  return kind;
+}
+
 void SqliteArrowColumn::set_schema(struct ArrowSchema* schema) const {
-  set_type(schema, kind);
+  set_type(schema, storage_kind());
   check_arrow(ArrowSchemaSetName(schema, name.c_str()), "Can't set Arrow name");
 }
 
@@ -240,23 +297,24 @@ void SqliteArrowColumn::conform_chunk(
   struct ArrowArray* chunk,
   ARROW_KIND chunk_kind
 ) const {
-  if (chunk_kind == kind) {
+  const ARROW_KIND target = storage_kind();
+  if (chunk_kind == target) {
     return;
   }
 
   nanoarrow::UniqueArray out;
-  init_array(out.get(), kind);
+  init_array(out.get(), target);
   if (chunk_kind == AK_NA) {
     check_arrow(
       ArrowArrayAppendNull(out.get(), chunk->length),
       "Can't append to Arrow array"
     );
-  } else if (chunk_kind == AK_INT64 && kind == AK_DOUBLE) {
+  } else if (chunk_kind == AK_INT64 && target == AK_DOUBLE) {
     append_ints_as_doubles(out.get(), chunk);
   } else {
     throw std::runtime_error(
       std::string("Internal error: can't convert an Arrow chunk of type ") +
-      format_kind(chunk_kind) + " to " + format_kind(kind)
+      format_kind(chunk_kind) + " to " + format_kind(target)
     );
   }
 
@@ -357,8 +415,8 @@ ARROW_KIND SqliteArrowColumn::kind_from_decltype() const {
 
 void SqliteArrowColumn::init_array() {
   array.reset();
-  init_array(array.get(), kind);
-  array_kind = kind;
+  array_kind = storage_kind();
+  init_array(array.get(), array_kind);
 }
 
 void SqliteArrowColumn::init_array(struct ArrowArray* out, ARROW_KIND kind) {
@@ -436,26 +494,29 @@ void SqliteArrowColumn::append_value(int column_type, int64_t row) {
   case AK_STRING:
     {
       fetch_bytes();
-      if (column_type == SQLITE_BLOB) {
-        // A blob keeps all its bytes, but only well-formed UTF-8 without NUL
-        // bytes is text
-        if (!rsqlite_is_utf8_string(
-              static_cast<const char*>(value_data),
-              static_cast<size_t>(value_size)
-            )) {
-          log.record(column_type, CR_INVALID_UTF8, row);
-          append_null();
-          break;
+      const char* text = static_cast<const char*>(value_data);
+      int64_t size = value_size;
+      if (data_frame && column_type == SQLITE_TEXT) {
+        // R strings end at the first NUL, like those of the default path,
+        // which passes text through unchecked; an Arrow stream checks it
+        const void* nul = memchr(text, '\0', static_cast<size_t>(size));
+        if (nul != NULL) {
+          size = static_cast<const char*>(nul) - text;
         }
+      } else if ((column_type == SQLITE_TEXT || column_type == SQLITE_BLOB) &&
+                 !is_utf8_text(text, static_cast<size_t>(size))) {
+        // SQLite doesn't enforce UTF-8 for text, and a blob keeps all its
+        // bytes: only well-formed UTF-8 without NUL bytes is text.
+        // Numbers convert to ASCII.
+        log.record(column_type, CR_INVALID_UTF8, row);
+        append_null();
+        break;
       }
       if (column_type != SQLITE_TEXT) {
         log.record(column_type, CR_CONVERTED, row);
       }
       check_arrow(
-        ArrowArrayAppendString(
-          array.get(),
-          arrow_string_view(static_cast<const char*>(value_data), value_size)
-        ),
+        ArrowArrayAppendString(array.get(), arrow_string_view(text, size)),
         "Can't append to Arrow array"
       );
       break;
@@ -502,10 +563,36 @@ void SqliteArrowColumn::append_value(int column_type, int64_t row) {
       if (!ok || ISNAN(seconds)) {
         log.record(column_type, CR_UNPARSABLE, row);
         append_null();
-      } else {
-        int64_t micros = static_cast<int64_t>(std::floor(seconds * 1e6 + 0.5));
+        break;
+      }
+      if (array_kind == AK_DOUBLE) {
+        // For a data frame: the seconds of the default path, all of them
         check_arrow(
-          ArrowArrayAppendInt(array.get(), micros),
+          ArrowArrayAppendDouble(array.get(), seconds),
+          "Can't append to Arrow array"
+        );
+        break;
+      }
+      double micros = std::floor(seconds * 1e6 + 0.5);
+      bool in_range;
+      if (kind == AK_TIME) {
+        // A time of day, [0, 86400) seconds: an hms value can hold any
+        // duration, Arrow's time64 can't.
+        // Rounding must not reach the end of the day.
+        in_range = seconds >= 0 && seconds < 86400;
+        micros = std::min(micros, 86400e6 - 1);
+      } else {
+        // int64 holds [-2^63, 2^63), both bounds exact as doubles: casting
+        // anything outside, an infinity included, would be undefined
+        in_range =
+          micros >= -9223372036854775808.0 && micros < 9223372036854775808.0;
+      }
+      if (!in_range) {
+        log.record(column_type, CR_OUT_OF_RANGE, row);
+        append_null();
+      } else {
+        check_arrow(
+          ArrowArrayAppendInt(array.get(), static_cast<int64_t>(micros)),
           "Can't append to Arrow array"
         );
       }

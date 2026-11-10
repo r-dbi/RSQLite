@@ -15,9 +15,8 @@ arrow_fetch_df <- function(res, n, chunk_size = ARROW_DF_CHUNK_SIZE) {
   # The C++ code takes a 64-bit integer, doubles are whole numbers up to 2^53
   n <- min(n, 2^53)
   fetched <- result_fetch_arrow_df(res@ptr, n, chunk_size)
-  df <- arrow_to_df(fetched$stream, res@conn, fetched$n, fetched$wide_ints)
 
-  if (length(df) == 0L) {
+  if (length(fetched$names) == 0L) {
     # Same warning as the default path, which gives none for `n = 0`
     if (n != 0) {
       warningc(
@@ -26,50 +25,73 @@ arrow_fetch_df <- function(res, n, chunk_size = ARROW_DF_CHUNK_SIZE) {
         "or `dbGetRowsAffected()`?"
       )
     }
-    df <- data.frame()
+    return(data.frame())
   }
 
-  df
+  arrow_to_df(fetched, res@conn@bigint)
 }
 
-# The unified conversion of an Arrow stream of `size` rows to a data frame,
-# `wide_ints` tells which columns have needed 64-bit integers in this fetch or
-# an earlier one
-arrow_to_df <- function(stream, conn, size, wide_ints) {
-  schema <- nanoarrow::infer_nanoarrow_schema(stream)
-  ptype <- arrow_df_ptype(schema)
-  df <- arrow_stream_to_df(stream, ptype, size)
-  arrow_df_int64(df, conn@bigint, wide_ints)
-}
+# The unified conversion of the arrays of a fetch to a data frame.
+# `fetched` holds the arrays with their lengths, the row count, the names and
+# Arrow formats of the columns, which columns have needed 64-bit integers in
+# this fetch or an earlier one, and the class of the columns of times and
+# timestamps, which come as doubles in seconds like on the default path.
+# The work is done on a plain list, small fetches pay for every R call.
+arrow_to_df <- function(fetched, bigint) {
+  formats <- fetched$formats
+  ptype <- arrow_df_ptype(formats, fetched$names)
+  arrays <- fetched$arrays
 
-# All rows of a stream with a known row count as a data frame:
-# for more than one array, the columns are allocated once, each array is
-# converted and copied into them and released before the next one is
-# requested, so that the arrays go as the data frame fills up
-arrow_stream_to_df <- function(stream, ptype, size) {
-  array <- stream$get_next(validate = FALSE)
-  if (!is.null(array) && array$length == size) {
+  if (length(arrays) == 1L) {
     # One array holds all rows, such as a fetch of fewer rows than a chunk:
     # nanoarrow's columns are the data frame, except that its character
     # vectors read from the array until they are touched, so these are copied
     # before the array is released
-    df <- nanoarrow::convert_array(array, to = ptype)
-    df[] <- lapply(df, function(col) if (is.character(col)) c(col) else col)
-    nanoarrow::nanoarrow_pointer_release(array)
-    stream$release()
-    return(df)
+    columns <- unclass(nanoarrow::convert_array(arrays[[1L]], to = ptype))
+    for (j in which(formats == "u")) {
+      columns[[j]] <- c(columns[[j]])
+    }
+    nanoarrow::nanoarrow_pointer_release(arrays[[1L]])
+  } else {
+    columns <- arrow_arrays_to_columns(arrays, fetched$lengths, ptype, fetched$n)
   }
 
+  for (j in which(fetched$seconds == "hms")) {
+    columns[[j]] <- hms::new_hms(columns[[j]])
+  }
+  for (j in which(fetched$seconds == "POSIXct")) {
+    columns[[j]] <- .POSIXct(columns[[j]], tz = "UTC")
+  }
+
+  # SQLite integers are 64-bit: a column whose values all fit is an integer,
+  # the others follow the `bigint` connection argument, like the default path,
+  # which also keeps a column that needed 64 bits in an earlier fetch
+  for (j in which(formats == "l" & !fetched$wide_ints)) {
+    as_int <- integer64_to_integer(columns[[j]])
+    if (!is.null(as_int)) {
+      columns[[j]] <- as_int
+    }
+  }
+  if (bigint != "integer64" && any(formats == "l")) {
+    columns <- convert_bigint(columns, bigint)
+  }
+
+  attr(columns, "row.names") <- .set_row_names(as.integer(fetched$n))
+  class(columns) <- "data.frame"
+  columns
+}
+
+# The columns of all rows of several arrays, as a list: the columns are
+# allocated once, each array is converted and copied into them and released
+# before the next one, so that the arrays go as the data frame fills up
+arrow_arrays_to_columns <- function(arrays, lengths, ptype, size) {
   size <- as.integer(size)
   columns <- lapply(ptype, function(col) vector(typeof(col), size))
   offset <- 0L
-  repeat {
-    if (is.null(array)) {
-      break
-    }
-    n <- as.integer(array$length)
+  for (i in seq_along(arrays)) {
+    n <- as.integer(lengths[[i]])
     if (n > 0L) {
-      chunk <- nanoarrow::convert_array(array, to = ptype)
+      chunk <- nanoarrow::convert_array(arrays[[i]], to = ptype)
       idx <- offset + seq_len(n)
       for (j in seq_along(columns)) {
         values <- chunk[[j]]
@@ -78,47 +100,45 @@ arrow_stream_to_df <- function(stream, ptype, size) {
       }
       offset <- offset + n
     }
-    nanoarrow::nanoarrow_pointer_release(array)
-    array <- stream$get_next(validate = FALSE)
+    nanoarrow::nanoarrow_pointer_release(arrays[[i]])
   }
-  stream$release()
 
   for (j in seq_along(columns)) {
     attributes(columns[[j]]) <- attributes(ptype[[j]])
   }
-  names(columns) <- names(ptype)
-  attr(columns, "row.names") <- .set_row_names(size)
-  class(columns) <- "data.frame"
   columns
 }
 
-# The R types that Arrow columns are converted to:
-# nanoarrow's own rules, except that 64-bit integers keep their range
-# and null columns are logical
-arrow_df_ptype <- function(schema) {
-  ptype <- nanoarrow::infer_nanoarrow_ptype(schema)
-  formats <- vapply(schema$children, function(child) child$format, character(1))
-  for (i in which(formats %in% c("l", "L"))) {
-    ptype[[i]] <- bit64::integer64()
-  }
-  for (i in which(formats == "n")) {
-    ptype[[i]] <- logical()
-  }
+# The zero-row data frame that the arrays of a fetch are converted to:
+# nanoarrow's own rules for the formats a fetch produces, except that 64-bit
+# integers keep their range and null columns are logical
+arrow_df_ptype <- function(formats, names) {
+  ptype <- lapply(formats, arrow_df_column_ptype)
+  names(ptype) <- names
+  attr(ptype, "row.names") <- integer()
+  class(ptype) <- "data.frame"
   ptype
 }
 
-# SQLite integers are 64-bit: a column whose values all fit is an integer,
-# the others follow the `bigint` connection argument, like the default path,
-# which also keeps a column that needed 64 bits in an earlier fetch
-arrow_df_int64 <- function(df, bigint, wide_ints) {
-  is_int64 <- which(vlapply(df, inherits, "integer64") & !wide_ints)
-  for (i in is_int64) {
-    as_int <- integer64_to_integer(df[[i]])
-    if (!is.null(as_int)) {
-      df[[i]] <- as_int
-    }
+arrow_df_ptypes <- new.env(parent = emptyenv())
+
+arrow_df_column_ptype <- function(format) {
+  ptype <- arrow_df_ptypes[[format]]
+  if (is.null(ptype)) {
+    ptype <- switch(format,
+      n = logical(),
+      l = bit64::integer64(),
+      g = double(),
+      u = character(),
+      z = blob::blob(),
+      tdD = structure(double(), class = "Date"),
+      ttu = hms::hms(),
+      "tsu:UTC" = .POSIXct(double(), tz = "UTC"),
+      stopc("Internal error: unexpected Arrow format ", format)
+    )
+    arrow_df_ptypes[[format]] <- ptype
   }
-  convert_bigint(df, bigint)
+  ptype
 }
 
 # dbAppendTable() through Arrow: the data frame is written as an Arrow stream
@@ -129,7 +149,7 @@ arrow_append_df <- function(conn, name, value) {
 
 # What the default path does in sqlData() and dbBind() before writing:
 # factors become strings, lists of raw vectors become blobs,
-# and a difftime is written as its number in its own units
+# and difftime, POSIXct and Date columns are written as their numbers
 arrow_prepare_df <- function(value) {
   value <- factor_to_string(value, warn = TRUE)
 
@@ -145,9 +165,10 @@ arrow_prepare_df <- function(value) {
   is_posixlt <- vlapply(value, inherits, "POSIXlt")
   value[is_posixlt] <- lapply(value[is_posixlt], as.POSIXct)
 
-  # nanoarrow would write a duration in seconds
-  is_difftime <- vlapply(value, inherits, "difftime")
-  value[is_difftime] <- lapply(value[is_difftime], as.numeric)
+  # nanoarrow would write a duration in seconds, and times, timestamps and
+  # dates in whole units, microseconds or days
+  is_number <- vlapply(value, inherits, c("difftime", "POSIXct", "Date"))
+  value[is_number] <- lapply(value[is_number], as.numeric)
 
   value
 }

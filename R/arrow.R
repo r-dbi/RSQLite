@@ -19,7 +19,8 @@
 #' Once the first chunk has been fetched the types are fixed.
 #' A value of another storage class is converted by SQLite's own rules,
 #' and becomes `NULL` in a column of the null type.
-#' A blob in a text column is kept only if it is valid UTF-8 without NUL bytes,
+#' Text and blobs in a text column are kept only if they are valid UTF-8 without NUL bytes,
+#' which SQLite does not enforce,
 #' and a date, time or timestamp that cannot be parsed is dropped;
 #' both become `NULL`.
 #' Such values are reported with one warning per chunk, of class `RSQLite_warning_coercion`,
@@ -50,6 +51,11 @@
 #' use `bit64::integer64()` as the target type to keep the full range.
 #' Dates, times and timestamps are parsed like the data frame path does it
 #' when `extended_types = TRUE`, see [SQLite()].
+#' Times and timestamps are 64-bit counts of microseconds:
+#' a number of seconds beyond about 9.2e12 either way, or an infinity, becomes `NULL`.
+#' A time is a time of day, at least 0 and less than 24 hours:
+#' other values, which the data frame path keeps as `hms` durations, become `NULL`.
+#' Both are reported as out of range in the warning about the chunk.
 #'
 #' @section Parameters:
 #' The columns of the parameter stream are bound like this:
@@ -76,22 +82,37 @@
 #' an `int64` column becomes an `integer` if all its values fit,
 #' and follows the `bigint` argument of [DBI::dbConnect()] otherwise, also in the later fetches of the result;
 #' a `null` column becomes a `logical`.
-#' `date32`, `time64` and `timestamp` columns become `Date`, `hms` and `POSIXct` in UTC,
-#' and `binary` columns become [blob::blob] objects,
+#' `date32` columns become `Date` and `binary` columns become [blob::blob] objects,
 #' as on the default path.
+#' Times and timestamps become `hms` and `POSIXct` in UTC,
+#' and travel as doubles in seconds in both directions,
+#' so they keep the default path's precision and range, times outside a day included,
+#' where a stream has microseconds and only times of day.
+#' Text ends at its first NUL character and is not checked for UTF-8, as on the default path,
+#' where a stream makes text `NULL` unless it is valid UTF-8 without NUL bytes.
+#' A blob in a text column is text only if it is valid UTF-8 without NUL bytes, as in a stream,
+#' and `NA` with a warning otherwise,
+#' where the default path ends it at its first NUL byte and does not check it.
 #'
 #' Unlike a stream, each fetch decides the types of its columns, the way the default path does it:
 #' the first value that is not `NULL` decides,
 #' integers become doubles when a real number follows in the same fetch,
 #' and a column without a value takes its declared type, or `logical` without one.
-#' The next fetch starts from these types, except that it decides a `logical` column again.
+#' The next fetch starts from these types, also after [DBI::dbBind()],
+#' except that it decides a `logical` column again.
+#' Three differences remain.
 #' The default path truncates a real number that follows an integer too large for an `integer`,
-#' with a warning, here the column becomes a `double`.
+#' with a warning, here the column becomes a `double`,
+#' which keeps the real number but rounds the integers beyond `2^53`.
 #' It also truncates a string or blob converted to an integer too large for an `integer`,
 #' here the column follows `bigint` from then on, as for such an integer.
+#' The default path reads `-2147483648` as a 32-bit integer, which is `NA` in R,
+#' here it is a value that needs 64 bits.
 #' Once [DBI::dbFetchArrow()] or [DBI::dbFetchArrowChunk()] has fixed the types of a result,
-#' later fetches keep them,
-#' and they hand out the rows kept for a schema, where the default path fails.
+#' later fetches keep them and the rules of a stream,
+#' with times and timestamps in microseconds, and text checked like a blob,
+#' and they hand out the rows kept for a schema and a row held back by the byte limits,
+#' where the default path fails.
 #' Values that are not of their column's type are converted or dropped as in a stream,
 #' and reported with one warning of class `RSQLite_warning_coercion` per [DBI::dbFetch()],
 #' which names the Arrow types the columns have at the end of the fetch.
@@ -101,7 +122,8 @@
 #' and in a fetch of no rows about the next row, from which it types the columns;
 #' through Arrow, a fetch of no rows returns no value and never warns.
 #' Before writing, factors become strings, lists of raw vectors become blobs,
-#' and `difftime` columns become their numbers in their own units, as on the default path.
+#' and `difftime`, `POSIXct` and `Date` columns become their numbers in their own units,
+#' as on the default path.
 #'
 #' Each fetch reads its rows into Arrow arrays first,
 #' so that the data frame is allocated once with the row count known,
@@ -131,6 +153,7 @@
 #' A chunk also ends after the row at which a string or binary column reaches 1 GiB,
 #' and before a row that would take such a column past the `2^31 - 1` bytes
 #' that the 32-bit offsets of the `utf8` and `binary` types can address.
+#' Such a row waits for the next Arrow fetch, and [DBI::dbFetch()] fails until then.
 #'
 #' An array returned by [DBI::dbFetchArrowChunk()] is freed
 #' when the garbage collector finds it unreachable,

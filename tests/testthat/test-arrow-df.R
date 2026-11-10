@@ -5,7 +5,7 @@ test_that("the arrow argument is validated and recorded", {
   expect_true(con@arrow)
 
   con2 <- dbConnect(SQLite(), ":memory:")
-  on.exit(dbDisconnect(con2))
+  on.exit(dbDisconnect(con2), add = TRUE, after = FALSE)
   expect_false(con2@arrow)
 
   expect_error(dbConnect(SQLite(), ":memory:", arrow = NA), "arrow")
@@ -30,7 +30,7 @@ test_that("dbFetch() converts Arrow chunks to the same data frames", {
   expect_equal(out, expected)
 
   rs <- dbSendQuery(con, "SELECT * FROM t")
-  on.exit(dbClearResult(rs))
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
   expect_equal(dbFetch(rs, n = 0), expected[0, ])
   expect_equal(dbFetch(rs, n = 2), expected[1:2, ])
   expect_false(dbHasCompleted(rs))
@@ -94,8 +94,63 @@ test_that("extended types come back as Date, hms and POSIXct on the Arrow path",
   expect_equal(out, df)
 
   rs <- dbSendQuery(con, "SELECT * FROM t")
-  on.exit(dbClearResult(rs))
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
   expect_equal(dbFetch(rs, n = 1), df[1, ])
+})
+
+test_that("times and timestamps keep their precision through Arrow", {
+  # Like values of Sys.time(), whose fractions need more than microseconds
+  df <- data.frame(id = 1:200)
+  df$ts <- withr::with_seed(1, .POSIXct(1.79e9 + runif(200), tz = "UTC"))
+  df$t <- withr::with_seed(2, hms::hms(runif(200) * 86400))
+  df$ts[3] <- NA
+  df$t[4] <- NA
+
+  con_default <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
+  on.exit(dbDisconnect(con_default))
+  con <- local_arrow_con(extended_types = TRUE)
+  dbWriteTable(con_default, "t", df)
+  dbWriteTable(con, "t", df)
+
+  # The same numbers are stored
+  numbers <- "SELECT ts + 0 AS ts, t + 0 AS t FROM t"
+  expect_identical(dbGetQuery(con, numbers), dbGetQuery(con_default, numbers))
+  expect_identical(dbGetQuery(con, numbers)$ts, as.numeric(df$ts))
+
+  # and read back as they were written
+  expect_identical(dbReadTable(con_default, "t"), df)
+  expect_identical(dbReadTable(con, "t"), df)
+  rs <- dbSendQuery(con, "SELECT * FROM t")
+  expect_identical(arrow_fetch_df(rs, 150, chunk_size = 7), df[1:150, ])
+  rest <- df[151:200, ]
+  rownames(rest) <- NULL
+  expect_identical(dbFetch(rs), rest)
+  dbClearResult(rs)
+
+  # A stream keeps microseconds
+  stream <- dbGetQueryArrow(con, "SELECT ts, t FROM t")
+  schema <- nanoarrow::infer_nanoarrow_schema(stream)
+  expect_identical(schema$children$ts$format, "tsu:UTC")
+  expect_identical(schema$children$t$format, "ttu")
+  stream$release()
+})
+
+test_that("times and timestamps keep their range through Arrow", {
+  sql <- c(
+    "CREATE TABLE t (t TIME, ts TIMESTAMP)",
+    "INSERT INTO t VALUES (9223372036855, 1e19), (-1e300, 1.5), (NULL, NULL)"
+  )
+  con_default <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
+  on.exit(dbDisconnect(con_default))
+  con <- local_arrow_con(extended_types = TRUE)
+  for (s in sql) {
+    dbExecute(con_default, s)
+    dbExecute(con, s)
+  }
+
+  expect_silent(out <- dbReadTable(con, "t"))
+  expect_identical(out, dbReadTable(con_default, "t"))
+  expect_identical(as.numeric(out$ts), c(1e19, 1.5, NA))
 })
 
 test_that("untyped NULL columns are logical on the Arrow path", {
@@ -204,7 +259,7 @@ test_that("data frames fetched in chunks through Arrow own their strings", {
 # fetch; `chunk_size` sets the rows per Arrow array of a fetch through Arrow
 fetch_sequence <- function(con, sql, ns, chunk_size = NULL) {
   rs <- dbSendQuery(con, sql)
-  on.exit(dbClearResult(rs))
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
   warnings <- integer(length(ns))
   data <- lapply(seq_along(ns), function(i) {
     withCallingHandlers(
@@ -312,6 +367,34 @@ test_that("a NULL-first column is typed by its first value through Arrow", {
   }
 })
 
+test_that("each binding through Arrow starts from the types of the last one", {
+  setup <- c(
+    "CREATE TABLE t (k, v, w, s)",
+    "INSERT INTO t VALUES (1, 1.5, 4294967296, 'a'), (2, NULL, 1, NULL)",
+    # Not a real after the wide integer: that is a documented exception
+    "INSERT INTO t VALUES (3, 2, 2, 5), (4, 'x', 'y', 1.5)"
+  )
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con))
+  con_arrow <- local_arrow_con()
+  for (sql in setup) {
+    dbExecute(con, sql)
+    dbExecute(con_arrow, sql)
+  }
+
+  bind_and_fetch <- function(con, ns) {
+    rs <- dbSendQuery(con, "SELECT v, w, s FROM t WHERE k = ?")
+    on.exit(dbClearResult(rs))
+    unlist(recursive = FALSE, lapply(c(1, 2, 3, 4, 99, 2), function(k) {
+      dbBind(rs, list(k))
+      lapply(ns, function(n) suppressWarnings(dbFetch(rs, n)))
+    }))
+  }
+  for (ns in list(-1, c(0, -1), c(1, 1))) {
+    expect_identical(bind_and_fetch(con_arrow, ns), bind_and_fetch(con, ns), info = paste(ns, collapse = ", "))
+  }
+})
+
 test_that("results larger than one chunk are typed by all their values through Arrow", {
   sql <- paste(
     "WITH RECURSIVE cnt(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM cnt WHERE i < 70000)",
@@ -332,6 +415,92 @@ test_that("results larger than one chunk are typed by all their values through A
   expect_identical(dbGetQuery(con_arrow, sql), expected)
 })
 
+test_that("times outside a day keep their value through Arrow like on the default path", {
+  sql <- c(
+    "CREATE TABLE t (i INTEGER, tm TIME)",
+    paste(
+      "INSERT INTO t VALUES (1, 0), (2, 86400), (3, 100000), (4, -1), (5, '24:00:00'),",
+      "(6, '30:00:00'), (7, 86399.9999996), (8, NULL)"
+    )
+  )
+  con_default <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
+  on.exit(dbDisconnect(con_default))
+  con <- local_arrow_con(extended_types = TRUE)
+  for (s in sql) {
+    dbExecute(con_default, s)
+    dbExecute(con, s)
+  }
+  query <- "SELECT tm FROM t ORDER BY i"
+
+  expected <- dbGetQuery(con_default, query)
+  expect_identical(as.numeric(expected$tm), c(0, 86400, 100000, -1, 86400, 108000, 86399.9999996, NA))
+  expect_silent(out <- dbGetQuery(con, query))
+  expect_identical(out, expected)
+  expect_identical(fetch_sequence(con, query, c(1, 2, -1)), fetch_sequence(con_default, query, c(1, 2, -1)))
+
+  # A stream holds times of day only
+  expect_warning(
+    stream_df <- as.data.frame(dbGetQueryArrow(con, query)),
+    "outside the range of Arrow type time64 are NULL"
+  )
+  expect_identical(is.na(stream_df$tm), c(FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE))
+  # and so do the data frames once a chunk has fixed the types
+  rs <- dbSendQuery(con, query)
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
+  expect_silent(dbFetchArrowChunk(rs, chunk_size = 1))
+  expect_warning(rest <- dbFetch(rs), "outside the range of Arrow type time64 are NULL")
+  expect_identical(is.na(rest$tm), c(TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE))
+})
+
+test_that("text through Arrow is read like on the default path", {
+  # Text ends at its first NUL and is not checked for UTF-8
+  sql <- paste(
+    "SELECT 'c' AS s UNION ALL SELECT CAST(x'610062' AS TEXT) UNION ALL SELECT CAST(x'ff' AS TEXT)",
+    "UNION ALL SELECT CAST(x'eda080' AS TEXT) UNION ALL SELECT NULL"
+  )
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con))
+  con_arrow <- local_arrow_con()
+
+  expected <- dbGetQuery(con, sql)
+  expect_identical(lapply(expected$s[1:4], charToRaw), list(charToRaw("c"), charToRaw("a"), as.raw(0xff), as.raw(c(0xed, 0xa0, 0x80))))
+  expect_silent(out <- dbGetQuery(con_arrow, sql))
+  expect_identical(out, expected)
+  expect_identical(fetch_sequence(con_arrow, sql, c(1, 2, -1)), fetch_sequence(con, sql, c(1, 2, -1)))
+
+  # A stream holds valid UTF-8 without NUL bytes only
+  expect_warning(
+    stream_df <- as.data.frame(dbGetQueryArrow(con_arrow, sql)),
+    "not valid UTF-8, or hold a NUL byte, are NULL"
+  )
+  expect_identical(stream_df$s, c("c", NA, NA, NA, NA))
+  # and so do the data frames once a chunk has fixed the types
+  rs <- dbSendQuery(con_arrow, sql)
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
+  expect_silent(dbFetchArrowChunk(rs, chunk_size = 1))
+  expect_warning(rest <- dbFetch(rs), "not valid UTF-8, or hold a NUL byte, are NULL")
+  expect_identical(rest$s, c(NA_character_, NA, NA, NA))
+})
+
+test_that("a blob in a text column is text through Arrow only if it is valid UTF-8", {
+  sql <- "SELECT 'a' AS x UNION ALL SELECT x'6869' UNION ALL SELECT x'610062' UNION ALL SELECT x'ff'"
+  con_arrow <- local_arrow_con()
+
+  # As in a stream, where the default path ends the blob at its first NUL
+  # and does not check it
+  messages <- character()
+  out <- withCallingHandlers(
+    dbGetQuery(con_arrow, sql),
+    warning = function(w) {
+      messages <<- c(messages, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_identical(out$x, c("a", "hi", NA, NA))
+  expect_match(messages, "`x`: mixed type", all = FALSE)
+  expect_match(messages, "`x`: values of type blob that are not valid UTF-8", all = FALSE)
+})
+
 test_that("dbFetch() through Arrow returns `n` rows across arrays cut short", {
   old <- arrow_set_bytes_limits(100, 150)
   withr::defer(arrow_set_bytes_limits(old[[1]], old[[2]]))
@@ -341,7 +510,7 @@ test_that("dbFetch() through Arrow returns `n` rows across arrays cut short", {
   dbWriteTable(con, "t", df)
 
   rs <- dbSendQuery(con, "SELECT s FROM t")
-  on.exit(dbClearResult(rs))
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
   expect_identical(dbFetch(rs, 5)$s, df$s[1:5])
   expect_false(dbHasCompleted(rs))
   expect_identical(dbFetch(rs, 5)$s, df$s[6:7])
@@ -362,7 +531,7 @@ test_that("dbFetch() through Arrow hands out the rows kept for a schema", {
   con <- local_arrow_con()
   dbWriteTable(con, "t", data.frame(a = 1:5))
   rs <- dbSendQuery(con, "SELECT a FROM t")
-  on.exit(dbClearResult(rs))
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
 
   # The schema fetches the first chunk and keeps it, which fixes the types
   stream <- dbFetchArrow(rs, chunk_size = 3)
@@ -373,4 +542,35 @@ test_that("dbFetch() through Arrow hands out the rows kept for a schema", {
   expect_identical(dbFetch(rs), data.frame(a = 3:5))
   expect_true(dbHasCompleted(rs))
   stream$release()
+})
+
+test_that("a handler of a fetch through Arrow can't use its result", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE u (i INTEGER, x)")
+  dbExecute(con, "INSERT INTO u VALUES (1, 1), (2, 'two'), (3, 3)")
+  busy <- "while one of its fetches or binds is running"
+
+  uses <- list(
+    function(rs) dbFetch(rs),
+    function(rs) dbFetch(rs, 0),
+    function(rs) dbBind(rs, list(i = 2)),
+    function(rs) dbClearResult(rs),
+    function(rs) dbColumnInfo(rs),
+    function(rs) dbFetchArrowChunk(rs)
+  )
+  for (use in uses) {
+    rs <- dbSendQuery(con, "SELECT x FROM u WHERE i >= $i ORDER BY i", params = list(i = 1))
+    # The mixed-type warning runs the handler in the middle of the fetch
+    expect_error(
+      withCallingHandlers(dbFetch(rs), warning = function(w) {
+        use(rs)
+        invokeRestart("muffleWarning")
+      }),
+      busy
+    )
+    # The result is usable again
+    dbBind(rs, list(i = 3))
+    expect_identical(dbFetch(rs), data.frame(x = 3L))
+    dbClearResult(rs)
+  }
 })

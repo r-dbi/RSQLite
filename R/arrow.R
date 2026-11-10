@@ -84,8 +84,24 @@
 #' each array holds at most `chunk_size` rows,
 #' fetched from the result when the array is requested,
 #' so the memory footprint is that of one chunk, not of the result set.
-#' The stream stays readable after the result has been cleared with [DBI::dbClearResult()],
-#' it is invalidated when another query is sent on the same connection.
+#' The stream holds on to the statement of the result:
+#' it stays readable after [DBI::dbClearResult()], while other queries run on the same connection,
+#' and even after [DBI::dbDisconnect()],
+#' when an error of the statement can only report SQLite's generic message for its result code.
+#' Until it has been read to the end or released, with `stream$release()` or by the garbage collector,
+#' it keeps the statement open, and with it a read transaction and the database file.
+#' It reads the rows of the parameters bound when it was created:
+#' once [DBI::dbBind()] or [DBI::dbBindArrow()] binds new parameters, reading it fails,
+#' and [DBI::dbFetchArrow()] returns a stream for the new rows.
+#' [DBI::dbFetchArrowChunk()] returns one such array per call,
+#' and an empty array once all rows are fetched.
+#' When the schema of a stream is requested before its first array,
+#' the first chunk is fetched to decide the types and kept for the next fetch:
+#' [DBI::dbGetRowCount()] and [DBI::dbHasCompleted()] count its rows once they have been handed out,
+#' and [DBI::dbFetch()] fails while they wait.
+#' A chunk also ends after the row at which a string or binary column reaches 1 GiB,
+#' and before a row that would take such a column past the `2^31 - 1` bytes
+#' that the 32-bit offsets of the `utf8` and `binary` types can address.
 #'
 #' An array returned by [DBI::dbFetchArrowChunk()] is freed
 #' when the garbage collector finds it unreachable,
@@ -94,9 +110,6 @@
 #' so that a loop that discards its chunks holds at most that much garbage.
 #' A loop that needs to be tighter releases each array
 #' with `nanoarrow::nanoarrow_pointer_release()` once done with it.
-#' [DBI::dbFetchArrowChunk()] returns one such array per call,
-#' and an empty array once all rows are fetched.
-#' A chunk is also cut once a string or binary column holds one gigabyte.
 #'
 #' @name sqlite-arrow
 #' @aliases arrow
@@ -129,11 +142,12 @@ arrow_gc <- if ("full" %in% names(formals(gc))) {
 }
 
 check_chunk_size <- function(chunk_size) {
-  if (!is.numeric(chunk_size) || length(chunk_size) != 1L || is.na(chunk_size) ||
+  if (!is.numeric(chunk_size) || length(chunk_size) != 1L || !is.finite(chunk_size) ||
     chunk_size < 1 || trunc(chunk_size) != chunk_size) {
     stopc("`chunk_size` must be a positive whole number")
   }
-  as.numeric(chunk_size)
+  # The C++ code takes a 64-bit integer, doubles are whole numbers up to 2^53
+  min(as.numeric(chunk_size), 2^53)
 }
 
 # The names of the columns of a struct schema, "" for unnamed columns

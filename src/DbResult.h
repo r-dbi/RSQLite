@@ -37,6 +37,9 @@ public:
   bool complete() const;
   bool ready() const;
   bool is_active() const;
+  // Counts the executions of the statement with new parameters:
+  // bind() and bind_arrow() start a new one
+  int64_t executions() const;
   int n_rows_fetched();
   int n_rows_affected();
 

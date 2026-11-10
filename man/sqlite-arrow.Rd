@@ -95,8 +95,24 @@ A fetch of \code{n} rows copies the strings out of its array and frees the array
 each array holds at most \code{chunk_size} rows,
 fetched from the result when the array is requested,
 so the memory footprint is that of one chunk, not of the result set.
-The stream stays readable after the result has been cleared with \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}},
-it is invalidated when another query is sent on the same connection.
+The stream holds on to the statement of the result:
+it stays readable after \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}}, while other queries run on the same connection,
+and even after \code{\link[DBI:dbDisconnect]{DBI::dbDisconnect()}},
+when an error of the statement can only report SQLite's generic message for its result code.
+Until it has been read to the end or released, with \code{stream$release()} or by the garbage collector,
+it keeps the statement open, and with it a read transaction and the database file.
+It reads the rows of the parameters bound when it was created:
+once \code{\link[DBI:dbBind]{DBI::dbBind()}} or \code{\link[DBI:dbBindArrow]{DBI::dbBindArrow()}} binds new parameters, reading it fails,
+and \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} returns a stream for the new rows.
+\code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} returns one such array per call,
+and an empty array once all rows are fetched.
+When the schema of a stream is requested before its first array,
+the first chunk is fetched to decide the types and kept for the next fetch:
+\code{\link[DBI:dbGetRowCount]{DBI::dbGetRowCount()}} and \code{\link[DBI:dbHasCompleted]{DBI::dbHasCompleted()}} count its rows once they have been handed out,
+and \code{\link[DBI:dbFetch]{DBI::dbFetch()}} fails while they wait.
+A chunk also ends after the row at which a string or binary column reaches 1 GiB,
+and before a row that would take such a column past the \code{2^31 - 1} bytes
+that the 32-bit offsets of the \code{utf8} and \code{binary} types can address.
 
 An array returned by \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} is freed
 when the garbage collector finds it unreachable,
@@ -105,8 +121,5 @@ After every 64 MB of arrays, RSQLite triggers a collection of the young generati
 so that a loop that discards its chunks holds at most that much garbage.
 A loop that needs to be tighter releases each array
 with \code{nanoarrow::nanoarrow_pointer_release()} once done with it.
-\code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} returns one such array per call,
-and an empty array once all rows are fetched.
-A chunk is also cut once a string or binary column holds one gigabyte.
 }
 

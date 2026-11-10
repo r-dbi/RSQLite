@@ -7,18 +7,39 @@
 
 namespace {
 
+// Counts the R conditions rethrown as C++ exceptions, for the tests
+int64_t rethrown_unwinds = 0;
+
 struct StreamState {
   DbResultPtr result;
   int64_t chunk_size;
+  // The execution of the statement whose rows the stream reads
+  int64_t executions;
+  // Set when C++ code of this package reads the stream, see below
+  bool rethrow_unwind;
   nanoarrow::UniqueSchema schema;
   std::string last_error;
 
   StreamState(const DbResultPtr& result_, int64_t chunk_size_)
-      : result(result_), chunk_size(chunk_size_) {}
+      : result(result_),
+        chunk_size(chunk_size_),
+        executions(result_->executions()),
+        rethrow_unwind(false) {}
 };
 
 StreamState* get_state(struct ArrowArrayStream* stream) {
   return static_cast<StreamState*>(stream->private_data);
+}
+
+// New parameters execute the statement again, with new rows and possibly
+// other types than those of the schema handed out
+void check_executions(StreamState* state) {
+  if (state->result->executions() != state->executions) {
+    throw std::runtime_error(
+      "The result was bound to new parameters after the Arrow stream was "
+      "created, call dbFetchArrow() again"
+    );
+  }
 }
 
 void ensure_schema(StreamState* state) {
@@ -28,6 +49,7 @@ void ensure_schema(StreamState* state) {
   if (!state->result) {
     throw std::runtime_error("The Arrow stream has already been consumed");
   }
+  check_executions(state);
   state->result->arrow_schema(state->schema.get(), state->chunk_size);
 }
 
@@ -48,6 +70,7 @@ int get_next_impl(StreamState* state, struct ArrowArray* out) {
   }
 
   ensure_schema(state);
+  check_executions(state);
 
   nanoarrow::UniqueArray array;
   int64_t n = state->result->fetch_arrow(array.get(), state->chunk_size);
@@ -67,6 +90,13 @@ int get_next_impl(StreamState* state, struct ArrowArray* out) {
 // An R error or interrupt raised through cpp11 arrives as a
 // cpp11::unwind_exception; its unwind is continued after leaving the try block
 // with no C++ objects alive, exactly like cpp11's entry-point wrapper does.
+// When C++ code of this package is the consumer, the exception is rethrown
+// instead, so that the unwind is continued at the entry point after the
+// consumer's C++ objects have been destroyed.
+// A C++ consumer of another package, such as arrow, still sees the longjmp:
+// the C stream interface has no other way to carry an R condition.
+// The conditions are interrupts, and warnings that a handler or
+// `options(warn = 2)` turns into a jump.
 
 int stream_get_schema(
   struct ArrowArrayStream* stream,
@@ -77,6 +107,10 @@ int stream_get_schema(
   try {
     return get_schema_impl(state, out);
   } catch (const cpp11::unwind_exception& e) {
+    if (state->rethrow_unwind) {
+      ++rethrown_unwinds;
+      throw;
+    }
     token = e.token;
   } catch (const std::exception& e) {
     state->last_error = e.what();
@@ -95,6 +129,10 @@ int stream_get_next(struct ArrowArrayStream* stream, struct ArrowArray* out) {
   try {
     return get_next_impl(state, out);
   } catch (const cpp11::unwind_exception& e) {
+    if (state->rethrow_unwind) {
+      ++rethrown_unwinds;
+      throw;
+    }
     token = e.token;
   } catch (const std::exception& e) {
     state->last_error = e.what();
@@ -214,4 +252,22 @@ int64_t db_arrow_buffered_stream_init(
   out->release = &buffered_release;
   out->private_data = state.release();
   return total;
+}
+
+bool db_arrow_stream_reads(
+  struct ArrowArrayStream* stream,
+  const DbResult* result
+) {
+  return stream->release == &stream_release &&
+         get_state(stream)->result.get() == result;
+}
+
+void db_arrow_stream_read_from_cpp(struct ArrowArrayStream* stream) {
+  if (stream->release == &stream_release) {
+    get_state(stream)->rethrow_unwind = true;
+  }
+}
+
+int64_t db_arrow_stream_rethrown_unwinds() {
+  return rethrown_unwinds;
 }

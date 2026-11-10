@@ -136,12 +136,16 @@ int64_t SqliteResultImpl::executions() const {
   return executions_;
 }
 
-int SqliteResultImpl::n_rows_fetched() {
+int64_t SqliteResultImpl::n_rows_fetched() {
   int64_t kept = 0;
   if (pending_chunk_->release != NULL) {
     kept = pending_chunk_->length - pending_offset_;
   }
-  return nrows_ - static_cast<int>(kept);
+  return nrows_ - kept;
+}
+
+void SqliteResultImpl::set_rows_fetched(int64_t n) {
+  nrows_ = n;
 }
 
 int SqliteResultImpl::n_rows_affected() {

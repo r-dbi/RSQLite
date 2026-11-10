@@ -150,6 +150,25 @@ test_that("times outside a day are NULL", {
   expect_equal(as.numeric(dbGetQuery(con, sql)$tm)[5:9], c(86400, 100000, -1, 86400, 108000))
 })
 
+test_that("text in a binary column is UTF-8, also in a UTF-16 database", {
+  con <- local_con()
+  dbExecute(con, "PRAGMA encoding = 'UTF-16'")
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
+  dbExecute(con, "INSERT INTO t VALUES (1, x'01'), (2, 'ab'), (3, 'caf\u00e9')")
+  sql <- "SELECT x FROM t ORDER BY i"
+
+  w <- coercion_warnings(df <- as.data.frame(dbGetQueryArrow(con, sql)))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_equal(vapply(values, `[[`, "", "class"), "string")
+  expect_equal(values[[1]]$rows, 2:3)
+  expected <- list(as.raw(1), charToRaw("ab"), charToRaw("caf\u00e9"))
+  expect_equal(unclass(df$x), expected, ignore_attr = TRUE)
+  # The data frame path returns the same bytes
+  expect_warning(default <- dbGetQuery(con, sql), "mixed type")
+  expect_equal(unclass(default$x), expected, ignore_attr = TRUE)
+})
+
 test_that("text that is not valid UTF-8 is NULL", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (i INTEGER, s TEXT)")
@@ -380,6 +399,25 @@ test_that("rows kept for the Arrow schema count once they are handed out", {
   expect_null(stream$get_next())
 })
 
+test_that("the row count goes on beyond the integers of R", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:6))
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t ORDER BY a")
+  withr::defer(dbClearResult(rs))
+
+  expect_equal(dbFetchArrowChunk(rs, chunk_size = 1)$length, 1)
+  expect_identical(dbGetRowCount(rs), 1L)
+  # As if a stream had read 2^31 - 2 rows
+  result_set_rows_fetched(rs@result@ptr, 2^31 - 2)
+  expect_equal(dbFetchArrowChunk(rs, chunk_size = 1)$length, 1)
+  expect_identical(dbGetRowCount(rs), .Machine$integer.max)
+  # Beyond, the count is a double, also on the data frame path
+  expect_equal(dbFetchArrowChunk(rs, chunk_size = 2)$length, 2)
+  expect_identical(dbGetRowCount(rs), 2^31 + 1)
+  expect_equal(nrow(dbFetch(rs)), 2L)
+  expect_identical(dbGetRowCount(rs), 2^31 + 3)
+})
+
 test_that("dbFetch() and dbFetchArrow() can be mixed on one result", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:5))
@@ -576,6 +614,40 @@ test_that("a result can't be used from a handler of its own fetch", {
   expect_silent(dbClearResult(rs))
   # Collects the streams of the first loop, which hold their results
   invisible(gc())
+})
+
+test_that("a result stays usable after an R error leaves its fetch by a longjmp", {
+  skip_on_cran()
+  skip_if_not(exists("mem.maxVSize", baseenv()), "mem.maxVSize() not available")
+
+  # A vector heap limit with at least 30 MB to spare, which R accepts only
+  # above the size the heap already has, and a blob 50 MB beyond the limit
+  old <- mem.maxVSize()
+  withr::defer(mem.maxVSize(old))
+  invisible(gc())
+  heap <- gc()["Vcells", ]
+  limit <- ceiling(max(heap[[4]], heap[[2]] + 30))
+  con <- local_con()
+  dbExecute(con, paste0("CREATE TABLE t AS SELECT zeroblob(", (limit + 50) * 2^20, ") AS b"))
+  rs <- dbSendQuery(con, "SELECT b FROM t")
+  withr::defer(if (dbIsValid(rs)) dbClearResult(rs))
+
+  # The data frame path allocates the blob with a raw R call, so the fetch
+  # fails by a longjmp that cpp11 does not see; the spare memory leaves room to
+  # handle the error
+  invisible(mem.maxVSize(limit))
+  expect_error(
+    withCallingHandlers(
+      dbFetch(rs),
+      error = function(e) invisible(mem.maxVSize(old))
+    ),
+    "vector memory limit"
+  )
+  invisible(mem.maxVSize(old))
+
+  # The result is not left marked busy: it fetches, and it clears
+  expect_equal(lengths(dbFetch(rs)$b), (limit + 50) * 2^20)
+  expect_silent(dbClearResult(rs))
 })
 
 test_that("a result must be bound again after its first parameter row fails", {
@@ -782,6 +854,64 @@ test_that("dbBindArrow() rejects parameters for a query without placeholders", {
   rs <- dbSendQueryArrow(con, "SELECT 1 AS a")
   on.exit(dbClearResult(rs))
   expect_error(dbBindArrow(rs, structure(data.frame(1L), names = "")), "does not require parameters")
+})
+
+test_that("dbBindArrow() checks the indices of a dictionary", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (a TEXT)")
+
+  # An index beyond the two values of the dictionary, which nanoarrow's
+  # validation does not look at
+  factors <- nanoarrow::as_nanoarrow_array(factor(c("a", "b")))
+  bad <- nanoarrow::nanoarrow_array_modify(
+    factors,
+    list(buffers = list(NULL, nanoarrow::as_nanoarrow_buffer(c(0L, 50000000L)))),
+    validate = FALSE
+  )
+  params <- nanoarrow::nanoarrow_array_modify(
+    nanoarrow::as_nanoarrow_array(data.frame(a = 1:2)),
+    list(children = list(a = bad)),
+    validate = FALSE
+  )
+  stream <- nanoarrow::basic_array_stream(
+    list(params),
+    schema = nanoarrow::na_struct(list(a = nanoarrow::infer_nanoarrow_schema(factors))),
+    validate = FALSE
+  )
+  expect_error(dbAppendTableArrow(con, "t", stream), "Dictionary index 50000000 out of range for 2 values")
+  expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 0L)
+
+  expect_equal(dbAppendTableArrow(con, "t", data.frame(a = factor(c("x", NA, "y")))), 3L)
+  expect_equal(dbReadTable(con, "t")$a, c("x", NA, "y"))
+})
+
+test_that("dbBindArrow() refuses values beyond SQLite's length limit", {
+  skip_if_not(
+    identical(Sys.getenv("RSQLITE_TEST_LARGE_ARROW"), "true"),
+    "Needs about 2 GB of memory, set RSQLITE_TEST_LARGE_ARROW=true to run"
+  )
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (s TEXT, b BLOB)")
+
+  # One value of 2^31 bytes, one more than SQLITE_MAX_LENGTH, shared by a
+  # large_utf8 and a large_binary column
+  offsets <- nanoarrow::as_nanoarrow_buffer(bit64::as.integer64(c(0, 2^31)))
+  data <- nanoarrow::as_nanoarrow_buffer(raw(2^31))
+  large <- function(type) {
+    nanoarrow::nanoarrow_array_modify(
+      nanoarrow::nanoarrow_array_init(type),
+      list(length = 1, null_count = 0, buffers = list(NULL, offsets, data))
+    )
+  }
+  for (column in c("s", "b")) {
+    type <- if (column == "s") nanoarrow::na_large_string() else nanoarrow::na_large_binary()
+    params <- nanoarrow::nanoarrow_array_modify(
+      nanoarrow::nanoarrow_array_init(nanoarrow::na_struct(stats::setNames(list(type), column))),
+      list(length = 1, null_count = 0, children = stats::setNames(list(large(type)), column))
+    )
+    expect_error(dbAppendTableArrow(con, "t", params), "Can't bind parameter 1: string or blob too big")
+  }
+  expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 0L)
 })
 
 test_that("dbAppendTableArrow() appends rows and reports their number", {

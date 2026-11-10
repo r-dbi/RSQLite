@@ -131,7 +131,7 @@ extern "C" SEXP _RSQLite_result_has_completed(SEXP res) {
   END_CPP11
 }
 // result.cpp
-int result_rows_fetched(DbResult* res);
+SEXP result_rows_fetched(DbResult* res);
 extern "C" SEXP _RSQLite_result_rows_fetched(SEXP res) {
   BEGIN_CPP11
     return cpp11::as_sexp(result_rows_fetched(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res)));
@@ -223,6 +223,14 @@ extern "C" SEXP _RSQLite_arrow_rethrown_unwinds() {
     return cpp11::as_sexp(arrow_rethrown_unwinds());
   END_CPP11
 }
+// result.cpp
+void result_set_rows_fetched(SqliteResult* res, double n);
+extern "C" SEXP _RSQLite_result_set_rows_fetched(SEXP res, SEXP n) {
+  BEGIN_CPP11
+    result_set_rows_fetched(cpp11::as_cpp<cpp11::decay_t<SqliteResult*>>(res), cpp11::as_cpp<cpp11::decay_t<double>>(n));
+    return R_NilValue;
+  END_CPP11
+}
 // rsqlite.cpp
 cpp11::strings rsqliteVersion();
 extern "C" SEXP _RSQLite_rsqliteVersion() {
@@ -258,6 +266,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_result_rows_affected",         (DL_FUNC) &_RSQLite_result_rows_affected,         1},
     {"_RSQLite_result_rows_fetched",          (DL_FUNC) &_RSQLite_result_rows_fetched,          1},
     {"_RSQLite_result_set_arrow_schema",      (DL_FUNC) &_RSQLite_result_set_arrow_schema,      3},
+    {"_RSQLite_result_set_rows_fetched",      (DL_FUNC) &_RSQLite_result_set_rows_fetched,      2},
     {"_RSQLite_result_valid",                 (DL_FUNC) &_RSQLite_result_valid,                 1},
     {"_RSQLite_rsqliteVersion",               (DL_FUNC) &_RSQLite_rsqliteVersion,               0},
     {"_RSQLite_set_busy_handler",             (DL_FUNC) &_RSQLite_set_busy_handler,             2},

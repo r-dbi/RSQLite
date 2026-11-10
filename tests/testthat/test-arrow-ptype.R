@@ -387,3 +387,32 @@ test_that("ptype can't be combined with schema", {
   expect_equal(dbFetch(rs), data.frame(a = as.Date("2024-01-01")))
   dbClearResult(rs)
 })
+
+test_that("dbColumnInfo() names each prototype as dbFetch() returns it", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (a, b)")
+  dbExecute(con, "INSERT INTO t VALUES ('2024-01-01', 1), (NULL, 2)")
+  type_name <- function(df) vapply(df, function(x) if (is.object(x)) class(x)[[1]] else typeof(x), "", USE.NAMES = FALSE)
+
+  prototypes <- list(
+    integer(), numeric(), character(), logical(), bit64::integer64(),
+    as.Date(character()), as.POSIXct(character(), tz = "Asia/Tokyo"), as.POSIXlt(character(), tz = "UTC"),
+    hms::hms(), blob::blob(), factor(), factor(levels = "x"), ordered(character()), vctrs::unspecified()
+  )
+  for (proto in prototypes) {
+    label <- class(proto)[[1]]
+    rs <- dbSendQuery(con, "SELECT a, b FROM t", ptype = list(a = proto))
+    info <- suppressWarnings(dbColumnInfo(rs))
+    empty <- suppressWarnings(dbFetch(rs, 0))
+    all <- suppressWarnings(dbFetch(rs))
+    dbClearResult(rs)
+    expect_identical(info$name, c("a", "b"), info = label)
+    expect_identical(info$type, type_name(empty), info = label)
+    expect_identical(info$type, type_name(all), info = label)
+  }
+
+  # The type of a prototype, not of its Arrow format
+  rs <- dbSendQuery(con, "SELECT a, b FROM t", ptype = list(a = factor(), b = bit64::integer64()))
+  expect_identical(dbColumnInfo(rs)$type, c("factor", "integer64"))
+  dbClearResult(rs)
+})

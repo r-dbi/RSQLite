@@ -306,6 +306,13 @@ void SqliteArrowParamSource::bind_parameter(
     {
       int64_t index = ArrowArrayViewGetIntUnsafe(values, row);
       const struct ArrowArrayView* dictionary = values->dictionary;
+      // The validation of the array does not look at the indices
+      if (index < 0 || index >= dictionary->length) {
+        std::stringstream ss;
+        ss << "Dictionary index " << index << " out of range for "
+           << dictionary->length << " values (parameter " << pos << ").";
+        throw std::runtime_error(ss.str());
+      }
       if (ArrowArrayViewIsNull(dictionary, index)) {
         sqlite3_bind_null(stmt, pos);
         break;
@@ -334,12 +341,16 @@ void SqliteArrowParamSource::bind_parameter(
   case NANOARROW_TYPE_BINARY_VIEW:
     {
       struct ArrowBufferView bytes = ArrowArrayViewGetBytesUnsafe(values, row);
-      sqlite3_bind_blob(
-        stmt,
-        pos,
-        bytes.data.data,
-        static_cast<int>(bytes.size_bytes),
-        SQLITE_TRANSIENT
+      // 64-bit sizes: SQLite refuses a value beyond its length limit
+      check_bind(
+        sqlite3_bind_blob64(
+          stmt,
+          pos,
+          bytes.data.data,
+          static_cast<sqlite3_uint64>(bytes.size_bytes),
+          SQLITE_TRANSIENT
+        ),
+        pos
       );
       break;
     }
@@ -395,13 +406,26 @@ void SqliteArrowParamSource::bind_string(
   int64_t row
 ) {
   struct ArrowStringView text = ArrowArrayViewGetStringUnsafe(values, row);
-  sqlite3_bind_text(
-    stmt,
-    pos,
-    text.data,
-    static_cast<int>(text.size_bytes),
-    SQLITE_TRANSIENT
+  // 64-bit sizes: SQLite refuses a value beyond its length limit
+  check_bind(
+    sqlite3_bind_text64(
+      stmt,
+      pos,
+      text.data,
+      static_cast<sqlite3_uint64>(text.size_bytes),
+      SQLITE_TRANSIENT,
+      SQLITE_UTF8
+    ),
+    pos
   );
+}
+
+void SqliteArrowParamSource::check_bind(int rc, int pos) {
+  if (rc != SQLITE_OK) {
+    std::stringstream ss;
+    ss << "Can't bind parameter " << pos << ": " << sqlite3_errstr(rc) << ".";
+    throw std::runtime_error(ss.str());
+  }
 }
 
 double SqliteArrowParamSource::units_per_second(enum ArrowTimeUnit unit) {

@@ -801,8 +801,13 @@ test_that("data frame fetches convert every type that can be requested", {
 
   # One array, and an array per two rows
   rs <- dbSendQueryArrow(con, sql, schema = types)
+  info <- dbColumnInfo(rs)
   one <- suppressWarnings(dbFetch(rs))
   dbClearResult(rs)
+  # dbColumnInfo() names the R types like the default path
+  expect_identical(info$name, names(types))
+  expect_identical(info$type, unname(vapply(one, arrow_column_type_name, "")))
+  expect_identical(info$type[c(1, 9, 14, 17, 19, 21)], c("logical", "integer", "list", "POSIXct", "hms", "logical"))
   rs <- dbSendQueryArrow(con, sql, schema = types)
   several <- suppressWarnings(arrow_fetch_df(rs@result, -1, chunk_size = 2))
   dbClearResult(rs)
@@ -825,4 +830,75 @@ test_that("data frame fetches convert every type that can be requested", {
   expect_equal(as.numeric(one$t64), values)
   expect_equal(as.numeric(one$ts), values)
   expect_identical(one$n, rep(NA, 5))
+})
+
+test_that("a requested uint64 beyond 2^63 - 1 is a double in data frames", {
+  for (bigint in c("integer64", "numeric")) {
+    con <- local_arrow_con(bigint = bigint)
+    dbExecute(con, "CREATE TABLE t (x)")
+    dbExecute(con, "INSERT INTO t VALUES (1), (2), (1e19), ('18446744073709551615'), (NULL), (5)")
+    sql <- "SELECT x FROM t ORDER BY rowid"
+    schema <- list(x = nanoarrow::na_uint64())
+    # integer64 would wrap these to negative numbers, a double rounds them
+    big <- c(1e19, 2^64)
+
+    rs <- dbSendQueryArrow(con, sql, schema = schema)
+    expect_identical(dbFetch(rs, 2)$x, 1:2, info = bigint)
+    expect_identical(suppressWarnings(dbFetch(rs, 2))$x, big, info = bigint)
+    # From then on
+    expect_identical(dbFetch(rs)$x, c(NA, 5), info = bigint)
+    expect_identical(dbColumnInfo(rs)$type, "double", info = bigint)
+    dbClearResult(rs)
+
+    # Also in one fetch of several arrays, and for the rows kept for a schema
+    rs <- dbSendQueryArrow(con, sql, schema = schema)
+    expect_identical(suppressWarnings(arrow_fetch_df(rs@result, -1, chunk_size = 2))$x, c(1, 2, big, NA, 5), info = bigint)
+    dbClearResult(rs)
+    # A column without a requested type makes the schema read the rows
+    rs <- dbSendQueryArrow(con, "SELECT x, x AS y FROM t ORDER BY rowid", schema = schema)
+    stream <- dbFetchArrow(rs)
+    expect_identical(suppressWarnings(schema_formats(stream)), c(x = "L", y = "g"))
+    expect_identical(dbGetRowCount(rs), 0L)
+    expect_identical(suppressWarnings(dbFetch(rs))$x, c(1, 2, big, NA, 5), info = bigint)
+    stream$release()
+    dbClearResult(rs)
+
+    # A stream holds the exact values
+    array <- suppressWarnings(single_array(dbGetQueryArrow(con, sql, schema = schema)))
+    expect_int64_bits(array$children$x, c("1", "2", "-8446744073709551616", "-1", NA, "5"))
+  }
+})
+
+test_that("dbColumnInfo() names the R type that dbFetch() returns for every requestable format", {
+  con <- local_arrow_con()
+  types <- list(
+    n = nanoarrow::na_na(), b = nanoarrow::na_bool(),
+    i8 = nanoarrow::na_int8(), i16 = nanoarrow::na_int16(), i32 = nanoarrow::na_int32(), i64 = nanoarrow::na_int64(),
+    u8 = nanoarrow::na_uint8(), u16 = nanoarrow::na_uint16(), u32 = nanoarrow::na_uint32(), u64 = nanoarrow::na_uint64(),
+    f32 = nanoarrow::na_float(), f64 = nanoarrow::na_double(),
+    s = nanoarrow::na_string(), ls = nanoarrow::na_large_string(),
+    bin = nanoarrow::na_binary(), lbin = nanoarrow::na_large_binary(),
+    d32 = nanoarrow::na_date32(), d64 = nanoarrow::na_date64(),
+    t_s = nanoarrow::na_time32("s"), t_ms = nanoarrow::na_time32("ms"),
+    t_us = nanoarrow::na_time64("us"), t_ns = nanoarrow::na_time64("ns"),
+    ts_s = nanoarrow::na_timestamp("s"), ts_ms = nanoarrow::na_timestamp("ms", "UTC"),
+    ts_us = nanoarrow::na_timestamp("us", "Europe/Zurich"), ts_ns = nanoarrow::na_timestamp("ns", "America/New_York")
+  )
+  sql <- paste("SELECT", paste0("1 AS ", names(types), collapse = ", "))
+  type_names <- function(df) unname(vapply(df, arrow_column_type_name, ""))
+
+  rs <- dbSendQueryArrow(con, sql, schema = nanoarrow::na_struct(types))
+  on.exit(dbClearResult(rs))
+  info <- dbColumnInfo(rs)
+  expect_identical(info$name, names(types))
+  expect_identical(info$type, type_names(dbFetch(rs, n = 0)))
+  expect_identical(dbColumnInfo(rs), info)
+  expect_identical(info$type, type_names(suppressWarnings(dbFetch(rs))))
+  expect_identical(
+    info$type,
+    c(
+      "logical", "logical", rep("integer", 4), rep("integer", 2), "double", "integer", "double", "double",
+      "character", "character", "list", "list", "Date", "POSIXct", rep("hms", 4), rep("POSIXct", 4)
+    )
+  )
 })

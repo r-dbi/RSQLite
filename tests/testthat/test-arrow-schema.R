@@ -1,5 +1,12 @@
 # Requesting Arrow types for result columns with `schema`
 
+# Every array that these tests read is checked with arrow's ValidateFull()
+# where arrow is installed: these read their streams to the end at once, the
+# lazy streams of dbFetchArrow() are checked where they are read
+dbGetQueryArrow <- function(...) arrow_validated(DBI::dbGetQueryArrow(...))
+dbReadTableArrow <- function(...) arrow_validated(DBI::dbReadTableArrow(...))
+dbFetchArrowChunk <- function(...) arrow_validated(DBI::dbFetchArrowChunk(...))
+
 test_that("a requested type is used without looking at the values", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x, y)")
@@ -24,7 +31,7 @@ test_that("a requested type is used without looking at the values", {
   on.exit(dbClearResult(rs))
   stream <- dbFetchArrow(rs, chunk_size = 1)
   expect_equal(schema_formats(stream), c(x = "g"))
-  expect_equal(as.data.frame(stream)$x, c(NA, NA, 1.5))
+  expect_equal(as.data.frame(arrow_validated(stream))$x, c(NA, NA, 1.5))
 })
 
 # The formats of a query's result, with the stream consumed
@@ -505,9 +512,9 @@ test_that("requested types survive dbBind() and apply to dbReadTableArrow()", {
   rs <- dbSendQueryArrow(con, "SELECT x FROM t WHERE x >= ?", schema = list(x = nanoarrow::na_int32()))
   on.exit(dbClearResult(rs))
   dbBind(rs, list(1))
-  expect_equal(as.data.frame(dbFetchArrow(rs))$x, c(1L, 2L))
+  expect_equal(as.data.frame(arrow_validated(dbFetchArrow(rs)))$x, c(1L, 2L))
   dbBind(rs, list(2))
-  expect_equal(as.data.frame(dbFetchArrow(rs))$x, 2L)
+  expect_equal(as.data.frame(arrow_validated(dbFetchArrow(rs)))$x, 2L)
   dbClearResult(rs)
   on.exit(NULL)
 
@@ -595,6 +602,11 @@ test_that("data frame fetches through Arrow keep the requested types", {
     data.frame(n = rep(NA, 3), i = 1:3, d = c(NA, 3L, NA))
   )
   dbClearResult(rs)
+  # The arrays behind such a fetch
+  rs <- dbSendQueryArrow(con, sql, schema = schema)
+  fetched <- suppressWarnings(result_fetch_arrow_df(rs@result@ptr, -1, 1))
+  expect_equal(chunk_lengths(arrow_validated(fetched$stream)), c(1, 1, 1))
+  dbClearResult(rs)
 
   # Like the default path, a 64-bit integer keeps a column as integer64 for
   # the later fetches, also in a fetch of no rows, and also from a real or text
@@ -626,7 +638,7 @@ test_that("the schema reads no rows when every column has a requested type", {
   expect_length(coercion_warnings(stream$get_schema()), 0)
   expect_equal(dbGetRowCount(rs), 0)
   expect_length(coercion_warnings(array <- stream$get_next()), 1)
-  expect_equal(array$length, 2)
+  expect_equal(arrow_validated(array)$length, 2)
   expect_equal(dbGetRowCount(rs), 2)
   stream$release()
   dbClearResult(rs)
@@ -636,7 +648,7 @@ test_that("the schema reads no rows when every column has a requested type", {
   stream <- dbFetchArrow(rs)
   expect_length(coercion_warnings(stream$get_schema()), 1)
   expect_length(coercion_warnings(array <- stream$get_next()), 0)
-  expect_equal(array$length, 2)
+  expect_equal(arrow_validated(array)$length, 2)
   stream$release()
 })
 
@@ -660,8 +672,8 @@ test_that("only the requested types with 32-bit offsets end chunks at the byte l
       schema <- setNames(list(types[[type]]), column)
       info <- paste(column, type)
       lengths <- if (startsWith(type, "large")) 7 else c(2, 1, 1, 1, 2)
-      stream <- dbGetQueryArrow(con, sql, schema = schema)
-      expect_equal(suppressWarnings(chunk_lengths(stream)), lengths, info = info)
+      stream <- suppressWarnings(dbGetQueryArrow(con, sql, schema = schema))
+      expect_equal(chunk_lengths(stream), lengths, info = info)
       values <- suppressWarnings(as.data.frame(dbGetQueryArrow(con, sql, schema = schema)))[[column]]
       expect_equal(if (is.character(values)) nchar(values) else lengths(values), sizes, info = info)
     }
@@ -685,8 +697,9 @@ test_that("the warning names each requested type", {
   values <- c(utf8 = "x'ff'", large_utf8 = "x'ff'", binary = "1", large_binary = "1", null = "1")
   for (type in names(types)) {
     value <- if (type %in% names(values)) values[[type]] else "'abc'"
-    stream <- dbGetQueryArrow(con, paste("SELECT", value, "AS x"), schema = list(x = types[[type]]))
-    w <- coercion_warnings(chunk_lengths(stream))
+    w <- coercion_warnings(
+      chunk_lengths(dbGetQueryArrow(con, paste("SELECT", value, "AS x"), schema = list(x = types[[type]])))
+    )
     expect_length(w, 1)
     expect_equal(w[[1]]$coercions[[1]]$type, type, info = type)
   }

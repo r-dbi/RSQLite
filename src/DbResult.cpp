@@ -63,7 +63,8 @@ void run_guarded(bool& busy, F&& body) {
 
 // Construction ////////////////////////////////////////////////////////////////
 
-DbResult::DbResult(const DbConnectionPtr& pConn) : pConn_(pConn), busy_(false) {
+DbResult::DbResult(const DbConnectionPtr& pConn)
+    : pConn_(pConn), busy_(false), rethrown_unwinds_(0) {
   pConn_->check_connection();
 
   // subclass constructor can throw, the destructor will remove the
@@ -95,6 +96,14 @@ bool DbResult::is_active() const {
 
 bool DbResult::busy() const {
   return busy_;
+}
+
+void DbResult::count_rethrown_unwind() {
+  ++rethrown_unwinds_;
+}
+
+int64_t DbResult::rethrown_unwinds() const {
+  return rethrown_unwinds_;
 }
 
 int64_t DbResult::executions() const {

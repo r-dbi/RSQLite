@@ -31,11 +31,23 @@ chunk_lengths <- function(stream) {
   lengths
 }
 
-# Lowers the bytes of a string or binary column after which, or beyond which,
-# a chunk ends, from 1 GiB and 2^31 - 1
-local_arrow_bytes_limits <- function(cut_bytes, max_bytes, envir = parent.frame()) {
-  old <- arrow_set_bytes_limits(cut_bytes, max_bytes)
-  withr::defer(arrow_set_bytes_limits(old[[1]], old[[2]]), envir = envir)
+# Lowers, for the result `rs` alone, the bytes of a string or binary column
+# after which, or beyond which, a chunk ends, from 1 GiB and 2^31 - 1
+set_bytes_limits <- function(rs, cut_bytes = 100, max_bytes = 150) {
+  if (methods::is(rs, "SQLiteResultArrow")) {
+    rs <- rs@result
+  }
+  result_set_bytes_limits(rs@ptr, cut_bytes, max_bytes)
+}
+
+# A lazy stream over `sql` with the byte limits lowered to 100 and 150,
+# `...` goes to dbSendQueryArrow(); the stream reads on after its result has
+# been cleared
+fetch_with_bytes_limits <- function(con, sql, ...) {
+  rs <- dbSendQueryArrow(con, sql, ...)
+  on.exit(dbClearResult(rs))
+  set_bytes_limits(rs)
+  dbFetchArrow(rs)
 }
 
 # The coercion warnings that `expr` raises, muffled

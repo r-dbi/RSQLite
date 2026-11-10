@@ -64,8 +64,11 @@
 #' each array holds at most `chunk_size` rows,
 #' fetched from the result when the array is requested,
 #' so the memory footprint is that of one chunk, not of the result set.
-#' The stream stays readable after the result has been cleared with [DBI::dbClearResult()],
-#' it is invalidated when another query is sent on the same connection.
+#' The stream holds on to the statement of the result:
+#' it stays readable after [DBI::dbClearResult()], while other queries run on the same connection,
+#' and even after [DBI::dbDisconnect()].
+#' Until it has been read to the end or released, with `stream$release()` or by the garbage collector,
+#' it keeps the statement open, and with it a read transaction and the database file.
 #' It reads the rows of the parameters bound when it was created:
 #' once [DBI::dbBind()] or [DBI::dbBindArrow()] binds new parameters, reading it fails,
 #' and [DBI::dbFetchArrow()] returns a stream for the new rows.

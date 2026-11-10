@@ -73,8 +73,11 @@ Named placeholders are matched to the names of the columns, like \code{\link[DBI
 each array holds at most \code{chunk_size} rows,
 fetched from the result when the array is requested,
 so the memory footprint is that of one chunk, not of the result set.
-The stream stays readable after the result has been cleared with \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}},
-it is invalidated when another query is sent on the same connection.
+The stream holds on to the statement of the result:
+it stays readable after \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}}, while other queries run on the same connection,
+and even after \code{\link[DBI:dbDisconnect]{DBI::dbDisconnect()}}.
+Until it has been read to the end or released, with \code{stream$release()} or by the garbage collector,
+it keeps the statement open, and with it a read transaction and the database file.
 It reads the rows of the parameters bound when it was created:
 once \code{\link[DBI:dbBind]{DBI::dbBind()}} or \code{\link[DBI:dbBindArrow]{DBI::dbBindArrow()}} binds new parameters, reading it fails,
 and \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} returns a stream for the new rows.

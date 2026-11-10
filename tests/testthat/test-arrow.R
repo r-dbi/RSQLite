@@ -283,6 +283,38 @@ test_that("a stream fails once its result is bound to new parameters", {
   expect_null(stream$get_next())
 })
 
+test_that("a stream reads on while other queries run on the connection", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:3))
+
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t ORDER BY a")
+  stream <- dbFetchArrow(rs, chunk_size = 2)
+  expect_equal(as.data.frame(stream$get_next())$a, c(1, 2))
+
+  # A new query clears the open result, not its stream
+  expect_warning(rs2 <- dbSendQuery(con, "SELECT 1 AS x"), "Closing open result set")
+  expect_false(dbIsValid(rs))
+  expect_equal(dbFetch(rs2)$x, 1L)
+  dbClearResult(rs2)
+  dbWriteTable(con, "u", data.frame(b = 1L))
+
+  expect_equal(as.data.frame(stream)$a, 3)
+
+  # A table is copied through a lazy stream on one connection
+  dbWriteTableArrow(con, "copy", dbGetQueryArrow(con, "SELECT a FROM t"))
+  expect_equal(dbReadTable(con, "copy"), data.frame(a = 1:3))
+})
+
+test_that("a stream not read to the end keeps the database open past dbDisconnect()", {
+  con <- dbConnect(SQLite(), ":memory:")
+  dbWriteTable(con, "t", data.frame(a = 1:3))
+  stream <- dbGetQueryArrow(con, "SELECT a FROM t ORDER BY a")
+
+  expect_warning(dbDisconnect(con), "1 results in use.*Arrow streams")
+  expect_false(dbIsValid(con))
+  expect_equal(as.data.frame(stream)$a, c(1, 2, 3))
+})
+
 test_that("dbGetQueryArrow() reads the whole result", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:3, b = letters[1:3]))

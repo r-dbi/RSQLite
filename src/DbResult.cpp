@@ -78,21 +78,15 @@ void DbResult::close() {
 
 // Arrow ///////////////////////////////////////////////////////////////////////
 
-void DbResult::arrow_schema(struct ArrowSchema* out, int64_t infer_rows) {
-  if (!is_active()) {
-    throw std::runtime_error("Inactive result set");
-  }
+// No is_active() check, unlike fetch(): a lazy Arrow stream reads on after the
+// R result object has been cleared and while other results are in use on the
+// connection, see db_arrow_stream_init()
 
+void DbResult::arrow_schema(struct ArrowSchema* out, int64_t infer_rows) {
   impl->arrow_schema(out, infer_rows);
 }
 
 int64_t DbResult::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
-  if (!is_active()) {
-    throw std::runtime_error(
-      "Result set was closed before the Arrow stream was consumed"
-    );
-  }
-
   return impl->fetch_arrow(out, n_max);
 }
 

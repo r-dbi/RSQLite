@@ -46,6 +46,8 @@ nanoarrow converts these to \code{double} by default,
 use \code{bit64::integer64()} as the target type to keep the full range.
 Dates, times and timestamps are parsed like the data frame path does it
 when \code{extended_types = TRUE}, see \code{\link[=SQLite]{SQLite()}}.
+Times and timestamps are 64-bit counts of microseconds:
+a number of seconds beyond about 9.2e12 either way, or an infinity, becomes \code{NULL} with a warning.
 }
 
 \section{Parameters}{

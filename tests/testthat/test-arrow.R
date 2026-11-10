@@ -134,6 +134,31 @@ test_that("extended types map to Arrow date, time and timestamp types", {
   expect_equal(df$dt, as.POSIXct(c(1577968496.75, NA), origin = "1970-01-01", tz = "UTC"))
 })
 
+test_that("times and timestamps outside the range of int64 microseconds are NULL", {
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, tm TIME, ts TIMESTAMP)")
+  # 9e999 is an infinity in SQLite
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 1.5, 1.5), (2, 9223372036855, -9223372036855),",
+    "(3, 1e19, -1e19), (4, 1e300, -1e300), (5, 9e999, -9e999)"
+  ))
+
+  messages <- character()
+  df <- withCallingHandlers(
+    as.data.frame(dbGetQueryArrow(con, "SELECT tm, ts FROM t ORDER BY i")),
+    warning = function(w) {
+      messages <<- c(messages, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_equal(as.numeric(df$tm), c(1.5, NA, NA, NA, NA))
+  expect_equal(as.numeric(df$ts), c(1.5, NA, NA, NA, NA))
+  # One warning per column, for the first such value, an integer
+  expect_equal(length(messages), 2L)
+  expect_match(messages, "`tm`: values of type integer outside the range of Arrow type time64", all = FALSE)
+  expect_match(messages, "`ts`: values of type integer outside the range of Arrow type timestamp", all = FALSE)
+})
+
 test_that("dbFetchArrow() streams lazily in chunks", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:10))

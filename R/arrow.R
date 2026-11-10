@@ -41,6 +41,8 @@
 #' use `bit64::integer64()` as the target type to keep the full range.
 #' Dates, times and timestamps are parsed like the data frame path does it
 #' when `extended_types = TRUE`, see [SQLite()].
+#' Times and timestamps are 64-bit counts of microseconds:
+#' a number of seconds beyond about 9.2e12 either way, or an infinity, becomes `NULL` with a warning.
 #'
 #' @section Parameters:
 #' The columns of the parameter stream are bound like this:

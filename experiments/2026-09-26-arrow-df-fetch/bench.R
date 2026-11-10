@@ -170,8 +170,9 @@ run_cell <- function(strategy, sql, db, chunk) {
     }
   )
   elapsed <- proc.time()[["elapsed"]] - start
-  # Outside the timing: object.size() reads every string, which materializes
-  # a lazy column
+  peak <- peak_rss_mb()
+  # Outside the timing and after the peak: object.size() reads every string,
+  # which materializes a lazy column
   if (exists("df", inherits = FALSE)) {
     df_mb <- as.numeric(object.size(df)) / 2^20
   }
@@ -180,7 +181,7 @@ run_cell <- function(strategy, sql, db, chunk) {
     elapsed = elapsed,
     rows = n_rows,
     df_mb = df_mb,
-    peak_rss_mb = peak_rss_mb(),
+    peak_rss_mb = peak,
     rsqlite = as.character(packageVersion("RSQLite")),
     stringsAsFactors = FALSE
   )

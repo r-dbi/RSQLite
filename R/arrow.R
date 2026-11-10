@@ -92,6 +92,9 @@
 #' and a column without a value takes its declared type, or `logical` without one.
 #' The next fetch starts from these types, also after [DBI::dbBind()],
 #' except that it decides a `logical` column again.
+#' [DBI::dbColumnInfo()] names the types that a fetch of no rows returns,
+#' and decides them for the next fetch like on the default path,
+#' without converting the values of the next row.
 #' Two differences remain.
 #' The default path truncates a real number that follows an integer too large for an `integer`,
 #' here the column becomes a `double`,

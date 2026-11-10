@@ -101,6 +101,9 @@ integers become doubles when a real number follows in the same fetch,
 and a column without a value takes its declared type, or \code{logical} without one.
 The next fetch starts from these types, also after \code{\link[DBI:dbBind]{DBI::dbBind()}},
 except that it decides a \code{logical} column again.
+\code{\link[DBI:dbColumnInfo]{DBI::dbColumnInfo()}} names the types that a fetch of no rows returns,
+and decides them for the next fetch like on the default path,
+without converting the values of the next row.
 Two differences remain.
 The default path truncates a real number that follows an integer too large for an \code{integer},
 here the column becomes a \code{double},

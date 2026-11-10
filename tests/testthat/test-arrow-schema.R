@@ -60,6 +60,12 @@ test_that("schema entries are matched by name, exactly", {
   expect_error(dbGetQueryArrow(con, "SELECT 1 AS abc", schema = list(ab = int32)), "not in the result: `ab`")
   expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = list(A = int32)), "not in the result: `A`")
   expect_error(dbGetQueryArrow(con, "SELECT 1 AS a, 2 AS a", schema = list(a = int32)), "more than once: `a`")
+  expect_error(
+    dbGetQueryArrow(con, "SELECT 1 AS b, 2 AS a, 3 AS b, 4 AS c, 5 AS c", schema = list(a = int32, c = int32, b = int32)),
+    "more than once: `c`, `b`$"
+  )
+  # Only the requested names matter
+  expect_equal(query_formats(con, "SELECT 1 AS a, 2 AS b, 3 AS b", schema = list(a = int32)), c(a = "i", b = "l", b = "l"))
   expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = list(int32)), "named")
   expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = list(a = int32, a = int32)), "Duplicate names")
   expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = int32), "struct")

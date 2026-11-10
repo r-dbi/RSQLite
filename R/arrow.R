@@ -202,8 +202,7 @@ arrow_set_schema <- function(res, schema) {
       paste0("`", requested[is.na(positions)], "`", collapse = ", ")
     )
   }
-  ambiguous <- requested[tabulate(positions, length(columns))[positions] > 0 &
-    vapply(requested, function(x) sum(columns == x) > 1, logical(1))]
+  ambiguous <- requested[requested %in% columns[duplicated(columns)]]
   if (length(ambiguous) > 0) {
     stopc(
       "Columns of `schema` that the result carries more than once: ",

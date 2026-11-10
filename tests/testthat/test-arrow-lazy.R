@@ -132,21 +132,33 @@ test_that("lazy strings beyond the 32-bit offsets give the same data frames", {
 
 test_that("lazy strings beyond 2 GiB take large_utf8", {
   skip_on_cran()
+  # Off unless the variable is true, which the GitHub Actions checks of this
+  # repository set in .github/workflows/custom/after-install
   skip_if_not(
     identical(Sys.getenv("RSQLITE_TEST_LARGE_ARROW"), "true"),
-    "Set RSQLITE_TEST_LARGE_ARROW=true to run, needs about 3.5 GB of memory"
+    "Needs about 2.5 GB of memory, set RSQLITE_TEST_LARGE_ARROW=true to run"
   )
+  gc_until_stable()
 
   con <- local_arrow_con(lazy_strings = TRUE)
-  # 2100 strings of 1 MiB: the chunks end at 1 GiB, the column needs 2100 MiB
+  # 2049 strings of 1 MiB: 2^31 + 2^20 bytes, past the 32-bit offsets
   sql <- paste(
-    "WITH RECURSIVE s(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM s WHERE i < 2100)",
+    "WITH RECURSIVE s(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM s WHERE i < 2049)",
     "SELECT i, hex(zeroblob(524288)) AS s FROM s"
   )
-  df <- dbGetQuery(con, sql)
-  expect_equal(df$i, 1:2100)
+  rs <- dbSendQuery(con, sql)
+  # Chunks end at 64 MiB instead of 1 GiB, so that the copy into one array
+  # needs little more than the column itself
+  set_bytes_limits(rs, 2^26, 2^31 - 1)
+  df <- dbFetch(rs)
+  dbClearResult(rs)
+  expect_equal(df$i, 1:2049)
   expect_true(is_lazy(df$s))
-  expect_equal(nchar(df$s[c(1, 1024, 1025, 2048, 2049, 2100)]), rep(2^20, 6))
+  expect_equal(nchar(df$s[c(1, 64, 65, 2048, 2049)]), rep(2^20, 5))
+
+  # The column goes with its view, before the next test
+  rm(df)
+  gc_until_stable()
 })
 
 test_that("lazy fetches convert column by column to the prototypes", {

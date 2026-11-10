@@ -4,6 +4,7 @@
 #include "RSQLite_types.h"
 #include "DbArrow.h"
 #include "DbArrowStream.h"
+#include "SqliteResultImpl.h"
 // After DbArrow.h, so that the Arrow C structs are defined once
 #include <nanoarrow/r.h>
 
@@ -89,34 +90,38 @@ SEXP result_fetch_arrow(
   return stream_xptr;
 }
 
-// All remaining rows, fetched up front as arrays of at most `chunk_size` rows:
-// a nanoarrow_array_stream that hands them out one by one, and the row count
+// The rows of one dbFetch() through Arrow, at most `n_max` or all for a
+// negative `n_max`, typed for a data frame and fetched up front as arrays of at
+// most `chunk_size` rows: a nanoarrow_array_stream that hands them out one by
+// one, the row count, and which columns have seen an integer that needs
+// 64 bits
 [[cpp11::register]]
-cpp11::list result_fetch_arrow_all(
-  cpp11::external_pointer<DbResultPtr> res_,
+cpp11::list result_fetch_arrow_df(
+  DbResult* res,
+  double n_max,
   double chunk_size
 ) {
-  DbResultPtr* res = res_.get();
-  if (res == NULL || res->get() == NULL) {
-    cpp11::stop("Invalid result set");
-  }
-  if (!(*res)->ready()) {
-    cpp11::stop("Query needs to be bound before fetching");
-  }
-
   cpp11::sexp stream_xptr(nanoarrow_array_stream_owning_xptr());
   struct ArrowArrayStream* stream =
     nanoarrow_output_array_stream_from_xptr(stream_xptr);
-  int64_t n = db_arrow_buffered_stream_init(
+  std::vector<bool> wide_ints;
+  int64_t n = res->fetch_arrow_df(
     stream,
-    *res,
+    wide_ints,
+    static_cast<int64_t>(n_max),
     static_cast<int64_t>(chunk_size)
   );
+
+  cpp11::writable::logicals wide(static_cast<R_xlen_t>(wide_ints.size()));
+  for (size_t j = 0; j < wide_ints.size(); ++j) {
+    wide[static_cast<R_xlen_t>(j)] = wide_ints[j] ? TRUE : FALSE;
+  }
 
   using namespace cpp11::literals;
   return cpp11::writable::list(
     { "stream"_nm = stream_xptr,
-      "n"_nm = cpp11::as_sexp(static_cast<double>(n)) }
+      "n"_nm = cpp11::as_sexp(static_cast<double>(n)),
+      "wide_ints"_nm = wide }
   );
 }
 
@@ -184,4 +189,24 @@ SEXP integer64_to_integer(cpp11::doubles x) {
     out[i] = (value == NA_INTEGER64) ? NA_INTEGER : static_cast<int>(value);
   }
   return out;
+}
+
+// For the tests: sets the bytes of a utf8 or binary column after which, or
+// beyond which, an Arrow chunk ends, and returns the previous values
+[[cpp11::register]]
+cpp11::doubles arrow_set_bytes_limits(double cut_bytes, double max_bytes) {
+  std::pair<int64_t, int64_t> old = SqliteResultImpl::set_arrow_bytes_limits(
+    static_cast<int64_t>(cut_bytes),
+    static_cast<int64_t>(max_bytes)
+  );
+  return cpp11::writable::doubles(
+    { static_cast<double>(old.first), static_cast<double>(old.second) }
+  );
+}
+
+// For the tests: how often an R condition raised while RSQLite's own C++ code
+// read one of its Arrow streams has been rethrown as a C++ exception
+[[cpp11::register]]
+double arrow_rethrown_unwinds() {
+  return static_cast<double>(db_arrow_stream_rethrown_unwinds());
 }

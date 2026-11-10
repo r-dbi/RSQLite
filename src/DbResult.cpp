@@ -2,6 +2,7 @@
 #include "DbResult.h"
 #include "DbConnection.h"
 #include "DbResultImpl.h"
+#include "DbArrowStream.h"
 
 // Construction ////////////////////////////////////////////////////////////////
 
@@ -33,6 +34,10 @@ bool DbResult::ready() const {
 
 bool DbResult::is_active() const {
   return pConn_->is_current_result(this);
+}
+
+int64_t DbResult::executions() const {
+  return impl->executions();
 }
 
 int DbResult::n_rows_fetched() {
@@ -74,28 +79,43 @@ void DbResult::close() {
 
 // Arrow ///////////////////////////////////////////////////////////////////////
 
-void DbResult::arrow_schema(struct ArrowSchema* out, int64_t infer_rows) {
-  if (!is_active()) {
-    throw std::runtime_error("Inactive result set");
-  }
+// No is_active() check, unlike fetch(): a lazy Arrow stream reads on after the
+// R result object has been cleared and while other results are in use on the
+// connection, see db_arrow_stream_init()
 
+void DbResult::arrow_schema(struct ArrowSchema* out, int64_t infer_rows) {
   impl->arrow_schema(out, infer_rows);
 }
 
 int64_t DbResult::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
-  if (!is_active()) {
-    throw std::runtime_error(
-      "Result set was closed before the Arrow stream was consumed"
-    );
-  }
-
   return impl->fetch_arrow(out, n_max);
+}
+
+int64_t DbResult::fetch_arrow_df(
+  struct ArrowArrayStream* out,
+  std::vector<bool>& wide_ints,
+  int64_t n_max,
+  int64_t chunk_size
+) {
+  nanoarrow::UniqueSchema schema;
+  std::vector<nanoarrow::UniqueArray> chunks;
+  int64_t n =
+    impl->fetch_arrow_df(schema.get(), chunks, wide_ints, n_max, chunk_size);
+  db_arrow_buffered_stream_init(out, schema, chunks);
+  return n;
 }
 
 void DbResult::bind_arrow(
   struct ArrowArrayStream* stream,
   const std::vector<int>& param_indexes
 ) {
+  // The stream would hold a share of the result that keeps it as parameters,
+  // and could never be read: the new execution invalidates it
+  if (db_arrow_stream_reads(stream, this)) {
+    throw std::runtime_error(
+      "Can't bind a result to an Arrow stream of its own rows."
+    );
+  }
   impl->bind_arrow(stream, param_indexes);
 }
 

@@ -110,6 +110,26 @@ test_that("dbAppendTable() writes through Arrow", {
   expect_error(dbAppendTable(con, "t", data.frame(a = 1L), row.names = TRUE), "row.names")
 })
 
+test_that("dbAppendTable() through Arrow writes difftime in its own units", {
+  df <- data.frame(id = 1:4)
+  df$d <- as.difftime(c(2, NA, 0.5, -1), units = "mins")
+  df$w <- as.difftime(c(1, 2, NA, 3), units = "weeks")
+  df$h <- hms::hms(c(61.5, NA, 90000, -5))
+
+  con_default <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con_default))
+  con <- local_arrow_con()
+  for (conn in list(con_default, con)) {
+    dbExecute(conn, "CREATE TABLE t (id INTEGER, d REAL, w REAL, h REAL)")
+    dbAppendTable(conn, "t", df)
+  }
+
+  out <- dbReadTable(con, "t")
+  expect_identical(out, dbReadTable(con_default, "t"))
+  expect_identical(out$d, c(2, NA, 0.5, -1))
+  expect_identical(out$w, c(1, 2, NA, 3))
+})
+
 test_that("dbWriteTable() and row names work through Arrow", {
   con <- local_arrow_con()
   dbWriteTable(con, "mtcars", mtcars, row.names = TRUE)
@@ -162,4 +182,137 @@ test_that("data frames fetched in chunks through Arrow own their strings", {
   gc()
   expect_equal(chunks[[1]]$s, c("a", "b"))
   expect_equal(chunks[[2]]$s, "c")
+})
+
+# The data frames of a sequence of fetches; `chunk_size` sets the rows per
+# Arrow array of a fetch through Arrow
+fetch_sequence <- function(con, sql, ns, chunk_size = NULL) {
+  rs <- dbSendQuery(con, sql)
+  on.exit(dbClearResult(rs))
+  lapply(ns, function(n) {
+    suppressWarnings(
+      if (is.null(chunk_size)) {
+        dbFetch(rs, n)
+      } else {
+        arrow_fetch_df(rs, n, chunk_size = chunk_size)
+      }
+    )
+  })
+}
+
+test_that("each fetch through Arrow is typed like on the default path", {
+  setup <- c(
+    "CREATE TABLE t (x, y INTEGER, z TEXT, w REAL, b BLOB, big, n)",
+    "INSERT INTO t VALUES (NULL, NULL, NULL, NULL, NULL, NULL, NULL)",
+    "INSERT INTO t VALUES (1, 2.5, NULL, 1, NULL, 1099511627776, NULL)",
+    "INSERT INTO t VALUES ('a', 3, 4, NULL, x'01', 1, NULL)",
+    "INSERT INTO t VALUES (NULL, NULL, 'c', 2.5, NULL, 2, NULL)",
+    "INSERT INTO t VALUES (2.5, 4, NULL, NULL, 'd', NULL, NULL)",
+    "INSERT INTO t VALUES (NULL, NULL, NULL, NULL, NULL, 3, 'e')"
+  )
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con))
+  con_arrow <- local_arrow_con()
+  for (sql in setup) {
+    dbExecute(con, sql)
+    dbExecute(con_arrow, sql)
+  }
+
+  sequences <- list(
+    c(0, -1), c(1, -1), c(2, -1), c(1, 1, 1, 1, 1, 1, 1),
+    c(0, 1, 0, 2, 0, -1), c(3, 0, 1, 1, 1), c(-1, 0, 1)
+  )
+  for (ns in sequences) {
+    expected <- fetch_sequence(con, "SELECT * FROM t", ns)
+    info <- paste("n =", paste(ns, collapse = ", "))
+    expect_identical(fetch_sequence(con_arrow, "SELECT * FROM t", ns), expected, info = info)
+    # Several arrays per fetch
+    for (chunk_size in 1:2) {
+      expect_identical(
+        fetch_sequence(con_arrow, "SELECT * FROM t", ns, chunk_size = chunk_size),
+        expected,
+        info = paste(info, "chunk_size =", chunk_size)
+      )
+    }
+  }
+})
+
+test_that("a NULL-first column is typed by its first value through Arrow", {
+  # The finding of the review: a small first fetch fixed the types
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (x, y INTEGER)")
+  dbExecute(con, "INSERT INTO t VALUES (NULL, NULL), (1, 2.5), ('a', 3)")
+
+  for (n in 0:1) {
+    rs <- dbSendQuery(con, "SELECT * FROM t")
+    first <- dbFetch(rs, n)
+    expect_warning(rest <- dbFetch(rs), class = "RSQLite_warning_coercion")
+    dbClearResult(rs)
+    expect_identical(first, data.frame(x = rep(NA, n), y = rep(NA_integer_, n)))
+    expect_identical(rest$x, c(NA, 1L, 0L)[seq.int(n + 1L, 3L)])
+    expect_identical(rest$y, c(NA, 2.5, 3)[seq.int(n + 1L, 3L)])
+  }
+})
+
+test_that("results larger than one chunk are typed by all their values through Arrow", {
+  sql <- paste(
+    "WITH RECURSIVE cnt(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM cnt WHERE i < 70000)",
+    "SELECT i,",
+    "CASE WHEN i > 66000 THEN 'v' || i END AS s,",
+    "CASE WHEN i > 66000 THEN i + 0.5 ELSE i END AS r,",
+    "CASE WHEN i > 66000 THEN i * 1099511627776 ELSE i END AS big,",
+    "NULL AS n",
+    "FROM cnt"
+  )
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con))
+  con_arrow <- local_arrow_con()
+
+  expected <- dbGetQuery(con, sql)
+  expect_type(expected$s, "character")
+  expect_type(expected$r, "double")
+  expect_identical(dbGetQuery(con_arrow, sql), expected)
+})
+
+test_that("dbFetch() through Arrow returns `n` rows across arrays cut short", {
+  old <- arrow_set_bytes_limits(100, 150)
+  withr::defer(arrow_set_bytes_limits(old[[1]], old[[2]]))
+
+  con <- local_arrow_con()
+  df <- data.frame(s = strrep(letters[1:7], 90), stringsAsFactors = FALSE)
+  dbWriteTable(con, "t", df)
+
+  rs <- dbSendQuery(con, "SELECT s FROM t")
+  on.exit(dbClearResult(rs))
+  expect_identical(dbFetch(rs, 5)$s, df$s[1:5])
+  expect_false(dbHasCompleted(rs))
+  expect_identical(dbFetch(rs, 5)$s, df$s[6:7])
+  expect_true(dbHasCompleted(rs))
+})
+
+test_that("dbFetch() through Arrow takes a huge `n`", {
+  con <- local_arrow_con()
+  dbWriteTable(con, "t", data.frame(a = 1:3))
+  for (n in c(2^31, 2^60, 1e300)) {
+    rs <- dbSendQuery(con, "SELECT a FROM t")
+    expect_identical(dbFetch(rs, n), data.frame(a = 1:3))
+    dbClearResult(rs)
+  }
+})
+
+test_that("dbFetch() through Arrow hands out the rows kept for a schema", {
+  con <- local_arrow_con()
+  dbWriteTable(con, "t", data.frame(a = 1:5))
+  rs <- dbSendQuery(con, "SELECT a FROM t")
+  on.exit(dbClearResult(rs))
+
+  # The schema fetches the first chunk and keeps it, which fixes the types
+  stream <- dbFetchArrow(rs, chunk_size = 3)
+  expect_identical(stream$get_schema()$children$a$format, "l")
+  expect_identical(dbFetch(rs, 0), data.frame(a = integer()))
+  expect_identical(dbFetch(rs, 2), data.frame(a = 1:2))
+  expect_identical(dbGetRowCount(rs), 2L)
+  expect_identical(dbFetch(rs), data.frame(a = 3:5))
+  expect_true(dbHasCompleted(rs))
+  stream$release()
 })

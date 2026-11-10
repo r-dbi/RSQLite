@@ -61,8 +61,9 @@ void connection_release(cpp11::external_pointer<DbConnectionPtr> con_) {
   long n = con_->use_count();
   if (n > 1) {
     Rf_warning(
-      "There are %ld result in use. The connection will be released when they "
-      "are closed",
+      "There are %ld results in use, by result objects or by Arrow streams not "
+      "read to the end. The connection will be released when the results are "
+      "cleared and the streams read to the end or released.",
       n - 1
     );
   }

@@ -1,17 +1,5 @@
 # One warning per chunk for values that are not of their column's type
 
-coercion_warnings <- function(expr) {
-  out <- list()
-  withCallingHandlers(
-    expr,
-    RSQLite_warning_coercion = function(w) {
-      out[[length(out) + 1]] <<- w
-      invokeRestart("muffleWarning")
-    }
-  )
-  out
-}
-
 test_that("coercions are reported once per chunk with row numbers", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x, y)")

@@ -6,6 +6,8 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
+#include <utility>
+#include <vector>
 #include "sqlite3-cpp.h"
 #include "DbArrow.h"
 #include "DbColumnDataType.h"
@@ -20,6 +22,8 @@ private:
   // Wrapped pointer
   sqlite3* conn;
   sqlite3_stmt* stmt;
+  // Kept alive by the DbResult that owns this object
+  const DbConnection* connection_;
 
   // Cache
   struct _cache {
@@ -36,16 +40,23 @@ private:
   bool complete_;
   bool ready_;
   int nrows_;
+  // Counts the executions with new parameters, see executions()
+  int64_t executions_;
   int total_changes_start_;
   boost::scoped_ptr<SqliteParamSource> params_;
   std::vector<DATA_TYPE> types_;
   bool with_alt_types_;
 
   // Arrow state: the column types, decided once per execution, and a chunk
-  // that had to be fetched to decide them before the schema was requested
+  // that had to be fetched to decide them before the schema was requested,
+  // with the number of its rows already handed out
   boost::ptr_vector<SqliteArrowColumn> arrow_columns_;
   bool arrow_frozen_;
   nanoarrow::UniqueArray pending_chunk_;
+  int64_t pending_offset_;
+  // Set while the columns hold the storage classes of the current row,
+  // also when a byte limit ended the chunk before it
+  bool arrow_row_read_;
 
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);
@@ -60,6 +71,7 @@ public:
   void close();
   bool complete() const;
   bool ready() const;
+  int64_t executions() const;
   int n_rows_fetched();
   int n_rows_affected();
   void bind(const cpp11::list& params);
@@ -70,6 +82,13 @@ public:
   // Arrow
   void arrow_schema(struct ArrowSchema* out, int64_t infer_rows);
   int64_t fetch_arrow(struct ArrowArray* out, int64_t n_max);
+  int64_t fetch_arrow_df(
+    struct ArrowSchema* schema,
+    std::vector<nanoarrow::UniqueArray>& chunks,
+    std::vector<bool>& wide_ints,
+    int64_t n_max,
+    int64_t chunk_size
+  );
   void bind_arrow(
     struct ArrowArrayStream* stream,
     const std::vector<int>& param_indexes
@@ -77,6 +96,14 @@ public:
 
 public:
   cpp11::strings get_placeholder_names() const;
+
+  // Sets the bytes of a utf8 or binary column after which, or beyond which,
+  // fetch_arrow_rows() ends a chunk, and returns the previous values;
+  // for the tests
+  static std::pair<int64_t, int64_t> set_arrow_bytes_limits(
+    int64_t cut_bytes,
+    int64_t max_bytes
+  );
 
 private:
   void after_set_params();
@@ -91,11 +118,19 @@ private:
 
   void ensure_arrow_columns();
   void freeze_arrow_columns();
-  int64_t fetch_arrow_rows(struct ArrowArray* out, int64_t n_max);
+  int64_t fetch_arrow_rows(
+    struct ArrowArray* out,
+    int64_t n_max,
+    std::vector<ARROW_KIND>* open_kinds = NULL
+  );
+  void set_arrow_struct_schema(struct ArrowSchema* out);
+  void copy_pending_rows(struct ArrowArray* out, int64_t n);
+  bool arrow_row_fits();
+  bool arrow_chunk_full();
   void warn_coercions();
 
 private:
-  NORET void raise_sqlite_exception() const;
+  NORET void raise_sqlite_exception(int rc) const;
   NORET static void raise_sqlite_exception(sqlite3* conn);
 };
 

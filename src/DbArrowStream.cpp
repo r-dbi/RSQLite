@@ -87,6 +87,10 @@ int get_next_impl(StreamState* state, struct ArrowArray* out) {
 // When C++ code of this package is the consumer, the exception is rethrown
 // instead, so that the unwind is continued at the entry point after the
 // consumer's C++ objects have been destroyed.
+// A C++ consumer of another package, such as arrow, still sees the longjmp:
+// the C stream interface has no other way to carry an R condition.
+// The conditions are interrupts, and warnings that a handler or
+// `options(warn = 2)` turns into a jump.
 
 int stream_get_schema(
   struct ArrowArrayStream* stream,

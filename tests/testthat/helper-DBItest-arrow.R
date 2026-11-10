@@ -1,5 +1,8 @@
 # The DBItest contexts for the data frame path through Arrow, and the groups
-# that exercise it: the others never fetch or write a data frame
+# that exercise it: the driver group checks `bigint` with dbGetQuery(), the
+# transaction group writes and reads tables inside transactions, and the
+# getting started, connection, compliance and stress groups never fetch or
+# write a data frame
 
 arrow_dbitest_context <- function(name, ...) {
   DBItest::make_context(
@@ -28,8 +31,10 @@ test_arrow_dbitest <- function(ctx) {
     # See helper-DBItest.R
     ARROW_ROUNDTRIP_SKIPS
   )
+  DBItest::test_driver(skip = skip, ctx = ctx)
   DBItest::test_result(skip = skip, ctx = ctx)
   DBItest::test_sql(skip = skip, ctx = ctx)
   DBItest::test_meta(skip = skip, ctx = ctx)
+  DBItest::test_transaction(skip = skip, ctx = ctx)
   DBItest::test_arrow(skip = skip, ctx = ctx)
 }

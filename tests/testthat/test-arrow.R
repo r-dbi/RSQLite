@@ -35,10 +35,11 @@ set_bytes_limits <- function(rs, cut_bytes = 100, max_bytes = 150) {
   result_set_bytes_limits(rs@ptr, cut_bytes, max_bytes)
 }
 
-# A lazy stream over `sql` with the byte limits lowered to 100 and 150;
-# the stream reads on after its result has been cleared
-fetch_with_bytes_limits <- function(con, sql) {
-  rs <- dbSendQuery(con, sql)
+# A lazy stream over `sql` with the byte limits lowered to 100 and 150,
+# `...` goes to dbSendQueryArrow(); the stream reads on after its result has
+# been cleared
+fetch_with_bytes_limits <- function(con, sql, ...) {
+  rs <- dbSendQueryArrow(con, sql, ...)
   on.exit(dbClearResult(rs))
   set_bytes_limits(rs)
   dbFetchArrow(rs)

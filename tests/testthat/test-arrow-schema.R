@@ -656,7 +656,6 @@ test_that("the schema reads no rows when every column has a requested type", {
 })
 
 test_that("only the requested types with 32-bit offsets end chunks at the byte limits", {
-  local_arrow_bytes_limits(100, 150)
   sizes <- c(60, 60, 80, 80, 200, 10, 10)
   con <- local_con()
   dbWriteTable(con, "t", data.frame(
@@ -675,9 +674,10 @@ test_that("only the requested types with 32-bit offsets end chunks at the byte l
       schema <- setNames(list(types[[type]]), column)
       info <- paste(column, type)
       lengths <- if (startsWith(type, "large")) 7 else c(2, 1, 1, 1, 2)
-      stream <- suppressWarnings(dbGetQueryArrow(con, sql, schema = schema))
+      # Checked with ValidateFull() like the dbGetQueryArrow() of these tests
+      stream <- suppressWarnings(arrow_validated(fetch_with_bytes_limits(con, sql, schema = schema)))
       expect_equal(chunk_lengths(stream), lengths, info = info)
-      values <- suppressWarnings(as.data.frame(dbGetQueryArrow(con, sql, schema = schema)))[[column]]
+      values <- suppressWarnings(as.data.frame(arrow_validated(fetch_with_bytes_limits(con, sql, schema = schema))))[[column]]
       expect_equal(if (is.character(values)) nchar(values) else lengths(values), sizes, info = info)
     }
   }

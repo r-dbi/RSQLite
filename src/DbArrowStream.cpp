@@ -7,9 +7,6 @@
 
 namespace {
 
-// Counts the R conditions rethrown as C++ exceptions, for the tests
-int64_t rethrown_unwinds = 0;
-
 struct StreamState {
   DbResultPtr result;
   int64_t chunk_size;
@@ -108,7 +105,9 @@ int stream_get_schema(
     return get_schema_impl(state, out);
   } catch (const cpp11::unwind_exception& e) {
     if (state->rethrow_unwind) {
-      ++rethrown_unwinds;
+      if (state->result) {
+        state->result->count_rethrown_unwind();
+      }
       throw;
     }
     token = e.token;
@@ -130,7 +129,9 @@ int stream_get_next(struct ArrowArrayStream* stream, struct ArrowArray* out) {
     return get_next_impl(state, out);
   } catch (const cpp11::unwind_exception& e) {
     if (state->rethrow_unwind) {
-      ++rethrown_unwinds;
+      if (state->result) {
+        state->result->count_rethrown_unwind();
+      }
       throw;
     }
     token = e.token;
@@ -255,8 +256,4 @@ void db_arrow_stream_read_from_cpp(struct ArrowArrayStream* stream) {
   if (stream->release == &stream_release) {
     get_state(stream)->rethrow_unwind = true;
   }
-}
-
-int64_t db_arrow_stream_rethrown_unwinds() {
-  return rethrown_unwinds;
 }

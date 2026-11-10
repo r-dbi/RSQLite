@@ -16,6 +16,7 @@
 #   and for a README.md that matches its README.Rmd.
 # - `soft` reports spelling, URLs and the NOTEs of R CMD check --as-cran --run-donttest
 #   with the CRAN incoming checks turned on, and never fails on a finding.
+# Only on r-dbi/RSQLite: in a fork, every job is skipped.
 # Each job writes its findings to the job summary,
 # and the `report` job posts the results to the open release pull request.
 on:
@@ -32,6 +33,8 @@ permissions:
 
 jobs:
   gate:
+    if: github.repository == 'r-dbi/RSQLite'
+
     runs-on: ubuntu-26.04
     timeout-minutes: 15
 
@@ -50,6 +53,8 @@ jobs:
         uses: BristolMyersSquibb/blockr.ci/.github/actions/release-gate@5ee8e2be16e71e96628c6c5c60c20c03f1b35155
 
   docs:
+    if: github.repository == 'r-dbi/RSQLite'
+
     runs-on: ubuntu-26.04
     timeout-minutes: 60
 
@@ -95,6 +100,8 @@ jobs:
         shell: bash
 
   soft:
+    if: github.repository == 'r-dbi/RSQLite'
+
     runs-on: ubuntu-26.04
     timeout-minutes: 120
 
@@ -132,7 +139,7 @@ jobs:
   # Posts the result to the open release pull request, one comment per workflow, updated in place.
   report:
     needs: [gate, docs, soft]
-    if: always()
+    if: always() && github.repository == 'r-dbi/RSQLite'
 
     runs-on: ubuntu-26.04
     timeout-minutes: 5

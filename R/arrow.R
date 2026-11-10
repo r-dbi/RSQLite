@@ -79,7 +79,8 @@
 #' The default path truncates a real number that follows an integer too large for an `integer`,
 #' here the column becomes a `double`.
 #' Once [DBI::dbFetchArrow()] or [DBI::dbFetchArrowChunk()] has fixed the types of a result,
-#' later fetches keep them.
+#' later fetches keep them,
+#' and they hand out the rows kept for a schema, where the default path fails.
 #' Before writing, factors become strings, lists of raw vectors become blobs,
 #' and `difftime` columns become their numbers in their own units, as on the default path.
 #'

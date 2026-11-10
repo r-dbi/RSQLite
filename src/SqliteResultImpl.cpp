@@ -178,6 +178,14 @@ cpp11::list SqliteResultImpl::fetch(const int n_max) {
       "fetch them with `dbFetchArrowChunk()` or `dbFetchArrow()`."
     );
   }
+  if (n_max != 0 && arrow_row_read_) {
+    // The byte check of the Arrow fetch has converted some of its values,
+    // only the Arrow path kept their storage classes
+    cpp11::stop(
+      "A row held back from the last Arrow chunk is waiting, "
+      "fetch it with `dbFetchArrowChunk()` or `dbFetchArrow()`."
+    );
+  }
 
   int n = 0;
   cpp11::list out;
@@ -418,8 +426,10 @@ void SqliteResultImpl::bind_arrow(
     after_set_params();
   } catch (...) {
     // A stream that fails on its first row is not kept: it may hold a share
-    // of this result, through a stream that wraps one of its Arrow streams
+    // of this result, through a stream that wraps one of its Arrow streams.
+    // The statement has lost its bindings: it must be bound again.
     params_.reset();
+    ready_ = false;
     throw;
   }
 }
@@ -485,7 +495,8 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   SqliteDataFrame data(stmt, cache.names_, n_max, types_, with_alt_types_);
 
   if (complete_ && data.get_ncols() == 0) {
-    Rf_warning(
+    // Through cpp11, so that an error made of it unwinds the C++ frames
+    cpp11::warning(
       "`dbGetQuery()`, `dbSendQuery()` and `dbFetch()` should only be used "
       "with `SELECT` queries. Did you mean `dbExecute()`, `dbSendStatement()` "
       "or `dbGetRowsAffected()`?"
@@ -525,7 +536,16 @@ bool SqliteResultImpl::step_run() {
 }
 
 bool SqliteResultImpl::step_done() {
-  bool more_params = bind_row();
+  bool more_params;
+  try {
+    more_params = bind_row();
+  } catch (...) {
+    // Parameters that fail to bind end the execution and are not kept:
+    // an Arrow stream may hold a share of a result bound to this one's stream
+    params_.reset();
+    complete_ = true;
+    throw;
+  }
 
   if (!more_params) {
     complete_ = true;

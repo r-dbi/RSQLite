@@ -24,6 +24,7 @@ SqliteArrowColumn::SqliteArrowColumn(
       array_kind(AK_UNDECIDED),
       pending_nulls(0),
       warned(false),
+      warned_range(false),
       wide_ints(false),
       value_type(SQLITE_NULL),
       value_data(NULL),
@@ -510,21 +511,37 @@ void SqliteArrowColumn::append_value(int column_type) {
     {
       double seconds =
         (kind == AK_TIME) ? source.fetch_time() : source.fetch_datetime_local();
-      if (ISNAN(seconds)) {
+      if (array_kind == AK_DOUBLE) {
+        // For a data frame: the seconds of the default path, all of them
+        if (ISNAN(seconds)) {
+          check_arrow(
+            ArrowArrayAppendNull(array.get(), 1),
+            "Can't append to Arrow array"
+          );
+        } else {
+          check_arrow(
+            ArrowArrayAppendDouble(array.get(), seconds),
+            "Can't append to Arrow array"
+          );
+        }
+        break;
+      }
+      double micros = std::floor(seconds * 1e6 + 0.5);
+      // int64 holds [-2^63, 2^63), both bounds exact as doubles: casting
+      // anything outside, an infinity included, would be undefined
+      bool in_range =
+        micros >= -9223372036854775808.0 && micros < 9223372036854775808.0;
+      if (!ISNAN(seconds) && !in_range) {
+        warn_out_of_range(column_type);
+      }
+      if (ISNAN(seconds) || !in_range) {
         check_arrow(
           ArrowArrayAppendNull(array.get(), 1),
           "Can't append to Arrow array"
         );
-      } else if (array_kind == AK_DOUBLE) {
-        // For a data frame, like the default path
-        check_arrow(
-          ArrowArrayAppendDouble(array.get(), seconds),
-          "Can't append to Arrow array"
-        );
       } else {
-        int64_t micros = static_cast<int64_t>(std::floor(seconds * 1e6 + 0.5));
         check_arrow(
-          ArrowArrayAppendInt(array.get(), micros),
+          ArrowArrayAppendInt(array.get(), static_cast<int64_t>(micros)),
           "Can't append to Arrow array"
         );
       }
@@ -588,6 +605,21 @@ void SqliteArrowColumn::warn_mixed(int column_type) {
   ss << "Column `" << name << "`: mixed type, Arrow type " << format_kind(kind)
      << " decided from the first values, coercing values of type "
      << format_column_type(column_type);
+  cpp11::warning(ss.str());
+  // A handler of the warning may have converted the value: read it again
+  value_fetched = false;
+}
+
+void SqliteArrowColumn::warn_out_of_range(int column_type) {
+  if (warned_range) {
+    return;
+  }
+  warned_range = true;
+
+  std::stringstream ss;
+  ss << "Column `" << name << "`: values of type "
+     << format_column_type(column_type) << " outside the range of Arrow type "
+     << format_kind(kind) << " are NULL";
   cpp11::warning(ss.str());
 }
 

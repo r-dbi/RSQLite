@@ -41,6 +41,8 @@
 #' use `bit64::integer64()` as the target type to keep the full range.
 #' Dates, times and timestamps are parsed like the data frame path does it
 #' when `extended_types = TRUE`, see [SQLite()].
+#' Times and timestamps are 64-bit counts of microseconds:
+#' a number of seconds beyond about 9.2e12 either way, or an infinity, becomes `NULL` with a warning.
 #'
 #' @section Parameters:
 #' The columns of the parameter stream are bound like this:
@@ -122,6 +124,7 @@
 #' A chunk also ends after the row at which a string or binary column reaches 1 GiB,
 #' and before a row that would take such a column past the `2^31 - 1` bytes
 #' that the 32-bit offsets of the `utf8` and `binary` types can address.
+#' Such a row waits for the next Arrow fetch, and [DBI::dbFetch()] fails until then.
 #'
 #' An array returned by [DBI::dbFetchArrowChunk()] is freed
 #' when the garbage collector finds it unreachable,

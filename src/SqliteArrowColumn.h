@@ -53,6 +53,7 @@ class SqliteArrowColumn {
   // Rows of the current chunk seen while undecided (all NULL)
   int64_t pending_nulls;
   bool warned;
+  bool warned_range;
   // Set once an integer has needed 64 bits: like the default path, a data
   // frame keeps the column as integer64 from then on
   bool wide_ints;
@@ -141,6 +142,7 @@ private:
   void append_value(int column_type);
   void promote_to_double();
   void warn_mixed(int column_type);
+  void warn_out_of_range(int column_type);
   static const char* format_kind(ARROW_KIND kind);
   static const char* format_column_type(int column_type);
 };

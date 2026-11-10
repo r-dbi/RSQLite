@@ -841,6 +841,64 @@ test_that("dbBindArrow() rejects parameters for a query without placeholders", {
   expect_error(dbBindArrow(rs, structure(data.frame(1L), names = "")), "does not require parameters")
 })
 
+test_that("dbBindArrow() checks the indices of a dictionary", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (a TEXT)")
+
+  # An index beyond the two values of the dictionary, which nanoarrow's
+  # validation does not look at
+  factors <- nanoarrow::as_nanoarrow_array(factor(c("a", "b")))
+  bad <- nanoarrow::nanoarrow_array_modify(
+    factors,
+    list(buffers = list(NULL, nanoarrow::as_nanoarrow_buffer(c(0L, 50000000L)))),
+    validate = FALSE
+  )
+  params <- nanoarrow::nanoarrow_array_modify(
+    nanoarrow::as_nanoarrow_array(data.frame(a = 1:2)),
+    list(children = list(a = bad)),
+    validate = FALSE
+  )
+  stream <- nanoarrow::basic_array_stream(
+    list(params),
+    schema = nanoarrow::na_struct(list(a = nanoarrow::infer_nanoarrow_schema(factors))),
+    validate = FALSE
+  )
+  expect_error(dbAppendTableArrow(con, "t", stream), "Dictionary index 50000000 out of range for 2 values")
+  expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 0L)
+
+  expect_equal(dbAppendTableArrow(con, "t", data.frame(a = factor(c("x", NA, "y")))), 3L)
+  expect_equal(dbReadTable(con, "t")$a, c("x", NA, "y"))
+})
+
+test_that("dbBindArrow() refuses values beyond SQLite's length limit", {
+  skip_if_not(
+    identical(Sys.getenv("RSQLITE_TEST_LARGE_ARROW"), "true"),
+    "Needs about 2 GB of memory, set RSQLITE_TEST_LARGE_ARROW=true to run"
+  )
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (s TEXT, b BLOB)")
+
+  # One value of 2^31 bytes, one more than SQLITE_MAX_LENGTH, shared by a
+  # large_utf8 and a large_binary column
+  offsets <- nanoarrow::as_nanoarrow_buffer(bit64::as.integer64(c(0, 2^31)))
+  data <- nanoarrow::as_nanoarrow_buffer(raw(2^31))
+  large <- function(type) {
+    nanoarrow::nanoarrow_array_modify(
+      nanoarrow::nanoarrow_array_init(type),
+      list(length = 1, null_count = 0, buffers = list(NULL, offsets, data))
+    )
+  }
+  for (column in c("s", "b")) {
+    type <- if (column == "s") nanoarrow::na_large_string() else nanoarrow::na_large_binary()
+    params <- nanoarrow::nanoarrow_array_modify(
+      nanoarrow::nanoarrow_array_init(nanoarrow::na_struct(stats::setNames(list(type), column))),
+      list(length = 1, null_count = 0, children = stats::setNames(list(large(type)), column))
+    )
+    expect_error(dbAppendTableArrow(con, "t", params), "Can't bind parameter 1: string or blob too big")
+  }
+  expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 0L)
+})
+
 test_that("dbAppendTableArrow() appends rows and reports their number", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (a INTEGER, b TEXT)")

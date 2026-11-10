@@ -64,6 +64,7 @@
 # The job then tags the commit as `v<version>`,
 # with the NEWS.md section as the message, like the tags fledge creates.
 # An existing tag of that name is never moved: the job prints it and its commit, and stops the run.
+# When the job cannot read the tags on GitHub, it cannot tell whether the tag exists, and stops the run too.
 # Every resubmission after a CRAN rejection is a new patch version instead.
 # Only a submission that CRAN never received, such as an upload that failed,
 # is retried on the same version, by dispatching with the input `retag`:

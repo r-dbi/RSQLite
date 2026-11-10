@@ -13,6 +13,7 @@
 # In this order, so that every check comes before the first write:
 #   1. An existing tag `v<version>` on origin stops the run: a tag is never moved, unless with --retag,
 #      which moves it to the commit; a dry run reports the existing tag and carries on.
+#      An origin that cannot be read stops the run too, because the tag may exist.
 #   2. A published release of the tag stops the run.
 #   3. The draft release is created, or the draft that is there is updated.
 #   4. The commit is tagged, and the tag is pushed to origin, with --force only for --retag.
@@ -125,7 +126,17 @@ output tag "$tag"
 # a version CRAN has received is never submitted again.
 group "Tag: is there a $tag on origin?"
 moves='' stops=''
-if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null; then
+# `--exit-code` exits with 2 when origin has no such ref, and with another status when origin cannot be read:
+# only 2 means that the tag is absent, and anything else stops the run before the first write.
+rc=0
+git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>"$work/git.err" || rc=$?
+if [ "$rc" -ne 0 ] && [ "$rc" -ne 2 ]; then
+  cat "$work/git.err" >&2
+  fail "Tag" "The tag $tag cannot be checked" "\`git ls-remote origin refs/tags/$tag\` exited with status $rc: $(head -n 1 "$work/git.err"). Nothing was drafted, tagged or uploaded." "$work/git.err" -- \
+    "This run cannot tell whether $tag exists, and stops rather than draft a release for a version that may have been submitted." \
+    "Rerun the workflow once GitHub answers; if it keeps failing, check that the checkout's credentials may read the repository."
+fi
+if [ "$rc" -eq 0 ]; then
   git fetch --quiet --depth=1 origin "refs/tags/$tag:refs/tags/$tag"
   existing=$(git rev-parse "$tag^{commit}")
   val "existing tag" "$tag at $existing"

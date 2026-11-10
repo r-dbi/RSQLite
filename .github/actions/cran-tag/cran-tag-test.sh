@@ -7,6 +7,8 @@
 #   2. An existing draft is updated, not duplicated.
 #   3. An existing tag stops a real run before anything is written, and stays where it was;
 #      a dry run reports it and carries on; --retag moves it, and a dry run with --retag only says so.
+#      An origin that cannot be read stops the run before anything is written, also with --retag:
+#      only `git ls-remote --exit-code` exiting with 2 means that there is no tag.
 #   4. A published release of the tag stops the run before anything is written.
 #   5. A dry run writes nothing, and reports the release and the tag a real run would write.
 #   6. A version without a NEWS.md section stops the run before anything is written.
@@ -274,6 +276,22 @@ has "with a warning" "$out" "::warning title=Moving the tag v2.0.0::Moving the e
 is "it updates the draft" "$(cat "$SCRATCH/writes")" "release edit v2.0.0"
 is "the tag moves to the commit" "$(remote_tag)" "$HEAD"
 is "with the section as its message" "$(remote_tag_message)" "$MESSAGE"
+
+echo
+echo "== an origin that cannot be read stops the run before anything is written"
+no_tag
+with_draft
+git -C "$PKG" remote set-url origin "$SCRATCH/unreachable.git"
+out=$(run)
+has "it fails" "$out" "exit 1"
+has "saying the tag cannot be checked" "$out" "::error title=The tag v2.0.0 cannot be checked::\`git ls-remote origin refs/tags/v2.0.0\` exited with status 128"
+has "and that nothing was written" "$out" "Nothing was drafted, tagged or uploaded."
+is "the existing draft is neither listed nor touched" "$(cat "$SCRATCH/gh.log")" ""
+out=$(run --retag)
+has "with retag too" "$out" "exit 1"
+is "which touches nothing either" "$(cat "$SCRATCH/gh.log")" ""
+git -C "$PKG" remote set-url origin "$REMOTE"
+is "and nothing is tagged" "$(remote_tag)" ""
 
 # --- 4: a published release --------------------------------------------------------
 

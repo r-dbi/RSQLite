@@ -345,6 +345,37 @@ test_that("a stream not read to the end keeps the database open past dbDisconnec
   expect_equal(as.data.frame(stream)$a, c(1, 2, 3))
 })
 
+test_that("an R error while the stream is read unwinds cleanly", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1), (2), ('three')")
+  # The second chunk warns about the mixed type, inside the stream callback
+  lazy_stream <- function() {
+    rs <- dbSendQueryArrow(con, "SELECT x FROM t")
+    on.exit(dbClearResult(rs))
+    dbFetchArrow(rs, chunk_size = 2)
+  }
+
+  withr::with_options(list(warn = 2), {
+    expect_error(as.data.frame(lazy_stream()), "mixed type")
+  })
+  expect_equal(
+    tryCatch(as.data.frame(lazy_stream()), warning = function(w) "exited"),
+    "exited"
+  )
+
+  # Also when RSQLite binds the stream as parameters
+  con2 <- local_con()
+  dbExecute(con2, "CREATE TABLE t (x)")
+  withr::with_options(list(warn = 2), {
+    expect_error(dbAppendTableArrow(con2, "t", lazy_stream()), "mixed type")
+  })
+  # The append is rolled back, both connections work on
+  expect_equal(dbGetQuery(con2, "SELECT count(*) AS n FROM t")$n, 0L)
+  expect_equal(dbAppendTableArrow(con2, "t", data.frame(x = 1L)), 1L)
+  expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 3L)
+})
+
 test_that("dbGetQueryArrow() reads the whole result", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:3, b = letters[1:3]))

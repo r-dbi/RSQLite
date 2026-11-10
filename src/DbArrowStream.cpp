@@ -9,13 +9,16 @@ struct StreamState {
   int64_t chunk_size;
   // The execution of the statement whose rows the stream reads
   int64_t executions;
+  // Set when C++ code of this package reads the stream, see below
+  bool rethrow_unwind;
   nanoarrow::UniqueSchema schema;
   std::string last_error;
 
   StreamState(const DbResultPtr& result_, int64_t chunk_size_)
       : result(result_),
         chunk_size(chunk_size_),
-        executions(result_->executions()) {}
+        executions(result_->executions()),
+        rethrow_unwind(false) {}
 };
 
 StreamState* get_state(struct ArrowArrayStream* stream) {
@@ -81,6 +84,9 @@ int get_next_impl(StreamState* state, struct ArrowArray* out) {
 // An R error or interrupt raised through cpp11 arrives as a
 // cpp11::unwind_exception; its unwind is continued after leaving the try block
 // with no C++ objects alive, exactly like cpp11's entry-point wrapper does.
+// When C++ code of this package is the consumer, the exception is rethrown
+// instead, so that the unwind is continued at the entry point after the
+// consumer's C++ objects have been destroyed.
 
 int stream_get_schema(
   struct ArrowArrayStream* stream,
@@ -91,6 +97,9 @@ int stream_get_schema(
   try {
     return get_schema_impl(state, out);
   } catch (const cpp11::unwind_exception& e) {
+    if (state->rethrow_unwind) {
+      throw;
+    }
     token = e.token;
   } catch (const std::exception& e) {
     state->last_error = e.what();
@@ -109,6 +118,9 @@ int stream_get_next(struct ArrowArrayStream* stream, struct ArrowArray* out) {
   try {
     return get_next_impl(state, out);
   } catch (const cpp11::unwind_exception& e) {
+    if (state->rethrow_unwind) {
+      throw;
+    }
     token = e.token;
   } catch (const std::exception& e) {
     state->last_error = e.what();
@@ -143,4 +155,10 @@ void db_arrow_stream_init(
   out->get_last_error = &stream_get_last_error;
   out->release = &stream_release;
   out->private_data = new StreamState(result, chunk_size);
+}
+
+void db_arrow_stream_read_from_cpp(struct ArrowArrayStream* stream) {
+  if (stream->release == &stream_release) {
+    get_state(stream)->rethrow_unwind = true;
+  }
 }

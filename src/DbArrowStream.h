@@ -19,4 +19,10 @@ void db_arrow_stream_init(
   int64_t chunk_size
 );
 
+// To be called when C++ code of this package takes over `stream` to read it:
+// if it is a stream of db_arrow_stream_init(), an R error or interrupt while
+// reading it propagates as a C++ exception instead of a longjmp, which would
+// skip the destructors of the reading code.
+void db_arrow_stream_read_from_cpp(struct ArrowArrayStream* stream);
+
 #endif  // RSQLITE_DBARROWSTREAM_H

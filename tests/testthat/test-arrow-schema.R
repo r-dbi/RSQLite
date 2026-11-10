@@ -322,3 +322,24 @@ test_that("extended types play no part for a requested type", {
   expect_equal(schema_formats(stream), c(d = "u"))
   expect_equal(as.data.frame(stream)$d, "2020-01-02")
 })
+
+test_that("a requested null type drops the values with a reason of their own", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1), (NULL), ('a')")
+
+  df <- NULL
+  w <- coercion_warnings(
+    df <- as.data.frame(dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_na())))
+  )
+  expect_true(all(is.na(df$x)))
+  expect_equal(nrow(df), 3)
+  expect_length(w, 1)
+  coercions <- w[[1]]$coercions[[1]]
+  expect_equal(coercions$type, "null")
+  expect_equal(
+    vapply(coercions$values, function(v) paste(v$class, v$reason), ""),
+    c("integer null_type", "string null_type")
+  )
+  expect_match(conditionMessage(w[[1]]), "1 integer value dropped by the null type, NA (row 1)", fixed = TRUE)
+})

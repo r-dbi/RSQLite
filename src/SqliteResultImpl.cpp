@@ -8,11 +8,11 @@
 #include <sstream>
 
 // The data of a utf8 or binary column ends a chunk: after the row that takes
-// it to `arrow_cut_bytes`, and before a row that would take it past
-// `arrow_max_bytes`, the most that the 32-bit offsets of these types address.
-// The tests lower both, see set_arrow_bytes_limits().
-static int64_t arrow_cut_bytes = int64_t(1) << 30;
-static int64_t arrow_max_bytes = INT32_MAX;
+// it to 1 GiB, and before a row that would take it past INT32_MAX bytes, the
+// most that the 32-bit offsets of these types address.
+// The tests lower both for one result, see set_arrow_bytes_limits().
+static const int64_t ARROW_CUT_BYTES = int64_t(1) << 30;
+static const int64_t ARROW_MAX_BYTES = INT32_MAX;
 
 // Construction ////////////////////////////////////////////////////////////////
 
@@ -35,7 +35,9 @@ SqliteResultImpl::SqliteResultImpl(
       arrow_frozen_(false),
       pending_offset_(0),
       arrow_row_read_(false),
-      df_carry_(false) {
+      df_carry_(false),
+      arrow_cut_bytes_(ARROW_CUT_BYTES),
+      arrow_max_bytes_(ARROW_MAX_BYTES) {
   try {
     if (cache.nparams_ == 0) {
       after_bind(true);
@@ -939,7 +941,7 @@ bool SqliteResultImpl::arrow_row_fits() {
   for (size_t j = 0; j < arrow_columns_.size(); ++j) {
     SqliteArrowColumn& column = arrow_columns_[j];
     int64_t bytes = column.value_bytes();
-    if (bytes > 0 && column.variable_bytes() + bytes > arrow_max_bytes) {
+    if (bytes > 0 && column.variable_bytes() + bytes > arrow_max_bytes_) {
       return false;
     }
   }
@@ -948,21 +950,19 @@ bool SqliteResultImpl::arrow_row_fits() {
 
 bool SqliteResultImpl::arrow_chunk_full() {
   for (size_t j = 0; j < arrow_columns_.size(); ++j) {
-    if (arrow_columns_[j].variable_bytes() >= arrow_cut_bytes) {
+    if (arrow_columns_[j].variable_bytes() >= arrow_cut_bytes_) {
       return true;
     }
   }
   return false;
 }
 
-std::pair<int64_t, int64_t> SqliteResultImpl::set_arrow_bytes_limits(
+void SqliteResultImpl::set_arrow_bytes_limits(
   int64_t cut_bytes,
   int64_t max_bytes
 ) {
-  std::pair<int64_t, int64_t> old(arrow_cut_bytes, arrow_max_bytes);
-  arrow_cut_bytes = cut_bytes;
-  arrow_max_bytes = max_bytes;
-  return old;
+  arrow_cut_bytes_ = cut_bytes;
+  arrow_max_bytes_ = max_bytes;
 }
 
 void SqliteResultImpl::raise_sqlite_exception(int rc) const {

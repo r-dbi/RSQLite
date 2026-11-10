@@ -720,15 +720,13 @@ test_that("a blob in a text column is text through Arrow only if it is valid UTF
 })
 
 test_that("dbFetch() through Arrow returns `n` rows across arrays cut short", {
-  old <- arrow_set_bytes_limits(100, 150)
-  withr::defer(arrow_set_bytes_limits(old[[1]], old[[2]]))
-
   con <- local_arrow_con()
   df <- data.frame(s = strrep(letters[1:7], 90), stringsAsFactors = FALSE)
   dbWriteTable(con, "t", df)
 
   rs <- dbSendQuery(con, "SELECT s FROM t")
   on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
+  set_bytes_limits(rs)
   expect_identical(dbFetch(rs, 5)$s, df$s[1:5])
   expect_false(dbHasCompleted(rs))
   expect_identical(dbFetch(rs, 5)$s, df$s[6:7])

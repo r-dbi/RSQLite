@@ -124,12 +124,12 @@ integer64_to_integer <- function(x) {
   .Call(`_RSQLite_integer64_to_integer`, x)
 }
 
-arrow_set_bytes_limits <- function(cut_bytes, max_bytes) {
-  .Call(`_RSQLite_arrow_set_bytes_limits`, cut_bytes, max_bytes)
+result_set_bytes_limits <- function(res, cut_bytes, max_bytes) {
+  invisible(.Call(`_RSQLite_result_set_bytes_limits`, res, cut_bytes, max_bytes))
 }
 
-arrow_rethrown_unwinds <- function() {
-  .Call(`_RSQLite_arrow_rethrown_unwinds`)
+result_rethrown_unwinds <- function(res) {
+  .Call(`_RSQLite_result_rethrown_unwinds`, res)
 }
 
 result_set_rows_fetched <- function(res, n) {

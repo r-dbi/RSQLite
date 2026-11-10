@@ -20,6 +20,9 @@ outputs:
   tag:
     description: "The tag, `v<version>`"
     value: ${{ steps.run.outputs.tag }}
+  release-id:
+    description: "The draft release's id, once a real run has written it"
+    value: ${{ steps.run.outputs.release-id }}
   release-url:
     description: "The draft release's URL, once a real run has written it"
     value: ${{ steps.run.outputs.release-url }}

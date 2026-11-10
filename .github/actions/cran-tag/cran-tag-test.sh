@@ -4,7 +4,8 @@
 #
 #   1. Without a tag or a release, a run creates the draft, with the NEWS.md section as notes and the marker,
 #      and pushes an annotated tag at the commit, with the section as its message.
-#   2. An existing draft is updated, not duplicated.
+#   2. An existing draft is updated by its id, not duplicated; several drafts for the tag stop the run
+#      before anything is written, also on a dry run.
 #   3. An existing tag stops a real run before anything is written, and stays where it was;
 #      a dry run reports it and carries on; --retag moves it, and a dry run with --retag only says so.
 #      An origin that cannot be read stops the run before anything is written, also with --retag:
@@ -14,9 +15,9 @@
 #   6. A version without a NEWS.md section stops the run before anything is written.
 #   7. A line starting with `# ` inside a fenced code block does not end the section.
 #
-# The `gh` stub answers `gh api <path> --jq <program>` by running the program with jq
-# over a JSON file named after the path, and records every call;
-# `gh release create` and `gh release edit` only record, and keep the notes.
+# The `gh` stub answers `gh api [-X <method>] <path> --jq <program>` by running the program with jq
+# over a JSON file named after the method and the path, and records every call;
+# a write also records its method and path, and its fields, and keeps the notes it sends as the body.
 #
 # Usage:
 #   .github/actions/cran-tag/cran-tag-test.sh
@@ -118,27 +119,29 @@ mkdir -p "$API" "$SCRATCH/bin"
 cat >"$SCRATCH/bin/gh" <<'EOF'
 #!/bin/bash
 echo "gh $*" >>"$SCRATCH/gh.log"
-if [ "$1" = release ]; then
-  echo "$1 $2 $3" >>"$SCRATCH/writes"
-  while [ $# -gt 0 ]; do
-    if [ "$1" = --notes-file ]; then cp "$2" "$SCRATCH/notes"; fi
-    shift
-  done
-  echo "https://github.example/r-dbi/RSQLite/releases/tag/untagged-new"
-  exit 0
-fi
 [ "$1" = api ] || { echo "unexpected: gh $*" >&2; exit 1; }
 shift
-path='' jq=''
+path='' jq='' method=GET
 while [ $# -gt 0 ]; do
   case "$1" in
     --jq) jq=$2; shift 2 ;;
     --paginate) shift ;;
+    -X) method=$2; shift 2 ;;
+    -f | -F)
+      echo "$1 $2" >>"$SCRATCH/fields"
+      case "$2" in body=@*) cp "${2#body=@}" "$SCRATCH/notes" ;; esac
+      shift 2
+      ;;
     -*) echo "unexpected: gh api ... $1" >&2; exit 1 ;;
     *) path=$1; shift ;;
   esac
 done
-file=$API/$(printf '%s' "$path" | tr '/?=&' '____').json
+if [ "$method" = GET ]; then
+  file=$API/$(printf '%s' "$path" | tr '/?=&' '____').json
+else
+  echo "$method $path" >>"$SCRATCH/writes"
+  file=$API/$method-$(printf '%s' "$path" | tr '/?=&' '____').json
+fi
 if [ ! -f "$file" ]; then
   echo "gh: Not Found (HTTP 404)" >&2
   exit 1
@@ -166,6 +169,9 @@ without_draft() {
 [{"id": 5, "draft": false, "tag_name": "v1.9.0", "html_url": "https://github.example/v1.9.0", "body": ""}]
 EOF
 }
+# What GitHub answers to creating a draft, and to updating the draft 7.
+echo "{\"id\": 77, \"html_url\": \"$NEW\"}" >"$API/POST-repos_r-dbi_RSQLite_releases.json"
+echo "{\"id\": 7, \"html_url\": \"$DRAFT\"}" >"$API/PATCH-repos_r-dbi_RSQLite_releases_7.json"
 
 NOTES="## Breaking changes
 
@@ -195,6 +201,7 @@ run() {
   : >"$SUMMARY"
   : >"$SCRATCH/gh.log"
   : >"$SCRATCH/writes"
+  : >"$SCRATCH/fields"
   : >"$SCRATCH/output"
   rm -f "$SCRATCH/notes"
   out=$(GITHUB_ACTIONS=true GITHUB_STEP_SUMMARY=$SUMMARY GITHUB_OUTPUT=$SCRATCH/output GH=$SCRATCH/bin/gh GH_REPO=r-dbi/RSQLite \
@@ -211,12 +218,16 @@ no_tag
 without_draft
 out=$(run)
 has "it succeeds" "$out" "exit 0"
-is "it creates one draft" "$(cat "$SCRATCH/writes")" "release create v2.0.0"
-has "targeting the commit, titled after the version" "$(cat "$SCRATCH/gh.log")" "--draft --target $HEAD --title RSQLite 2.0.0"
+is "it creates one draft" "$(cat "$SCRATCH/writes")" "POST repos/r-dbi/RSQLite/releases"
+is "for the tag, targeting the commit, titled after the version" "$(grep -v '^-F body=' "$SCRATCH/fields")" "-f tag_name=v2.0.0
+-f target_commitish=$HEAD
+-f name=RSQLite 2.0.0
+-F draft=true"
 is "with the section as notes, and the marker" "$(cat "$SCRATCH/notes")" "$NOTES"
 is "the tag is on origin, at the commit" "$(remote_tag)" "$HEAD"
 is "annotated with the section" "$(remote_tag_message)" "$MESSAGE"
 is "the outputs name the tag and the draft" "$(cat "$SCRATCH/output")" "tag=v2.0.0
+release-id=77
 release-url=$NEW"
 summary=$(cat "$SUMMARY")
 has "the report links the draft" "$summary" "Created the draft release [RSQLite 2.0.0]($NEW), for the tag \`v2.0.0\` at \`$HEAD\`."
@@ -230,11 +241,29 @@ no_tag
 with_draft
 out=$(run)
 has "it succeeds" "$out" "exit 0"
-is "it edits the draft and creates none" "$(cat "$SCRATCH/writes")" "release edit v2.0.0"
-has "retargeting it at the commit" "$(cat "$SCRATCH/gh.log")" "--draft --target $HEAD --title RSQLite 2.0.0"
+is "it edits the draft by its id, and creates none" "$(cat "$SCRATCH/writes")" "PATCH repos/r-dbi/RSQLite/releases/7"
+has "retargeting it at the commit" "$(cat "$SCRATCH/fields")" "-f target_commitish=$HEAD"
 is "with the notes of this commit" "$(cat "$SCRATCH/notes")" "$NOTES"
 is "the tag is on origin, at the commit" "$(remote_tag)" "$HEAD"
-has "the output links the draft" "$(cat "$SCRATCH/output")" "release-url=$DRAFT"
+has "the outputs name the draft" "$(cat "$SCRATCH/output")" "release-id=7
+release-url=$DRAFT"
+
+echo
+echo "== several drafts for the tag stop the run"
+no_tag
+releases <<EOF
+[
+  {"id": 9, "draft": true, "tag_name": "v2.0.0", "html_url": "$DRAFT-2", "body": "<!-- cran-submission: RSQLite 2.0.0 -->"},
+  {"id": 7, "draft": true, "tag_name": "v2.0.0", "html_url": "$DRAFT", "body": "<!-- cran-submission: RSQLite 2.0.0 -->"}
+]
+EOF
+out=$(run)
+has "it fails" "$out" "exit 1"
+has "naming both drafts" "$out" "::error title=Several drafts for v2.0.0::These draft releases all carry the tag name v2.0.0: $DRAFT-2 $DRAFT and"
+is "nothing is written to GitHub" "$(cat "$SCRATCH/writes")" ""
+is "and nothing is tagged" "$(remote_tag)" ""
+out=$(run --dry-run)
+has "a dry run fails too" "$out" "exit 1"
 
 # --- 3: an existing tag ----------------------------------------------------------
 
@@ -274,7 +303,7 @@ echo "== retag moves the tag"
 out=$(run --retag)
 has "it succeeds" "$out" "exit 0"
 has "with a warning" "$out" "::warning title=Moving the tag v2.0.0::Moving the existing tag v2.0.0 from $FIRST to $HEAD"
-is "it updates the draft" "$(cat "$SCRATCH/writes")" "release edit v2.0.0"
+is "it updates the draft" "$(cat "$SCRATCH/writes")" "PATCH repos/r-dbi/RSQLite/releases/7"
 is "the tag moves to the commit" "$(remote_tag)" "$HEAD"
 is "with the section as its message" "$(remote_tag_message)" "$MESSAGE"
 

@@ -4,17 +4,17 @@
 # Process: the header of .github/workflows/cran-submission.yaml
 #
 #   1. A draft whose version P3M does not list yet is one line in the report, and success.
-#   2. A draft whose version P3M lists is published, once it carries the submitted tarball
+#   2. A draft whose version P3M lists is published, by its id, once it carries the submitted tarball
 #      and its tag points at its target.
-#   3. A missing tag, a tag at another commit, and a draft without the submitted tarball
-#      fail with a "How to resolve" section and publish nothing.
+#   3. A missing tag, a tag at another commit, a draft without the submitted tarball,
+#      and two drafts with the marker for one tag fail with a "How to resolve" section and publish nothing.
 #   4. No draft with the marker is nothing to do: no request to P3M, and success.
 #   5. A dry run publishes nothing, and says what it would publish.
 #      The step output `published` names each release that was published, and only those.
 #   6. Only drafts carrying the marker of cran-submission.yaml, with the tag `v<version>`, count.
 #
 # The `gh` stub answers `gh api <path> --jq <program>` by running the program with jq
-# over a JSON file named after the path, and records every call; `gh release edit` only records.
+# over a JSON file named after the path, and records every call; a `gh api -X PATCH` only records.
 #
 # Usage:
 #   .github/actions/cran-release/cran-release-test.sh
@@ -103,15 +103,21 @@ cat >"$SCRATCH/bin/gh" <<'EOF'
 echo "gh $*" >>"$SCRATCH/gh.log"
 if [ "$1" = api ]; then
   shift
-  path='' jq=''
+  path='' jq='' method=GET
   while [ $# -gt 0 ]; do
     case "$1" in
       --jq) jq=$2; shift 2 ;;
       --paginate) shift ;;
+      -X) method=$2; shift 2 ;;
+      -f | -F) shift 2 ;;
       -*) shift ;;
       *) path=$1; shift ;;
     esac
   done
+  if [ "$method" != GET ]; then
+    echo "https://github.example/published"
+    exit 0
+  fi
   file=$API/$(printf '%s' "$path" | tr '/?=&' '____').json
   if [ ! -f "$file" ]; then
     echo "gh: Not Found (HTTP 404)" >&2
@@ -120,7 +126,6 @@ if [ "$1" = api ]; then
   if [ -n "$jq" ]; then jq -r "$jq" "$file"; else cat "$file"; fi
   exit
 fi
-[ "$1 $2" = "release edit" ] && exit 0
 echo "unexpected: gh $*" >&2
 exit 1
 EOF
@@ -139,14 +144,14 @@ releases() { # JSON for repos/r-dbi/RSQLite/releases?per_page=100
 with_draft() {
   releases <<EOF
 [
-  {"draft": true, "tag_name": "v2.0.0", "target_commitish": "$TARGET", "html_url": "$URL",
+  {"id": 101, "draft": true, "tag_name": "v2.0.0", "target_commitish": "$TARGET", "html_url": "$URL",
    "body": "## Breaking changes\n\n- Upgrade bundled SQLite.\n\n<!-- cran-submission: RSQLite 2.0.0 -->\n",
    "assets": [{"name": "RSQLite_2.0.0.tar.gz"}]},
-  {"draft": true, "tag_name": "v9.9.9", "target_commitish": "main", "html_url": "https://github.example/x",
+  {"id": 102, "draft": true, "tag_name": "v9.9.9", "target_commitish": "main", "html_url": "https://github.example/x",
    "body": "A draft written by hand."},
-  {"draft": false, "tag_name": "v1.5.6", "target_commitish": "main", "html_url": "https://github.example/v1.5.6",
+  {"id": 103, "draft": false, "tag_name": "v1.5.6", "target_commitish": "main", "html_url": "https://github.example/v1.5.6",
    "body": "<!-- cran-submission: RSQLite 1.5.6 -->"},
-  {"draft": true, "tag_name": "v3.0.0", "target_commitish": "main", "html_url": "https://github.example/odd",
+  {"id": 104, "draft": true, "tag_name": "v3.0.0", "target_commitish": "main", "html_url": "https://github.example/odd",
    "body": "<!-- cran-submission: RSQLite 2.9.0 -->"}
 ]
 EOF
@@ -175,7 +180,7 @@ run() {
     "$HERE/cran-release.sh" "$@" 2>&1) || rc=$?
   printf '%s\nexit %s\n' "$out" "$rc"
 }
-edits() { grep '^gh release' "$SCRATCH/gh.log" || true; }
+edits() { grep '^gh api -X' "$SCRATCH/gh.log" || true; }
 
 # --- 1: not on P3M yet ---------------------------------------------------------
 
@@ -208,7 +213,7 @@ echo "== a version P3M lists is published"
 serve "RSQLite 2.0.0"
 out=$(run)
 has "it succeeds" "$out" "exit 0"
-is "the draft is published as the latest release" "$(edits)" "gh release edit v2.0.0 --repo r-dbi/RSQLite --draft=false --latest"
+is "the draft is published as the latest release, by its id" "$(edits)" "gh api -X PATCH repos/r-dbi/RSQLite/releases/101 -F draft=false -f make_latest=true --jq .html_url"
 has "after reading the tag" "$(cat "$SCRATCH/gh.log")" "gh api repos/r-dbi/RSQLite/commits/refs/tags/v2.0.0 --jq .sha"
 has "with a notice" "$out" "::notice title=Published::RSQLite 2.0.0 is on P3M; published the release $URL."
 summary=$(cat "$SUMMARY")
@@ -249,7 +254,7 @@ echo
 echo "== a draft without the submitted tarball publishes nothing"
 tag_at "$TARGET"
 releases <<EOF
-[{"draft": true, "tag_name": "v2.0.0", "target_commitish": "$TARGET", "html_url": "$URL",
+[{"id": 101, "draft": true, "tag_name": "v2.0.0", "target_commitish": "$TARGET", "html_url": "$URL",
   "body": "<!-- cran-submission: RSQLite 2.0.0 -->", "assets": [{"name": "RSQLite_1.9.0.tar.gz"}]}]
 EOF
 out=$(run)
@@ -259,12 +264,27 @@ is "nothing is published" "$(edits)" ""
 is "and names nothing as published" "$(cat "$SCRATCH/output")" ""
 has "the report says how to attach it" "$(cat "$SUMMARY")" "\`gh release upload v2.0.0 RSQLite_2.0.0.tar.gz\`"
 releases <<EOF
-[{"draft": true, "tag_name": "v2.0.0", "target_commitish": "$TARGET", "html_url": "$URL",
+[{"id": 101, "draft": true, "tag_name": "v2.0.0", "target_commitish": "$TARGET", "html_url": "$URL",
   "body": "<!-- cran-submission: RSQLite 2.0.0 -->"}]
 EOF
 out=$(run)
 has "a draft without assets fails too" "$out" "::error title=The submitted tarball is missing::"
 is "and publishes nothing" "$(edits)" ""
+
+echo
+echo "== two drafts with the marker for one tag publish nothing"
+tag_at "$TARGET"
+releases <<EOF
+[{"id": 105, "draft": true, "tag_name": "v2.0.0", "target_commitish": "$TARGET", "html_url": "$URL-2",
+  "body": "<!-- cran-submission: RSQLite 2.0.0 -->", "assets": [{"name": "RSQLite_2.0.0.tar.gz"}]},
+ {"id": 101, "draft": true, "tag_name": "v2.0.0", "target_commitish": "$TARGET", "html_url": "$URL",
+  "body": "<!-- cran-submission: RSQLite 2.0.0 -->", "assets": [{"name": "RSQLite_2.0.0.tar.gz"}]}]
+EOF
+out=$(run)
+has "it fails" "$out" "exit 1"
+has "naming the tag" "$out" "::error title=Several drafts for v2.0.0::RSQLite 2.0.0 is on P3M, and more than one draft release"
+is "neither is published" "$(edits)" ""
+is "and nothing is named as published" "$(cat "$SCRATCH/output")" ""
 
 # --- 4: no draft -------------------------------------------------------------------
 
@@ -272,7 +292,7 @@ echo
 echo "== no draft of a submission is nothing to do"
 tag_at "$TARGET"
 releases <<'EOF'
-[{"draft": true, "tag_name": "v9.9.9", "target_commitish": "main", "html_url": "https://github.example/x", "body": null}]
+[{"id": 102, "draft": true, "tag_name": "v9.9.9", "target_commitish": "main", "html_url": "https://github.example/x", "body": null}]
 EOF
 out=$(run)
 has "it succeeds" "$out" "exit 0"

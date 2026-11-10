@@ -14,8 +14,8 @@
 #   1. An existing tag `v<version>` on origin stops the run: a tag is never moved, unless with --retag,
 #      which moves it to the commit; a dry run reports the existing tag and carries on.
 #      An origin that cannot be read stops the run too, because the tag may exist.
-#   2. A published release of the tag stops the run.
-#   3. The draft release is created, or the draft that is there is updated.
+#   2. A published release of the tag stops the run, and so do several drafts for the tag.
+#   3. The draft release is created, or the draft that is there is updated, by its id.
 #   4. The commit is tagged, and the tag is pushed to origin, with --force only for --retag.
 # --dry-run writes nothing, and prints and reports the release and the tag a real run would write.
 #
@@ -24,7 +24,7 @@
 #
 # <package dir> defaults to the root of this repository; it is a checkout whose `origin` the tag is pushed to,
 # with a Git identity for the annotated tag.
-# With GITHUB_OUTPUT set, the script writes `tag`, and on a real run `release-url` once the draft is written.
+# With GITHUB_OUTPUT set, the script writes `tag`, and on a real run `release-id` and `release-url` once the draft is written.
 # Exit status: 0 on success, 1 when a check stops the run or a write fails, 2 on a usage error.
 #
 # Environment:
@@ -191,23 +191,31 @@ endgroup
 # --- the draft release --------------------------------------------------------
 
 # Before the tag, so that a published release stops the run before the tag moves.
-# A draft has no tag yet, so it is found by its pending tag name in the list of releases.
+# A draft has no tag yet, so it is found by its pending tag name in the list of releases,
+# and then written by its id: several releases can carry the same pending tag name,
+# and `gh release edit <tag>` would pick one of them.
 group "Release: $title"
 if ! "$gh" api --paginate "repos/$repo/releases?per_page=100" \
-  --jq ".[] | select(.tag_name == \"$tag\") | [(if .draft then \"draft\" else \"published\" end), .html_url] | @tsv" \
+  --jq ".[] | select(.tag_name == \"$tag\") | [(if .draft then \"draft\" else \"published\" end), .id, .html_url] | @tsv" \
   >"$work/found" 2>"$work/gh.err"; then
   cat "$work/gh.err" >&2
   fail "Release" "The releases cannot be listed" "\`gh api repos/$repo/releases\` failed: $(head -n 1 "$work/gh.err")" "$work/gh.err" -- \
     "Check that the token may read the repository's releases; drafts need \`contents: write\`." \
     "Rerun the workflow; nothing was drafted, tagged or uploaded."
 fi
-published=$(awk -F '\t' '$1 == "published" { print $2; exit }' "$work/found")
-draft=$(awk -F '\t' '$1 == "draft" { print $2; exit }' "$work/found")
+published=$(awk -F '\t' '$1 == "published" { print $3; exit }' "$work/found")
+drafts=$(awk -F '\t' '$1 == "draft"' "$work/found")
+draft_id=$(printf '%s\n' "$drafts" | awk -F '\t' 'NF { print $2; exit }')
+draft=$(printf '%s\n' "$drafts" | awk -F '\t' 'NF { print $3; exit }')
 
 if [ -n "$published" ]; then
   fail "Release" "Release $tag is already published" "The release $tag is published at $published, and this workflow does not touch a published release. Nothing was tagged or uploaded." -- \
     "If $title is out, a new submission needs a new version: bump \`DESCRIPTION\` and \`NEWS.md\`, and dispatch again." \
     "If the published release is a mistake, open it, and save it as a draft again or delete it; then dispatch again, and this job updates the draft."
+fi
+if [ "$(printf '%s\n' "$drafts" | grep -c .)" -gt 1 ]; then
+  fail "Release" "Several drafts for $tag" "These draft releases all carry the tag name $tag: $(printf '%s\n' "$drafts" | cut -f 3 | tr '\n' ' ')and this workflow cannot tell which one is the submission's. Nothing was drafted, tagged or uploaded." -- \
+    "Open the releases page, keep at most one of these drafts, and delete the others; then dispatch again, and this job updates the one that is left."
 fi
 
 if [ -n "$draft" ]; then
@@ -234,18 +242,21 @@ if [ -n "$dry_run" ]; then
 else
   write_failed() {
     cat "$work/gh.err" >&2
-    fail "Release" "Writing the draft release failed" "Trying to $action, \`gh release\` failed: $(head -n 1 "$work/gh.err"). Nothing was tagged or uploaded." "$work/gh.err" -- \
+    fail "Release" "Writing the draft release failed" "Trying to $action, \`gh api\` failed: $(head -n 1 "$work/gh.err"). Nothing was tagged or uploaded." "$work/gh.err" -- \
       "Check that the token may write releases: the job needs \`contents: write\`." \
       "Then dispatch again; the run updates the draft if one was written."
   }
-  if [ -n "$draft" ]; then
-    "$gh" release edit "$tag" --repo "$repo" --draft --target "$commit" --title "$title" --notes-file "$notes" >/dev/null 2>"$work/gh.err" || write_failed
-    url=$draft
+  fields=(-f "tag_name=$tag" -f "target_commitish=$commit" -f "name=$title" -F "body=@$notes" -F draft=true)
+  if [ -n "$draft_id" ]; then
+    written=$("$gh" api -X PATCH "repos/$repo/releases/$draft_id" "${fields[@]}" --jq '[.id, .html_url] | @tsv' 2>"$work/gh.err") || write_failed
     done_="Updated the draft release"
   else
-    url=$("$gh" release create "$tag" --repo "$repo" --draft --target "$commit" --title "$title" --notes-file "$notes" 2>"$work/gh.err") || write_failed
+    written=$("$gh" api -X POST "repos/$repo/releases" "${fields[@]}" --jq '[.id, .html_url] | @tsv' 2>"$work/gh.err") || write_failed
     done_="Created the draft release"
   fi
+  release_id=${written%%$'\t'*}
+  url=${written#*$'\t'}
+  output release-id "$release_id"
   output release-url "$url"
   endgroup
   notice "Draft release" "$done_ $title at $url; the nightly cran-release.yaml publishes it once Posit's package manager serves the version."

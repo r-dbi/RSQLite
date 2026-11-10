@@ -13,11 +13,11 @@
 # `latest`, the index `fledge:::release_after_cran_built_binaries()` reads with
 # `utils::available.packages(repos = "https://packagemanager.posit.co/cran/latest")`:
 # the version is out when the index lists the package at exactly that version.
-# A version that is out is published (`gh release edit <tag> --draft=false --latest`),
-# after checking that the draft carries the tarball `<package>_<version>.tar.gz`,
-# which cran-submission.yaml attaches only after a successful upload,
+# A version that is out is published as the latest release, addressed by the release's id,
+# after checking that the draft is the only one with the marker for its tag,
+# that it carries the tarball `<package>_<version>.tar.gz`, which cran-submission.yaml attaches only after a successful upload,
 # and that the tag exists and points at the commit the draft targets;
-# a missing tarball or a missing or moved tag is reported, with how to resolve it, and nothing is published.
+# several drafts, a missing tarball or a missing or moved tag are reported, with how to resolve them, and nothing is published.
 # A version that is not out yet, or no draft at all, is a line in the report and success,
 # so a nightly run stays green while it waits.
 #
@@ -80,29 +80,31 @@ summary "## CRAN release${dry_run:+: dry run}" ""
 group "Drafts: the releases cran-submission.yaml drafted in $repo"
 # A draft has no tag yet, so its pending tag name is read from the release list.
 # One line per draft with the marker: tag, package, version, target, URL,
-# and whether the draft carries the submitted tarball as an asset.
+# whether the draft carries the submitted tarball as an asset, and the release's id.
 # shellcheck disable=SC2016  # a jq program, with jq's own $r
 if ! "$gh" api --paginate "repos/$repo/releases?per_page=100" --jq '
   .[] | select(.draft) | . as $r
   | ($r.body // "") | capture("<!-- cran-submission: (?<pkg>[^ ]+) (?<ver>[^ ]+) -->") | . as $m
   | [$r.tag_name, $m.pkg, $m.ver, $r.target_commitish, $r.html_url,
-     any($r.assets[]?; .name == "\($m.pkg)_\($m.ver).tar.gz")] | @tsv' >"$work/drafts" 2>"$work/gh.err"; then
+     any($r.assets[]?; .name == "\($m.pkg)_\($m.ver).tar.gz"), $r.id] | @tsv' >"$work/drafts" 2>"$work/gh.err"; then
   cat "$work/gh.err" >&2
   fail "Drafts" "The releases cannot be listed" "\`gh api repos/$repo/releases\` failed: $(head -n 1 "$work/gh.err")" "$work/gh.err" -- \
     "Check that the token may read the repository's releases; drafts need \`contents: write\`." \
     "Rerun the workflow; the next nightly run tries again in any case."
 fi
 n=0
-while IFS=$'\t' read -r tag pkg version target url tarball; do
+while IFS=$'\t' read -r tag pkg version target url tarball id; do
   if [ "$tag" != "v$version" ]; then
     say "  skipped: $url, tag $tag, which is not v$version as its marker says"
     continue
   fi
-  printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$tag" "$pkg" "$version" "$target" "$url" "$tarball" >>"$work/matching"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$tag" "$pkg" "$version" "$target" "$url" "$tarball" "$id" >>"$work/matching"
   val "draft" "$pkg $version, tag $tag, target $target, $url"
   n=$((n + 1))
 done <"$work/drafts"
 endgroup
+# The tags that more than one of these drafts carries.
+[ ! -s "$work/matching" ] || cut -f 1 "$work/matching" | sort | uniq -d >"$work/duplicates"
 
 if [ "$n" -eq 0 ]; then
   say "No draft release of a CRAN submission in $repo."
@@ -152,10 +154,10 @@ target_commit() { # <target>
 # --- each draft -------------------------------------------------------------
 
 failed=0
-while IFS=$'\t' read -r tag pkg version target url tarball <&3; do
+while IFS=$'\t' read -r tag pkg version target url tarball id <&3; do
   title="$pkg $version"
   group "Release: $title"
-  val "draft" "$url"
+  val "draft" "$url, id $id"
   val "tag" "$tag"
   val "target" "$target"
   served=$(p3m_version "$pkg")
@@ -174,6 +176,16 @@ while IFS=$'\t' read -r tag pkg version target url tarball <&3; do
     "- Draft release: [$title]($url), tag \`$tag\`" \
     "- Commit $(commit_link "$target"), the draft's target" \
     "- P3M: checked $index_url, which lists $pkg $served"
+
+  # cran-submission.yaml runs one submission at a time and refuses several drafts for a tag,
+  # so another one was written by hand, and only a person can tell which one CRAN got.
+  if grep -qxF "$tag" "$work/duplicates"; then
+    failure "$title" "Several drafts for $tag" "$title is on P3M, and more than one draft release with the marker of cran-submission.yaml carries the tag $tag, this one among them; nothing was published." -- \
+      "Find the draft of the run of cran-submission.yaml that submitted $title: it carries the tarball, and its target is the commit that run links." \
+      "Delete the other drafts; the next nightly run publishes the one that is left, or rerun this workflow."
+    failed=1
+    continue
+  fi
 
   # cran-submission.yaml writes the draft and the tag before it builds and uploads,
   # and attaches the tarball only once the upload went through:
@@ -225,9 +237,10 @@ while IFS=$'\t' read -r tag pkg version target url tarball <&3; do
     continue
   fi
 
-  if ! "$gh" release edit "$tag" --repo "$repo" --draft=false --latest >"$work/edit.out" 2>"$work/gh.err"; then
+  # By the release's id: `gh release edit <tag>` would pick any release that carries the tag name.
+  if ! "$gh" api -X PATCH "repos/$repo/releases/$id" -F draft=false -f make_latest=true --jq .html_url >"$work/edit.out" 2>"$work/gh.err"; then
     cat "$work/gh.err" >&2
-    failure "$title" "Publishing the release failed" "\`gh release edit $tag --draft=false --latest\` failed: $(head -n 1 "$work/gh.err")" "$work/gh.err" -- \
+    failure "$title" "Publishing the release failed" "\`gh api -X PATCH repos/$repo/releases/$id\` failed: $(head -n 1 "$work/gh.err")" "$work/gh.err" -- \
       "Check that the token may write releases: the workflow needs \`contents: write\`." \
       "Publish the draft by hand at $url, or rerun this workflow."
     failed=1

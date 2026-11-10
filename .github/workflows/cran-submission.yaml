@@ -59,7 +59,7 @@
 # The `tag` job runs .github/actions/cran-tag/cran-tag.sh.
 # It drafts a GitHub release titled `<package> <version>` for `v<version>`,
 # with the NEWS.md section of that version as its notes, or updates the draft that is there;
-# a published release of that tag stops the run instead.
+# a published release of that tag, or more than one draft for it, stops the run instead.
 # The notes end with the marker `<!-- cran-submission: <package> <version> -->`,
 # by which cran-release.yaml publishes the draft once Posit's package manager serves the version.
 # The job then tags the commit as `v<version>`,
@@ -81,9 +81,10 @@
 # Both steps print what they do and write a report with advice on failure to the run's summary page.
 #
 # The `attach-tarball` job then attaches the submitted tarball to the draft release as an asset,
-# after checking its sha256 against the one the upload used,
 # so that the record of what went to CRAN does not expire with the run's artifact;
 # cran-release.yaml publishes no draft without it.
+# It checks first that the tarball's sha256 is the one the upload used,
+# and that the draft the `tag` job wrote is the only release that carries the tag.
 # It is a job of its own, after the upload, so that only it and the `tag` job hold `contents: write`;
 # a run dispatched with `retag` replaces the asset of the earlier attempt.
 #
@@ -114,8 +115,10 @@ on:
 
 name: CRAN submission
 
+# One run at a time, whatever the ref: two runs for the same version on different refs
+# could otherwise both find no tag and no draft, and draft the release twice.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}
   cancel-in-progress: false
 
 permissions:
@@ -219,6 +222,7 @@ jobs:
       contents: write
 
     outputs:
+      release-id: ${{ steps.tag.outputs.release-id }}
       release-url: ${{ steps.tag.outputs.release-url }}
       tag: ${{ steps.tag.outputs.tag }}
 
@@ -363,6 +367,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           TAG: ${{ needs.tag.outputs.tag }}
+          RELEASE_ID: ${{ needs.tag.outputs.release-id }}
           URL: ${{ needs.tag.outputs.release-url }}
           SUBMITTED: ${{ needs.cran-submission.outputs.tarball }}
           SHA256: ${{ needs.cran-submission.outputs.sha256 }}
@@ -379,6 +384,19 @@ jobs:
               echo
               echo "The artifact's sha256 \`$actual\` is not the submitted tarball's \`$SHA256\`; nothing was attached."
               echo "The submission itself went through: attach the tarball by hand once its sha256 is confirmed."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          # `gh release upload` finds the release by its tag name, so only when the draft the `tag` job wrote
+          # is the one release that carries it.
+          ids="$(gh api --paginate "repos/$GH_REPO/releases?per_page=100" --jq ".[] | select(.tag_name == \"$TAG\") | .id" | paste -s -d ' ' -)"
+          if [ -z "$RELEASE_ID" ] || [ "$ids" != "$RELEASE_ID" ]; then
+            echo "::error title=Release mismatch::The releases carrying $TAG have the ids '$ids', not only the draft $RELEASE_ID the tag job wrote; nothing was attached."
+            {
+              echo "### Release asset: failed"
+              echo
+              echo "The releases that carry \`$TAG\` have the ids \`$ids\`, not only the draft \`$RELEASE_ID\` that the \`tag\` job wrote; nothing was attached."
+              echo "The submission itself went through: delete the drafts that are not this submission's, then attach the tarball by hand once its sha256 is confirmed."
             } >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi

@@ -7,8 +7,8 @@
 # against the source index of https://packagemanager.posit.co/cran/latest,
 # as `fledge:::release_after_cran_built_binaries()` did in fledge.yaml,
 # and publishes the drafts whose version that index lists, as the latest release,
-# once they carry the tarball the submission attached after its upload,
-# and their tag points at the commit they target.
+# once each is the only such draft for its tag, carries the tarball the submission attached after its upload,
+# and has a tag that points at the commit it targets.
 # A version that is not listed yet leaves the run green; the next night checks again.
 # Started by hand, from the Actions tab or with
 # `gh workflow run cran-release.yaml --repo r-dbi/RSQLite`, it does the same;

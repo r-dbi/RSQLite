@@ -28,7 +28,13 @@ arrow_fetch_df <- function(res, n, chunk_size = ARROW_DF_CHUNK_SIZE) {
     return(data.frame())
   }
 
-  arrow_to_df(fetched, res@conn@bigint)
+  df <- arrow_to_df(fetched, res@conn@bigint)
+  # Last, once the result is ready for the next fetch: a handler of the warning
+  # can use it, and an error raised from the warning only loses these rows
+  if (!is.null(fetched$coercions)) {
+    warn_coercion(fetched$coercions)
+  }
+  df
 }
 
 # The unified conversion of the arrays of a fetch to a data frame.

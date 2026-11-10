@@ -102,8 +102,9 @@ SEXP result_fetch_arrow(
 // negative `n_max`, typed for a data frame and fetched up front as arrays of at
 // most `chunk_size` rows: a list of nanoarrow_array objects with their
 // lengths, the row count, the names and Arrow formats of the columns, which
-// columns have seen an integer that needs 64 bits, and the R class of the
-// columns of times or timestamps in seconds.
+// columns have seen an integer that needs 64 bits, the R class of the
+// columns of times or timestamps in seconds, and the entries of the warning
+// for the values that were not of their column's type, or NULL.
 // Everything the conversion needs comes from here, which spares a small fetch
 // the R proxies of the Arrow objects.
 [[cpp11::register]]
@@ -162,7 +163,8 @@ cpp11::list result_fetch_arrow_df(
       "names"_nm = names,
       "formats"_nm = formats,
       "wide_ints"_nm = wide,
-      "seconds"_nm = seconds }
+      "seconds"_nm = seconds,
+      "coercions"_nm = columns.coercions }
   );
 }
 

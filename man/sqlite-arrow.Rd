@@ -34,6 +34,8 @@ It is raised when the chunk is fetched from the result:
 for a lazy stream when the array is requested,
 and for the first chunk when the schema is requested before it, see the section on chunking.
 The warning carries the details in its \code{coercions} field.
+A handler of the warning runs while the result is still busy with the chunk:
+it can't fetch from, bind, inspect or clear that result, which raises an error.
 The types can therefore depend on \code{chunk_size}:
 a real number in a later chunk is truncated to fit an \code{int64} column decided from integers,
 and a column whose first chunk holds only \code{NULL} keeps its declared type,
@@ -125,6 +127,9 @@ where the default path fails.
 Values that are not of their column's type are converted or dropped as in a stream,
 and reported with one warning of class \code{RSQLite_warning_coercion} per \code{\link[DBI:dbFetch]{DBI::dbFetch()}},
 which names the Arrow types the columns have at the end of the fetch.
+It is raised once the fetch has returned its rows,
+so a handler of the warning can use the result,
+where the default path warns while it fetches and a handler that uses the result raises an error.
 The default path warns on the same fetches, but once per column with values of another storage class,
 and once per date, time or timestamp that cannot be parsed.
 It also warns about the real numbers it truncates,

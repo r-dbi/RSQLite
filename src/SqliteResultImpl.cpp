@@ -317,8 +317,8 @@ int64_t SqliteResultImpl::fetch_arrow_chunk(
 
 // The rows of one dbFetch() through Arrow: at most `n_max` rows, all for a
 // negative `n_max`, as chunks of at most `chunk_size` rows that share `schema`,
-// with one warning for the values of all chunks that were not of their
-// column's type.
+// with the entries of one warning for the values of all chunks that were not
+// of their column's type.
 // Unless an Arrow stream or chunk has fixed the types already, they are
 // decided for this fetch like the default path decides them: a column that
 // sees only NULL stays open across chunks, integers widen to double in any
@@ -328,7 +328,8 @@ int64_t SqliteResultImpl::fetch_arrow_chunk(
 // Times and timestamps are doubles in seconds, which keep the precision of
 // the default path, unless an Arrow stream or chunk has fixed the types.
 // `columns` tells which columns have seen an integer that needs 64 bits, in
-// this fetch or an earlier one, and which hold seconds.
+// this fetch or an earlier one, and which hold seconds, and receives the
+// entries of the warning.
 int64_t SqliteResultImpl::fetch_arrow_df(
   struct ArrowSchema* schema,
   std::vector<nanoarrow::UniqueArray>& chunks,
@@ -430,13 +431,13 @@ int64_t SqliteResultImpl::fetch_arrow_df(
     df_wide_ints_.push_back(arrow_columns_[j].wide_integers());
   }
 
-  // One warning for the whole fetch, with the final types: a column logged
-  // as int64 may have become double since. A column that reopen() let go of
-  // the null type held no values, so has no entries.
-  // Last, so that an error raised from the warning leaves the result ready
-  // for the next fetch; the caller owns the chunks, the unwinding releases
-  // them.
-  warn_coercions();
+  // The entries of one warning for the whole fetch, with the final types: a
+  // column logged as int64 may have become double since. A column that
+  // reopen() let go of the null type held no values, so has no entries.
+  // dbFetch() raises the warning after the fetch has returned: the result is
+  // ready for the next fetch, also if the warning ends dbFetch() with an
+  // error, and no longer busy, so that a handler of the warning can use it.
+  columns.coercions = collect_coercions();
 
   return total;
 }
@@ -718,9 +719,10 @@ int64_t SqliteResultImpl::fetch_arrow_rows(
   return n;
 }
 
-// One warning for the values logged since the last call that were not of
-// their column's type, naming the current types of the columns
-void SqliteResultImpl::warn_coercions() {
+// The values logged since the last call that were not of their column's
+// type, as the entries of the warning, with the current types of the columns;
+// NULL if there were none
+cpp11::sexp SqliteResultImpl::collect_coercions() {
   cpp11::writable::list entries;
   for (size_t j = 0; j < arrow_columns_.size(); ++j) {
     cpp11::sexp coercions = arrow_columns_[j].coercions();
@@ -729,6 +731,18 @@ void SqliteResultImpl::warn_coercions() {
     }
   }
   if (entries.size() == 0) {
+    return R_NilValue;
+  }
+  // Through SEXP, which truncates the list to its length: a conversion
+  // straight to cpp11::sexp would keep the capacity that push_back() reserved
+  return static_cast<SEXP>(entries);
+}
+
+// One warning for the values logged since the last call that were not of
+// their column's type
+void SqliteResultImpl::warn_coercions() {
+  cpp11::sexp entries = collect_coercions();
+  if (entries == R_NilValue) {
     return;
   }
 

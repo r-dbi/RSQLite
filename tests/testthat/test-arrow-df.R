@@ -549,33 +549,87 @@ test_that("dbFetch() through Arrow hands out the rows kept for a schema", {
   stream$release()
 })
 
-test_that("a handler of a fetch through Arrow can't use its result", {
+test_that("a handler of the warning of a fetch through Arrow can use its result", {
   con <- local_arrow_con()
   dbExecute(con, "CREATE TABLE u (i INTEGER, x)")
-  dbExecute(con, "INSERT INTO u VALUES (1, 1), (2, 'two'), (3, 3)")
-  busy <- "while one of its fetches or binds is running"
+  dbExecute(con, "INSERT INTO u VALUES (1, 1), (2, 'two'), (3, 3), (4, 4)")
 
+  # The warning comes once the fetch has returned its rows,
+  # with the result ready for the next fetch
   uses <- list(
-    function(rs) dbFetch(rs),
-    function(rs) dbFetch(rs, 0),
+    function(rs) expect_identical(dbFetch(rs), data.frame(x = 3:4)),
+    function(rs) expect_identical(dbFetch(rs, 0), data.frame(x = integer())),
     function(rs) dbBind(rs, list(i = 2)),
     function(rs) dbClearResult(rs),
-    function(rs) dbColumnInfo(rs),
-    function(rs) dbFetchArrowChunk(rs)
+    function(rs) expect_identical(dbColumnInfo(rs)$name, "x"),
+    function(rs) expect_equal(dbFetchArrowChunk(rs)$length, 2)
   )
   for (use in uses) {
     rs <- dbSendQuery(con, "SELECT x FROM u WHERE i >= $i ORDER BY i", params = list(i = 1))
-    # The mixed-type warning runs the handler in the middle of the fetch
-    expect_error(
-      withCallingHandlers(dbFetch(rs), warning = function(w) {
-        use(rs)
-        invokeRestart("muffleWarning")
-      }),
-      busy
-    )
-    # The result is usable again
-    dbBind(rs, list(i = 3))
-    expect_identical(dbFetch(rs), data.frame(x = 3L))
-    dbClearResult(rs)
+    out <- withCallingHandlers(dbFetch(rs, 2), RSQLite_warning_coercion = function(w) {
+      use(rs)
+      invokeRestart("muffleWarning")
+    })
+    expect_identical(out, data.frame(x = c(1L, 0L)))
+    if (dbIsValid(rs)) {
+      dbClearResult(rs)
+    }
   }
+
+  # A handler of the warning of an Arrow chunk can't, also not for a data frame
+  rs <- dbSendQuery(con, "SELECT x FROM u ORDER BY i")
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
+  expect_error(
+    withCallingHandlers(dbFetchArrowChunk(rs), RSQLite_warning_coercion = function(w) dbFetch(rs)),
+    "while one of its fetches or binds is running"
+  )
+})
+
+test_that("a handler of the warning of a fetch through Arrow can fetch from another result", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE u (x)")
+  dbExecute(con, "INSERT INTO u VALUES (1), ('two'), (3)")
+  dbExecute(con, "CREATE TABLE v (y)")
+  dbExecute(con, "INSERT INTO v VALUES (1.5), (2), ('a')")
+  con2 <- local_arrow_con()
+  dbExecute(con2, "CREATE TABLE w (z)")
+  dbExecute(con2, "INSERT INTO w VALUES (1), (X'ff')")
+
+  # A stream on the same connection and a result on another one,
+  # whose fetches warn in turn
+  stream <- dbGetQueryArrow(con, "SELECT y FROM v")
+  rs2 <- dbSendQuery(con2, "SELECT z FROM w")
+  withr::defer(dbClearResult(rs2))
+  rs <- dbSendQuery(con, "SELECT x FROM u")
+  withr::defer(dbClearResult(rs))
+
+  coercions <- NULL
+  inner <- NULL
+  out <- withCallingHandlers(
+    dbFetch(rs),
+    RSQLite_warning_coercion = function(w) {
+      coercions <<- w$coercions
+      inner <<- list(
+        stream = coercion_warnings(stream_df <- as.data.frame(stream)),
+        df = coercion_warnings(df2 <- dbFetch(rs2)),
+        stream_df = stream_df,
+        df2 = df2
+      )
+      invokeRestart("muffleWarning")
+    }
+  )
+
+  expect_identical(out, data.frame(x = c(1L, 0L, 3L)))
+  expect_length(coercions, 1)
+  expect_identical(coercions[[1]]$column, "x")
+  expect_identical(coercions[[1]]$type, "int64")
+  expect_identical(coercions[[1]]$values[[1]]$class, "string")
+  expect_equal(coercions[[1]]$values[[1]]$rows, 2)
+
+  expect_identical(inner$stream_df$y, c(1.5, 2, 0))
+  expect_length(inner$stream, 1)
+  expect_equal(inner$stream[[1]]$coercions[[1]]$values[[1]]$rows, 3)
+  expect_identical(inner$df2$z, c(1L, 0L))
+  expect_length(inner$df, 1)
+  expect_identical(inner$df[[1]]$coercions[[1]]$values[[1]]$class, "blob")
 })

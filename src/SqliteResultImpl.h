@@ -133,6 +133,7 @@ private:
   void copy_pending_rows(struct ArrowArray* out, int64_t n);
   bool arrow_row_fits();
   bool arrow_chunk_full();
+  cpp11::sexp collect_coercions();
   void warn_coercions();
   void discard_coercions();
 

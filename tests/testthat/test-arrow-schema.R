@@ -270,7 +270,7 @@ test_that("float keeps to its range, bool takes a real as true unless zero", {
   dbExecute(con, "INSERT INTO t VALUES (1.5), (3.4e38), (1e300), (-1e300), (9e999), ('1e300'), (16777217), (0.0)")
 
   w <- coercion_warnings(
-    array <- arrow_validated(nanoarrow::as_nanoarrow_array(
+    array <- arrow_validated(single_array(
       dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_float()))
     ))
   )
@@ -287,7 +287,7 @@ test_that("float keeps to its range, bool takes a real as true unless zero", {
   dbExecute(con, "DELETE FROM t")
   dbExecute(con, "INSERT INTO t VALUES (0.5), (-0.9), (0.0), (2), (0), ('true'), ('2')")
   w <- coercion_warnings(
-    array <- arrow_validated(nanoarrow::as_nanoarrow_array(
+    array <- arrow_validated(single_array(
       dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_bool()))
     ))
   )
@@ -324,7 +324,7 @@ test_that("numbers beyond 64 bits are out of range, not saturated", {
   ))
   fetch <- function(type) {
     w <- coercion_warnings(
-      array <- nanoarrow::as_nanoarrow_array(dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type)))
+      array <- single_array(dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type)))
     )
     values <- w[[1]]$coercions[[1]]$values
     list(
@@ -367,7 +367,7 @@ test_that("numbers of days outside the range of a date type are NULL", {
   ))
   fetch <- function(type) {
     w <- coercion_warnings(
-      array <- nanoarrow::as_nanoarrow_array(dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type)))
+      array <- single_array(dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type)))
     )
     values <- w[[1]]$coercions[[1]]$values
     list(
@@ -442,7 +442,7 @@ test_that("integers and text become times and timestamps exactly", {
   ))
   fetch <- function(unit) {
     w <- coercion_warnings(
-      array <- arrow_validated(nanoarrow::as_nanoarrow_array(
+      array <- arrow_validated(single_array(
         dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_timestamp(unit, "UTC")))
       ))
     )
@@ -485,7 +485,7 @@ test_that("times outside a time of day are NULL", {
   for (unit in names(units)) {
     type <- if (unit %in% c("s", "ms")) nanoarrow::na_time32(unit) else nanoarrow::na_time64(unit)
     w <- coercion_warnings(
-      array <- arrow_validated(nanoarrow::as_nanoarrow_array(
+      array <- arrow_validated(single_array(
         dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type))
       ))
     )

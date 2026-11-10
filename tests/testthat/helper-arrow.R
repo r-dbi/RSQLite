@@ -79,3 +79,11 @@ arrow_validated <- function(x) {
   }
   x
 }
+
+# The one array of a stream, without the arrow package that
+# nanoarrow::as_nanoarrow_array() needs for a stream
+single_array <- function(stream) {
+  arrays <- nanoarrow::collect_array_stream(stream)
+  testthat::expect_length(arrays, 1)
+  arrays[[1]]
+}

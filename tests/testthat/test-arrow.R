@@ -333,10 +333,11 @@ test_that("a row held back by the byte limits is for the Arrow path only", {
 })
 
 test_that("chunks of large blobs stay within the 32-bit offsets", {
-  skip_on_cran()
+  # Off unless the variable is true, which the GitHub Actions checks of this
+  # repository set in .github/workflows/custom/after-install
   skip_if_not(
     identical(Sys.getenv("RSQLITE_TEST_LARGE_ARROW"), "true"),
-    "Set RSQLITE_TEST_LARGE_ARROW=true to run, needs about 3 GB of memory"
+    "Needs about 2.5 GB of memory, set RSQLITE_TEST_LARGE_ARROW=true to run"
   )
 
   con <- local_con()

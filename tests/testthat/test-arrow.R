@@ -369,6 +369,8 @@ test_that("an R error while the stream is read unwinds cleanly", {
     dbFetchArrow(rs, chunk_size = 2)
   }
 
+  # nanoarrow's C code reads the stream: the callback continues the unwind
+  rethrown <- arrow_rethrown_unwinds()
   withr::with_options(list(warn = 2), {
     expect_error(as.data.frame(lazy_stream()), "mixed type")
   })
@@ -376,13 +378,16 @@ test_that("an R error while the stream is read unwinds cleanly", {
     tryCatch(as.data.frame(lazy_stream()), warning = function(w) "exited"),
     "exited"
   )
+  expect_equal(arrow_rethrown_unwinds(), rethrown)
 
-  # Also when RSQLite binds the stream as parameters
+  # RSQLite's C++ code binds the stream as parameters: the callback rethrows,
+  # so that the unwind continues after the C++ frames have been left
   con2 <- local_con()
   dbExecute(con2, "CREATE TABLE t (x)")
   withr::with_options(list(warn = 2), {
     expect_error(dbAppendTableArrow(con2, "t", lazy_stream()), "mixed type")
   })
+  expect_equal(arrow_rethrown_unwinds(), rethrown + 1)
   # The append is rolled back, both connections work on
   expect_equal(dbGetQuery(con2, "SELECT count(*) AS n FROM t")$n, 0L)
   expect_equal(dbAppendTableArrow(con2, "t", data.frame(x = 1L)), 1L)

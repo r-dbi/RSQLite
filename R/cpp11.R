@@ -100,6 +100,10 @@ arrow_set_bytes_limits <- function(cut_bytes, max_bytes) {
   .Call(`_RSQLite_arrow_set_bytes_limits`, cut_bytes, max_bytes)
 }
 
+arrow_rethrown_unwinds <- function() {
+  .Call(`_RSQLite_arrow_rethrown_unwinds`)
+}
+
 rsqliteVersion <- function() {
   .Call(`_RSQLite_rsqliteVersion`)
 }

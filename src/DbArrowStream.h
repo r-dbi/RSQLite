@@ -25,4 +25,7 @@ void db_arrow_stream_init(
 // skip the destructors of the reading code.
 void db_arrow_stream_read_from_cpp(struct ArrowArrayStream* stream);
 
+// How often an R error or interrupt has propagated that way, for the tests
+int64_t db_arrow_stream_rethrown_unwinds();
+
 #endif  // RSQLITE_DBARROWSTREAM_H

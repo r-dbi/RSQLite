@@ -138,3 +138,10 @@ cpp11::doubles arrow_set_bytes_limits(double cut_bytes, double max_bytes) {
     { static_cast<double>(old.first), static_cast<double>(old.second) }
   );
 }
+
+// For the tests: how often an R condition raised while RSQLite's own C++ code
+// read one of its Arrow streams has been rethrown as a C++ exception
+[[cpp11::register]]
+double arrow_rethrown_unwinds() {
+  return static_cast<double>(db_arrow_stream_rethrown_unwinds());
+}

@@ -187,6 +187,13 @@ extern "C" SEXP _RSQLite_arrow_set_bytes_limits(SEXP cut_bytes, SEXP max_bytes) 
     return cpp11::as_sexp(arrow_set_bytes_limits(cpp11::as_cpp<cpp11::decay_t<double>>(cut_bytes), cpp11::as_cpp<cpp11::decay_t<double>>(max_bytes)));
   END_CPP11
 }
+// result.cpp
+double arrow_rethrown_unwinds();
+extern "C" SEXP _RSQLite_arrow_rethrown_unwinds() {
+  BEGIN_CPP11
+    return cpp11::as_sexp(arrow_rethrown_unwinds());
+  END_CPP11
+}
 // rsqlite.cpp
 cpp11::strings rsqliteVersion();
 extern "C" SEXP _RSQLite_rsqliteVersion() {
@@ -197,6 +204,7 @@ extern "C" SEXP _RSQLite_rsqliteVersion() {
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
+    {"_RSQLite_arrow_rethrown_unwinds",       (DL_FUNC) &_RSQLite_arrow_rethrown_unwinds,       0},
     {"_RSQLite_arrow_set_bytes_limits",       (DL_FUNC) &_RSQLite_arrow_set_bytes_limits,       2},
     {"_RSQLite_connection_connect",           (DL_FUNC) &_RSQLite_connection_connect,           5},
     {"_RSQLite_connection_copy_database",     (DL_FUNC) &_RSQLite_connection_copy_database,     2},

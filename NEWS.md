@@ -1,5 +1,79 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.53.3.9021 (2026-11-08)
+
+## Features
+
+- Upgrade bundled SQLite to 3.54.1 (#827).
+
+
+# RSQLite 3.53.3.9020 (2026-11-01)
+
+## Features
+
+- Upgrade bundled SQLite to 3.54.1 (#824).
+
+
+# RSQLite 3.53.3.9019 (2026-10-29)
+
+## Features
+
+- Upgrade bundled SQLite to 3.54.1 (#822).
+
+
+# RSQLite 3.53.3.9018 (2026-10-22)
+
+## Features
+
+- Upgrade bundled SQLite to 3.54.1 (#819).
+
+
+# RSQLite 3.53.3.9017 (2026-10-18)
+
+## Features
+
+- Upgrade bundled SQLite to 3.54.1 (#817).
+
+
+# RSQLite 3.53.3.9016 (2026-10-17)
+
+## Features
+
+- Upgrade bundled SQLite to 3.54.1 (#815).
+
+
+# RSQLite 3.53.3.9015 (2026-10-11)
+
+## Features
+
+- Upgrade bundled SQLite to 3.54.0 (#813).
+
+## Chore
+
+- Auto-update from GitHub Actions (#812).
+
+
+# RSQLite 3.53.3.9014 (2026-09-29)
+
+## Bug fixes
+
+### ci
+
+- Restore the custom actions and the `upgrade` workflow (#809).
+
+## Chore
+
+- Auto-update from GitHub Actions (#811).
+
+## Continuous integration
+
+- Run coverage checks after pkgdown push.
+
+## Uncategorized
+
+- Feat(ci): Render `README.md` and `index.md` in CI (cynkra/cynkratemplate#118).
+
+
 # RSQLite 3.53.3.9013 (2026-09-26)
 
 ## Documentation

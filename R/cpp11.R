@@ -96,8 +96,8 @@ result_fetch_arrow <- function(res_, chunk_size) {
   .Call(`_RSQLite_result_fetch_arrow`, res_, chunk_size)
 }
 
-result_fetch_arrow_all <- function(res_, chunk_size) {
-  .Call(`_RSQLite_result_fetch_arrow_all`, res_, chunk_size)
+result_fetch_arrow_df <- function(res, n_max, chunk_size) {
+  .Call(`_RSQLite_result_fetch_arrow_df`, res, n_max, chunk_size)
 }
 
 result_fetch_arrow_chunk <- function(res, chunk_size) {
@@ -110,6 +110,14 @@ result_bind_arrow <- function(res, params, param_indexes) {
 
 integer64_to_integer <- function(x) {
   .Call(`_RSQLite_integer64_to_integer`, x)
+}
+
+arrow_set_bytes_limits <- function(cut_bytes, max_bytes) {
+  .Call(`_RSQLite_arrow_set_bytes_limits`, cut_bytes, max_bytes)
+}
+
+arrow_rethrown_unwinds <- function() {
+  .Call(`_RSQLite_arrow_rethrown_unwinds`)
 }
 
 rsqliteVersion <- function() {

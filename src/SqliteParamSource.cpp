@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "SqliteParamSource.h"
+#include "DbArrowStream.h"
 #include "integer64.h"
 #include <cmath>
 #include <cstdlib>
@@ -105,6 +106,7 @@ SqliteArrowParamSource::SqliteArrowParamSource(
     : param_indexes(param_indexes_), i(0), n(0), exhausted(false) {
   // Take over the stream: the R object that provided it is released
   ArrowArrayStreamMove(stream_, stream.get());
+  db_arrow_stream_read_from_cpp(stream.get());
 
   struct ArrowError error;
   ArrowErrorInit(&error);

@@ -86,6 +86,29 @@ test_that("can connect to same db from multiple connections", {
   expect_equal(dbReadTable(con2, "airquality"), airquality)
 })
 
+test_that("a cloned connection keeps the arguments of the original", {
+  dbfile <- tempfile()
+  on.exit(unlink(dbfile))
+  con <- dbConnect(
+    SQLite(), dbfile,
+    bigint = "character", extended_types = TRUE, arrow = TRUE
+  )
+  on.exit(dbDisconnect(con), add = TRUE, after = FALSE)
+  clone <- dbConnect(con)
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+
+  expect_identical(clone@bigint, "character")
+  expect_true(clone@extended_types)
+  expect_true(clone@arrow)
+
+  dbExecute(con, "CREATE TABLE t (d DATE, big INTEGER)")
+  dbExecute(con, "INSERT INTO t VALUES ('2020-01-02', 1099511627776)")
+  expect_identical(
+    dbReadTable(clone, "t"),
+    data.frame(d = as.Date("2020-01-02"), big = "1099511627776")
+  )
+})
+
 test_that("temporary tables are connection local", {
   dbfile <- tempfile()
   con1 <- dbConnect(SQLite(), dbfile)

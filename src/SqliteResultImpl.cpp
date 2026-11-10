@@ -35,6 +35,7 @@ SqliteResultImpl::SqliteResultImpl(
       arrow_targets_(cache.ncols_),
       arrow_frozen_(false),
       pending_offset_(0),
+      pending_rows_(0),
       arrow_row_read_(false),
       df_carry_(false),
       arrow_cut_bytes_(ARROW_CUT_BYTES),
@@ -131,7 +132,7 @@ void SqliteResultImpl::close() {}
 // they have been handed out
 
 bool SqliteResultImpl::complete() const {
-  return complete_ && pending_chunk_->release == NULL;
+  return complete_ && pending_rows_ == 0;
 }
 
 bool SqliteResultImpl::ready() const {
@@ -143,10 +144,8 @@ int64_t SqliteResultImpl::executions() const {
 }
 
 int64_t SqliteResultImpl::n_rows_fetched() {
-  int64_t kept = 0;
-  if (pending_chunk_->release != NULL) {
-    kept = pending_chunk_->length - pending_offset_;
-  }
+  // The kept rows first: they are counted in nrows_ before they are kept
+  int64_t kept = pending_rows_;
   return nrows_ - kept;
 }
 
@@ -304,6 +303,7 @@ void SqliteResultImpl::arrow_schema(
       nanoarrow::UniqueArray chunk;
       fetch_arrow_rows(chunk.get(), infer_rows);
       chunk.move(pending_chunk_.get());
+      pending_rows_ = pending_chunk_->length;
     }
     // Columns that only ever held NULL take their declared type
     for (size_t j = 0; j < arrow_columns_.size(); ++j) {
@@ -351,6 +351,7 @@ int64_t SqliteResultImpl::fetch_arrow_chunk(
     );
     if (pending_offset_ == 0 && n == pending_chunk_->length) {
       pending_chunk_.move(out);
+      pending_rows_ = 0;
       return n;
     }
 
@@ -358,6 +359,7 @@ int64_t SqliteResultImpl::fetch_arrow_chunk(
     // its rows are handed out in copies of at most `n_max` rows
     copy_pending_rows(out, n);
     pending_offset_ += n;
+    pending_rows_ = pending_chunk_->length - pending_offset_;
     if (pending_offset_ == pending_chunk_->length) {
       pending_chunk_.reset();
       pending_offset_ = 0;
@@ -569,6 +571,7 @@ void SqliteResultImpl::after_set_params() {
   arrow_frozen_ = false;
   pending_chunk_.reset();
   pending_offset_ = 0;
+  pending_rows_ = 0;
   arrow_row_read_ = false;
 
   total_changes_start_ = sqlite3_total_changes(conn);
@@ -609,7 +612,7 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   while (!complete_) {
     data.set_col_values();
     step();
-    nrows_++;
+    ++nrows_;
     if (!data.advance()) {
       break;
     }

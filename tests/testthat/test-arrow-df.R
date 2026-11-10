@@ -350,6 +350,95 @@ test_that("a fetch of no rows warns on the default path only", {
   expect_same_fetches(actual, expected, ns, "n = 2, 0, 1")
 })
 
+test_that("unparsable times through Arrow are reported once per fetch", {
+  setup <- c(
+    "CREATE TABLE t (i INTEGER, tm TIME, ts TIMESTAMP)",
+    paste(
+      "INSERT INTO t VALUES (1, 3600.25, 1.5), (2, 'nope', 'nope'), (3, 100000, 1e19),",
+      "(4, '25:00:00', '2020-01-02 03:04:05'), (5, X'00', 2.5)"
+    )
+  )
+  con <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
+  on.exit(dbDisconnect(con))
+  con_arrow <- local_arrow_con(extended_types = TRUE)
+  for (sql in setup) {
+    dbExecute(con, sql)
+    dbExecute(con_arrow, sql)
+  }
+  query <- "SELECT tm, ts FROM t ORDER BY i"
+
+  for (ns in list(-1, c(1, 2, -1), c(3, 2))) {
+    expect_same_fetches(
+      fetch_sequence(con_arrow, query, ns),
+      fetch_sequence(con, query, ns),
+      ns,
+      paste("n =", paste(ns, collapse = ", "))
+    )
+  }
+
+  # Seconds keep times outside a day and large timestamps, as on the default path
+  w <- coercion_warnings(df <- dbGetQuery(con_arrow, query))
+  expect_identical(as.numeric(df$tm), c(3600.25, NA, 100000, 90000, NA))
+  expect_identical(as.numeric(df$ts), c(1.5, NA, 1e19, 1577934245, 2.5))
+  expect_length(w, 1)
+  coercions <- w[[1]]$coercions
+  expect_identical(vapply(coercions, `[[`, "", "type"), c("time64", "timestamp"))
+  tm <- coercions[[1]]$values
+  expect_identical(vapply(tm, `[[`, "", "class"), c("string", "blob"))
+  expect_identical(vapply(tm, `[[`, "", "reason"), c("unparsable", "unparsable"))
+  expect_equal(vapply(tm, `[[`, 1, "rows"), c(2, 5))
+  expect_equal(coercions[[2]]$values[[1]]$rows, 2)
+})
+
+test_that("the coercion warning counts the rows of each binding through Arrow", {
+  setup <- c(
+    "CREATE TABLE t (k INTEGER, v)",
+    "INSERT INTO t VALUES (1, 1), (1, 2), (2, 'x'), (2, 3), (2, 'y')"
+  )
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con))
+  con_arrow <- local_arrow_con()
+  for (sql in setup) {
+    dbExecute(con, sql)
+    dbExecute(con_arrow, sql)
+  }
+
+  bind_and_fetch <- function(con, ns) {
+    rs <- dbSendQuery(con, "SELECT v FROM t WHERE k = ? ORDER BY rowid")
+    on.exit(dbClearResult(rs))
+    warnings <- list()
+    data <- unlist(recursive = FALSE, lapply(1:2, function(k) {
+      dbBind(rs, list(k))
+      lapply(ns, function(n) {
+        withCallingHandlers(dbFetch(rs, n), warning = function(w) {
+          warnings[[length(warnings) + 1]] <<- w
+          invokeRestart("muffleWarning")
+        })
+      })
+    }))
+    list(data = data, warnings = warnings)
+  }
+
+  # The second binding starts from the integer type of the first one,
+  # its strings are converted
+  expected <- bind_and_fetch(con, -1)
+  expect_identical(expected$data[[2]]$v, c(0L, 3L, 0L))
+  actual <- bind_and_fetch(con_arrow, -1)
+  expect_identical(actual$data, expected$data)
+  expect_length(actual$warnings, 1)
+  # Row numbers count from the first row of the binding
+  values <- actual$warnings[[1]]$coercions[[1]]$values[[1]]
+  expect_identical(values$class, "string")
+  expect_equal(values$rows, c(1, 3))
+
+  # Also across the fetches of a binding
+  actual <- bind_and_fetch(con_arrow, c(2, -1))
+  expect_identical(actual$data, bind_and_fetch(con, c(2, -1))$data)
+  expect_length(actual$warnings, 2)
+  expect_equal(actual$warnings[[1]]$coercions[[1]]$values[[1]]$rows, 1)
+  expect_equal(actual$warnings[[2]]$coercions[[1]]$values[[1]]$rows, 3)
+})
+
 test_that("a NULL-first column is typed by its first value through Arrow", {
   # The finding of the review: a small first fetch fixed the types
   con <- local_arrow_con()

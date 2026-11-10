@@ -244,14 +244,16 @@ cpp11::list SqliteResultImpl::get_column_info() {
 
 void SqliteResultImpl::set_arrow_schema(
   const struct ArrowSchema* schema,
-  const std::vector<int>& positions
+  const std::vector<int>& positions,
+  const std::vector<bool>& seconds
 ) {
   if (!arrow_columns_.empty()) {
     throw std::runtime_error(
       "The Arrow types of the result have already been decided"
     );
   }
-  if (schema->n_children != static_cast<int64_t>(positions.size())) {
+  if (schema->n_children != static_cast<int64_t>(positions.size()) ||
+      seconds.size() != positions.size()) {
     throw std::runtime_error("Internal error: schema and positions differ");
   }
 
@@ -264,6 +266,14 @@ void SqliteResultImpl::set_arrow_schema(
     }
     targets[pos] =
       ArrowTarget::from_schema(schema->children[i], cache.names_[pos]);
+    if (seconds[i]) {
+      if (targets[pos].kind != AK_TIME64 && targets[pos].kind != AK_TIMESTAMP) {
+        throw std::runtime_error(
+          "Internal error: only a time64 or timestamp can be stored in seconds"
+        );
+      }
+      targets[pos].seconds = true;
+    }
   }
   arrow_targets_.swap(targets);
 }

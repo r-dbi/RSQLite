@@ -33,7 +33,7 @@ dbSendQuery_SQLiteConnection_character <- function(conn, statement, params = NUL
   on.exit(dbClearResult(rs), add = TRUE)
 
   if (!is.null(ptype)) {
-    arrow_set_schema(rs, ptype_schema, arg = "ptype")
+    arrow_set_schema(rs, ptype_schema, arg = "ptype", seconds = arrow_ptype_seconds(ptype))
   }
 
   if (!is.null(params)) {

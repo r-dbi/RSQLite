@@ -200,11 +200,13 @@
 #' `nanoarrow::infer_nanoarrow_schema()` gives for it, see the section on requesting types:
 #' `integer` as `int32`, so that values outside its range become `NA` with a warning,
 #' `bit64::integer64` as `int64`, `logical` as `bool`, `Date` as `date32`, and `blob` as `binary`.
-#' A `POSIXct` or `POSIXlt` column is requested as a timestamp in the time zone of the prototype,
-#' the session's time zone for an empty one:
-#' the values are read as UTC, like on both paths, and displayed in that zone.
-#' An `hms` column is requested as `time64` in microseconds,
-#' and a factor is read as text and converted to its levels, where other values become `NA` as with [base::factor()],
+#' `POSIXct`, `POSIXlt` and `hms` columns are requested as `timestamp[us]` and `time64[us]`,
+#' but read like the times and timestamps decided from `extended_types`, whatever the declared type:
+#' as doubles in seconds, with the default path's precision and range, times outside a day included,
+#' until an Arrow stream fixes the types of the result, see above.
+#' The timestamps are read as UTC, like on both paths,
+#' and take the time zone of the prototype, the session's time zone for an empty one.
+#' A factor is read as text and converted to its levels, where other values become `NA` as with [base::factor()],
 #' or to the levels found in the values of each fetch if it has none.
 #' A prototype that nanoarrow finds no type for, one of a type that cannot be requested, such as a `difftime`,
 #' and one that nanoarrow cannot convert back to, such as an [AsIs][base::I] vector, are errors that name the column.
@@ -258,8 +260,9 @@ NULL
 
 # Requests the Arrow types of `schema` for the columns of a result:
 # a struct nanoarrow_schema, an arrow Schema, or a named list of column types;
-# `arg` names the argument in error messages
-arrow_set_schema <- function(res, schema, arg = "schema") {
+# `arg` names the argument in error messages, and `seconds` marks the times and
+# timestamps that data frame fetches store as doubles in seconds
+arrow_set_schema <- function(res, schema, arg = "schema", seconds = NULL) {
   schema <- arrow_check_schema(schema)
   requested <- arrow_schema_names(schema)
   if (any(requested == "")) {
@@ -288,7 +291,10 @@ arrow_set_schema <- function(res, schema, arg = "schema") {
     )
   }
 
-  result_set_arrow_schema(res@ptr, schema, positions - 1L)
+  if (is.null(seconds)) {
+    seconds <- logical(length(requested))
+  }
+  result_set_arrow_schema(res@ptr, schema, positions - 1L, seconds)
   invisible(res)
 }
 

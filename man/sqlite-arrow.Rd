@@ -212,11 +212,13 @@ A column of the prototype is requested from SQLite as the Arrow type that
 \code{nanoarrow::infer_nanoarrow_schema()} gives for it, see the section on requesting types:
 \code{integer} as \code{int32}, so that values outside its range become \code{NA} with a warning,
 \code{bit64::integer64} as \code{int64}, \code{logical} as \code{bool}, \code{Date} as \code{date32}, and \code{blob} as \code{binary}.
-A \code{POSIXct} or \code{POSIXlt} column is requested as a timestamp in the time zone of the prototype,
-the session's time zone for an empty one:
-the values are read as UTC, like on both paths, and displayed in that zone.
-An \code{hms} column is requested as \code{time64} in microseconds,
-and a factor is read as text and converted to its levels, where other values become \code{NA} as with \code{\link[base:factor]{base::factor()}},
+\code{POSIXct}, \code{POSIXlt} and \code{hms} columns are requested as \code{timestamp[us]} and \code{time64[us]},
+but read like the times and timestamps decided from \code{extended_types}, whatever the declared type:
+as doubles in seconds, with the default path's precision and range, times outside a day included,
+until an Arrow stream fixes the types of the result, see above.
+The timestamps are read as UTC, like on both paths,
+and take the time zone of the prototype, the session's time zone for an empty one.
+A factor is read as text and converted to its levels, where other values become \code{NA} as with \code{\link[base:factor]{base::factor()}},
 or to the levels found in the values of each fetch if it has none.
 A prototype that nanoarrow finds no type for, one of a type that cannot be requested, such as a \code{difftime},
 and one that nanoarrow cannot convert back to, such as an \link[base:I]{AsIs} vector, are errors that name the column.

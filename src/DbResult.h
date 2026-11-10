@@ -55,9 +55,12 @@ public:
   cpp11::strings get_column_names();
 
   // Arrow
+  // `seconds` marks the times and timestamps that a data frame fetch stores
+  // as doubles in seconds, see ArrowTarget
   void set_arrow_schema(
     const struct ArrowSchema* schema,
-    const std::vector<int>& positions
+    const std::vector<int>& positions,
+    const std::vector<bool>& seconds
   );
   void arrow_schema(struct ArrowSchema* out, int64_t infer_rows);
   int64_t fetch_arrow(struct ArrowArray* out, int64_t n_max);

@@ -145,6 +145,7 @@ SqliteArrowColumn::SqliteArrowColumn(
       timezone("UTC"),
       frozen(false),
       requested(false),
+      seconds(false),
       data_frame(false),
       array_kind(AK_UNDECIDED),
       pending_nulls(0),
@@ -160,6 +161,7 @@ SqliteArrowColumn::SqliteArrowColumn(
     timezone = target.timezone;
     frozen = true;
     requested = true;
+    seconds = target.seconds;
     return;
   }
   if (with_alt_types) {
@@ -254,8 +256,9 @@ const char* SqliteArrowColumn::seconds_class() const {
 
 ARROW_KIND SqliteArrowColumn::storage_kind() const {
   // Decided from `extended_types`, these are a time64[us] or a timestamp[us]:
-  // a requested type is built as requested
-  if (data_frame && !requested && (kind == AK_TIME64 || kind == AK_TIMESTAMP)) {
+  // a requested type is built as requested, unless `seconds` is set
+  if (data_frame && (!requested || seconds) &&
+      (kind == AK_TIME64 || kind == AK_TIMESTAMP)) {
     return AK_DOUBLE;
   }
   return kind;

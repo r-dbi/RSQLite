@@ -72,10 +72,17 @@ arrow_check_ptype <- function(ptype) {
 }
 
 # The Arrow types to request for the columns of a prototype:
-# nanoarrow's inference, except that hms columns take the time64 type the
-# result path fills, and factors are read as strings
+# nanoarrow's inference, except that hms columns take the time64 type of a
+# decided time, and factors are read as strings
 arrow_ptype_schema <- function(ptype) {
   nanoarrow::na_struct(Map(arrow_ptype_column_schema, ptype, names(ptype)))
+}
+
+# The columns of a prototype that data frame fetches read like a decided time
+# or timestamp, as doubles in seconds with the default path's precision and
+# range, and that get the prototype's class and time zone in arrow_to_df()
+arrow_ptype_seconds <- function(ptype) {
+  vlapply(ptype, inherits, c("hms", "POSIXct"), USE.NAMES = FALSE)
 }
 
 # A column that nanoarrow finds no type for, or can't convert back to,
@@ -121,12 +128,14 @@ arrow_to_df <- function(fetched, bigint, ptype = NULL) {
 
   # The names of `ptype` occur once in the result, see arrow_set_schema().
   # nanoarrow builds factors only from given levels, the others come from the
-  # values.
+  # values, and times and timestamps in seconds take the prototype's
+  # attributes after the conversion.
   requested <- match(names(ptype), fetched$names)
   keep <- logical(length(formats))
   keep[requested] <- TRUE
   factors <- vlapply(ptype, function(col) is.factor(col) && length(levels(col)) == 0)
-  for (i in seq_along(requested)) {
+  seconds <- fetched$seconds[requested] != ""
+  for (i in which(!seconds)) {
     to[[requested[[i]]]] <- if (factors[[i]]) character() else ptype[[i]]
   }
 
@@ -152,6 +161,9 @@ arrow_to_df <- function(fetched, bigint, ptype = NULL) {
   }
   for (j in which(fetched$seconds == "POSIXct")) {
     columns[[j]] <- .POSIXct(columns[[j]], tz = "UTC")
+  }
+  for (i in which(seconds)) {
+    attributes(columns[[requested[[i]]]]) <- attributes(ptype[[i]])
   }
 
   # SQLite integers are 64-bit: a column whose values all fit is an integer,

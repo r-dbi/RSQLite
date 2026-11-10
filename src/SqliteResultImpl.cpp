@@ -303,8 +303,10 @@ void SqliteResultImpl::bind_arrow(
     after_set_params();
   } catch (...) {
     // A stream that fails on its first row is not kept: it may hold a share
-    // of this result, through a stream that wraps one of its Arrow streams
+    // of this result, through a stream that wraps one of its Arrow streams.
+    // The statement has lost its bindings: it must be bound again.
     params_.reset();
+    ready_ = false;
     throw;
   }
 }

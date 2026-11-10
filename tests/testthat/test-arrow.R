@@ -494,6 +494,31 @@ test_that("a result can't be used from a handler of its own fetch", {
   invisible(gc())
 })
 
+test_that("a result must be bound again after its first parameter row fails", {
+  con <- local_con()
+  rs <- dbSendQuery(con, "SELECT $a AS a")
+  on.exit(dbClearResult(rs))
+  dbBind(rs, list(a = 1:3))
+  expect_equal(dbFetch(rs, n = 1)$a, 1L)
+
+  # A uint64 value above the signed range can't be bound
+  params <- nanoarrow::as_nanoarrow_array(
+    data.frame(a = 1),
+    schema = nanoarrow::na_struct(list(a = nanoarrow::na_uint64()))
+  )
+  big <- nanoarrow::nanoarrow_array_modify(
+    params$children$a,
+    list(buffers = list(NULL, nanoarrow::as_nanoarrow_buffer(as.raw(rep(0xff, 8)))))
+  )
+  params <- nanoarrow::nanoarrow_array_modify(params, list(children = list(a = big)))
+  expect_error(dbBindArrow(rs, params), "outside the 64-bit signed integer range")
+
+  # The statement has lost its bindings, it has no rows to return
+  expect_error(dbFetch(rs), "needs to be bound")
+  dbBind(rs, list(a = 7L))
+  expect_equal(dbFetch(rs)$a, 7L)
+})
+
 test_that("dbGetQueryArrow() reads the whole result", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:3, b = letters[1:3]))

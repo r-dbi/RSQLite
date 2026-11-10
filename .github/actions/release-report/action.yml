@@ -19,7 +19,7 @@ inputs:
     description: "Markdown appended below the job results"
     default: ""
   issue-marker:
-    description: "Report to the open issue whose body carries this text instead of a pull request"
+    description: "Report to the newest open issue of an owner, member or collaborator whose body carries this text, instead of a pull request"
     default: ""
   token:
     description: "A token with `pull-requests: write`"

@@ -4,8 +4,10 @@
 # Process: the header of .github/workflows/cran-submission.yaml
 #
 # The target is the open pull request whose head is the ref the run was started on,
-# or, when ISSUE_MARKER is set, the open issue whose body carries that text instead:
+# or, when ISSUE_MARKER is set, the newest open issue whose body carries that text instead,
+# among the issues of an owner, member or collaborator of the repository:
 # the checklist issue, which stays open from the cut until the release is published.
+# Anyone can open an issue, so an issue by anyone else is never the target.
 # Without a target, the script says so and succeeds: there is nothing to report to.
 # The comment is found by the hidden marker `<!-- release-report: <key> -->`
 # among the comments of github-actions[bot].
@@ -35,11 +37,20 @@ repo=${GH_REPO:?}
 gh=${GH:-gh}
 owner=${repo%%/*}
 
-if [ -n "${ISSUE_MARKER:-}" ]; then
+# The open issues whose body carries <text>, newest first, opened by an owner, member or collaborator of the repository.
+# close-checklist.sh selects the issues it closes with the same filter.
+checklist_issues() { # <text>
+  local text=${1//\\/\\\\}
+  text=${text//\"/\\\"}
   # The issues endpoint lists pull requests too; they carry `pull_request`.
-  pr=$("$gh" api --paginate "repos/$repo/issues?state=open&per_page=100" \
-    --jq ".[] | select((.pull_request | not) and ((.body // \"\") | contains(\"$ISSUE_MARKER\"))) | .number" | head -n 1)
-  what="issue whose body carries $ISSUE_MARKER"
+  "$gh" api --paginate "repos/$repo/issues?state=open&per_page=100" --jq ".[] | select((.pull_request | not)
+    and (.author_association == \"OWNER\" or .author_association == \"MEMBER\" or .author_association == \"COLLABORATOR\")
+    and ((.body // \"\") | contains(\"$text\"))) | .number"
+}
+
+if [ -n "${ISSUE_MARKER:-}" ]; then
+  pr=$(checklist_issues "$ISSUE_MARKER" | head -n 1)
+  what="issue of an owner, member or collaborator whose body carries $ISSUE_MARKER"
 else
   pr=$("$gh" api "repos/$repo/pulls?state=open&head=$owner:$GITHUB_REF_NAME&per_page=1" --jq '.[0].number // empty')
   what="pull request has the head $GITHUB_REF_NAME"

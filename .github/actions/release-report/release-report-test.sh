@@ -4,11 +4,13 @@
 #   1. Without an earlier comment, the run posts one on the pull request whose head is the ref.
 #   2. With one, carrying the marker and written by github-actions[bot], the run updates it.
 #   3. A comment with the marker by someone else is left alone.
-#   4. With ISSUE_MARKER, the open issue carrying it is used, never a pull request;
-#      without a target, nothing is posted.
+#   4. With ISSUE_MARKER, the newest open issue carrying it is used, never a pull request,
+#      and only among the issues of an owner, member or collaborator: anyone else's issue is never the target,
+#      newer or not, and also not when it quotes the marker; without a target, nothing is posted.
 #   5. The overall result is failure when any job failed, and the body lists every job.
-#   6. close-checklist.sh comments on and closes the open issue carrying the exact marker of a published release,
-#      and no pull request or issue of another version; without such an issue, it writes nothing.
+#   6. close-checklist.sh comments on and closes the open issues of an owner, member or collaborator
+#      carrying the exact marker of a published release, and no pull request, no issue of another version,
+#      and no issue of anyone else; without such an issue, it writes nothing.
 #
 # Usage:
 #   .github/actions/release-report/release-report-test.sh
@@ -99,12 +101,31 @@ is "it patches the bot's comment, not the other one" "$(cat "$SCRATCH/writes")" 
 has "the overall result is success" "$(cat "$SCRATCH/body")" "### ✅ Release gate: success"
 
 echo "== with an issue marker, the checklist issue is the target"
-issues <<<'[{"number": 3, "body": "<!-- release-checklist: RSQLite 1.0.0 -->", "pull_request": {}},
-            {"number": 4, "body": null},
-            {"number": 9, "body": "Checklist\n<!-- release-checklist: RSQLite 1.0.0 -->"}]'
+issues <<<'[{"number": 3, "author_association": "OWNER", "body": "<!-- release-checklist: RSQLite 1.0.0 -->", "pull_request": {}},
+            {"number": 4, "author_association": "MEMBER", "body": null},
+            {"number": 9, "author_association": "MEMBER", "body": "Checklist\n<!-- release-checklist: RSQLite 1.0.0 -->"}]'
 comments 9 <<<'[]'
 out=$(RESULTS=publish=success ISSUE_MARKER="<!-- release-checklist: " run cran-release "CRAN release")
 is "it posts on the issue, not on the pull request" "$(cat "$SCRATCH/writes")" "POST repos/o/r/issues/9/comments"
+
+echo "== an issue of anyone else is never the checklist issue"
+for n in 10 11 12; do comments "$n" <<<'[]'; done
+# shellcheck disable=SC2016  # Markdown backticks, no command substitution
+issues <<<'[{"number": 12, "author_association": "NONE", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 11, "author_association": "CONTRIBUTOR", "body": "```\n<!-- release-checklist: RSQLite 1.0.0 -->\n```"},
+            {"number": 10, "author_association": "FIRST_TIME_CONTRIBUTOR", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 9, "author_association": "MEMBER", "body": "Checklist\n<!-- release-checklist: RSQLite 1.0.0 -->"}]'
+out=$(RESULTS=publish=success ISSUE_MARKER="<!-- release-checklist: " run cran-release "CRAN release")
+is "it posts on the member's older issue, not on the newer ones" "$(cat "$SCRATCH/writes")" "POST repos/o/r/issues/9/comments"
+issues <<<'[{"number": 12, "author_association": "NONE", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 6, "author_association": "COLLABORATOR", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"}]'
+comments 6 <<<'[]'
+out=$(RESULTS=publish=success ISSUE_MARKER="<!-- release-checklist: " run cran-release "CRAN release")
+is "a collaborator's issue counts" "$(cat "$SCRATCH/writes")" "POST repos/o/r/issues/6/comments"
+issues <<<'[{"number": 12, "author_association": "NONE", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"}]'
+out=$(RESULTS=publish=success ISSUE_MARKER="<!-- release-checklist: " run cran-release "CRAN release")
+is "with only an outsider's issue, nothing is posted" "$(cat "$SCRATCH/writes")" ""
+has "and a notice says which issue it looked for" "$out" "No open issue of an owner, member or collaborator whose body carries <!-- release-checklist: ; nothing was posted."
 
 echo "== without a target, nothing is posted"
 head_prs <<<'[]'
@@ -119,12 +140,17 @@ close_run() {
 }
 
 echo "== close-checklist.sh closes the checklist issue of a published release"
-issues <<<'[{"number": 3, "body": "<!-- release-checklist: RSQLite 1.0.0 -->", "pull_request": {}},
-            {"number": 8, "body": "<!-- release-checklist: RSQLite 0.9.0 -->"},
-            {"number": 9, "body": "Checklist\n<!-- release-checklist: RSQLite 1.0.0 -->"}]'
+issues <<<'[{"number": 12, "author_association": "NONE", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 11, "author_association": "CONTRIBUTOR", "body": "> <!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 9, "author_association": "MEMBER", "body": "Checklist\n<!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 8, "author_association": "OWNER", "body": "<!-- release-checklist: RSQLite 0.9.0 -->"},
+            {"number": 6, "author_association": "COLLABORATOR", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 3, "author_association": "OWNER", "body": "<!-- release-checklist: RSQLite 1.0.0 -->", "pull_request": {}}]'
 out=$(PUBLISHED="RSQLite 1.0.0" close_run)
-is "it comments on that issue and closes it, and nothing else" "$(cat "$SCRATCH/writes")" "POST repos/o/r/issues/9/comments
-PATCH repos/o/r/issues/9"
+is "it comments on and closes the member's and the collaborator's issue, and nothing else" "$(cat "$SCRATCH/writes")" "POST repos/o/r/issues/9/comments
+PATCH repos/o/r/issues/9
+POST repos/o/r/issues/6/comments
+PATCH repos/o/r/issues/6"
 has "the comment links the run" "$(cat "$SCRATCH/body")" "the [run](https://github.example/o/r/actions/runs/42) published its release"
 has "the log says so" "$out" "::notice title=Checklist closed::Closed #9 for RSQLite 1.0.0."
 
@@ -132,6 +158,9 @@ echo "== without a checklist issue, nothing is closed"
 out=$(PUBLISHED="RSQLite 2.0.0" close_run)
 is "no write" "$(cat "$SCRATCH/writes")" ""
 has "a notice says so" "$out" "::notice title=No checklist issue::"
+issues <<<'[{"number": 12, "author_association": "NONE", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"}]'
+out=$(PUBLISHED="RSQLite 1.0.0" close_run)
+is "an outsider's issue with the marker is left open" "$(cat "$SCRATCH/writes")" ""
 
 echo
 echo "$pass passed, $fail failed"

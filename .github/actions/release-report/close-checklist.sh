@@ -3,8 +3,10 @@
 # with a comment that links the run.
 # Process: the header of .github/workflows/cran-submission.yaml
 #
-# The checklist issue of `<package> <version>` is the open issue whose body carries
-# `<!-- release-checklist: <package> <version> -->`.
+# The checklist issue of `<package> <version>` is an open issue whose body carries
+# `<!-- release-checklist: <package> <version> -->`, opened by an owner, member or collaborator of the repository,
+# as release-report.sh finds it.
+# Anyone can open an issue, so an issue by anyone else is left alone, whatever its body carries.
 # A release without such an issue is a notice, and success: there is nothing to close.
 #
 # Usage:
@@ -25,14 +27,23 @@ set -euo pipefail
 repo=${GH_REPO:?}
 gh=${GH:-gh}
 
+# The open issues whose body carries <text>, opened by an owner, member or collaborator of the repository:
+# the same filter as in release-report.sh.
+checklist_issues() { # <text>
+  local text=${1//\\/\\\\}
+  text=${text//\"/\\\"}
+  # The issues endpoint lists pull requests too; they carry `pull_request`.
+  "$gh" api --paginate "repos/$repo/issues?state=open&per_page=100" --jq ".[] | select((.pull_request | not)
+    and (.author_association == \"OWNER\" or .author_association == \"MEMBER\" or .author_association == \"COLLABORATOR\")
+    and ((.body // \"\") | contains(\"$text\"))) | .number"
+}
+
 while read -r pkg version; do
   [ -n "$pkg" ] || continue
   marker="<!-- release-checklist: $pkg $version -->"
-  # The issues endpoint lists pull requests too; they carry `pull_request`.
-  issues=$("$gh" api --paginate "repos/$repo/issues?state=open&per_page=100" \
-    --jq ".[] | select((.pull_request | not) and ((.body // \"\") | contains(\"$marker\"))) | .number")
+  issues=$(checklist_issues "$marker")
   if [ -z "$issues" ]; then
-    echo "::notice title=No checklist issue::No open issue carries $marker; nothing to close."
+    echo "::notice title=No checklist issue::No open issue of an owner, member or collaborator carries $marker; nothing to close."
     continue
   fi
   for n in $issues; do

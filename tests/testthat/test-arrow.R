@@ -521,16 +521,20 @@ test_that("a result must be bound again after its first parameter row fails", {
   dbBind(rs, list(a = 1:3))
   expect_equal(dbFetch(rs, n = 1)$a, 1L)
 
-  # A uint64 value above the signed range can't be bound
-  params <- nanoarrow::as_nanoarrow_array(
-    data.frame(a = 1),
-    schema = nanoarrow::na_struct(list(a = nanoarrow::na_uint64()))
-  )
+  # A uint64 value above the signed range can't be bound, built from its
+  # buffer: nanoarrow needs the arrow package to convert R values to uint64
   big <- nanoarrow::nanoarrow_array_modify(
-    params$children$a,
-    list(buffers = list(NULL, nanoarrow::as_nanoarrow_buffer(as.raw(rep(0xff, 8)))))
+    nanoarrow::nanoarrow_array_init(nanoarrow::na_uint64()),
+    list(
+      length = 1,
+      null_count = 0,
+      buffers = list(NULL, nanoarrow::as_nanoarrow_buffer(as.raw(rep(0xff, 8))))
+    )
   )
-  params <- nanoarrow::nanoarrow_array_modify(params, list(children = list(a = big)))
+  params <- nanoarrow::nanoarrow_array_modify(
+    nanoarrow::nanoarrow_array_init(nanoarrow::na_struct(list(a = nanoarrow::na_uint64()))),
+    list(length = 1, null_count = 0, children = list(a = big))
+  )
   expect_error(dbBindArrow(rs, params), "outside the 64-bit signed integer range")
 
   # The statement has lost its bindings, it has no rows to return

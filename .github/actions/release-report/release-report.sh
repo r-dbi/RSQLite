@@ -7,7 +7,8 @@
 # or, when ISSUE_MARKER is set, the newest open issue whose body carries that text instead,
 # among the issues of an owner, member or collaborator of the repository:
 # the checklist issue, which stays open from the cut until the release is published.
-# Anyone can open an issue, so an issue by anyone else is never the target.
+# Anyone can open an issue, so an issue by anyone else is never the target;
+# when only such issues carry the text, the script warns about them.
 # Without a target, the script says so and succeeds: there is nothing to report to.
 # The comment is found by the hidden marker `<!-- release-report: <key> -->`
 # among the comments of github-actions[bot].
@@ -37,19 +38,29 @@ repo=${GH_REPO:?}
 gh=${GH:-gh}
 owner=${repo%%/*}
 
-# The open issues whose body carries <text>, newest first, opened by an owner, member or collaborator of the repository.
-# close-checklist.sh selects the issues it closes with the same filter.
-checklist_issues() { # <text>
+# The same three functions as in close-checklist.sh, which selects the issues it closes with them.
+# The open issues whose body carries <text>, newest first, one `<number> <author_association>` per line.
+# The issues endpoint lists pull requests too; they carry `pull_request`.
+marked_issues() { # <text>
   local text=${1//\\/\\\\}
   text=${text//\"/\\\"}
-  # The issues endpoint lists pull requests too; they carry `pull_request`.
-  "$gh" api --paginate "repos/$repo/issues?state=open&per_page=100" --jq ".[] | select((.pull_request | not)
-    and (.author_association == \"OWNER\" or .author_association == \"MEMBER\" or .author_association == \"COLLABORATOR\")
-    and ((.body // \"\") | contains(\"$text\"))) | .number"
+  "$gh" api --paginate "repos/$repo/issues?state=open&per_page=100" \
+    --jq ".[] | select((.pull_request | not) and ((.body // \"\") | contains(\"$text\"))) | \"\\(.number) \\(.author_association)\""
+}
+# Anyone can open an issue that carries the marker, so only the issues of an owner, a member or a collaborator
+# of the repository count: the checklist issue is opened by a person with access to the repository.
+trusted() { awk '$2 == "OWNER" || $2 == "MEMBER" || $2 == "COLLABORATOR" { print $1 }'; }
+# When none of the <marked issues> counts, warns about them, so that an ignored checklist issue does not go unnoticed.
+warn_ignored() { # <text> <marked issues>
+  local list
+  list=$(printf '%s\n' "$2" | awk 'NF { printf "%s#%s (%s)", sep, $1, $2; sep = ", " }')
+  [ -z "$list" ] || echo "::warning title=Checklist issue ignored::Open issues carry $1 but none was opened by an owner, member or collaborator of the repository, so none is the checklist issue: $list. The checklist issue must be opened by a person with access to the repository; an issue that a workflow or a bot opened does not count."
 }
 
 if [ -n "${ISSUE_MARKER:-}" ]; then
-  pr=$(checklist_issues "$ISSUE_MARKER" | head -n 1)
+  marked=$(marked_issues "$ISSUE_MARKER")
+  pr=$(printf '%s\n' "$marked" | trusted | sed -n 1p)
+  [ -n "$pr" ] || warn_ignored "$ISSUE_MARKER" "$marked"
   what="issue of an owner, member or collaborator whose body carries $ISSUE_MARKER"
 else
   pr=$("$gh" api "repos/$repo/pulls?state=open&head=$owner:$GITHUB_REF_NAME&per_page=1" --jq '.[0].number // empty')

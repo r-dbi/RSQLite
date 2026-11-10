@@ -29,8 +29,9 @@
 #    because the `tag` job looks for that heading; one bullet per change,
 #    grouped as the tidyverse style guide does (https://style.tidyverse.org/news.html), breaking changes first.
 #    Open the release pull request into `main`,
-#    and the checklist issue, whose body carries `<!-- release-checklist: RSQLite X.Y.Z -->`;
-#    cran-release.yaml uses it only when a member or collaborator of r-dbi/RSQLite opened it.
+#    and the checklist issue, whose body carries `<!-- release-checklist: RSQLite X.Y.Z -->`.
+#    A person with access to r-dbi/RSQLite, an owner, member or collaborator, must open the checklist issue:
+#    cran-release.yaml ignores an issue that anyone else opened, a workflow or a bot included, and warns about it.
 # 3. Check: dispatch R-CMD-check.yaml, rhub.yaml, release-gate.yaml, winbuilder.yaml and revdep.yaml
 #    on the release branch.
 #    The release workflows post their results to the release pull request;

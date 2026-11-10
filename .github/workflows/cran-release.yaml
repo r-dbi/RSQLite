@@ -22,6 +22,7 @@
 # (.github/actions/release-report/close-checklist.sh).
 # Only an issue opened by an owner, member or collaborator of the repository counts:
 # anyone can open an issue that carries the marker.
+# When only others' issues carry it, a workflow or a bot included, the job warns about them.
 on:
   schedule:
     - cron: "43 5 * * *"

@@ -104,9 +104,11 @@ and they hand out the rows kept for a schema, where the default path fails.
 Values that are not of their column's type are converted or dropped as in a stream,
 and reported with one warning of class \code{RSQLite_warning_coercion} per \code{\link[DBI:dbFetch]{DBI::dbFetch()}},
 which names the Arrow types the columns have at the end of the fetch.
-The default path warns on the same fetches, apart from the real numbers it truncates,
-but once per column with values of another storage class,
+The default path warns on the same fetches, but once per column with values of another storage class,
 and once per date, time or timestamp that cannot be parsed.
+It also warns about the real numbers it truncates,
+and in a fetch of no rows about the next row, from which it types the columns;
+through Arrow, a fetch of no rows returns no value and never warns.
 Before writing, factors become strings, lists of raw vectors become blobs,
 and \code{difftime} columns become their numbers in their own units, as on the default path.
 

@@ -223,10 +223,14 @@ fetch_sequence <- function(con, sql, ns, chunk_size = NULL) {
 }
 
 # The default path warns once per column with mixed types,
-# the Arrow path once per fetch
-expect_same_fetches <- function(actual, expected, info) {
+# the Arrow path once per fetch.
+# A fetch of no rows warns on the default path when the next row holds a value
+# of another storage class, never through Arrow: it returns no value.
+expect_same_fetches <- function(actual, expected, ns, info) {
   expect_identical(actual$data, expected$data, info = info)
-  expect_identical(actual$warnings, pmin(expected$warnings, 1L), info = info)
+  warned <- pmin(expected$warnings, 1L)
+  warned[ns == 0] <- 0L
+  expect_identical(actual$warnings, warned, info = info)
 }
 
 test_that("each fetch through Arrow is typed like on the default path", {
@@ -254,18 +258,41 @@ test_that("each fetch through Arrow is typed like on the default path", {
   for (ns in sequences) {
     expected <- fetch_sequence(con, "SELECT * FROM t", ns)
     info <- paste("n =", paste(ns, collapse = ", "))
-    expect_same_fetches(fetch_sequence(con_arrow, "SELECT * FROM t", ns), expected, info)
+    expect_same_fetches(fetch_sequence(con_arrow, "SELECT * FROM t", ns), expected, ns, info)
     # Several arrays per fetch
     for (chunk_size in 1:2) {
       expect_same_fetches(
         fetch_sequence(con_arrow, "SELECT * FROM t", ns, chunk_size = chunk_size),
         expected,
+        ns,
         paste(info, "chunk_size =", chunk_size)
       )
     }
   }
   # The values of other storage classes are in columns x and b
   expect_identical(fetch_sequence(con, "SELECT * FROM t", -1)$warnings, 2L)
+})
+
+test_that("a fetch of no rows warns on the default path only", {
+  setup <- c(
+    "CREATE TABLE t (a BLOB, b)",
+    "INSERT INTO t VALUES (1, 1), ('1.7', 2), (NULL, '12')"
+  )
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con))
+  con_arrow <- local_arrow_con()
+  for (sql in setup) {
+    dbExecute(con, sql)
+    dbExecute(con_arrow, sql)
+  }
+
+  ns <- c(2, 0, 1)
+  expected <- fetch_sequence(con, "SELECT * FROM t", ns)
+  # The fetch of no rows warns about the string in the integer column b
+  expect_identical(expected$warnings, c(1L, 1L, 1L))
+  actual <- fetch_sequence(con_arrow, "SELECT * FROM t", ns)
+  expect_identical(actual$warnings, c(1L, 0L, 1L))
+  expect_same_fetches(actual, expected, ns, "n = 2, 0, 1")
 })
 
 test_that("a NULL-first column is typed by its first value through Arrow", {

@@ -656,6 +656,201 @@ test_that("a coercion on a worker thread fails the stream instead of warning", {
   expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 300L)
 })
 
+test_that("a stream is read and released on another thread", {
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, s TEXT, d DATE, tm TIME, ts TIMESTAMP)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 'a', '2024-01-02', '12:34:56', '2024-01-02 12:34:56.25'),",
+    "(2, NULL, NULL, NULL, NULL), (3, 'c', 19725, 3600.5, 1704198896.5)"
+  ))
+  sql <- "SELECT * FROM t ORDER BY i"
+  rbind_arrays <- function(arrays) do.call(rbind, lapply(arrays, as.data.frame))
+
+  # Dates, times and timestamps parsed from text and from numbers
+  out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, sql, chunk_size = 2), -1, TRUE)
+  expect_equal(out$error, "")
+  expect_equal(vapply(out$arrays, function(array) array$length, numeric(1)), c(2, 1))
+  expect_equal(rbind_arrays(out$arrays), as.data.frame(dbGetQueryArrow(con, sql, chunk_size = 2)))
+
+  # One row of R parameters, and Arrow parameters
+  out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, "SELECT ? AS a", params = list(5L)), -1, TRUE)
+  expect_equal(rbind_arrays(out$arrays)$a, 5)
+  rs <- dbSendQueryArrow(con, "SELECT $a AS a")
+  dbBindArrow(rs, nanoarrow::as_nanoarrow_array_stream(data.frame(a = 1:3)))
+  out <- arrow_stream_read_on_thread(dbFetchArrow(rs, chunk_size = 2), -1, TRUE)
+  expect_equal(out$error, "")
+  expect_equal(rbind_arrays(out$arrays)$a, c(1, 2, 3))
+  dbClearResult(rs)
+})
+
+test_that("on another thread, what would warn or call R fails the stream", {
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x, d DATE)")
+  dbExecute(con, "INSERT INTO t VALUES (1, 1, '2024-01-02'), (2, 2, 'not a date'), (3, 'three', NULL)")
+
+  out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, "SELECT x FROM t ORDER BY i", chunk_size = 2), -1, TRUE)
+  expect_length(out$arrays, 1)
+  expect_match(out$error, "`x`: mixed type.*an error instead of a warning, because R can't warn")
+
+  out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, "SELECT d FROM t ORDER BY i"), -1, TRUE)
+  expect_length(out$arrays, 0)
+  expect_match(out$error, "Unknown string format, NA is returned.*an error instead of a warning")
+
+  # R parameters are R vectors: their second row can't be bound there
+  out <- arrow_stream_read_on_thread(
+    dbGetQueryArrow(con, "SELECT ? AS a", params = list(1:3), chunk_size = 1),
+    -1,
+    TRUE
+  )
+  expect_match(out$error, "Can't bind the next row of parameters while another thread reads.*dbBindArrow")
+
+  # Read on R's main thread, the same values warn
+  expect_warning(as.data.frame(dbGetQueryArrow(con, "SELECT d FROM t ORDER BY i")), "Unknown string format")
+})
+
+test_that("a stream released on another thread doesn't keep the database locked", {
+  db <- withr::local_tempfile(fileext = ".sqlite")
+  con <- dbConnect(SQLite(), db)
+  withr::defer(dbDisconnect(con))
+  dbWriteTable(con, "t", data.frame(a = 1:1000))
+  dbExecute(con, "CREATE TABLE w (a)")
+  con2 <- dbConnect(SQLite(), db)
+  withr::defer(dbDisconnect(con2))
+  write <- function() dbExecute(con2, "INSERT INTO w VALUES (1)")
+
+  # Released in the middle of the rows while the result object is alive:
+  # clearing the result closes its statement and read transaction
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t")
+  out <- arrow_stream_read_on_thread(dbFetchArrow(rs, chunk_size = 100), 2, TRUE)
+  expect_length(out$arrays, 2)
+  expect_error(write(), "database is locked")
+  dbClearResult(rs)
+  expect_equal(write(), 1)
+
+  # Released in the middle of the rows of a result already cleared:
+  # the statement closes at once
+  out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, "SELECT a FROM t", chunk_size = 100), 2, TRUE)
+  expect_length(out$arrays, 2)
+  expect_equal(write(), 1)
+
+  # Read on another thread and released on R's main thread
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t")
+  stream <- dbFetchArrow(rs, chunk_size = 100)
+  out <- arrow_stream_read_on_thread(stream, 2, FALSE)
+  expect_length(out$arrays, 2)
+  dbClearResult(rs)
+  expect_error(write(), "database is locked")
+  stream$release()
+  expect_equal(write(), 1)
+})
+
+test_that("a result read on another thread can't be used, but clears", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:3))
+  msg <- "its Arrow stream is being read on another thread, for example by arrow's scanner or Acero"
+
+  # While another thread holds the result with a share of its own, as a stream
+  # read there does
+  rs <- dbSendQuery(con, "SELECT a FROM t WHERE a >= $a")
+  dbBind(rs, list(a = 2L))
+  expect_equal(dbFetch(rs, n = 1)$a, 2L)
+  result_call_while_busy(rs@ptr, function() {
+    # What doesn't use the statement works
+    expect_equal(dbGetRowCount(rs), 1L)
+    expect_false(dbHasCompleted(rs))
+    expect_equal(dbGetRowsAffected(rs), 0L)
+    expect_equal(dbGetStatement(rs), "SELECT a FROM t WHERE a >= $a")
+    expect_true(dbIsValid(rs))
+    expect_equal(dbGetInfo(rs)$row.count, 1L)
+    expect_output(show(rs), "SELECT a FROM t")
+
+    expect_error(dbFetch(rs), msg)
+    expect_error(dbFetchArrowChunk(rs), msg)
+    expect_error(dbBind(rs, list(a = 1L)), msg)
+    expect_error(dbBindArrow(rs, nanoarrow::as_nanoarrow_array_stream(data.frame(a = 1L))), msg)
+    expect_error(dbColumnInfo(rs), msg)
+    expect_silent(dbClearResult(rs))
+    expect_false(dbIsValid(rs))
+    expect_equal(dbGetQuery(con, "SELECT 42 AS x")$x, 42L)
+  })
+
+  # The next query clears the open result
+  rs <- dbSendQuery(con, "SELECT a FROM t")
+  result_call_while_busy(rs@ptr, function() {
+    expect_warning(rs2 <- dbSendQuery(con, "SELECT 42 AS x"), "Closing open result set")
+    expect_false(dbIsValid(rs))
+    expect_equal(dbFetch(rs2)$x, 42L)
+    dbClearResult(rs2)
+  })
+
+  # Once the other thread is done, the result is used as before
+  rs <- dbSendQuery(con, "SELECT a FROM t")
+  result_call_while_busy(rs@ptr, function() NULL)
+  expect_equal(dbFetch(rs)$a, 1:3)
+  dbClearResult(rs)
+})
+
+test_that("a result clears while arrow's scanner reads its stream ahead", {
+  skip_if_not_installed("arrow")
+  skip_if_not(arrow::arrow_with_dataset())
+  con <- local_con()
+  sql <- paste(
+    "WITH RECURSIVE r(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM r WHERE i < 200000)",
+    "SELECT i AS a, printf('%08d', i) AS s FROM r"
+  )
+  read_rest <- function(reader, n) {
+    while (!is.null(batch <- reader$read_next_batch())) {
+      n <- n + batch$num_rows
+    }
+    n
+  }
+
+  # The scanner goes on reading in the background after its first batch,
+  # while R clears the result and runs another query on the connection
+  rs <- dbSendQueryArrow(con, sql)
+  reader <- arrow::Scanner$create(arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 1000)))$ToRecordBatchReader()
+  batch <- reader$read_next_batch()
+  expect_gt(batch$num_rows, 0)
+  expect_silent(dbClearResult(rs))
+  expect_equal(dbGetQuery(con, "SELECT 42 AS x")$x, 42L)
+  expect_equal(read_rest(reader, batch$num_rows), 200000)
+
+  # The next query clears the open result
+  rs <- dbSendQueryArrow(con, sql)
+  reader <- arrow::Scanner$create(arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 1000)))$ToRecordBatchReader()
+  batch <- reader$read_next_batch()
+  expect_warning(x <- dbGetQuery(con, "SELECT 42 AS x")$x, "Closing open result set")
+  expect_equal(x, 42L)
+  expect_false(dbIsValid(rs))
+  expect_equal(read_rest(reader, batch$num_rows), 200000)
+})
+
+test_that("the row count and completion follow a stream that arrow's scanner reads ahead", {
+  skip_if_not_installed("arrow")
+  skip_if_not(arrow::arrow_with_dataset())
+  con <- local_con()
+  n <- 200000
+  rs <- dbSendQueryArrow(con, paste(
+    "WITH RECURSIVE r(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM r WHERE i <", n, ")",
+    "SELECT i AS a FROM r"
+  ))
+  reader <- arrow::Scanner$create(arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 1000)))$ToRecordBatchReader()
+
+  # Polled while the scanner reads on in the background
+  counts <- dbGetRowCount(rs)
+  completed <- dbHasCompleted(rs)
+  while (!is.null(reader$read_next_batch())) {
+    counts <- c(counts, dbGetRowCount(rs))
+    completed <- c(completed, dbHasCompleted(rs))
+  }
+  expect_false(is.unsorted(counts))
+  expect_true(all(counts >= 0 & counts <= n))
+  expect_false(is.unsorted(completed))
+  expect_equal(dbGetRowCount(rs), n)
+  expect_true(dbHasCompleted(rs))
+  dbClearResult(rs)
+})
+
 test_that("an error of the statement after dbDisconnect() keeps its result code", {
   con <- dbConnect(SQLite(), ":memory:")
   dbExecute(con, "CREATE TABLE t (a)")

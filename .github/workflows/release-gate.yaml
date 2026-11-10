@@ -59,6 +59,11 @@ jobs:
     # so this job reports without holding up a release.
     continue-on-error: true
 
+    # With continue-on-error, `needs.docs.result` reads `success` even when the job failed,
+    # so the job hands its own status to the report.
+    outputs:
+      result: ${{ steps.result.outputs.result }}
+
     steps:
       - uses: actions/checkout@v6
         with:
@@ -79,6 +84,15 @@ jobs:
 
       - name: Check the generated documentation
         uses: BristolMyersSquibb/blockr.ci/.github/actions/release-docs@5ee8e2be16e71e96628c6c5c60c20c03f1b35155
+
+      - name: Hand the job's status to the report
+        id: result
+        if: always()
+        env:
+          STATUS: ${{ job.status }}
+        run: |
+          echo "result=$STATUS" >> "$GITHUB_OUTPUT"
+        shell: bash
 
   soft:
     runs-on: ubuntu-26.04
@@ -142,6 +156,6 @@ jobs:
           title: "Release gate"
           results: |
             gate=${{ needs.gate.result }}
-            docs=${{ needs.docs.result }} (reports only)
+            docs=${{ needs.docs.outputs.result || needs.docs.result }} (reports only)
             soft=${{ needs.soft.result }}
           token: ${{ github.token }}

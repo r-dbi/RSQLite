@@ -117,6 +117,8 @@ public:
   // as an R list with the column name, its current type and the entries of
   // the log, which is cleared; NULL if there were none
   cpp11::sexp coercions();
+  // Clears the log without reporting it
+  void discard_coercions();
 
 private:
   static ARROW_KIND kind_from_column_type(int column_type);

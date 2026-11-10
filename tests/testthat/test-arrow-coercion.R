@@ -161,6 +161,26 @@ test_that("a schema request that exits on its warning keeps the first chunk", {
   dbClearResult(rs)
 })
 
+test_that("the values of a failed fetch are not reported by the next one", {
+  for (arrow in c(FALSE, TRUE)) {
+    con <- local_con(arrow = arrow)
+    dbExecute(con, "CREATE TABLE t (i, x)")
+    dbExecute(con, "INSERT INTO t VALUES (1, 1), (2, 'a'), (3, 2), (4, NULL), (5, 3), (6, 4)")
+    # Row 4 fails with an integer overflow after row 2 has been logged
+    sql <- "SELECT CASE WHEN i = 4 THEN abs(-9223372036854775804 - i) ELSE x END AS x FROM t"
+    rs <- dbSendQuery(con, sql)
+    # SQLite decides what a fetch after the error reads, here no string
+    if (arrow) {
+      expect_error(dbFetch(rs, 10), "integer overflow")
+      expect_no_warning(dbFetch(rs, 2))
+    } else {
+      expect_error(dbFetchArrowChunk(rs, chunk_size = 10), "integer overflow")
+      expect_no_warning(dbFetchArrowChunk(rs, chunk_size = 2))
+    }
+    dbClearResult(rs)
+  }
+})
+
 test_that("long lists of rows are truncated", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x)")

@@ -295,6 +295,10 @@ cpp11::sexp SqliteArrowColumn::coercions() {
   return out;
 }
 
+void SqliteArrowColumn::discard_coercions() {
+  log.clear();
+}
+
 // Privates ////////////////////////////////////////////////////////////////////
 
 // The default path stores integers as 32-bit until one needs more

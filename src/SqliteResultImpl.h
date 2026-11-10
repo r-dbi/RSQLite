@@ -129,6 +129,7 @@ private:
   bool arrow_row_fits();
   bool arrow_chunk_full();
   void warn_coercions();
+  void discard_coercions();
 
 private:
   NORET void raise_sqlite_exception(int rc) const;

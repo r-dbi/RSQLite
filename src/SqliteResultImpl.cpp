@@ -238,6 +238,7 @@ void SqliteResultImpl::arrow_schema(
     // The first chunk decides the types, from the first value of each column
     // that is not NULL, and is kept for the next fetch
     if (pending_chunk_->release == NULL && !complete_) {
+      discard_coercions();
       nanoarrow::UniqueArray chunk;
       fetch_arrow_rows(chunk.get(), infer_rows);
       chunk.move(pending_chunk_.get());
@@ -258,6 +259,7 @@ void SqliteResultImpl::arrow_schema(
 }
 
 int64_t SqliteResultImpl::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
+  discard_coercions();
   nanoarrow::UniqueArray chunk;
   int64_t n = fetch_arrow_chunk(chunk.get(), n_max);
 
@@ -328,6 +330,7 @@ int64_t SqliteResultImpl::fetch_arrow_df(
   }
 
   ensure_arrow_columns();
+  discard_coercions();
   const size_t ncols = arrow_columns_.size();
   const bool open = !arrow_frozen_;
 
@@ -682,6 +685,14 @@ void SqliteResultImpl::warn_coercions() {
 
   cpp11::function warn_coercion = cpp11::package("RSQLite")["warn_coercion"];
   warn_coercion(entries);
+}
+
+// A fetch that failed, by an error or an interrupt, leaves the values it
+// logged: each fetch starts without them
+void SqliteResultImpl::discard_coercions() {
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    arrow_columns_[j].discard_coercions();
+  }
 }
 
 void SqliteResultImpl::set_arrow_struct_schema(struct ArrowSchema* out) {

@@ -19,6 +19,9 @@
 #' Once the first chunk has been fetched the types are fixed;
 #' later values of another storage class are converted by SQLite's own rules,
 #' with one warning per column.
+#' Text and blobs in a `utf8` column must be valid UTF-8 without NUL bytes,
+#' which SQLite does not enforce: other values become `NULL` with a warning,
+#' where the data frame path passes text through unchecked.
 #' The types can therefore depend on `chunk_size`:
 #' a real number in a later chunk is truncated to fit an `int64` column decided from integers,
 #' and a column whose first chunk holds only `NULL` keeps its declared type,
@@ -43,6 +46,8 @@
 #' when `extended_types = TRUE`, see [SQLite()].
 #' Times and timestamps are 64-bit counts of microseconds:
 #' a number of seconds beyond about 9.2e12 either way, or an infinity, becomes `NULL` with a warning.
+#' A time is a time of day, at least 0 and less than 24 hours:
+#' other values, which the data frame path keeps as `hms` durations, become `NULL` with a warning.
 #'
 #' @section Parameters:
 #' The columns of the parameter stream are bound like this:

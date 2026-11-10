@@ -1,11 +1,31 @@
 #include "pch.h"
 #include "SqliteArrowColumn.h"
 #include "affinity.h"
+#include "utf8.h"
 #include <boost/algorithm/string/predicate.hpp>
+#include <algorithm>
 #include <climits>
 #include <cmath>
 #include <cstring>
 #include <sstream>
+
+// Whether `size` bytes of text are valid UTF-8 without NUL bytes.
+// Most text is ASCII: eight bytes at a time, a word whose bytes are all in
+// 1..127 needs no further check, the rest goes to rsqlite_is_utf8_string().
+static bool is_utf8_text(const char* text, size_t size) {
+  const uint64_t ones = UINT64_C(0x0101010101010101);
+  const uint64_t highs = UINT64_C(0x8080808080808080);
+  size_t i = 0;
+  for (; i + 8 <= size; i += 8) {
+    uint64_t word;
+    memcpy(&word, text + i, 8);
+    // A NUL byte borrows in `word - ones`, a byte above 127 has its high bit
+    if (((word - ones) | word) & highs) {
+      break;
+    }
+  }
+  return rsqlite_is_utf8_string(text + i, size - i);
+}
 
 SqliteArrowColumn::SqliteArrowColumn(
   sqlite3_stmt* stmt_,
@@ -25,6 +45,7 @@ SqliteArrowColumn::SqliteArrowColumn(
       pending_nulls(0),
       warned(false),
       warned_range(false),
+      warned_utf8(false),
       wide_ints(false),
       value_type(SQLITE_NULL),
       value_data(NULL),
@@ -459,12 +480,22 @@ void SqliteArrowColumn::append_value(int column_type) {
       const char* text = static_cast<const char*>(value_data);
       int64_t size = value_size;
       if (data_frame && column_type == SQLITE_TEXT) {
-        // R strings end at the first NUL, like those of the default path; an
-        // Arrow stream keeps all bytes
+        // R strings end at the first NUL, like those of the default path,
+        // which passes text through unchecked; an Arrow stream keeps all bytes
         const void* nul = memchr(text, '\0', static_cast<size_t>(size));
         if (nul != NULL) {
           size = static_cast<const char*>(nul) - text;
         }
+      } else if ((column_type == SQLITE_TEXT || column_type == SQLITE_BLOB) &&
+                 !is_utf8_text(text, static_cast<size_t>(size))) {
+        // SQLite doesn't enforce UTF-8 for text, and keeps blobs as they are;
+        // numbers convert to ASCII
+        warn_invalid_utf8(column_type);
+        check_arrow(
+          ArrowArrayAppendNull(array.get(), 1),
+          "Can't append to Arrow array"
+        );
+        break;
       }
       check_arrow(
         ArrowArrayAppendString(array.get(), arrow_string_view(text, size)),
@@ -527,10 +558,19 @@ void SqliteArrowColumn::append_value(int column_type) {
         break;
       }
       double micros = std::floor(seconds * 1e6 + 0.5);
-      // int64 holds [-2^63, 2^63), both bounds exact as doubles: casting
-      // anything outside, an infinity included, would be undefined
-      bool in_range =
-        micros >= -9223372036854775808.0 && micros < 9223372036854775808.0;
+      bool in_range;
+      if (kind == AK_TIME) {
+        // A time of day, [0, 86400) seconds: an hms value can hold any
+        // duration, Arrow's time64 can't.
+        // Rounding must not reach the end of the day.
+        in_range = seconds >= 0 && seconds < 86400;
+        micros = std::min(micros, 86400e6 - 1);
+      } else {
+        // int64 holds [-2^63, 2^63), both bounds exact as doubles: casting
+        // anything outside, an infinity included, would be undefined
+        in_range =
+          micros >= -9223372036854775808.0 && micros < 9223372036854775808.0;
+      }
       if (!ISNAN(seconds) && !in_range) {
         warn_out_of_range(column_type);
       }
@@ -608,6 +648,19 @@ void SqliteArrowColumn::warn_mixed(int column_type) {
   cpp11::warning(ss.str());
   // A handler of the warning may have converted the value: read it again
   value_fetched = false;
+}
+
+void SqliteArrowColumn::warn_invalid_utf8(int column_type) {
+  if (warned_utf8) {
+    return;
+  }
+  warned_utf8 = true;
+
+  std::stringstream ss;
+  ss << "Column `" << name << "`: values of type "
+     << format_column_type(column_type)
+     << " that are not valid UTF-8, or hold a NUL byte, are NULL";
+  cpp11::warning(ss.str());
 }
 
 void SqliteArrowColumn::warn_out_of_range(int column_type) {

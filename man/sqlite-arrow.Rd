@@ -70,6 +70,8 @@ or a named list of column types such as
 The entries are matched to the result columns by name, exactly.
 A name that is not in the result, a name the result carries twice,
 and an unnamed entry are errors.
+The names and types are checked once the query has been sent,
+so a statement with side effects, such as \verb{INSERT ... RETURNING}, has run when they fail.
 A column with a requested type is typed without looking at its values,
 with no widening and no dependence on \code{chunk_size},
 and its declared type and \code{extended_types} play no part;

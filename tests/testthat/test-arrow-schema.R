@@ -71,8 +71,18 @@ test_that("schema entries are matched by name, exactly", {
   expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = int32), "struct")
   expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = data.frame(a = integer())), "infer_nanoarrow_schema")
 
-  # A failed request leaves no open result behind
+  # A failed request leaves no open result behind, also when `schema` itself
+  # fails or is malformed, which is found before the query is sent
   expect_error(dbSendQueryArrow(con, "SELECT 1 AS a", schema = list(b = int32)))
+  expect_error(dbSendQueryArrow(con, "SELECT 1 AS a", schema = list(a = nanoarrow::na_time32("us"))))
+  expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = list(a = stop("oops"))), "oops")
+  expect_no_warning(as.data.frame(dbGetQueryArrow(con, "SELECT 1 AS a")))
+  dbExecute(con, "CREATE TABLE t (a)")
+  expect_error(dbSendQueryArrow(con, "INSERT INTO t VALUES (1) RETURNING a", schema = int32), "struct")
+  expect_equal(dbGetQuery(con, "SELECT COUNT(*) AS n FROM t")$n, 0L)
+  # The names need the result: the statement has run
+  expect_error(dbSendQueryArrow(con, "INSERT INTO t VALUES (1) RETURNING a", schema = list(b = int32)), "`b`")
+  expect_equal(dbGetQuery(con, "SELECT COUNT(*) AS n FROM t")$n, 1L)
   expect_no_warning(as.data.frame(dbGetQueryArrow(con, "SELECT 1 AS a")))
 })
 

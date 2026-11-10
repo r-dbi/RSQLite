@@ -514,3 +514,9 @@ test_that("dbReadTableArrow() reads a table", {
   dbWriteTable(con, "t", data.frame(a = c(1.5, 2.5)))
   expect_equal(as.data.frame(dbReadTableArrow(con, "t")), data.frame(a = c(1.5, 2.5)))
 })
+
+test_that("the DBItest helper skips the round-trip specs for the native methods", {
+  # helper-DBItest.R decides at load time; with an RSQLite that uses DBI's
+  # default Arrow methods, as in the copies of DBItest and DBI, it skips nothing
+  expect_true("arrow_write_table_arrow_roundtrip_integer" %in% ARROW_ROUNDTRIP_SKIPS)
+})

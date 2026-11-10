@@ -387,14 +387,6 @@ int64_t SqliteResultImpl::fetch_arrow_df(
         arrow_columns_[j].conform_chunk(chunks[i]->children[j], kinds[i][j]);
       }
     }
-  }
-
-  // One warning for the whole fetch, with the final types: a column logged
-  // as int64 may have become double since. The caller owns the chunks, an
-  // error raised from the warning releases them.
-  warn_coercions();
-
-  if (open) {
     for (size_t j = 0; j < ncols; ++j) {
       arrow_columns_[j].reopen();
     }
@@ -404,6 +396,14 @@ int64_t SqliteResultImpl::fetch_arrow_df(
   for (size_t j = 0; j < ncols; ++j) {
     wide_ints.push_back(arrow_columns_[j].wide_integers());
   }
+
+  // One warning for the whole fetch, with the final types: a column logged
+  // as int64 may have become double since. A column that reopen() let go of
+  // the null type held no values, so has no entries.
+  // Last, so that an error raised from the warning leaves the result ready
+  // for the next fetch; the caller owns the chunks, the unwinding releases
+  // them.
+  warn_coercions();
 
   return total;
 }

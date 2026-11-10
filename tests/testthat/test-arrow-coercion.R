@@ -126,6 +126,23 @@ test_that("values in a column of the null type are reported as dropped", {
   }
 })
 
+test_that("a data frame fetch through Arrow that exits on its warning leaves the types open", {
+  # The default path, then the Arrow path
+  rest <- lapply(c(FALSE, TRUE), function(arrow) {
+    con <- local_con(arrow = arrow)
+    dbExecute(con, "CREATE TABLE t (x, y)")
+    dbExecute(con, "INSERT INTO t VALUES (1, NULL), ('a', NULL), (2, 5), (3, 'z')")
+    rs <- dbSendQuery(con, "SELECT * FROM t")
+    # The first fetch warns about x, y has seen only NULL
+    expect_equal(tryCatch(dbFetch(rs, 2), warning = function(w) "exited"), "exited")
+    rest <- suppressWarnings(dbFetch(rs))
+    dbClearResult(rs)
+    rest
+  })
+  expect_identical(rest[[2]], rest[[1]])
+  expect_identical(rest[[2]]$y, c(5L, 0L))
+})
+
 test_that("long lists of rows are truncated", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x)")

@@ -192,6 +192,9 @@ public:
   // as an R list with the column name, its current type and the entries of
   // the log, which is cleared; NULL if there were none
   cpp11::sexp coercions();
+  // The same as a line of the warning's text, empty if there were none,
+  // for a thread that can't call R; the log is cleared
+  std::string coercions_text();
   // Clears the log without reporting it
   void discard_coercions();
 

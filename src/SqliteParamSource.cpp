@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "SqliteParamSource.h"
 #include "DbArrowStream.h"
+#include "main_thread.h"
 #include "integer64.h"
 #include <cmath>
 #include <cstdlib>
@@ -20,6 +21,14 @@ SqliteListParamSource::SqliteListParamSource(const cpp11::list& params_)
 bool SqliteListParamSource::bind_next_row(sqlite3_stmt* stmt) {
   if (i >= n) {
     return false;
+  }
+  if (!rsqlite_on_main_thread()) {
+    // The parameters are R vectors, which only R's main thread may read
+    throw std::runtime_error(
+      "Can't bind the next row of parameters while another thread reads the "
+      "Arrow stream: bind them with dbBindArrow(), or read the stream on R's "
+      "main thread."
+    );
   }
 
   sqlite3_reset(stmt);

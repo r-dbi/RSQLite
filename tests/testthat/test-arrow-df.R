@@ -436,20 +436,25 @@ test_that("times outside a day keep their value through Arrow like on the defaul
   expect_identical(as.numeric(expected$tm), c(0, 86400, 100000, -1, 86400, 108000, 86399.9999996, NA))
   expect_silent(out <- dbGetQuery(con, query))
   expect_identical(out, expected)
-  expect_identical(fetch_sequence(con, query, c(1, 2, -1)), fetch_sequence(con_default, query, c(1, 2, -1)))
+  ns <- c(1, 2, -1)
+  expect_same_fetches(fetch_sequence(con, query, ns), fetch_sequence(con_default, query, ns), ns, "n = 1, 2, -1")
 
   # A stream holds times of day only
-  expect_warning(
-    stream_df <- as.data.frame(dbGetQueryArrow(con, query)),
-    "outside the range of Arrow type time64 are NULL"
-  )
+  w <- coercion_warnings(stream_df <- as.data.frame(dbGetQueryArrow(con, query)))
   expect_identical(is.na(stream_df$tm), c(FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE))
+  expect_length(w, 1)
+  expect_identical(vapply(w[[1]]$coercions[[1]]$values, `[[`, "", "reason"), c("out_of_range", "out_of_range"))
   # and so do the data frames once a chunk has fixed the types
   rs <- dbSendQuery(con, query)
   on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
   expect_silent(dbFetchArrowChunk(rs, chunk_size = 1))
-  expect_warning(rest <- dbFetch(rs), "outside the range of Arrow type time64 are NULL")
+  w <- coercion_warnings(rest <- dbFetch(rs))
   expect_identical(is.na(rest$tm), c(TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_identical(vapply(values, `[[`, "", "reason"), c("out_of_range", "out_of_range"))
+  expect_equal(values[[1]]$rows, 2:4)
+  expect_equal(values[[2]]$rows, 5:6)
 })
 
 test_that("text through Arrow is read like on the default path", {
@@ -466,20 +471,24 @@ test_that("text through Arrow is read like on the default path", {
   expect_identical(lapply(expected$s[1:4], charToRaw), list(charToRaw("c"), charToRaw("a"), as.raw(0xff), as.raw(c(0xed, 0xa0, 0x80))))
   expect_silent(out <- dbGetQuery(con_arrow, sql))
   expect_identical(out, expected)
-  expect_identical(fetch_sequence(con_arrow, sql, c(1, 2, -1)), fetch_sequence(con, sql, c(1, 2, -1)))
+  ns <- c(1, 2, -1)
+  expect_same_fetches(fetch_sequence(con_arrow, sql, ns), fetch_sequence(con, sql, ns), ns, "n = 1, 2, -1")
 
   # A stream holds valid UTF-8 without NUL bytes only
-  expect_warning(
-    stream_df <- as.data.frame(dbGetQueryArrow(con_arrow, sql)),
-    "not valid UTF-8, or hold a NUL byte, are NULL"
-  )
+  w <- coercion_warnings(stream_df <- as.data.frame(dbGetQueryArrow(con_arrow, sql)))
   expect_identical(stream_df$s, c("c", NA, NA, NA, NA))
+  expect_length(w, 1)
+  expect_identical(w[[1]]$coercions[[1]]$values[[1]]$reason, "invalid_utf8")
   # and so do the data frames once a chunk has fixed the types
   rs <- dbSendQuery(con_arrow, sql)
   on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
   expect_silent(dbFetchArrowChunk(rs, chunk_size = 1))
-  expect_warning(rest <- dbFetch(rs), "not valid UTF-8, or hold a NUL byte, are NULL")
+  w <- coercion_warnings(rest <- dbFetch(rs))
   expect_identical(rest$s, c(NA_character_, NA, NA, NA))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_identical(values[[1]]$reason, "invalid_utf8")
+  expect_equal(values[[1]]$rows, 2:4)
 })
 
 test_that("a blob in a text column is text through Arrow only if it is valid UTF-8", {
@@ -488,17 +497,13 @@ test_that("a blob in a text column is text through Arrow only if it is valid UTF
 
   # As in a stream, where the default path ends the blob at its first NUL
   # and does not check it
-  messages <- character()
-  out <- withCallingHandlers(
-    dbGetQuery(con_arrow, sql),
-    warning = function(w) {
-      messages <<- c(messages, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    }
-  )
+  w <- coercion_warnings(out <- dbGetQuery(con_arrow, sql))
   expect_identical(out$x, c("a", "hi", NA, NA))
-  expect_match(messages, "`x`: mixed type", all = FALSE)
-  expect_match(messages, "`x`: values of type blob that are not valid UTF-8", all = FALSE)
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_identical(vapply(values, `[[`, "", "reason"), c("converted", "invalid_utf8"))
+  expect_equal(values[[1]]$rows, 2)
+  expect_equal(values[[2]]$rows, 3:4)
 })
 
 test_that("dbFetch() through Arrow returns `n` rows across arrays cut short", {

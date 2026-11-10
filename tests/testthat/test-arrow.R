@@ -111,20 +111,21 @@ test_that("times and timestamps outside the range of int64 microseconds are NULL
     "(3, 1e19, -1e19), (4, 1e300, -1e300), (5, 9e999, -9e999)"
   ))
 
-  messages <- character()
-  df <- withCallingHandlers(
-    as.data.frame(dbGetQueryArrow(con, "SELECT tm, ts FROM t ORDER BY i")),
-    warning = function(w) {
-      messages <<- c(messages, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    }
-  )
+  w <- coercion_warnings(df <- as.data.frame(dbGetQueryArrow(con, "SELECT tm, ts FROM t ORDER BY i")))
   expect_equal(as.numeric(df$tm), c(1.5, NA, NA, NA, NA))
   expect_equal(as.numeric(df$ts), c(1.5, NA, NA, NA, NA))
-  # One warning per column, for the first such value, an integer
-  expect_equal(length(messages), 2L)
-  expect_match(messages, "`tm`: values of type integer outside the range of Arrow type time64", all = FALSE)
-  expect_match(messages, "`ts`: values of type integer outside the range of Arrow type timestamp", all = FALSE)
+  # One warning for the chunk, with the rows of each column
+  expect_length(w, 1)
+  coercions <- w[[1]]$coercions
+  expect_equal(vapply(coercions, `[[`, "", "column"), c("tm", "ts"))
+  expect_equal(vapply(coercions, `[[`, "", "type"), c("time64", "timestamp"))
+  for (coercion in coercions) {
+    expect_equal(vapply(coercion$values, `[[`, "", "class"), c("integer", "real"))
+    expect_equal(vapply(coercion$values, `[[`, "", "reason"), c("out_of_range", "out_of_range"))
+    expect_equal(coercion$values[[1]]$rows, 2)
+    expect_equal(coercion$values[[2]]$rows, 3:5)
+  }
+  expect_match(conditionMessage(w[[1]]), "1 integer value out of range, NA (row 2)", fixed = TRUE)
 })
 
 test_that("times outside a day are NULL", {
@@ -136,10 +137,13 @@ test_that("times outside a day are NULL", {
   ))
   sql <- "SELECT tm FROM t ORDER BY i"
 
-  expect_warning(
-    df <- as.data.frame(dbGetQueryArrow(con, sql)),
-    "`tm`: values of type integer outside the range of Arrow type time64 are NULL"
-  )
+  w <- coercion_warnings(df <- as.data.frame(dbGetQueryArrow(con, sql)))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_equal(vapply(values, `[[`, "", "class"), c("integer", "string"))
+  expect_equal(vapply(values, `[[`, "", "reason"), c("out_of_range", "out_of_range"))
+  expect_equal(values[[1]]$rows, 5:7)
+  expect_equal(values[[2]]$rows, 8:9)
   # The last microsecond of the day is as far as rounding goes
   expect_equal(as.numeric(df$tm), c(0, 43200.5, 86399.999999, 45296, NA, NA, NA, NA, NA))
   # The default path keeps any duration
@@ -157,19 +161,17 @@ test_that("text that is not valid UTF-8 is NULL", {
     "(10, CAST(x'616161616161616100' AS TEXT))"
   ))
 
-  messages <- character()
-  df <- withCallingHandlers(
-    as.data.frame(dbGetQueryArrow(con, "SELECT s FROM t ORDER BY i")),
-    warning = function(w) {
-      messages <<- c(messages, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    }
-  )
+  w <- coercion_warnings(df <- as.data.frame(dbGetQueryArrow(con, "SELECT s FROM t ORDER BY i")))
   # A stray byte, a NUL byte and a surrogate are not text, a valid blob is
   expect_equal(df$s, c("ok", NA, "\u00e9", NA, NA, "hi", NA, "aaaaaaaa\u00e9", NA, NA))
-  expect_equal(length(messages), 2L)
-  expect_match(messages, "`s`: values of type string that are not valid UTF-8, or hold a NUL byte, are NULL", all = FALSE)
-  expect_match(messages, "`s`: mixed type", all = FALSE)
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_equal(vapply(values, `[[`, "", "class"), c("string", "blob", "blob"))
+  expect_equal(vapply(values, `[[`, "", "reason"), c("invalid_utf8", "converted", "invalid_utf8"))
+  expect_equal(values[[1]]$rows, c(2, 4, 5, 9, 10))
+  expect_equal(values[[2]]$rows, 6)
+  expect_equal(values[[3]]$rows, 7)
+  expect_match(conditionMessage(w[[1]]), "5 string values not valid UTF-8, NA (rows 2, 4, 5, 9, and 10)", fixed = TRUE)
 })
 
 test_that("times and text that Arrow can't hold pass its full validation", {
@@ -297,10 +299,12 @@ test_that("a row held back by the byte limits is for the Arrow path only", {
   expect_equal(dbFetchArrowChunk(rs)$length, 1)
   # The byte check has converted the blob to text, a data frame would show that
   expect_error(dbFetch(rs, n = 1), "held back")
-  expect_warning(
-    expect_warning(chunk <- dbFetchArrowChunk(rs, chunk_size = 1), "coercing values of type blob"),
-    "not valid UTF-8"
-  )
+  w <- coercion_warnings(chunk <- dbFetchArrowChunk(rs, chunk_size = 1))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_equal(vapply(values, `[[`, "", "class"), "blob")
+  expect_equal(vapply(values, `[[`, "", "reason"), "invalid_utf8")
+  expect_equal(values[[1]]$rows, 2)
   expect_equal(chunk$length, 1)
   expect_equal(dbFetch(rs)$x, "z")
 })

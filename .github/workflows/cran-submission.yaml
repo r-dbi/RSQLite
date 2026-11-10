@@ -55,7 +55,8 @@
 # when DESCRIPTION carries a development version, one with more than three components;
 # the input `allow-dev-version` lets such a version through, with a warning.
 #
-# The `tag` job drafts a GitHub release titled `<package> <version>` for `v<version>`,
+# The `tag` job runs .github/actions/cran-tag/cran-tag.sh.
+# It drafts a GitHub release titled `<package> <version>` for `v<version>`,
 # with the NEWS.md section of that version as its notes, or updates the draft that is there;
 # a published release of that tag stops the run instead.
 # The notes end with the marker `<!-- cran-submission: <package> <version> -->`,
@@ -215,7 +216,7 @@ jobs:
       contents: write
 
     outputs:
-      release-url: ${{ steps.release.outputs.url }}
+      release-url: ${{ steps.tag.outputs.release-url }}
       tag: ${{ steps.tag.outputs.tag }}
 
     steps:
@@ -225,236 +226,13 @@ jobs:
       - name: Configure the Git identity
         uses: cynkra/cynkratemplate/.github/actions/git-identity@main
 
-      - name: Compute the tag, its message and the release notes
+      - name: Draft the release and tag the commit, or show both on a dry run
         id: tag
-        env:
-          DRY_RUN: ${{ inputs.dry-run }}
-          RETAG: ${{ inputs.retag }}
-        run: |
-          # The commit this job checked out, which is `github.sha`, as the other jobs check out.
-          commit="$(git rev-parse HEAD)"
-          echo "Commit [\`${commit:0:10}\`]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$commit) on \`$GITHUB_REF_NAME\`." >> "$GITHUB_STEP_SUMMARY"
-          echo >> "$GITHUB_STEP_SUMMARY"
-          echo "Commit: $commit ($GITHUB_REF_NAME)"
-
-          pkg_name="$(sed -n 's/^Package: *//p' DESCRIPTION)"
-          pkg_version="$(sed -n 's/^Version: *//p' DESCRIPTION)"
-          tag="v$pkg_version"
-
-          message="$RUNNER_TEMP/tag-message.md"
-          # The section from the version's heading to the next one, without the leading "# ".
-          awk -v heading="# $pkg_name $pkg_version" '
-            $0 == heading { found = 1; print substr($0, 3); next }
-            found && /^# / { exit }
-            found { print }
-          ' NEWS.md > "$message"
-          if [ ! -s "$message" ]; then
-            echo "::error::NEWS.md has no section for $pkg_name $pkg_version."
-            exit 1
-          fi
-          # The release carries the section without its heading, as the earlier releases do;
-          # its title is the heading.
-          # The marker at the end, which GitHub does not render, is how cran-release.yaml
-          # finds the drafts to publish once P3M serves the version (.github/actions/cran-release/cran-release.sh).
-          notes="$RUNNER_TEMP/release-notes.md"
-          {
-            # Without the heading, and without blank lines before and after the section.
-            tail -n +2 "$message" | sed '/./,$!d' | awk 'NF { for (; blank > 0; blank--) print ""; print; next } { blank++ }'
-            echo
-            echo "<!-- cran-submission: $pkg_name $pkg_version -->"
-          } > "$notes"
-
-          # An existing tag is never moved, unless the run was dispatched with `retag`:
-          # a version CRAN has received is never submitted again.
-          moves=""
-          stops=""
-          if git ls-remote --exit-code --tags origin "refs/tags/$tag" > /dev/null; then
-            git fetch --depth=1 origin "refs/tags/$tag:refs/tags/$tag"
-            existing="$(git rev-parse "$tag^{commit}")"
-            echo "Existing tag: $tag at $existing"
-            echo "::group::Existing tag $tag"
-            git cat-file -p "$tag"
-            echo "::endgroup::"
-            if [ "$RETAG" = true ]; then
-              moves="$existing"
-              if [ "$DRY_RUN" = true ]; then
-                echo "::notice::A real run would move the existing tag $tag from $moves to $commit, because the run was dispatched with retag."
-              else
-                echo "::warning::Moving the existing tag $tag from $moves to $commit, because the run was dispatched with retag."
-              fi
-              {
-                echo "### Tag: \`$tag\` exists, moved with \`retag\`"
-                echo
-                echo "The tag \`$tag\` points to \`$existing\`; this run moves it to \`$commit\`."
-                echo
-              } >> "$GITHUB_STEP_SUMMARY"
-            else
-              rerun="gh workflow run cran-submission.yaml --repo $GITHUB_REPOSITORY --ref $GITHUB_REF_NAME"
-              {
-                echo "### Tag: \`$tag\` exists"
-                echo
-                echo "The tag \`$tag\` exists and points to \`$existing\`, and this workflow never moves a tag by itself."
-                echo
-                echo "#### How to proceed"
-                echo
-                echo "- If CRAN received $pkg_name $pkg_version, a new submission is a new version: bump \`DESCRIPTION\` and \`NEWS.md\` to the next patch version, and dispatch on the commit that carries it."
-                echo "- Only if CRAN never received this version, for instance because the upload failed, dispatch again with \`retag\` on: \`$rerun -f retag=true\`."
-                echo
-              } >> "$GITHUB_STEP_SUMMARY"
-              if [ "$DRY_RUN" = true ]; then
-                echo "::error title=Tag $tag exists::The tag $tag exists and points to $existing; a real run stops here without retag. The dry run carries on."
-                stops="$existing"
-              else
-                echo "::error title=Tag $tag exists::The tag $tag exists and points to $existing, and this workflow never moves a tag without retag. Nothing was drafted, tagged or uploaded."
-                exit 1
-              fi
-            fi
-          fi
-
-          {
-            echo "tag=$tag"
-            echo "title=$pkg_name $pkg_version"
-            echo "target=$(git rev-parse HEAD)"
-            echo "message=$message"
-            echo "notes=$notes"
-            echo "moves=$moves"
-            echo "stops=$stops"
-          } | tee -a "$GITHUB_OUTPUT"
-        shell: bash
-
-      # Before the tag, so that a published release stops the run before the tag moves.
-      # A draft has no tag yet, so it is found by its pending tag name in the list of releases.
-      - name: Create or update the draft release, or show it on a dry run
-        id: release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          DRY_RUN: ${{ inputs.dry-run }}
-          TAG: ${{ steps.tag.outputs.tag }}
-          TITLE: ${{ steps.tag.outputs.title }}
-          TARGET: ${{ steps.tag.outputs.target }}
-          NOTES: ${{ steps.tag.outputs.notes }}
-        run: |
-          found="$(gh api --paginate "repos/$GH_REPO/releases?per_page=100" \
-            --jq ".[] | select(.tag_name == \"$TAG\") | [(if .draft then \"draft\" else \"published\" end), .html_url] | @tsv")"
-          published="$(printf '%s\n' "$found" | awk -F '\t' '$1 == "published" { print $2 }')"
-          draft="$(printf '%s\n' "$found" | awk -F '\t' '$1 == "draft" && !seen { print $2; seen = 1 }')"
-
-          if [ -n "$published" ]; then
-            echo "::error title=Release $TAG is already published::The release $TAG is published at $published, and this workflow does not touch a published release. Nothing was tagged or uploaded."
-            {
-              echo "### Release: failed"
-              echo
-              echo "The release \`$TAG\` is already published at $published, and this workflow does not touch a published release."
-              echo "Nothing was tagged or uploaded."
-              echo
-              echo "#### How to resolve"
-              echo
-              echo "- If $TITLE is out, a new submission needs a new version: bump \`DESCRIPTION\` and \`NEWS.md\`, and dispatch again."
-              echo "- If the published release is a mistake, open it, and save it as a draft again or delete it; then dispatch again, and this job updates the draft."
-            } >> "$GITHUB_STEP_SUMMARY"
-            exit 1
-          fi
-
-          if [ -n "$draft" ]; then
-            action="update the draft release $draft"
-          else
-            action="create a draft release"
-          fi
-          echo "Release: $action"
-          echo "  tag:    $TAG"
-          echo "  target: $TARGET"
-          echo "  title:  $TITLE"
-          echo "  draft:  true"
-          echo "::group::Release notes"
-          cat "$NOTES"
-          echo "::endgroup::"
-
-          if [ "$DRY_RUN" = true ]; then
-            echo "::notice title=Dry run::Would $action titled '$TITLE' for $TAG at $TARGET; nothing was created."
-            {
-              echo "### Release"
-              echo
-              echo "Dry run: a real run would $action:"
-              echo
-              echo "- Tag: \`$TAG\`, target \`$TARGET\`"
-              echo "- Title: $TITLE"
-              echo "- Draft: yes, published by the nightly \`cran-release.yaml\` once Posit's package manager serves the version"
-              echo
-              echo "<details><summary>Release notes</summary>"
-              echo
-              echo '````markdown'
-              cat "$NOTES"
-              echo '````'
-              echo
-              echo "</details>"
-              echo
-            } >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-
-          if [ -n "$draft" ]; then
-            gh release edit "$TAG" --draft --target "$TARGET" --title "$TITLE" --notes-file "$NOTES"
-            url="$draft"
-            done="Updated the draft release"
-          else
-            url="$(gh release create "$TAG" --draft --target "$TARGET" --title "$TITLE" --notes-file "$NOTES")"
-            done="Created the draft release"
-          fi
-          echo "url=$url" >> "$GITHUB_OUTPUT"
-          echo "::notice title=Draft release::$done $TITLE at $url; the nightly cran-release.yaml publishes it once Posit's package manager serves the version."
-          {
-            echo "### Release"
-            echo
-            echo "$done [$TITLE]($url), for the tag \`$TAG\` at \`$TARGET\`."
-            echo "The nightly \`cran-release.yaml\` publishes it once Posit's package manager serves the version."
-            echo
-          } >> "$GITHUB_STEP_SUMMARY"
-        shell: bash
-
-      - name: Create and push the tag, or show it on a dry run
-        env:
-          DRY_RUN: ${{ inputs.dry-run }}
-          TAG: ${{ steps.tag.outputs.tag }}
-          MESSAGE: ${{ steps.tag.outputs.message }}
-          MOVES: ${{ steps.tag.outputs.moves }}
-          STOPS: ${{ steps.tag.outputs.stops }}
-        run: |
-          if [ "$DRY_RUN" = true ] && [ -n "$STOPS" ]; then
-            echo "::notice title=Dry run::A real run stops before tagging: $TAG exists at $STOPS."
-            printf '### Tag\n\n%s\n' "Dry run: a real run stops before drafting or tagging, because \`$TAG\` exists at \`$STOPS\`." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          if [ "$DRY_RUN" = true ]; then
-            echo "::group::Message of the tag $TAG"
-            cat "$MESSAGE"
-            echo "::endgroup::"
-            echo "::notice title=Dry run::Would tag $(git rev-parse HEAD) as $TAG${MOVES:+, moving it from $MOVES}; nothing was tagged or pushed."
-            {
-              echo "### Tag"
-              echo
-              echo "Dry run: a real run tags \`$(git rev-parse HEAD)\` as \`$TAG\`${MOVES:+, moving it from \`$MOVES\`}, with this message:"
-              echo
-              echo '````markdown'
-              cat "$MESSAGE"
-              echo '````'
-            } >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-
-          # The default cleanup would drop the "## ..." subheadings as comment lines.
-          # Only a run dispatched with `retag` gets here with an existing tag, which it moves.
-          if [ -n "$MOVES" ]; then
-            echo "Moving $TAG from $MOVES to $(git rev-parse HEAD)."
-            git tag -a -f "$TAG" --cleanup=whitespace -F "$MESSAGE"
-            git push --force origin "refs/tags/$TAG"
-          else
-            git tag -a "$TAG" --cleanup=whitespace -F "$MESSAGE"
-            git push origin "refs/tags/$TAG"
-          fi
-          printf '### Tag\n\n' >> "$GITHUB_STEP_SUMMARY"
-          echo "Tagged $(git rev-parse HEAD) as $TAG." | tee -a "$GITHUB_STEP_SUMMARY"
-        shell: bash
+        uses: ./.github/actions/cran-tag
+        with:
+          token: ${{ github.token }}
+          dry-run: ${{ inputs.dry-run }}
+          retag: ${{ inputs.retag }}
 
   cran-submission:
     needs: [check-version, tag]

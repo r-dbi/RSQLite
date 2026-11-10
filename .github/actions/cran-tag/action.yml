@@ -1,0 +1,41 @@
+name: "Tag and draft the release"
+description: >
+  Drafts the GitHub release of a CRAN submission and tags the commit as `v<version>`,
+  with cran-tag.sh beside this file.
+  Used by the `tag` job of .github/workflows/cran-submission.yaml,
+  after a checkout whose credentials may push the tag, and with a Git identity configured.
+
+inputs:
+  token:
+    description: "A token that may read and write the repository's releases"
+    required: true
+  dry-run:
+    description: "`true` writes nothing and reports the release and the tag a real run would write"
+    default: "false"
+  retag:
+    description: "`true` moves an existing `v<version>` tag to the commit: only for a submission CRAN never received"
+    default: "false"
+
+outputs:
+  tag:
+    description: "The tag, `v<version>`"
+    value: ${{ steps.run.outputs.tag }}
+  release-url:
+    description: "The draft release's URL, once a real run has written it"
+    value: ${{ steps.run.outputs.release-url }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: run
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        GH_REPO: ${{ github.repository }}
+        DRY_RUN: ${{ inputs.dry-run }}
+        RETAG: ${{ inputs.retag }}
+      run: |
+        args=()
+        if [ "$DRY_RUN" = true ]; then args+=(--dry-run); fi
+        if [ "$RETAG" = true ]; then args+=(--retag); fi
+        "$GITHUB_ACTION_PATH/cran-tag.sh" "${args[@]}" "$GITHUB_WORKSPACE"
+      shell: bash

@@ -9,6 +9,11 @@ dbSendQueryArrow_SQLiteConnection <- function(conn, statement, params = NULL, ..
   # Evaluated and checked before the query is sent, so that an error leaves no
   # result open; the names and types need the result's columns
   if (!is.null(schema)) {
+    # The `ptype` of dbSendQuery() would stay on the result while the schema
+    # replaced its types, and data frame fetches would convert to the prototype
+    if (!is.null(list(...)[["ptype"]])) {
+      stopc("`schema` and `ptype` can't be combined, use one of them")
+    }
     schema <- arrow_check_schema(schema)
   }
   res <- dbSendQuery(conn, statement, params = params, ...)

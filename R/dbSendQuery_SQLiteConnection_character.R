@@ -3,7 +3,8 @@
 #'   as a data frame or a named list of vectors whose values are ignored,
 #'   such as `list(id = bit64::integer64(), when = as.POSIXct(character(), tz = "UTC"))`,
 #'   matched to the result columns by name.
-#'   Requires a connection with `arrow = TRUE`, see the section on data frames in [sqlite-arrow].
+#'   Requires a connection with `arrow = TRUE`, see the section on data frames in [sqlite-arrow],
+#'   and can't be combined with the `schema` argument of `dbSendQueryArrow()`.
 #'   The default `NULL` decides the types from the values.
 #' @usage NULL
 dbSendQuery_SQLiteConnection_character <- function(conn, statement, params = NULL, ..., ptype = NULL) {

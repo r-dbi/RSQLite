@@ -93,6 +93,7 @@ and text into a binary type, as its bytes;
 text and blobs into a numeric type, and reals into an integer type, truncated;
 \item \code{NULL}, with the warning: a blob into a text type unless it is valid UTF-8,
 a number outside the range of an integer type,
+a time or timestamp outside the range of its unit, such as a timestamp in nanoseconds after 2262,
 and a date or time that cannot be parsed.
 }
 }

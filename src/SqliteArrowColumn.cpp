@@ -546,9 +546,9 @@ void SqliteArrowColumn::append_null() {
 //   text type (SQLite renders them), text into a binary type (its bytes);
 // - converted by SQLite, logged: text and blobs into a numeric type, reals
 //   into an integer type (truncated);
-// - NULL, logged: a blob into a text type unless it is valid UTF-8, a number
-//   outside the range of an integer type, a date or time that can't be parsed,
-//   any value into the null type.
+// - NULL, logged: a blob into a text type unless it is valid UTF-8, a value
+//   outside the range of an integer, time or timestamp type, a date or time
+//   that can't be parsed, any value into the null type.
 void SqliteArrowColumn::append_value(int column_type, int64_t row) {
   switch (kind) {
   case AK_BOOL:
@@ -750,9 +750,17 @@ void SqliteArrowColumn::append_time(int column_type, int64_t row) {
     scale = 1e9;
     break;
   }
-  int64_t value = static_cast<int64_t>(std::floor(seconds * scale + 0.5));
+  // A number, or a timestamp in nanoseconds outside the years 1677 to 2262,
+  // may not fit
+  double value = std::floor(seconds * scale + 0.5);
+  double limit = (kind == AK_TIME32) ? 2147483648.0 : 9223372036854775808.0;
+  if (!(value >= -limit && value < limit)) {
+    log.record(column_type, CR_OUT_OF_RANGE, row);
+    append_null();
+    return;
+  }
   check_arrow(
-    ArrowArrayAppendInt(array.get(), value),
+    ArrowArrayAppendInt(array.get(), static_cast<int64_t>(value)),
     "Can't append to Arrow array"
   );
 }

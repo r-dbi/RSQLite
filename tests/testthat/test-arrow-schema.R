@@ -247,6 +247,43 @@ test_that("values out of range and coercions are reported per the rules", {
   )
 })
 
+test_that("times and timestamps outside the range of their unit are NULL", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (ts, tm)")
+  dbExecute(con, "INSERT INTO t VALUES ('2020-01-02 03:04:05', '01:00:00'), ('3000-01-01 00:00:00', 1e10), ('1600-01-01 00:00:00', -1e10)")
+  # Nanoseconds and microseconds since the epoch exceed the precision of a double
+  fetch <- function(schema) {
+    withCallingHandlers(
+      as.data.frame(dbGetQueryArrow(con, "SELECT * FROM t", schema = schema)),
+      nanoarrow_warning_lossy_conversion = function(w) invokeRestart("muffleWarning")
+    )
+  }
+
+  df <- NULL
+  w <- coercion_warnings(
+    df <- fetch(list(ts = nanoarrow::na_timestamp("ns", "UTC"), tm = nanoarrow::na_time32("s")))
+  )
+  expect_equal(format(df$ts, "%Y"), c("2020", NA, NA))
+  expect_equal(as.numeric(df$tm), c(3600, NA, NA))
+  expect_length(w, 1)
+  coercions <- w[[1]]$coercions
+  expect_equal(vapply(coercions, `[[`, "", "type"), c("timestamp", "time32"))
+  expect_equal(
+    lapply(coercions, function(x) vapply(x$values, function(v) paste(v$class, v$reason), "")),
+    list("string out_of_range", "real out_of_range")
+  )
+  expect_equal(lapply(coercions, function(x) x$values[[1]]$rows), list(2:3, 2:3))
+  expect_match(conditionMessage(w[[1]]), "2 string values out of range, NA", fixed = TRUE)
+
+  # Within the range of a coarser unit
+  expect_length(
+    coercion_warnings(df <- fetch(list(ts = nanoarrow::na_timestamp("us", "UTC"), tm = nanoarrow::na_time64("us")))),
+    0
+  )
+  expect_equal(format(df$ts, "%Y"), c("2020", "3000", "1600"))
+  expect_equal(as.numeric(df$tm), c(3600, 1e10, -1e10))
+})
+
 test_that("requested types survive dbBind() and apply to dbReadTableArrow()", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x)")

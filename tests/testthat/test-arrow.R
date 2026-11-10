@@ -599,22 +599,29 @@ test_that("an R error while the stream is read unwinds cleanly", {
   expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 3L)
 })
 
-test_that("arrow's Acero engine reads a stream on its worker threads", {
+test_that("arrow's scanner reads a stream on its worker threads", {
   skip_if_not_installed("arrow")
-  skip_if_not_installed("dplyr")
+  skip_if_not(arrow::arrow_with_dataset())
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:200000))
 
-  # Many chunks, read on a worker thread while R's main thread waits
+  # Many chunks, read on arrow's thread pool while R's main thread waits
   reader <- arrow::as_record_batch_reader(dbGetQueryArrow(con, "SELECT a FROM t"))
-  out <- dplyr::collect(dplyr::filter(reader, a > 100000))
-  expect_equal(nrow(out), 100000)
-  expect_equal(range(out$a), c(100001L, 200000L))
+  filter <- arrow::Expression$create(
+    "greater",
+    arrow::Expression$field_ref("a"),
+    arrow::Expression$scalar(100000L)
+  )
+  table <- arrow::Scanner$create(reader, filter = filter)$ToTable()
+  expect_equal(table$num_rows, 100000L)
+  expect_equal(range(as.vector(table$a)), c(100001L, 200000L))
   expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 200000L)
 })
 
 test_that("arrow::write_dataset() reads a stream on its worker threads", {
   skip_if_not_installed("arrow")
+  skip_if_not(arrow::arrow_with_dataset())
+  # write_dataset() builds its query plan with dplyr, which RSQLite doesn't use
   skip_if_not_installed("dplyr")
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:200000))
@@ -628,7 +635,7 @@ test_that("a coercion on a worker thread fails the stream instead of warning", {
   # Which thread reads the stream is up to arrow
   skip_on_cran()
   skip_if_not_installed("arrow")
-  skip_if_not_installed("dplyr")
+  skip_if_not(arrow::arrow_with_dataset())
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (a)")
   dbWriteTable(con, "t", data.frame(a = 1:300), append = TRUE)
@@ -638,12 +645,14 @@ test_that("a coercion on a worker thread fails the stream instead of warning", {
   withr::defer(if (dbIsValid(rs)) dbClearResult(rs))
   reader <- arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 100))
   expect_error(
-    dplyr::collect(dplyr::filter(reader, a > 0)),
+    arrow::Scanner$create(reader)$ToTable(),
     "mixed type.*an error instead of a warning"
   )
 
-  # The session and the connection go on
+  # The session and the connection go on, the stream goes with its reader
   expect_silent(dbClearResult(rs))
+  rm(reader)
+  gc_until_stable()
   expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 300L)
 })
 

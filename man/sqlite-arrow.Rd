@@ -106,7 +106,7 @@ Such a row waits for the next Arrow fetch, and \code{\link[DBI:dbFetch]{DBI::dbF
 
 A stream can be read on any thread, one call at a time, as the Arrow C stream interface allows.
 Some consumers read it on a worker thread while R waits,
-such as the Acero engine behind the dplyr verbs of the arrow package and \code{arrow::write_dataset()}.
+such as the scanner of the arrow package, the Acero engine behind its dplyr verbs, and \code{arrow::write_dataset()}.
 R can't be called on such a thread.
 A value that is converted with a warning on R's main thread, see above,
 fails the stream there with an error that gives the warning's message.

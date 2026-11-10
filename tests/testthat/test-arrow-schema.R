@@ -776,3 +776,53 @@ test_that("a requested type wins over the type a data frame fetch carries to a n
     list(list(v = c(0L, 0L), warnings = 1L), list(v = 1:2, warnings = 0L))
   )
 })
+
+test_that("data frame fetches convert every type that can be requested", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1), (2), (NULL), (4), (5)")
+  types <- list(
+    bool = nanoarrow::na_bool(), i8 = nanoarrow::na_int8(), i16 = nanoarrow::na_int16(),
+    i32 = nanoarrow::na_int32(), i64 = nanoarrow::na_int64(), u8 = nanoarrow::na_uint8(),
+    u16 = nanoarrow::na_uint16(), u32 = nanoarrow::na_uint32(), u64 = nanoarrow::na_uint64(),
+    f32 = nanoarrow::na_float(), f64 = nanoarrow::na_double(),
+    s = nanoarrow::na_string(), ls = nanoarrow::na_large_string(),
+    b = nanoarrow::na_binary(), lb = nanoarrow::na_large_binary(),
+    d32 = nanoarrow::na_date32(), d64 = nanoarrow::na_date64(),
+    t32 = nanoarrow::na_time32("ms"), t64 = nanoarrow::na_time64("ns"),
+    ts = nanoarrow::na_timestamp("s", "UTC"), n = nanoarrow::na_na()
+  )
+  sql <- paste(
+    "SELECT", paste0("x AS ", names(types)[1:11], collapse = ", "),
+    ", CAST(x AS TEXT) AS s, CAST(x AS TEXT) AS ls, CAST(x AS BLOB) AS b, CAST(x AS BLOB) AS lb,",
+    "x AS d32, x AS d64, x AS t32, x AS t64, x AS ts, NULL AS n FROM t ORDER BY rowid"
+  )
+  values <- c(1, 2, NA, 4, 5)
+
+  # One array, and an array per two rows
+  rs <- dbSendQueryArrow(con, sql, schema = types)
+  one <- suppressWarnings(dbFetch(rs))
+  dbClearResult(rs)
+  rs <- dbSendQueryArrow(con, sql, schema = types)
+  several <- suppressWarnings(arrow_fetch_df(rs@result, -1, chunk_size = 2))
+  dbClearResult(rs)
+  expect_identical(several, one)
+
+  expect_identical(one$bool, values != 0)
+  for (column in c("i8", "i16", "i32", "i64", "u8", "u16", "u64")) {
+    expect_identical(one[[column]], as.integer(values), info = column)
+  }
+  for (column in c("u32", "f32", "f64")) {
+    expect_identical(one[[column]], values, info = column)
+  }
+  expect_identical(one$s, as.character(values))
+  expect_identical(one$ls, as.character(values))
+  expect_identical(one$b, blob::as_blob(lapply(values, function(v) if (is.na(v)) NULL else charToRaw(as.character(v)))))
+  expect_identical(one$lb, one$b)
+  expect_identical(as.numeric(one$d32), values)
+  expect_equal(as.numeric(as.Date(one$d64)), values)
+  expect_equal(as.numeric(one$t32), values)
+  expect_equal(as.numeric(one$t64), values)
+  expect_equal(as.numeric(one$ts), values)
+  expect_identical(one$n, rep(NA, 5))
+})

@@ -144,8 +144,19 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
 
   total_changes_start_ = sqlite3_total_changes(conn);
 
-  bool has_params = bind_row();
-  after_bind(has_params);
+  try {
+    bool has_params = bind_row();
+    after_bind(has_params);
+  } catch (...) {
+    // A failed bind leaves the result unbound, as before the first bind:
+    // fetching asks for a new bind instead of running these parameters again
+    params_ = cpp11::list();
+    groups_ = 0;
+    ready_ = false;
+    complete_ = false;
+    nrows_ = 0;
+    throw;
+  }
 }
 
 cpp11::list SqliteResultImpl::fetch(const int n_max) {

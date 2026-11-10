@@ -250,3 +250,30 @@ test_that("a later parameter set that fails to bind completes the result", {
   expect_equal(nrow(dbFetch(res)), 0L)
   expect_equal(dbGetRowCount(res), 0L)
 })
+
+test_that("a failed dbBind() asks for a new bind", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  res <- dbSendQuery(con, "SELECT json(?) AS j")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  # The first parameter set fails in the statement
+  expect_error(dbBind(res, list(c("oops", "[2]"))), "malformed JSON")
+  expect_error(dbFetch(res), "needs to be bound")
+  expect_false(dbHasCompleted(res))
+  expect_equal(dbGetRowCount(res), 0L)
+
+  dbBind(res, list(c("[1]", "[2]")))
+  expect_equal(dbFetch(res, n = 1)$j, "[1]")
+
+  # The first parameter set fails to bind, after a partial fetch
+  expect_error(dbBind(res, list(list("a", as.raw(1)))), "raw vectors")
+  expect_error(dbFetch(res), "needs to be bound")
+  expect_equal(dbGetRowCount(res), 0L)
+
+  # A new bind makes the result usable again
+  dbBind(res, list(c("[3]", "[4]")))
+  expect_equal(dbFetch(res)$j, c("[3]", "[4]"))
+  expect_true(dbHasCompleted(res))
+})

@@ -410,3 +410,31 @@ test_that("the schema reads no rows when every column has a requested type", {
   expect_equal(array$length, 2)
   stream$release()
 })
+
+test_that("only the requested types with 32-bit offsets end chunks at the byte limits", {
+  local_arrow_bytes_limits(100, 150)
+  sizes <- c(60, 60, 80, 80, 200, 10, 10)
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(
+    i = seq_along(sizes),
+    s = strrep("x", sizes),
+    b = blob::as_blob(lapply(sizes, function(size) as.raw(rep(1, size))))
+  ))
+
+  for (column in c("s", "b")) {
+    sql <- paste0("SELECT ", column, " FROM t ORDER BY i")
+    types <- list(
+      utf8 = nanoarrow::na_string(), large_utf8 = nanoarrow::na_large_string(),
+      binary = nanoarrow::na_binary(), large_binary = nanoarrow::na_large_binary()
+    )
+    for (type in names(types)) {
+      schema <- setNames(list(types[[type]]), column)
+      info <- paste(column, type)
+      lengths <- if (startsWith(type, "large")) 7 else c(2, 1, 1, 1, 2)
+      stream <- dbGetQueryArrow(con, sql, schema = schema)
+      expect_equal(suppressWarnings(chunk_lengths(stream)), lengths, info = info)
+      values <- suppressWarnings(as.data.frame(dbGetQueryArrow(con, sql, schema = schema)))[[column]]
+      expect_equal(if (is.character(values)) nchar(values) else lengths(values), sizes, info = info)
+    }
+  }
+})

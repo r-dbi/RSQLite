@@ -441,7 +441,9 @@ cpp11::sexp SqliteArrowColumn::coercions() {
 
 // The default path stores integers as 32-bit until one needs more
 void SqliteArrowColumn::note_integer(int64_t value) {
-  if (value < -INT_MAX || value > INT_MAX) {
+  bool wide = (kind == AK_UINT64) ? static_cast<uint64_t>(value) > INT_MAX
+                                  : (value < -INT_MAX || value > INT_MAX);
+  if (wide) {
     wide_ints = true;
   }
 }
@@ -616,8 +618,19 @@ void SqliteArrowColumn::append_integer(int column_type, int64_t row) {
     append_value(column_type, row);
     return;
   }
-  int64_t value = sqlite3_column_int64(stmt, j);
-  if (!in_range(value)) {
+  if (kind == AK_BOOL) {
+    if (column_type != SQLITE_INTEGER) {
+      log.record(column_type, CR_CONVERTED, row);
+    }
+    check_arrow(
+      ArrowArrayAppendInt(array.get(), sqlite3_column_int64(stmt, j) != 0),
+      "Can't append to Arrow array"
+    );
+    return;
+  }
+
+  int64_t value;
+  if (!integer_value(column_type, value)) {
     log.record(column_type, CR_OUT_OF_RANGE, row);
     append_null();
     return;
@@ -629,12 +642,6 @@ void SqliteArrowColumn::append_integer(int column_type, int64_t row) {
   }
 
   switch (kind) {
-  case AK_BOOL:
-    check_arrow(
-      ArrowArrayAppendInt(array.get(), value != 0),
-      "Can't append to Arrow array"
-    );
-    break;
   case AK_UINT8:
   case AK_UINT16:
   case AK_UINT32:
@@ -651,6 +658,86 @@ void SqliteArrowColumn::append_integer(int column_type, int64_t row) {
     );
     break;
   }
+}
+
+// The integer at the start of `text`, read like SQLite reads text into an
+// integer: after spaces and a sign, the digits up to the first other
+// character. Its magnitude is exact up to 2^64 - 1, `overflow` is set beyond.
+static uint64_t leading_integer(
+  const char* text,
+  int size,
+  bool& negative,
+  bool& overflow
+) {
+  const char* end = text + size;
+  while (text < end && (*text == ' ' || (*text >= '\t' && *text <= '\r'))) {
+    ++text;
+  }
+  negative = false;
+  if (text < end && (*text == '-' || *text == '+')) {
+    negative = (*text == '-');
+    ++text;
+  }
+  uint64_t magnitude = 0;
+  overflow = false;
+  for (; text < end && *text >= '0' && *text <= '9'; ++text) {
+    unsigned digit = static_cast<unsigned>(*text - '0');
+    if (magnitude > (UINT64_MAX - digit) / 10) {
+      overflow = true;
+    } else {
+      magnitude = magnitude * 10 + digit;
+    }
+  }
+  return magnitude;
+}
+
+bool SqliteArrowColumn::integer_value(int column_type, int64_t& value) {
+  if (column_type == SQLITE_FLOAT) {
+    // Truncated toward zero, like SQLite does it, but not saturated
+    double real = std::trunc(sqlite3_column_double(stmt, j));
+    if (kind == AK_UINT64) {
+      if (!(real >= 0 && real < 18446744073709551616.0)) {
+        return false;
+      }
+      value = static_cast<int64_t>(static_cast<uint64_t>(real));
+      return true;
+    }
+    if (!(real >= -9223372036854775808.0 && real < 9223372036854775808.0)) {
+      return false;
+    }
+    value = static_cast<int64_t>(real);
+    return in_range(value);
+  }
+
+  value = sqlite3_column_int64(stmt, j);
+  if (column_type != SQLITE_INTEGER &&
+      (value == INT64_MAX || value == INT64_MIN)) {
+    // SQLite saturates the integer at the start of text or a blob
+    const void* data =
+      (column_type == SQLITE_TEXT)
+        ? static_cast<const void*>(sqlite3_column_text(stmt, j))
+        : sqlite3_column_blob(stmt, j);
+    int size = sqlite3_column_bytes(stmt, j);
+    bool negative;
+    bool overflow;
+    uint64_t magnitude =
+      leading_integer(static_cast<const char*>(data), size, negative, overflow);
+    if (overflow) {
+      return false;
+    }
+    if (negative) {
+      if (magnitude > UINT64_C(9223372036854775808)) {
+        return false;
+      }
+    } else if (magnitude > static_cast<uint64_t>(INT64_MAX)) {
+      if (kind != AK_UINT64) {
+        return false;
+      }
+      value = static_cast<int64_t>(magnitude);
+      return true;
+    }
+  }
+  return in_range(value);
 }
 
 bool SqliteArrowColumn::in_range(int64_t value) const {

@@ -160,6 +160,7 @@ public:
 
 private:
   static ARROW_KIND kind_from_column_type(int column_type);
+  // A uint64 comes in the bits of `value`
   void note_integer(int64_t value);
   ARROW_KIND kind_from_decltype() const;
 
@@ -179,6 +180,10 @@ private:
   void append_date(int column_type, int64_t row);
   void append_time(int column_type, int64_t row);
   void append_null();
+  // The value of the current row for an integer type other than bool, as
+  // SQLite converts it but without saturating at 64 bits; false if it is out
+  // of the range of the type. A uint64 comes back in the bits of `value`.
+  bool integer_value(int column_type, int64_t& value);
   bool in_range(int64_t value) const;
   void promote_to_double();
   static const char* format_kind(ARROW_KIND kind);

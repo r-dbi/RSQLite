@@ -247,6 +247,66 @@ test_that("values out of range and coercions are reported per the rules", {
   )
 })
 
+# Compares the values of a 64-bit integer array exactly with `expected`, as
+# strings, NA for NULL: a uint64 above 2^63 - 1 is written as the int64 with
+# its bits, such as "-1" for 2^64 - 1
+expect_int64_bits <- function(array, expected) {
+  is_null <- suppressWarnings(is.na(nanoarrow::convert_array(array, double())))
+  expect_equal(is_null, is.na(expected))
+  actual <- matrix(as.raw(array$buffers[[2]])[seq_len(8 * array$length)], nrow = 8)
+  # bit64 reads -2^63, its NA, with a warning, but with the right bits
+  wanted <- suppressWarnings(bit64::as.integer64(expected))
+  wanted <- matrix(writeBin(unclass(wanted), raw()), nrow = 8)
+  expect_equal(actual[, !is_null], wanted[, !is_null])
+}
+
+test_that("numbers beyond 64 bits are out of range, not saturated", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  # SQLite stores an integer literal beyond 64 bits as a real:
+  # 18446744073709551615 becomes 2^64, 9223372036854775808 is 2^63
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (9223372036854775807), (-9223372036854775808), (-1),",
+    "(18446744073709551615), (9223372036854775808), (1e19), (1e30), (-1e30), (9e999),",
+    "('18446744073709551615'), ('99999999999999999999'), ('-9223372036854775809'),",
+    "('9223372036854775807'), (' -9223372036854775808x'), (2.5)"
+  ))
+  fetch <- function(type) {
+    w <- coercion_warnings(
+      array <- nanoarrow::as_nanoarrow_array(dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type)))
+    )
+    values <- w[[1]]$coercions[[1]]$values
+    list(
+      array = array$children$x,
+      reasons = vapply(values, function(v) paste(v$class, v$reason, paste(v$rows, collapse = " ")), "")
+    )
+  }
+
+  int64 <- fetch(nanoarrow::na_int64())
+  expect_int64_bits(int64$array, c(
+    "9223372036854775807", "-9223372036854775808", "-1",
+    NA, NA, NA, NA, NA, NA,
+    NA, NA, NA,
+    "9223372036854775807", "-9223372036854775808", "2"
+  ))
+  expect_equal(int64$reasons, c(
+    "real out_of_range 4 5 6 7 8 9", "string out_of_range 10 11 12",
+    "string converted 13 14", "real converted 15"
+  ))
+
+  uint64 <- fetch(nanoarrow::na_uint64())
+  expect_int64_bits(uint64$array, c(
+    "9223372036854775807", NA, NA,
+    NA, "-9223372036854775808", "-8446744073709551616", NA, NA, NA,
+    "-1", NA, NA,
+    "9223372036854775807", NA, "2"
+  ))
+  expect_equal(uint64$reasons, c(
+    "integer out_of_range 2 3", "real out_of_range 4 7 8 9", "real converted 5 6 15",
+    "string converted 10 13", "string out_of_range 11 12 14"
+  ))
+})
+
 test_that("times and timestamps outside the range of their unit are NULL", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (ts, tm)")

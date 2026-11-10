@@ -17,7 +17,7 @@ arrow_fetch_df <- function(res, n) {
     chunk <- result_fetch_arrow_chunk(res@ptr, n)
     df <- arrow_to_df(chunk$array, res@conn)
     # nanoarrow's character vectors read from the array until they are touched:
-    # copy them, so that the array can be freed right away
+    # copy them, so that the array can be released right away
     df[] <- lapply(df, function(col) if (is.character(col)) c(col) else col)
     nanoarrow::nanoarrow_pointer_release(chunk$array)
   }
@@ -52,7 +52,7 @@ arrow_to_df <- function(x, conn, size = NULL) {
 
 # All rows of a stream with a known row count as a data frame:
 # the columns are allocated once, each array is converted and copied into
-# them and freed before the next one is requested, so that the arrays go
+# them and released before the next one is requested, so that the arrays go
 # as the data frame fills up
 arrow_stream_to_df <- function(stream, ptype, size) {
   size <- as.integer(size)

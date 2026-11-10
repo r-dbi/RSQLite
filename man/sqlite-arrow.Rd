@@ -84,9 +84,9 @@ Before writing, factors become strings and lists of raw vectors become blobs.
 
 A fetch of all rows reads the result into Arrow arrays first,
 so that the data frame is allocated once with the row count known,
-and frees each array as soon as it is converted:
+and releases each array as soon as it is converted:
 at its peak, the memory holds the arrays and the part of the data frame filled so far.
-A fetch of \code{n} rows copies the strings out of its array and frees the array right away.
+A fetch of \code{n} rows copies the strings out of its array and releases the array right away.
 }
 
 \section{Chunking}{

@@ -195,7 +195,8 @@
 #' fixes the R types of some or all result columns before the first row is read:
 #' a data frame, or a named list of vectors whose values are ignored, such as
 #' `list(id = bit64::integer64(), when = as.POSIXct(character(), tz = "UTC"))`.
-#' The columns are matched to the result by name, exactly, with the errors of `schema`.
+#' The columns are matched to the result by name, exactly, with the errors of `schema`,
+#' and the two arguments can't be combined in [DBI::dbSendQueryArrow()] or [DBI::dbGetQueryArrow()].
 #' A column of the prototype is requested from SQLite as the Arrow type that
 #' `nanoarrow::infer_nanoarrow_schema()` gives for it, see the section on requesting types:
 #' `integer` as `int32`, so that values outside its range become `NA` with a warning,

@@ -374,10 +374,11 @@ test_that("a fetch of no rows warns on the default path only", {
 
 test_that("unparsable times through Arrow are reported once per fetch", {
   setup <- c(
-    "CREATE TABLE t (i INTEGER, tm TIME, ts TIMESTAMP)",
+    "CREATE TABLE t (i INTEGER, tm TIME, ts TIMESTAMP, d DATE)",
     paste(
-      "INSERT INTO t VALUES (1, 3600.25, 1.5), (2, 'nope', 'nope'), (3, 100000, 1e19),",
-      "(4, '25:00:00', '2020-01-02 03:04:05'), (5, X'00', 2.5)"
+      "INSERT INTO t VALUES (1, 3600.25, 1.5, 18000), (2, 'nope', 'nope', '2020-01-02'),",
+      "(3, 100000, 1e19, 4294985296), (4, '25:00:00', '2020-01-02 03:04:05', -2147483649),",
+      "(5, X'00', 2.5, 18000.7), (6, 4294985296, 4294985296, 1e30)"
     )
   )
   con <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
@@ -398,10 +399,11 @@ test_that("unparsable times through Arrow are reported once per fetch", {
     )
   }
 
-  # Seconds keep times outside a day and large timestamps, as on the default path
+  # Seconds keep times outside a day and large timestamps, as on the default path,
+  # also beyond 32 bits
   w <- coercion_warnings(df <- dbGetQuery(con_arrow, query))
-  expect_identical(as.numeric(df$tm), c(3600.25, NA, 100000, 90000, NA))
-  expect_identical(as.numeric(df$ts), c(1.5, NA, 1e19, 1577934245, 2.5))
+  expect_identical(as.numeric(df$tm), c(3600.25, NA, 100000, 90000, NA, 4294985296))
+  expect_identical(as.numeric(df$ts), c(1.5, NA, 1e19, 1577934245, 2.5, 4294985296))
   expect_length(w, 1)
   coercions <- w[[1]]$coercions
   expect_identical(vapply(coercions, `[[`, "", "type"), c("time64", "timestamp"))
@@ -410,6 +412,31 @@ test_that("unparsable times through Arrow are reported once per fetch", {
   expect_identical(vapply(tm, `[[`, "", "reason"), c("unparsable", "unparsable"))
   expect_equal(vapply(tm, `[[`, 1, "rows"), c(2, 5))
   expect_equal(coercions[[2]]$values[[1]]$rows, 2)
+
+  # A number of days beyond 32 bits: the default path wraps it into another
+  # date without a warning, through Arrow it is NA and out of range
+  dates <- "SELECT d FROM t ORDER BY i"
+  wrapped <- c(3, 4, 6)
+  for (ns in list(-1, c(2, 1, -1), c(3, 3))) {
+    info <- paste("n =", paste(ns, collapse = ", "))
+    expected <- fetch_sequence(con, dates, ns)
+    expect_identical(expected$warnings, integer(length(ns)), info = info)
+    expected_d <- do.call(c, lapply(expected$data, `[[`, "d"))
+    expect_identical(as.numeric(expected_d), c(18000, 18263, 18000, 2147483647, 18000, -1), info = info)
+    actual <- fetch_sequence(con_arrow, dates, ns)
+    actual_d <- do.call(c, lapply(actual$data, `[[`, "d"))
+    expected_d[wrapped] <- NA
+    expect_identical(actual_d, expected_d, info = info)
+    # One warning for each fetch with such a number
+    rows <- cumsum(c(0, ifelse(ns < 0, 6, ns)))
+    hits <- vapply(seq_along(ns), function(i) any(wrapped > rows[[i]] & wrapped <= rows[[i + 1]]), logical(1))
+    expect_identical(actual$warnings, as.integer(hits), info = info)
+  }
+  w <- coercion_warnings(dbGetQuery(con_arrow, dates))
+  values <- w[[1]]$coercions[[1]]$values
+  expect_identical(w[[1]]$coercions[[1]]$type, "date32")
+  expect_identical(vapply(values, function(v) paste(v$class, v$reason), ""), c("integer out_of_range", "real out_of_range"))
+  expect_equal(lapply(values, `[[`, "rows"), list(c(3, 4), 6))
 })
 
 test_that("the coercion warning counts the rows of each binding through Arrow", {

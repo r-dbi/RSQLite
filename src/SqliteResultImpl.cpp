@@ -5,6 +5,7 @@
 #include "DbColumnStorage.h"
 #include "DbConnection.h"
 #include "integer64.h"
+#include "main_thread.h"
 #include <sstream>
 
 // The data of a utf8 or binary column ends a chunk: after the row that takes
@@ -49,9 +50,12 @@ SqliteResultImpl::SqliteResultImpl(
 }
 
 SqliteResultImpl::~SqliteResultImpl() {
-  try {
-    sqlite3_finalize(stmt);
-  } catch (...) {}
+  finalize_statement();
+}
+
+void SqliteResultImpl::finalize_statement() {
+  sqlite3_finalize(stmt);
+  stmt = NULL;
 }
 
 // Cache ///////////////////////////////////////////////////////////////////////
@@ -585,8 +589,11 @@ bool SqliteResultImpl::step_done() {
     more_params = bind_row();
   } catch (...) {
     // Parameters that fail to bind end the execution and are not kept:
-    // an Arrow stream may hold a share of a result bound to this one's stream
-    params_.reset();
+    // an Arrow stream may hold a share of a result bound to this one's stream.
+    // R vectors stay until the result is destroyed on R's main thread.
+    if (rsqlite_on_main_thread() || !params_->holds_r_objects()) {
+      params_.reset();
+    }
     complete_ = true;
     throw;
   }
@@ -682,7 +689,8 @@ int64_t SqliteResultImpl::fetch_arrow_rows(
     ++nrows_;
     ++n;
 
-    if (n % 1024 == 0) {
+    // R's main thread only: an Arrow stream can be read on another thread
+    if (n % 1024 == 0 && rsqlite_on_main_thread()) {
       cpp11::check_user_interrupt();
     }
     if (arrow_chunk_full()) {

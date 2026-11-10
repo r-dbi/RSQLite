@@ -564,6 +564,63 @@ test_that("an R error while the stream is read unwinds cleanly", {
   expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 3L)
 })
 
+test_that("arrow's scanner reads a stream on its worker threads", {
+  skip_if_not_installed("arrow")
+  skip_if_not(arrow::arrow_with_dataset())
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:200000))
+
+  # Many chunks, read on arrow's thread pool while R's main thread waits
+  reader <- arrow::as_record_batch_reader(dbGetQueryArrow(con, "SELECT a FROM t"))
+  filter <- arrow::Expression$create(
+    "greater",
+    arrow::Expression$field_ref("a"),
+    arrow::Expression$scalar(100000L)
+  )
+  table <- arrow::Scanner$create(reader, filter = filter)$ToTable()
+  expect_equal(table$num_rows, 100000L)
+  expect_equal(range(as.vector(table$a)), c(100001L, 200000L))
+  expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 200000L)
+})
+
+test_that("arrow::write_dataset() reads a stream on its worker threads", {
+  skip_if_not_installed("arrow")
+  skip_if_not(arrow::arrow_with_dataset())
+  # write_dataset() builds its query plan with dplyr, which RSQLite doesn't use
+  skip_if_not_installed("dplyr")
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:200000))
+
+  dir <- withr::local_tempfile()
+  arrow::write_dataset(arrow::as_record_batch_reader(dbGetQueryArrow(con, "SELECT a FROM t")), dir)
+  expect_equal(nrow(arrow::open_dataset(dir)), 200000)
+})
+
+test_that("a coercion on a worker thread fails the stream instead of warning", {
+  # Which thread reads the stream is up to arrow
+  skip_on_cran()
+  skip_if_not_installed("arrow")
+  skip_if_not(arrow::arrow_with_dataset())
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (a)")
+  dbWriteTable(con, "t", data.frame(a = 1:300), append = TRUE)
+  dbExecute(con, "UPDATE t SET a = 'x' WHERE rowid = 250")
+
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t")
+  withr::defer(if (dbIsValid(rs)) dbClearResult(rs))
+  reader <- arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 100))
+  expect_error(
+    arrow::Scanner$create(reader)$ToTable(),
+    "mixed type.*an error instead of a warning"
+  )
+
+  # The session and the connection go on, the stream goes with its reader
+  expect_silent(dbClearResult(rs))
+  rm(reader)
+  gc_until_stable()
+  expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 300L)
+})
+
 test_that("an error of the statement after dbDisconnect() keeps its result code", {
   con <- dbConnect(SQLite(), ":memory:")
   dbExecute(con, "CREATE TABLE t (a)")
@@ -647,15 +704,18 @@ test_that("a result stays usable after an R error leaves its fetch by a longjmp"
   skip_if_not(exists("mem.maxVSize", baseenv()), "mem.maxVSize() not available")
 
   # A vector heap limit with at least 30 MB to spare, which R accepts only
-  # above the size the heap already has, and a blob 50 MB beyond the limit
+  # above the size the heap already has, and a small row before a blob 50 MB
+  # beyond the limit
   old <- mem.maxVSize()
   withr::defer(mem.maxVSize(old))
   invisible(gc())
   heap <- gc()["Vcells", ]
   limit <- ceiling(max(heap[[4]], heap[[2]] + 30))
   con <- local_con()
-  dbExecute(con, paste0("CREATE TABLE t AS SELECT zeroblob(", (limit + 50) * 2^20, ") AS b"))
-  rs <- dbSendQuery(con, "SELECT b FROM t")
+  dbExecute(con, "CREATE TABLE t (i INTEGER PRIMARY KEY, b BLOB)")
+  dbExecute(con, "INSERT INTO t VALUES (1, x'01')")
+  dbExecute(con, paste0("INSERT INTO t VALUES (2, zeroblob(", (limit + 50) * 2^20, "))"))
+  rs <- dbSendQuery(con, "SELECT i, b FROM t ORDER BY i")
   withr::defer(if (dbIsValid(rs)) dbClearResult(rs))
 
   # The data frame path allocates the blob with a raw R call, so the fetch
@@ -667,12 +727,19 @@ test_that("a result stays usable after an R error leaves its fetch by a longjmp"
       dbFetch(rs),
       error = function(e) invisible(mem.maxVSize(old))
     ),
-    "vector memory limit"
+    "vector memory"
   )
   invisible(mem.maxVSize(old))
 
+  # The rows read before the error are lost with the data frame of the fetch,
+  # but counted: the small row does not come again
+  expect_equal(dbGetRowCount(rs), 1L)
+
   # The result is not left marked busy: it fetches, and it clears
-  expect_equal(lengths(dbFetch(rs)$b), (limit + 50) * 2^20)
+  out <- dbFetch(rs)
+  expect_equal(out$i, 2L)
+  expect_equal(lengths(out$b), (limit + 50) * 2^20)
+  expect_equal(dbGetRowCount(rs), 2L)
   expect_silent(dbClearResult(rs))
 })
 
@@ -938,6 +1005,10 @@ test_that("dbBindArrow() refuses values beyond SQLite's length limit", {
     expect_error(dbAppendTableArrow(con, "t", params), "Can't bind parameter 1: string or blob too big")
   }
   expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 0L)
+
+  # The 2 GiB go before the next test, see helper-memory.R
+  rm(params, data, large)
+  gc_until_stable()
 })
 
 test_that("dbAppendTableArrow() appends rows and reports their number", {

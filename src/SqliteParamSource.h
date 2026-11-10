@@ -17,6 +17,9 @@ public:
   // Binds the next row and returns true, or returns false once all rows are
   // bound.
   virtual bool bind_next_row(sqlite3_stmt* stmt) = 0;
+  // Whether destroying the source releases R objects, which only R's main
+  // thread may do
+  virtual bool holds_r_objects() const = 0;
 };
 
 // Parameters given as a list of R vectors of equal length
@@ -29,6 +32,9 @@ public:
 
 public:
   virtual bool bind_next_row(sqlite3_stmt* stmt);
+  virtual bool holds_r_objects() const {
+    return true;
+  }
 
 private:
   void bind_parameter(sqlite3_stmt* stmt, int pos, SEXP value_) const;
@@ -56,6 +62,9 @@ public:
 
 public:
   virtual bool bind_next_row(sqlite3_stmt* stmt);
+  virtual bool holds_r_objects() const {
+    return false;
+  }
 
 private:
   bool next_batch();

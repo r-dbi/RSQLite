@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "DbArrowStream.h"
 #include "DbConnection.h"
 
 namespace cpp11 {
@@ -57,6 +58,8 @@ void connection_release(cpp11::external_pointer<DbConnectionPtr> con_) {
     return;
   }
 
+  // Results that Arrow streams let go of on other threads count no longer
+  db_arrow_release_deferred();
   DbConnectionPtr* con = con_.get();
   long n = con_->use_count();
   if (n > 1) {

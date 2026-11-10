@@ -17,7 +17,8 @@
 #' A column whose first chunk holds only `NULL` values takes the type of its declaration,
 #' and a column without a declaration that only ever holds `NULL` is of the Arrow null type.
 #' Once the first chunk has been fetched the types are fixed.
-#' A value of another storage class is converted by SQLite's own rules.
+#' A value of another storage class is converted by SQLite's own rules,
+#' and becomes `NULL` in a column of the null type.
 #' A blob in a text column is kept only if it is valid UTF-8 without NUL bytes,
 #' and a date, time or timestamp that cannot be parsed is dropped;
 #' both become `NULL`.

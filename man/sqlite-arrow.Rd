@@ -22,7 +22,8 @@ and integers are widened to \code{double} if a real number turns up in the first
 A column whose first chunk holds only \code{NULL} values takes the type of its declaration,
 and a column without a declaration that only ever holds \code{NULL} is of the Arrow null type.
 Once the first chunk has been fetched the types are fixed.
-A value of another storage class is converted by SQLite's own rules.
+A value of another storage class is converted by SQLite's own rules,
+and becomes \code{NULL} in a column of the null type.
 A blob in a text column is kept only if it is valid UTF-8 without NUL bytes,
 and a date, time or timestamp that cannot be parsed is dropped;
 both become \code{NULL}.

@@ -92,6 +92,40 @@ test_that("a data frame fetch through Arrow warns once, with the final types", {
   expect_equal(vapply(w[[2]]$coercions[[1]]$values, `[[`, "", "class"), c("real", "string"))
 })
 
+test_that("values in a column of the null type are reported as dropped", {
+  for (arrow in c(FALSE, TRUE)) {
+    con <- local_con(arrow = arrow)
+    dbExecute(con, "CREATE TABLE t (x)")
+    dbExecute(con, "INSERT INTO t VALUES (NULL), (NULL), (1), ('a')")
+
+    # The first chunk fixes the null type
+    rs <- dbSendQuery(con, "SELECT x FROM t")
+    expect_no_warning(chunk <- dbFetchArrowChunk(rs, chunk_size = 2))
+    expect_equal(nanoarrow::infer_nanoarrow_schema(chunk)$children$x$format, "n")
+    # Later chunks, and a data frame fetch through Arrow, drop the values
+    if (arrow) {
+      w <- coercion_warnings(rest <- dbFetch(rs))
+      expect_equal(rest$x, c(NA, NA))
+    } else {
+      w <- coercion_warnings(rest <- dbFetchArrowChunk(rs, chunk_size = 2))
+      expect_equal(rest$length, 2)
+    }
+    dbClearResult(rs)
+
+    expect_length(w, 1)
+    coercions <- w[[1]]$coercions[[1]]
+    expect_equal(coercions$type, "null")
+    expect_equal(vapply(coercions$values, `[[`, "", "class"), c("integer", "string"))
+    expect_equal(vapply(coercions$values, `[[`, "", "reason"), c("null_type", "null_type"))
+    expect_equal(vapply(coercions$values, `[[`, 1, "rows"), c(3, 4))
+    expect_match(
+      conditionMessage(w[[1]]),
+      "1 integer value dropped by the null type, NA (row 3); 1 string value dropped by the null type, NA (row 4)",
+      fixed = TRUE
+    )
+  }
+})
+
 test_that("long lists of rows are truncated", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x)")

@@ -93,6 +93,8 @@ const char* CoercionLog::format_reason(COERCION_REASON reason) {
     return "unparsable";
   case CR_OUT_OF_RANGE:
     return "out_of_range";
+  case CR_NULL_TYPE:
+    return "null_type";
   }
   return "converted";
 }

@@ -14,7 +14,9 @@ enum COERCION_REASON {
   // A date or time that could not be parsed, NULL instead
   CR_UNPARSABLE,
   // A number outside the range of the type, NULL instead
-  CR_OUT_OF_RANGE
+  CR_OUT_OF_RANGE,
+  // A value in a column of the null type, which holds only NULL
+  CR_NULL_TYPE
 };
 
 // The values of one column that were not of its type, grouped by storage

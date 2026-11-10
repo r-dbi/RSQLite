@@ -54,6 +54,7 @@ format_coercion_values <- function(values) {
     invalid_utf8 = "not valid UTF-8, NA",
     unparsable = "not in the expected format, NA",
     out_of_range = "out of range, NA",
+    null_type = "dropped by the null type, NA",
     values$reason
   )
   paste0(what, " ", outcome, " (", format_coercion_rows(values), ")")

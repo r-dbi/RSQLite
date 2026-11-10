@@ -508,7 +508,9 @@ void SqliteArrowColumn::append_value(int column_type, int64_t row) {
     }
 
   case AK_NA:
-    log.record(column_type, CR_CONVERTED, row);
+    // Fixed by a first chunk of only NULL, for an Arrow stream or chunk and
+    // the data frame fetches after one: the null type drops the values
+    log.record(column_type, CR_NULL_TYPE, row);
     append_null();
     break;
 

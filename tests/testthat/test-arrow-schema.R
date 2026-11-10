@@ -214,6 +214,14 @@ test_that("requested types survive dbBind() and apply to dbReadTableArrow()", {
   expect_equal(schema_formats(stream), c(x = "i"))
   expect_equal(as.data.frame(stream)$x, c(1L, 2L))
   expect_equal(schema_formats(dbReadTableArrow(con, "t")), c(x = "l"))
+
+  # Every kind of table name
+  for (name in list(SQL('"t"'), Id(table = "t"), Id(schema = "main", table = "t"))) {
+    stream <- dbReadTableArrow(con, name, schema = list(x = nanoarrow::na_int32()))
+    expect_equal(schema_formats(stream), c(x = "i"))
+    expect_equal(as.data.frame(stream)$x, c(1L, 2L))
+  }
+  expect_error(dbReadTableArrow(con, c("t", "u")), "Invalid name")
 })
 
 test_that("extended types play no part for a requested type", {

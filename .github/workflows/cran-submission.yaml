@@ -82,7 +82,8 @@
 #
 # The `attach-tarball` job then attaches the submitted tarball to the draft release as an asset,
 # after checking its sha256 against the one the upload used,
-# so that the record of what went to CRAN does not expire with the run's artifact.
+# so that the record of what went to CRAN does not expire with the run's artifact;
+# cran-release.yaml publishes no draft without it.
 # It is a job of its own, after the upload, so that only it and the `tag` job hold `contents: write`;
 # a run dispatched with `retag` replaces the asset of the earlier attempt.
 #

@@ -14,8 +14,10 @@
 # `utils::available.packages(repos = "https://packagemanager.posit.co/cran/latest")`:
 # the version is out when the index lists the package at exactly that version.
 # A version that is out is published (`gh release edit <tag> --draft=false --latest`),
-# after checking that the tag exists and points at the commit the draft targets;
-# a missing or moved tag is reported, with how to resolve it, and nothing is published.
+# after checking that the draft carries the tarball `<package>_<version>.tar.gz`,
+# which cran-submission.yaml attaches only after a successful upload,
+# and that the tag exists and points at the commit the draft targets;
+# a missing tarball or a missing or moved tag is reported, with how to resolve it, and nothing is published.
 # A version that is not out yet, or no draft at all, is a line in the report and success,
 # so a nightly run stays green while it waits.
 #
@@ -77,24 +79,26 @@ summary "## CRAN release${dry_run:+: dry run}" ""
 
 group "Drafts: the releases cran-submission.yaml drafted in $repo"
 # A draft has no tag yet, so its pending tag name is read from the release list.
-# One line per draft with the marker: tag, package, version, target, URL.
+# One line per draft with the marker: tag, package, version, target, URL,
+# and whether the draft carries the submitted tarball as an asset.
 # shellcheck disable=SC2016  # a jq program, with jq's own $r
 if ! "$gh" api --paginate "repos/$repo/releases?per_page=100" --jq '
   .[] | select(.draft) | . as $r
-  | ($r.body // "") | capture("<!-- cran-submission: (?<pkg>[^ ]+) (?<ver>[^ ]+) -->")
-  | [$r.tag_name, .pkg, .ver, $r.target_commitish, $r.html_url] | @tsv' >"$work/drafts" 2>"$work/gh.err"; then
+  | ($r.body // "") | capture("<!-- cran-submission: (?<pkg>[^ ]+) (?<ver>[^ ]+) -->") | . as $m
+  | [$r.tag_name, $m.pkg, $m.ver, $r.target_commitish, $r.html_url,
+     any($r.assets[]?; .name == "\($m.pkg)_\($m.ver).tar.gz")] | @tsv' >"$work/drafts" 2>"$work/gh.err"; then
   cat "$work/gh.err" >&2
   fail "Drafts" "The releases cannot be listed" "\`gh api repos/$repo/releases\` failed: $(head -n 1 "$work/gh.err")" "$work/gh.err" -- \
     "Check that the token may read the repository's releases; drafts need \`contents: write\`." \
     "Rerun the workflow; the next nightly run tries again in any case."
 fi
 n=0
-while IFS=$'\t' read -r tag pkg version target url; do
+while IFS=$'\t' read -r tag pkg version target url tarball; do
   if [ "$tag" != "v$version" ]; then
     say "  skipped: $url, tag $tag, which is not v$version as its marker says"
     continue
   fi
-  printf '%s\t%s\t%s\t%s\t%s\n' "$tag" "$pkg" "$version" "$target" "$url" >>"$work/matching"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$tag" "$pkg" "$version" "$target" "$url" "$tarball" >>"$work/matching"
   val "draft" "$pkg $version, tag $tag, target $target, $url"
   n=$((n + 1))
 done <"$work/drafts"
@@ -148,7 +152,7 @@ target_commit() { # <target>
 # --- each draft -------------------------------------------------------------
 
 failed=0
-while IFS=$'\t' read -r tag pkg version target url <&3; do
+while IFS=$'\t' read -r tag pkg version target url tarball <&3; do
   title="$pkg $version"
   group "Release: $title"
   val "draft" "$url"
@@ -170,6 +174,22 @@ while IFS=$'\t' read -r tag pkg version target url <&3; do
     "- Draft release: [$title]($url), tag \`$tag\`" \
     "- Commit $(commit_link "$target"), the draft's target" \
     "- P3M: checked $index_url, which lists $pkg $served"
+
+  # cran-submission.yaml writes the draft and the tag before it builds and uploads,
+  # and attaches the tarball only once the upload went through:
+  # a draft without it is from a run that failed on the way, whatever P3M serves.
+  asset="${pkg}_${version}.tar.gz"
+  val "tarball" "$([ "$tarball" = true ] && echo "$asset" || echo "(none)")"
+  if [ "$tarball" != true ]; then
+    failure "$title" "The submitted tarball is missing" "$title is on P3M, but its draft release carries no asset $asset, which the submission run attaches after a successful upload; nothing was published." -- \
+      "Open the run of cran-submission.yaml that submitted $title: its summary says whether the upload went through, and links the commit." \
+      "If it did and only attaching failed, attach the run's artifact \`${pkg}_${version}\`: \`gh release upload $tag $asset\`." \
+      "If CRAN got $title some other way, attach the tarball CRAN got, and check that the tag and the draft's target are its commit." \
+      "The next nightly run publishes the release once the tarball is there, or rerun this workflow."
+    failed=1
+    continue
+  fi
+  summary "- Submitted tarball: \`$asset\`, attached to the draft"
 
   # Draft and tag are written by the same run of cran-submission.yaml, the draft first.
   if ! tagged=$(tag_commit "$tag" 2>"$work/gh.err"); then

@@ -4,9 +4,10 @@
 # Process: the header of .github/workflows/cran-submission.yaml
 #
 #   1. A draft whose version P3M does not list yet is one line in the report, and success.
-#   2. A draft whose version P3M lists is published, once its tag points at its target.
-#   3. A missing tag, and a tag at another commit, fail with a "How to resolve" section
-#      and publish nothing.
+#   2. A draft whose version P3M lists is published, once it carries the submitted tarball
+#      and its tag points at its target.
+#   3. A missing tag, a tag at another commit, and a draft without the submitted tarball
+#      fail with a "How to resolve" section and publish nothing.
 #   4. No draft with the marker is nothing to do: no request to P3M, and success.
 #   5. A dry run publishes nothing, and says what it would publish.
 #      The step output `published` names each release that was published, and only those.
@@ -139,7 +140,8 @@ with_draft() {
   releases <<EOF
 [
   {"draft": true, "tag_name": "v2.0.0", "target_commitish": "$TARGET", "html_url": "$URL",
-   "body": "## Breaking changes\n\n- Upgrade bundled SQLite.\n\n<!-- cran-submission: RSQLite 2.0.0 -->\n"},
+   "body": "## Breaking changes\n\n- Upgrade bundled SQLite.\n\n<!-- cran-submission: RSQLite 2.0.0 -->\n",
+   "assets": [{"name": "RSQLite_2.0.0.tar.gz"}]},
   {"draft": true, "tag_name": "v9.9.9", "target_commitish": "main", "html_url": "https://github.example/x",
    "body": "A draft written by hand."},
   {"draft": false, "tag_name": "v1.5.6", "target_commitish": "main", "html_url": "https://github.example/v1.5.6",
@@ -213,6 +215,7 @@ summary=$(cat "$SUMMARY")
 has "the report links the release" "$summary" "- Draft release: [RSQLite 2.0.0]($URL), tag \`v2.0.0\`"
 has "and the commit" "$summary" "- Commit [\`${TARGET:0:10}\`](https://github.example/r-dbi/RSQLite/commit/$TARGET), the draft's target"
 has "and what P3M said" "$summary" "- P3M: checked $INDEX, which lists RSQLite 2.0.0"
+has "and the tarball" "$summary" "- Submitted tarball: \`RSQLite_2.0.0.tar.gz\`, attached to the draft"
 has "and the outcome" "$summary" "- Published as the latest release."
 is "the step output names what was published" "$(cat "$SCRATCH/output")" "published<<EOF_PUBLISHED
 RSQLite 2.0.0
@@ -241,6 +244,27 @@ has "naming both commits" "$out" "::error title=The tag v2.0.0 points elsewhere:
 is "nothing is published" "$(edits)" ""
 is "and names nothing as published" "$(cat "$SCRATCH/output")" ""
 has "the report says how to resolve it" "$(cat "$SUMMARY")" "#### How to resolve"
+
+echo
+echo "== a draft without the submitted tarball publishes nothing"
+tag_at "$TARGET"
+releases <<EOF
+[{"draft": true, "tag_name": "v2.0.0", "target_commitish": "$TARGET", "html_url": "$URL",
+  "body": "<!-- cran-submission: RSQLite 2.0.0 -->", "assets": [{"name": "RSQLite_1.9.0.tar.gz"}]}]
+EOF
+out=$(run)
+has "it fails" "$out" "exit 1"
+has "naming the tarball" "$out" "::error title=The submitted tarball is missing::RSQLite 2.0.0 is on P3M, but its draft release carries no asset RSQLite_2.0.0.tar.gz"
+is "nothing is published" "$(edits)" ""
+is "and names nothing as published" "$(cat "$SCRATCH/output")" ""
+has "the report says how to attach it" "$(cat "$SUMMARY")" "\`gh release upload v2.0.0 RSQLite_2.0.0.tar.gz\`"
+releases <<EOF
+[{"draft": true, "tag_name": "v2.0.0", "target_commitish": "$TARGET", "html_url": "$URL",
+  "body": "<!-- cran-submission: RSQLite 2.0.0 -->"}]
+EOF
+out=$(run)
+has "a draft without assets fails too" "$out" "::error title=The submitted tarball is missing::"
+is "and publishes nothing" "$(edits)" ""
 
 # --- 4: no draft -------------------------------------------------------------------
 

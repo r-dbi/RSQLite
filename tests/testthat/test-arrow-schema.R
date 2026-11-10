@@ -164,6 +164,51 @@ test_that("every supported type can be requested", {
   expect_equal(attr(zurich$x, "tzone"), "Europe/Zurich")
 })
 
+test_that("the chunk kept for the schema is split in every requested type", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "WITH RECURSIVE s(x) AS (SELECT 1 UNION ALL SELECT x + 1 FROM s WHERE x < 10) INSERT INTO t SELECT x FROM s")
+  dbExecute(con, "UPDATE t SET x = NULL WHERE x IN (2, 7)")
+  schema <- list(
+    bool = nanoarrow::na_bool(), i8 = nanoarrow::na_int8(), i16 = nanoarrow::na_int16(),
+    i32 = nanoarrow::na_int32(), i64 = nanoarrow::na_int64(), u8 = nanoarrow::na_uint8(),
+    u16 = nanoarrow::na_uint16(), u32 = nanoarrow::na_uint32(), u64 = nanoarrow::na_uint64(),
+    f32 = nanoarrow::na_float(), f64 = nanoarrow::na_double(),
+    s = nanoarrow::na_string(), ls = nanoarrow::na_large_string(),
+    b = nanoarrow::na_binary(), lb = nanoarrow::na_large_binary(),
+    d32 = nanoarrow::na_date32(), d64 = nanoarrow::na_date64(),
+    t32 = nanoarrow::na_time32("ms"), t64 = nanoarrow::na_time64("ns"),
+    ts = nanoarrow::na_timestamp("s", "UTC"), n = nanoarrow::na_na()
+  )
+  sql <- paste(
+    "SELECT", paste0("x AS ", names(schema)[1:11], collapse = ", "),
+    ", CAST(x AS TEXT) AS s, CAST(x AS TEXT) AS ls, CAST(x AS BLOB) AS b, CAST(x AS BLOB) AS lb,",
+    "date('2020-01-01', '+' || x || ' days') AS d32, date('2020-01-01', '+' || x || ' days') AS d64,",
+    "time(0, '+' || x || ' seconds') AS t32, time(0, '+' || x || ' seconds') AS t64,",
+    "datetime(0, '+' || x || ' hours') AS ts, NULL AS n, x AS open FROM t ORDER BY rowid"
+  )
+  whole <- as.data.frame(dbGetQueryArrow(con, sql, schema = schema))
+
+  rs <- dbSendQueryArrow(con, sql, schema = schema)
+  on.exit(dbClearResult(rs))
+  stream <- dbFetchArrow(rs, chunk_size = 8)
+  # The column without a requested type needs the first 8 rows
+  expect_equal(schema_formats(stream)[["open"]], "l")
+
+  chunks <- list()
+  repeat {
+    chunk <- dbFetchArrowChunk(rs, chunk_size = 3)
+    if (chunk$length == 0) {
+      break
+    }
+    chunks <- c(chunks, list(chunk))
+  }
+  expect_equal(vapply(chunks, function(chunk) chunk$length, numeric(1)), c(3, 3, 2, 2))
+  expect_equal(as.data.frame(nanoarrow::basic_array_stream(chunks)), whole)
+  expect_equal(whole$u8, c(1L, NA, 3:6, NA, 8:10))
+  expect_equal(whole$ls, as.character(c(1, NA, 3:6, NA, 8:10)))
+})
+
 test_that("values out of range and coercions are reported per the rules", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x)")

@@ -748,17 +748,31 @@ static void append_arrow_value(
   if (ArrowArrayViewIsNull(values, i)) {
     code = ArrowArrayAppendNull(out, 1);
   } else {
+    // The storage types of every type that SqliteArrowColumn fills, the date
+    // and time types are integers; a null type is NULL throughout
     switch (values->storage_type) {
+    case NANOARROW_TYPE_BOOL:
+    case NANOARROW_TYPE_INT8:
+    case NANOARROW_TYPE_INT16:
     case NANOARROW_TYPE_INT32:
     case NANOARROW_TYPE_INT64:
       code = ArrowArrayAppendInt(out, ArrowArrayViewGetIntUnsafe(values, i));
       break;
+    case NANOARROW_TYPE_UINT8:
+    case NANOARROW_TYPE_UINT16:
+    case NANOARROW_TYPE_UINT32:
+    case NANOARROW_TYPE_UINT64:
+      code = ArrowArrayAppendUInt(out, ArrowArrayViewGetUIntUnsafe(values, i));
+      break;
+    case NANOARROW_TYPE_FLOAT:
     case NANOARROW_TYPE_DOUBLE:
       code =
         ArrowArrayAppendDouble(out, ArrowArrayViewGetDoubleUnsafe(values, i));
       break;
     case NANOARROW_TYPE_STRING:
+    case NANOARROW_TYPE_LARGE_STRING:
     case NANOARROW_TYPE_BINARY:
+    case NANOARROW_TYPE_LARGE_BINARY:
       code =
         ArrowArrayAppendBytes(out, ArrowArrayViewGetBytesUnsafe(values, i));
       break;

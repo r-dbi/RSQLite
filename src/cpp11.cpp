@@ -203,6 +203,13 @@ extern "C" SEXP _RSQLite_result_set_rows_fetched(SEXP res, SEXP n) {
     return R_NilValue;
   END_CPP11
 }
+// result.cpp
+cpp11::list arrow_stream_read_on_thread(SEXP stream_xptr, double n, bool release);
+extern "C" SEXP _RSQLite_arrow_stream_read_on_thread(SEXP stream_xptr, SEXP n, SEXP release) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(arrow_stream_read_on_thread(cpp11::as_cpp<cpp11::decay_t<SEXP>>(stream_xptr), cpp11::as_cpp<cpp11::decay_t<double>>(n), cpp11::as_cpp<cpp11::decay_t<bool>>(release)));
+  END_CPP11
+}
 // rsqlite.cpp
 cpp11::strings rsqliteVersion();
 extern "C" SEXP _RSQLite_rsqliteVersion() {
@@ -213,6 +220,7 @@ extern "C" SEXP _RSQLite_rsqliteVersion() {
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
+    {"_RSQLite_arrow_stream_read_on_thread",  (DL_FUNC) &_RSQLite_arrow_stream_read_on_thread,  3},
     {"_RSQLite_connection_connect",           (DL_FUNC) &_RSQLite_connection_connect,           5},
     {"_RSQLite_connection_copy_database",     (DL_FUNC) &_RSQLite_connection_copy_database,     2},
     {"_RSQLite_connection_import_file",       (DL_FUNC) &_RSQLite_connection_import_file,       6},

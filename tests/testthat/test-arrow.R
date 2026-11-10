@@ -656,6 +656,58 @@ test_that("a coercion on a worker thread fails the stream instead of warning", {
   expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 300L)
 })
 
+test_that("a stream is read and released on another thread", {
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, s TEXT, d DATE, tm TIME, ts TIMESTAMP)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 'a', '2024-01-02', '12:34:56', '2024-01-02 12:34:56.25'),",
+    "(2, NULL, NULL, NULL, NULL), (3, 'c', 19725, 3600.5, 1704198896.5)"
+  ))
+  sql <- "SELECT * FROM t ORDER BY i"
+  rbind_arrays <- function(arrays) do.call(rbind, lapply(arrays, as.data.frame))
+
+  # Dates, times and timestamps parsed from text and from numbers
+  out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, sql, chunk_size = 2), -1, TRUE)
+  expect_equal(out$error, "")
+  expect_equal(vapply(out$arrays, function(array) array$length, numeric(1)), c(2, 1))
+  expect_equal(rbind_arrays(out$arrays), as.data.frame(dbGetQueryArrow(con, sql, chunk_size = 2)))
+
+  # One row of R parameters, and Arrow parameters
+  out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, "SELECT ? AS a", params = list(5L)), -1, TRUE)
+  expect_equal(rbind_arrays(out$arrays)$a, 5)
+  rs <- dbSendQueryArrow(con, "SELECT ? AS a")
+  dbBindArrow(rs, nanoarrow::as_nanoarrow_array_stream(data.frame(a = 1:3)))
+  out <- arrow_stream_read_on_thread(dbFetchArrow(rs, chunk_size = 2), -1, TRUE)
+  expect_equal(out$error, "")
+  expect_equal(rbind_arrays(out$arrays)$a, c(1, 2, 3))
+  dbClearResult(rs)
+})
+
+test_that("on another thread, what would warn or call R fails the stream", {
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x, d DATE)")
+  dbExecute(con, "INSERT INTO t VALUES (1, 1, '2024-01-02'), (2, 2, 'not a date'), (3, 'three', NULL)")
+
+  out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, "SELECT x FROM t ORDER BY i", chunk_size = 2), -1, TRUE)
+  expect_length(out$arrays, 1)
+  expect_match(out$error, "`x`: mixed type.*an error instead of a warning, because R can't warn")
+
+  out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, "SELECT d FROM t ORDER BY i"), -1, TRUE)
+  expect_length(out$arrays, 0)
+  expect_match(out$error, "Unknown string format, NA is returned.*an error instead of a warning")
+
+  # R parameters are R vectors: their second row can't be bound there
+  out <- arrow_stream_read_on_thread(
+    dbGetQueryArrow(con, "SELECT ? AS a", params = list(1:3), chunk_size = 1),
+    -1,
+    TRUE
+  )
+  expect_match(out$error, "Can't bind the next row of parameters while another thread reads.*dbBindArrow")
+
+  # Read on R's main thread, the same values warn
+  expect_warning(as.data.frame(dbGetQueryArrow(con, "SELECT d FROM t ORDER BY i")), "Unknown string format")
+})
+
 test_that("an error of the statement after dbDisconnect() keeps its result code", {
   con <- dbConnect(SQLite(), ":memory:")
   dbExecute(con, "CREATE TABLE t (a)")

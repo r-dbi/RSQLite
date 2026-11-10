@@ -6,6 +6,10 @@
 // After DbArrow.h, so that the Arrow C structs are defined once
 #include <nanoarrow/r.h>
 
+#include <string>
+#include <thread>
+#include <vector>
+
 // #include "DbResult.h"
 
 [[cpp11::register]]
@@ -164,4 +168,73 @@ double result_rethrown_unwinds(DbResult* res) {
 [[cpp11::register]]
 void result_set_rows_fetched(SqliteResult* res, double n) {
   res->set_rows_fetched(static_cast<int64_t>(n));
+}
+
+// For the tests: reads a nanoarrow_array_stream on a thread of its own, as
+// arrow's scanner and Acero do, and calls no R API there. Reads the schema and
+// at most `n` arrays, all if `n` is negative, and releases the stream there if
+// `release` is true. Returns the arrays read and the error of the stream, ""
+// if none.
+[[cpp11::register]]
+cpp11::list arrow_stream_read_on_thread(
+  SEXP stream_xptr,
+  double n,
+  bool release
+) {
+  using namespace cpp11::literals;
+
+  if (!Rf_inherits(stream_xptr, "nanoarrow_array_stream")) {
+    cpp11::stop("`stream` must be a nanoarrow_array_stream.");
+  }
+  struct ArrowArrayStream* stream =
+    static_cast<struct ArrowArrayStream*>(R_ExternalPtrAddr(stream_xptr));
+  if (stream == NULL || stream->release == NULL) {
+    cpp11::stop("The nanoarrow_array_stream has already been released.");
+  }
+
+  nanoarrow::UniqueSchema schema;
+  std::vector<nanoarrow::UniqueArray> arrays;
+  std::string error;
+  std::thread reader([&] {
+    try {
+      int rc = stream->get_schema(stream, schema.get());
+      for (int64_t i = 0; rc == 0 && (n < 0 || i < n); ++i) {
+        nanoarrow::UniqueArray array;
+        rc = stream->get_next(stream, array.get());
+        if (rc != 0 || array->release == NULL) {
+          break;
+        }
+        arrays.push_back(std::move(array));
+      }
+      if (rc != 0) {
+        const char* message = stream->get_last_error(stream);
+        error = (message == NULL) ? "unknown error" : message;
+      }
+      if (release) {
+        stream->release(stream);
+      }
+    } catch (...) {
+      error = "C++ exception on the reading thread";
+    }
+  });
+  reader.join();
+
+  cpp11::writable::list out(static_cast<R_xlen_t>(arrays.size()));
+  if (!arrays.empty()) {
+    cpp11::sexp schema_xptr(nanoarrow_schema_owning_xptr());
+    ArrowSchemaMove(
+      schema.get(),
+      nanoarrow_output_schema_from_xptr(schema_xptr)
+    );
+    for (size_t i = 0; i < arrays.size(); ++i) {
+      cpp11::sexp array_xptr(nanoarrow_array_owning_xptr());
+      ArrowArrayMove(
+        arrays[i].get(),
+        nanoarrow_output_array_from_xptr(array_xptr)
+      );
+      R_SetExternalPtrTag(array_xptr, schema_xptr);
+      out[static_cast<R_xlen_t>(i)] = array_xptr;
+    }
+  }
+  return cpp11::list({ "arrays"_nm = out, "error"_nm = error });
 }

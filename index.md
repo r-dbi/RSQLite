@@ -28,11 +28,11 @@ RSQLite aims to:
   The engine's sources and the bundled extensions ship with the package, so no external database software is needed.
 - Implement the DBI specification for SQLite,
   with the full DBItest suite running as part of the package's own tests.
-- Behave the same on every installation,
+- Run the same SQLite engine, with the same build options, on every installation,
   by compiling the included SQLite sources into the package rather than linking a SQLite from the system.
   The only system library `configure` looks for is libcurl, and only for the optional HTTP VFS.
 - Make the SQLite-specific features that DBI does not cover available,
-  such as loadable extensions through `initExtension()`,
+  such as the bundled extension functions enabled by `initExtension()`,
   and read-only access to remote database files when libcurl is present at build time.
 
 It is explicitly not trying to:

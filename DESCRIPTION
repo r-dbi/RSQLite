@@ -1,7 +1,7 @@
 Package: RSQLite
 Title: SQLite Interface for R
-Version: 3.53.3.9013
-Date: 2026-09-26
+Version: 3.53.3.9021
+Date: 2026-11-08
 Authors@R: c(
     person("Kirill", "Müller", , "kirill@cynkra.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1416-3412")),
@@ -143,7 +143,7 @@ Collate:
     'utils.R'
     'version.R'
     'zzz.R'
-Config/roxygen2/version: 8.1.0.9100
+Config/roxygen2/version: 8.1.1.9100
 Config/cynkra/roxygen2: The .9100 suffix on Config/roxygen2/version marks a patched
     roxygen2, not an upstream development build. Upstream numbers its own
     development builds x.y.z.9000; the build that documents this package takes the

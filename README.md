@@ -27,11 +27,11 @@ RSQLite aims to:
   The engine's sources and the bundled extensions ship with the package, so no external database software is needed.
 - Implement the DBI specification for SQLite,
   with the full DBItest suite running as part of the package's own tests.
-- Behave the same on every installation,
+- Run the same SQLite engine, with the same build options, on every installation,
   by compiling the included SQLite sources into the package rather than linking a SQLite from the system.
   The only system library `configure` looks for is libcurl, and only for the optional HTTP VFS.
 - Make the SQLite-specific features that DBI does not cover available,
-  such as loadable extensions through `initExtension()`,
+  such as the bundled extension functions enabled by [`initExtension()`](https://rsqlite.r-dbi.org/reference/initExtension.html),
   and read-only access to remote database files when libcurl is present at build time.
 
 It is explicitly not trying to:
@@ -43,7 +43,7 @@ It is explicitly not trying to:
 - Make up for what SQLite does not do.
   It is a single-user, light-weight engine covering a subset of SQL 92, and RSQLite exposes it as it is.
 - Keep the pre-DBI API alive.
-  Functions such as `dbGetPreparedQuery()`, `sqliteBuildTableDefinition()` and `make.db.names()` remain only as deprecated shims for existing code.
+  Functions such as [`dbGetPreparedQuery()`](https://rsqlite.r-dbi.org/reference/query-dep.html), [`sqliteBuildTableDefinition()`](https://rsqlite.r-dbi.org/reference/sqliteBuildTableDefinition.html) and `make.db.names()` remain only as deprecated shims for existing code.
 
 ## Installation
 
@@ -65,7 +65,7 @@ pak::pak("r-dbi/RSQLite")
 RSQLite supports loadable extensions.
 An experimental HTTP/HTTPS VFS is available when the package is built with libcurl support,
 enabling read-only access to remote SQLite databases.
-See the help pages for `initExtension()`, `sqliteHttpConfig()`, `sqliteRemote()`, and `sqliteHasHttpVFS()`.
+See the help pages for [`initExtension()`](https://rsqlite.r-dbi.org/reference/initExtension.html), [`sqliteHttpConfig()`](https://rsqlite.r-dbi.org/reference/sqliteHttpConfig.html), [`sqliteRemote()`](https://rsqlite.r-dbi.org/reference/sqliteRemote.html), and [`sqliteHasHttpVFS()`](https://rsqlite.r-dbi.org/reference/sqliteHasHttpVFS.html).
 
 Discussions associated with DBI and related database packages take place on [R-SIG-DB](https://stat.ethz.ch/mailman/listinfo/r-sig-db).
 The website [Databases using R](https://db.rstudio.com/) describes the tools and best practices in this ecosystem.

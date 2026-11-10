@@ -441,14 +441,22 @@ void SqliteArrowColumn::fetch_bytes() {
   }
   // sqlite3_column_text() or sqlite3_column_blob() converts the value,
   // and must be called before sqlite3_column_bytes().
-  // Text in a binary column is read as UTF-8 too, like the data frame path
-  // does it: sqlite3_column_blob() keeps the encoding of the database.
-  if (kind == AK_STRING || value_type == SQLITE_TEXT) {
-    value_data = sqlite3_column_text(stmt, j);
-  } else {
+  // A blob keeps its bytes, also in a utf8 column: sqlite3_column_text()
+  // would take them for text in the encoding of the database, and transcode
+  // them in a UTF-16 one. Text and numbers are read as UTF-8 text, also in a
+  // binary column, like the data frame path does it.
+  if (value_type == SQLITE_BLOB) {
     value_data = sqlite3_column_blob(stmt, j);
+  } else {
+    value_data = sqlite3_column_text(stmt, j);
   }
   value_size = sqlite3_column_bytes(stmt, j);
+  if (value_data == NULL) {
+    // A zero-length blob, or out of memory while expanding a zeroblob(),
+    // which fails the next step with SQLITE_NOMEM
+    value_data = "";
+    value_size = 0;
+  }
   value_fetched = true;
 }
 

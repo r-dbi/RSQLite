@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">RSQLite</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">3.53.3.9013</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">3.53.3.9021</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,27 @@
 <!-- badges: start -->
 
 <p>Embeds the SQLite database engine in R, providing a DBI-compliant interface. <a href="https://www.sqlite.org/index.html" class="external-link">SQLite</a> is a public-domain, single-user, very light-weight database engine that implements a decent subset of the SQL 92 standard, including the core table creation, updating, insertion, and selection operations, plus transaction management.</p>
+<div class="section level2">
+<h2 id="goals-and-non-goals">Goals and non-goals<a class="anchor" aria-label="anchor" href="#goals-and-non-goals"></a>
+</h2>
+<p>RSQLite aims to:</p>
+<ul>
+<li>Embed SQLite in R. The engine’s sources and the bundled extensions ship with the package, so no external database software is needed.</li>
+<li>Implement the DBI specification for SQLite, with the full DBItest suite running as part of the package’s own tests.</li>
+<li>Run the same SQLite engine, with the same build options, on every installation, by compiling the included SQLite sources into the package rather than linking a SQLite from the system. The only system library <code>configure</code> looks for is libcurl, and only for the optional HTTP VFS.</li>
+<li>Make the SQLite-specific features that DBI does not cover available, such as the bundled extension functions enabled by <code><a href="reference/initExtension.html">initExtension()</a></code>, and read-only access to remote database files when libcurl is present at build time.</li>
+</ul>
+<p>It is explicitly not trying to:</p>
+<ul>
+<li>Use a SQLite installed on the system. The version and the build options are those of the sources included here.</li>
+<li>Define the database interface. That is DBI’s part, which is why the vignette tells you to load DBI rather than RSQLite.</li>
+<li>Make up for what SQLite does not do. It is a single-user, light-weight engine covering a subset of SQL 92, and RSQLite exposes it as it is.</li>
+<li>Keep the pre-DBI API alive. Functions such as <code><a href="reference/query-dep.html">dbGetPreparedQuery()</a></code>, <code><a href="reference/sqliteBuildTableDefinition.html">sqliteBuildTableDefinition()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/make.db.names.html" class="external-link">make.db.names()</a></code> remain only as deprecated shims for existing code.</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>You can install the latest released version from CRAN with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"RSQLite"</span><span class="op">)</span></span></code></pre></div>
@@ -60,6 +81,7 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"r-dbi/RSQLite"</span><span class="op">)</span></span></code></pre></div>
+</div>
 <div class="section level2">
 <h2 id="extensions">Extensions<a class="anchor" aria-label="anchor" href="#extensions"></a>
 </h2>

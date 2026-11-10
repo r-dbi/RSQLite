@@ -14,6 +14,7 @@ dbSendQuery_SQLiteConnection_character <- function(conn, statement, params = NUL
       stopc("`ptype` requires a connection with `arrow = TRUE`")
     }
     ptype <- arrow_check_ptype(ptype)
+    ptype_schema <- arrow_ptype_schema(ptype)
   }
 
   if (!is.null(conn@ref$result)) {
@@ -32,7 +33,7 @@ dbSendQuery_SQLiteConnection_character <- function(conn, statement, params = NUL
   on.exit(dbClearResult(rs), add = TRUE)
 
   if (!is.null(ptype)) {
-    arrow_set_schema(rs, arrow_ptype_schema(ptype), arg = "ptype")
+    arrow_set_schema(rs, ptype_schema, arg = "ptype")
   }
 
   if (!is.null(params)) {

@@ -97,16 +97,36 @@ arrow_check_ptype <- function(ptype) {
 # nanoarrow's inference, except that hms columns take the time64 type the
 # result path fills, and factors are read as strings
 arrow_ptype_schema <- function(ptype) {
-  children <- lapply(ptype, function(col) {
-    if (inherits(col, "hms")) {
-      nanoarrow::na_time64("us")
-    } else if (is.factor(col)) {
-      nanoarrow::na_string()
-    } else {
-      nanoarrow::infer_nanoarrow_schema(col)
+  nanoarrow::na_struct(Map(arrow_ptype_column_schema, ptype, names(ptype)))
+}
+
+# A column that nanoarrow finds no type for, or can't convert back to,
+# is an error that names it before the query is sent
+arrow_ptype_column_schema <- function(col, name) {
+  if (inherits(col, "hms")) {
+    return(nanoarrow::na_time64("us"))
+  }
+  if (is.factor(col)) {
+    return(nanoarrow::na_string())
+  }
+  schema <- tryCatch(
+    nanoarrow::infer_nanoarrow_schema(col),
+    error = function(e) {
+      stopc("Can't request a type for column `", name, "` of `ptype`: ", conditionMessage(e))
     }
-  })
-  nanoarrow::na_struct(children)
+  )
+  # nanoarrow infers a type for some classes it cannot convert back to, such as AsIs
+  back <- tryCatch(
+    nanoarrow::convert_array(nanoarrow::nanoarrow_array_init(schema), to = col),
+    error = function(e) NULL
+  )
+  if (!identical(class(back), class(col))) {
+    stopc(
+      "Can't convert the values of column `", name, "` of `ptype` ",
+      "to its class <", paste(class(col), collapse = "/"), ">"
+    )
+  }
+  schema
 }
 
 # All rows of a stream with a known row count as a data frame:

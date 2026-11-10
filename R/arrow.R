@@ -153,12 +153,14 @@
 #' `nanoarrow::infer_nanoarrow_schema()` gives for it, see the section on requesting types:
 #' `integer` as `int32`, so that values outside its range become `NA` with a warning,
 #' `bit64::integer64` as `int64`, `logical` as `bool`, `Date` as `date32`, and `blob` as `binary`.
-#' A `POSIXct` column is requested as a timestamp in the time zone of the prototype,
+#' A `POSIXct` or `POSIXlt` column is requested as a timestamp in the time zone of the prototype,
 #' the session's time zone for an empty one:
 #' the values are read as UTC, like on both paths, and displayed in that zone.
 #' An `hms` column is requested as `time64` in microseconds,
 #' and a factor is read as text and converted to its levels, where other values become `NA` as with [base::factor()],
 #' or to the levels found in the values of each fetch if it has none.
+#' A prototype that nanoarrow finds no type for, one of a type that cannot be requested, such as a `difftime`,
+#' and one that nanoarrow cannot convert back to, such as an [AsIs][base::I] vector, are errors that name the column.
 #' These columns keep their types in every fetch, whatever the values,
 #' and come back exactly as described:
 #' an `integer64` column stays one whatever the values and whatever `bigint` says.

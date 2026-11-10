@@ -289,3 +289,34 @@ test_that("logical and factor prototypes", {
   dbClearResult(rs)
 })
 
+test_that("ptype rejects prototypes it can't request or convert back to", {
+  con <- local_arrow_con()
+  expect_error(
+    dbGetQuery(con, "SELECT 1 AS a", ptype = list(a = complex())),
+    "Can't request a type for column `a` of `ptype`",
+    fixed = TRUE
+  )
+  expect_error(
+    dbGetQuery(con, "SELECT 1 AS a, 2 AS b", ptype = list(a = integer(), b = NULL)),
+    "Can't request a type for column `b` of `ptype`",
+    fixed = TRUE
+  )
+  expect_error(
+    dbGetQuery(con, "SELECT 1 AS a", ptype = list(a = I(numeric()))),
+    "Can't convert the values of column `a` of `ptype` to its class <AsIs>",
+    fixed = TRUE
+  )
+  expect_error(
+    dbGetQuery(con, "SELECT 1 AS a", ptype = list(a = list())),
+    "column `a` of `ptype`",
+    fixed = TRUE
+  )
+
+  # A rejected prototype leaves an open result alone
+  rs <- dbSendQuery(con, "SELECT 1 AS a")
+  expect_error(dbSendQuery(con, "SELECT 1 AS a", ptype = list(a = I(numeric()))))
+  expect_error(dbSendQuery(con, "SELECT 1 AS a", ptype = list(a = complex())))
+  expect_true(dbIsValid(rs))
+  expect_equal(dbFetch(rs), data.frame(a = 1L))
+  dbClearResult(rs)
+})

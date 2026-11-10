@@ -17,6 +17,7 @@ SqliteResultImpl::SqliteResultImpl(
       cache(stmt),
       complete_(false),
       ready_(false),
+      bind_started_(false),
       nrows_(0),
       total_changes_start_(sqlite3_total_changes(conn)),
       group_(0),
@@ -117,7 +118,8 @@ int SqliteResultImpl::n_rows_fetched() {
 }
 
 int SqliteResultImpl::n_rows_affected() {
-  if (!ready_) {
+  // Changes count from the latest bind, also if it failed partway
+  if (!ready_ && !bind_started_) {
     return NA_INTEGER;
   }
   return sqlite3_total_changes(conn) - total_changes_start_;
@@ -143,13 +145,15 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
   group_ = 0;
 
   total_changes_start_ = sqlite3_total_changes(conn);
+  bind_started_ = true;
 
   try {
     bool has_params = bind_row();
     after_bind(has_params);
   } catch (...) {
-    // A failed bind leaves the result unbound, as before the first bind:
-    // fetching asks for a new bind instead of running these parameters again
+    // Parameters that fail to bind or to execute leave the result unbound,
+    // as before the first bind: fetching asks for a new bind instead of
+    // running them again
     params_ = cpp11::list();
     groups_ = 0;
     ready_ = false;

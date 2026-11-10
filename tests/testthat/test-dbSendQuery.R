@@ -263,6 +263,7 @@ test_that("a failed dbBind() asks for a new bind", {
   expect_error(dbFetch(res), "needs to be bound")
   expect_false(dbHasCompleted(res))
   expect_equal(dbGetRowCount(res), 0L)
+  expect_equal(dbGetRowsAffected(res), 0L)
 
   dbBind(res, list(c("[1]", "[2]")))
   expect_equal(dbFetch(res, n = 1)$j, "[1]")
@@ -276,4 +277,28 @@ test_that("a failed dbBind() asks for a new bind", {
   dbBind(res, list(c("[3]", "[4]")))
   expect_equal(dbFetch(res)$j, c("[3]", "[4]"))
   expect_true(dbHasCompleted(res))
+})
+
+test_that("a statement that fails partway reports the rows it changed", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, "CREATE TABLE u (x INTEGER UNIQUE)")
+
+  res <- dbSendStatement(con, "INSERT INTO u VALUES (?)")
+  # The third parameter set fails, after the first two were written
+  expect_error(dbBind(res, list(c(1L, 2L, 2L, 3L))), "UNIQUE")
+  expect_equal(dbGetRowsAffected(res), 2L)
+  expect_error(dbFetch(res), "needs to be bound")
+
+  # A new bind counts its own changes
+  dbBind(res, list(3:4))
+  expect_equal(dbGetRowsAffected(res), 2L)
+  dbClearResult(res)
+
+  expect_error(
+    dbExecute(con, "INSERT INTO u VALUES (?)", params = list(c(5L, 4L, 6L))),
+    "UNIQUE"
+  )
+  expect_equal(dbGetQuery(con, "SELECT x FROM u ORDER BY x")$x, 1:5)
 })

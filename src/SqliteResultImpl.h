@@ -30,6 +30,8 @@ private:
   // State
   bool complete_;
   bool ready_;
+  // Set once a bind has started, also if it failed: see n_rows_affected()
+  bool bind_started_;
   int nrows_;
   int total_changes_start_;
   cpp11::list params_;

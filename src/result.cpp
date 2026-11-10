@@ -95,6 +95,7 @@ cpp11::list result_column_info(DbResult* res) {
 
 [[cpp11::register]]
 cpp11::strings result_column_names(DbResult* res) {
+  db_arrow_release_deferred();
   return res->get_column_names();
 }
 
@@ -118,6 +119,7 @@ void result_set_arrow_schema(
   }
   const struct ArrowSchema* schema_ptr = nanoarrow_schema_from_xptr(schema);
   std::vector<int> pos(positions.begin(), positions.end());
+  db_arrow_release_deferred();
   res->set_arrow_schema(schema_ptr, pos);
 }
 

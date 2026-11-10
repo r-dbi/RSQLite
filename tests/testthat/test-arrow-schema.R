@@ -868,3 +868,37 @@ test_that("a requested uint64 beyond 2^63 - 1 is a double in data frames", {
     expect_int64_bits(array$children$x, c("1", "2", "-8446744073709551616", "-1", NA, "5"))
   }
 })
+
+test_that("dbColumnInfo() names the R type that dbFetch() returns for every requestable format", {
+  con <- local_arrow_con()
+  types <- list(
+    n = nanoarrow::na_na(), b = nanoarrow::na_bool(),
+    i8 = nanoarrow::na_int8(), i16 = nanoarrow::na_int16(), i32 = nanoarrow::na_int32(), i64 = nanoarrow::na_int64(),
+    u8 = nanoarrow::na_uint8(), u16 = nanoarrow::na_uint16(), u32 = nanoarrow::na_uint32(), u64 = nanoarrow::na_uint64(),
+    f32 = nanoarrow::na_float(), f64 = nanoarrow::na_double(),
+    s = nanoarrow::na_string(), ls = nanoarrow::na_large_string(),
+    bin = nanoarrow::na_binary(), lbin = nanoarrow::na_large_binary(),
+    d32 = nanoarrow::na_date32(), d64 = nanoarrow::na_date64(),
+    t_s = nanoarrow::na_time32("s"), t_ms = nanoarrow::na_time32("ms"),
+    t_us = nanoarrow::na_time64("us"), t_ns = nanoarrow::na_time64("ns"),
+    ts_s = nanoarrow::na_timestamp("s"), ts_ms = nanoarrow::na_timestamp("ms", "UTC"),
+    ts_us = nanoarrow::na_timestamp("us", "Europe/Zurich"), ts_ns = nanoarrow::na_timestamp("ns", "America/New_York")
+  )
+  sql <- paste("SELECT", paste0("1 AS ", names(types), collapse = ", "))
+  type_names <- function(df) unname(vapply(df, arrow_column_type_name, ""))
+
+  rs <- dbSendQueryArrow(con, sql, schema = nanoarrow::na_struct(types))
+  on.exit(dbClearResult(rs))
+  info <- dbColumnInfo(rs)
+  expect_identical(info$name, names(types))
+  expect_identical(info$type, type_names(dbFetch(rs, n = 0)))
+  expect_identical(dbColumnInfo(rs), info)
+  expect_identical(info$type, type_names(suppressWarnings(dbFetch(rs))))
+  expect_identical(
+    info$type,
+    c(
+      "logical", "logical", rep("integer", 4), rep("integer", 2), "double", "integer", "double", "double",
+      "character", "character", "list", "list", "Date", "POSIXct", rep("hms", 4), rep("POSIXct", 4)
+    )
+  )
+})

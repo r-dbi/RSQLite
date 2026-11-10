@@ -9,18 +9,9 @@ arrow_dbitest_context <- function(name, ...) {
     RSQLite::SQLite(),
     list(dbname = tempfile(name, fileext = ".sqlite"), arrow = TRUE, ...),
     set_as_default = FALSE,
-    tweaks = DBItest::tweaks(
-      dbitest_version = "1.8.3.6",
-      constructor_relax_args = TRUE,
-      placeholder_pattern = c("?", "$1", "$name", ":name"),
-      date_cast = function(x) paste0("'", x, "'"),
-      time_cast = function(x) paste0("'", x, "'"),
-      timestamp_cast = function(x) paste0("'", x, "'"),
-      logical_return = function(x) as.integer(x),
-      date_typed = FALSE,
-      time_typed = FALSE,
-      timestamp_typed = FALSE
-    ),
+    # The tweaks of the default context of helper-DBItest.R, which DBItest and
+    # DBI copy and which therefore declares them itself
+    tweaks = DBItest::get_default_context()$tweaks,
     name = name
   )
 }

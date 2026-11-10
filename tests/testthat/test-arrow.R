@@ -1031,6 +1031,10 @@ test_that("dbBindArrow() refuses values beyond SQLite's length limit", {
     expect_error(dbAppendTableArrow(con, "t", params), "Can't bind parameter 1: string or blob too big")
   }
   expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 0L)
+
+  # The 2 GiB go before the next test, see helper-memory.R
+  rm(params, data, large)
+  gc_until_stable()
 })
 
 test_that("dbAppendTableArrow() appends rows and reports their number", {

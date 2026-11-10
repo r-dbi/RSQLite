@@ -411,7 +411,16 @@ bool SqliteResultImpl::step_run() {
 }
 
 bool SqliteResultImpl::step_done() {
-  bool more_params = bind_row();
+  bool more_params;
+  try {
+    more_params = bind_row();
+  } catch (...) {
+    // Parameters that fail to bind end the execution and are not kept:
+    // an Arrow stream may hold a share of a result bound to this one's stream
+    params_.reset();
+    complete_ = true;
+    throw;
+  }
 
   if (!more_params) {
     complete_ = true;

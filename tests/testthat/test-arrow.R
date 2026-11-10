@@ -519,6 +519,31 @@ test_that("a result must be bound again after its first parameter row fails", {
   expect_equal(dbFetch(rs)$a, 7L)
 })
 
+test_that("results bound to each other's streams don't keep each other", {
+  con_a <- dbConnect(SQLite(), ":memory:")
+  con_b <- dbConnect(SQLite(), ":memory:")
+  a <- dbSendQuery(con_a, "SELECT $a AS a")
+  b <- dbSendQuery(con_b, "SELECT $a AS a")
+  dbBind(a, list(a = 1:10))
+  dbBind(b, list(a = 1:10))
+
+  # The first rows come from the chunks kept for the schemas
+  dbBindArrow(a, dbFetchArrow(b, chunk_size = 2))
+  dbBindArrow(b, dbFetchArrow(a, chunk_size = 2))
+  # Further rows of b come from a, whose further rows come from b,
+  # which was bound to new parameters
+  expect_error(dbFetch(b), "bound to new parameters")
+  # Both executions have ended and dropped their parameters
+  expect_true(dbHasCompleted(a))
+  expect_true(dbHasCompleted(b))
+
+  dbClearResult(a)
+  dbClearResult(b)
+  invisible(gc())
+  expect_warning(dbDisconnect(con_a), NA)
+  expect_warning(dbDisconnect(con_b), NA)
+})
+
 test_that("dbGetQueryArrow() reads the whole result", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:3, b = letters[1:3]))

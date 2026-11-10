@@ -83,23 +83,30 @@ double SqliteColumnDataSource::fetch_real() const {
 }
 
 SEXP SqliteColumnDataSource::fetch_string() const {
-  // The storage class must be read before sqlite3_column_text() converts the
-  // value, after that sqlite3_column_type() is undefined
-  const bool is_blob = (get_column_type() == SQLITE_BLOB);
-  const char* const text =
-    reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
-  if (!is_blob) {
+  if (get_column_type() != SQLITE_BLOB) {
+    const char* const text =
+      reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
     return Rf_mkCharCE(text, CE_UTF8);
   }
 
-  // A blob read as text keeps all its bytes, but only well-formed UTF-8
-  // without NUL bytes can be an R string
+  // A blob is read as bytes.
+  // sqlite3_column_text() would transcode it in a UTF-16 database,
+  // and turn it into text for the next read of the same row,
+  // after a peek with dbFetch(n = 0) or dbColumnInfo().
+  // All bytes are kept, but only well-formed UTF-8 without NUL bytes can be
+  // an R string.
+  const char* const bytes =
+    static_cast<const char*>(sqlite3_column_blob(get_stmt(), get_j()));
+  if (bytes == NULL) {
+    // An empty blob
+    return R_BlankString;
+  }
   const int size = sqlite3_column_bytes(get_stmt(), get_j());
-  if (!rsqlite_is_utf8_string(text, static_cast<size_t>(size))) {
+  if (!rsqlite_is_utf8_string(bytes, static_cast<size_t>(size))) {
     ++n_invalid_strings;
     return NA_STRING;
   }
-  return Rf_mkCharLenCE(text, size, CE_UTF8);
+  return Rf_mkCharLenCE(bytes, size, CE_UTF8);
 }
 
 int64_t SqliteColumnDataSource::get_n_invalid_strings() const {

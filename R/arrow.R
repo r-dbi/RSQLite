@@ -102,6 +102,9 @@
 #' and a column without a value takes its declared type, or `logical` without one.
 #' The next fetch starts from these types, also after [DBI::dbBind()],
 #' except that it decides a `logical` column again.
+#' [DBI::dbColumnInfo()] names the types that a fetch of no rows returns,
+#' and decides them for the next fetch like on the default path,
+#' without converting the values of the next row.
 #' Three differences remain.
 #' The default path truncates a real number that follows an integer too large for an `integer`,
 #' with a warning, here the column becomes a `double`,
@@ -127,6 +130,7 @@
 #' and in a fetch of no rows about the next row, from which it types the columns;
 #' through Arrow, a fetch of no rows returns no value and never warns.
 #' Before writing, factors become strings, lists of raw vectors become blobs,
+#' `POSIXlt` columns, which the default path can't write, become `POSIXct`,
 #' and `difftime`, `POSIXct` and `Date` columns become their numbers in their own units,
 #' as on the default path.
 #'

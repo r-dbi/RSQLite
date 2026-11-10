@@ -12,11 +12,17 @@
 
 // #include "DbResult.h"
 
+// The entry points below run on R's main thread. Those that create, clear,
+// fetch from or bind a result first destroy the results that Arrow streams
+// let go of on other threads, see db_arrow_release_deferred(): until then,
+// such a result keeps its statement and its read transaction open.
+
 [[cpp11::register]]
 cpp11::external_pointer<DbResultPtr> result_create(
   cpp11::external_pointer<DbConnectionPtr> con,
   std::string sql
 ) {
+  db_arrow_release_deferred();
   (*con)->check_connection();
   DbResultPtr* res =
     new DbResultPtr(SqliteResult::create_and_send_query(*con, sql));
@@ -34,6 +40,8 @@ void result_release(cpp11::external_pointer<DbResultPtr> res) {
     );
   }
   res.reset();
+  // An Arrow stream may have let go of its share on another thread
+  db_arrow_release_deferred();
 }
 
 [[cpp11::register]]
@@ -44,11 +52,13 @@ bool result_valid(cpp11::external_pointer<DbResultPtr> res_) {
 
 [[cpp11::register]]
 cpp11::list result_fetch(DbResult* res, const int n) {
+  db_arrow_release_deferred();
   return res->fetch(n);
 }
 
 [[cpp11::register]]
 void result_bind(DbResult* res, cpp11::list params) {
+  db_arrow_release_deferred();
   res->bind(params);
 }
 
@@ -108,6 +118,7 @@ SEXP result_fetch_arrow(
 // The next chunk of at most `chunk_size` rows as a nanoarrow_array
 [[cpp11::register]]
 SEXP result_fetch_arrow_chunk(DbResult* res, double chunk_size) {
+  db_arrow_release_deferred();
   cpp11::sexp array_xptr(nanoarrow_array_owning_xptr());
   struct ArrowArray* array = nanoarrow_output_array_from_xptr(array_xptr);
   res->fetch_arrow(array, static_cast<int64_t>(chunk_size));
@@ -140,6 +151,7 @@ void result_bind_arrow(
   }
 
   std::vector<int> indexes(param_indexes.begin(), param_indexes.end());
+  db_arrow_release_deferred();
   res->bind_arrow(stream, indexes);
 }
 

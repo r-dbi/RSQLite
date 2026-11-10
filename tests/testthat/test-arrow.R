@@ -708,6 +708,42 @@ test_that("on another thread, what would warn or call R fails the stream", {
   expect_warning(as.data.frame(dbGetQueryArrow(con, "SELECT d FROM t ORDER BY i")), "Unknown string format")
 })
 
+test_that("a stream released on another thread doesn't keep the database locked", {
+  db <- withr::local_tempfile(fileext = ".sqlite")
+  con <- dbConnect(SQLite(), db)
+  withr::defer(dbDisconnect(con))
+  dbWriteTable(con, "t", data.frame(a = 1:1000))
+  dbExecute(con, "CREATE TABLE w (a)")
+  con2 <- dbConnect(SQLite(), db)
+  withr::defer(dbDisconnect(con2))
+  write <- function() dbExecute(con2, "INSERT INTO w VALUES (1)")
+
+  # Released in the middle of the rows while the result object is alive:
+  # clearing the result closes its statement and read transaction
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t")
+  out <- arrow_stream_read_on_thread(dbFetchArrow(rs, chunk_size = 100), 2, TRUE)
+  expect_length(out$arrays, 2)
+  expect_error(write(), "database is locked")
+  dbClearResult(rs)
+  expect_equal(write(), 1)
+
+  # Released in the middle of the rows of a result already cleared:
+  # the statement closes at once
+  out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, "SELECT a FROM t", chunk_size = 100), 2, TRUE)
+  expect_length(out$arrays, 2)
+  expect_equal(write(), 1)
+
+  # Read on another thread and released on R's main thread
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t")
+  stream <- dbFetchArrow(rs, chunk_size = 100)
+  out <- arrow_stream_read_on_thread(stream, 2, FALSE)
+  expect_length(out$arrays, 2)
+  dbClearResult(rs)
+  expect_error(write(), "database is locked")
+  stream$release()
+  expect_equal(write(), 1)
+})
+
 test_that("an error of the statement after dbDisconnect() keeps its result code", {
   con <- dbConnect(SQLite(), ":memory:")
   dbExecute(con, "CREATE TABLE t (a)")

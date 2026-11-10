@@ -119,8 +119,11 @@ void SqliteResultImpl::init(bool params_have_rows) {
 
 void SqliteResultImpl::close() {}
 
+// Rows kept from the chunk that decided the Arrow types count as fetched once
+// they have been handed out
+
 bool SqliteResultImpl::complete() const {
-  return complete_;
+  return complete_ && pending_chunk_->release == NULL;
 }
 
 bool SqliteResultImpl::ready() const {
@@ -132,7 +135,11 @@ int64_t SqliteResultImpl::executions() const {
 }
 
 int SqliteResultImpl::n_rows_fetched() {
-  return nrows_;
+  int64_t kept = 0;
+  if (pending_chunk_->release != NULL) {
+    kept = pending_chunk_->length - pending_offset_;
+  }
+  return nrows_ - static_cast<int>(kept);
 }
 
 int SqliteResultImpl::n_rows_affected() {
@@ -162,6 +169,13 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
 cpp11::list SqliteResultImpl::fetch(const int n_max) {
   if (!ready_) {
     cpp11::stop("Query needs to be bound before fetching");
+  }
+  if (n_max != 0 && pending_chunk_->release != NULL) {
+    // The statement has moved past them, a data frame can't include them
+    cpp11::stop(
+      "Rows fetched to decide the Arrow types are waiting, "
+      "fetch them with `dbFetchArrowChunk()` or `dbFetchArrow()`."
+    );
   }
 
   int n = 0;

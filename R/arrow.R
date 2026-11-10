@@ -75,6 +75,10 @@
 #' and [DBI::dbFetchArrow()] returns a stream for the new rows.
 #' [DBI::dbFetchArrowChunk()] returns one such array per call,
 #' and an empty array once all rows are fetched.
+#' When the schema of a stream is requested before its first array,
+#' the first chunk is fetched to decide the types and kept for the next fetch:
+#' [DBI::dbGetRowCount()] and [DBI::dbHasCompleted()] count its rows once they have been handed out,
+#' and [DBI::dbFetch()] fails while they wait.
 #' A chunk also ends after the row at which a string or binary column reaches 1 GiB,
 #' and before a row that would take such a column past the `2^31 - 1` bytes
 #' that the 32-bit offsets of the `utf8` and `binary` types can address.

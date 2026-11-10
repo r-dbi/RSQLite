@@ -274,6 +274,28 @@ test_that("the chunk fetched to decide the types keeps to a smaller chunk_size",
   expect_equal(as.data.frame(nanoarrow::basic_array_stream(chunks)), whole)
 })
 
+test_that("rows kept for the Arrow schema count once they are handed out", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:20))
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t ORDER BY a")
+  on.exit(dbClearResult(rs))
+  stream <- dbFetchArrow(rs, chunk_size = 100)
+
+  # The schema fetches all 20 rows to decide the types, they wait
+  expect_equal(schema_formats(stream), c(a = "l"))
+  expect_false(dbHasCompleted(rs))
+  expect_equal(dbGetRowCount(rs), 0L)
+  expect_error(dbFetch(rs, n = 1), "dbFetchArrowChunk")
+
+  values <- numeric()
+  while (!dbHasCompleted(rs)) {
+    values <- c(values, as.data.frame(dbFetchArrowChunk(rs, chunk_size = 5))$a)
+    expect_equal(dbGetRowCount(rs), length(values))
+  }
+  expect_equal(values, as.numeric(1:20))
+  expect_null(stream$get_next())
+})
+
 test_that("dbFetch() and dbFetchArrow() can be mixed on one result", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:5))

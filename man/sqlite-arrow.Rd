@@ -84,6 +84,10 @@ once \code{\link[DBI:dbBind]{DBI::dbBind()}} or \code{\link[DBI:dbBindArrow]{DBI
 and \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} returns a stream for the new rows.
 \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} returns one such array per call,
 and an empty array once all rows are fetched.
+When the schema of a stream is requested before its first array,
+the first chunk is fetched to decide the types and kept for the next fetch:
+\code{\link[DBI:dbGetRowCount]{DBI::dbGetRowCount()}} and \code{\link[DBI:dbHasCompleted]{DBI::dbHasCompleted()}} count its rows once they have been handed out,
+and \code{\link[DBI:dbFetch]{DBI::dbFetch()}} fails while they wait.
 A chunk also ends after the row at which a string or binary column reaches 1 GiB,
 and before a row that would take such a column past the \code{2^31 - 1} bytes
 that the 32-bit offsets of the \code{utf8} and \code{binary} types can address.

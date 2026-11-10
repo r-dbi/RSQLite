@@ -302,6 +302,12 @@ test_that("chunk_size is validated", {
   expect_error(dbFetchArrow(rs, chunk_size = 0), "chunk_size")
   expect_error(dbFetchArrow(rs, chunk_size = 1.5), "chunk_size")
   expect_error(dbFetchArrowChunk(rs, chunk_size = NA), "chunk_size")
+  expect_error(dbFetchArrow(rs, chunk_size = Inf), "chunk_size")
+  expect_error(dbFetchArrowChunk(rs, chunk_size = Inf), "chunk_size")
+  expect_error(dbFetchArrow(rs, chunk_size = NaN), "chunk_size")
+
+  # Beyond 2^53, the chunk size is a limit that no result reaches
+  expect_equal(as.data.frame(dbFetchArrow(rs, chunk_size = 1e300)), data.frame(`1` = 1, check.names = FALSE))
 })
 
 test_that("dbBindArrow() binds all Arrow types SQLite can store", {

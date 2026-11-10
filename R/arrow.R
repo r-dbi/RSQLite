@@ -77,11 +77,12 @@
 NULL
 
 check_chunk_size <- function(chunk_size) {
-  if (!is.numeric(chunk_size) || length(chunk_size) != 1L || is.na(chunk_size) ||
+  if (!is.numeric(chunk_size) || length(chunk_size) != 1L || !is.finite(chunk_size) ||
     chunk_size < 1 || trunc(chunk_size) != chunk_size) {
     stopc("`chunk_size` must be a positive whole number")
   }
-  as.numeric(chunk_size)
+  # The C++ code takes a 64-bit integer, doubles are whole numbers up to 2^53
+  min(as.numeric(chunk_size), 2^53)
 }
 
 # The names of the columns of a struct schema, "" for unnamed columns

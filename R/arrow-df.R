@@ -4,50 +4,42 @@
 # data frames are written as Arrow streams; the data frames are the same as on
 # the default path.
 
-# The number of rows per array when a whole result is fetched
+# The number of rows per array of a fetch
 ARROW_DF_CHUNK_SIZE <- 65536
 
-# dbFetch() through Arrow: `n` rows as a data frame, all rows for `n < 0`
-arrow_fetch_df <- function(res, n) {
-  if (n < 0) {
-    # All chunks are fetched first, so that the columns are allocated once
-    fetched <- result_fetch_arrow_all(res@ptr, ARROW_DF_CHUNK_SIZE)
-    df <- arrow_to_df(fetched$stream, res@conn, size = fetched$n)
-  } else {
-    chunk <- result_fetch_arrow_chunk(res@ptr, n)
-    df <- arrow_to_df(chunk$array, res@conn)
-    # nanoarrow's character vectors read from the array until they are touched:
-    # copy them, so that the array can be released right away
-    df[] <- lapply(df, function(col) if (is.character(col)) c(col) else col)
-    nanoarrow::nanoarrow_pointer_release(chunk$array)
-  }
+# dbFetch() through Arrow: `n` rows as a data frame, all rows for `n < 0`.
+# The rows are fetched first, as arrays typed for this fetch the way the
+# default path types it, so that the columns are allocated once with the row
+# count known.
+arrow_fetch_df <- function(res, n, chunk_size = ARROW_DF_CHUNK_SIZE) {
+  # The C++ code takes a 64-bit integer, doubles are whole numbers up to 2^53
+  n <- min(n, 2^53)
+  fetched <- result_fetch_arrow_df(res@ptr, n, chunk_size)
+  df <- arrow_to_df(fetched$stream, res@conn, fetched$n, fetched$wide_ints)
 
   if (length(df) == 0L) {
-    # Same warning as the default path
-    warningc(
-      "`dbGetQuery()`, `dbSendQuery()` and `dbFetch()` should only be used ",
-      "with `SELECT` queries. Did you mean `dbExecute()`, `dbSendStatement()` ",
-      "or `dbGetRowsAffected()`?"
-    )
+    # Same warning as the default path, which gives none for `n = 0`
+    if (n != 0) {
+      warningc(
+        "`dbGetQuery()`, `dbSendQuery()` and `dbFetch()` should only be used ",
+        "with `SELECT` queries. Did you mean `dbExecute()`, `dbSendStatement()` ",
+        "or `dbGetRowsAffected()`?"
+      )
+    }
     df <- data.frame()
   }
 
   df
 }
 
-# The unified conversion of Arrow data to a data frame,
-# `size` is the row count of a stream
-arrow_to_df <- function(x, conn, size = NULL) {
-  schema <- nanoarrow::infer_nanoarrow_schema(x)
+# The unified conversion of an Arrow stream of `size` rows to a data frame,
+# `wide_ints` tells which columns have needed 64-bit integers in this fetch or
+# an earlier one
+arrow_to_df <- function(stream, conn, size, wide_ints) {
+  schema <- nanoarrow::infer_nanoarrow_schema(stream)
   ptype <- arrow_df_ptype(schema)
-
-  if (inherits(x, "nanoarrow_array_stream")) {
-    df <- arrow_stream_to_df(x, ptype, size)
-  } else {
-    df <- nanoarrow::convert_array(x, to = ptype)
-  }
-
-  arrow_df_int64(df, conn@bigint)
+  df <- arrow_stream_to_df(stream, ptype, size)
+  arrow_df_int64(df, conn@bigint, wide_ints)
 }
 
 # All rows of a stream with a known row count as a data frame:
@@ -103,9 +95,10 @@ arrow_df_ptype <- function(schema) {
 }
 
 # SQLite integers are 64-bit: a column whose values all fit is an integer,
-# the others follow the `bigint` connection argument, like the default path
-arrow_df_int64 <- function(df, bigint) {
-  is_int64 <- which(vlapply(df, inherits, "integer64"))
+# the others follow the `bigint` connection argument, like the default path,
+# which also keeps a column that needed 64 bits in an earlier fetch
+arrow_df_int64 <- function(df, bigint, wide_ints) {
+  is_int64 <- which(vlapply(df, inherits, "integer64") & !wide_ints)
   for (i in is_int64) {
     as_int <- integer64_to_integer(df[[i]])
     if (!is.null(as_int)) {

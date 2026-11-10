@@ -91,6 +91,20 @@ int64_t DbResult::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
   return impl->fetch_arrow(out, n_max);
 }
 
+int64_t DbResult::fetch_arrow_df(
+  struct ArrowArrayStream* out,
+  std::vector<bool>& wide_ints,
+  int64_t n_max,
+  int64_t chunk_size
+) {
+  nanoarrow::UniqueSchema schema;
+  std::vector<nanoarrow::UniqueArray> chunks;
+  int64_t n =
+    impl->fetch_arrow_df(schema.get(), chunks, wide_ints, n_max, chunk_size);
+  db_arrow_buffered_stream_init(out, schema, chunks);
+  return n;
+}
+
 void DbResult::bind_arrow(
   struct ArrowArrayStream* stream,
   const std::vector<int>& param_indexes

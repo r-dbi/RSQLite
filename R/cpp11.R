@@ -88,8 +88,8 @@ result_fetch_arrow <- function(res_, chunk_size) {
   .Call(`_RSQLite_result_fetch_arrow`, res_, chunk_size)
 }
 
-result_fetch_arrow_all <- function(res_, chunk_size) {
-  .Call(`_RSQLite_result_fetch_arrow_all`, res_, chunk_size)
+result_fetch_arrow_df <- function(res, n_max, chunk_size) {
+  .Call(`_RSQLite_result_fetch_arrow_df`, res, n_max, chunk_size)
 }
 
 result_fetch_arrow_chunk <- function(res, chunk_size) {

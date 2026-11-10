@@ -82,6 +82,13 @@ public:
   // Arrow
   void arrow_schema(struct ArrowSchema* out, int64_t infer_rows);
   int64_t fetch_arrow(struct ArrowArray* out, int64_t n_max);
+  int64_t fetch_arrow_df(
+    struct ArrowSchema* schema,
+    std::vector<nanoarrow::UniqueArray>& chunks,
+    std::vector<bool>& wide_ints,
+    int64_t n_max,
+    int64_t chunk_size
+  );
   void bind_arrow(
     struct ArrowArrayStream* stream,
     const std::vector<int>& param_indexes
@@ -111,7 +118,11 @@ private:
 
   void ensure_arrow_columns();
   void freeze_arrow_columns();
-  int64_t fetch_arrow_rows(struct ArrowArray* out, int64_t n_max);
+  int64_t fetch_arrow_rows(
+    struct ArrowArray* out,
+    int64_t n_max,
+    std::vector<ARROW_KIND>* open_kinds = NULL
+  );
   void set_arrow_struct_schema(struct ArrowSchema* out);
   void copy_pending_rows(struct ArrowArray* out, int64_t n);
   bool arrow_row_fits();

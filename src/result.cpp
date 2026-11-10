@@ -90,34 +90,38 @@ SEXP result_fetch_arrow(
   return stream_xptr;
 }
 
-// All remaining rows, fetched up front as arrays of at most `chunk_size` rows:
-// a nanoarrow_array_stream that hands them out one by one, and the row count
+// The rows of one dbFetch() through Arrow, at most `n_max` or all for a
+// negative `n_max`, typed for a data frame and fetched up front as arrays of at
+// most `chunk_size` rows: a nanoarrow_array_stream that hands them out one by
+// one, the row count, and which columns have seen an integer that needs
+// 64 bits
 [[cpp11::register]]
-cpp11::list result_fetch_arrow_all(
-  cpp11::external_pointer<DbResultPtr> res_,
+cpp11::list result_fetch_arrow_df(
+  DbResult* res,
+  double n_max,
   double chunk_size
 ) {
-  DbResultPtr* res = res_.get();
-  if (res == NULL || res->get() == NULL) {
-    cpp11::stop("Invalid result set");
-  }
-  if (!(*res)->ready()) {
-    cpp11::stop("Query needs to be bound before fetching");
-  }
-
   cpp11::sexp stream_xptr(nanoarrow_array_stream_owning_xptr());
   struct ArrowArrayStream* stream =
     nanoarrow_output_array_stream_from_xptr(stream_xptr);
-  int64_t n = db_arrow_buffered_stream_init(
+  std::vector<bool> wide_ints;
+  int64_t n = res->fetch_arrow_df(
     stream,
-    *res,
+    wide_ints,
+    static_cast<int64_t>(n_max),
     static_cast<int64_t>(chunk_size)
   );
+
+  cpp11::writable::logicals wide(static_cast<R_xlen_t>(wide_ints.size()));
+  for (size_t j = 0; j < wide_ints.size(); ++j) {
+    wide[static_cast<R_xlen_t>(j)] = wide_ints[j] ? TRUE : FALSE;
+  }
 
   using namespace cpp11::literals;
   return cpp11::writable::list(
     { "stream"_nm = stream_xptr,
-      "n"_nm = cpp11::as_sexp(static_cast<double>(n)) }
+      "n"_nm = cpp11::as_sexp(static_cast<double>(n)),
+      "wide_ints"_nm = wide }
   );
 }
 

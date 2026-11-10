@@ -166,10 +166,10 @@ extern "C" SEXP _RSQLite_result_fetch_arrow(SEXP res_, SEXP chunk_size) {
   END_CPP11
 }
 // result.cpp
-cpp11::list result_fetch_arrow_all(cpp11::external_pointer<DbResultPtr> res_, double chunk_size);
-extern "C" SEXP _RSQLite_result_fetch_arrow_all(SEXP res_, SEXP chunk_size) {
+cpp11::list result_fetch_arrow_df(DbResult* res, double n_max, double chunk_size);
+extern "C" SEXP _RSQLite_result_fetch_arrow_df(SEXP res, SEXP n_max, SEXP chunk_size) {
   BEGIN_CPP11
-    return cpp11::as_sexp(result_fetch_arrow_all(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResultPtr>>>(res_), cpp11::as_cpp<cpp11::decay_t<double>>(chunk_size)));
+    return cpp11::as_sexp(result_fetch_arrow_df(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<double>>(n_max), cpp11::as_cpp<cpp11::decay_t<double>>(chunk_size)));
   END_CPP11
 }
 // result.cpp
@@ -234,8 +234,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_result_create",                (DL_FUNC) &_RSQLite_result_create,                2},
     {"_RSQLite_result_fetch",                 (DL_FUNC) &_RSQLite_result_fetch,                 2},
     {"_RSQLite_result_fetch_arrow",           (DL_FUNC) &_RSQLite_result_fetch_arrow,           2},
-    {"_RSQLite_result_fetch_arrow_all",       (DL_FUNC) &_RSQLite_result_fetch_arrow_all,       2},
     {"_RSQLite_result_fetch_arrow_chunk",     (DL_FUNC) &_RSQLite_result_fetch_arrow_chunk,     2},
+    {"_RSQLite_result_fetch_arrow_df",        (DL_FUNC) &_RSQLite_result_fetch_arrow_df,        3},
     {"_RSQLite_result_get_placeholder_names", (DL_FUNC) &_RSQLite_result_get_placeholder_names, 1},
     {"_RSQLite_result_has_completed",         (DL_FUNC) &_RSQLite_result_has_completed,         1},
     {"_RSQLite_result_release",               (DL_FUNC) &_RSQLite_result_release,               1},

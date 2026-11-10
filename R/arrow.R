@@ -61,23 +61,31 @@
 #'
 #' @section Data frames:
 #' With `dbConnect(arrow = TRUE)`, data frames travel through this interface:
-#' [DBI::dbFetch()] converts the arrays filled by [DBI::dbFetchArrowChunk()],
+#' [DBI::dbFetch()] converts Arrow arrays filled straight from the SQLite statement,
 #' and [DBI::dbAppendTable()] writes the data frame as an Arrow stream through [DBI::dbAppendTableArrow()].
 #' The conversion follows nanoarrow's rules, with these additions:
 #' an `int64` column becomes an `integer` if all its values fit,
-#' and follows the `bigint` argument of [DBI::dbConnect()] otherwise;
+#' and follows the `bigint` argument of [DBI::dbConnect()] otherwise, also in the later fetches of the result;
 #' a `null` column becomes a `logical`.
 #' `date32`, `time64` and `timestamp` columns become `Date`, `hms` and `POSIXct` in UTC,
 #' and `binary` columns become [blob::blob] objects,
 #' as on the default path.
-#' The first chunk of a result decides the types of all its chunks.
+#'
+#' Unlike a stream, each fetch decides the types of its columns, the way the default path does it:
+#' the first value that is not `NULL` decides,
+#' integers become doubles when a real number follows in the same fetch,
+#' and a column without a value takes its declared type, or `logical` without one.
+#' The next fetch starts from these types, except that it decides a `logical` column again.
+#' The default path truncates a real number that follows an integer too large for an `integer`,
+#' here the column becomes a `double`.
+#' Once [DBI::dbFetchArrow()] or [DBI::dbFetchArrowChunk()] has fixed the types of a result,
+#' later fetches keep them.
 #' Before writing, factors become strings and lists of raw vectors become blobs.
 #'
-#' A fetch of all rows reads the result into Arrow arrays first,
+#' Each fetch reads its rows into Arrow arrays first,
 #' so that the data frame is allocated once with the row count known,
 #' and releases each array as soon as it is converted:
 #' at its peak, the memory holds the arrays and the part of the data frame filled so far.
-#' A fetch of `n` rows copies the strings out of its array and releases the array right away.
 #'
 #' @section Chunking:
 #' [DBI::dbFetchArrow()] returns a nanoarrow array stream that is read lazily:

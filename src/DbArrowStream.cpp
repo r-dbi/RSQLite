@@ -227,31 +227,20 @@ void db_arrow_stream_init(
   out->private_data = new StreamState(result, chunk_size);
 }
 
-int64_t db_arrow_buffered_stream_init(
+void db_arrow_buffered_stream_init(
   struct ArrowArrayStream* out,
-  const DbResultPtr& result,
-  int64_t chunk_size
+  nanoarrow::UniqueSchema& schema,
+  std::vector<nanoarrow::UniqueArray>& arrays
 ) {
   std::unique_ptr<BufferedState> state(new BufferedState());
-  result->arrow_schema(state->schema.get(), chunk_size);
-
-  int64_t total = 0;
-  while (true) {
-    nanoarrow::UniqueArray array;
-    int64_t n = result->fetch_arrow(array.get(), chunk_size);
-    if (n == 0) {
-      break;
-    }
-    total += n;
-    state->arrays.push_back(std::move(array));
-  }
+  schema.move(state->schema.get());
+  state->arrays.swap(arrays);
 
   out->get_schema = &buffered_get_schema;
   out->get_next = &buffered_get_next;
   out->get_last_error = &buffered_get_last_error;
   out->release = &buffered_release;
   out->private_data = state.release();
-  return total;
 }
 
 bool db_arrow_stream_reads(

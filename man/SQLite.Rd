@@ -93,9 +93,9 @@ c.f. below for details.
 Defaults to \code{FALSE}.}
 
 \item{arrow}{When \code{TRUE}, data frames travel through the Arrow interface:
-\code{\link[DBI:dbFetch]{DBI::dbFetch()}} converts the Arrow arrays that \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} fills straight from the SQLite statement,
+\code{\link[DBI:dbFetch]{DBI::dbFetch()}} converts Arrow arrays filled straight from the SQLite statement,
 and \code{\link[DBI:dbAppendTable]{DBI::dbAppendTable()}} binds the data frame as an Arrow stream through \code{\link[DBI:dbAppendTableArrow]{DBI::dbAppendTableArrow()}}.
-The data frames are the same as with the default path, see \link{sqlite-arrow} for the rules.
+The data frames are the same as with the default path, see \link{sqlite-arrow} for the rules and the exceptions.
 When this was measured, fetching a large table took less time through Arrow than on the default path,
 and fetching it in chunks much less.
 Experimental, defaults to \code{FALSE}.}

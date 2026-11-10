@@ -70,23 +70,31 @@ Named placeholders are matched to the names of the columns, like \code{\link[DBI
 \section{Data frames}{
 
 With \code{dbConnect(arrow = TRUE)}, data frames travel through this interface:
-\code{\link[DBI:dbFetch]{DBI::dbFetch()}} converts the arrays filled by \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}},
+\code{\link[DBI:dbFetch]{DBI::dbFetch()}} converts Arrow arrays filled straight from the SQLite statement,
 and \code{\link[DBI:dbAppendTable]{DBI::dbAppendTable()}} writes the data frame as an Arrow stream through \code{\link[DBI:dbAppendTableArrow]{DBI::dbAppendTableArrow()}}.
 The conversion follows nanoarrow's rules, with these additions:
 an \code{int64} column becomes an \code{integer} if all its values fit,
-and follows the \code{bigint} argument of \code{\link[DBI:dbConnect]{DBI::dbConnect()}} otherwise;
+and follows the \code{bigint} argument of \code{\link[DBI:dbConnect]{DBI::dbConnect()}} otherwise, also in the later fetches of the result;
 a \code{null} column becomes a \code{logical}.
 \code{date32}, \code{time64} and \code{timestamp} columns become \code{Date}, \code{hms} and \code{POSIXct} in UTC,
 and \code{binary} columns become \link[blob:blob]{blob::blob} objects,
 as on the default path.
-The first chunk of a result decides the types of all its chunks.
+
+Unlike a stream, each fetch decides the types of its columns, the way the default path does it:
+the first value that is not \code{NULL} decides,
+integers become doubles when a real number follows in the same fetch,
+and a column without a value takes its declared type, or \code{logical} without one.
+The next fetch starts from these types, except that it decides a \code{logical} column again.
+The default path truncates a real number that follows an integer too large for an \code{integer},
+here the column becomes a \code{double}.
+Once \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} or \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} has fixed the types of a result,
+later fetches keep them.
 Before writing, factors become strings and lists of raw vectors become blobs.
 
-A fetch of all rows reads the result into Arrow arrays first,
+Each fetch reads its rows into Arrow arrays first,
 so that the data frame is allocated once with the row count known,
 and releases each array as soon as it is converted:
 at its peak, the memory holds the arrays and the part of the data frame filled so far.
-A fetch of \code{n} rows copies the strings out of its array and releases the array right away.
 }
 
 \section{Chunking}{

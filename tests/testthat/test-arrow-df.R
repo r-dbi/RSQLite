@@ -143,22 +143,6 @@ test_that("times and timestamps keep their range through Arrow", {
   expect_identical(as.numeric(out$ts), c(1e19, 1.5, NA))
 })
 
-test_that("text through Arrow ends at its first NUL like on the default path", {
-  sql <- "SELECT CAST(x'610062' AS TEXT) AS s UNION ALL SELECT 'c' UNION ALL SELECT NULL"
-  con <- dbConnect(SQLite(), ":memory:")
-  on.exit(dbDisconnect(con))
-  con_arrow <- local_arrow_con()
-
-  expect_identical(dbGetQuery(con_arrow, sql), dbGetQuery(con, sql))
-  expect_identical(dbGetQuery(con_arrow, sql)$s, c("a", "c", NA))
-
-  # An Arrow chunk keeps all three bytes
-  rs <- dbSendQueryArrow(con_arrow, sql)
-  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
-  chunk <- dbFetchArrowChunk(rs)
-  expect_identical(nanoarrow::convert_buffer(chunk$children$s$buffers[[2]]), c(0L, 3L, 4L, 4L))
-})
-
 test_that("untyped NULL columns are logical on the Arrow path", {
   con <- local_arrow_con()
   expect_equal(dbGetQuery(con, "SELECT NULL AS a"), data.frame(a = NA))
@@ -377,6 +361,92 @@ test_that("results larger than one chunk are typed by all their values through A
   expect_type(expected$s, "character")
   expect_type(expected$r, "double")
   expect_identical(dbGetQuery(con_arrow, sql), expected)
+})
+
+test_that("times outside a day keep their value through Arrow like on the default path", {
+  sql <- c(
+    "CREATE TABLE t (i INTEGER, tm TIME)",
+    paste(
+      "INSERT INTO t VALUES (1, 0), (2, 86400), (3, 100000), (4, -1), (5, '24:00:00'),",
+      "(6, '30:00:00'), (7, 86399.9999996), (8, NULL)"
+    )
+  )
+  con_default <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
+  on.exit(dbDisconnect(con_default))
+  con <- local_arrow_con(extended_types = TRUE)
+  for (s in sql) {
+    dbExecute(con_default, s)
+    dbExecute(con, s)
+  }
+  query <- "SELECT tm FROM t ORDER BY i"
+
+  expected <- dbGetQuery(con_default, query)
+  expect_identical(as.numeric(expected$tm), c(0, 86400, 100000, -1, 86400, 108000, 86399.9999996, NA))
+  expect_silent(out <- dbGetQuery(con, query))
+  expect_identical(out, expected)
+  expect_identical(fetch_sequence(con, query, c(1, 2, -1)), fetch_sequence(con_default, query, c(1, 2, -1)))
+
+  # A stream holds times of day only
+  expect_warning(
+    stream_df <- as.data.frame(dbGetQueryArrow(con, query)),
+    "outside the range of Arrow type time64 are NULL"
+  )
+  expect_identical(is.na(stream_df$tm), c(FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE))
+  # and so do the data frames once a chunk has fixed the types
+  rs <- dbSendQuery(con, query)
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
+  expect_silent(dbFetchArrowChunk(rs, chunk_size = 1))
+  expect_warning(rest <- dbFetch(rs), "outside the range of Arrow type time64 are NULL")
+  expect_identical(is.na(rest$tm), c(TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE))
+})
+
+test_that("text through Arrow is read like on the default path", {
+  # Text ends at its first NUL and is not checked for UTF-8
+  sql <- paste(
+    "SELECT 'c' AS s UNION ALL SELECT CAST(x'610062' AS TEXT) UNION ALL SELECT CAST(x'ff' AS TEXT)",
+    "UNION ALL SELECT CAST(x'eda080' AS TEXT) UNION ALL SELECT NULL"
+  )
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con))
+  con_arrow <- local_arrow_con()
+
+  expected <- dbGetQuery(con, sql)
+  expect_identical(lapply(expected$s[1:4], charToRaw), list(charToRaw("c"), charToRaw("a"), as.raw(0xff), as.raw(c(0xed, 0xa0, 0x80))))
+  expect_silent(out <- dbGetQuery(con_arrow, sql))
+  expect_identical(out, expected)
+  expect_identical(fetch_sequence(con_arrow, sql, c(1, 2, -1)), fetch_sequence(con, sql, c(1, 2, -1)))
+
+  # A stream holds valid UTF-8 without NUL bytes only
+  expect_warning(
+    stream_df <- as.data.frame(dbGetQueryArrow(con_arrow, sql)),
+    "not valid UTF-8, or hold a NUL byte, are NULL"
+  )
+  expect_identical(stream_df$s, c("c", NA, NA, NA, NA))
+  # and so do the data frames once a chunk has fixed the types
+  rs <- dbSendQuery(con_arrow, sql)
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
+  expect_silent(dbFetchArrowChunk(rs, chunk_size = 1))
+  expect_warning(rest <- dbFetch(rs), "not valid UTF-8, or hold a NUL byte, are NULL")
+  expect_identical(rest$s, c(NA_character_, NA, NA, NA))
+})
+
+test_that("a blob in a text column is text through Arrow only if it is valid UTF-8", {
+  sql <- "SELECT 'a' AS x UNION ALL SELECT x'6869' UNION ALL SELECT x'610062' UNION ALL SELECT x'ff'"
+  con_arrow <- local_arrow_con()
+
+  # As in a stream, where the default path ends the blob at its first NUL
+  # and does not check it
+  messages <- character()
+  out <- withCallingHandlers(
+    dbGetQuery(con_arrow, sql),
+    warning = function(w) {
+      messages <<- c(messages, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_identical(out$x, c("a", "hi", NA, NA))
+  expect_match(messages, "`x`: mixed type", all = FALSE)
+  expect_match(messages, "`x`: values of type blob that are not valid UTF-8", all = FALSE)
 })
 
 test_that("dbFetch() through Arrow returns `n` rows across arrays cut short", {

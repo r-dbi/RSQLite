@@ -88,8 +88,8 @@ result_get_placeholder_names <- function(res) {
   .Call(`_RSQLite_result_get_placeholder_names`, res)
 }
 
-result_set_arrow_schema <- function(res, schema, positions) {
-  invisible(.Call(`_RSQLite_result_set_arrow_schema`, res, schema, positions))
+result_set_arrow_schema <- function(res, schema, positions, seconds) {
+  invisible(.Call(`_RSQLite_result_set_arrow_schema`, res, schema, positions, seconds))
 }
 
 result_fetch_arrow <- function(res_, chunk_size) {
@@ -100,8 +100,8 @@ result_fetch_arrow_df <- function(res, n_max, chunk_size) {
   .Call(`_RSQLite_result_fetch_arrow_df`, res, n_max, chunk_size)
 }
 
-arrow_split_columns <- function(first, stream_xptr) {
-  .Call(`_RSQLite_arrow_split_columns`, first, stream_xptr)
+arrow_split_columns <- function(arrays) {
+  .Call(`_RSQLite_arrow_split_columns`, arrays)
 }
 
 arrow_concat_strings <- function(stream_xptr) {

@@ -34,7 +34,8 @@ SqliteResultImpl::SqliteResultImpl(
       arrow_targets_(cache.ncols_),
       arrow_frozen_(false),
       pending_offset_(0),
-      arrow_row_read_(false) {
+      arrow_row_read_(false),
+      df_carry_(false) {
   try {
     if (cache.nparams_ == 0) {
       after_bind(true);
@@ -178,6 +179,14 @@ cpp11::list SqliteResultImpl::fetch(const int n_max) {
       "fetch them with `dbFetchArrowChunk()` or `dbFetchArrow()`."
     );
   }
+  if (n_max != 0 && arrow_row_read_) {
+    // The byte check of the Arrow fetch has converted some of its values,
+    // only the Arrow path kept their storage classes
+    cpp11::stop(
+      "A row held back from the last Arrow chunk is waiting, "
+      "fetch it with `dbFetchArrowChunk()` or `dbFetchArrow()`."
+    );
+  }
 
   int n = 0;
   cpp11::list out;
@@ -235,14 +244,16 @@ cpp11::list SqliteResultImpl::get_column_info() {
 
 void SqliteResultImpl::set_arrow_schema(
   const struct ArrowSchema* schema,
-  const std::vector<int>& positions
+  const std::vector<int>& positions,
+  const std::vector<bool>& seconds
 ) {
   if (!arrow_columns_.empty()) {
     throw std::runtime_error(
       "The Arrow types of the result have already been decided"
     );
   }
-  if (schema->n_children != static_cast<int64_t>(positions.size())) {
+  if (schema->n_children != static_cast<int64_t>(positions.size()) ||
+      seconds.size() != positions.size()) {
     throw std::runtime_error("Internal error: schema and positions differ");
   }
 
@@ -255,6 +266,14 @@ void SqliteResultImpl::set_arrow_schema(
     }
     targets[pos] =
       ArrowTarget::from_schema(schema->children[i], cache.names_[pos]);
+    if (seconds[i]) {
+      if (targets[pos].kind != AK_TIME64 && targets[pos].kind != AK_TIMESTAMP) {
+        throw std::runtime_error(
+          "Internal error: only a time64 or timestamp can be stored in seconds"
+        );
+      }
+      targets[pos].seconds = true;
+    }
   }
   arrow_targets_.swap(targets);
 }
@@ -267,7 +286,7 @@ void SqliteResultImpl::arrow_schema(
     throw std::runtime_error("Query needs to be bound before fetching");
   }
 
-  ensure_arrow_columns();
+  ensure_arrow_columns(false);
 
   if (!arrow_frozen_) {
     // The first chunk decides the types, from the first value of each column
@@ -281,12 +300,9 @@ void SqliteResultImpl::arrow_schema(
       }
     }
     if (!all_frozen && pending_chunk_->release == NULL && !complete_) {
+      discard_coercions();
       nanoarrow::UniqueArray chunk;
       fetch_arrow_rows(chunk.get(), infer_rows);
-      // The rows have been read, the warning comes with the schema.
-      // Before the chunk is kept: if the warning is turned into an error,
-      // the chunk is released by the unwinding.
-      warn_coercions();
       chunk.move(pending_chunk_.get());
     }
     // Columns that only ever held NULL take their declared type
@@ -294,12 +310,18 @@ void SqliteResultImpl::arrow_schema(
       arrow_columns_[j].decide_from_decltype();
     }
     freeze_arrow_columns();
+
+    // The rows have been read, the warning comes with the schema.
+    // Last, with the chunk kept: if the warning is turned into an error,
+    // a retry returns the schema and the rows wait for the next fetch.
+    warn_coercions();
   }
 
   set_arrow_struct_schema(out);
 }
 
 int64_t SqliteResultImpl::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
+  discard_coercions();
   nanoarrow::UniqueArray chunk;
   int64_t n = fetch_arrow_chunk(chunk.get(), n_max);
 
@@ -320,7 +342,7 @@ int64_t SqliteResultImpl::fetch_arrow_chunk(
     throw std::runtime_error("Query needs to be bound before fetching");
   }
 
-  ensure_arrow_columns();
+  ensure_arrow_columns(false);
 
   if (pending_chunk_->release != NULL) {
     int64_t n = std::min(
@@ -348,20 +370,23 @@ int64_t SqliteResultImpl::fetch_arrow_chunk(
 
 // The rows of one dbFetch() through Arrow: at most `n_max` rows, all for a
 // negative `n_max`, as chunks of at most `chunk_size` rows that share `schema`,
-// with one warning for the values of all chunks that were not of their
-// column's type.
+// with the entries of one warning for the values of all chunks that were not
+// of their column's type.
 // Unless an Arrow stream or chunk has fixed the types already, they are
 // decided for this fetch like the default path decides them: a column that
 // sees only NULL stays open across chunks, integers widen to double in any
 // chunk, and the chunks are conformed to the final types at the end.
 // A column without a value takes its declared type, or the null type, which
 // the next fetch decides again; the other types carry over to the next fetch.
-// `wide_ints` tells which columns have seen an integer that needs 64 bits,
-// in this fetch or an earlier one.
+// Times and timestamps are doubles in seconds, which keep the precision of
+// the default path, unless an Arrow stream or chunk has fixed the types.
+// `columns` tells which columns have seen an integer that needs 64 bits, in
+// this fetch or an earlier one, and which hold seconds, and receives the
+// entries of the warning.
 int64_t SqliteResultImpl::fetch_arrow_df(
   struct ArrowSchema* schema,
   std::vector<nanoarrow::UniqueArray>& chunks,
-  std::vector<bool>& wide_ints,
+  ArrowDfColumns& columns,
   int64_t n_max,
   int64_t chunk_size
 ) {
@@ -369,18 +394,29 @@ int64_t SqliteResultImpl::fetch_arrow_df(
     throw std::runtime_error("Query needs to be bound before fetching");
   }
 
-  ensure_arrow_columns();
-  const size_t ncols = arrow_columns_.size();
   const bool open = !arrow_frozen_;
+  ensure_arrow_columns(open);
+  discard_coercions();
+  const size_t ncols = arrow_columns_.size();
+
+  if (open && df_carry_) {
+    // The first fetch of a new execution, as long as no Arrow stream has
+    // started afresh
+    for (size_t j = 0; j < ncols; ++j) {
+      arrow_columns_[j].carry_over(df_kinds_[j], df_wide_ints_[j]);
+    }
+  }
+  df_carry_ = false;
 
   if (open && n_max == 0 && !complete_) {
     // A fetch of no rows types the columns from the next row,
-    // like the default path does it
+    // like the default path does it. Reading the storage classes converts
+    // no value, so the row is not marked as held back: the next fetch reads
+    // them again, and the default path may fetch the row.
     if (!arrow_row_read_) {
       for (size_t j = 0; j < ncols; ++j) {
         arrow_columns_[j].read_row();
       }
-      arrow_row_read_ = true;
     }
     for (size_t j = 0; j < ncols; ++j) {
       arrow_columns_[j].peek_value();
@@ -430,23 +466,31 @@ int64_t SqliteResultImpl::fetch_arrow_df(
         arrow_columns_[j].conform_chunk(chunks[i]->children[j], kinds[i][j]);
       }
     }
-  }
-
-  // One warning for the whole fetch, with the final types: a column logged
-  // as int64 may have become double since. The caller owns the chunks, an
-  // error raised from the warning releases them.
-  warn_coercions();
-
-  if (open) {
     for (size_t j = 0; j < ncols; ++j) {
       arrow_columns_[j].reopen();
     }
   }
 
-  wide_ints.clear();
+  columns.wide_ints.clear();
+  columns.seconds_classes.clear();
+  df_kinds_.clear();
+  df_wide_ints_.clear();
   for (size_t j = 0; j < ncols; ++j) {
-    wide_ints.push_back(arrow_columns_[j].wide_integers());
+    columns.wide_ints.push_back(arrow_columns_[j].wide_integers());
+    columns.seconds_classes.push_back(arrow_columns_[j].seconds_class());
+    // The null type of a stream is decided again, like an open one
+    ARROW_KIND kind = arrow_columns_[j].get_kind();
+    df_kinds_.push_back(kind == AK_NA ? AK_UNDECIDED : kind);
+    df_wide_ints_.push_back(arrow_columns_[j].wide_integers());
   }
+
+  // The entries of one warning for the whole fetch, with the final types: a
+  // column logged as int64 may have become double since. A column that
+  // reopen() let go of the null type held no values, so has no entries.
+  // dbFetch() raises the warning after the fetch has returned: the result is
+  // ready for the next fetch, also if the warning ends dbFetch() with an
+  // error, and no longer busy, so that a handler of the warning can use it.
+  columns.coercions = collect_coercions();
 
   return total;
 }
@@ -471,8 +515,10 @@ void SqliteResultImpl::bind_arrow(
     after_set_params();
   } catch (...) {
     // A stream that fails on its first row is not kept: it may hold a share
-    // of this result, through a stream that wraps one of its Arrow streams
+    // of this result, through a stream that wraps one of its Arrow streams.
+    // The statement has lost its bindings: it must be bound again.
     params_.reset();
+    ready_ = false;
     throw;
   }
 }
@@ -502,8 +548,10 @@ cpp11::strings SqliteResultImpl::get_placeholder_names() const {
 void SqliteResultImpl::after_set_params() {
   ++executions_;
 
-  // A new execution may see other values in the first row
+  // A new execution may see other values in the first row: an Arrow stream
+  // decides its types afresh, a data frame fetch starts from the last one's
   arrow_columns_.clear();
+  df_carry_ = !df_kinds_.empty();
   arrow_frozen_ = false;
   pending_chunk_.reset();
   pending_offset_ = 0;
@@ -536,7 +584,8 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   SqliteDataFrame data(stmt, cache.names_, n_max, types_, with_alt_types_);
 
   if (complete_ && data.get_ncols() == 0) {
-    Rf_warning(
+    // Through cpp11, so that an error made of it unwinds the C++ frames
+    cpp11::warning(
       "`dbGetQuery()`, `dbSendQuery()` and `dbFetch()` should only be used "
       "with `SELECT` queries. Did you mean `dbExecute()`, `dbSendStatement()` "
       "or `dbGetRowsAffected()`?"
@@ -576,7 +625,16 @@ bool SqliteResultImpl::step_run() {
 }
 
 bool SqliteResultImpl::step_done() {
-  bool more_params = bind_row();
+  bool more_params;
+  try {
+    more_params = bind_row();
+  } catch (...) {
+    // Parameters that fail to bind end the execution and are not kept:
+    // an Arrow stream may hold a share of a result bound to this one's stream
+    params_.reset();
+    complete_ = true;
+    throw;
+  }
 
   if (!more_params) {
     complete_ = true;
@@ -596,7 +654,12 @@ cpp11::list SqliteResultImpl::peek_first_row() {
   return data.get_data(types_);
 }
 
-void SqliteResultImpl::ensure_arrow_columns() {
+// Creates the columns if needed, and selects the arrays they build: for a
+// data frame fetch or for an Arrow stream
+void SqliteResultImpl::ensure_arrow_columns(bool data_frame) {
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    arrow_columns_[j].set_data_frame(data_frame);
+  }
   if (!arrow_columns_.empty() || cache.ncols_ == 0) {
     return;
   }
@@ -612,6 +675,7 @@ void SqliteResultImpl::ensure_arrow_columns() {
       arrow_targets_[j]
     );
     column->decide_from_row(has_row);
+    column->set_data_frame(data_frame);
     arrow_columns_.push_back(column);
   }
 }
@@ -709,9 +773,10 @@ int64_t SqliteResultImpl::fetch_arrow_rows(
   return n;
 }
 
-// One warning for the values logged since the last call that were not of
-// their column's type, naming the current types of the columns
-void SqliteResultImpl::warn_coercions() {
+// The values logged since the last call that were not of their column's
+// type, as the entries of the warning, with the current types of the columns;
+// NULL if there were none
+cpp11::sexp SqliteResultImpl::collect_coercions() {
   cpp11::writable::list entries;
   for (size_t j = 0; j < arrow_columns_.size(); ++j) {
     cpp11::sexp coercions = arrow_columns_[j].coercions();
@@ -720,11 +785,31 @@ void SqliteResultImpl::warn_coercions() {
     }
   }
   if (entries.size() == 0) {
+    return R_NilValue;
+  }
+  // Through SEXP, which truncates the list to its length: a conversion
+  // straight to cpp11::sexp would keep the capacity that push_back() reserved
+  return static_cast<SEXP>(entries);
+}
+
+// One warning for the values logged since the last call that were not of
+// their column's type
+void SqliteResultImpl::warn_coercions() {
+  cpp11::sexp entries = collect_coercions();
+  if (entries == R_NilValue) {
     return;
   }
 
   cpp11::function warn_coercion = cpp11::package("RSQLite")["warn_coercion"];
   warn_coercion(entries);
+}
+
+// A fetch that failed, by an error or an interrupt, leaves the values it
+// logged: each fetch starts without them
+void SqliteResultImpl::discard_coercions() {
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    arrow_columns_[j].discard_coercions();
+  }
 }
 
 void SqliteResultImpl::set_arrow_struct_schema(struct ArrowSchema* out) {

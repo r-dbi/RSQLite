@@ -1,5 +1,12 @@
 # Requesting Arrow types for result columns with `schema`
 
+# Every array that these tests read is checked with arrow's ValidateFull()
+# where arrow is installed: these read their streams to the end at once, the
+# lazy streams of dbFetchArrow() are checked where they are read
+dbGetQueryArrow <- function(...) arrow_validated(DBI::dbGetQueryArrow(...))
+dbReadTableArrow <- function(...) arrow_validated(DBI::dbReadTableArrow(...))
+dbFetchArrowChunk <- function(...) arrow_validated(DBI::dbFetchArrowChunk(...))
+
 test_that("a requested type is used without looking at the values", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x, y)")
@@ -24,7 +31,7 @@ test_that("a requested type is used without looking at the values", {
   on.exit(dbClearResult(rs))
   stream <- dbFetchArrow(rs, chunk_size = 1)
   expect_equal(schema_formats(stream), c(x = "g"))
-  expect_equal(as.data.frame(stream)$x, c(NA, NA, 1.5))
+  expect_equal(as.data.frame(arrow_validated(stream))$x, c(NA, NA, 1.5))
 })
 
 # The formats of a query's result, with the stream consumed
@@ -71,8 +78,18 @@ test_that("schema entries are matched by name, exactly", {
   expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = int32), "struct")
   expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = data.frame(a = integer())), "infer_nanoarrow_schema")
 
-  # A failed request leaves no open result behind
+  # A failed request leaves no open result behind, also when `schema` itself
+  # fails or is malformed, which is found before the query is sent
   expect_error(dbSendQueryArrow(con, "SELECT 1 AS a", schema = list(b = int32)))
+  expect_error(dbSendQueryArrow(con, "SELECT 1 AS a", schema = list(a = nanoarrow::na_time32("us"))))
+  expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = list(a = stop("oops"))), "oops")
+  expect_no_warning(as.data.frame(dbGetQueryArrow(con, "SELECT 1 AS a")))
+  dbExecute(con, "CREATE TABLE t (a)")
+  expect_error(dbSendQueryArrow(con, "INSERT INTO t VALUES (1) RETURNING a", schema = int32), "struct")
+  expect_equal(dbGetQuery(con, "SELECT COUNT(*) AS n FROM t")$n, 0L)
+  # The names need the result: the statement has run
+  expect_error(dbSendQueryArrow(con, "INSERT INTO t VALUES (1) RETURNING a", schema = list(b = int32)), "`b`")
+  expect_equal(dbGetQuery(con, "SELECT COUNT(*) AS n FROM t")$n, 1L)
   expect_no_warning(as.data.frame(dbGetQueryArrow(con, "SELECT 1 AS a")))
 })
 
@@ -247,6 +264,139 @@ test_that("values out of range and coercions are reported per the rules", {
   )
 })
 
+test_that("float keeps to its range, bool takes a real as true unless zero", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1.5), (3.4e38), (1e300), (-1e300), (9e999), ('1e300'), (16777217), (0.0)")
+
+  w <- coercion_warnings(
+    array <- arrow_validated(single_array(
+      dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_float()))
+    ))
+  )
+  expect_equal(
+    nanoarrow::convert_array(array$children$x, double()),
+    c(1.5, as.numeric(3.4e38), NA, NA, Inf, NA, 16777216, 0),
+    tolerance = 1e-7
+  )
+  expect_equal(
+    vapply(w[[1]]$coercions[[1]]$values, function(v) paste(v$class, v$reason, paste(v$rows, collapse = " ")), ""),
+    c("real out_of_range 3 4", "string out_of_range 6")
+  )
+
+  dbExecute(con, "DELETE FROM t")
+  dbExecute(con, "INSERT INTO t VALUES (0.5), (-0.9), (0.0), (2), (0), ('true'), ('2')")
+  w <- coercion_warnings(
+    array <- arrow_validated(single_array(
+      dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_bool()))
+    ))
+  )
+  expect_equal(nanoarrow::convert_array(array$children$x), c(TRUE, TRUE, FALSE, TRUE, FALSE, FALSE, TRUE))
+  expect_equal(
+    vapply(w[[1]]$coercions[[1]]$values, function(v) paste(v$class, v$reason, paste(v$rows, collapse = " ")), ""),
+    c("real converted 1 2 3", "string converted 6 7")
+  )
+})
+
+# Compares the values of a 64-bit integer array exactly with `expected`, as
+# strings, NA for NULL: a uint64 above 2^63 - 1 is written as the int64 with
+# its bits, such as "-1" for 2^64 - 1
+expect_int64_bits <- function(array, expected) {
+  is_null <- suppressWarnings(is.na(nanoarrow::convert_array(array, double())))
+  expect_equal(is_null, is.na(expected))
+  actual <- matrix(as.raw(array$buffers[[2]])[seq_len(8 * array$length)], nrow = 8)
+  # bit64 reads -2^63, its NA, with a warning, but with the right bits
+  wanted <- suppressWarnings(bit64::as.integer64(expected))
+  wanted <- matrix(writeBin(unclass(wanted), raw()), nrow = 8)
+  expect_equal(actual[, !is_null], wanted[, !is_null])
+}
+
+test_that("numbers beyond 64 bits are out of range, not saturated", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  # SQLite stores an integer literal beyond 64 bits as a real:
+  # 18446744073709551615 becomes 2^64, 9223372036854775808 is 2^63
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (9223372036854775807), (-9223372036854775808), (-1),",
+    "(18446744073709551615), (9223372036854775808), (1e19), (1e30), (-1e30), (9e999),",
+    "('18446744073709551615'), ('99999999999999999999'), ('-9223372036854775809'),",
+    "('9223372036854775807'), (' -9223372036854775808x'), (2.5)"
+  ))
+  fetch <- function(type) {
+    w <- coercion_warnings(
+      array <- single_array(dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type)))
+    )
+    values <- w[[1]]$coercions[[1]]$values
+    list(
+      array = array$children$x,
+      reasons = vapply(values, function(v) paste(v$class, v$reason, paste(v$rows, collapse = " ")), "")
+    )
+  }
+
+  int64 <- fetch(nanoarrow::na_int64())
+  expect_int64_bits(int64$array, c(
+    "9223372036854775807", "-9223372036854775808", "-1",
+    NA, NA, NA, NA, NA, NA,
+    NA, NA, NA,
+    "9223372036854775807", "-9223372036854775808", "2"
+  ))
+  expect_equal(int64$reasons, c(
+    "real out_of_range 4 5 6 7 8 9", "string out_of_range 10 11 12",
+    "string converted 13 14", "real converted 15"
+  ))
+
+  uint64 <- fetch(nanoarrow::na_uint64())
+  expect_int64_bits(uint64$array, c(
+    "9223372036854775807", NA, NA,
+    NA, "-9223372036854775808", "-8446744073709551616", NA, NA, NA,
+    "-1", NA, NA,
+    "9223372036854775807", NA, "2"
+  ))
+  expect_equal(uint64$reasons, c(
+    "integer out_of_range 2 3", "real out_of_range 4 7 8 9", "real converted 5 6 15",
+    "string converted 10 13", "string out_of_range 11 12 14"
+  ))
+})
+
+test_that("numbers of days outside the range of a date type are NULL", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (18000), (18000.9), (-0.5), (2147483647), (2147483648), (4294985296),",
+    "(106751991167), (106751991168), (9007199254740993), (1e30), (-1e30), ('2020-01-02'), ('abc')"
+  ))
+  fetch <- function(type) {
+    w <- coercion_warnings(
+      array <- single_array(dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type)))
+    )
+    values <- w[[1]]$coercions[[1]]$values
+    list(
+      array = array$children$x,
+      reasons = vapply(values, function(v) paste(v$class, v$reason, paste(v$rows, collapse = " ")), "")
+    )
+  }
+
+  date32 <- fetch(nanoarrow::na_date32())
+  expect_equal(
+    as.numeric(nanoarrow::convert_array(date32$array)),
+    c(18000, 18000, 0, 2147483647, NA, NA, NA, NA, NA, NA, NA, 18263, NA)
+  )
+  expect_equal(date32$reasons, c(
+    "integer out_of_range 5 6 7 8 9", "real out_of_range 10 11", "string unparsable 13"
+  ))
+
+  # Milliseconds, exactly
+  date64 <- fetch(nanoarrow::na_date64())
+  ms <- function(days) format(bit64::as.integer64(days) * 86400000L, scientific = FALSE)
+  expect_int64_bits(date64$array, c(
+    ms(18000), ms(18000), "0", ms(2147483647), ms(2147483648), ms(4294985296),
+    ms(106751991167), NA, NA, NA, NA, ms(18263), NA
+  ))
+  expect_equal(date64$reasons, c(
+    "integer out_of_range 8 9", "real out_of_range 10 11", "string unparsable 13"
+  ))
+})
+
 test_that("times and timestamps outside the range of their unit are NULL", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (ts, tm)")
@@ -275,13 +425,83 @@ test_that("times and timestamps outside the range of their unit are NULL", {
   expect_equal(lapply(coercions, function(x) x$values[[1]]$rows), list(2:3, 2:3))
   expect_match(conditionMessage(w[[1]]), "2 string values out of range, NA", fixed = TRUE)
 
-  # Within the range of a coarser unit
-  expect_length(
-    coercion_warnings(df <- fetch(list(ts = nanoarrow::na_timestamp("us", "UTC"), tm = nanoarrow::na_time64("us")))),
-    0
-  )
+  # Within the range of a coarser unit, but not within a time of day
+  w <- coercion_warnings(df <- fetch(list(ts = nanoarrow::na_timestamp("us", "UTC"), tm = nanoarrow::na_time64("us"))))
   expect_equal(format(df$ts, "%Y"), c("2020", "3000", "1600"))
-  expect_equal(as.numeric(df$tm), c(3600, 1e10, -1e10))
+  expect_equal(as.numeric(df$tm), c(3600, NA, NA))
+  expect_equal(vapply(w[[1]]$coercions, `[[`, "", "column"), "tm")
+})
+
+test_that("integers and text become times and timestamps exactly", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES ('2020-02-03 04:05:06.000001'), ('2262-04-11 23:47:16.854775'),",
+    "('2262-04-11 23:47:16.854776'), ('1677-09-21 00:12:43.145225'), ('1677-09-21 00:12:43.145224'),",
+    "('1969-12-31 23:59:59.5'), (9007199254740993), (9223372036854775807), (1.5)"
+  ))
+  fetch <- function(unit) {
+    w <- coercion_warnings(
+      array <- arrow_validated(single_array(
+        dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_timestamp(unit, "UTC")))
+      ))
+    )
+    values <- if (length(w) > 0) w[[1]]$coercions[[1]]$values else list()
+    list(
+      array = array$children$x,
+      reasons = vapply(values, function(v) paste(v$class, v$reason, paste(v$rows, collapse = " ")), "")
+    )
+  }
+
+  ns <- fetch("ns")
+  expect_int64_bits(ns$array, c(
+    "1580702706000001000", "9223372036854775000", NA, "-9223372036854775000", NA,
+    "-500000000", NA, NA, "1500000000"
+  ))
+  expect_equal(ns$reasons, c("string out_of_range 3 5", "integer out_of_range 7 8"))
+
+  s <- fetch("s")
+  expect_int64_bits(s$array, c(
+    "1580702706", "9223372037", "9223372037", "-9223372037", "-9223372037",
+    "0", "9007199254740993", "9223372036854775807", "2"
+  ))
+  expect_length(s$reasons, 0)
+
+  # Text rounds half up in a coarser unit
+  expect_equal(
+    as.numeric(as.data.frame(dbGetQueryArrow(con, "SELECT '01:02:03.5' AS x", schema = list(x = nanoarrow::na_time32("s"))))$x),
+    3724
+  )
+})
+
+test_that("times outside a time of day are NULL", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES ('00:00:00'), ('23:59:59.6'), ('24:00:00'), ('-01:00:00'), ('2020-02-03'),",
+    "(3600), (86400), (-1), (0.4), (86399.6)"
+  ))
+  units <- c(s = 1, ms = 1e3, us = 1e6, ns = 1e9)
+  for (unit in names(units)) {
+    type <- if (unit %in% c("s", "ms")) nanoarrow::na_time32(unit) else nanoarrow::na_time64(unit)
+    w <- coercion_warnings(
+      array <- arrow_validated(single_array(
+        dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type))
+      ))
+    )
+    # The last tick of the day stops the rounding
+    last <- if (unit == "s") 86399 else 86399.6
+    expect_equal(
+      as.numeric(nanoarrow::convert_array(array$children$x, double())) / units[[unit]],
+      c(0, last, NA, NA, NA, 3600, NA, NA, if (unit == "s") 0 else 0.4, last),
+      info = unit
+    )
+    expect_equal(
+      lapply(w[[1]]$coercions[[1]]$values, function(v) paste(v$class, v$reason, paste(v$rows, collapse = " "))),
+      list("string out_of_range 3 4 5", "integer out_of_range 7 8"),
+      info = unit
+    )
+  }
 })
 
 test_that("requested types survive dbBind() and apply to dbReadTableArrow()", {
@@ -292,9 +512,9 @@ test_that("requested types survive dbBind() and apply to dbReadTableArrow()", {
   rs <- dbSendQueryArrow(con, "SELECT x FROM t WHERE x >= ?", schema = list(x = nanoarrow::na_int32()))
   on.exit(dbClearResult(rs))
   dbBind(rs, list(1))
-  expect_equal(as.data.frame(dbFetchArrow(rs))$x, c(1L, 2L))
+  expect_equal(as.data.frame(arrow_validated(dbFetchArrow(rs)))$x, c(1L, 2L))
   dbBind(rs, list(2))
-  expect_equal(as.data.frame(dbFetchArrow(rs))$x, 2L)
+  expect_equal(as.data.frame(arrow_validated(dbFetchArrow(rs)))$x, 2L)
   dbClearResult(rs)
   on.exit(NULL)
 
@@ -382,16 +602,29 @@ test_that("data frame fetches through Arrow keep the requested types", {
     data.frame(n = rep(NA, 3), i = 1:3, d = c(NA, 3L, NA))
   )
   dbClearResult(rs)
+  # The arrays behind such a fetch
+  rs <- dbSendQueryArrow(con, sql, schema = schema)
+  fetched <- result_fetch_arrow_df(rs@result@ptr, -1, 1)
+  expect_equal(fetched$lengths, c(1, 1, 1))
+  for (array in fetched$arrays) {
+    arrow_validated(array)
+  }
+  dbClearResult(rs)
 
   # Like the default path, a 64-bit integer keeps a column as integer64 for
-  # the later fetches, also in a fetch of no rows
-  sql <- "SELECT 4294967296 AS x UNION ALL SELECT 1"
-  for (type in list(nanoarrow::na_int64(), nanoarrow::na_uint64())) {
-    rs <- dbSendQueryArrow(con, sql, schema = list(x = type))
-    expect_s3_class(dbFetch(rs, 0)$x, "integer64")
-    expect_s3_class(dbFetch(rs, 1)$x, "integer64")
-    expect_s3_class(dbFetch(rs)$x, "integer64")
-    dbClearResult(rs)
+  # the later fetches, also in a fetch of no rows, and also from a real or text
+  for (wide in c("4294967296", "4294967296.0", "'4294967296'")) {
+    sql <- paste("SELECT", wide, "AS x UNION ALL SELECT 1 UNION ALL SELECT 2")
+    for (type in list(nanoarrow::na_int64(), nanoarrow::na_uint64())) {
+      rs <- dbSendQueryArrow(con, sql, schema = list(x = type))
+      w <- coercion_warnings({
+        expect_s3_class(dbFetch(rs, 0)$x, "integer64")
+        expect_s3_class(dbFetch(rs, 1)$x, "integer64")
+        expect_s3_class(dbFetch(rs, 1)$x, "integer64")
+        expect_s3_class(dbFetch(rs)$x, "integer64")
+      })
+      dbClearResult(rs)
+    }
   }
 })
 
@@ -408,7 +641,7 @@ test_that("the schema reads no rows when every column has a requested type", {
   expect_length(coercion_warnings(stream$get_schema()), 0)
   expect_equal(dbGetRowCount(rs), 0)
   expect_length(coercion_warnings(array <- stream$get_next()), 1)
-  expect_equal(array$length, 2)
+  expect_equal(arrow_validated(array)$length, 2)
   expect_equal(dbGetRowCount(rs), 2)
   stream$release()
   dbClearResult(rs)
@@ -418,7 +651,7 @@ test_that("the schema reads no rows when every column has a requested type", {
   stream <- dbFetchArrow(rs)
   expect_length(coercion_warnings(stream$get_schema()), 1)
   expect_length(coercion_warnings(array <- stream$get_next()), 0)
-  expect_equal(array$length, 2)
+  expect_equal(arrow_validated(array)$length, 2)
   stream$release()
 })
 
@@ -442,8 +675,8 @@ test_that("only the requested types with 32-bit offsets end chunks at the byte l
       schema <- setNames(list(types[[type]]), column)
       info <- paste(column, type)
       lengths <- if (startsWith(type, "large")) 7 else c(2, 1, 1, 1, 2)
-      stream <- dbGetQueryArrow(con, sql, schema = schema)
-      expect_equal(suppressWarnings(chunk_lengths(stream)), lengths, info = info)
+      stream <- suppressWarnings(dbGetQueryArrow(con, sql, schema = schema))
+      expect_equal(chunk_lengths(stream), lengths, info = info)
       values <- suppressWarnings(as.data.frame(dbGetQueryArrow(con, sql, schema = schema)))[[column]]
       expect_equal(if (is.character(values)) nchar(values) else lengths(values), sizes, info = info)
     }
@@ -467,9 +700,129 @@ test_that("the warning names each requested type", {
   values <- c(utf8 = "x'ff'", large_utf8 = "x'ff'", binary = "1", large_binary = "1", null = "1")
   for (type in names(types)) {
     value <- if (type %in% names(values)) values[[type]] else "'abc'"
-    stream <- dbGetQueryArrow(con, paste("SELECT", value, "AS x"), schema = list(x = types[[type]]))
-    w <- coercion_warnings(chunk_lengths(stream))
+    w <- coercion_warnings(
+      chunk_lengths(dbGetQueryArrow(con, paste("SELECT", value, "AS x"), schema = list(x = types[[type]])))
+    )
     expect_length(w, 1)
     expect_equal(w[[1]]$coercions[[1]]$type, type, info = type)
   }
+})
+
+test_that("data frame fetches build requested times and timestamps as requested", {
+  setup <- c(
+    "CREATE TABLE t (tm TIME, ts TIMESTAMP)",
+    "INSERT INTO t VALUES ('01:02:03.5', '2020-01-02 03:04:05.25'), ('25:00:00', '1960-01-01 00:00:00')"
+  )
+  con <- local_arrow_con(extended_types = TRUE)
+  for (sql in setup) {
+    dbExecute(con, sql)
+  }
+  sql <- "SELECT tm, ts FROM t"
+  ts <- as.numeric(as.POSIXct(c("2020-01-02 03:04:05.25", "1960-01-01 00:00:00"), tz = "UTC"))
+
+  # Decided: the seconds of the default path, a time outside a day included
+  df <- dbGetQuery(con, sql)
+  expect_s3_class(df$tm, "hms")
+  expect_equal(as.numeric(df$tm), c(3723.5, 90000))
+  expect_equal(attr(df$ts, "tzone"), "UTC")
+  expect_equal(as.numeric(df$ts), ts)
+
+  # Requested: the unit, the time zone and the time of day of the type
+  schema <- list(tm = nanoarrow::na_time32("s"), ts = nanoarrow::na_timestamp("ms", "Europe/Zurich"))
+  rs <- dbSendQueryArrow(con, sql, schema = schema)
+  w <- coercion_warnings(df <- dbFetch(rs))
+  dbClearResult(rs)
+  expect_s3_class(df$tm, "hms")
+  expect_equal(as.numeric(df$tm), c(3724, NA))
+  expect_s3_class(df$ts, "POSIXct")
+  expect_equal(attr(df$ts, "tzone"), "Europe/Zurich")
+  expect_equal(as.numeric(df$ts), ts)
+  expect_length(w, 1)
+  expect_equal(w[[1]]$coercions[[1]]$column, "tm")
+  expect_equal(w[[1]]$coercions[[1]]$type, "time32")
+  expect_equal(w[[1]]$coercions[[1]]$values[[1]]$reason, "out_of_range")
+
+  # The arrays of the fetch are of the requested types
+  rs <- dbSendQueryArrow(con, sql, schema = schema)
+  fetched <- suppressWarnings(result_fetch_arrow_df(rs@result@ptr, -1, 1))
+  dbClearResult(rs)
+  expect_equal(fetched$formats, c("tts", "tsm:Europe/Zurich"))
+  expect_equal(fetched$seconds, c("", ""))
+  for (array in fetched$arrays) {
+    arrow_validated(array)
+  }
+})
+
+test_that("a requested type wins over the type a data frame fetch carries to a new binding", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (k INTEGER, v)")
+  dbExecute(con, "INSERT INTO t VALUES (1, 'a'), (1, 'b'), (2, 1), (2, 2)")
+  sql <- "SELECT v FROM t WHERE k = ? ORDER BY rowid"
+  fetch_bindings <- function(...) {
+    rs <- dbSendQueryArrow(con, sql, ...)
+    on.exit(dbClearResult(rs))
+    lapply(1:2, function(k) {
+      dbBind(rs, list(k))
+      w <- coercion_warnings(df <- dbFetch(rs))
+      list(v = df$v, warnings = length(w))
+    })
+  }
+
+  # Like the default path, the second binding starts from text
+  expect_equal(fetch_bindings(), list(list(v = c("a", "b"), warnings = 0L), list(v = c("1", "2"), warnings = 0L)))
+  # A requested type holds for every binding
+  expect_equal(
+    fetch_bindings(schema = list(v = nanoarrow::na_int32())),
+    list(list(v = c(0L, 0L), warnings = 1L), list(v = 1:2, warnings = 0L))
+  )
+})
+
+test_that("data frame fetches convert every type that can be requested", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1), (2), (NULL), (4), (5)")
+  types <- list(
+    bool = nanoarrow::na_bool(), i8 = nanoarrow::na_int8(), i16 = nanoarrow::na_int16(),
+    i32 = nanoarrow::na_int32(), i64 = nanoarrow::na_int64(), u8 = nanoarrow::na_uint8(),
+    u16 = nanoarrow::na_uint16(), u32 = nanoarrow::na_uint32(), u64 = nanoarrow::na_uint64(),
+    f32 = nanoarrow::na_float(), f64 = nanoarrow::na_double(),
+    s = nanoarrow::na_string(), ls = nanoarrow::na_large_string(),
+    b = nanoarrow::na_binary(), lb = nanoarrow::na_large_binary(),
+    d32 = nanoarrow::na_date32(), d64 = nanoarrow::na_date64(),
+    t32 = nanoarrow::na_time32("ms"), t64 = nanoarrow::na_time64("ns"),
+    ts = nanoarrow::na_timestamp("s", "UTC"), n = nanoarrow::na_na()
+  )
+  sql <- paste(
+    "SELECT", paste0("x AS ", names(types)[1:11], collapse = ", "),
+    ", CAST(x AS TEXT) AS s, CAST(x AS TEXT) AS ls, CAST(x AS BLOB) AS b, CAST(x AS BLOB) AS lb,",
+    "x AS d32, x AS d64, x AS t32, x AS t64, x AS ts, NULL AS n FROM t ORDER BY rowid"
+  )
+  values <- c(1, 2, NA, 4, 5)
+
+  # One array, and an array per two rows
+  rs <- dbSendQueryArrow(con, sql, schema = types)
+  one <- suppressWarnings(dbFetch(rs))
+  dbClearResult(rs)
+  rs <- dbSendQueryArrow(con, sql, schema = types)
+  several <- suppressWarnings(arrow_fetch_df(rs@result, -1, chunk_size = 2))
+  dbClearResult(rs)
+  expect_identical(several, one)
+
+  expect_identical(one$bool, values != 0)
+  for (column in c("i8", "i16", "i32", "i64", "u8", "u16", "u64")) {
+    expect_identical(one[[column]], as.integer(values), info = column)
+  }
+  for (column in c("u32", "f32", "f64")) {
+    expect_identical(one[[column]], values, info = column)
+  }
+  expect_identical(one$s, as.character(values))
+  expect_identical(one$ls, as.character(values))
+  expect_identical(one$b, blob::as_blob(lapply(values, function(v) if (is.na(v)) NULL else charToRaw(as.character(v)))))
+  expect_identical(one$lb, one$b)
+  expect_identical(as.numeric(one$d32), values)
+  expect_equal(as.numeric(as.Date(one$d64)), values)
+  expect_equal(as.numeric(one$t32), values)
+  expect_equal(as.numeric(one$t64), values)
+  expect_equal(as.numeric(one$ts), values)
+  expect_identical(one$n, rep(NA, 5))
 })

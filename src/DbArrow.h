@@ -9,6 +9,9 @@
 
 #include <stdexcept>
 #include <string>
+#include <vector>
+
+#include <cpp11/sexp.hpp>
 
 #include "nanoarrow/nanoarrow.h"
 #include "nanoarrow/nanoarrow.hpp"
@@ -67,5 +70,18 @@ inline int64_t arrow_array_bytes(struct ArrowArray* array) {
   }
   return bytes;
 }
+
+// What a data frame needs to know about the columns of a fetch through Arrow
+struct ArrowDfColumns {
+  // Columns that have seen an integer that needs 64 bits, in this fetch or an
+  // earlier one
+  std::vector<bool> wide_ints;
+  // The R class of a column of times or timestamps stored as doubles in
+  // seconds, empty for the other columns
+  std::vector<std::string> seconds_classes;
+  // The values that were not of their column's type, as the entries of the
+  // warning that dbFetch() raises, or NULL
+  cpp11::sexp coercions;
+};
 
 #endif  // RSQLITE_DBARROW_H

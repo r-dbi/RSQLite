@@ -50,3 +50,40 @@ coercion_warnings <- function(expr) {
   )
   out
 }
+
+# Checks an Arrow array, or each array of a stream, with arrow's ValidateFull()
+# where arrow is installed, and returns an equivalent object: a stream is read
+# to the end and comes back as a stream of the same arrays
+arrow_validated <- function(x) {
+  if (inherits(x, "nanoarrow_array_stream")) {
+    schema <- x$get_schema()
+    arrays <- list()
+    repeat {
+      array <- x$get_next()
+      if (is.null(array)) {
+        break
+      }
+      arrays[[length(arrays) + 1]] <- arrow_validated(array)
+    }
+    x$release()
+    return(nanoarrow::basic_array_stream(arrays, schema = schema))
+  }
+
+  if (rlang::is_installed("arrow")) {
+    if (nanoarrow::infer_nanoarrow_schema(x)$format == "+s") {
+      table <- arrow::as_arrow_table(x)
+    } else {
+      table <- arrow::arrow_table(x = arrow::as_arrow_array(x))
+    }
+    testthat::expect_true(table$ValidateFull())
+  }
+  x
+}
+
+# The one array of a stream, without the arrow package that
+# nanoarrow::as_nanoarrow_array() needs for a stream
+single_array <- function(stream) {
+  arrays <- nanoarrow::collect_array_stream(stream)
+  testthat::expect_length(arrays, 1)
+  arrays[[1]]
+}

@@ -59,6 +59,11 @@ private:
   // Set while the columns hold the storage classes of the current row,
   // also when a byte limit ended the chunk before it
   bool arrow_row_read_;
+  // The types and 64-bit flags that the last data frame fetch left, which the
+  // first one of a new execution starts from, like the default path does
+  std::vector<ARROW_KIND> df_kinds_;
+  std::vector<bool> df_wide_ints_;
+  bool df_carry_;
 
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);
@@ -83,16 +88,19 @@ public:
   cpp11::strings get_column_names() const;
 
   // Arrow
+  // `seconds` marks the times and timestamps that a data frame fetch stores
+  // as doubles in seconds, see ArrowTarget
   void set_arrow_schema(
     const struct ArrowSchema* schema,
-    const std::vector<int>& positions
+    const std::vector<int>& positions,
+    const std::vector<bool>& seconds
   );
   void arrow_schema(struct ArrowSchema* out, int64_t infer_rows);
   int64_t fetch_arrow(struct ArrowArray* out, int64_t n_max);
   int64_t fetch_arrow_df(
     struct ArrowSchema* schema,
     std::vector<nanoarrow::UniqueArray>& chunks,
-    std::vector<bool>& wide_ints,
+    ArrowDfColumns& columns,
     int64_t n_max,
     int64_t chunk_size
   );
@@ -123,7 +131,7 @@ private:
   bool step_done();
   cpp11::list peek_first_row();
 
-  void ensure_arrow_columns();
+  void ensure_arrow_columns(bool data_frame);
   void freeze_arrow_columns();
   int64_t fetch_arrow_chunk(struct ArrowArray* out, int64_t n_max);
   int64_t fetch_arrow_rows(
@@ -135,7 +143,9 @@ private:
   void copy_pending_rows(struct ArrowArray* out, int64_t n);
   bool arrow_row_fits();
   bool arrow_chunk_full();
+  cpp11::sexp collect_coercions();
   void warn_coercions();
+  void discard_coercions();
 
 private:
   NORET void raise_sqlite_exception(int rc) const;

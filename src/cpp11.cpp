@@ -166,10 +166,10 @@ extern "C" SEXP _RSQLite_result_get_placeholder_names(SEXP res) {
   END_CPP11
 }
 // result.cpp
-void result_set_arrow_schema(DbResult* res, cpp11::sexp schema, cpp11::integers positions);
-extern "C" SEXP _RSQLite_result_set_arrow_schema(SEXP res, SEXP schema, SEXP positions) {
+void result_set_arrow_schema(DbResult* res, cpp11::sexp schema, cpp11::integers positions, cpp11::logicals seconds);
+extern "C" SEXP _RSQLite_result_set_arrow_schema(SEXP res, SEXP schema, SEXP positions, SEXP seconds) {
   BEGIN_CPP11
-    result_set_arrow_schema(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<cpp11::sexp>>(schema), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(positions));
+    result_set_arrow_schema(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<cpp11::sexp>>(schema), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(positions), cpp11::as_cpp<cpp11::decay_t<cpp11::logicals>>(seconds));
     return R_NilValue;
   END_CPP11
 }
@@ -188,10 +188,10 @@ extern "C" SEXP _RSQLite_result_fetch_arrow_df(SEXP res, SEXP n_max, SEXP chunk_
   END_CPP11
 }
 // result.cpp
-cpp11::list arrow_split_columns(cpp11::sexp first, cpp11::sexp stream_xptr);
-extern "C" SEXP _RSQLite_arrow_split_columns(SEXP first, SEXP stream_xptr) {
+cpp11::list arrow_split_columns(cpp11::list arrays);
+extern "C" SEXP _RSQLite_arrow_split_columns(SEXP arrays) {
   BEGIN_CPP11
-    return cpp11::as_sexp(arrow_split_columns(cpp11::as_cpp<cpp11::decay_t<cpp11::sexp>>(first), cpp11::as_cpp<cpp11::decay_t<cpp11::sexp>>(stream_xptr)));
+    return cpp11::as_sexp(arrow_split_columns(cpp11::as_cpp<cpp11::decay_t<cpp11::list>>(arrays)));
   END_CPP11
 }
 // result.cpp
@@ -258,7 +258,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_arrow_rethrown_unwinds",          (DL_FUNC) &_RSQLite_arrow_rethrown_unwinds,          0},
     {"_RSQLite_arrow_set_bytes_limits",          (DL_FUNC) &_RSQLite_arrow_set_bytes_limits,          2},
     {"_RSQLite_arrow_set_concat_utf8_max_bytes", (DL_FUNC) &_RSQLite_arrow_set_concat_utf8_max_bytes, 1},
-    {"_RSQLite_arrow_split_columns",             (DL_FUNC) &_RSQLite_arrow_split_columns,             2},
+    {"_RSQLite_arrow_split_columns",             (DL_FUNC) &_RSQLite_arrow_split_columns,             1},
     {"_RSQLite_connection_connect",              (DL_FUNC) &_RSQLite_connection_connect,              5},
     {"_RSQLite_connection_copy_database",        (DL_FUNC) &_RSQLite_connection_copy_database,        2},
     {"_RSQLite_connection_import_file",          (DL_FUNC) &_RSQLite_connection_import_file,          6},
@@ -281,7 +281,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_result_release",                  (DL_FUNC) &_RSQLite_result_release,                  1},
     {"_RSQLite_result_rows_affected",            (DL_FUNC) &_RSQLite_result_rows_affected,            1},
     {"_RSQLite_result_rows_fetched",             (DL_FUNC) &_RSQLite_result_rows_fetched,             1},
-    {"_RSQLite_result_set_arrow_schema",         (DL_FUNC) &_RSQLite_result_set_arrow_schema,         3},
+    {"_RSQLite_result_set_arrow_schema",         (DL_FUNC) &_RSQLite_result_set_arrow_schema,         4},
     {"_RSQLite_result_valid",                    (DL_FUNC) &_RSQLite_result_valid,                    1},
     {"_RSQLite_rsqliteVersion",                  (DL_FUNC) &_RSQLite_rsqliteVersion,                  0},
     {"_RSQLite_set_busy_handler",                (DL_FUNC) &_RSQLite_set_busy_handler,                2},

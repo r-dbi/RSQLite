@@ -320,3 +320,38 @@ test_that("ptype rejects prototypes it can't request or convert back to", {
   expect_equal(dbFetch(rs), data.frame(a = 1L))
   dbClearResult(rs)
 })
+
+test_that("time and timestamp prototypes keep the default path's precision and range", {
+  path <- withr::local_tempfile(fileext = ".sqlite")
+  con_default <- local_con(dbname = path, extended_types = TRUE)
+  con <- local_arrow_con(dbname = path)
+
+  # Fractions below a microsecond, like those of Sys.time(), and times beyond a day
+  ts <- .POSIXct(1767225600 + c(0.123456789, 31536000.987654321, -86399.000000123), tz = "UTC")
+  tm <- hms::hms(c(90000.123456789, -1.5, 3e9))
+  dbWriteTable(con_default, "t", data.frame(ts = ts, tm = tm))
+  dbExecute(con_default, "INSERT INTO t VALUES ('2024-01-01 12:00:00.123456', '25:30:00.5'), (NULL, NULL)")
+  expected <- dbGetQuery(con_default, "SELECT * FROM t")
+  expect_equal(as.numeric(expected$ts[1:3]), as.numeric(ts), tolerance = 0)
+  expect_equal(as.numeric(expected$tm[1:3]), as.numeric(tm), tolerance = 0)
+  attr(expected$ts, "tzone") <- "Asia/Tokyo"
+
+  ptype <- list(ts = as.POSIXct(character(), tz = "Asia/Tokyo"), tm = hms::hms())
+  expect_identical(dbGetQuery(con, "SELECT * FROM t", ptype = ptype), expected)
+  # Also without the declared types
+  expect_identical(
+    dbGetQuery(con, "SELECT ts + 0 AS ts, tm + 0 AS tm FROM t LIMIT 3", ptype = ptype),
+    expected[1:3, ]
+  )
+
+  rs <- dbSendQuery(con, "SELECT * FROM t", ptype = ptype)
+  expect_identical(dbFetch(rs, 0), expected[0, ])
+  df <- rbind(dbFetch(rs, 2), dbFetch(rs, 1), dbFetch(rs))
+  rownames(df) <- NULL
+  expect_identical(df, expected)
+  dbClearResult(rs)
+
+  rs <- dbSendQuery(con, "SELECT * FROM t", ptype = ptype)
+  expect_identical(arrow_fetch_df(rs, -1, chunk_size = 2), expected)
+  dbClearResult(rs)
+})

@@ -52,7 +52,6 @@ Suggests:
     cli,
     DBItest (>= 1.8.0),
     decor,
-    dplyr,
     gert,
     gh,
     hms,

@@ -240,6 +240,10 @@ void SqliteResultImpl::arrow_schema(
     if (pending_chunk_->release == NULL && !complete_) {
       nanoarrow::UniqueArray chunk;
       fetch_arrow_rows(chunk.get(), infer_rows);
+      // The rows have been read, the warning comes with the schema.
+      // Before the chunk is kept: if the warning is turned into an error,
+      // the chunk is released by the unwinding.
+      warn_coercions();
       chunk.move(pending_chunk_.get());
     }
     // Columns that only ever held NULL take their declared type
@@ -253,6 +257,22 @@ void SqliteResultImpl::arrow_schema(
 }
 
 int64_t SqliteResultImpl::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
+  nanoarrow::UniqueArray chunk;
+  int64_t n = fetch_arrow_chunk(chunk.get(), n_max);
+
+  // One warning per chunk, before it is handed out: if the warning is turned
+  // into an error, the chunk is released by the unwinding
+  warn_coercions();
+
+  chunk.move(out);
+  return n;
+}
+
+// The next chunk for fetch_arrow(), without the warning
+int64_t SqliteResultImpl::fetch_arrow_chunk(
+  struct ArrowArray* out,
+  int64_t n_max
+) {
   if (!ready_) {
     throw std::runtime_error("Query needs to be bound before fetching");
   }
@@ -284,7 +304,9 @@ int64_t SqliteResultImpl::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
 }
 
 // The rows of one dbFetch() through Arrow: at most `n_max` rows, all for a
-// negative `n_max`, as chunks of at most `chunk_size` rows that share `schema`.
+// negative `n_max`, as chunks of at most `chunk_size` rows that share `schema`,
+// with one warning for the values of all chunks that were not of their
+// column's type.
 // Unless an Arrow stream or chunk has fixed the types already, they are
 // decided for this fetch like the default path decides them: a column that
 // sees only NULL stays open across chunks, integers widen to double in any
@@ -337,7 +359,7 @@ int64_t SqliteResultImpl::fetch_arrow_df(
       kinds.push_back(std::vector<ARROW_KIND>());
       n = fetch_arrow_rows(chunk.get(), n_chunk, &kinds.back());
     } else {
-      n = fetch_arrow(chunk.get(), n_chunk);
+      n = fetch_arrow_chunk(chunk.get(), n_chunk);
     }
     if (n == 0) {
       // Not reached: only the end of the result gives an empty chunk
@@ -365,6 +387,14 @@ int64_t SqliteResultImpl::fetch_arrow_df(
         arrow_columns_[j].conform_chunk(chunks[i]->children[j], kinds[i][j]);
       }
     }
+  }
+
+  // One warning for the whole fetch, with the final types: a column logged
+  // as int64 may have become double since. The caller owns the chunks, an
+  // error raised from the warning releases them.
+  warn_coercions();
+
+  if (open) {
     for (size_t j = 0; j < ncols; ++j) {
       arrow_columns_[j].reopen();
     }
@@ -631,15 +661,12 @@ int64_t SqliteResultImpl::fetch_arrow_rows(
     &error
   );
 
-  // Before the chunk is handed out: if the warning is turned into an error,
-  // the chunk is released by the unwinding
-  warn_coercions();
-
   chunk.move(out);
   return n;
 }
 
-// One warning per chunk for all values that were not of their column's type
+// One warning for the values logged since the last call that were not of
+// their column's type, naming the current types of the columns
 void SqliteResultImpl::warn_coercions() {
   cpp11::writable::list entries;
   for (size_t j = 0; j < arrow_columns_.size(); ++j) {

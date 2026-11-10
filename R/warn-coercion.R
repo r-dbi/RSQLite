@@ -1,7 +1,8 @@
 # The warning for values that were not of the type of their column.
 #
-# The C++ code logs such values per column and chunk (see CoercionLog) and
-# calls warn_coercion() once per fetched chunk with the entries:
+# The C++ code logs such values per column (see CoercionLog) and calls
+# warn_coercion() once per Arrow chunk, or once per dbFetch() for a data frame
+# through Arrow, with the entries:
 # a list with one element per column, each a list with the column name,
 # its Arrow type and the values grouped by storage class and reason,
 # with their 1-based row numbers in the result.

@@ -113,9 +113,9 @@ public:
   // The bytes in the data buffer of a utf8 or binary column
   int64_t variable_bytes();
 
-  // The values of the chunk that were not of the column's type, as an R list
-  // with the column name, the type and the entries of the log, which is
-  // cleared; NULL if there were none
+  // The values logged since the last call that were not of the column's type,
+  // as an R list with the column name, its current type and the entries of
+  // the log, which is cleared; NULL if there were none
   cpp11::sexp coercions();
 
 private:

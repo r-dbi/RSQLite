@@ -51,6 +51,47 @@ test_that("row numbers count from the first row of the result", {
   expect_no_warning(dbFetchArrowChunk(rs, chunk_size = 2))
 })
 
+test_that("a data frame fetch through Arrow warns once, with the final types", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1), ('a'), (2), ('b'), (2.5), ('c')")
+
+  rs <- dbSendQuery(con, "SELECT x FROM t")
+  # Three arrays: the column is int64 in the first two, double in the third
+  w <- coercion_warnings(df <- arrow_fetch_df(rs, -1, chunk_size = 2))
+  dbClearResult(rs)
+  expect_equal(df$x, c(1, 0, 2, 0, 2.5, 0))
+  expect_length(w, 1)
+  coercions <- w[[1]]$coercions
+  expect_length(coercions, 1)
+  expect_equal(coercions[[1]]$type, "double")
+  expect_equal(coercions[[1]]$values[[1]]$rows, c(2, 4, 6))
+
+  # The arrays of 65536 rows of a fetch
+  sql <- paste(
+    "WITH RECURSIVE cnt(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM cnt WHERE i < 70000)",
+    "SELECT CASE WHEN i IN (2, 70000) THEN 'x' ELSE i END AS a FROM cnt"
+  )
+  w <- coercion_warnings(df <- dbGetQuery(con, sql))
+  expect_length(w, 1)
+  expect_equal(w[[1]]$coercions[[1]]$values[[1]]$rows, c(2, 70000))
+
+  # A stream warns per chunk, with the types fixed by the first one,
+  # and for the first chunk when it fetches it for the schema
+  rs <- dbSendQueryArrow(con, "SELECT x FROM t")
+  on.exit(dbClearResult(rs))
+  stream <- dbFetchArrow(rs, chunk_size = 2)
+  w <- coercion_warnings(stream$get_schema())
+  expect_length(w, 1)
+  expect_equal(w[[1]]$coercions[[1]]$values[[1]]$rows, 2)
+  w <- coercion_warnings(df <- as.data.frame(stream))
+  expect_equal(df$x, c(1, 0, 2, 0, 2, 0))
+  expect_length(w, 2)
+  expect_equal(w[[1]]$coercions[[1]]$values[[1]]$rows, 4)
+  expect_equal(w[[2]]$coercions[[1]]$type, "int64")
+  expect_equal(vapply(w[[2]]$coercions[[1]]$values, `[[`, "", "class"), c("real", "string"))
+})
+
 test_that("long lists of rows are truncated", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x)")

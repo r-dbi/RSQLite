@@ -184,20 +184,33 @@ test_that("data frames fetched in chunks through Arrow own their strings", {
   expect_equal(chunks[[2]]$s, "c")
 })
 
-# The data frames of a sequence of fetches; `chunk_size` sets the rows per
-# Arrow array of a fetch through Arrow
+# The data frames of a sequence of fetches, and the number of warnings of each
+# fetch; `chunk_size` sets the rows per Arrow array of a fetch through Arrow
 fetch_sequence <- function(con, sql, ns, chunk_size = NULL) {
   rs <- dbSendQuery(con, sql)
   on.exit(dbClearResult(rs))
-  lapply(ns, function(n) {
-    suppressWarnings(
+  warnings <- integer(length(ns))
+  data <- lapply(seq_along(ns), function(i) {
+    withCallingHandlers(
       if (is.null(chunk_size)) {
-        dbFetch(rs, n)
+        dbFetch(rs, ns[[i]])
       } else {
-        arrow_fetch_df(rs, n, chunk_size = chunk_size)
+        arrow_fetch_df(rs, ns[[i]], chunk_size = chunk_size)
+      },
+      warning = function(w) {
+        warnings[[i]] <<- warnings[[i]] + 1L
+        invokeRestart("muffleWarning")
       }
     )
   })
+  list(data = data, warnings = warnings)
+}
+
+# The default path warns once per column with mixed types,
+# the Arrow path once per fetch
+expect_same_fetches <- function(actual, expected, info) {
+  expect_identical(actual$data, expected$data, info = info)
+  expect_identical(actual$warnings, pmin(expected$warnings, 1L), info = info)
 }
 
 test_that("each fetch through Arrow is typed like on the default path", {
@@ -225,16 +238,18 @@ test_that("each fetch through Arrow is typed like on the default path", {
   for (ns in sequences) {
     expected <- fetch_sequence(con, "SELECT * FROM t", ns)
     info <- paste("n =", paste(ns, collapse = ", "))
-    expect_identical(fetch_sequence(con_arrow, "SELECT * FROM t", ns), expected, info = info)
+    expect_same_fetches(fetch_sequence(con_arrow, "SELECT * FROM t", ns), expected, info)
     # Several arrays per fetch
     for (chunk_size in 1:2) {
-      expect_identical(
+      expect_same_fetches(
         fetch_sequence(con_arrow, "SELECT * FROM t", ns, chunk_size = chunk_size),
         expected,
-        info = paste(info, "chunk_size =", chunk_size)
+        paste(info, "chunk_size =", chunk_size)
       )
     }
   }
+  # The values of other storage classes are in columns x and b
+  expect_identical(fetch_sequence(con, "SELECT * FROM t", -1)$warnings, 2L)
 })
 
 test_that("a NULL-first column is typed by its first value through Arrow", {

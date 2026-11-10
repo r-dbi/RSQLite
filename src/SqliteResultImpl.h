@@ -118,6 +118,7 @@ private:
 
   void ensure_arrow_columns();
   void freeze_arrow_columns();
+  int64_t fetch_arrow_chunk(struct ArrowArray* out, int64_t n_max);
   int64_t fetch_arrow_rows(
     struct ArrowArray* out,
     int64_t n_max,

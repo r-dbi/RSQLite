@@ -21,16 +21,17 @@ the first value that is not \code{NULL} decides,
 and integers are widened to \code{double} if a real number turns up in the first chunk.
 A column whose first chunk holds only \code{NULL} values takes the type of its declaration,
 and a column without a declaration that only ever holds \code{NULL} is of the Arrow null type.
-Once the first chunk has been fetched the types are fixed;
-later values of another storage class are converted by SQLite's own rules.
-Such values are reported with one warning per fetched chunk,
-of class \code{RSQLite_warning_coercion},
-that lists the affected columns with the 1-based row numbers in the result,
-for a lazy stream at the time the chunk is read.
-The warning carries the details in its \code{coercions} field.
+Once the first chunk has been fetched the types are fixed.
+A value of another storage class is converted by SQLite's own rules.
 A blob in a text column is kept only if it is valid UTF-8 without NUL bytes,
 and a date, time or timestamp that cannot be parsed is dropped;
-both become \code{NULL} and are listed in the same warning.
+both become \code{NULL}.
+Such values are reported with one warning per chunk, of class \code{RSQLite_warning_coercion},
+that lists the affected columns with their types and the 1-based row numbers in the result.
+It is raised when the chunk is fetched from the result:
+for a lazy stream when the array is requested,
+and for the first chunk when the schema is requested before it, see the section on chunking.
+The warning carries the details in its \code{coercions} field.
 The types can therefore depend on \code{chunk_size}:
 a real number in a later chunk is truncated to fit an \code{int64} column decided from integers,
 and a column whose first chunk holds only \code{NULL} keeps its declared type,
@@ -93,10 +94,16 @@ integers become doubles when a real number follows in the same fetch,
 and a column without a value takes its declared type, or \code{logical} without one.
 The next fetch starts from these types, except that it decides a \code{logical} column again.
 The default path truncates a real number that follows an integer too large for an \code{integer},
-here the column becomes a \code{double}.
+with a warning, here the column becomes a \code{double}.
 Once \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} or \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} has fixed the types of a result,
 later fetches keep them,
 and they hand out the rows kept for a schema, where the default path fails.
+Values that are not of their column's type are converted or dropped as in a stream,
+and reported with one warning of class \code{RSQLite_warning_coercion} per \code{\link[DBI:dbFetch]{DBI::dbFetch()}},
+which names the Arrow types the columns have at the end of the fetch.
+The default path warns on the same fetches, apart from the real numbers it truncates,
+but once per column with values of another storage class,
+and once per date, time or timestamp that cannot be parsed.
 Before writing, factors become strings, lists of raw vectors become blobs,
 and \code{difftime} columns become their numbers in their own units, as on the default path.
 

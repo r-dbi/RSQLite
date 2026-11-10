@@ -81,8 +81,12 @@
 #' and a column without a value takes its declared type, or `logical` without one.
 #' The next fetch starts from these types, also after [DBI::dbBind()],
 #' except that it decides a `logical` column again.
+#' Two differences remain.
 #' The default path truncates a real number that follows an integer too large for an `integer`,
-#' here the column becomes a `double`.
+#' here the column becomes a `double`,
+#' which keeps the real number but rounds the integers beyond `2^53`.
+#' The default path reads `-2147483648` as a 32-bit integer, which is `NA` in R,
+#' here it is a value that needs 64 bits.
 #' Once [DBI::dbFetchArrow()] or [DBI::dbFetchArrowChunk()] has fixed the types of a result,
 #' later fetches keep them, with times and timestamps in microseconds,
 #' and they hand out the rows kept for a schema, where the default path fails.

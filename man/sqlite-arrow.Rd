@@ -90,8 +90,12 @@ integers become doubles when a real number follows in the same fetch,
 and a column without a value takes its declared type, or \code{logical} without one.
 The next fetch starts from these types, also after \code{\link[DBI:dbBind]{DBI::dbBind()}},
 except that it decides a \code{logical} column again.
+Two differences remain.
 The default path truncates a real number that follows an integer too large for an \code{integer},
-here the column becomes a \code{double}.
+here the column becomes a \code{double},
+which keeps the real number but rounds the integers beyond \code{2^53}.
+The default path reads \code{-2147483648} as a 32-bit integer, which is \code{NA} in R,
+here it is a value that needs 64 bits.
 Once \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} or \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} has fixed the types of a result,
 later fetches keep them, with times and timestamps in microseconds,
 and they hand out the rows kept for a schema, where the default path fails.

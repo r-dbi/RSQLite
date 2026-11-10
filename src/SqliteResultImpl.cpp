@@ -151,9 +151,9 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
     bool has_params = bind_row();
     after_bind(has_params);
   } catch (...) {
-    // Parameters that fail to bind or to execute leave the result unbound,
-    // as before the first bind: fetching asks for a new bind instead of
-    // running them again
+    // Parameters that fail to bind or to execute leave the result unbound:
+    // fetching asks for a new bind instead of running them again,
+    // while dbGetRowsAffected() counts from this bind
     params_ = cpp11::list();
     groups_ = 0;
     ready_ = false;

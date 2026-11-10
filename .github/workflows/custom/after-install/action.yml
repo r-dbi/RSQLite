@@ -12,8 +12,12 @@ runs:
         }
       shell: Rscript {0}
 
-    # Patched roxygen2, for the sentence gap in man/. This runs before the
-    # Roxygenize step, which is why it lives in this hook and not in the shared
+    # Patched roxygen2, for the sentence gap in man/. Only the rcc-smoke job
+    # runs Roxygenize, so only that job installs it: rcc-full and rcc-suggests
+    # also call this hook and would build it for nothing. `github.job` is the
+    # id of the calling job. An unset ROXYGEN2_FORK_OUTCOME is not 'failure',
+    # so Roxygenize runs wherever this is skipped. The hook runs before the
+    # Roxygenize step, which is why it lives here and not in the shared
     # workflow. The step must not stop the job: a failed install costs the
     # documentation step and nothing else. The outcome goes into the job's
     # environment because the workflow reads it to skip Roxygenize and to report
@@ -22,10 +26,11 @@ runs:
     - name: Install roxygen2 from the fork branch
       id: roxygen2-fork
       continue-on-error: true
+      if: github.job == 'rcc-smoke'
       uses: ./.github/workflows/roxygen2-fork
 
     - name: Record the outcome of the roxygen2 fork install
-      if: always()
+      if: always() && github.job == 'rcc-smoke'
       env:
         OUTCOME: ${{ steps.roxygen2-fork.outcome }}
       run: echo "ROXYGEN2_FORK_OUTCOME=${OUTCOME}" >> "$GITHUB_ENV"

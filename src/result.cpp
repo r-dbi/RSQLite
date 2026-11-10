@@ -4,7 +4,6 @@
 #include "RSQLite_types.h"
 #include "DbArrow.h"
 #include "DbArrowStream.h"
-#include "SqliteResultImpl.h"
 // After DbArrow.h, so that the Arrow C structs are defined once
 #include <nanoarrow/r.h>
 
@@ -260,24 +259,25 @@ SEXP integer64_to_integer(cpp11::doubles x) {
   return out;
 }
 
-// For the tests: sets the bytes of a utf8 or binary column after which, or
-// beyond which, an Arrow chunk ends, and returns the previous values
+// For the tests: sets, for this result alone, the bytes of a utf8 or binary
+// column after which, or beyond which, an Arrow chunk ends
 [[cpp11::register]]
-cpp11::doubles arrow_set_bytes_limits(double cut_bytes, double max_bytes) {
-  std::pair<int64_t, int64_t> old = SqliteResultImpl::set_arrow_bytes_limits(
+void result_set_bytes_limits(
+  SqliteResult* res,
+  double cut_bytes,
+  double max_bytes
+) {
+  res->set_arrow_bytes_limits(
     static_cast<int64_t>(cut_bytes),
     static_cast<int64_t>(max_bytes)
-  );
-  return cpp11::writable::doubles(
-    { static_cast<double>(old.first), static_cast<double>(old.second) }
   );
 }
 
 // For the tests: how often an R condition raised while RSQLite's own C++ code
-// read one of its Arrow streams has been rethrown as a C++ exception
+// read an Arrow stream of this result has been rethrown as a C++ exception
 [[cpp11::register]]
-double arrow_rethrown_unwinds() {
-  return static_cast<double>(db_arrow_stream_rethrown_unwinds());
+double result_rethrown_unwinds(DbResult* res) {
+  return static_cast<double>(res->rethrown_unwinds());
 }
 
 // For the tests: sets the number of rows fetched from the statement

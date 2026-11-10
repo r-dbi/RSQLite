@@ -21,7 +21,7 @@ struct ArrowArrayStream;
 
 class DbResult : boost::noncopyable {
   DbConnectionPtr pConn_;
-  // Set while a fetch or a bind runs, see DbResult.cpp
+  // Set while a fetch or a bind runs, see run_guarded() in DbResult.cpp
   bool busy_;
 
 protected:

@@ -4,31 +4,60 @@
 #include "DbResultImpl.h"
 #include "DbArrowStream.h"
 
+#include <exception>
+#include <type_traits>
+
 namespace {
 
 // Marks a result busy while one of its fetches or binds runs.
 // R code can run meanwhile, a handler of a warning raised by the fetch, and
 // must not use the statement under it: a step or a bind would free the values
 // that the fetch is reading.
-// The flag is reset by the destructor, also when a C++ exception leaves the
-// fetch; R errors raised through cpp11 arrive as such exceptions.
-class BusyScope : boost::noncopyable {
-  bool& busy;
-
-public:
-  explicit BusyScope(bool& busy_) : busy(busy_) {
-    if (busy) {
-      throw std::runtime_error(
-        "Can't use a result while one of its fetches or binds is running, "
-        "as from a handler of a warning that it raised."
-      );
-    }
-    busy = true;
-  }
-  ~BusyScope() {
-    busy = false;
-  }
+// R_ExecWithCleanup() resets the flag when the body returns, and also when an
+// R error leaves the body by a longjmp instead of through cpp11: a raw
+// allocation that fails, an ALTREP parameter, a parameter stream of another
+// package that calls R. Such a longjmp still skips the C++ destructors of the
+// body, and can leave the statement in the middle of a step.
+// C++ exceptions are caught inside the body and rethrown after
+// R_ExecWithCleanup() has returned, so that none crosses R's C frames.
+struct GuardedCall {
+  void (*run)(void*);
+  void* body;
+  std::exception_ptr error;
 };
+
+SEXP guarded_body(void* data) {
+  GuardedCall* call = static_cast<GuardedCall*>(data);
+  try {
+    call->run(call->body);
+  } catch (...) {
+    call->error = std::current_exception();
+  }
+  return R_NilValue;
+}
+
+void guarded_cleanup(void* data) {
+  *static_cast<bool*>(data) = false;
+}
+
+template <typename F>
+void run_guarded(bool& busy, F&& body) {
+  if (busy) {
+    throw std::runtime_error(
+      "Can't use a result while one of its fetches or binds is running, "
+      "as from a handler of a warning that it raised."
+    );
+  }
+  typedef typename std::remove_reference<F>::type Body;
+  busy = true;
+  GuardedCall call = { [](void* f) { (*static_cast<Body*>(f))(); },
+                       &body,
+                       std::exception_ptr() };
+  R_ExecWithCleanup(guarded_body, &call, guarded_cleanup, &busy);
+  if (call.error) {
+    std::rethrow_exception(call.error);
+  }
+}
 
 }  // namespace
 
@@ -81,23 +110,26 @@ int DbResult::n_rows_affected() {
 }
 
 void DbResult::bind(const cpp11::list& params) {
-  BusyScope busy(busy_);
-  validate_params(params);
-  impl->bind(params);
+  run_guarded(busy_, [&] {
+    validate_params(params);
+    impl->bind(params);
+  });
 }
 
 cpp11::list DbResult::fetch(const int n_max) {
-  BusyScope busy(busy_);
-  if (!is_active()) {
-    cpp11::stop("Inactive result set");
-  }
-
-  return impl->fetch(n_max);
+  cpp11::list out;
+  run_guarded(busy_, [&] {
+    if (!is_active()) {
+      cpp11::stop("Inactive result set");
+    }
+    out = impl->fetch(n_max);
+  });
+  return out;
 }
 
 cpp11::list DbResult::get_column_info() {
-  BusyScope busy(busy_);
-  cpp11::writable::list out = impl->get_column_info();
+  cpp11::writable::list out;
+  run_guarded(busy_, [&] { out = impl->get_column_info(); });
 
   out.attr("row.names") = cpp11::integers({ NA_INTEGER, -Rf_length(out[0]) });
   out.attr("class") = "data.frame";
@@ -119,28 +151,29 @@ void DbResult::close() {
 // connection, see db_arrow_stream_init()
 
 void DbResult::arrow_schema(struct ArrowSchema* out, int64_t infer_rows) {
-  BusyScope busy(busy_);
-  impl->arrow_schema(out, infer_rows);
+  run_guarded(busy_, [&] { impl->arrow_schema(out, infer_rows); });
 }
 
 int64_t DbResult::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
-  BusyScope busy(busy_);
-  return impl->fetch_arrow(out, n_max);
+  int64_t n = 0;
+  run_guarded(busy_, [&] { n = impl->fetch_arrow(out, n_max); });
+  return n;
 }
 
 void DbResult::bind_arrow(
   struct ArrowArrayStream* stream,
   const std::vector<int>& param_indexes
 ) {
-  BusyScope busy(busy_);
-  // The stream would hold a share of the result that keeps it as parameters,
-  // and could never be read: the new execution invalidates it
-  if (db_arrow_stream_reads(stream, this)) {
-    throw std::runtime_error(
-      "Can't bind a result to an Arrow stream of its own rows."
-    );
-  }
-  impl->bind_arrow(stream, param_indexes);
+  run_guarded(busy_, [&] {
+    // The stream would hold a share of the result that keeps it as
+    // parameters, and could never be read: the new execution invalidates it
+    if (db_arrow_stream_reads(stream, this)) {
+      throw std::runtime_error(
+        "Can't bind a result to an Arrow stream of its own rows."
+      );
+    }
+    impl->bind_arrow(stream, param_indexes);
+  });
 }
 
 // Privates ///////////////////////////////////////////////////////////////////

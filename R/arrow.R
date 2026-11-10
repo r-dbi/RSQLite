@@ -87,6 +87,8 @@
 #' The next fetch starts from these types, except that it decides a `logical` column again.
 #' The default path truncates a real number that follows an integer too large for an `integer`,
 #' with a warning, here the column becomes a `double`.
+#' It also truncates a string or blob converted to an integer too large for an `integer`,
+#' here the column follows `bigint` from then on, as for such an integer.
 #' Once [DBI::dbFetchArrow()] or [DBI::dbFetchArrowChunk()] has fixed the types of a result,
 #' later fetches keep them,
 #' and they hand out the rows kept for a schema, where the default path fails.

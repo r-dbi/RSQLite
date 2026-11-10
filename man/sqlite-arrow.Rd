@@ -96,6 +96,8 @@ and a column without a value takes its declared type, or \code{logical} without 
 The next fetch starts from these types, except that it decides a \code{logical} column again.
 The default path truncates a real number that follows an integer too large for an \code{integer},
 with a warning, here the column becomes a \code{double}.
+It also truncates a string or blob converted to an integer too large for an \code{integer},
+here the column follows \code{bigint} from then on, as for such an integer.
 Once \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} or \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} has fixed the types of a result,
 later fetches keep them,
 and they hand out the rows kept for a schema, where the default path fails.

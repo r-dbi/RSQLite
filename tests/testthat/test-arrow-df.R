@@ -67,6 +67,22 @@ test_that("64-bit integers follow bigint on the Arrow path", {
   expect_equal(dbReadTable(con_int, "t")$big, c(NA, 2L))
 })
 
+test_that("a converted value that needs 64 bits keeps the column integer64 on the Arrow path", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1), ('99999999999'), (2)")
+
+  rs <- dbSendQuery(con, "SELECT x FROM t")
+  w <- coercion_warnings(first <- dbFetch(rs, 2))
+  rest <- dbFetch(rs)
+  dbClearResult(rs)
+  expect_length(w, 1)
+  # The default path truncates the string to an integer, in an integer column
+  expect_identical(first$x, bit64::as.integer64(c(1, 99999999999)))
+  # Also the next fetch, as after an integer that needs 64 bits
+  expect_identical(rest$x, bit64::as.integer64(2))
+})
+
 test_that("extended types come back as Date, hms and POSIXct on the Arrow path", {
   con <- local_arrow_con(extended_types = TRUE)
   df <- data.frame(d = as.Date("2020-01-02") + 0:1)

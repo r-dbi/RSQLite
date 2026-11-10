@@ -410,9 +410,10 @@ void SqliteArrowColumn::append_value(int column_type, int64_t row) {
     }
     {
       int64_t value = sqlite3_column_int64(stmt, j);
-      if (column_type == SQLITE_INTEGER) {
-        note_integer(value);
-      } else {
+      // Also a converted value: a data frame keeps the column as integer64
+      // once a value has needed 64 bits, whatever its storage class
+      note_integer(value);
+      if (column_type != SQLITE_INTEGER) {
         log.record(column_type, CR_CONVERTED, row);
       }
       check_arrow(

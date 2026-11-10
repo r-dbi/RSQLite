@@ -240,10 +240,6 @@ void SqliteResultImpl::arrow_schema(
     if (pending_chunk_->release == NULL && !complete_) {
       nanoarrow::UniqueArray chunk;
       fetch_arrow_rows(chunk.get(), infer_rows);
-      // The rows have been read, the warning comes with the schema.
-      // Before the chunk is kept: if the warning is turned into an error,
-      // the chunk is released by the unwinding.
-      warn_coercions();
       chunk.move(pending_chunk_.get());
     }
     // Columns that only ever held NULL take their declared type
@@ -251,6 +247,11 @@ void SqliteResultImpl::arrow_schema(
       arrow_columns_[j].decide_from_decltype();
     }
     freeze_arrow_columns();
+
+    // The rows have been read, the warning comes with the schema.
+    // Last, with the chunk kept: if the warning is turned into an error,
+    // a retry returns the schema and the rows wait for the next fetch.
+    warn_coercions();
   }
 
   set_arrow_struct_schema(out);

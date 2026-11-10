@@ -143,6 +143,24 @@ test_that("a data frame fetch through Arrow that exits on its warning leaves the
   expect_identical(rest[[2]]$y, c(5L, 0L))
 })
 
+test_that("a schema request that exits on its warning keeps the first chunk", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1), ('a'), (2), (3), (4)")
+  rs <- dbSendQueryArrow(con, "SELECT x FROM t")
+  stream <- dbFetchArrow(rs, chunk_size = 2)
+
+  # The first chunk is fetched for the schema and warns about row 2
+  expect_equal(tryCatch(stream$get_schema(), warning = function(w) "exited"), "exited")
+  expect_identical(dbGetRowCount(rs), 0L)
+  # The retry returns the schema without warning again, and all rows follow
+  expect_no_warning(schema <- stream$get_schema())
+  expect_identical(schema$children$x$format, "l")
+  expect_no_warning(df <- as.data.frame(stream))
+  expect_equal(df$x, c(1, 0, 2, 3, 4))
+  dbClearResult(rs)
+})
+
 test_that("long lists of rows are truncated", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x)")

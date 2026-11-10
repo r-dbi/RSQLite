@@ -167,16 +167,15 @@
 #' The other columns are typed and converted as described above.
 #'
 #' Each fetch reads its rows into Arrow arrays first,
-#' so that the data frame is allocated once with the row count known.
-#' A fetch that fits into one array converts it at once and releases it right away;
-#' the arrays of a larger fetch are split by column,
-#' and nanoarrow fills each column in one go, releasing its arrays to the garbage collector as it goes:
+#' so that the data frame is allocated once with the row count known,
+#' and releases each array as soon as it is converted:
 #' at its peak, the memory holds the arrays and the part of the data frame filled so far.
-#' Character columns are copied out of their arrays,
+#' Character columns are copied out of the arrays,
 #' unless the connection was opened with `lazy_strings = TRUE`:
 #' then a character column, without a prototype or with a `character()` one,
-#' stays a view into one Arrow array that holds all its strings and is freed with the column,
-#' while the other columns are converted as before, from arrays split by column even in a fetch that fits into one.
+#' stays a view into one Arrow array that holds all its strings and is freed with the column.
+#' A fetch with such a column splits its arrays by column,
+#' and nanoarrow fills each of the other columns in one go and releases its arrays to the garbage collector.
 #' Unless they repeat, the strings take less memory in the array than in R,
 #' and the arrays count towards the collections described in the section on chunking.
 #' Most vectorised uses of such a view convert its strings again, one by one,

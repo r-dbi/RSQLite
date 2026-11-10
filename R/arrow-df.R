@@ -139,14 +139,18 @@ arrow_ptype_column_schema <- function(col, name) {
   schema
 }
 
-# All rows of a stream with a known row count as a data frame.
-# One array is converted at once, the strings are copied out of it before it is
-# released; several arrays are split by column, and each column is allocated
-# once and filled by nanoarrow, its arrays released as it is converted.
-# The columns in `lazy` stay views into one array each, with all their strings.
+# All rows of a stream with a known row count as a data frame:
+# for more than one array, the columns are allocated once, each array is
+# converted and copied into them and released before the next one is
+# requested, so that the arrays go as the data frame fills up.
+# The columns in `lazy` stay views into one array each, see arrow_lazy_to_df().
 arrow_stream_to_df <- function(stream, ptype, size, lazy = logical(length(ptype))) {
   array <- stream$get_next(validate = FALSE)
-  if (!any(lazy) && !is.null(array) && array$length == size) {
+  if (any(lazy)) {
+    return(arrow_lazy_to_df(array, stream, ptype, size, lazy))
+  }
+
+  if (!is.null(array) && array$length == size) {
     # One array holds all rows, such as a fetch of fewer rows than a chunk:
     # nanoarrow's columns are the data frame, except that its character
     # vectors read from the array until they are touched, so these are copied
@@ -158,18 +162,55 @@ arrow_stream_to_df <- function(stream, ptype, size, lazy = logical(length(ptype)
     return(df)
   }
 
-  # One stream per column, the arrays move out of the stream and of `array`
+  size <- as.integer(size)
+  columns <- lapply(ptype, function(col) vector(typeof(col), size))
+  offset <- 0L
+  repeat {
+    if (is.null(array)) {
+      break
+    }
+    n <- as.integer(array$length)
+    if (n > 0L) {
+      chunk <- nanoarrow::convert_array(array, to = ptype)
+      idx <- offset + seq_len(n)
+      for (j in seq_along(columns)) {
+        values <- chunk[[j]]
+        attributes(values) <- NULL
+        columns[[j]][idx] <- values
+      }
+      offset <- offset + n
+    }
+    nanoarrow::nanoarrow_pointer_release(array)
+    array <- stream$get_next(validate = FALSE)
+  }
+  stream$release()
+
+  for (j in seq_along(columns)) {
+    attributes(columns[[j]]) <- attributes(ptype[[j]])
+  }
+  names(columns) <- names(ptype)
+  attr(columns, "row.names") <- .set_row_names(size)
+  class(columns) <- "data.frame"
+  columns
+}
+
+# The same with `lazy_strings = TRUE`, for the first array of the stream and
+# the others: the arrays are split by column, so that a view holds only the
+# strings of its own column.
+# The columns in `lazy` are concatenated into one array each, which a view
+# keeps until the garbage collector frees it; nanoarrow fills each of the
+# other columns in one vector and releases its arrays to the collector.
+arrow_lazy_to_df <- function(array, stream, ptype, size, lazy) {
   streams <- arrow_split_columns(array, stream)
   size <- as.integer(size)
   columns <- vector("list", length(streams))
   for (j in seq_along(streams)) {
     if (lazy[[j]]) {
-      # Freed by the garbage collector, which does not see its memory
       strings <- arrow_concat_strings(streams[[j]])
       columns[[j]] <- nanoarrow::convert_array(strings$array, to = ptype[[j]])
+      # The collector does not see the memory of the array
       arrow_chunk_handed_out(strings$bytes)
     } else {
-      # nanoarrow fills the column in one vector, whose strings are copies
       col <- nanoarrow::convert_array_stream(streams[[j]], to = ptype[[j]], size = size)
       nanoarrow::nanoarrow_pointer_release(streams[[j]])
       attributes(col) <- attributes(ptype[[j]])

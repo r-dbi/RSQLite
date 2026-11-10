@@ -149,7 +149,7 @@ test_that("lazy strings beyond 2 GiB take large_utf8", {
   expect_equal(nchar(df$s[c(1, 1024, 1025, 2048, 2049, 2100)]), rep(2^20, 6))
 })
 
-test_that("the columns converted one by one keep their prototypes", {
+test_that("lazy fetches convert column by column to the prototypes", {
   path <- withr::local_tempfile(fileext = ".sqlite")
   eager <- dbConnect(SQLite(), path, arrow = TRUE)
   withr::defer(dbDisconnect(eager))
@@ -172,7 +172,7 @@ test_that("the columns converted one by one keep their prototypes", {
     on.exit(dbClearResult(rs))
     arrow_fetch_df(rs, -1, chunk_size = chunk_size)
   }
-  # One array, as one data frame, against one array per row, column by column
+  # One array against one array per row, eagerly and column by column
   expected <- fetch(eager, 3)
   expect_identical(fetch(eager, 1), expected)
   expect_identical(fetch(lazy, 3), expected)

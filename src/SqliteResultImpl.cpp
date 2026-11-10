@@ -318,21 +318,30 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
     );
   }
 
+  // Rows count as fetched once they are returned, not if the fetch fails
+  int n_fetched = 0;
   while (!complete_) {
     data.set_col_values();
     step();
-    nrows_++;
+    n_fetched++;
     if (!data.advance()) {
       break;
     }
   }
+  nrows_ += n_fetched;
 
   return data.get_data(types_);
 }
 
 void SqliteResultImpl::step() {
-  while (step_run())
-    ;
+  try {
+    while (step_run())
+      ;
+  } catch (...) {
+    // An error ends the execution: stepping again would silently restart it
+    complete_ = true;
+    throw;
+  }
 }
 
 bool SqliteResultImpl::step_run() {

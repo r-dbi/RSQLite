@@ -185,3 +185,68 @@ test_that("dbFetch with statement other than SELECT warns reasonably (#523)", {
 
   expect_warning(dbFetch(res), "dbGetRowsAffected")
 })
+
+json_error_setup <- function() {
+  con <- dbConnect(SQLite(), ":memory:")
+  df <- data.frame(id = 1:4, v = c("[1]", "[2]", "oops", "[4]"))
+  dbWriteTable(con, "t1", df)
+  con
+}
+
+test_that("an error in the middle of a result completes it", {
+  con <- json_error_setup()
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  res <- dbSendQuery(con, "SELECT id, json(v) AS j FROM t1")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  expect_equal(dbFetch(res, n = 1)$id, 1L)
+  expect_error(dbFetch(res), "malformed JSON")
+  expect_true(dbHasCompleted(res))
+  # The rows read by the failed fetch were not returned
+  expect_equal(dbGetRowCount(res), 1L)
+
+  # The statement is not restarted from the first row
+  out <- dbFetch(res)
+  expect_equal(nrow(out), 0L)
+  expect_named(out, c("id", "j"))
+  expect_true(dbHasCompleted(res))
+  expect_equal(dbGetRowCount(res), 1L)
+})
+
+test_that("an error in a later parameter set completes the result", {
+  con <- json_error_setup()
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  res <- dbSendQuery(con, "SELECT id, json(v) AS j FROM t1 WHERE id >= ?")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  dbBind(res, list(c(4L, 1L)))
+  expect_equal(dbFetch(res, n = 1)$id, 4L)
+  expect_error(dbFetch(res), "malformed JSON")
+  expect_true(dbHasCompleted(res))
+  expect_equal(dbGetRowCount(res), 1L)
+  expect_equal(nrow(dbFetch(res)), 0L)
+  expect_equal(dbGetRowCount(res), 1L)
+
+  # A new bind makes the result usable again
+  dbBind(res, list(4L))
+  expect_false(dbHasCompleted(res))
+  expect_equal(dbFetch(res)$id, 4L)
+  expect_true(dbHasCompleted(res))
+  expect_equal(dbGetRowCount(res), 1L)
+})
+
+test_that("a later parameter set that fails to bind completes the result", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  res <- dbSendQuery(con, "SELECT ? AS x")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  dbBind(res, list(list(as.raw(1), "a")))
+  expect_error(dbFetch(res), "raw vectors")
+  expect_true(dbHasCompleted(res))
+  expect_equal(nrow(dbFetch(res)), 0L)
+  expect_equal(dbGetRowCount(res), 0L)
+})

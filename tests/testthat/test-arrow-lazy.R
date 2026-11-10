@@ -233,13 +233,17 @@ test_that("lazy fetches keep times in seconds and the coercion warning", {
   expect_true(is_lazy(fetch(lazy, 1)$df$s))
 })
 
-test_that("lazy strings count towards the collection trigger", {
+test_that("lazy fetches count their arrays towards the collection trigger", {
   con <- local_arrow_con(lazy_strings = TRUE)
-  arrow_gc_state$bytes <- 0
-  df <- dbGetQuery(con, "SELECT 'abc' AS s, 1 AS i")
-  expect_true(is_lazy(df$s))
-  expect_gt(arrow_gc_state$bytes, 0)
-  arrow_gc_state$bytes <- 0
-  df <- dbGetQuery(con, "SELECT 1 AS i")
-  expect_equal(arrow_gc_state$bytes, 0)
+  handed_out <- function(sql) {
+    arrow_gc_state$bytes <- 0
+    df <- dbGetQuery(con, sql)
+    arrow_gc_state$bytes
+  }
+  strings <- handed_out("SELECT 'abc' AS s")
+  expect_gt(strings, 0)
+  # The arrays of the other columns wait for the collector too
+  expect_gt(handed_out("SELECT 'abc' AS s, 1 AS i"), strings)
+  # A fetch without a lazy column releases its arrays right away
+  expect_equal(handed_out("SELECT 1 AS i"), 0)
 })

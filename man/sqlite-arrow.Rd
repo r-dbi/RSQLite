@@ -237,8 +237,8 @@ then a character column, without a prototype or with a \code{character()} one,
 stays a view into one Arrow array that holds all its strings and is freed with the column.
 A fetch with such a column splits its arrays by column,
 and nanoarrow fills each of the other columns in one go and releases its arrays to the garbage collector.
-Unless they repeat, the strings take less memory in the array than in R,
-and the arrays count towards the collections described in the section on chunking.
+The arrays of such a fetch count towards the collections described in the section on chunking.
+Unless they repeat, the strings take less memory in the array than in R.
 Most vectorised uses of such a view convert its strings again, one by one,
 so a column that is used more than once is better copied with \code{c()} first.
 }

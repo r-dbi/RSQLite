@@ -232,24 +232,29 @@ arrow_arrays_to_columns <- function(arrays, lengths, ptype, size) {
 # The columns in `lazy` are concatenated into one array each, which a view
 # keeps until the garbage collector frees it; nanoarrow fills each of the
 # other columns in one vector and releases its arrays to the collector.
+# The collector does not see the memory of these arrays: they count towards
+# the collections that arrow_chunk_handed_out() triggers.
 arrow_lazy_columns <- function(arrays, ptype, size, lazy) {
-  streams <- arrow_split_columns(arrays)
+  split <- arrow_split_columns(arrays)
+  streams <- split$streams
   size <- as.integer(size)
   columns <- vector("list", length(streams))
   names(columns) <- names(ptype)
+  bytes <- 0
   for (j in seq_along(streams)) {
     if (lazy[[j]]) {
       strings <- arrow_concat_strings(streams[[j]])
       columns[[j]] <- nanoarrow::convert_array(strings$array, to = ptype[[j]])
-      # The collector does not see the memory of the array
-      arrow_chunk_handed_out(strings$bytes)
+      bytes <- bytes + strings$bytes
     } else {
       col <- nanoarrow::convert_array_stream(streams[[j]], to = ptype[[j]], size = size)
       nanoarrow::nanoarrow_pointer_release(streams[[j]])
       attributes(col) <- attributes(ptype[[j]])
       columns[[j]] <- col
+      bytes <- bytes + split$bytes[[j]]
     }
   }
+  arrow_chunk_handed_out(bytes)
   columns
 }
 

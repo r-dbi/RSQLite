@@ -199,7 +199,8 @@ cpp11::list result_fetch_arrow_df(
 
 // The columns of struct arrays that share their schema, such as those of
 // result_fetch_arrow_df(), as one nanoarrow_array_stream per column, so that
-// each column can be converted on its own and its arrays released with it.
+// each column can be converted on its own and its arrays released with it,
+// with the bytes that the arrays of each column hold.
 // The children move out of the arrays, which are released with what is left.
 [[cpp11::register]]
 cpp11::list arrow_split_columns(cpp11::list arrays) {
@@ -241,6 +242,11 @@ cpp11::list arrow_split_columns(cpp11::list arrays) {
     );
   }
 
+  cpp11::writable::doubles bytes(ncols);
+  for (R_xlen_t j = 0; j < ncols; ++j) {
+    bytes[j] = 0;
+  }
+
   std::vector<std::vector<nanoarrow::UniqueArray> > split(ncols_);
   for (R_xlen_t i = 0; i < n_arrays; ++i) {
     struct ArrowArray* array =
@@ -254,6 +260,8 @@ cpp11::list arrow_split_columns(cpp11::list arrays) {
     for (size_t j = 0; j < ncols_; ++j) {
       nanoarrow::UniqueArray column;
       ArrowArrayMove(chunk->children[j], column.get());
+      bytes[static_cast<R_xlen_t>(j)] +=
+        static_cast<double>(arrow_array_bytes(column.get()));
       split[j].push_back(std::move(column));
     }
   }
@@ -265,7 +273,9 @@ cpp11::list arrow_split_columns(cpp11::list arrays) {
       split[static_cast<size_t>(j)]
     );
   }
-  return columns;
+
+  using namespace cpp11::literals;
+  return cpp11::writable::list({ "streams"_nm = columns, "bytes"_nm = bytes });
 }
 
 namespace {

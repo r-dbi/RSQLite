@@ -105,8 +105,16 @@ Such a row waits for the next Arrow fetch, and \code{\link[DBI:dbFetch]{DBI::dbF
 \section{Threads}{
 
 A stream can be read on any thread, one call at a time, as the Arrow C stream interface allows.
-Some consumers read it on a worker thread while R waits,
+Some consumers read it on worker threads,
 such as the scanner of the arrow package, the Acero engine behind its dplyr verbs, and \code{arrow::write_dataset()}.
+The scanner and Acero read ahead in the background, also while R goes on after their first batch.
+While such a thread reads the stream, \code{\link[DBI:dbFetch]{DBI::dbFetch()}}, \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}}, \code{\link[DBI:dbBind]{DBI::dbBind()}},
+\code{\link[DBI:dbBindArrow]{DBI::dbBindArrow()}} and \code{\link[DBI:dbColumnInfo]{DBI::dbColumnInfo()}} fail on its result with an error that says so,
+and one of them running on R's main thread fails the read on the other thread.
+\code{\link[DBI:dbClearResult]{DBI::dbClearResult()}} and the next query on the connection, which clears an open result,
+clear the result object all the same, and the stream reads on.
+A stream released on such a thread closes its statement at once if its result object has been cleared,
+and otherwise once it is.
 R can't be called on such a thread.
 A value that is converted with a warning on R's main thread, see above,
 fails the stream there with an error that gives the warning's message.

@@ -53,7 +53,7 @@ arrow_to_df <- function(stream, conn, size, wide_ints, ptype = NULL) {
 
   df <- arrow_stream_to_df(stream, to, size)
   for (name in factors) {
-    df[[name]] <- factor(df[[name]])
+    df[[name]] <- factor(df[[name]], ordered = is.ordered(ptype[[name]]))
   }
 
   arrow_df_int64(df, conn@bigint, wide_ints, keep = names(df) %in% names(ptype))

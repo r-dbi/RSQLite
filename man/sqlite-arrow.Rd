@@ -169,7 +169,7 @@ A \code{POSIXct} column is requested as a timestamp in the time zone of the prot
 the session's time zone for an empty one:
 the values are read as UTC, like on both paths, and displayed in that zone.
 An \code{hms} column is requested as \code{time64} in microseconds,
-and a factor is read as text and converted to its levels,
+and a factor is read as text and converted to its levels, where other values become \code{NA} as with \code{\link[base:factor]{base::factor()}},
 or to the levels found in the values of each fetch if it has none.
 These columns keep their types in every fetch, whatever the values,
 and come back exactly as described:

@@ -259,3 +259,33 @@ test_that("an integer64 prototype stays integer64 whatever bigint says", {
   }
 })
 
+test_that("logical and factor prototypes", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (b, f)")
+  dbExecute(con, "INSERT INTO t VALUES (0, 'b'), (1, 'a'), (NULL, 'c'), (2, NULL)")
+
+  expect_equal(
+    dbGetQuery(con, "SELECT b FROM t", ptype = list(b = logical())),
+    data.frame(b = c(FALSE, TRUE, NA, TRUE))
+  )
+
+  # Values outside the levels become NA, as with factor()
+  expect_equal(
+    dbGetQuery(con, "SELECT f FROM t", ptype = list(f = factor(levels = c("b", "a")))),
+    data.frame(f = factor(c("b", "a", NA, NA), levels = c("b", "a")))
+  )
+  expect_equal(
+    dbGetQuery(con, "SELECT f FROM t", ptype = list(f = factor(levels = c("c", "b", "a"), ordered = TRUE))),
+    data.frame(f = factor(c("b", "a", "c", NA), levels = c("c", "b", "a"), ordered = TRUE))
+  )
+  # Without levels, the levels come from the values of each fetch
+  expect_equal(
+    dbGetQuery(con, "SELECT f FROM t", ptype = list(f = ordered(character()))),
+    data.frame(f = ordered(c("b", "a", "c", NA)))
+  )
+  rs <- dbSendQuery(con, "SELECT f FROM t", ptype = list(f = factor()))
+  expect_equal(dbFetch(rs, 1), data.frame(f = factor("b")))
+  expect_equal(dbFetch(rs), data.frame(f = factor(c("a", "c", NA))))
+  dbClearResult(rs)
+})
+

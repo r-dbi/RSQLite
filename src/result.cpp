@@ -7,13 +7,25 @@
 // After DbArrow.h, so that the Arrow C structs are defined once
 #include <nanoarrow/r.h>
 
+#include <exception>
+#include <future>
+#include <string>
+#include <thread>
+#include <vector>
+
 // #include "DbResult.h"
+
+// The entry points below run on R's main thread. Those that create, clear,
+// fetch from or bind a result first destroy the results that Arrow streams
+// let go of on other threads, see db_arrow_release_deferred(): until then,
+// such a result keeps its statement and its read transaction open.
 
 [[cpp11::register]]
 cpp11::external_pointer<DbResultPtr> result_create(
   cpp11::external_pointer<DbConnectionPtr> con,
   std::string sql
 ) {
+  db_arrow_release_deferred();
   (*con)->check_connection();
   DbResultPtr* res =
     new DbResultPtr(SqliteResult::create_and_send_query(*con, sql));
@@ -23,14 +35,19 @@ cpp11::external_pointer<DbResultPtr> result_create(
 [[cpp11::register]]
 void result_release(cpp11::external_pointer<DbResultPtr> res) {
   DbResultPtr* ptr = res.get();
-  if (ptr != NULL && ptr->get() != NULL && (*ptr)->busy()) {
+  if (ptr != NULL && ptr->get() != NULL &&
+      (*ptr)->busy_owner() == DbResult::BUSY_MAIN_THREAD) {
     // Freeing it would pull the statement from under the running fetch
     cpp11::stop(
       "Can't clear a result while one of its fetches or binds is running, "
       "as from a handler of a warning that it raised."
     );
   }
+  // Another thread holds the result only while it reads an Arrow stream of
+  // it, which keeps a share of its own: R's share can go
   res.reset();
+  // An Arrow stream may have let go of its share on another thread
+  db_arrow_release_deferred();
 }
 
 [[cpp11::register]]
@@ -41,11 +58,13 @@ bool result_valid(cpp11::external_pointer<DbResultPtr> res_) {
 
 [[cpp11::register]]
 cpp11::list result_fetch(DbResult* res, const int n) {
+  db_arrow_release_deferred();
   return res->fetch(n);
 }
 
 [[cpp11::register]]
 void result_bind(DbResult* res, cpp11::list params) {
+  db_arrow_release_deferred();
   res->bind(params);
 }
 
@@ -117,6 +136,7 @@ cpp11::list result_fetch_arrow_df(
   double n_max,
   double chunk_size
 ) {
+  db_arrow_release_deferred();
   nanoarrow::UniqueArrayStream stream;
   ArrowDfColumns columns;
   int64_t n = res->fetch_arrow_df(
@@ -176,6 +196,7 @@ cpp11::list result_fetch_arrow_df(
 // with the bytes its buffers hold
 [[cpp11::register]]
 cpp11::list result_fetch_arrow_chunk(DbResult* res, double chunk_size) {
+  db_arrow_release_deferred();
   cpp11::sexp array_xptr(nanoarrow_array_owning_xptr());
   struct ArrowArray* array = nanoarrow_output_array_from_xptr(array_xptr);
   res->fetch_arrow(array, static_cast<int64_t>(chunk_size));
@@ -214,6 +235,7 @@ void result_bind_arrow(
   }
 
   std::vector<int> indexes(param_indexes.begin(), param_indexes.end());
+  db_arrow_release_deferred();
   res->bind_arrow(stream, indexes);
 }
 
@@ -263,4 +285,116 @@ double result_rethrown_unwinds(DbResult* res) {
 [[cpp11::register]]
 void result_set_rows_fetched(SqliteResult* res, double n) {
   res->set_rows_fetched(static_cast<int64_t>(n));
+}
+
+// For the tests: reads a nanoarrow_array_stream on a thread of its own, as
+// arrow's scanner and Acero do, and calls no R API there. Reads the schema and
+// at most `n` arrays, all if `n` is negative, and releases the stream there if
+// `release` is true. Returns the arrays read and the error of the stream, ""
+// if none.
+[[cpp11::register]]
+cpp11::list arrow_stream_read_on_thread(
+  SEXP stream_xptr,
+  double n,
+  bool release
+) {
+  using namespace cpp11::literals;
+
+  if (!Rf_inherits(stream_xptr, "nanoarrow_array_stream")) {
+    cpp11::stop("`stream` must be a nanoarrow_array_stream.");
+  }
+  struct ArrowArrayStream* stream =
+    static_cast<struct ArrowArrayStream*>(R_ExternalPtrAddr(stream_xptr));
+  if (stream == NULL || stream->release == NULL) {
+    cpp11::stop("The nanoarrow_array_stream has already been released.");
+  }
+
+  nanoarrow::UniqueSchema schema;
+  std::vector<nanoarrow::UniqueArray> arrays;
+  std::string error;
+  std::thread reader([&] {
+    try {
+      int rc = stream->get_schema(stream, schema.get());
+      for (int64_t i = 0; rc == 0 && (n < 0 || i < n); ++i) {
+        nanoarrow::UniqueArray array;
+        rc = stream->get_next(stream, array.get());
+        if (rc != 0 || array->release == NULL) {
+          break;
+        }
+        arrays.push_back(std::move(array));
+      }
+      if (rc != 0) {
+        const char* message = stream->get_last_error(stream);
+        error = (message == NULL) ? "unknown error" : message;
+      }
+      if (release) {
+        stream->release(stream);
+      }
+    } catch (...) {
+      error = "C++ exception on the reading thread";
+    }
+  });
+  reader.join();
+
+  cpp11::writable::list out(static_cast<R_xlen_t>(arrays.size()));
+  if (!arrays.empty()) {
+    cpp11::sexp schema_xptr(nanoarrow_schema_owning_xptr());
+    ArrowSchemaMove(
+      schema.get(),
+      nanoarrow_output_schema_from_xptr(schema_xptr)
+    );
+    for (size_t i = 0; i < arrays.size(); ++i) {
+      cpp11::sexp array_xptr(nanoarrow_array_owning_xptr());
+      ArrowArrayMove(
+        arrays[i].get(),
+        nanoarrow_output_array_from_xptr(array_xptr)
+      );
+      R_SetExternalPtrTag(array_xptr, schema_xptr);
+      out[static_cast<R_xlen_t>(i)] = array_xptr;
+    }
+  }
+  return cpp11::list({ "arrays"_nm = out, "error"_nm = error });
+}
+
+// For the tests: calls `fun` on R's main thread while another thread holds the
+// result busy with a share of its own, as a stream read there does
+[[cpp11::register]]
+void result_call_while_busy(
+  cpp11::external_pointer<DbResultPtr> res,
+  cpp11::function fun
+) {
+  DbResultPtr* ptr = res.get();
+  if (ptr == NULL || ptr->get() == NULL) {
+    cpp11::stop("Invalid result set");
+  }
+  DbResultPtr result = *ptr;
+
+  std::promise<void> entered;
+  std::future<void> has_entered = entered.get_future();
+  std::promise<void> leave;
+  std::shared_future<void> may_leave = leave.get_future().share();
+  std::thread holder([&] {
+    try {
+      result->hold_busy([&] {
+        entered.set_value();
+        may_leave.wait();
+      });
+    } catch (...) {
+      try {
+        entered.set_exception(std::current_exception());
+      } catch (...) {}
+    }
+  });
+  // Also when `fun` fails: lets the other thread go before the share does
+  struct Finish {
+    std::promise<void>& leave;
+    std::thread& holder;
+    ~Finish() {
+      leave.set_value();
+      holder.join();
+    }
+  } finish = { leave, holder };
+
+  has_entered.get();
+  fun();
 }

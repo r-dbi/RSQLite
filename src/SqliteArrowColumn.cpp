@@ -562,7 +562,7 @@ void SqliteArrowColumn::append_value(int column_type, int64_t row) {
     {
       bool ok;
       double days = source.parse_date(ok);
-      if (!ok || ISNAN(days)) {
+      if (!ok || std::isnan(days)) {
         log.record(column_type, CR_UNPARSABLE, row);
         append_null();
       } else {
@@ -580,7 +580,7 @@ void SqliteArrowColumn::append_value(int column_type, int64_t row) {
       bool ok;
       double seconds = (kind == AK_TIME) ? source.parse_time(ok)
                                          : source.parse_datetime_local(ok);
-      if (!ok || ISNAN(seconds)) {
+      if (!ok || std::isnan(seconds)) {
         log.record(column_type, CR_UNPARSABLE, row);
         append_null();
         break;

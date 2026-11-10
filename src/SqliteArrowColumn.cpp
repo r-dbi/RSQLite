@@ -401,7 +401,7 @@ void SqliteArrowColumn::append_value(int column_type) {
   case AK_DATE:
     {
       double days = source.fetch_date();
-      if (ISNAN(days)) {
+      if (std::isnan(days)) {
         check_arrow(
           ArrowArrayAppendNull(array.get(), 1),
           "Can't append to Arrow array"
@@ -434,10 +434,10 @@ void SqliteArrowColumn::append_value(int column_type) {
         in_range =
           micros >= -9223372036854775808.0 && micros < 9223372036854775808.0;
       }
-      if (!ISNAN(seconds) && !in_range) {
+      if (!std::isnan(seconds) && !in_range) {
         warn_out_of_range(column_type);
       }
-      if (ISNAN(seconds) || !in_range) {
+      if (std::isnan(seconds) || !in_range) {
         check_arrow(
           ArrowArrayAppendNull(array.get(), 1),
           "Can't append to Arrow array"

@@ -112,6 +112,10 @@ arrow_rethrown_unwinds <- function() {
   .Call(`_RSQLite_arrow_rethrown_unwinds`)
 }
 
+result_set_rows_fetched <- function(res, n) {
+  invisible(.Call(`_RSQLite_result_set_rows_fetched`, res, n))
+}
+
 rsqliteVersion <- function() {
   .Call(`_RSQLite_rsqliteVersion`)
 }

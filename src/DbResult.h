@@ -23,7 +23,7 @@ struct ArrowDfColumns;
 
 class DbResult : boost::noncopyable {
   DbConnectionPtr pConn_;
-  // Set while a fetch or a bind runs, see DbResult.cpp
+  // Set while a fetch or a bind runs, see run_guarded() in DbResult.cpp
   bool busy_;
 
 protected:
@@ -45,7 +45,7 @@ public:
   // Counts the executions of the statement with new parameters:
   // bind() and bind_arrow() start a new one
   int64_t executions() const;
-  int n_rows_fetched();
+  int64_t n_rows_fetched();
   int n_rows_affected();
 
   void bind(const cpp11::list& params);

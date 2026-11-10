@@ -24,14 +24,15 @@ and a column without a declaration that only ever holds \code{NULL} is of the Ar
 Once the first chunk has been fetched the types are fixed;
 later values of another storage class are converted by SQLite's own rules,
 with one warning per column.
-Text and blobs in a \code{utf8} column must be valid UTF-8 without NUL bytes,
-which SQLite does not enforce: other values become \code{NULL} with a warning,
-where the data frame path passes text through unchecked.
 The types can therefore depend on \code{chunk_size}:
 a real number in a later chunk is truncated to fit an \code{int64} column decided from integers,
 and a column whose first chunk holds only \code{NULL} keeps its declared type,
 or the null type without a declaration, for the whole result.
-The default chunk size makes this rare, a small \code{chunk_size} makes it likely.\tabular{ll}{
+The default chunk size makes this rare, a small \code{chunk_size} makes it likely.
+Text and blobs in a \code{utf8} column must be valid UTF-8 without NUL bytes,
+which SQLite does not enforce: other values become \code{NULL} with a warning,
+where the data frame path passes text through unchecked.
+Text in a \code{binary} column is its UTF-8 bytes, also in a UTF-16 database, as on the data frame path.\tabular{ll}{
    \emph{SQLite value or declared type} \tab \emph{Arrow type} \cr
    integer, or INTEGER affinity \tab \code{int64} \cr
    real, or REAL and NUMERIC affinity \tab \code{double} \cr

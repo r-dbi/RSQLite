@@ -72,6 +72,8 @@
 #' Times and timestamps become `hms` and `POSIXct` in UTC,
 #' and travel as doubles in seconds in both directions,
 #' so they keep the default path's precision, where a stream has microseconds.
+#' A text value ends at its first NUL character, as on the default path,
+#' where a stream keeps all its bytes.
 #'
 #' Unlike a stream, each fetch decides the types of its columns, the way the default path does it:
 #' the first value that is not `NULL` decides,

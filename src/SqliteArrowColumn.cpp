@@ -4,6 +4,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <climits>
 #include <cmath>
+#include <cstring>
 #include <sstream>
 
 SqliteArrowColumn::SqliteArrowColumn(
@@ -454,11 +455,18 @@ void SqliteArrowColumn::append_value(int column_type) {
         warn_mixed(column_type);
       }
       fetch_bytes();
+      const char* text = static_cast<const char*>(value_data);
+      int64_t size = value_size;
+      if (data_frame && column_type == SQLITE_TEXT) {
+        // R strings end at the first NUL, like those of the default path; an
+        // Arrow stream keeps all bytes
+        const void* nul = memchr(text, '\0', static_cast<size_t>(size));
+        if (nul != NULL) {
+          size = static_cast<const char*>(nul) - text;
+        }
+      }
       check_arrow(
-        ArrowArrayAppendString(
-          array.get(),
-          arrow_string_view(static_cast<const char*>(value_data), value_size)
-        ),
+        ArrowArrayAppendString(array.get(), arrow_string_view(text, size)),
         "Can't append to Arrow array"
       );
       break;

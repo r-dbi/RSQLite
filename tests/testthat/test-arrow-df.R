@@ -125,6 +125,22 @@ test_that("times and timestamps keep their precision through Arrow", {
   stream$release()
 })
 
+test_that("text through Arrow ends at its first NUL like on the default path", {
+  sql <- "SELECT CAST(x'610062' AS TEXT) AS s UNION ALL SELECT 'c' UNION ALL SELECT NULL"
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con))
+  con_arrow <- local_arrow_con()
+
+  expect_identical(dbGetQuery(con_arrow, sql), dbGetQuery(con, sql))
+  expect_identical(dbGetQuery(con_arrow, sql)$s, c("a", "c", NA))
+
+  # An Arrow chunk keeps all three bytes
+  rs <- dbSendQueryArrow(con_arrow, sql)
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
+  chunk <- dbFetchArrowChunk(rs)
+  expect_identical(nanoarrow::convert_buffer(chunk$children$s$buffers[[2]]), c(0L, 3L, 4L, 4L))
+})
+
 test_that("untyped NULL columns are logical on the Arrow path", {
   con <- local_arrow_con()
   expect_equal(dbGetQuery(con, "SELECT NULL AS a"), data.frame(a = NA))

@@ -86,6 +86,12 @@ void DbColumn::warn_type_conflicts(const cpp11::r_string& name) const {
 }
 
 void DbColumn::warn_invalid_strings(const cpp11::r_string& name) const {
+  // A zero-row peek with dbFetch(n = 0) or dbColumnInfo() reads a row
+  // without returning it: the fetch that returns the row reports it.
+  if (n == 0) {
+    return;
+  }
+
   const int64_t n_invalid = source->get_n_invalid_strings();
   if (n_invalid == 0) {
     return;

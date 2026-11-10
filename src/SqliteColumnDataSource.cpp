@@ -98,7 +98,9 @@ SEXP SqliteColumnDataSource::fetch_string() const {
   const char* const bytes =
     static_cast<const char*>(sqlite3_column_blob(get_stmt(), get_j()));
   if (bytes == NULL) {
-    // An empty blob
+    // An empty blob, or out of memory while expanding a zeroblob().
+    // In that case the next sqlite3_step() fails with SQLITE_NOMEM,
+    // so returning "" is safe only because a step follows.
     return R_BlankString;
   }
   const int size = sqlite3_column_bytes(get_stmt(), get_j());

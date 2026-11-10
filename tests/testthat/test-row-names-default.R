@@ -80,6 +80,7 @@ test_that("row.names default via pkgconfig applies only to the package that set 
   expect_warning(out <- query_from_tools(con), "deprecated")
   expect_named(out, "a")
 
+  memoise::forget(warning_once)
   expect_no_warning(out <- dbGetQuery(con, "SELECT * FROM t1"))
   expect_named(out, c("row_names", "a"))
 })

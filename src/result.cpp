@@ -92,38 +92,67 @@ SEXP result_fetch_arrow(
 
 // The rows of one dbFetch() through Arrow, at most `n_max` or all for a
 // negative `n_max`, typed for a data frame and fetched up front as arrays of at
-// most `chunk_size` rows: a nanoarrow_array_stream that hands them out one by
-// one, the row count, which columns have seen an integer that needs 64 bits,
-// and the R class of the columns of times or timestamps in seconds
+// most `chunk_size` rows: a list of nanoarrow_array objects with their
+// lengths, the row count, the names and Arrow formats of the columns, which
+// columns have seen an integer that needs 64 bits, and the R class of the
+// columns of times or timestamps in seconds.
+// Everything the conversion needs comes from here, which spares a small fetch
+// the R proxies of the Arrow objects.
 [[cpp11::register]]
 cpp11::list result_fetch_arrow_df(
   DbResult* res,
   double n_max,
   double chunk_size
 ) {
-  cpp11::sexp stream_xptr(nanoarrow_array_stream_owning_xptr());
-  struct ArrowArrayStream* stream =
-    nanoarrow_output_array_stream_from_xptr(stream_xptr);
+  nanoarrow::UniqueArrayStream stream;
   ArrowDfColumns columns;
   int64_t n = res->fetch_arrow_df(
-    stream,
+    stream.get(),
     columns,
     static_cast<int64_t>(n_max),
     static_cast<int64_t>(chunk_size)
   );
 
-  const R_xlen_t ncols = static_cast<R_xlen_t>(columns.wide_ints.size());
+  cpp11::sexp schema_xptr(nanoarrow_schema_owning_xptr());
+  struct ArrowSchema* schema = nanoarrow_output_schema_from_xptr(schema_xptr);
+  check_arrow(
+    stream->get_schema(stream.get(), schema),
+    "Can't get Arrow schema"
+  );
+
+  const R_xlen_t ncols = static_cast<R_xlen_t>(schema->n_children);
+  cpp11::writable::strings names(ncols);
+  cpp11::writable::strings formats(ncols);
   cpp11::writable::logicals wide(ncols);
   cpp11::writable::strings seconds(ncols);
   for (R_xlen_t j = 0; j < ncols; ++j) {
+    names[j] = cpp11::r_string(schema->children[j]->name);
+    formats[j] = schema->children[j]->format;
     wide[j] = static_cast<bool>(columns.wide_ints[j]);
     seconds[j] = columns.seconds_classes[j];
   }
 
+  cpp11::writable::list arrays;
+  cpp11::writable::doubles lengths;
+  while (true) {
+    cpp11::sexp array_xptr(nanoarrow_array_owning_xptr());
+    struct ArrowArray* array = nanoarrow_output_array_from_xptr(array_xptr);
+    check_arrow(stream->get_next(stream.get(), array), "Can't get Arrow array");
+    if (array->release == NULL) {
+      break;
+    }
+    R_SetExternalPtrTag(array_xptr, schema_xptr);
+    arrays.push_back(array_xptr);
+    lengths.push_back(static_cast<double>(array->length));
+  }
+
   using namespace cpp11::literals;
   return cpp11::writable::list(
-    { "stream"_nm = stream_xptr,
+    { "arrays"_nm = arrays,
+      "lengths"_nm = lengths,
       "n"_nm = cpp11::as_sexp(static_cast<double>(n)),
+      "names"_nm = names,
+      "formats"_nm = formats,
       "wide_ints"_nm = wide,
       "seconds"_nm = seconds }
   );

@@ -191,6 +191,25 @@ test_that("dbAppendTable() through Arrow writes difftime in its own units", {
   expect_identical(out$w, c(1, 2, NA, 3))
 })
 
+test_that("dbAppendTable() through Arrow writes POSIXlt like POSIXct", {
+  df <- data.frame(id = 1:3)
+  df$ts <- as.POSIXct(c("2020-01-02 03:04:05.25", NA, "1960-06-07 08:09:10"), tz = "UTC")
+  df_lt <- df
+  df_lt$ts <- as.POSIXlt(df$ts)
+
+  con_default <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con_default))
+  con <- local_arrow_con()
+  for (conn in list(con_default, con)) {
+    dbExecute(conn, "CREATE TABLE t (id INTEGER, ts REAL)")
+  }
+  # The default path can only write it as POSIXct
+  dbAppendTable(con_default, "t", df)
+  expect_identical(dbAppendTable(con, "t", df_lt), 3L)
+  expect_identical(dbReadTable(con, "t"), dbReadTable(con_default, "t"))
+  expect_identical(dbReadTable(con, "t")$ts, as.numeric(df$ts))
+})
+
 test_that("dbWriteTable() and row names work through Arrow", {
   con <- local_arrow_con()
   dbWriteTable(con, "mtcars", mtcars, row.names = TRUE)

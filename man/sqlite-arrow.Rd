@@ -116,6 +116,7 @@ with times and timestamps in microseconds, and text checked like a blob,
 and they hand out the rows kept for a schema and a row held back by the byte limits,
 where the default path fails.
 Before writing, factors become strings, lists of raw vectors become blobs,
+\code{POSIXlt} columns, which the default path can't write, become \code{POSIXct},
 and \code{difftime}, \code{POSIXct} and \code{Date} columns become their numbers in their own units,
 as on the default path.
 

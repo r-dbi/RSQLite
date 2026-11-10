@@ -182,6 +182,11 @@ arrow_append_df <- function(conn, name, value) {
 arrow_prepare_df <- function(value) {
   value <- factor_to_string(value, warn = TRUE)
 
+  # A POSIXlt column is a list, which the default path can't bind:
+  # it is written as POSIXct, before the check of the lists
+  is_posixlt <- vlapply(value, inherits, "POSIXlt")
+  value[is_posixlt] <- lapply(value[is_posixlt], as.POSIXct)
+
   is_list <- vlapply(value, function(x) is.list(x) && !is.data.frame(x) && !inherits(x, "blob"))
   value[is_list] <- lapply(value[is_list], function(x) {
     x <- unclass(x)
@@ -190,9 +195,6 @@ arrow_prepare_df <- function(value) {
     }
     blob::as_blob(x)
   })
-
-  is_posixlt <- vlapply(value, inherits, "POSIXlt")
-  value[is_posixlt] <- lapply(value[is_posixlt], as.POSIXct)
 
   # nanoarrow would write a duration in seconds, and times, timestamps and
   # dates in whole units, microseconds or days

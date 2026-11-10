@@ -107,6 +107,7 @@
 #' and they hand out the rows kept for a schema and a row held back by the byte limits,
 #' where the default path fails.
 #' Before writing, factors become strings, lists of raw vectors become blobs,
+#' `POSIXlt` columns, which the default path can't write, become `POSIXct`,
 #' and `difftime`, `POSIXct` and `Date` columns become their numbers in their own units,
 #' as on the default path.
 #'

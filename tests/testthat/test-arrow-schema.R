@@ -247,6 +247,40 @@ test_that("values out of range and coercions are reported per the rules", {
   )
 })
 
+test_that("float keeps to its range, bool takes a real as true unless zero", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1.5), (3.4e38), (1e300), (-1e300), (9e999), ('1e300'), (16777217), (0.0)")
+
+  w <- coercion_warnings(
+    array <- arrow_validated(nanoarrow::as_nanoarrow_array(
+      dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_float()))
+    ))
+  )
+  expect_equal(
+    nanoarrow::convert_array(array$children$x, double()),
+    c(1.5, as.numeric(3.4e38), NA, NA, Inf, NA, 16777216, 0),
+    tolerance = 1e-7
+  )
+  expect_equal(
+    vapply(w[[1]]$coercions[[1]]$values, function(v) paste(v$class, v$reason, paste(v$rows, collapse = " ")), ""),
+    c("real out_of_range 3 4", "string out_of_range 6")
+  )
+
+  dbExecute(con, "DELETE FROM t")
+  dbExecute(con, "INSERT INTO t VALUES (0.5), (-0.9), (0.0), (2), (0), ('true'), ('2')")
+  w <- coercion_warnings(
+    array <- arrow_validated(nanoarrow::as_nanoarrow_array(
+      dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_bool()))
+    ))
+  )
+  expect_equal(nanoarrow::convert_array(array$children$x), c(TRUE, TRUE, FALSE, TRUE, FALSE, FALSE, TRUE))
+  expect_equal(
+    vapply(w[[1]]$coercions[[1]]$values, function(v) paste(v$class, v$reason, paste(v$rows, collapse = " ")), ""),
+    c("real converted 1 2 3", "string converted 6 7")
+  )
+})
+
 # Compares the values of a 64-bit integer array exactly with `expected`, as
 # strings, NA for NULL: a uint64 above 2^63 - 1 is written as the int64 with
 # its bits, such as "-1" for 2^64 - 1

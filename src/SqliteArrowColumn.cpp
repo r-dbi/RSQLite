@@ -5,6 +5,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <cfloat>
 #include <climits>
 #include <cmath>
 
@@ -549,10 +550,10 @@ void SqliteArrowColumn::append_null() {
 // - silently: integers into a floating point type, integers and reals into a
 //   text type (SQLite renders them), text into a binary type (its bytes);
 // - converted by SQLite, logged: text and blobs into a numeric type, reals
-//   into an integer type (truncated);
+//   into an integer type (truncated) or bool (true unless zero);
 // - NULL, logged: a blob into a text type unless it is valid UTF-8, a value
-//   outside the range of an integer, date, time or timestamp type, a date or
-//   time that can't be parsed, any value into the null type.
+//   outside the range of an integer, float, date, time or timestamp type, a
+//   date or time that can't be parsed, any value into the null type.
 void SqliteArrowColumn::append_value(int column_type, int64_t row) {
   switch (kind) {
   case AK_BOOL:
@@ -569,14 +570,23 @@ void SqliteArrowColumn::append_value(int column_type, int64_t row) {
 
   case AK_FLOAT:
   case AK_DOUBLE:
-    if (column_type != SQLITE_FLOAT && column_type != SQLITE_INTEGER) {
-      log.record(column_type, CR_CONVERTED, row);
+    {
+      double value = sqlite3_column_double(stmt, j);
+      if (kind == AK_FLOAT && std::isfinite(value) &&
+          std::fabs(value) > FLT_MAX) {
+        log.record(column_type, CR_OUT_OF_RANGE, row);
+        append_null();
+        break;
+      }
+      if (column_type != SQLITE_FLOAT && column_type != SQLITE_INTEGER) {
+        log.record(column_type, CR_CONVERTED, row);
+      }
+      check_arrow(
+        ArrowArrayAppendDouble(array.get(), value),
+        "Can't append to Arrow array"
+      );
+      break;
     }
-    check_arrow(
-      ArrowArrayAppendDouble(array.get(), sqlite3_column_double(stmt, j)),
-      "Can't append to Arrow array"
-    );
-    break;
 
   case AK_STRING:
   case AK_LARGE_STRING:
@@ -621,11 +631,16 @@ void SqliteArrowColumn::append_integer(int column_type, int64_t row) {
     return;
   }
   if (kind == AK_BOOL) {
+    // A real is true unless it is zero, text and blobs are converted to an
+    // integer by SQLite first
     if (column_type != SQLITE_INTEGER) {
       log.record(column_type, CR_CONVERTED, row);
     }
+    bool truth = (column_type == SQLITE_FLOAT)
+                   ? sqlite3_column_double(stmt, j) != 0.0
+                   : sqlite3_column_int64(stmt, j) != 0;
     check_arrow(
-      ArrowArrayAppendInt(array.get(), sqlite3_column_int64(stmt, j) != 0),
+      ArrowArrayAppendInt(array.get(), truth),
       "Can't append to Arrow array"
     );
     return;

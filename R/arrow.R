@@ -91,10 +91,12 @@
 #'   integers and reals into a text type, where SQLite renders them,
 #'   and text into a binary type, as its bytes;
 #' * converted by SQLite, with the warning described above:
-#'   text and blobs into a numeric type, and reals into an integer type, truncated;
+#'   text and blobs into a numeric type,
+#'   and reals into an integer type, truncated, or into `bool`, true unless zero;
 #' * `NULL`, with the warning: a blob into a text type unless it is valid UTF-8,
 #'   a number outside the range of an integer type,
 #'   including a real or the integer at the start of a text beyond 64 bits, which SQLite would saturate,
+#'   a finite number beyond the range of `float`,
 #'   a date outside the range of its type, such as a number of days beyond `2^31 - 1` for `date32`,
 #'   a time outside a day, from 0 up to 24 hours excluded,
 #'   a timestamp outside the range of its unit, such as nanoseconds after 2262,

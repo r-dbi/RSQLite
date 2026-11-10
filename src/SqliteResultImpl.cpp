@@ -22,6 +22,7 @@ SqliteResultImpl::SqliteResultImpl(
 )
     : conn(conn_->conn()),
       stmt(prepare(conn, sql)),
+      connection_(conn_.get()),
       cache(stmt),
       complete_(false),
       ready_(false),
@@ -381,7 +382,7 @@ bool SqliteResultImpl::step_run() {
   case SQLITE_ROW:
     return false;
   default:
-    raise_sqlite_exception();
+    raise_sqlite_exception(rc);
   }
 }
 
@@ -629,7 +630,16 @@ std::pair<int64_t, int64_t> SqliteResultImpl::set_arrow_bytes_limits(
   return old;
 }
 
-void SqliteResultImpl::raise_sqlite_exception() const {
+void SqliteResultImpl::raise_sqlite_exception(int rc) const {
+  if (!connection_->is_valid()) {
+    // After dbDisconnect(), sqlite3_close_v2() has left a handle whose
+    // sqlite3_errmsg() only reports API misuse: an Arrow stream that reads on
+    // has the result code
+    throw std::runtime_error(
+      std::string(sqlite3_errstr(rc)) +
+      " (no details, the connection has been closed)"
+    );
+  }
   raise_sqlite_exception(conn);
 }
 

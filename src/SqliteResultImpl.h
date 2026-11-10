@@ -22,6 +22,8 @@ private:
   // Wrapped pointer
   sqlite3* conn;
   sqlite3_stmt* stmt;
+  // Kept alive by the DbResult that owns this object
+  const DbConnection* connection_;
 
   // Cache
   struct _cache {
@@ -116,7 +118,7 @@ private:
   bool arrow_chunk_full();
 
 private:
-  NORET void raise_sqlite_exception() const;
+  NORET void raise_sqlite_exception(int rc) const;
   NORET static void raise_sqlite_exception(sqlite3* conn);
 };
 

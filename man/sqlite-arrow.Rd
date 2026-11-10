@@ -75,7 +75,8 @@ fetched from the result when the array is requested,
 so the memory footprint is that of one chunk, not of the result set.
 The stream holds on to the statement of the result:
 it stays readable after \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}}, while other queries run on the same connection,
-and even after \code{\link[DBI:dbDisconnect]{DBI::dbDisconnect()}}.
+and even after \code{\link[DBI:dbDisconnect]{DBI::dbDisconnect()}},
+when an error of the statement can only report SQLite's generic message for its result code.
 Until it has been read to the end or released, with \code{stream$release()} or by the garbage collector,
 it keeps the statement open, and with it a read transaction and the database file.
 It reads the rows of the parameters bound when it was created:

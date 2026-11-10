@@ -389,6 +389,21 @@ test_that("an R error while the stream is read unwinds cleanly", {
   expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 3L)
 })
 
+test_that("an error of the statement after dbDisconnect() keeps its result code", {
+  con <- dbConnect(SQLite(), ":memory:")
+  dbExecute(con, "CREATE TABLE t (a)")
+  dbExecute(con, "INSERT INTO t VALUES ('{\"x\": 1}'), ('{\"x\": 2}'), ('not json')")
+  rs <- dbSendQueryArrow(con, "SELECT json_extract(a, '$.x') AS x FROM t")
+  stream <- dbFetchArrow(rs, chunk_size = 1)
+  dbClearResult(rs)
+  expect_warning(dbDisconnect(con), "results in use")
+
+  expect_equal(as.data.frame(stream$get_next())$x, 1)
+  # The third row fails to evaluate while the second chunk is fetched,
+  # SQLite's message is gone with the connection
+  expect_error(stream$get_next(), "SQL logic error .*connection has been closed")
+})
+
 test_that("dbGetQueryArrow() reads the whole result", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:3, b = letters[1:3]))

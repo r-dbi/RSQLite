@@ -302,3 +302,22 @@ test_that("a statement that fails partway reports the rows it changed", {
   )
   expect_equal(dbGetQuery(con, "SELECT x FROM u ORDER BY x")$x, 1:5)
 })
+
+test_that("rows of a fetch whose conversion fails don't count", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, "CREATE TABLE m (x)")
+  dbExecute(con, "INSERT INTO m VALUES (1), (2), ('a'), (4), (5)")
+
+  res <- dbSendQuery(con, "SELECT x FROM m")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  expect_equal(dbFetch(res, n = 2)$x, 1:2)
+  # The mixed types in the next rows give a warning, made an error here
+  withr::with_options(
+    list(warn = 2),
+    expect_error(dbFetch(res, n = 2), "mixed type")
+  )
+  expect_equal(dbGetRowCount(res), 2L)
+})

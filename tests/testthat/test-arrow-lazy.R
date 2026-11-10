@@ -198,6 +198,39 @@ test_that("lazy fetches convert column by column to the prototypes", {
     df <- fetch(eager, chunk_size)
     expect_false(any(vapply(df, is_lazy, logical(1))))
   }
+
+  # The views own their arrays
+  df <- fetch(lazy, 1)
+  gc()
+  expect_identical(df, expected)
+})
+
+test_that("lazy fetches keep times in seconds and the coercion warning", {
+  path <- withr::local_tempfile(fileext = ".sqlite")
+  eager <- dbConnect(SQLite(), path, arrow = TRUE, extended_types = TRUE)
+  withr::defer(dbDisconnect(eager))
+  lazy <- dbConnect(SQLite(), path, arrow = TRUE, extended_types = TRUE, lazy_strings = TRUE)
+  withr::defer(dbDisconnect(lazy))
+  dbExecute(eager, "CREATE TABLE t (i INTEGER, s TEXT, d DATE, tm TIME, ts TIMESTAMP)")
+  dbExecute(eager, "INSERT INTO t VALUES
+    (1, 'a', '2024-01-01', '12:34:56.5', '2024-01-01 12:00:00'),
+    (2, NULL, NULL, '25:00:00', NULL),
+    ('x', 'c', '2024-02-02', NULL, '2024-06-01 00:00:00')")
+
+  fetch <- function(con, chunk_size) {
+    rs <- dbSendQuery(con, "SELECT * FROM t")
+    on.exit(dbClearResult(rs))
+    w <- coercion_warnings(df <- arrow_fetch_df(rs, -1, chunk_size = chunk_size))
+    list(df = df, warnings = length(w))
+  }
+  expected <- fetch(eager, 3)
+  expect_equal(expected$warnings, 1L)
+  expect_s3_class(expected$df$tm, "hms")
+  expect_equal(as.numeric(expected$df$tm), c(45296.5, 90000, NA))
+  expect_identical(fetch(eager, 1), expected)
+  expect_identical(fetch(lazy, 3), expected)
+  expect_identical(fetch(lazy, 1), expected)
+  expect_true(is_lazy(fetch(lazy, 1)$df$s))
 })
 
 test_that("lazy strings count towards the collection trigger", {

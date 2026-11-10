@@ -555,7 +555,7 @@ void SqliteArrowColumn::append_value(int column_type) {
         (kind == AK_TIME) ? source.fetch_time() : source.fetch_datetime_local();
       if (array_kind == AK_DOUBLE) {
         // For a data frame: the seconds of the default path, all of them
-        if (ISNAN(seconds)) {
+        if (std::isnan(seconds)) {
           check_arrow(
             ArrowArrayAppendNull(array.get(), 1),
             "Can't append to Arrow array"

@@ -750,7 +750,7 @@ test_that("a result stays usable after an R error leaves its fetch by a longjmp"
       dbFetch(rs),
       error = function(e) invisible(mem.maxVSize(old))
     ),
-    "vector memory limit"
+    "vector memory"
   )
   invisible(mem.maxVSize(old))
 

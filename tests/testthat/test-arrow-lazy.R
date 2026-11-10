@@ -145,3 +145,65 @@ test_that("lazy strings beyond 2 GiB take large_utf8", {
   expect_true(is_lazy(df$s))
   expect_equal(nchar(df$s[c(1, 1024, 1025, 2048, 2049, 2100)]), rep(2^20, 6))
 })
+
+test_that("the columns converted one by one keep their prototypes", {
+  path <- withr::local_tempfile(fileext = ".sqlite")
+  eager <- dbConnect(SQLite(), path, arrow = TRUE)
+  withr::defer(dbDisconnect(eager))
+  lazy <- dbConnect(SQLite(), path, arrow = TRUE, lazy_strings = TRUE)
+  withr::defer(dbDisconnect(lazy))
+  dbExecute(eager, "CREATE TABLE t (id, big, ts, d, tm, f, fo, fl, flo, b, chr, txt, num, nul)")
+  dbExecute(eager, "INSERT INTO t VALUES
+    (1, 1, '2024-01-01 12:00:00', '2024-01-01', '12:34:56', 'a', 'b', 'x', 'y', X'0102', 1, 'one', 1.5, NULL),
+    (2, 2, '2024-06-01 00:00:00', '2024-02-02', '00:00:01', 'b', 'a', 'y', 'x', NULL, 2, NULL, 2, NULL),
+    (3, 3, NULL, NULL, NULL, 'c', NULL, NULL, 'z', X'', NULL, 'three', NULL, NULL)")
+  ptype <- list(
+    big = bit64::integer64(), ts = as.POSIXct(character(), tz = "Europe/Zurich"),
+    d = as.Date(character()), tm = hms::hms(),
+    f = factor(levels = c("b", "a")), fo = factor(levels = c("b", "a"), ordered = TRUE),
+    fl = factor(), flo = ordered(character()), b = blob::blob(), chr = character()
+  )
+
+  fetch <- function(con, chunk_size) {
+    rs <- dbSendQuery(con, "SELECT * FROM t", ptype = ptype)
+    on.exit(dbClearResult(rs))
+    arrow_fetch_df(rs, -1, chunk_size = chunk_size)
+  }
+  # One array, as one data frame, against one array per row, column by column
+  expected <- fetch(eager, 3)
+  expect_identical(fetch(eager, 1), expected)
+  expect_identical(fetch(lazy, 3), expected)
+  expect_identical(fetch(lazy, 1), expected)
+
+  ts <- as.POSIXct(c("2024-01-01 12:00:00", "2024-06-01 00:00:00", NA), tz = "UTC")
+  attr(ts, "tzone") <- "Europe/Zurich"
+  expect_equal(expected$ts, ts)
+  expect_equal(expected$big, bit64::as.integer64(1:3))
+  expect_equal(expected$f, factor(c("a", "b", NA), levels = c("b", "a")))
+  expect_equal(expected$fo, factor(c("b", "a", NA), levels = c("b", "a"), ordered = TRUE))
+  expect_equal(expected$fl, factor(c("x", "y", NA)))
+  expect_equal(expected$flo, ordered(c("y", "x", "z")))
+  expect_equal(expected$b, blob::blob(as.raw(1:2), NULL, raw()))
+  expect_equal(expected$chr, c("1", "2", NA))
+  expect_type(expected$id, "integer")
+  expect_type(expected$nul, "logical")
+
+  # Only character columns stay views, factors are built from copies
+  for (chunk_size in c(1, 3)) {
+    df <- fetch(lazy, chunk_size)
+    expect_equal(names(df)[vapply(df, is_lazy, logical(1))], c("chr", "txt"))
+    df <- fetch(eager, chunk_size)
+    expect_false(any(vapply(df, is_lazy, logical(1))))
+  }
+})
+
+test_that("lazy strings count towards the collection trigger", {
+  con <- local_arrow_con(lazy_strings = TRUE)
+  arrow_gc_state$bytes <- 0
+  df <- dbGetQuery(con, "SELECT 'abc' AS s, 1 AS i")
+  expect_true(is_lazy(df$s))
+  expect_gt(arrow_gc_state$bytes, 0)
+  arrow_gc_state$bytes <- 0
+  df <- dbGetQuery(con, "SELECT 1 AS i")
+  expect_equal(arrow_gc_state$bytes, 0)
+})

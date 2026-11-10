@@ -3,6 +3,8 @@
 #include "affinity.h"
 #include "utf8.h"
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <climits>
 #include <cmath>
 
@@ -837,41 +839,105 @@ void SqliteArrowColumn::append_date(int column_type, int64_t row) {
   );
 }
 
-void SqliteArrowColumn::append_time(int column_type, int64_t row) {
-  bool ok;
-  double seconds = (kind == AK_TIMESTAMP) ? source.parse_datetime_local(ok)
-                                          : source.parse_time(ok);
-  if (!ok || ISNAN(seconds)) {
-    log.record(column_type, CR_UNPARSABLE, row);
-    append_null();
-    return;
-  }
-
-  double scale;
+// The ticks of a time unit per second
+static int64_t ticks_per_second(enum ArrowTimeUnit unit) {
   switch (unit) {
   case NANOARROW_TIME_UNIT_SECOND:
-    scale = 1;
-    break;
+    return 1;
   case NANOARROW_TIME_UNIT_MILLI:
-    scale = 1e3;
-    break;
+    return 1000;
   case NANOARROW_TIME_UNIT_MICRO:
-    scale = 1e6;
-    break;
+    return 1000000;
   default:
-    scale = 1e9;
-    break;
+    return 1000000000;
   }
-  double value = std::floor(seconds * scale + 0.5);
+}
+
+// `a * b` for a positive `b`, false if it doesn't fit 64 bits
+static bool checked_multiply(int64_t a, int64_t b, int64_t& out) {
+  if (a > INT64_MAX / b || a < INT64_MIN / b) {
+    return false;
+  }
+  out = a * b;
+  return true;
+}
+
+// `a / b` rounded toward negative infinity, for a positive `b`
+static int64_t floor_divide(int64_t a, int64_t b) {
+  int64_t q = a / b;
+  if (a % b < 0) {
+    --q;
+  }
+  return q;
+}
+
+bool SqliteArrowColumn::parse_micros(int column_type, int64_t& micros) const {
+  namespace bp = boost::posix_time;
+  namespace bg = boost::gregorian;
+  namespace bd = boost::date_time;
+
+  if (column_type != SQLITE_TEXT) {
+    return false;
+  }
+  const char* text =
+    reinterpret_cast<const char*>(sqlite3_column_text(stmt, j));
+  try {
+    if (kind == AK_TIMESTAMP) {
+      bp::ptime time(bd::parse_delimited_time<bp::ptime>(text, ' '));
+      micros = (time - bp::ptime(bg::date(1970, 1, 1), bp::seconds(0)))
+                 .total_microseconds();
+    } else {
+      micros = bp::duration_from_string(text).total_microseconds();
+    }
+  } catch (...) {
+    return false;
+  }
+  return true;
+}
+
+void SqliteArrowColumn::append_time(int column_type, int64_t row) {
+  const int64_t per_second = ticks_per_second(unit);
+  int64_t value = 0;
   bool fits;
-  if (kind == AK_TIMESTAMP) {
-    // A number, or a timestamp in nanoseconds outside the years 1677 to 2262,
-    // may not fit
-    fits = value >= -9223372036854775808.0 && value < 9223372036854775808.0;
+  // Whether a time is before the end of the day before it is rounded
+  bool before_day_end = false;
+
+  if (column_type == SQLITE_INTEGER) {
+    // Whole seconds, scaled exactly
+    fits = checked_multiply(sqlite3_column_int64(stmt, j), per_second, value);
+  } else if (column_type == SQLITE_FLOAT) {
+    // Seconds, rounded to the nearest tick in double precision
+    double seconds = sqlite3_column_double(stmt, j);
+    double ticks = std::floor(seconds * per_second + 0.5);
+    fits = ticks >= -9223372036854775808.0 && ticks < 9223372036854775808.0;
+    if (fits) {
+      value = static_cast<int64_t>(ticks);
+    }
+    before_day_end = seconds < 86400;
   } else {
+    // Text, parsed to whole microseconds and rounded to the nearest tick
+    int64_t micros;
+    if (!parse_micros(column_type, micros)) {
+      log.record(column_type, CR_UNPARSABLE, row);
+      append_null();
+      return;
+    }
+    if (per_second >= 1000000) {
+      fits = checked_multiply(micros, per_second / 1000000, value);
+    } else {
+      const int64_t per_tick = 1000000 / per_second;
+      fits = micros <= INT64_MAX - per_tick / 2;
+      if (fits) {
+        value = floor_divide(micros + per_tick / 2, per_tick);
+      }
+    }
+    before_day_end = micros < INT64_C(86400000000);
+  }
+
+  if (fits && kind != AK_TIMESTAMP) {
     // A time of day, which rounding doesn't take past its last tick
-    const double day = 86400 * scale;
-    if (value == day && seconds < 86400) {
+    const int64_t day = 86400 * per_second;
+    if (value == day && before_day_end) {
       value = day - 1;
     }
     fits = value >= 0 && value < day;
@@ -882,7 +948,7 @@ void SqliteArrowColumn::append_time(int column_type, int64_t row) {
     return;
   }
   check_arrow(
-    ArrowArrayAppendInt(array.get(), static_cast<int64_t>(value)),
+    ArrowArrayAppendInt(array.get(), value),
     "Can't append to Arrow array"
   );
 }

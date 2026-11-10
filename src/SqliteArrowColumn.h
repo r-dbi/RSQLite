@@ -179,6 +179,9 @@ private:
   void append_binary(int column_type, int64_t row);
   void append_date(int column_type, int64_t row);
   void append_time(int column_type, int64_t row);
+  // Parses text into whole microseconds, since 1970-01-01 for a timestamp,
+  // like SqliteColumnDataSource parses it into seconds; false if it can't
+  bool parse_micros(int column_type, int64_t& micros) const;
   void append_null();
   // The value of the current row for an integer type other than bool, as
   // SQLite converts it but without saturating at 64 bits; false if it is out

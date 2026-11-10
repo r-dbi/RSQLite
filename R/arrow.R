@@ -79,7 +79,9 @@
 #' a timestamp is read as UTC and only labelled with the requested time zone.
 #' A number is a count of days for a date, truncated, and of seconds for a time or timestamp.
 #' Times and timestamps are rounded to the nearest tick of their unit,
-#' a time to the last tick of the day at most.
+#' a time to the last tick of the day at most:
+#' exactly for an integer and for text, which is read to the microsecond,
+#' and in double precision for a real.
 #' Dictionary, decimal, nested and extension types are an error.
 #'
 #' Values of another storage class than the column's type follow these rules,

@@ -381,6 +381,48 @@ test_that("times and timestamps outside the range of their unit are NULL", {
   expect_equal(vapply(w[[1]]$coercions, `[[`, "", "column"), "tm")
 })
 
+test_that("integers and text become times and timestamps exactly", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES ('2020-02-03 04:05:06.000001'), ('2262-04-11 23:47:16.854775'),",
+    "('2262-04-11 23:47:16.854776'), ('1677-09-21 00:12:43.145225'), ('1677-09-21 00:12:43.145224'),",
+    "('1969-12-31 23:59:59.5'), (9007199254740993), (9223372036854775807), (1.5)"
+  ))
+  fetch <- function(unit) {
+    w <- coercion_warnings(
+      array <- arrow_validated(nanoarrow::as_nanoarrow_array(
+        dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_timestamp(unit, "UTC")))
+      ))
+    )
+    values <- if (length(w) > 0) w[[1]]$coercions[[1]]$values else list()
+    list(
+      array = array$children$x,
+      reasons = vapply(values, function(v) paste(v$class, v$reason, paste(v$rows, collapse = " ")), "")
+    )
+  }
+
+  ns <- fetch("ns")
+  expect_int64_bits(ns$array, c(
+    "1580702706000001000", "9223372036854775000", NA, "-9223372036854775000", NA,
+    "-500000000", NA, NA, "1500000000"
+  ))
+  expect_equal(ns$reasons, c("string out_of_range 3 5", "integer out_of_range 7 8"))
+
+  s <- fetch("s")
+  expect_int64_bits(s$array, c(
+    "1580702706", "9223372037", "9223372037", "-9223372037", "-9223372037",
+    "0", "9007199254740993", "9223372036854775807", "2"
+  ))
+  expect_length(s$reasons, 0)
+
+  # Text rounds half up in a coarser unit
+  expect_equal(
+    as.numeric(as.data.frame(dbGetQueryArrow(con, "SELECT '01:02:03.5' AS x", schema = list(x = nanoarrow::na_time32("s"))))$x),
+    3724
+  )
+})
+
 test_that("times outside a time of day are NULL", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x)")

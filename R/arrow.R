@@ -174,11 +174,11 @@
 #' at its peak, the memory holds the arrays and the part of the data frame filled so far.
 #' Character columns are copied out of their arrays,
 #' unless the connection was opened with `lazy_strings = TRUE`:
-#' then the arrays of every fetch are split by column,
-#' and a character column, without a prototype or with a `character()` one,
+#' then a character column, without a prototype or with a `character()` one,
 #' stays a view into one Arrow array that holds all its strings and is freed with the column,
-#' while the other columns are converted as before.
-#' Unless they repeat, the strings take less memory in the array than in R.
+#' while the other columns are converted as before, from arrays split by column even in a fetch that fits into one.
+#' Unless they repeat, the strings take less memory in the array than in R,
+#' and the arrays count towards the collections described in the section on chunking.
 #' Most vectorised uses of such a view convert its strings again, one by one,
 #' so a column that is used more than once is better copied with `c()` first.
 #'

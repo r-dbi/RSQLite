@@ -15,9 +15,9 @@ on two states of [#796](https://github.com/r-dbi/RSQLite/pull/796),
 and on `1ad5ac0`, the head of the stacked pull request that converts column by column
 and adds `lazy_strings`.
 On 2026-11-10, with the vendored SQLite 3.54.1, after that pull request took in the reworked layers below it:
-on `844b42f`, the head of [#802](https://github.com/r-dbi/RSQLite/pull/802) below it,
+on `844b42f`, a head of [#802](https://github.com/r-dbi/RSQLite/pull/802) below it,
 on `7b026b6`, the merge with the column-by-column conversion of every fetch,
-and on `de9734e`, which keeps it for fetches with lazy strings only.
+and on `fbd54c9`, which keeps it for fetches with lazy strings only, on the final layers below.
 A synthetic table of one million rows (three repetitions) and of five million rows (two), medians reported.
 The harness is [`bench.R`](bench.R), and the runs are the CSV files beside it.
 
@@ -75,8 +75,8 @@ The build under test is the RSQLite installed in the library the script runs wit
 * [`results-lazy-7b026b6-5e6.csv`](results-lazy-7b026b6-5e6.csv):
   the column-by-column conversion merged onto them, for every fetch of several arrays;
   its eager cells compare with the run above.
-* [`results-lazy-de9734e-5e6.csv`](results-lazy-de9734e-5e6.csv):
-  the eager conversion of the layers below, and the column-by-column conversion for lazy strings only.
+* [`results-lazy-fbd54c9-5e6.csv`](results-lazy-fbd54c9-5e6.csv):
+  the eager conversion of the final layers below, and the column-by-column conversion for lazy strings only.
   Run with the harness that reads the peak RSS before `object.size()`:
   that call allocates a hash table for the strings of a column and materializes a lazy one,
   which added up to 170 MB to the peaks of the cells with text in all earlier runs.
@@ -175,35 +175,35 @@ at 180 against 150 MB above the floor, and the other cells scale the same way.
 
 The floor is 103 MB in this run.
 
-### Five million rows, on the reworked layers (`844b42f`, `7b026b6`, `de9734e`)
+### Five million rows, on the reworked layers (`844b42f`, `7b026b6`, `fbd54c9`)
 
 | query | strategy | seconds | peak RSS MB | above floor MB | data frame MB |
 |---|---|---:|---:|---:|---:|
-| all | default | 16.42 | 717 | 614 | 411 |
-| all | arrow_df | 9.41 | 834 | 731 | 411 |
-| all | arrow_df_chunked | 7.36 | 215 | 113 | |
-| all | arrow_df_lazy | 3.56 | 745 | 642 | 411 |
-| all | arrow_df_lazy_chunked | 3.60 | 287 | 185 | |
-| numbers | default | 3.14 | 257 | 154 | 76 |
-| numbers | arrow_df | 2.14 | 364 | 261 | 76 |
-| numbers | arrow_df_chunked | 1.95 | 183 | 80 | |
-| numbers | arrow_df_lazy | 2.10 | 364 | 261 | 76 |
-| numbers | arrow_df_lazy_chunked | 2.10 | 176 | 74 | |
-| strings | default | 11.71 | 565 | 462 | 334 |
-| strings | arrow_df | 7.77 | 582 | 479 | 334 |
-| strings | arrow_df_chunked | 6.19 | 212 | 109 | |
-| strings | arrow_df_lazy | 2.04 | 503 | 400 | 334 |
-| strings | arrow_df_lazy_chunked | 1.97 | 219 | 117 | |
-| filtered | default | 4.65 | 302 | 199 | 141 |
-| filtered | arrow_df | 3.26 | 347 | 244 | 141 |
-| filtered | arrow_df_chunked | 2.73 | 206 | 103 | |
-| filtered | arrow_df_lazy | 1.46 | 309 | 206 | 141 |
-| filtered | arrow_df_lazy_chunked | 1.44 | 222 | 119 | |
+| all | default | 15.72 | 717 | 614 | 411 |
+| all | arrow_df | 9.35 | 833 | 730 | 411 |
+| all | arrow_df_chunked | 6.76 | 236 | 133 | |
+| all | arrow_df_lazy | 3.57 | 745 | 642 | 411 |
+| all | arrow_df_lazy_chunked | 3.33 | 262 | 159 | |
+| numbers | default | 3.04 | 257 | 154 | 76 |
+| numbers | arrow_df | 2.09 | 360 | 257 | 76 |
+| numbers | arrow_df_chunked | 1.91 | 175 | 72 | |
+| numbers | arrow_df_lazy | 2.10 | 360 | 257 | 76 |
+| numbers | arrow_df_lazy_chunked | 1.87 | 176 | 73 | |
+| strings | default | 11.58 | 565 | 462 | 334 |
+| strings | arrow_df | 7.52 | 581 | 478 | 334 |
+| strings | arrow_df_chunked | 5.53 | 223 | 120 | |
+| strings | arrow_df_lazy | 1.96 | 503 | 400 | 334 |
+| strings | arrow_df_lazy_chunked | 1.96 | 218 | 115 | |
+| filtered | default | 4.27 | 302 | 199 | 141 |
+| filtered | arrow_df | 3.25 | 345 | 243 | 141 |
+| filtered | arrow_df_chunked | 2.47 | 220 | 117 | |
+| filtered | arrow_df_lazy | 1.37 | 303 | 200 | 141 |
+| filtered | arrow_df_lazy_chunked | 1.45 | 238 | 135 | |
 
-The table is `de9734e`; the floor is 103 MB.
-With the earlier harness, its eager cells matched those of `844b42f` to the MB, at 9.98 s for `arrow_df` on `all`.
-On `7b026b6`, `arrow_df` took 9.03 s for `all` and 7.96 s for the strings, within the spread of the repetitions,
-and peaked at 832 and 651 MB above the floor, against 821 and 562 MB on `844b42f`.
+The table is `fbd54c9`; the floor is 103 MB.
+With the earlier harness, `arrow_df` took 9.98 s for `all` on `844b42f`,
+and 9.03 s on `7b026b6`, within the spread of the repetitions,
+where it peaked at 832 MB above the floor for `all` and 651 MB for the strings, against 821 and 562 MB on `844b42f`.
 
 ## What the numbers say
 
@@ -246,13 +246,13 @@ and peaked at 832 and 651 MB above the floor, against 821 and 562 MB on `844b42f
   Eager fetches therefore take the path of the layers below,
   and only a fetch with a lazy column is split by column, so that a view holds the strings of its own column alone.
 * **`lazy_strings = TRUE` removes the string conversion from the fetch.**
-  The full fetch of `all` takes 3.6 s against 9.4 s eager and 16.4 s on the default path,
-  the strings alone 2.0 against 7.8 and 11.7 s, and the numbers cells, which have no text column, do not move.
-  The peak is lower too, 642 against 731 MB above the floor for `all` and 400 against 479 MB for the strings,
+  The full fetch of `all` takes 3.6 s against 9.4 s eager and 15.7 s on the default path,
+  the strings alone 2.0 against 7.5 and 11.6 s, and the numbers cells, which have no text column, do not move.
+  The peak is lower too, 642 against 730 MB above the floor for `all` and 400 against 478 MB for the strings,
   because a column stays in Arrow form, about 26 MB per million of the 30-character strings against
   some 64 MB as R strings.
-  The chunked loop that discards its data frames runs at 3.6 s and 185 MB, against 7.4 s and 113 MB eager:
-  its views wait for the collection that every 64 MB of arrays trigger.
+  The chunked loop that discards its data frames runs at 3.3 s and 159 MB, against 6.8 s and 133 MB eager:
+  its arrays wait for the collection that every 64 MB of them trigger.
   On `1ad5ac0`, the same cells took 5.7 and 4.4 s.
   The price is paid later: most vectorised uses of a view convert its strings again, one by one,
   at about the cost of the conversion the fetch skipped.

@@ -297,6 +297,34 @@ test_that("a NULL-first column is typed by its first value through Arrow", {
   }
 })
 
+test_that("each binding through Arrow starts from the types of the last one", {
+  setup <- c(
+    "CREATE TABLE t (k, v, w, s)",
+    "INSERT INTO t VALUES (1, 1.5, 4294967296, 'a'), (2, NULL, 1, NULL)",
+    # Not a real after the wide integer: that is a documented exception
+    "INSERT INTO t VALUES (3, 2, 2, 5), (4, 'x', 'y', 1.5)"
+  )
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con))
+  con_arrow <- local_arrow_con()
+  for (sql in setup) {
+    dbExecute(con, sql)
+    dbExecute(con_arrow, sql)
+  }
+
+  bind_and_fetch <- function(con, ns) {
+    rs <- dbSendQuery(con, "SELECT v, w, s FROM t WHERE k = ?")
+    on.exit(dbClearResult(rs))
+    unlist(recursive = FALSE, lapply(c(1, 2, 3, 4, 99, 2), function(k) {
+      dbBind(rs, list(k))
+      lapply(ns, function(n) suppressWarnings(dbFetch(rs, n)))
+    }))
+  }
+  for (ns in list(-1, c(0, -1), c(1, 1))) {
+    expect_identical(bind_and_fetch(con_arrow, ns), bind_and_fetch(con, ns), info = paste(ns, collapse = ", "))
+  }
+})
+
 test_that("results larger than one chunk are typed by all their values through Arrow", {
   sql <- paste(
     "WITH RECURSIVE cnt(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM cnt WHERE i < 70000)",

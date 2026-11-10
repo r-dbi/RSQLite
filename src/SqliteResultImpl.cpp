@@ -33,7 +33,8 @@ SqliteResultImpl::SqliteResultImpl(
       with_alt_types_(conn_->with_alt_types()),
       arrow_frozen_(false),
       pending_offset_(0),
-      arrow_row_read_(false) {
+      arrow_row_read_(false),
+      df_carry_(false) {
   try {
     if (cache.nparams_ == 0) {
       after_bind(true);
@@ -310,6 +311,15 @@ int64_t SqliteResultImpl::fetch_arrow_df(
   ensure_arrow_columns(open);
   const size_t ncols = arrow_columns_.size();
 
+  if (open && df_carry_) {
+    // The first fetch of a new execution, as long as no Arrow stream has
+    // started afresh
+    for (size_t j = 0; j < ncols; ++j) {
+      arrow_columns_[j].carry_over(df_kinds_[j], df_wide_ints_[j]);
+    }
+  }
+  df_carry_ = false;
+
   if (open && n_max == 0 && !complete_) {
     // A fetch of no rows types the columns from the next row,
     // like the default path does it
@@ -374,9 +384,15 @@ int64_t SqliteResultImpl::fetch_arrow_df(
 
   columns.wide_ints.clear();
   columns.seconds_classes.clear();
+  df_kinds_.clear();
+  df_wide_ints_.clear();
   for (size_t j = 0; j < ncols; ++j) {
     columns.wide_ints.push_back(arrow_columns_[j].wide_integers());
     columns.seconds_classes.push_back(arrow_columns_[j].seconds_class());
+    // The null type of a stream is decided again, like an open one
+    ARROW_KIND kind = arrow_columns_[j].get_kind();
+    df_kinds_.push_back(kind == AK_NA ? AK_UNDECIDED : kind);
+    df_wide_ints_.push_back(arrow_columns_[j].wide_integers());
   }
 
   return total;
@@ -433,8 +449,10 @@ cpp11::strings SqliteResultImpl::get_placeholder_names() const {
 void SqliteResultImpl::after_set_params() {
   ++executions_;
 
-  // A new execution may see other values in the first row
+  // A new execution may see other values in the first row: an Arrow stream
+  // decides its types afresh, a data frame fetch starts from the last one's
   arrow_columns_.clear();
+  df_carry_ = !df_kinds_.empty();
   arrow_frozen_ = false;
   pending_chunk_.reset();
   pending_offset_ = 0;

@@ -40,6 +40,17 @@ bool SqliteArrowColumn::decided() const {
   return kind != AK_UNDECIDED;
 }
 
+ARROW_KIND SqliteArrowColumn::get_kind() const {
+  return kind;
+}
+
+void SqliteArrowColumn::carry_over(ARROW_KIND kind_, bool wide_ints_) {
+  if (kind_ != AK_UNDECIDED) {
+    kind = kind_;
+  }
+  wide_ints = wide_ints || wide_ints_;
+}
+
 void SqliteArrowColumn::decide_from_row(bool has_row) {
   if (decided() || !has_row) {
     return;

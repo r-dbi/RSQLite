@@ -86,7 +86,8 @@ Unlike a stream, each fetch decides the types of its columns, the way the defaul
 the first value that is not \code{NULL} decides,
 integers become doubles when a real number follows in the same fetch,
 and a column without a value takes its declared type, or \code{logical} without one.
-The next fetch starts from these types, except that it decides a \code{logical} column again.
+The next fetch starts from these types, also after \code{\link[DBI:dbBind]{DBI::dbBind()}},
+except that it decides a \code{logical} column again.
 The default path truncates a real number that follows an integer too large for an \code{integer},
 here the column becomes a \code{double}.
 Once \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} or \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} has fixed the types of a result,

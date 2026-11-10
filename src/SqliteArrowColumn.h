@@ -75,6 +75,11 @@ public:
 
 public:
   bool decided() const;
+  ARROW_KIND get_kind() const;
+  // Starts a data frame fetch of a new execution from the type and the 64-bit
+  // flag of the last one, like the default path; an undecided type keeps the
+  // decision from the first row
+  void carry_over(ARROW_KIND kind_, bool wide_ints_);
   // Decides the kind from the value of the current row, if there is one
   void decide_from_row(bool has_row);
   // Types the column from the value read by read_row() for a data frame

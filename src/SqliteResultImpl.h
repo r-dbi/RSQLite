@@ -57,6 +57,11 @@ private:
   // Set while the columns hold the storage classes of the current row,
   // also when a byte limit ended the chunk before it
   bool arrow_row_read_;
+  // The types and 64-bit flags that the last data frame fetch left, which the
+  // first one of a new execution starts from, like the default path does
+  std::vector<ARROW_KIND> df_kinds_;
+  std::vector<bool> df_wide_ints_;
+  bool df_carry_;
 
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);

@@ -77,7 +77,8 @@
 #' the first value that is not `NULL` decides,
 #' integers become doubles when a real number follows in the same fetch,
 #' and a column without a value takes its declared type, or `logical` without one.
-#' The next fetch starts from these types, except that it decides a `logical` column again.
+#' The next fetch starts from these types, also after [DBI::dbBind()],
+#' except that it decides a `logical` column again.
 #' The default path truncates a real number that follows an integer too large for an `integer`,
 #' here the column becomes a `double`.
 #' Once [DBI::dbFetchArrow()] or [DBI::dbFetchArrowChunk()] has fixed the types of a result,

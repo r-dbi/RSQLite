@@ -30,7 +30,8 @@ SqliteResultImpl::SqliteResultImpl(
       total_changes_start_(sqlite3_total_changes(conn)),
       types_(get_initial_field_types(cache.ncols_)),
       with_alt_types_(conn_->with_alt_types()),
-      arrow_frozen_(false) {
+      arrow_frozen_(false),
+      pending_offset_(0) {
   try {
     if (cache.nparams_ == 0) {
       after_bind(true);
@@ -232,14 +233,7 @@ void SqliteResultImpl::arrow_schema(
     freeze_arrow_columns();
   }
 
-  ArrowSchemaInit(out);
-  check_arrow(
-    ArrowSchemaSetTypeStruct(out, static_cast<int64_t>(arrow_columns_.size())),
-    "Can't allocate Arrow schema"
-  );
-  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
-    arrow_columns_[j].set_schema(out->children[j]);
-  }
+  set_arrow_struct_schema(out);
 }
 
 int64_t SqliteResultImpl::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
@@ -250,8 +244,23 @@ int64_t SqliteResultImpl::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
   ensure_arrow_columns();
 
   if (pending_chunk_->release != NULL) {
-    int64_t n = pending_chunk_->length;
-    pending_chunk_.move(out);
+    int64_t n = std::min(
+      pending_chunk_->length - pending_offset_,
+      std::max(n_max, int64_t(0))
+    );
+    if (pending_offset_ == 0 && n == pending_chunk_->length) {
+      pending_chunk_.move(out);
+      return n;
+    }
+
+    // The chunk was fetched with a larger chunk size than this one:
+    // its rows are handed out in copies of at most `n_max` rows
+    copy_pending_rows(out, n);
+    pending_offset_ += n;
+    if (pending_offset_ == pending_chunk_->length) {
+      pending_chunk_.reset();
+      pending_offset_ = 0;
+    }
     return n;
   }
 
@@ -306,6 +315,7 @@ void SqliteResultImpl::after_set_params() {
   arrow_columns_.clear();
   arrow_frozen_ = false;
   pending_chunk_.reset();
+  pending_offset_ = 0;
 
   total_changes_start_ = sqlite3_total_changes(conn);
 
@@ -488,6 +498,97 @@ int64_t SqliteResultImpl::fetch_arrow_rows(
 
   chunk.move(out);
   return n;
+}
+
+void SqliteResultImpl::set_arrow_struct_schema(struct ArrowSchema* out) {
+  ArrowSchemaInit(out);
+  check_arrow(
+    ArrowSchemaSetTypeStruct(out, static_cast<int64_t>(arrow_columns_.size())),
+    "Can't allocate Arrow schema"
+  );
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    arrow_columns_[j].set_schema(out->children[j]);
+  }
+}
+
+// Appends the value in row `i` of `values` to `out`, of the same type
+static void append_arrow_value(
+  struct ArrowArray* out,
+  const struct ArrowArrayView* values,
+  int64_t i
+) {
+  int code;
+  if (ArrowArrayViewIsNull(values, i)) {
+    code = ArrowArrayAppendNull(out, 1);
+  } else {
+    switch (values->storage_type) {
+    case NANOARROW_TYPE_INT32:
+    case NANOARROW_TYPE_INT64:
+      code = ArrowArrayAppendInt(out, ArrowArrayViewGetIntUnsafe(values, i));
+      break;
+    case NANOARROW_TYPE_DOUBLE:
+      code =
+        ArrowArrayAppendDouble(out, ArrowArrayViewGetDoubleUnsafe(values, i));
+      break;
+    case NANOARROW_TYPE_STRING:
+    case NANOARROW_TYPE_BINARY:
+      code =
+        ArrowArrayAppendBytes(out, ArrowArrayViewGetBytesUnsafe(values, i));
+      break;
+    default:
+      throw std::runtime_error(
+        "Internal error: can't copy Arrow values of type " +
+        std::string(ArrowTypeString(values->storage_type))
+      );
+    }
+  }
+  check_arrow(code, "Can't append to Arrow array");
+}
+
+void SqliteResultImpl::copy_pending_rows(struct ArrowArray* out, int64_t n) {
+  nanoarrow::UniqueSchema schema;
+  set_arrow_struct_schema(schema.get());
+
+  struct ArrowError error;
+  ArrowErrorInit(&error);
+  nanoarrow::UniqueArrayView view;
+  check_arrow(
+    ArrowArrayViewInitFromSchema(view.get(), schema.get(), &error),
+    "Can't read Arrow array",
+    &error
+  );
+  check_arrow(
+    ArrowArrayViewSetArray(view.get(), pending_chunk_.get(), &error),
+    "Can't read Arrow array",
+    &error
+  );
+
+  nanoarrow::UniqueArray chunk;
+  check_arrow(
+    ArrowArrayInitFromSchema(chunk.get(), schema.get(), &error),
+    "Can't allocate Arrow array",
+    &error
+  );
+  check_arrow(
+    ArrowArrayStartAppending(chunk.get()),
+    "Can't allocate Arrow array"
+  );
+  for (int64_t i = pending_offset_; i < pending_offset_ + n; ++i) {
+    for (int64_t j = 0; j < chunk->n_children; ++j) {
+      append_arrow_value(chunk->children[j], view->children[j], i);
+    }
+    check_arrow(
+      ArrowArrayFinishElement(chunk.get()),
+      "Can't append to Arrow array"
+    );
+  }
+  check_arrow(
+    ArrowArrayFinishBuildingDefault(chunk.get(), &error),
+    "Can't finish Arrow array",
+    &error
+  );
+
+  chunk.move(out);
 }
 
 bool SqliteResultImpl::arrow_row_fits(const std::vector<int>& column_types) {

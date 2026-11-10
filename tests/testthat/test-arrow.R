@@ -231,6 +231,36 @@ test_that("chunks of large blobs stay within the 32-bit offsets", {
   expect_equal(chunk_lengths(dbGetQueryArrow(con, sql)), c(1, 1, 1))
 })
 
+test_that("the chunk fetched to decide the types keeps to a smaller chunk_size", {
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, r REAL, s TEXT, b BLOB, d DATE, n)")
+  dbExecute(con, paste(
+    "WITH RECURSIVE s(x) AS (SELECT 1 UNION ALL SELECT x + 1 FROM s WHERE x < 10)",
+    "INSERT INTO t SELECT x, x / 2.0, 'v' || x, randomblob(x),",
+    "date('2020-01-01', '+' || x || ' days'), NULL FROM s"
+  ))
+  dbExecute(con, "UPDATE t SET r = NULL, s = NULL, b = NULL, d = NULL WHERE i IN (2, 7)")
+  sql <- "SELECT * FROM t ORDER BY i"
+  whole <- as.data.frame(dbGetQueryArrow(con, sql))
+
+  rs <- dbSendQueryArrow(con, sql)
+  on.exit(dbClearResult(rs))
+  stream <- dbFetchArrow(rs, chunk_size = 8)
+  # The schema fetches the first 8 rows to decide the types
+  expect_equal(schema_formats(stream), c(i = "l", r = "g", s = "u", b = "z", d = "tdD", n = "n"))
+
+  chunks <- list()
+  repeat {
+    chunk <- dbFetchArrowChunk(rs, chunk_size = 3)
+    if (chunk$length == 0) {
+      break
+    }
+    chunks <- c(chunks, list(chunk))
+  }
+  expect_equal(vapply(chunks, function(chunk) chunk$length, numeric(1)), c(3, 3, 2, 2))
+  expect_equal(as.data.frame(nanoarrow::basic_array_stream(chunks)), whole)
+})
+
 test_that("dbFetch() and dbFetchArrow() can be mixed on one result", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:5))

@@ -46,10 +46,12 @@ private:
   bool with_alt_types_;
 
   // Arrow state: the column types, decided once per execution, and a chunk
-  // that had to be fetched to decide them before the schema was requested
+  // that had to be fetched to decide them before the schema was requested,
+  // with the number of its rows already handed out
   boost::ptr_vector<SqliteArrowColumn> arrow_columns_;
   bool arrow_frozen_;
   nanoarrow::UniqueArray pending_chunk_;
+  int64_t pending_offset_;
 
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);
@@ -105,6 +107,8 @@ private:
   void ensure_arrow_columns();
   void freeze_arrow_columns();
   int64_t fetch_arrow_rows(struct ArrowArray* out, int64_t n_max);
+  void set_arrow_struct_schema(struct ArrowSchema* out);
+  void copy_pending_rows(struct ArrowArray* out, int64_t n);
   bool arrow_row_fits(const std::vector<int>& column_types);
   bool arrow_chunk_full();
 

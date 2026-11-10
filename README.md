@@ -37,7 +37,7 @@ pak::pak("r-dbi/RSQLite")
 RSQLite supports loadable extensions.
 An experimental HTTP/HTTPS VFS is available when the package is built with libcurl support,
 enabling read-only access to remote SQLite databases.
-See the help pages for `initExtension()`, `sqliteHttpConfig()`, `sqliteRemote()`, and `sqliteHasHttpVFS()`.
+See the help pages for [`initExtension()`](https://rsqlite.r-dbi.org/reference/initExtension.html), [`sqliteHttpConfig()`](https://rsqlite.r-dbi.org/reference/sqliteHttpConfig.html), [`sqliteRemote()`](https://rsqlite.r-dbi.org/reference/sqliteRemote.html), and [`sqliteHasHttpVFS()`](https://rsqlite.r-dbi.org/reference/sqliteHasHttpVFS.html).
 
 Discussions associated with DBI and related database packages take place on [R-SIG-DB](https://stat.ethz.ch/mailman/listinfo/r-sig-db).
 The website [Databases using R](https://db.rstudio.com/) describes the tools and best practices in this ecosystem.

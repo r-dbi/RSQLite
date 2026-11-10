@@ -439,6 +439,8 @@ void SqliteArrowColumn::warn_mixed(int column_type) {
      << " decided from the first values, coercing values of type "
      << format_column_type(column_type);
   cpp11::warning(ss.str());
+  // A handler of the warning may have converted the value: read it again
+  value_fetched = false;
 }
 
 const char* SqliteArrowColumn::format_kind(ARROW_KIND kind) {

@@ -21,6 +21,8 @@ struct ArrowArrayStream;
 
 class DbResult : boost::noncopyable {
   DbConnectionPtr pConn_;
+  // Set while a fetch or a bind runs, see DbResult.cpp
+  bool busy_;
 
 protected:
   boost::scoped_ptr<DbResultImpl> impl;
@@ -37,6 +39,7 @@ public:
   bool complete() const;
   bool ready() const;
   bool is_active() const;
+  bool busy() const;
   // Counts the executions of the statement with new parameters:
   // bind() and bind_arrow() start a new one
   int64_t executions() const;

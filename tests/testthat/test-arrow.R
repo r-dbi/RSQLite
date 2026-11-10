@@ -448,6 +448,52 @@ test_that("a result can't be bound to an Arrow stream of its own rows", {
   expect_warning(dbDisconnect(con), NA)
 })
 
+test_that("a result can't be used from a handler of its own fetch", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
+  dbExecute(con, "INSERT INTO t VALUES (1, 'abc'), (2, zeroblob(500)), (3, 'z')")
+  in_handler <- function(fetch, use) {
+    withCallingHandlers(fetch(), warning = function(w) {
+      use()
+      invokeRestart("muffleWarning")
+    })
+  }
+  busy <- "while one of its fetches or binds is running"
+
+  # The warning about the blob in a utf8 column runs the handler while the
+  # fetch holds the bytes of that value
+  fetches <- list(
+    function(rs) dbFetchArrow(rs, chunk_size = 10)$get_next(),
+    function(rs) dbFetchArrowChunk(rs, chunk_size = 10)
+  )
+  uses <- list(
+    function(rs) dbFetch(rs),
+    function(rs) dbBind(rs, list(i = 5)),
+    function(rs) dbClearResult(rs),
+    function(rs) dbColumnInfo(rs),
+    function(rs) dbFetchArrowChunk(rs)
+  )
+  for (fetch in fetches) {
+    for (use in uses) {
+      rs <- dbSendQuery(con, "SELECT x FROM t WHERE i >= $i ORDER BY i", params = list(i = 1))
+      expect_error(in_handler(function() fetch(rs), function() use(rs)), busy)
+      # The result is usable again
+      dbBind(rs, list(i = 3))
+      expect_equal(dbFetch(rs)$x, "z")
+      dbClearResult(rs)
+    }
+  }
+
+  # The data frame path warns about mixed types as well
+  dbExecute(con, "CREATE TABLE u (i INTEGER, x)")
+  dbExecute(con, "INSERT INTO u VALUES (1, 1), (2, 'two')")
+  rs <- dbSendQuery(con, "SELECT x FROM u ORDER BY i")
+  expect_error(in_handler(function() dbFetch(rs), function() dbFetch(rs)), busy)
+  expect_silent(dbClearResult(rs))
+  # Collects the streams of the first loop, which hold their results
+  invisible(gc())
+})
+
 test_that("dbGetQueryArrow() reads the whole result", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:3, b = letters[1:3]))

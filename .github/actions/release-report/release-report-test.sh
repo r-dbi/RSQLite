@@ -1,0 +1,179 @@
+#!/bin/bash
+# Check release-report.sh and close-checklist.sh offline, against a `gh` stub: nothing reaches GitHub.
+#
+#   1. Without an earlier comment, the run posts one on the pull request whose head is the ref.
+#   2. With one, carrying the marker and written by github-actions[bot], the run updates it.
+#   3. A comment with the marker by someone else is left alone.
+#   4. With ISSUE_MARKER, the newest open issue carrying it is used, never a pull request,
+#      and only among the issues of an owner, member or collaborator: anyone else's issue is never the target,
+#      newer or not, and also not when it quotes the marker; without a target, nothing is posted.
+#      When only others' issues carry the marker, a warning lists them with their association.
+#   5. The overall result is failure when any job failed, and the body lists every job.
+#   6. close-checklist.sh comments on and closes the open issues of an owner, member or collaborator
+#      carrying the exact marker of a published release, and no pull request, no issue of another version,
+#      and no issue of anyone else; without such an issue, it writes nothing,
+#      and warns about the issues of others that carry the marker.
+#
+# Usage:
+#   .github/actions/release-report/release-report-test.sh
+
+set -euo pipefail
+
+HERE=$(cd "$(dirname "$0")" && pwd)
+SCRATCH=$(mktemp -d)
+trap '[ -n "${KEEP:-}" ] || rm -rf "$SCRATCH"' EXIT
+
+pass=0
+fail=0
+ok() { pass=$((pass + 1)); echo "  ok   $1"; }
+no() { fail=$((fail + 1)); echo "  FAIL $1"; }
+is() { if [ "$2" = "$3" ]; then ok "$1"; else no "$1"; echo "         actual: $2"; echo "       expected: $3"; fi; }
+has() { case "$2" in *"$3"*) ok "$1" ;; *) no "$1"; echo "       missing: $3"; echo "        in: $2" ;; esac; }
+hasnt() { case "$2" in *"$3"*) no "$1"; echo "       present: $3" ;; *) ok "$1" ;; esac; }
+
+command -v jq >/dev/null || {
+  echo "jq is needed to answer for the gh stub" >&2
+  exit 1
+}
+
+# The stub answers `gh api <path> --jq <program>` from a JSON file named after the path,
+# records every call, and keeps the body of a POST or PATCH in $SCRATCH/body.
+API=$SCRATCH/api
+mkdir -p "$API" "$SCRATCH/bin"
+cat >"$SCRATCH/bin/gh" <<'STUB'
+#!/bin/bash
+echo "gh $*" >>"$SCRATCH/gh.log"
+shift
+path='' jq='' method=GET
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --jq) jq=$2; shift 2 ;;
+    -X) method=$2; shift 2 ;;
+    -F) method=${method/GET/POST}; cp "${2#body=@}" "$SCRATCH/body"; shift 2 ;;
+    -f)
+      method=${method/GET/POST}
+      case "$2" in body=*) printf '%s\n' "${2#body=}" >"$SCRATCH/body" ;; esac
+      shift 2
+      ;;
+    --paginate) shift ;;
+    *) path=$1; shift ;;
+  esac
+done
+if [ "$method" != GET ]; then
+  echo "$method $path" >>"$SCRATCH/writes"
+  echo "https://github.example/comment"
+  exit 0
+fi
+file=$API/$(printf '%s' "$path" | tr '/?=&:' '_____').json
+[ -f "$file" ] || { echo "gh: Not Found (HTTP 404)" >&2; exit 1; }
+jq -r "$jq" "$file"
+STUB
+chmod +x "$SCRATCH/bin/gh"
+export SCRATCH API
+
+head_prs() { cat >"$API/repos_o_r_pulls_state_open_head_o_release-1.0.0_per_page_1.json"; }
+issues() { cat >"$API/repos_o_r_issues_state_open_per_page_100.json"; }
+comments() { cat >"$API/repos_o_r_issues_${1}_comments_per_page_100.json"; }
+
+run() {
+  : >"$SCRATCH/writes"
+  rm -f "$SCRATCH/body"
+  GH=$SCRATCH/bin/gh GH_REPO=o/r GITHUB_SERVER_URL=https://github.example GITHUB_RUN_ID=42 GITHUB_RUN_NUMBER=7 \
+    GITHUB_RUN_ATTEMPT=1 GITHUB_REF_NAME=release-1.0.0 GITHUB_SHA=0123456789abcdef GITHUB_EVENT_NAME=workflow_dispatch \
+    "$HERE/release-report.sh" "$@" 2>&1
+}
+
+echo "== a first run posts a comment"
+head_prs <<<'[{"number": 5}]'
+comments 5 <<<'[]'
+out=$(RESULTS=$'gate=success\ndocs=failure\nsoft=skipped' DETAILS="Extra line." run release-gate "Release gate")
+is "it posts on the pull request of the ref" "$(cat "$SCRATCH/writes")" "POST repos/o/r/issues/5/comments"
+body=$(cat "$SCRATCH/body")
+has "with the marker first" "$(head -n 1 <<<"$body")" "<!-- release-report: release-gate -->"
+has "the overall result is failure" "$body" "### ❌ Release gate: failure"
+has "with the run linked" "$body" "Run [#7](https://github.example/o/r/actions/runs/42)"
+has "every job" "$body" $'- `gate`: success\n- `docs`: failure\n- `soft`: skipped'
+has "and the details" "$body" "Extra line."
+has "the log says so" "$out" "Posted a comment on #5."
+
+echo "== a later run updates it"
+comments 5 <<<'[{"id": 11, "user": {"login": "someone"}, "body": "<!-- release-report: release-gate -->\nquoted"},
+               {"id": 12, "user": {"login": "github-actions[bot]"}, "body": "<!-- release-report: release-gate -->\nold"}]'
+out=$(RESULTS=gate=success run release-gate "Release gate")
+is "it patches the bot's comment, not the other one" "$(cat "$SCRATCH/writes")" "PATCH repos/o/r/issues/comments/12"
+has "the overall result is success" "$(cat "$SCRATCH/body")" "### ✅ Release gate: success"
+
+echo "== with an issue marker, the checklist issue is the target"
+issues <<<'[{"number": 3, "author_association": "OWNER", "body": "<!-- release-checklist: RSQLite 1.0.0 -->", "pull_request": {}},
+            {"number": 4, "author_association": "MEMBER", "body": null},
+            {"number": 9, "author_association": "MEMBER", "body": "Checklist\n<!-- release-checklist: RSQLite 1.0.0 -->"}]'
+comments 9 <<<'[]'
+out=$(RESULTS=publish=success ISSUE_MARKER="<!-- release-checklist: " run cran-release "CRAN release")
+is "it posts on the issue, not on the pull request" "$(cat "$SCRATCH/writes")" "POST repos/o/r/issues/9/comments"
+
+echo "== an issue of anyone else is never the checklist issue"
+for n in 10 11 12; do comments "$n" <<<'[]'; done
+# shellcheck disable=SC2016  # Markdown backticks, no command substitution
+issues <<<'[{"number": 12, "author_association": "NONE", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 11, "author_association": "CONTRIBUTOR", "body": "```\n<!-- release-checklist: RSQLite 1.0.0 -->\n```"},
+            {"number": 10, "author_association": "FIRST_TIME_CONTRIBUTOR", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 9, "author_association": "MEMBER", "body": "Checklist\n<!-- release-checklist: RSQLite 1.0.0 -->"}]'
+out=$(RESULTS=publish=success ISSUE_MARKER="<!-- release-checklist: " run cran-release "CRAN release")
+is "it posts on the member's older issue, not on the newer ones" "$(cat "$SCRATCH/writes")" "POST repos/o/r/issues/9/comments"
+hasnt "and warns about none, since there is a checklist issue" "$out" "::warning"
+issues <<<'[{"number": 12, "author_association": "NONE", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 6, "author_association": "COLLABORATOR", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"}]'
+comments 6 <<<'[]'
+out=$(RESULTS=publish=success ISSUE_MARKER="<!-- release-checklist: " run cran-release "CRAN release")
+is "a collaborator's issue counts" "$(cat "$SCRATCH/writes")" "POST repos/o/r/issues/6/comments"
+issues <<<'[{"number": 13, "author_association": "CONTRIBUTOR", "body": "Opened by a workflow\n<!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 12, "author_association": "NONE", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 4, "author_association": "MEMBER", "body": "Another issue."}]'
+out=$(RESULTS=publish=success ISSUE_MARKER="<!-- release-checklist: " run cran-release "CRAN release")
+is "with only outsiders' issues, nothing is posted" "$(cat "$SCRATCH/writes")" ""
+has "a warning lists them with their association" "$out" "::warning title=Checklist issue ignored::Open issues carry <!-- release-checklist:  but none was opened by an owner, member or collaborator of the repository, so none is the checklist issue: #13 (CONTRIBUTOR), #12 (NONE)."
+has "and a notice says which issue it looked for" "$out" "No open issue of an owner, member or collaborator whose body carries <!-- release-checklist: ; nothing was posted."
+
+echo "== without a target, nothing is posted"
+head_prs <<<'[]'
+out=$(RESULTS=publish=success run cran-release "CRAN release")
+is "no write" "$(cat "$SCRATCH/writes")" ""
+has "a notice says so" "$out" "::notice title=Nothing to report to::"
+
+close_run() {
+  : >"$SCRATCH/writes"
+  rm -f "$SCRATCH/body"
+  GH=$SCRATCH/bin/gh GH_REPO=o/r RUN_URL=https://github.example/o/r/actions/runs/42 "$HERE/close-checklist.sh" 2>&1
+}
+
+echo "== close-checklist.sh closes the checklist issue of a published release"
+issues <<<'[{"number": 12, "author_association": "NONE", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 11, "author_association": "CONTRIBUTOR", "body": "> <!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 9, "author_association": "MEMBER", "body": "Checklist\n<!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 8, "author_association": "OWNER", "body": "<!-- release-checklist: RSQLite 0.9.0 -->"},
+            {"number": 6, "author_association": "COLLABORATOR", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 3, "author_association": "OWNER", "body": "<!-- release-checklist: RSQLite 1.0.0 -->", "pull_request": {}}]'
+out=$(PUBLISHED="RSQLite 1.0.0" close_run)
+is "it comments on and closes the member's and the collaborator's issue, and nothing else" "$(cat "$SCRATCH/writes")" "POST repos/o/r/issues/9/comments
+PATCH repos/o/r/issues/9
+POST repos/o/r/issues/6/comments
+PATCH repos/o/r/issues/6"
+has "the comment links the run" "$(cat "$SCRATCH/body")" "the [run](https://github.example/o/r/actions/runs/42) published its release"
+has "the log says so" "$out" "::notice title=Checklist closed::Closed #9 for RSQLite 1.0.0."
+
+hasnt "and warns about none, since there are checklist issues" "$out" "::warning"
+
+echo "== without a checklist issue, nothing is closed"
+out=$(PUBLISHED="RSQLite 2.0.0" close_run)
+is "no write" "$(cat "$SCRATCH/writes")" ""
+has "a notice says so" "$out" "::notice title=No checklist issue::"
+hasnt "and no warning, since no issue carries the marker" "$out" "::warning"
+issues <<<'[{"number": 12, "author_association": "NONE", "body": "<!-- release-checklist: RSQLite 1.0.0 -->"},
+            {"number": 8, "author_association": "OWNER", "body": "<!-- release-checklist: RSQLite 0.9.0 -->"}]'
+out=$(PUBLISHED="RSQLite 1.0.0" close_run)
+is "an outsider's issue with the marker is left open" "$(cat "$SCRATCH/writes")" ""
+has "with a warning that names it" "$out" "::warning title=Checklist issue ignored::Open issues carry <!-- release-checklist: RSQLite 1.0.0 --> but none was opened by an owner, member or collaborator of the repository, so none is the checklist issue: #12 (NONE)."
+
+echo
+echo "$pass passed, $fail failed"
+[ "$fail" -eq 0 ]

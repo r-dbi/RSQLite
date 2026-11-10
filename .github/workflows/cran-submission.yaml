@@ -1,0 +1,459 @@
+# Copied from duckdb/duckdb-r's .github/workflows/cran-submission.yaml at 86ac17f6b.
+# Derived from igraph/rigraph's .github/workflows/cran-submission.yaml at fe3538b925.
+#
+# Tags the commit and submits the package to CRAN.
+# It runs only when started by hand, on the ref it is started on:
+# from the Actions tab, or with
+# `gh workflow run cran-submission.yaml --repo r-dbi/RSQLite --ref <ref>`.
+# Nothing here checks the package or asks for a confirmation:
+# a release is green before it is submitted, and CRAN's confirmation e-mail is the manual step.
+#
+# The release process, adapted from duckdb/duckdb-r's handbook
+# (handbook/operations/releases/cran/README.md and process/README.md at 86ac17f6b).
+# Every run below is dispatched by hand on r-dbi/RSQLite itself, never on a fork,
+# where a run would tag and draft in the fork and upload to CRAN under the maintainer's address:
+# in a fork, the jobs of this workflow and of the other release workflows are skipped.
+#
+# 1. Review: before the cut, go through the open issues and pull requests,
+#    the CI history on `main` (scheduled runs and R-devel included),
+#    CRAN's check results with their additional issues,
+#    https://cran.r-project.org/web/checks/check_results_RSQLite.html,
+#    the r-universe build, https://r-dbi.r-universe.dev/RSQLite, the last reverse-dependency results,
+#    and the CRAN Repository Policy, https://cran.r-project.org/web/packages/policies.html.
+#    Record the findings in the release's checklist issue.
+#    CRAN asks for about a week between two releases of a package.
+# 2. Cut: create the release branch, for instance `release-X.Y.Z`, from the chosen commit of `main`.
+#    Remove fledge's marker line from the top of NEWS.md, and never run `fledge::bump_version()` afterwards.
+#    Set `Version: X.Y.Z` in DESCRIPTION by hand.
+#    Fold the development sections into one section headed exactly `# RSQLite X.Y.Z`, without a date,
+#    because the `tag` job looks for that heading; one bullet per change,
+#    grouped as the tidyverse style guide does (https://style.tidyverse.org/news.html), breaking changes first.
+#    Open the release pull request into `main`,
+#    and the checklist issue, whose body carries `<!-- release-checklist: RSQLite X.Y.Z -->`.
+#    A person with access to r-dbi/RSQLite, an owner, member or collaborator, must open the checklist issue:
+#    cran-release.yaml ignores an issue that anyone else opened, a workflow or a bot included, and warns about it.
+# 3. Check: dispatch R-CMD-check.yaml, rhub.yaml, release-gate.yaml, winbuilder.yaml and revdep.yaml
+#    on the release branch.
+#    The release workflows post their results to the release pull request;
+#    win-builder mails its verdict to the maintainer.
+#    Every error, warning and note is a blocker unless the checklist issue explains it.
+# 4. Dry run: dispatch this workflow with `dry-run` on the final commit.
+#    Its summary shows the tarball, the fields it would post and the draft release's notes;
+#    any later change to the branch, NEWS.md included, means another dry run.
+# 5. Submit: dispatch this workflow without `dry-run`,
+#    only once R-CMD-check, the release gate and the reverse-dependency run on that commit are finished and green;
+#    the maintainer follows the confirmation link CRAN mails.
+# 6. Merge back: merge the release pull request into `main` with a merge commit, never a squash,
+#    so that the tag `vX.Y.Z` is reachable from `main`.
+#    Then set `main` to `X.Y.Z.9000`, with NEWS.md starting with `# RSQLite (development version)`
+#    and the line `Changes since vX.Y.Z: <https://github.com/r-dbi/RSQLite/compare/vX.Y.Z...main>`:
+#    fledge is off once its marker is gone, and nothing else bumps the version.
+# 7. Publish: cran-release.yaml publishes the draft release once Posit's package manager serves the version,
+#    reports each night to the checklist issue, and closes it once the release is published.
+#
+# Acceptance is asynchronous and can take days.
+# A rejection is fixed on the release branch and resubmitted as a new patch version, never rolled back.
+#
+# The `check-version` job stops the run before anything else happens
+# when DESCRIPTION carries a development version, one with more than three components;
+# the input `allow-dev-version` lets such a version through, with a warning.
+#
+# The `tag` job runs .github/actions/cran-tag/cran-tag.sh.
+# It drafts a GitHub release titled `<package> <version>` for `v<version>`,
+# with the NEWS.md section of that version as its notes, or updates the draft that is there;
+# a published release of that tag, or more than one draft for it, stops the run instead.
+# The notes end with the marker `<!-- cran-submission: <package> <version> -->`,
+# by which cran-release.yaml publishes the draft once Posit's package manager serves the version.
+# The job then tags the commit as `v<version>`,
+# with the NEWS.md section as the message, like the tags fledge creates.
+# An existing tag of that name is never moved: the job prints it and its commit, and stops the run.
+# When the job cannot read the tags on GitHub, it cannot tell whether the tag exists, and stops the run too.
+# Every resubmission after a CRAN rejection is a new patch version instead.
+# Only a submission that CRAN never received, such as an upload that failed,
+# is retried on the same version, by dispatching with the input `retag`:
+# the job then prints the commit the tag pointed to and moves the tag to this commit.
+#
+# The `cran-submission` job runs .github/actions/cran-submit/cran-submit.sh twice.
+# `tarball` builds the package with `R CMD build`, recompresses it with zopfli (`pigz -11`)
+# and verifies the result; the run keeps that tarball as an artifact named `<package>_<version>`.
+# `upload` then posts it to CRAN's submission form as `devtools:::upload_cran()` does,
+# with the comment `<package> <version>`, and confirms the submission.
+# CRAN mails a confirmation link to the maintainer in DESCRIPTION,
+# and the submission only counts once that link has been followed.
+# Both steps print what they do and write a report with advice on failure to the run's summary page.
+#
+# The `attach-tarball` job then attaches the submitted tarball to the draft release as an asset,
+# so that the record of what went to CRAN does not expire with the run's artifact;
+# cran-release.yaml publishes no draft without it.
+# It checks first that the tarball's sha256 is the one the upload used,
+# and that the draft the `tag` job wrote is the only release that carries the tag.
+# It is a job of its own, after the upload, so that only it and the `tag` job hold `contents: write`.
+# When a run updates an existing draft, as one dispatched with `retag` does,
+# the `tag` job deletes the earlier attempt's tarball from it first,
+# so that a draft never carries a tarball of another commit than the one it targets.
+#
+# The `report` job posts the outcome to the open release pull request,
+# one comment that the dry run and the real run update in turn.
+#
+# The input `dry-run` (`-f dry-run=true` for `gh workflow run`) tags, drafts and sends nothing:
+# the `tag` job prints the release and the tag it would write, and whether it would update a draft,
+# move a tag (with `retag`) or stop at an existing one (a dry run carries on and reports it),
+# and the `cran-submission` job builds, verifies and keeps the tarball as a real run does,
+# then prints and reports every field the upload would post.
+# The version check runs on a dry run too.
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: "Dry run: build and keep the tarball, but create no tag or release and send nothing to CRAN"
+        type: boolean
+        default: false
+      allow-dev-version:
+        description: "Submit even when DESCRIPTION carries a development version, one with more than three components"
+        type: boolean
+        default: false
+      retag:
+        description: "Move an existing v<version> tag to this commit: only for a submission CRAN never received"
+        type: boolean
+        default: false
+
+name: CRAN submission
+
+# One run at a time, whatever the ref: two runs for the same version on different refs
+# could otherwise both find no tag and no draft, and draft the release twice.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  # A few seconds, so that a development version stops the run
+  # before anything is built, tagged or uploaded.
+  check-version:
+    # Only on r-dbi/RSQLite; in a fork, this job and every job that needs it are skipped.
+    if: github.repository == 'r-dbi/RSQLite'
+
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+
+    name: "Check the version"
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Announce the dry run
+        if: inputs.dry-run
+        run: |
+          echo "::notice title=Dry run::Nothing is tagged or submitted in this run."
+          {
+            echo "> [!NOTE]"
+            echo "> **Dry run: nothing was tagged or submitted.**"
+            echo "> To submit, dispatch the workflow again with \`dry-run\` off:"
+            echo "> \`gh workflow run cran-submission.yaml --repo $GITHUB_REPOSITORY --ref $GITHUB_REF_NAME\`"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+        shell: bash
+
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          sparse-checkout: DESCRIPTION
+          sparse-checkout-cone-mode: false
+
+      - name: Check that DESCRIPTION carries a release version
+        env:
+          ALLOW_DEV_VERSION: ${{ inputs.allow-dev-version }}
+        run: |
+          # The commit this job checked out, which is `github.sha`, as the other jobs check out.
+          commit="$(git rev-parse HEAD)"
+          echo "Commit [\`${commit:0:10}\`]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$commit) on \`$GITHUB_REF_NAME\`." >> "$GITHUB_STEP_SUMMARY"
+          echo >> "$GITHUB_STEP_SUMMARY"
+          echo "Commit: $commit ($GITHUB_REF_NAME)"
+
+          version="$(sed -n 's/^Version: *//p' DESCRIPTION)"
+          # R separates the components of a version with dots or dashes.
+          components="$(printf '%s\n' "$version" | awk -F '[.-]' '{ print NF }')"
+          echo "Version: $version ($components components)"
+          if [ -z "$version" ]; then
+            echo "::error title=No version::DESCRIPTION carries no Version: field."
+            exit 1
+          fi
+          if [ "$components" -le 3 ]; then
+            printf '### Version\n\n%s\n' "\`DESCRIPTION\` carries the release version \`$version\`." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          rerun="gh workflow run cran-submission.yaml --repo $GITHUB_REPOSITORY --ref $GITHUB_REF_NAME"
+          if [ "$ALLOW_DEV_VERSION" = true ]; then
+            echo "::warning title=Development version::DESCRIPTION carries the version '$version', which has more than three components; the input allow-dev-version lets it through."
+            {
+              echo "### Version: development version allowed"
+              echo
+              echo "\`DESCRIPTION\` carries \`$version\`, which has more than three components: a development version."
+              echo "CRAN takes release versions only, and this run goes on because it was dispatched with \`allow-dev-version\` on."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          echo "::error title=Development version::DESCRIPTION carries the version '$version', and CRAN takes release versions only: three components, such as 2.0.0. Nothing was built, tagged or uploaded."
+          {
+            echo "### Version: failed"
+            echo
+            echo "\`DESCRIPTION\` carries \`$version\`, which is no release version."
+            echo "CRAN takes release versions only, with three components such as \`2.0.0\`;"
+            echo "a fourth component, as in \`1.99.99.9001\`, marks a development version."
+            echo "Nothing was built, tagged or uploaded."
+            echo
+            echo "#### How to proceed"
+            echo
+            echo "- Set \`Version:\` in \`DESCRIPTION\` to a release version by hand, and dispatch this workflow on the commit that carries it."
+            echo "- If submitting this version is really intended, dispatch again with \`allow-dev-version\` on: \`$rerun -f allow-dev-version=true\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+        shell: bash
+
+  # A job of its own, so that the token that can push the tag and write the release
+  # is never available to the steps that build and upload the package.
+  tag:
+    needs: check-version
+
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+
+    name: "Tag the commit and draft the release"
+
+    permissions:
+      contents: write
+
+    outputs:
+      release-id: ${{ steps.tag.outputs.release-id }}
+      release-url: ${{ steps.tag.outputs.release-url }}
+      tag: ${{ steps.tag.outputs.tag }}
+      tagged: ${{ steps.tag.outputs.tagged }}
+
+    steps:
+      # The same commit as the submission: both jobs check out `github.sha`.
+      - uses: actions/checkout@v6
+
+      # At @main, like every cynkratemplate action in this repository's workflows,
+      # R-CMD-check.yaml's job that commits included; pinning them is one decision for all of them.
+      - name: Configure the Git identity
+        uses: cynkra/cynkratemplate/.github/actions/git-identity@main
+
+      - name: Draft the release and tag the commit, or show both on a dry run
+        id: tag
+        uses: ./.github/actions/cran-tag
+        with:
+          token: ${{ github.token }}
+          dry-run: ${{ inputs.dry-run }}
+          retag: ${{ inputs.retag }}
+
+  cran-submission:
+    needs: [check-version, tag]
+
+    runs-on: ubuntu-26.04
+    timeout-minutes: 60
+
+    name: "Submit to CRAN"
+
+    permissions:
+      contents: read
+
+    outputs:
+      artifact: ${{ steps.tarball.outputs.package }}_${{ steps.tarball.outputs.version }}
+      tarball: ${{ steps.tarball.outputs.tarball }}
+      sha256: ${{ steps.tarball.outputs.sha256 }}
+
+    steps:
+      - name: Announce the dry run
+        if: inputs.dry-run
+        run: |
+          echo "::notice title=Dry run::Nothing is tagged or submitted in this run."
+          {
+            echo "> [!NOTE]"
+            echo "> **Dry run: nothing was tagged or submitted.**"
+            echo "> To submit, dispatch the workflow again with \`dry-run\` off:"
+            echo "> \`gh workflow run cran-submission.yaml --repo $GITHUB_REPOSITORY --ref $GITHUB_REF_NAME\`"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+        shell: bash
+
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      # R CMD build builds the vignette, which needs the package and its dependencies.
+      - name: Run the repository-specific before-install steps
+        uses: ./.github/workflows/custom/before-install
+        if: hashFiles('.github/workflows/custom/before-install/action.yml') != ''
+
+      - name: Install R and the package dependencies
+        uses: cynkra/cynkratemplate/.github/actions/install@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          cache-version: cran-submission-1
+          needs: build
+
+      - name: Run the repository-specific after-install steps
+        uses: ./.github/workflows/custom/after-install
+        if: hashFiles('.github/workflows/custom/after-install/action.yml') != ''
+
+      # pigz -11 is zopfli, run block by block on every core.
+      - name: Install pigz
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y pigz
+        shell: bash
+
+      - name: Build, recompress with zopfli, and verify the source package
+        id: tarball
+        uses: ./.github/actions/cran-submit
+        with:
+          stage: tarball
+          out-dir: ${{ runner.temp }}/cran
+
+      # Before the upload, so that the run keeps what it submitted, or tried to.
+      - name: Keep the tarball to submit
+        id: artifact
+        if: always() && steps.tarball.outputs.tarball != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ steps.tarball.outputs.package }}_${{ steps.tarball.outputs.version }}
+          path: ${{ steps.tarball.outputs.tarball }}
+          if-no-files-found: error
+          # The tarball is compressed already.
+          compression-level: 0
+
+      - name: Name the artifact in the summary
+        if: always() && steps.artifact.outcome == 'success'
+        env:
+          NAME: ${{ steps.tarball.outputs.package }}_${{ steps.tarball.outputs.version }}
+          URL: ${{ steps.artifact.outputs.artifact-url }}
+        run: |
+          echo "- Kept as the artifact [$NAME]($URL) of this run" >> "$GITHUB_STEP_SUMMARY"
+        shell: bash
+
+      - name: Upload to CRAN and confirm the submission, or show what would be sent
+        uses: ./.github/actions/cran-submit
+        with:
+          stage: upload
+          tarball: ${{ steps.tarball.outputs.tarball }}
+          dry-run: ${{ inputs.dry-run }}
+
+      - name: Point to the draft release
+        if: success() && !inputs.dry-run
+        env:
+          URL: ${{ needs.tag.outputs.release-url }}
+        run: |
+          echo "**Once CRAN has accepted the package:** the nightly \`cran-release.yaml\` publishes the [draft release]($URL) when Posit's package manager serves the version." >> "$GITHUB_STEP_SUMMARY"
+        shell: bash
+
+  # After the upload, so that the release carries exactly what went to CRAN,
+  # and in a job of its own, so that the steps that build and upload never hold a token that can write.
+  attach-tarball:
+    needs: [tag, cran-submission]
+    if: ${{ !inputs.dry-run }}
+
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+
+    name: "Attach the tarball to the draft release"
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download the submitted tarball
+        uses: actions/download-artifact@v7
+        with:
+          name: ${{ needs.cran-submission.outputs.artifact }}
+          path: ${{ runner.temp }}/cran
+
+      - name: Attach it to the draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.tag.outputs.tag }}
+          RELEASE_ID: ${{ needs.tag.outputs.release-id }}
+          URL: ${{ needs.tag.outputs.release-url }}
+          SUBMITTED: ${{ needs.cran-submission.outputs.tarball }}
+          SHA256: ${{ needs.cran-submission.outputs.sha256 }}
+        run: |
+          tarball="$RUNNER_TEMP/cran/$(basename "$SUBMITTED")"
+          actual="$(sha256sum "$tarball" | cut -d' ' -f1)"
+          echo "Tarball: $tarball"
+          echo "  sha256:    $actual"
+          echo "  submitted: $SHA256"
+          if [ "$actual" != "$SHA256" ]; then
+            echo "::error title=Tarball mismatch::The artifact's sha256 $actual is not the submitted tarball's $SHA256; nothing was attached."
+            {
+              echo "### Release asset: failed"
+              echo
+              echo "The artifact's sha256 \`$actual\` is not the submitted tarball's \`$SHA256\`; nothing was attached."
+              echo "The submission itself went through: attach the tarball by hand once its sha256 is confirmed."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          # `gh release upload` finds the release by its tag name, so only when the draft the `tag` job wrote
+          # is the one release that carries it.
+          ids="$(gh api --paginate "repos/$GH_REPO/releases?per_page=100" --jq ".[] | select(.tag_name == \"$TAG\") | .id" | paste -s -d ' ' -)"
+          if [ -z "$RELEASE_ID" ] || [ "$ids" != "$RELEASE_ID" ]; then
+            echo "::error title=Release mismatch::The releases carrying $TAG have the ids '$ids', not only the draft $RELEASE_ID the tag job wrote; nothing was attached."
+            {
+              echo "### Release asset: failed"
+              echo
+              echo "The releases that carry \`$TAG\` have the ids \`$ids\`, not only the draft \`$RELEASE_ID\` that the \`tag\` job wrote; nothing was attached."
+              echo "The submission itself went through: delete the drafts that are not this submission's, then attach the tarball by hand once its sha256 is confirmed."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          # --clobber: the `tag` job deleted an earlier attempt's tarball; this replaces one attached by hand since.
+          gh release upload "$TAG" "$tarball" --clobber
+          echo "::notice title=Release asset::Attached $(basename "$tarball") (sha256 $actual) to the draft release $URL."
+          {
+            echo "### Release asset"
+            echo
+            echo "Attached \`$(basename "$tarball")\`, sha256 \`$actual\`, to the [draft release]($URL)."
+          } >> "$GITHUB_STEP_SUMMARY"
+        shell: bash
+
+  # Posts the result to the open release pull request, one comment per workflow, updated in place.
+  report:
+    needs: [check-version, tag, cran-submission, attach-tarball]
+    if: always() && github.repository == 'r-dbi/RSQLite'
+
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+
+    name: "Report to the release pull request"
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/actions
+
+      - name: Post or update the comment
+        uses: ./.github/actions/release-report
+        with:
+          key: cran-submission
+          title: "CRAN submission"
+          results: |
+            check-version=${{ needs.check-version.result }}
+            tag=${{ needs.tag.result }}
+            cran-submission=${{ needs.cran-submission.result }}
+            attach-tarball=${{ needs.attach-tarball.result }}
+          details: |
+            ${{ inputs.dry-run && '**Dry run:** nothing was tagged, drafted or sent to CRAN.' || '**Real run:** if the upload succeeded, CRAN has e-mailed the maintainer; the submission counts once the link in that e-mail is followed.' }}
+
+            - Tarball: ${{ needs.cran-submission.outputs.sha256 && format('`{0}.tar.gz`, sha256 `{1}`', needs.cran-submission.outputs.artifact, needs.cran-submission.outputs.sha256) || 'none built' }}
+            - Tag: ${{ needs.tag.outputs.tagged && format('`{0}` at `{1}`', needs.tag.outputs.tag, needs.tag.outputs.tagged) || 'none written' }}
+            - Draft release: ${{ needs.tag.outputs.release-url || 'none written' }}
+          token: ${{ github.token }}

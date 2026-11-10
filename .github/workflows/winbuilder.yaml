@@ -1,0 +1,181 @@
+# Copied from duckdb/duckdb-r's .github/workflows/winbuilder.yaml at 86ac17f6b.
+# Derived from igraph/rigraph's .github/workflows/winbuilder.yaml at fe3538b925.
+#
+# Uploads the source package to win-builder (https://win-builder.r-project.org),
+# which checks it on Windows and mails the result to the maintainer in DESCRIPTION
+# 15 to 30 minutes later.
+# This is devtools::check_win_devel(), with the tarball built in CI instead of locally.
+#
+# Every upload is started by hand, because each one sends an email:
+# `gh workflow run winbuilder.yaml --repo r-dbi/RSQLite --ref <branch> [-f queues="R-devel R-release"]`.
+# Only on r-dbi/RSQLite: in a fork, every job is skipped, so that nothing is uploaded under the maintainer's address.
+# The `report` job posts what was uploaded to the open release pull request;
+# win-builder's verdict arrives only by e-mail.
+on:
+  workflow_dispatch:
+    inputs:
+      queues:
+        description: "Space-separated win-builder queues: R-devel, R-release, R-oldrelease"
+        type: string
+        default: "R-devel"
+
+name: win-builder
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  winbuilder:
+    if: github.repository == 'r-dbi/RSQLite'
+
+    runs-on: ubuntu-26.04
+    timeout-minutes: 60
+
+    name: "Upload to win-builder"
+
+    outputs:
+      tarball: ${{ steps.build.outputs.tarball }}
+      uploaded: ${{ steps.upload.outputs.uploaded }}
+      finished: ${{ steps.upload.outputs.finished }}
+
+    env:
+      QUEUES: ${{ inputs.queues || 'R-devel' }}
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Check the queue names
+        run: |
+          for queue in $QUEUES; do
+            case "$queue" in
+              R-devel|R-release|R-oldrelease) ;;
+              *) echo "::error::Unknown win-builder queue: $queue"; exit 1 ;;
+            esac
+          done
+        shell: bash
+
+      - name: Run the repository-specific before-install steps
+        uses: ./.github/workflows/custom/before-install
+        if: hashFiles('.github/workflows/custom/before-install/action.yml') != ''
+
+      - name: Install R and the package dependencies
+        uses: cynkra/cynkratemplate/.github/actions/install@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          cache-version: winbuilder-1
+          needs: build
+
+      - name: Run the repository-specific after-install steps
+        uses: ./.github/workflows/custom/after-install
+        if: hashFiles('.github/workflows/custom/after-install/action.yml') != ''
+
+      - name: Build the source package
+        id: build
+        run: |
+          R CMD build .
+          tarball="$(ls -1 -- *.tar.gz)"
+          echo "tarball=$tarball" | tee -a "$GITHUB_OUTPUT"
+        shell: bash
+
+      # `uploaded` names the queues that took the tarball, written again after each one,
+      # so that it holds them also when a later queue fails or the job is cancelled or times out meanwhile
+      # (the last value written wins); `finished` says that the loop ran to its end.
+      - name: Upload the source package to win-builder
+        id: upload
+        env:
+          TARBALL: ${{ steps.build.outputs.tarball }}
+        run: |
+          uploaded=""
+          failed=""
+          for queue in $QUEUES; do
+            if ! curl --fail --silent --show-error --retry 3 -T "$TARBALL" "ftp://win-builder.r-project.org/$queue/"; then
+              echo "::error::Uploading $TARBALL to $queue failed; the queues after it were not tried."
+              failed="$queue"
+              break
+            fi
+            echo "Uploaded $TARBALL to $queue."
+            uploaded="${uploaded:+$uploaded }$queue"
+            echo "uploaded=$uploaded" >> "$GITHUB_OUTPUT"
+          done
+          echo "finished=true" >> "$GITHUB_OUTPUT"
+          {
+            echo "### win-builder"
+            echo
+            if [ -n "$uploaded" ]; then
+              echo "Uploaded \`$TARBALL\` to: $uploaded."
+              echo "The results are mailed to the maintainer in \`DESCRIPTION\`."
+            fi
+            if [ -n "$failed" ]; then
+              echo "Uploading to $failed failed, and the queues after it were not tried."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          [ -z "$failed" ]
+        shell: bash
+
+      - name: Keep the uploaded source package
+        uses: actions/upload-artifact@v6
+        with:
+          name: winbuilder-source-package
+          path: ${{ steps.build.outputs.tarball }}
+
+  # Posts the result to the open release pull request, one comment per workflow, updated in place.
+  report:
+    needs: [winbuilder]
+    if: always() && github.repository == 'r-dbi/RSQLite'
+
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+
+    name: "Report to the release pull request"
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/actions
+
+      # Only a finished upload step knows what it uploaded.
+      # A job cancelled or timed out after the build may have stopped in the middle of an upload,
+      # so what win-builder got is then unknown.
+      - name: Say what was uploaded
+        id: details
+        env:
+          RESULT: ${{ needs.winbuilder.result }}
+          TARBALL: ${{ needs.winbuilder.outputs.tarball }}
+          UPLOADED: ${{ needs.winbuilder.outputs.uploaded }}
+          FINISHED: ${{ needs.winbuilder.outputs.finished }}
+        run: |
+          mails="win-builder mails its results to the maintainer in \`DESCRIPTION\`, 15 to 30 minutes after the upload."
+          if [ -n "$FINISHED" ] && [ -n "$UPLOADED" ]; then
+            text="Uploaded \`$TARBALL\` to: $UPLOADED. $mails"
+          elif [ -n "$FINISHED" ]; then
+            text="Nothing was uploaded to win-builder."
+          elif [ "$RESULT" = cancelled ] || [ -n "$TARBALL" ]; then
+            what="the source package"
+            [ -z "$TARBALL" ] || what="\`$TARBALL\`"
+            text="The job stopped before its upload step finished, as when it is cancelled or times out, so which queues got $what is unknown${UPLOADED:+; it had uploaded it to: $UPLOADED}. Look for win-builder's e-mails to the maintainer in \`DESCRIPTION\`, which follow each upload by 15 to 30 minutes."
+          else
+            text="Nothing was uploaded to win-builder."
+          fi
+          echo "text=$text" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+      - name: Post or update the comment
+        uses: ./.github/actions/release-report
+        with:
+          key: winbuilder
+          title: "win-builder upload"
+          results: |
+            upload=${{ needs.winbuilder.result }}
+          details: ${{ steps.details.outputs.text }}
+          token: ${{ github.token }}

@@ -1,0 +1,322 @@
+#!/bin/bash
+# Check .github/actions/cran-tag/cran-tag.sh offline, against a local bare repository as origin and a `gh` stub: nothing reaches GitHub.
+# Process: the header of .github/workflows/cran-submission.yaml
+#
+#   1. Without a tag or a release, a run creates the draft, with the NEWS.md section as notes and the marker,
+#      and pushes an annotated tag at the commit, with the section as its message.
+#   2. An existing draft is updated, not duplicated.
+#   3. An existing tag stops a real run before anything is written, and stays where it was;
+#      a dry run reports it and carries on; --retag moves it, and a dry run with --retag only says so.
+#   4. A published release of the tag stops the run before anything is written.
+#   5. A dry run writes nothing, and reports the release and the tag a real run would write.
+#   6. A version without a NEWS.md section stops the run before anything is written.
+#
+# The `gh` stub answers `gh api <path> --jq <program>` by running the program with jq
+# over a JSON file named after the path, and records every call;
+# `gh release create` and `gh release edit` only record, and keep the notes.
+#
+# Usage:
+#   .github/actions/cran-tag/cran-tag-test.sh
+#
+# Environment variables:
+#   KEEP - if non-empty, do not delete the scratch directory
+
+set -euo pipefail
+
+HERE=$(cd "$(dirname "$0")" && pwd)
+SCRATCH=$(mktemp -d)
+trap '[ -n "${KEEP:-}" ] || rm -rf "$SCRATCH"' EXIT
+[ -z "${KEEP:-}" ] || echo "scratch: $SCRATCH"
+
+pass=0
+fail=0
+ok() { pass=$((pass + 1)); echo "  ok   $1"; }
+no() { fail=$((fail + 1)); echo "  FAIL $1"; }
+is() { if [ "$2" = "$3" ]; then ok "$1"; else no "$1"; echo "         actual: $2"; echo "       expected: $3"; fi; }
+has() { case "$2" in *"$3"*) ok "$1" ;; *) no "$1"; echo "       missing: $3"; echo "        in: $2" ;; esac; }
+hasnt() { case "$2" in *"$3"*) no "$1"; echo "       present: $3" ;; *) ok "$1" ;; esac; }
+
+command -v jq >/dev/null || {
+  echo "jq is needed to answer for the gh stub" >&2
+  exit 1
+}
+
+# --- the repositories ----------------------------------------------------------
+#
+# A package with a NEWS.md section for its version, committed and pushed to a bare repository, its origin.
+# Git reads no configuration but this one: no signing, and a fixed identity.
+
+cat >"$SCRATCH/gitconfig" <<'EOF'
+[user]
+	name = Release Test
+	email = release-test@example.com
+[init]
+	defaultBranch = main
+EOF
+export GIT_CONFIG_GLOBAL=$SCRATCH/gitconfig GIT_CONFIG_NOSYSTEM=1
+
+REMOTE=$SCRATCH/remote.git
+PKG=$SCRATCH/pkg
+git init --quiet --bare "$REMOTE"
+git init --quiet "$PKG"
+cat >"$PKG/DESCRIPTION" <<'EOF'
+Package: RSQLite
+Version: 2.0.0
+EOF
+# The NEWS.md of the release, with one more line at the end of its section.
+news() { # <line>
+  cat <<EOF
+# RSQLite 2.0.0
+
+## Breaking changes
+
+- Upgrade bundled SQLite.
+
+## Features
+
+- Something new.
+$1
+
+
+# RSQLite 1.9.0
+
+- Old.
+EOF
+}
+news "" >"$PKG/NEWS.md"
+git -C "$PKG" add -A
+git -C "$PKG" commit --quiet -m "Release 2.0.0"
+git -C "$PKG" remote add origin "$REMOTE"
+git -C "$PKG" push --quiet origin main
+FIRST=$(git -C "$PKG" rev-parse HEAD)
+news "- Fix the release notes." >"$PKG/NEWS.md"
+git -C "$PKG" commit --quiet -am "Fix the release notes"
+git -C "$PKG" push --quiet origin main
+HEAD=$(git -C "$PKG" rev-parse HEAD)
+
+# The commit v2.0.0 points to on origin, empty without that tag.
+remote_tag() { git -C "$REMOTE" rev-parse --verify --quiet "refs/tags/v2.0.0^{commit}" || true; }
+remote_tag_message() { git -C "$REMOTE" tag -l --format='%(contents)' v2.0.0; }
+# Puts v2.0.0 on origin at <commit>, as an earlier submission did; the checkout has no tags, as in CI.
+tag_on_origin() { # <commit>
+  git -C "$PKG" tag -a -f v2.0.0 -m "RSQLite 2.0.0, earlier" "$1"
+  git -C "$PKG" push --quiet --force origin refs/tags/v2.0.0
+  git -C "$PKG" tag -d v2.0.0 >/dev/null
+}
+no_tag() {
+  git -C "$REMOTE" tag -d v2.0.0 >/dev/null 2>&1 || true
+  git -C "$PKG" tag -d v2.0.0 >/dev/null 2>&1 || true
+}
+
+# --- the gh stub -------------------------------------------------------------
+
+API=$SCRATCH/api
+mkdir -p "$API" "$SCRATCH/bin"
+cat >"$SCRATCH/bin/gh" <<'EOF'
+#!/bin/bash
+echo "gh $*" >>"$SCRATCH/gh.log"
+if [ "$1" = release ]; then
+  echo "$1 $2 $3" >>"$SCRATCH/writes"
+  while [ $# -gt 0 ]; do
+    if [ "$1" = --notes-file ]; then cp "$2" "$SCRATCH/notes"; fi
+    shift
+  done
+  echo "https://github.example/r-dbi/RSQLite/releases/tag/untagged-new"
+  exit 0
+fi
+[ "$1" = api ] || { echo "unexpected: gh $*" >&2; exit 1; }
+shift
+path='' jq=''
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --jq) jq=$2; shift 2 ;;
+    --paginate) shift ;;
+    -*) echo "unexpected: gh api ... $1" >&2; exit 1 ;;
+    *) path=$1; shift ;;
+  esac
+done
+file=$API/$(printf '%s' "$path" | tr '/?=&' '____').json
+if [ ! -f "$file" ]; then
+  echo "gh: Not Found (HTTP 404)" >&2
+  exit 1
+fi
+if [ -n "$jq" ]; then jq -r "$jq" "$file"; else cat "$file"; fi
+EOF
+chmod +x "$SCRATCH/bin/gh"
+export SCRATCH API
+
+releases() { # JSON for repos/r-dbi/RSQLite/releases?per_page=100
+  cat >"$API/repos_r-dbi_RSQLite_releases_per_page_100.json"
+}
+DRAFT=https://github.example/r-dbi/RSQLite/releases/tag/untagged-draft
+NEW=https://github.example/r-dbi/RSQLite/releases/tag/untagged-new
+with_draft() {
+  releases <<EOF
+[
+  {"id": 7, "draft": true, "tag_name": "v2.0.0", "html_url": "$DRAFT", "body": "old notes"},
+  {"id": 5, "draft": false, "tag_name": "v1.9.0", "html_url": "https://github.example/v1.9.0", "body": ""}
+]
+EOF
+}
+without_draft() {
+  releases <<'EOF'
+[{"id": 5, "draft": false, "tag_name": "v1.9.0", "html_url": "https://github.example/v1.9.0", "body": ""}]
+EOF
+}
+
+NOTES="## Breaking changes
+
+- Upgrade bundled SQLite.
+
+## Features
+
+- Something new.
+- Fix the release notes.
+
+<!-- cran-submission: RSQLite 2.0.0 -->"
+MESSAGE="RSQLite 2.0.0
+
+## Breaking changes
+
+- Upgrade bundled SQLite.
+
+## Features
+
+- Something new.
+- Fix the release notes."
+
+SUMMARY=$SCRATCH/summary.md
+# Runs the script as the workflow does, on the package's checkout; prints its output and its exit status.
+run() {
+  local rc=0 out
+  : >"$SUMMARY"
+  : >"$SCRATCH/gh.log"
+  : >"$SCRATCH/writes"
+  : >"$SCRATCH/output"
+  rm -f "$SCRATCH/notes"
+  out=$(GITHUB_ACTIONS=true GITHUB_STEP_SUMMARY=$SUMMARY GITHUB_OUTPUT=$SCRATCH/output GH=$SCRATCH/bin/gh GH_REPO=r-dbi/RSQLite \
+    GITHUB_REPOSITORY=r-dbi/RSQLite GITHUB_SERVER_URL=https://github.example GITHUB_REF_NAME=release-2.0.0 \
+    "$HERE/cran-tag.sh" "$@" "$PKG" 2>&1) || rc=$?
+  printf '%s\nexit %s\n' "$out" "$rc"
+}
+
+# --- 1: a first run ------------------------------------------------------------
+
+echo
+echo "== a first run drafts the release and pushes the tag"
+no_tag
+without_draft
+out=$(run)
+has "it succeeds" "$out" "exit 0"
+is "it creates one draft" "$(cat "$SCRATCH/writes")" "release create v2.0.0"
+has "targeting the commit, titled after the version" "$(cat "$SCRATCH/gh.log")" "--draft --target $HEAD --title RSQLite 2.0.0"
+is "with the section as notes, and the marker" "$(cat "$SCRATCH/notes")" "$NOTES"
+is "the tag is on origin, at the commit" "$(remote_tag)" "$HEAD"
+is "annotated with the section" "$(remote_tag_message)" "$MESSAGE"
+is "the outputs name the tag and the draft" "$(cat "$SCRATCH/output")" "tag=v2.0.0
+release-url=$NEW"
+summary=$(cat "$SUMMARY")
+has "the report links the draft" "$summary" "Created the draft release [RSQLite 2.0.0]($NEW), for the tag \`v2.0.0\` at \`$HEAD\`."
+has "and names the tag" "$summary" "Tagged \`$HEAD\` as \`v2.0.0\`."
+
+# --- 2: an existing draft --------------------------------------------------------
+
+echo
+echo "== an existing draft is updated"
+no_tag
+with_draft
+out=$(run)
+has "it succeeds" "$out" "exit 0"
+is "it edits the draft and creates none" "$(cat "$SCRATCH/writes")" "release edit v2.0.0"
+has "retargeting it at the commit" "$(cat "$SCRATCH/gh.log")" "--draft --target $HEAD --title RSQLite 2.0.0"
+is "with the notes of this commit" "$(cat "$SCRATCH/notes")" "$NOTES"
+is "the tag is on origin, at the commit" "$(remote_tag)" "$HEAD"
+has "the output links the draft" "$(cat "$SCRATCH/output")" "release-url=$DRAFT"
+
+# --- 3: an existing tag ----------------------------------------------------------
+
+echo
+echo "== an existing tag stops a real run"
+no_tag
+tag_on_origin "$FIRST"
+with_draft
+out=$(run)
+has "it fails" "$out" "exit 1"
+has "naming the tag and its commit" "$out" "::error title=Tag v2.0.0 exists::The tag v2.0.0 exists and points to $FIRST"
+is "nothing is written to GitHub" "$(cat "$SCRATCH/writes")" ""
+is "the tag stays where it was" "$(remote_tag)" "$FIRST"
+summary=$(cat "$SUMMARY")
+has "the report says how to proceed" "$summary" "#### How to resolve"
+has "with retag only for a submission CRAN never received" "$summary" "gh workflow run cran-submission.yaml --repo r-dbi/RSQLite --ref release-2.0.0 -f retag=true"
+
+echo
+echo "== a dry run reports an existing tag and carries on"
+out=$(run --dry-run)
+has "it succeeds" "$out" "exit 0"
+has "with the error annotated" "$out" "::error title=Tag v2.0.0 exists::"
+is "nothing is written to GitHub" "$(cat "$SCRATCH/writes")" ""
+is "the tag stays where it was" "$(remote_tag)" "$FIRST"
+has "the report says a real run stops" "$(cat "$SUMMARY")" "Dry run: a real run stops before drafting or tagging, because \`v2.0.0\` exists at \`$FIRST\`."
+
+echo
+echo "== a dry run with retag says it would move the tag"
+out=$(run --dry-run --retag)
+has "it succeeds" "$out" "exit 0"
+has "saying so" "$out" "::notice title=Dry run::A real run would move the existing tag v2.0.0 from $FIRST to $HEAD"
+is "nothing is written to GitHub" "$(cat "$SCRATCH/writes")" ""
+is "the tag stays where it was" "$(remote_tag)" "$FIRST"
+
+echo
+echo "== retag moves the tag"
+out=$(run --retag)
+has "it succeeds" "$out" "exit 0"
+has "with a warning" "$out" "::warning title=Moving the tag v2.0.0::Moving the existing tag v2.0.0 from $FIRST to $HEAD"
+is "it updates the draft" "$(cat "$SCRATCH/writes")" "release edit v2.0.0"
+is "the tag moves to the commit" "$(remote_tag)" "$HEAD"
+is "with the section as its message" "$(remote_tag_message)" "$MESSAGE"
+
+# --- 4: a published release --------------------------------------------------------
+
+echo
+echo "== a published release stops the run"
+no_tag
+releases <<'EOF'
+[{"id": 8, "draft": false, "tag_name": "v2.0.0", "html_url": "https://github.example/v2.0.0", "body": ""}]
+EOF
+out=$(run)
+has "it fails" "$out" "exit 1"
+has "naming the release" "$out" "::error title=Release v2.0.0 is already published::The release v2.0.0 is published at https://github.example/v2.0.0"
+is "nothing is written to GitHub" "$(cat "$SCRATCH/writes")" ""
+is "and nothing is tagged" "$(remote_tag)" ""
+
+# --- 5: a dry run --------------------------------------------------------------------
+
+echo
+echo "== a dry run writes nothing"
+no_tag
+without_draft
+out=$(run --dry-run)
+has "it succeeds" "$out" "exit 0"
+is "nothing is written to GitHub" "$(cat "$SCRATCH/writes")" ""
+is "and nothing is tagged" "$(remote_tag)" ""
+is "the output names the tag only" "$(cat "$SCRATCH/output")" "tag=v2.0.0"
+summary=$(cat "$SUMMARY")
+has "the report says what a real run does" "$summary" "Dry run: a real run would create a draft release:"
+has "with the notes" "$summary" "$NOTES"
+has "and the tag's message" "$summary" "Dry run: a real run tags \`$HEAD\` as \`v2.0.0\`, with this message:"
+
+# --- 6: no NEWS.md section -------------------------------------------------------------
+
+echo
+echo "== a version without a NEWS.md section stops the run"
+sed -i.bak 's/^Version: 2.0.0$/Version: 2.0.1/' "$PKG/DESCRIPTION"
+out=$(run)
+mv "$PKG/DESCRIPTION.bak" "$PKG/DESCRIPTION"
+has "it fails" "$out" "exit 1"
+has "naming the heading it looked for" "$out" "NEWS.md has no section headed \`# RSQLite 2.0.1\`"
+is "without asking GitHub" "$(cat "$SCRATCH/gh.log")" ""
+is "and nothing is tagged" "$(git -C "$REMOTE" tag -l)" ""
+
+echo
+echo "$pass passed, $fail failed"
+[ "$fail" -eq 0 ]

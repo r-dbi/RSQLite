@@ -2,6 +2,7 @@
 #include "SqliteArrowColumn.h"
 #include "affinity.h"
 #include <boost/algorithm/string/predicate.hpp>
+#include <algorithm>
 #include <cmath>
 #include <sstream>
 
@@ -374,10 +375,19 @@ void SqliteArrowColumn::append_value(int column_type) {
       double seconds =
         (kind == AK_TIME) ? source.fetch_time() : source.fetch_datetime_local();
       double micros = std::floor(seconds * 1e6 + 0.5);
-      // int64 holds [-2^63, 2^63), both bounds exact as doubles: casting
-      // anything outside, an infinity included, would be undefined
-      bool in_range =
-        micros >= -9223372036854775808.0 && micros < 9223372036854775808.0;
+      bool in_range;
+      if (kind == AK_TIME) {
+        // A time of day, [0, 86400) seconds: an hms value can hold any
+        // duration, Arrow's time64 can't.
+        // Rounding must not reach the end of the day.
+        in_range = seconds >= 0 && seconds < 86400;
+        micros = std::min(micros, 86400e6 - 1);
+      } else {
+        // int64 holds [-2^63, 2^63), both bounds exact as doubles: casting
+        // anything outside, an infinity included, would be undefined
+        in_range =
+          micros >= -9223372036854775808.0 && micros < 9223372036854775808.0;
+      }
       if (!ISNAN(seconds) && !in_range) {
         warn_out_of_range(column_type);
       }

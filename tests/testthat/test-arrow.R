@@ -159,6 +159,25 @@ test_that("times and timestamps outside the range of int64 microseconds are NULL
   expect_match(messages, "`ts`: values of type integer outside the range of Arrow type timestamp", all = FALSE)
 })
 
+test_that("times outside a day are NULL", {
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, tm TIME)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 0), (2, 43200.5), (3, 86399.9999996), (4, '12:34:56'),",
+    "(5, 86400), (6, 100000), (7, -1), (8, '24:00:00'), (9, '30:00:00')"
+  ))
+  sql <- "SELECT tm FROM t ORDER BY i"
+
+  expect_warning(
+    df <- as.data.frame(dbGetQueryArrow(con, sql)),
+    "`tm`: values of type integer outside the range of Arrow type time64 are NULL"
+  )
+  # The last microsecond of the day is as far as rounding goes
+  expect_equal(as.numeric(df$tm), c(0, 43200.5, 86399.999999, 45296, NA, NA, NA, NA, NA))
+  # The default path keeps any duration
+  expect_equal(as.numeric(dbGetQuery(con, sql)$tm)[5:9], c(86400, 100000, -1, 86400, 108000))
+})
+
 test_that("dbFetchArrow() streams lazily in chunks", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:10))

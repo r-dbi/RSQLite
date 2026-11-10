@@ -43,6 +43,8 @@
 #' when `extended_types = TRUE`, see [SQLite()].
 #' Times and timestamps are 64-bit counts of microseconds:
 #' a number of seconds beyond about 9.2e12 either way, or an infinity, becomes `NULL` with a warning.
+#' A time is a time of day, at least 0 and less than 24 hours:
+#' other values, which the data frame path keeps as `hms` durations, become `NULL` with a warning.
 #'
 #' @section Parameters:
 #' The columns of the parameter stream are bound like this:

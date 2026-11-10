@@ -39,7 +39,8 @@ private:
   // State
   bool complete_;
   bool ready_;
-  int nrows_;
+  // 64 bits: an Arrow stream reads past INT_MAX rows
+  int64_t nrows_;
   // Counts the executions with new parameters, see executions()
   int64_t executions_;
   int total_changes_start_;
@@ -72,7 +73,9 @@ public:
   bool complete() const;
   bool ready() const;
   int64_t executions() const;
-  int n_rows_fetched();
+  int64_t n_rows_fetched();
+  // For the tests
+  void set_rows_fetched(int64_t n);
   int n_rows_affected();
   void bind(const cpp11::list& params);
   cpp11::list fetch(const int n_max);

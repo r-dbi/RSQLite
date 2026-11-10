@@ -101,7 +101,7 @@ int64_t DbResult::executions() const {
   return impl->executions();
 }
 
-int DbResult::n_rows_fetched() {
+int64_t DbResult::n_rows_fetched() {
   return impl->n_rows_fetched();
 }
 

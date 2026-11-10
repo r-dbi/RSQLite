@@ -403,6 +403,25 @@ test_that("rows kept for the Arrow schema count once they are handed out", {
   expect_null(stream$get_next())
 })
 
+test_that("the row count goes on beyond the integers of R", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:6))
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t ORDER BY a")
+  withr::defer(dbClearResult(rs))
+
+  expect_equal(dbFetchArrowChunk(rs, chunk_size = 1)$length, 1)
+  expect_identical(dbGetRowCount(rs), 1L)
+  # As if a stream had read 2^31 - 2 rows
+  result_set_rows_fetched(rs@result@ptr, 2^31 - 2)
+  expect_equal(dbFetchArrowChunk(rs, chunk_size = 1)$length, 1)
+  expect_identical(dbGetRowCount(rs), .Machine$integer.max)
+  # Beyond, the count is a double, also on the data frame path
+  expect_equal(dbFetchArrowChunk(rs, chunk_size = 2)$length, 2)
+  expect_identical(dbGetRowCount(rs), 2^31 + 1)
+  expect_equal(nrow(dbFetch(rs)), 2L)
+  expect_identical(dbGetRowCount(rs), 2^31 + 3)
+})
+
 test_that("dbFetch() and dbFetchArrow() can be mixed on one result", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:5))

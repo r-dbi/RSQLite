@@ -116,6 +116,26 @@ test_that("dbAppendTable() writes through Arrow", {
   expect_error(dbAppendTable(con, "t", data.frame(a = 1L), row.names = TRUE), "row.names")
 })
 
+test_that("dbAppendTable() through Arrow writes difftime in its own units", {
+  df <- data.frame(id = 1:4)
+  df$d <- as.difftime(c(2, NA, 0.5, -1), units = "mins")
+  df$w <- as.difftime(c(1, 2, NA, 3), units = "weeks")
+  df$h <- hms::hms(c(61.5, NA, 90000, -5))
+
+  con_default <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con_default))
+  con <- local_arrow_con()
+  for (conn in list(con_default, con)) {
+    dbExecute(conn, "CREATE TABLE t (id INTEGER, d REAL, w REAL, h REAL)")
+    dbAppendTable(conn, "t", df)
+  }
+
+  out <- dbReadTable(con, "t")
+  expect_identical(out, dbReadTable(con_default, "t"))
+  expect_identical(out$d, c(2, NA, 0.5, -1))
+  expect_identical(out$w, c(1, 2, NA, 3))
+})
+
 test_that("dbWriteTable() and row names work through Arrow", {
   con <- local_arrow_con()
   dbWriteTable(con, "mtcars", mtcars, row.names = TRUE)

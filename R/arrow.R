@@ -80,7 +80,8 @@
 #' here the column becomes a `double`.
 #' Once [DBI::dbFetchArrow()] or [DBI::dbFetchArrowChunk()] has fixed the types of a result,
 #' later fetches keep them.
-#' Before writing, factors become strings and lists of raw vectors become blobs.
+#' Before writing, factors become strings, lists of raw vectors become blobs,
+#' and `difftime` columns become their numbers in their own units, as on the default path.
 #'
 #' Each fetch reads its rows into Arrow arrays first,
 #' so that the data frame is allocated once with the row count known,

@@ -89,7 +89,8 @@ The default path truncates a real number that follows an integer too large for a
 here the column becomes a \code{double}.
 Once \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} or \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} has fixed the types of a result,
 later fetches keep them.
-Before writing, factors become strings and lists of raw vectors become blobs.
+Before writing, factors become strings, lists of raw vectors become blobs,
+and \code{difftime} columns become their numbers in their own units, as on the default path.
 
 Each fetch reads its rows into Arrow arrays first,
 so that the data frame is allocated once with the row count known,

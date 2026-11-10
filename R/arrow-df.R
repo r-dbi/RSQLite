@@ -115,7 +115,8 @@ arrow_append_df <- function(conn, name, value) {
 }
 
 # What the default path does in sqlData() and dbBind() before writing:
-# factors become strings, lists of raw vectors become blobs
+# factors become strings, lists of raw vectors become blobs,
+# and a difftime is written as its number in its own units
 arrow_prepare_df <- function(value) {
   value <- factor_to_string(value, warn = TRUE)
 
@@ -130,6 +131,10 @@ arrow_prepare_df <- function(value) {
 
   is_posixlt <- vlapply(value, inherits, "POSIXlt")
   value[is_posixlt] <- lapply(value[is_posixlt], as.POSIXct)
+
+  # nanoarrow would write a duration in seconds
+  is_difftime <- vlapply(value, inherits, "difftime")
+  value[is_difftime] <- lapply(value[is_difftime], as.numeric)
 
   value
 }

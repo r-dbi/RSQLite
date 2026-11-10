@@ -6,6 +6,11 @@
 #'   The default `NULL` decides the types from the values.
 #' @usage NULL
 dbSendQueryArrow_SQLiteConnection <- function(conn, statement, params = NULL, ..., schema = NULL) {
+  # Evaluated and checked before the query is sent, so that an error leaves no
+  # result open; the names and types need the result's columns
+  if (!is.null(schema)) {
+    schema <- arrow_check_schema(schema)
+  }
   res <- dbSendQuery(conn, statement, params = params, ...)
   if (!is.null(schema)) {
     tryCatch(

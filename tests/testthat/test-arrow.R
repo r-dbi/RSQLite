@@ -102,6 +102,91 @@ test_that("extended types map to Arrow date, time and timestamp types", {
   expect_equal(df$dt, as.POSIXct(c(1577968496.75, NA), origin = "1970-01-01", tz = "UTC"))
 })
 
+test_that("times and timestamps outside the range of int64 microseconds are NULL", {
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, tm TIME, ts TIMESTAMP)")
+  # 9e999 is an infinity in SQLite
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 1.5, 1.5), (2, 9223372036855, -9223372036855),",
+    "(3, 1e19, -1e19), (4, 1e300, -1e300), (5, 9e999, -9e999)"
+  ))
+
+  w <- coercion_warnings(df <- as.data.frame(dbGetQueryArrow(con, "SELECT tm, ts FROM t ORDER BY i")))
+  expect_equal(as.numeric(df$tm), c(1.5, NA, NA, NA, NA))
+  expect_equal(as.numeric(df$ts), c(1.5, NA, NA, NA, NA))
+  # One warning for the chunk, with the rows of each column
+  expect_length(w, 1)
+  coercions <- w[[1]]$coercions
+  expect_equal(vapply(coercions, `[[`, "", "column"), c("tm", "ts"))
+  expect_equal(vapply(coercions, `[[`, "", "type"), c("time64", "timestamp"))
+  for (coercion in coercions) {
+    expect_equal(vapply(coercion$values, `[[`, "", "class"), c("integer", "real"))
+    expect_equal(vapply(coercion$values, `[[`, "", "reason"), c("out_of_range", "out_of_range"))
+    expect_equal(coercion$values[[1]]$rows, 2)
+    expect_equal(coercion$values[[2]]$rows, 3:5)
+  }
+  expect_match(conditionMessage(w[[1]]), "1 integer value out of range, NA (row 2)", fixed = TRUE)
+})
+
+test_that("times outside a day are NULL", {
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, tm TIME)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 0), (2, 43200.5), (3, 86399.9999996), (4, '12:34:56'),",
+    "(5, 86400), (6, 100000), (7, -1), (8, '24:00:00'), (9, '30:00:00')"
+  ))
+  sql <- "SELECT tm FROM t ORDER BY i"
+
+  w <- coercion_warnings(df <- as.data.frame(dbGetQueryArrow(con, sql)))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_equal(vapply(values, `[[`, "", "class"), c("integer", "string"))
+  expect_equal(vapply(values, `[[`, "", "reason"), c("out_of_range", "out_of_range"))
+  expect_equal(values[[1]]$rows, 5:7)
+  expect_equal(values[[2]]$rows, 8:9)
+  # The last microsecond of the day is as far as rounding goes
+  expect_equal(as.numeric(df$tm), c(0, 43200.5, 86399.999999, 45296, NA, NA, NA, NA, NA))
+  # The default path keeps any duration
+  expect_equal(as.numeric(dbGetQuery(con, sql)$tm)[5:9], c(86400, 100000, -1, 86400, 108000))
+})
+
+test_that("text that is not valid UTF-8 is NULL", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (i INTEGER, s TEXT)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 'ok'), (2, CAST(x'ff' AS TEXT)), (3, CAST(x'c3a9' AS TEXT)),",
+    "(4, CAST(x'610062' AS TEXT)), (5, CAST(x'eda080' AS TEXT)), (6, x'6869'), (7, x'ff'),",
+    # Longer than the eight bytes checked at a time
+    "(8, CAST(x'6161616161616161c3a9' AS TEXT)), (9, CAST(x'61616161616161616161ff' AS TEXT)),",
+    "(10, CAST(x'616161616161616100' AS TEXT))"
+  ))
+
+  w <- coercion_warnings(df <- as.data.frame(dbGetQueryArrow(con, "SELECT s FROM t ORDER BY i")))
+  # A stray byte, a NUL byte and a surrogate are not text, a valid blob is
+  expect_equal(df$s, c("ok", NA, "\u00e9", NA, NA, "hi", NA, "aaaaaaaa\u00e9", NA, NA))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_equal(vapply(values, `[[`, "", "class"), c("string", "blob", "blob"))
+  expect_equal(vapply(values, `[[`, "", "reason"), c("invalid_utf8", "converted", "invalid_utf8"))
+  expect_equal(values[[1]]$rows, c(2, 4, 5, 9, 10))
+  expect_equal(values[[2]]$rows, 6)
+  expect_equal(values[[3]]$rows, 7)
+  expect_match(conditionMessage(w[[1]]), "5 string values not valid UTF-8, NA (rows 2, 4, 5, 9, and 10)", fixed = TRUE)
+})
+
+test_that("times and text that Arrow can't hold pass its full validation", {
+  skip_if_not_installed("arrow")
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, tm TIME, s TEXT)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 100000, CAST(x'ff' AS TEXT)), (2, '24:00:00', 'ok'),",
+    "(3, 86399.9999996, CAST(x'c0af' AS TEXT))"
+  ))
+  table <- suppressWarnings(arrow::as_arrow_table(dbGetQueryArrow(con, "SELECT tm, s FROM t ORDER BY i")))
+  expect_true(table$ValidateFull())
+  expect_equal(table$num_rows, 3L)
+})
+
 test_that("dbFetchArrow() streams lazily in chunks", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:10))
@@ -186,7 +271,7 @@ test_that("a row held back by the byte limits keeps its storage classes", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
   # A 90-byte string decides utf8, a 120-byte blob would take the column past 150
-  dbExecute(con, "INSERT INTO t VALUES (1, hex(zeroblob(45))), (2, zeroblob(120))")
+  dbExecute(con, "INSERT INTO t VALUES (1, hex(zeroblob(45))), (2, CAST(hex(zeroblob(60)) AS BLOB))")
 
   # The size check converts the blob to text, the warning still names a blob,
   # with its row number in the result
@@ -197,6 +282,31 @@ test_that("a row held back by the byte limits keeps its storage classes", {
   values <- w[[1]]$coercions[[1]]$values[[1]]
   expect_equal(values$class, "blob")
   expect_equal(values$rows, 2)
+})
+
+test_that("a row held back by the byte limits is for the Arrow path only", {
+  local_arrow_bytes_limits(100, 150)
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
+  # A 127-byte blob with a NUL byte would take the utf8 column past 150 bytes
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, hex(zeroblob(45))),",
+    "(2, CAST(x'41424300444546' || zeroblob(120) AS BLOB)), (3, 'z')"
+  ))
+
+  rs <- dbSendQuery(con, "SELECT x FROM t ORDER BY i")
+  withr::defer(dbClearResult(rs))
+  expect_equal(dbFetchArrowChunk(rs)$length, 1)
+  # The byte check has converted the blob to text, a data frame would show that
+  expect_error(dbFetch(rs, n = 1), "held back")
+  w <- coercion_warnings(chunk <- dbFetchArrowChunk(rs, chunk_size = 1))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_equal(vapply(values, `[[`, "", "class"), "blob")
+  expect_equal(vapply(values, `[[`, "", "reason"), "invalid_utf8")
+  expect_equal(values[[1]]$rows, 2)
+  expect_equal(chunk$length, 1)
+  expect_equal(dbFetch(rs)$x, "z")
 })
 
 test_that("chunks of large blobs stay within the 32-bit offsets", {
@@ -419,6 +529,106 @@ test_that("a result can't be bound to an Arrow stream of its own rows", {
   dbClearResult(rs)
   gc()
   expect_warning(dbDisconnect(con), NA)
+})
+
+test_that("a result can't be used from a handler of its own fetch", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
+  dbExecute(con, "INSERT INTO t VALUES (1, 'abc'), (2, zeroblob(500)), (3, 'z')")
+  in_handler <- function(fetch, use) {
+    withCallingHandlers(fetch(), warning = function(w) {
+      use()
+      invokeRestart("muffleWarning")
+    })
+  }
+  busy <- "while one of its fetches or binds is running"
+
+  # The warning about the blob in a utf8 column runs the handler while the
+  # fetch holds the bytes of that value
+  fetches <- list(
+    function(rs) dbFetchArrow(rs, chunk_size = 10)$get_next(),
+    function(rs) dbFetchArrowChunk(rs, chunk_size = 10)
+  )
+  uses <- list(
+    function(rs) dbFetch(rs),
+    function(rs) dbBind(rs, list(i = 5)),
+    function(rs) dbClearResult(rs),
+    function(rs) dbColumnInfo(rs),
+    function(rs) dbFetchArrowChunk(rs)
+  )
+  for (fetch in fetches) {
+    for (use in uses) {
+      rs <- dbSendQuery(con, "SELECT x FROM t WHERE i >= $i ORDER BY i", params = list(i = 1))
+      expect_error(in_handler(function() fetch(rs), function() use(rs)), busy)
+      # The result is usable again
+      dbBind(rs, list(i = 3))
+      expect_equal(dbFetch(rs)$x, "z")
+      dbClearResult(rs)
+    }
+  }
+
+  # The data frame path warns about mixed types as well
+  dbExecute(con, "CREATE TABLE u (i INTEGER, x)")
+  dbExecute(con, "INSERT INTO u VALUES (1, 1), (2, 'two')")
+  rs <- dbSendQuery(con, "SELECT x FROM u ORDER BY i")
+  expect_error(in_handler(function() dbFetch(rs), function() dbFetch(rs)), busy)
+  expect_silent(dbClearResult(rs))
+  # Collects the streams of the first loop, which hold their results
+  invisible(gc())
+})
+
+test_that("a result must be bound again after its first parameter row fails", {
+  con <- local_con()
+  rs <- dbSendQuery(con, "SELECT $a AS a")
+  on.exit(dbClearResult(rs))
+  dbBind(rs, list(a = 1:3))
+  expect_equal(dbFetch(rs, n = 1)$a, 1L)
+
+  # A uint64 value above the signed range can't be bound, built from its
+  # buffer: nanoarrow needs the arrow package to convert R values to uint64
+  big <- nanoarrow::nanoarrow_array_modify(
+    nanoarrow::nanoarrow_array_init(nanoarrow::na_uint64()),
+    list(
+      length = 1,
+      null_count = 0,
+      buffers = list(NULL, nanoarrow::as_nanoarrow_buffer(as.raw(rep(0xff, 8))))
+    )
+  )
+  params <- nanoarrow::nanoarrow_array_modify(
+    nanoarrow::nanoarrow_array_init(nanoarrow::na_struct(list(a = nanoarrow::na_uint64()))),
+    list(length = 1, null_count = 0, children = list(a = big))
+  )
+  expect_error(dbBindArrow(rs, params), "outside the 64-bit signed integer range")
+
+  # The statement has lost its bindings, it has no rows to return
+  expect_error(dbFetch(rs), "needs to be bound")
+  dbBind(rs, list(a = 7L))
+  expect_equal(dbFetch(rs)$a, 7L)
+})
+
+test_that("results bound to each other's streams don't keep each other", {
+  con_a <- dbConnect(SQLite(), ":memory:")
+  con_b <- dbConnect(SQLite(), ":memory:")
+  a <- dbSendQuery(con_a, "SELECT $a AS a")
+  b <- dbSendQuery(con_b, "SELECT $a AS a")
+  dbBind(a, list(a = 1:10))
+  dbBind(b, list(a = 1:10))
+
+  # The first rows come from the chunks kept for the schemas
+  dbBindArrow(a, dbFetchArrow(b, chunk_size = 2))
+  dbBindArrow(b, dbFetchArrow(a, chunk_size = 2))
+  # Further rows of b come from a, whose further rows come from b,
+  # which was bound to new parameters
+  expect_error(dbFetch(b), "bound to new parameters")
+  # Both executions have ended and dropped their parameters
+  expect_true(dbHasCompleted(a))
+  expect_true(dbHasCompleted(b))
+
+  dbClearResult(a)
+  dbClearResult(b)
+  invisible(gc())
+  expect_warning(dbDisconnect(con_a), NA)
+  expect_warning(dbDisconnect(con_b), NA)
 })
 
 test_that("dbGetQueryArrow() reads the whole result", {

@@ -177,18 +177,14 @@ test_that("a blob in a utf8 column keeps its bytes, also in a UTF-16 database", 
     "INSERT INTO t VALUES (1, 'first'), (2, x'6162'), (3, x'c3a4'), (4, x'00ff'), (5, x'')"
   ))
 
-  messages <- character()
-  df <- withCallingHandlers(
-    as.data.frame(dbGetQueryArrow(con, "SELECT x FROM t ORDER BY i")),
-    warning = function(w) {
-      messages <<- c(messages, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    }
-  )
+  w <- coercion_warnings(df <- as.data.frame(dbGetQueryArrow(con, "SELECT x FROM t ORDER BY i")))
   # The bytes are UTF-8, not UTF-16 to transcode
   expect_equal(df$x, c("first", "ab", "\u00e4", NA, ""))
-  expect_match(messages, "`x`: mixed type", all = FALSE)
-  expect_match(messages, "`x`: values of type blob that are not valid UTF-8", all = FALSE)
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_equal(vapply(values, `[[`, "", "reason"), c("converted", "invalid_utf8"))
+  expect_equal(values[[1]]$rows, c(2, 3, 5))
+  expect_equal(values[[2]]$rows, 4)
 })
 
 test_that("text that is not valid UTF-8 is NULL", {

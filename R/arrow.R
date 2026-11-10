@@ -106,7 +106,8 @@
 #' * converted by SQLite, with the warning described above:
 #'   text and blobs into a numeric type,
 #'   and reals into an integer type, truncated, or into `bool`, true unless zero;
-#' * `NULL`, with the warning: a blob into a text type unless it is valid UTF-8,
+#' * `NULL`, with the warning: a blob into a text type unless it is valid UTF-8 without NUL bytes,
+#'   like text itself, see above,
 #'   a number outside the range of an integer type,
 #'   including a real or the integer at the start of a text beyond 64 bits, which SQLite would saturate,
 #'   a finite number beyond the range of `float`,

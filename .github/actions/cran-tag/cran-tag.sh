@@ -15,7 +15,8 @@
 #      which moves it to the commit; a dry run reports the existing tag and carries on.
 #      An origin that cannot be read stops the run too, because the tag may exist.
 #   2. A published release of the tag stops the run, and so do several drafts for the tag.
-#   3. The draft release is created, or the draft that is there is updated, by its id.
+#   3. The draft release is created, or the draft that is there is updated, by its id;
+#      the draft's tarball `<package>_<version>.tar.gz` from an earlier attempt is deleted first.
 #   4. The commit is tagged, and the tag is pushed to origin, with --force only for --retag.
 # --dry-run writes nothing, and prints and reports the release and the tag a real run would write.
 #
@@ -195,9 +196,12 @@ endgroup
 # A draft has no tag yet, so it is found by its pending tag name in the list of releases,
 # and then written by its id: several releases can carry the same pending tag name,
 # and `gh release edit <tag>` would pick one of them.
+# The fourth field is the id of the release's asset `<package>_<version>.tar.gz`, if it has one.
 group "Release: $title"
+asset="${pkg}_${version}.tar.gz"
 if ! "$gh" api --paginate "repos/$repo/releases?per_page=100" \
-  --jq ".[] | select(.tag_name == \"$tag\") | [(if .draft then \"draft\" else \"published\" end), .id, .html_url] | @tsv" \
+  --jq ".[] | select(.tag_name == \"$tag\") | [(if .draft then \"draft\" else \"published\" end), .id, .html_url,
+    ([.assets[]? | select(.name == \"$asset\") | .id | tostring] | join(\" \"))] | @tsv" \
   >"$work/found" 2>"$work/gh.err"; then
   cat "$work/gh.err" >&2
   fail "Release" "The releases cannot be listed" "\`gh api repos/$repo/releases\` failed: $(head -n 1 "$work/gh.err")" "$work/gh.err" -- \
@@ -208,6 +212,9 @@ published=$(awk -F '\t' '$1 == "published" { print $3; exit }' "$work/found")
 drafts=$(awk -F '\t' '$1 == "draft"' "$work/found")
 draft_id=$(printf '%s\n' "$drafts" | awk -F '\t' 'NF { print $2; exit }')
 draft=$(printf '%s\n' "$drafts" | awk -F '\t' 'NF { print $3; exit }')
+# The tarball of an earlier attempt, which a run dispatched with `retag` must not leave on the retargeted draft:
+# if this run failed before attaching its own, cran-release.sh, which checks the asset by name, would take it for this one.
+stale=$(printf '%s\n' "$drafts" | awk -F '\t' 'NF { print $4; exit }')
 
 if [ -n "$published" ]; then
   fail "Release" "Release $tag is already published" "The release $tag is published at $published, and this workflow does not touch a published release. Nothing was tagged or uploaded." -- \
@@ -229,6 +236,7 @@ val "tag" "$tag"
 val "target" "$commit"
 val "title" "$title"
 val "draft" "true"
+[ -z "$stale" ] || val "earlier tarball" "$asset, asset id $stale, to delete"
 say "Release notes:"
 cat "$notes"
 
@@ -240,6 +248,7 @@ if [ -n "$dry_run" ]; then
     "- Title: $title" \
     "- Draft: yes, published by the nightly \`cran-release.yaml\` once Posit's package manager serves the version" "" \
     "<details><summary>Release notes</summary>" "" '````markdown' "$(cat "$notes")" '````' "" "</details>" ""
+  [ -z "$stale" ] || summary "A real run first deletes the draft's \`$asset\`, the tarball of an earlier attempt." ""
 else
   write_failed() {
     cat "$work/gh.err" >&2
@@ -247,6 +256,17 @@ else
       "Check that the token may write releases: the job needs \`contents: write\`." \
       "Then dispatch again; the run updates the draft if one was written."
   }
+  # Before the draft is retargeted, so that the draft never targets this commit while it carries another commit's tarball.
+  if [ -n "$stale" ]; then
+    for asset_id in $stale; do
+      "$gh" api -X DELETE "repos/$repo/releases/assets/$asset_id" >/dev/null 2>"$work/gh.err" || {
+        cat "$work/gh.err" >&2
+        fail "Release" "Deleting the earlier tarball failed" "The draft $draft carries $asset from an earlier attempt, and deleting it (asset id $asset_id) failed: $(head -n 1 "$work/gh.err"). Nothing was written or tagged." "$work/gh.err" -- \
+          "Delete the asset $asset from the draft by hand, then dispatch again."
+      }
+    done
+    say "Deleted $asset, asset id $stale, the tarball of an earlier attempt."
+  fi
   fields=(-f "tag_name=$tag" -f "target_commitish=$commit" -f "name=$title" -F "body=@$notes" -F draft=true)
   if [ -n "$draft_id" ]; then
     written=$("$gh" api -X PATCH "repos/$repo/releases/$draft_id" "${fields[@]}" --jq '[.id, .html_url] | @tsv' 2>"$work/gh.err") || write_failed
@@ -263,6 +283,7 @@ else
   notice "Draft release" "$done_ $title at $url; the nightly cran-release.yaml publishes it once Posit's package manager serves the version."
   summary "### Release" "" "$done_ [$title]($url), for the tag \`$tag\` at \`$commit\`." \
     "The nightly \`cran-release.yaml\` publishes it once Posit's package manager serves the version." ""
+  [ -z "$stale" ] || summary "Deleted the draft's \`$asset\` first, the tarball of an earlier attempt; this run attaches its own after the upload." ""
 fi
 
 # --- the tag ------------------------------------------------------------------

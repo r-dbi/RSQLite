@@ -4,8 +4,9 @@
 #
 #   1. Without a tag or a release, a run creates the draft, with the NEWS.md section as notes and the marker,
 #      and pushes an annotated tag at the commit, with the section as its message.
-#   2. An existing draft is updated by its id, not duplicated; several drafts for the tag stop the run
-#      before anything is written, also on a dry run.
+#   2. An existing draft is updated by its id, not duplicated, after its tarball from an earlier attempt
+#      is deleted by the asset's id; a failed deletion writes nothing else.
+#      Several drafts for the tag stop the run before anything is written, also on a dry run.
 #   3. An existing tag stops a real run before anything is written, and stays where it was;
 #      a dry run reports it and carries on; --retag moves it, and a dry run with --retag only says so.
 #      An origin that cannot be read stops the run before anything is written, also with --retag:
@@ -159,7 +160,8 @@ NEW=https://github.example/r-dbi/RSQLite/releases/tag/untagged-new
 with_draft() {
   releases <<EOF
 [
-  {"id": 7, "draft": true, "tag_name": "v2.0.0", "html_url": "$DRAFT", "body": "old notes"},
+  {"id": 7, "draft": true, "tag_name": "v2.0.0", "html_url": "$DRAFT", "body": "old notes",
+   "assets": [{"id": 32, "name": "notes.txt"}, {"id": 31, "name": "RSQLite_2.0.0.tar.gz"}]},
   {"id": 5, "draft": false, "tag_name": "v1.9.0", "html_url": "https://github.example/v1.9.0", "body": ""}
 ]
 EOF
@@ -172,6 +174,9 @@ EOF
 # What GitHub answers to creating a draft, and to updating the draft 7.
 echo "{\"id\": 77, \"html_url\": \"$NEW\"}" >"$API/POST-repos_r-dbi_RSQLite_releases.json"
 echo "{\"id\": 7, \"html_url\": \"$DRAFT\"}" >"$API/PATCH-repos_r-dbi_RSQLite_releases_7.json"
+# Deleting the asset 31 answers nothing; without this file, the stub fails as for a 404.
+deletable() { : >"$API/DELETE-repos_r-dbi_RSQLite_releases_assets_31.json"; }
+deletable
 
 NOTES="## Breaking changes
 
@@ -242,12 +247,32 @@ no_tag
 with_draft
 out=$(run)
 has "it succeeds" "$out" "exit 0"
-is "it edits the draft by its id, and creates none" "$(cat "$SCRATCH/writes")" "PATCH repos/r-dbi/RSQLite/releases/7"
+is "it deletes the earlier tarball by its asset id, then edits the draft by its id, and creates none" "$(cat "$SCRATCH/writes")" "DELETE repos/r-dbi/RSQLite/releases/assets/31
+PATCH repos/r-dbi/RSQLite/releases/7"
+has "the report says so" "$(cat "$SUMMARY")" "Deleted the draft's \`RSQLite_2.0.0.tar.gz\` first, the tarball of an earlier attempt"
 has "retargeting it at the commit" "$(cat "$SCRATCH/fields")" "-f target_commitish=$HEAD"
 is "with the notes of this commit" "$(cat "$SCRATCH/notes")" "$NOTES"
 is "the tag is on origin, at the commit" "$(remote_tag)" "$HEAD"
 has "the outputs name the draft" "$(cat "$SCRATCH/output")" "release-id=7
 release-url=$DRAFT"
+
+echo
+echo "== a failed deletion of the earlier tarball writes nothing else"
+no_tag
+rm "$API/DELETE-repos_r-dbi_RSQLite_releases_assets_31.json"
+out=$(run)
+deletable
+has "it fails" "$out" "exit 1"
+has "naming the asset" "$out" "::error title=Deleting the earlier tarball failed::The draft $DRAFT carries RSQLite_2.0.0.tar.gz from an earlier attempt"
+is "the draft is not edited" "$(cat "$SCRATCH/writes")" "DELETE repos/r-dbi/RSQLite/releases/assets/31"
+is "and nothing is tagged" "$(remote_tag)" ""
+
+echo
+echo "== a dry run with a draft deletes nothing"
+out=$(run --dry-run)
+has "it succeeds" "$out" "exit 0"
+is "nothing is written to GitHub" "$(cat "$SCRATCH/writes")" ""
+has "and says a real run deletes the earlier tarball" "$(cat "$SUMMARY")" "A real run first deletes the draft's \`RSQLite_2.0.0.tar.gz\`, the tarball of an earlier attempt."
 
 echo
 echo "== several drafts for the tag stop the run"
@@ -304,7 +329,8 @@ echo "== retag moves the tag"
 out=$(run --retag)
 has "it succeeds" "$out" "exit 0"
 has "with a warning" "$out" "::warning title=Moving the tag v2.0.0::Moving the existing tag v2.0.0 from $FIRST to $HEAD"
-is "it updates the draft" "$(cat "$SCRATCH/writes")" "PATCH repos/r-dbi/RSQLite/releases/7"
+is "it deletes the earlier attempt's tarball and updates the draft" "$(cat "$SCRATCH/writes")" "DELETE repos/r-dbi/RSQLite/releases/assets/31
+PATCH repos/r-dbi/RSQLite/releases/7"
 is "the tag moves to the commit" "$(remote_tag)" "$HEAD"
 is "with the section as its message" "$(remote_tag_message)" "$MESSAGE"
 

@@ -86,8 +86,10 @@
 # cran-release.yaml publishes no draft without it.
 # It checks first that the tarball's sha256 is the one the upload used,
 # and that the draft the `tag` job wrote is the only release that carries the tag.
-# It is a job of its own, after the upload, so that only it and the `tag` job hold `contents: write`;
-# a run dispatched with `retag` replaces the asset of the earlier attempt.
+# It is a job of its own, after the upload, so that only it and the `tag` job hold `contents: write`.
+# When a run updates an existing draft, as one dispatched with `retag` does,
+# the `tag` job deletes the earlier attempt's tarball from it first,
+# so that a draft never carries a tarball of another commit than the one it targets.
 #
 # The `report` job posts the outcome to the open release pull request,
 # one comment that the dry run and the real run update in turn.
@@ -407,7 +409,7 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
-          # --clobber: a run dispatched with `retag` replaces the earlier attempt's tarball.
+          # --clobber: the `tag` job deleted an earlier attempt's tarball; this replaces one attached by hand since.
           gh release upload "$TAG" "$tarball" --clobber
           echo "::notice title=Release asset::Attached $(basename "$tarball") (sha256 $actual) to the draft release $URL."
           {

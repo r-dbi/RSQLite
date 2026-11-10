@@ -382,6 +382,17 @@ test_that("data frame fetches through Arrow keep the requested types", {
     data.frame(n = rep(NA, 3), i = 1:3, d = c(NA, 3L, NA))
   )
   dbClearResult(rs)
+
+  # Like the default path, a 64-bit integer keeps a column as integer64 for
+  # the later fetches, also in a fetch of no rows
+  sql <- "SELECT 4294967296 AS x UNION ALL SELECT 1"
+  for (type in list(nanoarrow::na_int64(), nanoarrow::na_uint64())) {
+    rs <- dbSendQueryArrow(con, sql, schema = list(x = type))
+    expect_s3_class(dbFetch(rs, 0)$x, "integer64")
+    expect_s3_class(dbFetch(rs, 1)$x, "integer64")
+    expect_s3_class(dbFetch(rs)$x, "integer64")
+    dbClearResult(rs)
+  }
 })
 
 test_that("the schema reads no rows when every column has a requested type", {

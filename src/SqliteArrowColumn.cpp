@@ -169,7 +169,7 @@ void SqliteArrowColumn::peek_value() {
   } else if (kind == AK_INT64 && value_type == SQLITE_FLOAT && !frozen) {
     kind = AK_DOUBLE;
   }
-  if (kind == AK_INT64 && value_type == SQLITE_INTEGER) {
+  if ((kind == AK_INT64 || kind == AK_UINT64) && value_type == SQLITE_INTEGER) {
     note_integer(sqlite3_column_int64(stmt, j));
   }
 }

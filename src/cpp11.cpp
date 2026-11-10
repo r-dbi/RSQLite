@@ -210,6 +210,14 @@ extern "C" SEXP _RSQLite_arrow_stream_read_on_thread(SEXP stream_xptr, SEXP n, S
     return cpp11::as_sexp(arrow_stream_read_on_thread(cpp11::as_cpp<cpp11::decay_t<SEXP>>(stream_xptr), cpp11::as_cpp<cpp11::decay_t<double>>(n), cpp11::as_cpp<cpp11::decay_t<bool>>(release)));
   END_CPP11
 }
+// result.cpp
+void result_call_while_busy(cpp11::external_pointer<DbResultPtr> res, cpp11::function fun);
+extern "C" SEXP _RSQLite_result_call_while_busy(SEXP res, SEXP fun) {
+  BEGIN_CPP11
+    result_call_while_busy(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResultPtr>>>(res), cpp11::as_cpp<cpp11::decay_t<cpp11::function>>(fun));
+    return R_NilValue;
+  END_CPP11
+}
 // rsqlite.cpp
 cpp11::strings rsqliteVersion();
 extern "C" SEXP _RSQLite_rsqliteVersion() {
@@ -230,6 +238,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_extension_load",               (DL_FUNC) &_RSQLite_extension_load,               3},
     {"_RSQLite_result_bind",                  (DL_FUNC) &_RSQLite_result_bind,                  2},
     {"_RSQLite_result_bind_arrow",            (DL_FUNC) &_RSQLite_result_bind_arrow,            3},
+    {"_RSQLite_result_call_while_busy",       (DL_FUNC) &_RSQLite_result_call_while_busy,       2},
     {"_RSQLite_result_column_info",           (DL_FUNC) &_RSQLite_result_column_info,           1},
     {"_RSQLite_result_create",                (DL_FUNC) &_RSQLite_result_create,                2},
     {"_RSQLite_result_fetch",                 (DL_FUNC) &_RSQLite_result_fetch,                 2},

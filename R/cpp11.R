@@ -112,6 +112,10 @@ arrow_stream_read_on_thread <- function(stream_xptr, n, release) {
   .Call(`_RSQLite_arrow_stream_read_on_thread`, stream_xptr, n, release)
 }
 
+result_call_while_busy <- function(res, fun) {
+  invisible(.Call(`_RSQLite_result_call_while_busy`, res, fun))
+}
+
 rsqliteVersion <- function() {
   .Call(`_RSQLite_rsqliteVersion`)
 }

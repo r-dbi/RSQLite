@@ -100,17 +100,6 @@ StreamState* get_state(struct ArrowArrayStream* stream) {
   return static_cast<StreamState*>(stream->private_data);
 }
 
-// New parameters execute the statement again, with new rows and possibly
-// other types than those of the schema handed out
-void check_executions(StreamState* state) {
-  if (state->result->executions() != state->executions) {
-    throw std::runtime_error(
-      "The result was bound to new parameters after the Arrow stream was "
-      "created, call dbFetchArrow() again"
-    );
-  }
-}
-
 void ensure_schema(StreamState* state) {
   if (state->schema->release != NULL) {
     return;
@@ -118,8 +107,8 @@ void ensure_schema(StreamState* state) {
   if (!state->result) {
     throw std::runtime_error("The Arrow stream has already been consumed");
   }
-  check_executions(state);
-  state->result->arrow_schema(state->schema.get(), state->chunk_size);
+  state->result
+    ->arrow_schema(state->schema.get(), state->chunk_size, state->executions);
 }
 
 int get_schema_impl(StreamState* state, struct ArrowSchema* out) {
@@ -139,11 +128,16 @@ int get_next_impl(StreamState* state, struct ArrowArray* out) {
   }
 
   ensure_schema(state);
-  check_executions(state);
 
   nanoarrow::UniqueArray array;
-  int64_t n = state->result->fetch_arrow(array.get(), state->chunk_size);
-  if (n == 0 && state->result->complete()) {
+  bool complete = false;
+  int64_t n = state->result->fetch_arrow(
+    array.get(),
+    state->chunk_size,
+    state->executions,
+    &complete
+  );
+  if (n == 0 && complete) {
     // Release the result as early as possible
     drop_result(state->result);
     out->release = NULL;
@@ -155,9 +149,10 @@ int get_next_impl(StreamState* state, struct ArrowArray* out) {
 }
 
 // The callbacks below run inside the C code of the stream consumer, on R's
-// main thread or, for consumers such as arrow's Acero engine, on a worker
-// thread while R's main thread waits: there, no R API is called at all, and
-// what would be an R warning or error becomes the error of the stream.
+// main thread or, for consumers such as arrow's scanner and Acero, on a worker
+// thread, also while R goes on: there, no R API is called at all, what would
+// be an R warning or error becomes the error of the stream, and the result is
+// used only inside its busy mark, see run_guarded() in DbResult.cpp.
 // C++ exceptions are turned into stream errors.
 // An R error or interrupt raised through cpp11 arrives as a
 // cpp11::unwind_exception; its unwind is continued after leaving the try block

@@ -744,6 +744,77 @@ test_that("a stream released on another thread doesn't keep the database locked"
   expect_equal(write(), 1)
 })
 
+test_that("a result read on another thread can't be used, but clears", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:3))
+  msg <- "its Arrow stream is being read on another thread, for example by arrow's scanner or Acero"
+
+  # While another thread holds the result with a share of its own, as a stream
+  # read there does
+  rs <- dbSendQuery(con, "SELECT a FROM t WHERE a >= ?")
+  dbBind(rs, list(2L))
+  result_call_while_busy(rs@ptr, function() {
+    expect_error(dbFetch(rs), msg)
+    expect_error(dbFetchArrowChunk(rs), msg)
+    expect_error(dbBind(rs, list(1L)), msg)
+    expect_error(dbBindArrow(rs, nanoarrow::as_nanoarrow_array_stream(data.frame(a = 1L))), msg)
+    expect_error(dbColumnInfo(rs), msg)
+    expect_silent(dbClearResult(rs))
+    expect_false(dbIsValid(rs))
+    expect_equal(dbGetQuery(con, "SELECT 42 AS x")$x, 42L)
+  })
+
+  # The next query clears the open result
+  rs <- dbSendQuery(con, "SELECT a FROM t")
+  result_call_while_busy(rs@ptr, function() {
+    expect_warning(rs2 <- dbSendQuery(con, "SELECT 42 AS x"), "Closing open result set")
+    expect_false(dbIsValid(rs))
+    expect_equal(dbFetch(rs2)$x, 42L)
+    dbClearResult(rs2)
+  })
+
+  # Once the other thread is done, the result is used as before
+  rs <- dbSendQuery(con, "SELECT a FROM t")
+  result_call_while_busy(rs@ptr, function() NULL)
+  expect_equal(dbFetch(rs)$a, 1:3)
+  dbClearResult(rs)
+})
+
+test_that("a result clears while arrow's scanner reads its stream ahead", {
+  skip_if_not_installed("arrow")
+  skip_if_not(arrow::arrow_with_dataset())
+  con <- local_con()
+  sql <- paste(
+    "WITH RECURSIVE r(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM r WHERE i < 200000)",
+    "SELECT i AS a, printf('%08d', i) AS s FROM r"
+  )
+  read_rest <- function(reader, n) {
+    while (!is.null(batch <- reader$read_next_batch())) {
+      n <- n + batch$num_rows
+    }
+    n
+  }
+
+  # The scanner goes on reading in the background after its first batch,
+  # while R clears the result and runs another query on the connection
+  rs <- dbSendQueryArrow(con, sql)
+  reader <- arrow::Scanner$create(arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 1000)))$ToRecordBatchReader()
+  batch <- reader$read_next_batch()
+  expect_gt(batch$num_rows, 0)
+  expect_silent(dbClearResult(rs))
+  expect_equal(dbGetQuery(con, "SELECT 42 AS x")$x, 42L)
+  expect_equal(read_rest(reader, batch$num_rows), 200000)
+
+  # The next query clears the open result
+  rs <- dbSendQueryArrow(con, sql)
+  reader <- arrow::Scanner$create(arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 1000)))$ToRecordBatchReader()
+  batch <- reader$read_next_batch()
+  expect_warning(x <- dbGetQuery(con, "SELECT 42 AS x")$x, "Closing open result set")
+  expect_equal(x, 42L)
+  expect_false(dbIsValid(rs))
+  expect_equal(read_rest(reader, batch$num_rows), 200000)
+})
+
 test_that("an error of the statement after dbDisconnect() keeps its result code", {
   con <- dbConnect(SQLite(), ":memory:")
   dbExecute(con, "CREATE TABLE t (a)")

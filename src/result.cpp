@@ -6,6 +6,8 @@
 // After DbArrow.h, so that the Arrow C structs are defined once
 #include <nanoarrow/r.h>
 
+#include <exception>
+#include <future>
 #include <string>
 #include <thread>
 #include <vector>
@@ -32,13 +34,16 @@ cpp11::external_pointer<DbResultPtr> result_create(
 [[cpp11::register]]
 void result_release(cpp11::external_pointer<DbResultPtr> res) {
   DbResultPtr* ptr = res.get();
-  if (ptr != NULL && ptr->get() != NULL && (*ptr)->busy()) {
+  if (ptr != NULL && ptr->get() != NULL &&
+      (*ptr)->busy_owner() == DbResult::BUSY_MAIN_THREAD) {
     // Freeing it would pull the statement from under the running fetch
     cpp11::stop(
       "Can't clear a result while one of its fetches or binds is running, "
       "as from a handler of a warning that it raised."
     );
   }
+  // Another thread holds the result only while it reads an Arrow stream of
+  // it, which keeps a share of its own: R's share can go
   res.reset();
   // An Arrow stream may have let go of its share on another thread
   db_arrow_release_deferred();
@@ -249,4 +254,47 @@ cpp11::list arrow_stream_read_on_thread(
     }
   }
   return cpp11::list({ "arrays"_nm = out, "error"_nm = error });
+}
+
+// For the tests: calls `fun` on R's main thread while another thread holds the
+// result busy with a share of its own, as a stream read there does
+[[cpp11::register]]
+void result_call_while_busy(
+  cpp11::external_pointer<DbResultPtr> res,
+  cpp11::function fun
+) {
+  DbResultPtr* ptr = res.get();
+  if (ptr == NULL || ptr->get() == NULL) {
+    cpp11::stop("Invalid result set");
+  }
+  DbResultPtr result = *ptr;
+
+  std::promise<void> entered;
+  std::future<void> has_entered = entered.get_future();
+  std::promise<void> leave;
+  std::shared_future<void> may_leave = leave.get_future().share();
+  std::thread holder([&] {
+    try {
+      result->hold_busy([&] {
+        entered.set_value();
+        may_leave.wait();
+      });
+    } catch (...) {
+      try {
+        entered.set_exception(std::current_exception());
+      } catch (...) {}
+    }
+  });
+  // Also when `fun` fails: lets the other thread go before the share does
+  struct Finish {
+    std::promise<void>& leave;
+    std::thread& holder;
+    ~Finish() {
+      leave.set_value();
+      holder.join();
+    }
+  } finish = { leave, holder };
+
+  has_entered.get();
+  fun();
 }

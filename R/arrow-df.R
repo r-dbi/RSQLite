@@ -43,15 +43,27 @@ arrow_to_df <- function(stream, conn, size, wide_ints) {
 }
 
 # All rows of a stream with a known row count as a data frame:
-# the columns are allocated once, each array is converted and copied into
-# them and released before the next one is requested, so that the arrays go
-# as the data frame fills up
+# for more than one array, the columns are allocated once, each array is
+# converted and copied into them and released before the next one is
+# requested, so that the arrays go as the data frame fills up
 arrow_stream_to_df <- function(stream, ptype, size) {
+  array <- stream$get_next(validate = FALSE)
+  if (!is.null(array) && array$length == size) {
+    # One array holds all rows, such as a fetch of fewer rows than a chunk:
+    # nanoarrow's columns are the data frame, except that its character
+    # vectors read from the array until they are touched, so these are copied
+    # before the array is released
+    df <- nanoarrow::convert_array(array, to = ptype)
+    df[] <- lapply(df, function(col) if (is.character(col)) c(col) else col)
+    nanoarrow::nanoarrow_pointer_release(array)
+    stream$release()
+    return(df)
+  }
+
   size <- as.integer(size)
   columns <- lapply(ptype, function(col) vector(typeof(col), size))
   offset <- 0L
   repeat {
-    array <- stream$get_next(validate = FALSE)
     if (is.null(array)) {
       break
     }
@@ -67,6 +79,7 @@ arrow_stream_to_df <- function(stream, ptype, size) {
       offset <- offset + n
     }
     nanoarrow::nanoarrow_pointer_release(array)
+    array <- stream$get_next(validate = FALSE)
   }
   stream$release()
 

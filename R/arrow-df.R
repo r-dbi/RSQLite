@@ -253,12 +253,15 @@ arrow_df_column_ptype <- function(format) {
 # dbColumnInfo() through Arrow: the types of a fetch of no rows, named like
 # the default path names them. Like the peek of the default path, the fetch
 # reads the next row without converting it, and the next fetch starts from the
-# types it decides.
+# types it decides. The columns of `ptype` are named after their prototype,
+# which dbFetch() returns them as, whatever their Arrow format.
 arrow_column_info <- function(res) {
   fetched <- result_fetch_arrow_df(res@ptr, 0, ARROW_DF_CHUNK_SIZE)
   formats <- fetched$formats
   type <- character(length(formats))
-  for (j in seq_along(formats)) {
+  requested <- match(names(res@ptype), fetched$names)
+  type[requested] <- vapply(res@ptype, arrow_type_name, character(1), USE.NAMES = FALSE)
+  for (j in setdiff(seq_along(formats), requested)) {
     type[[j]] <- switch(formats[[j]],
       n = "logical",
       # The default path names the type of storage of integer64
@@ -277,6 +280,12 @@ arrow_column_info <- function(res) {
     row.names = .set_row_names(length(type)),
     class = "data.frame"
   )
+}
+
+# The type of an R vector as dbColumnInfo() names it: the class of an object
+# such as a factor or a Date, the storage type of the others
+arrow_type_name <- function(x) {
+  if (is.object(x)) class(x)[[1L]] else typeof(x)
 }
 
 # dbAppendTable() through Arrow: the data frame is written as an Arrow stream

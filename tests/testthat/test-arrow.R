@@ -26,11 +26,22 @@ chunk_lengths <- function(stream) {
   lengths
 }
 
-# Lowers the bytes of a string or binary column after which, or beyond which,
-# a chunk ends, from 1 GiB and 2^31 - 1
-local_arrow_bytes_limits <- function(cut_bytes, max_bytes, envir = parent.frame()) {
-  old <- arrow_set_bytes_limits(cut_bytes, max_bytes)
-  withr::defer(arrow_set_bytes_limits(old[[1]], old[[2]]), envir = envir)
+# Lowers, for the result `rs` alone, the bytes of a string or binary column
+# after which, or beyond which, a chunk ends, from 1 GiB and 2^31 - 1
+set_bytes_limits <- function(rs, cut_bytes = 100, max_bytes = 150) {
+  if (methods::is(rs, "SQLiteResultArrow")) {
+    rs <- rs@result
+  }
+  result_set_bytes_limits(rs@ptr, cut_bytes, max_bytes)
+}
+
+# A lazy stream over `sql` with the byte limits lowered to 100 and 150;
+# the stream reads on after its result has been cleared
+fetch_with_bytes_limits <- function(con, sql) {
+  rs <- dbSendQuery(con, sql)
+  on.exit(dbClearResult(rs))
+  set_bytes_limits(rs)
+  dbFetchArrow(rs)
 }
 
 test_that("dbSendQueryArrow() returns a SQLiteResultArrow", {
@@ -313,7 +324,6 @@ test_that("dbFetchArrowChunk() returns one chunk per call", {
 test_that("string and binary columns end a chunk before their offsets overflow", {
   # 100 bytes end a chunk after the row that reaches them,
   # a row that would go past 150 bytes starts the next chunk
-  local_arrow_bytes_limits(100, 150)
   sizes <- c(60, 60, 80, 80, 200, 10, 10)
   con <- local_con()
   dbWriteTable(con, "t", data.frame(
@@ -326,28 +336,28 @@ test_that("string and binary columns end a chunk before their offsets overflow",
     sql <- paste0("SELECT ", column, " FROM t ORDER BY i")
     # 60 + 60 reaches 100; 80 + 80 and 80 + 200 would go past 150;
     # a single value fills an empty chunk whatever its size
-    expect_equal(chunk_lengths(dbGetQueryArrow(con, sql)), c(2, 1, 1, 1, 2))
+    expect_equal(chunk_lengths(fetch_with_bytes_limits(con, sql)), c(2, 1, 1, 1, 2))
     # No row is lost or repeated at the cuts
-    values <- as.data.frame(dbGetQueryArrow(con, sql))[[column]]
+    values <- as.data.frame(fetch_with_bytes_limits(con, sql))[[column]]
     expect_equal(if (is.character(values)) nchar(values) else lengths(values), sizes)
+    # The limits belong to that result: another one keeps the defaults
+    expect_equal(chunk_lengths(dbGetQueryArrow(con, sql)), 7)
   }
 })
 
 test_that("a row held back by the byte limits keeps its storage classes", {
-  local_arrow_bytes_limits(100, 150)
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
   # A 90-byte string decides utf8, a 120-byte blob would take the column past 150
   dbExecute(con, "INSERT INTO t VALUES (1, hex(zeroblob(45))), (2, CAST(hex(zeroblob(60)) AS BLOB))")
 
   # The size check converts the blob to text, the warning still names a blob
-  stream <- dbGetQueryArrow(con, "SELECT x FROM t ORDER BY i")
+  stream <- fetch_with_bytes_limits(con, "SELECT x FROM t ORDER BY i")
   expect_warning(lengths <- chunk_lengths(stream), "coercing values of type blob")
   expect_equal(lengths, c(1, 1))
 })
 
 test_that("a row held back by the byte limits is for the Arrow path only", {
-  local_arrow_bytes_limits(100, 150)
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
   # A 127-byte blob with a NUL byte would take the utf8 column past 150 bytes
@@ -358,6 +368,7 @@ test_that("a row held back by the byte limits is for the Arrow path only", {
 
   rs <- dbSendQuery(con, "SELECT x FROM t ORDER BY i")
   withr::defer(dbClearResult(rs))
+  set_bytes_limits(rs)
   expect_equal(dbFetchArrowChunk(rs)$length, 1)
   # The byte check has converted the blob to text, a data frame would show that
   expect_error(dbFetch(rs, n = 1), "held back")
@@ -547,32 +558,40 @@ test_that("an R error while the stream is read unwinds cleanly", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x)")
   dbExecute(con, "INSERT INTO t VALUES (1), (2), ('three')")
-  # The second chunk warns about the mixed type, inside the stream callback
-  lazy_stream <- function() {
+  # The second chunk warns about the mixed type, inside the stream callback;
+  # each result counts the R conditions rethrown from its streams
+  lazy_result <- function() {
     rs <- dbSendQueryArrow(con, "SELECT x FROM t")
-    on.exit(dbClearResult(rs))
-    dbFetchArrow(rs, chunk_size = 2)
+    withr::defer(if (dbIsValid(rs)) dbClearResult(rs), envir = parent.frame())
+    rs
   }
+  rethrown <- function(rs) result_rethrown_unwinds(rs@result@ptr)
 
   # nanoarrow's C code reads the stream: the callback continues the unwind
-  rethrown <- arrow_rethrown_unwinds()
+  rs <- lazy_result()
   withr::with_options(list(warn = 2), {
-    expect_error(as.data.frame(lazy_stream()), "mixed type")
+    expect_error(as.data.frame(dbFetchArrow(rs, chunk_size = 2)), "mixed type")
   })
+  expect_equal(rethrown(rs), 0)
+  dbClearResult(rs)
+  rs <- lazy_result()
   expect_equal(
-    tryCatch(as.data.frame(lazy_stream()), warning = function(w) "exited"),
+    tryCatch(as.data.frame(dbFetchArrow(rs, chunk_size = 2)), warning = function(w) "exited"),
     "exited"
   )
-  expect_equal(arrow_rethrown_unwinds(), rethrown)
+  expect_equal(rethrown(rs), 0)
+  dbClearResult(rs)
 
   # RSQLite's C++ code binds the stream as parameters: the callback rethrows,
   # so that the unwind continues after the C++ frames have been left
   con2 <- local_con()
   dbExecute(con2, "CREATE TABLE t (x)")
+  rs <- lazy_result()
   withr::with_options(list(warn = 2), {
-    expect_error(dbAppendTableArrow(con2, "t", lazy_stream()), "mixed type")
+    expect_error(dbAppendTableArrow(con2, "t", dbFetchArrow(rs, chunk_size = 2)), "mixed type")
   })
-  expect_equal(arrow_rethrown_unwinds(), rethrown + 1)
+  expect_equal(rethrown(rs), 1)
+  dbClearResult(rs)
   # The append is rolled back, both connections work on
   expect_equal(dbGetQuery(con2, "SELECT count(*) AS n FROM t")$n, 0L)
   expect_equal(dbAppendTableArrow(con2, "t", data.frame(x = 1L)), 1L)

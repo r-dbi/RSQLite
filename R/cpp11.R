@@ -96,12 +96,12 @@ result_bind_arrow <- function(res, params, param_indexes) {
   invisible(.Call(`_RSQLite_result_bind_arrow`, res, params, param_indexes))
 }
 
-arrow_set_bytes_limits <- function(cut_bytes, max_bytes) {
-  .Call(`_RSQLite_arrow_set_bytes_limits`, cut_bytes, max_bytes)
+result_set_bytes_limits <- function(res, cut_bytes, max_bytes) {
+  invisible(.Call(`_RSQLite_result_set_bytes_limits`, res, cut_bytes, max_bytes))
 }
 
-arrow_rethrown_unwinds <- function() {
-  .Call(`_RSQLite_arrow_rethrown_unwinds`)
+result_rethrown_unwinds <- function(res) {
+  .Call(`_RSQLite_result_rethrown_unwinds`, res)
 }
 
 result_set_rows_fetched <- function(res, n) {

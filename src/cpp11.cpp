@@ -181,17 +181,18 @@ extern "C" SEXP _RSQLite_result_bind_arrow(SEXP res, SEXP params, SEXP param_ind
   END_CPP11
 }
 // result.cpp
-cpp11::doubles arrow_set_bytes_limits(double cut_bytes, double max_bytes);
-extern "C" SEXP _RSQLite_arrow_set_bytes_limits(SEXP cut_bytes, SEXP max_bytes) {
+void result_set_bytes_limits(SqliteResult* res, double cut_bytes, double max_bytes);
+extern "C" SEXP _RSQLite_result_set_bytes_limits(SEXP res, SEXP cut_bytes, SEXP max_bytes) {
   BEGIN_CPP11
-    return cpp11::as_sexp(arrow_set_bytes_limits(cpp11::as_cpp<cpp11::decay_t<double>>(cut_bytes), cpp11::as_cpp<cpp11::decay_t<double>>(max_bytes)));
+    result_set_bytes_limits(cpp11::as_cpp<cpp11::decay_t<SqliteResult*>>(res), cpp11::as_cpp<cpp11::decay_t<double>>(cut_bytes), cpp11::as_cpp<cpp11::decay_t<double>>(max_bytes));
+    return R_NilValue;
   END_CPP11
 }
 // result.cpp
-double arrow_rethrown_unwinds();
-extern "C" SEXP _RSQLite_arrow_rethrown_unwinds() {
+double result_rethrown_unwinds(DbResult* res);
+extern "C" SEXP _RSQLite_result_rethrown_unwinds(SEXP res) {
   BEGIN_CPP11
-    return cpp11::as_sexp(arrow_rethrown_unwinds());
+    return cpp11::as_sexp(result_rethrown_unwinds(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res)));
   END_CPP11
 }
 // result.cpp
@@ -212,8 +213,6 @@ extern "C" SEXP _RSQLite_rsqliteVersion() {
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
-    {"_RSQLite_arrow_rethrown_unwinds",       (DL_FUNC) &_RSQLite_arrow_rethrown_unwinds,       0},
-    {"_RSQLite_arrow_set_bytes_limits",       (DL_FUNC) &_RSQLite_arrow_set_bytes_limits,       2},
     {"_RSQLite_connection_connect",           (DL_FUNC) &_RSQLite_connection_connect,           5},
     {"_RSQLite_connection_copy_database",     (DL_FUNC) &_RSQLite_connection_copy_database,     2},
     {"_RSQLite_connection_import_file",       (DL_FUNC) &_RSQLite_connection_import_file,       6},
@@ -231,8 +230,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_result_get_placeholder_names", (DL_FUNC) &_RSQLite_result_get_placeholder_names, 1},
     {"_RSQLite_result_has_completed",         (DL_FUNC) &_RSQLite_result_has_completed,         1},
     {"_RSQLite_result_release",               (DL_FUNC) &_RSQLite_result_release,               1},
+    {"_RSQLite_result_rethrown_unwinds",      (DL_FUNC) &_RSQLite_result_rethrown_unwinds,      1},
     {"_RSQLite_result_rows_affected",         (DL_FUNC) &_RSQLite_result_rows_affected,         1},
     {"_RSQLite_result_rows_fetched",          (DL_FUNC) &_RSQLite_result_rows_fetched,          1},
+    {"_RSQLite_result_set_bytes_limits",      (DL_FUNC) &_RSQLite_result_set_bytes_limits,      3},
     {"_RSQLite_result_set_rows_fetched",      (DL_FUNC) &_RSQLite_result_set_rows_fetched,      2},
     {"_RSQLite_result_valid",                 (DL_FUNC) &_RSQLite_result_valid,                 1},
     {"_RSQLite_rsqliteVersion",               (DL_FUNC) &_RSQLite_rsqliteVersion,               0},

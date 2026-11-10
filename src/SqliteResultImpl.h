@@ -6,7 +6,6 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
-#include <utility>
 #include <vector>
 #include "sqlite3-cpp.h"
 #include "DbArrow.h"
@@ -58,6 +57,9 @@ private:
   // Set while the columns hold the storage classes of the current row,
   // also when a byte limit ended the chunk before it
   bool arrow_row_read_;
+  // The byte limits of utf8 and binary columns, see fetch_arrow_rows()
+  int64_t arrow_cut_bytes_;
+  int64_t arrow_max_bytes_;
 
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);
@@ -94,12 +96,8 @@ public:
   cpp11::strings get_placeholder_names() const;
 
   // Sets the bytes of a utf8 or binary column after which, or beyond which,
-  // fetch_arrow_rows() ends a chunk, and returns the previous values;
-  // for the tests
-  static std::pair<int64_t, int64_t> set_arrow_bytes_limits(
-    int64_t cut_bytes,
-    int64_t max_bytes
-  );
+  // fetch_arrow_rows() ends a chunk of this result; for the tests
+  void set_arrow_bytes_limits(int64_t cut_bytes, int64_t max_bytes);
 
 private:
   void after_set_params();

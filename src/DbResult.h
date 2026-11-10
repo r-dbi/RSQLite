@@ -23,6 +23,9 @@ class DbResult : boost::noncopyable {
   DbConnectionPtr pConn_;
   // Set while a fetch or a bind runs, see run_guarded() in DbResult.cpp
   bool busy_;
+  // Counts the R conditions rethrown as C++ exceptions from an Arrow stream of
+  // this result, see db_arrow_stream_read_from_cpp(); for the tests
+  int64_t rethrown_unwinds_;
 
 protected:
   boost::scoped_ptr<DbResultImpl> impl;
@@ -40,6 +43,8 @@ public:
   bool ready() const;
   bool is_active() const;
   bool busy() const;
+  void count_rethrown_unwind();
+  int64_t rethrown_unwinds() const;
   // Counts the executions of the statement with new parameters:
   // bind() and bind_arrow() start a new one
   int64_t executions() const;

@@ -2,6 +2,7 @@
 #include "DbResult.h"
 #include "DbConnection.h"
 #include "DbResultImpl.h"
+#include "DbArrowStream.h"
 
 // Construction ////////////////////////////////////////////////////////////////
 
@@ -94,6 +95,13 @@ void DbResult::bind_arrow(
   struct ArrowArrayStream* stream,
   const std::vector<int>& param_indexes
 ) {
+  // The stream would hold a share of the result that keeps it as parameters,
+  // and could never be read: the new execution invalidates it
+  if (db_arrow_stream_reads(stream, this)) {
+    throw std::runtime_error(
+      "Can't bind a result to an Arrow stream of its own rows."
+    );
+  }
   impl->bind_arrow(stream, param_indexes);
 }
 

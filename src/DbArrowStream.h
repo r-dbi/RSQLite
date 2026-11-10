@@ -19,6 +19,12 @@ void db_arrow_stream_init(
   int64_t chunk_size
 );
 
+// Whether `stream` is a stream of db_arrow_stream_init() that reads `result`
+bool db_arrow_stream_reads(
+  struct ArrowArrayStream* stream,
+  const DbResult* result
+);
+
 // To be called when C++ code of this package takes over `stream` to read it:
 // if it is a stream of db_arrow_stream_init(), an R error or interrupt while
 // reading it propagates as a C++ exception instead of a longjmp, which would

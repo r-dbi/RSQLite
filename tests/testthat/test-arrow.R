@@ -431,6 +431,23 @@ test_that("an error of the statement after dbDisconnect() keeps its result code"
   expect_error(stream$get_next(), "SQL logic error .*connection has been closed")
 })
 
+test_that("a result can't be bound to an Arrow stream of its own rows", {
+  con <- dbConnect(SQLite(), ":memory:")
+  rs <- dbSendQueryArrow(con, "SELECT $a AS a")
+
+  dbBind(rs, list(a = 1:3))
+  expect_error(dbBindArrow(rs, dbFetchArrow(rs)), "its own rows")
+  # A stream that wraps one fails on its first row and is not kept
+  dbBind(rs, list(a = 1:3))
+  wrapped <- nanoarrow::array_stream_set_finalizer(dbFetchArrow(rs), function() NULL)
+  expect_error(dbBindArrow(rs, wrapped), "bound to new parameters")
+
+  # No stream keeps the statement open
+  dbClearResult(rs)
+  gc()
+  expect_warning(dbDisconnect(con), NA)
+})
+
 test_that("dbGetQueryArrow() reads the whole result", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:3, b = letters[1:3]))

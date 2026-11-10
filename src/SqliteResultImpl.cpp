@@ -299,7 +299,14 @@ void SqliteResultImpl::bind_arrow(
   }
 
   params_.reset(new SqliteArrowParamSource(stream, param_indexes));
-  after_set_params();
+  try {
+    after_set_params();
+  } catch (...) {
+    // A stream that fails on its first row is not kept: it may hold a share
+    // of this result, through a stream that wraps one of its Arrow streams
+    params_.reset();
+    throw;
+  }
 }
 
 // Publics (custom) ////////////////////////////////////////////////////////////

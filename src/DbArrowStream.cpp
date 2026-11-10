@@ -166,6 +166,14 @@ void db_arrow_stream_init(
   out->private_data = new StreamState(result, chunk_size);
 }
 
+bool db_arrow_stream_reads(
+  struct ArrowArrayStream* stream,
+  const DbResult* result
+) {
+  return stream->release == &stream_release &&
+         get_state(stream)->result.get() == result;
+}
+
 void db_arrow_stream_read_from_cpp(struct ArrowArrayStream* stream) {
   if (stream->release == &stream_release) {
     get_state(stream)->rethrow_unwind = true;

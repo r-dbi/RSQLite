@@ -178,6 +178,45 @@ test_that("times outside a day are NULL", {
   expect_equal(as.numeric(dbGetQuery(con, sql)$tm)[5:9], c(86400, 100000, -1, 86400, 108000))
 })
 
+test_that("text that is not valid UTF-8 is NULL", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (i INTEGER, s TEXT)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 'ok'), (2, CAST(x'ff' AS TEXT)), (3, CAST(x'c3a9' AS TEXT)),",
+    "(4, CAST(x'610062' AS TEXT)), (5, CAST(x'eda080' AS TEXT)), (6, x'6869'), (7, x'ff'),",
+    # Longer than the eight bytes checked at a time
+    "(8, CAST(x'6161616161616161c3a9' AS TEXT)), (9, CAST(x'61616161616161616161ff' AS TEXT)),",
+    "(10, CAST(x'616161616161616100' AS TEXT))"
+  ))
+
+  messages <- character()
+  df <- withCallingHandlers(
+    as.data.frame(dbGetQueryArrow(con, "SELECT s FROM t ORDER BY i")),
+    warning = function(w) {
+      messages <<- c(messages, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  # A stray byte, a NUL byte and a surrogate are not text, a valid blob is
+  expect_equal(df$s, c("ok", NA, "\u00e9", NA, NA, "hi", NA, "aaaaaaaa\u00e9", NA, NA))
+  expect_equal(length(messages), 2L)
+  expect_match(messages, "`s`: values of type string that are not valid UTF-8, or hold a NUL byte, are NULL", all = FALSE)
+  expect_match(messages, "`s`: mixed type", all = FALSE)
+})
+
+test_that("times and text that Arrow can't hold pass its full validation", {
+  skip_if_not_installed("arrow")
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, tm TIME, s TEXT)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 100000, CAST(x'ff' AS TEXT)), (2, '24:00:00', 'ok'),",
+    "(3, 86399.9999996, CAST(x'c0af' AS TEXT))"
+  ))
+  table <- suppressWarnings(arrow::as_arrow_table(dbGetQueryArrow(con, "SELECT tm, s FROM t ORDER BY i")))
+  expect_true(table$ValidateFull())
+  expect_equal(table$num_rows, 3L)
+})
+
 test_that("dbFetchArrow() streams lazily in chunks", {
   con <- local_con()
   dbWriteTable(con, "t", data.frame(a = 1:10))
@@ -262,7 +301,7 @@ test_that("a row held back by the byte limits keeps its storage classes", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
   # A 90-byte string decides utf8, a 120-byte blob would take the column past 150
-  dbExecute(con, "INSERT INTO t VALUES (1, hex(zeroblob(45))), (2, zeroblob(120))")
+  dbExecute(con, "INSERT INTO t VALUES (1, hex(zeroblob(45))), (2, CAST(hex(zeroblob(60)) AS BLOB))")
 
   # The size check converts the blob to text, the warning still names a blob
   stream <- dbGetQueryArrow(con, "SELECT x FROM t ORDER BY i")
@@ -285,7 +324,10 @@ test_that("a row held back by the byte limits is for the Arrow path only", {
   expect_equal(dbFetchArrowChunk(rs)$length, 1)
   # The byte check has converted the blob to text, a data frame would show that
   expect_error(dbFetch(rs, n = 1), "held back")
-  expect_warning(chunk <- dbFetchArrowChunk(rs, chunk_size = 1), "coercing values of type blob")
+  expect_warning(
+    expect_warning(chunk <- dbFetchArrowChunk(rs, chunk_size = 1), "coercing values of type blob"),
+    "not valid UTF-8"
+  )
   expect_equal(chunk$length, 1)
   expect_equal(dbFetch(rs)$x, "z")
 })

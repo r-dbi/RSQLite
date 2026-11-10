@@ -1,10 +1,30 @@
 #include "pch.h"
 #include "SqliteArrowColumn.h"
 #include "affinity.h"
+#include "utf8.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <algorithm>
 #include <cmath>
+#include <cstring>
 #include <sstream>
+
+// Whether `size` bytes of text are valid UTF-8 without NUL bytes.
+// Most text is ASCII: eight bytes at a time, a word whose bytes are all in
+// 1..127 needs no further check, the rest goes to rsqlite_is_utf8_string().
+static bool is_utf8_text(const char* text, size_t size) {
+  const uint64_t ones = UINT64_C(0x0101010101010101);
+  const uint64_t highs = UINT64_C(0x8080808080808080);
+  size_t i = 0;
+  for (; i + 8 <= size; i += 8) {
+    uint64_t word;
+    memcpy(&word, text + i, 8);
+    // A NUL byte borrows in `word - ones`, a byte above 127 has its high bit
+    if (((word - ones) | word) & highs) {
+      break;
+    }
+  }
+  return rsqlite_is_utf8_string(text + i, size - i);
+}
 
 SqliteArrowColumn::SqliteArrowColumn(
   sqlite3_stmt* stmt_,
@@ -22,6 +42,7 @@ SqliteArrowColumn::SqliteArrowColumn(
       pending_nulls(0),
       warned(false),
       warned_range(false),
+      warned_utf8(false),
       value_type(SQLITE_NULL),
       value_data(NULL),
       value_size(0),
@@ -326,6 +347,20 @@ void SqliteArrowColumn::append_value(int column_type) {
         warn_mixed(column_type);
       }
       fetch_bytes();
+      // SQLite doesn't enforce UTF-8 for text, and keeps blobs as they are;
+      // numbers convert to ASCII
+      if ((column_type == SQLITE_TEXT || column_type == SQLITE_BLOB) &&
+          !is_utf8_text(
+            static_cast<const char*>(value_data),
+            static_cast<size_t>(value_size)
+          )) {
+        warn_invalid_utf8(column_type);
+        check_arrow(
+          ArrowArrayAppendNull(array.get(), 1),
+          "Can't append to Arrow array"
+        );
+        break;
+      }
       check_arrow(
         ArrowArrayAppendString(
           array.get(),
@@ -459,6 +494,19 @@ void SqliteArrowColumn::warn_mixed(int column_type) {
   cpp11::warning(ss.str());
   // A handler of the warning may have converted the value: read it again
   value_fetched = false;
+}
+
+void SqliteArrowColumn::warn_invalid_utf8(int column_type) {
+  if (warned_utf8) {
+    return;
+  }
+  warned_utf8 = true;
+
+  std::stringstream ss;
+  ss << "Column `" << name << "`: values of type "
+     << format_column_type(column_type)
+     << " that are not valid UTF-8, or hold a NUL byte, are NULL";
+  cpp11::warning(ss.str());
 }
 
 void SqliteArrowColumn::warn_out_of_range(int column_type) {

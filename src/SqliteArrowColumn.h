@@ -43,6 +43,7 @@ class SqliteArrowColumn {
   int64_t pending_nulls;
   bool warned;
   bool warned_range;
+  bool warned_utf8;
 
   // The value of the current row: its storage class, read before any
   // conversion, and for a utf8 or binary column its bytes, read once for the
@@ -95,6 +96,7 @@ private:
   void promote_to_double();
   void warn_mixed(int column_type);
   void warn_out_of_range(int column_type);
+  void warn_invalid_utf8(int column_type);
   static const char* format_kind(ARROW_KIND kind);
   static const char* format_column_type(int column_type);
 };

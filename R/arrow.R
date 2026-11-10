@@ -19,6 +19,9 @@
 #' Once the first chunk has been fetched the types are fixed;
 #' later values of another storage class are converted by SQLite's own rules,
 #' with one warning per column.
+#' Text and blobs in a `utf8` column must be valid UTF-8 without NUL bytes,
+#' which SQLite does not enforce: other values become `NULL` with a warning,
+#' where the data frame path passes text through unchecked.
 #' The types can therefore depend on `chunk_size`:
 #' a real number in a later chunk is truncated to fit an `int64` column decided from integers,
 #' and a column whose first chunk holds only `NULL` keeps its declared type,

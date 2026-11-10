@@ -253,6 +253,21 @@ extern "C" SEXP _RSQLite_result_set_rows_fetched(SEXP res, SEXP n) {
     return R_NilValue;
   END_CPP11
 }
+// result.cpp
+cpp11::list arrow_stream_read_on_thread(SEXP stream_xptr, double n, bool release);
+extern "C" SEXP _RSQLite_arrow_stream_read_on_thread(SEXP stream_xptr, SEXP n, SEXP release) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(arrow_stream_read_on_thread(cpp11::as_cpp<cpp11::decay_t<SEXP>>(stream_xptr), cpp11::as_cpp<cpp11::decay_t<double>>(n), cpp11::as_cpp<cpp11::decay_t<bool>>(release)));
+  END_CPP11
+}
+// result.cpp
+void result_call_while_busy(cpp11::external_pointer<DbResultPtr> res, cpp11::function fun);
+extern "C" SEXP _RSQLite_result_call_while_busy(SEXP res, SEXP fun) {
+  BEGIN_CPP11
+    result_call_while_busy(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResultPtr>>>(res), cpp11::as_cpp<cpp11::decay_t<cpp11::function>>(fun));
+    return R_NilValue;
+  END_CPP11
+}
 // rsqlite.cpp
 cpp11::strings rsqliteVersion();
 extern "C" SEXP _RSQLite_rsqliteVersion() {
@@ -266,6 +281,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_arrow_concat_strings",            (DL_FUNC) &_RSQLite_arrow_concat_strings,            1},
     {"_RSQLite_arrow_set_concat_utf8_max_bytes", (DL_FUNC) &_RSQLite_arrow_set_concat_utf8_max_bytes, 1},
     {"_RSQLite_arrow_split_columns",             (DL_FUNC) &_RSQLite_arrow_split_columns,             1},
+    {"_RSQLite_arrow_stream_read_on_thread",     (DL_FUNC) &_RSQLite_arrow_stream_read_on_thread,     3},
     {"_RSQLite_connection_connect",              (DL_FUNC) &_RSQLite_connection_connect,              5},
     {"_RSQLite_connection_copy_database",        (DL_FUNC) &_RSQLite_connection_copy_database,        2},
     {"_RSQLite_connection_import_file",          (DL_FUNC) &_RSQLite_connection_import_file,          6},
@@ -276,6 +292,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_integer64_to_integer",            (DL_FUNC) &_RSQLite_integer64_to_integer,            1},
     {"_RSQLite_result_bind",                     (DL_FUNC) &_RSQLite_result_bind,                     2},
     {"_RSQLite_result_bind_arrow",               (DL_FUNC) &_RSQLite_result_bind_arrow,               3},
+    {"_RSQLite_result_call_while_busy",          (DL_FUNC) &_RSQLite_result_call_while_busy,          2},
     {"_RSQLite_result_column_info",              (DL_FUNC) &_RSQLite_result_column_info,              1},
     {"_RSQLite_result_column_names",             (DL_FUNC) &_RSQLite_result_column_names,             1},
     {"_RSQLite_result_create",                   (DL_FUNC) &_RSQLite_result_create,                   2},

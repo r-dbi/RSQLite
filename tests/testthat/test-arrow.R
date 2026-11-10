@@ -753,7 +753,17 @@ test_that("a result read on another thread can't be used, but clears", {
   # read there does
   rs <- dbSendQuery(con, "SELECT a FROM t WHERE a >= $a")
   dbBind(rs, list(a = 2L))
+  expect_equal(dbFetch(rs, n = 1)$a, 2L)
   result_call_while_busy(rs@ptr, function() {
+    # What doesn't use the statement works
+    expect_equal(dbGetRowCount(rs), 1L)
+    expect_false(dbHasCompleted(rs))
+    expect_equal(dbGetRowsAffected(rs), 0L)
+    expect_equal(dbGetStatement(rs), "SELECT a FROM t WHERE a >= $a")
+    expect_true(dbIsValid(rs))
+    expect_equal(dbGetInfo(rs)$row.count, 1L)
+    expect_output(show(rs), "SELECT a FROM t")
+
     expect_error(dbFetch(rs), msg)
     expect_error(dbFetchArrowChunk(rs), msg)
     expect_error(dbBind(rs, list(a = 1L)), msg)
@@ -813,6 +823,32 @@ test_that("a result clears while arrow's scanner reads its stream ahead", {
   expect_equal(x, 42L)
   expect_false(dbIsValid(rs))
   expect_equal(read_rest(reader, batch$num_rows), 200000)
+})
+
+test_that("the row count and completion follow a stream that arrow's scanner reads ahead", {
+  skip_if_not_installed("arrow")
+  skip_if_not(arrow::arrow_with_dataset())
+  con <- local_con()
+  n <- 200000
+  rs <- dbSendQueryArrow(con, paste(
+    "WITH RECURSIVE r(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM r WHERE i <", n, ")",
+    "SELECT i AS a FROM r"
+  ))
+  reader <- arrow::Scanner$create(arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 1000)))$ToRecordBatchReader()
+
+  # Polled while the scanner reads on in the background
+  counts <- dbGetRowCount(rs)
+  completed <- dbHasCompleted(rs)
+  while (!is.null(reader$read_next_batch())) {
+    counts <- c(counts, dbGetRowCount(rs))
+    completed <- c(completed, dbHasCompleted(rs))
+  }
+  expect_false(is.unsorted(counts))
+  expect_true(all(counts >= 0 & counts <= n))
+  expect_false(is.unsorted(completed))
+  expect_equal(dbGetRowCount(rs), n)
+  expect_true(dbHasCompleted(rs))
+  dbClearResult(rs)
 })
 
 test_that("an error of the statement after dbDisconnect() keeps its result code", {

@@ -111,6 +111,7 @@ The scanner and Acero read ahead in the background, also while R goes on after t
 While such a thread reads the stream, \code{\link[DBI:dbFetch]{DBI::dbFetch()}}, \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}}, \code{\link[DBI:dbBind]{DBI::dbBind()}},
 \code{\link[DBI:dbBindArrow]{DBI::dbBindArrow()}} and \code{\link[DBI:dbColumnInfo]{DBI::dbColumnInfo()}} fail on its result with an error that says so,
 and one of them running on R's main thread fails the read on the other thread.
+\code{\link[DBI:dbGetRowCount]{DBI::dbGetRowCount()}} and \code{\link[DBI:dbHasCompleted]{DBI::dbHasCompleted()}} work meanwhile and follow the rows read there.
 \code{\link[DBI:dbClearResult]{DBI::dbClearResult()}} and the next query on the connection, which clears an open result,
 clear the result object all the same, and the stream reads on.
 A stream released on such a thread closes its statement at once if its result object has been cleared,

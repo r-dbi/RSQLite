@@ -6,6 +6,7 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
+#include <atomic>
 #include <vector>
 #include "sqlite3-cpp.h"
 #include "DbArrow.h"
@@ -15,6 +16,28 @@
 
 class DbConnection;
 typedef boost::shared_ptr<DbConnection> DbConnectionPtr;
+
+// A value that one thread at a time writes, under the busy mark of the result,
+// and that R's main thread reads at any time: dbGetRowCount() and
+// dbHasCompleted() follow a stream read on another thread
+template <typename T>
+class ProgressValue {
+  std::atomic<T> value_;
+
+public:
+  explicit ProgressValue(T value) : value_(value) {}
+  operator T() const {
+    return value_.load(std::memory_order_acquire);
+  }
+  ProgressValue& operator=(T value) {
+    value_.store(value, std::memory_order_release);
+    return *this;
+  }
+  // Not an atomic increment: there is one writer at a time
+  ProgressValue& operator++() {
+    return *this = static_cast<T>(*this) + 1;
+  }
+};
 
 class SqliteResultImpl : public boost::noncopyable {
 private:
@@ -36,10 +59,10 @@ private:
   } cache;
 
   // State
-  bool complete_;
+  ProgressValue<bool> complete_;
   bool ready_;
   // 64 bits: an Arrow stream reads past INT_MAX rows
-  int64_t nrows_;
+  ProgressValue<int64_t> nrows_;
   // Counts the executions with new parameters, see executions()
   int64_t executions_;
   int total_changes_start_;
@@ -54,6 +77,8 @@ private:
   bool arrow_frozen_;
   nanoarrow::UniqueArray pending_chunk_;
   int64_t pending_offset_;
+  // The rows of that chunk not handed out yet, for n_rows_fetched()
+  ProgressValue<int64_t> pending_rows_;
   // Set while the columns hold the storage classes of the current row,
   // also when a byte limit ended the chunk before it
   bool arrow_row_read_;

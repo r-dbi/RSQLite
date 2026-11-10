@@ -355,3 +355,35 @@ test_that("time and timestamp prototypes keep the default path's precision and r
   expect_identical(arrow_fetch_df(rs, -1, chunk_size = 2), expected)
   dbClearResult(rs)
 })
+
+test_that("ptype can't be combined with schema", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (a)")
+  dbExecute(con, "INSERT INTO t VALUES ('2024-01-01')")
+  ptype <- list(a = as.Date(character()))
+  schema <- list(a = nanoarrow::na_string())
+
+  expect_error(
+    dbSendQueryArrow(con, "SELECT * FROM t", ptype = ptype, schema = schema),
+    "`schema` and `ptype` can't be combined",
+    fixed = TRUE
+  )
+  expect_error(
+    dbGetQueryArrow(con, "SELECT * FROM t", ptype = ptype, schema = schema),
+    "`schema` and `ptype` can't be combined",
+    fixed = TRUE
+  )
+  # Refused before the query is sent, so an open result is left alone
+  rs <- dbSendQuery(con, "SELECT * FROM t")
+  expect_error(dbSendQueryArrow(con, "SELECT * FROM t", ptype = ptype, schema = schema))
+  expect_true(dbIsValid(rs))
+  dbClearResult(rs)
+
+  # Each one alone is fine
+  rs <- dbSendQueryArrow(con, "SELECT * FROM t", schema = schema, ptype = NULL)
+  expect_equal(dbFetch(rs), data.frame(a = "2024-01-01"))
+  dbClearResult(rs)
+  rs <- dbSendQueryArrow(con, "SELECT * FROM t", ptype = ptype)
+  expect_equal(dbFetch(rs), data.frame(a = as.Date("2024-01-01")))
+  dbClearResult(rs)
+})

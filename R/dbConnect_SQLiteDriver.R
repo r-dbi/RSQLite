@@ -46,7 +46,8 @@
 #'   The data frames are the same as with the default path, see [sqlite-arrow] for the rules and the exceptions,
 #'   and the `ptype` argument of [DBI::dbSendQuery()] can fix the types of the columns up front.
 #'   When this was measured, fetching a large table took less time through Arrow than on the default path,
-#'   and fetching it in chunks much less.
+#'   whole or in chunks of thousands of rows,
+#'   and a fetch of a few rows took more.
 #'   Experimental, defaults to `FALSE`.
 #' @param lazy_strings When `TRUE`, with `arrow = TRUE`, the character columns of a fetched data frame
 #'   stay views into Arrow arrays instead of being copied into R's strings,

@@ -390,7 +390,9 @@ int64_t SqliteResultImpl::fetch_arrow_df(
   int64_t n_max,
   int64_t chunk_size
 ) {
-  if (!ready_) {
+  if (!ready_ && n_max != 0) {
+    // A fetch of no rows also serves dbColumnInfo(), which the default path
+    // answers before the parameters are bound, from the declared types
     throw std::runtime_error("Query needs to be bound before fetching");
   }
 

@@ -170,7 +170,8 @@ The default \code{NULL} decides the types from the values.}
 as a data frame or a named list of vectors whose values are ignored,
 such as \code{list(id = bit64::integer64(), when = as.POSIXct(character(), tz = "UTC"))},
 matched to the result columns by name.
-Requires a connection with \code{arrow = TRUE}, see the section on data frames in \link{sqlite-arrow}.
+Requires a connection with \code{arrow = TRUE}, see the section on data frames in \link{sqlite-arrow},
+and can't be combined with the \code{schema} argument of \code{dbSendQueryArrow()}.
 The default \code{NULL} decides the types from the values.}
 }
 \description{

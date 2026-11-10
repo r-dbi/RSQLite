@@ -30,7 +30,7 @@
 #' and for the first chunk when the schema is requested before it, see the section on chunking.
 #' The warning carries the details in its `coercions` field.
 #' A handler of the warning runs while the result is still busy with the chunk:
-#' it can't fetch from, bind, inspect or clear that result, which raises an error.
+#' it gets an error if it fetches from, binds, inspects or clears that result.
 #' The types can therefore depend on `chunk_size`:
 #' a real number in a later chunk is truncated to fit an `int64` column decided from integers,
 #' and a column whose first chunk holds only `NULL` keeps its declared type,
@@ -93,7 +93,7 @@
 #' Text ends at its first NUL character and is not checked for UTF-8, as on the default path,
 #' where a stream makes text `NULL` unless it is valid UTF-8 without NUL bytes.
 #' A blob in a text column is text only if it is valid UTF-8 without NUL bytes, as in a stream,
-#' and `NA` with a warning otherwise,
+#' and `NA` otherwise, reported in the warning of the fetch,
 #' where the default path ends it at its first NUL byte and does not check it.
 #'
 #' Unlike a stream, each fetch decides the types of its columns, the way the default path does it:

@@ -33,8 +33,7 @@ warn_coercion <- function(entries) {
   rlang::warn(
     c(header, rlang::set_names(bullets, "*")),
     class = "RSQLite_warning_coercion",
-    coercions = entries,
-    call = NULL
+    coercions = entries
   )
 }
 

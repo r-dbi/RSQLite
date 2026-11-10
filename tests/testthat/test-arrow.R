@@ -166,6 +166,24 @@ test_that("text in a binary column is UTF-8, also in a UTF-16 database", {
   expect_equal(unclass(default$x), expected, ignore_attr = TRUE)
 })
 
+test_that("a blob in a utf8 column keeps its bytes, also in a UTF-16 database", {
+  con <- local_con()
+  dbExecute(con, "PRAGMA encoding = 'UTF-16'")
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 'first'), (2, x'6162'), (3, x'c3a4'), (4, x'00ff'), (5, x'')"
+  ))
+
+  w <- coercion_warnings(df <- as.data.frame(dbGetQueryArrow(con, "SELECT x FROM t ORDER BY i")))
+  # The bytes are UTF-8, not UTF-16 to transcode
+  expect_equal(df$x, c("first", "ab", "\u00e4", NA, ""))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_equal(vapply(values, `[[`, "", "reason"), c("converted", "invalid_utf8"))
+  expect_equal(values[[1]]$rows, c(2, 3, 5))
+  expect_equal(values[[2]]$rows, 4)
+})
+
 test_that("text that is not valid UTF-8 is NULL", {
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (i INTEGER, s TEXT)")

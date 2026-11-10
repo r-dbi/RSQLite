@@ -18,7 +18,17 @@
 #' @param select.cols  Deprecated, do not use.
 #' @param ... Needed for compatibility with generic.
 #'   Otherwise ignored.
-#' @inheritParams DBI::sqlRownamesToColumn
+#' @param row.names Either `TRUE`, `FALSE`, `NA` or a string.
+#'
+#'   If `TRUE`, always translate row names to a column called "row_names".
+#'   If `FALSE`, never translate row names.
+#'   If `NA`, translate rownames only if they're a character vector.
+#'
+#'   A string is equivalent to `TRUE`, but allows you to override the default name.
+#'
+#'   A default set with `pkgconfig::set_config()` is still honored, with a deprecation warning; pass `row.names` explicitly instead.
+#'
+#'   For backward compatibility, `NULL` is equivalent to `FALSE`.
 #' @rdname dbReadTable
 #' @examples
 #' library(DBI)

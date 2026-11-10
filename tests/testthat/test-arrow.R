@@ -675,7 +675,7 @@ test_that("a stream is read and released on another thread", {
   # One row of R parameters, and Arrow parameters
   out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, "SELECT ? AS a", params = list(5L)), -1, TRUE)
   expect_equal(rbind_arrays(out$arrays)$a, 5)
-  rs <- dbSendQueryArrow(con, "SELECT ? AS a")
+  rs <- dbSendQueryArrow(con, "SELECT $a AS a")
   dbBindArrow(rs, nanoarrow::as_nanoarrow_array_stream(data.frame(a = 1:3)))
   out <- arrow_stream_read_on_thread(dbFetchArrow(rs, chunk_size = 2), -1, TRUE)
   expect_equal(out$error, "")
@@ -751,12 +751,12 @@ test_that("a result read on another thread can't be used, but clears", {
 
   # While another thread holds the result with a share of its own, as a stream
   # read there does
-  rs <- dbSendQuery(con, "SELECT a FROM t WHERE a >= ?")
-  dbBind(rs, list(2L))
+  rs <- dbSendQuery(con, "SELECT a FROM t WHERE a >= $a")
+  dbBind(rs, list(a = 2L))
   result_call_while_busy(rs@ptr, function() {
     expect_error(dbFetch(rs), msg)
     expect_error(dbFetchArrowChunk(rs), msg)
-    expect_error(dbBind(rs, list(1L)), msg)
+    expect_error(dbBind(rs, list(a = 1L)), msg)
     expect_error(dbBindArrow(rs, nanoarrow::as_nanoarrow_array_stream(data.frame(a = 1L))), msg)
     expect_error(dbColumnInfo(rs), msg)
     expect_silent(dbClearResult(rs))

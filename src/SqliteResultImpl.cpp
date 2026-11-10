@@ -438,22 +438,21 @@ int64_t SqliteResultImpl::fetch_arrow_rows(
     arrow_columns_[j].start_chunk();
   }
 
-  std::vector<int> column_types(ncols);
   int64_t n = 0;
   while (!complete_ && n < n_max) {
     // The storage classes are read once per row, before any conversion
     for (size_t j = 0; j < ncols; ++j) {
-      column_types[j] = arrow_columns_[j].column_type();
+      arrow_columns_[j].read_row();
     }
     // A row that would overflow a column starts the next chunk.
     // An empty chunk takes any row: sqlite3_column_bytes() returns an int,
     // so a single value never overflows.
-    if (n > 0 && !arrow_row_fits(column_types)) {
+    if (n > 0 && !arrow_row_fits()) {
       break;
     }
 
     for (size_t j = 0; j < ncols; ++j) {
-      arrow_columns_[j].append_row(column_types[j]);
+      arrow_columns_[j].append_row();
     }
     step();
     ++nrows_;
@@ -591,10 +590,10 @@ void SqliteResultImpl::copy_pending_rows(struct ArrowArray* out, int64_t n) {
   chunk.move(out);
 }
 
-bool SqliteResultImpl::arrow_row_fits(const std::vector<int>& column_types) {
+bool SqliteResultImpl::arrow_row_fits() {
   for (size_t j = 0; j < arrow_columns_.size(); ++j) {
     SqliteArrowColumn& column = arrow_columns_[j];
-    int64_t bytes = column.value_bytes(column_types[j]);
+    int64_t bytes = column.value_bytes();
     if (bytes > 0 && column.variable_bytes() + bytes > arrow_max_bytes) {
       return false;
     }

@@ -19,7 +19,11 @@ SqliteArrowColumn::SqliteArrowColumn(
       kind(AK_UNDECIDED),
       frozen(false),
       pending_nulls(0),
-      warned(false) {
+      warned(false),
+      value_type(SQLITE_NULL),
+      value_data(NULL),
+      value_size(0),
+      value_fetched(false) {
   if (with_alt_types) {
     ARROW_KIND decl = kind_from_decltype();
     if (decl == AK_DATE || decl == AK_TIME || decl == AK_TIMESTAMP) {
@@ -130,30 +134,22 @@ void SqliteArrowColumn::start_chunk() {
   }
 }
 
-int SqliteArrowColumn::column_type() const {
-  return sqlite3_column_type(stmt, j);
+void SqliteArrowColumn::read_row() {
+  value_type = sqlite3_column_type(stmt, j);
+  value_fetched = false;
 }
 
-int64_t SqliteArrowColumn::value_bytes(int column_type) {
-  if (column_type == SQLITE_NULL) {
+int64_t SqliteArrowColumn::value_bytes() {
+  if (value_type == SQLITE_NULL || (kind != AK_STRING && kind != AK_BINARY)) {
     return 0;
   }
-  // The same calls as in append_value(), which then reuses the conversion:
-  // sqlite3_column_text() or sqlite3_column_blob() before
-  // sqlite3_column_bytes()
-  switch (kind) {
-  case AK_STRING:
-    sqlite3_column_text(stmt, j);
-    return sqlite3_column_bytes(stmt, j);
-  case AK_BINARY:
-    sqlite3_column_blob(stmt, j);
-    return sqlite3_column_bytes(stmt, j);
-  default:
-    return 0;
-  }
+  fetch_bytes();
+  return value_size;
 }
 
-void SqliteArrowColumn::append_row(int column_type) {
+void SqliteArrowColumn::append_row() {
+  const int column_type = value_type;
+
   if (!decided()) {
     if (column_type == SQLITE_NULL) {
       ++pending_nulls;
@@ -275,6 +271,22 @@ void SqliteArrowColumn::init_array() {
   );
 }
 
+// Reads the bytes of a utf8 or binary value once per row
+void SqliteArrowColumn::fetch_bytes() {
+  if (value_fetched) {
+    return;
+  }
+  // sqlite3_column_text() or sqlite3_column_blob() converts the value,
+  // and must be called before sqlite3_column_bytes()
+  if (kind == AK_STRING) {
+    value_data = sqlite3_column_text(stmt, j);
+  } else {
+    value_data = sqlite3_column_blob(stmt, j);
+  }
+  value_size = sqlite3_column_bytes(stmt, j);
+  value_fetched = true;
+}
+
 void SqliteArrowColumn::append_value(int column_type) {
   switch (kind) {
   case AK_INT64:
@@ -308,12 +320,12 @@ void SqliteArrowColumn::append_value(int column_type) {
       if (column_type != SQLITE_TEXT) {
         warn_mixed(column_type);
       }
-      // sqlite3_column_text() must be called before sqlite3_column_bytes()
-      const char* text =
-        reinterpret_cast<const char*>(sqlite3_column_text(stmt, j));
-      int size = sqlite3_column_bytes(stmt, j);
+      fetch_bytes();
       check_arrow(
-        ArrowArrayAppendString(array.get(), arrow_string_view(text, size)),
+        ArrowArrayAppendString(
+          array.get(),
+          arrow_string_view(static_cast<const char*>(value_data), value_size)
+        ),
         "Can't append to Arrow array"
       );
       break;
@@ -324,10 +336,12 @@ void SqliteArrowColumn::append_value(int column_type) {
       if (column_type != SQLITE_BLOB) {
         warn_mixed(column_type);
       }
-      const void* blob = sqlite3_column_blob(stmt, j);
-      int size = sqlite3_column_bytes(stmt, j);
+      fetch_bytes();
       check_arrow(
-        ArrowArrayAppendBytes(array.get(), arrow_buffer_view(blob, size)),
+        ArrowArrayAppendBytes(
+          array.get(),
+          arrow_buffer_view(value_data, value_size)
+        ),
         "Can't append to Arrow array"
       );
       break;

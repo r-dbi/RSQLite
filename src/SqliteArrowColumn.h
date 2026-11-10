@@ -43,6 +43,14 @@ class SqliteArrowColumn {
   int64_t pending_nulls;
   bool warned;
 
+  // The value of the current row: its storage class, read before any
+  // conversion, and for a utf8 or binary column its bytes, read once for the
+  // byte limits and the append
+  int value_type;
+  const void* value_data;
+  int value_size;
+  bool value_fetched;
+
 public:
   SqliteArrowColumn(
     sqlite3_stmt* stmt_,
@@ -63,13 +71,13 @@ public:
 
   // Chunk building
   void start_chunk();
-  // The storage class of the current row, to be read before any conversion
-  int column_type() const;
+  // Reads the storage class of the value of the current row
+  void read_row();
   // The bytes that the value of the current row adds to the data buffer of a
   // utf8 or binary column, zero for the other types
-  int64_t value_bytes(int column_type);
-  // Appends the value of the current row of storage class `column_type`
-  void append_row(int column_type);
+  int64_t value_bytes();
+  // Appends the value of the current row
+  void append_row();
   void finish_chunk(int64_t n);
   void move_chunk_to(struct ArrowArray* out);
   // The bytes in the data buffer of a utf8 or binary column
@@ -80,6 +88,7 @@ private:
   ARROW_KIND kind_from_decltype() const;
 
   void init_array();
+  void fetch_bytes();
   void append_value(int column_type);
   void promote_to_double();
   void warn_mixed(int column_type);

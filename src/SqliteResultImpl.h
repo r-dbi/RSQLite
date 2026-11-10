@@ -109,7 +109,7 @@ private:
   int64_t fetch_arrow_rows(struct ArrowArray* out, int64_t n_max);
   void set_arrow_struct_schema(struct ArrowSchema* out);
   void copy_pending_rows(struct ArrowArray* out, int64_t n);
-  bool arrow_row_fits(const std::vector<int>& column_types);
+  bool arrow_row_fits();
   bool arrow_chunk_full();
 
 private:

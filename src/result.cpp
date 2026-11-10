@@ -134,6 +134,7 @@ cpp11::doubles arrow_set_bytes_limits(double cut_bytes, double max_bytes) {
     static_cast<int64_t>(cut_bytes),
     static_cast<int64_t>(max_bytes)
   );
-  return cpp11::writable::doubles({ static_cast<double>(old.first),
-                                    static_cast<double>(old.second) });
+  return cpp11::writable::doubles(
+    { static_cast<double>(old.first), static_cast<double>(old.second) }
+  );
 }

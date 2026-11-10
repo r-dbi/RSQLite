@@ -203,7 +203,8 @@ test_that("an error in the middle of a result completes it", {
   expect_equal(dbFetch(res, n = 1)$id, 1L)
   expect_error(dbFetch(res), "malformed JSON")
   expect_true(dbHasCompleted(res))
-  # The rows read by the failed fetch were not returned
+  # The rows read by the failed fetch were not returned, and are lost.
+  # They include row 2, read before the step onto row 3 failed.
   expect_equal(dbGetRowCount(res), 1L)
 
   # The statement is not restarted from the first row
@@ -211,6 +212,15 @@ test_that("an error in the middle of a result completes it", {
   expect_equal(nrow(out), 0L)
   expect_named(out, c("id", "j"))
   expect_true(dbHasCompleted(res))
+  expect_equal(dbGetRowCount(res), 1L)
+
+  # The structure stays available
+  out <- dbFetch(res, n = 0)
+  expect_equal(nrow(out), 0L)
+  expect_named(out, c("id", "j"))
+  info <- dbColumnInfo(res)
+  expect_equal(info$name, c("id", "j"))
+  expect_equal(info$type, c("integer", "character"))
   expect_equal(dbGetRowCount(res), 1L)
 })
 

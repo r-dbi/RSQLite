@@ -330,4 +330,8 @@ test_that("rows of a fetch whose conversion fails don't count", {
     expect_error(dbFetch(res, n = 2), "mixed type")
   )
   expect_equal(dbGetRowCount(res), 2L)
+
+  # The result goes on after the rows of the failed fetch, which are skipped
+  expect_false(dbHasCompleted(res))
+  expect_equal(dbFetch(res)$x, 5L)
 })

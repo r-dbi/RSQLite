@@ -198,5 +198,5 @@ test_that("random byte strings agree with base R", {
 })
 
 test_that("non-raw input is an error", {
-  expect_error(utf8_valid(list("a")))
+  expect_error(utf8_valid(list("a")), "expected 'raw'")
 })

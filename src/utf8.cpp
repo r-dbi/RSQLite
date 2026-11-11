@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <vector>
+
 // The length of the UTF-8 sequence at the start of the `size` bytes at `s`,
 // or 0 if it is not well-formed or is a NUL byte.
 static size_t utf8_sequence_length(const unsigned char* s, size_t size) {
@@ -96,10 +98,15 @@ cpp11::logicals utf8_valid(cpp11::list x) {
   cpp11::writable::logicals out(n);
   for (R_xlen_t k = 0; k < n; ++k) {
     cpp11::raws bytes(x[k]);
-    const bool valid = rsqlite_is_utf8_string(
-      reinterpret_cast<const char*>(RAW(bytes)),
-      static_cast<size_t>(bytes.size())
-    );
+    const size_t size = static_cast<size_t>(bytes.size());
+    // Continuation bytes behind the input: a read past `size` would turn a
+    // truncated sequence into a valid one, so the tests would see it.
+    // Empty input is passed as NULL, which the header allows.
+    std::vector<char> buf(size + 3, '\x80');
+    if (size > 0) {
+      memcpy(buf.data(), RAW(bytes), size);
+    }
+    const bool valid = rsqlite_is_utf8_string(size > 0 ? buf.data() : NULL, size);
     out[k] = cpp11::r_bool(valid);
   }
   return out;

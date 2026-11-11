@@ -1,14 +1,3 @@
-os <- function() {
-  ostype <- .Platform[["OS.type"]]
-  if (ostype == "windows") {
-    return("windows")
-  }
-  if (grepl("darwin", R.Version()$os)) {
-    return("osx")
-  }
-  ostype
-}
-
 # Specific to RSQLite
 test_that("can connect to memory database (#140)", {
   expect_true(

@@ -274,17 +274,6 @@ test_that("data frames fetched in chunks through Arrow own their strings", {
   expect_equal(chunks[[2]]$s, "c")
 })
 
-# The default path warns once per column with mixed types,
-# the Arrow path once per fetch.
-# A fetch of no rows warns on the default path when the next row holds a value
-# of another storage class, never through Arrow: it returns no value.
-expect_same_fetches <- function(actual, expected, ns, info) {
-  expect_identical(actual$data, expected$data, info = info)
-  warned <- pmin(expected$warnings, 1L)
-  warned[ns == 0] <- 0L
-  expect_identical(actual$warnings, warned, info = info)
-}
-
 test_that("each fetch through Arrow is typed like on the default path", {
   setup <- c(
     "CREATE TABLE t (x, y INTEGER, z TEXT, w REAL, b BLOB, big, n)",

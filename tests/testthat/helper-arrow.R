@@ -81,6 +81,18 @@ fetch_sequence <- function(con, sql, ns, chunk_size = NULL, info = FALSE) {
   list(data = data, warnings = warnings)
 }
 
+# Compares the fetch_sequence() of the Arrow path with that of the default path.
+# The default path warns once per column with mixed types,
+# the Arrow path once per fetch.
+# A fetch of no rows warns on the default path when the next row holds a value
+# of another storage class, never through Arrow: it returns no value.
+expect_same_fetches <- function(actual, expected, ns, info) {
+  expect_identical(actual$data, expected$data, info = info)
+  warned <- pmin(expected$warnings, 1L)
+  warned[ns == 0] <- 0L
+  expect_identical(actual$warnings, warned, info = info)
+}
+
 # The coercion warnings that `expr` raises, muffled
 coercion_warnings <- function(expr) {
   out <- list()

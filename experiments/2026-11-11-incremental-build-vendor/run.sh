@@ -10,7 +10,8 @@
 # On exit it restores those files with their time stamps,
 # and deletes src/ext-http.o and src/ext-http.d,
 # so that the next build compiles ext-http.c from the restored sources.
-# The full log of each build stays in the temporary directory, which is deleted on exit.
+# The full log of each build is written to the temporary directory, which is deleted on exit,
+# so a build that fails has the tail of its log printed to stderr first.
 
 set -euo pipefail
 
@@ -65,17 +66,27 @@ dd_summary() {
   echo "$(wc -l < "$1") lines, $(grep -c '^ */' "$1" || true) absolute paths, $(grep -c '^ *vendor/' "$1" || true) vendored paths"
 }
 
-install() {
-  local name=$1
+# Runs a build with its output in $work/<step>.log.
+# If the build fails, prints the last 30 lines of the log and the step to stderr, and exits.
+build() {
+  local step=$1
   shift
-  R CMD INSTALL --no-clean-on-error "$@" -l "$lib" . > "$work/$name.log" 2>&1
-  report "$work/$name.log"
+  if ! "$@" > "$work/$step.log" 2>&1; then
+    echo "Step $step failed: $*" >&2
+    tail -n 30 "$work/$step.log" >&2
+    exit 1
+  fi
+  report "$work/$step.log"
+}
+
+install() {
+  local step=$1
+  shift
+  build "$step" R CMD INSTALL --no-clean-on-error "$@" -l "$lib" .
 }
 
 compile_dll() {
-  local name=$1
-  Rscript -e 'pkgbuild::compile_dll(".", quiet = FALSE)' > "$work/$name.log" 2>&1
-  report "$work/$name.log"
+  build "$1" Rscript -e 'pkgbuild::compile_dll(".", quiet = FALSE)'
 }
 
 edit_vendored() {

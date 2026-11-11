@@ -110,13 +110,23 @@ After step 6:
 
 ## Replicating
 
-From the root of a checkout, with R, the package's build dependencies, pkgbuild and GNU make, and optionally clang:
+The driver needs bash, GNU make, GNU coreutils and GNU sed on Linux, and R with pkgbuild, the package's build dependencies and a compiler.
+Step 8 uses `gcc` and `clang` as found on the `PATH`, and skips one that is missing.
+On macOS the link detection, which looks for `-shared`, and `gcc`, which there is Apple's clang, would not work as written.
+
+From the root of a checkout:
 
 ```sh
 experiments/2026-11-11-incremental-build-vendor/run.sh
 ```
 
 It takes about a minute with a warm ccache, and longer without, since steps 1 and 6 compile the whole package.
-It leaves in `src/` the build output that any in-place `R CMD INSTALL` leaves.
+The driver overwrites any existing in-place build of `src/`, and the next normal build recompiles everything.
+It is best run in a throwaway worktree, as the record itself was.
+The record was measured at 3b7bea34.
+The branch commit that adds the record changes nothing under `src/`, so running it from this branch prints that commit instead, with the same findings.
+If a build fails, the driver prints the step and the tail of its log to stderr, restores the files it edited and exits.
 Time stamps and paths differ between runs and machines.
 The findings rest on what each step compiled, on the dependency files, and on the indents.
+Step 1's list of regenerated `.dd` files depends on the time stamps of the checkout, so a first run from a fresh checkout may not list `cpp11.dd`.
+That does not affect the findings.

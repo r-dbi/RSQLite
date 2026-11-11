@@ -15,13 +15,8 @@ test_that("http VFS can read a small db via local HTTP server", {
     ranges = FALSE
   )
 
-  # The HTTP VFS cannot load the default extensions yet.
-  con <- dbConnect(
-    SQLite(),
-    http_vfs_uri(server$url),
-    flags = SQLITE_RO,
-    default.extensions = FALSE
-  )
+  # Also loads the default extensions through the HTTP VFS.
+  con <- dbConnect(SQLite(), http_vfs_uri(server$url), flags = SQLITE_RO)
   withr::defer(dbDisconnect(con))
 
   res <- dbGetQuery(con, "SELECT count(*) AS n FROM t")

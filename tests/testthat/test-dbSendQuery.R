@@ -293,7 +293,7 @@ test_that("a statement that fails partway reports the rows it changed", {
   expect_equal(dbGetQuery(con, "SELECT x FROM u ORDER BY x")$x, 1:5)
 })
 
-test_that("rows of a fetch whose conversion fails don't count", {
+test_that("a fetch whose conversion fails after reading its rows completes the result", {
   con <- dbConnect(SQLite(), ":memory:")
   on.exit(dbDisconnect(con), add = TRUE)
 
@@ -304,14 +304,91 @@ test_that("rows of a fetch whose conversion fails don't count", {
   on.exit(dbClearResult(res), add = TRUE, after = FALSE)
 
   expect_equal(dbFetch(res, n = 2)$x, 1:2)
-  # The mixed types in the next rows give a warning, made an error here
+  # The mixed types in the next rows give a warning, made an error here,
+  # once these rows are read: they are lost, and the result ends
+  # instead of going on after them
   withr::with_options(
     list(warn = 2),
     expect_error(dbFetch(res, n = 2), "mixed type")
   )
+  expect_true(dbHasCompleted(res))
   expect_equal(dbGetRowCount(res), 2L)
+  out <- dbFetch(res)
+  expect_equal(nrow(out), 0L)
+  expect_named(out, "x")
+  expect_equal(dbGetRowCount(res), 2L)
+})
 
-  # The result goes on after the rows of the failed fetch, which are skipped
-  expect_false(dbHasCompleted(res))
-  expect_equal(dbFetch(res)$x, 5L)
+test_that("a handler that leaves a fetch on a warning completes the result", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, "CREATE TABLE m (x)")
+  dbExecute(con, "INSERT INTO m VALUES (1), (2), ('a'), (4), (5)")
+
+  res <- dbSendQuery(con, "SELECT x FROM m")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  expect_equal(dbFetch(res, n = 2)$x, 1:2)
+  expect_equal(
+    tryCatch(dbFetch(res, n = 2), warning = function(w) "left"),
+    "left"
+  )
+  expect_true(dbHasCompleted(res))
+  expect_equal(dbGetRowCount(res), 2L)
+  expect_equal(nrow(dbFetch(res)), 0L)
+})
+
+test_that("a fetch whose conversion fails before reading on completes the result", {
+  con <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, "CREATE TABLE d (x DATE)")
+  dbExecute(
+    con,
+    "INSERT INTO d VALUES ('2026-01-01'), ('2026-01-02'), ('oops'), ('2026-01-04')"
+  )
+
+  res <- dbSendQuery(con, "SELECT x FROM d")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  # Row 3 is not a date, which gives a warning, made an error here.
+  # A loop that handles the error ends, because row 3 is not converted again.
+  out <- list()
+  n_errors <- 0L
+  withr::with_options(list(warn = 2), {
+    for (i in 1:10) {
+      if (dbHasCompleted(res)) break
+      tryCatch(
+        out <- c(out, list(dbFetch(res, n = 2))),
+        error = function(e) n_errors <<- n_errors + 1L
+      )
+    }
+  })
+  expect_true(dbHasCompleted(res))
+  expect_equal(n_errors, 1L)
+  expect_equal(do.call(rbind, out)$x, as.Date(c("2026-01-01", "2026-01-02")))
+  expect_equal(dbGetRowCount(res), 2L)
+  expect_equal(nrow(dbFetch(res)), 0L)
+})
+
+test_that("a fetch whose conversion fails drops the error kept past its rows", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, "CREATE TABLE m (x, v)")
+  dbExecute(con, "INSERT INTO m VALUES (1, '[1]'), ('a', '[2]'), (3, 'oops')")
+
+  res <- dbSendQuery(con, "SELECT x, json(v) AS j FROM m")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  expect_equal(dbFetch(res, n = 1)$x, 1L)
+  # The step past row 2 fails, but the conversion of row 2 fails first
+  withr::with_options(
+    list(warn = 2),
+    expect_error(dbFetch(res, n = 1), "mixed type")
+  )
+  expect_true(dbHasCompleted(res))
+  expect_equal(nrow(dbFetch(res)), 0L)
+  expect_equal(dbGetRowCount(res), 1L)
 })

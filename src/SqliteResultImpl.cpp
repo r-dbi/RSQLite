@@ -342,13 +342,6 @@ void SqliteResultImpl::after_bind(bool params_have_rows) {
 cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
-  // The step past the rows of the previous fetch failed:
-  // its error ends the execution, as an error of any other step does
-  if (error_kept_) {
-    complete_ = true;
-    raise_kept_error();
-  }
-
   SqliteDataFrame data(stmt, cache.names_, n_max, types_, with_alt_types_);
 
   if (complete_ && data.get_ncols() == 0) {
@@ -362,20 +355,39 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   // Rows count as fetched once they are returned, not if the fetch fails,
   // also not if the conversion fails
   int n_fetched = 0;
-  while (!complete_) {
-    data.set_col_values();
-    // The step past the last row of a full fetch only reads ahead
-    if (++n_fetched == n_max) {
-      read_ahead();
-    } else {
-      step();
+  cpp11::list out;
+  try {
+    // The step past the rows of the previous fetch failed
+    if (error_kept_) {
+      raise_kept_error();
     }
-    if (!data.advance()) {
-      break;
+
+    while (!complete_) {
+      data.set_col_values();
+      // The step past the last row of a full fetch only reads ahead
+      if (++n_fetched == n_max) {
+        read_ahead();
+      } else {
+        step();
+      }
+      if (!data.advance()) {
+        break;
+      }
     }
+
+    out = data.get_data(types_);
+  } catch (...) {
+    // Any error that leaves a fetch ends the execution, also one raised
+    // while converting values, for example a warning made an error:
+    // stepping again would silently restart a statement that failed,
+    // and fetching again would convert the same value again
+    // or go on after the rows of this fetch
+    complete_ = true;
+    error_kept_ = false;
+    kept_error_.clear();
+    throw;
   }
 
-  cpp11::list out = data.get_data(types_);
   nrows_ += n_fetched;
   return out;
 }
@@ -389,8 +401,6 @@ void SqliteResultImpl::step() {
   } catch (const step_error& e) {
     error = e.what();
   }
-  // An error ends the execution: stepping again would silently restart it
-  complete_ = true;
   raise_sqlite_exception(error.c_str());
 }
 
@@ -437,7 +447,9 @@ cpp11::list SqliteResultImpl::peek_first_row() {
   SqliteDataFrame data(stmt, cache.names_, 1, types_, with_alt_types_);
 
   // After a failed step, the statement is on no row:
-  // the kept error is left for the next fetch that reads rows
+  // the kept error is left for the next fetch that reads rows.
+  // An error while converting the row leaves the result as it is,
+  // because peeking reads no row.
   if (!complete_ && !error_kept_) {
     data.set_col_values();
   }

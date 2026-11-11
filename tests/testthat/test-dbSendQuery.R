@@ -183,7 +183,8 @@ test_that("an error in the middle of a result completes it", {
   expect_error(dbFetch(res), "malformed JSON")
   expect_true(dbHasCompleted(res))
   # The rows read by the failed fetch were not returned, and are lost.
-  # They include row 2, read before the step onto row 3 failed.
+  # They include row 2: the step onto row 3 is one of this fetch's own steps,
+  # not one past its last row, so the error comes from this fetch.
   expect_equal(dbGetRowCount(res), 1L)
 
   # The statement is not restarted from the first row

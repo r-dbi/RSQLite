@@ -274,44 +274,6 @@ test_that("data frames fetched in chunks through Arrow own their strings", {
   expect_equal(chunks[[2]]$s, "c")
 })
 
-# The data frames of a sequence of fetches, and the number of warnings of each
-# fetch; `chunk_size` sets the rows per Arrow array of a fetch through Arrow.
-# `info` asks dbColumnInfo() before each fetch, which decides the types of the
-# next fetch on the default path, and pairs its answer with each data frame.
-# Only the warnings of the fetches are counted.
-fetch_sequence <- function(con, sql, ns, chunk_size = NULL, info = FALSE) {
-  rs <- dbSendQuery(con, sql)
-  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
-  warnings <- integer(length(ns))
-  data <- lapply(seq_along(ns), function(i) {
-    column_info <- if (info) suppressWarnings(dbColumnInfo(rs))
-    df <- withCallingHandlers(
-      if (is.null(chunk_size)) {
-        dbFetch(rs, ns[[i]])
-      } else {
-        arrow_fetch_df(rs, ns[[i]], chunk_size = chunk_size)
-      },
-      warning = function(w) {
-        warnings[[i]] <<- warnings[[i]] + 1L
-        invokeRestart("muffleWarning")
-      }
-    )
-    if (info) list(info = column_info, df = df) else df
-  })
-  list(data = data, warnings = warnings)
-}
-
-# The default path warns once per column with mixed types,
-# the Arrow path once per fetch.
-# A fetch of no rows warns on the default path when the next row holds a value
-# of another storage class, never through Arrow: it returns no value.
-expect_same_fetches <- function(actual, expected, ns, info) {
-  expect_identical(actual$data, expected$data, info = info)
-  warned <- pmin(expected$warnings, 1L)
-  warned[ns == 0] <- 0L
-  expect_identical(actual$warnings, warned, info = info)
-}
-
 test_that("each fetch through Arrow is typed like on the default path", {
   setup <- c(
     "CREATE TABLE t (x, y INTEGER, z TEXT, w REAL, b BLOB, big, n)",

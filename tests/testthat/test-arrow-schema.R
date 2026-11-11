@@ -1,11 +1,8 @@
 # Requesting Arrow types for result columns with `schema`
 
 # Every array that these tests read is checked with arrow's ValidateFull()
-# where arrow is installed: these read their streams to the end at once, the
-# lazy streams of dbFetchArrow() are checked where they are read
-dbGetQueryArrow <- function(...) arrow_validated(DBI::dbGetQueryArrow(...))
-dbReadTableArrow <- function(...) arrow_validated(DBI::dbReadTableArrow(...))
-dbFetchArrowChunk <- function(...) arrow_validated(DBI::dbFetchArrowChunk(...))
+# where arrow is installed, through the validated_*() functions of helper-arrow.R;
+# the lazy streams of dbFetchArrow() are checked where they are read
 
 test_that("a requested type is used without looking at the values", {
   con <- local_con()
@@ -13,11 +10,11 @@ test_that("a requested type is used without looking at the values", {
   dbExecute(con, "INSERT INTO t VALUES (1, 'a'), (2.5, 'b')")
 
   # Decided from the values: x widens to double
-  expect_equal(schema_formats(dbGetQueryArrow(con, "SELECT * FROM t")), c(x = "g", y = "u"))
+  expect_equal(schema_formats(validated_dbGetQueryArrow(con, "SELECT * FROM t")), c(x = "g", y = "u"))
 
   # Requested: x stays int64 and the real is truncated with a warning, y is decided
   rs <- dbSendQueryArrow(con, "SELECT * FROM t", schema = list(x = nanoarrow::na_int64()))
-  expect_warning(chunk <- dbFetchArrowChunk(rs), class = "RSQLite_warning_coercion")
+  expect_warning(chunk <- validated_dbFetchArrowChunk(rs), class = "RSQLite_warning_coercion")
   dbClearResult(rs)
   expect_equal(schema_formats(chunk), c(x = "l", y = "u"))
   df <- as.data.frame(chunk)
@@ -33,13 +30,6 @@ test_that("a requested type is used without looking at the values", {
   expect_equal(schema_formats(stream), c(x = "g"))
   expect_equal(as.data.frame(arrow_validated(stream))$x, c(NA, NA, 1.5))
 })
-
-# The formats of a query's result, with the stream consumed
-query_formats <- function(con, sql, ...) {
-  stream <- dbGetQueryArrow(con, sql, ...)
-  on.exit(stream$release())
-  schema_formats(stream)
-}
 
 test_that("schema accepts a struct schema, a named list, and an arrow Schema", {
   con <- local_con()
@@ -64,33 +54,33 @@ test_that("schema accepts a struct schema, a named list, and an arrow Schema", {
 test_that("schema entries are matched by name, exactly", {
   con <- local_con()
   int32 <- nanoarrow::na_int32()
-  expect_error(dbGetQueryArrow(con, "SELECT 1 AS abc", schema = list(ab = int32)), "not in the result: `ab`")
-  expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = list(A = int32)), "not in the result: `A`")
-  expect_error(dbGetQueryArrow(con, "SELECT 1 AS a, 2 AS a", schema = list(a = int32)), "more than once: `a`")
+  expect_error(validated_dbGetQueryArrow(con, "SELECT 1 AS abc", schema = list(ab = int32)), "not in the result: `ab`")
+  expect_error(validated_dbGetQueryArrow(con, "SELECT 1 AS a", schema = list(A = int32)), "not in the result: `A`")
+  expect_error(validated_dbGetQueryArrow(con, "SELECT 1 AS a, 2 AS a", schema = list(a = int32)), "more than once: `a`")
   expect_error(
-    dbGetQueryArrow(con, "SELECT 1 AS b, 2 AS a, 3 AS b, 4 AS c, 5 AS c", schema = list(a = int32, c = int32, b = int32)),
+    validated_dbGetQueryArrow(con, "SELECT 1 AS b, 2 AS a, 3 AS b, 4 AS c, 5 AS c", schema = list(a = int32, c = int32, b = int32)),
     "more than once: `c`, `b`$"
   )
   # Only the requested names matter
   expect_equal(query_formats(con, "SELECT 1 AS a, 2 AS b, 3 AS b", schema = list(a = int32)), c(a = "i", b = "l", b = "l"))
-  expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = list(int32)), "named")
-  expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = list(a = int32, a = int32)), "Duplicate names")
-  expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = int32), "struct")
-  expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = data.frame(a = integer())), "infer_nanoarrow_schema")
+  expect_error(validated_dbGetQueryArrow(con, "SELECT 1 AS a", schema = list(int32)), "named")
+  expect_error(validated_dbGetQueryArrow(con, "SELECT 1 AS a", schema = list(a = int32, a = int32)), "Duplicate names")
+  expect_error(validated_dbGetQueryArrow(con, "SELECT 1 AS a", schema = int32), "struct")
+  expect_error(validated_dbGetQueryArrow(con, "SELECT 1 AS a", schema = data.frame(a = integer())), "infer_nanoarrow_schema")
 
   # A failed request leaves no open result behind, also when `schema` itself
   # fails or is malformed, which is found before the query is sent
   expect_error(dbSendQueryArrow(con, "SELECT 1 AS a", schema = list(b = int32)))
   expect_error(dbSendQueryArrow(con, "SELECT 1 AS a", schema = list(a = nanoarrow::na_time32("us"))))
-  expect_error(dbGetQueryArrow(con, "SELECT 1 AS a", schema = list(a = stop("oops"))), "oops")
-  expect_no_warning(as.data.frame(dbGetQueryArrow(con, "SELECT 1 AS a")))
+  expect_error(validated_dbGetQueryArrow(con, "SELECT 1 AS a", schema = list(a = stop("oops"))), "oops")
+  expect_no_warning(as.data.frame(validated_dbGetQueryArrow(con, "SELECT 1 AS a")))
   dbExecute(con, "CREATE TABLE t (a)")
   expect_error(dbSendQueryArrow(con, "INSERT INTO t VALUES (1) RETURNING a", schema = int32), "struct")
   expect_equal(dbGetQuery(con, "SELECT COUNT(*) AS n FROM t")$n, 0L)
   # The names need the result: the statement has run
   expect_error(dbSendQueryArrow(con, "INSERT INTO t VALUES (1) RETURNING a", schema = list(b = int32)), "`b`")
   expect_equal(dbGetQuery(con, "SELECT COUNT(*) AS n FROM t")$n, 1L)
-  expect_no_warning(as.data.frame(dbGetQueryArrow(con, "SELECT 1 AS a")))
+  expect_no_warning(as.data.frame(validated_dbGetQueryArrow(con, "SELECT 1 AS a")))
 })
 
 test_that("unsupported types are rejected when the query is sent", {
@@ -115,7 +105,7 @@ test_that("every supported type can be requested", {
   dbExecute(con, "INSERT INTO t VALUES (7), (NULL)")
 
   fetch_as <- function(type, sql = "SELECT x FROM t") {
-    stream <- dbGetQueryArrow(con, sql, schema = list(x = type))
+    stream <- validated_dbGetQueryArrow(con, sql, schema = list(x = type))
     list(format = schema_formats(stream)[["x"]], x = as.data.frame(stream)$x)
   }
 
@@ -204,7 +194,7 @@ test_that("the chunk kept for the schema is split in every requested type", {
     "time(0, '+' || x || ' seconds') AS t32, time(0, '+' || x || ' seconds') AS t64,",
     "datetime(0, '+' || x || ' hours') AS ts, NULL AS n, x AS open FROM t ORDER BY rowid"
   )
-  whole <- as.data.frame(dbGetQueryArrow(con, sql, schema = schema))
+  whole <- as.data.frame(validated_dbGetQueryArrow(con, sql, schema = schema))
 
   rs <- dbSendQueryArrow(con, sql, schema = schema)
   on.exit(dbClearResult(rs))
@@ -214,7 +204,7 @@ test_that("the chunk kept for the schema is split in every requested type", {
 
   chunks <- list()
   repeat {
-    chunk <- dbFetchArrowChunk(rs, chunk_size = 3)
+    chunk <- validated_dbFetchArrowChunk(rs, chunk_size = 3)
     if (chunk$length == 0) {
       break
     }
@@ -233,7 +223,7 @@ test_that("values out of range and coercions are reported per the rules", {
 
   w <- NULL
   df <- withCallingHandlers(
-    as.data.frame(dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_uint8()))),
+    as.data.frame(validated_dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_uint8()))),
     RSQLite_warning_coercion = function(cnd) {
       w <<- cnd
       invokeRestart("muffleWarning")
@@ -248,18 +238,18 @@ test_that("values out of range and coercions are reported per the rules", {
   expect_equal(vapply(values, `[[`, 1, "rows"), c(2, 3, 4, 5, 6))
 
   # Silent: integers into double and text, text into binary
-  expect_no_warning(as.data.frame(dbGetQueryArrow(con, "SELECT 1 AS x", schema = list(x = nanoarrow::na_double()))))
+  expect_no_warning(as.data.frame(validated_dbGetQueryArrow(con, "SELECT 1 AS x", schema = list(x = nanoarrow::na_double()))))
   expect_equal(
-    expect_no_warning(as.data.frame(dbGetQueryArrow(con, "SELECT 1 AS x UNION ALL SELECT 2.5", schema = list(x = nanoarrow::na_string())))$x),
+    expect_no_warning(as.data.frame(validated_dbGetQueryArrow(con, "SELECT 1 AS x UNION ALL SELECT 2.5", schema = list(x = nanoarrow::na_string())))$x),
     c("1", "2.5")
   )
   expect_equal(
-    expect_no_warning(as.data.frame(dbGetQueryArrow(con, "SELECT 'ab' AS x", schema = list(x = nanoarrow::na_binary())))$x),
+    expect_no_warning(as.data.frame(validated_dbGetQueryArrow(con, "SELECT 'ab' AS x", schema = list(x = nanoarrow::na_binary())))$x),
     blob::blob(charToRaw("ab"))
   )
   # A number into binary is a coercion
   expect_warning(
-    as.data.frame(dbGetQueryArrow(con, "SELECT 1 AS x", schema = list(x = nanoarrow::na_binary()))),
+    as.data.frame(validated_dbGetQueryArrow(con, "SELECT 1 AS x", schema = list(x = nanoarrow::na_binary()))),
     class = "RSQLite_warning_coercion"
   )
 })
@@ -271,7 +261,7 @@ test_that("float keeps to its range, bool takes a real as true unless zero", {
 
   w <- coercion_warnings(
     array <- arrow_validated(single_array(
-      dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_float()))
+      validated_dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_float()))
     ))
   )
   expect_equal(
@@ -288,7 +278,7 @@ test_that("float keeps to its range, bool takes a real as true unless zero", {
   dbExecute(con, "INSERT INTO t VALUES (0.5), (-0.9), (0.0), (2), (0), ('true'), ('2')")
   w <- coercion_warnings(
     array <- arrow_validated(single_array(
-      dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_bool()))
+      validated_dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_bool()))
     ))
   )
   expect_equal(nanoarrow::convert_array(array$children$x), c(TRUE, TRUE, FALSE, TRUE, FALSE, FALSE, TRUE))
@@ -297,19 +287,6 @@ test_that("float keeps to its range, bool takes a real as true unless zero", {
     c("real converted 1 2 3", "string converted 6 7")
   )
 })
-
-# Compares the values of a 64-bit integer array exactly with `expected`, as
-# strings, NA for NULL: a uint64 above 2^63 - 1 is written as the int64 with
-# its bits, such as "-1" for 2^64 - 1
-expect_int64_bits <- function(array, expected) {
-  is_null <- suppressWarnings(is.na(nanoarrow::convert_array(array, double())))
-  expect_equal(is_null, is.na(expected))
-  actual <- matrix(as.raw(array$buffers[[2]])[seq_len(8 * array$length)], nrow = 8)
-  # bit64 reads -2^63, its NA, with a warning, but with the right bits
-  wanted <- suppressWarnings(bit64::as.integer64(expected))
-  wanted <- matrix(writeBin(unclass(wanted), raw()), nrow = 8)
-  expect_equal(actual[, !is_null], wanted[, !is_null])
-}
 
 test_that("numbers beyond 64 bits are out of range, not saturated", {
   con <- local_con()
@@ -324,7 +301,7 @@ test_that("numbers beyond 64 bits are out of range, not saturated", {
   ))
   fetch <- function(type) {
     w <- coercion_warnings(
-      array <- single_array(dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type)))
+      array <- single_array(validated_dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type)))
     )
     values <- w[[1]]$coercions[[1]]$values
     list(
@@ -367,7 +344,7 @@ test_that("numbers of days outside the range of a date type are NULL", {
   ))
   fetch <- function(type) {
     w <- coercion_warnings(
-      array <- single_array(dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type)))
+      array <- single_array(validated_dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type)))
     )
     values <- w[[1]]$coercions[[1]]$values
     list(
@@ -404,7 +381,7 @@ test_that("times and timestamps outside the range of their unit are NULL", {
   # Nanoseconds and microseconds since the epoch exceed the precision of a double
   fetch <- function(schema) {
     withCallingHandlers(
-      as.data.frame(dbGetQueryArrow(con, "SELECT * FROM t", schema = schema)),
+      as.data.frame(validated_dbGetQueryArrow(con, "SELECT * FROM t", schema = schema)),
       nanoarrow_warning_lossy_conversion = function(w) invokeRestart("muffleWarning")
     )
   }
@@ -443,7 +420,7 @@ test_that("integers and text become times and timestamps exactly", {
   fetch <- function(unit) {
     w <- coercion_warnings(
       array <- arrow_validated(single_array(
-        dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_timestamp(unit, "UTC")))
+        validated_dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_timestamp(unit, "UTC")))
       ))
     )
     values <- if (length(w) > 0) w[[1]]$coercions[[1]]$values else list()
@@ -469,7 +446,7 @@ test_that("integers and text become times and timestamps exactly", {
 
   # Text rounds half up in a coarser unit
   expect_equal(
-    as.numeric(as.data.frame(dbGetQueryArrow(con, "SELECT '01:02:03.5' AS x", schema = list(x = nanoarrow::na_time32("s"))))$x),
+    as.numeric(as.data.frame(validated_dbGetQueryArrow(con, "SELECT '01:02:03.5' AS x", schema = list(x = nanoarrow::na_time32("s"))))$x),
     3724
   )
 })
@@ -486,7 +463,7 @@ test_that("times outside a time of day are NULL", {
     type <- if (unit %in% c("s", "ms")) nanoarrow::na_time32(unit) else nanoarrow::na_time64(unit)
     w <- coercion_warnings(
       array <- arrow_validated(single_array(
-        dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type))
+        validated_dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = type))
       ))
     )
     # The last tick of the day stops the rounding
@@ -518,18 +495,18 @@ test_that("requested types survive dbBind() and apply to dbReadTableArrow()", {
   dbClearResult(rs)
   on.exit(NULL)
 
-  stream <- dbReadTableArrow(con, "t", schema = list(x = nanoarrow::na_int32()))
+  stream <- validated_dbReadTableArrow(con, "t", schema = list(x = nanoarrow::na_int32()))
   expect_equal(schema_formats(stream), c(x = "i"))
   expect_equal(as.data.frame(stream)$x, c(1L, 2L))
-  expect_equal(schema_formats(dbReadTableArrow(con, "t")), c(x = "l"))
+  expect_equal(schema_formats(validated_dbReadTableArrow(con, "t")), c(x = "l"))
 
   # Every kind of table name
   for (name in list(SQL('"t"'), Id(table = "t"), Id(schema = "main", table = "t"))) {
-    stream <- dbReadTableArrow(con, name, schema = list(x = nanoarrow::na_int32()))
+    stream <- validated_dbReadTableArrow(con, name, schema = list(x = nanoarrow::na_int32()))
     expect_equal(schema_formats(stream), c(x = "i"))
     expect_equal(as.data.frame(stream)$x, c(1L, 2L))
   }
-  expect_error(dbReadTableArrow(con, c("t", "u")), "Invalid name")
+  expect_error(validated_dbReadTableArrow(con, c("t", "u")), "Invalid name")
 })
 
 test_that("extended types play no part for a requested type", {
@@ -538,7 +515,7 @@ test_that("extended types play no part for a requested type", {
   dbExecute(con, "CREATE TABLE t (d DATE)")
   dbExecute(con, "INSERT INTO t VALUES ('2020-01-02')")
   expect_equal(query_formats(con, "SELECT d FROM t"), c(d = "tdD"))
-  stream <- dbGetQueryArrow(con, "SELECT d FROM t", schema = list(d = nanoarrow::na_string()))
+  stream <- validated_dbGetQueryArrow(con, "SELECT d FROM t", schema = list(d = nanoarrow::na_string()))
   expect_equal(schema_formats(stream), c(d = "u"))
   expect_equal(as.data.frame(stream)$d, "2020-01-02")
 })
@@ -550,7 +527,7 @@ test_that("a requested null type drops the values with a reason of their own", {
 
   df <- NULL
   w <- coercion_warnings(
-    df <- as.data.frame(dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_na())))
+    df <- as.data.frame(validated_dbGetQueryArrow(con, "SELECT x FROM t", schema = list(x = nanoarrow::na_na())))
   )
   expect_true(all(is.na(df$x)))
   expect_equal(nrow(df), 3)
@@ -674,7 +651,7 @@ test_that("only the requested types with 32-bit offsets end chunks at the byte l
       schema <- setNames(list(types[[type]]), column)
       info <- paste(column, type)
       lengths <- if (startsWith(type, "large")) 7 else c(2, 1, 1, 1, 2)
-      # Checked with ValidateFull() like the dbGetQueryArrow() of these tests
+      # Checked with ValidateFull() like validated_dbGetQueryArrow()
       stream <- suppressWarnings(arrow_validated(fetch_with_bytes_limits(con, sql, schema = schema)))
       expect_equal(chunk_lengths(stream), lengths, info = info)
       values <- suppressWarnings(as.data.frame(arrow_validated(fetch_with_bytes_limits(con, sql, schema = schema))))[[column]]
@@ -701,7 +678,7 @@ test_that("the warning names each requested type", {
   for (type in names(types)) {
     value <- if (type %in% names(values)) values[[type]] else "'abc'"
     w <- coercion_warnings(
-      chunk_lengths(dbGetQueryArrow(con, paste("SELECT", value, "AS x"), schema = list(x = types[[type]])))
+      chunk_lengths(validated_dbGetQueryArrow(con, paste("SELECT", value, "AS x"), schema = list(x = types[[type]])))
     )
     expect_length(w, 1)
     expect_equal(w[[1]]$coercions[[1]]$type, type, info = type)
@@ -864,7 +841,7 @@ test_that("a requested uint64 beyond 2^63 - 1 is a double in data frames", {
     dbClearResult(rs)
 
     # A stream holds the exact values
-    array <- suppressWarnings(single_array(dbGetQueryArrow(con, sql, schema = schema)))
+    array <- suppressWarnings(single_array(validated_dbGetQueryArrow(con, sql, schema = schema)))
     expect_int64_bits(array$children$x, c("1", "2", "-8446744073709551616", "-1", NA, "5"))
   }
 })

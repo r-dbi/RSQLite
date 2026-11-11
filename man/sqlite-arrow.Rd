@@ -75,6 +75,58 @@ Nested types raise an error.
 Named placeholders are matched to the names of the columns, like \code{\link[DBI:dbBind]{DBI::dbBind()}} does it.
 }
 
+\section{Data frames}{
+
+With \code{dbConnect(arrow = TRUE)}, data frames travel through this interface:
+\code{\link[DBI:dbFetch]{DBI::dbFetch()}} converts Arrow arrays filled straight from the SQLite statement,
+and \code{\link[DBI:dbAppendTable]{DBI::dbAppendTable()}} writes the data frame as an Arrow stream through \code{\link[DBI:dbAppendTableArrow]{DBI::dbAppendTableArrow()}}.
+The conversion follows nanoarrow's rules, with these additions:
+an \code{int64} column becomes an \code{integer} if all its values fit,
+and follows the \code{bigint} argument of \code{\link[DBI:dbConnect]{DBI::dbConnect()}} otherwise, also in the later fetches of the result;
+a \code{null} column becomes a \code{logical}.
+\code{date32} columns become \code{Date} and \code{binary} columns become \link[blob:blob]{blob::blob} objects,
+as on the default path.
+Times and timestamps become \code{hms} and \code{POSIXct} in UTC,
+and travel as doubles in seconds in both directions,
+so they keep the default path's precision and range, times outside a day included,
+where a stream has microseconds and only times of day.
+Text ends at its first NUL character and is not checked for UTF-8, as on the default path,
+where a stream makes text \code{NULL} unless it is valid UTF-8 without NUL bytes.
+A blob in a text column is text only if it is valid UTF-8 without NUL bytes, as in a stream,
+and \code{NA} with a warning otherwise,
+where the default path ends it at its first NUL byte and does not check it.
+
+Unlike a stream, each fetch decides the types of its columns, the way the default path does it:
+the first value that is not \code{NULL} decides,
+integers become doubles when a real number follows in the same fetch,
+and a column without a value takes its declared type, or \code{logical} without one.
+The next fetch starts from these types, also after \code{\link[DBI:dbBind]{DBI::dbBind()}},
+except that it decides a \code{logical} column again.
+\code{\link[DBI:dbColumnInfo]{DBI::dbColumnInfo()}} names the types that a fetch of no rows returns,
+and decides them for the next fetch like on the default path,
+without converting the values of the next row.
+Two differences remain.
+The default path truncates a real number that follows an integer too large for an \code{integer},
+here the column becomes a \code{double},
+which keeps the real number but rounds the integers beyond \code{2^53}.
+The default path reads \code{-2147483648} as a 32-bit integer, which is \code{NA} in R,
+here it is a value that needs 64 bits.
+Once \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} or \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} has fixed the types of a result,
+later fetches keep them and the rules of a stream,
+with times and timestamps in microseconds, and text checked like a blob,
+and they hand out the rows kept for a schema and a row held back by the byte limits,
+where the default path fails.
+Before writing, factors become strings, lists of raw vectors become blobs,
+\code{POSIXlt} columns, which the default path can't write, become \code{POSIXct},
+and \code{difftime}, \code{POSIXct} and \code{Date} columns become their numbers in their own units,
+as on the default path.
+
+Each fetch reads its rows into Arrow arrays first,
+so that the data frame is allocated once with the row count known,
+and releases each array as soon as it is converted:
+at its peak, the memory holds the arrays and the part of the data frame filled so far.
+}
+
 \section{Chunking}{
 
 \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} returns a nanoarrow array stream that is read lazily:
@@ -100,6 +152,14 @@ A chunk also ends after the row at which a string or binary column reaches 1 GiB
 and before a row that would take such a column past the \code{2^31 - 1} bytes
 that the 32-bit offsets of the \code{utf8} and \code{binary} types can address.
 Such a row waits for the next Arrow fetch, and \code{\link[DBI:dbFetch]{DBI::dbFetch()}} fails until then.
+
+An array returned by \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} is freed
+when the garbage collector finds it unreachable,
+and the collector does not see the memory that nanoarrow allocated for it.
+After every 64 MB of arrays, RSQLite triggers a collection of the young generation,
+so that a loop that discards its chunks holds at most that much garbage.
+A loop that needs to be tighter releases each array
+with \code{nanoarrow::nanoarrow_pointer_release()} once done with it.
 }
 
 \section{Threads}{

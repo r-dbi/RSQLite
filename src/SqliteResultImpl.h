@@ -82,6 +82,11 @@ private:
   // Set while the columns hold the storage classes of the current row,
   // also when a byte limit ended the chunk before it
   bool arrow_row_read_;
+  // The types and 64-bit flags that the last data frame fetch left, which the
+  // first one of a new execution starts from, like the default path does
+  std::vector<ARROW_KIND> df_kinds_;
+  std::vector<bool> df_wide_ints_;
+  bool df_carry_;
   // The byte limits of utf8 and binary columns, see fetch_arrow_rows()
   int64_t arrow_cut_bytes_;
   int64_t arrow_max_bytes_;
@@ -114,6 +119,13 @@ public:
   // Arrow
   void arrow_schema(struct ArrowSchema* out, int64_t infer_rows);
   int64_t fetch_arrow(struct ArrowArray* out, int64_t n_max);
+  int64_t fetch_arrow_df(
+    struct ArrowSchema* schema,
+    std::vector<nanoarrow::UniqueArray>& chunks,
+    ArrowDfColumns& columns,
+    int64_t n_max,
+    int64_t chunk_size
+  );
   void bind_arrow(
     struct ArrowArrayStream* stream,
     const std::vector<int>& param_indexes
@@ -137,9 +149,13 @@ private:
   bool step_done();
   cpp11::list peek_first_row();
 
-  void ensure_arrow_columns();
+  void ensure_arrow_columns(bool data_frame);
   void freeze_arrow_columns();
-  int64_t fetch_arrow_rows(struct ArrowArray* out, int64_t n_max);
+  int64_t fetch_arrow_rows(
+    struct ArrowArray* out,
+    int64_t n_max,
+    std::vector<ARROW_KIND>* open_kinds = NULL
+  );
   void set_arrow_struct_schema(struct ArrowSchema* out);
   void copy_pending_rows(struct ArrowArray* out, int64_t n);
   bool arrow_row_fits();

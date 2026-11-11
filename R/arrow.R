@@ -67,6 +67,56 @@
 #' Nested types raise an error.
 #' Named placeholders are matched to the names of the columns, like [DBI::dbBind()] does it.
 #'
+#' @section Data frames:
+#' With `dbConnect(arrow = TRUE)`, data frames travel through this interface:
+#' [DBI::dbFetch()] converts Arrow arrays filled straight from the SQLite statement,
+#' and [DBI::dbAppendTable()] writes the data frame as an Arrow stream through [DBI::dbAppendTableArrow()].
+#' The conversion follows nanoarrow's rules, with these additions:
+#' an `int64` column becomes an `integer` if all its values fit,
+#' and follows the `bigint` argument of [DBI::dbConnect()] otherwise, also in the later fetches of the result;
+#' a `null` column becomes a `logical`.
+#' `date32` columns become `Date` and `binary` columns become [blob::blob] objects,
+#' as on the default path.
+#' Times and timestamps become `hms` and `POSIXct` in UTC,
+#' and travel as doubles in seconds in both directions,
+#' so they keep the default path's precision and range, times outside a day included,
+#' where a stream has microseconds and only times of day.
+#' Text ends at its first NUL character and is not checked for UTF-8, as on the default path,
+#' where a stream makes text `NULL` unless it is valid UTF-8 without NUL bytes.
+#' A blob in a text column is text only if it is valid UTF-8 without NUL bytes, as in a stream,
+#' and `NA` with a warning otherwise,
+#' where the default path ends it at its first NUL byte and does not check it.
+#'
+#' Unlike a stream, each fetch decides the types of its columns, the way the default path does it:
+#' the first value that is not `NULL` decides,
+#' integers become doubles when a real number follows in the same fetch,
+#' and a column without a value takes its declared type, or `logical` without one.
+#' The next fetch starts from these types, also after [DBI::dbBind()],
+#' except that it decides a `logical` column again.
+#' [DBI::dbColumnInfo()] names the types that a fetch of no rows returns,
+#' and decides them for the next fetch like on the default path,
+#' without converting the values of the next row.
+#' Two differences remain.
+#' The default path truncates a real number that follows an integer too large for an `integer`,
+#' here the column becomes a `double`,
+#' which keeps the real number but rounds the integers beyond `2^53`.
+#' The default path reads `-2147483648` as a 32-bit integer, which is `NA` in R,
+#' here it is a value that needs 64 bits.
+#' Once [DBI::dbFetchArrow()] or [DBI::dbFetchArrowChunk()] has fixed the types of a result,
+#' later fetches keep them and the rules of a stream,
+#' with times and timestamps in microseconds, and text checked like a blob,
+#' and they hand out the rows kept for a schema and a row held back by the byte limits,
+#' where the default path fails.
+#' Before writing, factors become strings, lists of raw vectors become blobs,
+#' `POSIXlt` columns, which the default path can't write, become `POSIXct`,
+#' and `difftime`, `POSIXct` and `Date` columns become their numbers in their own units,
+#' as on the default path.
+#'
+#' Each fetch reads its rows into Arrow arrays first,
+#' so that the data frame is allocated once with the row count known,
+#' and releases each array as soon as it is converted:
+#' at its peak, the memory holds the arrays and the part of the data frame filled so far.
+#'
 #' @section Chunking:
 #' [DBI::dbFetchArrow()] returns a nanoarrow array stream that is read lazily:
 #' each array holds at most `chunk_size` rows,
@@ -91,6 +141,14 @@
 #' and before a row that would take such a column past the `2^31 - 1` bytes
 #' that the 32-bit offsets of the `utf8` and `binary` types can address.
 #' Such a row waits for the next Arrow fetch, and [DBI::dbFetch()] fails until then.
+#'
+#' An array returned by [DBI::dbFetchArrowChunk()] is freed
+#' when the garbage collector finds it unreachable,
+#' and the collector does not see the memory that nanoarrow allocated for it.
+#' After every 64 MB of arrays, RSQLite triggers a collection of the young generation,
+#' so that a loop that discards its chunks holds at most that much garbage.
+#' A loop that needs to be tighter releases each array
+#' with `nanoarrow::nanoarrow_pointer_release()` once done with it.
 #'
 #' @section Threads:
 #' A stream can be read on any thread, one call at a time, as the Arrow C stream interface allows.
@@ -118,6 +176,32 @@
 #' @name sqlite-arrow
 #' @aliases arrow
 NULL
+
+# An array that dbFetchArrowChunk() handed out is freed when the garbage
+# collector finds it unreachable, and the collector does not see the memory
+# that nanoarrow allocated for it: a loop that discards its chunks could pile
+# up the whole result as garbage before a collection happens on its own.
+# A collection of the young generation every ARROW_GC_BYTES of arrays bounds that.
+ARROW_GC_BYTES <- 64 * 1024^2
+
+arrow_gc_state <- new.env(parent = emptyenv())
+arrow_gc_state$bytes <- 0
+
+arrow_chunk_handed_out <- function(bytes) {
+  arrow_gc_state$bytes <- arrow_gc_state$bytes + bytes
+  if (arrow_gc_state$bytes >= ARROW_GC_BYTES) {
+    arrow_gc_state$bytes <- 0
+    arrow_gc()
+  }
+  invisible()
+}
+
+# R < 3.5.0 has no partial collection
+arrow_gc <- if ("full" %in% names(formals(gc))) {
+  function() gc(full = FALSE)
+} else {
+  function() gc()
+}
 
 check_chunk_size <- function(chunk_size) {
   if (!is.numeric(chunk_size) || length(chunk_size) != 1L || !is.finite(chunk_size) ||

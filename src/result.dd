@@ -8,6 +8,7 @@ result.o: \
   RSQLite.h \
   RSQLite_types.h \
   SqliteResult.h \
+  integer64.h \
   pch.h \
   result.cpp \
   sqlite3-cpp.h \

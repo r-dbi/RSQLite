@@ -36,6 +36,7 @@ SqliteResultImpl::SqliteResultImpl(
       pending_offset_(0),
       pending_rows_(0),
       arrow_row_read_(false),
+      df_carry_(false),
       arrow_cut_bytes_(ARROW_CUT_BYTES),
       arrow_max_bytes_(ARROW_MAX_BYTES) {
   try {
@@ -249,7 +250,7 @@ void SqliteResultImpl::arrow_schema(
     throw std::runtime_error("Query needs to be bound before fetching");
   }
 
-  ensure_arrow_columns();
+  ensure_arrow_columns(false);
 
   if (!arrow_frozen_) {
     // The first chunk decides the types, from the first value of each column
@@ -275,7 +276,7 @@ int64_t SqliteResultImpl::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
     throw std::runtime_error("Query needs to be bound before fetching");
   }
 
-  ensure_arrow_columns();
+  ensure_arrow_columns(false);
 
   if (pending_chunk_->release != NULL) {
     int64_t n = std::min(
@@ -301,6 +302,123 @@ int64_t SqliteResultImpl::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
   }
 
   return fetch_arrow_rows(out, n_max);
+}
+
+// The rows of one dbFetch() through Arrow: at most `n_max` rows, all for a
+// negative `n_max`, as chunks of at most `chunk_size` rows that share `schema`.
+// Unless an Arrow stream or chunk has fixed the types already, they are
+// decided for this fetch like the default path decides them: a column that
+// sees only NULL stays open across chunks, integers widen to double in any
+// chunk, and the chunks are conformed to the final types at the end.
+// A column without a value takes its declared type, or the null type, which
+// the next fetch decides again; the other types carry over to the next fetch.
+// Times and timestamps are doubles in seconds, which keep the precision of
+// the default path, unless an Arrow stream or chunk has fixed the types.
+// `columns` tells which columns have seen an integer that needs 64 bits, in
+// this fetch or an earlier one, and which hold seconds.
+int64_t SqliteResultImpl::fetch_arrow_df(
+  struct ArrowSchema* schema,
+  std::vector<nanoarrow::UniqueArray>& chunks,
+  ArrowDfColumns& columns,
+  int64_t n_max,
+  int64_t chunk_size
+) {
+  if (!ready_ && n_max != 0) {
+    // A fetch of no rows also serves dbColumnInfo(), which the default path
+    // answers before the parameters are bound, from the declared types
+    throw std::runtime_error("Query needs to be bound before fetching");
+  }
+
+  const bool open = !arrow_frozen_;
+  ensure_arrow_columns(open);
+  const size_t ncols = arrow_columns_.size();
+
+  if (open && df_carry_) {
+    // The first fetch of a new execution, as long as no Arrow stream has
+    // started afresh
+    for (size_t j = 0; j < ncols; ++j) {
+      arrow_columns_[j].carry_over(df_kinds_[j], df_wide_ints_[j]);
+    }
+  }
+  df_carry_ = false;
+
+  if (open && n_max == 0 && !complete_) {
+    // A fetch of no rows types the columns from the next row,
+    // like the default path does it. Reading the storage classes converts
+    // no value, so the row is not marked as held back: the next fetch reads
+    // them again, and the default path may fetch the row.
+    if (!arrow_row_read_) {
+      for (size_t j = 0; j < ncols; ++j) {
+        arrow_columns_[j].read_row();
+      }
+    }
+    for (size_t j = 0; j < ncols; ++j) {
+      arrow_columns_[j].peek_value();
+    }
+  }
+
+  // The type of each column in each chunk, while the types are open
+  std::vector<std::vector<ARROW_KIND> > kinds;
+  int64_t total = 0;
+  while ((n_max < 0 || total < n_max) && !complete()) {
+    int64_t n_chunk = chunk_size;
+    if (n_max >= 0) {
+      n_chunk = std::min(chunk_size, n_max - total);
+    }
+
+    nanoarrow::UniqueArray chunk;
+    int64_t n;
+    if (open) {
+      kinds.push_back(std::vector<ARROW_KIND>());
+      n = fetch_arrow_rows(chunk.get(), n_chunk, &kinds.back());
+    } else {
+      n = fetch_arrow(chunk.get(), n_chunk);
+    }
+    if (n == 0) {
+      // Not reached: only the end of the result gives an empty chunk
+      if (open) {
+        kinds.pop_back();
+      }
+      break;
+    }
+
+    total += n;
+    chunks.push_back(std::move(chunk));
+  }
+
+  if (open) {
+    for (size_t j = 0; j < ncols; ++j) {
+      arrow_columns_[j].decide_from_decltype();
+    }
+  }
+
+  set_arrow_struct_schema(schema);
+
+  if (open) {
+    for (size_t i = 0; i < chunks.size(); ++i) {
+      for (size_t j = 0; j < ncols; ++j) {
+        arrow_columns_[j].conform_chunk(chunks[i]->children[j], kinds[i][j]);
+      }
+    }
+    for (size_t j = 0; j < ncols; ++j) {
+      arrow_columns_[j].reopen();
+    }
+  }
+
+  columns.wide_ints.clear();
+  columns.seconds_classes.clear();
+  df_kinds_.clear();
+  df_wide_ints_.clear();
+  for (size_t j = 0; j < ncols; ++j) {
+    columns.wide_ints.push_back(arrow_columns_[j].wide_integers());
+    columns.seconds_classes.push_back(arrow_columns_[j].seconds_class());
+    // The null type of a stream is decided again, like an open one
+    ARROW_KIND kind = arrow_columns_[j].get_kind();
+    df_kinds_.push_back(kind == AK_NA ? AK_UNDECIDED : kind);
+    df_wide_ints_.push_back(arrow_columns_[j].wide_integers());
+  }
+
+  return total;
 }
 
 void SqliteResultImpl::bind_arrow(
@@ -356,8 +474,10 @@ cpp11::strings SqliteResultImpl::get_placeholder_names() const {
 void SqliteResultImpl::after_set_params() {
   ++executions_;
 
-  // A new execution may see other values in the first row
+  // A new execution may see other values in the first row: an Arrow stream
+  // decides its types afresh, a data frame fetch starts from the last one's
   arrow_columns_.clear();
+  df_carry_ = !df_kinds_.empty();
   arrow_frozen_ = false;
   pending_chunk_.reset();
   pending_offset_ = 0;
@@ -464,7 +584,12 @@ cpp11::list SqliteResultImpl::peek_first_row() {
   return data.get_data(types_);
 }
 
-void SqliteResultImpl::ensure_arrow_columns() {
+// Creates the columns if needed, and selects the arrays they build: for a
+// data frame fetch or for an Arrow stream
+void SqliteResultImpl::ensure_arrow_columns(bool data_frame) {
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    arrow_columns_[j].set_data_frame(data_frame);
+  }
   if (!arrow_columns_.empty() || cache.ncols_ == 0) {
     return;
   }
@@ -479,6 +604,7 @@ void SqliteResultImpl::ensure_arrow_columns() {
       with_alt_types_
     );
     column->decide_from_row(has_row);
+    column->set_data_frame(data_frame);
     arrow_columns_.push_back(column);
   }
 }
@@ -490,9 +616,13 @@ void SqliteResultImpl::freeze_arrow_columns() {
   arrow_frozen_ = true;
 }
 
+// The next chunk of at most `n_max` rows. The types are final from the first
+// chunk on, unless `open_kinds` is given: then they stay open, as for a data
+// frame, and `open_kinds` receives the type of each column in this chunk.
 int64_t SqliteResultImpl::fetch_arrow_rows(
   struct ArrowArray* out,
-  int64_t n_max
+  int64_t n_max,
+  std::vector<ARROW_KIND>* open_kinds
 ) {
   const size_t ncols = arrow_columns_.size();
 
@@ -535,10 +665,11 @@ int64_t SqliteResultImpl::fetch_arrow_rows(
   }
 
   for (size_t j = 0; j < ncols; ++j) {
-    arrow_columns_[j].finish_chunk(n);
+    arrow_columns_[j].finish_chunk(n, open_kinds != NULL);
   }
-  // The types are final from the first chunk on
-  freeze_arrow_columns();
+  if (open_kinds == NULL) {
+    freeze_arrow_columns();
+  }
 
   nanoarrow::UniqueArray chunk;
   check_arrow(
@@ -550,7 +681,10 @@ int64_t SqliteResultImpl::fetch_arrow_rows(
     "Can't allocate Arrow array"
   );
   for (size_t j = 0; j < ncols; ++j) {
-    arrow_columns_[j].move_chunk_to(chunk->children[j]);
+    ARROW_KIND kind = arrow_columns_[j].move_chunk_to(chunk->children[j]);
+    if (open_kinds != NULL) {
+      open_kinds->push_back(kind);
+    }
   }
   chunk->length = n;
   chunk->null_count = 0;

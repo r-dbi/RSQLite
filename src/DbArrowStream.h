@@ -1,6 +1,9 @@
 #ifndef RSQLITE_DBARROWSTREAM_H
 #define RSQLITE_DBARROWSTREAM_H
 
+#include <vector>
+
+#include "DbArrow.h"
 #include "DbResult.h"
 
 struct ArrowArrayStream;
@@ -17,6 +20,17 @@ void db_arrow_stream_init(
   struct ArrowArrayStream* out,
   const DbResultPtr& result,
   int64_t chunk_size
+);
+
+// Initializes `out` as a stream over `arrays`, fetched up front, so that the
+// row count is known before the conversion starts; takes over `schema` and
+// `arrays`. Each array is moved out when it is requested, so a consumer that
+// converts the arrays one by one releases each of them before it asks for the
+// next.
+void db_arrow_buffered_stream_init(
+  struct ArrowArrayStream* out,
+  nanoarrow::UniqueSchema& schema,
+  std::vector<nanoarrow::UniqueArray>& arrays
 );
 
 // Whether `stream` is a stream of db_arrow_stream_init() that reads `result`

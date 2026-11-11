@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <climits>
+#include "integer64.h"
 #include "RSQLite_types.h"
 #include "DbArrow.h"
 #include "DbArrowStream.h"
@@ -120,9 +121,79 @@ SEXP result_fetch_arrow(
   return stream_xptr;
 }
 
-// The next chunk of at most `chunk_size` rows as a nanoarrow_array
+// The rows of one dbFetch() through Arrow, at most `n_max` or all for a
+// negative `n_max`, typed for a data frame and fetched up front as arrays of at
+// most `chunk_size` rows: a list of nanoarrow_array objects with their
+// lengths, the row count, the names and Arrow formats of the columns, which
+// columns have seen an integer that needs 64 bits, and the R class of the
+// columns of times or timestamps in seconds.
+// Everything the conversion needs comes from here, which spares a small fetch
+// the R proxies of the Arrow objects.
 [[cpp11::register]]
-SEXP result_fetch_arrow_chunk(DbResult* res, double chunk_size) {
+cpp11::list result_fetch_arrow_df(
+  DbResult* res,
+  double n_max,
+  double chunk_size
+) {
+  db_arrow_release_deferred();
+  nanoarrow::UniqueArrayStream stream;
+  ArrowDfColumns columns;
+  int64_t n = res->fetch_arrow_df(
+    stream.get(),
+    columns,
+    static_cast<int64_t>(n_max),
+    static_cast<int64_t>(chunk_size)
+  );
+
+  cpp11::sexp schema_xptr(nanoarrow_schema_owning_xptr());
+  struct ArrowSchema* schema = nanoarrow_output_schema_from_xptr(schema_xptr);
+  check_arrow(
+    stream->get_schema(stream.get(), schema),
+    "Can't get Arrow schema"
+  );
+
+  const R_xlen_t ncols = static_cast<R_xlen_t>(schema->n_children);
+  cpp11::writable::strings names(ncols);
+  cpp11::writable::strings formats(ncols);
+  cpp11::writable::logicals wide(ncols);
+  cpp11::writable::strings seconds(ncols);
+  for (R_xlen_t j = 0; j < ncols; ++j) {
+    names[j] = cpp11::r_string(schema->children[j]->name);
+    formats[j] = schema->children[j]->format;
+    wide[j] = static_cast<bool>(columns.wide_ints[j]);
+    seconds[j] = columns.seconds_classes[j];
+  }
+
+  cpp11::writable::list arrays;
+  cpp11::writable::doubles lengths;
+  while (true) {
+    cpp11::sexp array_xptr(nanoarrow_array_owning_xptr());
+    struct ArrowArray* array = nanoarrow_output_array_from_xptr(array_xptr);
+    check_arrow(stream->get_next(stream.get(), array), "Can't get Arrow array");
+    if (array->release == NULL) {
+      break;
+    }
+    R_SetExternalPtrTag(array_xptr, schema_xptr);
+    arrays.push_back(array_xptr);
+    lengths.push_back(static_cast<double>(array->length));
+  }
+
+  using namespace cpp11::literals;
+  return cpp11::writable::list(
+    { "arrays"_nm = arrays,
+      "lengths"_nm = lengths,
+      "n"_nm = cpp11::as_sexp(static_cast<double>(n)),
+      "names"_nm = names,
+      "formats"_nm = formats,
+      "wide_ints"_nm = wide,
+      "seconds"_nm = seconds }
+  );
+}
+
+// The next chunk of at most `chunk_size` rows as a nanoarrow_array,
+// with the bytes its buffers hold
+[[cpp11::register]]
+cpp11::list result_fetch_arrow_chunk(DbResult* res, double chunk_size) {
   db_arrow_release_deferred();
   cpp11::sexp array_xptr(nanoarrow_array_owning_xptr());
   struct ArrowArray* array = nanoarrow_output_array_from_xptr(array_xptr);
@@ -135,7 +206,13 @@ SEXP result_fetch_arrow_chunk(DbResult* res, double chunk_size) {
     static_cast<int64_t>(chunk_size)
   );
   R_SetExternalPtrTag(array_xptr, schema_xptr);
-  return array_xptr;
+
+  using namespace cpp11::literals;
+  return cpp11::writable::list(
+    { "array"_nm = array_xptr,
+      "bytes"_nm =
+        cpp11::as_sexp(static_cast<double>(arrow_array_bytes(array))) }
+  );
 }
 
 // Binds all rows of a nanoarrow_array_stream, `param_indexes` gives the
@@ -158,6 +235,27 @@ void result_bind_arrow(
   std::vector<int> indexes(param_indexes.begin(), param_indexes.end());
   db_arrow_release_deferred();
   res->bind_arrow(stream, indexes);
+}
+
+// The values of an integer64 vector as an integer vector,
+// or NULL if one of them does not fit
+[[cpp11::register]]
+SEXP integer64_to_integer(cpp11::doubles x) {
+  const R_xlen_t n = x.size();
+  const int64_t* values = reinterpret_cast<const int64_t*>(REAL(x));
+  for (R_xlen_t i = 0; i < n; ++i) {
+    const int64_t value = values[i];
+    if (value != NA_INTEGER64 && (value < -INT_MAX || value > INT_MAX)) {
+      return R_NilValue;
+    }
+  }
+
+  cpp11::writable::integers out(n);
+  for (R_xlen_t i = 0; i < n; ++i) {
+    const int64_t value = values[i];
+    out[i] = (value == NA_INTEGER64) ? NA_INTEGER : static_cast<int>(value);
+  }
+  return out;
 }
 
 // For the tests: sets, for this result alone, the bytes of a utf8 or binary

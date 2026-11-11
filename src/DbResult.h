@@ -4,6 +4,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <vector>
 
 #include <atomic>
 #include <functional>
@@ -19,6 +20,7 @@ typedef boost::shared_ptr<DbResult> DbResultPtr;
 struct ArrowSchema;
 struct ArrowArray;
 struct ArrowArrayStream;
+struct ArrowDfColumns;
 
 // DbResult --------------------------------------------------------------------
 
@@ -83,6 +85,15 @@ public:
     int64_t n_max,
     int64_t stream_execution = -1,
     bool* complete = NULL
+  );
+  // At most `n_max` rows, all for a negative `n_max`, typed for a data frame,
+  // as a stream of arrays of at most `chunk_size` rows; returns the row count
+  // and describes the columns in `columns`
+  int64_t fetch_arrow_df(
+    struct ArrowArrayStream* out,
+    ArrowDfColumns& columns,
+    int64_t n_max,
+    int64_t chunk_size
   );
   void bind_arrow(
     struct ArrowArrayStream* stream,

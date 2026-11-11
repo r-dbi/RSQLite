@@ -9,6 +9,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include "nanoarrow/nanoarrow.h"
 #include "nanoarrow/nanoarrow.hpp"
@@ -54,5 +55,28 @@ inline struct ArrowBufferView arrow_buffer_view(
   view.size_bytes = size;
   return view;
 }
+
+// The bytes held by the buffers of an array built by nanoarrow, children
+// included
+inline int64_t arrow_array_bytes(struct ArrowArray* array) {
+  int64_t bytes = 0;
+  for (int i = 0; i < NANOARROW_MAX_FIXED_BUFFERS; ++i) {
+    bytes += ArrowArrayBuffer(array, i)->size_bytes;
+  }
+  for (int64_t j = 0; j < array->n_children; ++j) {
+    bytes += arrow_array_bytes(array->children[j]);
+  }
+  return bytes;
+}
+
+// What a data frame needs to know about the columns of a fetch through Arrow
+struct ArrowDfColumns {
+  // Columns that have seen an integer that needs 64 bits, in this fetch or an
+  // earlier one
+  std::vector<bool> wide_ints;
+  // The R class of a column of times or timestamps stored as doubles in
+  // seconds, empty for the other columns
+  std::vector<std::string> seconds_classes;
+};
 
 #endif  // RSQLITE_DBARROW_H

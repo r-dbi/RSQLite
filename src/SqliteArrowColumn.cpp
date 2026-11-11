@@ -5,6 +5,7 @@
 #include "main_thread.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <algorithm>
+#include <climits>
 #include <cmath>
 #include <cstring>
 #include <sstream>
@@ -40,10 +41,13 @@ SqliteArrowColumn::SqliteArrowColumn(
       source(stmt_, j_, with_alt_types_),
       kind(AK_UNDECIDED),
       frozen(false),
+      data_frame(false),
+      array_kind(AK_UNDECIDED),
       pending_nulls(0),
       warned(false),
       warned_range(false),
       warned_utf8(false),
+      wide_ints(false),
       value_type(SQLITE_NULL),
       value_data(NULL),
       value_size(0),
@@ -60,11 +64,36 @@ bool SqliteArrowColumn::decided() const {
   return kind != AK_UNDECIDED;
 }
 
+ARROW_KIND SqliteArrowColumn::get_kind() const {
+  return kind;
+}
+
+void SqliteArrowColumn::carry_over(ARROW_KIND kind_, bool wide_ints_) {
+  if (kind_ != AK_UNDECIDED) {
+    kind = kind_;
+  }
+  wide_ints = wide_ints || wide_ints_;
+}
+
 void SqliteArrowColumn::decide_from_row(bool has_row) {
   if (decided() || !has_row) {
     return;
   }
   kind = kind_from_column_type(sqlite3_column_type(stmt, j));
+}
+
+void SqliteArrowColumn::peek_value() {
+  if (value_type == SQLITE_NULL) {
+    return;
+  }
+  if (!decided()) {
+    kind = kind_from_column_type(value_type);
+  } else if (kind == AK_INT64 && value_type == SQLITE_FLOAT && !frozen) {
+    kind = AK_DOUBLE;
+  }
+  if (kind == AK_INT64 && value_type == SQLITE_INTEGER) {
+    note_integer(sqlite3_column_int64(stmt, j));
+  }
 }
 
 void SqliteArrowColumn::decide_from_decltype() {
@@ -81,7 +110,49 @@ void SqliteArrowColumn::freeze() {
   frozen = true;
 }
 
+void SqliteArrowColumn::reopen() {
+  // The default path types an all-NULL column without a declared type as
+  // logical, and decides it again in the next fetch
+  if (!frozen && kind == AK_NA) {
+    kind = AK_UNDECIDED;
+  }
+}
+
+void SqliteArrowColumn::set_data_frame(bool data_frame_) {
+  data_frame = data_frame_;
+}
+
+const char* SqliteArrowColumn::seconds_class() const {
+  if (storage_kind() != AK_DOUBLE) {
+    return "";
+  }
+  switch (kind) {
+  case AK_TIME:
+    return "hms";
+  case AK_TIMESTAMP:
+    return "POSIXct";
+  default:
+    return "";
+  }
+}
+
+ARROW_KIND SqliteArrowColumn::storage_kind() const {
+  if (data_frame && (kind == AK_TIME || kind == AK_TIMESTAMP)) {
+    return AK_DOUBLE;
+  }
+  return kind;
+}
+
 void SqliteArrowColumn::set_schema(struct ArrowSchema* schema) const {
+  set_type(schema, storage_kind());
+  check_arrow(ArrowSchemaSetName(schema, name.c_str()), "Can't set Arrow name");
+}
+
+bool SqliteArrowColumn::wide_integers() const {
+  return wide_ints;
+}
+
+void SqliteArrowColumn::set_type(struct ArrowSchema* schema, ARROW_KIND kind) {
   switch (kind) {
   case AK_NA:
     check_arrow(
@@ -144,8 +215,6 @@ void SqliteArrowColumn::set_schema(struct ArrowSchema* schema) const {
   case AK_UNDECIDED:
     throw std::runtime_error("Internal error: Arrow type not decided");
   }
-
-  check_arrow(ArrowSchemaSetName(schema, name.c_str()), "Can't set Arrow name");
 }
 
 // Chunk building //////////////////////////////////////////////////////////////
@@ -202,13 +271,22 @@ void SqliteArrowColumn::append_row() {
   append_value(column_type);
 }
 
-void SqliteArrowColumn::finish_chunk(int64_t n) {
+void SqliteArrowColumn::finish_chunk(int64_t n, bool keep_open) {
   if (decided()) {
     return;
   }
-  // Every value of this chunk was NULL, this is the last chance to decide
-  decide_from_decltype();
-  init_array();
+  // Every value of this chunk was NULL
+  if (keep_open) {
+    // A later chunk of the same fetch decides, and conform_chunk() types this
+    // one then
+    array.reset();
+    init_array(array.get(), AK_NA);
+    array_kind = AK_NA;
+  } else {
+    // This is the last chance to decide
+    decide_from_decltype();
+    init_array();
+  }
   check_arrow(
     ArrowArrayAppendNull(array.get(), n),
     "Can't append to Arrow array"
@@ -216,8 +294,46 @@ void SqliteArrowColumn::finish_chunk(int64_t n) {
   pending_nulls = 0;
 }
 
-void SqliteArrowColumn::move_chunk_to(struct ArrowArray* out) {
+ARROW_KIND SqliteArrowColumn::move_chunk_to(struct ArrowArray* out) {
   ArrowArrayMove(array.get(), out);
+  return array_kind;
+}
+
+void SqliteArrowColumn::conform_chunk(
+  struct ArrowArray* chunk,
+  ARROW_KIND chunk_kind
+) const {
+  const ARROW_KIND target = storage_kind();
+  if (chunk_kind == target) {
+    return;
+  }
+
+  nanoarrow::UniqueArray out;
+  init_array(out.get(), target);
+  if (chunk_kind == AK_NA) {
+    check_arrow(
+      ArrowArrayAppendNull(out.get(), chunk->length),
+      "Can't append to Arrow array"
+    );
+  } else if (chunk_kind == AK_INT64 && target == AK_DOUBLE) {
+    append_ints_as_doubles(out.get(), chunk);
+  } else {
+    throw std::runtime_error(
+      std::string("Internal error: can't convert an Arrow chunk of type ") +
+      format_kind(chunk_kind) + " to " + format_kind(target)
+    );
+  }
+
+  struct ArrowError error;
+  ArrowErrorInit(&error);
+  check_arrow(
+    ArrowArrayFinishBuildingDefault(out.get(), &error),
+    "Can't finish Arrow array",
+    &error
+  );
+
+  chunk->release(chunk);
+  ArrowArrayMove(out.get(), chunk);
 }
 
 int64_t SqliteArrowColumn::variable_bytes() {
@@ -231,6 +347,13 @@ int64_t SqliteArrowColumn::variable_bytes() {
 }
 
 // Privates ////////////////////////////////////////////////////////////////////
+
+// The default path stores integers as 32-bit until one needs more
+void SqliteArrowColumn::note_integer(int64_t value) {
+  if (value < -INT_MAX || value > INT_MAX) {
+    wide_ints = true;
+  }
+}
 
 ARROW_KIND SqliteArrowColumn::kind_from_column_type(int column_type) {
   switch (column_type) {
@@ -280,22 +403,24 @@ ARROW_KIND SqliteArrowColumn::kind_from_decltype() const {
 }
 
 void SqliteArrowColumn::init_array() {
+  array.reset();
+  array_kind = storage_kind();
+  init_array(array.get(), array_kind);
+}
+
+void SqliteArrowColumn::init_array(struct ArrowArray* out, ARROW_KIND kind) {
   nanoarrow::UniqueSchema schema;
   ArrowSchemaInit(schema.get());
-  set_schema(schema.get());
+  set_type(schema.get(), kind);
 
   struct ArrowError error;
   ArrowErrorInit(&error);
-  array.reset();
   check_arrow(
-    ArrowArrayInitFromSchema(array.get(), schema.get(), &error),
+    ArrowArrayInitFromSchema(out, schema.get(), &error),
     "Can't allocate Arrow array",
     &error
   );
-  check_arrow(
-    ArrowArrayStartAppending(array.get()),
-    "Can't allocate Arrow array"
-  );
+  check_arrow(ArrowArrayStartAppending(out), "Can't allocate Arrow array");
 }
 
 // Reads the bytes of a utf8 or binary value once per row
@@ -333,14 +458,19 @@ void SqliteArrowColumn::append_value(int column_type) {
       append_value(column_type);
       return;
     }
-    if (column_type != SQLITE_INTEGER) {
-      warn_mixed(column_type);
+    {
+      int64_t value = sqlite3_column_int64(stmt, j);
+      if (column_type == SQLITE_INTEGER) {
+        note_integer(value);
+      } else {
+        warn_mixed(column_type);
+      }
+      check_arrow(
+        ArrowArrayAppendInt(array.get(), value),
+        "Can't append to Arrow array"
+      );
+      break;
     }
-    check_arrow(
-      ArrowArrayAppendInt(array.get(), sqlite3_column_int64(stmt, j)),
-      "Can't append to Arrow array"
-    );
-    break;
 
   case AK_DOUBLE:
     if (column_type != SQLITE_FLOAT && column_type != SQLITE_INTEGER) {
@@ -358,13 +488,19 @@ void SqliteArrowColumn::append_value(int column_type) {
         warn_mixed(column_type);
       }
       fetch_bytes();
-      // SQLite doesn't enforce UTF-8 for text, and keeps blobs as they are;
-      // numbers convert to ASCII
-      if ((column_type == SQLITE_TEXT || column_type == SQLITE_BLOB) &&
-          !is_utf8_text(
-            static_cast<const char*>(value_data),
-            static_cast<size_t>(value_size)
-          )) {
+      const char* text = static_cast<const char*>(value_data);
+      int64_t size = value_size;
+      if (data_frame && column_type == SQLITE_TEXT) {
+        // R strings end at the first NUL, like those of the default path,
+        // which passes text through unchecked; an Arrow stream keeps all bytes
+        const void* nul = memchr(text, '\0', static_cast<size_t>(size));
+        if (nul != NULL) {
+          size = static_cast<const char*>(nul) - text;
+        }
+      } else if ((column_type == SQLITE_TEXT || column_type == SQLITE_BLOB) &&
+                 !is_utf8_text(text, static_cast<size_t>(size))) {
+        // SQLite doesn't enforce UTF-8 for text, and keeps blobs as they are;
+        // numbers convert to ASCII
         warn_invalid_utf8(column_type);
         check_arrow(
           ArrowArrayAppendNull(array.get(), 1),
@@ -373,10 +509,7 @@ void SqliteArrowColumn::append_value(int column_type) {
         break;
       }
       check_arrow(
-        ArrowArrayAppendString(
-          array.get(),
-          arrow_string_view(static_cast<const char*>(value_data), value_size)
-        ),
+        ArrowArrayAppendString(array.get(), arrow_string_view(text, size)),
         "Can't append to Arrow array"
       );
       break;
@@ -420,6 +553,21 @@ void SqliteArrowColumn::append_value(int column_type) {
     {
       double seconds =
         (kind == AK_TIME) ? source.fetch_time() : source.fetch_datetime_local();
+      if (array_kind == AK_DOUBLE) {
+        // For a data frame: the seconds of the default path, all of them
+        if (std::isnan(seconds)) {
+          check_arrow(
+            ArrowArrayAppendNull(array.get(), 1),
+            "Can't append to Arrow array"
+          );
+        } else {
+          check_arrow(
+            ArrowArrayAppendDouble(array.get(), seconds),
+            "Can't append to Arrow array"
+          );
+        }
+        break;
+      }
       double micros = std::floor(seconds * 1e6 + 0.5);
       bool in_range;
       if (kind == AK_TIME) {
@@ -468,24 +616,30 @@ void SqliteArrowColumn::append_value(int column_type) {
 void SqliteArrowColumn::promote_to_double() {
   nanoarrow::UniqueArray ints;
   ArrowArrayMove(array.get(), ints.get());
-  int64_t n = ints->length;
-  const int64_t* values =
-    reinterpret_cast<const int64_t*>(ArrowArrayBuffer(ints.get(), 1)->data);
-  const struct ArrowBitmap* validity = ArrowArrayValidityBitmap(ints.get());
-  bool has_nulls = validity->buffer.size_bytes > 0;
 
   kind = AK_DOUBLE;
   init_array();
+  append_ints_as_doubles(array.get(), ints.get());
+}
+
+// Appends the values of `ints`, an int64 array built by nanoarrow, finished or
+// not, to the double array `out`
+void SqliteArrowColumn::append_ints_as_doubles(
+  struct ArrowArray* out,
+  struct ArrowArray* ints
+) {
+  int64_t n = ints->length;
+  const int64_t* values =
+    reinterpret_cast<const int64_t*>(ArrowArrayBuffer(ints, 1)->data);
+  const struct ArrowBitmap* validity = ArrowArrayValidityBitmap(ints);
+  bool has_nulls = validity->buffer.size_bytes > 0;
 
   for (int64_t i = 0; i < n; ++i) {
     if (has_nulls && !ArrowBitGet(validity->buffer.data, i)) {
-      check_arrow(
-        ArrowArrayAppendNull(array.get(), 1),
-        "Can't append to Arrow array"
-      );
+      check_arrow(ArrowArrayAppendNull(out, 1), "Can't append to Arrow array");
     } else {
       check_arrow(
-        ArrowArrayAppendDouble(array.get(), static_cast<double>(values[i])),
+        ArrowArrayAppendDouble(out, static_cast<double>(values[i])),
         "Can't append to Arrow array"
       );
     }

@@ -4,6 +4,7 @@
 #include <string>
 
 #include "sqlite3-cpp.h"
+#include "CoercionLog.h"
 #include "DbArrow.h"
 #include "SqliteColumnDataSource.h"
 
@@ -53,9 +54,6 @@ class SqliteArrowColumn {
   ARROW_KIND array_kind;
   // Rows of the current chunk seen while undecided (all NULL)
   int64_t pending_nulls;
-  bool warned;
-  bool warned_range;
-  bool warned_utf8;
   // Set once an integer has needed 64 bits: like the default path, a data
   // frame keeps the column as integer64 from then on
   bool wide_ints;
@@ -67,6 +65,10 @@ class SqliteArrowColumn {
   const void* value_data;
   int value_size;
   bool value_fetched;
+
+  // Values that were not of the column's type, since the last call to
+  // coercions()
+  CoercionLog log;
 
 public:
   SqliteArrowColumn(
@@ -111,8 +113,9 @@ public:
   // The bytes that the value of the current row adds to the data buffer of a
   // utf8 or binary column, zero for the other types
   int64_t value_bytes();
-  // Appends the value of the current row
-  void append_row();
+  // Appends the value of the current row, `row` is its 1-based row number in
+  // the result for the coercion log
+  void append_row(int64_t row);
   // Completes the chunk of `n` rows: an undecided column takes its declared
   // type, or stays open with a chunk of the null type when `keep_open` is set
   void finish_chunk(int64_t n, bool keep_open);
@@ -124,6 +127,16 @@ public:
   void conform_chunk(struct ArrowArray* chunk, ARROW_KIND chunk_kind) const;
   // The bytes in the data buffer of a utf8 or binary column
   int64_t variable_bytes();
+
+  // The values logged since the last call that were not of the column's type,
+  // as an R list with the column name, its current type and the entries of
+  // the log, which is cleared; NULL if there were none
+  cpp11::sexp coercions();
+  // The same as a line of the warning's text, empty if there were none,
+  // for a thread that can't call R; the log is cleared
+  std::string coercions_text();
+  // Clears the log without reporting it
+  void discard_coercions();
 
 private:
   static ARROW_KIND kind_from_column_type(int column_type);
@@ -141,13 +154,10 @@ private:
   );
   void init_array();
   void fetch_bytes();
-  void append_value(int column_type);
+  void append_value(int column_type, int64_t row);
+  void append_null();
   void promote_to_double();
-  void warn_mixed(int column_type);
-  void warn_out_of_range(int column_type);
-  void warn_invalid_utf8(int column_type);
   static const char* format_kind(ARROW_KIND kind);
-  static const char* format_column_type(int column_type);
 };
 
 #endif  // RSQLITE_SQLITEARROWCOLUMN_H

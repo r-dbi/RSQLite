@@ -67,6 +67,22 @@ test_that("64-bit integers follow bigint on the Arrow path", {
   expect_equal(dbReadTable(con_int, "t")$big, c(NA, 2L))
 })
 
+test_that("a converted value that needs 64 bits keeps the column integer64 on the Arrow path", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1), ('99999999999'), (2)")
+
+  rs <- dbSendQuery(con, "SELECT x FROM t")
+  w <- coercion_warnings(first <- dbFetch(rs, 2))
+  rest <- dbFetch(rs)
+  dbClearResult(rs)
+  expect_length(w, 1)
+  # The default path truncates the string to an integer, in an integer column
+  expect_identical(first$x, bit64::as.integer64(c(1, 99999999999)))
+  # Also the next fetch, as after an integer that needs 64 bits
+  expect_identical(rest$x, bit64::as.integer64(2))
+})
+
 test_that("extended types come back as Date, hms and POSIXct on the Arrow path", {
   con <- local_arrow_con(extended_types = TRUE)
   df <- data.frame(d = as.Date("2020-01-02") + 0:1)
@@ -284,21 +300,136 @@ test_that("each fetch through Arrow is typed like on the default path", {
     for (with_info in c(FALSE, TRUE)) {
       expected <- fetch_sequence(con, "SELECT * FROM t", ns, info = with_info)
       info <- paste("n =", paste(ns, collapse = ", "), "dbColumnInfo():", with_info)
-      expect_identical(
+      expect_same_fetches(
         fetch_sequence(con_arrow, "SELECT * FROM t", ns, info = with_info),
         expected,
-        info = info
+        ns,
+        info
       )
       # Several arrays per fetch
       for (chunk_size in 1:2) {
-        expect_identical(
+        expect_same_fetches(
           fetch_sequence(con_arrow, "SELECT * FROM t", ns, chunk_size = chunk_size, info = with_info),
           expected,
-          info = paste(info, "chunk_size =", chunk_size)
+          ns,
+          paste(info, "chunk_size =", chunk_size)
         )
       }
     }
   }
+  # The values of other storage classes are in columns x and b
+  expect_identical(fetch_sequence(con, "SELECT * FROM t", -1)$warnings, 2L)
+})
+
+test_that("a fetch of no rows warns on the default path only", {
+  setup <- c(
+    "CREATE TABLE t (a BLOB, b)",
+    "INSERT INTO t VALUES (1, 1), ('1.7', 2), (NULL, '12')"
+  )
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con))
+  con_arrow <- local_arrow_con()
+  for (sql in setup) {
+    dbExecute(con, sql)
+    dbExecute(con_arrow, sql)
+  }
+
+  ns <- c(2, 0, 1)
+  expected <- fetch_sequence(con, "SELECT * FROM t", ns)
+  # The fetch of no rows warns about the string in the integer column b
+  expect_identical(expected$warnings, c(1L, 1L, 1L))
+  actual <- fetch_sequence(con_arrow, "SELECT * FROM t", ns)
+  expect_identical(actual$warnings, c(1L, 0L, 1L))
+  expect_same_fetches(actual, expected, ns, "n = 2, 0, 1")
+})
+
+test_that("unparsable times through Arrow are reported once per fetch", {
+  setup <- c(
+    "CREATE TABLE t (i INTEGER, tm TIME, ts TIMESTAMP)",
+    paste(
+      "INSERT INTO t VALUES (1, 3600.25, 1.5), (2, 'nope', 'nope'), (3, 100000, 1e19),",
+      "(4, '25:00:00', '2020-01-02 03:04:05'), (5, X'00', 2.5)"
+    )
+  )
+  con <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
+  on.exit(dbDisconnect(con))
+  con_arrow <- local_arrow_con(extended_types = TRUE)
+  for (sql in setup) {
+    dbExecute(con, sql)
+    dbExecute(con_arrow, sql)
+  }
+  query <- "SELECT tm, ts FROM t ORDER BY i"
+
+  for (ns in list(-1, c(1, 2, -1), c(3, 2))) {
+    expect_same_fetches(
+      fetch_sequence(con_arrow, query, ns),
+      fetch_sequence(con, query, ns),
+      ns,
+      paste("n =", paste(ns, collapse = ", "))
+    )
+  }
+
+  # Seconds keep times outside a day and large timestamps, as on the default path
+  w <- coercion_warnings(df <- dbGetQuery(con_arrow, query))
+  expect_identical(as.numeric(df$tm), c(3600.25, NA, 100000, 90000, NA))
+  expect_identical(as.numeric(df$ts), c(1.5, NA, 1e19, 1577934245, 2.5))
+  expect_length(w, 1)
+  coercions <- w[[1]]$coercions
+  expect_identical(vapply(coercions, `[[`, "", "type"), c("time64", "timestamp"))
+  tm <- coercions[[1]]$values
+  expect_identical(vapply(tm, `[[`, "", "class"), c("string", "blob"))
+  expect_identical(vapply(tm, `[[`, "", "reason"), c("unparsable", "unparsable"))
+  expect_equal(vapply(tm, `[[`, 1, "rows"), c(2, 5))
+  expect_equal(coercions[[2]]$values[[1]]$rows, 2)
+})
+
+test_that("the coercion warning counts the rows of each binding through Arrow", {
+  setup <- c(
+    "CREATE TABLE t (k INTEGER, v)",
+    "INSERT INTO t VALUES (1, 1), (1, 2), (2, 'x'), (2, 3), (2, 'y')"
+  )
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con))
+  con_arrow <- local_arrow_con()
+  for (sql in setup) {
+    dbExecute(con, sql)
+    dbExecute(con_arrow, sql)
+  }
+
+  bind_and_fetch <- function(con, ns) {
+    rs <- dbSendQuery(con, "SELECT v FROM t WHERE k = ? ORDER BY rowid")
+    on.exit(dbClearResult(rs))
+    warnings <- list()
+    data <- unlist(recursive = FALSE, lapply(1:2, function(k) {
+      dbBind(rs, list(k))
+      lapply(ns, function(n) {
+        withCallingHandlers(dbFetch(rs, n), warning = function(w) {
+          warnings[[length(warnings) + 1]] <<- w
+          invokeRestart("muffleWarning")
+        })
+      })
+    }))
+    list(data = data, warnings = warnings)
+  }
+
+  # The second binding starts from the integer type of the first one,
+  # its strings are converted
+  expected <- bind_and_fetch(con, -1)
+  expect_identical(expected$data[[2]]$v, c(0L, 3L, 0L))
+  actual <- bind_and_fetch(con_arrow, -1)
+  expect_identical(actual$data, expected$data)
+  expect_length(actual$warnings, 1)
+  # Row numbers count from the first row of the binding
+  values <- actual$warnings[[1]]$coercions[[1]]$values[[1]]
+  expect_identical(values$class, "string")
+  expect_equal(values$rows, c(1, 3))
+
+  # Also across the fetches of a binding
+  actual <- bind_and_fetch(con_arrow, c(2, -1))
+  expect_identical(actual$data, bind_and_fetch(con, c(2, -1))$data)
+  expect_length(actual$warnings, 2)
+  expect_equal(actual$warnings[[1]]$coercions[[1]]$values[[1]]$rows, 1)
+  expect_equal(actual$warnings[[2]]$coercions[[1]]$values[[1]]$rows, 3)
 })
 
 test_that("dbColumnInfo() through Arrow answers like the data frames", {
@@ -354,7 +485,7 @@ test_that("a NULL-first column is typed by its first value through Arrow", {
   for (n in 0:1) {
     rs <- dbSendQuery(con, "SELECT * FROM t")
     first <- dbFetch(rs, n)
-    expect_warning(rest <- dbFetch(rs), "mixed type")
+    expect_warning(rest <- dbFetch(rs), class = "RSQLite_warning_coercion")
     dbClearResult(rs)
     expect_identical(first, data.frame(x = rep(NA, n), y = rep(NA_integer_, n)))
     expect_identical(rest$x, c(NA, 1L, 0L)[seq.int(n + 1L, 3L)])
@@ -431,20 +562,25 @@ test_that("times outside a day keep their value through Arrow like on the defaul
   expect_identical(as.numeric(expected$tm), c(0, 86400, 100000, -1, 86400, 108000, 86399.9999996, NA))
   expect_silent(out <- dbGetQuery(con, query))
   expect_identical(out, expected)
-  expect_identical(fetch_sequence(con, query, c(1, 2, -1)), fetch_sequence(con_default, query, c(1, 2, -1)))
+  ns <- c(1, 2, -1)
+  expect_same_fetches(fetch_sequence(con, query, ns), fetch_sequence(con_default, query, ns), ns, "n = 1, 2, -1")
 
   # A stream holds times of day only
-  expect_warning(
-    stream_df <- as.data.frame(dbGetQueryArrow(con, query)),
-    "outside the range of Arrow type time64 are NULL"
-  )
+  w <- coercion_warnings(stream_df <- as.data.frame(dbGetQueryArrow(con, query)))
   expect_identical(is.na(stream_df$tm), c(FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE))
+  expect_length(w, 1)
+  expect_identical(vapply(w[[1]]$coercions[[1]]$values, `[[`, "", "reason"), c("out_of_range", "out_of_range"))
   # and so do the data frames once a chunk has fixed the types
   rs <- dbSendQuery(con, query)
   on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
   expect_silent(dbFetchArrowChunk(rs, chunk_size = 1))
-  expect_warning(rest <- dbFetch(rs), "outside the range of Arrow type time64 are NULL")
+  w <- coercion_warnings(rest <- dbFetch(rs))
   expect_identical(is.na(rest$tm), c(TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_identical(vapply(values, `[[`, "", "reason"), c("out_of_range", "out_of_range"))
+  expect_equal(values[[1]]$rows, 2:4)
+  expect_equal(values[[2]]$rows, 5:6)
 })
 
 test_that("text through Arrow is read like on the default path", {
@@ -461,20 +597,24 @@ test_that("text through Arrow is read like on the default path", {
   expect_identical(lapply(expected$s[1:4], charToRaw), list(charToRaw("c"), charToRaw("a"), as.raw(0xff), as.raw(c(0xed, 0xa0, 0x80))))
   expect_silent(out <- dbGetQuery(con_arrow, sql))
   expect_identical(out, expected)
-  expect_identical(fetch_sequence(con_arrow, sql, c(1, 2, -1)), fetch_sequence(con, sql, c(1, 2, -1)))
+  ns <- c(1, 2, -1)
+  expect_same_fetches(fetch_sequence(con_arrow, sql, ns), fetch_sequence(con, sql, ns), ns, "n = 1, 2, -1")
 
   # A stream holds valid UTF-8 without NUL bytes only
-  expect_warning(
-    stream_df <- as.data.frame(dbGetQueryArrow(con_arrow, sql)),
-    "not valid UTF-8, or hold a NUL byte, are NULL"
-  )
+  w <- coercion_warnings(stream_df <- as.data.frame(dbGetQueryArrow(con_arrow, sql)))
   expect_identical(stream_df$s, c("c", NA, NA, NA, NA))
+  expect_length(w, 1)
+  expect_identical(w[[1]]$coercions[[1]]$values[[1]]$reason, "invalid_utf8")
   # and so do the data frames once a chunk has fixed the types
   rs <- dbSendQuery(con_arrow, sql)
   on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
   expect_silent(dbFetchArrowChunk(rs, chunk_size = 1))
-  expect_warning(rest <- dbFetch(rs), "not valid UTF-8, or hold a NUL byte, are NULL")
+  w <- coercion_warnings(rest <- dbFetch(rs))
   expect_identical(rest$s, c(NA_character_, NA, NA, NA))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_identical(values[[1]]$reason, "invalid_utf8")
+  expect_equal(values[[1]]$rows, 2:4)
 })
 
 test_that("a blob in a text column is text through Arrow only if it is valid UTF-8", {
@@ -483,17 +623,13 @@ test_that("a blob in a text column is text through Arrow only if it is valid UTF
 
   # As in a stream, where the default path ends the blob at its first NUL
   # and does not check it
-  messages <- character()
-  out <- withCallingHandlers(
-    dbGetQuery(con_arrow, sql),
-    warning = function(w) {
-      messages <<- c(messages, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    }
-  )
+  w <- coercion_warnings(out <- dbGetQuery(con_arrow, sql))
   expect_identical(out$x, c("a", "hi", NA, NA))
-  expect_match(messages, "`x`: mixed type", all = FALSE)
-  expect_match(messages, "`x`: values of type blob that are not valid UTF-8", all = FALSE)
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_identical(vapply(values, `[[`, "", "reason"), c("converted", "invalid_utf8"))
+  expect_equal(values[[1]]$rows, 2)
+  expect_equal(values[[2]]$rows, 3:4)
 })
 
 test_that("dbFetch() through Arrow returns `n` rows across arrays cut short", {
@@ -503,8 +639,7 @@ test_that("dbFetch() through Arrow returns `n` rows across arrays cut short", {
 
   rs <- dbSendQuery(con, "SELECT s FROM t")
   on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
-  # The byte limits of this result, lowered from 1 GiB and 2^31 - 1
-  result_set_bytes_limits(rs@ptr, 100, 150)
+  set_bytes_limits(rs)
   expect_identical(dbFetch(rs, 5)$s, df$s[1:5])
   expect_false(dbHasCompleted(rs))
   expect_identical(dbFetch(rs, 5)$s, df$s[6:7])
@@ -538,33 +673,87 @@ test_that("dbFetch() through Arrow hands out the rows kept for a schema", {
   stream$release()
 })
 
-test_that("a handler of a fetch through Arrow can't use its result", {
+test_that("a handler of the warning of a fetch through Arrow can use its result", {
   con <- local_arrow_con()
   dbExecute(con, "CREATE TABLE u (i INTEGER, x)")
-  dbExecute(con, "INSERT INTO u VALUES (1, 1), (2, 'two'), (3, 3)")
-  busy <- "while one of its fetches or binds is running"
+  dbExecute(con, "INSERT INTO u VALUES (1, 1), (2, 'two'), (3, 3), (4, 4)")
 
+  # The warning comes once the fetch has returned its rows,
+  # with the result ready for the next fetch
   uses <- list(
-    function(rs) dbFetch(rs),
-    function(rs) dbFetch(rs, 0),
+    function(rs) expect_identical(dbFetch(rs), data.frame(x = 3:4)),
+    function(rs) expect_identical(dbFetch(rs, 0), data.frame(x = integer())),
     function(rs) dbBind(rs, list(i = 2)),
     function(rs) dbClearResult(rs),
-    function(rs) dbColumnInfo(rs),
-    function(rs) dbFetchArrowChunk(rs)
+    function(rs) expect_identical(dbColumnInfo(rs)$name, "x"),
+    function(rs) expect_equal(dbFetchArrowChunk(rs)$length, 2)
   )
   for (use in uses) {
     rs <- dbSendQuery(con, "SELECT x FROM u WHERE i >= $i ORDER BY i", params = list(i = 1))
-    # The mixed-type warning runs the handler in the middle of the fetch
-    expect_error(
-      withCallingHandlers(dbFetch(rs), warning = function(w) {
-        use(rs)
-        invokeRestart("muffleWarning")
-      }),
-      busy
-    )
-    # The result is usable again
-    dbBind(rs, list(i = 3))
-    expect_identical(dbFetch(rs), data.frame(x = 3L))
-    dbClearResult(rs)
+    out <- withCallingHandlers(dbFetch(rs, 2), RSQLite_warning_coercion = function(w) {
+      use(rs)
+      invokeRestart("muffleWarning")
+    })
+    expect_identical(out, data.frame(x = c(1L, 0L)))
+    if (dbIsValid(rs)) {
+      dbClearResult(rs)
+    }
   }
+
+  # A handler of the warning of an Arrow chunk can't, also not for a data frame
+  rs <- dbSendQuery(con, "SELECT x FROM u ORDER BY i")
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
+  expect_error(
+    withCallingHandlers(dbFetchArrowChunk(rs), RSQLite_warning_coercion = function(w) dbFetch(rs)),
+    "while one of its fetches or binds is running"
+  )
+})
+
+test_that("a handler of the warning of a fetch through Arrow can fetch from another result", {
+  con <- local_arrow_con()
+  dbExecute(con, "CREATE TABLE u (x)")
+  dbExecute(con, "INSERT INTO u VALUES (1), ('two'), (3)")
+  dbExecute(con, "CREATE TABLE v (y)")
+  dbExecute(con, "INSERT INTO v VALUES (1.5), (2), ('a')")
+  con2 <- local_arrow_con()
+  dbExecute(con2, "CREATE TABLE w (z)")
+  dbExecute(con2, "INSERT INTO w VALUES (1), (X'ff')")
+
+  # A stream on the same connection and a result on another one,
+  # whose fetches warn in turn
+  stream <- dbGetQueryArrow(con, "SELECT y FROM v")
+  rs2 <- dbSendQuery(con2, "SELECT z FROM w")
+  withr::defer(dbClearResult(rs2))
+  rs <- dbSendQuery(con, "SELECT x FROM u")
+  withr::defer(dbClearResult(rs))
+
+  coercions <- NULL
+  inner <- NULL
+  out <- withCallingHandlers(
+    dbFetch(rs),
+    RSQLite_warning_coercion = function(w) {
+      coercions <<- w$coercions
+      inner <<- list(
+        stream = coercion_warnings(stream_df <- as.data.frame(stream)),
+        df = coercion_warnings(df2 <- dbFetch(rs2)),
+        stream_df = stream_df,
+        df2 = df2
+      )
+      invokeRestart("muffleWarning")
+    }
+  )
+
+  expect_identical(out, data.frame(x = c(1L, 0L, 3L)))
+  expect_length(coercions, 1)
+  expect_identical(coercions[[1]]$column, "x")
+  expect_identical(coercions[[1]]$type, "int64")
+  expect_identical(coercions[[1]]$values[[1]]$class, "string")
+  expect_equal(coercions[[1]]$values[[1]]$rows, 2)
+
+  expect_identical(inner$stream_df$y, c(1.5, 2, 0))
+  expect_length(inner$stream, 1)
+  expect_equal(inner$stream[[1]]$coercions[[1]]$values[[1]]$rows, 3)
+  expect_identical(inner$df2$z, c(1L, 0L))
+  expect_length(inner$df, 1)
+  expect_identical(inner$df[[1]]$coercions[[1]]$values[[1]]$class, "blob")
 })

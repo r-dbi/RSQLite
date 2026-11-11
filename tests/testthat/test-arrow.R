@@ -72,7 +72,7 @@ test_that("mixed types after the first chunk are coerced with a warning", {
   expect_equal(as.data.frame(chunk)$x, c(1, 2))
   expect_warning(
     chunk <- dbFetchArrowChunk(rs, chunk_size = 2),
-    "mixed type"
+    class = "RSQLite_warning_coercion"
   )
   expect_equal(nanoarrow::infer_nanoarrow_schema(chunk)$children$x$format, "l")
 })
@@ -111,20 +111,21 @@ test_that("times and timestamps outside the range of int64 microseconds are NULL
     "(3, 1e19, -1e19), (4, 1e300, -1e300), (5, 9e999, -9e999)"
   ))
 
-  messages <- character()
-  df <- withCallingHandlers(
-    as.data.frame(dbGetQueryArrow(con, "SELECT tm, ts FROM t ORDER BY i")),
-    warning = function(w) {
-      messages <<- c(messages, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    }
-  )
+  w <- coercion_warnings(df <- as.data.frame(dbGetQueryArrow(con, "SELECT tm, ts FROM t ORDER BY i")))
   expect_equal(as.numeric(df$tm), c(1.5, NA, NA, NA, NA))
   expect_equal(as.numeric(df$ts), c(1.5, NA, NA, NA, NA))
-  # One warning per column, for the first such value, an integer
-  expect_equal(length(messages), 2L)
-  expect_match(messages, "`tm`: values of type integer outside the range of Arrow type time64", all = FALSE)
-  expect_match(messages, "`ts`: values of type integer outside the range of Arrow type timestamp", all = FALSE)
+  # One warning for the chunk, with the rows of each column
+  expect_length(w, 1)
+  coercions <- w[[1]]$coercions
+  expect_equal(vapply(coercions, `[[`, "", "column"), c("tm", "ts"))
+  expect_equal(vapply(coercions, `[[`, "", "type"), c("time64", "timestamp"))
+  for (coercion in coercions) {
+    expect_equal(vapply(coercion$values, `[[`, "", "class"), c("integer", "real"))
+    expect_equal(vapply(coercion$values, `[[`, "", "reason"), c("out_of_range", "out_of_range"))
+    expect_equal(coercion$values[[1]]$rows, 2)
+    expect_equal(coercion$values[[2]]$rows, 3:5)
+  }
+  expect_match(conditionMessage(w[[1]]), "1 integer value out of range, NA (row 2)", fixed = TRUE)
 })
 
 test_that("times outside a day are NULL", {
@@ -136,10 +137,13 @@ test_that("times outside a day are NULL", {
   ))
   sql <- "SELECT tm FROM t ORDER BY i"
 
-  expect_warning(
-    df <- as.data.frame(dbGetQueryArrow(con, sql)),
-    "`tm`: values of type integer outside the range of Arrow type time64 are NULL"
-  )
+  w <- coercion_warnings(df <- as.data.frame(dbGetQueryArrow(con, sql)))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_equal(vapply(values, `[[`, "", "class"), c("integer", "string"))
+  expect_equal(vapply(values, `[[`, "", "reason"), c("out_of_range", "out_of_range"))
+  expect_equal(values[[1]]$rows, 5:7)
+  expect_equal(values[[2]]$rows, 8:9)
   # The last microsecond of the day is as far as rounding goes
   expect_equal(as.numeric(df$tm), c(0, 43200.5, 86399.999999, 45296, NA, NA, NA, NA, NA))
   # The default path keeps any duration
@@ -153,7 +157,11 @@ test_that("text in a binary column is UTF-8, also in a UTF-16 database", {
   dbExecute(con, "INSERT INTO t VALUES (1, x'01'), (2, 'ab'), (3, 'caf\u00e9')")
   sql <- "SELECT x FROM t ORDER BY i"
 
-  expect_warning(df <- as.data.frame(dbGetQueryArrow(con, sql)), "coercing values of type string")
+  w <- coercion_warnings(df <- as.data.frame(dbGetQueryArrow(con, sql)))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_equal(vapply(values, `[[`, "", "class"), "string")
+  expect_equal(values[[1]]$rows, 2:3)
   expected <- list(as.raw(1), charToRaw("ab"), charToRaw("caf\u00e9"))
   expect_equal(unclass(df$x), expected, ignore_attr = TRUE)
   # The data frame path returns the same bytes
@@ -169,18 +177,14 @@ test_that("a blob in a utf8 column keeps its bytes, also in a UTF-16 database", 
     "INSERT INTO t VALUES (1, 'first'), (2, x'6162'), (3, x'c3a4'), (4, x'00ff'), (5, x'')"
   ))
 
-  messages <- character()
-  df <- withCallingHandlers(
-    as.data.frame(dbGetQueryArrow(con, "SELECT x FROM t ORDER BY i")),
-    warning = function(w) {
-      messages <<- c(messages, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    }
-  )
+  w <- coercion_warnings(df <- as.data.frame(dbGetQueryArrow(con, "SELECT x FROM t ORDER BY i")))
   # The bytes are UTF-8, not UTF-16 to transcode
   expect_equal(df$x, c("first", "ab", "\u00e4", NA, ""))
-  expect_match(messages, "`x`: mixed type", all = FALSE)
-  expect_match(messages, "`x`: values of type blob that are not valid UTF-8", all = FALSE)
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_equal(vapply(values, `[[`, "", "reason"), c("converted", "invalid_utf8"))
+  expect_equal(values[[1]]$rows, c(2, 3, 5))
+  expect_equal(values[[2]]$rows, 4)
 })
 
 test_that("text that is not valid UTF-8 is NULL", {
@@ -194,19 +198,17 @@ test_that("text that is not valid UTF-8 is NULL", {
     "(10, CAST(x'616161616161616100' AS TEXT))"
   ))
 
-  messages <- character()
-  df <- withCallingHandlers(
-    as.data.frame(dbGetQueryArrow(con, "SELECT s FROM t ORDER BY i")),
-    warning = function(w) {
-      messages <<- c(messages, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    }
-  )
+  w <- coercion_warnings(df <- as.data.frame(dbGetQueryArrow(con, "SELECT s FROM t ORDER BY i")))
   # A stray byte, a NUL byte and a surrogate are not text, a valid blob is
   expect_equal(df$s, c("ok", NA, "\u00e9", NA, NA, "hi", NA, "aaaaaaaa\u00e9", NA, NA))
-  expect_equal(length(messages), 2L)
-  expect_match(messages, "`s`: values of type string that are not valid UTF-8, or hold a NUL byte, are NULL", all = FALSE)
-  expect_match(messages, "`s`: mixed type", all = FALSE)
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_equal(vapply(values, `[[`, "", "class"), c("string", "blob", "blob"))
+  expect_equal(vapply(values, `[[`, "", "reason"), c("invalid_utf8", "converted", "invalid_utf8"))
+  expect_equal(values[[1]]$rows, c(2, 4, 5, 9, 10))
+  expect_equal(values[[2]]$rows, 6)
+  expect_equal(values[[3]]$rows, 7)
+  expect_match(conditionMessage(w[[1]]), "5 string values not valid UTF-8, NA (rows 2, 4, 5, 9, and 10)", fixed = TRUE)
 })
 
 test_that("times and text that Arrow can't hold pass its full validation", {
@@ -308,10 +310,15 @@ test_that("a row held back by the byte limits keeps its storage classes", {
   # A 90-byte string decides utf8, a 120-byte blob would take the column past 150
   dbExecute(con, "INSERT INTO t VALUES (1, hex(zeroblob(45))), (2, CAST(hex(zeroblob(60)) AS BLOB))")
 
-  # The size check converts the blob to text, the warning still names a blob
+  # The size check converts the blob to text, the warning still names a blob,
+  # with its row number in the result
   stream <- fetch_with_bytes_limits(con, "SELECT x FROM t ORDER BY i")
-  expect_warning(lengths <- chunk_lengths(stream), "coercing values of type blob")
+  w <- coercion_warnings(lengths <- chunk_lengths(stream))
   expect_equal(lengths, c(1, 1))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values[[1]]
+  expect_equal(values$class, "blob")
+  expect_equal(values$rows, 2)
 })
 
 test_that("a row held back by the byte limits is for the Arrow path only", {
@@ -329,10 +336,12 @@ test_that("a row held back by the byte limits is for the Arrow path only", {
   expect_equal(dbFetchArrowChunk(rs)$length, 1)
   # The byte check has converted the blob to text, a data frame would show that
   expect_error(dbFetch(rs, n = 1), "held back")
-  expect_warning(
-    expect_warning(chunk <- dbFetchArrowChunk(rs, chunk_size = 1), "coercing values of type blob"),
-    "not valid UTF-8"
-  )
+  w <- coercion_warnings(chunk <- dbFetchArrowChunk(rs, chunk_size = 1))
+  expect_length(w, 1)
+  values <- w[[1]]$coercions[[1]]$values
+  expect_equal(vapply(values, `[[`, "", "class"), "blob")
+  expect_equal(vapply(values, `[[`, "", "reason"), "invalid_utf8")
+  expect_equal(values[[1]]$rows, 2)
   expect_equal(chunk$length, 1)
   expect_equal(dbFetch(rs)$x, "z")
 })
@@ -527,7 +536,7 @@ test_that("an R error while the stream is read unwinds cleanly", {
   # nanoarrow's C code reads the stream: the callback continues the unwind
   rs <- lazy_result()
   withr::with_options(list(warn = 2), {
-    expect_error(as.data.frame(dbFetchArrow(rs, chunk_size = 2)), "mixed type")
+    expect_error(as.data.frame(dbFetchArrow(rs, chunk_size = 2)), "Mixed types")
   })
   expect_equal(rethrown(rs), 0)
   dbClearResult(rs)
@@ -545,7 +554,7 @@ test_that("an R error while the stream is read unwinds cleanly", {
   dbExecute(con2, "CREATE TABLE t (x)")
   rs <- lazy_result()
   withr::with_options(list(warn = 2), {
-    expect_error(dbAppendTableArrow(con2, "t", dbFetchArrow(rs, chunk_size = 2)), "mixed type")
+    expect_error(dbAppendTableArrow(con2, "t", dbFetchArrow(rs, chunk_size = 2)), "Mixed types")
   })
   expect_equal(rethrown(rs), 1)
   dbClearResult(rs)
@@ -600,9 +609,14 @@ test_that("a coercion on a worker thread fails the stream instead of warning", {
   rs <- dbSendQueryArrow(con, "SELECT a FROM t")
   withr::defer(if (dbIsValid(rs)) dbClearResult(rs))
   reader <- arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 100))
+  # The text of the coercion warning, as R shows it without cli
   expect_error(
     arrow::Scanner$create(reader)$ToTable(),
-    "mixed type.*an error instead of a warning"
+    paste0(
+      "Mixed types in 1 column, values converted to the column type:\n",
+      "\\* Column `a` \\(int64\\): 1 string value converted \\(row 250\\) ",
+      "\\(an error instead of a warning"
+    )
   )
 
   # The session and the connection go on, the stream goes with its reader
@@ -646,11 +660,11 @@ test_that("on another thread, what would warn or call R fails the stream", {
 
   out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, "SELECT x FROM t ORDER BY i", chunk_size = 2), -1, TRUE)
   expect_length(out$arrays, 1)
-  expect_match(out$error, "`x`: mixed type.*an error instead of a warning, because R can't warn")
+  expect_match(out$error, "Mixed types in 1 column.*`x` \\(int64\\): 1 string value converted \\(row 3\\).*an error instead of a warning, because R can't warn")
 
   out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, "SELECT d FROM t ORDER BY i"), -1, TRUE)
   expect_length(out$arrays, 0)
-  expect_match(out$error, "Unknown string format, NA is returned.*an error instead of a warning")
+  expect_match(out$error, "`d` \\(date32\\): 1 string value not in the expected format, NA \\(row 2\\).*an error instead of a warning")
 
   # R parameters are R vectors: their second row can't be bound there
   out <- arrow_stream_read_on_thread(
@@ -661,7 +675,11 @@ test_that("on another thread, what would warn or call R fails the stream", {
   expect_match(out$error, "Can't bind the next row of parameters while another thread reads.*dbBindArrow")
 
   # Read on R's main thread, the same values warn
-  expect_warning(as.data.frame(dbGetQueryArrow(con, "SELECT d FROM t ORDER BY i")), "Unknown string format")
+  expect_warning(
+    as.data.frame(dbGetQueryArrow(con, "SELECT d FROM t ORDER BY i")),
+    "not in the expected format",
+    class = "RSQLite_warning_coercion"
+  )
 })
 
 test_that("a stream released on another thread doesn't keep the database locked", {

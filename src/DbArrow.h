@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+#include <cpp11/sexp.hpp>
+
 #include "nanoarrow/nanoarrow.h"
 #include "nanoarrow/nanoarrow.hpp"
 
@@ -77,6 +79,9 @@ struct ArrowDfColumns {
   // The R class of a column of times or timestamps stored as doubles in
   // seconds, empty for the other columns
   std::vector<std::string> seconds_classes;
+  // The values that were not of their column's type, as the entries of the
+  // warning that dbFetch() raises, or NULL
+  cpp11::sexp coercions;
 };
 
 #endif  // RSQLITE_DBARROW_H

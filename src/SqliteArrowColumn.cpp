@@ -2,13 +2,13 @@
 #include "SqliteArrowColumn.h"
 #include "affinity.h"
 #include "utf8.h"
-#include "main_thread.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <algorithm>
 #include <climits>
 #include <cmath>
 #include <cstring>
-#include <sstream>
+
+using namespace cpp11::literals;
 
 // Whether `size` bytes of text are valid UTF-8 without NUL bytes.
 // Most text is ASCII: eight bytes at a time, a word whose bytes are all in
@@ -44,9 +44,6 @@ SqliteArrowColumn::SqliteArrowColumn(
       data_frame(false),
       array_kind(AK_UNDECIDED),
       pending_nulls(0),
-      warned(false),
-      warned_range(false),
-      warned_utf8(false),
       wide_ints(false),
       value_type(SQLITE_NULL),
       value_data(NULL),
@@ -243,7 +240,7 @@ int64_t SqliteArrowColumn::value_bytes() {
   return value_size;
 }
 
-void SqliteArrowColumn::append_row() {
+void SqliteArrowColumn::append_row(int64_t row) {
   const int column_type = value_type;
 
   if (!decided()) {
@@ -261,14 +258,11 @@ void SqliteArrowColumn::append_row() {
   }
 
   if (column_type == SQLITE_NULL) {
-    check_arrow(
-      ArrowArrayAppendNull(array.get(), 1),
-      "Can't append to Arrow array"
-    );
+    append_null();
     return;
   }
 
-  append_value(column_type);
+  append_value(column_type, row);
 }
 
 void SqliteArrowColumn::finish_chunk(int64_t n, bool keep_open) {
@@ -344,6 +338,33 @@ int64_t SqliteArrowColumn::variable_bytes() {
     return 0;
   }
   return ArrowArrayBuffer(array.get(), 2)->size_bytes;
+}
+
+cpp11::sexp SqliteArrowColumn::coercions() {
+  if (log.empty()) {
+    return R_NilValue;
+  }
+  cpp11::writable::list out(
+    { "column"_nm = cpp11::r_string(name),
+      "type"_nm = cpp11::r_string(format_kind(kind)),
+      "values"_nm = log.as_list() }
+  );
+  log.clear();
+  return out;
+}
+
+std::string SqliteArrowColumn::coercions_text() {
+  if (log.empty()) {
+    return std::string();
+  }
+  std::string out = std::string("Column `") + name + "` (" + format_kind(kind) +
+                    "): " + log.format();
+  log.clear();
+  return out;
+}
+
+void SqliteArrowColumn::discard_coercions() {
+  log.clear();
 }
 
 // Privates ////////////////////////////////////////////////////////////////////
@@ -449,21 +470,29 @@ void SqliteArrowColumn::fetch_bytes() {
   value_fetched = true;
 }
 
-void SqliteArrowColumn::append_value(int column_type) {
+void SqliteArrowColumn::append_null() {
+  check_arrow(
+    ArrowArrayAppendNull(array.get(), 1),
+    "Can't append to Arrow array"
+  );
+}
+
+void SqliteArrowColumn::append_value(int column_type, int64_t row) {
   switch (kind) {
   case AK_INT64:
     if (column_type == SQLITE_FLOAT && !frozen) {
       // The type is still open: a real value widens the column
       promote_to_double();
-      append_value(column_type);
+      append_value(column_type, row);
       return;
     }
     {
       int64_t value = sqlite3_column_int64(stmt, j);
-      if (column_type == SQLITE_INTEGER) {
-        note_integer(value);
-      } else {
-        warn_mixed(column_type);
+      // Also a converted value: a data frame keeps the column as integer64
+      // once a value has needed 64 bits, whatever its storage class
+      note_integer(value);
+      if (column_type != SQLITE_INTEGER) {
+        log.record(column_type, CR_CONVERTED, row);
       }
       check_arrow(
         ArrowArrayAppendInt(array.get(), value),
@@ -474,7 +503,7 @@ void SqliteArrowColumn::append_value(int column_type) {
 
   case AK_DOUBLE:
     if (column_type != SQLITE_FLOAT && column_type != SQLITE_INTEGER) {
-      warn_mixed(column_type);
+      log.record(column_type, CR_CONVERTED, row);
     }
     check_arrow(
       ArrowArrayAppendDouble(array.get(), sqlite3_column_double(stmt, j)),
@@ -484,29 +513,27 @@ void SqliteArrowColumn::append_value(int column_type) {
 
   case AK_STRING:
     {
-      if (column_type != SQLITE_TEXT) {
-        warn_mixed(column_type);
-      }
       fetch_bytes();
       const char* text = static_cast<const char*>(value_data);
       int64_t size = value_size;
       if (data_frame && column_type == SQLITE_TEXT) {
         // R strings end at the first NUL, like those of the default path,
-        // which passes text through unchecked; an Arrow stream keeps all bytes
+        // which passes text through unchecked; an Arrow stream checks it
         const void* nul = memchr(text, '\0', static_cast<size_t>(size));
         if (nul != NULL) {
           size = static_cast<const char*>(nul) - text;
         }
       } else if ((column_type == SQLITE_TEXT || column_type == SQLITE_BLOB) &&
                  !is_utf8_text(text, static_cast<size_t>(size))) {
-        // SQLite doesn't enforce UTF-8 for text, and keeps blobs as they are;
-        // numbers convert to ASCII
-        warn_invalid_utf8(column_type);
-        check_arrow(
-          ArrowArrayAppendNull(array.get(), 1),
-          "Can't append to Arrow array"
-        );
+        // SQLite doesn't enforce UTF-8 for text, and a blob keeps all its
+        // bytes: only well-formed UTF-8 without NUL bytes is text.
+        // Numbers convert to ASCII.
+        log.record(column_type, CR_INVALID_UTF8, row);
+        append_null();
         break;
+      }
+      if (column_type != SQLITE_TEXT) {
+        log.record(column_type, CR_CONVERTED, row);
       }
       check_arrow(
         ArrowArrayAppendString(array.get(), arrow_string_view(text, size)),
@@ -518,7 +545,7 @@ void SqliteArrowColumn::append_value(int column_type) {
   case AK_BINARY:
     {
       if (column_type != SQLITE_BLOB) {
-        warn_mixed(column_type);
+        log.record(column_type, CR_CONVERTED, row);
       }
       fetch_bytes();
       check_arrow(
@@ -533,12 +560,11 @@ void SqliteArrowColumn::append_value(int column_type) {
 
   case AK_DATE:
     {
-      double days = source.fetch_date();
-      if (std::isnan(days)) {
-        check_arrow(
-          ArrowArrayAppendNull(array.get(), 1),
-          "Can't append to Arrow array"
-        );
+      bool ok;
+      double days = source.parse_date(ok);
+      if (!ok || std::isnan(days)) {
+        log.record(column_type, CR_UNPARSABLE, row);
+        append_null();
       } else {
         check_arrow(
           ArrowArrayAppendInt(array.get(), static_cast<int64_t>(days)),
@@ -551,21 +577,20 @@ void SqliteArrowColumn::append_value(int column_type) {
   case AK_TIME:
   case AK_TIMESTAMP:
     {
-      double seconds =
-        (kind == AK_TIME) ? source.fetch_time() : source.fetch_datetime_local();
+      bool ok;
+      double seconds = (kind == AK_TIME) ? source.parse_time(ok)
+                                         : source.parse_datetime_local(ok);
+      if (!ok || std::isnan(seconds)) {
+        log.record(column_type, CR_UNPARSABLE, row);
+        append_null();
+        break;
+      }
       if (array_kind == AK_DOUBLE) {
         // For a data frame: the seconds of the default path, all of them
-        if (std::isnan(seconds)) {
-          check_arrow(
-            ArrowArrayAppendNull(array.get(), 1),
-            "Can't append to Arrow array"
-          );
-        } else {
-          check_arrow(
-            ArrowArrayAppendDouble(array.get(), seconds),
-            "Can't append to Arrow array"
-          );
-        }
+        check_arrow(
+          ArrowArrayAppendDouble(array.get(), seconds),
+          "Can't append to Arrow array"
+        );
         break;
       }
       double micros = std::floor(seconds * 1e6 + 0.5);
@@ -582,14 +607,9 @@ void SqliteArrowColumn::append_value(int column_type) {
         in_range =
           micros >= -9223372036854775808.0 && micros < 9223372036854775808.0;
       }
-      if (!std::isnan(seconds) && !in_range) {
-        warn_out_of_range(column_type);
-      }
-      if (std::isnan(seconds) || !in_range) {
-        check_arrow(
-          ArrowArrayAppendNull(array.get(), 1),
-          "Can't append to Arrow array"
-        );
+      if (!in_range) {
+        log.record(column_type, CR_OUT_OF_RANGE, row);
+        append_null();
       } else {
         check_arrow(
           ArrowArrayAppendInt(array.get(), static_cast<int64_t>(micros)),
@@ -600,11 +620,10 @@ void SqliteArrowColumn::append_value(int column_type) {
     }
 
   case AK_NA:
-    warn_mixed(column_type);
-    check_arrow(
-      ArrowArrayAppendNull(array.get(), 1),
-      "Can't append to Arrow array"
-    );
+    // Fixed by a first chunk of only NULL, for an Arrow stream or chunk and
+    // the data frame fetches after one: the null type drops the values
+    log.record(column_type, CR_NULL_TYPE, row);
+    append_null();
     break;
 
   case AK_UNDECIDED:
@@ -646,47 +665,6 @@ void SqliteArrowColumn::append_ints_as_doubles(
   }
 }
 
-void SqliteArrowColumn::warn_mixed(int column_type) {
-  if (warned) {
-    return;
-  }
-  warned = true;
-
-  std::stringstream ss;
-  ss << "Column `" << name << "`: mixed type, Arrow type " << format_kind(kind)
-     << " decided from the first values, coercing values of type "
-     << format_column_type(column_type);
-  rsqlite_warning(ss.str());
-  // A handler of the warning may have converted the value: read it again
-  value_fetched = false;
-}
-
-void SqliteArrowColumn::warn_invalid_utf8(int column_type) {
-  if (warned_utf8) {
-    return;
-  }
-  warned_utf8 = true;
-
-  std::stringstream ss;
-  ss << "Column `" << name << "`: values of type "
-     << format_column_type(column_type)
-     << " that are not valid UTF-8, or hold a NUL byte, are NULL";
-  rsqlite_warning(ss.str());
-}
-
-void SqliteArrowColumn::warn_out_of_range(int column_type) {
-  if (warned_range) {
-    return;
-  }
-  warned_range = true;
-
-  std::stringstream ss;
-  ss << "Column `" << name << "`: values of type "
-     << format_column_type(column_type) << " outside the range of Arrow type "
-     << format_kind(kind) << " are NULL";
-  rsqlite_warning(ss.str());
-}
-
 const char* SqliteArrowColumn::format_kind(ARROW_KIND kind) {
   switch (kind) {
   case AK_NA:
@@ -707,20 +685,5 @@ const char* SqliteArrowColumn::format_kind(ARROW_KIND kind) {
     return "timestamp";
   default:
     return "<undecided>";
-  }
-}
-
-const char* SqliteArrowColumn::format_column_type(int column_type) {
-  switch (column_type) {
-  case SQLITE_INTEGER:
-    return "integer";
-  case SQLITE_FLOAT:
-    return "real";
-  case SQLITE_TEXT:
-    return "string";
-  case SQLITE_BLOB:
-    return "blob";
-  default:
-    return "null";
   }
 }

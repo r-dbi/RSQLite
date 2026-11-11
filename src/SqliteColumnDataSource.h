@@ -7,9 +7,17 @@
 class SqliteColumnDataSource : public DbColumnDataSource {
   sqlite3_stmt* stmt;
   const bool with_alt_types;
+  const bool check_utf8;
+  // Text and blob values that fetch_string() replaced by NA
+  mutable int64_t n_invalid_strings;
 
 public:
-  SqliteColumnDataSource(sqlite3_stmt* stmt, const int j, bool with_alt_types);
+  SqliteColumnDataSource(
+    sqlite3_stmt* stmt,
+    const int j,
+    bool with_alt_types,
+    bool check_utf8
+  );
 
 public:
   virtual DATA_TYPE get_data_type() const;
@@ -28,7 +36,11 @@ public:
   virtual double fetch_datetime() const;
   virtual double fetch_time() const;
 
+  virtual int64_t get_n_invalid_strings() const;
+
 private:
+  SEXP fetch_checked_string(const int field_type) const;
+
   static DATA_TYPE datatype_from_decltype(
     const char* decl_type,
     bool with_alt_types

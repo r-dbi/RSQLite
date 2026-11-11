@@ -23,7 +23,8 @@ setClass("SQLiteConnection",
     vfs = "character",
     ref = "environment",
     bigint = "character",
-    extended_types = "logical"
+    extended_types = "logical",
+    check_utf8 = "logical"
   )
 )
 

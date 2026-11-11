@@ -39,6 +39,13 @@
 #' @param extended_types When `TRUE` columns of type `DATE`, `DATETIME` / `TIMESTAMP`, and `TIME` are mapped to corresponding R-classes,
 #' c.f. below for details.
 #' Defaults to `FALSE`.
+#' @param check_utf8 When `TRUE`, text and blob values that are read into a character column are checked:
+#'   a value that is not valid UTF-8 or that contains a NUL byte becomes `NA`,
+#'   with one warning per column and fetch that counts these values.
+#'   A blob is read into a character column when the column's earlier values are text.
+#'   When `FALSE`, text is cut at the first NUL byte and is marked as UTF-8 even if it is not valid,
+#'   and a blob is converted to text the same way.
+#'   Defaults to the `RSQLite.check_utf8` option, or `FALSE` if it is unset.
 #'
 #' @return `dbConnect()` returns an object of class [SQLiteConnection-class].
 #'
@@ -82,7 +89,8 @@ dbConnect_SQLiteDriver <- function(drv, dbname = "", ..., loadable.extensions = 
                                    default.extensions = loadable.extensions, cache_size = NULL,
                                    synchronous = "off", flags = SQLITE_RWC, vfs = NULL,
                                    bigint = c("integer64", "integer", "numeric", "character"),
-                                   extended_types = FALSE) {
+                                   extended_types = FALSE,
+                                   check_utf8 = getOption("RSQLite.check_utf8", FALSE)) {
   stopifnot(length(dbname) == 1, !is.na(dbname))
 
   if (!is_url_or_special_filename(dbname)) {
@@ -100,15 +108,18 @@ dbConnect_SQLiteDriver <- function(drv, dbname = "", ..., loadable.extensions = 
   if (extended_types) {
     check_suggested("hms", "dbConnect")
   }
+  check_utf8 <- isTRUE(check_utf8)
+
   conn <- new("SQLiteConnection",
-    ptr = connection_connect(dbname, loadable.extensions, flags, vfs, extended_types),
+    ptr = connection_connect(dbname, loadable.extensions, flags, vfs, extended_types, check_utf8),
     dbname = dbname,
     flags = flags,
     vfs = vfs,
     loadable.extensions = loadable.extensions,
     ref = new.env(parent = emptyenv()),
     bigint = bigint,
-    extended_types = extended_types
+    extended_types = extended_types,
+    check_utf8 = check_utf8
   )
 
   ## experimental PRAGMAs

@@ -33,6 +33,7 @@ public:
   void set_col_value();
   void finalize(const int n_);
   void warn_type_conflicts(const cpp11::r_string& name) const;
+  void warn_invalid_strings(const cpp11::r_string& name) const;
 
   operator SEXP() const;
   DATA_TYPE get_type() const;

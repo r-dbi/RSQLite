@@ -22,7 +22,8 @@ SqliteResultImpl::SqliteResultImpl(
       group_(0),
       groups_(0),
       types_(get_initial_field_types(cache.ncols_)),
-      with_alt_types_(conn_->with_alt_types()) {
+      with_alt_types_(conn_->with_alt_types()),
+      check_utf8_(conn_->check_utf8()) {
   try {
     if (cache.nparams_ == 0) {
       after_bind(true);
@@ -308,7 +309,8 @@ void SqliteResultImpl::after_bind(bool params_have_rows) {
 cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
-  SqliteDataFrame data(stmt, cache.names_, n_max, types_, with_alt_types_);
+  SqliteDataFrame
+    data(stmt, cache.names_, n_max, types_, with_alt_types_, check_utf8_);
 
   if (complete_ && data.get_ncols() == 0) {
     Rf_warning(
@@ -360,7 +362,8 @@ bool SqliteResultImpl::step_done() {
 }
 
 cpp11::list SqliteResultImpl::peek_first_row() {
-  SqliteDataFrame data(stmt, cache.names_, 1, types_, with_alt_types_);
+  SqliteDataFrame
+    data(stmt, cache.names_, 1, types_, with_alt_types_, check_utf8_);
 
   if (!complete_) {
     data.set_col_values();

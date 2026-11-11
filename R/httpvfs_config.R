@@ -4,7 +4,7 @@
 #' lifecycle::badge("experimental")
 #'
 #' Set conservative, process-wide options for the experimental HTTP/HTTPS VFS.
-#' These values are read on first open of a remote database in the current process.
+#' These values are read each time a remote database is opened.
 #'
 #' @details
 #' Options are stored in environment variables so they also affect C-level code:

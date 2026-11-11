@@ -106,7 +106,8 @@ cpp11::logicals utf8_valid(cpp11::list x) {
     if (size > 0) {
       memcpy(buf.data(), RAW(bytes), size);
     }
-    const bool valid = rsqlite_is_utf8_string(size > 0 ? buf.data() : NULL, size);
+    const bool valid =
+      rsqlite_is_utf8_string(size > 0 ? buf.data() : NULL, size);
     out[k] = cpp11::r_bool(valid);
   }
   return out;

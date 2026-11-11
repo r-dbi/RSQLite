@@ -3,6 +3,17 @@ name: 'Custom steps to run after R packages are installed'
 runs:
   using: "composite"
   steps:
+    # The HTTP VFS tests skip when configure finds no libcurl,
+    # which CI only gets as a system requirement of suggested packages.
+    # With RSQLITE_TEST_HTTPVFS=true they fail instead, so losing libcurl is noticed.
+    # A value set before this step, for instance in a matrix entry's `env`, wins.
+    - name: Require the HTTP VFS tests
+      run: |
+        if [ -z "${RSQLITE_TEST_HTTPVFS:-}" ]; then
+          echo 'RSQLITE_TEST_HTTPVFS=true' | tee -a "$GITHUB_ENV"
+        fi
+      shell: bash
+
     # Must happen after R is installed...
     - name: Define R CMD check error condition
       # Allow NOTEs on R 4.5 due to SET_TRUELENGTH, SET_GROWABLE_BIT and SETLENGTH from cpp11

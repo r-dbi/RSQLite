@@ -407,10 +407,17 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   return out;
 }
 
-// A failed step throws a step_error, which reaches R at the entry point
+// A failed step ends the execution for every caller, and its error,
+// a step_error, reaches R at the entry point:
+// stepping again would silently restart a statement that failed
 void SqliteResultImpl::step() {
-  while (step_run())
-    ;
+  try {
+    while (step_run())
+      ;
+  } catch (...) {
+    complete_ = true;
+    throw;
+  }
 }
 
 // Steps past the last row of a full fetch.

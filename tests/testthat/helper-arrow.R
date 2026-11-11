@@ -142,3 +142,30 @@ single_array <- function(stream) {
   testthat::expect_length(arrays, 1)
   arrays[[1]]
 }
+
+# dbGetQueryArrow(), dbReadTableArrow() and dbFetchArrowChunk() with every
+# array they return checked by arrow_validated(), for the tests of `schema`:
+# these read their streams to the end at once
+validated_dbGetQueryArrow <- function(...) arrow_validated(DBI::dbGetQueryArrow(...))
+validated_dbReadTableArrow <- function(...) arrow_validated(DBI::dbReadTableArrow(...))
+validated_dbFetchArrowChunk <- function(...) arrow_validated(DBI::dbFetchArrowChunk(...))
+
+# The formats of a query's result, with the stream consumed
+query_formats <- function(con, sql, ...) {
+  stream <- validated_dbGetQueryArrow(con, sql, ...)
+  on.exit(stream$release())
+  schema_formats(stream)
+}
+
+# Compares the values of a 64-bit integer array exactly with `expected`, as
+# strings, NA for NULL: a uint64 above 2^63 - 1 is written as the int64 with
+# its bits, such as "-1" for 2^64 - 1
+expect_int64_bits <- function(array, expected) {
+  is_null <- suppressWarnings(is.na(nanoarrow::convert_array(array, double())))
+  expect_equal(is_null, is.na(expected))
+  actual <- matrix(as.raw(array$buffers[[2]])[seq_len(8 * array$length)], nrow = 8)
+  # bit64 reads -2^63, its NA, with a warning, but with the right bits
+  wanted <- suppressWarnings(bit64::as.integer64(expected))
+  wanted <- matrix(writeBin(unclass(wanted), raw()), nrow = 8)
+  expect_equal(actual[, !is_null], wanted[, !is_null])
+}

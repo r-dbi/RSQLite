@@ -130,3 +130,7 @@ Time stamps and paths differ between runs and machines.
 The findings rest on what each step compiled, on the dependency files, and on the indents.
 Step 1's list of regenerated `.dd` files depends on the time stamps of the checkout, so a first run from a fresh checkout may not list `cpp11.dd`.
 That does not affect the findings.
+Whether step 1 prints the line `.Rconfig: changed, ...` depends on whether the untracked `src/.Rconfig` exists
+and matches `R CMD config --all` (the rule in `src/Makevars.deps` compares them):
+it does not in a fresh checkout or after an earlier run of this driver, whose step 6 leaves one written with pkgbuild's flags,
+so the line appears then, and `--preclean` rebuilds every object either way, so the findings are unaffected.

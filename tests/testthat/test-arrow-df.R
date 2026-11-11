@@ -1,11 +1,5 @@
 # dbConnect(arrow = TRUE): data frames travel through Arrow
 
-local_arrow_con <- function(..., envir = parent.frame()) {
-  con <- dbConnect(SQLite(), ":memory:", arrow = TRUE, ...)
-  withr::defer(dbDisconnect(con), envir = envir)
-  con
-}
-
 test_that("the arrow argument is validated and recorded", {
   con <- local_arrow_con()
   expect_true(con@arrow)
@@ -263,24 +257,6 @@ test_that("data frames fetched in chunks through Arrow own their strings", {
   expect_equal(chunks[[1]]$s, c("a", "b"))
   expect_equal(chunks[[2]]$s, "c")
 })
-
-# The data frames of a sequence of fetches; `chunk_size` sets the rows per
-# Arrow array of a fetch through Arrow, `info` asks dbColumnInfo() before each
-# fetch, which decides the types of the next fetch on the default path
-fetch_sequence <- function(con, sql, ns, chunk_size = NULL, info = FALSE) {
-  rs <- dbSendQuery(con, sql)
-  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
-  lapply(ns, function(n) {
-    suppressWarnings(list(
-      info = if (info) dbColumnInfo(rs),
-      df = if (is.null(chunk_size)) {
-        dbFetch(rs, n)
-      } else {
-        arrow_fetch_df(rs, n, chunk_size = chunk_size)
-      }
-    ))
-  })
-}
 
 test_that("each fetch through Arrow is typed like on the default path", {
   setup <- c(

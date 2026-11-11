@@ -8,6 +8,13 @@ local_con <- function(..., envir = parent.frame()) {
   con
 }
 
+# An in-memory connection with `arrow = TRUE`, disconnected when `envir` exits
+local_arrow_con <- function(..., envir = parent.frame()) {
+  con <- dbConnect(SQLite(), ":memory:", arrow = TRUE, ...)
+  withr::defer(dbDisconnect(con), envir = envir)
+  con
+}
+
 # The Arrow format of each column of `x`, by column name
 schema_formats <- function(x) {
   schema <- nanoarrow::infer_nanoarrow_schema(x)
@@ -45,4 +52,22 @@ fetch_with_bytes_limits <- function(con, sql, ...) {
   on.exit(dbClearResult(rs))
   set_bytes_limits(rs)
   dbFetchArrow(rs)
+}
+
+# The data frames of a sequence of fetches; `chunk_size` sets the rows per
+# Arrow array of a fetch through Arrow, `info` asks dbColumnInfo() before each
+# fetch, which decides the types of the next fetch on the default path
+fetch_sequence <- function(con, sql, ns, chunk_size = NULL, info = FALSE) {
+  rs <- dbSendQuery(con, sql)
+  on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
+  lapply(ns, function(n) {
+    suppressWarnings(list(
+      info = if (info) dbColumnInfo(rs),
+      df = if (is.null(chunk_size)) {
+        dbFetch(rs, n)
+      } else {
+        arrow_fetch_df(rs, n, chunk_size = chunk_size)
+      }
+    ))
+  })
 }

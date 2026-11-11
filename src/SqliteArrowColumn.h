@@ -1,0 +1,104 @@
+#ifndef RSQLITE_SQLITEARROWCOLUMN_H
+#define RSQLITE_SQLITEARROWCOLUMN_H
+
+#include <string>
+
+#include "sqlite3-cpp.h"
+#include "DbArrow.h"
+#include "SqliteColumnDataSource.h"
+
+// The Arrow type of a result column.
+//
+// SQLite is dynamically typed, so the type is decided from the first value
+// seen (int64, double, utf8 or binary), or from the declared type of the
+// column: the date and time types when `extended_types` is set, otherwise the
+// affinity, which only matters when every value of the first chunk is NULL.
+// Columns without a declared type that never see a value are of the null type.
+enum ARROW_KIND {
+  AK_UNDECIDED,
+  AK_NA,
+  AK_INT64,
+  AK_DOUBLE,
+  AK_STRING,
+  AK_BINARY,
+  AK_DATE,
+  AK_TIME,
+  AK_TIMESTAMP
+};
+
+class SqliteArrowColumn {
+  sqlite3_stmt* stmt;
+  const int j;
+  const std::string name;
+  const bool with_alt_types;
+  SqliteColumnDataSource source;
+
+  ARROW_KIND kind;
+  // Set when the schema has been handed out: the kind is final from then on
+  bool frozen;
+
+  // Child array of the chunk under construction
+  nanoarrow::UniqueArray array;
+  // Rows of the current chunk seen while undecided (all NULL)
+  int64_t pending_nulls;
+  bool warned;
+  bool warned_range;
+  bool warned_utf8;
+
+  // The value of the current row: its storage class, read before any
+  // conversion, and for a utf8 or binary column its bytes, read once for the
+  // byte limits and the append
+  int value_type;
+  const void* value_data;
+  int value_size;
+  bool value_fetched;
+
+public:
+  SqliteArrowColumn(
+    sqlite3_stmt* stmt_,
+    const int j_,
+    const std::string& name_,
+    bool with_alt_types_
+  );
+
+public:
+  bool decided() const;
+  // Decides the kind from the value of the current row, if there is one
+  void decide_from_row(bool has_row);
+  // Decides the kind from the declared type, falling back to the null type
+  void decide_from_decltype();
+  void freeze();
+
+  void set_schema(struct ArrowSchema* schema) const;
+
+  // Chunk building
+  void start_chunk();
+  // Reads the storage class of the value of the current row; a row held
+  // back from the previous chunk keeps it for the next one
+  void read_row();
+  // The bytes that the value of the current row adds to the data buffer of a
+  // utf8 or binary column, zero for the other types
+  int64_t value_bytes();
+  // Appends the value of the current row
+  void append_row();
+  void finish_chunk(int64_t n);
+  void move_chunk_to(struct ArrowArray* out);
+  // The bytes in the data buffer of a utf8 or binary column
+  int64_t variable_bytes();
+
+private:
+  static ARROW_KIND kind_from_column_type(int column_type);
+  ARROW_KIND kind_from_decltype() const;
+
+  void init_array();
+  void fetch_bytes();
+  void append_value(int column_type);
+  void promote_to_double();
+  void warn_mixed(int column_type);
+  void warn_out_of_range(int column_type);
+  void warn_invalid_utf8(int column_type);
+  static const char* format_kind(ARROW_KIND kind);
+  static const char* format_column_type(int column_type);
+};
+
+#endif  // RSQLITE_SQLITEARROWCOLUMN_H

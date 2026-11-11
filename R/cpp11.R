@@ -84,6 +84,38 @@ result_get_placeholder_names <- function(res) {
   .Call(`_RSQLite_result_get_placeholder_names`, res)
 }
 
+result_fetch_arrow <- function(res_, chunk_size) {
+  .Call(`_RSQLite_result_fetch_arrow`, res_, chunk_size)
+}
+
+result_fetch_arrow_chunk <- function(res, chunk_size) {
+  .Call(`_RSQLite_result_fetch_arrow_chunk`, res, chunk_size)
+}
+
+result_bind_arrow <- function(res, params, param_indexes) {
+  invisible(.Call(`_RSQLite_result_bind_arrow`, res, params, param_indexes))
+}
+
+result_set_bytes_limits <- function(res, cut_bytes, max_bytes) {
+  invisible(.Call(`_RSQLite_result_set_bytes_limits`, res, cut_bytes, max_bytes))
+}
+
+result_rethrown_unwinds <- function(res) {
+  .Call(`_RSQLite_result_rethrown_unwinds`, res)
+}
+
+result_set_rows_fetched <- function(res, n) {
+  invisible(.Call(`_RSQLite_result_set_rows_fetched`, res, n))
+}
+
+arrow_stream_read_on_thread <- function(stream_xptr, n, release) {
+  .Call(`_RSQLite_arrow_stream_read_on_thread`, stream_xptr, n, release)
+}
+
+result_call_while_busy <- function(res, fun) {
+  invisible(.Call(`_RSQLite_result_call_while_busy`, res, fun))
+}
+
 rsqliteVersion <- function() {
   .Call(`_RSQLite_rsqliteVersion`)
 }

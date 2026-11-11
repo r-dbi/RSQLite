@@ -2,6 +2,7 @@
 #include "SqliteColumnDataSource.h"
 #include "integer64.h"
 #include "affinity.h"
+#include "main_thread.h"
 #include <boost/limits.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -109,12 +110,12 @@ double SqliteColumnDataSource::fetch_date() const {
       bg::date_duration delta = dt - bg::date(1970, 1, 1);
       dateval = static_cast<double>(delta.days());
     } catch (...) {
-      cpp11::warning(std::string("Unknown string format, NA is returned."));
+      rsqlite_warning("Unknown string format, NA is returned.");
       dateval = NA_REAL;
     }
     return dateval;
   } else if (dt == SQLITE_BLOB) {
-    cpp11::warning(std::string("Cannot convert blob, NA is returned."));
+    rsqlite_warning("Cannot convert blob, NA is returned.");
     return NA_REAL;
   } else {
     return static_cast<double>(sqlite3_column_int(get_stmt(), get_j()));
@@ -138,12 +139,12 @@ double SqliteColumnDataSource::fetch_datetime_local() const {
         dttm - bp::ptime(bg::date(1970, 1, 1), bp::seconds(0));
       dateval = delta.total_microseconds() * 1e-6;
     } catch (...) {
-      cpp11::warning(std::string("Unknown string format, NA is returned."));
+      rsqlite_warning("Unknown string format, NA is returned.");
       dateval = NA_REAL;
     }
     return dateval;
   } else if (dt == SQLITE_BLOB) {
-    cpp11::warning(std::string("Cannot convert blob, NA is returned."));
+    rsqlite_warning("Cannot convert blob, NA is returned.");
     return NA_REAL;
   } else {
     return sqlite3_column_double(get_stmt(), get_j());
@@ -168,12 +169,12 @@ double SqliteColumnDataSource::fetch_time() const {
       bp::time_duration secs(bp::duration_from_string(tmstr));
       dateval = secs.total_microseconds() * 1e-6;
     } catch (...) {
-      cpp11::warning(std::string("Unknown string format, NA is returned."));
+      rsqlite_warning("Unknown string format, NA is returned.");
       dateval = NA_REAL;
     }
     return dateval;
   } else if (dt == SQLITE_BLOB) {
-    cpp11::warning(std::string("Cannot convert blob, NA is returned."));
+    rsqlite_warning("Cannot convert blob, NA is returned.");
     return NA_REAL;
   } else {
     return sqlite3_column_double(get_stmt(), get_j());

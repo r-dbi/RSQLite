@@ -21,3 +21,33 @@ tryCatch(skip = function(e) message(conditionMessage(e)), {
     name = "RSQLite"
   )
 })
+
+# SQLite integers are 64-bit, so with RSQLite's native Arrow methods an R integer
+# column written to SQLite comes back as Arrow int64, which nanoarrow converts to
+# double by default.
+# These specs compare the round trip with expect_identical() against R integer
+# columns, which no faithful Arrow mapping of SQLite can satisfy; DuckDB and ADBC
+# map SQLite integers to 64 bits as well.
+# DBItest and DBI copy this file and may test an RSQLite without these methods,
+# which passes the specs with DBI's default Arrow methods: skip only for the
+# native ones.
+ARROW_ROUNDTRIP_SKIPS <- if (
+  requireNamespace("RSQLite", quietly = TRUE) &&
+    methods::existsMethod("dbFetchArrow", "SQLiteResult", where = asNamespace("RSQLite"))
+) {
+  c(
+    "arrow_read_table_arrow",
+    "arrow_read_table_arrow_empty",
+    "arrow_write_table_arrow_roundtrip_integer",
+    "arrow_write_table_arrow_roundtrip_logical",
+    "arrow_write_table_arrow_roundtrip_character",
+    "arrow_write_table_arrow_roundtrip_blob",
+    "arrow_write_table_arrow_roundtrip_mixed",
+    "arrow_append_table_arrow_roundtrip_integer",
+    "arrow_append_table_arrow_roundtrip_logical",
+    "arrow_append_table_arrow_roundtrip_character",
+    "arrow_append_table_arrow_roundtrip_blob",
+    "arrow_append_table_arrow_roundtrip_mixed",
+    NULL
+  )
+}

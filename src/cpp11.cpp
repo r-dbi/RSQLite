@@ -87,25 +87,25 @@ extern "C" SEXP _RSQLite_sqlite_http_stats() {
   END_CPP11
 }
 // result.cpp
-cpp11::external_pointer<DbResult> result_create(cpp11::external_pointer<DbConnectionPtr> con, std::string sql);
+cpp11::external_pointer<DbResultPtr> result_create(cpp11::external_pointer<DbConnectionPtr> con, std::string sql);
 extern "C" SEXP _RSQLite_result_create(SEXP con, SEXP sql) {
   BEGIN_CPP11
     return cpp11::as_sexp(result_create(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbConnectionPtr>>>(con), cpp11::as_cpp<cpp11::decay_t<std::string>>(sql)));
   END_CPP11
 }
 // result.cpp
-void result_release(cpp11::external_pointer<DbResult> res);
+void result_release(cpp11::external_pointer<DbResultPtr> res);
 extern "C" SEXP _RSQLite_result_release(SEXP res) {
   BEGIN_CPP11
-    result_release(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResult>>>(res));
+    result_release(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResultPtr>>>(res));
     return R_NilValue;
   END_CPP11
 }
 // result.cpp
-bool result_valid(cpp11::external_pointer<DbResult> res_);
+bool result_valid(cpp11::external_pointer<DbResultPtr> res_);
 extern "C" SEXP _RSQLite_result_valid(SEXP res_) {
   BEGIN_CPP11
-    return cpp11::as_sexp(result_valid(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResult>>>(res_)));
+    return cpp11::as_sexp(result_valid(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResultPtr>>>(res_)));
   END_CPP11
 }
 // result.cpp
@@ -131,7 +131,7 @@ extern "C" SEXP _RSQLite_result_has_completed(SEXP res) {
   END_CPP11
 }
 // result.cpp
-int result_rows_fetched(DbResult* res);
+SEXP result_rows_fetched(DbResult* res);
 extern "C" SEXP _RSQLite_result_rows_fetched(SEXP res) {
   BEGIN_CPP11
     return cpp11::as_sexp(result_rows_fetched(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res)));
@@ -158,6 +158,66 @@ extern "C" SEXP _RSQLite_result_get_placeholder_names(SEXP res) {
     return cpp11::as_sexp(result_get_placeholder_names(cpp11::as_cpp<cpp11::decay_t<SqliteResult*>>(res)));
   END_CPP11
 }
+// result.cpp
+SEXP result_fetch_arrow(cpp11::external_pointer<DbResultPtr> res_, double chunk_size);
+extern "C" SEXP _RSQLite_result_fetch_arrow(SEXP res_, SEXP chunk_size) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(result_fetch_arrow(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResultPtr>>>(res_), cpp11::as_cpp<cpp11::decay_t<double>>(chunk_size)));
+  END_CPP11
+}
+// result.cpp
+SEXP result_fetch_arrow_chunk(DbResult* res, double chunk_size);
+extern "C" SEXP _RSQLite_result_fetch_arrow_chunk(SEXP res, SEXP chunk_size) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(result_fetch_arrow_chunk(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<double>>(chunk_size)));
+  END_CPP11
+}
+// result.cpp
+void result_bind_arrow(DbResult* res, cpp11::sexp params, cpp11::integers param_indexes);
+extern "C" SEXP _RSQLite_result_bind_arrow(SEXP res, SEXP params, SEXP param_indexes) {
+  BEGIN_CPP11
+    result_bind_arrow(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<cpp11::sexp>>(params), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(param_indexes));
+    return R_NilValue;
+  END_CPP11
+}
+// result.cpp
+void result_set_bytes_limits(SqliteResult* res, double cut_bytes, double max_bytes);
+extern "C" SEXP _RSQLite_result_set_bytes_limits(SEXP res, SEXP cut_bytes, SEXP max_bytes) {
+  BEGIN_CPP11
+    result_set_bytes_limits(cpp11::as_cpp<cpp11::decay_t<SqliteResult*>>(res), cpp11::as_cpp<cpp11::decay_t<double>>(cut_bytes), cpp11::as_cpp<cpp11::decay_t<double>>(max_bytes));
+    return R_NilValue;
+  END_CPP11
+}
+// result.cpp
+double result_rethrown_unwinds(DbResult* res);
+extern "C" SEXP _RSQLite_result_rethrown_unwinds(SEXP res) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(result_rethrown_unwinds(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res)));
+  END_CPP11
+}
+// result.cpp
+void result_set_rows_fetched(SqliteResult* res, double n);
+extern "C" SEXP _RSQLite_result_set_rows_fetched(SEXP res, SEXP n) {
+  BEGIN_CPP11
+    result_set_rows_fetched(cpp11::as_cpp<cpp11::decay_t<SqliteResult*>>(res), cpp11::as_cpp<cpp11::decay_t<double>>(n));
+    return R_NilValue;
+  END_CPP11
+}
+// result.cpp
+cpp11::list arrow_stream_read_on_thread(SEXP stream_xptr, double n, bool release);
+extern "C" SEXP _RSQLite_arrow_stream_read_on_thread(SEXP stream_xptr, SEXP n, SEXP release) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(arrow_stream_read_on_thread(cpp11::as_cpp<cpp11::decay_t<SEXP>>(stream_xptr), cpp11::as_cpp<cpp11::decay_t<double>>(n), cpp11::as_cpp<cpp11::decay_t<bool>>(release)));
+  END_CPP11
+}
+// result.cpp
+void result_call_while_busy(cpp11::external_pointer<DbResultPtr> res, cpp11::function fun);
+extern "C" SEXP _RSQLite_result_call_while_busy(SEXP res, SEXP fun) {
+  BEGIN_CPP11
+    result_call_while_busy(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResultPtr>>>(res), cpp11::as_cpp<cpp11::decay_t<cpp11::function>>(fun));
+    return R_NilValue;
+  END_CPP11
+}
 // rsqlite.cpp
 cpp11::strings rsqliteVersion();
 extern "C" SEXP _RSQLite_rsqliteVersion() {
@@ -168,6 +228,7 @@ extern "C" SEXP _RSQLite_rsqliteVersion() {
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
+    {"_RSQLite_arrow_stream_read_on_thread",  (DL_FUNC) &_RSQLite_arrow_stream_read_on_thread,  3},
     {"_RSQLite_connection_connect",           (DL_FUNC) &_RSQLite_connection_connect,           5},
     {"_RSQLite_connection_copy_database",     (DL_FUNC) &_RSQLite_connection_copy_database,     2},
     {"_RSQLite_connection_import_file",       (DL_FUNC) &_RSQLite_connection_import_file,       6},
@@ -176,14 +237,21 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_connection_valid",             (DL_FUNC) &_RSQLite_connection_valid,             1},
     {"_RSQLite_extension_load",               (DL_FUNC) &_RSQLite_extension_load,               3},
     {"_RSQLite_result_bind",                  (DL_FUNC) &_RSQLite_result_bind,                  2},
+    {"_RSQLite_result_bind_arrow",            (DL_FUNC) &_RSQLite_result_bind_arrow,            3},
+    {"_RSQLite_result_call_while_busy",       (DL_FUNC) &_RSQLite_result_call_while_busy,       2},
     {"_RSQLite_result_column_info",           (DL_FUNC) &_RSQLite_result_column_info,           1},
     {"_RSQLite_result_create",                (DL_FUNC) &_RSQLite_result_create,                2},
     {"_RSQLite_result_fetch",                 (DL_FUNC) &_RSQLite_result_fetch,                 2},
+    {"_RSQLite_result_fetch_arrow",           (DL_FUNC) &_RSQLite_result_fetch_arrow,           2},
+    {"_RSQLite_result_fetch_arrow_chunk",     (DL_FUNC) &_RSQLite_result_fetch_arrow_chunk,     2},
     {"_RSQLite_result_get_placeholder_names", (DL_FUNC) &_RSQLite_result_get_placeholder_names, 1},
     {"_RSQLite_result_has_completed",         (DL_FUNC) &_RSQLite_result_has_completed,         1},
     {"_RSQLite_result_release",               (DL_FUNC) &_RSQLite_result_release,               1},
+    {"_RSQLite_result_rethrown_unwinds",      (DL_FUNC) &_RSQLite_result_rethrown_unwinds,      1},
     {"_RSQLite_result_rows_affected",         (DL_FUNC) &_RSQLite_result_rows_affected,         1},
     {"_RSQLite_result_rows_fetched",          (DL_FUNC) &_RSQLite_result_rows_fetched,          1},
+    {"_RSQLite_result_set_bytes_limits",      (DL_FUNC) &_RSQLite_result_set_bytes_limits,      3},
+    {"_RSQLite_result_set_rows_fetched",      (DL_FUNC) &_RSQLite_result_set_rows_fetched,      2},
     {"_RSQLite_result_valid",                 (DL_FUNC) &_RSQLite_result_valid,                 1},
     {"_RSQLite_rsqliteVersion",               (DL_FUNC) &_RSQLite_rsqliteVersion,               0},
     {"_RSQLite_set_busy_handler",             (DL_FUNC) &_RSQLite_set_busy_handler,             2},
@@ -194,8 +262,11 @@ static const R_CallMethodDef CallEntries[] = {
 };
 }
 
+void rsqlite_init_main_thread(DllInfo* dll);
+
 extern "C" attribute_visible void R_init_RSQLite(DllInfo* dll){
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
+  rsqlite_init_main_thread(dll);
   R_forceSymbols(dll, TRUE);
 }

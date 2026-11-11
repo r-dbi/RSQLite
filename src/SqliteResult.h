@@ -18,6 +18,9 @@ public:
 
 public:
   cpp11::strings get_placeholder_names() const;
+  // For the tests
+  void set_rows_fetched(int64_t n);
+  void set_arrow_bytes_limits(int64_t cut_bytes, int64_t max_bytes);
 };
 
 #endif

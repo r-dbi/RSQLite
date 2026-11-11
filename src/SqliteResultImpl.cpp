@@ -5,6 +5,15 @@
 #include "DbColumnStorage.h"
 #include "DbConnection.h"
 #include "integer64.h"
+#include "main_thread.h"
+#include <sstream>
+
+// The data of a utf8 or binary column ends a chunk: after the row that takes
+// it to 1 GiB, and before a row that would take it past INT32_MAX bytes, the
+// most that the 32-bit offsets of these types address.
+// The tests lower both for one result, see set_arrow_bytes_limits().
+static const int64_t ARROW_CUT_BYTES = int64_t(1) << 30;
+static const int64_t ARROW_MAX_BYTES = INT32_MAX;
 
 // Construction ////////////////////////////////////////////////////////////////
 
@@ -14,15 +23,21 @@ SqliteResultImpl::SqliteResultImpl(
 )
     : conn(conn_->conn()),
       stmt(prepare(conn, sql)),
+      connection_(conn_.get()),
       cache(stmt),
       complete_(false),
       ready_(false),
       nrows_(0),
+      executions_(0),
       total_changes_start_(sqlite3_total_changes(conn)),
-      group_(0),
-      groups_(0),
       types_(get_initial_field_types(cache.ncols_)),
-      with_alt_types_(conn_->with_alt_types()) {
+      with_alt_types_(conn_->with_alt_types()),
+      arrow_frozen_(false),
+      pending_offset_(0),
+      pending_rows_(0),
+      arrow_row_read_(false),
+      arrow_cut_bytes_(ARROW_CUT_BYTES),
+      arrow_max_bytes_(ARROW_MAX_BYTES) {
   try {
     if (cache.nparams_ == 0) {
       after_bind(true);
@@ -35,9 +50,12 @@ SqliteResultImpl::SqliteResultImpl(
 }
 
 SqliteResultImpl::~SqliteResultImpl() {
-  try {
-    sqlite3_finalize(stmt);
-  } catch (...) {}
+  finalize_statement();
+}
+
+void SqliteResultImpl::finalize_statement() {
+  sqlite3_finalize(stmt);
+  stmt = NULL;
 }
 
 // Cache ///////////////////////////////////////////////////////////////////////
@@ -108,12 +126,29 @@ void SqliteResultImpl::init(bool params_have_rows) {
 
 void SqliteResultImpl::close() {}
 
+// Rows kept from the chunk that decided the Arrow types count as fetched once
+// they have been handed out
+
 bool SqliteResultImpl::complete() const {
-  return complete_;
+  return complete_ && pending_rows_ == 0;
 }
 
-int SqliteResultImpl::n_rows_fetched() {
-  return nrows_;
+bool SqliteResultImpl::ready() const {
+  return ready_;
+}
+
+int64_t SqliteResultImpl::executions() const {
+  return executions_;
+}
+
+int64_t SqliteResultImpl::n_rows_fetched() {
+  // The kept rows first: they are counted in nrows_ before they are kept
+  int64_t kept = pending_rows_;
+  return nrows_ - kept;
+}
+
+void SqliteResultImpl::set_rows_fetched(int64_t n) {
+  nrows_ = n;
 }
 
 int SqliteResultImpl::n_rows_affected() {
@@ -136,21 +171,28 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
     );
   }
 
-  set_params(params);
-
-  SEXP first_col = cpp11::as_sexp(params[0]);
-  groups_ = Rf_length(first_col);
-  group_ = 0;
-
-  total_changes_start_ = sqlite3_total_changes(conn);
-
-  bool has_params = bind_row();
-  after_bind(has_params);
+  params_.reset(new SqliteListParamSource(params));
+  after_set_params();
 }
 
 cpp11::list SqliteResultImpl::fetch(const int n_max) {
   if (!ready_) {
     cpp11::stop("Query needs to be bound before fetching");
+  }
+  if (n_max != 0 && pending_chunk_->release != NULL) {
+    // The statement has moved past them, a data frame can't include them
+    cpp11::stop(
+      "Rows fetched to decide the Arrow types are waiting, "
+      "fetch them with `dbFetchArrowChunk()` or `dbFetchArrow()`."
+    );
+  }
+  if (n_max != 0 && arrow_row_read_) {
+    // The byte check of the Arrow fetch has converted some of its values,
+    // only the Arrow path kept their storage classes
+    cpp11::stop(
+      "A row held back from the last Arrow chunk is waiting, "
+      "fetch it with `dbFetchArrowChunk()` or `dbFetchArrow()`."
+    );
   }
 
   int n = 0;
@@ -197,6 +239,98 @@ cpp11::list SqliteResultImpl::get_column_info() {
   return cpp11::list({ "name"_nm = names, "type"_nm = types });
 }
 
+// Arrow ///////////////////////////////////////////////////////////////////////
+
+void SqliteResultImpl::arrow_schema(
+  struct ArrowSchema* out,
+  int64_t infer_rows
+) {
+  if (!ready_) {
+    throw std::runtime_error("Query needs to be bound before fetching");
+  }
+
+  ensure_arrow_columns();
+
+  if (!arrow_frozen_) {
+    // The first chunk decides the types, from the first value of each column
+    // that is not NULL, and is kept for the next fetch
+    if (pending_chunk_->release == NULL && !complete_) {
+      nanoarrow::UniqueArray chunk;
+      fetch_arrow_rows(chunk.get(), infer_rows);
+      chunk.move(pending_chunk_.get());
+      pending_rows_ = pending_chunk_->length;
+    }
+    // Columns that only ever held NULL take their declared type
+    for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+      arrow_columns_[j].decide_from_decltype();
+    }
+    freeze_arrow_columns();
+  }
+
+  set_arrow_struct_schema(out);
+}
+
+int64_t SqliteResultImpl::fetch_arrow(struct ArrowArray* out, int64_t n_max) {
+  if (!ready_) {
+    throw std::runtime_error("Query needs to be bound before fetching");
+  }
+
+  ensure_arrow_columns();
+
+  if (pending_chunk_->release != NULL) {
+    int64_t n = std::min(
+      pending_chunk_->length - pending_offset_,
+      std::max(n_max, int64_t(0))
+    );
+    if (pending_offset_ == 0 && n == pending_chunk_->length) {
+      pending_chunk_.move(out);
+      pending_rows_ = 0;
+      return n;
+    }
+
+    // The chunk was fetched with a larger chunk size than this one:
+    // its rows are handed out in copies of at most `n_max` rows
+    copy_pending_rows(out, n);
+    pending_offset_ += n;
+    pending_rows_ = pending_chunk_->length - pending_offset_;
+    if (pending_offset_ == pending_chunk_->length) {
+      pending_chunk_.reset();
+      pending_offset_ = 0;
+    }
+    return n;
+  }
+
+  return fetch_arrow_rows(out, n_max);
+}
+
+void SqliteResultImpl::bind_arrow(
+  struct ArrowArrayStream* stream,
+  const std::vector<int>& param_indexes
+) {
+  if (cache.nparams_ == 0) {
+    throw std::runtime_error("Query does not require parameters.");
+  }
+
+  if (param_indexes.size() != static_cast<size_t>(cache.nparams_)) {
+    std::stringstream ss;
+    ss << "Query requires " << cache.nparams_ << " params; "
+       << param_indexes.size() << " supplied.";
+    throw std::runtime_error(ss.str());
+  }
+
+  params_.reset(new SqliteArrowParamSource(stream, param_indexes));
+  try {
+    after_set_params();
+  } catch (...) {
+    // A stream that fails on its first row is not kept: it may hold a share
+    // of this result, through a stream that wraps one of its Arrow streams.
+    // The statement has lost its bindings: it must be bound again.
+    params_.reset();
+    ready_ = false;
+    throw;
+  }
+}
+
 // Publics (custom) ////////////////////////////////////////////////////////////
 
 cpp11::strings SqliteResultImpl::get_placeholder_names() const {
@@ -219,83 +353,29 @@ cpp11::strings SqliteResultImpl::get_placeholder_names() const {
 
 // Privates ////////////////////////////////////////////////////////////////////
 
-void SqliteResultImpl::set_params(const cpp11::list& params) {
-  params_ = params;
+void SqliteResultImpl::after_set_params() {
+  ++executions_;
+
+  // A new execution may see other values in the first row
+  arrow_columns_.clear();
+  arrow_frozen_ = false;
+  pending_chunk_.reset();
+  pending_offset_ = 0;
+  pending_rows_ = 0;
+  arrow_row_read_ = false;
+
+  total_changes_start_ = sqlite3_total_changes(conn);
+
+  bool has_params = bind_row();
+  after_bind(has_params);
 }
 
 bool SqliteResultImpl::bind_row() {
-  if (group_ >= groups_) {
+  if (!params_) {
     return false;
   }
 
-  sqlite3_reset(stmt);
-  sqlite3_clear_bindings(stmt);
-
-  for (R_xlen_t j = 0; j < params_.size(); ++j) {
-    // sqlite parameters are 1-indexed
-    bind_parameter_pos((int)j + 1, params_[j]);
-  }
-
-  return true;
-}
-
-void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
-  if (TYPEOF(value_) == LGLSXP) {
-    int value = LOGICAL(value_)[group_];
-    if (value == NA_LOGICAL) {
-      sqlite3_bind_null(stmt, j);
-    } else {
-      sqlite3_bind_int(stmt, j, value);
-    }
-  } else if (TYPEOF(value_) == INT64SXP && Rf_inherits(value_, "integer64")) {
-    int64_t value = INTEGER64(value_)[group_];
-    if (value == NA_INTEGER64) {
-      sqlite3_bind_null(stmt, j);
-    } else {
-      sqlite3_bind_int64(stmt, j, value);
-    }
-  } else if (TYPEOF(value_) == INTSXP) {
-    int value = INTEGER(value_)[group_];
-    if (value == NA_INTEGER) {
-      sqlite3_bind_null(stmt, j);
-    } else {
-      sqlite3_bind_int(stmt, j, value);
-    }
-  } else if (TYPEOF(value_) == REALSXP) {
-    double value = REAL(value_)[group_];
-    if (value == NA_REAL) {
-      sqlite3_bind_null(stmt, j);
-    } else {
-      sqlite3_bind_double(stmt, j, value);
-    }
-  } else if (TYPEOF(value_) == STRSXP) {
-    SEXP value = STRING_ELT(value_, group_);
-    if (value == NA_STRING) {
-      sqlite3_bind_null(stmt, j);
-    } else {
-      sqlite3_bind_text(stmt, j, CHAR(value), -1, SQLITE_TRANSIENT);
-    }
-  } else if (TYPEOF(value_) == VECSXP) {
-    SEXP value = VECTOR_ELT(value_, group_);
-    if (TYPEOF(value) == NILSXP) {
-      sqlite3_bind_null(stmt, j);
-    } else if (TYPEOF(value) == RAWSXP) {
-      sqlite3_bind_blob(
-        stmt,
-        j,
-        RAW(value),
-        Rf_length(value),
-        SQLITE_TRANSIENT
-      );
-    } else {
-      cpp11::stop("Can only bind lists of raw vectors (or NULL)");
-    }
-  } else {
-    cpp11::stop(
-      "Don't know how to handle parameter of type %s.",
-      Rf_type2char(TYPEOF(value_))
-    );
-  }
+  return params_->bind_next_row(stmt);
 }
 
 void SqliteResultImpl::after_bind(bool params_have_rows) {
@@ -311,7 +391,8 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   SqliteDataFrame data(stmt, cache.names_, n_max, types_, with_alt_types_);
 
   if (complete_ && data.get_ncols() == 0) {
-    Rf_warning(
+    // Through cpp11, so that an error made of it unwinds the C++ frames
+    cpp11::warning(
       "`dbGetQuery()`, `dbSendQuery()` and `dbFetch()` should only be used "
       "with `SELECT` queries. Did you mean `dbExecute()`, `dbSendStatement()` "
       "or `dbGetRowsAffected()`?"
@@ -321,7 +402,7 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   while (!complete_) {
     data.set_col_values();
     step();
-    nrows_++;
+    ++nrows_;
     if (!data.advance()) {
       break;
     }
@@ -331,6 +412,8 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
 }
 
 void SqliteResultImpl::step() {
+  // The next row has storage classes of its own
+  arrow_row_read_ = false;
   while (step_run())
     ;
 }
@@ -344,13 +427,24 @@ bool SqliteResultImpl::step_run() {
   case SQLITE_ROW:
     return false;
   default:
-    raise_sqlite_exception();
+    raise_sqlite_exception(rc);
   }
 }
 
 bool SqliteResultImpl::step_done() {
-  ++group_;
-  bool more_params = bind_row();
+  bool more_params;
+  try {
+    more_params = bind_row();
+  } catch (...) {
+    // Parameters that fail to bind end the execution and are not kept:
+    // an Arrow stream may hold a share of a result bound to this one's stream.
+    // R vectors stay until the result is destroyed on R's main thread.
+    if (rsqlite_on_main_thread() || !params_->holds_r_objects()) {
+      params_.reset();
+    }
+    complete_ = true;
+    throw;
+  }
 
   if (!more_params) {
     complete_ = true;
@@ -370,10 +464,244 @@ cpp11::list SqliteResultImpl::peek_first_row() {
   return data.get_data(types_);
 }
 
-void SqliteResultImpl::raise_sqlite_exception() const {
+void SqliteResultImpl::ensure_arrow_columns() {
+  if (!arrow_columns_.empty() || cache.ncols_ == 0) {
+    return;
+  }
+
+  // A row is available unless the query is complete
+  bool has_row = !complete_;
+  for (size_t j = 0; j < cache.ncols_; ++j) {
+    SqliteArrowColumn* column = new SqliteArrowColumn(
+      stmt,
+      static_cast<int>(j),
+      cache.names_[j],
+      with_alt_types_
+    );
+    column->decide_from_row(has_row);
+    arrow_columns_.push_back(column);
+  }
+}
+
+void SqliteResultImpl::freeze_arrow_columns() {
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    arrow_columns_[j].freeze();
+  }
+  arrow_frozen_ = true;
+}
+
+int64_t SqliteResultImpl::fetch_arrow_rows(
+  struct ArrowArray* out,
+  int64_t n_max
+) {
+  const size_t ncols = arrow_columns_.size();
+
+  for (size_t j = 0; j < ncols; ++j) {
+    arrow_columns_[j].start_chunk();
+  }
+
+  int64_t n = 0;
+  while (!complete_ && n < n_max) {
+    // The storage classes are read once per row, before any conversion.
+    // A row that a byte limit held back from the previous chunk keeps them:
+    // the check converted some of its values.
+    if (!arrow_row_read_) {
+      for (size_t j = 0; j < ncols; ++j) {
+        arrow_columns_[j].read_row();
+      }
+      arrow_row_read_ = true;
+    }
+    // A row that would overflow a column starts the next chunk.
+    // An empty chunk takes any row: sqlite3_column_bytes() returns an int,
+    // so a single value never overflows.
+    if (n > 0 && !arrow_row_fits()) {
+      break;
+    }
+
+    for (size_t j = 0; j < ncols; ++j) {
+      arrow_columns_[j].append_row();
+    }
+    step();
+    ++nrows_;
+    ++n;
+
+    // R's main thread only: an Arrow stream can be read on another thread
+    if (n % 1024 == 0 && rsqlite_on_main_thread()) {
+      cpp11::check_user_interrupt();
+    }
+    if (arrow_chunk_full()) {
+      break;
+    }
+  }
+
+  for (size_t j = 0; j < ncols; ++j) {
+    arrow_columns_[j].finish_chunk(n);
+  }
+  // The types are final from the first chunk on
+  freeze_arrow_columns();
+
+  nanoarrow::UniqueArray chunk;
+  check_arrow(
+    ArrowArrayInitFromType(chunk.get(), NANOARROW_TYPE_STRUCT),
+    "Can't allocate Arrow array"
+  );
+  check_arrow(
+    ArrowArrayAllocateChildren(chunk.get(), static_cast<int64_t>(ncols)),
+    "Can't allocate Arrow array"
+  );
+  for (size_t j = 0; j < ncols; ++j) {
+    arrow_columns_[j].move_chunk_to(chunk->children[j]);
+  }
+  chunk->length = n;
+  chunk->null_count = 0;
+
+  struct ArrowError error;
+  ArrowErrorInit(&error);
+  check_arrow(
+    ArrowArrayFinishBuildingDefault(chunk.get(), &error),
+    "Can't finish Arrow array",
+    &error
+  );
+
+  chunk.move(out);
+  return n;
+}
+
+void SqliteResultImpl::set_arrow_struct_schema(struct ArrowSchema* out) {
+  ArrowSchemaInit(out);
+  check_arrow(
+    ArrowSchemaSetTypeStruct(out, static_cast<int64_t>(arrow_columns_.size())),
+    "Can't allocate Arrow schema"
+  );
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    arrow_columns_[j].set_schema(out->children[j]);
+  }
+}
+
+// Appends the value in row `i` of `values` to `out`, of the same type
+static void append_arrow_value(
+  struct ArrowArray* out,
+  const struct ArrowArrayView* values,
+  int64_t i
+) {
+  int code;
+  if (ArrowArrayViewIsNull(values, i)) {
+    code = ArrowArrayAppendNull(out, 1);
+  } else {
+    switch (values->storage_type) {
+    case NANOARROW_TYPE_INT32:
+    case NANOARROW_TYPE_INT64:
+      code = ArrowArrayAppendInt(out, ArrowArrayViewGetIntUnsafe(values, i));
+      break;
+    case NANOARROW_TYPE_DOUBLE:
+      code =
+        ArrowArrayAppendDouble(out, ArrowArrayViewGetDoubleUnsafe(values, i));
+      break;
+    case NANOARROW_TYPE_STRING:
+    case NANOARROW_TYPE_BINARY:
+      code =
+        ArrowArrayAppendBytes(out, ArrowArrayViewGetBytesUnsafe(values, i));
+      break;
+    default:
+      throw std::runtime_error(
+        "Internal error: can't copy Arrow values of type " +
+        std::string(ArrowTypeString(values->storage_type))
+      );
+    }
+  }
+  check_arrow(code, "Can't append to Arrow array");
+}
+
+void SqliteResultImpl::copy_pending_rows(struct ArrowArray* out, int64_t n) {
+  nanoarrow::UniqueSchema schema;
+  set_arrow_struct_schema(schema.get());
+
+  struct ArrowError error;
+  ArrowErrorInit(&error);
+  nanoarrow::UniqueArrayView view;
+  check_arrow(
+    ArrowArrayViewInitFromSchema(view.get(), schema.get(), &error),
+    "Can't read Arrow array",
+    &error
+  );
+  check_arrow(
+    ArrowArrayViewSetArray(view.get(), pending_chunk_.get(), &error),
+    "Can't read Arrow array",
+    &error
+  );
+
+  nanoarrow::UniqueArray chunk;
+  check_arrow(
+    ArrowArrayInitFromSchema(chunk.get(), schema.get(), &error),
+    "Can't allocate Arrow array",
+    &error
+  );
+  check_arrow(
+    ArrowArrayStartAppending(chunk.get()),
+    "Can't allocate Arrow array"
+  );
+  for (int64_t i = pending_offset_; i < pending_offset_ + n; ++i) {
+    for (int64_t j = 0; j < chunk->n_children; ++j) {
+      append_arrow_value(chunk->children[j], view->children[j], i);
+    }
+    check_arrow(
+      ArrowArrayFinishElement(chunk.get()),
+      "Can't append to Arrow array"
+    );
+  }
+  check_arrow(
+    ArrowArrayFinishBuildingDefault(chunk.get(), &error),
+    "Can't finish Arrow array",
+    &error
+  );
+
+  chunk.move(out);
+}
+
+bool SqliteResultImpl::arrow_row_fits() {
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    SqliteArrowColumn& column = arrow_columns_[j];
+    int64_t bytes = column.value_bytes();
+    if (bytes > 0 && column.variable_bytes() + bytes > arrow_max_bytes_) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool SqliteResultImpl::arrow_chunk_full() {
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    if (arrow_columns_[j].variable_bytes() >= arrow_cut_bytes_) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void SqliteResultImpl::set_arrow_bytes_limits(
+  int64_t cut_bytes,
+  int64_t max_bytes
+) {
+  arrow_cut_bytes_ = cut_bytes;
+  arrow_max_bytes_ = max_bytes;
+}
+
+void SqliteResultImpl::raise_sqlite_exception(int rc) const {
+  if (!connection_->is_valid()) {
+    // After dbDisconnect(), sqlite3_close_v2() has left a handle whose
+    // sqlite3_errmsg() only reports API misuse: an Arrow stream that reads on
+    // has the result code
+    throw std::runtime_error(
+      std::string(sqlite3_errstr(rc)) +
+      " (no details, the connection has been closed)"
+    );
+  }
   raise_sqlite_exception(conn);
 }
 
+// Throws a C++ exception rather than an R error, so that the fetch loop can
+// also run inside an Arrow stream callback; cpp11 turns it into an R error
+// at the entry point.
 void SqliteResultImpl::raise_sqlite_exception(sqlite3* conn) {
-  cpp11::stop(sqlite3_errmsg(conn));
+  throw std::runtime_error(sqlite3_errmsg(conn));
 }

@@ -1,0 +1,1252 @@
+# Native Arrow interface: results are filled straight from the SQLite
+# statement, parameters are bound straight from Arrow arrays.
+
+test_that("dbSendQueryArrow() returns a SQLiteResultArrow", {
+  con <- local_con()
+  rs <- dbSendQueryArrow(con, "SELECT 1 AS a, 'x' AS b, 1.5 AS c, x'0102' AS d, NULL AS e")
+  on.exit(dbClearResult(rs))
+
+  expect_s4_class(rs, "SQLiteResultArrow")
+  expect_s4_class(rs, "DBIResultArrow")
+  expect_true(dbIsValid(rs))
+  expect_false(dbHasCompleted(rs))
+  expect_equal(dbGetStatement(rs), "SELECT 1 AS a, 'x' AS b, 1.5 AS c, x'0102' AS d, NULL AS e")
+  expect_snapshot(rs)
+
+  stream <- dbFetchArrow(rs)
+  expect_s3_class(stream, "nanoarrow_array_stream")
+  expect_equal(
+    schema_formats(stream),
+    c(a = "l", b = "u", c = "g", d = "z", e = "n")
+  )
+
+  df <- as.data.frame(stream)
+  expect_equal(df$a, 1)
+  expect_equal(df$b, "x")
+  expect_equal(df$c, 1.5)
+  expect_equal(df$d, blob::blob(as.raw(1:2)))
+  expect_true(dbHasCompleted(rs))
+  expect_equal(dbGetRowCount(rs), 1L)
+  expect_snapshot(rs)
+})
+
+test_that("column types come from the values, then from the declared types", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (i INTEGER, r REAL, s TEXT, b BLOB, n NUMERIC, x)")
+  dbExecute(con, "INSERT INTO t VALUES (NULL, NULL, NULL, NULL, NULL, NULL)")
+
+  # Only NULL values: declared types decide, undeclared columns are null
+  stream <- dbGetQueryArrow(con, "SELECT * FROM t")
+  expect_equal(
+    schema_formats(stream),
+    c(i = "l", r = "g", s = "u", b = "z", n = "g", x = "n")
+  )
+  expect_equal(nrow(as.data.frame(stream)), 1L)
+
+  dbExecute(con, "INSERT INTO t VALUES (1, 2.5, 'a', x'00', 3, 'text')")
+  # The first non-NULL value decides, also for the undeclared column
+  df <- as.data.frame(dbGetQueryArrow(con, "SELECT * FROM t ORDER BY i"))
+  expect_equal(df$i, c(NA, 1))
+  expect_equal(df$r, c(NA, 2.5))
+  expect_equal(df$s, c(NA, "a"))
+  expect_equal(df$b, blob::blob(NULL, as.raw(0)))
+  expect_equal(df$n, c(NA, 3))
+  expect_equal(df$x, c(NA, "text"))
+})
+
+test_that("integers widen to double within the first chunk", {
+  con <- local_con()
+  stream <- dbGetQueryArrow(con, "SELECT 1 AS a UNION ALL SELECT 2.5 UNION ALL SELECT NULL")
+  expect_equal(schema_formats(stream), c(a = "g"))
+  expect_equal(as.data.frame(stream)$a, c(1, 2.5, NA))
+})
+
+test_that("mixed types after the first chunk are coerced with a warning", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1), (2), ('three')")
+
+  rs <- dbSendQueryArrow(con, "SELECT x FROM t")
+  on.exit(dbClearResult(rs))
+  chunk <- dbFetchArrowChunk(rs, chunk_size = 2)
+  expect_equal(as.data.frame(chunk)$x, c(1, 2))
+  expect_warning(
+    chunk <- dbFetchArrowChunk(rs, chunk_size = 2),
+    "mixed type"
+  )
+  expect_equal(nanoarrow::infer_nanoarrow_schema(chunk)$children$x$format, "l")
+})
+
+test_that("64-bit integers keep their range", {
+  con <- local_con()
+  stream <- dbGetQueryArrow(con, "SELECT 1099511627776 AS a")
+  expect_equal(schema_formats(stream), c(a = "l"))
+  expect_equal(
+    nanoarrow::convert_array_stream(stream, data.frame(a = bit64::integer64()))$a,
+    bit64::as.integer64("1099511627776")
+  )
+})
+
+test_that("extended types map to Arrow date, time and timestamp types", {
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (d DATE, t TIME, ts TIMESTAMP, dt DATETIME)")
+  dbExecute(con, "INSERT INTO t VALUES ('2020-01-02', '12:34:56.5', '2020-01-02 12:34:56.25', 1577968496.75)")
+  dbExecute(con, "INSERT INTO t VALUES (NULL, NULL, NULL, NULL)")
+
+  stream <- dbGetQueryArrow(con, "SELECT * FROM t")
+  expect_equal(schema_formats(stream), c(d = "tdD", t = "ttu", ts = "tsu:UTC", dt = "tsu:UTC"))
+  df <- as.data.frame(stream)
+  expect_equal(df$d, as.Date(c("2020-01-02", NA)))
+  expect_equal(df$t, hms::as_hms(c(45296.5, NA)))
+  expect_equal(df$ts, as.POSIXct(c("2020-01-02 12:34:56.25", NA), tz = "UTC"))
+  expect_equal(df$dt, as.POSIXct(c(1577968496.75, NA), origin = "1970-01-01", tz = "UTC"))
+})
+
+test_that("times and timestamps outside the range of int64 microseconds are NULL", {
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, tm TIME, ts TIMESTAMP)")
+  # 9e999 is an infinity in SQLite
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 1.5, 1.5), (2, 9223372036855, -9223372036855),",
+    "(3, 1e19, -1e19), (4, 1e300, -1e300), (5, 9e999, -9e999)"
+  ))
+
+  messages <- character()
+  df <- withCallingHandlers(
+    as.data.frame(dbGetQueryArrow(con, "SELECT tm, ts FROM t ORDER BY i")),
+    warning = function(w) {
+      messages <<- c(messages, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_equal(as.numeric(df$tm), c(1.5, NA, NA, NA, NA))
+  expect_equal(as.numeric(df$ts), c(1.5, NA, NA, NA, NA))
+  # One warning per column, for the first such value, an integer
+  expect_equal(length(messages), 2L)
+  expect_match(messages, "`tm`: values of type integer outside the range of Arrow type time64", all = FALSE)
+  expect_match(messages, "`ts`: values of type integer outside the range of Arrow type timestamp", all = FALSE)
+})
+
+test_that("times outside a day are NULL", {
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, tm TIME)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 0), (2, 43200.5), (3, 86399.9999996), (4, '12:34:56'),",
+    "(5, 86400), (6, 100000), (7, -1), (8, '24:00:00'), (9, '30:00:00')"
+  ))
+  sql <- "SELECT tm FROM t ORDER BY i"
+
+  expect_warning(
+    df <- as.data.frame(dbGetQueryArrow(con, sql)),
+    "`tm`: values of type integer outside the range of Arrow type time64 are NULL"
+  )
+  # The last microsecond of the day is as far as rounding goes
+  expect_equal(as.numeric(df$tm), c(0, 43200.5, 86399.999999, 45296, NA, NA, NA, NA, NA))
+  # The default path keeps any duration
+  expect_equal(as.numeric(dbGetQuery(con, sql)$tm)[5:9], c(86400, 100000, -1, 86400, 108000))
+})
+
+test_that("text in a binary column is UTF-8, also in a UTF-16 database", {
+  con <- local_con()
+  dbExecute(con, "PRAGMA encoding = 'UTF-16'")
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
+  dbExecute(con, "INSERT INTO t VALUES (1, x'01'), (2, 'ab'), (3, 'caf\u00e9')")
+  sql <- "SELECT x FROM t ORDER BY i"
+
+  expect_warning(df <- as.data.frame(dbGetQueryArrow(con, sql)), "coercing values of type string")
+  expected <- list(as.raw(1), charToRaw("ab"), charToRaw("caf\u00e9"))
+  expect_equal(unclass(df$x), expected, ignore_attr = TRUE)
+  # The data frame path returns the same bytes
+  expect_warning(default <- dbGetQuery(con, sql), "mixed type")
+  expect_equal(unclass(default$x), expected, ignore_attr = TRUE)
+})
+
+test_that("a blob in a utf8 column keeps its bytes, also in a UTF-16 database", {
+  con <- local_con()
+  dbExecute(con, "PRAGMA encoding = 'UTF-16'")
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 'first'), (2, x'6162'), (3, x'c3a4'), (4, x'00ff'), (5, x'')"
+  ))
+
+  messages <- character()
+  df <- withCallingHandlers(
+    as.data.frame(dbGetQueryArrow(con, "SELECT x FROM t ORDER BY i")),
+    warning = function(w) {
+      messages <<- c(messages, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  # The bytes are UTF-8, not UTF-16 to transcode
+  expect_equal(df$x, c("first", "ab", "\u00e4", NA, ""))
+  expect_match(messages, "`x`: mixed type", all = FALSE)
+  expect_match(messages, "`x`: values of type blob that are not valid UTF-8", all = FALSE)
+})
+
+test_that("text that is not valid UTF-8 is NULL", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (i INTEGER, s TEXT)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 'ok'), (2, CAST(x'ff' AS TEXT)), (3, CAST(x'c3a9' AS TEXT)),",
+    "(4, CAST(x'610062' AS TEXT)), (5, CAST(x'eda080' AS TEXT)), (6, x'6869'), (7, x'ff'),",
+    # Longer than the eight bytes checked at a time
+    "(8, CAST(x'6161616161616161c3a9' AS TEXT)), (9, CAST(x'61616161616161616161ff' AS TEXT)),",
+    "(10, CAST(x'616161616161616100' AS TEXT))"
+  ))
+
+  messages <- character()
+  df <- withCallingHandlers(
+    as.data.frame(dbGetQueryArrow(con, "SELECT s FROM t ORDER BY i")),
+    warning = function(w) {
+      messages <<- c(messages, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  # A stray byte, a NUL byte and a surrogate are not text, a valid blob is
+  expect_equal(df$s, c("ok", NA, "\u00e9", NA, NA, "hi", NA, "aaaaaaaa\u00e9", NA, NA))
+  expect_equal(length(messages), 2L)
+  expect_match(messages, "`s`: values of type string that are not valid UTF-8, or hold a NUL byte, are NULL", all = FALSE)
+  expect_match(messages, "`s`: mixed type", all = FALSE)
+})
+
+test_that("times and text that Arrow can't hold pass its full validation", {
+  skip_if_not_installed("arrow")
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, tm TIME, s TEXT)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 100000, CAST(x'ff' AS TEXT)), (2, '24:00:00', 'ok'),",
+    "(3, 86399.9999996, CAST(x'c0af' AS TEXT))"
+  ))
+  table <- suppressWarnings(arrow::as_arrow_table(dbGetQueryArrow(con, "SELECT tm, s FROM t ORDER BY i")))
+  expect_true(table$ValidateFull())
+  expect_equal(table$num_rows, 3L)
+})
+
+test_that("dbFetchArrow() streams lazily in chunks", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:10))
+
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t ORDER BY a")
+  on.exit(dbClearResult(rs))
+  stream <- dbFetchArrow(rs, chunk_size = 4)
+
+  # Nothing has been fetched yet
+  expect_equal(dbGetRowCount(rs), 0L)
+  expect_false(dbHasCompleted(rs))
+
+  first <- stream$get_next()
+  expect_equal(first$length, 4L)
+  expect_equal(dbGetRowCount(rs), 4L)
+  expect_false(dbHasCompleted(rs))
+
+  sizes <- c(4L)
+  repeat {
+    chunk <- stream$get_next()
+    if (is.null(chunk)) {
+      break
+    }
+    sizes <- c(sizes, chunk$length)
+  }
+  expect_equal(sizes, c(4L, 4L, 2L))
+  expect_true(dbHasCompleted(rs))
+  expect_equal(dbGetRowCount(rs), 10L)
+
+  # A consumed result yields an empty stream
+  again <- as.data.frame(dbFetchArrow(rs))
+  expect_equal(nrow(again), 0L)
+  expect_equal(names(again), "a")
+})
+
+test_that("dbFetchArrowChunk() returns one chunk per call", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:5))
+
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t ORDER BY a")
+  on.exit(dbClearResult(rs))
+
+  chunk <- dbFetchArrowChunk(rs, chunk_size = 3)
+  expect_s3_class(chunk, "nanoarrow_array")
+  expect_equal(as.data.frame(chunk)$a, c(1, 2, 3))
+  expect_false(dbHasCompleted(rs))
+
+  chunk <- dbFetchArrowChunk(rs, chunk_size = 3)
+  expect_equal(as.data.frame(chunk)$a, c(4, 5))
+  expect_true(dbHasCompleted(rs))
+
+  chunk <- dbFetchArrowChunk(rs)
+  expect_equal(chunk$length, 0L)
+  expect_equal(names(as.data.frame(chunk)), "a")
+})
+
+test_that("string and binary columns end a chunk before their offsets overflow", {
+  # 100 bytes end a chunk after the row that reaches them,
+  # a row that would go past 150 bytes starts the next chunk
+  sizes <- c(60, 60, 80, 80, 200, 10, 10)
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(
+    i = seq_along(sizes),
+    s = strrep("x", sizes),
+    b = blob::as_blob(lapply(sizes, function(size) as.raw(rep(1, size))))
+  ))
+
+  for (column in c("s", "b")) {
+    sql <- paste0("SELECT ", column, " FROM t ORDER BY i")
+    # 60 + 60 reaches 100; 80 + 80 and 80 + 200 would go past 150;
+    # a single value fills an empty chunk whatever its size
+    expect_equal(chunk_lengths(fetch_with_bytes_limits(con, sql)), c(2, 1, 1, 1, 2))
+    # No row is lost or repeated at the cuts
+    values <- as.data.frame(fetch_with_bytes_limits(con, sql))[[column]]
+    expect_equal(if (is.character(values)) nchar(values) else lengths(values), sizes)
+    # The limits belong to that result: another one keeps the defaults
+    expect_equal(chunk_lengths(dbGetQueryArrow(con, sql)), 7)
+  }
+})
+
+test_that("a row held back by the byte limits keeps its storage classes", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
+  # A 90-byte string decides utf8, a 120-byte blob would take the column past 150
+  dbExecute(con, "INSERT INTO t VALUES (1, hex(zeroblob(45))), (2, CAST(hex(zeroblob(60)) AS BLOB))")
+
+  # The size check converts the blob to text, the warning still names a blob
+  stream <- fetch_with_bytes_limits(con, "SELECT x FROM t ORDER BY i")
+  expect_warning(lengths <- chunk_lengths(stream), "coercing values of type blob")
+  expect_equal(lengths, c(1, 1))
+})
+
+test_that("a row held back by the byte limits is for the Arrow path only", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
+  # A 127-byte blob with a NUL byte would take the utf8 column past 150 bytes
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, hex(zeroblob(45))),",
+    "(2, CAST(x'41424300444546' || zeroblob(120) AS BLOB)), (3, 'z')"
+  ))
+
+  rs <- dbSendQuery(con, "SELECT x FROM t ORDER BY i")
+  withr::defer(dbClearResult(rs))
+  set_bytes_limits(rs)
+  expect_equal(dbFetchArrowChunk(rs)$length, 1)
+  # The byte check has converted the blob to text, a data frame would show that
+  expect_error(dbFetch(rs, n = 1), "held back")
+  expect_warning(
+    expect_warning(chunk <- dbFetchArrowChunk(rs, chunk_size = 1), "coercing values of type blob"),
+    "not valid UTF-8"
+  )
+  expect_equal(chunk$length, 1)
+  expect_equal(dbFetch(rs)$x, "z")
+})
+
+test_that("chunks of large blobs stay within the 32-bit offsets", {
+  # Off unless the variable is true, which the GitHub Actions checks of this
+  # repository set in .github/workflows/custom/after-install
+  skip_if_not(
+    identical(Sys.getenv("RSQLITE_TEST_LARGE_ARROW"), "true"),
+    "Needs about 2.5 GB of memory, set RSQLITE_TEST_LARGE_ARROW=true to run"
+  )
+
+  con <- local_con()
+  # 1e9 bytes stay below 1 GiB, 1e9 + 1.2e9 bytes would overflow,
+  # 1.2e9 bytes reach 1 GiB
+  sql <- paste(
+    "SELECT zeroblob(1000000000) AS b",
+    "UNION ALL SELECT zeroblob(1200000000)",
+    "UNION ALL SELECT zeroblob(1)"
+  )
+  expect_equal(chunk_lengths(dbGetQueryArrow(con, sql)), c(1, 1, 1))
+})
+
+test_that("the chunk fetched to decide the types keeps to a smaller chunk_size", {
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, r REAL, s TEXT, b BLOB, d DATE, n)")
+  dbExecute(con, paste(
+    "WITH RECURSIVE s(x) AS (SELECT 1 UNION ALL SELECT x + 1 FROM s WHERE x < 10)",
+    "INSERT INTO t SELECT x, x / 2.0, 'v' || x, randomblob(x),",
+    "date('2020-01-01', '+' || x || ' days'), NULL FROM s"
+  ))
+  dbExecute(con, "UPDATE t SET r = NULL, s = NULL, b = NULL, d = NULL WHERE i IN (2, 7)")
+  sql <- "SELECT * FROM t ORDER BY i"
+  whole <- as.data.frame(dbGetQueryArrow(con, sql))
+
+  rs <- dbSendQueryArrow(con, sql)
+  on.exit(dbClearResult(rs))
+  stream <- dbFetchArrow(rs, chunk_size = 8)
+  # The schema fetches the first 8 rows to decide the types
+  expect_equal(schema_formats(stream), c(i = "l", r = "g", s = "u", b = "z", d = "tdD", n = "n"))
+
+  chunks <- list()
+  repeat {
+    chunk <- dbFetchArrowChunk(rs, chunk_size = 3)
+    if (chunk$length == 0) {
+      break
+    }
+    chunks <- c(chunks, list(chunk))
+  }
+  expect_equal(vapply(chunks, function(chunk) chunk$length, numeric(1)), c(3, 3, 2, 2))
+  expect_equal(as.data.frame(nanoarrow::basic_array_stream(chunks)), whole)
+})
+
+test_that("rows kept for the Arrow schema count once they are handed out", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:20))
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t ORDER BY a")
+  on.exit(dbClearResult(rs))
+  stream <- dbFetchArrow(rs, chunk_size = 100)
+
+  # The schema fetches all 20 rows to decide the types, they wait
+  expect_equal(schema_formats(stream), c(a = "l"))
+  expect_false(dbHasCompleted(rs))
+  expect_equal(dbGetRowCount(rs), 0L)
+  expect_error(dbFetch(rs, n = 1), "dbFetchArrowChunk")
+
+  values <- numeric()
+  while (!dbHasCompleted(rs)) {
+    values <- c(values, as.data.frame(dbFetchArrowChunk(rs, chunk_size = 5))$a)
+    expect_equal(dbGetRowCount(rs), length(values))
+  }
+  expect_equal(values, as.numeric(1:20))
+  expect_null(stream$get_next())
+})
+
+test_that("the row count goes on beyond the integers of R", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:6))
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t ORDER BY a")
+  withr::defer(dbClearResult(rs))
+
+  expect_equal(dbFetchArrowChunk(rs, chunk_size = 1)$length, 1)
+  expect_identical(dbGetRowCount(rs), 1L)
+  # As if a stream had read 2^31 - 2 rows
+  result_set_rows_fetched(rs@result@ptr, 2^31 - 2)
+  expect_equal(dbFetchArrowChunk(rs, chunk_size = 1)$length, 1)
+  expect_identical(dbGetRowCount(rs), .Machine$integer.max)
+  # Beyond, the count is a double, also on the data frame path
+  expect_equal(dbFetchArrowChunk(rs, chunk_size = 2)$length, 2)
+  expect_identical(dbGetRowCount(rs), 2^31 + 1)
+  expect_equal(nrow(dbFetch(rs)), 2L)
+  expect_identical(dbGetRowCount(rs), 2^31 + 3)
+})
+
+test_that("dbFetch() and dbFetchArrow() can be mixed on one result", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:5))
+
+  rs <- dbSendQuery(con, "SELECT a FROM t ORDER BY a")
+  on.exit(dbClearResult(rs))
+
+  expect_equal(dbFetch(rs, n = 2)$a, 1:2)
+  expect_equal(as.data.frame(dbFetchArrowChunk(rs, chunk_size = 2))$a, c(3, 4))
+  expect_equal(as.data.frame(dbFetchArrow(rs))$a, 5)
+  expect_true(dbHasCompleted(rs))
+})
+
+test_that("the stream stays readable after the result is cleared", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:3))
+
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t ORDER BY a")
+  stream <- dbFetchArrow(rs, chunk_size = 2)
+  dbClearResult(rs)
+  expect_false(dbIsValid(rs))
+
+  expect_equal(as.data.frame(stream)$a, c(1, 2, 3))
+})
+
+test_that("a stream fails once its result is bound to new parameters", {
+  con <- local_con()
+  rs <- dbSendQueryArrow(con, "SELECT ? AS a")
+  on.exit(dbClearResult(rs))
+
+  dbBind(rs, list(1L))
+  stream <- dbFetchArrow(rs)
+  expect_equal(schema_formats(stream), c(a = "l"))
+  # The int64 schema handed out does not fit the new value
+  dbBind(rs, list(2.5))
+  expect_error(stream$get_next(), "bound to new parameters")
+  expect_equal(as.data.frame(dbFetchArrow(rs))$a, 2.5)
+
+  # Also when the schema has not been requested yet, and with dbBindArrow()
+  stream <- dbFetchArrow(rs)
+  dbBindArrow(rs, structure(data.frame("text"), names = ""))
+  expect_error(stream$get_next(), "bound to new parameters")
+  expect_error(nanoarrow::infer_nanoarrow_schema(stream), "bound to new parameters")
+  expect_equal(as.data.frame(dbFetchArrow(rs))$a, "text")
+
+  # A stream read to the end has released the result and stays at its end
+  stream <- dbFetchArrow(rs)
+  expect_null(stream$get_next())
+  dbBind(rs, list(3L))
+  expect_null(stream$get_next())
+})
+
+test_that("a stream reads on while other queries run on the connection", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:3))
+
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t ORDER BY a")
+  stream <- dbFetchArrow(rs, chunk_size = 2)
+  expect_equal(as.data.frame(stream$get_next())$a, c(1, 2))
+
+  # A new query clears the open result, not its stream
+  expect_warning(rs2 <- dbSendQuery(con, "SELECT 1 AS x"), "Closing open result set")
+  expect_false(dbIsValid(rs))
+  expect_equal(dbFetch(rs2)$x, 1L)
+  dbClearResult(rs2)
+  dbWriteTable(con, "u", data.frame(b = 1L))
+
+  expect_equal(as.data.frame(stream)$a, 3)
+
+  # A table is copied through a lazy stream on one connection
+  dbWriteTableArrow(con, "copy", dbGetQueryArrow(con, "SELECT a FROM t"))
+  expect_equal(dbReadTable(con, "copy"), data.frame(a = 1:3))
+})
+
+test_that("a stream not read to the end keeps the database open past dbDisconnect()", {
+  con <- dbConnect(SQLite(), ":memory:")
+  dbWriteTable(con, "t", data.frame(a = 1:3))
+  stream <- dbGetQueryArrow(con, "SELECT a FROM t ORDER BY a")
+
+  expect_warning(dbDisconnect(con), "1 results in use.*Arrow streams")
+  expect_false(dbIsValid(con))
+  expect_equal(as.data.frame(stream)$a, c(1, 2, 3))
+})
+
+test_that("an R error while the stream is read unwinds cleanly", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1), (2), ('three')")
+  # The second chunk warns about the mixed type, inside the stream callback;
+  # each result counts the R conditions rethrown from its streams
+  lazy_result <- function() {
+    rs <- dbSendQueryArrow(con, "SELECT x FROM t")
+    withr::defer(if (dbIsValid(rs)) dbClearResult(rs), envir = parent.frame())
+    rs
+  }
+  rethrown <- function(rs) result_rethrown_unwinds(rs@result@ptr)
+
+  # nanoarrow's C code reads the stream: the callback continues the unwind
+  rs <- lazy_result()
+  withr::with_options(list(warn = 2), {
+    expect_error(as.data.frame(dbFetchArrow(rs, chunk_size = 2)), "mixed type")
+  })
+  expect_equal(rethrown(rs), 0)
+  dbClearResult(rs)
+  rs <- lazy_result()
+  expect_equal(
+    tryCatch(as.data.frame(dbFetchArrow(rs, chunk_size = 2)), warning = function(w) "exited"),
+    "exited"
+  )
+  expect_equal(rethrown(rs), 0)
+  dbClearResult(rs)
+
+  # RSQLite's C++ code binds the stream as parameters: the callback rethrows,
+  # so that the unwind continues after the C++ frames have been left
+  con2 <- local_con()
+  dbExecute(con2, "CREATE TABLE t (x)")
+  rs <- lazy_result()
+  withr::with_options(list(warn = 2), {
+    expect_error(dbAppendTableArrow(con2, "t", dbFetchArrow(rs, chunk_size = 2)), "mixed type")
+  })
+  expect_equal(rethrown(rs), 1)
+  dbClearResult(rs)
+  # The append is rolled back, both connections work on
+  expect_equal(dbGetQuery(con2, "SELECT count(*) AS n FROM t")$n, 0L)
+  expect_equal(dbAppendTableArrow(con2, "t", data.frame(x = 1L)), 1L)
+  expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 3L)
+})
+
+test_that("arrow's scanner reads a stream on its worker threads", {
+  skip_if_not_installed("arrow")
+  skip_if_not(arrow::arrow_with_dataset())
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:200000))
+
+  # Many chunks, read on arrow's thread pool while R's main thread waits
+  reader <- arrow::as_record_batch_reader(dbGetQueryArrow(con, "SELECT a FROM t"))
+  filter <- arrow::Expression$create(
+    "greater",
+    arrow::Expression$field_ref("a"),
+    arrow::Expression$scalar(100000L)
+  )
+  table <- arrow::Scanner$create(reader, filter = filter)$ToTable()
+  expect_equal(table$num_rows, 100000L)
+  expect_equal(range(as.vector(table$a)), c(100001L, 200000L))
+  expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 200000L)
+})
+
+test_that("arrow::write_dataset() reads a stream on its worker threads", {
+  skip_if_not_installed("arrow")
+  skip_if_not(arrow::arrow_with_dataset())
+  # write_dataset() builds its query plan with dplyr, which RSQLite doesn't use
+  skip_if_not_installed("dplyr")
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:200000))
+
+  dir <- withr::local_tempfile()
+  arrow::write_dataset(arrow::as_record_batch_reader(dbGetQueryArrow(con, "SELECT a FROM t")), dir)
+  expect_equal(nrow(arrow::open_dataset(dir)), 200000)
+})
+
+test_that("a coercion on a worker thread fails the stream instead of warning", {
+  # Which thread reads the stream is up to arrow
+  skip_on_cran()
+  skip_if_not_installed("arrow")
+  skip_if_not(arrow::arrow_with_dataset())
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (a)")
+  dbWriteTable(con, "t", data.frame(a = 1:300), append = TRUE)
+  dbExecute(con, "UPDATE t SET a = 'x' WHERE rowid = 250")
+
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t")
+  withr::defer(if (dbIsValid(rs)) dbClearResult(rs))
+  reader <- arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 100))
+  expect_error(
+    arrow::Scanner$create(reader)$ToTable(),
+    "mixed type.*an error instead of a warning"
+  )
+
+  # The session and the connection go on, the stream goes with its reader
+  expect_silent(dbClearResult(rs))
+  rm(reader)
+  gc_until_stable()
+  expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 300L)
+})
+
+test_that("a stream is read and released on another thread", {
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, s TEXT, d DATE, tm TIME, ts TIMESTAMP)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 'a', '2024-01-02', '12:34:56', '2024-01-02 12:34:56.25'),",
+    "(2, NULL, NULL, NULL, NULL), (3, 'c', 19725, 3600.5, 1704198896.5)"
+  ))
+  sql <- "SELECT * FROM t ORDER BY i"
+  rbind_arrays <- function(arrays) do.call(rbind, lapply(arrays, as.data.frame))
+
+  # Dates, times and timestamps parsed from text and from numbers
+  out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, sql, chunk_size = 2), -1, TRUE)
+  expect_equal(out$error, "")
+  expect_equal(vapply(out$arrays, function(array) array$length, numeric(1)), c(2, 1))
+  expect_equal(rbind_arrays(out$arrays), as.data.frame(dbGetQueryArrow(con, sql, chunk_size = 2)))
+
+  # One row of R parameters, and Arrow parameters
+  out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, "SELECT ? AS a", params = list(5L)), -1, TRUE)
+  expect_equal(rbind_arrays(out$arrays)$a, 5)
+  rs <- dbSendQueryArrow(con, "SELECT $a AS a")
+  dbBindArrow(rs, nanoarrow::as_nanoarrow_array_stream(data.frame(a = 1:3)))
+  out <- arrow_stream_read_on_thread(dbFetchArrow(rs, chunk_size = 2), -1, TRUE)
+  expect_equal(out$error, "")
+  expect_equal(rbind_arrays(out$arrays)$a, c(1, 2, 3))
+  dbClearResult(rs)
+})
+
+test_that("on another thread, what would warn or call R fails the stream", {
+  con <- local_con(extended_types = TRUE)
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x, d DATE)")
+  dbExecute(con, "INSERT INTO t VALUES (1, 1, '2024-01-02'), (2, 2, 'not a date'), (3, 'three', NULL)")
+
+  out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, "SELECT x FROM t ORDER BY i", chunk_size = 2), -1, TRUE)
+  expect_length(out$arrays, 1)
+  expect_match(out$error, "`x`: mixed type.*an error instead of a warning, because R can't warn")
+
+  out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, "SELECT d FROM t ORDER BY i"), -1, TRUE)
+  expect_length(out$arrays, 0)
+  expect_match(out$error, "Unknown string format, NA is returned.*an error instead of a warning")
+
+  # R parameters are R vectors: their second row can't be bound there
+  out <- arrow_stream_read_on_thread(
+    dbGetQueryArrow(con, "SELECT ? AS a", params = list(1:3), chunk_size = 1),
+    -1,
+    TRUE
+  )
+  expect_match(out$error, "Can't bind the next row of parameters while another thread reads.*dbBindArrow")
+
+  # Read on R's main thread, the same values warn
+  expect_warning(as.data.frame(dbGetQueryArrow(con, "SELECT d FROM t ORDER BY i")), "Unknown string format")
+})
+
+test_that("a stream released on another thread doesn't keep the database locked", {
+  db <- withr::local_tempfile(fileext = ".sqlite")
+  con <- dbConnect(SQLite(), db)
+  withr::defer(dbDisconnect(con))
+  dbWriteTable(con, "t", data.frame(a = 1:1000))
+  dbExecute(con, "CREATE TABLE w (a)")
+  con2 <- dbConnect(SQLite(), db)
+  withr::defer(dbDisconnect(con2))
+  write <- function() dbExecute(con2, "INSERT INTO w VALUES (1)")
+
+  # Released in the middle of the rows while the result object is alive:
+  # clearing the result closes its statement and read transaction
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t")
+  out <- arrow_stream_read_on_thread(dbFetchArrow(rs, chunk_size = 100), 2, TRUE)
+  expect_length(out$arrays, 2)
+  expect_error(write(), "database is locked")
+  dbClearResult(rs)
+  expect_equal(write(), 1)
+
+  # Released in the middle of the rows of a result already cleared:
+  # the statement closes at once
+  out <- arrow_stream_read_on_thread(dbGetQueryArrow(con, "SELECT a FROM t", chunk_size = 100), 2, TRUE)
+  expect_length(out$arrays, 2)
+  expect_equal(write(), 1)
+
+  # Read on another thread and released on R's main thread
+  rs <- dbSendQueryArrow(con, "SELECT a FROM t")
+  stream <- dbFetchArrow(rs, chunk_size = 100)
+  out <- arrow_stream_read_on_thread(stream, 2, FALSE)
+  expect_length(out$arrays, 2)
+  dbClearResult(rs)
+  expect_error(write(), "database is locked")
+  stream$release()
+  expect_equal(write(), 1)
+})
+
+test_that("a result read on another thread can't be used, but clears", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:3))
+  msg <- "its Arrow stream is being read on another thread, for example by arrow's scanner or Acero"
+
+  # While another thread holds the result with a share of its own, as a stream
+  # read there does
+  rs <- dbSendQuery(con, "SELECT a FROM t WHERE a >= $a")
+  dbBind(rs, list(a = 2L))
+  expect_equal(dbFetch(rs, n = 1)$a, 2L)
+  result_call_while_busy(rs@ptr, function() {
+    # What doesn't use the statement works
+    expect_equal(dbGetRowCount(rs), 1L)
+    expect_false(dbHasCompleted(rs))
+    expect_equal(dbGetRowsAffected(rs), 0L)
+    expect_equal(dbGetStatement(rs), "SELECT a FROM t WHERE a >= $a")
+    expect_true(dbIsValid(rs))
+    expect_equal(dbGetInfo(rs)$row.count, 1L)
+    expect_output(show(rs), "SELECT a FROM t")
+
+    expect_error(dbFetch(rs), msg)
+    expect_error(dbFetchArrowChunk(rs), msg)
+    expect_error(dbBind(rs, list(a = 1L)), msg)
+    expect_error(dbBindArrow(rs, nanoarrow::as_nanoarrow_array_stream(data.frame(a = 1L))), msg)
+    expect_error(dbColumnInfo(rs), msg)
+    expect_silent(dbClearResult(rs))
+    expect_false(dbIsValid(rs))
+    expect_equal(dbGetQuery(con, "SELECT 42 AS x")$x, 42L)
+  })
+
+  # The next query clears the open result
+  rs <- dbSendQuery(con, "SELECT a FROM t")
+  result_call_while_busy(rs@ptr, function() {
+    expect_warning(rs2 <- dbSendQuery(con, "SELECT 42 AS x"), "Closing open result set")
+    expect_false(dbIsValid(rs))
+    expect_equal(dbFetch(rs2)$x, 42L)
+    dbClearResult(rs2)
+  })
+
+  # Once the other thread is done, the result is used as before
+  rs <- dbSendQuery(con, "SELECT a FROM t")
+  result_call_while_busy(rs@ptr, function() NULL)
+  expect_equal(dbFetch(rs)$a, 1:3)
+  dbClearResult(rs)
+})
+
+test_that("a result clears while arrow's scanner reads its stream ahead", {
+  skip_if_not_installed("arrow")
+  skip_if_not(arrow::arrow_with_dataset())
+  con <- local_con()
+  sql <- paste(
+    "WITH RECURSIVE r(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM r WHERE i < 200000)",
+    "SELECT i AS a, printf('%08d', i) AS s FROM r"
+  )
+  read_rest <- function(reader, n) {
+    while (!is.null(batch <- reader$read_next_batch())) {
+      n <- n + batch$num_rows
+    }
+    n
+  }
+
+  # The scanner goes on reading in the background after its first batch,
+  # while R clears the result and runs another query on the connection
+  rs <- dbSendQueryArrow(con, sql)
+  reader <- arrow::Scanner$create(arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 1000)))$ToRecordBatchReader()
+  batch <- reader$read_next_batch()
+  expect_gt(batch$num_rows, 0)
+  expect_silent(dbClearResult(rs))
+  expect_equal(dbGetQuery(con, "SELECT 42 AS x")$x, 42L)
+  expect_equal(read_rest(reader, batch$num_rows), 200000)
+
+  # The next query clears the open result
+  rs <- dbSendQueryArrow(con, sql)
+  reader <- arrow::Scanner$create(arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 1000)))$ToRecordBatchReader()
+  batch <- reader$read_next_batch()
+  expect_warning(x <- dbGetQuery(con, "SELECT 42 AS x")$x, "Closing open result set")
+  expect_equal(x, 42L)
+  expect_false(dbIsValid(rs))
+  expect_equal(read_rest(reader, batch$num_rows), 200000)
+})
+
+test_that("the row count and completion follow a stream that arrow's scanner reads ahead", {
+  skip_if_not_installed("arrow")
+  skip_if_not(arrow::arrow_with_dataset())
+  con <- local_con()
+  n <- 200000
+  rs <- dbSendQueryArrow(con, paste(
+    "WITH RECURSIVE r(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM r WHERE i <", n, ")",
+    "SELECT i AS a FROM r"
+  ))
+  reader <- arrow::Scanner$create(arrow::as_record_batch_reader(dbFetchArrow(rs, chunk_size = 1000)))$ToRecordBatchReader()
+
+  # Polled while the scanner reads on in the background
+  counts <- dbGetRowCount(rs)
+  completed <- dbHasCompleted(rs)
+  while (!is.null(reader$read_next_batch())) {
+    counts <- c(counts, dbGetRowCount(rs))
+    completed <- c(completed, dbHasCompleted(rs))
+  }
+  expect_false(is.unsorted(counts))
+  expect_true(all(counts >= 0 & counts <= n))
+  expect_false(is.unsorted(completed))
+  expect_equal(dbGetRowCount(rs), n)
+  expect_true(dbHasCompleted(rs))
+  dbClearResult(rs)
+})
+
+test_that("an error of the statement after dbDisconnect() keeps its result code", {
+  con <- dbConnect(SQLite(), ":memory:")
+  dbExecute(con, "CREATE TABLE t (a)")
+  dbExecute(con, "INSERT INTO t VALUES ('{\"x\": 1}'), ('{\"x\": 2}'), ('not json')")
+  rs <- dbSendQueryArrow(con, "SELECT json_extract(a, '$.x') AS x FROM t")
+  stream <- dbFetchArrow(rs, chunk_size = 1)
+  dbClearResult(rs)
+  expect_warning(dbDisconnect(con), "results in use")
+
+  expect_equal(as.data.frame(stream$get_next())$x, 1)
+  # The third row fails to evaluate while the second chunk is fetched,
+  # SQLite's message is gone with the connection
+  expect_error(stream$get_next(), "SQL logic error .*connection has been closed")
+})
+
+test_that("a result can't be bound to an Arrow stream of its own rows", {
+  con <- dbConnect(SQLite(), ":memory:")
+  rs <- dbSendQueryArrow(con, "SELECT $a AS a")
+
+  dbBind(rs, list(a = 1:3))
+  expect_error(dbBindArrow(rs, dbFetchArrow(rs)), "its own rows")
+  # A stream that wraps one fails on its first row and is not kept
+  dbBind(rs, list(a = 1:3))
+  wrapped <- nanoarrow::array_stream_set_finalizer(dbFetchArrow(rs), function() NULL)
+  expect_error(dbBindArrow(rs, wrapped), "bound to new parameters")
+
+  # No stream keeps the statement open
+  dbClearResult(rs)
+  gc()
+  expect_warning(dbDisconnect(con), NA)
+})
+
+test_that("a result can't be used from a handler of its own fetch", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
+  dbExecute(con, "INSERT INTO t VALUES (1, 'abc'), (2, zeroblob(500)), (3, 'z')")
+  in_handler <- function(fetch, use) {
+    withCallingHandlers(fetch(), warning = function(w) {
+      use()
+      invokeRestart("muffleWarning")
+    })
+  }
+  busy <- "while one of its fetches or binds is running"
+
+  # The warning about the blob in a utf8 column runs the handler while the
+  # fetch holds the bytes of that value
+  fetches <- list(
+    function(rs) dbFetchArrow(rs, chunk_size = 10)$get_next(),
+    function(rs) dbFetchArrowChunk(rs, chunk_size = 10)
+  )
+  uses <- list(
+    function(rs) dbFetch(rs),
+    function(rs) dbBind(rs, list(i = 5)),
+    function(rs) dbClearResult(rs),
+    function(rs) dbColumnInfo(rs),
+    function(rs) dbFetchArrowChunk(rs)
+  )
+  for (fetch in fetches) {
+    for (use in uses) {
+      rs <- dbSendQuery(con, "SELECT x FROM t WHERE i >= $i ORDER BY i", params = list(i = 1))
+      expect_error(in_handler(function() fetch(rs), function() use(rs)), busy)
+      # The result is usable again
+      dbBind(rs, list(i = 3))
+      expect_equal(dbFetch(rs)$x, "z")
+      dbClearResult(rs)
+    }
+  }
+
+  # The data frame path warns about mixed types as well
+  dbExecute(con, "CREATE TABLE u (i INTEGER, x)")
+  dbExecute(con, "INSERT INTO u VALUES (1, 1), (2, 'two')")
+  rs <- dbSendQuery(con, "SELECT x FROM u ORDER BY i")
+  expect_error(in_handler(function() dbFetch(rs), function() dbFetch(rs)), busy)
+  expect_silent(dbClearResult(rs))
+  # Collects the streams of the first loop, which hold their results
+  invisible(gc())
+})
+
+test_that("a result stays usable after an R error leaves its fetch by a longjmp", {
+  skip_on_cran()
+  skip_if_not(exists("mem.maxVSize", baseenv()), "mem.maxVSize() not available")
+
+  # A vector heap limit with at least 30 MB to spare, which R accepts only
+  # above the size the heap already has, and a small row before a blob 50 MB
+  # beyond the limit
+  old <- mem.maxVSize()
+  withr::defer(mem.maxVSize(old))
+  invisible(gc())
+  heap <- gc()["Vcells", ]
+  limit <- ceiling(max(heap[[4]], heap[[2]] + 30))
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (i INTEGER PRIMARY KEY, b BLOB)")
+  dbExecute(con, "INSERT INTO t VALUES (1, x'01')")
+  dbExecute(con, paste0("INSERT INTO t VALUES (2, zeroblob(", (limit + 50) * 2^20, "))"))
+  rs <- dbSendQuery(con, "SELECT i, b FROM t ORDER BY i")
+  withr::defer(if (dbIsValid(rs)) dbClearResult(rs))
+
+  # The data frame path allocates the blob with a raw R call, so the fetch
+  # fails by a longjmp that cpp11 does not see; the spare memory leaves room to
+  # handle the error
+  invisible(mem.maxVSize(limit))
+  expect_error(
+    withCallingHandlers(
+      dbFetch(rs),
+      error = function(e) invisible(mem.maxVSize(old))
+    ),
+    "vector memory"
+  )
+  invisible(mem.maxVSize(old))
+
+  # The rows read before the error are lost with the data frame of the fetch,
+  # but counted: the small row does not come again
+  expect_equal(dbGetRowCount(rs), 1L)
+
+  # The result is not left marked busy: it fetches, and it clears
+  out <- dbFetch(rs)
+  expect_equal(out$i, 2L)
+  expect_equal(lengths(out$b), (limit + 50) * 2^20)
+  expect_equal(dbGetRowCount(rs), 2L)
+  expect_silent(dbClearResult(rs))
+})
+
+test_that("a result must be bound again after its first parameter row fails", {
+  con <- local_con()
+  rs <- dbSendQuery(con, "SELECT $a AS a")
+  on.exit(dbClearResult(rs))
+  dbBind(rs, list(a = 1:3))
+  expect_equal(dbFetch(rs, n = 1)$a, 1L)
+
+  # A uint64 value above the signed range can't be bound, built from its
+  # buffer: nanoarrow needs the arrow package to convert R values to uint64
+  big <- nanoarrow::nanoarrow_array_modify(
+    nanoarrow::nanoarrow_array_init(nanoarrow::na_uint64()),
+    list(
+      length = 1,
+      null_count = 0,
+      buffers = list(NULL, nanoarrow::as_nanoarrow_buffer(as.raw(rep(0xff, 8))))
+    )
+  )
+  params <- nanoarrow::nanoarrow_array_modify(
+    nanoarrow::nanoarrow_array_init(nanoarrow::na_struct(list(a = nanoarrow::na_uint64()))),
+    list(length = 1, null_count = 0, children = list(a = big))
+  )
+  expect_error(dbBindArrow(rs, params), "outside the 64-bit signed integer range")
+
+  # The statement has lost its bindings, it has no rows to return
+  expect_error(dbFetch(rs), "needs to be bound")
+  dbBind(rs, list(a = 7L))
+  expect_equal(dbFetch(rs)$a, 7L)
+})
+
+test_that("results bound to each other's streams don't keep each other", {
+  con_a <- dbConnect(SQLite(), ":memory:")
+  con_b <- dbConnect(SQLite(), ":memory:")
+  a <- dbSendQuery(con_a, "SELECT $a AS a")
+  b <- dbSendQuery(con_b, "SELECT $a AS a")
+  dbBind(a, list(a = 1:10))
+  dbBind(b, list(a = 1:10))
+
+  # The first rows come from the chunks kept for the schemas
+  dbBindArrow(a, dbFetchArrow(b, chunk_size = 2))
+  dbBindArrow(b, dbFetchArrow(a, chunk_size = 2))
+  # Further rows of b come from a, whose further rows come from b,
+  # which was bound to new parameters
+  expect_error(dbFetch(b), "bound to new parameters")
+  # Both executions have ended and dropped their parameters
+  expect_true(dbHasCompleted(a))
+  expect_true(dbHasCompleted(b))
+
+  dbClearResult(a)
+  dbClearResult(b)
+  invisible(gc())
+  expect_warning(dbDisconnect(con_a), NA)
+  expect_warning(dbDisconnect(con_b), NA)
+})
+
+test_that("dbGetQueryArrow() reads the whole result", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = 1:3, b = letters[1:3]))
+
+  df <- as.data.frame(dbGetQueryArrow(con, "SELECT * FROM t ORDER BY a"))
+  expect_equal(df, data.frame(a = c(1, 2, 3), b = letters[1:3]))
+
+  df <- as.data.frame(dbGetQueryArrow(con, "SELECT * FROM t WHERE a > ?", params = list(1L)))
+  expect_equal(df, data.frame(a = c(2, 3), b = letters[2:3]))
+})
+
+test_that("errors of the statement surface from the stream", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (a)")
+  dbExecute(con, "INSERT INTO t VALUES ('{\"x\": 1}'), ('{\"x\": 2}'), ('not json')")
+
+  rs <- dbSendQueryArrow(con, "SELECT json_extract(a, '$.x') AS x FROM t")
+  on.exit(dbClearResult(rs))
+  stream <- dbFetchArrow(rs, chunk_size = 1)
+  expect_equal(as.data.frame(stream$get_next())$x, 1)
+
+  # The third row fails to evaluate while the second chunk is fetched
+  expect_error(stream$get_next(), "malformed JSON")
+})
+
+test_that("fetching from a cleared or unbound result fails", {
+  con <- local_con()
+  rs <- dbSendQueryArrow(con, "SELECT 1")
+  dbClearResult(rs)
+  expect_error(dbFetchArrow(rs), "Invalid result set")
+  expect_error(dbFetchArrowChunk(rs), "Invalid result set")
+
+  rs <- dbSendQueryArrow(con, "SELECT ? AS a")
+  on.exit(dbClearResult(rs))
+  expect_error(dbFetchArrow(rs), "bound")
+  expect_error(dbFetchArrowChunk(rs), "bound")
+  expect_error(dbFetch(rs), "bound")
+})
+
+test_that("chunk_size is validated", {
+  con <- local_con()
+  rs <- dbSendQueryArrow(con, "SELECT 1")
+  on.exit(dbClearResult(rs))
+  expect_error(dbFetchArrow(rs, chunk_size = 0), "chunk_size")
+  expect_error(dbFetchArrow(rs, chunk_size = 1.5), "chunk_size")
+  expect_error(dbFetchArrowChunk(rs, chunk_size = NA), "chunk_size")
+  expect_error(dbFetchArrow(rs, chunk_size = Inf), "chunk_size")
+  expect_error(dbFetchArrowChunk(rs, chunk_size = Inf), "chunk_size")
+  expect_error(dbFetchArrow(rs, chunk_size = NaN), "chunk_size")
+
+  # Beyond 2^53, the chunk size is a limit that no result reaches
+  expect_equal(as.data.frame(dbFetchArrow(rs, chunk_size = 1e300)), data.frame(`1` = 1, check.names = FALSE))
+})
+
+test_that("dbBindArrow() binds all Arrow types SQLite can store", {
+  con <- local_con()
+  rs <- dbSendQueryArrow(con, "SELECT ? AS a, typeof(?) AS b")
+  on.exit(dbClearResult(rs))
+
+  bind_one <- function(value) {
+    # Anonymous placeholders are bound by position, the columns can't be named
+    params <- structure(data.frame(value, value), names = c("", ""))
+    dbBindArrow(rs, nanoarrow::as_nanoarrow_array_stream(params))
+    as.data.frame(dbFetchArrow(rs))
+  }
+
+  expect_equal(bind_one(1L), data.frame(a = 1, b = "integer"))
+  expect_equal(bind_one(TRUE), data.frame(a = 1, b = "integer"))
+  expect_equal(bind_one(1.5), data.frame(a = 1.5, b = "real"))
+  expect_equal(bind_one("x"), data.frame(a = "x", b = "text"))
+  expect_equal(bind_one(factor("x")), data.frame(a = "x", b = "text"))
+  na_out <- bind_one(NA)
+  expect_true(is.na(na_out$a))
+  expect_equal(na_out$b, "null")
+  expect_equal(bind_one(as.Date("2020-01-02")), data.frame(a = 18263, b = "real"))
+  expect_equal(bind_one(hms::hms(61.5)), data.frame(a = 61.5, b = "real"))
+  expect_equal(
+    bind_one(as.POSIXct("2020-01-02 03:04:05.5", tz = "UTC")),
+    data.frame(a = 1577934245.5, b = "real")
+  )
+  expect_equal(
+    bind_one(blob::blob(as.raw(1:3))),
+    data.frame(a = blob::blob(as.raw(1:3)), b = "blob")
+  )
+
+  big <- bit64::as.integer64("1099511627776")
+  out <- bind_one(big)
+  expect_equal(out$a, 1099511627776)
+  expect_equal(out$b, "integer")
+})
+
+test_that("dbBindArrow() consumes batches lazily and executes once per row", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (a INTEGER, b TEXT)")
+
+  rs <- dbSendStatement(con, "INSERT INTO t VALUES (?, ?)")
+  on.exit(dbClearResult(rs))
+  unnamed <- function(...) structure(data.frame(...), names = c("", ""))
+  batches <- list(
+    nanoarrow::as_nanoarrow_array(unnamed(1:2, c("x", "y"))),
+    nanoarrow::as_nanoarrow_array(unnamed(integer(), character())),
+    nanoarrow::as_nanoarrow_array(unnamed(3L, "z"))
+  )
+  stream <- nanoarrow::basic_array_stream(batches)
+  dbBindArrow(rs, stream)
+  expect_equal(dbGetRowsAffected(rs), 3L)
+  dbClearResult(rs)
+  on.exit(NULL)
+
+  expect_equal(
+    dbReadTable(con, "t"),
+    data.frame(a = 1:3, b = c("x", "y", "z"))
+  )
+})
+
+test_that("dbBindArrow() matches named placeholders", {
+  con <- local_con()
+  rs <- dbSendQueryArrow(con, "SELECT $a AS a, :b AS b")
+  on.exit(dbClearResult(rs))
+
+  dbBindArrow(rs, data.frame(b = 2L, a = 1L))
+  expect_equal(as.data.frame(dbFetchArrow(rs)), data.frame(a = 1, b = 2))
+
+  expect_error(dbBindArrow(rs, data.frame(a = 1L)), "No value given for placeholder b")
+  expect_error(dbBindArrow(rs, data.frame(a = 1L, b = 2L, c = 3L)), "Named parameters not used")
+  expect_error(dbBindArrow(rs, structure(data.frame(1L, 2L), names = c("", ""))), "No value given")
+})
+
+test_that("dbBindArrow() rejects the wrong number and shape of parameters", {
+  con <- local_con()
+  rs <- dbSendQueryArrow(con, "SELECT ? AS a")
+  on.exit(dbClearResult(rs))
+
+  unnamed <- function(...) structure(data.frame(...), names = rep("", ...length()))
+  expect_error(dbBindArrow(rs, unnamed(1L, 2L)), "Query requires 1 params")
+  expect_error(dbBindArrow(rs, data.frame(a = 1L)), "Cannot use named parameters")
+  skip_if_not_installed("vctrs")
+  nested <- unnamed(1L)
+  nested[[1]] <- vctrs::list_of(1:2)
+  expect_error(dbBindArrow(rs, nested), "Can't bind Arrow type")
+  not_a_struct <- nanoarrow::basic_array_stream(list(nanoarrow::as_nanoarrow_array(1:3)))
+  expect_error(dbBindArrow(rs, not_a_struct), "struct")
+
+})
+
+test_that("dbBindArrow() rejects parameters for a query without placeholders", {
+  con <- local_con()
+  rs <- dbSendQueryArrow(con, "SELECT 1 AS a")
+  on.exit(dbClearResult(rs))
+  expect_error(dbBindArrow(rs, structure(data.frame(1L), names = "")), "does not require parameters")
+})
+
+test_that("dbBindArrow() checks the indices of a dictionary", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (a TEXT)")
+
+  # An index beyond the two values of the dictionary, which nanoarrow's
+  # validation does not look at
+  factors <- nanoarrow::as_nanoarrow_array(factor(c("a", "b")))
+  bad <- nanoarrow::nanoarrow_array_modify(
+    factors,
+    list(buffers = list(NULL, nanoarrow::as_nanoarrow_buffer(c(0L, 50000000L)))),
+    validate = FALSE
+  )
+  params <- nanoarrow::nanoarrow_array_modify(
+    nanoarrow::as_nanoarrow_array(data.frame(a = 1:2)),
+    list(children = list(a = bad)),
+    validate = FALSE
+  )
+  stream <- nanoarrow::basic_array_stream(
+    list(params),
+    schema = nanoarrow::na_struct(list(a = nanoarrow::infer_nanoarrow_schema(factors))),
+    validate = FALSE
+  )
+  expect_error(dbAppendTableArrow(con, "t", stream), "Dictionary index 50000000 out of range for 2 values")
+  expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 0L)
+
+  expect_equal(dbAppendTableArrow(con, "t", data.frame(a = factor(c("x", NA, "y")))), 3L)
+  expect_equal(dbReadTable(con, "t")$a, c("x", NA, "y"))
+})
+
+test_that("dbBindArrow() refuses values beyond SQLite's length limit", {
+  skip_if_not(
+    identical(Sys.getenv("RSQLITE_TEST_LARGE_ARROW"), "true"),
+    "Needs about 2 GB of memory, set RSQLITE_TEST_LARGE_ARROW=true to run"
+  )
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (s TEXT, b BLOB)")
+
+  # One value of 2^31 bytes, one more than SQLITE_MAX_LENGTH, shared by a
+  # large_utf8 and a large_binary column
+  offsets <- nanoarrow::as_nanoarrow_buffer(bit64::as.integer64(c(0, 2^31)))
+  data <- nanoarrow::as_nanoarrow_buffer(raw(2^31))
+  large <- function(type) {
+    nanoarrow::nanoarrow_array_modify(
+      nanoarrow::nanoarrow_array_init(type),
+      list(length = 1, null_count = 0, buffers = list(NULL, offsets, data))
+    )
+  }
+  for (column in c("s", "b")) {
+    type <- if (column == "s") nanoarrow::na_large_string() else nanoarrow::na_large_binary()
+    params <- nanoarrow::nanoarrow_array_modify(
+      nanoarrow::nanoarrow_array_init(nanoarrow::na_struct(stats::setNames(list(type), column))),
+      list(length = 1, null_count = 0, children = stats::setNames(list(large(type)), column))
+    )
+    expect_error(dbAppendTableArrow(con, "t", params), "Can't bind parameter 1: string or blob too big")
+  }
+  expect_equal(dbGetQuery(con, "SELECT count(*) AS n FROM t")$n, 0L)
+
+  # The 2 GiB go before the next test, see helper-memory.R
+  rm(params, data, large)
+  gc_until_stable()
+})
+
+test_that("dbAppendTableArrow() appends rows and reports their number", {
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (a INTEGER, b TEXT)")
+
+  expect_equal(dbAppendTableArrow(con, "t", data.frame(a = 1:2, b = c("x", "y"))), 2L)
+  expect_equal(dbAppendTableArrow(con, "t", data.frame(b = "z")), 1L)
+  expect_equal(dbAppendTableArrow(con, "t", data.frame(a = integer(), b = character())), 0L)
+  expect_equal(
+    dbReadTable(con, "t"),
+    data.frame(a = c(1L, 2L, NA), b = c("x", "y", "z"))
+  )
+
+  expect_error(dbAppendTableArrow(con, "t", data.frame(c = 1L)))
+  expect_error(dbAppendTableArrow(con, "t", data.frame()), "at least one column")
+  expect_error(dbAppendTableArrow(con, "missing", data.frame(a = 1L)))
+  # The failed append leaves the table unchanged
+  expect_equal(nrow(dbReadTable(con, "t")), 3L)
+})
+
+test_that("dbWriteTableArrow() and dbCreateTableArrow() create tables from Arrow data", {
+  con <- local_con()
+  stream <- nanoarrow::as_nanoarrow_array_stream(data.frame(a = 1:2, b = c(1.5, NA), c = c("x", "y")))
+  dbWriteTableArrow(con, "t", stream)
+  expect_equal(dbReadTable(con, "t"), data.frame(a = 1:2, b = c(1.5, NA), c = c("x", "y")))
+
+  expect_error(dbWriteTableArrow(con, "t", data.frame(a = 3L)), "exists")
+  dbWriteTableArrow(con, "t", data.frame(a = 3L), append = TRUE)
+  expect_equal(dbReadTable(con, "t")$a, 1:3)
+  dbWriteTableArrow(con, "t", data.frame(a = 4L), overwrite = TRUE)
+  expect_equal(dbReadTable(con, "t"), data.frame(a = 4L))
+
+  # The schema of a stream is enough to create the table, the stream is not consumed
+  stream <- nanoarrow::as_nanoarrow_array_stream(data.frame(x = bit64::as.integer64(1), y = "a"))
+  dbCreateTableArrow(con, "u", stream)
+  expect_equal(dbListFields(con, "u"), c("x", "y"))
+  expect_equal(dbAppendTableArrow(con, "u", stream), 1L)
+  expect_equal(dbReadTable(con, "u"), data.frame(x = 1L, y = "a"))
+
+  dbCreateTableArrow(con, "v", nanoarrow::infer_nanoarrow_schema(data.frame(z = 1)), field.types = c(z = "TEXT"))
+  expect_equal(dbGetQuery(con, "SELECT type FROM pragma_table_info('v')")$type, "TEXT")
+})
+
+test_that("dbReadTableArrow() reads a table", {
+  con <- local_con()
+  dbWriteTable(con, "t", data.frame(a = c(1.5, 2.5)))
+  expect_equal(as.data.frame(dbReadTableArrow(con, "t")), data.frame(a = c(1.5, 2.5)))
+})
+
+test_that("the DBItest helper skips the round-trip specs for the native methods", {
+  # helper-DBItest.R decides at load time; with an RSQLite that uses DBI's
+  # default Arrow methods, as in the copies of DBItest and DBI, it skips nothing
+  expect_true("arrow_write_table_arrow_roundtrip_integer" %in% ARROW_ROUNDTRIP_SKIPS)
+})

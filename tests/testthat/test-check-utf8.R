@@ -200,6 +200,22 @@ test_that("check_utf8 = TRUE reads valid blobs in a text column in full", {
   expect_identical(utf8_warnings(out), character())
 })
 
+test_that("check_utf8 = TRUE reads a blob by its length", {
+  skip_if_not_installed("blob")
+  con <- local_check_con()
+
+  # A bound blob, unlike a value read from a table, is not followed by NUL bytes
+  out <- with_warnings(
+    dbGetQuery(
+      con,
+      "SELECT CASE WHEN column1 = 1 THEN 'a' ELSE ? END AS x FROM (VALUES (1), (2))",
+      params = list(blob::blob(charToRaw("abcdefgh")))
+    )
+  )
+  expect_identical(out$value$x, c("a", "abcdefgh"))
+  expect_identical(utf8_warnings(out), character())
+})
+
 test_that("check_utf8 = TRUE reads empty text and blobs as empty strings", {
   con <- local_check_con()
   create_check_table(con, c("'a'", "''", "X''", "zeroblob(0)"))

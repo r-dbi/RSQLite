@@ -1,10 +1,5 @@
 # Character columns as views into their Arrow arrays: `lazy_strings = TRUE`
 
-# Whether a character vector is one of nanoarrow's views
-is_lazy <- function(x) {
-  any(grepl("altrep_chr", capture.output(.Internal(inspect(x)))))
-}
-
 test_that("lazy_strings is validated and recorded", {
   expect_error(dbConnect(SQLite(), lazy_strings = TRUE), "requires `arrow = TRUE`", fixed = TRUE)
   expect_error(dbConnect(SQLite(), arrow = TRUE, lazy_strings = NA), "must be `TRUE` or `FALSE`", fixed = TRUE)
@@ -44,16 +39,16 @@ test_that("lazy strings give the same data frames", {
   df_lazy <- dbReadTable(lazy, "t")
   expect_equal(df_eager, df_in)
   expect_equal(df_lazy, df_in)
-  expect_false(is_lazy(df_eager$s))
-  expect_true(is_lazy(df_lazy$s))
-  expect_true(is_lazy(df_lazy$t))
+  expect_false(is_lazy_strings(df_eager$s))
+  expect_true(is_lazy_strings(df_lazy$s))
+  expect_true(is_lazy_strings(df_lazy$t))
   expect_type(df_lazy$a, "integer")
 
   # Chunks, an empty tail, and a zero-row result
   rs <- dbSendQuery(lazy, "SELECT * FROM t")
   chunk <- dbFetch(rs, 3)
   expect_equal(chunk, df_in[1:3, ])
-  expect_true(is_lazy(chunk$s))
+  expect_true(is_lazy_strings(chunk$s))
   rest <- dbFetch(rs)
   expect_equal(nrow(rest), n - 3L)
   expect_equal(dbFetch(rs, 3), df_in[0, ])
@@ -75,7 +70,7 @@ test_that("lazy strings follow ptype", {
   dbExecute(con, "INSERT INTO t VALUES (1, 'a', X'0102'), (2, 'b', NULL)")
 
   df <- dbGetQuery(con, "SELECT * FROM t", ptype = list(id = character(), txt = factor(), b = blob::blob()))
-  expect_true(is_lazy(df$id))
+  expect_true(is_lazy_strings(df$id))
   expect_equal(df$id, c("1", "2"))
   expect_equal(df$txt, factor(c("a", "b")))
   expect_equal(df$b, blob::blob(as.raw(c(1, 2)), NULL))
@@ -83,13 +78,6 @@ test_that("lazy strings follow ptype", {
   df <- dbGetQuery(con, "SELECT txt FROM t", ptype = list(txt = factor(levels = c("b", "a"))))
   expect_equal(df$txt, factor(c("a", "b"), levels = c("b", "a")))
 })
-
-# Lowers the bytes of string data above which concatenated strings take the
-# large_utf8 type, from 2^31 - 1
-local_concat_utf8_max_bytes <- function(max_bytes, envir = parent.frame()) {
-  old <- arrow_set_concat_utf8_max_bytes(max_bytes)
-  withr::defer(arrow_set_concat_utf8_max_bytes(old), envir = envir)
-}
 
 test_that("concatenated strings take large_utf8 beyond the 32-bit offsets", {
   concat <- function(...) {
@@ -126,7 +114,7 @@ test_that("lazy strings beyond the 32-bit offsets give the same data frames", {
   rs <- dbSendQuery(lazy, "SELECT * FROM t")
   df <- arrow_fetch_df(rs, -1, chunk_size = 8)
   dbClearResult(rs)
-  expect_true(is_lazy(df$s))
+  expect_true(is_lazy_strings(df$s))
   expect_equal(df, dbReadTable(eager, "t"))
 })
 
@@ -153,7 +141,7 @@ test_that("lazy strings beyond 2 GiB take large_utf8", {
   df <- dbFetch(rs)
   dbClearResult(rs)
   expect_equal(df$i, 1:2049)
-  expect_true(is_lazy(df$s))
+  expect_true(is_lazy_strings(df$s))
   expect_equal(nchar(df$s[c(1, 64, 65, 2048, 2049)]), rep(2^20, 5))
 
   # The column goes with its view, before the next test
@@ -206,9 +194,9 @@ test_that("lazy fetches convert column by column to the prototypes", {
   # Only character columns stay views, factors are built from copies
   for (chunk_size in c(1, 3)) {
     df <- fetch(lazy, chunk_size)
-    expect_equal(names(df)[vapply(df, is_lazy, logical(1))], c("chr", "txt"))
+    expect_equal(names(df)[vapply(df, is_lazy_strings, logical(1))], c("chr", "txt"))
     df <- fetch(eager, chunk_size)
-    expect_false(any(vapply(df, is_lazy, logical(1))))
+    expect_false(any(vapply(df, is_lazy_strings, logical(1))))
   }
 
   # The views own their arrays
@@ -242,7 +230,7 @@ test_that("lazy fetches keep times in seconds and the coercion warning", {
   expect_identical(fetch(eager, 1), expected)
   expect_identical(fetch(lazy, 3), expected)
   expect_identical(fetch(lazy, 1), expected)
-  expect_true(is_lazy(fetch(lazy, 1)$df$s))
+  expect_true(is_lazy_strings(fetch(lazy, 1)$df$s))
 })
 
 test_that("lazy fetches count their arrays towards the collection trigger", {

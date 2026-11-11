@@ -74,6 +74,16 @@ test_that("an error among the rows a fetch asks for comes from that fetch", {
   expect_error(dbGetQuery(con, "SELECT json(v) FROM t1"), "malformed JSON")
 })
 
+test_that("dbGetQuery() with n drops an error after its rows, as LIMIT does", {
+  con <- local_json_error_at_5()
+  sql <- "SELECT id, json(v) AS j FROM t1"
+
+  # The error is kept for a next fetch, and clearing the result drops it
+  expect_silent(out <- dbGetQuery(con, sql, n = 4))
+  expect_equal(out$id, 1:4)
+  expect_equal(out, dbGetQuery(con, paste(sql, "LIMIT 4")))
+})
+
 test_that("an error after the last row of a fetch keeps it across parameter sets", {
   # Each parameter set returns one row, and the fifth fails
   for (n in c(1L, 4L)) {
@@ -109,6 +119,45 @@ test_that("an error after the last row of a fetch keeps it across parameter sets
   expect_true(dbHasCompleted(res))
   expect_equal(nrow(dbFetch(res)), 0L)
   expect_equal(dbGetRowCount(res), 2L)
+})
+
+test_that("an error kept for the next fetch keeps SQLite's message", {
+  con <- local_json_error_at_5()
+  res <- dbSendQuery(con, "SELECT id, json(v) AS j FROM t1")
+  withr::defer(dbClearResult(res))
+  expect_equal(dbFetch(res, n = 4)$id, 1:4)
+
+  # Statements that fail later overwrite the message of the connection.
+  # `dbSendQuery()` would close `res`, so they are sent internally.
+  expect_error(result_create(con@ptr, "SELECT x FROM nothere"), "no such table")
+  expect_error(
+    result_create(con@ptr, "SELECT abs(-9223372036854775807 - 1)"),
+    "integer overflow"
+  )
+
+  expect_error(dbFetch(res), "malformed JSON")
+})
+
+test_that("an SQLite message is not used as a format string", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+  dbExecute(
+    con,
+    'CREATE TABLE c (x INTEGER CONSTRAINT "positive %d%d%x" CHECK (x > 0))'
+  )
+  msg <- "CHECK constraint failed: positive %d%d%x"
+
+  res <- dbSendQuery(con, "INSERT INTO c VALUES (?) RETURNING x")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  # The second parameter set fails while a fetch steps on
+  dbBind(res, list(c(1L, -1L)))
+  expect_error(dbFetch(res), msg, fixed = TRUE)
+
+  # The second parameter set fails in the step past the last row of a fetch
+  dbBind(res, list(c(2L, -1L)))
+  expect_equal(dbFetch(res, n = 1)$x, 2L)
+  expect_error(dbFetch(res, n = 1), msg, fixed = TRUE)
 })
 
 test_that("the structure of a result stays available with an error kept", {

@@ -9,13 +9,22 @@
 
 namespace {
 
-// An error of a step, from SQLite or from a parameter that cannot be bound.
-// As a C++ exception it reaches R only when it is raised,
-// so that read_ahead() can keep it for the next fetch.
+// An error of a step, from SQLite or from a parameter that cannot be bound,
+// with SQLite's result code; SQLITE_ERROR for a parameter.
+// It leaves the C++ code only through cpp11's entry points,
+// which turn it into an R error with its message,
+// so that read_ahead() can keep it for the next fetch instead.
 class step_error : public std::runtime_error {
 public:
-  explicit step_error(const std::string& message)
-      : std::runtime_error(message) {}
+  step_error(const std::string& message, int code)
+      : std::runtime_error(message), code_(code) {}
+
+  int code() const {
+    return code_;
+  }
+
+private:
+  int code_;
 };
 
 }  // namespace
@@ -38,7 +47,8 @@ SqliteResultImpl::SqliteResultImpl(
       groups_(0),
       types_(get_initial_field_types(cache.ncols_)),
       with_alt_types_(conn_->with_alt_types()),
-      error_kept_(false) {
+      error_kept_(false),
+      kept_error_code_(SQLITE_OK) {
   try {
     if (cache.nparams_ == 0) {
       after_bind(true);
@@ -165,6 +175,7 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
   // A new execution starts: the error kept from the previous one is dropped
   error_kept_ = false;
   kept_error_.clear();
+  kept_error_code_ = SQLITE_OK;
 
   try {
     bool has_params = bind_row();
@@ -322,12 +333,16 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
         SQLITE_TRANSIENT
       );
     } else {
-      throw step_error("Can only bind lists of raw vectors (or NULL)");
+      throw step_error(
+        "Can only bind lists of raw vectors (or NULL)",
+        SQLITE_ERROR
+      );
     }
   } else {
     throw step_error(
       std::string("Don't know how to handle parameter of type ") +
-      Rf_type2char(TYPEOF(value_)) + "."
+        Rf_type2char(TYPEOF(value_)) + ".",
+      SQLITE_ERROR
     );
   }
 }
@@ -392,23 +407,18 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   return out;
 }
 
+// A failed step throws a step_error, which reaches R at the entry point
 void SqliteResultImpl::step() {
-  std::string error;
-  try {
-    while (step_run())
-      ;
-    return;
-  } catch (const step_error& e) {
-    error = e.what();
-  }
-  raise_sqlite_exception(error.c_str());
+  while (step_run())
+    ;
 }
 
 // Steps past the last row of a full fetch.
 // This step only tells whether the result is complete,
 // and finishes the statement if it is, so that it releases its locks.
 // An error is kept for the next fetch instead of costing the rows of this one;
-// SQLite's message is saved now, before later calls overwrite it.
+// SQLite's message and result code are saved now,
+// before later calls overwrite them.
 void SqliteResultImpl::read_ahead() {
   try {
     while (step_run())
@@ -416,6 +426,7 @@ void SqliteResultImpl::read_ahead() {
   } catch (const step_error& e) {
     error_kept_ = true;
     kept_error_ = e.what();
+    kept_error_code_ = e.code();
   }
 }
 
@@ -428,7 +439,7 @@ bool SqliteResultImpl::step_run() {
   case SQLITE_ROW:
     return false;
   default:
-    throw step_error(sqlite3_errmsg(conn));
+    throw step_error(sqlite3_errmsg(conn), rc);
   }
 }
 
@@ -459,16 +470,15 @@ cpp11::list SqliteResultImpl::peek_first_row() {
 }
 
 void SqliteResultImpl::raise_kept_error() {
-  std::string error;
-  error.swap(kept_error_);
+  step_error error(kept_error_, kept_error_code_);
   error_kept_ = false;
-  raise_sqlite_exception(error.c_str());
+  kept_error_.clear();
+  kept_error_code_ = SQLITE_OK;
+  throw error;
 }
 
+// Throws a C++ exception rather than an R error: cpp11 turns it into an R error
+// at the entry point, with the message as it is, not as a format string.
 void SqliteResultImpl::raise_sqlite_exception(sqlite3* conn) {
-  raise_sqlite_exception(sqlite3_errmsg(conn));
-}
-
-void SqliteResultImpl::raise_sqlite_exception(const char* message) {
-  cpp11::stop(message);
+  throw std::runtime_error(sqlite3_errmsg(conn));
 }

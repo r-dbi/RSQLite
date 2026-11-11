@@ -360,7 +360,9 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   SqliteDataFrame data(stmt, cache.names_, n_max, types_, with_alt_types_);
 
   if (complete_ && data.get_ncols() == 0) {
-    Rf_warning(
+    // Through cpp11, so that an error made of it unwinds the C++ frames
+    cpp11::warning(
+      "%s",
       "`dbGetQuery()`, `dbSendQuery()` and `dbFetch()` should only be used "
       "with `SELECT` queries. Did you mean `dbExecute()`, `dbSendStatement()` "
       "or `dbGetRowsAffected()`?"
@@ -392,14 +394,22 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
 
     out = data.get_data(types_);
   } catch (...) {
-    // Any error that leaves a fetch ends the execution, also one raised
-    // while converting values, for example a warning made an error:
-    // stepping again would silently restart a statement that failed,
+    // An error that unwinds through the C++ frames of a fetch ends the
+    // execution: a failed step or a kept error, an error that the conversion
+    // raises through cpp11, a warning raised through cpp11 that becomes an
+    // error or that a handler leaves the fetch on, or an interrupt.
+    // Stepping again would silently restart a statement that failed,
     // and fetching again would convert the same value again
-    // or go on after the rows of this fetch
+    // or go on after the rows of this fetch.
+    // Resetting the statement ends it, so that it releases its read lock.
+    // An R error that longjmps past these frames, such as a failed allocation
+    // in R's API while values are read, skips this: the result stays
+    // incomplete, and the next fetch goes on after the rows that were lost.
     complete_ = true;
     error_kept_ = false;
     kept_error_.clear();
+    kept_error_code_ = SQLITE_OK;
+    sqlite3_reset(stmt);
     throw;
   }
 

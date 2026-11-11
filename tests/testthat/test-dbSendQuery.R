@@ -319,6 +319,36 @@ test_that("a fetch whose conversion fails after reading its rows completes the r
   expect_equal(dbGetRowCount(res), 2L)
 })
 
+test_that("a result completed by an error while converting holds no lock", {
+  path <- withr::local_tempfile(fileext = ".sqlite")
+  con <- dbConnect(SQLite(), path)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, "CREATE TABLE m (x)")
+  dbExecute(con, "INSERT INTO m VALUES (1), (2), ('a'), (4), (5)")
+
+  con2 <- dbConnect(SQLite(), path)
+  on.exit(dbDisconnect(con2), add = TRUE)
+  sqliteSetBusyHandler(con2, 0L)
+
+  res <- dbSendQuery(con, "SELECT x FROM m")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  # While the result reads, its statement holds a read lock
+  expect_equal(dbFetch(res, n = 2)$x, 1:2)
+  expect_error(dbExecute(con2, "INSERT INTO m VALUES (6)"), "locked")
+
+  withr::with_options(
+    list(warn = 2),
+    expect_error(dbFetch(res, n = 2), "mixed type")
+  )
+  expect_true(dbHasCompleted(res))
+
+  # The statement is ended and holds no lock on the database
+  expect_equal(dbExecute(con2, "INSERT INTO m VALUES (6)"), 1L)
+  expect_equal(nrow(dbFetch(res)), 0L)
+})
+
 test_that("a handler that leaves a fetch on a warning completes the result", {
   con <- dbConnect(SQLite(), ":memory:")
   on.exit(dbDisconnect(con), add = TRUE)

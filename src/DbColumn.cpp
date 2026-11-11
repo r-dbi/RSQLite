@@ -83,7 +83,9 @@ void DbColumn::warn_type_conflicts(const cpp11::r_string& name) const {
   cpp11::warning(ss.str());
 }
 
-void DbColumn::warn_invalid_strings(const cpp11::r_string& name) const {
+// The name is taken as the UTF-8 bytes from sqlite3_column_name(),
+// so that nothing is allocated unless there is something to warn about
+void DbColumn::warn_invalid_strings(const std::string& name) const {
   // A peek with dbFetch(n = 0) or dbColumnInfo() reads a row without
   // returning it: the fetch that returns the row warns about it
   if (n == 0) {
@@ -96,7 +98,7 @@ void DbColumn::warn_invalid_strings(const cpp11::r_string& name) const {
   }
 
   std::stringstream ss;
-  ss << "Column `" << static_cast<std::string>(name) << "`: ";
+  ss << "Column `" << name << "`: ";
   if (n_invalid == 1) {
     ss << "1 value is not valid UTF-8 or contains a NUL byte";
   } else {

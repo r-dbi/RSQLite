@@ -43,7 +43,8 @@
 #' @param arrow When `TRUE`, data frames travel through the Arrow interface:
 #'   [DBI::dbFetch()] converts Arrow arrays filled straight from the SQLite statement,
 #'   and [DBI::dbAppendTable()] binds the data frame as an Arrow stream through [DBI::dbAppendTableArrow()].
-#'   The data frames are the same as with the default path, see [sqlite-arrow] for the rules and the exceptions.
+#'   The data frames are the same as with the default path, see [sqlite-arrow] for the rules and the exceptions,
+#'   and the `ptype` argument of [DBI::dbSendQuery()] can fix the types of the columns up front.
 #'   When this was measured, fetching a large table took less time through Arrow than on the default path,
 #'   whole or in chunks of thousands of rows,
 #'   and a fetch of a few rows took more.

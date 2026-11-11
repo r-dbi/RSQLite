@@ -107,20 +107,27 @@ cpp11::strings result_get_placeholder_names(SqliteResult* res) {
 // Arrow ///////////////////////////////////////////////////////////////////////
 
 // Requests the Arrow types of the children of `schema` for the result columns
-// at the zero-based `positions`, before the first row is fetched
+// at the zero-based `positions`, before the first row is fetched; `seconds`
+// marks the times and timestamps that a data frame fetch stores as doubles in
+// seconds, like decided ones
 [[cpp11::register]]
 void result_set_arrow_schema(
   DbResult* res,
   cpp11::sexp schema,
-  cpp11::integers positions
+  cpp11::integers positions,
+  cpp11::logicals seconds
 ) {
   if (!Rf_inherits(schema, "nanoarrow_schema")) {
     cpp11::stop("`schema` must be a nanoarrow_schema.");
   }
   const struct ArrowSchema* schema_ptr = nanoarrow_schema_from_xptr(schema);
   std::vector<int> pos(positions.begin(), positions.end());
+  std::vector<bool> secs;
+  for (R_xlen_t i = 0; i < seconds.size(); ++i) {
+    secs.push_back(seconds[i] == TRUE);
+  }
   db_arrow_release_deferred();
-  res->set_arrow_schema(schema_ptr, pos);
+  res->set_arrow_schema(schema_ptr, pos, secs);
 }
 
 // A lazy nanoarrow_array_stream over the remaining rows of the result

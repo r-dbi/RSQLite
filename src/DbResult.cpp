@@ -211,14 +211,15 @@ cpp11::strings DbResult::get_column_names() {
 
 void DbResult::set_arrow_schema(
   const struct ArrowSchema* schema,
-  const std::vector<int>& positions
+  const std::vector<int>& positions,
+  const std::vector<bool>& seconds
 ) {
   run_guarded(busy_, [&] {
     if (!is_active()) {
       throw std::runtime_error("Inactive result set");
     }
 
-    impl->set_arrow_schema(schema, positions);
+    impl->set_arrow_schema(schema, positions, seconds);
   });
 }
 

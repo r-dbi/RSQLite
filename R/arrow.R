@@ -205,6 +205,31 @@
 #' and `difftime`, `POSIXct` and `Date` columns become their numbers in their own units,
 #' as on the default path.
 #'
+#' The `ptype` argument of [DBI::dbSendQuery()], [DBI::dbGetQuery()] and [DBI::dbReadTable()]
+#' fixes the R types of some or all result columns before the first row is read:
+#' a data frame, or a named list of vectors whose values are ignored, such as
+#' `list(id = bit64::integer64(), when = as.POSIXct(character(), tz = "UTC"))`.
+#' The columns are matched to the result by name, exactly, with the errors of `schema`,
+#' and the two arguments can't be combined in [DBI::dbSendQueryArrow()] or [DBI::dbGetQueryArrow()].
+#' A column of the prototype is requested from SQLite as the Arrow type that
+#' `nanoarrow::infer_nanoarrow_schema()` gives for it, see the section on requesting types:
+#' `integer` as `int32`, so that values outside its range become `NA` with a warning,
+#' `bit64::integer64` as `int64`, `logical` as `bool`, `Date` as `date32`, and `blob` as `binary`.
+#' `POSIXct`, `POSIXlt` and `hms` columns are requested as `timestamp[us]` and `time64[us]`,
+#' but read like the times and timestamps decided from `extended_types`, whatever the declared type:
+#' as doubles in seconds, with the default path's precision and range, times outside a day included,
+#' until an Arrow stream fixes the types of the result, see above.
+#' The timestamps are read as UTC, like on both paths,
+#' and take the time zone of the prototype, the session's time zone for an empty one.
+#' A factor is read as text and converted to its levels, where other values become `NA` as with [base::factor()],
+#' or to the levels found in the values of each fetch if it has none.
+#' A prototype that nanoarrow finds no type for, one of a type that cannot be requested, such as a `difftime`,
+#' and one that nanoarrow cannot convert back to, such as an [AsIs][base::I] vector, are errors that name the column.
+#' These columns keep their types in every fetch, whatever the values,
+#' and come back exactly as described:
+#' an `integer64` column stays one whatever the values and whatever `bigint` says.
+#' The other columns are typed and converted as described above.
+#'
 #' Each fetch reads its rows into Arrow arrays first,
 #' so that the data frame is allocated once with the row count known,
 #' and releases each array as soon as it is converted:
@@ -272,16 +297,18 @@
 NULL
 
 # Requests the Arrow types of `schema` for the columns of a result:
-# a struct nanoarrow_schema, an arrow Schema, or a named list of column types
-arrow_set_schema <- function(res, schema) {
+# a struct nanoarrow_schema, an arrow Schema, or a named list of column types;
+# `arg` names the argument in error messages, and `seconds` marks the times and
+# timestamps that data frame fetches store as doubles in seconds
+arrow_set_schema <- function(res, schema, arg = "schema", seconds = NULL) {
   schema <- arrow_check_schema(schema)
   requested <- arrow_schema_names(schema)
   if (any(requested == "")) {
-    stopc("All entries of `schema` must be named")
+    stopc("All entries of `", arg, "` must be named")
   }
   if (anyDuplicated(requested)) {
     stopc(
-      "Duplicate names in `schema`: ",
+      "Duplicate names in `", arg, "`: ",
       paste0("`", unique(requested[duplicated(requested)]), "`", collapse = ", ")
     )
   }
@@ -290,19 +317,22 @@ arrow_set_schema <- function(res, schema) {
   positions <- match(requested, columns)
   if (anyNA(positions)) {
     stopc(
-      "Columns of `schema` not in the result: ",
+      "Columns of `", arg, "` not in the result: ",
       paste0("`", requested[is.na(positions)], "`", collapse = ", ")
     )
   }
   ambiguous <- requested[requested %in% columns[duplicated(columns)]]
   if (length(ambiguous) > 0) {
     stopc(
-      "Columns of `schema` that the result carries more than once: ",
+      "Columns of `", arg, "` that the result carries more than once: ",
       paste0("`", ambiguous, "`", collapse = ", ")
     )
   }
 
-  result_set_arrow_schema(res@ptr, schema, positions - 1L)
+  if (is.null(seconds)) {
+    seconds <- logical(length(requested))
+  }
+  result_set_arrow_schema(res@ptr, schema, positions - 1L, seconds)
   invisible(res)
 }
 

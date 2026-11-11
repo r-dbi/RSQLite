@@ -217,6 +217,31 @@ Before writing, factors become strings, lists of raw vectors become blobs,
 and \code{difftime}, \code{POSIXct} and \code{Date} columns become their numbers in their own units,
 as on the default path.
 
+The \code{ptype} argument of \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}}, \code{\link[DBI:dbGetQuery]{DBI::dbGetQuery()}} and \code{\link[DBI:dbReadTable]{DBI::dbReadTable()}}
+fixes the R types of some or all result columns before the first row is read:
+a data frame, or a named list of vectors whose values are ignored, such as
+\code{list(id = bit64::integer64(), when = as.POSIXct(character(), tz = "UTC"))}.
+The columns are matched to the result by name, exactly, with the errors of \code{schema},
+and the two arguments can't be combined in \code{\link[DBI:dbSendQueryArrow]{DBI::dbSendQueryArrow()}} or \code{\link[DBI:dbGetQueryArrow]{DBI::dbGetQueryArrow()}}.
+A column of the prototype is requested from SQLite as the Arrow type that
+\code{nanoarrow::infer_nanoarrow_schema()} gives for it, see the section on requesting types:
+\code{integer} as \code{int32}, so that values outside its range become \code{NA} with a warning,
+\code{bit64::integer64} as \code{int64}, \code{logical} as \code{bool}, \code{Date} as \code{date32}, and \code{blob} as \code{binary}.
+\code{POSIXct}, \code{POSIXlt} and \code{hms} columns are requested as \code{timestamp[us]} and \code{time64[us]},
+but read like the times and timestamps decided from \code{extended_types}, whatever the declared type:
+as doubles in seconds, with the default path's precision and range, times outside a day included,
+until an Arrow stream fixes the types of the result, see above.
+The timestamps are read as UTC, like on both paths,
+and take the time zone of the prototype, the session's time zone for an empty one.
+A factor is read as text and converted to its levels, where other values become \code{NA} as with \code{\link[base:factor]{base::factor()}},
+or to the levels found in the values of each fetch if it has none.
+A prototype that nanoarrow finds no type for, one of a type that cannot be requested, such as a \code{difftime},
+and one that nanoarrow cannot convert back to, such as an \link[base:I]{AsIs} vector, are errors that name the column.
+These columns keep their types in every fetch, whatever the values,
+and come back exactly as described:
+an \code{integer64} column stays one whatever the values and whatever \code{bigint} says.
+The other columns are typed and converted as described above.
+
 Each fetch reads its rows into Arrow arrays first,
 so that the data frame is allocated once with the row count known,
 and releases each array as soon as it is converted:

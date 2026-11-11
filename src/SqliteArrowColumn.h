@@ -53,15 +53,21 @@ enum ARROW_KIND {
 };
 
 // An Arrow type requested for a column: the kind, and for the time types the
-// unit and the time zone
+// unit and the time zone. A time64 or timestamp with `seconds` set, which the
+// `ptype` of a data frame fetch requests for hms and POSIXct prototypes, is
+// built like a decided one: as doubles in seconds for a data frame fetch.
 struct ArrowTarget {
   bool set;
   ARROW_KIND kind;
   enum ArrowTimeUnit unit;
   std::string timezone;
+  bool seconds;
 
   ArrowTarget()
-      : set(false), kind(AK_UNDECIDED), unit(NANOARROW_TIME_UNIT_MICRO) {}
+      : set(false),
+        kind(AK_UNDECIDED),
+        unit(NANOARROW_TIME_UNIT_MICRO),
+        seconds(false) {}
 
   // Reads the target from a schema, throws for a type that can't be filled
   static ArrowTarget from_schema(
@@ -85,6 +91,9 @@ class SqliteArrowColumn {
   bool frozen;
   // Set when the type was requested
   bool requested;
+  // Set when a requested time or timestamp is stored like a decided one, see
+  // ArrowTarget
+  bool seconds;
   // Set while the column builds arrays for a data frame fetch
   bool data_frame;
 
@@ -196,7 +205,7 @@ private:
   ARROW_KIND kind_from_decltype() const;
 
   // The type of the arrays: a time or timestamp is a double in seconds for a
-  // data frame, unless the type was requested
+  // data frame, unless the type was requested without `seconds`
   ARROW_KIND storage_kind() const;
   // The time types take the column's unit and time zone
   void set_type(struct ArrowSchema* schema, ARROW_KIND kind) const;

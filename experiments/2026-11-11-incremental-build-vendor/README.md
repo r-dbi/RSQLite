@@ -124,8 +124,8 @@ It takes about a minute with a warm ccache, and longer without, since steps 1 an
 The driver overwrites any existing in-place build of `src/`, and the next normal build recompiles everything.
 It is best run in a throwaway worktree, as the record itself was.
 The record was measured at 3b7bea34.
-The branch commit that adds the record changes nothing under `src/`, so running it from this branch prints that commit instead, with the same findings.
-If a build fails, the driver prints the step and the tail of its log to stderr, restores the files it edited and exits.
+Running it from a later commit on this branch prints that commit, with the same findings, since those commits change nothing under `src/`.
+If a build fails, the driver prints the step, the log lines that report an error, and the tail of its log to stderr, restores the files it edited and exits.
 Time stamps and paths differ between runs and machines.
 The findings rest on what each step compiled, on the dependency files, and on the indents.
 Step 1's list of regenerated `.dd` files depends on the time stamps of the checkout, so a first run from a fresh checkout may not list `cpp11.dd`.

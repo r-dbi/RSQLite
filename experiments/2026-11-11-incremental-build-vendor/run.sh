@@ -11,7 +11,7 @@
 # and deletes src/ext-http.o and src/ext-http.d,
 # so that the next build compiles ext-http.c from the restored sources.
 # The full log of each build is written to the temporary directory, which is deleted on exit,
-# so a build that fails has the tail of its log printed to stderr first.
+# so a build that fails has the step, the log lines that report an error, and the tail of its log printed to stderr first.
 
 set -euo pipefail
 
@@ -67,12 +67,14 @@ dd_summary() {
 }
 
 # Runs a build with its output in $work/<step>.log.
-# If the build fails, prints the last 30 lines of the log and the step to stderr, and exits.
+# If the build fails, prints the step, the log lines that report an error, and the last 30 lines of the log to stderr, and exits.
 build() {
   local step=$1
   shift
   if ! "$@" > "$work/$step.log" 2>&1; then
     echo "Step $step failed: $*" >&2
+    grep -E -A3 ': (fatal )?error|make: \*\*\*|^ERROR' "$work/$step.log" | head -n 30 >&2 || true
+    echo "--- last 30 lines of the log:" >&2
     tail -n 30 "$work/$step.log" >&2
     exit 1
   fi

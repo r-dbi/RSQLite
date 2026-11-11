@@ -44,6 +44,9 @@ SQLITE_EXTENSION_INIT1
 #include <stdlib.h>
 #include <math.h>
 #include <curl/curl.h>
+#define R_NO_REMAP
+#include <Rinternals.h>
+#include <R_ext/Utils.h>
 
 #ifndef SQLITE_CORE
 #define SQLITE_CORE 1
@@ -90,6 +93,21 @@ static long http_env_seconds(const char *name, long defval){
   return (long)x;
 }
 
+static void http_check_interrupt(void *data){ (void)data; R_CheckUserInterrupt(); }
+
+/* Aborts the transfer when the user interrupts R.
+   R_ToplevelExec() keeps the interrupt from jumping across SQLite and libcurl;
+   the aborted transfer then fails the read with an SQLite error.
+   libcurl before 7.32.0 has only the older progress callback, which takes doubles. */
+#if LIBCURL_VERSION_NUM >= 0x072000
+static int http_progress_cb(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow){
+#else
+static int http_progress_cb(void *p, double dltotal, double dlnow, double ultotal, double ulnow){
+#endif
+  (void)p; (void)dltotal; (void)dlnow; (void)ultotal; (void)ulnow;
+  return !R_ToplevelExec(http_check_interrupt, NULL);
+}
+
 /* Creates every handle, with limits so that a server that stops answering fails the transfer
    instead of blocking R: connecting may take RSQLITE_HTTP_CONNECT_TIMEOUT seconds (default 30),
    and a transfer that receives less than one byte per second for RSQLITE_HTTP_STALL_TIMEOUT seconds
@@ -100,7 +118,13 @@ static CURL *http_easy_init(void){
   if(!curl) return 0;
   if(curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, http_env_seconds("RSQLITE_HTTP_CONNECT_TIMEOUT", 30)) != CURLE_OK ||
      curl_easy_setopt(curl, CURLOPT_LOW_SPEED_LIMIT, 1L) != CURLE_OK ||
-     curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, http_env_seconds("RSQLITE_HTTP_STALL_TIMEOUT", 60)) != CURLE_OK){
+     curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, http_env_seconds("RSQLITE_HTTP_STALL_TIMEOUT", 60)) != CURLE_OK ||
+#if LIBCURL_VERSION_NUM >= 0x072000
+     curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, http_progress_cb) != CURLE_OK ||
+#else
+     curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, http_progress_cb) != CURLE_OK ||
+#endif
+     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L) != CURLE_OK){
     curl_easy_cleanup(curl);
     return 0;
   }
@@ -266,9 +290,9 @@ static int http_probe_meta_uncached(HttpFile *hf){
   curl_easy_setopt(hf->curl, CURLOPT_NOBODY, 0L);
   curl_easy_setopt(hf->curl, CURLOPT_HEADERFUNCTION, NULL);
   curl_easy_setopt(hf->curl, CURLOPT_HEADERDATA, NULL);
-  /* Without a connection, the request below would only wait again. */
+  /* Without a connection, or once interrupted, the request below would only wait again. */
   if(rc == CURLE_COULDNT_RESOLVE_HOST || rc == CURLE_COULDNT_CONNECT ||
-     rc == CURLE_OPERATION_TIMEDOUT){
+     rc == CURLE_OPERATION_TIMEDOUT || rc == CURLE_ABORTED_BY_CALLBACK){
     return SQLITE_CANTOPEN;
   }
   if(rc == CURLE_OK && code < 400){
@@ -316,7 +340,7 @@ static int http_probe_meta_uncached(HttpFile *hf){
 }
 
 /* A failed probe is not repeated within one open,
-   so that a server that does not answer costs one timeout. */
+   so that a server that does not answer costs one timeout, and one interrupt aborts the open. */
 static int http_probe_meta(HttpFile *hf){
   if(hf->have_meta) return SQLITE_OK;
   if(hf->probe_rc == SQLITE_OK) hf->probe_rc = http_probe_meta_uncached(hf);

@@ -22,7 +22,7 @@
 #' and libcurl 8.19.0 or later caps the stall timeout at 65535 seconds (about 18 hours).
 #' Anything else uses the default.
 #'
-#' An aborted transfer fails the open or the query with an SQLite error.
+#' An aborted transfer, or one interrupted by the user, fails the open or the query with an SQLite error.
 #'
 #' @param cache_size_mb Integer megabytes for in-memory page cache.
 #'   `NULL` leaves unchanged.

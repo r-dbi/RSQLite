@@ -369,6 +369,58 @@ test_that("a handler that leaves a fetch on a warning completes the result", {
   expect_equal(nrow(dbFetch(res)), 0L)
 })
 
+test_that("an interrupt completes the result of a fetch", {
+  skip_on_cran()
+  skip_if(getRversion() < "4.0")
+
+  # This test makes use of the installed package!
+  session <- callr::r_session$new()
+  on.exit(session$close(), add = TRUE)
+  session$run(function() {
+    .GlobalEnv$con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+    .GlobalEnv$res <- DBI::dbSendQuery(
+      .GlobalEnv$con,
+      "WITH RECURSIVE s(x) AS (SELECT 1 UNION ALL SELECT x + 1 FROM s)
+       SELECT x FROM s LIMIT 50000000"
+    )
+    NULL
+  })
+
+  session$call(function() {
+    tryCatch(
+      DBI::dbFetch(.GlobalEnv$res, n = -1),
+      interrupt = function(e) {
+        writeLines("interrupted")
+      }
+    )
+    writeLines("done")
+  })
+
+  expect_equal(session$poll_process(500), "timeout")
+  expect_equal(session$get_state(), "busy")
+
+  expect_true(session$interrupt())
+
+  expect_equal(session$poll_process(5000), "ready")
+  out <- session$read()
+  expect_equal(out$code, 200)
+  expect_equal(gsub("\r", "", out$stdout), "interrupted\ndone\n")
+  expect_equal(session$get_state(), "idle")
+
+  # The rows of the interrupted fetch are lost, and the result has ended
+  # instead of going on after them
+  state <- session$run(function() {
+    list(
+      completed = DBI::dbHasCompleted(.GlobalEnv$res),
+      count = DBI::dbGetRowCount(.GlobalEnv$res),
+      rows = nrow(DBI::dbFetch(.GlobalEnv$res))
+    )
+  })
+  expect_true(state$completed)
+  expect_equal(state$count, 0L)
+  expect_equal(state$rows, 0L)
+})
+
 test_that("a fetch whose conversion fails before reading on completes the result", {
   con <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
   on.exit(dbDisconnect(con), add = TRUE)

@@ -13,6 +13,17 @@
 #' - `RSQLITE_HTTP_FALLBACK_FULLDL`: If `TRUE` (default), fall back to full download when the server does not support HTTP Range;
 #'   if `FALSE`, open will fail.
 #'
+#' Two more variables, without an argument here, limit how long a transfer may wait:
+#' - `RSQLITE_HTTP_CONNECT_TIMEOUT`: Seconds to wait for a connection to the server (default 30).
+#' - `RSQLITE_HTTP_STALL_TIMEOUT`: Seconds a transfer may receive less than one byte per second before it is aborted (default 60).
+#'
+#' Only whole numbers of seconds of at least 1 are honored, in any notation such as `120` or `1e+05`.
+#' Larger values than 2147483 seconds (about 25 days) are capped,
+#' and libcurl 8.19.0 or later caps the stall timeout at 65535 seconds (about 18 hours).
+#' Anything else uses the default.
+#'
+#' An aborted transfer fails the open or the query with an SQLite error.
+#'
 #' @param cache_size_mb Integer megabytes for in-memory page cache.
 #'   `NULL` leaves unchanged.
 #' @param prefetch_pages Integer pages to prefetch ahead.

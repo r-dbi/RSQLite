@@ -77,3 +77,19 @@ test_that("http VFS fails open without Range when fallback disabled", {
   # Opening reads the file header, which needs a Range request.
   expect_error(sqliteRemote(server$url), "disk I/O error")
 })
+
+test_that("http VFS gives up on a server that never answers", {
+  skip_if_no_http_vfs()
+
+  withr::local_envvar(RSQLITE_HTTP_STALL_TIMEOUT = "1")
+
+  server <- local_http_server(raw(), ranges = FALSE, answer = FALSE)
+
+  time <- system.time(
+    expect_error(sqliteRemote(server$url), "unable to open database file")
+  )
+  # The default stall timeout is a minute.
+  expect_lt(time[["elapsed"]], 30)
+  # The server got the HEAD, so the open stalled instead of failing to connect.
+  expect_equal(server$requests(), "HEAD")
+})

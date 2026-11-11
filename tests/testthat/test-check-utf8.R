@@ -121,6 +121,41 @@ test_that("the RSQLite.check_utf8 option sets the default", {
   )
 })
 
+test_that("check_utf8 must be TRUE or FALSE", {
+  withr::local_options(RSQLite.check_utf8 = NULL)
+  message <- paste(
+    "`check_utf8` must be TRUE or FALSE",
+    "(it defaults to the option RSQLite.check_utf8)."
+  )
+
+  for (value in list("TRUE", 1, NA, c(TRUE, TRUE), logical(), NULL)) {
+    expect_error(
+      dbConnect(SQLite(), check_utf8 = value),
+      message,
+      fixed = TRUE,
+      info = deparse(value)
+    )
+  }
+})
+
+test_that("the RSQLite.check_utf8 option must be TRUE or FALSE", {
+  message <- paste(
+    "`check_utf8` must be TRUE or FALSE",
+    "(it defaults to the option RSQLite.check_utf8)."
+  )
+
+  for (value in list("TRUE", 1, NA, c(TRUE, TRUE))) {
+    withr::with_options(list(RSQLite.check_utf8 = value), {
+      expect_error(dbConnect(SQLite()), message, fixed = TRUE, info = deparse(value))
+
+      # An argument overrides the option without looking at it
+      con <- dbConnect(SQLite(), check_utf8 = FALSE)
+      expect_false(con@check_utf8)
+      dbDisconnect(con)
+    })
+  }
+})
+
 test_that("check_utf8 = TRUE turns invalid text into NA, with a warning", {
   con <- local_check_con()
   dbExecute(con, "CREATE TABLE t (x, y)")

@@ -108,6 +108,9 @@ dbConnect_SQLiteDriver <- function(drv, dbname = "", ..., loadable.extensions = 
   if (extended_types) {
     check_suggested("hms", "dbConnect")
   }
+  if (!is.logical(check_utf8) || length(check_utf8) != 1L || is.na(check_utf8)) {
+    stopc("`check_utf8` must be TRUE or FALSE (it defaults to the option RSQLite.check_utf8).")
+  }
   check_utf8 <- isTRUE(check_utf8)
 
   conn <- new("SQLiteConnection",

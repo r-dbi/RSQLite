@@ -9,7 +9,8 @@ dbConnect_SQLiteConnection <- function(drv, ...) {
     vfs = drv@vfs, flags = drv@flags,
     loadable.extensions = drv@loadable.extensions,
     bigint = drv@bigint, extended_types = drv@extended_types,
-    arrow = drv@arrow
+    arrow = drv@arrow,
+    lazy_strings = drv@lazy_strings
   )
 }
 #' @rdname SQLite

@@ -49,6 +49,10 @@
 #'   whole or in chunks of thousands of rows,
 #'   and a fetch of a few rows took more.
 #'   Experimental, defaults to `FALSE`.
+#' @param lazy_strings When `TRUE`, with `arrow = TRUE`, the character columns of a fetched data frame
+#'   stay views into Arrow arrays instead of being copied into R's strings,
+#'   see the section on data frames in [sqlite-arrow] for what that costs.
+#'   Experimental, defaults to `FALSE`.
 #'
 #' @return `dbConnect()` returns an object of class [SQLiteConnection-class].
 #'
@@ -92,7 +96,7 @@ dbConnect_SQLiteDriver <- function(drv, dbname = "", ..., loadable.extensions = 
                                    default.extensions = loadable.extensions, cache_size = NULL,
                                    synchronous = "off", flags = SQLITE_RWC, vfs = NULL,
                                    bigint = c("integer64", "integer", "numeric", "character"),
-                                   extended_types = FALSE, arrow = FALSE) {
+                                   extended_types = FALSE, arrow = FALSE, lazy_strings = FALSE) {
   stopifnot(length(dbname) == 1, !is.na(dbname))
 
   if (!is_url_or_special_filename(dbname)) {
@@ -114,6 +118,12 @@ dbConnect_SQLiteDriver <- function(drv, dbname = "", ..., loadable.extensions = 
   if (!is.logical(arrow) || length(arrow) != 1L || is.na(arrow)) {
     stopc("`arrow` must be `TRUE` or `FALSE`")
   }
+  if (!is.logical(lazy_strings) || length(lazy_strings) != 1L || is.na(lazy_strings)) {
+    stopc("`lazy_strings` must be `TRUE` or `FALSE`")
+  }
+  if (lazy_strings && !arrow) {
+    stopc("`lazy_strings = TRUE` requires `arrow = TRUE`")
+  }
 
   conn <- new("SQLiteConnection",
     ptr = connection_connect(dbname, loadable.extensions, flags, vfs, extended_types),
@@ -124,7 +134,8 @@ dbConnect_SQLiteDriver <- function(drv, dbname = "", ..., loadable.extensions = 
     ref = new.env(parent = emptyenv()),
     bigint = bigint,
     extended_types = extended_types,
-    arrow = arrow
+    arrow = arrow,
+    lazy_strings = lazy_strings
   )
 
   ## experimental PRAGMAs

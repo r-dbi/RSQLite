@@ -32,7 +32,8 @@ SQLite(...)
   vfs = NULL,
   bigint = c("integer64", "integer", "numeric", "character"),
   extended_types = FALSE,
-  arrow = FALSE
+  arrow = FALSE,
+  lazy_strings = FALSE
 )
 
 \S4method{dbDisconnect}{SQLiteConnection}(conn, ...)
@@ -100,6 +101,11 @@ and the \code{ptype} argument of \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()
 When this was measured, fetching a large table took less time through Arrow than on the default path,
 whole or in chunks of thousands of rows,
 and a fetch of a few rows took more.
+Experimental, defaults to \code{FALSE}.}
+
+\item{lazy_strings}{When \code{TRUE}, with \code{arrow = TRUE}, the character columns of a fetched data frame
+stay views into Arrow arrays instead of being copied into R's strings,
+see the section on data frames in \link{sqlite-arrow} for what that costs.
 Experimental, defaults to \code{FALSE}.}
 }
 \value{

@@ -28,7 +28,7 @@ arrow_fetch_df <- function(res, n, chunk_size = ARROW_DF_CHUNK_SIZE) {
     return(data.frame())
   }
 
-  df <- arrow_to_df(fetched, res@conn@bigint, res@ptype)
+  df <- arrow_to_df(fetched, res@conn@bigint, res@ptype, res@conn@lazy_strings)
   # Last, once the result is ready for the next fetch: a handler of the warning
   # can use it, and an error raised from the warning only loses these rows
   if (!is.null(fetched$coercions)) {
@@ -120,8 +120,10 @@ arrow_ptype_column_schema <- function(col, name) {
 # this fetch or an earlier one, and the class of the columns of times and
 # timestamps, which come as doubles in seconds like on the default path.
 # The columns of `ptype` are converted to its types.
+# With `lazy_strings`, a character column without a prototype, or with a plain
+# `character()` one, stays a view into an array of its own.
 # The work is done on a plain list, small fetches pay for every R call.
-arrow_to_df <- function(fetched, bigint, ptype = NULL) {
+arrow_to_df <- function(fetched, bigint, ptype = NULL, lazy_strings = FALSE) {
   formats <- fetched$formats
   to <- arrow_df_ptype(formats, fetched$names)
   arrays <- fetched$arrays
@@ -139,7 +141,17 @@ arrow_to_df <- function(fetched, bigint, ptype = NULL) {
     to[[requested[[i]]]] <- if (factors[[i]]) character() else ptype[[i]]
   }
 
-  if (length(arrays) == 1L) {
+  lazy <- logical(length(formats))
+  if (lazy_strings) {
+    lazy <- formats %in% c("u", "U") &
+      vlapply(to, function(col) is.character(col) && is.null(attributes(col)), USE.NAMES = FALSE)
+    # Built from copies
+    lazy[requested[factors]] <- FALSE
+  }
+
+  if (any(lazy) && length(arrays) > 0L) {
+    columns <- arrow_lazy_columns(arrays, to, fetched$n, lazy)
+  } else if (length(arrays) == 1L) {
     # One array holds all rows, such as a fetch of fewer rows than a chunk:
     # nanoarrow's columns are the data frame, except that its character
     # vectors read from the array until they are touched, so these are copied
@@ -211,6 +223,38 @@ arrow_arrays_to_columns <- function(arrays, lengths, ptype, size) {
   for (j in seq_along(columns)) {
     attributes(columns[[j]]) <- attributes(ptype[[j]])
   }
+  columns
+}
+
+# The columns of all rows of several arrays with `lazy_strings`, as a list:
+# the arrays are split by column, so that a view holds only the strings of its
+# own column.
+# The columns in `lazy` are concatenated into one array each, which a view
+# keeps until the garbage collector frees it; nanoarrow fills each of the
+# other columns in one vector and releases its arrays to the collector.
+# The collector does not see the memory of these arrays: they count towards
+# the collections that arrow_chunk_handed_out() triggers.
+arrow_lazy_columns <- function(arrays, ptype, size, lazy) {
+  split <- arrow_split_columns(arrays)
+  streams <- split$streams
+  size <- as.integer(size)
+  columns <- vector("list", length(streams))
+  names(columns) <- names(ptype)
+  bytes <- 0
+  for (j in seq_along(streams)) {
+    if (lazy[[j]]) {
+      strings <- arrow_concat_strings(streams[[j]])
+      columns[[j]] <- nanoarrow::convert_array(strings$array, to = ptype[[j]])
+      bytes <- bytes + strings$bytes
+    } else {
+      col <- nanoarrow::convert_array_stream(streams[[j]], to = ptype[[j]], size = size)
+      nanoarrow::nanoarrow_pointer_release(streams[[j]])
+      attributes(col) <- attributes(ptype[[j]])
+      columns[[j]] <- col
+      bytes <- bytes + split$bytes[[j]]
+    }
+  }
+  arrow_chunk_handed_out(bytes)
   columns
 }
 

@@ -169,3 +169,15 @@ expect_int64_bits <- function(array, expected) {
   wanted <- matrix(writeBin(unclass(wanted), raw()), nrow = 8)
   expect_equal(actual[, !is_null], wanted[, !is_null])
 }
+
+# Whether a character vector is one of nanoarrow's views
+is_lazy_strings <- function(x) {
+  any(grepl("altrep_chr", capture.output(.Internal(inspect(x)))))
+}
+
+# Lowers the bytes of string data above which concatenated strings take the
+# large_utf8 type, from 2^31 - 1
+local_concat_utf8_max_bytes <- function(max_bytes, envir = parent.frame()) {
+  old <- arrow_set_concat_utf8_max_bytes(max_bytes)
+  withr::defer(arrow_set_concat_utf8_max_bytes(old), envir = envir)
+}

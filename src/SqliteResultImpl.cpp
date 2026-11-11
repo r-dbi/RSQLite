@@ -402,6 +402,8 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
     // and fetching again would convert the same value again
     // or go on after the rows of this fetch.
     // Resetting the statement ends it, so that it releases its read lock.
+    // The statement is still there: a handler can't clear the result while
+    // the fetch runs, see run_guarded() in DbResult.cpp.
     // An R error that longjmps past these frames, such as a failed allocation
     // in R's API while values are read, skips this: the result stays
     // incomplete, and the next fetch goes on after the rows that were lost.

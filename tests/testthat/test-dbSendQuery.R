@@ -369,6 +369,159 @@ test_that("a handler that leaves a fetch on a warning completes the result", {
   expect_equal(nrow(dbFetch(res)), 0L)
 })
 
+test_that("a handler can't clear a result while its fetch runs", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, "CREATE TABLE m (x)")
+  dbExecute(con, "INSERT INTO m VALUES (1), (2), ('a'), (4), (5)")
+
+  res <- dbSendQuery(con, "SELECT x FROM m")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  expect_equal(dbFetch(res, n = 2)$x, 1:2)
+  # Clearing it would free the statement under the fetch
+  expect_error(
+    withCallingHandlers(
+      dbFetch(res, n = 2),
+      warning = function(w) {
+        dbClearResult(res)
+        stop("x")
+      }
+    ),
+    "Can't clear a result while one of its fetches or binds is running"
+  )
+
+  # The error left the fetch, which completed the result
+  expect_true(dbIsValid(res))
+  expect_true(dbHasCompleted(res))
+  expect_equal(dbGetRowCount(res), 2L)
+  expect_equal(dbColumnInfo(res)$name, "x")
+  expect_equal(nrow(dbFetch(res)), 0L)
+})
+
+test_that("a handler can't clear a result and muffle the warning of its fetch", {
+  con <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, "CREATE TABLE d (x DATE)")
+  dbExecute(
+    con,
+    "INSERT INTO d VALUES ('2026-01-01'), ('oops'), ('2026-01-03')"
+  )
+
+  res <- dbSendQuery(con, "SELECT x FROM d")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  # The muffled fetch would go on stepping the statement
+  expect_error(
+    withCallingHandlers(
+      dbFetch(res),
+      warning = function(w) {
+        dbClearResult(res)
+        invokeRestart("muffleWarning")
+      }
+    ),
+    "Can't clear a result while one of its fetches or binds is running"
+  )
+
+  expect_true(dbIsValid(res))
+  expect_true(dbHasCompleted(res))
+  expect_equal(nrow(dbFetch(res)), 0L)
+})
+
+test_that("a handler of `rlang::try_fetch()` can't clear a result while its fetch runs", {
+  con <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, "CREATE TABLE d (x DATE)")
+  dbExecute(
+    con,
+    "INSERT INTO d VALUES ('2026-01-01'), ('oops'), ('2026-01-03')"
+  )
+
+  res <- dbSendQuery(con, "SELECT x FROM d")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  # The handler runs before the fetch is left
+  expect_error(
+    rlang::try_fetch(
+      dbFetch(res),
+      warning = function(cnd) {
+        dbClearResult(res)
+        NULL
+      }
+    ),
+    "Can't clear a result while one of its fetches or binds is running"
+  )
+
+  expect_true(dbIsValid(res))
+  expect_true(dbHasCompleted(res))
+  expect_equal(nrow(dbFetch(res)), 0L)
+})
+
+test_that("a handler can't clear a result while its column info is read", {
+  con <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, "CREATE TABLE d (x DATE)")
+  dbExecute(con, "INSERT INTO d VALUES ('oops'), ('2026-01-02')")
+
+  res <- dbSendQuery(con, "SELECT x FROM d")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  # The column info converts the first row, which warns
+  expect_error(
+    withCallingHandlers(
+      dbColumnInfo(res),
+      warning = function(w) {
+        dbClearResult(res)
+        invokeRestart("muffleWarning")
+      }
+    ),
+    "Can't clear a result while one of its fetches or binds is running"
+  )
+
+  # Reading the column info fetches no row
+  expect_false(dbHasCompleted(res))
+  expect_warning(out <- dbFetch(res), "Unknown string format")
+  expect_equal(out$x, as.Date(c(NA, "2026-01-02")))
+})
+
+test_that("a busy handler can't clear the result whose bind waits for it", {
+  path <- withr::local_tempfile(fileext = ".sqlite")
+  con <- dbConnect(SQLite(), path)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1)")
+
+  con2 <- dbConnect(SQLite(), path)
+  on.exit(dbDisconnect(con2), add = TRUE)
+
+  res <- dbSendQuery(con2, "SELECT x FROM t WHERE x = ?")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  # The busy handler swallows errors, the message is kept here
+  cleared <- NULL
+  sqliteSetBusyHandler(con2, function(n) {
+    cleared <<- tryCatch(dbClearResult(res), error = conditionMessage)
+    0L
+  })
+
+  dbExecute(con, "BEGIN EXCLUSIVE")
+  expect_error(dbBind(res, list(1)), "locked")
+  expect_match(
+    cleared,
+    "Can't clear a result while one of its fetches or binds is running"
+  )
+  dbExecute(con, "COMMIT")
+
+  expect_true(dbIsValid(res))
+  dbBind(res, list(1))
+  expect_equal(dbFetch(res)$x, 1)
+})
+
 test_that("an interrupt completes the result of a fetch", {
   skip_on_cran()
   skip_if(getRversion() < "4.0")

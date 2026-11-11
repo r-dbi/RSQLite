@@ -15,6 +15,14 @@ cpp11::external_pointer<DbResult> result_create(
 
 [[cpp11::register]]
 void result_release(cpp11::external_pointer<DbResult> res) {
+  DbResult* ptr = res.get();
+  if (ptr != NULL && ptr->busy()) {
+    // Freeing it would pull the statement from under the running fetch
+    cpp11::stop(
+      "Can't clear a result while one of its fetches or binds is running, "
+      "as from a handler of a warning that it raised."
+    );
+  }
   res.reset();
 }
 

@@ -201,7 +201,26 @@ void DbResult::close() {
   }
 }
 
+cpp11::strings DbResult::get_column_names() {
+  cpp11::strings out;
+  run_guarded(busy_, [&] { out = impl->get_column_names(); });
+  return out;
+}
+
 // Arrow ///////////////////////////////////////////////////////////////////////
+
+void DbResult::set_arrow_schema(
+  const struct ArrowSchema* schema,
+  const std::vector<int>& positions
+) {
+  run_guarded(busy_, [&] {
+    if (!is_active()) {
+      throw std::runtime_error("Inactive result set");
+    }
+
+    impl->set_arrow_schema(schema, positions);
+  });
+}
 
 // No is_active() check, unlike fetch(): a lazy Arrow stream reads on after the
 // R result object has been cleared and while other results are in use on the

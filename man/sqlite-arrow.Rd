@@ -27,7 +27,8 @@ The types can therefore depend on \code{chunk_size}:
 a real number in a later chunk is truncated to fit an \code{int64} column decided from integers,
 and a column whose first chunk holds only \code{NULL} keeps its declared type,
 or the null type without a declaration, for the whole result.
-The default chunk size makes this rare, a small \code{chunk_size} makes it likely.
+The default chunk size makes this rare, a small \code{chunk_size} makes it likely,
+and a \code{schema} fixes the types up front, see the section on requesting types.
 A value in a column of the null type becomes \code{NULL}.
 Text and blobs in a \code{utf8} column are kept only if they are valid UTF-8 without NUL bytes,
 which SQLite does not enforce,
@@ -38,7 +39,8 @@ Converted and dropped values are reported with one warning per chunk, of class \
 that lists the affected columns with their types and the 1-based row numbers in the result.
 It is raised when the chunk is fetched from the result:
 for a lazy stream when the array is requested,
-and for the first chunk when the schema is requested before it, see the section on chunking.
+and for the first chunk when the schema is requested before it
+and a column has no requested type, see the sections on chunking and on requesting types.
 The warning carries the details in its \code{coercions} field.
 A handler of the warning runs while the result is still busy with the chunk:
 it gets an error if it fetches from, binds, inspects or clears that result.\tabular{ll}{
@@ -64,6 +66,65 @@ a number of seconds beyond about 9.2e12 either way, or an infinity, becomes \cod
 A time is a time of day, at least 0 and less than 24 hours:
 other values, which the data frame path keeps as \code{hms} durations, become \code{NULL}.
 Both are reported as out of range in the warning about the chunk.
+}
+
+\section{Requesting types}{
+
+The \code{schema} argument of \code{\link[DBI:dbSendQueryArrow]{DBI::dbSendQueryArrow()}}, \code{\link[DBI:dbGetQueryArrow]{DBI::dbGetQueryArrow()}}
+and \code{\link[DBI:dbReadTableArrow]{DBI::dbReadTableArrow()}} fixes the Arrow types of some or all result columns
+before the first row is read:
+a struct \code{nanoarrow_schema}, an arrow \code{Schema},
+or a named list of column types such as
+\code{list(id = nanoarrow::na_int32(), when = nanoarrow::na_timestamp("ms", "UTC"))}.
+The entries are matched to the result columns by name, exactly.
+A name that is not in the result, a name the result carries twice,
+and an unnamed entry are errors.
+The names and types are checked once the query has been sent,
+so a statement with side effects, such as \verb{INSERT ... RETURNING}, has run when they fail.
+A column with a requested type is typed without looking at its values,
+with no widening and no dependence on \code{chunk_size},
+and its declared type and \code{extended_types} play no part;
+the other columns are typed as described above.
+The requested types are kept when the query is executed again with \code{\link[DBI:dbBind]{DBI::dbBind()}},
+and by the data frame fetches of a connection with \code{arrow = TRUE}, see the section on data frames,
+where nanoarrow converts them to R types.
+There they take precedence over the types that a fetch carries over from an earlier execution,
+and a requested time or timestamp has the requested unit and time zone,
+where a decided one travels as seconds.
+
+The types that can be requested are
+\code{null}, \code{bool}, \code{int8} to \code{int64}, \code{uint8} to \code{uint64}, \code{float}, \code{double},
+\code{utf8} and \code{large_utf8}, \code{binary} and \code{large_binary}, \code{date32} and \code{date64},
+\code{time32} and \code{time64} in any unit, and \code{timestamp} in any unit and time zone.
+Dates, times and timestamps are parsed from their text form like \code{extended_types = TRUE} does it,
+a timestamp is read as UTC and only labelled with the requested time zone.
+A number is a count of days for a date, truncated, and of seconds for a time or timestamp.
+Times and timestamps are rounded to the nearest tick of their unit,
+a time to the last tick of the day at most:
+exactly for an integer and for text, which is read to the microsecond,
+and in double precision for a real.
+Dictionary, decimal, nested and extension types are an error.
+
+Values of another storage class than the column's type follow these rules,
+whether the type was requested or decided from the values:
+\itemize{
+\item silently: integers into a floating point type,
+integers and reals into a text type, where SQLite renders them,
+and text into a binary type, as its bytes;
+\item converted by SQLite, with the warning described above:
+text and blobs into a numeric type,
+and reals into an integer type, truncated, or into \code{bool}, true unless zero;
+\item \code{NULL}, with the warning: a blob into a text type unless it is valid UTF-8 without NUL bytes,
+like text itself, see above,
+a number outside the range of an integer type,
+including a real or the integer at the start of a text beyond 64 bits, which SQLite would saturate,
+a finite number beyond the range of \code{float},
+a date outside the range of its type, such as a number of days beyond \code{2^31 - 1} for \code{date32},
+a time outside a day, from 0 up to 24 hours excluded,
+a timestamp outside the range of its unit, such as nanoseconds after 2262,
+a date or time that cannot be parsed,
+and any value into the null type.
+}
 }
 
 \section{Parameters}{
@@ -93,11 +154,15 @@ and \code{\link[DBI:dbAppendTable]{DBI::dbAppendTable()}} writes the data frame 
 The conversion follows nanoarrow's rules, with these additions:
 an \code{int64} column becomes an \code{integer} if all its values fit,
 and follows the \code{bigint} argument of \code{\link[DBI:dbConnect]{DBI::dbConnect()}} otherwise, also in the later fetches of the result;
+a requested \code{uint64} column does the same,
+but becomes a \code{double} once a value is beyond \code{2^63 - 1}, which \code{integer64} cannot hold,
+also in the later fetches until the query is bound again,
+where nanoarrow would wrap such a value to a negative \code{integer64} and the stream holds it exactly;
 a \code{null} column becomes a \code{logical}.
 \code{date32} columns become \code{Date} and \code{binary} columns become \link[blob:blob]{blob::blob} objects,
 as on the default path.
 Times and timestamps become \code{hms} and \code{POSIXct} in UTC,
-and travel as doubles in seconds in both directions,
+and travel as doubles in seconds in both directions unless their type was requested,
 so they keep the default path's precision and range, times outside a day included,
 where a stream has microseconds and only times of day.
 Text ends at its first NUL character and is not checked for UTF-8, as on the default path,
@@ -106,7 +171,8 @@ A blob in a text column is text only if it is valid UTF-8 without NUL bytes, as 
 and \code{NA} otherwise, reported in the warning of the fetch,
 where the default path ends it at its first NUL byte and does not check it.
 
-Unlike a stream, each fetch decides the types of its columns, the way the default path does it:
+Unlike a stream, each fetch decides the types of its columns without a requested type,
+the way the default path does it:
 the first value that is not \code{NULL} decides,
 integers become doubles when a real number follows in the same fetch,
 and a column without a value takes its declared type, or \code{logical} without one.
@@ -115,7 +181,7 @@ except that it decides a \code{logical} column again.
 \code{\link[DBI:dbColumnInfo]{DBI::dbColumnInfo()}} names the types that a fetch of no rows returns,
 and decides them for the next fetch like on the default path,
 without converting the values of the next row.
-Three differences remain.
+Four differences remain.
 The default path truncates a real number that follows an integer too large for an \code{integer},
 with a warning, here the column becomes a \code{double},
 which keeps the real number but rounds the integers beyond \code{2^53}.
@@ -123,6 +189,10 @@ It also truncates a string or blob converted to an integer too large for an \cod
 here the column follows \code{bigint} from then on, as for such an integer.
 The default path reads \code{-2147483648} as a 32-bit integer, which is \code{NA} in R,
 here it is a value that needs 64 bits.
+With \code{extended_types = TRUE}, the default path reads a number in a \code{DATE} column as days in 32 bits
+and wraps a larger one into another date without a warning,
+here such a number is \code{NA} and reported as out of range;
+numbers in \code{TIME} and \code{TIMESTAMP} columns are seconds on both paths.
 Once \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} or \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} has fixed the types of a result,
 later fetches keep them and the rules of a stream,
 with times and timestamps in microseconds, and text checked like a blob,
@@ -134,7 +204,10 @@ which names the Arrow types the columns have at the end of the fetch.
 It is raised once the fetch has returned its rows,
 so a handler of the warning can use the result,
 where the default path warns while it fetches and a handler that uses the result raises an error.
-The default path warns on the same fetches, but once per column with values of another storage class,
+The default path warns on the same fetches,
+apart from the values converted silently, as listed in the section on requesting types,
+and the numbers of days beyond 32 bits, which it wraps,
+but once per column with values of another storage class,
 and once per date, time or timestamp that cannot be parsed.
 It also warns about the real numbers it truncates,
 and in a fetch of no rows about the next row, from which it types the columns;
@@ -168,6 +241,7 @@ and \code{\link[DBI:dbFetchArrow]{DBI::dbFetchArrow()}} returns a stream for the
 \code{\link[DBI:dbFetchArrowChunk]{DBI::dbFetchArrowChunk()}} returns one such array per call,
 and an empty array once all rows are fetched.
 When the schema of a stream is requested before its first array,
+and a column has no requested type,
 the first chunk is fetched to decide the types and kept for the next fetch:
 \code{\link[DBI:dbGetRowCount]{DBI::dbGetRowCount()}} and \code{\link[DBI:dbHasCompleted]{DBI::dbHasCompleted()}} count its rows once they have been handed out,
 and \code{\link[DBI:dbFetch]{DBI::dbFetch()}} fails while they wait.

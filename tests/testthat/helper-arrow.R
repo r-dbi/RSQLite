@@ -105,3 +105,67 @@ coercion_warnings <- function(expr) {
   )
   out
 }
+
+# Checks an Arrow array, or each array of a stream, with arrow's ValidateFull()
+# where arrow is installed, and returns an equivalent object: a stream is read
+# to the end and comes back as a stream of the same arrays
+arrow_validated <- function(x) {
+  if (inherits(x, "nanoarrow_array_stream")) {
+    schema <- x$get_schema()
+    arrays <- list()
+    repeat {
+      array <- x$get_next()
+      if (is.null(array)) {
+        break
+      }
+      arrays[[length(arrays) + 1]] <- arrow_validated(array)
+    }
+    x$release()
+    return(nanoarrow::basic_array_stream(arrays, schema = schema))
+  }
+
+  if (rlang::is_installed("arrow")) {
+    if (nanoarrow::infer_nanoarrow_schema(x)$format == "+s") {
+      table <- arrow::as_arrow_table(x)
+    } else {
+      table <- arrow::arrow_table(x = arrow::as_arrow_array(x))
+    }
+    testthat::expect_true(table$ValidateFull())
+  }
+  x
+}
+
+# The one array of a stream, without the arrow package that
+# nanoarrow::as_nanoarrow_array() needs for a stream
+single_array <- function(stream) {
+  arrays <- nanoarrow::collect_array_stream(stream)
+  testthat::expect_length(arrays, 1)
+  arrays[[1]]
+}
+
+# dbGetQueryArrow(), dbReadTableArrow() and dbFetchArrowChunk() with every
+# array they return checked by arrow_validated(), for the tests of `schema`:
+# these read their streams to the end at once
+validated_dbGetQueryArrow <- function(...) arrow_validated(DBI::dbGetQueryArrow(...))
+validated_dbReadTableArrow <- function(...) arrow_validated(DBI::dbReadTableArrow(...))
+validated_dbFetchArrowChunk <- function(...) arrow_validated(DBI::dbFetchArrowChunk(...))
+
+# The formats of a query's result, with the stream consumed
+query_formats <- function(con, sql, ...) {
+  stream <- validated_dbGetQueryArrow(con, sql, ...)
+  on.exit(stream$release())
+  schema_formats(stream)
+}
+
+# Compares the values of a 64-bit integer array exactly with `expected`, as
+# strings, NA for NULL: a uint64 above 2^63 - 1 is written as the int64 with
+# its bits, such as "-1" for 2^64 - 1
+expect_int64_bits <- function(array, expected) {
+  is_null <- suppressWarnings(is.na(nanoarrow::convert_array(array, double())))
+  expect_equal(is_null, is.na(expected))
+  actual <- matrix(as.raw(array$buffers[[2]])[seq_len(8 * array$length)], nrow = 8)
+  # bit64 reads -2^63, its NA, with a warning, but with the right bits
+  wanted <- suppressWarnings(bit64::as.integer64(expected))
+  wanted <- matrix(writeBin(unclass(wanted), raw()), nrow = 8)
+  expect_equal(actual[, !is_null], wanted[, !is_null])
+}

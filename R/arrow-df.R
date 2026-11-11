@@ -54,7 +54,7 @@ arrow_to_df <- function(fetched, bigint) {
     # vectors read from the array until they are touched, so these are copied
     # before the array is released
     columns <- unclass(nanoarrow::convert_array(arrays[[1L]], to = ptype))
-    for (j in which(formats == "u")) {
+    for (j in which(formats %in% c("u", "U"))) {
       columns[[j]] <- c(columns[[j]])
     }
     nanoarrow::nanoarrow_pointer_release(arrays[[1L]])
@@ -72,13 +72,13 @@ arrow_to_df <- function(fetched, bigint) {
   # SQLite integers are 64-bit: a column whose values all fit is an integer,
   # the others follow the `bigint` connection argument, like the default path,
   # which also keeps a column that needed 64 bits in an earlier fetch
-  for (j in which(formats == "l" & !fetched$wide_ints)) {
+  for (j in which(formats %in% c("l", "L") & !fetched$wide_ints)) {
     as_int <- integer64_to_integer(columns[[j]])
     if (!is.null(as_int)) {
       columns[[j]] <- as_int
     }
   }
-  if (bigint != "integer64" && any(formats == "l")) {
+  if (bigint != "integer64" && any(formats %in% c("l", "L"))) {
     columns <- convert_bigint(columns, bigint)
   }
 
@@ -140,7 +140,11 @@ arrow_df_column_ptype <- function(format) {
       tdD = structure(double(), class = "Date"),
       ttu = hms::hms(),
       "tsu:UTC" = .POSIXct(double(), tz = "UTC"),
-      stopc("Internal error: unexpected Arrow format ", format)
+      # The other types come from a `schema` of dbSendQueryArrow()
+      L = bit64::integer64(),
+      nanoarrow::infer_nanoarrow_ptype(
+        nanoarrow::nanoarrow_schema_modify(nanoarrow::na_na(), list(format = format))
+      )
     )
     arrow_df_ptypes[[format]] <- ptype
   }
@@ -166,7 +170,9 @@ arrow_column_info <- function(res) {
       tdD = "Date",
       ttu = "hms",
       "tsu:UTC" = "POSIXct",
-      stopc("Internal error: unexpected Arrow format ", formats[[j]])
+      L = if (fetched$wide_ints[[j]]) "double" else "integer",
+      # The other types come from a `schema` of dbSendQueryArrow()
+      arrow_column_type_name(arrow_df_column_ptype(formats[[j]]))
     )
   }
   structure(
@@ -174,6 +180,19 @@ arrow_column_info <- function(res) {
     row.names = .set_row_names(length(type)),
     class = "data.frame"
   )
+}
+
+# The name of the R type of a prototype, like the default path names it
+arrow_column_type_name <- function(ptype) {
+  for (class in c("POSIXct", "hms", "Date")) {
+    if (inherits(ptype, class)) {
+      return(class)
+    }
+  }
+  if (inherits(ptype, "blob")) {
+    return("list")
+  }
+  typeof(ptype)
 }
 
 # dbAppendTable() through Arrow: the data frame is written as an Arrow stream

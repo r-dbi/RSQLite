@@ -32,6 +32,7 @@ SqliteResultImpl::SqliteResultImpl(
       total_changes_start_(sqlite3_total_changes(conn)),
       types_(get_initial_field_types(cache.ncols_)),
       with_alt_types_(conn_->with_alt_types()),
+      arrow_targets_(cache.ncols_),
       arrow_frozen_(false),
       pending_offset_(0),
       pending_rows_(0),
@@ -208,6 +209,14 @@ cpp11::list SqliteResultImpl::fetch(const int n_max) {
   return out;
 }
 
+cpp11::strings SqliteResultImpl::get_column_names() const {
+  cpp11::writable::strings names(cache.names_.size());
+  for (size_t i = 0; i < cache.names_.size(); ++i) {
+    names[i] = cache.names_[i];
+  }
+  return names;
+}
+
 cpp11::list SqliteResultImpl::get_column_info() {
   using namespace cpp11::literals;
   peek_first_row();
@@ -242,6 +251,32 @@ cpp11::list SqliteResultImpl::get_column_info() {
 
 // Arrow ///////////////////////////////////////////////////////////////////////
 
+void SqliteResultImpl::set_arrow_schema(
+  const struct ArrowSchema* schema,
+  const std::vector<int>& positions
+) {
+  if (!arrow_columns_.empty()) {
+    throw std::runtime_error(
+      "The Arrow types of the result have already been decided"
+    );
+  }
+  if (schema->n_children != static_cast<int64_t>(positions.size())) {
+    throw std::runtime_error("Internal error: schema and positions differ");
+  }
+
+  // A new schema replaces the previous one
+  std::vector<ArrowTarget> targets(cache.ncols_);
+  for (size_t i = 0; i < positions.size(); ++i) {
+    const int pos = positions[i];
+    if (pos < 0 || static_cast<size_t>(pos) >= cache.ncols_) {
+      throw std::runtime_error("Internal error: column position out of range");
+    }
+    targets[pos] =
+      ArrowTarget::from_schema(schema->children[i], cache.names_[pos]);
+  }
+  arrow_targets_.swap(targets);
+}
+
 void SqliteResultImpl::arrow_schema(
   struct ArrowSchema* out,
   int64_t infer_rows
@@ -254,8 +289,16 @@ void SqliteResultImpl::arrow_schema(
 
   if (!arrow_frozen_) {
     // The first chunk decides the types, from the first value of each column
-    // that is not NULL, and is kept for the next fetch
-    if (pending_chunk_->release == NULL && !complete_) {
+    // that is not NULL, and is kept for the next fetch; not needed when every
+    // column has a requested type
+    bool all_frozen = true;
+    for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+      if (!arrow_columns_[j].is_frozen()) {
+        all_frozen = false;
+        break;
+      }
+    }
+    if (!all_frozen && pending_chunk_->release == NULL && !complete_) {
       discard_coercions();
       nanoarrow::UniqueArray chunk;
       fetch_arrow_rows(chunk.get(), infer_rows);
@@ -429,6 +472,18 @@ int64_t SqliteResultImpl::fetch_arrow_df(
     }
     for (size_t j = 0; j < ncols; ++j) {
       arrow_columns_[j].reopen();
+    }
+  }
+
+  // A data frame holds a uint64 as integer64, which ends at 2^63 - 1: a column
+  // with a larger value is a double from then on, in streamed rows kept for
+  // a schema too
+  for (size_t j = 0; j < ncols; ++j) {
+    if (arrow_columns_[j].conform_unsigned(chunks, j)) {
+      check_arrow(
+        ArrowSchemaSetType(schema->children[j], NANOARROW_TYPE_DOUBLE),
+        "Can't set Arrow type"
+      );
     }
   }
 
@@ -636,7 +691,8 @@ void SqliteResultImpl::ensure_arrow_columns(bool data_frame) {
       stmt,
       static_cast<int>(j),
       cache.names_[j],
-      with_alt_types_
+      with_alt_types_,
+      arrow_targets_[j]
     );
     column->decide_from_row(has_row);
     column->set_data_frame(data_frame);
@@ -833,17 +889,31 @@ static void append_arrow_value(
   if (ArrowArrayViewIsNull(values, i)) {
     code = ArrowArrayAppendNull(out, 1);
   } else {
+    // The storage types of every type that SqliteArrowColumn fills, the date
+    // and time types are integers; a null type is NULL throughout
     switch (values->storage_type) {
+    case NANOARROW_TYPE_BOOL:
+    case NANOARROW_TYPE_INT8:
+    case NANOARROW_TYPE_INT16:
     case NANOARROW_TYPE_INT32:
     case NANOARROW_TYPE_INT64:
       code = ArrowArrayAppendInt(out, ArrowArrayViewGetIntUnsafe(values, i));
       break;
+    case NANOARROW_TYPE_UINT8:
+    case NANOARROW_TYPE_UINT16:
+    case NANOARROW_TYPE_UINT32:
+    case NANOARROW_TYPE_UINT64:
+      code = ArrowArrayAppendUInt(out, ArrowArrayViewGetUIntUnsafe(values, i));
+      break;
+    case NANOARROW_TYPE_FLOAT:
     case NANOARROW_TYPE_DOUBLE:
       code =
         ArrowArrayAppendDouble(out, ArrowArrayViewGetDoubleUnsafe(values, i));
       break;
     case NANOARROW_TYPE_STRING:
+    case NANOARROW_TYPE_LARGE_STRING:
     case NANOARROW_TYPE_BINARY:
+    case NANOARROW_TYPE_LARGE_BINARY:
       code =
         ArrowArrayAppendBytes(out, ArrowArrayViewGetBytesUnsafe(values, i));
       break;

@@ -157,11 +157,8 @@ test_that("text in a binary column is UTF-8, also in a UTF-16 database", {
   dbExecute(con, "INSERT INTO t VALUES (1, x'01'), (2, 'ab'), (3, 'caf\u00e9')")
   sql <- "SELECT x FROM t ORDER BY i"
 
-  w <- coercion_warnings(df <- as.data.frame(dbGetQueryArrow(con, sql)))
-  expect_length(w, 1)
-  values <- w[[1]]$coercions[[1]]$values
-  expect_equal(vapply(values, `[[`, "", "class"), "string")
-  expect_equal(values[[1]]$rows, 2:3)
+  # Text into a binary type is silent, see ?"sqlite-arrow"
+  expect_no_warning(df <- as.data.frame(dbGetQueryArrow(con, sql)))
   expected <- list(as.raw(1), charToRaw("ab"), charToRaw("caf\u00e9"))
   expect_equal(unclass(df$x), expected, ignore_attr = TRUE)
   # The data frame path returns the same bytes

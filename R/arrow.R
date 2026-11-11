@@ -22,7 +22,8 @@
 #' a real number in a later chunk is truncated to fit an `int64` column decided from integers,
 #' and a column whose first chunk holds only `NULL` keeps its declared type,
 #' or the null type without a declaration, for the whole result.
-#' The default chunk size makes this rare, a small `chunk_size` makes it likely.
+#' The default chunk size makes this rare, a small `chunk_size` makes it likely,
+#' and a `schema` fixes the types up front, see the section on requesting types.
 #' A value in a column of the null type becomes `NULL`.
 #' Text and blobs in a `utf8` column are kept only if they are valid UTF-8 without NUL bytes,
 #' which SQLite does not enforce,
@@ -33,7 +34,8 @@
 #' that lists the affected columns with their types and the 1-based row numbers in the result.
 #' It is raised when the chunk is fetched from the result:
 #' for a lazy stream when the array is requested,
-#' and for the first chunk when the schema is requested before it, see the section on chunking.
+#' and for the first chunk when the schema is requested before it
+#' and a column has no requested type, see the sections on chunking and on requesting types.
 #' The warning carries the details in its `coercions` field.
 #' A handler of the warning runs while the result is still busy with the chunk:
 #' it gets an error if it fetches from, binds, inspects or clears that result.
@@ -60,6 +62,62 @@
 #' other values, which the data frame path keeps as `hms` durations, become `NULL`.
 #' Both are reported as out of range in the warning about the chunk.
 #'
+#' @section Requesting types:
+#' The `schema` argument of [DBI::dbSendQueryArrow()], [DBI::dbGetQueryArrow()]
+#' and [DBI::dbReadTableArrow()] fixes the Arrow types of some or all result columns
+#' before the first row is read:
+#' a struct `nanoarrow_schema`, an arrow `Schema`,
+#' or a named list of column types such as
+#' `list(id = nanoarrow::na_int32(), when = nanoarrow::na_timestamp("ms", "UTC"))`.
+#' The entries are matched to the result columns by name, exactly.
+#' A name that is not in the result, a name the result carries twice,
+#' and an unnamed entry are errors.
+#' The names and types are checked once the query has been sent,
+#' so a statement with side effects, such as `INSERT ... RETURNING`, has run when they fail.
+#' A column with a requested type is typed without looking at its values,
+#' with no widening and no dependence on `chunk_size`,
+#' and its declared type and `extended_types` play no part;
+#' the other columns are typed as described above.
+#' The requested types are kept when the query is executed again with [DBI::dbBind()],
+#' and by the data frame fetches of a connection with `arrow = TRUE`, see the section on data frames,
+#' where nanoarrow converts them to R types.
+#' There they take precedence over the types that a fetch carries over from an earlier execution,
+#' and a requested time or timestamp has the requested unit and time zone,
+#' where a decided one travels as seconds.
+#'
+#' The types that can be requested are
+#' `null`, `bool`, `int8` to `int64`, `uint8` to `uint64`, `float`, `double`,
+#' `utf8` and `large_utf8`, `binary` and `large_binary`, `date32` and `date64`,
+#' `time32` and `time64` in any unit, and `timestamp` in any unit and time zone.
+#' Dates, times and timestamps are parsed from their text form like `extended_types = TRUE` does it,
+#' a timestamp is read as UTC and only labelled with the requested time zone.
+#' A number is a count of days for a date, truncated, and of seconds for a time or timestamp.
+#' Times and timestamps are rounded to the nearest tick of their unit,
+#' a time to the last tick of the day at most:
+#' exactly for an integer and for text, which is read to the microsecond,
+#' and in double precision for a real.
+#' Dictionary, decimal, nested and extension types are an error.
+#'
+#' Values of another storage class than the column's type follow these rules,
+#' whether the type was requested or decided from the values:
+#'
+#' * silently: integers into a floating point type,
+#'   integers and reals into a text type, where SQLite renders them,
+#'   and text into a binary type, as its bytes;
+#' * converted by SQLite, with the warning described above:
+#'   text and blobs into a numeric type,
+#'   and reals into an integer type, truncated, or into `bool`, true unless zero;
+#' * `NULL`, with the warning: a blob into a text type unless it is valid UTF-8 without NUL bytes,
+#'   like text itself, see above,
+#'   a number outside the range of an integer type,
+#'   including a real or the integer at the start of a text beyond 64 bits, which SQLite would saturate,
+#'   a finite number beyond the range of `float`,
+#'   a date outside the range of its type, such as a number of days beyond `2^31 - 1` for `date32`,
+#'   a time outside a day, from 0 up to 24 hours excluded,
+#'   a timestamp outside the range of its unit, such as nanoseconds after 2262,
+#'   a date or time that cannot be parsed,
+#'   and any value into the null type.
+#'
 #' @section Parameters:
 #' The columns of the parameter stream are bound like this:
 #'
@@ -84,11 +142,15 @@
 #' The conversion follows nanoarrow's rules, with these additions:
 #' an `int64` column becomes an `integer` if all its values fit,
 #' and follows the `bigint` argument of [DBI::dbConnect()] otherwise, also in the later fetches of the result;
+#' a requested `uint64` column does the same,
+#' but becomes a `double` once a value is beyond `2^63 - 1`, which `integer64` cannot hold,
+#' also in the later fetches until the query is bound again,
+#' where nanoarrow would wrap such a value to a negative `integer64` and the stream holds it exactly;
 #' a `null` column becomes a `logical`.
 #' `date32` columns become `Date` and `binary` columns become [blob::blob] objects,
 #' as on the default path.
 #' Times and timestamps become `hms` and `POSIXct` in UTC,
-#' and travel as doubles in seconds in both directions,
+#' and travel as doubles in seconds in both directions unless their type was requested,
 #' so they keep the default path's precision and range, times outside a day included,
 #' where a stream has microseconds and only times of day.
 #' Text ends at its first NUL character and is not checked for UTF-8, as on the default path,
@@ -97,7 +159,8 @@
 #' and `NA` otherwise, reported in the warning of the fetch,
 #' where the default path ends it at its first NUL byte and does not check it.
 #'
-#' Unlike a stream, each fetch decides the types of its columns, the way the default path does it:
+#' Unlike a stream, each fetch decides the types of its columns without a requested type,
+#' the way the default path does it:
 #' the first value that is not `NULL` decides,
 #' integers become doubles when a real number follows in the same fetch,
 #' and a column without a value takes its declared type, or `logical` without one.
@@ -106,7 +169,7 @@
 #' [DBI::dbColumnInfo()] names the types that a fetch of no rows returns,
 #' and decides them for the next fetch like on the default path,
 #' without converting the values of the next row.
-#' Three differences remain.
+#' Four differences remain.
 #' The default path truncates a real number that follows an integer too large for an `integer`,
 #' with a warning, here the column becomes a `double`,
 #' which keeps the real number but rounds the integers beyond `2^53`.
@@ -114,6 +177,10 @@
 #' here the column follows `bigint` from then on, as for such an integer.
 #' The default path reads `-2147483648` as a 32-bit integer, which is `NA` in R,
 #' here it is a value that needs 64 bits.
+#' With `extended_types = TRUE`, the default path reads a number in a `DATE` column as days in 32 bits
+#' and wraps a larger one into another date without a warning,
+#' here such a number is `NA` and reported as out of range;
+#' numbers in `TIME` and `TIMESTAMP` columns are seconds on both paths.
 #' Once [DBI::dbFetchArrow()] or [DBI::dbFetchArrowChunk()] has fixed the types of a result,
 #' later fetches keep them and the rules of a stream,
 #' with times and timestamps in microseconds, and text checked like a blob,
@@ -125,7 +192,10 @@
 #' It is raised once the fetch has returned its rows,
 #' so a handler of the warning can use the result,
 #' where the default path warns while it fetches and a handler that uses the result raises an error.
-#' The default path warns on the same fetches, but once per column with values of another storage class,
+#' The default path warns on the same fetches,
+#' apart from the values converted silently, as listed in the section on requesting types,
+#' and the numbers of days beyond 32 bits, which it wraps,
+#' but once per column with values of another storage class,
 #' and once per date, time or timestamp that cannot be parsed.
 #' It also warns about the real numbers it truncates,
 #' and in a fetch of no rows about the next row, from which it types the columns;
@@ -157,6 +227,7 @@
 #' [DBI::dbFetchArrowChunk()] returns one such array per call,
 #' and an empty array once all rows are fetched.
 #' When the schema of a stream is requested before its first array,
+#' and a column has no requested type,
 #' the first chunk is fetched to decide the types and kept for the next fetch:
 #' [DBI::dbGetRowCount()] and [DBI::dbHasCompleted()] count its rows once they have been handed out,
 #' and [DBI::dbFetch()] fails while they wait.
@@ -199,6 +270,62 @@
 #' @name sqlite-arrow
 #' @aliases arrow
 NULL
+
+# Requests the Arrow types of `schema` for the columns of a result:
+# a struct nanoarrow_schema, an arrow Schema, or a named list of column types
+arrow_set_schema <- function(res, schema) {
+  schema <- arrow_check_schema(schema)
+  requested <- arrow_schema_names(schema)
+  if (any(requested == "")) {
+    stopc("All entries of `schema` must be named")
+  }
+  if (anyDuplicated(requested)) {
+    stopc(
+      "Duplicate names in `schema`: ",
+      paste0("`", unique(requested[duplicated(requested)]), "`", collapse = ", ")
+    )
+  }
+
+  columns <- result_column_names(res@ptr)
+  positions <- match(requested, columns)
+  if (anyNA(positions)) {
+    stopc(
+      "Columns of `schema` not in the result: ",
+      paste0("`", requested[is.na(positions)], "`", collapse = ", ")
+    )
+  }
+  ambiguous <- requested[requested %in% columns[duplicated(columns)]]
+  if (length(ambiguous) > 0) {
+    stopc(
+      "Columns of `schema` that the result carries more than once: ",
+      paste0("`", ambiguous, "`", collapse = ", ")
+    )
+  }
+
+  result_set_arrow_schema(res@ptr, schema, positions - 1L)
+  invisible(res)
+}
+
+arrow_check_schema <- function(schema) {
+  if (is.data.frame(schema)) {
+    stopc(
+      "`schema` must describe Arrow types, ",
+      "use `nanoarrow::infer_nanoarrow_schema()` for a data frame prototype"
+    )
+  }
+  if (is.list(schema) && !inherits(schema, "nanoarrow_schema")) {
+    if (length(schema) == 0 || is.null(names(schema)) || any(names(schema) == "")) {
+      stopc("A list passed as `schema` must have named entries")
+    }
+    schema <- nanoarrow::na_struct(lapply(schema, nanoarrow::as_nanoarrow_schema))
+  } else {
+    schema <- nanoarrow::as_nanoarrow_schema(schema)
+  }
+  if (schema$format != "+s") {
+    stopc("`schema` must be a struct schema, not ", schema$format)
+  }
+  schema
+}
 
 # An array that dbFetchArrowChunk() handed out is freed when the garbage
 # collector finds it unreachable, and the collector does not see the memory

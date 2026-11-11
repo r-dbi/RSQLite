@@ -70,8 +70,13 @@ public:
   cpp11::list fetch(int n_max = -1);
 
   cpp11::list get_column_info();
+  cpp11::strings get_column_names();
 
   // Arrow
+  void set_arrow_schema(
+    const struct ArrowSchema* schema,
+    const std::vector<int>& positions
+  );
   // A stream passes the execution whose rows it reads, see executions(), so
   // that a result bound to new parameters fails it; and gets the completion
   // of the result along with the chunk

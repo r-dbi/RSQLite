@@ -525,8 +525,8 @@ test_that("a busy handler can't clear the result whose bind waits for it", {
 test_that("an interrupt completes the result of a fetch", {
   skip_on_cran()
   skip_if(getRversion() < "4.0")
+  skip_unless_callr_loads_tested_rsqlite()
 
-  # This test makes use of the installed package!
   session <- callr::r_session$new()
   on.exit(session$close(), add = TRUE)
   session$run(function() {

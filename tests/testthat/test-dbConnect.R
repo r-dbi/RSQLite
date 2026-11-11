@@ -138,12 +138,12 @@ test_that("error in busy handler", {
 test_that("interrupt in busy handler", {
   skip_on_cran()
   skip_if(getRversion() < "4.0")
+  skip_unless_callr_loads_tested_rsqlite()
 
   dbfile <- tempfile()
   con1 <- dbConnect(SQLite(), dbfile)
   on.exit(dbDisconnect(con1), add = TRUE)
 
-  # This test makes use of the installed package!
   session <- callr::r_session$new()
   session$run(args = list(dbfile = dbfile), function(dbfile) {
     .GlobalEnv$con2 <- DBI::dbConnect(RSQLite::SQLite(), dbfile)

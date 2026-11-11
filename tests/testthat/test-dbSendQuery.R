@@ -1,17 +1,3 @@
-bind_select_setup <- function() {
-  con <- dbConnect(SQLite())
-
-  df <- data.frame(
-    id = letters[1:5],
-    x = 1:5,
-    y = c(1L, 1L, 2L, 2L, 3L),
-    stringsAsFactors = FALSE
-  )
-
-  dbWriteTable(con, "t1", df, row.names = FALSE)
-  con
-}
-
 test_that("attempting to change schema with pending rows generates warning", {
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con))
@@ -185,13 +171,6 @@ test_that("dbFetch with statement other than SELECT warns reasonably (#523)", {
 
   expect_warning(dbFetch(res), "dbGetRowsAffected")
 })
-
-json_error_setup <- function() {
-  con <- dbConnect(SQLite(), ":memory:")
-  df <- data.frame(id = 1:4, v = c("[1]", "[2]", "oops", "[4]"))
-  dbWriteTable(con, "t1", df)
-  con
-}
 
 test_that("an error in the middle of a result completes it", {
   con <- json_error_setup()

@@ -1,57 +1,3 @@
-# A string marked as UTF-8 from its bytes in hex, which may be invalid UTF-8
-utf8_hex <- function(x) {
-  out <- rawToChar(as.raw(strtoi(strsplit(x, " ")[[1]], 16L)))
-  Encoding(out) <- "UTF-8"
-  out
-}
-
-local_check_con <- function(
-  check_utf8 = TRUE,
-  encoding = NULL,
-  .env = parent.frame()
-) {
-  con <- dbConnect(SQLite(), check_utf8 = check_utf8)
-  withr::defer(dbDisconnect(con), envir = .env)
-  if (!is.null(encoding)) {
-    dbExecute(con, paste0("PRAGMA encoding = '", encoding, "'"))
-  }
-  con
-}
-
-# A table `t` with one untyped column `x`, so that values keep their type
-create_check_table <- function(con, values) {
-  dbExecute(con, "CREATE TABLE t (x)")
-  rows <- paste0("(", values, ")", collapse = ", ")
-  dbExecute(con, paste("INSERT INTO t VALUES", rows))
-}
-
-# The value of `expr` and the messages of the warnings it raises
-with_warnings <- function(expr) {
-  messages <- character()
-  value <- withCallingHandlers(
-    expr,
-    warning = function(w) {
-      messages <<- c(messages, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    }
-  )
-  list(value = value, warnings = messages)
-}
-
-# Only the warnings of check_utf8, not the one about mixed types
-utf8_warnings <- function(out) {
-  grep("UTF-8", out$warnings, value = TRUE)
-}
-
-invalid_message <- function(n, name = "x") {
-  if (n == 1) {
-    what <- "1 value is not valid UTF-8 or contains a NUL byte"
-  } else {
-    what <- paste(n, "values are not valid UTF-8 or contain NUL bytes")
-  }
-  paste0("Column `", name, "`: ", what, ", NA is returned")
-}
-
 # check_utf8 = FALSE ----------------------------------------------------------
 
 test_that("check_utf8 is FALSE by default", {
@@ -63,13 +9,13 @@ test_that("check_utf8 is FALSE by default", {
 })
 
 test_that("check_utf8 = FALSE reads a blob in a text column as text", {
-  con <- local_check_con(check_utf8 = FALSE)
-  create_check_table(
+  con <- local_utf8_check_con(check_utf8 = FALSE)
+  create_utf8_check_table(
     con,
     c("'a'", "X'00ff'", "X'6162'", "X'610062'", "X'61ff'")
   )
 
-  out <- with_warnings(dbGetQuery(con, "SELECT x FROM t"))
+  out <- utf8_with_warnings(dbGetQuery(con, "SELECT x FROM t"))
   x <- out$value$x
   expect_identical(x[1:4], c("a", "", "ab", "a"))
   expect_identical(charToRaw(x[[5]]), as.raw(c(0x61, 0xff)))
@@ -79,9 +25,9 @@ test_that("check_utf8 = FALSE reads a blob in a text column as text", {
 })
 
 test_that("check_utf8 = FALSE cuts text at a NUL byte", {
-  con <- local_check_con(check_utf8 = FALSE)
+  con <- local_utf8_check_con(check_utf8 = FALSE)
 
-  out <- with_warnings(
+  out <- utf8_with_warnings(
     dbGetQuery(con, "SELECT CAST(X'610062' AS TEXT) AS x")
   )
   expect_identical(out$value$x, "a")
@@ -89,9 +35,9 @@ test_that("check_utf8 = FALSE cuts text at a NUL byte", {
 })
 
 test_that("check_utf8 = FALSE returns text that is not valid UTF-8", {
-  con <- local_check_con(check_utf8 = FALSE)
+  con <- local_utf8_check_con(check_utf8 = FALSE)
 
-  out <- with_warnings(dbGetQuery(con, "SELECT CAST(X'61ff' AS TEXT) AS x"))
+  out <- utf8_with_warnings(dbGetQuery(con, "SELECT CAST(X'61ff' AS TEXT) AS x"))
   x <- out$value$x
   expect_identical(charToRaw(x), as.raw(c(0x61, 0xff)))
   expect_identical(Encoding(x), "UTF-8")
@@ -110,9 +56,9 @@ test_that("the RSQLite.check_utf8 option sets the default", {
 
   expect_true(con@check_utf8)
   sql <- "SELECT CAST(X'61ff' AS TEXT) AS x"
-  out <- with_warnings(dbGetQuery(con, sql))
+  out <- utf8_with_warnings(dbGetQuery(con, sql))
   expect_identical(out$value$x, NA_character_)
-  expect_identical(out$warnings, invalid_message(1))
+  expect_identical(out$warnings, utf8_invalid_message(1))
 
   expect_false(con_false@check_utf8)
   expect_identical(
@@ -157,7 +103,7 @@ test_that("the RSQLite.check_utf8 option must be TRUE or FALSE", {
 })
 
 test_that("check_utf8 = TRUE turns invalid text into NA, with a warning", {
-  con <- local_check_con()
+  con <- local_utf8_check_con()
   dbExecute(con, "CREATE TABLE t (x, y)")
   dbExecute(
     con,
@@ -170,28 +116,28 @@ test_that("check_utf8 = TRUE turns invalid text into NA, with a warning", {
     )
   )
 
-  out <- with_warnings(dbGetQuery(con, "SELECT x, y FROM t"))
+  out <- utf8_with_warnings(dbGetQuery(con, "SELECT x, y FROM t"))
   expect_identical(out$value$x, c("a", NA, NA, utf8_hex("c3 a4")))
   expect_identical(out$value$y, c("a", "b", NA, NA))
   expect_identical(
     out$warnings,
-    c(invalid_message(2, "x"), invalid_message(2, "y"))
+    c(utf8_invalid_message(2, "x"), utf8_invalid_message(2, "y"))
   )
 })
 
 test_that("check_utf8 = TRUE turns text with a NUL byte into NA", {
-  con <- local_check_con()
+  con <- local_utf8_check_con()
 
-  out <- with_warnings(
+  out <- utf8_with_warnings(
     dbGetQuery(con, "SELECT CAST(X'610062' AS TEXT) AS x")
   )
   expect_identical(out$value$x, NA_character_)
-  expect_identical(out$warnings, invalid_message(1))
+  expect_identical(out$warnings, utf8_invalid_message(1))
 })
 
 test_that("check_utf8 = TRUE turns invalid blobs in a text column into NA", {
-  con <- local_check_con()
-  create_check_table(
+  con <- local_utf8_check_con()
+  create_utf8_check_table(
     con,
     c(
       "'a'",
@@ -206,20 +152,20 @@ test_that("check_utf8 = TRUE turns invalid blobs in a text column into NA", {
     )
   )
 
-  out <- with_warnings(dbGetQuery(con, "SELECT x FROM t"))
+  out <- utf8_with_warnings(dbGetQuery(con, "SELECT x FROM t"))
   expect_identical(out$value$x, c("a", rep(NA, 8)))
-  expect_identical(utf8_warnings(out), invalid_message(8))
+  expect_identical(utf8_warnings(out), utf8_invalid_message(8))
   expect_match(out$warnings, "mixed type", all = FALSE)
 })
 
 test_that("check_utf8 = TRUE reads valid blobs in a text column in full", {
-  con <- local_check_con()
-  create_check_table(
+  con <- local_utf8_check_con()
+  create_utf8_check_table(
     con,
     c("'a'", "X'6162'", "X'c3a4'", "X'e282ac'", "X'f09f9880'", "X'f48fbfbf'")
   )
 
-  out <- with_warnings(dbGetQuery(con, "SELECT x FROM t"))
+  out <- utf8_with_warnings(dbGetQuery(con, "SELECT x FROM t"))
   expect_identical(
     out$value$x,
     c(
@@ -237,10 +183,10 @@ test_that("check_utf8 = TRUE reads valid blobs in a text column in full", {
 
 test_that("check_utf8 = TRUE reads a blob by its length", {
   skip_if_not_installed("blob")
-  con <- local_check_con()
+  con <- local_utf8_check_con()
 
   # A bound blob, unlike a value read from a table, is not followed by NUL bytes
-  out <- with_warnings(
+  out <- utf8_with_warnings(
     dbGetQuery(
       con,
       "SELECT CASE WHEN column1 = 1 THEN 'a' ELSE ? END AS x FROM (VALUES (1), (2))",
@@ -252,28 +198,28 @@ test_that("check_utf8 = TRUE reads a blob by its length", {
 })
 
 test_that("check_utf8 = TRUE reads empty text and blobs as empty strings", {
-  con <- local_check_con()
-  create_check_table(con, c("'a'", "''", "X''", "zeroblob(0)"))
+  con <- local_utf8_check_con()
+  create_utf8_check_table(con, c("'a'", "''", "X''", "zeroblob(0)"))
 
-  out <- with_warnings(dbGetQuery(con, "SELECT x FROM t"))
+  out <- utf8_with_warnings(dbGetQuery(con, "SELECT x FROM t"))
   expect_identical(out$value$x, c("a", "", "", ""))
   expect_identical(utf8_warnings(out), character())
 })
 
 test_that("check_utf8 = TRUE leaves numbers in a text column alone", {
-  con <- local_check_con()
-  create_check_table(con, c("'a'", "1", "2.5", "12345678901"))
+  con <- local_utf8_check_con()
+  create_utf8_check_table(con, c("'a'", "1", "2.5", "12345678901"))
 
-  out <- with_warnings(dbGetQuery(con, "SELECT x FROM t"))
+  out <- utf8_with_warnings(dbGetQuery(con, "SELECT x FROM t"))
   expect_identical(out$value$x, c("a", "1", "2.5", "12345678901"))
   expect_identical(utf8_warnings(out), character())
 })
 
 test_that("check_utf8 = TRUE leaves a blob column alone", {
-  con <- local_check_con()
-  create_check_table(con, c("X'ff'", "X'00'"))
+  con <- local_utf8_check_con()
+  create_utf8_check_table(con, c("X'ff'", "X'00'"))
 
-  out <- with_warnings(dbGetQuery(con, "SELECT x FROM t"))
+  out <- utf8_with_warnings(dbGetQuery(con, "SELECT x FROM t"))
   expect_identical(
     out$value$x,
     blob::blob(as.raw(0xff), as.raw(0x00))
@@ -282,8 +228,8 @@ test_that("check_utf8 = TRUE leaves a blob column alone", {
 })
 
 test_that("check_utf8 = TRUE warns in the chunk that holds the invalid values", {
-  con <- local_check_con()
-  create_check_table(
+  con <- local_utf8_check_con()
+  create_utf8_check_table(
     con,
     c("'a'", "'b'", "X'ff'", "CAST(X'61ff' AS TEXT)", "'c'", "X'6162'")
   )
@@ -291,22 +237,22 @@ test_that("check_utf8 = TRUE warns in the chunk that holds the invalid values", 
   res <- dbSendQuery(con, "SELECT x FROM t")
   withr::defer(dbClearResult(res))
 
-  out <- with_warnings(dbFetch(res, 2))
+  out <- utf8_with_warnings(dbFetch(res, 2))
   expect_identical(out$value$x, c("a", "b"))
   expect_identical(out$warnings, character())
 
-  out <- with_warnings(dbFetch(res, 2))
+  out <- utf8_with_warnings(dbFetch(res, 2))
   expect_identical(out$value$x, c(NA_character_, NA_character_))
-  expect_identical(utf8_warnings(out), invalid_message(2))
+  expect_identical(utf8_warnings(out), utf8_invalid_message(2))
 
-  out <- with_warnings(dbFetch(res))
+  out <- utf8_with_warnings(dbFetch(res))
   expect_identical(out$value$x, c("c", "ab"))
   expect_identical(utf8_warnings(out), character())
 })
 
 test_that("check_utf8 = TRUE is not affected by a peek between chunks", {
-  con <- local_check_con()
-  create_check_table(
+  con <- local_utf8_check_con()
+  create_utf8_check_table(
     con,
     c("'a'", "X'00ff'", "X'6162'", "CAST(X'ff' AS TEXT)")
   )
@@ -317,20 +263,20 @@ test_that("check_utf8 = TRUE is not affected by a peek between chunks", {
   expect_identical(dbFetch(res, 1)$x, "a")
 
   # The peeks read the next row but do not return it, so they do not warn
-  out <- with_warnings(dbColumnInfo(res))
+  out <- utf8_with_warnings(dbColumnInfo(res))
   expect_identical(utf8_warnings(out), character())
-  out <- with_warnings(dbFetch(res, 0))
+  out <- utf8_with_warnings(dbFetch(res, 0))
   expect_identical(nrow(out$value), 0L)
   expect_identical(utf8_warnings(out), character())
 
-  out <- with_warnings(dbFetch(res))
+  out <- utf8_with_warnings(dbFetch(res))
   expect_identical(out$value$x, c(NA, "ab", NA))
-  expect_identical(utf8_warnings(out), invalid_message(2))
+  expect_identical(utf8_warnings(out), utf8_invalid_message(2))
 })
 
 test_that("check_utf8 = TRUE reads blobs as bytes in a UTF-16 database", {
   for (encoding in c("UTF-16le", "UTF-16be")) {
-    con <- local_check_con(encoding = encoding)
+    con <- local_utf8_check_con(encoding = encoding)
     dbExecute(con, "CREATE TABLE t (x)")
     dbExecute(
       con,
@@ -351,29 +297,29 @@ test_that("check_utf8 = TRUE reads blobs as bytes in a UTF-16 database", {
       NA
     )
 
-    out <- with_warnings(dbGetQuery(con, "SELECT x FROM t"))
+    out <- utf8_with_warnings(dbGetQuery(con, "SELECT x FROM t"))
     expect_identical(out$value$x, expected, info = encoding)
-    expect_identical(utf8_warnings(out), invalid_message(3), info = encoding)
+    expect_identical(utf8_warnings(out), utf8_invalid_message(3), info = encoding)
 
     # Also after a peek at the first blob
     res <- dbSendQuery(con, "SELECT x FROM t")
     expect_identical(dbFetch(res, 2)$x, expected[1:2], info = encoding)
     suppressWarnings(dbColumnInfo(res))
-    out <- with_warnings(dbFetch(res))
+    out <- utf8_with_warnings(dbFetch(res))
     dbClearResult(res)
     expect_identical(out$value$x, expected[-1:-2], info = encoding)
-    expect_identical(utf8_warnings(out), invalid_message(3), info = encoding)
+    expect_identical(utf8_warnings(out), utf8_invalid_message(3), info = encoding)
   }
 })
 
 test_that("check_utf8 = TRUE prints a column name with % as is", {
-  con <- local_check_con()
+  con <- local_utf8_check_con()
 
-  out <- with_warnings(
+  out <- utf8_with_warnings(
     dbGetQuery(con, "SELECT CAST(X'ff' AS TEXT) AS [x%s%d]")
   )
   expect_identical(out$value[["x%s%d"]], NA_character_)
-  expect_identical(out$warnings, invalid_message(1, "x%s%d"))
+  expect_identical(out$warnings, utf8_invalid_message(1, "x%s%d"))
 })
 
 test_that("check_utf8 = TRUE agrees with base R on random blobs and text", {
@@ -395,7 +341,7 @@ test_that("check_utf8 = TRUE agrees with base R on random blobs and text", {
   expected[valid] <- vapply(values[valid], rawToChar, character(1))
   Encoding(expected) <- "UTF-8"
 
-  con <- local_check_con()
+  con <- local_utf8_check_con()
   dbExecute(con, "CREATE TABLE t (i INTEGER, x)")
   dbExecute(con, "INSERT INTO t VALUES (0, 'a')")
   dbExecute(
@@ -409,9 +355,9 @@ test_that("check_utf8 = TRUE agrees with base R on random blobs and text", {
     "INSERT INTO t SELECT i + 10000, CAST(x AS TEXT) FROM t WHERE i > 0"
   )
 
-  out <- with_warnings(dbGetQuery(con, "SELECT x FROM t ORDER BY i"))
+  out <- utf8_with_warnings(dbGetQuery(con, "SELECT x FROM t ORDER BY i"))
   expect_true(any(valid))
   expect_false(all(valid))
   expect_identical(out$value$x, c("a", expected, expected))
-  expect_identical(utf8_warnings(out), invalid_message(2 * sum(!valid)))
+  expect_identical(utf8_warnings(out), utf8_invalid_message(2 * sum(!valid)))
 })

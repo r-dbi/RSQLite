@@ -98,7 +98,13 @@ with one warning per column and fetch that counts these values.
 A blob is read into a character column when the column's earlier values are text.
 When \code{FALSE}, text is cut at the first NUL byte and is marked as UTF-8 even if it is not valid,
 and a blob is converted to text the same way.
-Defaults to the \code{RSQLite.check_utf8} option, or \code{FALSE} if it is unset.}
+In a UTF-16 database, such a blob is taken as UTF-8 bytes when \code{TRUE} (\verb{X'6162'} gives \code{"ab"}),
+and is transcoded from UTF-16 when \code{FALSE}.
+The checks apply to every query on the connection, including the ones RSQLite runs itself:
+for example, \code{\link[DBI:dbListTables]{dbListTables()}} reports a table name that is not valid UTF-8 as \code{NA}.
+Defaults to the \code{RSQLite.check_utf8} option, or \code{FALSE} if it is unset.
+\code{dbConnect()} on an existing connection does not carry this setting over,
+nor \code{extended_types} or \code{bigint}, but reads the option again.}
 }
 \value{
 \code{SQLite()} returns an object of class \link[=SQLiteDriver-class]{SQLiteDriver}.

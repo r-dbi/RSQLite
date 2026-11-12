@@ -85,7 +85,9 @@ test_that("text and blobs in int64 and double columns as SQLite reads them", {
     "INSERT INTO u VALUES (1, 1), (2, '9223372036854775807'),",
     "(3, '9223372036854775808'), (4, ' -9223372036854775808'),",
     "(5, '-9223372036854775809'), (6, '000000000000000000000000000012'),",
-    "(7, x'3939393939393939393939393939393939393939'), (8, '+12e300')"
+    "(7, x'3939393939393939393939393939393939393939'), (8, '+12e300'),",
+    "(9, ' ' || char(9) || '99999999999999999999'),",
+    "(10, '+9223372036854775808'), (11, char(10) || '+9223372036854775807')"
   ))
   res <- local_result(con, "SELECT i FROM u ORDER BY id")
   chunk <- fetch_arrow_chunk(res)
@@ -93,9 +95,62 @@ test_that("text and blobs in int64 and double columns as SQLite reads them", {
   expect_equal(
     as.character(arrow_values(chunk, bit64::integer64())$i),
     # bit64 takes the smallest int64 for NA, the array holds it as a value
-    c("1", "9223372036854775807", NA, NA, NA, "12", NA, "12")
+    c(
+      "1", "9223372036854775807", NA, NA, NA, "12", NA, "12",
+      NA, NA, "9223372036854775807"
+    )
   )
-  expect_equal(chunk$children$i$null_count, 3L)
+  expect_equal(chunk$children$i$null_count, 5L)
+  dbClearResult(res)
+
+  # A UTF-16 database holds the digits of a blob as UTF-16 for SQLite,
+  # in the chunk that decides the type and in a later one
+  con <- local_con()
+  dbExecute(con, "PRAGMA encoding = 'UTF-16'")
+  sql <- paste0(
+    "SELECT column1 AS i FROM ",
+    "(VALUES (1), (x'", strrep("3900", 20), "'), (x'31003200'), (x'3132'))"
+  )
+  for (ns in list(-1, c(1, -1))) {
+    res <- local_result(con, sql)
+    chunks <- lapply(ns, function(n) fetch_arrow_chunk(res, n))
+    for (chunk in chunks) {
+      expect_valid_chunk(chunk)
+    }
+    values <- unlist(lapply(chunks, function(chunk) arrow_values(chunk)$i))
+    expect_identical(values, c(1, NA, 12, 0))
+    dbClearResult(res)
+  }
+})
+
+test_that("text in an int64 column that a later real widens reads as a real", {
+  skip_if_not_installed("nanoarrow")
+  con <- local_con()
+  values <- c(
+    "1", "'2.5'", "'99999999999999999999'",
+    paste0("x'2d", strrep("39", 22), "'"), "3.5"
+  )
+
+  # The same values in any order, as SQLite reads them into a real
+  for (order in list(1:5, c(5, 1:4), c(1, 2, 5, 3, 4))) {
+    res <- local_result(con, paste(
+      "SELECT column1 AS x FROM (VALUES",
+      paste0("(", values[order], ")", collapse = ", "),
+      ")"
+    ))
+    chunk <- fetch_arrow_chunk(res)
+    expect_valid_chunk(chunk)
+    expect_equal(arrow_formats(chunk), c(x = "g"))
+    expect_equal(arrow_values(chunk)$x, c(1, 2.5, 1e20, -1e22, 3.5)[order])
+    dbClearResult(res)
+  }
+
+  # Once the first chunk has fixed the type, text keeps its integer reading
+  res <- local_result(con, paste(
+    "SELECT column1 AS x FROM (VALUES (1), ('2.5'), (3.5))"
+  ))
+  expect_equal(arrow_formats(fetch_arrow_chunk(res, 1)), c(x = "l"))
+  expect_equal(arrow_values(fetch_arrow_chunk(res))$x, c(2, 3))
 })
 
 test_that("later chunks convert text and blobs to the types of the first", {
@@ -300,10 +355,50 @@ test_that("a UTF-16 database gives text as UTF-8 and blobs as their bytes", {
   )
 
   # A blob in a utf8 column keeps its bytes, where the default path
-  # transcodes them from UTF-16 (#799);
-  # a lone surrogate and a NUL character make the text NULL
+  # transcodes them from UTF-16 on this base, until #799.
+  # A lone surrogate at the end of the text and a NUL character make it NULL.
+  # Elsewhere, SQLite merges a lone surrogate with the character after it.
+  dbExecute(
+    con,
+    "INSERT INTO t (id, x) VALUES (5, CAST(x'780000d86100' AS TEXT))"
+  )
   res <- local_result(con, "SELECT x FROM t ORDER BY id")
   chunk <- fetch_arrow_chunk(res)
   expect_valid_chunk(chunk)
-  expect_identical(arrow_values(chunk)$x, c("abc", "ab", NA, NA))
+  expect_identical(arrow_values(chunk)$x, c("abc", "ab", NA, NA, "x\U00010061"))
+  dbClearResult(res)
+  expect_identical(
+    dbGetQuery(con, "SELECT x FROM t WHERE id = 5")$x,
+    "x\U00010061"
+  )
+})
+
+test_that("a value that runs out of memory fails its chunk at once", {
+  skip_on_cran()
+  skip_if_not_installed("nanoarrow")
+  skip_if_not_installed("callr")
+  skip_unless_callr_loads_tested_rsqlite()
+
+  # The second row of each query is the last row of a chunk of one row,
+  # whose step past it only reads ahead and would keep its error.
+  # Its 20 million characters take 40 MB as UTF-16,
+  # and the UTF-8 text that utf8, int64 and double columns read 60 MB more,
+  # beyond the limit.
+  # A zeroblob() expands only when it is read.
+  digits <- "printf('%.*c', 20000000, '9')"
+  for (values in c(
+    paste0("'a', ", digits),
+    paste0("1, ", digits),
+    paste0("1.5, ", digits),
+    "x'00', zeroblob(60000000)"
+  )) {
+    sql <- paste0(
+      "SELECT iif(column1 = 1, ", values, ") AS x ",
+      "FROM (VALUES (1), (2), (3))"
+    )
+    out <- fetch_arrow_chunk_out_of_memory(sql, limit = 50000000)
+    expect_match(out$error, "out of memory while reading a value", info = sql)
+    expect_true(out$completed)
+    expect_equal(out$rows, 1L)
+  }
 })

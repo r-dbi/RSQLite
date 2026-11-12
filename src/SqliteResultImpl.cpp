@@ -1,6 +1,7 @@
 #include <cpp11.hpp>
 #include "pch.h"
 #include "SqliteResultImpl.h"
+#include "SqliteArrowColumn.h"
 #include "SqliteDataFrame.h"
 #include "DbColumnStorage.h"
 #include "DbConnection.h"

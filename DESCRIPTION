@@ -33,6 +33,7 @@ Description: Embeds the SQLite database engine in R and provides an
     virtual file system (VFS) can be enabled to allow read-only access
     to remote immutable SQLite database files via URIs.
 License: LGPL (>= 2.1)
+Copyright: See file COPYRIGHTS.
 URL: https://rsqlite.r-dbi.org, https://github.com/r-dbi/RSQLite
 BugReports: https://github.com/r-dbi/RSQLite/issues
 Depends: 
@@ -56,7 +57,7 @@ Suggests:
     httpuv,
     knitr,
     magrittr,
-    nanoarrow,
+    nanoarrow (>= 0.4.0),
     rmarkdown,
     rvest,
     testthat (>= 3.0.0),
@@ -64,7 +65,7 @@ Suggests:
     xml2
 LinkingTo: 
     cpp11 (>= 0.4.0),
-    nanoarrow
+    nanoarrow (>= 0.4.0)
 VignetteBuilder: 
     knitr
 Config/Needs/website: 

@@ -11,10 +11,11 @@ Copies of `LICENSE.txt` and `NOTICE.txt` are installed from `inst/licenses/`, an
 
 To update:
 
-1. Download the CRAN sources of the new nanoarrow version and copy `src/nanoarrow.c`, `src/nanoarrow.h` and `src/nanoarrow.hpp` over these files.
+1. Download the CRAN sources of the new nanoarrow version, unpack them into a temporary directory (`tar -xzf nanoarrow_X.Y.Z.tar.gz -C "$tmp"`, with `tmp=$(mktemp -d)`),
+   and copy `src/nanoarrow.c`, `src/nanoarrow.h` and `src/nanoarrow.hpp` from there over these files.
 2. Set the namespace line in `nanoarrow.h` back to `#define NANOARROW_NAMESPACE RSQLite  // Changed by RSQLite from RPkg, see README.md`.
 3. Copy `LICENSE.txt` and `NOTICE.txt` from the release tag, also to `inst/licenses/nanoarrow-LICENSE.txt` and `inst/licenses/nanoarrow-NOTICE.txt`,
    and update the version here and in `inst/COPYRIGHTS`.
-4. Check the delta: in the directory with the unpacked tarball, `for f in nanoarrow.c nanoarrow.h nanoarrow.hpp; do diff nanoarrow/src/$f src/vendor/nanoarrow/$f; done`
+4. Check the delta: `for f in nanoarrow.c nanoarrow.h nanoarrow.hpp; do diff "$tmp/nanoarrow/src/$f" src/vendor/nanoarrow/$f; done`
    must print only the namespace line of `nanoarrow.h`.
 5. Rebuild, and check that `nm -D --defined-only src/RSQLite.so | grep -i arrow` prints nothing.

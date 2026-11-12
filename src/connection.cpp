@@ -58,7 +58,9 @@ void connection_release(cpp11::external_pointer<DbConnectionPtr> con_) {
   }
 
   DbConnectionPtr* con = con_.get();
-  long n = con_->use_count();
+  // Each result holds a share of the connection,
+  // also one cleared while an Arrow stream reads it
+  long n = con_->use_count() - (*con)->n_cleared_results();
   if (n > 1) {
     Rf_warning(
       "There are %ld result in use. The connection will be released when they "

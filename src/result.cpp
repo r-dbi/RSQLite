@@ -32,7 +32,7 @@ void result_release(cpp11::external_pointer<DbResultPtr> res) {
         "as from a handler of a warning that it raised."
       );
     }
-    // Now, also while an Arrow stream shares the result
+    // An Arrow stream that shares the result reads on
     (*ptr)->clear();
   }
   res.reset();

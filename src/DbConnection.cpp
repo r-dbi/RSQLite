@@ -8,7 +8,12 @@ DbConnection::DbConnection(
   const std::string& vfs,
   bool with_alt_types
 )
-    : pConn_(NULL), with_alt_types_(with_alt_types), busy_callback_(NULL) {
+    : pConn_(NULL),
+      pDeferred_(NULL),
+      n_streams_(0),
+      n_cleared_results_(0),
+      with_alt_types_(with_alt_types),
+      busy_callback_(NULL) {
   // Get the underlying database connection
   // Always ensure URI filenames are enabled so that parameters like vfs= and
   // immutable= work.
@@ -82,9 +87,35 @@ void DbConnection::copy_to(const DbConnectionPtr& pDest) {
 }
 
 void DbConnection::disconnect() {
-  sqlite3_close_v2(pConn_);
+  if (n_streams_ > 0) {
+    // The busy handler stays until the handle is closed
+    pDeferred_ = pConn_;
+  } else {
+    // A zombie until the statements of open results are finalized
+    sqlite3_close_v2(pConn_);
+    release_callback_data();
+  }
   pConn_ = NULL;
-  release_callback_data();
+}
+
+void DbConnection::add_stream() {
+  ++n_streams_;
+}
+
+void DbConnection::remove_stream() {
+  if (--n_streams_ == 0 && pDeferred_ != NULL) {
+    sqlite3_close_v2(pDeferred_);
+    pDeferred_ = NULL;
+    release_callback_data();
+  }
+}
+
+void DbConnection::add_cleared_result(const int n) {
+  n_cleared_results_ += n;
+}
+
+long DbConnection::n_cleared_results() const {
+  return n_cleared_results_;
 }
 
 bool DbConnection::with_alt_types() const {

@@ -11,11 +11,13 @@
 // as result_fetch_arrow_chunk() does.
 //
 // The stream shares the result with its R object,
-// so that the result outlives the stream's callbacks,
-// also when R's garbage collector frees the R object meanwhile.
-// Once the result is cleared, which frees its statement,
-// its connection closed,
-// or the result bound to new parameters,
+// so that the result and its statement live as long as the stream reads them:
+// it reads on after dbClearResult(), dbDisconnect(),
+// or R's garbage collector have dropped the R objects
+// of the result and its connection.
+// The statement is finalized, and a disconnected connection closed,
+// once the last stream that reads them has ended or is released.
+// Once the result is bound to new parameters,
 // the next get_schema() or get_next() fails with an error that says so.
 // The callbacks run on R's main thread, inside the consumer's C code,
 // such as nanoarrow's conversion.
@@ -23,7 +25,7 @@
 namespace {
 
 struct StreamState {
-  // Dropped once the stream has ended
+  // Dropped once the stream has ended, see drop_result()
   DbResultPtr result;
   // The execution whose rows the stream reads
   const int executions;
@@ -46,28 +48,32 @@ struct StreamState {
         done(false),
         failed(false),
         running(0),
-        released(false) {}
+        released(false) {
+    result->add_stream();
+  }
+
+  ~StreamState() {
+    drop_result();
+  }
+
+  // Finalizes the statement unless R or another stream still holds the result,
+  // and closes a disconnected connection unless another stream reads from it:
+  // sqlite3_close_v2() completes once the statements are finalized
+  void drop_result() {
+    if (result) {
+      result->remove_stream();
+      result.reset();
+    }
+  }
 };
 
 StreamState* get_state(struct ArrowArrayStream* stream) {
   return static_cast<StreamState*>(stream->private_data);
 }
 
-// The result, while the stream can read it.
-// A handler of a warning raised by a fetch can't clear it,
-// see run_guarded() in DbResult.cpp.
+// The result, while the stream can read it
 DbResult* checked_result(StreamState* state) {
   DbResult* result = state->result.get();
-  if (result->cleared()) {
-    throw std::runtime_error(
-      "Can't read an Arrow stream after its result has been cleared."
-    );
-  }
-  if (!result->connection_valid()) {
-    throw std::runtime_error(
-      "Can't read an Arrow stream after its connection has been closed."
-    );
-  }
   if (result->executions() != state->executions) {
     throw std::runtime_error(
       "Can't read an Arrow stream after its result has been bound "
@@ -117,8 +123,7 @@ void get_next_impl(StreamState* state, struct ArrowArray* out) {
   // only the chunk that get_schema() keeps for it can be empty
   if (array->release == NULL || (array->length == 0 && result->complete())) {
     state->done = true;
-    // Frees the statement unless R still holds the result
-    state->result.reset();
+    state->drop_result();
     return;
   }
   ArrowArrayMove(array.get(), out);
@@ -169,8 +174,7 @@ void callback_cleanup(void* data) {
   // The flag is never cleared once set.
   if (call->code != NANOARROW_OK && state->running == 0 && !state->failed) {
     const DbResult* result = state->result.get();
-    state->failed =
-      result == NULL || result->cleared() || !result->arrow_chunk_kept();
+    state->failed = result == NULL || !result->arrow_chunk_kept();
   }
   if (state->released && state->running == 0) {
     delete state;
@@ -271,6 +275,13 @@ SEXP result_create_arrow_stream(
   }
   if (n == 0 || n < -1) {
     cpp11::stop("`n` must be positive, or -1 for all rows.");
+  }
+  // The stream keeps a connection open, not one closed already
+  if (!(*result)->connection_valid()) {
+    cpp11::stop(
+      "Can't read a result as an Arrow stream after its connection "
+      "has been closed."
+    );
   }
   cpp11::sexp stream_xptr(cpp11::safe[nanoarrow_array_stream_owning_xptr]());
   struct ArrowArrayStream* stream =

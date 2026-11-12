@@ -4,8 +4,10 @@
 # with the warning about the values converted to the type of their column.
 # get_schema() reads the first chunk, which decides the types,
 # and keeps it for the first get_next().
-# Once `res` is cleared, its connection closed,
-# or `res` bound to new parameters,
+# The stream reads on after `res` is cleared or its connection closed,
+# and keeps the statement, and a closed connection, open until it has ended
+# or is released.
+# Once `res` is bound to new parameters,
 # the stream fails with an error that says so.
 # Internal for now: no DBI method calls it yet.
 read_arrow_stream <- function(res, n = 65536L) {

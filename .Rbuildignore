@@ -30,6 +30,7 @@ a.out.dSYM
 ^cmake-build-debug$
 ^build\.sh$
 ^codecov\.yml$
+^\.covrignore$
 ^src/.*\.gch$
 .*\.orig$
 ^CRAN-RELEASE$

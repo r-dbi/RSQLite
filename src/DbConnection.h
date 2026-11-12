@@ -59,6 +59,10 @@ public:
   void add_stream();
   void remove_stream();
 
+  // Whether the handle has been closed,
+  // which a statement of an open result can still step
+  bool is_closed() const;
+
   // Results that R no longer holds, as dbClearResult() or R's garbage
   // collector dropped them, while an Arrow stream still holds them:
   // they don't count as in use for dbDisconnect()

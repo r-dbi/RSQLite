@@ -99,10 +99,17 @@ void DbConnection::disconnect() {
 void DbConnection::close_handle(sqlite3* conn) {
   // The statements of open results can still step the handle,
   // which stays a zombie until they are finalized:
-  // they get SQLITE_BUSY at once rather than call the released R handler
-  sqlite3_busy_handler(conn, NULL, NULL);
+  // they get SQLITE_BUSY at once rather than call the released R handler.
+  // A busy timeout calls no R code and stays.
+  if (busy_callback_ && !Rf_isInteger(busy_callback_)) {
+    sqlite3_busy_handler(conn, NULL, NULL);
+  }
   release_callback_data();
   sqlite3_close_v2(conn);
+}
+
+bool DbConnection::is_closed() const {
+  return pConn_ == NULL && pDeferred_ == NULL;
 }
 
 void DbConnection::add_stream() {

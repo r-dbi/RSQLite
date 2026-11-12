@@ -236,7 +236,7 @@ test_that("a stream keeps the busy handler after dbDisconnect() until it is rele
   stream$release()
   dbBind(res, list(10))
   dbExecute(other, "BEGIN EXCLUSIVE")
-  expect_error(dbBind(res, list(1)))
+  expect_error(dbBind(res, list(1)), "^database is locked$")
   expect_equal(calls, 1L)
   dbExecute(other, "ROLLBACK")
   dbClearResult(res)
@@ -272,11 +272,32 @@ test_that("a result of a closed connection no longer calls the busy handler", {
     # The result fails at once, without the handler
     dbBind(res, list(10))
     dbExecute(other, "BEGIN EXCLUSIVE")
-    expect_error(dbBind(res, list(1)), info = with_stream)
+    expect_error(dbBind(res, list(1)), "^database is locked$", info = with_stream)
     expect_equal(calls, 0L, info = with_stream)
     dbExecute(other, "ROLLBACK")
     dbClearResult(res)
   }
+})
+
+test_that("a result of a closed connection keeps the busy timeout", {
+  path <- withr::local_tempfile(fileext = ".sqlite")
+  other <- dbConnect(SQLite(), path)
+  withr::defer(dbDisconnect(other))
+  dbWriteTable(other, "t", data.frame(a = 1:3))
+
+  con <- dbConnect(SQLite(), path)
+  sqliteSetBusyHandler(con, 500L)
+  res <- dbSendQuery(con, "SELECT a FROM t WHERE a > ?")
+  dbBind(res, list(10))
+  expect_warning(dbDisconnect(con), "1 result in use")
+
+  dbExecute(other, "BEGIN EXCLUSIVE")
+  elapsed <- system.time(
+    expect_error(dbBind(res, list(1)), "^database is locked$")
+  )[["elapsed"]]
+  expect_gte(elapsed, 0.4)
+  dbExecute(other, "ROLLBACK")
+  dbClearResult(res)
 })
 
 test_that("a stream of a cleared result of a closed connection keeps its warnings and releases", {

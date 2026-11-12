@@ -7,6 +7,7 @@ test_that("dbGetRowCount() goes on beyond INT_MAX as a double", {
 
   expect_equal(nrow(dbFetch(rs, n = 1)), 1L)
   expect_identical(dbGetRowCount(rs), 1L)
+  expect_error(result_set_rows_fetched(rs@ptr, NA_real_), "whole number")
   # As if 2^31 - 2 rows had been fetched
   result_set_rows_fetched(rs@ptr, 2^31 - 2)
   expect_equal(nrow(dbFetch(rs, n = 1)), 1L)
@@ -27,7 +28,10 @@ test_that("dbGetRowsAffected() goes on beyond INT_MAX as a double", {
   on.exit(dbClearResult(rs), add = TRUE, after = FALSE)
 
   expect_identical(dbGetRowsAffected(rs), 0L)
-  # As if the statement had changed 2^31 - 1 rows
+  # As if the statement had changed 2^31 - 1 rows.
+  # The hook moves the start of the count, not SQLite's total of changes,
+  # so this covers the R type and the 64-bit arithmetic only:
+  # only the gated test below catches a return to the 32-bit total.
   result_set_rows_affected(rs@ptr, 2^31 - 1)
   expect_identical(dbGetRowsAffected(rs), .Machine$integer.max)
   expect_equal(nrow(dbFetch(rs)), 3L)

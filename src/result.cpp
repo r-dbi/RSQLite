@@ -67,14 +67,25 @@ cpp11::strings result_get_placeholder_names(SqliteResult* res) {
   return res->get_placeholder_names();
 }
 
+// For the tests: a count of rows from R.
+// The cast to int64_t is undefined for a value that it can't hold,
+// so the range is checked first; the check also fails for NA and NaN.
+static int64_t row_count_from_double(double n) {
+  if (!(n >= 0 && n <= 9007199254740992.0) ||
+      static_cast<double>(static_cast<int64_t>(n)) != n) {
+    cpp11::stop("`n` must be a whole number from 0 to 2^53.");
+  }
+  return static_cast<int64_t>(n);
+}
+
 // For the tests: sets the number of rows fetched from the statement
 [[cpp11::register]]
 void result_set_rows_fetched(SqliteResult* res, double n) {
-  res->set_rows_fetched(static_cast<int64_t>(n));
+  res->set_rows_fetched(row_count_from_double(n));
 }
 
 // For the tests: sets the number of rows the statement has changed so far
 [[cpp11::register]]
 void result_set_rows_affected(SqliteResult* res, double n) {
-  res->set_rows_affected(static_cast<int64_t>(n));
+  res->set_rows_affected(row_count_from_double(n));
 }

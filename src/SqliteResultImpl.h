@@ -104,6 +104,7 @@ public:
   // and is kept for the next Arrow fetch, as a chunk whose warning exited.
   void arrow_schema(struct ArrowSchema* schema, const int n_max);
   int executions() const;
+  bool arrow_chunk_kept() const;
 
   cpp11::list get_column_info();
 
@@ -125,7 +126,6 @@ private:
   bool step_done();
   cpp11::list peek_first_row();
   void build_arrow_chunk(const int n_max);
-  bool arrow_chunk_kept() const;
   bool arrow_types_decided() const;
   void warn_arrow_coercions();
 

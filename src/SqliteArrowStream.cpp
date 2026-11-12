@@ -29,13 +29,23 @@ struct StreamState {
   const int n_max;
   nanoarrow::UniqueSchema schema;
   bool done;
+  // Set once a fetch has failed, see run_callback()
+  bool failed;
   std::string last_error;
+  // The callbacks running, and whether release() came meanwhile,
+  // as from a handler of a warning that the fetch raised:
+  // the state is deleted once the last of them returns
+  int running;
+  bool released;
 
   StreamState(const DbResultPtr& result_, int n_max_)
       : result(result_),
         executions(result_->executions()),
         n_max(n_max_),
-        done(false) {}
+        done(false),
+        failed(false),
+        running(0),
+        released(false) {}
 };
 
 StreamState* get_state(struct ArrowArrayStream* stream) {
@@ -86,6 +96,9 @@ void get_schema_impl(StreamState* state, struct ArrowSchema* out) {
 
 void get_next_impl(StreamState* state, struct ArrowArray* out) {
   out->release = NULL;
+  if (state->failed) {
+    throw std::runtime_error(state->last_error);
+  }
   if (state->done) {
     return;
   }
@@ -113,23 +126,45 @@ void get_next_impl(StreamState* state, struct ArrowArray* out) {
 // arrives as a cpp11::unwind_exception.
 // Its jump goes on once the C++ objects of the callback are destroyed,
 // as at cpp11's entry points, through the C code of the consumer.
+//
+// A failure is final: later get_next() calls fail with its message,
+// rather than end the stream as if the rows were complete,
+// as the result is after a failed fetch.
+// Only a chunk kept when its warning exited comes with the next call.
 template <typename F>
 int run_callback(StreamState* state, F body) {
   SEXP token = R_NilValue;
+  int code = NANOARROW_OK;
+  ++state->running;
   try {
     body();
-    return NANOARROW_OK;
   } catch (const cpp11::unwind_exception& e) {
     token = e.token;
+    state->last_error =
+      "Can't read an Arrow stream after an R condition interrupted a fetch.";
+    code = EIO;
   } catch (const std::exception& e) {
     state->last_error = e.what();
-    return EIO;
+    code = EIO;
   } catch (...) {
     state->last_error = "Unknown C++ error";
-    return EIO;
+    code = EIO;
   }
-  R_ContinueUnwind(token);
-  return EIO;
+  --state->running;
+  // A call from a handler during another callback, which the busy guard
+  // refuses, leaves the stream to that callback
+  if (code != NANOARROW_OK && state->running == 0) {
+    const DbResult* result = state->result.get();
+    state->failed =
+      result == NULL || result->cleared() || !result->arrow_chunk_kept();
+  }
+  if (state->released && state->running == 0) {
+    delete state;
+  }
+  if (token != R_NilValue) {
+    R_ContinueUnwind(token);
+  }
+  return code;
 }
 
 int stream_get_schema(
@@ -150,9 +185,16 @@ const char* stream_get_last_error(struct ArrowArrayStream* stream) {
 }
 
 // Destroys the result if R has dropped it,
-// as R's garbage collector does when it frees the stream
+// as R's garbage collector does when it frees the stream.
+// During a callback, the callback deletes the state once it returns:
+// it goes on with the state and the result.
 void stream_release(struct ArrowArrayStream* stream) {
-  delete get_state(stream);
+  StreamState* state = get_state(stream);
+  if (state->running > 0) {
+    state->released = true;
+  } else {
+    delete state;
+  }
   stream->private_data = NULL;
   stream->release = NULL;
 }

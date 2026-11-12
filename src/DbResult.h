@@ -42,6 +42,9 @@ public:
   // also while an Arrow stream shares the result, which fails from then on
   void clear();
   bool cleared() const;
+  // Whether an Arrow chunk is kept for the next Arrow fetch,
+  // as when its warning exited
+  bool arrow_chunk_kept() const;
 
   bool complete() const;
   bool is_active() const;

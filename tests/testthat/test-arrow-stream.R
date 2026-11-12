@@ -163,7 +163,8 @@ test_that("an error of SQLite fails the stream and completes the result", {
   expect_false(dbHasCompleted(res))
   expect_error(stream$get_next(), "integer overflow")
   expect_true(dbHasCompleted(res))
-  expect_null(stream$get_next())
+  # The failure is final, not the end of a complete stream
+  expect_error(stream$get_next(), "integer overflow")
   dbClearResult(res)
 
   # The failed step inside a chunk fails it
@@ -172,6 +173,43 @@ test_that("an error of SQLite fails the stream and completes the result", {
   expect_error(stream$get_next(), "integer overflow")
   expect_true(dbHasCompleted(res))
   expect_equal(dbGetRowCount(res), 0)
+  expect_error(stream$get_next(), "integer overflow")
+})
+
+test_that("a stream can be released from a handler of its own warning", {
+  skip_if_not_installed("nanoarrow")
+  con <- local_con()
+  sql <- "SELECT 1 AS x UNION ALL SELECT 'a' UNION ALL SELECT 3"
+  for (drop in c(FALSE, TRUE)) {
+    # Not registered with the connection, so that R can free it
+    res <- new(
+      "SQLiteResult",
+      sql = sql, ptr = result_create(con@ptr, sql), conn = con, bigint = con@bigint
+    )
+    stream <- read_arrow_stream(res, 3)
+    if (drop) {
+      rm(res)
+      gc()
+    }
+    # The fetch goes on with the state and the result,
+    # and nanoarrow fails when it asks the released stream for the schema
+    expect_error(
+      withCallingHandlers(
+        stream$get_next(),
+        RSQLite_warning_coercion = function(w) {
+          stream$release()
+          gc()
+          invokeRestart("muffleWarning")
+        }
+      ),
+      "already been released",
+      info = drop
+    )
+    if (!drop) {
+      expect_true(dbHasCompleted(res))
+      dbClearResult(res)
+    }
+  }
 })
 
 test_that("a result is fetched either as data frames or as an Arrow stream", {

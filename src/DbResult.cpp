@@ -107,6 +107,10 @@ bool DbResult::cleared() const {
   return !impl;
 }
 
+bool DbResult::arrow_chunk_kept() const {
+  return impl->arrow_chunk_kept();
+}
+
 bool DbResult::connection_valid() const {
   return pConn_->is_valid();
 }

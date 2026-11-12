@@ -585,6 +585,9 @@ void SqliteResultImpl::step() {
 // An error is kept for the next fetch instead of costing the rows of this one;
 // SQLite's message and result code are saved now,
 // before later calls overwrite them.
+// The Arrow columns read the storage classes of the row read ahead at once,
+// and keep them for the next Arrow fetch, as for a row that a chunk held back:
+// reading the row as a data frame meanwhile can convert its values.
 void SqliteResultImpl::read_ahead() {
   try {
     while (step_run())
@@ -593,7 +596,15 @@ void SqliteResultImpl::read_ahead() {
     error_kept_ = true;
     kept_error_ = e.what();
     kept_error_code_ = e.code();
+    return;
   }
+  if (complete_ || arrow_columns_.empty()) {
+    return;
+  }
+  for (size_t j = 0; j < arrow_columns_.size(); ++j) {
+    arrow_columns_[j].read_type();
+  }
+  arrow_row_read_ = true;
 }
 
 bool SqliteResultImpl::step_run() {

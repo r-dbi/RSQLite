@@ -60,7 +60,8 @@ private:
   // kept when the warning about its values exits: see fetch_arrow_chunk()
   boost::scoped_ptr<KeptArrowChunk> arrow_chunk_;
   // Set while the Arrow columns hold the storage classes of the current row,
-  // also when a chunk ended before it: see ArrowChunk::takes_row()
+  // also when a chunk ended before it or a fetch read it ahead:
+  // see ArrowChunk::takes_row() and read_ahead()
   bool arrow_row_read_;
   // The most bytes of text or blobs in a utf8 or binary column of a chunk,
   // the 2^31 - 1 that their 32-bit offsets address unless a test lowers them

@@ -2,6 +2,8 @@
 # before a row whose text or blobs would take a utf8 or binary column beyond
 # the 2^31 - 1 bytes that the 32-bit offsets of these types address.
 # The tests lower the limit for their result with result_set_arrow_max_bytes().
+# The row that starts the next chunk, held back or read ahead, keeps the
+# storage classes that it had before anything converted its values.
 
 test_that("a chunk ends before the row that would take a column beyond the limit", {
   skip_if_not_installed("nanoarrow")
@@ -148,6 +150,40 @@ test_that("a row held back reports its conversions with the chunk of its own", {
   expect_identical(arrow_values(chunk)$s, c("eeeeeeeee", "6"))
   expect_true(dbHasCompleted(res))
   expect_equal(dbGetRowCount(res), 6)
+})
+
+test_that("a row read ahead keeps its storage classes for the next chunk", {
+  skip_if_not_installed("nanoarrow")
+  con <- local_con()
+  dbExecute(con, "CREATE TABLE t (i INTEGER, s)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES (1, 'a'), (2, 'bb'), (3, x'636363'), (4, 'd'),",
+    "(5, 'e'), (6, x'666666'), (7, 'g')"
+  ))
+  res <- local_result(con, "SELECT s FROM t ORDER BY i")
+  # Fixes `s` as character for the data frames
+  expect_identical(dbFetch(res, 1)$s, "a")
+
+  # A full chunk reads row 3 ahead; reading it as a data frame converts its
+  # blob to text, the next chunk keeps the storage class read before
+  expect_identical(arrow_values(fetch_arrow_chunk(res, 1))$s, "bb")
+  expect_warning(dbColumnInfo(res), "mixed type")
+  expect_coercions(
+    warnings_of(chunk <- fetch_arrow_chunk(res, 2)),
+    "Column `s` (utf8): 1 blob value converted (row 3)"
+  )
+  expect_identical(arrow_values(chunk)$s, c("ccc", "d"))
+
+  # Also when a data frame fetch between the chunks reads row 6 ahead
+  expect_identical(dbFetch(res, 1)$s, "e")
+  expect_warning(dbColumnInfo(res), "mixed type")
+  expect_coercions(
+    warnings_of(chunk <- fetch_arrow_chunk(res)),
+    "Column `s` (utf8): 1 blob value converted (row 6)"
+  )
+  expect_identical(arrow_values(chunk)$s, c("fff", "g"))
+  expect_true(dbHasCompleted(res))
+  expect_equal(dbGetRowCount(res), 7)
 })
 
 test_that("a value beyond the limit on its own fails after the rows before it", {

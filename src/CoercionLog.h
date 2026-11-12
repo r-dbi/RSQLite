@@ -23,7 +23,8 @@ enum COERCION_REASON {
 
 // The values of one column of a chunk that didn't fit its type,
 // grouped by storage class and reason, with their count
-// and the first of their 1-based row numbers in the result.
+// and the first of their 1-based row numbers in the result,
+// in the order of their first rows.
 // Recording calls no R API: the log is handed to R with as_list()
 // once the chunk is complete.
 class CoercionLog {

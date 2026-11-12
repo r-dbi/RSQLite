@@ -83,7 +83,9 @@ public:
   void bind(const cpp11::list& params);
   cpp11::list fetch(const int n_max);
   // Fetches at most `n_max` rows, all of them if negative, into a struct array,
-  // and warns about the values converted to the type of their column.
+  // and warns about the values converted to the type of their column;
+  // hands out a chunk kept when its warning exited instead, whole,
+  // whatever `n_max`.
   // The chunk ends before a row whose text or blobs would take a utf8 or
   // binary column beyond `arrow_max_bytes_`, and the next one starts with it.
   void fetch_arrow_chunk(

@@ -8,6 +8,9 @@
 # each a list of `class`, `reason`, `count`,
 # and `rows`, the first row numbers in the result, counted from 1.
 # The warning carries `coercions` in a field of the same name.
+# The condition is built and signalled with base R:
+# through rlang::warn(), the warning costs about eight times as much,
+# which a stream of small chunks pays once per chunk.
 warn_coercion <- function(coercions) {
   n <- length(coercions)
   header <- paste0(
@@ -15,11 +18,14 @@ warn_coercion <- function(coercions) {
     if (n == 1) " column:" else " columns:"
   )
   bullets <- vapply(coercions, format_coercion_column, character(1))
-  rlang::warn(
-    c(header, rlang::set_names(bullets, "*")),
-    class = "RSQLite_warning_coercion",
-    coercions = coercions
-  )
+  warning(structure(
+    list(
+      message = paste(c(header, paste0("* ", bullets)), collapse = "\n"),
+      call = NULL,
+      coercions = coercions
+    ),
+    class = c("RSQLite_warning_coercion", "warning", "condition")
+  ))
 }
 
 format_coercion_column <- function(column) {

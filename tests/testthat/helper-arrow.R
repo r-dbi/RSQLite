@@ -17,6 +17,7 @@ local_result <- function(con, sql, envir = parent.frame()) {
 }
 
 # The next chunk of at most `n` rows of `res`, all of them for -1,
+# or all of a chunk kept when its warning exited,
 # as a nanoarrow_array of a struct type.
 # With `converted = TRUE`, expects the warning about values converted to the
 # type of their column, whose text test-arrow-coercion.R checks

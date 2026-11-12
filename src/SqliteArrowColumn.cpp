@@ -331,6 +331,7 @@ void SqliteArrowColumn::append_value(int column_type) {
     break;
 
   case AK_BINARY:
+    // read_bytes() has read the value
     if (column_type != SQLITE_BLOB) {
       note(column_type, CR_CONVERTED);
     }

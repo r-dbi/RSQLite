@@ -230,6 +230,7 @@ test_that("a stream can be released from a handler while nanoarrow converts it",
     "SELECT 1 AS x UNION ALL SELECT 2 UNION ALL SELECT 'a' UNION ALL SELECT 4"
   )
   stream <- read_arrow_stream(res, 2)
+  # From the stream, or "already been released" from a nanoarrow that checks
   expect_error(
     withCallingHandlers(
       nanoarrow::convert_array_stream(stream),
@@ -238,7 +239,7 @@ test_that("a stream can be released from a handler while nanoarrow converts it",
         invokeRestart("muffleWarning")
       }
     ),
-    "has been released"
+    "been released"
   )
 })
 

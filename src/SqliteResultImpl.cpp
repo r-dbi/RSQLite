@@ -27,6 +27,85 @@ private:
   int code_;
 };
 
+// The rows of an Arrow chunk, built column by column, see fetch_loop()
+class ArrowChunk {
+  boost::ptr_vector<SqliteArrowColumn>& columns_;
+  const int n_max_;
+  int i_;
+
+public:
+  ArrowChunk(boost::ptr_vector<SqliteArrowColumn>& columns, const int n_max)
+      : columns_(columns), n_max_(n_max), i_(0) {
+    for (size_t j = 0; j < columns_.size(); ++j) {
+      columns_[j].start_chunk();
+    }
+  }
+
+  void set_col_values() {
+    for (size_t j = 0; j < columns_.size(); ++j) {
+      columns_[j].append_row();
+    }
+  }
+
+  bool advance() {
+    ++i_;
+
+    if (i_ % 1024 == 0) {
+      cpp11::check_user_interrupt();
+    }
+
+    return (n_max_ < 0 || i_ < n_max_);
+  }
+
+  // Moves the chunk and its schema to `array` and `schema` once both are
+  // complete; the types of the columns are final from then on
+  void finish(struct ArrowArray* array, struct ArrowSchema* schema) {
+    const int64_t ncols = static_cast<int64_t>(columns_.size());
+    for (size_t j = 0; j < columns_.size(); ++j) {
+      columns_[j].finish_chunk(i_);
+    }
+
+    nanoarrow::UniqueSchema out_schema;
+    ArrowSchemaInit(out_schema.get());
+    check_arrow(
+      ArrowSchemaSetTypeStruct(out_schema.get(), ncols),
+      "Can't allocate Arrow schema"
+    );
+    for (size_t j = 0; j < columns_.size(); ++j) {
+      columns_[j].set_schema(out_schema->children[j]);
+    }
+
+    nanoarrow::UniqueArray out;
+    check_arrow(
+      ArrowArrayInitFromType(out.get(), NANOARROW_TYPE_STRUCT),
+      "Can't allocate Arrow array"
+    );
+    check_arrow(
+      ArrowArrayAllocateChildren(out.get(), ncols),
+      "Can't allocate Arrow array"
+    );
+    for (size_t j = 0; j < columns_.size(); ++j) {
+      columns_[j].move_chunk_to(out->children[j]);
+    }
+    out->length = i_;
+    out->null_count = 0;
+
+    struct ArrowError error;
+    ArrowErrorInit(&error);
+    check_arrow(
+      ArrowArrayFinishBuildingDefault(out.get(), &error),
+      "Can't finish Arrow array",
+      &error
+    );
+
+    for (size_t j = 0; j < columns_.size(); ++j) {
+      columns_[j].freeze();
+    }
+    out.move(array);
+    out_schema.move(schema);
+  }
+};
+
 }  // namespace
 
 // Construction ////////////////////////////////////////////////////////////////
@@ -162,6 +241,8 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
   }
 
   params_.reset(new SqliteListParamSource(params));
+  // A new execution decides its Arrow types anew
+  arrow_columns_.clear();
 
   total_changes_start_ = sqlite3_total_changes(conn);
   bind_started_ = true;
@@ -201,6 +282,27 @@ cpp11::list SqliteResultImpl::fetch(const int n_max) {
   }
 
   return out;
+}
+
+void SqliteResultImpl::fetch_arrow_chunk(
+  struct ArrowArray* array,
+  struct ArrowSchema* schema,
+  const int n_max
+) {
+  if (!ready_) {
+    throw std::runtime_error("Query needs to be bound before fetching");
+  }
+
+  if (arrow_columns_.empty()) {
+    for (size_t j = 0; j < cache.ncols_; ++j) {
+      arrow_columns_.push_back(
+        new SqliteArrowColumn(stmt, static_cast<int>(j), cache.names_[j])
+      );
+    }
+  }
+
+  ArrowChunk chunk(arrow_columns_, n_max);
+  fetch_loop(chunk, n_max, [&] { chunk.finish(array, schema); });
 }
 
 cpp11::list SqliteResultImpl::get_column_info() {
@@ -302,7 +404,8 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
 // Reads rows into `rows` until `n_max` rows, all of them if negative,
 // or the end of the result, and completes them with `finish()`.
 // `rows` appends the current row with set_col_values(),
-// and tells with advance() whether it takes another one, as DbDataFrame does.
+// and tells with advance() whether it takes another one,
+// as DbDataFrame and ArrowChunk do.
 template <typename Rows, typename Finish>
 void SqliteResultImpl::fetch_loop(Rows& rows, const int n_max, Finish finish) {
   // Rows count as fetched once they are returned, not if the fetch fails,
@@ -331,8 +434,9 @@ void SqliteResultImpl::fetch_loop(Rows& rows, const int n_max, Finish finish) {
   } catch (...) {
     // An error that unwinds through the C++ frames of a fetch ends the
     // execution: a failed step or a kept error, an error that the conversion
-    // raises through cpp11, a warning raised through cpp11 that becomes an
-    // error or that a handler leaves the fetch on, or an interrupt.
+    // raises through cpp11 or that building the Arrow arrays throws,
+    // a warning raised through cpp11 that becomes an error
+    // or that a handler leaves the fetch on, or an interrupt.
     // Stepping again would silently restart a statement that failed,
     // and fetching again would convert the same value again
     // or go on after the rows of this fetch.

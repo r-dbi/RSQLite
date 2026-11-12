@@ -9,6 +9,8 @@
 
 class DbConnection;
 typedef boost::shared_ptr<DbConnection> DbConnectionPtr;
+struct ArrowArray;
+struct ArrowSchema;
 
 // Owned by the external pointer of a result, see result_create()
 class DbResult;
@@ -41,6 +43,11 @@ public:
 
   void bind(const cpp11::list& params);
   cpp11::list fetch(int n_max = -1);
+  void fetch_arrow_chunk(
+    struct ArrowArray* array,
+    struct ArrowSchema* schema,
+    int n_max
+  );
 
   cpp11::list get_column_info();
 

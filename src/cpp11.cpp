@@ -116,6 +116,13 @@ extern "C" SEXP _RSQLite_result_fetch(SEXP res, SEXP n) {
   END_CPP11
 }
 // result.cpp
+SEXP result_fetch_arrow_chunk(DbResult* res, const int n);
+extern "C" SEXP _RSQLite_result_fetch_arrow_chunk(SEXP res, SEXP n) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(result_fetch_arrow_chunk(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<const int>>(n)));
+  END_CPP11
+}
+// result.cpp
 void result_bind(DbResult* res, cpp11::list params);
 extern "C" SEXP _RSQLite_result_bind(SEXP res, SEXP params) {
   BEGIN_CPP11
@@ -179,6 +186,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_result_column_info",           (DL_FUNC) &_RSQLite_result_column_info,           1},
     {"_RSQLite_result_create",                (DL_FUNC) &_RSQLite_result_create,                2},
     {"_RSQLite_result_fetch",                 (DL_FUNC) &_RSQLite_result_fetch,                 2},
+    {"_RSQLite_result_fetch_arrow_chunk",     (DL_FUNC) &_RSQLite_result_fetch_arrow_chunk,     2},
     {"_RSQLite_result_get_placeholder_names", (DL_FUNC) &_RSQLite_result_get_placeholder_names, 1},
     {"_RSQLite_result_has_completed",         (DL_FUNC) &_RSQLite_result_has_completed,         1},
     {"_RSQLite_result_release",               (DL_FUNC) &_RSQLite_result_release,               1},

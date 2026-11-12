@@ -60,6 +60,10 @@ result_fetch <- function(res, n) {
   .Call(`_RSQLite_result_fetch`, res, n)
 }
 
+result_fetch_arrow_chunk <- function(res, n) {
+  .Call(`_RSQLite_result_fetch_arrow_chunk`, res, n)
+}
+
 result_bind <- function(res, params) {
   invisible(.Call(`_RSQLite_result_bind`, res, params))
 }

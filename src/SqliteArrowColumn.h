@@ -2,6 +2,8 @@
 #define RSQLITE_SQLITEARROWCOLUMN_H
 
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "sqlite3-cpp.h"
 #include "CoercionLog.h"
@@ -49,6 +51,9 @@ class SqliteArrowColumn {
   nanoarrow::UniqueArray array;
   // Rows of the current chunk seen while undecided (all NULL)
   int64_t pending_nulls;
+  // Rows of the current chunk whose text or blob an open int64 column has
+  // read as an integer, with their reading as a real for promote_to_double()
+  std::vector<std::pair<int64_t, double> > text_reals;
   // The 1-based row number in the result of the value being appended
   int64_t row;
   // The values of the current chunk that didn't fit the type
@@ -96,10 +101,13 @@ private:
   bool integer_value(int column_type, int64_t& value) const;
   void append_string(int column_type);
   struct ArrowBufferView value_bytes(int column_type) const;
+  const char* value_text() const;
+  double text_real() const;
   void append_date(int column_type);
   void append_time(int column_type);
   void append_null();
   void promote_to_double();
+  NORET void stop_out_of_memory() const;
   void note(int column_type, COERCION_REASON reason);
   const char* type_name() const;
 };

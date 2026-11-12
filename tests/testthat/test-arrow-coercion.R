@@ -55,6 +55,24 @@ test_that("reals in a fixed int64 column are converted, and NULL beyond it", {
   expect_equal(arrow_values(chunk)$x, c(2, NA, 7, NA, 12, 7))
 })
 
+test_that("text beyond int64 before a real widens the column is converted", {
+  skip_if_not_installed("nanoarrow")
+  con <- local_con()
+  res <- local_result(con, paste(
+    "SELECT column1 AS x FROM (VALUES (1), ('99999999999999999999'),",
+    "('2.5'), (x'3132'), (3.5))"
+  ))
+
+  # The column is double at the end of the chunk,
+  # where the text beyond int64 has its reading as a real
+  warnings <- warnings_of(chunk <- fetch_arrow_chunk(res))
+  expect_coercions(warnings, paste(
+    "Column `x` (double): 2 text values converted (rows 2 and 3);",
+    "1 blob value converted (row 4)"
+  ))
+  expect_equal(arrow_values(chunk)$x, c(1, 1e20, 2.5, 12, 3.5))
+})
+
 test_that("values in a column of the null type are reported as dropped", {
   skip_if_not_installed("nanoarrow")
   con <- local_con()

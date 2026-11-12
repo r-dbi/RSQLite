@@ -41,7 +41,9 @@ test_that("numbers are days or seconds since 1970, as dbFetch() reads them", {
     "(2, 19724.9, 45296.5, 1704198896.25), (3, -0.5, 0.1, -0.1),",
     # Julian days are a count of days or seconds since 1970 for both paths
     "(4, julianday('2024-01-02'), 86399.9999996, julianday('2024-01-02')),",
-    "(5, NULL, 0.0000004, -0.0000016)"
+    "(5, NULL, 0.0000004, -0.0000016),",
+    "(6, NULL, 0.0000025, 5000000000.000001),",
+    "(7, NULL, 0.0000035, -5000000000.000001)"
   ))
 
   sql <- "SELECT d, tm, ts FROM t WHERE id < 5 ORDER BY id"
@@ -52,17 +54,17 @@ test_that("numbers are days or seconds since 1970, as dbFetch() reads them", {
     c(19724, 19724, 0, 2460311)
   )
   # Seconds are rounded to the nearest microsecond, where dbFetch() keeps
-  # what the double holds, and a time before midnight to the last
-  # microsecond of the day at most
+  # what the double holds: halves to even, an odd count between 2^52 and 2^53
+  # as it is, and a time before midnight to the last microsecond of the day
   chunk <- fetch_arrow_all(con, "SELECT tm, ts FROM t ORDER BY id")
   expect_identical(
     arrow_micros(chunk, "tm"),
-    c("45296000000", "45296500000", "100000", "86399999999", "0")
+    c("45296000000", "45296500000", "100000", "86399999999", "0", "2", "4")
   )
-  expect_identical(
-    arrow_micros(chunk, "ts"),
-    c("1704198896000000", "1704198896250000", "-100000", "2460311500000", "-2")
-  )
+  expect_identical(arrow_micros(chunk, "ts"), c(
+    "1704198896000000", "1704198896250000", "-100000", "2460311500000", "-2",
+    "5000000000000001", "-5000000000000001"
+  ))
 })
 
 test_that("fractional seconds keep their microseconds", {
@@ -179,13 +181,17 @@ test_that("values beyond the range of the Arrow type are NULL", {
     c("9223372036854000000", "-9223372036854000000", NA, NA, NA, NA, NA)
   )
 
-  # dbFetch() keeps any duration, and wraps a count of days beyond 32 bits
+  # dbFetch() keeps any duration, and wraps a count of days beyond 32 bits,
+  # also of a real, which SQLite saturates at 64 bits first
   expected <- dbGetQuery(con, "SELECT d, tm FROM t ORDER BY id")
   expect_equal(
     as.numeric(expected$tm),
     c(0, 86399.9999996, 86400, -1, 86400, -1, 86399.999999)
   )
-  expect_identical(unclass(expected$d)[3:4], c(-2147483648, 2147483647))
+  expect_identical(
+    unclass(expected$d)[3:7],
+    c(-2147483648, 2147483647, 1410065408, -1, 0)
+  )
 })
 
 test_that("blobs and text that can't be parsed are NULL, dbFetch() warns", {
@@ -218,6 +224,36 @@ test_that("blobs and text that can't be parsed are NULL, dbFetch() warns", {
     arrow_micros(chunks[[1]], "ts"),
     c(NA, NA, NA, NA, NA, "1704196800000000")
   )
+})
+
+test_that("text that runs out of memory fails its chunk at once", {
+  skip_on_cran()
+  skip_if_not_installed("nanoarrow")
+  skip_if_not_installed("callr")
+  skip_unless_callr_loads_tested_rsqlite()
+
+  # As for the utf8, int64 and double columns of test-arrow-text.R:
+  # the second row is the last of a chunk of one row,
+  # and its 20 million characters, computed as it is read,
+  # take 40 MB as UTF-16, and the UTF-8 text to parse more, beyond the limit
+  for (type in c("DATE", "TIME", "TIMESTAMP")) {
+    setup <- c(
+      paste0(
+        "CREATE TABLE t (n INTEGER, x ", type,
+        " AS (iif(n = 1, '2024-01-02', printf('%.*c', 20000000, 'x'))))"
+      ),
+      "INSERT INTO t (n) VALUES (1), (2), (3)"
+    )
+    out <- fetch_arrow_chunk_out_of_memory(
+      "SELECT x FROM t ORDER BY n",
+      limit = 50000000,
+      setup = setup,
+      extended_types = TRUE
+    )
+    expect_match(out$error, "out of memory while reading a value", info = type)
+    expect_true(out$completed)
+    expect_equal(out$rows, 1L)
+  }
 })
 
 test_that("columns of only NULL take their declared type", {

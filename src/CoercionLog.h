@@ -32,6 +32,8 @@ public:
   static const size_t N_ROWS = 5;
 
   void record(int column_type, COERCION_REASON reason, int64_t row);
+  // Moves the values of `column_type` logged with `from` to `to`
+  void merge(int column_type, COERCION_REASON from, COERCION_REASON to);
   bool empty() const;
   void clear();
 
@@ -47,6 +49,8 @@ private:
     std::vector<int64_t> rows;
   };
   std::vector<Entry> entries;
+
+  Entry* find(int column_type, COERCION_REASON reason);
 };
 
 #endif  // RSQLITE_COERCIONLOG_H

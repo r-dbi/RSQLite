@@ -1,17 +1,13 @@
 #include "pch.h"
 #include "CoercionLog.h"
 #include "sqlite3-cpp.h"
+#include <algorithm>
+#include <iterator>
 
 using namespace cpp11::literals;
 
 void CoercionLog::record(int column_type, COERCION_REASON reason, int64_t row) {
-  Entry* entry = NULL;
-  for (size_t i = 0; i < entries.size(); ++i) {
-    if (entries[i].column_type == column_type && entries[i].reason == reason) {
-      entry = &entries[i];
-      break;
-    }
-  }
+  Entry* entry = find(column_type, reason);
   if (entry == NULL) {
     entries.push_back(Entry());
     entry = &entries.back();
@@ -26,12 +22,54 @@ void CoercionLog::record(int column_type, COERCION_REASON reason, int64_t row) {
   }
 }
 
+void CoercionLog::merge(
+  int column_type,
+  COERCION_REASON from,
+  COERCION_REASON to
+) {
+  Entry* source = find(column_type, from);
+  if (source == NULL) {
+    return;
+  }
+  Entry* target = find(column_type, to);
+  if (target == NULL) {
+    source->reason = to;
+    return;
+  }
+
+  target->count += source->count;
+  // Each keeps its first rows in order,
+  // so the first rows of both are the first of the two lists merged
+  std::vector<int64_t> rows;
+  std::merge(
+    target->rows.begin(),
+    target->rows.end(),
+    source->rows.begin(),
+    source->rows.end(),
+    std::back_inserter(rows)
+  );
+  if (rows.size() > N_ROWS) {
+    rows.resize(N_ROWS);
+  }
+  target->rows.swap(rows);
+  entries.erase(entries.begin() + (source - &entries[0]));
+}
+
 bool CoercionLog::empty() const {
   return entries.empty();
 }
 
 void CoercionLog::clear() {
   entries.clear();
+}
+
+CoercionLog::Entry* CoercionLog::find(int column_type, COERCION_REASON reason) {
+  for (size_t i = 0; i < entries.size(); ++i) {
+    if (entries[i].column_type == column_type && entries[i].reason == reason) {
+      return &entries[i];
+    }
+  }
+  return NULL;
 }
 
 static const char* format_column_type(int column_type) {

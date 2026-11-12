@@ -1,6 +1,7 @@
 #include <cpp11.hpp>
 #include "pch.h"
 #include "SqliteResultImpl.h"
+#include "SqliteArrowColumn.h"
 #include "SqliteDataFrame.h"
 #include "DbColumnStorage.h"
 #include "DbConnection.h"
@@ -116,6 +117,12 @@ public:
 
 }  // namespace
 
+// The chunk of an Arrow fetch until it is handed out, see fetch_arrow_chunk()
+struct KeptArrowChunk {
+  nanoarrow::UniqueArray array;
+  nanoarrow::UniqueSchema schema;
+};
+
 // Construction ////////////////////////////////////////////////////////////////
 
 SqliteResultImpl::SqliteResultImpl(
@@ -227,7 +234,7 @@ bool SqliteResultImpl::complete() const {
 
 int SqliteResultImpl::n_rows_fetched() {
   if (arrow_chunk_kept()) {
-    return nrows_ - static_cast<int>(arrow_chunk_->length);
+    return nrows_ - static_cast<int>(arrow_chunk_->array->length);
   }
   return nrows_;
 }
@@ -258,7 +265,6 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
   // and drops a chunk kept from the previous one
   arrow_columns_.clear();
   arrow_chunk_.reset();
-  arrow_chunk_schema_.reset();
 
   total_changes_start_ = sqlite3_total_changes(conn);
   bind_started_ = true;
@@ -316,25 +322,27 @@ void SqliteResultImpl::fetch_arrow_chunk(
     throw std::runtime_error("Query needs to be bound before fetching");
   }
 
+  if (!arrow_chunk_) {
+    arrow_chunk_.reset(new KeptArrowChunk());
+  }
+
   // A chunk kept when its warning exited comes first, whatever `n_max`,
   // and without warning again
   if (!arrow_chunk_kept()) {
     if (arrow_columns_.empty()) {
       for (size_t j = 0; j < cache.ncols_; ++j) {
-        arrow_columns_.push_back(
-          new SqliteArrowColumn(
-            stmt,
-            static_cast<int>(j),
-            cache.names_[j],
-            with_alt_types_
-          )
-        );
+        arrow_columns_.push_back(new SqliteArrowColumn(
+          stmt,
+          static_cast<int>(j),
+          cache.names_[j],
+          with_alt_types_
+        ));
       }
     }
 
     ArrowChunk chunk(arrow_columns_, n_max, nrows_);
     fetch_loop(chunk, n_max, [&] {
-      chunk.finish(arrow_chunk_.get(), arrow_chunk_schema_.get());
+      chunk.finish(arrow_chunk_->array.get(), arrow_chunk_->schema.get());
     });
 
     // The warning comes once the chunk is complete and the fetch loop is left,
@@ -346,8 +354,8 @@ void SqliteResultImpl::fetch_arrow_chunk(
     warn_arrow_coercions();
   }
 
-  arrow_chunk_.move(array);
-  arrow_chunk_schema_.move(schema);
+  arrow_chunk_->array.move(array);
+  arrow_chunk_->schema.move(schema);
 }
 
 cpp11::list SqliteResultImpl::get_column_info() {
@@ -571,7 +579,7 @@ cpp11::list SqliteResultImpl::peek_first_row() {
 }
 
 bool SqliteResultImpl::arrow_chunk_kept() const {
-  return arrow_chunk_->release != NULL;
+  return arrow_chunk_ && arrow_chunk_->array->release != NULL;
 }
 
 // One warning for the values of the latest Arrow chunk that didn't fit

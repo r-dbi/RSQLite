@@ -8,11 +8,16 @@
 #include <boost/shared_ptr.hpp>
 #include "sqlite3-cpp.h"
 #include "DbColumnDataType.h"
-#include "SqliteArrowColumn.h"
 
 class DbConnection;
 typedef boost::shared_ptr<DbConnection> DbConnectionPtr;
 class SqliteParamSource;
+// Declared only, so that the files that include this header
+// don't compile the nanoarrow headers
+class SqliteArrowColumn;
+struct ArrowArray;
+struct ArrowSchema;
+struct KeptArrowChunk;
 
 class SqliteResultImpl : public boost::noncopyable {
 private:
@@ -53,8 +58,7 @@ private:
   boost::ptr_vector<SqliteArrowColumn> arrow_columns_;
   // The latest Arrow chunk until it is handed out,
   // kept when the warning about its values exits: see fetch_arrow_chunk()
-  nanoarrow::UniqueArray arrow_chunk_;
-  nanoarrow::UniqueSchema arrow_chunk_schema_;
+  boost::scoped_ptr<KeptArrowChunk> arrow_chunk_;
 
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);

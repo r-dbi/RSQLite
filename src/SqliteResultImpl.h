@@ -73,6 +73,8 @@ private:
   void after_bind(bool params_have_rows);
 
   cpp11::list fetch_rows(int n_max, int& n);
+  template <typename Rows, typename Finish>
+  void fetch_loop(Rows& rows, int n_max, Finish finish);
   void step();
   void read_ahead();
   bool step_run();

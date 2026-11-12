@@ -294,10 +294,20 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
     );
   }
 
+  cpp11::list out;
+  fetch_loop(data, n_max, [&] { out = data.get_data(types_); });
+  return out;
+}
+
+// Reads rows into `rows` until `n_max` rows, all of them if negative,
+// or the end of the result, and completes them with `finish()`.
+// `rows` appends the current row with set_col_values(),
+// and tells with advance() whether it takes another one, as DbDataFrame does.
+template <typename Rows, typename Finish>
+void SqliteResultImpl::fetch_loop(Rows& rows, const int n_max, Finish finish) {
   // Rows count as fetched once they are returned, not if the fetch fails,
   // also not if the conversion fails
   int n_fetched = 0;
-  cpp11::list out;
   try {
     // The step past the rows of the previous fetch failed
     if (error_kept_) {
@@ -305,19 +315,19 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
     }
 
     while (!complete_) {
-      data.set_col_values();
+      rows.set_col_values();
       // The step past the last row of a full fetch only reads ahead
       if (++n_fetched == n_max) {
         read_ahead();
       } else {
         step();
       }
-      if (!data.advance()) {
+      if (!rows.advance()) {
         break;
       }
     }
 
-    out = data.get_data(types_);
+    finish();
   } catch (...) {
     // An error that unwinds through the C++ frames of a fetch ends the
     // execution: a failed step or a kept error, an error that the conversion
@@ -341,7 +351,6 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   }
 
   nrows_ += n_fetched;
-  return out;
 }
 
 // A failed step ends the execution for every caller, and its error,

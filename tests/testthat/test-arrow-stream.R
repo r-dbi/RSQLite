@@ -174,6 +174,14 @@ test_that("an error of SQLite fails the stream and completes the result", {
   expect_true(dbHasCompleted(res))
   expect_equal(dbGetRowCount(res), 0)
   expect_error(stream$get_next(), "integer overflow")
+  dbClearResult(res)
+
+  # A failure while the schema is read is final too
+  res <- local_result(con, sql)
+  stream <- read_arrow_stream(res, 5)
+  for (i in 1:3) {
+    expect_error(nanoarrow::convert_array_stream(stream), "integer overflow")
+  }
 })
 
 test_that("a stream can be released from a handler of its own warning", {
@@ -210,6 +218,28 @@ test_that("a stream can be released from a handler of its own warning", {
       dbClearResult(res)
     }
   }
+})
+
+test_that("a stream can be released from a handler while nanoarrow converts it", {
+  skip_if_not_installed("nanoarrow")
+  con <- local_con()
+  # The warning comes with the second chunk,
+  # and nanoarrow asks the released stream for a third one
+  res <- local_result(
+    con,
+    "SELECT 1 AS x UNION ALL SELECT 2 UNION ALL SELECT 'a' UNION ALL SELECT 4"
+  )
+  stream <- read_arrow_stream(res, 2)
+  expect_error(
+    withCallingHandlers(
+      nanoarrow::convert_array_stream(stream),
+      RSQLite_warning_coercion = function(w) {
+        stream$release()
+        invokeRestart("muffleWarning")
+      }
+    ),
+    "has been released"
+  )
 })
 
 test_that("a result is fetched either as data frames or as an Arrow stream", {

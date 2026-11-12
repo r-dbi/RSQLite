@@ -28,7 +28,8 @@ protected:
   DbResult(const DbConnectionPtr& pConn);
 
 public:
-  ~DbResult();
+  // Virtual, because a DbResultPtr deletes a SqliteResult through a DbResult*
+  virtual ~DbResult();
 
 public:
   void close();

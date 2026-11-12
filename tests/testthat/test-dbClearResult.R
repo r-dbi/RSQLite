@@ -88,9 +88,14 @@ test_that("a result collected without being cleared lets go of its connection", 
 })
 
 test_that("disconnecting with an open result warns, the result holds the connection", {
-  con <- dbConnect(SQLite(), ":memory:")
+  path <- withr::local_tempfile(fileext = ".sqlite")
+  con <- dbConnect(SQLite(), path)
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, "INSERT INTO t VALUES (1), (2)")
+
   res <- dbSendQuery(con, "SELECT 1 AS a")
-  ptr <- result_create(con@ptr, "SELECT 2 AS b")
+  # Reads the first of two rows, which keeps a read lock on the database
+  ptr <- result_create(con@ptr, "SELECT x FROM t")
 
   expect_warning(
     dbDisconnect(con),
@@ -106,9 +111,13 @@ test_that("disconnecting with an open result warns, the result holds the connect
   expect_silent(dbClearResult(res))
   expect_false(dbIsValid(res))
 
-  # The last result lets go of the connection when collected
+  # The last result keeps the database locked until it is collected
+  con2 <- dbConnect(SQLite(), path)
+  on.exit(dbDisconnect(con2), add = TRUE, after = FALSE)
+  expect_error(dbExecute(con2, "INSERT INTO t VALUES (3)"), "database is locked")
   rm(ptr)
-  expect_silent(invisible(gc()))
+  invisible(gc())
+  expect_equal(dbExecute(con2, "INSERT INTO t VALUES (3)"), 1L)
 })
 
 test_that("a handler of a fetch can't clear its result, which can be cleared after", {

@@ -7,6 +7,17 @@
 
 // The parameter sets bound to a prepared statement, one at a time:
 // the statement runs once for each set.
+// A source must not leave by the longjmp of an R error,
+// which skips the C++ frames of the result:
+// the result would stay ready on a statement
+// that was reset and only partly bound,
+// and the next fetch would step it with the bindings cleared.
+// R API calls that can fail go through cpp11's safe wrappers,
+// whose exception the result handles like any other error,
+// or are made before binding starts.
+// SqliteListParamSource reads its vectors with R's API directly,
+// as the result did before: that fails only for an ALTREP vector
+// whose data pointer can't be taken.
 class SqliteParamSource : public boost::noncopyable {
 public:
   virtual ~SqliteParamSource();

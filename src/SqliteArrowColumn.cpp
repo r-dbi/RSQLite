@@ -519,8 +519,7 @@ void SqliteArrowColumn::append_time(int column_type) {
     if (ok) {
       const int64_t base = static_cast<int64_t>(whole) * 1000000;
       // At most a second, with the sign of the seconds
-      const int64_t part =
-        static_cast<int64_t>(std::nearbyint(fraction * 1e6));
+      const int64_t part = static_cast<int64_t>(std::nearbyint(fraction * 1e6));
       // Within the int64 microseconds but their smallest value,
       // which bit64 reads as NA, as for an integer
       ok = (part >= 0) ? base <= INT64_MAX - part : base >= -INT64_MAX - part;

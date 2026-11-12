@@ -11,6 +11,7 @@ dbFetch_SQLiteResult <- function(res, n = -1, ...,
   }
   if (is.infinite(n)) n <- -1
   if (trunc(n) != n) stopc("`n` must be a whole number")
+  claim_fetch_kind(res, "a data frame")
   ret <- result_fetch(res@ptr, n = n)
   ret <- convert_bigint(ret, res@bigint)
   ret <- sqlColumnToRownames(ret, row.names)

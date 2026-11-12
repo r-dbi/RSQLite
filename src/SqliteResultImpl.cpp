@@ -29,6 +29,23 @@ private:
   int code_;
 };
 
+// The struct type of the Arrow chunks of `columns`
+void set_struct_schema(
+  const boost::ptr_vector<SqliteArrowColumn>& columns,
+  struct ArrowSchema* schema
+) {
+  nanoarrow::UniqueSchema out;
+  ArrowSchemaInit(out.get());
+  check_arrow(
+    ArrowSchemaSetTypeStruct(out.get(), static_cast<int64_t>(columns.size())),
+    "Can't allocate Arrow schema"
+  );
+  for (size_t j = 0; j < columns.size(); ++j) {
+    columns[j].set_schema(out->children[j]);
+  }
+  out.move(schema);
+}
+
 // The rows of an Arrow chunk, built column by column, see fetch_loop()
 class ArrowChunk {
   boost::ptr_vector<SqliteArrowColumn>& columns_;
@@ -114,14 +131,7 @@ public:
     }
 
     nanoarrow::UniqueSchema out_schema;
-    ArrowSchemaInit(out_schema.get());
-    check_arrow(
-      ArrowSchemaSetTypeStruct(out_schema.get(), ncols),
-      "Can't allocate Arrow schema"
-    );
-    for (size_t j = 0; j < columns_.size(); ++j) {
-      columns_[j].set_schema(out_schema->children[j]);
-    }
+    set_struct_schema(columns_, out_schema.get());
 
     nanoarrow::UniqueArray out;
     check_arrow(
@@ -181,7 +191,8 @@ SqliteResultImpl::SqliteResultImpl(
       error_kept_(false),
       kept_error_code_(SQLITE_OK),
       arrow_row_read_(false),
-      arrow_max_bytes_(INT32_MAX) {
+      arrow_max_bytes_(INT32_MAX),
+      executions_(0) {
   try {
     if (cache.nparams_ == 0) {
       after_bind(true);
@@ -302,6 +313,7 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
   }
 
   params_.reset(new SqliteListParamSource(params));
+  ++executions_;
   // A new execution decides its Arrow types anew,
   // and drops a chunk kept from the previous one
   arrow_columns_.clear();
@@ -359,6 +371,42 @@ void SqliteResultImpl::fetch_arrow_chunk(
   struct ArrowSchema* schema,
   const int n_max
 ) {
+  // A chunk kept when its warning exited,
+  // or by arrow_schema(), comes first, whatever `n_max`,
+  // and without warning again
+  if (!arrow_chunk_kept()) {
+    build_arrow_chunk(n_max);
+  }
+
+  arrow_chunk_->array.move(array);
+  arrow_chunk_->schema.move(schema);
+}
+
+void SqliteResultImpl::arrow_schema(
+  struct ArrowSchema* schema,
+  const int n_max
+) {
+  // The first chunk decides the types,
+  // and is kept for the next fetch
+  if (!arrow_chunk_kept() && !arrow_types_decided()) {
+    build_arrow_chunk(n_max);
+  }
+
+  if (arrow_chunk_kept()) {
+    check_arrow(
+      ArrowSchemaDeepCopy(arrow_chunk_->schema.get(), schema),
+      "Can't copy Arrow schema"
+    );
+  } else {
+    set_struct_schema(arrow_columns_, schema);
+  }
+}
+
+int SqliteResultImpl::executions() const {
+  return executions_;
+}
+
+void SqliteResultImpl::build_arrow_chunk(const int n_max) {
   if (!ready_) {
     throw std::runtime_error("Query needs to be bound before fetching");
   }
@@ -367,37 +415,30 @@ void SqliteResultImpl::fetch_arrow_chunk(
     arrow_chunk_.reset(new KeptArrowChunk());
   }
 
-  // A chunk kept when its warning exited comes first, whatever `n_max`,
-  // and without warning again
-  if (!arrow_chunk_kept()) {
-    if (arrow_columns_.empty()) {
-      for (size_t j = 0; j < cache.ncols_; ++j) {
-        arrow_columns_.push_back(new SqliteArrowColumn(
-          stmt,
-          static_cast<int>(j),
-          cache.names_[j],
-          with_alt_types_
-        ));
-      }
+  if (arrow_columns_.empty()) {
+    for (size_t j = 0; j < cache.ncols_; ++j) {
+      arrow_columns_.push_back(new SqliteArrowColumn(
+        stmt,
+        static_cast<int>(j),
+        cache.names_[j],
+        with_alt_types_
+      ));
     }
-
-    ArrowChunk
-      chunk(arrow_columns_, n_max, nrows_, arrow_max_bytes_, arrow_row_read_);
-    fetch_loop(chunk, n_max, [&] {
-      chunk.finish(arrow_chunk_->array.get(), arrow_chunk_->schema.get());
-    });
-
-    // The warning comes once the chunk is complete and the fetch loop is left,
-    // while the result stays busy, see run_guarded() in DbResult.cpp.
-    // Its handlers can't find a chunk half-built,
-    // and an error made of the warning, as with options(warn = 2),
-    // or a handler that exits leaves the result as it is:
-    // the chunk is kept and comes with the next fetch.
-    warn_arrow_coercions();
   }
 
-  arrow_chunk_->array.move(array);
-  arrow_chunk_->schema.move(schema);
+  ArrowChunk
+    chunk(arrow_columns_, n_max, nrows_, arrow_max_bytes_, arrow_row_read_);
+  fetch_loop(chunk, n_max, [&] {
+    chunk.finish(arrow_chunk_->array.get(), arrow_chunk_->schema.get());
+  });
+
+  // The warning comes once the chunk is complete and the fetch loop is left,
+  // while the result stays busy, see run_guarded() in DbResult.cpp.
+  // Its handlers can't find a chunk half-built,
+  // and an error made of the warning, as with options(warn = 2),
+  // or a handler that exits leaves the result as it is:
+  // the chunk is kept and comes with the next fetch.
+  warn_arrow_coercions();
 }
 
 cpp11::list SqliteResultImpl::get_column_info() {
@@ -644,6 +685,11 @@ cpp11::list SqliteResultImpl::peek_first_row() {
 
 bool SqliteResultImpl::arrow_chunk_kept() const {
   return arrow_chunk_ && arrow_chunk_->array->release != NULL;
+}
+
+// A chunk of the current execution has fixed the Arrow types
+bool SqliteResultImpl::arrow_types_decided() const {
+  return !arrow_columns_.empty() && arrow_columns_[0].is_frozen();
 }
 
 // One warning for the values of the latest Arrow chunk that didn't fit

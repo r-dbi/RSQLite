@@ -74,7 +74,7 @@ DbResult::DbResult(const DbConnectionPtr& pConn) : pConn_(pConn), busy_(false) {
 
 DbResult::~DbResult() {
   try {
-    if (is_active()) {
+    if (pConn_ && is_active()) {
       pConn_->reset_current_result(this);
     }
   } catch (...) {}
@@ -92,6 +92,27 @@ bool DbResult::is_active() const {
 
 bool DbResult::busy() const {
   return busy_;
+}
+
+void DbResult::clear() {
+  impl.reset();
+  // A stream doesn't count as a result in use by dbDisconnect()
+  if (is_active()) {
+    pConn_->reset_current_result(this);
+  }
+  pConn_.reset();
+}
+
+bool DbResult::cleared() const {
+  return !impl;
+}
+
+bool DbResult::connection_valid() const {
+  return pConn_->is_valid();
+}
+
+int DbResult::executions() const {
+  return impl->executions();
 }
 
 int DbResult::n_rows_fetched() {
@@ -131,6 +152,22 @@ void DbResult::fetch_arrow_chunk(
     }
     impl->fetch_arrow_chunk(array, schema, n_max);
   });
+}
+
+void DbResult::arrow_schema(struct ArrowSchema* schema, const int n_max) {
+  run_guarded(busy_, [&] {
+    if (!is_active()) {
+      cpp11::stop("Inactive result set");
+    }
+    impl->arrow_schema(schema, n_max);
+  });
+}
+
+std::string DbResult::claim_fetch_kind(const std::string& kind) {
+  if (fetch_kind_.empty()) {
+    fetch_kind_ = kind;
+  }
+  return fetch_kind_;
 }
 
 cpp11::list DbResult::get_column_info() {

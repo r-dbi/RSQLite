@@ -64,6 +64,10 @@ void SqliteArrowColumn::freeze() {
   std::vector<std::pair<int64_t, double> >().swap(text_reals);
 }
 
+bool SqliteArrowColumn::is_frozen() const {
+  return frozen;
+}
+
 void SqliteArrowColumn::set_schema(struct ArrowSchema* schema) const {
   enum ArrowType type;
   switch (kind) {

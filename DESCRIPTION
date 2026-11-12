@@ -81,6 +81,7 @@ Collate:
     'SQLiteDriver.R'
     'SQLite.R'
     'SQLiteResult.R'
+    'arrow-stream.R'
     'coerce.R'
     'compatRowNames.R'
     'copy.R'

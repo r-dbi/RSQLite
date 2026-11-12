@@ -23,12 +23,16 @@ cpp11::external_pointer<DbResultPtr> result_create(
 [[cpp11::register]]
 void result_release(cpp11::external_pointer<DbResultPtr> res) {
   DbResultPtr* ptr = res.get();
-  if (ptr != NULL && ptr->get() != NULL && (*ptr)->busy()) {
-    // Freeing it would pull the statement from under the running fetch
-    cpp11::stop(
-      "Can't clear a result while one of its fetches or binds is running, "
-      "as from a handler of a warning that it raised."
-    );
+  if (ptr != NULL && ptr->get() != NULL) {
+    if ((*ptr)->busy()) {
+      // Freeing it would pull the statement from under the running fetch
+      cpp11::stop(
+        "Can't clear a result while one of its fetches or binds is running, "
+        "as from a handler of a warning that it raised."
+      );
+    }
+    // Now, also while an Arrow stream shares the result
+    (*ptr)->clear();
   }
   res.reset();
 }
@@ -65,6 +69,12 @@ SEXP result_fetch_arrow_chunk(DbResult* res, const int n) {
   // The schema of a nanoarrow_array lives in the tag of the external pointer
   R_SetExternalPtrTag(array_xptr, schema_xptr);
   return array_xptr;
+}
+
+// See claim_fetch_kind() in R
+[[cpp11::register]]
+std::string result_claim_fetch_kind(DbResult* res, std::string kind) {
+  return res->claim_fetch_kind(kind);
 }
 
 [[cpp11::register]]

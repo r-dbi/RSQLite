@@ -302,7 +302,11 @@ void SqliteArrowParamSource::bind_parameter(
   case NANOARROW_TYPE_HALF_FLOAT:
   case NANOARROW_TYPE_FLOAT:
   case NANOARROW_TYPE_DOUBLE:
-    rc = sqlite3_bind_double(stmt, pos, ArrowArrayViewGetDoubleUnsafe(values, row));
+    rc = sqlite3_bind_double(
+      stmt,
+      pos,
+      ArrowArrayViewGetDoubleUnsafe(values, row)
+    );
     break;
   case NANOARROW_TYPE_STRING:
   case NANOARROW_TYPE_LARGE_STRING:

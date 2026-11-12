@@ -77,7 +77,9 @@ public:
   void bind(const cpp11::list& params);
   cpp11::list fetch(const int n_max);
   // Fetches at most `n_max` rows, all of them if negative, into a struct array,
-  // and warns about the values converted to the type of their column
+  // and warns about the values converted to the type of their column;
+  // hands out a chunk kept when its warning exited instead, whole,
+  // whatever `n_max`
   void fetch_arrow_chunk(
     struct ArrowArray* array,
     struct ArrowSchema* schema,

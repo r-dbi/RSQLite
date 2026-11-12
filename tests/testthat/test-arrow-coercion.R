@@ -22,7 +22,7 @@ test_that("one warning per chunk names the columns, values and rows", {
   fetch_arrow_chunk(res, 2)
   warnings <- warnings_of(fetch_arrow_chunk(res))
   expect_length(warnings, 1)
-  expect_s3_class(warnings[[1]], "RSQLite_warning_coercion")
+  expect_s3_class(warnings[[1]], c("RSQLite_warning_coercion", "warning"))
   expect_equal(warnings[[1]]$coercions, list(list(
     column = "i",
     type = "int64",
@@ -60,17 +60,18 @@ test_that("text beyond int64 before a real widens the column is converted", {
   con <- local_con()
   res <- local_result(con, paste(
     "SELECT column1 AS x FROM (VALUES (1), ('99999999999999999999'),",
-    "('2.5'), (x'3132'), (3.5))"
+    "(x'3132'), ('2.5'), (3.5))"
   ))
 
   # The column is double at the end of the chunk,
-  # where the text beyond int64 has its reading as a real
+  # where the text beyond int64 has its reading as a real;
+  # the groups stay in the order of their first rows
   warnings <- warnings_of(chunk <- fetch_arrow_chunk(res))
   expect_coercions(warnings, paste(
-    "Column `x` (double): 2 text values converted (rows 2 and 3);",
-    "1 blob value converted (row 4)"
+    "Column `x` (double): 2 text values converted (rows 2 and 4);",
+    "1 blob value converted (row 3)"
   ))
-  expect_equal(arrow_values(chunk)$x, c(1, 1e20, 2.5, 12, 3.5))
+  expect_equal(arrow_values(chunk)$x, c(1, 1e20, 12, 2.5, 3.5))
 })
 
 test_that("values in a column of the null type are reported as dropped", {
@@ -220,8 +221,10 @@ test_that("with options(warn = 2), the chunk is kept for the next fetch", {
   expect_equal(dbGetRowCount(res), 0)
   expect_error(dbFetch(res), "Can't fetch a data frame before the Arrow chunk")
 
-  # The next fetch hands out the chunk, whatever its `n`, without warning
+  # The next fetch hands out the whole chunk, whatever its `n`,
+  # without warning
   chunk <- fetch_arrow_chunk(res, 1)
+  expect_equal(chunk$length, 2)
   expect_equal(arrow_values(chunk)$x, c(1, 0))
   expect_equal(dbGetRowCount(res), 2)
   chunk <- fetch_arrow_chunk(res)

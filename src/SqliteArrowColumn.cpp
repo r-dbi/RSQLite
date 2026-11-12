@@ -288,14 +288,17 @@ void SqliteArrowColumn::append_value(int column_type) {
     break;
 
   case AK_BINARY:
-    if (column_type != SQLITE_BLOB) {
-      note(column_type, CR_CONVERTED);
+    {
+      const struct ArrowBufferView bytes = value_bytes(column_type);
+      if (column_type != SQLITE_BLOB) {
+        note(column_type, CR_CONVERTED);
+      }
+      check_arrow(
+        ArrowArrayAppendBytes(array.get(), bytes),
+        "Can't append to Arrow array"
+      );
+      break;
     }
-    check_arrow(
-      ArrowArrayAppendBytes(array.get(), value_bytes(column_type)),
-      "Can't append to Arrow array"
-    );
-    break;
 
   case AK_DATE32:
     append_date(column_type);

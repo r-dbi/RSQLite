@@ -44,7 +44,10 @@ cpp11::list result_fetch(DbResult* res, const int n) {
   return res->fetch(n);
 }
 
-// At most `n` rows, all of them for -1, as a nanoarrow_array of a struct type.
+// At most `n` rows, all of them for -1, as a nanoarrow_array of a struct type,
+// with one warning about the values converted to the type of their column.
+// A chunk kept because that warning exited comes whole with the next call,
+// whatever its `n`.
 // Internal for now: no DBI method calls it yet.
 [[cpp11::register]]
 SEXP result_fetch_arrow_chunk(DbResult* res, const int n) {

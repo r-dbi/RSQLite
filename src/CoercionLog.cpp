@@ -52,7 +52,17 @@ void CoercionLog::merge(
     rows.resize(N_ROWS);
   }
   target->rows.swap(rows);
-  entries.erase(entries.begin() + (source - &entries[0]));
+
+  // The groups are in the order of their first rows:
+  // the merged one takes the slot of the earlier of the two
+  const size_t i_source = static_cast<size_t>(source - &entries[0]);
+  const size_t i_target = static_cast<size_t>(target - &entries[0]);
+  if (i_source < i_target) {
+    std::swap(entries[i_source], entries[i_target]);
+    entries.erase(entries.begin() + i_target);
+  } else {
+    entries.erase(entries.begin() + i_source);
+  }
 }
 
 bool CoercionLog::empty() const {

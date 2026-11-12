@@ -4,7 +4,8 @@
 #'   the new connection has the database, `vfs`, `flags`, `loadable.extensions`, `bigint` and `extended_types` of the original,
 #'   unless they are passed as arguments to `dbConnect()`.
 #'   `default.extensions`, `synchronous` and `cache_size` are not carried over.
-#'   A temporary database can be cloned only into another `dbname`.
+#'   A connection to a temporary database can only be used as a template for a connection to another `dbname`:
+#'   its settings carry over, its data does not.
 #' @param dbname The path to the database file.
 #'   SQLite keeps each database instance in one single file.
 #'   The name of the database \emph{is} the file name,

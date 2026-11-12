@@ -212,3 +212,57 @@ expect_coercions <- function(warnings, lines) {
     lines
   )
 }
+
+# Writes a table `t` with a row for each of `sizes`, numbered by `i`:
+# `s` holds text of that many bytes and `b` a blob of that many bytes,
+# both NULL for NA
+write_sized_table <- function(con, sizes) {
+  blobs <- lapply(sizes, function(size) if (!is.na(size)) as.raw(rep(1, size)))
+  dbWriteTable(con, "t", data.frame(
+    i = seq_along(sizes),
+    s = strrep("x", sizes),
+    b = blob::as_blob(blobs)
+  ))
+}
+
+# A result of `sql` whose Arrow chunks hold at most `max_bytes` bytes of text
+# or blobs per column instead of 2^31 - 1, so that the tests of the limit
+# need little memory; cleared as by local_result()
+local_limited_result <- function(con, sql, max_bytes, envir = parent.frame()) {
+  res <- local_result(con, sql, envir = envir)
+  result_set_arrow_max_bytes(res@ptr, max_bytes)
+  res
+}
+
+# The chunks of at most `n` rows of `res` until it completes, each checked
+# with expect_valid_chunk(), and expecting dbGetRowCount() to count their rows.
+# With `converted = TRUE`, the warnings about converted values are muffled.
+fetch_arrow_chunks <- function(res, n = -1L, converted = FALSE) {
+  chunks <- list()
+  rows <- dbGetRowCount(res)
+  while (!dbHasCompleted(res)) {
+    chunk <- withCallingHandlers(
+      fetch_arrow_chunk(res, n),
+      RSQLite_warning_coercion = function(w) {
+        if (converted) {
+          invokeRestart("muffleWarning")
+        }
+      }
+    )
+    expect_valid_chunk(chunk)
+    # An empty chunk before the end would never end the loop
+    expect_gt(chunk$length, 0)
+    if (chunk$length == 0) {
+      break
+    }
+    rows <- rows + chunk$length
+    expect_equal(dbGetRowCount(res), rows)
+    chunks[[length(chunks) + 1]] <- chunk
+  }
+  chunks
+}
+
+# The numbers of rows of `chunks`
+chunk_lengths <- function(chunks) {
+  vapply(chunks, function(chunk) chunk$length, numeric(1))
+}

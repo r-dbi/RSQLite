@@ -21,3 +21,7 @@ DbResult* SqliteResult::create_and_send_query(
 cpp11::strings SqliteResult::get_placeholder_names() const {
   return impl->get_placeholder_names();
 }
+
+void SqliteResult::set_arrow_max_bytes(int64_t max_bytes) {
+  impl->set_arrow_max_bytes(max_bytes);
+}

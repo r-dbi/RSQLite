@@ -14,6 +14,11 @@ public:
     bool with_alt_types
   );
   virtual ~SqliteDataFrame();
+
+  // A data frame takes every row, see SqliteResultImpl::fetch_loop()
+  bool takes_row() const {
+    return true;
+  }
 };
 
 #endif  // RSQLITE_SQLITEDATAFRAME_H

@@ -6,6 +6,7 @@
 #include "DbColumnStorage.h"
 #include "DbConnection.h"
 #include "SqliteParamSource.h"
+#include <cstdint>
 #include <stdexcept>
 
 namespace {
@@ -34,18 +35,56 @@ class ArrowChunk {
   const int n_max_;
   // The rows of the result before this chunk
   const int64_t offset_;
+  // The most bytes of text or blobs in a utf8 or binary column
+  const int64_t max_bytes_;
+  // Set while the columns hold the storage classes of the current row
+  bool& row_read_;
   int i_;
 
 public:
   ArrowChunk(
     boost::ptr_vector<SqliteArrowColumn>& columns,
     const int n_max,
-    const int64_t offset
+    const int64_t offset,
+    const int64_t max_bytes,
+    bool& row_read
   )
-      : columns_(columns), n_max_(n_max), offset_(offset), i_(0) {
+      : columns_(columns),
+        n_max_(n_max),
+        offset_(offset),
+        max_bytes_(max_bytes),
+        row_read_(row_read),
+        i_(0) {
     for (size_t j = 0; j < columns_.size(); ++j) {
       columns_[j].start_chunk();
     }
+  }
+
+  // Whether the chunk takes the current row: not if one of its values would
+  // take the data of a utf8 or binary column beyond `max_bytes_`.
+  // The statement then stays on the row, which starts the next chunk.
+  // A value beyond them on its own fails the chunk that it starts,
+  // so that the rows before it come out first.
+  bool takes_row() {
+    // The storage classes are read before anything converts the values,
+    // and kept for the next chunk when this one doesn't take the row
+    if (!row_read_) {
+      for (size_t j = 0; j < columns_.size(); ++j) {
+        columns_[j].read_type();
+      }
+      row_read_ = true;
+    }
+    // The bytes are read anew in each chunk:
+    // reading the row as a data frame meanwhile may have moved them
+    for (size_t j = 0; j < columns_.size(); ++j) {
+      if (!columns_[j].read_bytes(max_bytes_)) {
+        if (i_ == 0) {
+          columns_[j].stop_too_long(max_bytes_);
+        }
+        return false;
+      }
+    }
+    return true;
   }
 
   void set_col_values() {
@@ -140,7 +179,9 @@ SqliteResultImpl::SqliteResultImpl(
       types_(get_initial_field_types(cache.ncols_)),
       with_alt_types_(conn_->with_alt_types()),
       error_kept_(false),
-      kept_error_code_(SQLITE_OK) {
+      kept_error_code_(SQLITE_OK),
+      arrow_row_read_(false),
+      arrow_max_bytes_(INT32_MAX) {
   try {
     if (cache.nparams_ == 0) {
       after_bind(true);
@@ -340,7 +381,13 @@ void SqliteResultImpl::fetch_arrow_chunk(
       }
     }
 
-    ArrowChunk chunk(arrow_columns_, n_max, nrows_);
+    ArrowChunk chunk(
+      arrow_columns_,
+      n_max,
+      nrows_,
+      arrow_max_bytes_,
+      arrow_row_read_
+    );
     fetch_loop(chunk, n_max, [&] {
       chunk.finish(arrow_chunk_->array.get(), arrow_chunk_->schema.get());
     });
@@ -391,6 +438,10 @@ cpp11::list SqliteResultImpl::get_column_info() {
 }
 
 // Publics (custom) ////////////////////////////////////////////////////////////
+
+void SqliteResultImpl::set_arrow_max_bytes(int64_t max_bytes) {
+  arrow_max_bytes_ = max_bytes;
+}
 
 cpp11::strings SqliteResultImpl::get_placeholder_names() const {
   int n = sqlite3_bind_parameter_count(stmt);
@@ -456,9 +507,11 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
 
 // Reads rows into `rows` until `n_max` rows, all of them if negative,
 // or the end of the result, and completes them with `finish()`.
-// `rows` appends the current row with set_col_values(),
+// `rows` tells with takes_row() whether it takes the current row,
+// appends it with set_col_values(),
 // and tells with advance() whether it takes another one,
-// as DbDataFrame and ArrowChunk do.
+// as SqliteDataFrame and ArrowChunk do.
+// A row that it doesn't take stays the current one, for the next fetch.
 template <typename Rows, typename Finish>
 void SqliteResultImpl::fetch_loop(Rows& rows, const int n_max, Finish finish) {
   // Rows count as fetched once they are returned, not if the fetch fails,
@@ -471,6 +524,9 @@ void SqliteResultImpl::fetch_loop(Rows& rows, const int n_max, Finish finish) {
     }
 
     while (!complete_) {
+      if (!rows.takes_row()) {
+        break;
+      }
       rows.set_col_values();
       // The step past the last row of a full fetch only reads ahead
       if (++n_fetched == n_max) {
@@ -541,6 +597,8 @@ void SqliteResultImpl::read_ahead() {
 }
 
 bool SqliteResultImpl::step_run() {
+  // The next row has storage classes of its own
+  arrow_row_read_ = false;
   int rc = sqlite3_step(stmt);
 
   switch (rc) {

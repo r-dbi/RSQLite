@@ -18,6 +18,7 @@ public:
 
 public:
   cpp11::strings get_placeholder_names() const;
+  void set_arrow_max_bytes(int64_t max_bytes);
 };
 
 #endif

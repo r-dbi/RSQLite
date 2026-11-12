@@ -88,6 +88,10 @@ result_get_placeholder_names <- function(res) {
   .Call(`_RSQLite_result_get_placeholder_names`, res)
 }
 
+result_set_arrow_max_bytes <- function(res, max_bytes) {
+  invisible(.Call(`_RSQLite_result_set_arrow_max_bytes`, res, max_bytes))
+}
+
 rsqliteVersion <- function() {
   .Call(`_RSQLite_rsqliteVersion`)
 }

@@ -100,8 +100,9 @@ test_that("a cloned connection keeps `bigint` and `extended_types`", {
   dbExecute(con, "INSERT INTO t VALUES ('2020-01-02', 1099511627776)")
   expect_identical(
     dbReadTable(clone, "t"),
-    data.frame(d = as.Date("2020-01-02"), big = "1099511627776")
+    data.frame(d = as.Date("2020-01-02"), big = "1099511627776", stringsAsFactors = FALSE)
   )
+  expect_identical(dbDataType(clone, Sys.Date()), "DATE")
 })
 
 test_that("a cloned connection has the defaults of a fresh one", {
@@ -113,6 +114,42 @@ test_that("a cloned connection has the defaults of a fresh one", {
 
   expect_identical(clone@bigint, "integer64")
   expect_false(clone@extended_types)
+})
+
+test_that("arguments to `dbConnect()` on a connection override the original", {
+  con <- dbConnect(SQLite(), tempfile(), bigint = "character", extended_types = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  clone <- dbConnect(con, bigint = "integer64")
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+  expect_identical(clone@bigint, "integer64")
+  expect_true(clone@extended_types)
+
+  clone2 <- dbConnect(con, extended_types = FALSE)
+  on.exit(dbDisconnect(clone2), add = TRUE, after = FALSE)
+  expect_identical(clone2@bigint, "character")
+  expect_false(clone2@extended_types)
+})
+
+test_that("a second argument to `dbConnect()` on a connection is the database", {
+  other <- tempfile()
+  con <- dbConnect(SQLite(), tempfile(), bigint = "character")
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  clone <- dbConnect(con, other)
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+  expect_identical(clone@dbname, normalizePath(other, mustWork = FALSE))
+  expect_identical(clone@bigint, "character")
+})
+
+test_that("a temporary database can be cloned into another database", {
+  other <- tempfile()
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  clone <- dbConnect(con, dbname = other)
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+  expect_identical(clone@dbname, normalizePath(other, mustWork = FALSE))
 })
 
 test_that("a temporary database can't be cloned", {

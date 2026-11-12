@@ -295,14 +295,12 @@ void SqliteResultImpl::fetch_arrow_chunk(
 
   if (arrow_columns_.empty()) {
     for (size_t j = 0; j < cache.ncols_; ++j) {
-      arrow_columns_.push_back(
-        new SqliteArrowColumn(
-          stmt,
-          static_cast<int>(j),
-          cache.names_[j],
-          with_alt_types_
-        )
-      );
+      arrow_columns_.push_back(new SqliteArrowColumn(
+        stmt,
+        static_cast<int>(j),
+        cache.names_[j],
+        with_alt_types_
+      ));
     }
   }
 

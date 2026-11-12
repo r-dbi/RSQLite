@@ -86,6 +86,41 @@ test_that("can connect to same db from multiple connections", {
   expect_equal(dbReadTable(con2, "airquality"), airquality)
 })
 
+test_that("a cloned connection keeps `bigint` and `extended_types`", {
+  dbfile <- tempfile()
+  con <- dbConnect(SQLite(), dbfile, bigint = "character", extended_types = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+  clone <- dbConnect(con)
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+
+  expect_identical(clone@bigint, "character")
+  expect_true(clone@extended_types)
+
+  dbExecute(con, "CREATE TABLE t (d DATE, big INTEGER)")
+  dbExecute(con, "INSERT INTO t VALUES ('2020-01-02', 1099511627776)")
+  expect_identical(
+    dbReadTable(clone, "t"),
+    data.frame(d = as.Date("2020-01-02"), big = "1099511627776")
+  )
+})
+
+test_that("a cloned connection has the defaults of a fresh one", {
+  dbfile <- tempfile()
+  con <- dbConnect(SQLite(), dbfile)
+  on.exit(dbDisconnect(con), add = TRUE)
+  clone <- dbConnect(con)
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+
+  expect_identical(clone@bigint, "integer64")
+  expect_false(clone@extended_types)
+})
+
+test_that("a temporary database can't be cloned", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+  expect_error(dbConnect(con), "Can't clone a temporary database")
+})
+
 test_that("temporary tables are connection local", {
   dbfile <- tempfile()
   con1 <- dbConnect(SQLite(), dbfile)

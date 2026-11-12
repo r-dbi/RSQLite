@@ -102,3 +102,36 @@ expect_same_chunks <- function(con, sql, ns, int64 = double(), mixed = FALSE) {
   expect_equal(actual, expected)
   invisible(chunks)
 }
+
+# Fetches a first chunk of one row of `sql` in a UTF-16 database
+# in a new R session, limits SQLite's heap to `limit` bytes,
+# and fetches a second chunk of one row.
+# SQLite can't lift the limit again, hence the session of its own.
+# Returns the error of the second fetch, if any,
+# and the state of the result after it.
+fetch_arrow_chunk_out_of_memory <- function(sql, limit) {
+  callr::r(
+    function(sql, limit) {
+      library(RSQLite)
+      con <- dbConnect(SQLite(), ":memory:")
+      other <- dbConnect(SQLite(), ":memory:")
+      dbExecute(con, "PRAGMA encoding = 'UTF-16'")
+      res <- dbSendQuery(con, sql)
+      RSQLite:::result_fetch_arrow_chunk(res@ptr, 1L)
+      dbExecute(other, paste("PRAGMA hard_heap_limit =", limit))
+      error <- tryCatch(
+        {
+          RSQLite:::result_fetch_arrow_chunk(res@ptr, 1L)
+          NA_character_
+        },
+        error = conditionMessage
+      )
+      list(
+        error = error,
+        completed = dbHasCompleted(res),
+        rows = dbGetRowCount(res)
+      )
+    },
+    list(sql, format(limit, scientific = FALSE))
+  )
+}

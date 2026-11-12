@@ -8,11 +8,15 @@
 #include <boost/shared_ptr.hpp>
 #include "sqlite3-cpp.h"
 #include "DbColumnDataType.h"
-#include "SqliteArrowColumn.h"
 
 class DbConnection;
 typedef boost::shared_ptr<DbConnection> DbConnectionPtr;
 class SqliteParamSource;
+// Declared only, so that the files that include this header
+// don't compile the nanoarrow headers
+class SqliteArrowColumn;
+struct ArrowArray;
+struct ArrowSchema;
 
 class SqliteResultImpl : public boost::noncopyable {
 private:

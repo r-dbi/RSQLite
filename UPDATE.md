@@ -1,8 +1,9 @@
 # Updates
 
-Two components are shipped with the package that can be updated:
+Three components are shipped with the package that can be updated:
 
 - SQLite library
+- nanoarrow library, see `src/vendor/nanoarrow/README.md`
 - Datasets database
 
 Ideally the update should happen right *after* each CRAN release, so that a new SQLite version is tested for some time before it's released to CRAN.

@@ -8,6 +8,7 @@ CURL_LIBS=
 -include Makevars.local
 
 PKG_CPPFLAGS=-Ivendor \
+             -DNANOARROW_DLL= \
              -DRSQLITE_USE_BUNDLED_SQLITE \
              -DSQLITE_ENABLE_RTREE \
              -DSQLITE_ENABLE_FTS3 \
@@ -32,6 +33,8 @@ PKG_LIBS = vendor/sqlite3/sqlite3.o vendor/nanoarrow/nanoarrow.o $(CURL_LIBS)
 all: $(SHLIB)
 
 $(SHLIB): vendor/sqlite3/sqlite3.o vendor/nanoarrow/nanoarrow.o
+
+vendor/nanoarrow/nanoarrow.o: vendor/nanoarrow/nanoarrow.h
 
 # This file is available only during development.
 # For the tarball, we create an empty file.

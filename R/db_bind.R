@@ -3,9 +3,30 @@ NULL
 
 db_bind <- function(res, params, ..., allow_named_superset) {
   placeholder_names <- result_get_placeholder_names(res@ptr)
+
+  if (is_unnamed_placeholders(placeholder_names)) {
+    if (!is.null(names(params)) || any(names(params) != "")) {
+      stopc("Cannot use named parameters for anonymous/numbered placeholders")
+    }
+  } else {
+    param_indexes <- match_placeholders(
+      placeholder_names,
+      params,
+      allow_named_superset
+    )
+    params <- unname(params[param_indexes])
+  }
+
+  params <- factor_to_string(params, warn = TRUE)
+  params <- string_to_utf8(params)
+
+  result_bind(res@ptr, params)
+  invisible(res)
+}
+
+is_unnamed_placeholders <- function(placeholder_names) {
   empty <- placeholder_names == ""
   numbers <- grepl("^[1-9][0-9]*$", placeholder_names)
-  names <- !(empty | numbers)
 
   if (any(empty) && !all(empty)) {
     stopc("Cannot mix anonymous and named/numbered placeholders in query")
@@ -15,40 +36,40 @@ db_bind <- function(res, params, ..., allow_named_superset) {
     stopc("Cannot mix numbered and named placeholders in query")
   }
 
-  if (any(empty) || any(numbers)) {
-    if (!is.null(names(params)) || any(names(params) != "")) {
-      stopc("Cannot use named parameters for anonymous/numbered placeholders")
-    }
-  } else {
-    param_indexes <- match(placeholder_names, names(params))
-    if (any(is.na(param_indexes))) {
-      stopc(
-        "No value given for placeholder ",
-        paste0(placeholder_names[is.na(param_indexes)], collapse = ", ")
-      )
-    }
-    unmatched_param_indexes <- setdiff(seq_along(params), param_indexes)
-    if (length(unmatched_param_indexes) > 0L) {
-      if (allow_named_superset) {
-        errorc <- warningc
-      } else {
-        errorc <- stopc
-      }
+  any(empty) || any(numbers)
+}
 
-      errorc(
-        "Named parameters not used in query: ",
-        paste0(names(params)[unmatched_param_indexes], collapse = ", ")
-      )
+# The position of each placeholder among the elements of `params`, by name.
+# An element that no placeholder uses, such as any element of an unnamed list,
+# is an error, or a warning with `allow_named_superset`.
+match_placeholders <- function(
+  placeholder_names,
+  params,
+  allow_named_superset
+) {
+  param_names <- names(params)
+  param_indexes <- match(placeholder_names, param_names)
+  if (any(is.na(param_indexes))) {
+    stopc(
+      "No value given for placeholder ",
+      paste0(placeholder_names[is.na(param_indexes)], collapse = ", ")
+    )
+  }
+  unmatched_param_indexes <- setdiff(seq_along(params), param_indexes)
+  if (length(unmatched_param_indexes) > 0L) {
+    if (allow_named_superset) {
+      errorc <- warningc
+    } else {
+      errorc <- stopc
     }
 
-    params <- unname(params[param_indexes])
+    errorc(
+      "Named parameters not used in query: ",
+      paste0(param_names[unmatched_param_indexes], collapse = ", ")
+    )
   }
 
-  params <- factor_to_string(params, warn = TRUE)
-  params <- string_to_utf8(params)
-
-  result_bind(res@ptr, params)
-  invisible(res)
+  param_indexes
 }
 
 convert_bigint <- function(df, bigint) {

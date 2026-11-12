@@ -153,7 +153,7 @@ fetch_arrow_all <- function(con, sql, converted = FALSE) {
 # SQLite can't lift the limit again, hence the session of its own.
 # The statements of `setup` run before `sql`,
 # on a connection with `extended_types` as given.
-# Returns the error of the second fetch, if any,
+# Returns the error of the second fetch or the value of its column `x`,
 # and the state of the result after it.
 fetch_arrow_chunk_out_of_memory <- function(sql, limit, setup = character(),
                                             extended_types = FALSE) {
@@ -169,15 +169,18 @@ fetch_arrow_chunk_out_of_memory <- function(sql, limit, setup = character(),
       res <- dbSendQuery(con, sql)
       RSQLite:::result_fetch_arrow_chunk(res@ptr, 1L)
       dbExecute(other, paste("PRAGMA hard_heap_limit =", limit))
+      value <- NULL
       error <- tryCatch(
         {
-          RSQLite:::result_fetch_arrow_chunk(res@ptr, 1L)
+          chunk <- RSQLite:::result_fetch_arrow_chunk(res@ptr, 1L)
+          value <- nanoarrow::convert_array(chunk)$x
           NA_character_
         },
         error = conditionMessage
       )
       list(
         error = error,
+        value = value,
         completed = dbHasCompleted(res),
         rows = dbGetRowCount(res)
       )

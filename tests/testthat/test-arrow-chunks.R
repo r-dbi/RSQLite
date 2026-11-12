@@ -34,6 +34,11 @@ test_that("a chunk ends before the row that would take a column beyond the limit
       dbClearResult(res)
     }
   }
+
+  # The setter refuses a limit that is not a whole number of bytes in range
+  res <- local_result(con, "SELECT s FROM t")
+  expect_error(result_set_arrow_max_bytes(res@ptr, 1.5), "must be a whole number")
+  expect_error(result_set_arrow_max_bytes(res@ptr, -1), "must be a whole number")
 })
 
 test_that("each text or blob column ends a chunk, numbers count as their text", {

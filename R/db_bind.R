@@ -40,6 +40,9 @@ is_unnamed_placeholders <- function(placeholder_names) {
 }
 
 # The position of each placeholder among the elements of `params`, by name.
+# `params` is any vector or list whose names are matched,
+# such as a list of parameters or the named `children` of an Arrow schema,
+# not a vector of the names themselves.
 # An element that no placeholder uses, such as any element of an unnamed list,
 # is an error, or a warning with `allow_named_superset`.
 match_placeholders <- function(

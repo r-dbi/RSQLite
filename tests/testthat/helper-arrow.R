@@ -107,7 +107,7 @@ expect_same_chunks <- function(con, sql, ns, int64 = double(), mixed = FALSE) {
 # in a new R session, limits SQLite's heap to `limit` bytes,
 # and fetches a second chunk of one row.
 # SQLite can't lift the limit again, hence the session of its own.
-# Returns the error of the second fetch, if any,
+# Returns the error of the second fetch or the value of its column `x`,
 # and the state of the result after it.
 fetch_arrow_chunk_out_of_memory <- function(sql, limit) {
   callr::r(
@@ -119,15 +119,18 @@ fetch_arrow_chunk_out_of_memory <- function(sql, limit) {
       res <- dbSendQuery(con, sql)
       RSQLite:::result_fetch_arrow_chunk(res@ptr, 1L)
       dbExecute(other, paste("PRAGMA hard_heap_limit =", limit))
+      value <- NULL
       error <- tryCatch(
         {
-          RSQLite:::result_fetch_arrow_chunk(res@ptr, 1L)
+          chunk <- RSQLite:::result_fetch_arrow_chunk(res@ptr, 1L)
+          value <- nanoarrow::convert_array(chunk)$x
           NA_character_
         },
         error = conditionMessage
       )
       list(
         error = error,
+        value = value,
         completed = dbHasCompleted(res),
         rows = dbGetRowCount(res)
       )

@@ -46,6 +46,7 @@ class SqliteArrowColumn {
   int64_t pending_nulls;
   // Rows of the current chunk whose text or blob an open int64 column has
   // read as an integer, with their reading as a real for promote_to_double()
+  // where it differs
   std::vector<std::pair<int64_t, double> > text_reals;
 
 public:
@@ -83,7 +84,7 @@ private:
   void append_string(int column_type);
   struct ArrowBufferView value_bytes(int column_type) const;
   const char* value_text() const;
-  double text_real() const;
+  double text_real(int column_type) const;
   void append_null();
   void promote_to_double();
   NORET void stop_out_of_memory() const;

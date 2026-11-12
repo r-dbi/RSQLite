@@ -4,6 +4,7 @@
 #include "utf8.h"
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <stdexcept>
 
 SqliteArrowColumn::SqliteArrowColumn(
@@ -31,6 +32,8 @@ void SqliteArrowColumn::decide_from_decltype() {
 
 void SqliteArrowColumn::freeze() {
   frozen = true;
+  // Read only while the type is open, released with its capacity
+  std::vector<std::pair<int64_t, double> >().swap(text_reals);
 }
 
 void SqliteArrowColumn::set_schema(struct ArrowSchema* schema) const {
@@ -194,10 +197,6 @@ void SqliteArrowColumn::append_value(int column_type) {
       append_value(column_type);
       return;
     }
-    if ((column_type == SQLITE_TEXT || column_type == SQLITE_BLOB) && !frozen) {
-      // For a real that may widen the column later in this chunk
-      text_reals.push_back(std::make_pair(array->length, text_real()));
-    }
     append_int64(column_type);
     break;
 
@@ -206,7 +205,7 @@ void SqliteArrowColumn::append_value(int column_type) {
       ArrowArrayAppendDouble(
         array.get(),
         (column_type == SQLITE_TEXT || column_type == SQLITE_BLOB)
-          ? text_real()
+          ? text_real(column_type)
           : sqlite3_column_double(stmt, j)
       ),
       "Can't append to Arrow array"
@@ -234,8 +233,18 @@ void SqliteArrowColumn::append_value(int column_type) {
 }
 
 void SqliteArrowColumn::append_int64(int column_type) {
-  int64_t value;
-  if (!integer_value(column_type, value)) {
+  int64_t value = 0;
+  const bool fits = integer_value(column_type, value);
+  if ((column_type == SQLITE_TEXT || column_type == SQLITE_BLOB) && !frozen) {
+    // For a real that may widen the column later in this chunk,
+    // the reading as a real where it differs from the integer
+    const double real = text_real(column_type);
+    const double integer = static_cast<double>(value);
+    if (!fits || memcmp(&real, &integer, sizeof(double)) != 0) {
+      text_reals.push_back(std::make_pair(array->length, real));
+    }
+  }
+  if (!fits) {
     append_null();
     return;
   }
@@ -366,11 +375,26 @@ const char* SqliteArrowColumn::value_text() const {
 }
 
 // Text or a blob as SQLite reads it into a real.
-// Reading it as UTF-8 text first tells a failed conversion from a zero,
-// and leaves sqlite3_column_double() nothing to allocate.
-double SqliteArrowColumn::text_real() const {
-  value_text();
-  return sqlite3_column_double(stmt, j);
+double SqliteArrowColumn::text_real(int column_type) const {
+  if (column_type == SQLITE_TEXT) {
+    // Reading it as UTF-8 text first tells a failed conversion from a zero,
+    // and leaves sqlite3_column_double() nothing to allocate
+    value_text();
+    return sqlite3_column_double(stmt, j);
+  }
+
+  // A blob isn't read as text,
+  // which would expand a zeroblob() that SQLite reads as 0 without it.
+  // Only the error code of the connection tells that the copy for the
+  // reading ran out of memory; a code left from an earlier call hides that,
+  // and the next step fails instead.
+  sqlite3* conn = sqlite3_db_handle(stmt);
+  const bool failed_before = (sqlite3_errcode(conn) == SQLITE_NOMEM);
+  const double real = sqlite3_column_double(stmt, j);
+  if (!failed_before && sqlite3_errcode(conn) == SQLITE_NOMEM) {
+    stop_out_of_memory();
+  }
+  return real;
 }
 
 void SqliteArrowColumn::append_null() {
@@ -393,7 +417,8 @@ void SqliteArrowColumn::promote_to_double() {
   kind = AK_DOUBLE;
   init_array();
 
-  // Text and blobs take their reading as reals, in the order of their rows
+  // Text and blobs whose reading as a real differs take it,
+  // in the order of their rows
   std::vector<std::pair<int64_t, double> >::const_iterator text =
     text_reals.begin();
   for (int64_t i = 0; i < n; ++i) {

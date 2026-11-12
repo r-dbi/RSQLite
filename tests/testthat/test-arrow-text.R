@@ -383,13 +383,15 @@ test_that("a value that runs out of memory fails its chunk at once", {
   # whose step past it only reads ahead and would keep its error.
   # Its 20 million characters take 40 MB as UTF-16,
   # and the UTF-8 text that utf8, int64 and double columns read 60 MB more,
-  # beyond the limit.
-  # A zeroblob() expands only when it is read.
+  # beyond the limit; a double column reads the 40 MB of a blob from a copy
+  # of half its size.
+  # A zeroblob() expands only when it is read as bytes.
   digits <- "printf('%.*c', 20000000, '9')"
   for (values in c(
     paste0("'a', ", digits),
     paste0("1, ", digits),
     paste0("1.5, ", digits),
+    paste0("1.5, CAST(", digits, " AS BLOB)"),
     "x'00', zeroblob(60000000)"
   )) {
     sql <- paste0(
@@ -398,7 +400,21 @@ test_that("a value that runs out of memory fails its chunk at once", {
     )
     out <- fetch_arrow_chunk_out_of_memory(sql, limit = 50000000)
     expect_match(out$error, "out of memory while reading a value", info = sql)
+    expect_null(out$value)
     expect_true(out$completed)
     expect_equal(out$rows, 1L)
   }
+
+  # A double column reads a zeroblob() as 0 without expanding it
+  out <- fetch_arrow_chunk_out_of_memory(
+    paste(
+      "SELECT iif(column1 = 1, 1.5, zeroblob(60000000)) AS x",
+      "FROM (VALUES (1), (2), (3))"
+    ),
+    limit = 50000000
+  )
+  expect_identical(out$error, NA_character_)
+  expect_identical(out$value, 0)
+  expect_false(out$completed)
+  expect_equal(out$rows, 2L)
 })

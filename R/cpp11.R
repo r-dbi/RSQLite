@@ -76,6 +76,10 @@ result_bind <- function(res, params) {
   invisible(.Call(`_RSQLite_result_bind`, res, params))
 }
 
+result_bind_arrow_stream <- function(res, stream, indexes) {
+  invisible(.Call(`_RSQLite_result_bind_arrow_stream`, res, stream, indexes))
+}
+
 result_has_completed <- function(res) {
   .Call(`_RSQLite_result_has_completed`, res)
 }

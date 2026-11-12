@@ -5,6 +5,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <string>
+#include <vector>
 
 #include "DbResultImplDecl.h"
 
@@ -12,6 +13,7 @@ class DbConnection;
 typedef boost::shared_ptr<DbConnection> DbConnectionPtr;
 struct ArrowArray;
 struct ArrowSchema;
+struct ArrowArrayStream;
 
 // Owned by the external pointer of a result, see result_create()
 class DbResult;
@@ -62,6 +64,10 @@ public:
   int n_rows_affected();
 
   void bind(const cpp11::list& params);
+  void bind_arrow(
+    struct ArrowArrayStream* stream,
+    const std::vector<int>& indexes
+  );
   cpp11::list fetch(int n_max = -1);
   void fetch_arrow_chunk(
     struct ArrowArray* array,

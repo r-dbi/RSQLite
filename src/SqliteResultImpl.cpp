@@ -301,19 +301,38 @@ int SqliteResultImpl::n_rows_affected() {
 }
 
 void SqliteResultImpl::bind(const cpp11::list& params) {
+  check_param_count(params.size());
+  start_bind(new SqliteListParamSource(params));
+}
+
+void SqliteResultImpl::bind_arrow(
+  struct ArrowArrayStream* stream,
+  const std::vector<int>& indexes
+) {
+  check_param_count(static_cast<R_xlen_t>(indexes.size()));
+  // The source checks the types of the parameters
+  // before the previous bind is dropped,
+  // so that a type that can't be bound leaves the result as it was
+  start_bind(new SqliteArrowParamSource(stream, indexes));
+}
+
+void SqliteResultImpl::check_param_count(R_xlen_t n) const {
   if (cache.nparams_ == 0) {
     cpp11::stop("Query does not require parameters.");
   }
 
-  if (params.size() != cache.nparams_) {
+  if (n != cache.nparams_) {
     cpp11::stop(
       "Query requires %i params; %i supplied.",
       cache.nparams_,
-      params.size()
+      static_cast<int>(n)
     );
   }
+}
 
-  params_.reset(new SqliteListParamSource(params));
+// Takes `params` over, and executes the statement for its first set
+void SqliteResultImpl::start_bind(SqliteParamSource* params) {
+  params_.reset(params);
   ++executions_;
   // A new execution decides its Arrow types anew,
   // and drops a chunk kept from the previous one

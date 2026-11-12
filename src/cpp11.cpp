@@ -145,6 +145,14 @@ extern "C" SEXP _RSQLite_result_bind(SEXP res, SEXP params) {
   END_CPP11
 }
 // result.cpp
+void result_bind_arrow_stream(DbResult* res, SEXP stream, cpp11::integers indexes);
+extern "C" SEXP _RSQLite_result_bind_arrow_stream(SEXP res, SEXP stream, SEXP indexes) {
+  BEGIN_CPP11
+    result_bind_arrow_stream(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<SEXP>>(stream), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(indexes));
+    return R_NilValue;
+  END_CPP11
+}
+// result.cpp
 bool result_has_completed(DbResult* res);
 extern "C" SEXP _RSQLite_result_has_completed(SEXP res) {
   BEGIN_CPP11
@@ -212,6 +220,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_connection_valid",             (DL_FUNC) &_RSQLite_connection_valid,             1},
     {"_RSQLite_extension_load",               (DL_FUNC) &_RSQLite_extension_load,               3},
     {"_RSQLite_result_bind",                  (DL_FUNC) &_RSQLite_result_bind,                  2},
+    {"_RSQLite_result_bind_arrow_stream",     (DL_FUNC) &_RSQLite_result_bind_arrow_stream,     3},
     {"_RSQLite_result_claim_fetch_kind",      (DL_FUNC) &_RSQLite_result_claim_fetch_kind,      2},
     {"_RSQLite_result_column_info",           (DL_FUNC) &_RSQLite_result_column_info,           1},
     {"_RSQLite_result_create",                (DL_FUNC) &_RSQLite_result_create,                2},

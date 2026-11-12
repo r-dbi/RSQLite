@@ -267,3 +267,45 @@ fetch_arrow_chunks <- function(res, n = -1L, converted = FALSE) {
 chunk_lengths <- function(chunks) {
   vapply(chunks, function(chunk) chunk$length, numeric(1))
 }
+
+# A nanoarrow array of the integer type `schema`, int8 to uint32,
+# with `values` and nulls for NA, which nanoarrow doesn't convert without arrow
+arrow_int_array <- function(values, schema) {
+  size <- c(c = 1, C = 1, s = 2, S = 2, i = 4, I = 4)[[schema$format]]
+  valid <- !is.na(values)
+  values[!valid] <- 0L
+  nanoarrow::nanoarrow_array_modify(nanoarrow::nanoarrow_array_init(schema), list(
+    length = length(values),
+    null_count = sum(!valid),
+    buffers = list(
+      nanoarrow::as_nanoarrow_array(valid, schema = nanoarrow::na_bool())$buffers[[2]],
+      nanoarrow::as_nanoarrow_buffer(
+        writeBin(as.integer(values), raw(), size = size, endian = "little")
+      )
+    )
+  ))
+}
+
+# A stream of one struct array with the arrays `...` as its columns,
+# unnamed unless named
+arrow_params <- function(...) {
+  arrays <- list(...)
+  if (is.null(names(arrays))) {
+    names(arrays) <- rep("", length(arrays))
+  }
+  schema <- nanoarrow::na_struct(lapply(arrays, nanoarrow::infer_nanoarrow_schema))
+  array <- nanoarrow::nanoarrow_array_modify(
+    nanoarrow::nanoarrow_array_init(schema),
+    list(length = arrays[[1]]$length, children = arrays)
+  )
+  nanoarrow::basic_array_stream(list(array))
+}
+
+# The values that `stream` binds, as text, and their storage classes,
+# one row per row of the stream
+bound_values <- function(con, stream) {
+  res <- dbSendQuery(con, "SELECT CAST(?1 AS TEXT) AS x, typeof(?1) AS type")
+  on.exit(dbClearResult(res))
+  bind_arrow_stream(res, stream)
+  dbFetch(res)
+}

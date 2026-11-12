@@ -17,6 +17,7 @@ class SqliteParamSource;
 class SqliteArrowColumn;
 struct ArrowArray;
 struct ArrowSchema;
+struct ArrowArrayStream;
 struct KeptArrowChunk;
 
 class SqliteResultImpl : public boost::noncopyable {
@@ -87,6 +88,13 @@ public:
   int n_rows_fetched();
   int n_rows_affected();
   void bind(const cpp11::list& params);
+  // Binds the rows of an Arrow array stream of struct arrays,
+  // taking child `indexes[k]` for placeholder k + 1,
+  // see SqliteArrowParamSource
+  void bind_arrow(
+    struct ArrowArrayStream* stream,
+    const std::vector<int>& indexes
+  );
   cpp11::list fetch(const int n_max);
   // Fetches at most `n_max` rows, all of them if negative, into a struct array,
   // and warns about the values converted to the type of their column;
@@ -116,6 +124,8 @@ public:
   cpp11::strings get_placeholder_names() const;
 
 private:
+  void check_param_count(R_xlen_t n) const;
+  void start_bind(SqliteParamSource* params);
   bool bind_row();
   void after_bind(bool params_have_rows);
 

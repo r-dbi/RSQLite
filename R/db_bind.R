@@ -24,6 +24,45 @@ db_bind <- function(res, params, ..., allow_named_superset) {
   invisible(res)
 }
 
+# Binds the rows of `stream`, a nanoarrow_array_stream of struct arrays
+# or an object that nanoarrow converts to one, such as a data frame,
+# as dbBind() binds the rows of a data frame:
+# the statement runs once per row.
+# Named placeholders take the columns of the same name,
+# anonymous and numbered ones take unnamed columns by position.
+# Types that SQLite can't store fail before any row runs,
+# and leave `stream` and the previous bind as they were;
+# otherwise the result takes the stream over and reads its arrays as it runs.
+# Internal for now: no DBI method calls it yet.
+bind_arrow_stream <- function(res, stream) {
+  stream <- nanoarrow::as_nanoarrow_array_stream(stream)
+  schema <- nanoarrow::infer_nanoarrow_schema(stream)
+  if (!identical(schema$format, "+s")) {
+    stopc(
+      "Parameters must be an Arrow stream of struct arrays, ",
+      "with a column per placeholder."
+    )
+  }
+  children <- schema$children
+  placeholder_names <- result_get_placeholder_names(res@ptr)
+
+  if (is_unnamed_placeholders(placeholder_names)) {
+    if (any(names(children) != "")) {
+      stopc("Cannot use named parameters for anonymous/numbered placeholders")
+    }
+    param_indexes <- seq_along(children)
+  } else {
+    param_indexes <- match_placeholders(
+      placeholder_names,
+      children,
+      allow_named_superset = FALSE
+    )
+  }
+
+  result_bind_arrow_stream(res@ptr, stream, param_indexes - 1L)
+  invisible(res)
+}
+
 is_unnamed_placeholders <- function(placeholder_names) {
   empty <- placeholder_names == ""
   numbers <- grepl("^[1-9][0-9]*$", placeholder_names)

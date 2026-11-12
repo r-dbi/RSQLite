@@ -3,6 +3,14 @@
 
 // #include "DbResult.h"
 
+// An integer while it fits, a double beyond INT_MAX, where R integers end
+static SEXP row_count_as_sexp(int64_t n) {
+  if (n <= INT_MAX) {
+    return cpp11::as_sexp(static_cast<int>(n));
+  }
+  return cpp11::as_sexp(static_cast<double>(n));
+}
+
 [[cpp11::register]]
 cpp11::external_pointer<DbResult> result_create(
   cpp11::external_pointer<DbConnectionPtr> con,
@@ -40,13 +48,13 @@ bool result_has_completed(DbResult* res) {
 }
 
 [[cpp11::register]]
-int result_rows_fetched(DbResult* res) {
-  return res->n_rows_fetched();
+SEXP result_rows_fetched(DbResult* res) {
+  return row_count_as_sexp(res->n_rows_fetched());
 }
 
 [[cpp11::register]]
-int result_rows_affected(DbResult* res) {
-  return res->n_rows_affected();
+SEXP result_rows_affected(DbResult* res) {
+  return row_count_as_sexp(res->n_rows_affected());
 }
 
 [[cpp11::register]]
@@ -57,4 +65,16 @@ cpp11::list result_column_info(DbResult* res) {
 [[cpp11::register]]
 cpp11::strings result_get_placeholder_names(SqliteResult* res) {
   return res->get_placeholder_names();
+}
+
+// For the tests: sets the number of rows fetched from the statement
+[[cpp11::register]]
+void result_set_rows_fetched(SqliteResult* res, double n) {
+  res->set_rows_fetched(static_cast<int64_t>(n));
+}
+
+// For the tests: sets the number of rows the statement has changed so far
+[[cpp11::register]]
+void result_set_rows_affected(SqliteResult* res, double n) {
+  res->set_rows_affected(static_cast<int64_t>(n));
 }

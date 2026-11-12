@@ -381,13 +381,8 @@ void SqliteResultImpl::fetch_arrow_chunk(
       }
     }
 
-    ArrowChunk chunk(
-      arrow_columns_,
-      n_max,
-      nrows_,
-      arrow_max_bytes_,
-      arrow_row_read_
-    );
+    ArrowChunk
+      chunk(arrow_columns_, n_max, nrows_, arrow_max_bytes_, arrow_row_read_);
     fetch_loop(chunk, n_max, [&] {
       chunk.finish(arrow_chunk_->array.get(), arrow_chunk_->schema.get());
     });

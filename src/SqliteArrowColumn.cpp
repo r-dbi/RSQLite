@@ -157,9 +157,8 @@ bool SqliteArrowColumn::read_bytes(int64_t max_bytes) {
 
 void SqliteArrowColumn::stop_too_long(int64_t max_bytes) const {
   throw std::runtime_error(
-    "Column `" + name + "`: a value of " +
-    std::to_string(value.size_bytes) + " bytes exceeds the " +
-    std::to_string(max_bytes) +
+    "Column `" + name + "`: a value of " + std::to_string(value.size_bytes) +
+    " bytes exceeds the " + std::to_string(max_bytes) +
     " bytes that an Arrow utf8 or binary array can hold."
   );
 }

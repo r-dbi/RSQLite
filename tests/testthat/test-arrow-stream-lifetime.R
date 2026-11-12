@@ -64,6 +64,8 @@ test_that("a result of a closed connection can't start a stream", {
     read_arrow_stream(res),
     "after its connection has been closed"
   )
+  # The failed call hasn't claimed the result for Arrow
+  expect_equal(dbFetch(res)$x, 1)
   dbClearResult(res)
 })
 
@@ -168,4 +170,150 @@ test_that("streams of several results of one connection read independently", {
   ones$release()
   expect_equal(nanoarrow::convert_array(twos$get_next())$b, c(30L, 40L))
   expect_null(twos$get_next())
+})
+
+test_that("a stream reads on after R frees a connection never disconnected", {
+  skip_if_not_installed("nanoarrow")
+  # Without the finalizer of dbConnect(), which warns about the disconnect
+  con <- new(
+    "SQLiteConnection",
+    ptr = connection_connect(":memory:", FALSE, SQLITE_RWC, "", FALSE),
+    dbname = ":memory:", flags = SQLITE_RWC, vfs = "",
+    loadable.extensions = FALSE, ref = new.env(parent = emptyenv()),
+    bigint = "integer64", extended_types = FALSE
+  )
+  dbWriteTable(con, "t", data.frame(a = 1:3))
+  res <- dbSendQuery(con, "SELECT a FROM t")
+  stream <- read_arrow_stream(res, 2)
+  dbClearResult(res)
+  rm(res, con)
+  gc()
+  expect_equal(nanoarrow::convert_array_stream(stream)$a, 1:3)
+})
+
+test_that("a result that R frees while a stream reads it isn't in use", {
+  skip_if_not_installed("nanoarrow")
+  con <- dbConnect(SQLite(), ":memory:")
+  # Not registered with the connection, so that R can free it
+  sql <- "SELECT 1 AS x"
+  res <- new(
+    "SQLiteResult",
+    sql = sql, ptr = result_create(con@ptr, sql), conn = con, bigint = con@bigint
+  )
+  stream <- read_arrow_stream(res)
+  rm(res)
+  gc()
+  expect_no_warning(dbDisconnect(con))
+  expect_equal(nanoarrow::convert_array_stream(stream)$x, 1)
+})
+
+test_that("a stream keeps the busy handler after dbDisconnect() until it is released", {
+  skip_if_not_installed("nanoarrow")
+  path <- withr::local_tempfile(fileext = ".sqlite")
+  con <- dbConnect(SQLite(), path)
+  dbWriteTable(con, "t", data.frame(a = 1:3))
+  calls <- 0L
+  sqliteSetBusyHandler(con, function(n) {
+    calls <<- calls + 1L
+    0L
+  })
+  # Without rows, so that the statement holds no lock
+  res <- dbSendQuery(con, "SELECT a FROM t WHERE a > ?")
+  dbBind(res, list(10))
+  stream <- read_arrow_stream(res)
+  expect_warning(dbDisconnect(con), "1 result in use")
+  rm(con)
+  gc()
+
+  other <- dbConnect(SQLite(), path)
+  withr::defer(dbDisconnect(other))
+  dbExecute(other, "BEGIN EXCLUSIVE")
+  expect_error(dbBind(res, list(1)), "locked")
+  expect_equal(calls, 1L)
+  dbExecute(other, "ROLLBACK")
+
+  # The release closes the connection: the result fails without the handler
+  stream$release()
+  dbBind(res, list(10))
+  dbExecute(other, "BEGIN EXCLUSIVE")
+  expect_error(dbBind(res, list(1)))
+  expect_equal(calls, 1L)
+  dbExecute(other, "ROLLBACK")
+  dbClearResult(res)
+})
+
+test_that("a result of a closed connection no longer calls the busy handler", {
+  skip_if_not_installed("nanoarrow")
+  path <- withr::local_tempfile(fileext = ".sqlite")
+  other <- dbConnect(SQLite(), path)
+  withr::defer(dbDisconnect(other))
+  dbWriteTable(other, "t", data.frame(a = 1:3))
+
+  for (with_stream in c(FALSE, TRUE)) {
+    con <- dbConnect(SQLite(), path)
+    calls <- 0L
+    sqliteSetBusyHandler(con, function(n) {
+      calls <<- calls + 1L
+      0L
+    })
+    res <- dbSendQuery(con, "SELECT a FROM t WHERE a > ?")
+    dbBind(res, list(0))
+    if (with_stream) {
+      stream <- read_arrow_stream(res)
+    }
+    expect_warning(dbDisconnect(con), "1 result in use")
+    if (with_stream) {
+      # The last stream to end closes the connection
+      expect_equal(nanoarrow::convert_array_stream(stream)$a, 1:3)
+    }
+    rm(con)
+    gc()
+
+    # The result fails at once, without the handler
+    dbBind(res, list(10))
+    dbExecute(other, "BEGIN EXCLUSIVE")
+    expect_error(dbBind(res, list(1)), info = with_stream)
+    expect_equal(calls, 0L, info = with_stream)
+    dbExecute(other, "ROLLBACK")
+    dbClearResult(res)
+  }
+})
+
+test_that("a stream of a cleared result of a closed connection keeps its warnings and releases", {
+  skip_if_not_installed("nanoarrow")
+  sql <- "SELECT 1 AS x UNION ALL SELECT 2 UNION ALL SELECT 'a' UNION ALL SELECT 4"
+
+  # A warning made an error keeps the chunk for the next call
+  con <- dbConnect(SQLite(), ":memory:")
+  res <- dbSendQuery(con, sql)
+  stream <- read_arrow_stream(res, 2)
+  dbClearResult(res)
+  dbDisconnect(con)
+  expect_equal(stream$get_next()$length, 2)
+  withr::with_options(
+    list(warn = 2),
+    expect_error(stream$get_next(), "converted from warning")
+  )
+  expect_equal(nanoarrow::convert_array(stream$get_next())$x, c(0, 4))
+  expect_null(stream$get_next())
+
+  # A release from a handler of the stream's own warning
+  con <- dbConnect(SQLite(), ":memory:")
+  res <- dbSendQuery(con, sql)
+  stream <- read_arrow_stream(res, 2)
+  dbClearResult(res)
+  dbDisconnect(con)
+  rm(res, con)
+  gc()
+  expect_error(
+    withCallingHandlers(
+      nanoarrow::convert_array_stream(stream),
+      RSQLite_warning_coercion = function(w) {
+        stream$release()
+        gc()
+        invokeRestart("muffleWarning")
+      }
+    ),
+    "been released"
+  )
 })

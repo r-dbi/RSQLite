@@ -59,7 +59,7 @@ void connection_release(cpp11::external_pointer<DbConnectionPtr> con_) {
 
   DbConnectionPtr* con = con_.get();
   // Each result holds a share of the connection,
-  // also one cleared while an Arrow stream reads it
+  // also one that R no longer holds while an Arrow stream reads it
   long n = con_->use_count() - (*con)->n_cleared_results();
   if (n > 1) {
     Rf_warning(

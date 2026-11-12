@@ -7,6 +7,24 @@
 
 // #include "DbResult.h"
 
+namespace {
+
+// Drops R's share of a result that R's garbage collector frees,
+// as dbClearResult() does
+void result_finalize(SEXP xptr) {
+  DbResultPtr* res = static_cast<DbResultPtr*>(R_ExternalPtrAddr(xptr));
+  if (res == NULL) {
+    return;
+  }
+  R_ClearExternalPtr(xptr);
+  if (res->get() != NULL) {
+    (*res)->clear();
+  }
+  delete res;
+}
+
+}  // namespace
+
 // The external pointer owns a shared pointer to the result,
 // as that of a connection owns one to the connection.
 // It is R's share of the result, dropped by dbClearResult() or the finalizer.
@@ -16,9 +34,15 @@ cpp11::external_pointer<DbResultPtr> result_create(
   std::string sql
 ) {
   (*con)->check_connection();
-  DbResultPtr* res =
-    new DbResultPtr(SqliteResult::create_and_send_query(*con, sql));
-  return cpp11::external_pointer<DbResultPtr>(res, true);
+  cpp11::sexp xptr(
+    cpp11::safe[R_MakeExternalPtr](nullptr, R_NilValue, R_NilValue)
+  );
+  R_RegisterCFinalizerEx(xptr, result_finalize, TRUE);
+  R_SetExternalPtrAddr(
+    xptr,
+    new DbResultPtr(SqliteResult::create_and_send_query(*con, sql))
+  );
+  return cpp11::external_pointer<DbResultPtr>(xptr);
 }
 
 [[cpp11::register]]

@@ -59,8 +59,9 @@ public:
   void add_stream();
   void remove_stream();
 
-  // Results cleared while an Arrow stream still holds them,
-  // which don't count as in use for dbDisconnect()
+  // Results that R no longer holds, as dbClearResult() or R's garbage
+  // collector dropped them, while an Arrow stream still holds them:
+  // they don't count as in use for dbDisconnect()
   void add_cleared_result(int n);
   long n_cleared_results() const;
 
@@ -80,6 +81,7 @@ private:
   const bool with_alt_types_;
   SEXP busy_callback_;
   void release_callback_data();
+  void close_handle(sqlite3* conn);
   static int busy_callback_helper(void* data, int num);
 };
 

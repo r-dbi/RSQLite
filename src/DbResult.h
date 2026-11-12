@@ -40,7 +40,8 @@ public:
 
 public:
   void close();
-  // For dbClearResult(), which drops R's share of the result:
+  // For dbClearResult() and R's garbage collector,
+  // which drop R's share of the result:
   // an Arrow stream that shares it reads on,
   // but it no longer counts as in use for dbDisconnect()
   void clear();

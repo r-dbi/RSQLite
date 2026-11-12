@@ -15,6 +15,12 @@ read_arrow_stream <- function(res, n = 65536L) {
     !(n == -1 || (n >= 1 && n <= .Machine$integer.max && n == trunc(n)))) {
     rlang::abort("`n` must be a positive whole number, or -1 for all rows.")
   }
+  # Before the claim, so that a failed call claims nothing
+  if (!connection_valid(res@conn@ptr)) {
+    rlang::abort(
+      "Can't read a result as an Arrow stream after its connection has been closed."
+    )
+  }
   claim_fetch_kind(res, "an Arrow stream")
   result_create_arrow_stream(res@ptr, as.integer(n))
 }

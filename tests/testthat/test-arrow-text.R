@@ -88,7 +88,7 @@ test_that("text and blobs in int64 and double columns as SQLite reads them", {
     "(7, x'3939393939393939393939393939393939393939'), (8, '+12e300')"
   ))
   res <- local_result(con, "SELECT i FROM u ORDER BY id")
-  chunk <- fetch_arrow_chunk(res)
+  chunk <- fetch_arrow_chunk(res, converted = TRUE)
   expect_valid_chunk(chunk)
   expect_equal(
     as.character(arrow_values(chunk, bit64::integer64())$i),
@@ -114,7 +114,7 @@ test_that("later chunks convert text and blobs to the types of the first", {
   formats <- c(s = "u", b = "z", t = "u", z = "z", i = "l", n = "n")
   expect_equal(arrow_formats(first), formats)
 
-  rest <- fetch_arrow_chunk(res)
+  rest <- fetch_arrow_chunk(res, converted = TRUE)
   expect_valid_chunk(rest)
   expect_equal(arrow_formats(rest), formats)
   expect_identical(
@@ -155,7 +155,7 @@ test_that("text that isn't valid UTF-8 is NULL in a utf8 column", {
     "SELECT CAST(unhex(h) AS TEXT) AS s, iif(id = 1, 'a', unhex(h)) AS b",
     "FROM t ORDER BY id"
   ))
-  chunk <- fetch_arrow_chunk(res)
+  chunk <- fetch_arrow_chunk(res, converted = TRUE)
   expect_valid_chunk(chunk)
   expect_equal(arrow_formats(chunk), c(s = "u", b = "u"))
   expected <- ifelse(valid, text, NA)
@@ -196,7 +196,7 @@ test_that("text with a NUL byte is NULL in a utf8 column", {
     paste("SELECT column1 AS s FROM (VALUES ('a'),", values, ")")
   )) {
     res <- local_result(con, sql)
-    chunk <- fetch_arrow_chunk(res)
+    chunk <- fetch_arrow_chunk(res, converted = TRUE)
     expect_valid_chunk(chunk)
     expect_equal(arrow_formats(chunk), c(s = "u"))
     expect_true(all(is.na(tail(arrow_values(chunk)$s, 4))))
@@ -215,7 +215,7 @@ test_that("text with a NUL byte is NULL in a utf8 column", {
     "SELECT column1 AS b FROM",
     "(VALUES (x'00'), (CAST(x'610062' AS TEXT)), (CAST(x'0061' AS TEXT)))"
   ))
-  chunk <- fetch_arrow_chunk(res)
+  chunk <- fetch_arrow_chunk(res, converted = TRUE)
   expect_valid_chunk(chunk)
   expect_identical(
     arrow_values(chunk)$b,
@@ -303,7 +303,7 @@ test_that("a UTF-16 database gives text as UTF-8 and blobs as their bytes", {
   # transcodes them from UTF-16 (#799);
   # a lone surrogate and a NUL character make the text NULL
   res <- local_result(con, "SELECT x FROM t ORDER BY id")
-  chunk <- fetch_arrow_chunk(res)
+  chunk <- fetch_arrow_chunk(res, converted = TRUE)
   expect_valid_chunk(chunk)
   expect_identical(arrow_values(chunk)$x, c("abc", "ab", NA, NA))
 })

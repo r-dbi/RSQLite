@@ -159,7 +159,11 @@ test_that("values beyond the range of the Arrow type are NULL", {
     "(5, 1e10, '24:00:00', 1e300), (6, 9e999, '-00:00:01', -9e999),",
     "(7, -9e999, '23:59:59.9999999', 1e19)"
   ))
-  chunk <- fetch_arrow_all(con, "SELECT d, tm, ts FROM t ORDER BY id")
+  chunk <- fetch_arrow_all(
+    con,
+    "SELECT d, tm, ts FROM t ORDER BY id",
+    converted = TRUE
+  )
 
   expect_identical(
     unclass(nanoarrow::convert_array(chunk$children$d)),

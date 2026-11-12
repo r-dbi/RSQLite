@@ -17,7 +17,8 @@ SqliteArrowColumn::SqliteArrowColumn(
       name(name_),
       kind(AK_UNDECIDED),
       frozen(false),
-      pending_nulls(0) {
+      pending_nulls(0),
+      row(0) {
   if (!with_alt_types) {
     return;
   }
@@ -108,13 +109,16 @@ void SqliteArrowColumn::set_schema(struct ArrowSchema* schema) const {
 void SqliteArrowColumn::start_chunk() {
   array.reset();
   pending_nulls = 0;
+  // Also the values of a chunk that failed
+  coercions.clear();
   if (decided()) {
     init_array();
   }
 }
 
-void SqliteArrowColumn::append_row() {
+void SqliteArrowColumn::append_row(int64_t row_) {
   const int column_type = sqlite3_column_type(stmt, j);
+  row = row_;
 
   if (!decided()) {
     if (column_type == SQLITE_NULL) {
@@ -154,6 +158,20 @@ void SqliteArrowColumn::finish_chunk(int64_t n) {
 
 void SqliteArrowColumn::move_chunk_to(struct ArrowArray* out) {
   ArrowArrayMove(array.get(), out);
+}
+
+cpp11::sexp SqliteArrowColumn::take_coercions() {
+  using namespace cpp11::literals;
+  if (coercions.empty()) {
+    return R_NilValue;
+  }
+  cpp11::writable::list out(
+    { "column"_nm = name,
+      "type"_nm = type_name(),
+      "values"_nm = coercions.as_list() }
+  );
+  coercions.clear();
+  return out;
 }
 
 // Privates ////////////////////////////////////////////////////////////////////
@@ -227,6 +245,9 @@ void SqliteArrowColumn::init_array() {
 // an integer that SQLite would saturate in an int64 column,
 // a date or time that can't be parsed or is beyond the range of its type,
 // and any value in a column of the null type.
+// Each value that these rules convert or make NULL is logged with note(),
+// except an integer in a double column and a number within the range
+// of a date or time column, which dbFetch() reads the same way without warning.
 void SqliteArrowColumn::append_value(int column_type) {
   switch (kind) {
   case AK_INT64:
@@ -240,6 +261,9 @@ void SqliteArrowColumn::append_value(int column_type) {
     break;
 
   case AK_DOUBLE:
+    if (column_type == SQLITE_TEXT || column_type == SQLITE_BLOB) {
+      note(column_type, CR_CONVERTED);
+    }
     check_arrow(
       ArrowArrayAppendDouble(array.get(), sqlite3_column_double(stmt, j)),
       "Can't append to Arrow array"
@@ -251,6 +275,9 @@ void SqliteArrowColumn::append_value(int column_type) {
     break;
 
   case AK_BINARY:
+    if (column_type != SQLITE_BLOB) {
+      note(column_type, CR_CONVERTED);
+    }
     check_arrow(
       ArrowArrayAppendBytes(array.get(), value_bytes(column_type)),
       "Can't append to Arrow array"
@@ -267,6 +294,7 @@ void SqliteArrowColumn::append_value(int column_type) {
     break;
 
   case AK_NA:
+    note(column_type, CR_NULL_TYPE);
     append_null();
     break;
 
@@ -278,8 +306,12 @@ void SqliteArrowColumn::append_value(int column_type) {
 void SqliteArrowColumn::append_int64(int column_type) {
   int64_t value;
   if (!integer_value(column_type, value)) {
+    note(column_type, CR_OUT_OF_RANGE);
     append_null();
     return;
+  }
+  if (column_type != SQLITE_INTEGER) {
+    note(column_type, CR_CONVERTED);
   }
   check_arrow(
     ArrowArrayAppendInt(array.get(), value),
@@ -352,8 +384,12 @@ void SqliteArrowColumn::append_string(int column_type) {
         bytes.data.as_char,
         static_cast<size_t>(bytes.size_bytes)
       )) {
+    note(column_type, CR_INVALID_UTF8);
     append_null();
     return;
+  }
+  if (column_type != SQLITE_TEXT) {
+    note(column_type, CR_CONVERTED);
   }
   struct ArrowStringView view;
   view.data = bytes.data.as_char;
@@ -416,6 +452,13 @@ void SqliteArrowColumn::append_date(int column_type) {
   }
 
   if (!ok) {
+    // Numbers fail by their range, text and blobs by their parsing
+    note(
+      column_type,
+      (column_type == SQLITE_INTEGER || column_type == SQLITE_FLOAT)
+        ? CR_OUT_OF_RANGE
+        : CR_UNPARSABLE
+    );
     append_null();
     return;
   }
@@ -438,6 +481,8 @@ void SqliteArrowColumn::append_time(int column_type) {
 
   int64_t micros = 0;
   bool ok = false;
+  // False for text that can't be parsed and for a blob
+  bool parsed = true;
   if (column_type == SQLITE_INTEGER) {
     const int64_t seconds = sqlite3_column_int64(stmt, j);
     ok = seconds >= -INT64_MAX / 1000000 && seconds <= INT64_MAX / 1000000;
@@ -463,12 +508,16 @@ void SqliteArrowColumn::append_time(int column_type) {
     ok = (kind == AK_TIMESTAMP)
            ? SqliteColumnDataSource::parse_datetime_local(text, micros)
            : SqliteColumnDataSource::parse_time(text, micros);
+    parsed = ok;
+  } else {
+    parsed = false;
   }
 
   if (kind == AK_TIME64) {
     ok = ok && micros >= 0 && micros < day;
   }
   if (!ok) {
+    note(column_type, parsed ? CR_OUT_OF_RANGE : CR_UNPARSABLE);
     append_null();
     return;
   }
@@ -507,5 +556,35 @@ void SqliteArrowColumn::promote_to_double() {
         "Can't append to Arrow array"
       );
     }
+  }
+}
+
+void SqliteArrowColumn::note(int column_type, COERCION_REASON reason) {
+  coercions.record(column_type, reason, row);
+}
+
+// The type as the warning about the values of a chunk names it
+const char* SqliteArrowColumn::type_name() const {
+  switch (kind) {
+  case AK_NA:
+    return "null";
+  case AK_INT64:
+    return "int64";
+  case AK_DOUBLE:
+    return "double";
+  case AK_STRING:
+    return "utf8";
+  case AK_BINARY:
+    return "binary";
+  case AK_DATE32:
+    return "date32";
+  case AK_TIME64:
+    return "time64[us]";
+  case AK_TIMESTAMP:
+    return "timestamp[us, UTC]";
+  case AK_UNDECIDED:
+  default:
+    // Doesn't occur: a chunk decides the type of every column
+    return "undecided";
   }
 }

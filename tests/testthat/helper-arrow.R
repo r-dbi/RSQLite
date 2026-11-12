@@ -17,9 +17,18 @@ local_result <- function(con, sql, envir = parent.frame()) {
 }
 
 # The next chunk of at most `n` rows of `res`, all of them for -1,
-# as a nanoarrow_array of a struct type
-fetch_arrow_chunk <- function(res, n = -1L) {
-  result_fetch_arrow_chunk(res@ptr, n)
+# as a nanoarrow_array of a struct type.
+# With `converted = TRUE`, expects the warning about values converted to the
+# type of their column, whose text test-arrow-coercion.R checks
+fetch_arrow_chunk <- function(res, n = -1L, converted = FALSE) {
+  if (!converted) {
+    return(result_fetch_arrow_chunk(res@ptr, n))
+  }
+  expect_warning(
+    chunk <- result_fetch_arrow_chunk(res@ptr, n),
+    class = "RSQLite_warning_coercion"
+  )
+  chunk
 }
 
 # The Arrow format of each column of a chunk, by column name
@@ -70,7 +79,9 @@ expect_valid_chunk <- function(chunk) {
 # and expects the same values, dbHasCompleted() and dbGetRowCount() after
 # each chunk, and valid chunks; `int64` as for arrow_values().
 # With `mixed = TRUE`, dbFetch() may warn of a column of mixed types,
-# and with `unparsable = TRUE` of dates and times it can't convert.
+# and with `unparsable = TRUE` of dates and times it can't convert;
+# with either, the Arrow chunks may warn of values converted to the type of
+# their column.
 # Returns the Arrow chunks.
 expect_same_chunks <- function(con, sql, ns, int64 = double(), mixed = FALSE,
                                unparsable = FALSE) {
@@ -98,7 +109,14 @@ expect_same_chunks <- function(con, sql, ns, int64 = double(), mixed = FALSE,
   on.exit(dbClearResult(res))
   chunks <- list()
   actual <- lapply(ns, function(n) {
-    chunk <- fetch_arrow_chunk(res, n)
+    chunk <- withCallingHandlers(
+      fetch_arrow_chunk(res, n),
+      RSQLite_warning_coercion = function(w) {
+        if (mixed || unparsable) {
+          invokeRestart("muffleWarning")
+        }
+      }
+    )
     expect_valid_chunk(chunk)
     chunks[[length(chunks) + 1]] <<- chunk
     list(
@@ -120,11 +138,35 @@ arrow_micros <- function(chunk, name) {
 }
 
 # All rows of `sql` as one Arrow chunk, checked with expect_valid_chunk(),
-# with the result cleared
-fetch_arrow_all <- function(con, sql) {
+# with the result cleared; `converted` as for fetch_arrow_chunk()
+fetch_arrow_all <- function(con, sql, converted = FALSE) {
   res <- dbSendQuery(con, sql)
   on.exit(dbClearResult(res))
-  chunk <- fetch_arrow_chunk(res)
+  chunk <- fetch_arrow_chunk(res, converted = converted)
   expect_valid_chunk(chunk)
   chunk
+}
+
+# The warnings that `expr` raises, muffled
+warnings_of <- function(expr) {
+  warnings <- list()
+  withCallingHandlers(
+    expr,
+    warning = function(w) {
+      warnings[[length(warnings) + 1]] <<- w
+      invokeRestart("muffleWarning")
+    }
+  )
+  warnings
+}
+
+# Expects `warnings` to be one warning about values converted to the type of
+# their column, with a line for each column as in `lines`
+expect_coercions <- function(warnings, lines) {
+  expect_length(warnings, 1)
+  expect_s3_class(warnings[[1]], "RSQLite_warning_coercion")
+  expect_equal(
+    vapply(warnings[[1]]$coercions, format_coercion_column, character(1)),
+    lines
+  )
 }

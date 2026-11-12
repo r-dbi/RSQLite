@@ -51,6 +51,10 @@ private:
   // see SqliteArrowColumn.
   // A data frame fetch types its columns on its own, see types_.
   boost::ptr_vector<SqliteArrowColumn> arrow_columns_;
+  // The latest Arrow chunk until it is handed out,
+  // kept when the warning about its values exits: see fetch_arrow_chunk()
+  nanoarrow::UniqueArray arrow_chunk_;
+  nanoarrow::UniqueSchema arrow_chunk_schema_;
 
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);
@@ -68,7 +72,8 @@ public:
   int n_rows_affected();
   void bind(const cpp11::list& params);
   cpp11::list fetch(const int n_max);
-  // Fetches at most `n_max` rows, all of them if negative, into a struct array
+  // Fetches at most `n_max` rows, all of them if negative, into a struct array,
+  // and warns about the values converted to the type of their column
   void fetch_arrow_chunk(
     struct ArrowArray* array,
     struct ArrowSchema* schema,
@@ -92,6 +97,8 @@ private:
   bool step_run();
   bool step_done();
   cpp11::list peek_first_row();
+  bool arrow_chunk_kept() const;
+  void warn_arrow_coercions();
 
 private:
   NORET void raise_kept_error();

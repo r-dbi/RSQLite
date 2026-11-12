@@ -76,7 +76,7 @@ test_that("the first chunk fixes the types for the later chunks", {
   # Unlike dbFetch(), which types each fetch anew:
   # a real in an int64 column is truncated toward zero, and NULL beyond the
   # range of int64; a value in a column of the null type is NULL
-  rest <- fetch_arrow_chunk(res)
+  rest <- fetch_arrow_chunk(res, converted = TRUE)
   expect_equal(arrow_formats(rest), c(x = "l", y = "n", z = "l"))
   expect_equal(
     arrow_values(rest, bit64::integer64()),

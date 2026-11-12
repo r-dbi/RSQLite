@@ -4,6 +4,7 @@
 #include <string>
 
 #include "sqlite3-cpp.h"
+#include "CoercionLog.h"
 #include "DbArrow.h"
 
 // The Arrow type of a result column.
@@ -22,7 +23,7 @@
 //
 // The first chunk of an execution fixes the types for its later chunks.
 // Values that don't fit the type of their column are converted or NULL,
-// see append_value(), and not reported yet.
+// see append_value(), and logged with their rows, see take_coercions().
 enum ARROW_KIND {
   AK_UNDECIDED,
   AK_NA,
@@ -48,6 +49,10 @@ class SqliteArrowColumn {
   nanoarrow::UniqueArray array;
   // Rows of the current chunk seen while undecided (all NULL)
   int64_t pending_nulls;
+  // The 1-based row number in the result of the value being appended
+  int64_t row;
+  // The values of the current chunk that didn't fit the type
+  CoercionLog coercions;
 
 public:
   // With `with_alt_types`, the column takes the date and time types
@@ -69,12 +74,17 @@ public:
 
   // Chunk building
   void start_chunk();
-  // Appends the value of the current row
-  void append_row();
+  // Appends the value of the current row, whose 1-based number in the result
+  // is `row_`
+  void append_row(int64_t row_);
   // Completes the chunk of `n` rows:
   // a column that has seen only NULL takes its declared type
   void finish_chunk(int64_t n);
   void move_chunk_to(struct ArrowArray* out);
+  // The values of the chunk that didn't fit the type, which is final then,
+  // as an R list with the column name, the type, and the entries of the log,
+  // which is cleared; NULL if there were none
+  cpp11::sexp take_coercions();
 
 private:
   static ARROW_KIND kind_from_column_type(int column_type);
@@ -90,6 +100,8 @@ private:
   void append_time(int column_type);
   void append_null();
   void promote_to_double();
+  void note(int column_type, COERCION_REASON reason);
+  const char* type_name() const;
 };
 
 #endif  // RSQLITE_SQLITEARROWCOLUMN_H

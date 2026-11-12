@@ -106,7 +106,7 @@ namespace {
 // becomes a cpp11::unwind_exception, which unwinds the C++ frames,
 // and continues at the entry point.
 // A stream of RSQLite protects its own callbacks with cpp11 in turn:
-// cpp11 >= 0.5.0 protects nested calls, see LinkingTo in DESCRIPTION.
+// cpp11 >= 0.4.6 protects nested calls, see LinkingTo in DESCRIPTION.
 template <typename Callback>
 void call_stream(
   struct ArrowArrayStream* stream,

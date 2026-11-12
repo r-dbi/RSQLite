@@ -121,32 +121,47 @@ test_that("sliced struct arrays and sliced columns bind their own rows", {
   skip_if_not_installed("nanoarrow")
   con <- local_con()
   values <- function(array) {
-    res <- dbSendQuery(con, "SELECT :x AS x, :y AS y")
+    res <- dbSendQuery(con, "SELECT :x AS x, :y AS y, :z AS z, :b AS b")
     on.exit(dbClearResult(res))
     bind_arrow_stream(res, nanoarrow::basic_array_stream(list(array)))
     dbFetch(res)
   }
   array <- nanoarrow::as_nanoarrow_array(data.frame(
     x = c(10L, 20L, 30L, 40L, 50L),
-    y = c("a", NA, "ccc", "", "e")
+    y = c("a", NA, "ccc", "", "e"),
+    # Booleans and validity bitmaps start at a bit offset
+    z = c(TRUE, FALSE, FALSE, TRUE, NA),
+    b = blob::blob(as.raw(1), NULL, raw(), as.raw(4), as.raw(5))
   ))
+  expected <- function(x, y, z, b) {
+    data.frame(x = x, y = y, z = z, b = blob::as_blob(b))
+  }
 
   # The offset of the struct array applies to its columns,
   # also with a validity bitmap of its own
   sliced <- nanoarrow::nanoarrow_array_modify(array, list(offset = 1, length = 3))
-  expect_equal(values(sliced), data.frame(x = c(20L, 30L, 40L), y = c(NA, "ccc", "")))
+  expect_equal(
+    values(sliced),
+    expected(c(20L, 30L, 40L), c(NA, "ccc", ""), c(0L, 0L, 1L), list(NULL, raw(), as.raw(4)))
+  )
   validity <- nanoarrow::as_nanoarrow_array(c(TRUE, TRUE, FALSE, TRUE, TRUE))
   sliced <- nanoarrow::nanoarrow_array_modify(array, list(
     offset = 1, length = 3, null_count = 1, buffers = list(validity$buffers[[2]])
   ))
-  expect_equal(values(sliced), data.frame(x = c(20L, NA, 40L), y = c(NA, NA, "")))
+  expect_equal(
+    values(sliced),
+    expected(c(20L, NA, 40L), c(NA, NA, ""), c(0L, NA, 1L), list(NULL, NULL, as.raw(4)))
+  )
 
   # Columns with offsets of their own, inside a sliced struct array
   columns <- lapply(array$children, nanoarrow::nanoarrow_array_modify, list(offset = 1, length = 4))
   sliced <- nanoarrow::nanoarrow_array_modify(array, list(
     offset = 2, length = 2, children = columns
   ))
-  expect_equal(values(sliced), data.frame(x = c(40L, 50L), y = c("", "e")))
+  expect_equal(
+    values(sliced),
+    expected(c(40L, 50L), c("", "e"), c(1L, NA), list(as.raw(4), as.raw(5)))
+  )
 })
 
 test_that("a stream of several arrays, some empty, or of none binds its rows", {

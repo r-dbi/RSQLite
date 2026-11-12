@@ -56,6 +56,10 @@ private:
 // The constructor checks the schema and only then takes the stream over,
 // so that a stream of a type that can't be bound stays with its owner;
 // the source releases it when it is destroyed.
+// That release() runs unprotected, also from a bind in progress,
+// dbClearResult() or a finalizer,
+// so it must not raise an R error, as the Arrow C stream interface
+// expects of a release callback anyway.
 // The arrays are read as the sets are bound.
 // The stream's callbacks may call R:
 // an R error that leaves them by a longjmp becomes a C++ exception.

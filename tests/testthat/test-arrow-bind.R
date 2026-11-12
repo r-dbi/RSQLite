@@ -81,7 +81,7 @@ test_that("integers, booleans and floats bind as integers and reals", {
   )
 })
 
-test_that("large types, other time units and time zones bind, and null rows", {
+test_that("large types, other time units, time zones and durations bind, and null rows", {
   skip_if_not_installed("nanoarrow")
   skip_if_not_installed("hms")
   con <- local_con()
@@ -95,6 +95,13 @@ test_that("large types, other time units and time zones bind, and null rows", {
       schema = nanoarrow::na_timestamp("s", "Europe/Zurich")
     )
   )
+  # Durations bind as seconds, as dbBind() binds a difftime in seconds
+  durations <- as.difftime(c(90, NA), units = "mins")
+  expect_equal(
+    bound_values(con, arrow_params(as_array(durations, schema = nanoarrow::na_duration("ms")))),
+    data.frame(x = c("5400.0", NA), type = c("real", "null"))
+  )
+
   # A null row of the struct array binds NULL to every placeholder
   array <- stream$get_next()
   array <- nanoarrow::nanoarrow_array_modify(array, list(
@@ -108,6 +115,38 @@ test_that("large types, other time units and time zones bind, and null rows", {
     unname(as.list(dbFetch(res))),
     list(c("a", NA, NA), blob::blob(as.raw(1), NULL, NULL), c(1.5, NA, NA), c(2, NA, NA))
   )
+})
+
+test_that("sliced struct arrays and sliced columns bind their own rows", {
+  skip_if_not_installed("nanoarrow")
+  con <- local_con()
+  values <- function(array) {
+    res <- dbSendQuery(con, "SELECT :x AS x, :y AS y")
+    on.exit(dbClearResult(res))
+    bind_arrow_stream(res, nanoarrow::basic_array_stream(list(array)))
+    dbFetch(res)
+  }
+  array <- nanoarrow::as_nanoarrow_array(data.frame(
+    x = c(10L, 20L, 30L, 40L, 50L),
+    y = c("a", NA, "ccc", "", "e")
+  ))
+
+  # The offset of the struct array applies to its columns,
+  # also with a validity bitmap of its own
+  sliced <- nanoarrow::nanoarrow_array_modify(array, list(offset = 1, length = 3))
+  expect_equal(values(sliced), data.frame(x = c(20L, 30L, 40L), y = c(NA, "ccc", "")))
+  validity <- nanoarrow::as_nanoarrow_array(c(TRUE, TRUE, FALSE, TRUE, TRUE))
+  sliced <- nanoarrow::nanoarrow_array_modify(array, list(
+    offset = 1, length = 3, null_count = 1, buffers = list(validity$buffers[[2]])
+  ))
+  expect_equal(values(sliced), data.frame(x = c(20L, NA, 40L), y = c(NA, NA, "")))
+
+  # Columns with offsets of their own, inside a sliced struct array
+  columns <- lapply(array$children, nanoarrow::nanoarrow_array_modify, list(offset = 1, length = 4))
+  sliced <- nanoarrow::nanoarrow_array_modify(array, list(
+    offset = 2, length = 2, children = columns
+  ))
+  expect_equal(values(sliced), data.frame(x = c(40L, 50L), y = c("", "e")))
 })
 
 test_that("a stream of several arrays, some empty, or of none binds its rows", {

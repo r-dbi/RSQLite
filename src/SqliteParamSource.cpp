@@ -105,6 +105,8 @@ namespace {
 // as in a stream implemented in R,
 // becomes a cpp11::unwind_exception, which unwinds the C++ frames,
 // and continues at the entry point.
+// A stream of RSQLite protects its own callbacks with cpp11 in turn:
+// cpp11 >= 0.5.0 protects nested calls, see LinkingTo in DESCRIPTION.
 template <typename Callback>
 void call_stream(
   struct ArrowArrayStream* stream,
@@ -150,6 +152,7 @@ bool can_bind(enum ArrowType type) {
   case NANOARROW_TYPE_TIME32:
   case NANOARROW_TYPE_TIME64:
   case NANOARROW_TYPE_TIMESTAMP:
+  case NANOARROW_TYPE_DURATION:
     return true;
   default:
     return false;
@@ -238,9 +241,12 @@ bool SqliteArrowParamSource::bind_next_row(sqlite3_stmt* stmt) {
   // A null struct row binds NULL to every placeholder,
   // as sqlite3_clear_bindings() left them
   if (!ArrowArrayViewIsNull(view.get(), i)) {
+    // The offset of the struct array applies to its children,
+    // whose views add only their own offsets
+    const int64_t row = view->offset + i;
     for (size_t k = 0; k < indexes.size(); ++k) {
       // sqlite parameters are 1-indexed
-      bind_parameter(stmt, static_cast<int>(k) + 1, i);
+      bind_parameter(stmt, static_cast<int>(k) + 1, row);
     }
   }
 
@@ -351,7 +357,9 @@ void SqliteArrowParamSource::bind_parameter(
   case NANOARROW_TYPE_TIME32:
   case NANOARROW_TYPE_TIME64:
   case NANOARROW_TYPE_TIMESTAMP:
-    // Seconds since midnight or the epoch, as dbBind() binds hms and POSIXct;
+  case NANOARROW_TYPE_DURATION:
+    // Seconds since midnight or the epoch, or of a duration,
+    // as dbBind() binds hms, POSIXct and difftime in seconds;
     // a timestamp is an instant, whatever its time zone
     rc = sqlite3_bind_double(
       stmt,

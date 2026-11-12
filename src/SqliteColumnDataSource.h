@@ -37,7 +37,9 @@ public:
   static bool parse_time(const char* text, int64_t& micros);
   static bool parse_datetime_local(const char* text, int64_t& micros);
 
-private:
+  // The type of a column declared as `decl_type`, which is NULL for an
+  // expression: with `with_alt_types`, DT_DATE, DT_TIME or DT_DATETIME
+  // for DATE, TIME, and DATETIME or TIMESTAMP, otherwise from the affinity
   static DATA_TYPE datatype_from_decltype(
     const char* decl_type,
     bool with_alt_types

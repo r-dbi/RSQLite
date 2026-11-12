@@ -30,7 +30,8 @@ arrow_formats <- function(chunk) {
 
 # The values of a chunk as a data frame:
 # int64 columns as `int64`, double by default, the null type as logical,
-# utf8 as character and binary as blob, as dbFetch() returns them
+# utf8 as character, binary as blob, date32 as Date, time64 as hms
+# and timestamp as POSIXct in UTC, as dbFetch() returns them
 arrow_values <- function(chunk, int64 = double()) {
   ptype <- lapply(arrow_formats(chunk), function(format) {
     switch(
@@ -39,7 +40,10 @@ arrow_values <- function(chunk, int64 = double()) {
       g = double(),
       n = logical(),
       u = character(),
-      z = blob::blob()
+      z = blob::blob(),
+      tdD = structure(double(), class = "Date"),
+      ttu = hms::hms(),
+      "tsu:UTC" = .POSIXct(double(), tz = "UTC")
     )
   })
   ptype <- structure(ptype, class = "data.frame", row.names = integer())
@@ -65,15 +69,19 @@ expect_valid_chunk <- function(chunk) {
 # Fetches `sql` in chunks of `ns` rows through Arrow, and again with dbFetch(),
 # and expects the same values, dbHasCompleted() and dbGetRowCount() after
 # each chunk, and valid chunks; `int64` as for arrow_values().
-# With `mixed = TRUE`, dbFetch() may warn of a column of mixed types.
+# With `mixed = TRUE`, dbFetch() may warn of a column of mixed types,
+# and with `unparsable = TRUE` of dates and times it can't convert.
 # Returns the Arrow chunks.
-expect_same_chunks <- function(con, sql, ns, int64 = double(), mixed = FALSE) {
+expect_same_chunks <- function(con, sql, ns, int64 = double(), mixed = FALSE,
+                               unparsable = FALSE) {
   res <- dbSendQuery(con, sql)
   expected <- lapply(ns, function(n) {
     values <- withCallingHandlers(
       dbFetch(res, n),
       warning = function(w) {
-        if (mixed && grepl("mixed type", conditionMessage(w))) {
+        message <- conditionMessage(w)
+        if ((mixed && grepl("mixed type", message)) ||
+          (unparsable && grepl("NA is returned", message))) {
           invokeRestart("muffleWarning")
         }
       }
@@ -101,4 +109,22 @@ expect_same_chunks <- function(con, sql, ns, int64 = double(), mixed = FALSE) {
   })
   expect_equal(actual, expected)
   invisible(chunks)
+}
+
+# The values of a time64[us] or timestamp[us] column of `chunk` as strings
+# of whole microseconds, NA for NULL: exact also beyond the 2^53 that a
+# conversion to seconds would round
+arrow_micros <- function(chunk, name) {
+  micros <- nanoarrow::convert_array(chunk$children[[name]], bit64::integer64())
+  as.character(micros)
+}
+
+# All rows of `sql` as one Arrow chunk, checked with expect_valid_chunk(),
+# with the result cleared
+fetch_arrow_all <- function(con, sql) {
+  res <- dbSendQuery(con, sql)
+  on.exit(dbClearResult(res))
+  chunk <- fetch_arrow_chunk(res)
+  expect_valid_chunk(chunk)
+  chunk
 }

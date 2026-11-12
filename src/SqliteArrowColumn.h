@@ -8,8 +8,11 @@
 
 // The Arrow type of a result column.
 //
-// SQLite is dynamically typed, so the type is decided from the first value
-// that is not NULL: int64 for an integer, double for a real,
+// With `extended_types`, a column declared as DATE, TIME, DATETIME or TIMESTAMP
+// is date32, time64[us] or timestamp[us, UTC] whatever its values,
+// as the data frame path reads it as Date, hms or POSIXct in UTC.
+// Otherwise SQLite is dynamically typed, so the type is decided from the first
+// value that is not NULL: int64 for an integer, double for a real,
 // utf8 for text, binary for a blob.
 // An int64 column widens to double when a real arrives later in the same chunk.
 // A column whose values in that chunk are all NULL takes the type of its
@@ -26,7 +29,10 @@ enum ARROW_KIND {
   AK_INT64,
   AK_DOUBLE,
   AK_STRING,
-  AK_BINARY
+  AK_BINARY,
+  AK_DATE32,
+  AK_TIME64,
+  AK_TIMESTAMP
 };
 
 class SqliteArrowColumn {
@@ -44,10 +50,13 @@ class SqliteArrowColumn {
   int64_t pending_nulls;
 
 public:
+  // With `with_alt_types`, the column takes the date and time types
+  // from its declared type
   SqliteArrowColumn(
     sqlite3_stmt* stmt_,
     const int j_,
-    const std::string& name_
+    const std::string& name_,
+    bool with_alt_types
   );
 
 public:
@@ -77,6 +86,8 @@ private:
   bool integer_value(int column_type, int64_t& value) const;
   void append_string(int column_type);
   struct ArrowBufferView value_bytes(int column_type) const;
+  void append_date(int column_type);
+  void append_time(int column_type);
   void append_null();
   void promote_to_double();
 };

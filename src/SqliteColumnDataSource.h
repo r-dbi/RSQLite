@@ -28,6 +28,15 @@ public:
   virtual double fetch_datetime() const;
   virtual double fetch_time() const;
 
+  // The parsers of the text that fetch_date(), fetch_time() and
+  // fetch_datetime_local() read, without their warning:
+  // false if `text` can't be parsed.
+  // A date is parsed into days since 1970-01-01, a time into microseconds,
+  // and a timestamp into microseconds since 1970-01-01 00:00:00.
+  static bool parse_date(const char* text, int64_t& days);
+  static bool parse_time(const char* text, int64_t& micros);
+  static bool parse_datetime_local(const char* text, int64_t& micros);
+
 private:
   static DATA_TYPE datatype_from_decltype(
     const char* decl_type,
@@ -36,6 +45,7 @@ private:
 
 private:
   sqlite3_stmt* get_stmt() const;
+  const char* get_text() const;
 
   int get_column_type() const;
 

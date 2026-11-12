@@ -172,6 +172,13 @@ extern "C" SEXP _RSQLite_rsqliteVersion() {
     return cpp11::as_sexp(rsqliteVersion());
   END_CPP11
 }
+// utf8.cpp
+cpp11::logicals utf8_valid(cpp11::list x);
+extern "C" SEXP _RSQLite_utf8_valid(SEXP x) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(utf8_valid(cpp11::as_cpp<cpp11::decay_t<cpp11::list>>(x)));
+  END_CPP11
+}
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
@@ -198,6 +205,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_sqlite_has_http_vfs",          (DL_FUNC) &_RSQLite_sqlite_has_http_vfs,          0},
     {"_RSQLite_sqlite_http_stats",            (DL_FUNC) &_RSQLite_sqlite_http_stats,            0},
     {"_RSQLite_sqlite_httpvfs_compiled",      (DL_FUNC) &_RSQLite_sqlite_httpvfs_compiled,      0},
+    {"_RSQLite_utf8_valid",                   (DL_FUNC) &_RSQLite_utf8_valid,                   1},
     {NULL, NULL, 0}
 };
 }

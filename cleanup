@@ -7,4 +7,4 @@
 # R CMD build's own cleanup only removes top-level src/*.o, not files in the
 # vendored subdirectory, so without this script the object file ends up in the
 # tarball and R CMD check reports it ("checking if this is a source package").
-rm -f src/vendor/sqlite3/*.o src/vendor/sqlite3/*.a
+rm -f src/vendor/sqlite3/*.o src/vendor/sqlite3/*.a src/vendor/nanoarrow/*.o

@@ -133,15 +133,21 @@ fetch_arrow_all <- function(con, sql) {
 # in a new R session, limits SQLite's heap to `limit` bytes,
 # and fetches a second chunk of one row.
 # SQLite can't lift the limit again, hence the session of its own.
+# The statements of `setup` run before `sql`,
+# on a connection with `extended_types` as given.
 # Returns the error of the second fetch, if any,
 # and the state of the result after it.
-fetch_arrow_chunk_out_of_memory <- function(sql, limit) {
+fetch_arrow_chunk_out_of_memory <- function(sql, limit, setup = character(),
+                                            extended_types = FALSE) {
   callr::r(
-    function(sql, limit) {
+    function(sql, limit, setup, extended_types) {
       library(RSQLite)
-      con <- dbConnect(SQLite(), ":memory:")
+      con <- dbConnect(SQLite(), ":memory:", extended_types = extended_types)
       other <- dbConnect(SQLite(), ":memory:")
       dbExecute(con, "PRAGMA encoding = 'UTF-16'")
+      for (statement in setup) {
+        dbExecute(con, statement)
+      }
       res <- dbSendQuery(con, sql)
       RSQLite:::result_fetch_arrow_chunk(res@ptr, 1L)
       dbExecute(other, paste("PRAGMA hard_heap_limit =", limit))
@@ -158,6 +164,6 @@ fetch_arrow_chunk_out_of_memory <- function(sql, limit) {
         rows = dbGetRowCount(res)
       )
     },
-    list(sql, format(limit, scientific = FALSE))
+    list(sql, format(limit, scientific = FALSE), setup, extended_types)
   )
 }

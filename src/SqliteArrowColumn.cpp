@@ -449,10 +449,7 @@ void SqliteArrowColumn::append_date(int column_type) {
     }
   } else if (column_type == SQLITE_TEXT) {
     // The years 1400 to 9999, well within date32
-    ok = SqliteColumnDataSource::parse_date(
-      reinterpret_cast<const char*>(sqlite3_column_text(stmt, j)),
-      days
-    );
+    ok = SqliteColumnDataSource::parse_date(value_text(), days);
   }
 
   if (!ok) {
@@ -486,9 +483,12 @@ void SqliteArrowColumn::append_time(int column_type) {
     }
   } else if (column_type == SQLITE_FLOAT) {
     const double seconds = sqlite3_column_double(stmt, j);
+    // To the nearest microsecond, halves to even in the default rounding mode.
+    // Adding 0.5 and rounding down would round an odd count between 2^52 and
+    // 2^53 one up: the count is exact there, and adding 0.5 makes a tie.
     // Both bounds are exact as doubles, and casting a value outside,
-    // an infinity included, would be undefined
-    const double rounded = std::floor(seconds * 1e6 + 0.5);
+    // an infinity included, would be undefined.
+    const double rounded = std::nearbyint(seconds * 1e6);
     ok = rounded >= -9223372036854775808.0 && rounded < 9223372036854775808.0;
     if (ok) {
       micros = static_cast<int64_t>(rounded);
@@ -498,8 +498,7 @@ void SqliteArrowColumn::append_time(int column_type) {
       micros = day - 1;
     }
   } else if (column_type == SQLITE_TEXT) {
-    const char* text =
-      reinterpret_cast<const char*>(sqlite3_column_text(stmt, j));
+    const char* text = value_text();
     ok = (kind == AK_TIMESTAMP)
            ? SqliteColumnDataSource::parse_datetime_local(text, micros)
            : SqliteColumnDataSource::parse_time(text, micros);

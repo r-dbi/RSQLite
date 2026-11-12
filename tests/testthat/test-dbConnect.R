@@ -152,6 +152,29 @@ test_that("a temporary database can be cloned into another database", {
   expect_identical(clone@dbname, normalizePath(other, mustWork = FALSE))
 })
 
+test_that("`NULL` arguments to `dbConnect()` on a connection are kept", {
+  path <- tempfile()
+  con <- dbConnect(SQLite(), path)
+  on.exit(dbDisconnect(con), add = TRUE)
+  fresh <- dbConnect(SQLite(), path, synchronous = NULL)
+  on.exit(dbDisconnect(fresh), add = TRUE, after = FALSE)
+  clone <- dbConnect(con, synchronous = NULL)
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+
+  expect_identical(
+    dbGetQuery(clone, "PRAGMA synchronous")[[1]],
+    dbGetQuery(fresh, "PRAGMA synchronous")[[1]]
+  )
+
+  expect_error(dbConnect(con, dbname = NULL))
+})
+
+test_that("a misspelled `dbname` does not clone a temporary database", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+  expect_error(dbConnect(con, dbnames = tempfile()), "Can't clone a temporary database")
+})
+
 test_that("a temporary database can't be cloned", {
   con <- dbConnect(SQLite(), ":memory:")
   on.exit(dbDisconnect(con), add = TRUE)

@@ -46,7 +46,8 @@ and any arguments here will be ignored with a warning.}
 If a connection, the connection will be cloned:
 the new connection has the database, \code{vfs}, \code{flags}, \code{loadable.extensions}, \code{bigint} and \code{extended_types} of the original,
 unless they are passed as arguments to \code{dbConnect()}.
-\code{default.extensions}, \code{synchronous} and \code{cache_size} are not carried over.}
+\code{default.extensions}, \code{synchronous} and \code{cache_size} are not carried over.
+A temporary database can be cloned only into another \code{dbname}.}
 
 \item{dbname}{The path to the database file.
 SQLite keeps each database instance in one single file.

@@ -6,7 +6,7 @@ dbConnect_SQLiteConnection <- function(drv, ...) {
   call <- match.call(dbConnect_SQLiteDriver, as.call(c(list(quote(f), NA), list(...))))
   args <- as.list(call)[-(1:2)]
 
-  if (is.null(args$dbname) && drv@dbname %in% c("", ":memory:", "file::memory:")) {
+  if (is.null(args[["dbname"]]) && drv@dbname %in% c("", ":memory:", "file::memory:")) {
     stop("Can't clone a temporary database", call. = FALSE)
   }
 
@@ -16,7 +16,8 @@ dbConnect_SQLiteConnection <- function(drv, ...) {
     loadable.extensions = drv@loadable.extensions,
     bigint = drv@bigint, extended_types = drv@extended_types
   )
-  args <- utils::modifyList(defaults, args)
+  # Not `modifyList()`, which would drop an argument that is `NULL`.
+  args <- c(args, defaults[setdiff(names(defaults), names(args))])
 
   do.call(dbConnect, c(list(SQLite()), args))
 }

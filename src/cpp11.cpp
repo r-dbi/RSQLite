@@ -87,25 +87,25 @@ extern "C" SEXP _RSQLite_sqlite_http_stats() {
   END_CPP11
 }
 // result.cpp
-cpp11::external_pointer<DbResult> result_create(cpp11::external_pointer<DbConnectionPtr> con, std::string sql);
+cpp11::external_pointer<DbResultPtr> result_create(cpp11::external_pointer<DbConnectionPtr> con, std::string sql);
 extern "C" SEXP _RSQLite_result_create(SEXP con, SEXP sql) {
   BEGIN_CPP11
     return cpp11::as_sexp(result_create(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbConnectionPtr>>>(con), cpp11::as_cpp<cpp11::decay_t<std::string>>(sql)));
   END_CPP11
 }
 // result.cpp
-void result_release(cpp11::external_pointer<DbResult> res);
+void result_release(cpp11::external_pointer<DbResultPtr> res);
 extern "C" SEXP _RSQLite_result_release(SEXP res) {
   BEGIN_CPP11
-    result_release(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResult>>>(res));
+    result_release(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResultPtr>>>(res));
     return R_NilValue;
   END_CPP11
 }
 // result.cpp
-bool result_valid(cpp11::external_pointer<DbResult> res_);
+bool result_valid(cpp11::external_pointer<DbResultPtr> res_);
 extern "C" SEXP _RSQLite_result_valid(SEXP res_) {
   BEGIN_CPP11
-    return cpp11::as_sexp(result_valid(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResult>>>(res_)));
+    return cpp11::as_sexp(result_valid(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResultPtr>>>(res_)));
   END_CPP11
 }
 // result.cpp

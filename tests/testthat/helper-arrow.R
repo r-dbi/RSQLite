@@ -29,24 +29,57 @@ arrow_formats <- function(chunk) {
 }
 
 # The values of a chunk as a data frame:
-# int64 columns as `int64`, double by default, and the null type as logical
+# int64 columns as `int64`, double by default, the null type as logical,
+# utf8 as character and binary as blob, as dbFetch() returns them
 arrow_values <- function(chunk, int64 = double()) {
   ptype <- lapply(arrow_formats(chunk), function(format) {
-    switch(format, l = int64, g = double(), n = logical())
+    switch(
+      format,
+      l = int64,
+      g = double(),
+      n = logical(),
+      u = character(),
+      z = blob::blob()
+    )
   })
   ptype <- structure(ptype, class = "data.frame", row.names = integer())
   nanoarrow::convert_array(chunk, ptype)
 }
 
+# Expects `chunk` to pass nanoarrow's full validation, which reading it back
+# from the Arrow IPC format runs, and its utf8 values to be valid UTF-8,
+# which Arrow's full validation adds.
+# Converting a utf8 value with a NUL byte to R would fail.
+expect_valid_chunk <- function(chunk) {
+  path <- withr::local_tempfile()
+  nanoarrow::write_nanoarrow(chunk, path)
+  stream <- nanoarrow::read_nanoarrow(path)
+  expect_equal(stream$get_next()$length, chunk$length)
+  stream$release()
+
+  for (child in chunk$children[arrow_formats(chunk) == "u"]) {
+    expect_true(all(validUTF8(nanoarrow::convert_array(child, character()))))
+  }
+}
+
 # Fetches `sql` in chunks of `ns` rows through Arrow, and again with dbFetch(),
 # and expects the same values, dbHasCompleted() and dbGetRowCount() after
-# each chunk; `int64` as for arrow_values().
+# each chunk, and valid chunks; `int64` as for arrow_values().
+# With `mixed = TRUE`, dbFetch() may warn of a column of mixed types.
 # Returns the Arrow chunks.
-expect_same_chunks <- function(con, sql, ns, int64 = double()) {
+expect_same_chunks <- function(con, sql, ns, int64 = double(), mixed = FALSE) {
   res <- dbSendQuery(con, sql)
   expected <- lapply(ns, function(n) {
+    values <- withCallingHandlers(
+      dbFetch(res, n),
+      warning = function(w) {
+        if (mixed && grepl("mixed type", conditionMessage(w))) {
+          invokeRestart("muffleWarning")
+        }
+      }
+    )
     list(
-      values = dbFetch(res, n),
+      values = values,
       completed = dbHasCompleted(res),
       rows = dbGetRowCount(res)
     )
@@ -58,6 +91,7 @@ expect_same_chunks <- function(con, sql, ns, int64 = double()) {
   chunks <- list()
   actual <- lapply(ns, function(n) {
     chunk <- fetch_arrow_chunk(res, n)
+    expect_valid_chunk(chunk)
     chunks[[length(chunks) + 1]] <<- chunk
     list(
       values = arrow_values(chunk, int64),

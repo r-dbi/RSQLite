@@ -91,7 +91,7 @@ sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
       ++tail;
     }
     if (*tail) {
-      cpp11::warning(std::string("Ignoring remaining part of query: ") + tail);
+      cpp11::warning("Ignoring remaining part of query: %s", tail);
     }
   }
 
@@ -375,5 +375,5 @@ void SqliteResultImpl::raise_sqlite_exception() const {
 }
 
 void SqliteResultImpl::raise_sqlite_exception(sqlite3* conn) {
-  cpp11::stop(sqlite3_errmsg(conn));
+  cpp11::stop("%s", sqlite3_errmsg(conn));
 }

@@ -186,7 +186,7 @@ test_that("`NULL` arguments to `dbConnect()` on a connection are kept", {
     dbGetQuery(fresh, "PRAGMA synchronous")[[1]]
   )
 
-  expect_error(dbConnect(con, dbname = NULL))
+  expect_error(dbConnect(con, dbname = NULL), "length(dbname) == 1 is not TRUE", fixed = TRUE)
 })
 
 test_that("a misspelled `dbname` does not clone a temporary database", {
@@ -212,6 +212,63 @@ test_that("`dbConnect()` on a connection has the arguments of `dbConnect()` on a
   )
   same_default <- setdiff(names(drv_formals)[-1], c(from_connection, "..."))
   expect_identical(conn_formals[same_default], drv_formals[same_default])
+})
+
+test_that("`dbConnect()` on a connection passes each argument on to the driver", {
+  con <- dbConnect(SQLite(), tempfile())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  args <- NULL
+  local_mocked_bindings(dbConnect_SQLiteDriver = function(drv, ...) {
+    args <<- list(...)
+    con
+  })
+
+  arg_names <- setdiff(names(formals(dbConnect_SQLiteConnection)), c("drv", "..."))
+  for (name in arg_names) {
+    sentinel <- structure(list(), class = paste0("sentinel_", name))
+    args <- NULL
+    do.call(dbConnect, c(list(con), stats::setNames(list(sentinel), name)))
+    expect_identical(args[[name]], sentinel, info = name)
+  }
+
+  args <- NULL
+  dbConnect(con, extra = "passed on")
+  expect_identical(args$extra, "passed on")
+})
+
+test_that("`dbConnect()` on a connection takes its defaults from the connection", {
+  con <- dbConnect(SQLite(), tempfile())
+  on.exit(dbDisconnect(con), add = TRUE)
+  template <- con
+  template@dbname <- "sentinel.sqlite"
+  template@loadable.extensions <- FALSE
+  template@flags <- 12345L
+  template@vfs <- "sentinel-vfs"
+  template@bigint <- "sentinel-bigint"
+  template@extended_types <- TRUE
+  template@check_utf8 <- TRUE
+
+  args <- NULL
+  local_mocked_bindings(dbConnect_SQLiteDriver = function(drv, ...) {
+    args <<- list(...)
+    con
+  })
+
+  dbConnect(template)
+  expect_identical(args$dbname, "sentinel.sqlite")
+  expect_identical(args$loadable.extensions, FALSE)
+  expect_identical(args$default.extensions, FALSE)
+  expect_identical(args$flags, 12345L)
+  expect_identical(args$vfs, "sentinel-vfs")
+  expect_identical(args$bigint, "sentinel-bigint")
+  expect_identical(args$extended_types, TRUE)
+  expect_identical(args$check_utf8, TRUE)
+  expect_identical(args$synchronous, "off")
+  expect_null(args$cache_size)
+
+  dbConnect(template, loadable.extensions = TRUE)
+  expect_identical(args$default.extensions, TRUE)
 })
 
 test_that("temporary tables are connection local", {

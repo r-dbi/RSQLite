@@ -27,7 +27,7 @@ A named list of previous values (in R types).
 lifecycle::badge("experimental")
 
 Set conservative, process-wide options for the experimental HTTP/HTTPS VFS.
-These values are read on first open of a remote database in the current process.
+These values are read each time a remote database is opened.
 }
 \details{
 Options are stored in environment variables so they also affect C-level code:
@@ -37,6 +37,19 @@ Options are stored in environment variables so they also affect C-level code:
 \item \code{RSQLITE_HTTP_FALLBACK_FULLDL}: If \code{TRUE} (default), fall back to full download when the server does not support HTTP Range;
 if \code{FALSE}, open will fail.
 }
+
+Two more variables, without an argument here, limit how long a transfer may wait:
+\itemize{
+\item \code{RSQLITE_HTTP_CONNECT_TIMEOUT}: Seconds to wait for a connection to the server (default 30).
+\item \code{RSQLITE_HTTP_STALL_TIMEOUT}: Seconds a transfer may receive less than one byte per second before it is aborted (default 60).
+}
+
+Only whole numbers of seconds of at least 1 are honored, in any notation such as \code{120} or \code{1e+05}.
+Larger values than 2147483 seconds (about 25 days) are capped,
+and libcurl 8.19.0 or later caps the stall timeout at 65535 seconds (about 18 hours).
+Anything else uses the default.
+
+An aborted transfer fails the open or the query with an SQLite error.
 }
 \examples{
 old <- sqliteHttpConfig(cache_size_mb = 8, prefetch_pages = 1, fallback_full_download = TRUE)

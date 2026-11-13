@@ -16,6 +16,10 @@ connection_in_transaction <- function(con_) {
   .Call(`_RSQLite_connection_in_transaction`, con_)
 }
 
+connection_limit_length <- function(con, n) {
+  .Call(`_RSQLite_connection_limit_length`, con, n)
+}
+
 connection_copy_database <- function(from, to) {
   invisible(.Call(`_RSQLite_connection_copy_database`, from, to))
 }

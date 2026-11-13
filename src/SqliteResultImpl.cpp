@@ -4,7 +4,7 @@
 #include "SqliteDataFrame.h"
 #include "DbColumnStorage.h"
 #include "DbConnection.h"
-#include "integer64.h"
+#include "SqliteParamSource.h"
 #include <stdexcept>
 
 namespace {
@@ -43,8 +43,6 @@ SqliteResultImpl::SqliteResultImpl(
       bind_started_(false),
       nrows_(0),
       total_changes_start_(sqlite3_total_changes64(conn)),
-      group_(0),
-      groups_(0),
       types_(get_initial_field_types(cache.ncols_)),
       with_alt_types_(conn_->with_alt_types()),
       error_kept_(false),
@@ -172,11 +170,7 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
     );
   }
 
-  set_params(params);
-
-  SEXP first_col = cpp11::as_sexp(params[0]);
-  groups_ = Rf_length(first_col);
-  group_ = 0;
+  params_.reset(new SqliteListParamSource(params));
 
   total_changes_start_ = sqlite3_total_changes64(conn);
   bind_started_ = true;
@@ -193,8 +187,7 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
     // Parameters that fail to bind or to execute leave the result unbound:
     // fetching asks for a new bind instead of running them again,
     // while dbGetRowsAffected() counts from this bind
-    params_ = cpp11::list();
-    groups_ = 0;
+    params_.reset();
     ready_ = false;
     complete_ = false;
     nrows_ = 0;
@@ -273,86 +266,18 @@ cpp11::strings SqliteResultImpl::get_placeholder_names() const {
 
 // Privates ////////////////////////////////////////////////////////////////////
 
-void SqliteResultImpl::set_params(const cpp11::list& params) {
-  params_ = params;
-}
-
+// Binds the next parameter set, if any.
+// A value that can't be bound fails like a step, with SQLITE_ERROR:
+// the error of a later set stays for the next fetch, see read_ahead().
 bool SqliteResultImpl::bind_row() {
-  if (group_ >= groups_) {
+  if (!params_) {
     return false;
   }
 
-  sqlite3_reset(stmt);
-  sqlite3_clear_bindings(stmt);
-
-  for (R_xlen_t j = 0; j < params_.size(); ++j) {
-    // sqlite parameters are 1-indexed
-    bind_parameter_pos((int)j + 1, params_[j]);
-  }
-
-  return true;
-}
-
-void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
-  if (TYPEOF(value_) == LGLSXP) {
-    int value = LOGICAL(value_)[group_];
-    if (value == NA_LOGICAL) {
-      sqlite3_bind_null(stmt, j);
-    } else {
-      sqlite3_bind_int(stmt, j, value);
-    }
-  } else if (TYPEOF(value_) == INT64SXP && Rf_inherits(value_, "integer64")) {
-    int64_t value = INTEGER64(value_)[group_];
-    if (value == NA_INTEGER64) {
-      sqlite3_bind_null(stmt, j);
-    } else {
-      sqlite3_bind_int64(stmt, j, value);
-    }
-  } else if (TYPEOF(value_) == INTSXP) {
-    int value = INTEGER(value_)[group_];
-    if (value == NA_INTEGER) {
-      sqlite3_bind_null(stmt, j);
-    } else {
-      sqlite3_bind_int(stmt, j, value);
-    }
-  } else if (TYPEOF(value_) == REALSXP) {
-    double value = REAL(value_)[group_];
-    if (value == NA_REAL) {
-      sqlite3_bind_null(stmt, j);
-    } else {
-      sqlite3_bind_double(stmt, j, value);
-    }
-  } else if (TYPEOF(value_) == STRSXP) {
-    SEXP value = STRING_ELT(value_, group_);
-    if (value == NA_STRING) {
-      sqlite3_bind_null(stmt, j);
-    } else {
-      sqlite3_bind_text(stmt, j, CHAR(value), -1, SQLITE_TRANSIENT);
-    }
-  } else if (TYPEOF(value_) == VECSXP) {
-    SEXP value = VECTOR_ELT(value_, group_);
-    if (TYPEOF(value) == NILSXP) {
-      sqlite3_bind_null(stmt, j);
-    } else if (TYPEOF(value) == RAWSXP) {
-      sqlite3_bind_blob(
-        stmt,
-        j,
-        RAW(value),
-        Rf_length(value),
-        SQLITE_TRANSIENT
-      );
-    } else {
-      throw step_error(
-        "Can only bind lists of raw vectors (or NULL)",
-        SQLITE_ERROR
-      );
-    }
-  } else {
-    throw step_error(
-      std::string("Don't know how to handle parameter of type ") +
-        Rf_type2char(TYPEOF(value_)) + ".",
-      SQLITE_ERROR
-    );
+  try {
+    return params_->bind_next_row(stmt);
+  } catch (const std::runtime_error& e) {
+    throw step_error(e.what(), SQLITE_ERROR);
   }
 }
 
@@ -472,7 +397,6 @@ bool SqliteResultImpl::step_run() {
 }
 
 bool SqliteResultImpl::step_done() {
-  ++group_;
   bool more_params = bind_row();
 
   if (!more_params) {

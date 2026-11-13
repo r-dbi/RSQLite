@@ -3,12 +3,14 @@
 
 #include <cpp11.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include "sqlite3-cpp.h"
 #include "DbColumnDataType.h"
 
 class DbConnection;
 typedef boost::shared_ptr<DbConnection> DbConnectionPtr;
+class SqliteParamSource;
 
 class SqliteResultImpl : public boost::noncopyable {
 private:
@@ -36,8 +38,8 @@ private:
   // and a statement can change as many
   int64_t nrows_;
   int64_t total_changes_start_;
-  cpp11::list params_;
-  int group_, groups_;
+  // The parameter sets of the latest bind, see bind_row()
+  boost::scoped_ptr<SqliteParamSource> params_;
   std::vector<DATA_TYPE> types_;
   bool with_alt_types_;
   // The error of the step past the last row of a full fetch,
@@ -72,9 +74,7 @@ public:
   cpp11::strings get_placeholder_names() const;
 
 private:
-  void set_params(const cpp11::list& params);
   bool bind_row();
-  void bind_parameter_pos(int j, SEXP value_);
   void after_bind(bool params_have_rows);
 
   cpp11::list fetch_rows(int n_max, int& n);

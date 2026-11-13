@@ -527,7 +527,12 @@ test_that("an interrupt completes the result of a fetch", {
   skip_if(getRversion() < "4.0")
   skip_unless_callr_loads_tested_rsqlite()
 
-  session <- callr::r_session$new()
+  # A busy machine, or a run under ASan or valgrind, can take many seconds
+  # to start the session or to stop after the interrupt.
+  # Both waits end as soon as the session is ready.
+  timeout_ms <- 60000
+
+  session <- callr::r_session$new(wait_timeout = timeout_ms)
   on.exit(session$close(), add = TRUE)
   session$run(function() {
     .GlobalEnv$con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
@@ -539,22 +544,36 @@ test_that("an interrupt completes the result of a fetch", {
     NULL
   })
 
-  session$call(function() {
-    tryCatch(
-      DBI::dbFetch(.GlobalEnv$res, n = -1),
-      interrupt = function(e) {
-        writeLines("interrupted")
-      }
-    )
-    writeLines("done")
-  })
+  # The interrupt is sent only once the fetch has begun
+  started <- tempfile()
+  on.exit(unlink(started), add = TRUE)
+  session$call(
+    function(started) {
+      tryCatch(
+        {
+          file.create(started)
+          DBI::dbFetch(.GlobalEnv$res, n = -1)
+        },
+        interrupt = function(e) {
+          writeLines("interrupted")
+        }
+      )
+      writeLines("done")
+    },
+    list(started)
+  )
 
+  deadline <- Sys.time() + timeout_ms / 1000
+  while (!file.exists(started) && Sys.time() < deadline) {
+    Sys.sleep(0.05)
+  }
+  expect_true(file.exists(started))
   expect_equal(session$poll_process(500), "timeout")
   expect_equal(session$get_state(), "busy")
 
   expect_true(session$interrupt())
 
-  expect_equal(session$poll_process(5000), "ready")
+  expect_equal(session$poll_process(timeout_ms), "ready")
   out <- session$read()
   expect_equal(out$code, 200)
   expect_equal(gsub("\r", "", out$stdout), "interrupted\ndone\n")

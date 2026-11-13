@@ -20,7 +20,11 @@ SqliteArrowColumn::SqliteArrowColumn(
       kind(AK_UNDECIDED),
       frozen(false),
       pending_nulls(0),
-      row(0) {
+      row(0),
+      value_type(SQLITE_NULL),
+      value_valid(true) {
+  value.data.data = NULL;
+  value.size_bytes = 0;
   if (!with_alt_types) {
     return;
   }
@@ -121,8 +125,46 @@ void SqliteArrowColumn::start_chunk() {
   }
 }
 
+void SqliteArrowColumn::read_type() {
+  value_type = sqlite3_column_type(stmt, j);
+}
+
+// The bytes are read once for the check and the append,
+// and again by the next chunk when this one ends before the row.
+// Only what the append adds counts:
+// nothing for NULL and for a value that is NULL as not valid UTF-8.
+bool SqliteArrowColumn::read_bytes(int64_t max_bytes) {
+  // An undecided column takes the type of its first value that isn't NULL
+  const ARROW_KIND value_kind =
+    decided() ? kind : kind_from_column_type(value_type);
+  if (value_type == SQLITE_NULL ||
+      (value_kind != AK_STRING && value_kind != AK_BINARY)) {
+    return true;
+  }
+
+  value = value_bytes(value_type);
+  // SQLite doesn't enforce UTF-8 for text, and a blob keeps all its bytes:
+  // only well-formed UTF-8 without NUL bytes is text, as R strings need it.
+  // Numbers render as ASCII.
+  value_valid = value_kind != AK_STRING ||
+                (value_type != SQLITE_TEXT && value_type != SQLITE_BLOB) ||
+                rsqlite_is_utf8_string(
+                  value.data.as_char,
+                  static_cast<size_t>(value.size_bytes)
+                );
+  return !value_valid || value.size_bytes <= max_bytes - data_bytes();
+}
+
+void SqliteArrowColumn::stop_too_long(int64_t max_bytes) const {
+  throw std::runtime_error(
+    "Column `" + name + "`: a value of " + std::to_string(value.size_bytes) +
+    " bytes exceeds the " + std::to_string(max_bytes) +
+    " bytes that an Arrow utf8 or binary array can hold."
+  );
+}
+
 void SqliteArrowColumn::append_row(int64_t row_) {
-  const int column_type = sqlite3_column_type(stmt, j);
+  const int column_type = value_type;
   row = row_;
 
   if (!decided()) {
@@ -288,17 +330,15 @@ void SqliteArrowColumn::append_value(int column_type) {
     break;
 
   case AK_BINARY:
-    {
-      const struct ArrowBufferView bytes = value_bytes(column_type);
-      if (column_type != SQLITE_BLOB) {
-        note(column_type, CR_CONVERTED);
-      }
-      check_arrow(
-        ArrowArrayAppendBytes(array.get(), bytes),
-        "Can't append to Arrow array"
-      );
-      break;
+    // read_bytes() has read the value
+    if (column_type != SQLITE_BLOB) {
+      note(column_type, CR_CONVERTED);
     }
+    check_arrow(
+      ArrowArrayAppendBytes(array.get(), value),
+      "Can't append to Arrow array"
+    );
+    break;
 
   case AK_DATE32:
     append_date(column_type);
@@ -398,16 +438,9 @@ bool SqliteArrowColumn::integer_value(int column_type, int64_t& value) const {
   return leading_integer_fits(text, sqlite3_column_bytes(stmt, j));
 }
 
+// The bytes and their check come from read_bytes()
 void SqliteArrowColumn::append_string(int column_type) {
-  const struct ArrowBufferView bytes = value_bytes(column_type);
-  // SQLite doesn't enforce UTF-8 for text, and a blob keeps all its bytes:
-  // only well-formed UTF-8 without NUL bytes is text, as R strings need it.
-  // Numbers render as ASCII.
-  if ((column_type == SQLITE_TEXT || column_type == SQLITE_BLOB) &&
-      !rsqlite_is_utf8_string(
-        bytes.data.as_char,
-        static_cast<size_t>(bytes.size_bytes)
-      )) {
+  if (!value_valid) {
     note(column_type, CR_INVALID_UTF8);
     append_null();
     return;
@@ -416,8 +449,8 @@ void SqliteArrowColumn::append_string(int column_type) {
     note(column_type, CR_CONVERTED);
   }
   struct ArrowStringView view;
-  view.data = bytes.data.as_char;
-  view.size_bytes = bytes.size_bytes;
+  view.data = value.data.as_char;
+  view.size_bytes = value.size_bytes;
   check_arrow(
     ArrowArrayAppendString(array.get(), view),
     "Can't append to Arrow array"
@@ -452,6 +485,14 @@ struct ArrowBufferView SqliteArrowColumn::value_bytes(int column_type) const {
     out.data.data = "";
   }
   return out;
+}
+
+// The bytes in the data buffer of the chunk of a utf8 or binary column
+int64_t SqliteArrowColumn::data_bytes() {
+  if (!decided()) {
+    return 0;
+  }
+  return ArrowArrayBuffer(array.get(), 2)->size_bytes;
 }
 
 // The current value as UTF-8 text, as SQLite converts it.

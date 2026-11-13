@@ -3,6 +3,7 @@
 #include "DbArrow.h"
 // After DbArrow.h, so that the Arrow C structs are defined once
 #include <nanoarrow/r.h>
+#include <cmath>
 
 // #include "DbResult.h"
 
@@ -103,6 +104,18 @@ cpp11::list result_column_info(DbResult* res) {
 [[cpp11::register]]
 cpp11::strings result_get_placeholder_names(SqliteResult* res) {
   return res->get_placeholder_names();
+}
+
+// For the tests: lowers the bytes of text or blobs that a utf8 or binary
+// column of an Arrow chunk of `res` holds, from the 2^31 - 1 that their
+// 32-bit offsets address, so that the tests of the limit need little memory
+[[cpp11::register]]
+void result_set_arrow_max_bytes(SqliteResult* res, double max_bytes) {
+  if (!(max_bytes >= 0 && max_bytes <= INT32_MAX &&
+        max_bytes == std::floor(max_bytes))) {
+    cpp11::stop("`max_bytes` must be a whole number between 0 and 2^31 - 1.");
+  }
+  res->set_arrow_max_bytes(static_cast<int64_t>(max_bytes));
 }
 
 // For the tests: a count of rows from R.

@@ -11,3 +11,16 @@ runs:
           cat('RCMDCHECK_ERROR_ON="warning"\n', file = Sys.getenv("GITHUB_ENV"), append = TRUE)
         }
       shell: Rscript {0}
+
+    # The Arrow test with blobs near 2 GiB peaks at about 2.5 GB of memory,
+    # so it runs only when RSQLITE_TEST_LARGE_ARROW is true.
+    # The hosted runners of the jobs that call this action afford that:
+    # R-CMD-check.yaml and R-CMD-check-dev.yaml, the daily `rcc dev` jobs, both call this hook.
+    # The R-hub containers of rhub.yaml call no custom action, so the test stays off there.
+    # A value set before this step, for instance in a matrix entry's `env`, wins.
+    - name: Enable the Arrow test with blobs near 2 GiB
+      run: |
+        if [ -z "${RSQLITE_TEST_LARGE_ARROW:-}" ]; then
+          echo 'RSQLITE_TEST_LARGE_ARROW=true' | tee -a "$GITHUB_ENV"
+        fi
+      shell: bash

@@ -61,6 +61,13 @@ private:
   // The latest Arrow chunk until it is handed out,
   // kept when the warning about its values exits: see fetch_arrow_chunk()
   boost::scoped_ptr<KeptArrowChunk> arrow_chunk_;
+  // Set while the Arrow columns hold the storage classes of the current row,
+  // also when a chunk ended before it or a fetch read it ahead:
+  // see ArrowChunk::takes_row() and read_ahead()
+  bool arrow_row_read_;
+  // The most bytes of text or blobs in a utf8 or binary column of a chunk,
+  // the 2^31 - 1 that their 32-bit offsets address unless a test lowers them
+  int64_t arrow_max_bytes_;
 
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);
@@ -84,7 +91,9 @@ public:
   // Fetches at most `n_max` rows, all of them if negative, into a struct array,
   // and warns about the values converted to the type of their column;
   // hands out a chunk kept when its warning exited instead, whole,
-  // whatever `n_max`
+  // whatever `n_max`.
+  // The chunk ends before a row whose text or blobs would take a utf8 or
+  // binary column beyond `arrow_max_bytes_`, and the next one starts with it.
   void fetch_arrow_chunk(
     struct ArrowArray* array,
     struct ArrowSchema* schema,
@@ -94,6 +103,8 @@ public:
   cpp11::list get_column_info();
 
 public:
+  // For the tests, see result_set_arrow_max_bytes()
+  void set_arrow_max_bytes(int64_t max_bytes);
   cpp11::strings get_placeholder_names() const;
 
 private:

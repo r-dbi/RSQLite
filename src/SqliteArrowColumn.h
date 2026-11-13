@@ -26,6 +26,8 @@
 // The first chunk of an execution fixes the types for its later chunks.
 // Values that don't fit the type of their column are converted or NULL,
 // see append_value(), and logged with their rows, see take_coercions().
+// The text and blobs of a utf8 or binary column of a chunk take at most the
+// bytes that the 32-bit offsets of these types address, see read_bytes().
 enum ARROW_KIND {
   AK_UNDECIDED,
   AK_NA,
@@ -57,6 +59,13 @@ class SqliteArrowColumn {
   std::vector<std::pair<int64_t, double> > text_reals;
   // The 1-based row number in the result of the value being appended
   int64_t row;
+  // The value of the current row, read once for the byte limit and the append:
+  // its storage class, read before anything converts the value,
+  // and for a utf8 or binary column its bytes,
+  // and whether they are appended or NULL instead as not valid UTF-8
+  int value_type;
+  struct ArrowBufferView value;
+  bool value_valid;
   // The values of the current chunk that didn't fit the type
   CoercionLog coercions;
 
@@ -80,8 +89,17 @@ public:
 
   // Chunk building
   void start_chunk();
-  // Appends the value of the current row, whose 1-based number in the result
-  // is `row_`
+  // Reads the storage class of the value of the current row,
+  // before anything converts the value
+  void read_type();
+  // Reads the bytes of the value of the current row for a utf8 or binary
+  // column, and tells whether the data of the chunk can take them
+  // within `max_bytes`; true for the other types
+  bool read_bytes(int64_t max_bytes);
+  // Fails for a value that read_bytes() found beyond `max_bytes` on its own
+  NORET void stop_too_long(int64_t max_bytes) const;
+  // Appends the value of the current row, as read_type() and read_bytes()
+  // have read it, whose 1-based number in the result is `row_`
   void append_row(int64_t row_);
   // Completes the chunk of `n` rows:
   // a column that has seen only NULL takes its declared type
@@ -102,6 +120,7 @@ private:
   bool integer_value(int column_type, int64_t& value) const;
   void append_string(int column_type);
   struct ArrowBufferView value_bytes(int column_type) const;
+  int64_t data_bytes();
   const char* value_text() const;
   double text_real(int column_type) const;
   void append_date(int column_type);

@@ -166,6 +166,14 @@ extern "C" SEXP _RSQLite_result_get_placeholder_names(SEXP res) {
   END_CPP11
 }
 // result.cpp
+void result_set_arrow_max_bytes(SqliteResult* res, double max_bytes);
+extern "C" SEXP _RSQLite_result_set_arrow_max_bytes(SEXP res, SEXP max_bytes) {
+  BEGIN_CPP11
+    result_set_arrow_max_bytes(cpp11::as_cpp<cpp11::decay_t<SqliteResult*>>(res), cpp11::as_cpp<cpp11::decay_t<double>>(max_bytes));
+    return R_NilValue;
+  END_CPP11
+}
+// result.cpp
 void result_set_rows_fetched(SqliteResult* res, double n);
 extern "C" SEXP _RSQLite_result_set_rows_fetched(SEXP res, SEXP n) {
   BEGIN_CPP11
@@ -215,6 +223,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_result_release",               (DL_FUNC) &_RSQLite_result_release,               1},
     {"_RSQLite_result_rows_affected",         (DL_FUNC) &_RSQLite_result_rows_affected,         1},
     {"_RSQLite_result_rows_fetched",          (DL_FUNC) &_RSQLite_result_rows_fetched,          1},
+    {"_RSQLite_result_set_arrow_max_bytes",   (DL_FUNC) &_RSQLite_result_set_arrow_max_bytes,   2},
     {"_RSQLite_result_set_rows_affected",     (DL_FUNC) &_RSQLite_result_set_rows_affected,     2},
     {"_RSQLite_result_set_rows_fetched",      (DL_FUNC) &_RSQLite_result_set_rows_fetched,      2},
     {"_RSQLite_result_valid",                 (DL_FUNC) &_RSQLite_result_valid,                 1},

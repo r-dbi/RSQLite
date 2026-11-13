@@ -80,7 +80,7 @@ void DbColumn::warn_type_conflicts(const cpp11::r_string& name) const {
     ss << format_data_type(*it);
   }
 
-  cpp11::warning(ss.str());
+  cpp11::warning("%s", ss.str().c_str());
 }
 
 DbColumn::operator SEXP() const {

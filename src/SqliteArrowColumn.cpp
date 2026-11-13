@@ -597,15 +597,25 @@ void SqliteArrowColumn::append_time(int column_type) {
     }
   } else if (column_type == SQLITE_FLOAT) {
     const double seconds = sqlite3_column_double(stmt, j);
-    // To the nearest microsecond, halves to even in the default rounding mode.
-    // Adding 0.5 and rounding down would round an odd count between 2^52 and
-    // 2^53 one up: the count is exact there, and adding 0.5 makes a tie.
-    // Both bounds are exact as doubles, and casting a value outside,
-    // an infinity included, would be undefined.
-    const double rounded = std::nearbyint(seconds * 1e6);
-    ok = rounded >= -9223372036854775808.0 && rounded < 9223372036854775808.0;
+    // The whole seconds and their fraction, both exact,
+    // and the fraction rounded to the nearest microsecond,
+    // halves to even in the default rounding mode, as CPython does it.
+    // Rounding the seconds times 1e6 would round twice, to a double first,
+    // and miss the nearest microsecond of one present-day timestamp in eight.
+    double whole;
+    const double fraction = std::modf(seconds, &whole);
+    // False for an infinity, whose cast would be undefined
+    ok = whole >= -INT64_MAX / 1000000 && whole <= INT64_MAX / 1000000;
     if (ok) {
-      micros = static_cast<int64_t>(rounded);
+      const int64_t base = static_cast<int64_t>(whole) * 1000000;
+      // At most a second, with the sign of the seconds
+      const int64_t part = static_cast<int64_t>(std::nearbyint(fraction * 1e6));
+      // Within the int64 microseconds but their smallest value,
+      // which bit64 reads as NA, as for an integer
+      ok = (part >= 0) ? base <= INT64_MAX - part : base >= -INT64_MAX - part;
+      if (ok) {
+        micros = base + part;
+      }
     }
     // Rounding a time before midnight stops at the last microsecond of the day
     if (kind == AK_TIME64 && micros == day && seconds < 86400) {

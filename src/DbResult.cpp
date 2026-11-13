@@ -120,6 +120,19 @@ cpp11::list DbResult::fetch(const int n_max) {
   return out;
 }
 
+void DbResult::fetch_arrow_chunk(
+  struct ArrowArray* array,
+  struct ArrowSchema* schema,
+  const int n_max
+) {
+  run_guarded(busy_, [&] {
+    if (!is_active()) {
+      cpp11::stop("Inactive result set");
+    }
+    impl->fetch_arrow_chunk(array, schema, n_max);
+  });
+}
+
 cpp11::list DbResult::get_column_info() {
   cpp11::writable::list out;
   run_guarded(busy_, [&] { out = impl->get_column_info(); });

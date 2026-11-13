@@ -57,13 +57,15 @@ Suggests:
     httpuv,
     knitr,
     magrittr,
+    nanoarrow (>= 0.4.0),
     rmarkdown,
     rvest,
     testthat (>= 3.0.0),
     withr,
     xml2
 LinkingTo: 
-    cpp11 (>= 0.4.0)
+    cpp11 (>= 0.4.0),
+    nanoarrow (>= 0.4.0)
 VignetteBuilder: 
     knitr
 Config/Needs/website: 

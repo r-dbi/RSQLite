@@ -3,6 +3,7 @@
 
 #include <cpp11.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include "sqlite3-cpp.h"
@@ -11,6 +12,11 @@
 class DbConnection;
 typedef boost::shared_ptr<DbConnection> DbConnectionPtr;
 class SqliteParamSource;
+// Declared only, so that the files that include this header
+// don't compile the nanoarrow headers
+class SqliteArrowColumn;
+struct ArrowArray;
+struct ArrowSchema;
 
 class SqliteResultImpl : public boost::noncopyable {
 private:
@@ -47,6 +53,10 @@ private:
   bool error_kept_;
   std::string kept_error_;
   int kept_error_code_;
+  // The Arrow column types, decided by the first Arrow fetch of an execution,
+  // see SqliteArrowColumn.
+  // A data frame fetch types its columns on its own, see types_.
+  boost::ptr_vector<SqliteArrowColumn> arrow_columns_;
 
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);
@@ -67,6 +77,12 @@ public:
   void set_rows_affected(int64_t n);
   void bind(const cpp11::list& params);
   cpp11::list fetch(const int n_max);
+  // Fetches at most `n_max` rows, all of them if negative, into a struct array
+  void fetch_arrow_chunk(
+    struct ArrowArray* array,
+    struct ArrowSchema* schema,
+    const int n_max
+  );
 
   cpp11::list get_column_info();
 
@@ -78,6 +94,8 @@ private:
   void after_bind(bool params_have_rows);
 
   cpp11::list fetch_rows(int n_max, int& n);
+  template <typename Rows, typename Finish>
+  void fetch_loop(Rows& rows, int n_max, Finish finish);
   void step();
   void read_ahead();
   bool step_run();

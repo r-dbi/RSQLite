@@ -43,6 +43,8 @@ private:
   // The error of the step past the last row of a full fetch,
   // kept for the next fetch with SQLite's result code: see read_ahead()
   bool error_kept_;
+  // Whether raising the kept error completes the result
+  bool kept_error_completes_;
   std::string kept_error_;
   int kept_error_code_;
 
@@ -87,6 +89,7 @@ private:
 private:
   NORET void raise_kept_error();
   NORET static void raise_sqlite_exception(sqlite3* conn);
+  NORET void raise_bind_exception(int j, int rc);
 };
 
 #endif  // RSQLITE_SQLITERESULTIMPL_H

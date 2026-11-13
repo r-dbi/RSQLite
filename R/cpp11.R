@@ -99,3 +99,7 @@ result_set_rows_affected <- function(res, n) {
 rsqliteVersion <- function() {
   .Call(`_RSQLite_rsqliteVersion`)
 }
+
+utf8_valid <- function(x) {
+  .Call(`_RSQLite_utf8_valid`, x)
+}

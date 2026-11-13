@@ -1,7 +1,11 @@
 #include "pch.h"
 #include "SqliteArrowColumn.h"
 #include "affinity.h"
+#include "utf8.h"
 #include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <stdexcept>
 
 SqliteArrowColumn::SqliteArrowColumn(
   sqlite3_stmt* stmt_,
@@ -28,6 +32,8 @@ void SqliteArrowColumn::decide_from_decltype() {
 
 void SqliteArrowColumn::freeze() {
   frozen = true;
+  // Read only while the type is open, released with its capacity
+  std::vector<std::pair<int64_t, double> >().swap(text_reals);
 }
 
 void SqliteArrowColumn::set_schema(struct ArrowSchema* schema) const {
@@ -41,6 +47,12 @@ void SqliteArrowColumn::set_schema(struct ArrowSchema* schema) const {
     break;
   case AK_DOUBLE:
     type = NANOARROW_TYPE_DOUBLE;
+    break;
+  case AK_STRING:
+    type = NANOARROW_TYPE_STRING;
+    break;
+  case AK_BINARY:
+    type = NANOARROW_TYPE_BINARY;
     break;
   case AK_UNDECIDED:
   default:
@@ -56,6 +68,7 @@ void SqliteArrowColumn::set_schema(struct ArrowSchema* schema) const {
 void SqliteArrowColumn::start_chunk() {
   array.reset();
   pending_nulls = 0;
+  text_reals.clear();
   if (decided()) {
     init_array();
   }
@@ -63,9 +76,6 @@ void SqliteArrowColumn::start_chunk() {
 
 void SqliteArrowColumn::append_row() {
   const int column_type = sqlite3_column_type(stmt, j);
-  if (column_type == SQLITE_TEXT || column_type == SQLITE_BLOB) {
-    stop_unsupported();
-  }
 
   if (!decided()) {
     if (column_type == SQLITE_NULL) {
@@ -115,6 +125,10 @@ ARROW_KIND SqliteArrowColumn::kind_from_column_type(int column_type) {
     return AK_INT64;
   case SQLITE_FLOAT:
     return AK_DOUBLE;
+  case SQLITE_TEXT:
+    return AK_STRING;
+  case SQLITE_BLOB:
+    return AK_BINARY;
   default:
     return AK_UNDECIDED;
   }
@@ -132,9 +146,13 @@ ARROW_KIND SqliteArrowColumn::kind_from_decltype() const {
   case SQLITE_AFF_NUMERIC:
   case SQLITE_AFF_REAL:
     return AK_DOUBLE;
+  case SQLITE_AFF_TEXT:
+    return AK_STRING;
+  case SQLITE_AFF_BLOB:
+    return AK_BINARY;
   default:
-    // TEXT or BLOB, not supported yet
-    stop_unsupported();
+    // Doesn't occur
+    return AK_NA;
   }
 }
 
@@ -157,39 +175,50 @@ void SqliteArrowColumn::init_array() {
   );
 }
 
+// Values of another storage class than the type of their column
+// are read as SQLite converts them:
+// text and blobs in an int64 or double column, integers in a double column,
+// numbers in a utf8 or binary column as the text SQLite renders,
+// and text in a binary column as its UTF-8 bytes.
+// A blob in a utf8 column keeps its bytes, which must be valid UTF-8.
+// Text and blobs in an int64 column that a real widens later in the same chunk
+// take the readings as reals that they would have in a double column.
+// Once the type is fixed, a real in an int64 column is truncated toward zero.
+// NULL takes the place of
+// text or a blob in a utf8 column that isn't valid UTF-8 or holds a NUL byte,
+// an integer that SQLite would saturate in an int64 column,
+// and any value in a column of the null type.
 void SqliteArrowColumn::append_value(int column_type) {
   switch (kind) {
   case AK_INT64:
-    if (column_type == SQLITE_FLOAT) {
-      if (!frozen) {
-        // The type is still open: a real value widens the column
-        promote_to_double();
-        append_value(column_type);
-        return;
-      }
-      // Truncated toward zero as SQLite does it, but NULL where SQLite would
-      // saturate. Both bounds are exact as doubles, and casting a value
-      // outside, an infinity included, would be undefined.
-      double real = std::trunc(sqlite3_column_double(stmt, j));
-      if (!(real >= -9223372036854775808.0 && real < 9223372036854775808.0)) {
-        append_null();
-        return;
-      }
-      check_arrow(
-        ArrowArrayAppendInt(array.get(), static_cast<int64_t>(real)),
-        "Can't append to Arrow array"
-      );
+    if (column_type == SQLITE_FLOAT && !frozen) {
+      // The type is still open: a real value widens the column
+      promote_to_double();
+      append_value(column_type);
       return;
     }
-    check_arrow(
-      ArrowArrayAppendInt(array.get(), sqlite3_column_int64(stmt, j)),
-      "Can't append to Arrow array"
-    );
+    append_int64(column_type);
     break;
 
   case AK_DOUBLE:
     check_arrow(
-      ArrowArrayAppendDouble(array.get(), sqlite3_column_double(stmt, j)),
+      ArrowArrayAppendDouble(
+        array.get(),
+        (column_type == SQLITE_TEXT || column_type == SQLITE_BLOB)
+          ? text_real(column_type)
+          : sqlite3_column_double(stmt, j)
+      ),
+      "Can't append to Arrow array"
+    );
+    break;
+
+  case AK_STRING:
+    append_string(column_type);
+    break;
+
+  case AK_BINARY:
+    check_arrow(
+      ArrowArrayAppendBytes(array.get(), value_bytes(column_type)),
       "Can't append to Arrow array"
     );
     break;
@@ -201,6 +230,171 @@ void SqliteArrowColumn::append_value(int column_type) {
   case AK_UNDECIDED:
     throw std::runtime_error("Internal error: Arrow type not decided");
   }
+}
+
+void SqliteArrowColumn::append_int64(int column_type) {
+  int64_t value = 0;
+  const bool fits = integer_value(column_type, value);
+  if ((column_type == SQLITE_TEXT || column_type == SQLITE_BLOB) && !frozen) {
+    // For a real that may widen the column later in this chunk,
+    // the reading as a real where it differs from the integer
+    const double real = text_real(column_type);
+    const double integer = static_cast<double>(value);
+    if (!fits || memcmp(&real, &integer, sizeof(double)) != 0) {
+      text_reals.push_back(std::make_pair(array->length, real));
+    }
+  }
+  if (!fits) {
+    append_null();
+    return;
+  }
+  check_arrow(
+    ArrowArrayAppendInt(array.get(), value),
+    "Can't append to Arrow array"
+  );
+}
+
+// Whether the magnitude of the integer at the start of `text` fits int64,
+// read as SQLite reads text into an integer: after spaces and a sign,
+// the digits up to the first other character
+static bool leading_integer_fits(const char* text, int size) {
+  const char* end = text + size;
+  while (text < end && (*text == ' ' || (*text >= '\t' && *text <= '\r'))) {
+    ++text;
+  }
+  bool negative = false;
+  if (text < end && (*text == '-' || *text == '+')) {
+    negative = (*text == '-');
+    ++text;
+  }
+  // A negative integer reaches the magnitude of INT64_MIN
+  const uint64_t limit = negative ? UINT64_C(9223372036854775808) : INT64_MAX;
+  uint64_t magnitude = 0;
+  for (; text < end && *text >= '0' && *text <= '9'; ++text) {
+    const unsigned digit = static_cast<unsigned>(*text - '0');
+    if (magnitude > (limit - digit) / 10) {
+      return false;
+    }
+    magnitude = magnitude * 10 + digit;
+  }
+  return true;
+}
+
+// The integer of the current value, as SQLite reads it, into `value`.
+// False where SQLite would saturate it: a real beyond the range of int64,
+// or text and blobs whose leading integer is.
+bool SqliteArrowColumn::integer_value(int column_type, int64_t& value) const {
+  if (column_type == SQLITE_FLOAT) {
+    // Truncated toward zero as SQLite does it.
+    // Both bounds are exact as doubles, and casting a value outside,
+    // an infinity included, would be undefined.
+    double real = std::trunc(sqlite3_column_double(stmt, j));
+    if (!(real >= -9223372036854775808.0 && real < 9223372036854775808.0)) {
+      return false;
+    }
+    value = static_cast<int64_t>(real);
+    return true;
+  }
+
+  value = sqlite3_column_int64(stmt, j);
+  if (column_type == SQLITE_INTEGER ||
+      (value != INT64_MAX && value != INT64_MIN)) {
+    return true;
+  }
+  // SQLite saturates the leading integer of text and blobs,
+  // which it reads as text in the encoding of the database
+  const char* text = value_text();
+  return leading_integer_fits(text, sqlite3_column_bytes(stmt, j));
+}
+
+void SqliteArrowColumn::append_string(int column_type) {
+  const struct ArrowBufferView bytes = value_bytes(column_type);
+  // SQLite doesn't enforce UTF-8 for text, and a blob keeps all its bytes:
+  // only well-formed UTF-8 without NUL bytes is text, as R strings need it.
+  // Numbers render as ASCII.
+  if ((column_type == SQLITE_TEXT || column_type == SQLITE_BLOB) &&
+      !rsqlite_is_utf8_string(
+        bytes.data.as_char,
+        static_cast<size_t>(bytes.size_bytes)
+      )) {
+    append_null();
+    return;
+  }
+  struct ArrowStringView view;
+  view.data = bytes.data.as_char;
+  view.size_bytes = bytes.size_bytes;
+  check_arrow(
+    ArrowArrayAppendString(array.get(), view),
+    "Can't append to Arrow array"
+  );
+}
+
+// The bytes of the current value for a utf8 or binary column.
+// A blob keeps its bytes, also in a utf8 column: sqlite3_column_text()
+// would take them for text in the encoding of the database,
+// and transcode them in a UTF-16 one.
+// Text and numbers are read as UTF-8 text, also in a binary column,
+// as the data frame path reads them.
+struct ArrowBufferView SqliteArrowColumn::value_bytes(int column_type) const {
+  struct ArrowBufferView out;
+  if (column_type != SQLITE_BLOB) {
+    // sqlite3_column_text() converts the value,
+    // and must come before sqlite3_column_bytes()
+    out.data.data = value_text();
+    out.size_bytes = sqlite3_column_bytes(stmt, j);
+    return out;
+  }
+
+  // The size of a blob needs no conversion, and comes first:
+  // sqlite3_column_blob() gives NULL for a blob of no bytes,
+  // and also if it runs out of memory while expanding a zeroblob()
+  out.size_bytes = sqlite3_column_bytes(stmt, j);
+  out.data.data = sqlite3_column_blob(stmt, j);
+  if (out.data.data == NULL) {
+    if (out.size_bytes > 0) {
+      stop_out_of_memory();
+    }
+    out.data.data = "";
+  }
+  return out;
+}
+
+// The current value as UTF-8 text, as SQLite converts it.
+// For a value that isn't NULL, sqlite3_column_text() gives NULL
+// only if the conversion runs out of memory.
+// SQLite fails the next step then,
+// but after a full chunk that step only reads ahead,
+// and keeps its error for the next fetch:
+// the chunk would come back with a wrong value.
+const char* SqliteArrowColumn::value_text() const {
+  const unsigned char* text = sqlite3_column_text(stmt, j);
+  if (text == NULL) {
+    stop_out_of_memory();
+  }
+  return reinterpret_cast<const char*>(text);
+}
+
+// Text or a blob as SQLite reads it into a real.
+double SqliteArrowColumn::text_real(int column_type) const {
+  if (column_type == SQLITE_TEXT) {
+    // Reading it as UTF-8 text first tells a failed conversion from a zero,
+    // and leaves sqlite3_column_double() nothing to allocate
+    value_text();
+    return sqlite3_column_double(stmt, j);
+  }
+
+  // A blob isn't read as text,
+  // which would expand a zeroblob() that SQLite reads as 0 without it.
+  // Only the error code of the connection tells that the copy for the
+  // reading ran out of memory; a code left from an earlier call hides that,
+  // and the next step fails instead.
+  sqlite3* conn = sqlite3_db_handle(stmt);
+  const bool failed_before = (sqlite3_errcode(conn) == SQLITE_NOMEM);
+  const double real = sqlite3_column_double(stmt, j);
+  if (!failed_before && sqlite3_errcode(conn) == SQLITE_NOMEM) {
+    stop_out_of_memory();
+  }
+  return real;
 }
 
 void SqliteArrowColumn::append_null() {
@@ -223,21 +417,28 @@ void SqliteArrowColumn::promote_to_double() {
   kind = AK_DOUBLE;
   init_array();
 
+  // Text and blobs whose reading as a real differs take it,
+  // in the order of their rows
+  std::vector<std::pair<int64_t, double> >::const_iterator text =
+    text_reals.begin();
   for (int64_t i = 0; i < n; ++i) {
-    if (has_nulls && !ArrowBitGet(validity->buffer.data, i)) {
+    double value = static_cast<double>(values[i]);
+    if (text != text_reals.end() && text->first == i) {
+      value = (text++)->second;
+    } else if (has_nulls && !ArrowBitGet(validity->buffer.data, i)) {
       append_null();
-    } else {
-      check_arrow(
-        ArrowArrayAppendDouble(array.get(), static_cast<double>(values[i])),
-        "Can't append to Arrow array"
-      );
+      continue;
     }
+    check_arrow(
+      ArrowArrayAppendDouble(array.get(), value),
+      "Can't append to Arrow array"
+    );
   }
+  text_reals.clear();
 }
 
-void SqliteArrowColumn::stop_unsupported() const {
+void SqliteArrowColumn::stop_out_of_memory() const {
   throw std::runtime_error(
-    "Column `" + name +
-    "`: Arrow arrays of text and blobs are not supported yet."
+    "Column `" + name + "`: out of memory while reading a value."
   );
 }

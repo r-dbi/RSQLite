@@ -1,6 +1,7 @@
 # Arrow arrays built from the integer, real and NULL columns of a result,
 # through the internal result_fetch_arrow_chunk().
 # Each chunk is compared with what dbFetch() returns for the same rows.
+# Text and blobs are in test-arrow-text.R.
 
 test_that("integer, real and NULL columns become int64, double and null", {
   skip_if_not_installed("nanoarrow")
@@ -92,14 +93,19 @@ test_that("the first chunk fixes the types for the later chunks", {
 test_that("columns of NULL values take the type of their declared affinity", {
   skip_if_not_installed("nanoarrow")
   con <- local_con()
-  dbExecute(con, "CREATE TABLE t (i INTEGER, r REAL, n NUMERIC, x)")
-  dbExecute(con, "INSERT INTO t VALUES (NULL, NULL, NULL, NULL)")
-  dbExecute(con, "INSERT INTO t VALUES (NULL, NULL, NULL, NULL)")
+  dbExecute(con, paste(
+    "CREATE TABLE t",
+    "(i INTEGER, r REAL, n NUMERIC, s TEXT, c CHAR(1), b BLOB, x)"
+  ))
+  dbExecute(con, "INSERT INTO t (x) VALUES (NULL), (NULL)")
 
   # Integers through the default path, doubles through Arrow: as values equal
   chunks <- expect_same_chunks(con, "SELECT * FROM t", c(1, 1))
   for (chunk in chunks) {
-    expect_equal(arrow_formats(chunk), c(i = "l", r = "g", n = "g", x = "n"))
+    expect_equal(
+      arrow_formats(chunk),
+      c(i = "l", r = "g", n = "g", s = "u", c = "u", b = "z", x = "n")
+    )
   }
 
   # An expression has no declared type
@@ -270,41 +276,6 @@ test_that("a handler can't use a result while its Arrow chunk is fetched", {
   expect_true(dbHasCompleted(res))
   expect_equal(dbGetRowCount(res), 1L)
   dbExecute(con, "COMMIT")
-})
-
-test_that("text and blobs fail the chunk and complete the result", {
-  skip_if_not_installed("nanoarrow")
-  con <- local_con()
-  dbExecute(con, "CREATE TABLE t (id INTEGER, x, s TEXT, b BLOB)")
-  dbExecute(con, "INSERT INTO t VALUES (1, 1, NULL, NULL)")
-  dbExecute(con, "INSERT INTO t VALUES (2, 'two', NULL, NULL)")
-
-  for (sql in c("SELECT 'a' AS x", "SELECT x'00' AS x")) {
-    res <- local_result(con, sql)
-    expect_error(
-      fetch_arrow_chunk(res),
-      "Column `x`: Arrow arrays of text and blobs are not supported yet.",
-      fixed = TRUE
-    )
-    expect_true(dbHasCompleted(res))
-    expect_equal(dbGetRowCount(res), 0L)
-    dbClearResult(res)
-  }
-
-  # Also after a number, in a later chunk
-  res <- local_result(con, "SELECT x FROM t ORDER BY id")
-  expect_equal(fetch_arrow_chunk(res, 1)$length, 1L)
-  expect_error(fetch_arrow_chunk(res, 1), "Column `x`: Arrow arrays of text")
-  expect_true(dbHasCompleted(res))
-  expect_equal(dbGetRowCount(res), 1L)
-  dbClearResult(res)
-
-  # A column of NULL values declared as text or blob
-  for (column in c("s", "b")) {
-    res <- local_result(con, paste("SELECT", column, "FROM t"))
-    expect_error(fetch_arrow_chunk(res), paste0("Column `", column, "`"))
-    dbClearResult(res)
-  }
 })
 
 test_that("each execution decides its own types", {

@@ -54,7 +54,7 @@ test_that("a dictionary index out of range fails at its row", {
   skip_if_not_installed("nanoarrow")
   con <- local_con()
   dbExecute(con, "CREATE TABLE t (x)")
-  res <- dbSendStatement(con, "INSERT INTO t VALUES (?)")
+  res <- local_result(con, "INSERT INTO t VALUES (?)")
   values <- nanoarrow::as_nanoarrow_array(c("x", "y"))
   for (case in list(
     list(c(0, 2), nanoarrow::na_int8()),
@@ -67,8 +67,16 @@ test_that("a dictionary index out of range fails at its row", {
     expect_snapshot(error = TRUE, bind_arrow_stream(res, stream))
     expect_equal(dbGetRowsAffected(res), 1)
   }
+  # Also into values of the null type, which bind NULL
+  nulls <- nanoarrow::nanoarrow_array_modify(
+    nanoarrow::nanoarrow_array_init(nanoarrow::na_na()),
+    list(length = 1, null_count = 1)
+  )
+  stream <- arrow_params(arrow_dictionary(c(0, 99), nulls, nanoarrow::na_int32()))
+  expect_snapshot(error = TRUE, bind_arrow_stream(res, stream))
+  expect_equal(dbGetRowsAffected(res), 1)
   dbClearResult(res)
-  expect_equal(dbGetQuery(con, "SELECT x FROM t")$x, c("x", "y", "x", "y", "x"))
+  expect_equal(dbGetQuery(con, "SELECT x FROM t")$x, c("x", "y", "x", "y", "x", NA))
 })
 
 test_that("values beyond SQLite's length limit fail with their parameter and row", {
@@ -156,4 +164,23 @@ test_that("results whose parameters read each other's rows fail up front", {
   stream <- read_arrow_stream(results[[3]], 1)
   expect_snapshot(error = TRUE, bind_arrow_stream(results[[1]], stream))
   expect_equal(nanoarrow::convert_array_stream(stream), data.frame(c = c(1000, 2000, 3000)))
+})
+
+test_that("a chain whose first stream has ended no longer reads its first result", {
+  skip_if_not_installed("nanoarrow")
+  env <- environment()
+  results <- lapply(1:5, function(i) {
+    local_result(local_con(envir = env), "SELECT :v + 1 AS v", envir = env)
+  })
+  dbBind(results[[1]], list(v = 1:3))
+  for (i in 2:5) {
+    bind_arrow_stream(results[[i]], read_arrow_stream(results[[i - 1]], 1))
+  }
+  # Reading the schemas has fetched ahead:
+  # the stream of the first result has ended, which ends the chain there
+  bind_arrow_stream(results[[1]], read_arrow_stream(results[[5]], 1))
+  expect_equal(
+    nanoarrow::convert_array_stream(read_arrow_stream(results[[1]], -1)),
+    data.frame(v = 7:9)
+  )
 })

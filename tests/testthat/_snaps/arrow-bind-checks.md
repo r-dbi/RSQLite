@@ -38,6 +38,14 @@
       Error:
       ! Can't bind the dictionary index 18446744073709551615 of parameter 1 in row 2, out of range for 2 values.
 
+---
+
+    Code
+      bind_arrow_stream(res, stream)
+    Condition
+      Error:
+      ! Can't bind the dictionary index 99 of parameter 1 in row 2, out of range for 1 values.
+
 # values beyond SQLite's length limit fail with their parameter and row
 
     Code

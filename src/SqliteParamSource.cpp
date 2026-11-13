@@ -301,10 +301,11 @@ void SqliteArrowParamSource::bind_parameter(
 ) const {
   const struct ArrowSchemaView& type = types[pos - 1];
   const struct ArrowArrayView* values = view->children[indexes[pos - 1]];
-  if (type.type == NANOARROW_TYPE_NA || ArrowArrayViewIsNull(values, row)) {
+  if (ArrowArrayViewIsNull(values, row)) {
     return;
   }
-  // A dictionary binds the value of its index, or NULL for a null value.
+  // A dictionary binds the value of its index, or NULL for a null value,
+  // also of the null type.
   // Validation of the array doesn't look at the indices.
   if (values->dictionary != NULL) {
     const int64_t index = ArrowArrayViewGetIntUnsafe(values, row);
@@ -321,9 +322,9 @@ void SqliteArrowParamSource::bind_parameter(
     }
     values = values->dictionary;
     row = index;
-    if (ArrowArrayViewIsNull(values, row)) {
-      return;
-    }
+  }
+  if (type.type == NANOARROW_TYPE_NA || ArrowArrayViewIsNull(values, row)) {
+    return;
   }
 
   int rc = SQLITE_OK;

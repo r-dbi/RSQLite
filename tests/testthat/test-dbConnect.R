@@ -105,6 +105,25 @@ test_that("a cloned connection keeps `bigint` and `extended_types`", {
   expect_identical(dbDataType(clone, Sys.Date()), "DATE")
 })
 
+test_that("a cloned connection keeps `check_utf8` unless overridden", {
+  con <- dbConnect(SQLite(), tempfile(), check_utf8 = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  clone <- dbConnect(con)
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+  expect_true(clone@check_utf8)
+
+  dbExecute(con, "CREATE TABLE t (x TEXT)")
+  dbExecute(con, "INSERT INTO t VALUES (CAST(X'61FF62' AS TEXT))")
+  expect_warning(res <- dbGetQuery(clone, "SELECT x FROM t"))
+  expect_identical(res$x, NA_character_)
+
+  clone2 <- dbConnect(con, check_utf8 = FALSE)
+  on.exit(dbDisconnect(clone2), add = TRUE, after = FALSE)
+  expect_false(clone2@check_utf8)
+  expect_no_warning(dbGetQuery(clone2, "SELECT x FROM t"))
+})
+
 test_that("a cloned connection has the defaults of a fresh one", {
   dbfile <- tempfile()
   con <- dbConnect(SQLite(), dbfile)
@@ -114,6 +133,7 @@ test_that("a cloned connection has the defaults of a fresh one", {
 
   expect_identical(clone@bigint, "integer64")
   expect_false(clone@extended_types)
+  expect_false(clone@check_utf8)
 })
 
 test_that("arguments to `dbConnect()` on a connection override the original", {
@@ -179,6 +199,19 @@ test_that("a temporary database can't be cloned", {
   con <- dbConnect(SQLite(), ":memory:")
   on.exit(dbDisconnect(con), add = TRUE)
   expect_error(dbConnect(con), "Can't clone a temporary database")
+})
+
+test_that("`dbConnect()` on a connection has the arguments of `dbConnect()` on a driver", {
+  conn_formals <- formals(RSQLite:::dbConnect_SQLiteConnection)
+  drv_formals <- formals(RSQLite:::dbConnect_SQLiteDriver)
+  expect_identical(names(conn_formals)[-1], names(drv_formals)[-1])
+
+  from_connection <- c(
+    "dbname", "loadable.extensions", "flags", "vfs", "bigint", "extended_types",
+    "check_utf8"
+  )
+  same_default <- setdiff(names(drv_formals)[-1], c(from_connection, "..."))
+  expect_identical(conn_formals[same_default], drv_formals[same_default])
 })
 
 test_that("temporary tables are connection local", {

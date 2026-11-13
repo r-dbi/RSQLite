@@ -1,25 +1,32 @@
 #' @rdname SQLite
 #' @usage NULL
-dbConnect_SQLiteConnection <- function(drv, ...) {
-  # Match the arguments the way `dbConnect(SQLite(), ...)` would,
-  # by name and by position.
-  call <- match.call(dbConnect_SQLiteDriver, as.call(c(list(quote(f), NA), list(...))))
-  args <- as.list(call)[-(1:2)]
-
-  if (is.null(args[["dbname"]]) && drv@dbname %in% c("", ":memory:", "file::memory:")) {
+dbConnect_SQLiteConnection <- function(drv, dbname = drv@dbname, ..., loadable.extensions = drv@loadable.extensions,
+                                       default.extensions = loadable.extensions, cache_size = NULL,
+                                       synchronous = "off", flags = drv@flags, vfs = drv@vfs,
+                                       bigint = drv@bigint,
+                                       extended_types = drv@extended_types,
+                                       check_utf8 = drv@check_utf8) {
+  # The formals mirror those of `dbConnect_SQLiteDriver()`,
+  # with the connection's own settings as defaults;
+  # a test checks that the two stay in step.
+  if (missing(dbname) && drv@dbname %in% c("", ":memory:", "file::memory:")) {
     stop("Can't clone a temporary database", call. = FALSE)
   }
 
-  defaults <- list(
-    dbname = drv@dbname,
-    vfs = drv@vfs, flags = drv@flags,
-    loadable.extensions = drv@loadable.extensions,
-    bigint = drv@bigint, extended_types = drv@extended_types
+  dbConnect_SQLiteDriver(
+    SQLite(),
+    dbname = dbname,
+    ...,
+    loadable.extensions = loadable.extensions,
+    default.extensions = default.extensions,
+    cache_size = cache_size,
+    synchronous = synchronous,
+    flags = flags,
+    vfs = vfs,
+    bigint = bigint,
+    extended_types = extended_types,
+    check_utf8 = check_utf8
   )
-  # Not `modifyList()`, which would drop an argument that is `NULL`.
-  args <- c(args, defaults[setdiff(names(defaults), names(args))])
-
-  do.call(dbConnect, c(list(SQLite()), args))
 }
 #' @rdname SQLite
 #' @export

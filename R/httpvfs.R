@@ -53,7 +53,6 @@ sqliteRemote <- function(url, immutable = TRUE, ...) {
     SQLite(),
     uri,
     flags = SQLITE_RO,
-    default.extensions = FALSE,
     ...
   )
 }

@@ -48,8 +48,13 @@ test_that("http VFS uses HTTP Range requests when available", {
   con <- sqliteRemote(server$url)
   withr::defer(dbDisconnect(con))
 
-  res <- dbGetQuery(con, "SELECT sum(x) AS s, count(*) AS n FROM t WHERE x <= 5")
+  # stdev() comes from the default extension, which sqliteRemote() loads.
+  res <- dbGetQuery(
+    con,
+    "SELECT sum(x) AS s, count(*) AS n, stdev(x) AS sd FROM t WHERE x <= 5"
+  )
   expect_equal(res$n[[1]], 5L)
+  expect_equal(res$sd[[1]], sd(1:5))
   # Expect we served less than the full file if Range was used
   expect_lt(server$bytes_sent(), length(body))
 

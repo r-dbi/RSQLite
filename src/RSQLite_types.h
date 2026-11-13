@@ -15,11 +15,11 @@ using enable_if_dbres_ptr =
 
 template <typename T>
 enable_if_dbres_ptr<T> as_cpp(SEXP x) {
-  DbResult* result = (DbResult*)(R_ExternalPtrAddr(x));
-  if (!result) {
+  DbResultPtr* result = (DbResultPtr*)(R_ExternalPtrAddr(x));
+  if (!result || !result->get()) {
     cpp11::stop("Invalid result set");
   }
-  return result;
+  return result->get();
 }
 
 template <typename T>
@@ -28,11 +28,12 @@ using enable_if_sqliteres_ptr =
 
 template <typename T>
 enable_if_sqliteres_ptr<T> as_cpp(SEXP x) {
-  SqliteResult* result = (SqliteResult*)(R_ExternalPtrAddr(x));
-  if (!result) {
+  DbResultPtr* result = (DbResultPtr*)(R_ExternalPtrAddr(x));
+  if (!result || !result->get()) {
     cpp11::stop("Invalid result set");
   }
-  return result;
+  // Every result is created by SqliteResult::create_and_send_query()
+  return static_cast<SqliteResult*>(result->get());
 }
 
 }  // namespace cpp11

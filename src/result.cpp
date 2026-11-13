@@ -11,20 +11,24 @@ static SEXP row_count_as_sexp(int64_t n) {
   return cpp11::as_sexp(static_cast<double>(n));
 }
 
+// The external pointer owns a shared pointer to the result,
+// as that of a connection owns one to the connection.
+// It is R's share of the result, dropped by dbClearResult() or the finalizer.
 [[cpp11::register]]
-cpp11::external_pointer<DbResult> result_create(
+cpp11::external_pointer<DbResultPtr> result_create(
   cpp11::external_pointer<DbConnectionPtr> con,
   std::string sql
 ) {
   (*con)->check_connection();
-  DbResult* res = SqliteResult::create_and_send_query(*con, sql);
-  return cpp11::external_pointer<DbResult>(res, true);
+  DbResultPtr* res =
+    new DbResultPtr(SqliteResult::create_and_send_query(*con, sql));
+  return cpp11::external_pointer<DbResultPtr>(res, true);
 }
 
 [[cpp11::register]]
-void result_release(cpp11::external_pointer<DbResult> res) {
-  DbResult* ptr = res.get();
-  if (ptr != NULL && ptr->busy()) {
+void result_release(cpp11::external_pointer<DbResultPtr> res) {
+  DbResultPtr* ptr = res.get();
+  if (ptr != NULL && ptr->get() != NULL && (*ptr)->busy()) {
     // Freeing it would pull the statement from under the running fetch
     cpp11::stop(
       "Can't clear a result while one of its fetches or binds is running, "
@@ -35,9 +39,9 @@ void result_release(cpp11::external_pointer<DbResult> res) {
 }
 
 [[cpp11::register]]
-bool result_valid(cpp11::external_pointer<DbResult> res_) {
-  DbResult* res = res_.get();
-  return res != NULL && res->is_active();
+bool result_valid(cpp11::external_pointer<DbResultPtr> res_) {
+  DbResultPtr* res = res_.get();
+  return res != NULL && res->get() != NULL && (*res)->is_active();
 }
 
 [[cpp11::register]]

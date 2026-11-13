@@ -10,6 +10,10 @@
 class DbConnection;
 typedef boost::shared_ptr<DbConnection> DbConnectionPtr;
 
+// Owned by the external pointer of a result, see result_create()
+class DbResult;
+typedef boost::shared_ptr<DbResult> DbResultPtr;
+
 // DbResult --------------------------------------------------------------------
 
 class DbResult : boost::noncopyable {
@@ -24,7 +28,8 @@ protected:
   DbResult(const DbConnectionPtr& pConn);
 
 public:
-  ~DbResult();
+  // Virtual, because a DbResultPtr deletes a SqliteResult through a DbResult*
+  virtual ~DbResult();
 
 public:
   void close();

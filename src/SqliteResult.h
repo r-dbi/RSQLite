@@ -18,6 +18,9 @@ public:
 
 public:
   cpp11::strings get_placeholder_names() const;
+  // For the tests
+  void set_rows_fetched(int64_t n);
+  void set_rows_affected(int64_t n);
 };
 
 #endif

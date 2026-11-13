@@ -31,11 +31,11 @@ bool DbResult::is_active() const {
   return pConn_->is_current_result(this);
 }
 
-int DbResult::n_rows_fetched() {
+int64_t DbResult::n_rows_fetched() {
   return impl->n_rows_fetched();
 }
 
-int DbResult::n_rows_affected() {
+int64_t DbResult::n_rows_affected() {
   return impl->n_rows_affected();
 }
 

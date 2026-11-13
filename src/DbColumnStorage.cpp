@@ -118,8 +118,8 @@ DbColumnStorage* DbColumnStorage::append_data_to_new(DATA_TYPE new_dt) {
   R_xlen_t desired_capacity = (n_max < 0) ? (get_capacity() * 2) : (n_max - i);
 
   // Own the new storage until the value is in it:
-  // converting the value can raise a warning that a handler turns into an error,
-  // which unwinds past this frame before the caller takes ownership.
+  // converting the value can raise a warning that a handler turns into an
+  // error, which unwinds past this frame before the caller takes ownership.
   std::unique_ptr<DbColumnStorage> spillover(
     new DbColumnStorage(new_dt, desired_capacity, n_max, source)
   );

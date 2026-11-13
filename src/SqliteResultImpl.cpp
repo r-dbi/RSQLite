@@ -42,7 +42,7 @@ SqliteResultImpl::SqliteResultImpl(
       ready_(false),
       bind_started_(false),
       nrows_(0),
-      total_changes_start_(sqlite3_total_changes(conn)),
+      total_changes_start_(sqlite3_total_changes64(conn)),
       group_(0),
       groups_(0),
       types_(get_initial_field_types(cache.ncols_)),
@@ -138,16 +138,25 @@ bool SqliteResultImpl::complete() const {
   return complete_;
 }
 
-int SqliteResultImpl::n_rows_fetched() {
+int64_t SqliteResultImpl::n_rows_fetched() {
   return nrows_;
 }
 
-int SqliteResultImpl::n_rows_affected() {
+// Before the first bind, NA_INTEGER, which result_rows_affected() returns as NA
+int64_t SqliteResultImpl::n_rows_affected() {
   // Changes count from the latest bind, also if it failed partway
   if (!ready_ && !bind_started_) {
     return NA_INTEGER;
   }
-  return sqlite3_total_changes(conn) - total_changes_start_;
+  return sqlite3_total_changes64(conn) - total_changes_start_;
+}
+
+void SqliteResultImpl::set_rows_fetched(int64_t n) {
+  nrows_ = n;
+}
+
+void SqliteResultImpl::set_rows_affected(int64_t n) {
+  total_changes_start_ = sqlite3_total_changes64(conn) - n;
 }
 
 void SqliteResultImpl::bind(const cpp11::list& params) {
@@ -169,7 +178,7 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
   groups_ = Rf_length(first_col);
   group_ = 0;
 
-  total_changes_start_ = sqlite3_total_changes(conn);
+  total_changes_start_ = sqlite3_total_changes64(conn);
   bind_started_ = true;
 
   // A new execution starts: the error kept from the previous one is dropped

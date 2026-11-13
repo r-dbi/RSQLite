@@ -5,6 +5,13 @@
 #include "cpp11/declarations.hpp"
 #include <R_ext/Visibility.h>
 
+// SqliteArrowStream.cpp
+SEXP result_create_arrow_stream(cpp11::external_pointer<DbResultPtr> res, const int n);
+extern "C" SEXP _RSQLite_result_create_arrow_stream(SEXP res, SEXP n) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(result_create_arrow_stream(cpp11::as_cpp<cpp11::decay_t<cpp11::external_pointer<DbResultPtr>>>(res), cpp11::as_cpp<cpp11::decay_t<const int>>(n)));
+  END_CPP11
+}
 // connection.cpp
 cpp11::external_pointer<DbConnectionPtr> connection_connect(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs, bool with_alt_types);
 extern "C" SEXP _RSQLite_connection_connect(SEXP path, SEXP allow_ext, SEXP flags, SEXP vfs, SEXP with_alt_types) {
@@ -123,6 +130,13 @@ extern "C" SEXP _RSQLite_result_fetch_arrow_chunk(SEXP res, SEXP n) {
   END_CPP11
 }
 // result.cpp
+std::string result_claim_fetch_kind(DbResult* res, std::string kind);
+extern "C" SEXP _RSQLite_result_claim_fetch_kind(SEXP res, SEXP kind) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(result_claim_fetch_kind(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<std::string>>(kind)));
+  END_CPP11
+}
+// result.cpp
 void result_bind(DbResult* res, cpp11::list params);
 extern "C" SEXP _RSQLite_result_bind(SEXP res, SEXP params) {
   BEGIN_CPP11
@@ -214,8 +228,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_connection_valid",             (DL_FUNC) &_RSQLite_connection_valid,             1},
     {"_RSQLite_extension_load",               (DL_FUNC) &_RSQLite_extension_load,               3},
     {"_RSQLite_result_bind",                  (DL_FUNC) &_RSQLite_result_bind,                  2},
+    {"_RSQLite_result_claim_fetch_kind",      (DL_FUNC) &_RSQLite_result_claim_fetch_kind,      2},
     {"_RSQLite_result_column_info",           (DL_FUNC) &_RSQLite_result_column_info,           1},
     {"_RSQLite_result_create",                (DL_FUNC) &_RSQLite_result_create,                2},
+    {"_RSQLite_result_create_arrow_stream",   (DL_FUNC) &_RSQLite_result_create_arrow_stream,   2},
     {"_RSQLite_result_fetch",                 (DL_FUNC) &_RSQLite_result_fetch,                 2},
     {"_RSQLite_result_fetch_arrow_chunk",     (DL_FUNC) &_RSQLite_result_fetch_arrow_chunk,     2},
     {"_RSQLite_result_get_placeholder_names", (DL_FUNC) &_RSQLite_result_get_placeholder_names, 1},

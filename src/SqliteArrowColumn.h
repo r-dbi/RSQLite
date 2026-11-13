@@ -84,6 +84,7 @@ public:
   // Decides the kind from the declared type, falling back to the null type
   void decide_from_decltype();
   void freeze();
+  bool is_frozen() const;
 
   void set_schema(struct ArrowSchema* schema) const;
 

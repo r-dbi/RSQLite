@@ -68,6 +68,9 @@ private:
   // The most bytes of text or blobs in a utf8 or binary column of a chunk,
   // the 2^31 - 1 that their 32-bit offsets address unless a test lowers them
   int64_t arrow_max_bytes_;
+  // Counts the binds, so that an Arrow stream can tell that the rows of the
+  // execution that it reads are gone, see SqliteArrowStream.cpp
+  int executions_;
 
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);
@@ -100,6 +103,14 @@ public:
     const int n_max
   );
 
+  // The struct type of the Arrow chunks of the current execution.
+  // Unless an Arrow fetch has decided it already,
+  // the first chunk of at most `n_max` rows decides it now,
+  // and is kept for the next Arrow fetch, as a chunk whose warning exited.
+  void arrow_schema(struct ArrowSchema* schema, const int n_max);
+  int executions() const;
+  bool arrow_chunk_kept() const;
+
   cpp11::list get_column_info();
 
 public:
@@ -119,7 +130,8 @@ private:
   bool step_run();
   bool step_done();
   cpp11::list peek_first_row();
-  bool arrow_chunk_kept() const;
+  void build_arrow_chunk(const int n_max);
+  bool arrow_types_decided() const;
   void warn_arrow_coercions();
 
 private:

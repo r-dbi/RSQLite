@@ -21,3 +21,11 @@ DbResult* SqliteResult::create_and_send_query(
 cpp11::strings SqliteResult::get_placeholder_names() const {
   return impl->get_placeholder_names();
 }
+
+void SqliteResult::set_rows_fetched(int64_t n) {
+  impl->set_rows_fetched(n);
+}
+
+void SqliteResult::set_rows_affected(int64_t n) {
+  impl->set_rows_affected(n);
+}

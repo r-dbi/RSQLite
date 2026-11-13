@@ -41,6 +41,88 @@ test_that("Can read time", {
   expect_equal(resdf[[1]], expected_times)
 })
 
+test_that("Datetime applies a UTC offset as SQLite does (#877)", {
+  con <- dbConnect(SQLite(), extended_types = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  values <- c(
+    "2024-01-02 12:00:00-05:00",
+    "2024-01-02 12:00:00-05:30",
+    "2024-01-02 12:00-02:00",
+    "2024-01-02 12:00:00.5-02:00",
+    "2024-01-02 23:00:00-02:00",
+    "2024-01-02 12:00:00+02:00",
+    "2024-01-02 12:00:00Z",
+    "2024-01-02 12:00:00 -02:00 "
+  )
+  dbExecute(con, "create table t1(id INTEGER, dt DATETIME)")
+  dbAppendTable(con, "t1", data.frame(id = seq_along(values), dt = values))
+
+  resdf <- dbGetQuery(con, "SELECT dt, datetime(dt, 'subsec') AS sqlite FROM t1 ORDER BY id")
+  # Seconds after 2024-01-02 12:00:00 UTC
+  secs <- c(18000, 19800, 7200, 7200.5, 46800, -7200, 0, 7200)
+  expect_equal(resdf$dt, .POSIXct(1704196800 + secs, tz = "UTC"))
+  expect_equal(resdf$dt, as.POSIXct(resdf$sqlite, tz = "UTC"))
+})
+
+test_that("Datetime with an offset SQLite does not read gives NA (#877)", {
+  con <- dbConnect(SQLite(), extended_types = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  values <- c(
+    "2024-01-02 12:00:00-0500",
+    "2024-01-02 12:00:00-15:00",
+    "2024-01-02 12:00:00-05:00x"
+  )
+  dbExecute(con, "create table t1(id INTEGER, dt DATETIME)")
+  dbAppendTable(con, "t1", data.frame(id = seq_along(values), dt = values))
+
+  warnings <- capture_warnings(
+    resdf <- dbGetQuery(con, "SELECT dt, datetime(dt) IS NULL AS sqlite_na FROM t1 ORDER BY id")
+  )
+  expect_equal(warnings, rep("Unknown string format, NA is returned.", 3))
+  expect_equal(resdf$dt, .POSIXct(rep(NA_real_, 3), tz = "UTC"))
+  expect_equal(resdf$sqlite_na, rep(1L, 3))
+})
+
+test_that("Time applies a UTC offset as SQLite does (#877)", {
+  con <- dbConnect(SQLite(), extended_types = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  values <- c(
+    "12:00:00-02:00",
+    "12:00:00.25-02:00",
+    "23:00:00-02:00",
+    "01:00:00+02:00",
+    "12:00Z"
+  )
+  dbExecute(con, "create table t1(id INTEGER, tm TIME)")
+  dbAppendTable(con, "t1", data.frame(id = seq_along(values), tm = values))
+
+  resdf <- dbGetQuery(con, "SELECT tm, time(tm, 'subsec') AS sqlite FROM t1 ORDER BY id")
+  expected_times <- structure(
+    c(50400, 50400.25, 3600, 82800, 43200),
+    units = "secs",
+    class = c("hms", "difftime")
+  )
+  expect_equal(resdf$tm, expected_times)
+  expect_equal(resdf$sqlite, c("14:00:00.000", "14:00:00.250", "01:00:00.000", "23:00:00.000", "12:00:00.000"))
+})
+
+test_that("Time with an offset SQLite does not read gives NA (#877)", {
+  con <- dbConnect(SQLite(), extended_types = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, "create table t1(tm TIME)")
+  dbExecute(con, "insert into t1 values ('12:00:00-0200')")
+
+  expect_warning(
+    resdf <- dbGetQuery(con, "SELECT tm FROM t1"),
+    "Unknown string format, NA is returned."
+  )
+  expect_equal(resdf$tm, structure(NA_real_, units = "secs", class = c("hms", "difftime")))
+})
+
 
 test_that("Columninfo dates", {
   con <- dbConnect(SQLite(), extended_types = TRUE)

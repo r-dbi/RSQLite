@@ -49,8 +49,25 @@ public:
   // Copies a database
   void copy_to(const DbConnectionPtr& pDest);
 
-  // Disconnects from a database
+  // Disconnects from a database,
+  // and closes it once no Arrow stream reads from it, see add_stream()
   void disconnect();
+
+  // An Arrow stream that reads from the connection
+  // keeps it open after disconnect() until the stream has ended
+  // or is released
+  void add_stream();
+  void remove_stream();
+
+  // Whether the handle has been closed,
+  // which a statement of an open result can still step
+  bool is_closed() const;
+
+  // Results that R no longer holds, as dbClearResult() or R's garbage
+  // collector dropped them, while an Arrow stream still holds them:
+  // they don't count as in use for dbDisconnect()
+  void add_cleared_result(int n);
+  long n_cleared_results() const;
 
   bool with_alt_types() const;
 
@@ -59,10 +76,16 @@ public:
   bool in_transaction() const;
 
 private:
+  // NULL once disconnected
   sqlite3* pConn_;
+  // The handle that disconnect() leaves open for the streams
+  sqlite3* pDeferred_;
+  int n_streams_;
+  long n_cleared_results_;
   const bool with_alt_types_;
   SEXP busy_callback_;
   void release_callback_data();
+  void close_handle(sqlite3* conn);
   static int busy_callback_helper(void* data, int num);
 };
 

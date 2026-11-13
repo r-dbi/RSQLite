@@ -180,6 +180,7 @@ SqliteResultImpl::SqliteResultImpl(
 )
     : conn(conn_->conn()),
       stmt(prepare(conn, sql)),
+      connection_(conn_.get()),
       cache(stmt),
       complete_(false),
       ready_(false),
@@ -663,7 +664,11 @@ bool SqliteResultImpl::step_run() {
   case SQLITE_ROW:
     return false;
   default:
-    throw step_error(sqlite3_errmsg(conn), rc);
+    // sqlite3_errmsg() of a closed handle only reports API misuse
+    throw step_error(
+      connection_->is_closed() ? sqlite3_errstr(rc) : sqlite3_errmsg(conn),
+      rc
+    );
   }
 }
 

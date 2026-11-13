@@ -64,7 +64,8 @@ void run_guarded(bool& busy, F&& body) {
 
 // Construction ////////////////////////////////////////////////////////////////
 
-DbResult::DbResult(const DbConnectionPtr& pConn) : pConn_(pConn), busy_(false) {
+DbResult::DbResult(const DbConnectionPtr& pConn)
+    : pConn_(pConn), busy_(false), cleared_(false) {
   pConn_->check_connection();
 
   // subclass constructor can throw, the destructor will remove the
@@ -74,7 +75,10 @@ DbResult::DbResult(const DbConnectionPtr& pConn) : pConn_(pConn), busy_(false) {
 
 DbResult::~DbResult() {
   try {
-    if (pConn_ && is_active()) {
+    if (cleared_) {
+      pConn_->add_cleared_result(-1);
+    }
+    if (is_active()) {
       pConn_->reset_current_result(this);
     }
   } catch (...) {}
@@ -95,16 +99,18 @@ bool DbResult::busy() const {
 }
 
 void DbResult::clear() {
-  impl.reset();
-  // A stream doesn't count as a result in use by dbDisconnect()
-  if (is_active()) {
-    pConn_->reset_current_result(this);
+  if (!cleared_) {
+    cleared_ = true;
+    pConn_->add_cleared_result(1);
   }
-  pConn_.reset();
 }
 
-bool DbResult::cleared() const {
-  return !impl;
+void DbResult::add_stream() {
+  pConn_->add_stream();
+}
+
+void DbResult::remove_stream() {
+  pConn_->remove_stream();
 }
 
 bool DbResult::arrow_chunk_kept() const {

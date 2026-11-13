@@ -4,14 +4,22 @@
 # with the warning about the values converted to the type of their column.
 # get_schema() reads the first chunk, which decides the types,
 # and keeps it for the first get_next().
-# Once `res` is cleared, its connection closed,
-# or `res` bound to new parameters,
+# The stream reads on after `res` is cleared or its connection closed,
+# and keeps the statement, and a closed connection, open until it has ended
+# or is released.
+# Once `res` is bound to new parameters,
 # the stream fails with an error that says so.
 # Internal for now: no DBI method calls it yet.
 read_arrow_stream <- function(res, n = 65536L) {
   if (!is.numeric(n) || length(n) != 1 || is.na(n) ||
     !(n == -1 || (n >= 1 && n <= .Machine$integer.max && n == trunc(n)))) {
     rlang::abort("`n` must be a positive whole number, or -1 for all rows.")
+  }
+  # Before the claim, so that a failed call claims nothing
+  if (!connection_valid(res@conn@ptr)) {
+    rlang::abort(
+      "Can't read a result as an Arrow stream after its connection has been closed."
+    )
   }
   claim_fetch_kind(res, "an Arrow stream")
   result_create_arrow_stream(res@ptr, as.integer(n))

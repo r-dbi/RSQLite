@@ -7,6 +7,24 @@
 
 // #include "DbResult.h"
 
+namespace {
+
+// Drops R's share of a result that R's garbage collector frees,
+// as dbClearResult() does
+void result_finalize(SEXP xptr) {
+  DbResultPtr* res = static_cast<DbResultPtr*>(R_ExternalPtrAddr(xptr));
+  if (res == NULL) {
+    return;
+  }
+  R_ClearExternalPtr(xptr);
+  if (res->get() != NULL) {
+    (*res)->clear();
+  }
+  delete res;
+}
+
+}  // namespace
+
 // An integer while it fits, a double beyond INT_MAX, where R integers end
 static SEXP row_count_as_sexp(int64_t n) {
   if (n <= INT_MAX) {
@@ -24,9 +42,15 @@ cpp11::external_pointer<DbResultPtr> result_create(
   std::string sql
 ) {
   (*con)->check_connection();
-  DbResultPtr* res =
-    new DbResultPtr(SqliteResult::create_and_send_query(*con, sql));
-  return cpp11::external_pointer<DbResultPtr>(res, true);
+  cpp11::sexp xptr(
+    cpp11::safe[R_MakeExternalPtr](nullptr, R_NilValue, R_NilValue)
+  );
+  R_RegisterCFinalizerEx(xptr, result_finalize, TRUE);
+  R_SetExternalPtrAddr(
+    xptr,
+    new DbResultPtr(SqliteResult::create_and_send_query(*con, sql))
+  );
+  return cpp11::external_pointer<DbResultPtr>(xptr);
 }
 
 [[cpp11::register]]
@@ -40,7 +64,7 @@ void result_release(cpp11::external_pointer<DbResultPtr> res) {
         "as from a handler of a warning that it raised."
       );
     }
-    // Now, also while an Arrow stream shares the result
+    // An Arrow stream that shares the result reads on
     (*ptr)->clear();
   }
   res.reset();

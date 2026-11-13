@@ -93,31 +93,6 @@ test_that("a stream warns once per chunk about converted values", {
   expect_null(stream$get_next())
 })
 
-test_that("a stream fails once its result is cleared", {
-  skip_if_not_installed("nanoarrow")
-  con <- local_con()
-  res <- dbSendQuery(con, "SELECT 1 AS x UNION ALL SELECT 2")
-  stream <- read_arrow_stream(res, 1)
-  expect_equal(stream$get_next()$length, 1)
-
-  dbClearResult(res)
-  expect_error(stream$get_next(), "after its result has been cleared")
-  # The schema read before stays readable
-  expect_equal(stream$get_schema()$children$x$format, "l")
-})
-
-test_that("a stream fails once its connection is closed", {
-  skip_if_not_installed("nanoarrow")
-  con <- dbConnect(SQLite(), ":memory:")
-  res <- dbSendQuery(con, "SELECT 1 AS x UNION ALL SELECT 2")
-  stream <- read_arrow_stream(res, 1)
-  expect_equal(stream$get_next()$length, 1)
-
-  expect_warning(dbDisconnect(con), "1 result in use")
-  expect_error(stream$get_next(), "after its connection has been closed")
-  dbClearResult(res)
-})
-
 test_that("a stream fails once its result is bound to new parameters", {
   skip_if_not_installed("nanoarrow")
   con <- local_con()

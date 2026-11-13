@@ -25,6 +25,8 @@ class DbResult : boost::noncopyable {
   bool busy_;
   // How the rows of the result are fetched, see claim_fetch_kind()
   std::string fetch_kind_;
+  // Set by clear()
+  bool cleared_;
 
 protected:
   boost::scoped_ptr<DbResultImpl> impl;
@@ -38,10 +40,15 @@ public:
 
 public:
   void close();
-  // Frees the statement and drops the connection for dbClearResult(),
-  // also while an Arrow stream shares the result, which fails from then on
+  // For dbClearResult() and R's garbage collector,
+  // which drop R's share of the result:
+  // an Arrow stream that shares it reads on,
+  // but it no longer counts as in use for dbDisconnect()
   void clear();
-  bool cleared() const;
+  // An Arrow stream that reads the result keeps its connection open,
+  // see DbConnection::add_stream()
+  void add_stream();
+  void remove_stream();
   // Whether an Arrow chunk is kept for the next Arrow fetch,
   // as when its warning exited
   bool arrow_chunk_kept() const;

@@ -24,6 +24,8 @@ private:
   // Wrapped pointer
   sqlite3* conn;
   sqlite3_stmt* stmt;
+  // Kept alive by the DbResult that owns this object
+  const DbConnection* connection_;
 
   // Cache
   struct _cache {

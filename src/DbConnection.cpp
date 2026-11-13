@@ -8,7 +8,12 @@ DbConnection::DbConnection(
   const std::string& vfs,
   bool with_alt_types
 )
-    : pConn_(NULL), with_alt_types_(with_alt_types), busy_callback_(NULL) {
+    : pConn_(NULL),
+      pDeferred_(NULL),
+      n_streams_(0),
+      n_cleared_results_(0),
+      with_alt_types_(with_alt_types),
+      busy_callback_(NULL) {
   // Get the underlying database connection
   // Always ensure URI filenames are enabled so that parameters like vfs= and
   // immutable= work.
@@ -82,9 +87,48 @@ void DbConnection::copy_to(const DbConnectionPtr& pDest) {
 }
 
 void DbConnection::disconnect() {
-  sqlite3_close_v2(pConn_);
+  if (n_streams_ > 0) {
+    // The busy handler stays until the handle is closed
+    pDeferred_ = pConn_;
+  } else {
+    close_handle(pConn_);
+  }
   pConn_ = NULL;
+}
+
+void DbConnection::close_handle(sqlite3* conn) {
+  // The statements of open results can still step the handle,
+  // which stays a zombie until they are finalized:
+  // they get SQLITE_BUSY at once rather than call the released R handler.
+  // A busy timeout calls no R code and stays.
+  if (busy_callback_ && !Rf_isInteger(busy_callback_)) {
+    sqlite3_busy_handler(conn, NULL, NULL);
+  }
   release_callback_data();
+  sqlite3_close_v2(conn);
+}
+
+bool DbConnection::is_closed() const {
+  return pConn_ == NULL && pDeferred_ == NULL;
+}
+
+void DbConnection::add_stream() {
+  ++n_streams_;
+}
+
+void DbConnection::remove_stream() {
+  if (--n_streams_ == 0 && pDeferred_ != NULL) {
+    close_handle(pDeferred_);
+    pDeferred_ = NULL;
+  }
+}
+
+void DbConnection::add_cleared_result(const int n) {
+  n_cleared_results_ += n;
+}
+
+long DbConnection::n_cleared_results() const {
+  return n_cleared_results_;
 }
 
 bool DbConnection::with_alt_types() const {

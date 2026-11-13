@@ -32,7 +32,7 @@ private:
 class ArrowChunk {
   boost::ptr_vector<SqliteArrowColumn>& columns_;
   const int n_max_;
-  int i_;
+  int64_t i_;
 
 public:
   ArrowChunk(boost::ptr_vector<SqliteArrowColumn>& columns, const int n_max)
@@ -420,7 +420,7 @@ template <typename Rows, typename Finish>
 void SqliteResultImpl::fetch_loop(Rows& rows, const int n_max, Finish finish) {
   // Rows count as fetched once they are returned, not if the fetch fails,
   // also not if the conversion fails
-  int n_fetched = 0;
+  int64_t n_fetched = 0;
   try {
     // The step past the rows of the previous fetch failed
     if (error_kept_) {

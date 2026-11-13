@@ -124,7 +124,13 @@ DbColumnStorage* DbColumnStorage::append_data_to_new(DATA_TYPE new_dt) {
     new DbColumnStorage(new_dt, desired_capacity, n_max, source)
   );
   DbColumnStorage* ret = spillover->append_data();
-  spillover.release();
+  // The new storage can itself spill over without taking the value,
+  // for example a full integer storage that meets a real value.
+  // The caller then owns only the storage returned,
+  // and the empty one in between is deleted here.
+  if (ret == spillover.get()) {
+    spillover.release();
+  }
   return ret;
 }
 

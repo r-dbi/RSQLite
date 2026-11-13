@@ -135,3 +135,24 @@ test_that("warnings on mixed data types (#161)", {
     fixed = TRUE
   )
 })
+
+test_that("a full integer column that meets a real or 64-bit value keeps all rows (#879)", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  # 100 integers fill the first storage exactly,
+  # so the next value spills over twice.
+  dbExecute(con, "CREATE TABLE t (x)")
+  dbExecute(con, paste(
+    "WITH RECURSIVE s(v) AS (SELECT 1 UNION ALL SELECT v + 1 FROM s WHERE v < 100)",
+    "INSERT INTO t SELECT v FROM s"
+  ))
+
+  dbExecute(con, "INSERT INTO t VALUES (1.5)")
+  out <- suppressWarnings(dbGetQuery(con, "SELECT x FROM t"))
+  expect_identical(out$x, c(1:100, 1.5))
+
+  dbExecute(con, "UPDATE t SET x = 5000000000 WHERE x = 1.5")
+  out <- suppressWarnings(dbGetQuery(con, "SELECT x FROM t"))
+  expect_identical(out$x, bit64::as.integer64(c(1:100, 5000000000)))
+})

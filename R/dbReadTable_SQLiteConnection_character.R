@@ -18,7 +18,17 @@
 #' @param select.cols  Deprecated, do not use.
 #' @param ... Needed for compatibility with generic.
 #'   Otherwise ignored.
-#' @inheritParams DBI::sqlRownamesToColumn
+#' @param row.names Either `TRUE`, `FALSE`, `NA` or a string.
+#'
+#'   If `TRUE`, always translate row names to a column called "row_names".
+#'   If `FALSE`, never translate row names.
+#'   If `NA`, translate rownames only if they're a character vector.
+#'
+#'   A string is equivalent to `TRUE`, but allows you to override the default name.
+#'
+#'   A default set with `pkgconfig::set_config()` is still honored, with a deprecation warning; pass `row.names` explicitly instead.
+#'
+#'   For backward compatibility, `NULL` is equivalent to `FALSE`.
 #' @rdname dbReadTable
 #' @examples
 #' library(DBI)
@@ -28,10 +38,13 @@
 #' dbDisconnect(db)
 #' @usage NULL
 dbReadTable_SQLiteConnection_character <- function(conn, name, ...,
-                                                   row.names = pkgconfig::get_config("RSQLite::row.names.table", FALSE),
+                                                   row.names = FALSE,
                                                    check.names = TRUE, select.cols = NULL) {
   name <- check_quoted_identifier(name)
 
+  if (missing(row.names)) {
+    row.names <- row_names_default("RSQLite::row.names.table")
+  }
   row.names <- compatRowNames(row.names)
 
   if ((!is.logical(row.names) && !is.character(row.names)) || length(row.names) != 1L) {

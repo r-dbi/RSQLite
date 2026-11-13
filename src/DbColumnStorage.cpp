@@ -1,4 +1,5 @@
 #include <cpp11.hpp>
+#include <memory>
 #include "pch.h"
 #include "DbColumnStorage.h"
 #include "DbColumnDataSource.h"
@@ -116,9 +117,15 @@ DbColumnStorage* DbColumnStorage::append_data_to_new(DATA_TYPE new_dt) {
 
   R_xlen_t desired_capacity = (n_max < 0) ? (get_capacity() * 2) : (n_max - i);
 
-  DbColumnStorage* spillover =
-    new DbColumnStorage(new_dt, desired_capacity, n_max, source);
-  return spillover->append_data();
+  // Own the new storage until the value is in it:
+  // converting the value can raise a warning that a handler turns into an error,
+  // which unwinds past this frame before the caller takes ownership.
+  std::unique_ptr<DbColumnStorage> spillover(
+    new DbColumnStorage(new_dt, desired_capacity, n_max, source)
+  );
+  DbColumnStorage* ret = spillover->append_data();
+  spillover.release();
+  return ret;
 }
 
 void DbColumnStorage::fetch_value() {

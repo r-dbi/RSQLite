@@ -546,7 +546,7 @@ void SqliteResultImpl::raise_bind_exception(int j, int rc) {
   if (name != NULL) {
     message += std::string(" (") + name + ")";
   }
-  message += " in row " + std::to_string(group_ + 1) + ": " +
-    sqlite3_errmsg(conn) + ".";
+  message +=
+    " in row " + std::to_string(group_ + 1) + ": " + sqlite3_errmsg(conn) + ".";
   throw step_error(message, rc);
 }

@@ -271,6 +271,26 @@ test_that("`dbConnect()` on a connection takes its defaults from the connection"
   expect_identical(args$default.extensions, TRUE)
 })
 
+test_that("a connection saved by an older RSQLite clones with the driver defaults", {
+  con <- dbConnect(SQLite(), tempfile(), bigint = "character", extended_types = TRUE, check_utf8 = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  # Slots are stored as attributes,
+  # an object saved before a slot existed has no such attribute.
+  old <- con
+  attr(old, "bigint") <- NULL
+  attr(old, "extended_types") <- NULL
+  attr(old, "check_utf8") <- NULL
+  expect_false(methods::.hasSlot(old, "check_utf8"))
+
+  clone <- dbConnect(old)
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+  expect_identical(clone@dbname, con@dbname)
+  expect_identical(clone@bigint, "integer64")
+  expect_false(clone@extended_types)
+  expect_false(clone@check_utf8)
+})
+
 test_that("temporary tables are connection local", {
   dbfile <- tempfile()
   con1 <- dbConnect(SQLite(), dbfile)

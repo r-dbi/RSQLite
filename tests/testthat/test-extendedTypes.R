@@ -94,33 +94,44 @@ test_that("Time applies a UTC offset as SQLite does (#877)", {
     "12:00:00.25-02:00",
     "23:00:00-02:00",
     "01:00:00+02:00",
-    "12:00Z"
+    "12:00Z",
+    "24:00:00+00:00"
   )
   dbExecute(con, "create table t1(id INTEGER, tm TIME)")
   dbAppendTable(con, "t1", data.frame(id = seq_along(values), tm = values))
 
   resdf <- dbGetQuery(con, "SELECT tm, time(tm, 'subsec') AS sqlite FROM t1 ORDER BY id")
   expected_times <- structure(
-    c(50400, 50400.25, 3600, 82800, 43200),
+    c(50400, 50400.25, 3600, 82800, 43200, 0),
     units = "secs",
     class = c("hms", "difftime")
   )
   expect_equal(resdf$tm, expected_times)
-  expect_equal(resdf$sqlite, c("14:00:00.000", "14:00:00.250", "01:00:00.000", "23:00:00.000", "12:00:00.000"))
+  expect_equal(resdf$sqlite, c("14:00:00.000", "14:00:00.250", "01:00:00.000", "23:00:00.000", "12:00:00.000", "00:00:00.000"))
 })
 
 test_that("Time with an offset SQLite does not read gives NA (#877)", {
   con <- dbConnect(SQLite(), extended_types = TRUE)
   on.exit(dbDisconnect(con), add = TRUE)
 
-  dbExecute(con, "create table t1(tm TIME)")
-  dbExecute(con, "insert into t1 values ('12:00:00-0200')")
-
-  expect_warning(
-    resdf <- dbGetQuery(con, "SELECT tm FROM t1"),
-    "Unknown string format, NA is returned."
+  # Boost reads these as durations, SQLite's `time()` rejects them
+  values <- c(
+    "12:00:00-0200",
+    "25:00:00-02:00",
+    "100:00:00-01:00",
+    "12:60:00-01:00",
+    "-01:00:00+00:00",
+    "24:00:01+00:00"
   )
-  expect_equal(resdf$tm, structure(NA_real_, units = "secs", class = c("hms", "difftime")))
+  dbExecute(con, "create table t1(id INTEGER, tm TIME)")
+  dbAppendTable(con, "t1", data.frame(id = seq_along(values), tm = values))
+
+  warnings <- capture_warnings(
+    resdf <- dbGetQuery(con, "SELECT tm, time(tm) IS NULL AS sqlite_na FROM t1 ORDER BY id")
+  )
+  expect_equal(warnings, rep("Unknown string format, NA is returned.", 6))
+  expect_equal(resdf$tm, structure(rep(NA_real_, 6), units = "secs", class = c("hms", "difftime")))
+  expect_equal(resdf$sqlite_na, rep(1L, 6))
 })
 
 

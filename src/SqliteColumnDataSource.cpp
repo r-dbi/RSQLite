@@ -79,6 +79,31 @@ std::string split_utc_offset(
   return text.substr(0, value_end);
 }
 
+// Throws unless a time with an offset is a time of day
+// in the form SQLite's `time()` accepts: `HH:MM`, `HH:MM:SS` or `HH:MM:SS.SSS`,
+// with hours up to 24 and minutes and seconds up to 59.
+// Boost reads any duration, such as `25:00:00` or `12:60:00`.
+void check_time_of_day(const std::string& text) {
+  const std::string::size_type n = text.size();
+  bool valid = n >= 5 && is_ascii_digit(text[0]) && is_ascii_digit(text[1]) &&
+               text[2] == ':' && is_ascii_digit(text[3]) &&
+               is_ascii_digit(text[4]) &&
+               (text[0] - '0') * 10 + (text[1] - '0') <= 24 && text[3] <= '5';
+  if (valid && n > 5) {
+    valid = n >= 8 && text[5] == ':' && is_ascii_digit(text[6]) &&
+            is_ascii_digit(text[7]) && text[6] <= '5';
+    if (valid && n > 8) {
+      valid = n >= 10 && text[8] == '.';
+      for (std::string::size_type i = 9; valid && i < n; ++i) {
+        valid = is_ascii_digit(text[i]);
+      }
+    }
+  }
+  if (!valid) {
+    throw std::invalid_argument("Invalid time of day");
+  }
+}
+
 }  // namespace
 
 SqliteColumnDataSource::SqliteColumnDataSource(
@@ -259,11 +284,18 @@ double SqliteColumnDataSource::fetch_time() const {
       bool has_offset;
       int offset_secs;
       const std::string text = split_utc_offset(tmstr, has_offset, offset_secs);
+      if (has_offset) {
+        check_time_of_day(text);
+      }
       bp::time_duration secs(bp::duration_from_string(text));
       dateval = secs.total_microseconds() * 1e-6;
       if (has_offset) {
         // As in SQLite's `time()`,
-        // a time with an offset is a time of day in UTC.
+        // a time with an offset is a time of day in UTC,
+        // and hour 24 is allowed only for 24:00:00.
+        if (dateval > 86400.0) {
+          throw std::invalid_argument("Invalid time of day");
+        }
         dateval = std::fmod(dateval - offset_secs, 86400.0);
         if (dateval < 0) {
           dateval += 86400.0;

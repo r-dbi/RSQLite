@@ -380,7 +380,7 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
 
   // Rows count as fetched once they are returned, not if the fetch fails,
   // also not if the conversion fails
-  int n_fetched = 0;
+  int64_t n_fetched = 0;
   cpp11::list out;
   try {
     // The step past the rows of the previous fetch failed

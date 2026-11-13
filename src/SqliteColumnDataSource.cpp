@@ -85,8 +85,21 @@ SEXP SqliteColumnDataSource::fetch_string() const {
 }
 
 SEXP SqliteColumnDataSource::fetch_blob() const {
+  // Keep sqlite3_column_bytes() before sqlite3_column_blob():
+  // the out-of-memory check below relies on the size
+  // being read before sqlite3_column_blob() tries to expand the value.
   int size = sqlite3_column_bytes(get_stmt(), get_j());
   const void* blob = sqlite3_column_blob(get_stmt(), get_j());
+
+  // An empty blob may come back as a NULL pointer,
+  // which must not reach memcpy().
+  if (size == 0) {
+    return Rf_allocVector(RAWSXP, 0);
+  }
+  // A NULL pointer with a nonzero size means that SQLite ran out of memory.
+  if (blob == NULL) {
+    cpp11::stop("Out of memory while fetching a blob of %d bytes.", size);
+  }
 
   SEXP bytes = Rf_allocVector(RAWSXP, size);
   memcpy(RAW(bytes), blob, size);

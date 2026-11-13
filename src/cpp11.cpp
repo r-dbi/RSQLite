@@ -42,6 +42,13 @@ extern "C" SEXP _RSQLite_connection_in_transaction(SEXP con_) {
   END_CPP11
 }
 // connection.cpp
+int connection_limit_length(const cpp11::external_pointer<DbConnectionPtr>& con, const int n);
+extern "C" SEXP _RSQLite_connection_limit_length(SEXP con, SEXP n) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(connection_limit_length(cpp11::as_cpp<cpp11::decay_t<const cpp11::external_pointer<DbConnectionPtr>&>>(con), cpp11::as_cpp<cpp11::decay_t<const int>>(n)));
+  END_CPP11
+}
+// connection.cpp
 void connection_copy_database(const cpp11::external_pointer<DbConnectionPtr>& from, const cpp11::external_pointer<DbConnectionPtr>& to);
 extern "C" SEXP _RSQLite_connection_copy_database(SEXP from, SEXP to) {
   BEGIN_CPP11
@@ -145,6 +152,14 @@ extern "C" SEXP _RSQLite_result_bind(SEXP res, SEXP params) {
   END_CPP11
 }
 // result.cpp
+void result_check_arrow_params(DbResult* res, SEXP stream);
+extern "C" SEXP _RSQLite_result_check_arrow_params(SEXP res, SEXP stream) {
+  BEGIN_CPP11
+    result_check_arrow_params(cpp11::as_cpp<cpp11::decay_t<DbResult*>>(res), cpp11::as_cpp<cpp11::decay_t<SEXP>>(stream));
+    return R_NilValue;
+  END_CPP11
+}
+// result.cpp
 void result_bind_arrow_stream(DbResult* res, SEXP stream, cpp11::integers indexes);
 extern "C" SEXP _RSQLite_result_bind_arrow_stream(SEXP res, SEXP stream, SEXP indexes) {
   BEGIN_CPP11
@@ -232,11 +247,13 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_connection_copy_database",     (DL_FUNC) &_RSQLite_connection_copy_database,     2},
     {"_RSQLite_connection_import_file",       (DL_FUNC) &_RSQLite_connection_import_file,       6},
     {"_RSQLite_connection_in_transaction",    (DL_FUNC) &_RSQLite_connection_in_transaction,    1},
+    {"_RSQLite_connection_limit_length",      (DL_FUNC) &_RSQLite_connection_limit_length,      2},
     {"_RSQLite_connection_release",           (DL_FUNC) &_RSQLite_connection_release,           1},
     {"_RSQLite_connection_valid",             (DL_FUNC) &_RSQLite_connection_valid,             1},
     {"_RSQLite_extension_load",               (DL_FUNC) &_RSQLite_extension_load,               3},
     {"_RSQLite_result_bind",                  (DL_FUNC) &_RSQLite_result_bind,                  2},
     {"_RSQLite_result_bind_arrow_stream",     (DL_FUNC) &_RSQLite_result_bind_arrow_stream,     3},
+    {"_RSQLite_result_check_arrow_params",    (DL_FUNC) &_RSQLite_result_check_arrow_params,    2},
     {"_RSQLite_result_claim_fetch_kind",      (DL_FUNC) &_RSQLite_result_claim_fetch_kind,      2},
     {"_RSQLite_result_column_info",           (DL_FUNC) &_RSQLite_result_column_info,           1},
     {"_RSQLite_result_create",                (DL_FUNC) &_RSQLite_result_create,                2},

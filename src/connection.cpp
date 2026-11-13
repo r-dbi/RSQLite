@@ -79,6 +79,16 @@ bool connection_in_transaction(cpp11::external_pointer<DbConnectionPtr> con_) {
   return (con->get()->in_transaction() != 0);
 }
 
+// Sets SQLite's length limit for strings and blobs of `con` to `n` bytes,
+// unless negative, and returns the previous limit; for tests
+[[cpp11::register]]
+int connection_limit_length(
+  const cpp11::external_pointer<DbConnectionPtr>& con,
+  const int n
+) {
+  return sqlite3_limit(con->get()->conn(), SQLITE_LIMIT_LENGTH, n);
+}
+
 // Quoting
 
 // Transactions

@@ -3,6 +3,7 @@
 #include "DbConnection.h"
 #include "DbResultImpl.h"
 #include <exception>
+#include <set>
 #include <stdexcept>
 #include <type_traits>
 
@@ -144,7 +145,34 @@ void DbResult::bind_arrow(
   struct ArrowArrayStream* stream,
   const std::vector<int>& indexes
 ) {
+  check_arrow_params(stream);
   run_guarded(busy_, [&] { impl->bind_arrow(stream, indexes); });
+}
+
+// A stream of RSQLite that reads this result,
+// or a result whose parameters read this result in turn, and so on,
+// would read the rows of the bind that reads them:
+// the result would recurse into itself, which the busy guard refuses,
+// or fail as bound to new parameters,
+// and the results would hold each other.
+// Called before the schema of the stream is read, which fetches rows.
+// A stream that wraps a stream of RSQLite hides the chain.
+void DbResult::check_arrow_params(const struct ArrowArrayStream* stream) const {
+  std::set<const DbResult*> seen;
+  const DbResult* result = arrow_stream_result(stream);
+  while (result != NULL && seen.insert(result).second) {
+    if (result == this) {
+      throw std::runtime_error(
+        seen.size() == 1
+          ? "Can't bind a result to an Arrow stream of its own rows."
+          : "Can't bind a result to an Arrow stream of a result "
+            "whose parameters read the rows of this one."
+      );
+    }
+    const struct ArrowArrayStream* params =
+      result->impl ? result->impl->arrow_param_stream() : NULL;
+    result = params != NULL ? arrow_stream_result(params) : NULL;
+  }
 }
 
 cpp11::list DbResult::fetch(const int n_max) {

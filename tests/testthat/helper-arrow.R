@@ -287,7 +287,7 @@ arrow_int_array <- function(values, schema) {
 }
 
 # A stream of one struct array with the arrays `...` as its columns,
-# unnamed unless named
+# unnamed unless named, not validated
 arrow_params <- function(...) {
   arrays <- list(...)
   if (is.null(names(arrays))) {
@@ -296,7 +296,8 @@ arrow_params <- function(...) {
   schema <- nanoarrow::na_struct(lapply(arrays, nanoarrow::infer_nanoarrow_schema))
   array <- nanoarrow::nanoarrow_array_modify(
     nanoarrow::nanoarrow_array_init(schema),
-    list(length = arrays[[1]]$length, children = arrays)
+    list(length = arrays[[1]]$length, children = arrays),
+    validate = FALSE
   )
   nanoarrow::basic_array_stream(list(array))
 }
@@ -308,4 +309,52 @@ bound_values <- function(con, stream) {
   on.exit(dbClearResult(res))
   bind_arrow_stream(res, stream)
   dbFetch(res)
+}
+
+# A dictionary array of the values of the array `values`
+# with `indices` of the integer type `index_type`, int8 to uint64,
+# nulls for NA; neither the indices nor the values are validated
+arrow_dictionary <- function(indices, values, index_type) {
+  if (index_type$format %in% c("l", "L")) {
+    indices <- nanoarrow::as_nanoarrow_array(
+      bit64::as.integer64(indices),
+      schema = nanoarrow::na_int64()
+    )
+  } else {
+    indices <- arrow_int_array(indices, index_type)
+  }
+  schema <- nanoarrow::na_dictionary(
+    nanoarrow::infer_nanoarrow_schema(values),
+    index_type
+  )
+  nanoarrow::nanoarrow_array_modify(
+    nanoarrow::nanoarrow_array_init(schema),
+    list(
+      length = indices$length,
+      null_count = indices$null_count,
+      buffers = indices$buffers,
+      dictionary = values
+    ),
+    validate = FALSE
+  )
+}
+
+# A string or binary array of `type` with the raw `offsets`,
+# a large type for 64-bit offsets, over the bytes of `data`, not validated
+arrow_offsets_array <- function(offsets, data, type) {
+  n <- length(offsets) - 1
+  offsets <- if (type$format %in% c("U", "Z")) {
+    nanoarrow::as_nanoarrow_array(bit64::as.integer64(offsets))$buffers[[2]]
+  } else {
+    nanoarrow::as_nanoarrow_buffer(as.integer(offsets))
+  }
+  nanoarrow::nanoarrow_array_modify(
+    nanoarrow::nanoarrow_array_init(type),
+    list(
+      length = n,
+      null_count = 0,
+      buffers = list(NULL, offsets, nanoarrow::as_nanoarrow_buffer(charToRaw(data)))
+    ),
+    validate = FALSE
+  )
 }

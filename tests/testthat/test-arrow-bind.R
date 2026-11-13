@@ -248,7 +248,7 @@ test_that("a type that can't be bound fails before any row runs", {
 
   for (i in 1:2) {
     array <- list(
-      nanoarrow::as_nanoarrow_array(factor("a")),
+      nanoarrow::as_nanoarrow_array(as.Date("2020-01-01"), schema = nanoarrow::na_date64()),
       nanoarrow::as_nanoarrow_array(list(1L), schema = nanoarrow::na_list(nanoarrow::na_int32()))
     )[[i]]
     stream <- arrow_params(x = array)

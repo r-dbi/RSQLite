@@ -120,6 +120,8 @@ public:
   void arrow_schema(struct ArrowSchema* schema, const int n_max);
   int executions() const;
   bool arrow_chunk_kept() const;
+  // The Arrow stream bound as parameters, if any
+  const struct ArrowArrayStream* arrow_param_stream() const;
 
   cpp11::list get_column_info();
 

@@ -20,6 +20,10 @@ connection_in_transaction <- function(con_) {
   .Call(`_RSQLite_connection_in_transaction`, con_)
 }
 
+connection_limit_length <- function(con, n) {
+  .Call(`_RSQLite_connection_limit_length`, con, n)
+}
+
 connection_copy_database <- function(from, to) {
   invisible(.Call(`_RSQLite_connection_copy_database`, from, to))
 }
@@ -74,6 +78,10 @@ result_claim_fetch_kind <- function(res, kind) {
 
 result_bind <- function(res, params) {
   invisible(.Call(`_RSQLite_result_bind`, res, params))
+}
+
+result_check_arrow_params <- function(res, stream) {
+  invisible(.Call(`_RSQLite_result_check_arrow_params`, res, stream))
 }
 
 result_bind_arrow_stream <- function(res, stream, indexes) {

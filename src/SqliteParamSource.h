@@ -3,6 +3,7 @@
 
 #include <cpp11.hpp>
 #include <boost/noncopyable.hpp>
+#include <string>
 #include <vector>
 #include "sqlite3-cpp.h"
 #include "DbArrow.h"
@@ -63,15 +64,19 @@ private:
 // The arrays are read as the sets are bound.
 // The stream's callbacks may call R:
 // an R error that leaves them by a longjmp becomes a C++ exception.
+// A dictionary binds the values its indices point to.
 class SqliteArrowParamSource : public SqliteParamSource {
   nanoarrow::UniqueArrayStream stream;
   nanoarrow::UniqueSchema schema;
-  // The types of the children that `indexes` names, in the same order
+  // The types of the children that `indexes` names, in the same order,
+  // or of their values for a dictionary
   std::vector<struct ArrowSchemaView> types;
   std::vector<int> indexes;
   nanoarrow::UniqueArray array;
   nanoarrow::UniqueArrayView view;
   int64_t i;
+  // The rows of the stream bound so far, for messages
+  int64_t rows;
 
 public:
   SqliteArrowParamSource(
@@ -81,10 +86,18 @@ public:
 
 public:
   virtual bool bind_next_row(sqlite3_stmt* stmt);
+  const struct ArrowArrayStream* get_stream() const;
 
 private:
   bool next_array();
   void bind_parameter(sqlite3_stmt* stmt, int pos, int64_t row) const;
+  struct ArrowBufferView value_bytes(
+    sqlite3_stmt* stmt,
+    int pos,
+    const struct ArrowArrayView* values,
+    int64_t row
+  ) const;
+  std::string where(int pos) const;
 };
 
 #endif  // RSQLITE_SQLITEPARAMSOURCE_H

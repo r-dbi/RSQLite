@@ -47,6 +47,7 @@ SqliteResultImpl::SqliteResultImpl(
       types_(get_initial_field_types(cache.ncols_)),
       with_alt_types_(conn_->with_alt_types()),
       error_kept_(false),
+      kept_error_completes_(false),
       kept_error_code_(SQLITE_OK) {
   try {
     if (cache.nparams_ == 0) {
@@ -178,8 +179,15 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
 
   total_changes_start_ = sqlite3_total_changes64(conn);
 
+  // Until the first row is bound, the result counts as unbound,
+  // so that a failed bind doesn't leave the previous binding's state behind.
+  ready_ = false;
+  complete_ = true;
+  nrows_ = 0;
+
   // A new execution starts: the error kept from the previous one is dropped
   error_kept_ = false;
+  kept_error_completes_ = false;
   kept_error_.clear();
   kept_error_code_ = SQLITE_OK;
 
@@ -279,47 +287,48 @@ bool SqliteResultImpl::bind_row() {
 }
 
 void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
+  int rc = SQLITE_OK;
   if (TYPEOF(value_) == LGLSXP) {
     int value = LOGICAL(value_)[group_];
     if (value == NA_LOGICAL) {
-      sqlite3_bind_null(stmt, j);
+      rc = sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_int(stmt, j, value);
+      rc = sqlite3_bind_int(stmt, j, value);
     }
   } else if (TYPEOF(value_) == INT64SXP && Rf_inherits(value_, "integer64")) {
     int64_t value = INTEGER64(value_)[group_];
     if (value == NA_INTEGER64) {
-      sqlite3_bind_null(stmt, j);
+      rc = sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_int64(stmt, j, value);
+      rc = sqlite3_bind_int64(stmt, j, value);
     }
   } else if (TYPEOF(value_) == INTSXP) {
     int value = INTEGER(value_)[group_];
     if (value == NA_INTEGER) {
-      sqlite3_bind_null(stmt, j);
+      rc = sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_int(stmt, j, value);
+      rc = sqlite3_bind_int(stmt, j, value);
     }
   } else if (TYPEOF(value_) == REALSXP) {
     double value = REAL(value_)[group_];
     if (value == NA_REAL) {
-      sqlite3_bind_null(stmt, j);
+      rc = sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_double(stmt, j, value);
+      rc = sqlite3_bind_double(stmt, j, value);
     }
   } else if (TYPEOF(value_) == STRSXP) {
     SEXP value = STRING_ELT(value_, group_);
     if (value == NA_STRING) {
-      sqlite3_bind_null(stmt, j);
+      rc = sqlite3_bind_null(stmt, j);
     } else {
-      sqlite3_bind_text(stmt, j, CHAR(value), -1, SQLITE_TRANSIENT);
+      rc = sqlite3_bind_text(stmt, j, CHAR(value), -1, SQLITE_TRANSIENT);
     }
   } else if (TYPEOF(value_) == VECSXP) {
     SEXP value = VECTOR_ELT(value_, group_);
     if (TYPEOF(value) == NILSXP) {
-      sqlite3_bind_null(stmt, j);
+      rc = sqlite3_bind_null(stmt, j);
     } else if (TYPEOF(value) == RAWSXP) {
-      sqlite3_bind_blob(
+      rc = sqlite3_bind_blob(
         stmt,
         j,
         RAW(value),
@@ -338,6 +347,10 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
         Rf_type2char(TYPEOF(value_)) + ".",
       SQLITE_ERROR
     );
+  }
+
+  if (rc != SQLITE_OK) {
+    raise_bind_exception(j, rc);
   }
 }
 
@@ -404,6 +417,11 @@ void SqliteResultImpl::read_ahead() {
     error_kept_ = true;
     kept_error_ = e.what();
     kept_error_code_ = e.code();
+    // A value SQLite refused to bind completes the result,
+    // but only once the next fetch has raised the error:
+    // until then, dbHasCompleted() stays FALSE.
+    kept_error_completes_ = complete_;
+    complete_ = false;
   }
 }
 
@@ -446,7 +464,11 @@ cpp11::list SqliteResultImpl::peek_first_row() {
 
 void SqliteResultImpl::raise_kept_error() {
   step_error error(kept_error_, kept_error_code_);
+  if (kept_error_completes_) {
+    complete_ = true;
+  }
   error_kept_ = false;
+  kept_error_completes_ = false;
   kept_error_.clear();
   kept_error_code_ = SQLITE_OK;
   throw error;
@@ -456,4 +478,22 @@ void SqliteResultImpl::raise_kept_error() {
 // at the entry point, with the message as it is, not as a format string.
 void SqliteResultImpl::raise_sqlite_exception(sqlite3* conn) {
   throw std::runtime_error(sqlite3_errmsg(conn));
+}
+
+// A value SQLite refuses to bind, such as one over its length limit,
+// would otherwise be bound as NULL.
+// The result is marked complete, so that no fetch reads the reset statement;
+// the next dbBind() resets the statement and binds afresh.
+// It throws a step_error with SQLite's result code,
+// so that read_ahead() can keep it like the error of a step.
+void SqliteResultImpl::raise_bind_exception(int j, int rc) {
+  complete_ = true;
+  std::string message = "Can't bind parameter " + std::to_string(j);
+  const char* name = sqlite3_bind_parameter_name(stmt, j);
+  if (name != NULL) {
+    message += std::string(" (") + name + ")";
+  }
+  message += " in row " + std::to_string(group_ + 1) + ": " +
+    sqlite3_errmsg(conn) + ".";
+  throw step_error(message, rc);
 }

@@ -113,6 +113,37 @@ test_that("an error after the last row of a fetch keeps it across parameter sets
   expect_error(dbFetch(res, n = 2), "raw vectors")
 })
 
+test_that("a value SQLite refuses to bind after a fetch comes from the next fetch", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+  connection_limit_length(con@ptr, 30L)
+
+  res <- dbSendQuery(con, "SELECT :x AS x")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  # The second parameter set is over the length limit
+  dbBind(res, list(x = c("a", strrep("a", 31), "c")))
+  expect_identical(dbFetch(res, n = 1)$x, "a")
+  expect_false(dbHasCompleted(res))
+  expect_equal(dbGetRowCount(res), 1L)
+
+  expect_error(
+    dbFetch(res, n = 1),
+    "Can't bind parameter 1 (:x) in row 2: string or blob too big",
+    fixed = TRUE
+  )
+
+  # The error completes the result, and no fetch reads the reset statement
+  expect_true(dbHasCompleted(res))
+  expect_equal(nrow(dbFetch(res)), 0L)
+  expect_equal(dbGetRowCount(res), 1L)
+
+  # A new dbBind() starts afresh, with no error kept
+  dbBind(res, list(x = "d"))
+  expect_identical(dbFetch(res)$x, "d")
+  expect_true(dbHasCompleted(res))
+})
+
 test_that("an error kept for the next fetch keeps SQLite's message", {
   con <- local_json_error_at_5()
   res <- dbSendQuery(con, "SELECT id, json(v) AS j FROM t1")

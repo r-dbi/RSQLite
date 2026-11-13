@@ -35,6 +35,13 @@ extern "C" SEXP _RSQLite_connection_in_transaction(SEXP con_) {
   END_CPP11
 }
 // connection.cpp
+int connection_limit_length(const cpp11::external_pointer<DbConnectionPtr>& con, const int n);
+extern "C" SEXP _RSQLite_connection_limit_length(SEXP con, SEXP n) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(connection_limit_length(cpp11::as_cpp<cpp11::decay_t<const cpp11::external_pointer<DbConnectionPtr>&>>(con), cpp11::as_cpp<cpp11::decay_t<const int>>(n)));
+  END_CPP11
+}
+// connection.cpp
 void connection_copy_database(const cpp11::external_pointer<DbConnectionPtr>& from, const cpp11::external_pointer<DbConnectionPtr>& to);
 extern "C" SEXP _RSQLite_connection_copy_database(SEXP from, SEXP to) {
   BEGIN_CPP11
@@ -188,6 +195,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_connection_copy_database",     (DL_FUNC) &_RSQLite_connection_copy_database,     2},
     {"_RSQLite_connection_import_file",       (DL_FUNC) &_RSQLite_connection_import_file,       6},
     {"_RSQLite_connection_in_transaction",    (DL_FUNC) &_RSQLite_connection_in_transaction,    1},
+    {"_RSQLite_connection_limit_length",      (DL_FUNC) &_RSQLite_connection_limit_length,      2},
     {"_RSQLite_connection_release",           (DL_FUNC) &_RSQLite_connection_release,           1},
     {"_RSQLite_connection_valid",             (DL_FUNC) &_RSQLite_connection_valid,             1},
     {"_RSQLite_extension_load",               (DL_FUNC) &_RSQLite_extension_load,               3},

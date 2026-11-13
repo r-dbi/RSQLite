@@ -41,8 +41,10 @@ private:
   bool ready_;
   // Set once a bind has started, also if it failed: see n_rows_affected()
   bool bind_started_;
-  int nrows_;
-  int total_changes_start_;
+  // 64 bits: a result read in chunks can pass INT_MAX rows,
+  // and a statement can change as many
+  int64_t nrows_;
+  int64_t total_changes_start_;
   // The parameter sets of the latest bind, see bind_row()
   boost::scoped_ptr<SqliteParamSource> params_;
   std::vector<DATA_TYPE> types_;
@@ -82,8 +84,11 @@ private:
 public:
   void close();
   bool complete() const;
-  int n_rows_fetched();
-  int n_rows_affected();
+  int64_t n_rows_fetched();
+  int64_t n_rows_affected();
+  // For the tests
+  void set_rows_fetched(int64_t n);
+  void set_rows_affected(int64_t n);
   void bind(const cpp11::list& params);
   cpp11::list fetch(const int n_max);
   // Fetches at most `n_max` rows, all of them if negative, into a struct array,

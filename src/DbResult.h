@@ -51,8 +51,8 @@ public:
   bool busy() const;
   bool connection_valid() const;
   int executions() const;
-  int n_rows_fetched();
-  int n_rows_affected();
+  int64_t n_rows_fetched();
+  int64_t n_rows_affected();
 
   void bind(const cpp11::list& params);
   cpp11::list fetch(int n_max = -1);

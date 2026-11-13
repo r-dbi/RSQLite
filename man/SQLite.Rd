@@ -32,7 +32,7 @@ SQLite(...)
   vfs = NULL,
   bigint = c("integer64", "integer", "numeric", "character"),
   extended_types = FALSE,
-  check_utf8 = getOption("RSQLite.check_utf8", FALSE)
+  check_utf8 = FALSE
 )
 
 \S4method{dbDisconnect}{SQLiteConnection}(conn, ...)
@@ -102,9 +102,9 @@ In a UTF-16 database, such a blob is taken as UTF-8 bytes when \code{TRUE} (\ver
 and is transcoded from UTF-16 when \code{FALSE}.
 The checks apply to every query on the connection, including the ones RSQLite runs itself:
 for example, \code{\link[DBI:dbListTables]{dbListTables()}} reports a table name that is not valid UTF-8 as \code{NA}.
-Defaults to the \code{RSQLite.check_utf8} option, or \code{FALSE} if it is unset.
+Defaults to \code{FALSE}.
 \code{dbConnect()} on an existing connection does not carry this setting over,
-nor \code{extended_types} or \code{bigint}, but reads the option again.}
+nor \code{extended_types} or \code{bigint}.}
 }
 \value{
 \code{SQLite()} returns an object of class \link[=SQLiteDriver-class]{SQLiteDriver}.

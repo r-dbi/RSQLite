@@ -1,7 +1,6 @@
 # check_utf8 = FALSE ----------------------------------------------------------
 
 test_that("check_utf8 is FALSE by default", {
-  withr::local_options(RSQLite.check_utf8 = NULL)
   con <- dbConnect(SQLite())
   on.exit(dbDisconnect(con), add = TRUE)
 
@@ -47,32 +46,8 @@ test_that("check_utf8 = FALSE returns text that is not valid UTF-8", {
 
 # check_utf8 = TRUE -----------------------------------------------------------
 
-test_that("the RSQLite.check_utf8 option sets the default", {
-  withr::local_options(RSQLite.check_utf8 = TRUE)
-  con <- dbConnect(SQLite())
-  on.exit(dbDisconnect(con), add = TRUE)
-  con_false <- dbConnect(SQLite(), check_utf8 = FALSE)
-  on.exit(dbDisconnect(con_false), add = TRUE)
-
-  expect_true(con@check_utf8)
-  sql <- "SELECT CAST(X'61ff' AS TEXT) AS x"
-  out <- utf8_with_warnings(dbGetQuery(con, sql))
-  expect_identical(out$value$x, NA_character_)
-  expect_identical(out$warnings, utf8_invalid_message(1))
-
-  expect_false(con_false@check_utf8)
-  expect_identical(
-    charToRaw(dbGetQuery(con_false, sql)$x),
-    as.raw(c(0x61, 0xff))
-  )
-})
-
 test_that("check_utf8 must be TRUE or FALSE", {
-  withr::local_options(RSQLite.check_utf8 = NULL)
-  message <- paste(
-    "`check_utf8` must be TRUE or FALSE",
-    "(it defaults to the option RSQLite.check_utf8)."
-  )
+  message <- "`check_utf8` must be TRUE or FALSE."
 
   for (value in list("TRUE", 1, NA, c(TRUE, TRUE), logical(), NULL)) {
     expect_error(
@@ -81,24 +56,6 @@ test_that("check_utf8 must be TRUE or FALSE", {
       fixed = TRUE,
       info = deparse(value)
     )
-  }
-})
-
-test_that("the RSQLite.check_utf8 option must be TRUE or FALSE", {
-  message <- paste(
-    "`check_utf8` must be TRUE or FALSE",
-    "(it defaults to the option RSQLite.check_utf8)."
-  )
-
-  for (value in list("TRUE", 1, NA, c(TRUE, TRUE))) {
-    withr::with_options(list(RSQLite.check_utf8 = value), {
-      expect_error(dbConnect(SQLite()), message, fixed = TRUE, info = deparse(value))
-
-      # An argument overrides the option without looking at it
-      con <- dbConnect(SQLite(), check_utf8 = FALSE)
-      expect_false(con@check_utf8)
-      dbDisconnect(con)
-    })
   }
 })
 

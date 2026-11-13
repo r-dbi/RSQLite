@@ -49,9 +49,9 @@
 #'   and is transcoded from UTF-16 when `FALSE`.
 #'   The checks apply to every query on the connection, including the ones RSQLite runs itself:
 #'   for example, [dbListTables()] reports a table name that is not valid UTF-8 as `NA`.
-#'   Defaults to the `RSQLite.check_utf8` option, or `FALSE` if it is unset.
+#'   Defaults to `FALSE`.
 #'   `dbConnect()` on an existing connection does not carry this setting over,
-#'   nor `extended_types` or `bigint`, but reads the option again.
+#'   nor `extended_types` or `bigint`.
 #'
 #' @return `dbConnect()` returns an object of class [SQLiteConnection-class].
 #'
@@ -96,7 +96,7 @@ dbConnect_SQLiteDriver <- function(drv, dbname = "", ..., loadable.extensions = 
                                    synchronous = "off", flags = SQLITE_RWC, vfs = NULL,
                                    bigint = c("integer64", "integer", "numeric", "character"),
                                    extended_types = FALSE,
-                                   check_utf8 = getOption("RSQLite.check_utf8", FALSE)) {
+                                   check_utf8 = FALSE) {
   stopifnot(length(dbname) == 1, !is.na(dbname))
 
   if (!is_url_or_special_filename(dbname)) {
@@ -115,7 +115,7 @@ dbConnect_SQLiteDriver <- function(drv, dbname = "", ..., loadable.extensions = 
     check_suggested("hms", "dbConnect")
   }
   if (!is.logical(check_utf8) || length(check_utf8) != 1L || is.na(check_utf8)) {
-    stopc("`check_utf8` must be TRUE or FALSE (it defaults to the option RSQLite.check_utf8).")
+    stopc("`check_utf8` must be TRUE or FALSE.")
   }
   check_utf8 <- isTRUE(check_utf8)
 

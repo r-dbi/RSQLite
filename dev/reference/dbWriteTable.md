@@ -31,7 +31,7 @@ dbWriteTable(
   name,
   value,
   ...,
-  row.names = pkgconfig::get_config("RSQLite::row.names.table", FALSE),
+  row.names = FALSE,
   overwrite = FALSE,
   append = FALSE,
   field.types = NULL,
@@ -102,7 +102,10 @@ dbWriteTable(
   whatever the R identifier `"row.names"` maps to the DBMS (see
   [`DBI::make.db.names()`](https://dbi.r-dbi.org/reference/make.db.names.html)).
   If `NA` will add rows names if they are characters, otherwise will
-  ignore.
+  ignore. A default set with
+  [`pkgconfig::set_config()`](https://rdrr.io/pkg/pkgconfig/man/set_config.html)
+  is still honored, with a deprecation warning; pass `row.names`
+  explicitly instead.
 
 - nrows:
 

@@ -10,7 +10,7 @@ dbReadTable(
   conn,
   name,
   ...,
-  row.names = pkgconfig::get_config("RSQLite::row.names.table", FALSE),
+  row.names = FALSE,
   check.names = TRUE,
   select.cols = NULL
 )
@@ -45,6 +45,11 @@ dbReadTable(
 
   A string is equivalent to `TRUE`, but allows you to override the
   default name.
+
+  A default set with
+  [`pkgconfig::set_config()`](https://rdrr.io/pkg/pkgconfig/man/set_config.html)
+  is still honored, with a deprecation warning; pass `row.names`
+  explicitly instead.
 
   For backward compatibility, `NULL` is equivalent to `FALSE`.
 

@@ -65,7 +65,7 @@
 <span>  <span class="va">name</span>,</span>
 <span>  <span class="va">value</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  row.names <span class="op">=</span> <span class="fu">pkgconfig</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pkgconfig/man/get_config.html" class="external-link">get_config</a></span><span class="op">(</span><span class="st">"RSQLite::row.names.table"</span>, <span class="cn">FALSE</span><span class="op">)</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  append <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  field.types <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -127,7 +127,8 @@ used to override defaults when imputing classes from on-disk file.</p></dd>
 <dt id="arg-row-names">row.names<a class="anchor" aria-label="anchor" href="#arg-row-names"></a></dt>
 <dd><p>A logical specifying whether the <code>row.names</code> should be output to the output DBMS table;
 if <code>TRUE</code>, an extra field whose name will be whatever the R identifier <code>"row.names"</code> maps to the DBMS (see <code><a href="https://dbi.r-dbi.org/reference/make.db.names.html" class="external-link">DBI::make.db.names()</a></code>).
-If <code>NA</code> will add rows names if they are characters, otherwise will ignore.</p></dd>
+If <code>NA</code> will add rows names if they are characters, otherwise will ignore.
+A default set with <code><a href="https://rdrr.io/pkg/pkgconfig/man/set_config.html" class="external-link">pkgconfig::set_config()</a></code> is still honored, with a deprecation warning; pass <code>row.names</code> explicitly instead.</p></dd>
 
 
 <dt id="arg-nrows">nrows<a class="anchor" aria-label="anchor" href="#arg-nrows"></a></dt>

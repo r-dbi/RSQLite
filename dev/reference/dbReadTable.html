@@ -45,7 +45,7 @@
 <span>  <span class="va">conn</span>,</span>
 <span>  <span class="va">name</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  row.names <span class="op">=</span> <span class="fu">pkgconfig</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pkgconfig/man/get_config.html" class="external-link">get_config</a></span><span class="op">(</span><span class="st">"RSQLite::row.names.table"</span>, <span class="cn">FALSE</span><span class="op">)</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  check.names <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  select.cols <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -73,10 +73,10 @@ Otherwise ignored.</p></dd>
 <dt id="arg-row-names">row.names<a class="anchor" aria-label="anchor" href="#arg-row-names"></a></dt>
 <dd><p>Either <code>TRUE</code>, <code>FALSE</code>, <code>NA</code> or a string.</p>
 <p>If <code>TRUE</code>, always translate row names to a column called "row_names".
-If <code>FALSE</code>, never translate row names. If <code>NA</code>, translate
-rownames only if they're a character vector.</p>
-<p>A string is equivalent to <code>TRUE</code>, but allows you to override the
-default name.</p>
+If <code>FALSE</code>, never translate row names.
+If <code>NA</code>, translate rownames only if they're a character vector.</p>
+<p>A string is equivalent to <code>TRUE</code>, but allows you to override the default name.</p>
+<p>A default set with <code><a href="https://rdrr.io/pkg/pkgconfig/man/set_config.html" class="external-link">pkgconfig::set_config()</a></code> is still honored, with a deprecation warning; pass <code>row.names</code> explicitly instead.</p>
 <p>For backward compatibility, <code>NULL</code> is equivalent to <code>FALSE</code>.</p></dd>
 
 

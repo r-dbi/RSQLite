@@ -61,12 +61,7 @@ dbUnquoteIdentifier(conn, x, ...)
 show(object)
 
 # S4 method for class 'SQLiteConnection'
-sqlData(
-  con,
-  value,
-  row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE),
-  ...
-)
+sqlData(con, value, row.names = FALSE, ...)
 ```
 
 ## Arguments

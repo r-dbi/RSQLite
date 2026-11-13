@@ -21,12 +21,7 @@ dbClearResult(res, ...)
 dbColumnInfo(res, ...)
 
 # S4 method for class 'SQLiteResult'
-dbFetch(
-  res,
-  n = -1,
-  ...,
-  row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE)
-)
+dbFetch(res, n = -1, ..., row.names = FALSE)
 
 # S4 method for class 'SQLiteResult'
 dbGetRowCount(res, ...)

@@ -11,7 +11,7 @@ sqliteBuildTableDefinition(
   name,
   value,
   field.types = NULL,
-  row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE)
+  row.names = FALSE
 )
 ```
 
@@ -37,7 +37,7 @@ sqliteBuildTableDefinition(
 - row.names:
 
   Logical. Should row.name of `value` be exported as a `row_names`
-  field? Default is `TRUE`
+  field? Default is `FALSE`.
 
 ## Value
 

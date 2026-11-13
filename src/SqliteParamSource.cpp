@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "SqliteParamSource.h"
 #include "integer64.h"
+#include <cstring>
 #include <stdexcept>
 
 SqliteParamSource::~SqliteParamSource() {}
@@ -92,4 +93,285 @@ void SqliteListParamSource::bind_parameter(
       Rf_type2char(TYPEOF(value_)) + "."
     );
   }
+}
+
+// SqliteArrowParamSource //////////////////////////////////////////////////////
+
+namespace {
+
+// Calls `callback` of `stream` and throws its error as a std::runtime_error,
+// prefixed with `what`.
+// An R error that leaves the callback by a longjmp,
+// as in a stream implemented in R,
+// becomes a cpp11::unwind_exception, which unwinds the C++ frames,
+// and continues at the entry point.
+// A stream of RSQLite protects its own callbacks with cpp11 in turn:
+// cpp11 >= 0.4.6 protects nested calls, see LinkingTo in DESCRIPTION.
+template <typename Callback>
+void call_stream(
+  struct ArrowArrayStream* stream,
+  Callback callback,
+  const char* what
+) {
+  int code = 0;
+  const char* message = NULL;
+  cpp11::unwind_protect([&] {
+    code = callback();
+    if (code != 0) {
+      message = stream->get_last_error(stream);
+    }
+  });
+  if (code != 0) {
+    throw std::runtime_error(
+      std::string(what) + ": " + (message != NULL ? message : strerror(code))
+    );
+  }
+}
+
+// The types that map to a storage class of SQLite
+bool can_bind(enum ArrowType type) {
+  switch (type) {
+  case NANOARROW_TYPE_NA:
+  case NANOARROW_TYPE_BOOL:
+  case NANOARROW_TYPE_INT8:
+  case NANOARROW_TYPE_UINT8:
+  case NANOARROW_TYPE_INT16:
+  case NANOARROW_TYPE_UINT16:
+  case NANOARROW_TYPE_INT32:
+  case NANOARROW_TYPE_UINT32:
+  case NANOARROW_TYPE_INT64:
+  case NANOARROW_TYPE_UINT64:
+  case NANOARROW_TYPE_HALF_FLOAT:
+  case NANOARROW_TYPE_FLOAT:
+  case NANOARROW_TYPE_DOUBLE:
+  case NANOARROW_TYPE_STRING:
+  case NANOARROW_TYPE_LARGE_STRING:
+  case NANOARROW_TYPE_BINARY:
+  case NANOARROW_TYPE_LARGE_BINARY:
+  case NANOARROW_TYPE_DATE32:
+  case NANOARROW_TYPE_TIME32:
+  case NANOARROW_TYPE_TIME64:
+  case NANOARROW_TYPE_TIMESTAMP:
+  case NANOARROW_TYPE_DURATION:
+    return true;
+  default:
+    return false;
+  }
+}
+
+double units_per_second(enum ArrowTimeUnit unit) {
+  switch (unit) {
+  case NANOARROW_TIME_UNIT_MILLI:
+    return 1e3;
+  case NANOARROW_TIME_UNIT_MICRO:
+    return 1e6;
+  case NANOARROW_TIME_UNIT_NANO:
+    return 1e9;
+  case NANOARROW_TIME_UNIT_SECOND:
+  default:
+    return 1.0;
+  }
+}
+
+void check_bind(int rc, int pos) {
+  if (rc != SQLITE_OK) {
+    throw std::runtime_error(
+      "Can't bind parameter " + std::to_string(pos) + ": " +
+      sqlite3_errstr(rc) + "."
+    );
+  }
+}
+
+}  // namespace
+
+SqliteArrowParamSource::SqliteArrowParamSource(
+  struct ArrowArrayStream* stream_,
+  const std::vector<int>& indexes_
+)
+    : indexes(indexes_), i(0) {
+  call_stream(
+    stream_,
+    [&] { return stream_->get_schema(stream_, schema.get()); },
+    "Can't read the schema of the Arrow parameters"
+  );
+
+  struct ArrowError error;
+  ArrowErrorInit(&error);
+  for (size_t k = 0; k < indexes.size(); ++k) {
+    if (indexes[k] < 0 || indexes[k] >= schema->n_children) {
+      throw std::runtime_error("Internal error: parameter index out of range");
+    }
+    const struct ArrowSchema* child = schema->children[indexes[k]];
+    struct ArrowSchemaView type;
+    check_arrow(
+      ArrowSchemaViewInit(&type, child, &error),
+      "Can't read the schema of the Arrow parameters",
+      &error
+    );
+    if (!can_bind(type.type)) {
+      char name[256];
+      ArrowSchemaToString(child, name, sizeof(name), 1);
+      throw std::runtime_error(
+        "Can't bind parameter " + std::to_string(k + 1) + " of Arrow type " +
+        name + "."
+      );
+    }
+    types.push_back(type);
+  }
+  check_arrow(
+    ArrowArrayViewInitFromSchema(view.get(), schema.get(), &error),
+    "Can't read the schema of the Arrow parameters",
+    &error
+  );
+
+  ArrowArrayStreamMove(stream_, stream.get());
+}
+
+bool SqliteArrowParamSource::bind_next_row(sqlite3_stmt* stmt) {
+  // Empty arrays bind nothing
+  while (array->release == NULL || i >= array->length) {
+    if (!next_array()) {
+      return false;
+    }
+  }
+
+  sqlite3_reset(stmt);
+  sqlite3_clear_bindings(stmt);
+
+  // A null struct row binds NULL to every placeholder,
+  // as sqlite3_clear_bindings() left them
+  if (!ArrowArrayViewIsNull(view.get(), i)) {
+    // The offset of the struct array applies to its children,
+    // whose views add only their own offsets
+    const int64_t row = view->offset + i;
+    for (size_t k = 0; k < indexes.size(); ++k) {
+      // sqlite parameters are 1-indexed
+      bind_parameter(stmt, static_cast<int>(k) + 1, row);
+    }
+  }
+
+  ++i;
+  return true;
+}
+
+// Reads the next array of the stream, or returns false at its end
+bool SqliteArrowParamSource::next_array() {
+  array.reset();
+  i = 0;
+  struct ArrowArrayStream* s = stream.get();
+  call_stream(
+    s,
+    [&] { return s->get_next(s, array.get()); },
+    "Can't read the Arrow parameters"
+  );
+  if (array->release == NULL) {
+    return false;
+  }
+
+  struct ArrowError error;
+  ArrowErrorInit(&error);
+  check_arrow(
+    ArrowArrayViewSetArray(view.get(), array.get(), &error),
+    "Invalid Arrow parameters",
+    &error
+  );
+  return true;
+}
+
+// Binds the value of `row` of the child of placeholder `pos`;
+// a null leaves the NULL of sqlite3_clear_bindings()
+void SqliteArrowParamSource::bind_parameter(
+  sqlite3_stmt* stmt,
+  int pos,
+  int64_t row
+) const {
+  const struct ArrowSchemaView& type = types[pos - 1];
+  const struct ArrowArrayView* values = view->children[indexes[pos - 1]];
+  if (type.type == NANOARROW_TYPE_NA || ArrowArrayViewIsNull(values, row)) {
+    return;
+  }
+
+  int rc = SQLITE_OK;
+  switch (type.type) {
+  case NANOARROW_TYPE_UINT64:
+    {
+      uint64_t value = ArrowArrayViewGetUIntUnsafe(values, row);
+      if (value > static_cast<uint64_t>(INT64_MAX)) {
+        throw std::runtime_error(
+          "Can't bind the value " + std::to_string(value) + " of parameter " +
+          std::to_string(pos) + " beyond the range of a signed 64-bit integer."
+        );
+      }
+      rc = sqlite3_bind_int64(stmt, pos, static_cast<sqlite3_int64>(value));
+      break;
+    }
+  case NANOARROW_TYPE_HALF_FLOAT:
+  case NANOARROW_TYPE_FLOAT:
+  case NANOARROW_TYPE_DOUBLE:
+    rc = sqlite3_bind_double(
+      stmt,
+      pos,
+      ArrowArrayViewGetDoubleUnsafe(values, row)
+    );
+    break;
+  case NANOARROW_TYPE_STRING:
+  case NANOARROW_TYPE_LARGE_STRING:
+    {
+      struct ArrowStringView text = ArrowArrayViewGetStringUnsafe(values, row);
+      // An empty value may have no data, which would bind NULL
+      rc = sqlite3_bind_text64(
+        stmt,
+        pos,
+        text.size_bytes > 0 ? text.data : "",
+        static_cast<sqlite3_uint64>(text.size_bytes),
+        SQLITE_TRANSIENT,
+        SQLITE_UTF8
+      );
+      break;
+    }
+  case NANOARROW_TYPE_BINARY:
+  case NANOARROW_TYPE_LARGE_BINARY:
+    {
+      struct ArrowBufferView bytes = ArrowArrayViewGetBytesUnsafe(values, row);
+      if (bytes.size_bytes == 0) {
+        rc = sqlite3_bind_zeroblob(stmt, pos, 0);
+      } else {
+        rc = sqlite3_bind_blob64(
+          stmt,
+          pos,
+          bytes.data.data,
+          static_cast<sqlite3_uint64>(bytes.size_bytes),
+          SQLITE_TRANSIENT
+        );
+      }
+      break;
+    }
+  case NANOARROW_TYPE_DATE32:
+    // Days since the epoch, as dbBind() binds a Date
+    rc = sqlite3_bind_double(
+      stmt,
+      pos,
+      static_cast<double>(ArrowArrayViewGetIntUnsafe(values, row))
+    );
+    break;
+  case NANOARROW_TYPE_TIME32:
+  case NANOARROW_TYPE_TIME64:
+  case NANOARROW_TYPE_TIMESTAMP:
+  case NANOARROW_TYPE_DURATION:
+    // Seconds since midnight or the epoch, or of a duration,
+    // as dbBind() binds hms, POSIXct and difftime in seconds;
+    // a timestamp is an instant, whatever its time zone
+    rc = sqlite3_bind_double(
+      stmt,
+      pos,
+      static_cast<double>(ArrowArrayViewGetIntUnsafe(values, row)) /
+        units_per_second(type.time_unit)
+    );
+    break;
+  default:
+    // Booleans and the other integers, see can_bind()
+    rc = sqlite3_bind_int64(stmt, pos, ArrowArrayViewGetIntUnsafe(values, row));
+    break;
+  }
+  check_bind(rc, pos);
 }

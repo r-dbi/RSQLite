@@ -115,6 +115,24 @@ void result_bind(DbResult* res, cpp11::list params) {
   res->bind(params);
 }
 
+// Binds the rows of `stream`, a nanoarrow_array_stream of struct arrays,
+// taking the child `indexes[k]`, 0-based, for placeholder k + 1.
+// The result takes the stream over, unless its schema can't be bound.
+// Internal for now: no DBI method calls it yet, see bind_arrow_stream() in R.
+[[cpp11::register]]
+void result_bind_arrow_stream(
+  DbResult* res,
+  SEXP stream,
+  cpp11::integers indexes
+) {
+  struct ArrowArrayStream* array_stream =
+    cpp11::safe[nanoarrow_array_stream_from_xptr](stream);
+  res->bind_arrow(
+    array_stream,
+    std::vector<int>(indexes.begin(), indexes.end())
+  );
+}
+
 [[cpp11::register]]
 bool result_has_completed(DbResult* res) {
   return res->complete();

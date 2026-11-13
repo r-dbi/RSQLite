@@ -140,6 +140,13 @@ void DbResult::bind(const cpp11::list& params) {
   });
 }
 
+void DbResult::bind_arrow(
+  struct ArrowArrayStream* stream,
+  const std::vector<int>& indexes
+) {
+  run_guarded(busy_, [&] { impl->bind_arrow(stream, indexes); });
+}
+
 cpp11::list DbResult::fetch(const int n_max) {
   cpp11::list out;
   run_guarded(busy_, [&] {

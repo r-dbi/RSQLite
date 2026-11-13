@@ -9,7 +9,7 @@
   conn,
   name,
   ...,
-  row.names = pkgconfig::get_config("RSQLite::row.names.table", FALSE),
+  row.names = FALSE,
   check.names = TRUE,
   select.cols = NULL
 )
@@ -27,11 +27,12 @@ Otherwise ignored.}
 \item{row.names}{Either \code{TRUE}, \code{FALSE}, \code{NA} or a string.
 
 If \code{TRUE}, always translate row names to a column called "row_names".
-If \code{FALSE}, never translate row names. If \code{NA}, translate
-rownames only if they're a character vector.
+If \code{FALSE}, never translate row names.
+If \code{NA}, translate rownames only if they're a character vector.
 
-A string is equivalent to \code{TRUE}, but allows you to override the
-default name.
+A string is equivalent to \code{TRUE}, but allows you to override the default name.
+
+A default set with \code{pkgconfig::set_config()} is still honored, with a deprecation warning; pass \code{row.names} explicitly instead.
 
 For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
 

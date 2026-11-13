@@ -8,7 +8,7 @@ dbExistsTable_SQLiteConnection_Id <- function(conn, name, ...) {
   table <- id$table
 
   if (!is.null(schema)) {
-    schemas <- dbGetQuery(conn, "SELECT name FROM pragma_database_list;")$name
+    schemas <- dbGetQuery(conn, "SELECT name FROM pragma_database_list;", row.names = FALSE)$name
 
     if (!(schema %in% schemas)) {
       return(FALSE)
@@ -20,7 +20,7 @@ dbExistsTable_SQLiteConnection_Id <- function(conn, name, ...) {
   dbBind(rs, list(name = tolower(table)))
   on.exit(dbClearResult(rs), add = TRUE)
 
-  nrow(dbFetch(rs, 1L)) > 0
+  nrow(dbFetch(rs, 1L, row.names = FALSE)) > 0
 }
 #' @rdname SQLiteConnection-class
 #' @export

@@ -11,15 +11,18 @@ NULL
 #' @param field.types Optional, named character vector of the types for each field in `value`
 #' @param row.names Logical.
 #'   Should row.name of `value` be exported as a `row_names` field?
-#'   Default is `TRUE`
+#'   Default is `FALSE`.
 #' @return An SQL string
 #' @keywords internal
 #' @aliases dbBuildTableDefinition
 #' @export
 sqliteBuildTableDefinition <- function(con, name, value, field.types = NULL,
-                                       row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE)) {
+                                       row.names = FALSE) {
 
   warning_once("RSQLite::sqliteBuildTableDefinition() is deprecated, please switch to DBI::sqlCreateTable().")
+  if (missing(row.names)) {
+    row.names <- row_names_default("RSQLite::row.names.query")
+  }
   row.names <- compatRowNames(row.names)
 
   if (!is.data.frame(value)) {

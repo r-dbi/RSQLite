@@ -16,6 +16,7 @@
 #' @param row.names A logical specifying whether the `row.names` should be output to the output DBMS table;
 #'   if `TRUE`, an extra field whose name will be whatever the R identifier `"row.names"` maps to the DBMS (see [DBI::make.db.names()]).
 #'   If `NA` will add rows names if they are characters, otherwise will ignore.
+#'   A default set with `pkgconfig::set_config()` is still honored, with a deprecation warning; pass `row.names` explicitly instead.
 #' @param overwrite a logical specifying whether to overwrite an existing table or not.
 #'   Its default is `FALSE`.
 #' @param append a logical specifying whether to append to an existing table in the DBMS.
@@ -43,9 +44,12 @@
 #' dbDisconnect(con)
 #' @usage NULL
 dbWriteTable_SQLiteConnection_character_data.frame <- function(conn, name, value, ...,
-                                                               row.names = pkgconfig::get_config("RSQLite::row.names.table", FALSE),
+                                                               row.names = FALSE,
                                                                overwrite = FALSE, append = FALSE,
                                                                field.types = NULL, temporary = FALSE) {
+  if (missing(row.names)) {
+    row.names <- row_names_default("RSQLite::row.names.table")
+  }
   row.names <- compatRowNames(row.names)
 
   if ((!is.logical(row.names) && !is.character(row.names)) || length(row.names) != 1L) {

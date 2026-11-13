@@ -132,7 +132,7 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
     cpp11::stop(
       "Query requires %i params; %i supplied.",
       cache.nparams_,
-      params.size()
+      static_cast<int>(params.size())
     );
   }
 

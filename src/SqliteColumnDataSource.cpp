@@ -85,6 +85,9 @@ SEXP SqliteColumnDataSource::fetch_string() const {
 }
 
 SEXP SqliteColumnDataSource::fetch_blob() const {
+  // Keep sqlite3_column_bytes() before sqlite3_column_blob():
+  // the out-of-memory check below relies on the size
+  // being read before sqlite3_column_blob() tries to expand the value.
   int size = sqlite3_column_bytes(get_stmt(), get_j());
   const void* blob = sqlite3_column_blob(get_stmt(), get_j());
 

@@ -83,6 +83,33 @@ void DbColumn::warn_type_conflicts(const cpp11::r_string& name) const {
   cpp11::warning("%s", ss.str().c_str());
 }
 
+// The name is taken as the UTF-8 bytes from sqlite3_column_name(),
+// so that nothing is allocated unless there is something to warn about
+void DbColumn::warn_invalid_strings(const std::string& name) const {
+  // A peek with dbFetch(n = 0) or dbColumnInfo() reads a row without
+  // returning it: the fetch that returns the row warns about it
+  if (n == 0) {
+    return;
+  }
+
+  const int64_t n_invalid = source->get_n_invalid_strings();
+  if (n_invalid == 0) {
+    return;
+  }
+
+  std::stringstream ss;
+  ss << "Column `" << name << "`: ";
+  if (n_invalid == 1) {
+    ss << "1 value is not valid UTF-8 or contains a NUL byte";
+  } else {
+    ss << n_invalid << " values are not valid UTF-8 or contain NUL bytes";
+  }
+  ss << ", NA is returned";
+
+  // The message is an argument, not a format
+  cpp11::warning("%s", ss.str().c_str());
+}
+
 DbColumn::operator SEXP() const {
   DATA_TYPE dt = get_last_storage()->get_data_type();
   SEXP ret = PROTECT(DbColumnStorage::allocate(n, dt));

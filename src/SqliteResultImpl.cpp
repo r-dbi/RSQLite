@@ -49,6 +49,7 @@ SqliteResultImpl::SqliteResultImpl(
       groups_(0),
       types_(get_initial_field_types(cache.ncols_)),
       with_alt_types_(conn_->with_alt_types()),
+      check_utf8_(conn_->check_utf8()),
       error_kept_(false),
       kept_error_completes_(false),
       kept_error_code_(SQLITE_OK) {
@@ -372,7 +373,8 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
     raise_kept_error();
   }
 
-  SqliteDataFrame data(stmt, cache.names_, n_max, types_, with_alt_types_);
+  SqliteDataFrame
+    data(stmt, cache.names_, n_max, types_, with_alt_types_, check_utf8_);
 
   if (complete_ && data.get_ncols() == 0) {
     Rf_warning(
@@ -453,7 +455,8 @@ bool SqliteResultImpl::step_done() {
 }
 
 cpp11::list SqliteResultImpl::peek_first_row() {
-  SqliteDataFrame data(stmt, cache.names_, 1, types_, with_alt_types_);
+  SqliteDataFrame
+    data(stmt, cache.names_, 1, types_, with_alt_types_, check_utf8_);
 
   // After a failed step, the statement is on no row:
   // the kept error is left for the next fetch that reads rows

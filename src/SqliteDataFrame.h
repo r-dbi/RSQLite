@@ -11,7 +11,8 @@ public:
     std::vector<std::string> names,
     const int n_max_,
     const std::vector<DATA_TYPE>& types,
-    bool with_alt_types
+    bool with_alt_types,
+    bool check_utf8
   );
   virtual ~SqliteDataFrame();
 };

@@ -6,9 +6,13 @@ DbConnection::DbConnection(
   const bool allow_ext,
   const int flags,
   const std::string& vfs,
-  bool with_alt_types
+  bool with_alt_types,
+  bool check_utf8
 )
-    : pConn_(NULL), with_alt_types_(with_alt_types), busy_callback_(NULL) {
+    : pConn_(NULL),
+      with_alt_types_(with_alt_types),
+      check_utf8_(check_utf8),
+      busy_callback_(NULL) {
   // Get the underlying database connection
   // Always ensure URI filenames are enabled so that parameters like vfs= and
   // immutable= work.
@@ -89,6 +93,10 @@ void DbConnection::disconnect() {
 
 bool DbConnection::with_alt_types() const {
   return with_alt_types_;
+}
+
+bool DbConnection::check_utf8() const {
+  return check_utf8_;
 }
 
 void DbConnection::set_busy_handler(SEXP r_callback) {

@@ -6,10 +6,10 @@
 #include <R_ext/Visibility.h>
 
 // connection.cpp
-cpp11::external_pointer<DbConnectionPtr> connection_connect(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs, bool with_alt_types);
-extern "C" SEXP _RSQLite_connection_connect(SEXP path, SEXP allow_ext, SEXP flags, SEXP vfs, SEXP with_alt_types) {
+cpp11::external_pointer<DbConnectionPtr> connection_connect(const std::string& path, const bool allow_ext, const int flags, const std::string& vfs, bool with_alt_types, bool check_utf8);
+extern "C" SEXP _RSQLite_connection_connect(SEXP path, SEXP allow_ext, SEXP flags, SEXP vfs, SEXP with_alt_types, SEXP check_utf8) {
   BEGIN_CPP11
-    return cpp11::as_sexp(connection_connect(cpp11::as_cpp<cpp11::decay_t<const std::string&>>(path), cpp11::as_cpp<cpp11::decay_t<const bool>>(allow_ext), cpp11::as_cpp<cpp11::decay_t<const int>>(flags), cpp11::as_cpp<cpp11::decay_t<const std::string&>>(vfs), cpp11::as_cpp<cpp11::decay_t<bool>>(with_alt_types)));
+    return cpp11::as_sexp(connection_connect(cpp11::as_cpp<cpp11::decay_t<const std::string&>>(path), cpp11::as_cpp<cpp11::decay_t<const bool>>(allow_ext), cpp11::as_cpp<cpp11::decay_t<const int>>(flags), cpp11::as_cpp<cpp11::decay_t<const std::string&>>(vfs), cpp11::as_cpp<cpp11::decay_t<bool>>(with_alt_types), cpp11::as_cpp<cpp11::decay_t<bool>>(check_utf8)));
   END_CPP11
 }
 // connection.cpp
@@ -188,10 +188,17 @@ extern "C" SEXP _RSQLite_rsqliteVersion() {
     return cpp11::as_sexp(rsqliteVersion());
   END_CPP11
 }
+// utf8.cpp
+cpp11::logicals utf8_valid(cpp11::list x);
+extern "C" SEXP _RSQLite_utf8_valid(SEXP x) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(utf8_valid(cpp11::as_cpp<cpp11::decay_t<cpp11::list>>(x)));
+  END_CPP11
+}
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
-    {"_RSQLite_connection_connect",           (DL_FUNC) &_RSQLite_connection_connect,           5},
+    {"_RSQLite_connection_connect",           (DL_FUNC) &_RSQLite_connection_connect,           6},
     {"_RSQLite_connection_copy_database",     (DL_FUNC) &_RSQLite_connection_copy_database,     2},
     {"_RSQLite_connection_import_file",       (DL_FUNC) &_RSQLite_connection_import_file,       6},
     {"_RSQLite_connection_in_transaction",    (DL_FUNC) &_RSQLite_connection_in_transaction,    1},
@@ -216,6 +223,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_sqlite_has_http_vfs",          (DL_FUNC) &_RSQLite_sqlite_has_http_vfs,          0},
     {"_RSQLite_sqlite_http_stats",            (DL_FUNC) &_RSQLite_sqlite_http_stats,            0},
     {"_RSQLite_sqlite_httpvfs_compiled",      (DL_FUNC) &_RSQLite_sqlite_httpvfs_compiled,      0},
+    {"_RSQLite_utf8_valid",                   (DL_FUNC) &_RSQLite_utf8_valid,                   1},
     {NULL, NULL, 0}
 };
 }

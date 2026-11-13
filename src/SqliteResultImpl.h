@@ -38,6 +38,7 @@ private:
   int group_, groups_;
   std::vector<DATA_TYPE> types_;
   bool with_alt_types_;
+  bool check_utf8_;
   // The error of the step past the last row of a full fetch,
   // kept for the next fetch with SQLite's result code: see read_ahead()
   bool error_kept_;

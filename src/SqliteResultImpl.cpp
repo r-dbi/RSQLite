@@ -147,6 +147,7 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
   // Until the first row is bound, the result counts as unbound,
   // so that a failed bind doesn't leave the previous binding's state behind.
   ready_ = false;
+  complete_ = true;
   nrows_ = 0;
 
   bool has_params = bind_row();

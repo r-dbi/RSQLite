@@ -93,9 +93,50 @@ test_that("a failed dbBind() leaves a fetched result unbound", {
   expect_equal(dbGetRowCount(res), 1L)
 
   expect_error(dbBind(res, list(strrep("a", 31))), "too big")
+  expect_true(dbHasCompleted(res))
+  expect_true(is.na(dbGetRowsAffected(res)))
   expect_error(dbFetch(res), "needs to be bound")
   expect_equal(dbGetRowCount(res), 0L)
 
   dbBind(res, list("again"))
   expect_identical(dbFetch(res)$x, "again")
+})
+
+test_that("a failed dbBind() leaves a statement unbound", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+  dbExecute(con, "CREATE TABLE t (x TEXT)")
+  connection_limit_length(con@ptr, 30L)
+
+  res <- dbSendStatement(con, "INSERT INTO t VALUES (?)")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  dbBind(res, list(c("a", "b")))
+  expect_equal(dbGetRowsAffected(res), 2L)
+
+  expect_error(dbBind(res, list(strrep("a", 31))), "too big")
+  expect_true(dbHasCompleted(res))
+  expect_true(is.na(dbGetRowsAffected(res)))
+
+  dbBind(res, list("c"))
+  expect_equal(dbGetRowsAffected(res), 1L)
+})
+
+test_that("an unsupported parameter type leaves a completed, unbound result", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  res <- dbSendQuery(con, "SELECT ? AS x")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  dbBind(res, list(c("a", "b")))
+  expect_identical(dbFetch(res, 1)$x, "a")
+  expect_false(dbHasCompleted(res))
+
+  expect_error(dbBind(res, list(list(1))), "raw vectors")
+  expect_true(dbHasCompleted(res))
+  expect_error(dbFetch(res), "needs to be bound")
+
+  dbBind(res, list("c"))
+  expect_identical(dbFetch(res)$x, "c")
 })

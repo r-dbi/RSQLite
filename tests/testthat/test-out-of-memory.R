@@ -33,6 +33,45 @@ test_that("dbFetch() raises out of memory for a date it cannot convert", {
   )
 })
 
+test_that("a fetch after out of memory does not blame an empty blob", {
+  skip_on_cran()
+
+  for (check_utf8 in c(FALSE, TRUE)) {
+    local({
+      con <- dbConnect(SQLite(), ":memory:", check_utf8 = check_utf8)
+      on.exit(dbDisconnect(con))
+      dbExecute(con, "PRAGMA encoding = 'UTF-16le'")
+      dbExecute(con, "CREATE TABLE t (b TEXT, s TEXT)")
+      dbExecute(
+        con,
+        "INSERT INTO t VALUES ('a', 'a'), (X'', ?)",
+        params = list(strrep("x", 4e6))
+      )
+      res <- dbSendQuery(con, "SELECT b, s FROM t")
+      on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+      expect_identical(dbFetch(res, n = 1)$b, "a")
+
+      local({
+        local_sqlite_heap_limit(16e6)
+        expect_error(
+          suppressWarnings(dbFetch(res, n = 1)),
+          "Cannot read column 2: out of memory",
+          fixed = TRUE,
+          info = paste("check_utf8 =", check_utf8)
+        )
+      })
+
+      # The same row is read again, with SQLITE_NOMEM still on the connection
+      err <- expect_error(suppressWarnings(dbFetch(res, n = 1)))
+      expect_identical(
+        conditionMessage(err),
+        "out of memory",
+        info = paste("check_utf8 =", check_utf8)
+      )
+    })
+  }
+})
+
 test_that("the large text value reads in full without a heap limit", {
   con <- local_utf16_large_text_con(check_utf8 = TRUE)
 

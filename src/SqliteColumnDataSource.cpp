@@ -99,8 +99,7 @@ const char* SqliteColumnDataSource::fetch_text() const {
   const char* const text =
     reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
   check_out_of_memory(text);
-  // Without SQLITE_NOMEM, NULL means a NULL value or an empty blob:
-  // read it as an empty string.
+  // NULL for a NULL value: read it as an empty string.
   return text == NULL ? "" : text;
 }
 
@@ -108,7 +107,10 @@ void SqliteColumnDataSource::check_out_of_memory(const void* data) const {
   // sqlite3_column_text() and sqlite3_column_blob() return NULL
   // for a NULL value, for an empty blob, and when SQLite runs out of memory.
   // Only the last sets SQLITE_NOMEM, as the SQLite documentation describes.
-  if (data != NULL) {
+  // The code may also be left over from an out-of-memory error
+  // on an earlier read of the same row,
+  // so callers rule out an empty blob first, and a NULL value is checked here.
+  if (data != NULL || get_column_type() == SQLITE_NULL) {
     return;
   }
   sqlite3* conn = sqlite3_db_handle(get_stmt());
@@ -124,12 +126,16 @@ SEXP SqliteColumnDataSource::fetch_checked_string(const int field_type) const {
   const void* data;
   if (field_type == SQLITE_BLOB) {
     data = sqlite3_column_blob(get_stmt(), get_j());
+    // An empty blob comes back as NULL,
+    // and reading the size of a blob allocates nothing.
+    if (data == NULL && sqlite3_column_bytes(get_stmt(), get_j()) == 0) {
+      return R_BlankString;
+    }
   } else {
     data = sqlite3_column_text(get_stmt(), get_j());
   }
   check_out_of_memory(data);
   if (data == NULL) {
-    // An empty blob
     return R_BlankString;
   }
 

@@ -23,10 +23,9 @@ bool is_ascii_space(char c) {
 
 // Splits a trailing UTC offset off a time or timestamp,
 // in the forms SQLite's date and time functions accept:
-// `Z`, or a sign, two digits for hours up to 14, a colon and two digits for minutes,
-// optionally surrounded by whitespace.
-// Returns the text before the offset,
-// and stores whether there is one and its value in seconds east of UTC.
+// `Z`, or a sign, two digits for hours up to 14, a colon and two digits for
+// minutes, optionally surrounded by whitespace. Returns the text before the
+// offset, and stores whether there is one and its value in seconds east of UTC.
 // Anything else after the time that starts with a sign or `Z` throws,
 // because boost would read it as part of the time.
 std::string split_utc_offset(
@@ -80,7 +79,7 @@ std::string split_utc_offset(
   return text.substr(0, value_end);
 }
 
-} // namespace
+}  // namespace
 
 SqliteColumnDataSource::SqliteColumnDataSource(
   sqlite3_stmt* stmt_,

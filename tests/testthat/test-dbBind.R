@@ -79,3 +79,23 @@ test_that("dbExecute() refuses a value over the length limit", {
   )
   expect_identical(dbGetQuery(con, "SELECT COUNT(*) AS n FROM t")$n, 0L)
 })
+
+test_that("a failed dbBind() leaves a fetched result unbound", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+  connection_limit_length(con@ptr, 30L)
+
+  res <- dbSendQuery(con, "SELECT ? AS x")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  dbBind(res, list("ok"))
+  expect_identical(dbFetch(res)$x, "ok")
+  expect_equal(dbGetRowCount(res), 1L)
+
+  expect_error(dbBind(res, list(strrep("a", 31))), "too big")
+  expect_error(dbFetch(res), "needs to be bound")
+  expect_equal(dbGetRowCount(res), 0L)
+
+  dbBind(res, list("again"))
+  expect_identical(dbFetch(res)$x, "again")
+})

@@ -144,6 +144,11 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
 
   total_changes_start_ = sqlite3_total_changes(conn);
 
+  // Until the first row is bound, the result counts as unbound,
+  // so that a failed bind doesn't leave the previous binding's state behind.
+  ready_ = false;
+  nrows_ = 0;
+
   bool has_params = bind_row();
   after_bind(has_params);
 }

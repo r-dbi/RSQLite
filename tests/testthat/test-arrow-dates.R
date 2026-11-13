@@ -42,8 +42,10 @@ test_that("numbers are days or seconds since 1970, as dbFetch() reads them", {
     # Julian days are a count of days or seconds since 1970 for both paths
     "(4, julianday('2024-01-02'), 86399.9999996, julianday('2024-01-02')),",
     "(5, NULL, 0.0000004, -0.0000016),",
-    "(6, NULL, 0.0000025, 5000000000.000001),",
-    "(7, NULL, 0.0000035, -5000000000.000001)"
+    "(6, NULL, 0.0078125, 5000000000.000001),",
+    "(7, NULL, 0.0234375, -5000000000.000001),",
+    "(8, NULL, NULL, 1759618878.0778434), (9, NULL, NULL, 1743364568.3662386),",
+    "(10, NULL, NULL, 1722323896.4607015)"
   ))
 
   sql <- "SELECT d, tm, ts FROM t WHERE id < 5 ORDER BY id"
@@ -53,17 +55,20 @@ test_that("numbers are days or seconds since 1970, as dbFetch() reads them", {
     unclass(arrow_values(chunks[[1]])$d),
     c(19724, 19724, 0, 2460311)
   )
-  # Seconds are rounded to the nearest microsecond, where dbFetch() keeps
-  # what the double holds: halves to even, an odd count between 2^52 and 2^53
-  # as it is, and a time before midnight to the last microsecond of the day
+  # Seconds are rounded to the microsecond nearest to what the double holds,
+  # which dbFetch() keeps, as CPython's datetime.fromtimestamp() rounds them:
+  # exact halves (7812.5 and 23437.5) to even, an odd count between 2^52 and
+  # 2^53 as it is, present-day timestamps that the seconds times 1e6 would
+  # round one off, and a time before midnight to its last microsecond
   chunk <- fetch_arrow_all(con, "SELECT tm, ts FROM t ORDER BY id")
-  expect_identical(
-    arrow_micros(chunk, "tm"),
-    c("45296000000", "45296500000", "100000", "86399999999", "0", "2", "4")
-  )
+  expect_identical(arrow_micros(chunk, "tm"), c(
+    "45296000000", "45296500000", "100000", "86399999999", "0", "7812",
+    "23438", NA, NA, NA
+  ))
   expect_identical(arrow_micros(chunk, "ts"), c(
     "1704198896000000", "1704198896250000", "-100000", "2460311500000", "-2",
-    "5000000000000001", "-5000000000000001"
+    "5000000000000001", "-5000000000000001", "1759618878077843",
+    "1743364568366239", "1722323896460701"
   ))
 })
 
@@ -159,7 +164,10 @@ test_that("values beyond the range of the Arrow type are NULL", {
     "(3, 2147483648, 86400, 9223372036855),",
     "(4, -2147483649, -1, -9223372036855),",
     "(5, 1e10, '24:00:00', 1e300), (6, 9e999, '-00:00:01', -9e999),",
-    "(7, -9e999, '23:59:59.9999999', 1e19)"
+    "(7, -9e999, '23:59:59.9999999', 1e19),",
+    # The double nearest to -2^63 microseconds, and the next one down
+    "(8, NULL, NULL, -9223372036854.775808),",
+    "(9, NULL, NULL, -9223372036854.777344)"
   ))
   chunk <- fetch_arrow_all(
     con,
@@ -169,24 +177,25 @@ test_that("values beyond the range of the Arrow type are NULL", {
 
   expect_identical(
     unclass(nanoarrow::convert_array(chunk$children$d)),
-    c(2147483647, -2147483648, NA, NA, NA, NA, NA)
+    c(2147483647, -2147483648, NA, NA, NA, NA, NA, NA, NA)
   )
   # time64 holds a time of day
   expect_identical(
     arrow_micros(chunk, "tm"),
-    c("0", "86399999999", NA, NA, NA, NA, "86399999999")
+    c("0", "86399999999", NA, NA, NA, NA, "86399999999", NA, NA)
   )
-  expect_identical(
-    arrow_micros(chunk, "ts"),
-    c("9223372036854000000", "-9223372036854000000", NA, NA, NA, NA, NA)
-  )
+  # Never the smallest int64, which bit64 reads as NA
+  expect_identical(arrow_micros(chunk, "ts"), c(
+    "9223372036854000000", "-9223372036854000000", NA, NA, NA, NA, NA,
+    "-9223372036854775391", NA
+  ))
 
   # dbFetch() keeps any duration, and wraps a count of days beyond 32 bits,
   # also of a real, which SQLite saturates at 64 bits first
   expected <- dbGetQuery(con, "SELECT d, tm FROM t ORDER BY id")
   expect_equal(
     as.numeric(expected$tm),
-    c(0, 86399.9999996, 86400, -1, 86400, -1, 86399.999999)
+    c(0, 86399.9999996, 86400, -1, 86400, -1, 86399.999999, NA, NA)
   )
   expect_identical(
     unclass(expected$d)[3:7],

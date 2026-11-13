@@ -104,6 +104,14 @@ result_set_arrow_max_bytes <- function(res, max_bytes) {
   invisible(.Call(`_RSQLite_result_set_arrow_max_bytes`, res, max_bytes))
 }
 
+result_set_rows_fetched <- function(res, n) {
+  invisible(.Call(`_RSQLite_result_set_rows_fetched`, res, n))
+}
+
+result_set_rows_affected <- function(res, n) {
+  invisible(.Call(`_RSQLite_result_set_rows_affected`, res, n))
+}
+
 rsqliteVersion <- function() {
   .Call(`_RSQLite_rsqliteVersion`)
 }

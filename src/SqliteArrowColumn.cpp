@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "SqliteArrowColumn.h"
+#include "SqliteColumnDataSource.h"
 #include "affinity.h"
 #include "utf8.h"
 #include <cmath>
@@ -10,14 +11,36 @@
 SqliteArrowColumn::SqliteArrowColumn(
   sqlite3_stmt* stmt_,
   const int j_,
-  const std::string& name_
+  const std::string& name_,
+  bool with_alt_types
 )
     : stmt(stmt_),
       j(j_),
       name(name_),
       kind(AK_UNDECIDED),
       frozen(false),
-      pending_nulls(0) {}
+      pending_nulls(0) {
+  if (!with_alt_types) {
+    return;
+  }
+  // The declared types that the data frame path reads as dates and times
+  switch (SqliteColumnDataSource::datatype_from_decltype(
+    sqlite3_column_decltype(stmt, j),
+    true
+  )) {
+  case DT_DATE:
+    kind = AK_DATE32;
+    break;
+  case DT_TIME:
+    kind = AK_TIME64;
+    break;
+  case DT_DATETIME:
+    kind = AK_TIMESTAMP;
+    break;
+  default:
+    break;
+  }
+}
 
 bool SqliteArrowColumn::decided() const {
   return kind != AK_UNDECIDED;
@@ -54,12 +77,33 @@ void SqliteArrowColumn::set_schema(struct ArrowSchema* schema) const {
   case AK_BINARY:
     type = NANOARROW_TYPE_BINARY;
     break;
+  case AK_DATE32:
+    type = NANOARROW_TYPE_DATE32;
+    break;
+  case AK_TIME64:
+    type = NANOARROW_TYPE_TIME64;
+    break;
+  case AK_TIMESTAMP:
+    type = NANOARROW_TYPE_TIMESTAMP;
+    break;
   case AK_UNDECIDED:
   default:
     throw std::runtime_error("Internal error: Arrow type not decided");
   }
 
-  check_arrow(ArrowSchemaSetType(schema, type), "Can't set Arrow type");
+  if (kind == AK_TIME64 || kind == AK_TIMESTAMP) {
+    check_arrow(
+      ArrowSchemaSetTypeDateTime(
+        schema,
+        type,
+        NANOARROW_TIME_UNIT_MICRO,
+        (kind == AK_TIMESTAMP) ? "UTC" : NULL
+      ),
+      "Can't set Arrow type"
+    );
+  } else {
+    check_arrow(ArrowSchemaSetType(schema, type), "Can't set Arrow type");
+  }
   check_arrow(ArrowSchemaSetName(schema, name.c_str()), "Can't set Arrow name");
 }
 
@@ -184,9 +228,11 @@ void SqliteArrowColumn::init_array() {
 // Text and blobs in an int64 column that a real widens later in the same chunk
 // take the readings as reals that they would have in a double column.
 // Once the type is fixed, a real in an int64 column is truncated toward zero.
+// Dates, times and timestamps are read as append_date() and append_time() say.
 // NULL takes the place of
 // text or a blob in a utf8 column that isn't valid UTF-8 or holds a NUL byte,
 // an integer that SQLite would saturate in an int64 column,
+// a date or time that can't be parsed or is beyond the range of its type,
 // and any value in a column of the null type.
 void SqliteArrowColumn::append_value(int column_type) {
   switch (kind) {
@@ -221,6 +267,15 @@ void SqliteArrowColumn::append_value(int column_type) {
       ArrowArrayAppendBytes(array.get(), value_bytes(column_type)),
       "Can't append to Arrow array"
     );
+    break;
+
+  case AK_DATE32:
+    append_date(column_type);
+    break;
+
+  case AK_TIME64:
+  case AK_TIMESTAMP:
+    append_time(column_type);
     break;
 
   case AK_NA:
@@ -395,6 +450,105 @@ double SqliteArrowColumn::text_real(int column_type) const {
     stop_out_of_memory();
   }
   return real;
+}
+
+// The days since 1970-01-01, as the data frame path reads a date:
+// text as SqliteColumnDataSource::parse_date() parses it,
+// and a number as a count of days, truncated toward zero.
+// The data frame path reads that count in 32 bits, which wraps beyond them,
+// so here it is read in full and NULL beyond the range of date32.
+// A blob is NULL, as the data frame path doesn't convert it.
+void SqliteArrowColumn::append_date(int column_type) {
+  int64_t days = 0;
+  bool ok = false;
+  if (column_type == SQLITE_INTEGER) {
+    days = sqlite3_column_int64(stmt, j);
+    ok = days >= INT32_MIN && days <= INT32_MAX;
+  } else if (column_type == SQLITE_FLOAT) {
+    const double real = std::trunc(sqlite3_column_double(stmt, j));
+    // False for an infinity
+    ok = real >= INT32_MIN && real <= INT32_MAX;
+    if (ok) {
+      days = static_cast<int64_t>(real);
+    }
+  } else if (column_type == SQLITE_TEXT) {
+    // The years 1400 to 9999, well within date32
+    ok = SqliteColumnDataSource::parse_date(value_text(), days);
+  }
+
+  if (!ok) {
+    append_null();
+    return;
+  }
+  check_arrow(
+    ArrowArrayAppendInt(array.get(), days),
+    "Can't append to Arrow array"
+  );
+}
+
+// The microseconds of a time since midnight, or of a timestamp since
+// 1970-01-01 00:00:00 UTC, as the data frame path reads their seconds:
+// text as SqliteColumnDataSource::parse_time() or parse_datetime_local()
+// parses it, and a number as seconds, rounded to the nearest microsecond.
+// A blob is NULL, as the data frame path doesn't convert it,
+// and so is a number beyond the range of int64 microseconds,
+// and a time outside the day that time64 holds,
+// which the data frame path keeps as a duration.
+void SqliteArrowColumn::append_time(int column_type) {
+  static const int64_t day = INT64_C(86400000000);
+
+  int64_t micros = 0;
+  bool ok = false;
+  if (column_type == SQLITE_INTEGER) {
+    const int64_t seconds = sqlite3_column_int64(stmt, j);
+    ok = seconds >= -INT64_MAX / 1000000 && seconds <= INT64_MAX / 1000000;
+    if (ok) {
+      micros = seconds * 1000000;
+    }
+  } else if (column_type == SQLITE_FLOAT) {
+    const double seconds = sqlite3_column_double(stmt, j);
+    // The whole seconds and their fraction, both exact,
+    // and the fraction rounded to the nearest microsecond,
+    // halves to even in the default rounding mode, as CPython does it.
+    // Rounding the seconds times 1e6 would round twice, to a double first,
+    // and miss the nearest microsecond of one present-day timestamp in eight.
+    double whole;
+    const double fraction = std::modf(seconds, &whole);
+    // False for an infinity, whose cast would be undefined
+    ok = whole >= -INT64_MAX / 1000000 && whole <= INT64_MAX / 1000000;
+    if (ok) {
+      const int64_t base = static_cast<int64_t>(whole) * 1000000;
+      // At most a second, with the sign of the seconds
+      const int64_t part = static_cast<int64_t>(std::nearbyint(fraction * 1e6));
+      // Within the int64 microseconds but their smallest value,
+      // which bit64 reads as NA, as for an integer
+      ok = (part >= 0) ? base <= INT64_MAX - part : base >= -INT64_MAX - part;
+      if (ok) {
+        micros = base + part;
+      }
+    }
+    // Rounding a time before midnight stops at the last microsecond of the day
+    if (kind == AK_TIME64 && micros == day && seconds < 86400) {
+      micros = day - 1;
+    }
+  } else if (column_type == SQLITE_TEXT) {
+    const char* text = value_text();
+    ok = (kind == AK_TIMESTAMP)
+           ? SqliteColumnDataSource::parse_datetime_local(text, micros)
+           : SqliteColumnDataSource::parse_time(text, micros);
+  }
+
+  if (kind == AK_TIME64) {
+    ok = ok && micros >= 0 && micros < day;
+  }
+  if (!ok) {
+    append_null();
+    return;
+  }
+  check_arrow(
+    ArrowArrayAppendInt(array.get(), micros),
+    "Can't append to Arrow array"
+  );
 }
 
 void SqliteArrowColumn::append_null() {

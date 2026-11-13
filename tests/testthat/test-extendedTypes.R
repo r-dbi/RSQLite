@@ -145,3 +145,84 @@ test_that("roundtrip extended_types with dbWriteTable", {
     lapply(dates_times, class)
   )
 })
+
+test_that("dates, times and timestamps keep their exact values and warnings", {
+  con <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, paste(
+    "CREATE TABLE t",
+    "(i INTEGER, d DATE, tm TIME, ts TIMESTAMP, dt DATETIME)"
+  ))
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES",
+    "(1, '2024-01-02', '12:34:56.123456789', '2024-01-02 12:34:56.5',",
+    "'1900-01-01 00:00:00'),",
+    "(2, -1.9, -0.25, 1704198896.25, 4102444800),",
+    "(3, 19725, '-01:30:00', -1, -2208988800.5),",
+    "(4, x'07', 'x', 'not a timestamp', x'08'),",
+    "(5, NULL, NULL, NULL, NULL),",
+    "(6, 'not a date', x'09', '2024-01-02', '9999-12-31 23:59:59'),",
+    "(7, '1400-01-01 12:00:00', '25:00:00.000001',",
+    "'2024-01-02 12:00:00-02:00', ''),",
+    "(8, NULL, '23:59:59.999999', '2024-01-02 12:34:56.999999', NULL)"
+  ))
+
+  warnings <- character()
+  df <- withCallingHandlers(
+    dbGetQuery(con, "SELECT d, tm, ts, dt FROM t ORDER BY i"),
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+
+  # Parsed text is a number of days, or of microseconds times 1e-6,
+  # which differs from microseconds divided by 1e6 in row 8
+  expect_identical(
+    unclass(df$d),
+    c(19724, -1, 19725, NA, NA, NA, -208188, NA)
+  )
+  expect_identical(as.numeric(df$tm), c(
+    45296123456 * 1e-6, -0.25, -5400000000 * 1e-6, NA, NA, NA,
+    90000000001 * 1e-6, 86399999999 * 1e-6
+  ))
+  # A negative offset reads as a fraction of a second
+  expect_identical(as.numeric(df$ts), c(
+    1704198896500000 * 1e-6, 1704198896.25, -1, NA, NA, NA,
+    1704196800020000 * 1e-6, 1704198896999999 * 1e-6
+  ))
+  expect_identical(as.numeric(df$dt), c(
+    -2208988800000000 * 1e-6, 4102444800, -2208988800.5, NA, NA,
+    253402300799000000 * 1e-6, NA, NA
+  ))
+  expect_identical(attr(df$ts, "tzone"), "UTC")
+
+  # One warning per value, row by row
+  unknown <- "Unknown string format, NA is returned."
+  blob <- "Cannot convert blob, NA is returned."
+  expect_identical(
+    warnings,
+    c(blob, unknown, unknown, blob, unknown, blob, unknown, unknown)
+  )
+})
+
+test_that("a date that can't be parsed fails a fetch if warnings are errors", {
+  con <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, "CREATE TABLE t (d DATE)")
+  dbExecute(con, paste(
+    "INSERT INTO t VALUES ('2024-01-02'), ('oops'), ('2024-01-03')"
+  ))
+
+  res <- dbSendQuery(con, "SELECT d FROM t")
+  on.exit(dbClearResult(res), add = TRUE, after = FALSE)
+
+  withr::with_options(
+    list(warn = 2),
+    expect_error(dbFetch(res), "Unknown string format")
+  )
+  expect_true(dbHasCompleted(res))
+  expect_equal(dbGetRowCount(res), 0L)
+})

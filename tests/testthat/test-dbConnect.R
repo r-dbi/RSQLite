@@ -86,6 +86,211 @@ test_that("can connect to same db from multiple connections", {
   expect_equal(dbReadTable(con2, "airquality"), airquality)
 })
 
+test_that("a cloned connection keeps `bigint` and `extended_types`", {
+  dbfile <- tempfile()
+  con <- dbConnect(SQLite(), dbfile, bigint = "character", extended_types = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+  clone <- dbConnect(con)
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+
+  expect_identical(clone@bigint, "character")
+  expect_true(clone@extended_types)
+
+  dbExecute(con, "CREATE TABLE t (d DATE, big INTEGER)")
+  dbExecute(con, "INSERT INTO t VALUES ('2020-01-02', 1099511627776)")
+  expect_identical(
+    dbReadTable(clone, "t"),
+    data.frame(d = as.Date("2020-01-02"), big = "1099511627776", stringsAsFactors = FALSE)
+  )
+  expect_identical(dbDataType(clone, Sys.Date()), "DATE")
+})
+
+test_that("a cloned connection keeps `check_utf8` unless overridden", {
+  con <- dbConnect(SQLite(), tempfile(), check_utf8 = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  clone <- dbConnect(con)
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+  expect_true(clone@check_utf8)
+
+  dbExecute(con, "CREATE TABLE t (x TEXT)")
+  dbExecute(con, "INSERT INTO t VALUES (CAST(X'61FF62' AS TEXT))")
+  expect_warning(res <- dbGetQuery(clone, "SELECT x FROM t"))
+  expect_identical(res$x, NA_character_)
+
+  clone2 <- dbConnect(con, check_utf8 = FALSE)
+  on.exit(dbDisconnect(clone2), add = TRUE, after = FALSE)
+  expect_false(clone2@check_utf8)
+  expect_no_warning(dbGetQuery(clone2, "SELECT x FROM t"))
+})
+
+test_that("a cloned connection has the defaults of a fresh one", {
+  dbfile <- tempfile()
+  con <- dbConnect(SQLite(), dbfile)
+  on.exit(dbDisconnect(con), add = TRUE)
+  clone <- dbConnect(con)
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+
+  expect_identical(clone@bigint, "integer64")
+  expect_false(clone@extended_types)
+  expect_false(clone@check_utf8)
+})
+
+test_that("arguments to `dbConnect()` on a connection override the original", {
+  con <- dbConnect(SQLite(), tempfile(), bigint = "character", extended_types = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  clone <- dbConnect(con, bigint = "integer64")
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+  expect_identical(clone@bigint, "integer64")
+  expect_true(clone@extended_types)
+
+  clone2 <- dbConnect(con, extended_types = FALSE)
+  on.exit(dbDisconnect(clone2), add = TRUE, after = FALSE)
+  expect_identical(clone2@bigint, "character")
+  expect_false(clone2@extended_types)
+})
+
+test_that("a second argument to `dbConnect()` on a connection is the database", {
+  other <- tempfile()
+  con <- dbConnect(SQLite(), tempfile(), bigint = "character")
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  clone <- dbConnect(con, other)
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+  expect_identical(clone@dbname, normalizePath(other, mustWork = FALSE))
+  expect_identical(clone@bigint, "character")
+})
+
+test_that("a temporary database can be cloned into another database", {
+  other <- tempfile()
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  clone <- dbConnect(con, dbname = other)
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+  expect_identical(clone@dbname, normalizePath(other, mustWork = FALSE))
+})
+
+test_that("`NULL` arguments to `dbConnect()` on a connection are kept", {
+  path <- tempfile()
+  con <- dbConnect(SQLite(), path)
+  on.exit(dbDisconnect(con), add = TRUE)
+  fresh <- dbConnect(SQLite(), path, synchronous = NULL)
+  on.exit(dbDisconnect(fresh), add = TRUE, after = FALSE)
+  clone <- dbConnect(con, synchronous = NULL)
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+
+  expect_identical(
+    dbGetQuery(clone, "PRAGMA synchronous")[[1]],
+    dbGetQuery(fresh, "PRAGMA synchronous")[[1]]
+  )
+
+  expect_error(dbConnect(con, dbname = NULL), "length(dbname) == 1 is not TRUE", fixed = TRUE)
+})
+
+test_that("a misspelled `dbname` does not clone a temporary database", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+  expect_error(dbConnect(con, dbnames = tempfile()), "Can't clone a temporary database")
+})
+
+test_that("a temporary database can't be cloned", {
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con), add = TRUE)
+  expect_error(dbConnect(con), "Can't clone a temporary database")
+})
+
+test_that("`dbConnect()` on a connection has the arguments of `dbConnect()` on a driver", {
+  conn_formals <- formals(RSQLite:::dbConnect_SQLiteConnection)
+  drv_formals <- formals(RSQLite:::dbConnect_SQLiteDriver)
+  expect_identical(names(conn_formals)[-1], names(drv_formals)[-1])
+
+  from_connection <- c(
+    "dbname", "loadable.extensions", "flags", "vfs", "bigint", "extended_types",
+    "check_utf8"
+  )
+  same_default <- setdiff(names(drv_formals)[-1], c(from_connection, "..."))
+  expect_identical(conn_formals[same_default], drv_formals[same_default])
+})
+
+test_that("`dbConnect()` on a connection passes each argument on to the driver", {
+  con <- dbConnect(SQLite(), tempfile())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  args <- NULL
+  local_mocked_bindings(dbConnect_SQLiteDriver = function(drv, ...) {
+    args <<- list(...)
+    con
+  })
+
+  arg_names <- setdiff(names(formals(dbConnect_SQLiteConnection)), c("drv", "..."))
+  for (name in arg_names) {
+    sentinel <- structure(list(), class = paste0("sentinel_", name))
+    args <- NULL
+    do.call(dbConnect, c(list(con), stats::setNames(list(sentinel), name)))
+    expect_identical(args[[name]], sentinel, info = name)
+  }
+
+  args <- NULL
+  dbConnect(con, extra = "passed on")
+  expect_identical(args$extra, "passed on")
+})
+
+test_that("`dbConnect()` on a connection takes its defaults from the connection", {
+  con <- dbConnect(SQLite(), tempfile())
+  on.exit(dbDisconnect(con), add = TRUE)
+  template <- con
+  template@dbname <- "sentinel.sqlite"
+  template@loadable.extensions <- FALSE
+  template@flags <- 12345L
+  template@vfs <- "sentinel-vfs"
+  template@bigint <- "sentinel-bigint"
+  template@extended_types <- TRUE
+  template@check_utf8 <- TRUE
+
+  args <- NULL
+  local_mocked_bindings(dbConnect_SQLiteDriver = function(drv, ...) {
+    args <<- list(...)
+    con
+  })
+
+  dbConnect(template)
+  expect_identical(args$dbname, "sentinel.sqlite")
+  expect_identical(args$loadable.extensions, FALSE)
+  expect_identical(args$default.extensions, FALSE)
+  expect_identical(args$flags, 12345L)
+  expect_identical(args$vfs, "sentinel-vfs")
+  expect_identical(args$bigint, "sentinel-bigint")
+  expect_identical(args$extended_types, TRUE)
+  expect_identical(args$check_utf8, TRUE)
+  expect_identical(args$synchronous, "off")
+  expect_null(args$cache_size)
+
+  dbConnect(template, loadable.extensions = TRUE)
+  expect_identical(args$default.extensions, TRUE)
+})
+
+test_that("a connection saved by an older RSQLite clones with the driver defaults", {
+  con <- dbConnect(SQLite(), tempfile(), bigint = "character", extended_types = TRUE, check_utf8 = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  # Slots are stored as attributes,
+  # an object saved before a slot existed has no such attribute.
+  old <- con
+  attr(old, "bigint") <- NULL
+  attr(old, "extended_types") <- NULL
+  attr(old, "check_utf8") <- NULL
+  expect_false(methods::.hasSlot(old, "check_utf8"))
+
+  clone <- dbConnect(old)
+  on.exit(dbDisconnect(clone), add = TRUE, after = FALSE)
+  expect_identical(clone@dbname, con@dbname)
+  expect_identical(clone@bigint, "integer64")
+  expect_false(clone@extended_types)
+  expect_false(clone@check_utf8)
+})
+
 test_that("temporary tables are connection local", {
   dbfile <- tempfile()
   con1 <- dbConnect(SQLite(), dbfile)

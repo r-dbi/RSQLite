@@ -309,9 +309,10 @@ void SqliteArrowParamSource::bind_parameter(
   if (values->dictionary != NULL) {
     const int64_t index = ArrowArrayViewGetIntUnsafe(values, row);
     if (index < 0 || index >= values->dictionary->length) {
-      const std::string text = values->storage_type == NANOARROW_TYPE_UINT64
-        ? std::to_string(ArrowArrayViewGetUIntUnsafe(values, row))
-        : std::to_string(index);
+      const std::string text =
+        values->storage_type == NANOARROW_TYPE_UINT64
+          ? std::to_string(ArrowArrayViewGetUIntUnsafe(values, row))
+          : std::to_string(index);
       throw std::runtime_error(
         "Can't bind the dictionary index " + text + where(pos) +
         ", out of range for " + std::to_string(values->dictionary->length) +
@@ -460,5 +461,5 @@ struct ArrowBufferView SqliteArrowParamSource::value_bytes(
 // Names the parameter and the row being bound, for messages
 std::string SqliteArrowParamSource::where(int pos) const {
   return " of parameter " + std::to_string(pos) + " in row " +
-    std::to_string(rows);
+         std::to_string(rows);
 }

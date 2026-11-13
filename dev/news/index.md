@@ -1,5 +1,17 @@
 # Changelog
 
+## RSQLite 3.53.3.9022 (2026-11-11)
+
+### Chore
+
+- Add CRAN submission and release workflows
+  ([\#820](https://github.com/r-dbi/RSQLite/issues/820)).
+
+### Documentation
+
+- State the goals and non-goals
+  ([\#788](https://github.com/r-dbi/RSQLite/issues/788)).
+
 ## RSQLite 3.53.3.9021 (2026-11-08)
 
 ### Features

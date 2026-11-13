@@ -100,6 +100,14 @@ rsqliteVersion <- function() {
   .Call(`_RSQLite_rsqliteVersion`)
 }
 
+sqlite_heap_limits <- function(hard, soft) {
+  .Call(`_RSQLite_sqlite_heap_limits`, hard, soft)
+}
+
+sqlite_memory_used <- function() {
+  .Call(`_RSQLite_sqlite_memory_used`)
+}
+
 utf8_valid <- function(x) {
   .Call(`_RSQLite_utf8_valid`, x)
 }

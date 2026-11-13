@@ -92,9 +92,31 @@ SEXP SqliteColumnDataSource::fetch_string() const {
     }
   }
 
+  return Rf_mkCharCE(fetch_text(), CE_UTF8);
+}
+
+const char* SqliteColumnDataSource::fetch_text() const {
   const char* const text =
     reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
-  return Rf_mkCharCE(text, CE_UTF8);
+  check_out_of_memory(text);
+  // Without SQLITE_NOMEM, NULL means a NULL value or an empty blob:
+  // read it as an empty string.
+  return text == NULL ? "" : text;
+}
+
+void SqliteColumnDataSource::check_out_of_memory(const void* data) const {
+  // sqlite3_column_text() and sqlite3_column_blob() return NULL
+  // for a NULL value, for an empty blob, and when SQLite runs out of memory.
+  // Only the last sets SQLITE_NOMEM, as the SQLite documentation describes.
+  if (data != NULL) {
+    return;
+  }
+  sqlite3* conn = sqlite3_db_handle(get_stmt());
+  if (sqlite3_errcode(conn) == SQLITE_NOMEM) {
+    cpp11::stop(
+      "Cannot read column %d: %s", get_j() + 1, sqlite3_errmsg(conn)
+    );
+  }
 }
 
 SEXP SqliteColumnDataSource::fetch_checked_string(const int field_type) const {
@@ -107,10 +129,9 @@ SEXP SqliteColumnDataSource::fetch_checked_string(const int field_type) const {
   } else {
     data = sqlite3_column_text(get_stmt(), get_j());
   }
+  check_out_of_memory(data);
   if (data == NULL) {
-    // An empty blob, or out of memory: then the next sqlite3_step() fails
-    // with SQLITE_NOMEM. A fetch steps after every row it reads, and a peek
-    // returns no rows, so this "" never reaches the caller.
+    // An empty blob
     return R_BlankString;
   }
 
@@ -158,8 +179,7 @@ double SqliteColumnDataSource::fetch_date() const {
   int dt = get_column_type();
 
   if (dt == SQLITE_TEXT) {
-    const char* dtstr =
-      reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
+    const char* dtstr = fetch_text();
     double dateval;
 
     try {
@@ -187,8 +207,7 @@ double SqliteColumnDataSource::fetch_datetime_local() const {
   int dt = get_column_type();
 
   if (dt == SQLITE_TEXT) {
-    const char* dtstr =
-      reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
+    const char* dtstr = fetch_text();
     double dateval;
     try {
       bp::ptime dttm(bd::parse_delimited_time<bp::ptime>(dtstr, ' '));
@@ -219,8 +238,7 @@ double SqliteColumnDataSource::fetch_time() const {
   int dt = get_column_type();
 
   if (dt == SQLITE_TEXT) {
-    const char* tmstr =
-      reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
+    const char* tmstr = fetch_text();
     double dateval;
     try {
       bp::time_duration secs(bp::duration_from_string(tmstr));

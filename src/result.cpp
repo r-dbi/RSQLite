@@ -107,6 +107,15 @@ void result_bind(DbResult* res, cpp11::list params) {
   res->bind(params);
 }
 
+// Refuses a stream that reads the rows of `res` itself,
+// before bind_arrow_stream() reads its schema, which fetches rows
+[[cpp11::register]]
+void result_check_arrow_params(DbResult* res, SEXP stream) {
+  res->check_arrow_params(
+    cpp11::safe[nanoarrow_array_stream_from_xptr](stream)
+  );
+}
+
 // Binds the rows of `stream`, a nanoarrow_array_stream of struct arrays,
 // taking the child `indexes[k]`, 0-based, for placeholder k + 1.
 // The result takes the stream over, unless its schema can't be bound.

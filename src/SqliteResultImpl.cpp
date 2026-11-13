@@ -711,6 +711,12 @@ bool SqliteResultImpl::arrow_chunk_kept() const {
   return arrow_chunk_ && arrow_chunk_->array->release != NULL;
 }
 
+const struct ArrowArrayStream* SqliteResultImpl::arrow_param_stream() const {
+  const SqliteArrowParamSource* source =
+    dynamic_cast<const SqliteArrowParamSource*>(params_.get());
+  return source != NULL ? source->get_stream() : NULL;
+}
+
 // A chunk of the current execution has fixed the Arrow types
 bool SqliteResultImpl::arrow_types_decided() const {
   return !arrow_columns_.empty() && arrow_columns_[0].is_frozen();

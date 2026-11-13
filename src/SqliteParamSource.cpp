@@ -188,7 +188,7 @@ SqliteArrowParamSource::SqliteArrowParamSource(
   struct ArrowArrayStream* stream_,
   const std::vector<int>& indexes_
 )
-    : indexes(indexes_), i(0) {
+    : indexes(indexes_), i(0), rows(0) {
   call_stream(
     stream_,
     [&] { return stream_->get_schema(stream_, schema.get()); },
@@ -208,6 +208,15 @@ SqliteArrowParamSource::SqliteArrowParamSource(
       "Can't read the schema of the Arrow parameters",
       &error
     );
+    // A dictionary of values of a type that can be bound,
+    // with indices of any integer type
+    if (type.type == NANOARROW_TYPE_DICTIONARY) {
+      check_arrow(
+        ArrowSchemaViewInit(&type, child->dictionary, &error),
+        "Can't read the schema of the Arrow parameters",
+        &error
+      );
+    }
     if (!can_bind(type.type)) {
       char name[256];
       ArrowSchemaToString(child, name, sizeof(name), 1);
@@ -237,6 +246,7 @@ bool SqliteArrowParamSource::bind_next_row(sqlite3_stmt* stmt) {
 
   sqlite3_reset(stmt);
   sqlite3_clear_bindings(stmt);
+  ++rows;
 
   // A null struct row binds NULL to every placeholder,
   // as sqlite3_clear_bindings() left them
@@ -252,6 +262,10 @@ bool SqliteArrowParamSource::bind_next_row(sqlite3_stmt* stmt) {
 
   ++i;
   return true;
+}
+
+const struct ArrowArrayStream* SqliteArrowParamSource::get_stream() const {
+  return stream.get();
 }
 
 // Reads the next array of the stream, or returns false at its end
@@ -290,6 +304,26 @@ void SqliteArrowParamSource::bind_parameter(
   if (type.type == NANOARROW_TYPE_NA || ArrowArrayViewIsNull(values, row)) {
     return;
   }
+  // A dictionary binds the value of its index, or NULL for a null value.
+  // Validation of the array doesn't look at the indices.
+  if (values->dictionary != NULL) {
+    const int64_t index = ArrowArrayViewGetIntUnsafe(values, row);
+    if (index < 0 || index >= values->dictionary->length) {
+      const std::string text = values->storage_type == NANOARROW_TYPE_UINT64
+        ? std::to_string(ArrowArrayViewGetUIntUnsafe(values, row))
+        : std::to_string(index);
+      throw std::runtime_error(
+        "Can't bind the dictionary index " + text + where(pos) +
+        ", out of range for " + std::to_string(values->dictionary->length) +
+        " values."
+      );
+    }
+    values = values->dictionary;
+    row = index;
+    if (ArrowArrayViewIsNull(values, row)) {
+      return;
+    }
+  }
 
   int rc = SQLITE_OK;
   switch (type.type) {
@@ -317,12 +351,12 @@ void SqliteArrowParamSource::bind_parameter(
   case NANOARROW_TYPE_STRING:
   case NANOARROW_TYPE_LARGE_STRING:
     {
-      struct ArrowStringView text = ArrowArrayViewGetStringUnsafe(values, row);
+      struct ArrowBufferView text = value_bytes(stmt, pos, values, row);
       // An empty value may have no data, which would bind NULL
       rc = sqlite3_bind_text64(
         stmt,
         pos,
-        text.size_bytes > 0 ? text.data : "",
+        text.size_bytes > 0 ? text.data.as_char : "",
         static_cast<sqlite3_uint64>(text.size_bytes),
         SQLITE_TRANSIENT,
         SQLITE_UTF8
@@ -332,7 +366,7 @@ void SqliteArrowParamSource::bind_parameter(
   case NANOARROW_TYPE_BINARY:
   case NANOARROW_TYPE_LARGE_BINARY:
     {
-      struct ArrowBufferView bytes = ArrowArrayViewGetBytesUnsafe(values, row);
+      struct ArrowBufferView bytes = value_bytes(stmt, pos, values, row);
       if (bytes.size_bytes == 0) {
         rc = sqlite3_bind_zeroblob(stmt, pos, 0);
       } else {
@@ -374,4 +408,57 @@ void SqliteArrowParamSource::bind_parameter(
     break;
   }
   check_bind(rc, pos);
+}
+
+// The bytes of value `row` of a string or binary array.
+// Validation of the array checks only its first and last offsets:
+// a value whose offsets are negative, decreasing or beyond the data
+// fails here rather than read out of bounds.
+// The C data interface has no buffer sizes,
+// so the last offset gives the size of the data.
+// A value longer than SQLite's length limit fails with its size and row,
+// before its data is read;
+// sqlite3_bind_text64() and sqlite3_bind_blob64() would refuse it too.
+struct ArrowBufferView SqliteArrowParamSource::value_bytes(
+  sqlite3_stmt* stmt,
+  int pos,
+  const struct ArrowArrayView* values,
+  int64_t row
+) const {
+  const int64_t k = values->offset + row;
+  int64_t start, end;
+  if (values->layout.element_size_bits[1] == 64) {
+    start = values->buffer_views[1].data.as_int64[k];
+    end = values->buffer_views[1].data.as_int64[k + 1];
+  } else {
+    start = values->buffer_views[1].data.as_int32[k];
+    end = values->buffer_views[1].data.as_int32[k + 1];
+  }
+  if (start < 0 || end < start || end > values->buffer_views[2].size_bytes) {
+    throw std::runtime_error(
+      "Invalid Arrow parameters: the offsets" + where(pos) +
+      " point outside its data."
+    );
+  }
+
+  const int64_t limit =
+    sqlite3_limit(sqlite3_db_handle(stmt), SQLITE_LIMIT_LENGTH, -1);
+  if (end - start > limit) {
+    throw std::runtime_error(
+      "Can't bind the value of " + std::to_string(end - start) + " bytes" +
+      where(pos) + ", beyond SQLite's length limit of " +
+      std::to_string(limit) + " bytes."
+    );
+  }
+
+  struct ArrowBufferView out;
+  out.data.as_uint8 = values->buffer_views[2].data.as_uint8 + start;
+  out.size_bytes = end - start;
+  return out;
+}
+
+// Names the parameter and the row being bound, for messages
+std::string SqliteArrowParamSource::where(int pos) const {
+  return " of parameter " + std::to_string(pos) + " in row " +
+    std::to_string(rows);
 }

@@ -19,6 +19,10 @@ struct ArrowArrayStream;
 class DbResult;
 typedef boost::shared_ptr<DbResult> DbResultPtr;
 
+// The result that `stream` reads, if it is an Arrow stream of RSQLite
+// that hasn't ended, see SqliteArrowStream.cpp
+const DbResult* arrow_stream_result(const struct ArrowArrayStream* stream);
+
 // DbResult --------------------------------------------------------------------
 
 class DbResult : boost::noncopyable {
@@ -68,6 +72,8 @@ public:
     struct ArrowArrayStream* stream,
     const std::vector<int>& indexes
   );
+  // Refuses parameters that read the rows of the result itself
+  void check_arrow_params(const struct ArrowArrayStream* stream) const;
   cpp11::list fetch(int n_max = -1);
   void fetch_arrow_chunk(
     struct ArrowArray* array,

@@ -30,12 +30,18 @@ db_bind <- function(res, params, ..., allow_named_superset) {
 # the statement runs once per row.
 # Named placeholders take the columns of the same name,
 # anonymous and numbered ones take unnamed columns by position.
-# Types that SQLite can't store fail before any row runs,
+# A dictionary, such as a factor, binds its values.
+# Types that SQLite can't store,
+# and a stream that reads the rows of `res`,
+# also through the parameters of other results,
+# fail before any row runs,
 # and leave `stream` and the previous bind as they were;
 # otherwise the result takes the stream over and reads its arrays as it runs.
 # Internal for now: no DBI method calls it yet.
 bind_arrow_stream <- function(res, stream) {
   stream <- nanoarrow::as_nanoarrow_array_stream(stream)
+  # Before the schema, whose read fetches the rows of a stream of RSQLite
+  result_check_arrow_params(res@ptr, stream)
   schema <- nanoarrow::infer_nanoarrow_schema(stream)
   if (!identical(schema$format, "+s")) {
     stopc(

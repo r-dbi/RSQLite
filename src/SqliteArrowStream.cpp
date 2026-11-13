@@ -261,6 +261,13 @@ void stream_release(struct ArrowArrayStream* stream) {
 
 }  // namespace
 
+const DbResult* arrow_stream_result(const struct ArrowArrayStream* stream) {
+  if (stream->release != &stream_release || stream->private_data == NULL) {
+    return NULL;
+  }
+  return get_state(const_cast<struct ArrowArrayStream*>(stream))->result.get();
+}
+
 // The rows of `res` as a nanoarrow_array_stream,
 // fetched lazily in chunks of at most `n` rows, all of them for -1.
 // Internal for now: no DBI method calls it yet, see read_arrow_stream().

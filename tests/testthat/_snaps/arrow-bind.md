@@ -13,7 +13,7 @@
       bind_arrow_stream(res, stream)
     Condition
       Error:
-      ! Can't bind parameter 1 of Arrow type dictionary(int32)<string>.
+      ! Can't bind parameter 1 of Arrow type date64.
 
 ---
 

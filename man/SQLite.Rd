@@ -28,9 +28,9 @@ SQLite(...)
   synchronous = "off",
   flags = drv@flags,
   vfs = drv@vfs,
-  bigint = drv@bigint,
-  extended_types = drv@extended_types,
-  check_utf8 = drv@check_utf8
+  bigint = slot_or_default(drv, "bigint", "integer64"),
+  extended_types = slot_or_default(drv, "extended_types", FALSE),
+  check_utf8 = slot_or_default(drv, "check_utf8", FALSE)
 )
 
 \S4method{dbConnect}{SQLiteDriver}(

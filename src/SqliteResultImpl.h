@@ -38,6 +38,11 @@ private:
   int group_, groups_;
   std::vector<DATA_TYPE> types_;
   bool with_alt_types_;
+  // The error of the step past the last row of a full fetch,
+  // kept for the next fetch with SQLite's result code: see read_ahead()
+  bool error_kept_;
+  std::string kept_error_;
+  int kept_error_code_;
 
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);
@@ -72,12 +77,13 @@ private:
 
   cpp11::list fetch_rows(int n_max, int& n);
   void step();
+  void read_ahead();
   bool step_run();
   bool step_done();
   cpp11::list peek_first_row();
 
 private:
-  NORET void raise_sqlite_exception() const;
+  NORET void raise_kept_error();
   NORET static void raise_sqlite_exception(sqlite3* conn);
 };
 

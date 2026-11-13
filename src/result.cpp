@@ -6,6 +6,14 @@
 
 // #include "DbResult.h"
 
+// An integer while it fits, a double beyond INT_MAX, where R integers end
+static SEXP row_count_as_sexp(int64_t n) {
+  if (n <= INT_MAX) {
+    return cpp11::as_sexp(static_cast<int>(n));
+  }
+  return cpp11::as_sexp(static_cast<double>(n));
+}
+
 // The external pointer owns a shared pointer to the result,
 // as that of a connection owns one to the connection.
 // It is R's share of the result, dropped by dbClearResult() or the finalizer.
@@ -78,13 +86,13 @@ bool result_has_completed(DbResult* res) {
 }
 
 [[cpp11::register]]
-int result_rows_fetched(DbResult* res) {
-  return res->n_rows_fetched();
+SEXP result_rows_fetched(DbResult* res) {
+  return row_count_as_sexp(res->n_rows_fetched());
 }
 
 [[cpp11::register]]
-int result_rows_affected(DbResult* res) {
-  return res->n_rows_affected();
+SEXP result_rows_affected(DbResult* res) {
+  return row_count_as_sexp(res->n_rows_affected());
 }
 
 [[cpp11::register]]
@@ -95,4 +103,27 @@ cpp11::list result_column_info(DbResult* res) {
 [[cpp11::register]]
 cpp11::strings result_get_placeholder_names(SqliteResult* res) {
   return res->get_placeholder_names();
+}
+
+// For the tests: a count of rows from R.
+// The cast to int64_t is undefined for a value that it can't hold,
+// so the range is checked first; the check also fails for NA and NaN.
+static int64_t row_count_from_double(double n) {
+  if (!(n >= 0 && n <= 9007199254740992.0) ||
+      static_cast<double>(static_cast<int64_t>(n)) != n) {
+    cpp11::stop("`n` must be a whole number from 0 to 2^53.");
+  }
+  return static_cast<int64_t>(n);
+}
+
+// For the tests: sets the number of rows fetched from the statement
+[[cpp11::register]]
+void result_set_rows_fetched(SqliteResult* res, double n) {
+  res->set_rows_fetched(row_count_from_double(n));
+}
+
+// For the tests: sets the number of rows the statement has changed so far
+[[cpp11::register]]
+void result_set_rows_affected(SqliteResult* res, double n) {
+  res->set_rows_affected(row_count_from_double(n));
 }

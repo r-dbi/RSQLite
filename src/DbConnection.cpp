@@ -19,7 +19,14 @@ DbConnection::DbConnection(
     vfs.empty() ? NULL : vfs.c_str()
   );
   if (rc != SQLITE_OK) {
-    cpp11::stop("Could not connect to database:\n%s", getException().c_str());
+    // SQLite usually allocates a handle even when opening fails,
+    // and the destructor does not run when the constructor throws,
+    // so close the handle here.
+    // The message comes from the handle and must be read first.
+    std::string msg = getException();
+    sqlite3_close_v2(pConn_);
+    pConn_ = NULL;
+    cpp11::stop("Could not connect to database:\n%s", msg.c_str());
   }
   if (allow_ext) {
     sqlite3_enable_load_extension(pConn_, 1);

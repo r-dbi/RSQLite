@@ -43,6 +43,23 @@ test_that("can get and set vfs values", {
 })
 
 # Specific to RSQLite
+test_that("a failed open reports SQLite's message and closes the handle (#826)", {
+  path <- file.path(tempfile(), "missing", "db.sqlite")
+
+  # The message is read from the handle before it is closed.
+  for (i in 1:3) {
+    expect_error(
+      dbConnect(SQLite(), path),
+      "Could not connect to database:\nunable to open database file",
+      fixed = TRUE
+    )
+  }
+
+  con <- dbConnect(SQLite(), ":memory:")
+  on.exit(dbDisconnect(con))
+  expect_equal(dbGetQuery(con, "SELECT 1 AS a")$a, 1L)
+})
+
 test_that("forbidden operations throw errors", {
   tmpFile <- tempfile()
   on.exit(unlink(tmpFile))

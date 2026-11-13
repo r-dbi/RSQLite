@@ -1,0 +1,45 @@
+RSQLite bundles third-party source code.
+Its terms, as far as they are evident from the sources, are:
+
+src/vendor/nanoarrow/ (nanoarrow 0.9.0, nanoarrow.c, nanoarrow.h, nanoarrow.hpp)
+  Copyright: The Apache Software Foundation
+  License: Apache License, Version 2.0
+  The license text is installed as licenses/nanoarrow-LICENSE.txt, and the NOTICE of the project as licenses/nanoarrow-NOTICE.txt:
+
+    Apache Arrow nanoarrow
+    Copyright 2023 The Apache Software Foundation
+
+    This product includes software developed at
+    The Apache Software Foundation (http://www.apache.org/).
+
+  nanoarrow.h was changed by RSQLite: the line defining NANOARROW_NAMESPACE reads RSQLite instead of RPkg.
+  See src/vendor/nanoarrow/README.md in the source package.
+
+src/vendor/sqlite3/ (the SQLite amalgamation) and src/vendor/extensions/ (csv.c, regexp.c, series.c, uuid.c, sqlite3ext.h)
+  Public domain: the authors disclaim copyright, and the sources carry the SQLite blessing in place of a legal notice.
+
+src/vendor/extensions/http.c
+  Written for RSQLite; its header says "Public domain / CC0 style".
+
+src/vendor/extensions/extension-functions.c (from https://www.sqlite.org/contrib, modified for RSQLite)
+  The file's history credits the original code to "relicoder" (June 2006), posted to the sqlite-users mailing list by "Mikey C" (February 2007),
+  and later versions to Liam Healy, with thanks to others named there.
+  The file states no license or copyright terms.
+
+src/import-file.c
+  Copyright (C) 1999-2003 The Omega Project for Statistical Computing.
+  License: GNU Lesser General Public License, version 2 or (at your option) any later version, as stated in the file header.
+  Part of it comes from SQLite's shell.c, which is public domain.
+
+src/affinity.c
+  Extracted from the SQLite amalgamation (sqlite3.c), which is public domain.
+
+src/vendor/boost/ (a subset of the Boost C++ libraries, from the BH package)
+  Copyright: the individual Boost authors, named in each file.
+  License: Boost Software License, Version 1.0, as stated in the file headers.
+  A header-only library: the license does not require a notice for object code.
+
+src/vendor/boost/intrusive/detail/function_detector.hpp
+  Besides the Boost license, the header carries a notice of its own:
+  "Copyright 2007 Alexandre Courpron. Permission to use, copy, modify, redistribute and sell this software,
+  provided that this copyright notice appears on all copies of the software."

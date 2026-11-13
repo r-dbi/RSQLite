@@ -9,6 +9,7 @@ a.out.dSYM
 ^cran-comments\.md$
 ^data-raw$
 ^src/vendor/sqlite3/.*\.o$
+^src/vendor/nanoarrow/.*\.o$
 ^src/vendor/sqlite3/.*\.a$
 ^revdep$
 ^src/.*\.d$
@@ -29,6 +30,7 @@ a.out.dSYM
 ^cmake-build-debug$
 ^build\.sh$
 ^codecov\.yml$
+^\.covrignore$
 ^src/.*\.gch$
 .*\.orig$
 ^CRAN-RELEASE$

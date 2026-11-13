@@ -45,3 +45,17 @@ test_that("blob class", {
     data
   )
 })
+
+test_that("empty blobs", {
+  con <- dbConnect(SQLite())
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  expect_equal(
+    dbGetQuery(con, "SELECT X'' AS x, zeroblob(0) AS y, X'0102' AS z"),
+    data.frame(x = blob(raw()), y = blob(raw()), z = blob(as.raw(1:2)))
+  )
+
+  data <- data.frame(id = 1:2, data = blob(raw(), raw(3)))
+  dbWriteTable(con, "data", data)
+  expect_equal(dbReadTable(con, "data"), data)
+})

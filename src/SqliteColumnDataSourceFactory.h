@@ -7,9 +7,14 @@
 class SqliteColumnDataSourceFactory : public DbColumnDataSourceFactory {
   sqlite3_stmt* stmt;
   bool with_alt_types;
+  bool check_utf8;
 
 public:
-  SqliteColumnDataSourceFactory(sqlite3_stmt* stmt_, bool with_alt_types_);
+  SqliteColumnDataSourceFactory(
+    sqlite3_stmt* stmt_,
+    bool with_alt_types_,
+    bool check_utf8_
+  );
   ~SqliteColumnDataSourceFactory();
 
 public:

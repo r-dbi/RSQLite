@@ -24,7 +24,8 @@ public:
     bool allow_ext,
     int flags,
     const std::string& vfs = "",
-    bool with_alt_types = false
+    bool with_alt_types = false,
+    bool check_utf8 = false
   );
   ~DbConnection();
 
@@ -53,6 +54,7 @@ public:
   void disconnect();
 
   bool with_alt_types() const;
+  bool check_utf8() const;
 
   void set_busy_handler(SEXP r_callback);
 
@@ -61,6 +63,7 @@ public:
 private:
   sqlite3* pConn_;
   const bool with_alt_types_;
+  const bool check_utf8_;
   SEXP busy_callback_;
   void release_callback_data();
   static int busy_callback_helper(void* data, int num);

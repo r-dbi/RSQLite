@@ -9,4 +9,5 @@ SqliteColumnDataSource.o: \
   integer64.h \
   pch.h \
   sqlite3-cpp.h \
+  utf8.h \
   .Rconfig

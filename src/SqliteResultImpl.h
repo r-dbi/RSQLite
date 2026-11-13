@@ -38,6 +38,7 @@ private:
   int group_, groups_;
   std::vector<DATA_TYPE> types_;
   bool with_alt_types_;
+  bool check_utf8_;
 
 public:
   SqliteResultImpl(const DbConnectionPtr& conn_, const std::string& sql);

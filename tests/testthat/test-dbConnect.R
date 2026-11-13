@@ -43,10 +43,10 @@ test_that("can get and set vfs values", {
 })
 
 # Specific to RSQLite
-test_that("a failed open reports SQLite's message and closes the handle (#826)", {
+test_that("a failed open keeps SQLite's message and later connections work (#826)", {
   path <- file.path(tempfile(), "missing", "db.sqlite")
 
-  # The message is read from the handle before it is closed.
+  # The handle leak itself is not visible from R and was checked with valgrind.
   for (i in 1:3) {
     expect_error(
       dbConnect(SQLite(), path),

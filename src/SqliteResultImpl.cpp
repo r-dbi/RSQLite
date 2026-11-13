@@ -10,7 +10,10 @@
 namespace {
 
 // An error of a step, from SQLite or from a parameter that cannot be bound,
-// with SQLite's result code; SQLITE_ERROR for a parameter.
+// with SQLite's result code:
+// the code of SQLite's refusal for a value it does not accept,
+// such as SQLITE_TOOBIG,
+// and SQLITE_ERROR for a parameter of a type that cannot be bound.
 // It leaves the C++ code only through cpp11's entry points,
 // which turn it into an R error with its message,
 // so that read_ahead() can keep it for the next fetch instead.
@@ -47,6 +50,7 @@ SqliteResultImpl::SqliteResultImpl(
       groups_(0),
       types_(get_initial_field_types(cache.ncols_)),
       with_alt_types_(conn_->with_alt_types()),
+      check_utf8_(conn_->check_utf8()),
       error_kept_(false),
       kept_error_completes_(false),
       kept_error_code_(SQLITE_OK) {
@@ -379,7 +383,8 @@ void SqliteResultImpl::after_bind(bool params_have_rows) {
 cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
-  SqliteDataFrame data(stmt, cache.names_, n_max, types_, with_alt_types_);
+  SqliteDataFrame
+    data(stmt, cache.names_, n_max, types_, with_alt_types_, check_utf8_);
 
   if (complete_ && data.get_ncols() == 0) {
     // Through cpp11, so that an error made of it unwinds the C++ frames
@@ -501,7 +506,8 @@ bool SqliteResultImpl::step_done() {
 }
 
 cpp11::list SqliteResultImpl::peek_first_row() {
-  SqliteDataFrame data(stmt, cache.names_, 1, types_, with_alt_types_);
+  SqliteDataFrame
+    data(stmt, cache.names_, 1, types_, with_alt_types_, check_utf8_);
 
   // After a failed step, the statement is on no row:
   // the kept error is left for the next fetch that reads rows.

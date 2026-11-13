@@ -66,6 +66,11 @@ cpp11::list DbDataFrame::get_data(std::vector<DATA_TYPE>& types_) {
     names,
     boost::bind(&DbColumn::warn_type_conflicts, _1, _2)
   );
+  boost::for_each(
+    data,
+    names,
+    boost::bind(&DbColumn::warn_invalid_strings, _1, _2)
+  );
 
   cpp11::writable::list out(data.size());
   auto it = data.begin();

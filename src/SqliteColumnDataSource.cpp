@@ -2,6 +2,7 @@
 #include "SqliteColumnDataSource.h"
 #include "integer64.h"
 #include "affinity.h"
+#include "utf8.h"
 #include <boost/limits.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -10,9 +11,14 @@
 SqliteColumnDataSource::SqliteColumnDataSource(
   sqlite3_stmt* stmt_,
   const int j_,
-  bool with_alt_types_
+  bool with_alt_types_,
+  bool check_utf8_
 )
-    : DbColumnDataSource(j_), stmt(stmt_), with_alt_types(with_alt_types_) {}
+    : DbColumnDataSource(j_),
+      stmt(stmt_),
+      with_alt_types(with_alt_types_),
+      check_utf8(check_utf8_),
+      n_invalid_strings(0) {}
 
 DATA_TYPE SqliteColumnDataSource::get_data_type() const {
   if (with_alt_types) {
@@ -79,9 +85,50 @@ double SqliteColumnDataSource::fetch_real() const {
 }
 
 SEXP SqliteColumnDataSource::fetch_string() const {
+  if (check_utf8) {
+    const int field_type = get_column_type();
+    if (field_type == SQLITE_TEXT || field_type == SQLITE_BLOB) {
+      return fetch_checked_string(field_type);
+    }
+  }
+
   const char* const text =
     reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
   return Rf_mkCharCE(text, CE_UTF8);
+}
+
+SEXP SqliteColumnDataSource::fetch_checked_string(const int field_type) const {
+  // A blob is read as bytes: sqlite3_column_text() would transcode it
+  // in a UTF-16 database, and turn it into text for the next read
+  // of the same row after a peek with dbFetch(n = 0) or dbColumnInfo().
+  const void* data;
+  if (field_type == SQLITE_BLOB) {
+    data = sqlite3_column_blob(get_stmt(), get_j());
+  } else {
+    data = sqlite3_column_text(get_stmt(), get_j());
+  }
+  if (data == NULL) {
+    // An empty blob, or out of memory: then the next sqlite3_step() fails
+    // with SQLITE_NOMEM. A peek returns no rows,
+    // and a fetch steps after every row it reads:
+    // that step raises the error, or, after the last row of a full fetch,
+    // keeps it for the next fetch, so this "" reaches the caller only then.
+    return R_BlankString;
+  }
+
+  // Called after sqlite3_column_blob() or sqlite3_column_text(),
+  // as SQLite recommends
+  const int size = sqlite3_column_bytes(get_stmt(), get_j());
+  const char* const bytes = static_cast<const char*>(data);
+  if (!rsqlite_is_utf8_string(bytes, static_cast<size_t>(size))) {
+    ++n_invalid_strings;
+    return NA_STRING;
+  }
+  return Rf_mkCharLenCE(bytes, size, CE_UTF8);
+}
+
+int64_t SqliteColumnDataSource::get_n_invalid_strings() const {
+  return n_invalid_strings;
 }
 
 SEXP SqliteColumnDataSource::fetch_blob() const {

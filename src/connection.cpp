@@ -35,10 +35,11 @@ cpp11::external_pointer<DbConnectionPtr> connection_connect(
   const bool allow_ext,
   const int flags,
   const std::string& vfs = "",
-  bool with_alt_types = false
+  bool with_alt_types = false,
+  bool check_utf8 = false
 ) {
   DbConnectionPtr* pConn = new DbConnectionPtr(
-    new DbConnection(path, allow_ext, flags, vfs, with_alt_types)
+    new DbConnection(path, allow_ext, flags, vfs, with_alt_types, check_utf8)
   );
 
   return cpp11::external_pointer<DbConnectionPtr>(pConn, true);

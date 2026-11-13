@@ -31,7 +31,8 @@ SQLite(...)
   flags = SQLITE_RWC,
   vfs = NULL,
   bigint = c("integer64", "integer", "numeric", "character"),
-  extended_types = FALSE
+  extended_types = FALSE,
+  check_utf8 = FALSE
 )
 
 \S4method{dbDisconnect}{SQLiteConnection}(conn, ...)
@@ -90,6 +91,20 @@ default is \link[bit64:integer64]{bit64::integer64}, which allows the full range
 \item{extended_types}{When \code{TRUE} columns of type \code{DATE}, \code{DATETIME} / \code{TIMESTAMP}, and \code{TIME} are mapped to corresponding R-classes,
 c.f. below for details.
 Defaults to \code{FALSE}.}
+
+\item{check_utf8}{When \code{TRUE}, text and blob values that are read into a character column are checked:
+a value that is not valid UTF-8 or that contains a NUL byte becomes \code{NA},
+with one warning per column and fetch that counts these values.
+A blob is read into a character column when the column's earlier values are text.
+When \code{FALSE}, text is cut at the first NUL byte and is marked as UTF-8 even if it is not valid,
+and a blob is converted to text the same way.
+In a UTF-16 database, such a blob is taken as UTF-8 bytes when \code{TRUE} (\verb{X'6162'} gives \code{"ab"}),
+and is transcoded from UTF-16 when \code{FALSE}.
+The checks apply to every query on the connection, including the ones RSQLite runs itself:
+for example, \code{\link[DBI:dbListTables]{dbListTables()}} reports a table name that is not valid UTF-8 as \code{NA}.
+Defaults to \code{FALSE}.
+\code{dbConnect()} on an existing connection does not carry this setting over,
+nor \code{extended_types} or \code{bigint}.}
 }
 \value{
 \code{SQLite()} returns an object of class \link[=SQLiteDriver-class]{SQLiteDriver}.

@@ -145,3 +145,27 @@ test_that("roundtrip extended_types with dbWriteTable", {
     lapply(dates_times, class)
   )
 })
+
+test_that("an error from a warning handler on a new column storage propagates (#879)", {
+  con <- dbConnect(SQLite(), ":memory:", extended_types = TRUE)
+  on.exit(dbDisconnect(con), add = TRUE)
+
+  dbExecute(con, "CREATE TABLE d (x DATE)")
+  dbExecute(con, "INSERT INTO d VALUES ('oops'), ('2026-01-02')")
+
+  res <- dbSendQuery(con, "SELECT x FROM d")
+  expect_error(
+    withCallingHandlers(
+      dbFetch(res),
+      warning = function(w) stop("from handler")
+    ),
+    "from handler"
+  )
+  dbClearResult(res)
+
+  expect_warning(
+    out <- dbGetQuery(con, "SELECT x FROM d"),
+    "Unknown string format, NA is returned."
+  )
+  expect_identical(out$x, as.Date(c(NA, "2026-01-02")))
+})

@@ -7,10 +7,11 @@ SqliteDataFrame::SqliteDataFrame(
   std::vector<std::string> names,
   const int n_max_,
   const std::vector<DATA_TYPE>& types,
-  bool with_alt_types
+  bool with_alt_types,
+  bool check_utf8
 )
     : DbDataFrame(
-        new SqliteColumnDataSourceFactory(stmt, with_alt_types),
+        new SqliteColumnDataSourceFactory(stmt, with_alt_types, check_utf8),
         names,
         n_max_,
         types

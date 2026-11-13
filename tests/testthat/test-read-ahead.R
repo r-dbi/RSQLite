@@ -1,7 +1,7 @@
 # A fetch steps one row past the last row it returns,
 # to tell whether the result is complete.
 # If that step fails, the fetch still returns its rows,
-# and the next fetch raises the error.
+# and the next fetch raises the error, which completes the result.
 
 test_that("a fetch that returns the last row completes the result", {
   path <- withr::local_tempfile(fileext = ".sqlite")
@@ -41,6 +41,9 @@ test_that("an error after the last row of a fetch comes from the next fetch", {
       expect_equal(dbGetRowCount(res), 4L)
 
       expect_error(dbFetch(res, n = n), "malformed JSON")
+      expect_true(dbHasCompleted(res))
+      expect_equal(dbGetRowCount(res), 4L)
+      expect_equal(nrow(dbFetch(res)), 0L)
       expect_equal(dbGetRowCount(res), 4L)
     })
   }
@@ -97,6 +100,8 @@ test_that("an error after the last row of a fetch keeps it across parameter sets
       expect_equal(ids, 1:4)
       expect_false(dbHasCompleted(res))
       expect_error(dbFetch(res, n = n), "malformed JSON")
+      expect_true(dbHasCompleted(res))
+      expect_equal(dbGetRowCount(res), 4L)
     })
   }
 
@@ -111,6 +116,9 @@ test_that("an error after the last row of a fetch keeps it across parameter sets
   expect_false(dbHasCompleted(res))
   expect_equal(dbGetRowCount(res), 2L)
   expect_error(dbFetch(res, n = 2), "raw vectors")
+  expect_true(dbHasCompleted(res))
+  expect_equal(nrow(dbFetch(res)), 0L)
+  expect_equal(dbGetRowCount(res), 2L)
 })
 
 test_that("a value SQLite refuses to bind after a fetch comes from the next fetch", {
@@ -199,6 +207,7 @@ test_that("the structure of a result stays available with an error kept", {
   expect_equal(info$type, c("integer", "character"))
 
   expect_error(dbFetch(res), "malformed JSON")
+  expect_true(dbHasCompleted(res))
 })
 
 test_that("a new dbBind() drops the error kept from the previous one", {

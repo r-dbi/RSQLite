@@ -155,7 +155,7 @@ test_that("interrupt in busy handler", {
   on.exit(dbDisconnect(con1), add = TRUE)
 
   # This test makes use of the installed package!
-  session <- callr::r_session$new()
+  session <- local_rsqlite_session()
   session$run(args = list(dbfile = dbfile), function(dbfile) {
     .GlobalEnv$con2 <- DBI::dbConnect(RSQLite::SQLite(), dbfile)
 

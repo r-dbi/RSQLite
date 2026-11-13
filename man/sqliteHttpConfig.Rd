@@ -49,7 +49,7 @@ Larger values than 2147483 seconds (about 25 days) are capped,
 and libcurl 8.19.0 or later caps the stall timeout at 65535 seconds (about 18 hours).
 Anything else uses the default.
 
-An aborted transfer fails the open or the query with an SQLite error.
+An aborted transfer, or one interrupted by the user, fails the open or the query with an SQLite error.
 }
 \examples{
 old <- sqliteHttpConfig(cache_size_mb = 8, prefetch_pages = 1, fallback_full_download = TRUE)

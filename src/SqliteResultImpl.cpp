@@ -18,7 +18,7 @@ SqliteResultImpl::SqliteResultImpl(
       complete_(false),
       ready_(false),
       nrows_(0),
-      total_changes_start_(sqlite3_total_changes(conn)),
+      total_changes_start_(sqlite3_total_changes64(conn)),
       group_(0),
       groups_(0),
       types_(get_initial_field_types(cache.ncols_)),
@@ -92,7 +92,7 @@ sqlite3_stmt* SqliteResultImpl::prepare(sqlite3* conn, const std::string& sql) {
       ++tail;
     }
     if (*tail) {
-      cpp11::warning(std::string("Ignoring remaining part of query: ") + tail);
+      cpp11::warning("Ignoring remaining part of query: %s", tail);
     }
   }
 
@@ -113,15 +113,24 @@ bool SqliteResultImpl::complete() const {
   return complete_;
 }
 
-int SqliteResultImpl::n_rows_fetched() {
+int64_t SqliteResultImpl::n_rows_fetched() {
   return nrows_;
 }
 
-int SqliteResultImpl::n_rows_affected() {
+// Before a bind, NA_INTEGER, which result_rows_affected() returns as NA
+int64_t SqliteResultImpl::n_rows_affected() {
   if (!ready_) {
     return NA_INTEGER;
   }
-  return sqlite3_total_changes(conn) - total_changes_start_;
+  return sqlite3_total_changes64(conn) - total_changes_start_;
+}
+
+void SqliteResultImpl::set_rows_fetched(int64_t n) {
+  nrows_ = n;
+}
+
+void SqliteResultImpl::set_rows_affected(int64_t n) {
+  total_changes_start_ = sqlite3_total_changes64(conn) - n;
 }
 
 void SqliteResultImpl::bind(const cpp11::list& params) {
@@ -133,7 +142,7 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
     cpp11::stop(
       "Query requires %i params; %i supplied.",
       cache.nparams_,
-      params.size()
+      static_cast<int>(params.size())
     );
   }
 
@@ -143,7 +152,7 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
   groups_ = Rf_length(first_col);
   group_ = 0;
 
-  total_changes_start_ = sqlite3_total_changes(conn);
+  total_changes_start_ = sqlite3_total_changes64(conn);
 
   bool has_params = bind_row();
   after_bind(has_params);
@@ -378,5 +387,5 @@ void SqliteResultImpl::raise_sqlite_exception() const {
 }
 
 void SqliteResultImpl::raise_sqlite_exception(sqlite3* conn) {
-  cpp11::stop(sqlite3_errmsg(conn));
+  cpp11::stop("%s", sqlite3_errmsg(conn));
 }

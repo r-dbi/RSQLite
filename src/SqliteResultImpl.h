@@ -80,6 +80,7 @@ private:
 private:
   NORET void raise_sqlite_exception() const;
   NORET static void raise_sqlite_exception(sqlite3* conn);
+  NORET void raise_bind_exception(int j);
 };
 
 #endif  // RSQLITE_SQLITERESULTIMPL_H

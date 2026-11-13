@@ -60,7 +60,8 @@ See <code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="exte
 <span>  flags <span class="op">=</span> <span class="va">SQLITE_RWC</span>,</span>
 <span>  vfs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  bigint <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"integer64"</span>, <span class="st">"integer"</span>, <span class="st">"numeric"</span>, <span class="st">"character"</span><span class="op">)</span>,</span>
-<span>  extended_types <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  extended_types <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  check_utf8 <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'SQLiteConnection'</span></span>
@@ -143,6 +144,22 @@ default is <a href="https://bit64.r-lib.org/reference/bit64-package.html" class=
 <dd><p>When <code>TRUE</code> columns of type <code>DATE</code>, <code>DATETIME</code> / <code>TIMESTAMP</code>, and <code>TIME</code> are mapped to corresponding R-classes,
 c.f. below for details.
 Defaults to <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-check-utf-">check_utf8<a class="anchor" aria-label="anchor" href="#arg-check-utf-"></a></dt>
+<dd><p>When <code>TRUE</code>, text and blob values that are read into a character column are checked:
+a value that is not valid UTF-8 or that contains a NUL byte becomes <code>NA</code>,
+with one warning per column and fetch that counts these values.
+A blob is read into a character column when the column's earlier values are text.
+When <code>FALSE</code>, text is cut at the first NUL byte and is marked as UTF-8 even if it is not valid,
+and a blob is converted to text the same way.
+In a UTF-16 database, such a blob is taken as UTF-8 bytes when <code>TRUE</code> (<code>X'6162'</code> gives <code>"ab"</code>),
+and is transcoded from UTF-16 when <code>FALSE</code>.
+The checks apply to every query on the connection, including the ones RSQLite runs itself:
+for example, <code><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables()</a></code> reports a table name that is not valid UTF-8 as <code>NA</code>.
+Defaults to <code>FALSE</code>.
+<code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect()</a></code> on an existing connection does not carry this setting over,
+nor <code>extended_types</code> or <code>bigint</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

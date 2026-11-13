@@ -26,7 +26,8 @@ dbConnect(
   flags = SQLITE_RWC,
   vfs = NULL,
   bigint = c("integer64", "integer", "numeric", "character"),
-  extended_types = FALSE
+  extended_types = FALSE,
+  check_utf8 = FALSE
 )
 
 # S4 method for class 'SQLiteConnection'
@@ -117,6 +118,26 @@ dbDisconnect(conn, ...)
   When `TRUE` columns of type `DATE`, `DATETIME` / `TIMESTAMP`, and
   `TIME` are mapped to corresponding R-classes, c.f. below for details.
   Defaults to `FALSE`.
+
+- check_utf8:
+
+  When `TRUE`, text and blob values that are read into a character
+  column are checked: a value that is not valid UTF-8 or that contains a
+  NUL byte becomes `NA`, with one warning per column and fetch that
+  counts these values. A blob is read into a character column when the
+  column's earlier values are text. When `FALSE`, text is cut at the
+  first NUL byte and is marked as UTF-8 even if it is not valid, and a
+  blob is converted to text the same way. In a UTF-16 database, such a
+  blob is taken as UTF-8 bytes when `TRUE` (`X'6162'` gives `"ab"`), and
+  is transcoded from UTF-16 when `FALSE`. The checks apply to every
+  query on the connection, including the ones RSQLite runs itself: for
+  example,
+  [`dbListTables()`](https://dbi.r-dbi.org/reference/dbListTables.html)
+  reports a table name that is not valid UTF-8 as `NA`. Defaults to
+  `FALSE`.
+  [`dbConnect()`](https://dbi.r-dbi.org/reference/dbConnect.html) on an
+  existing connection does not carry this setting over, nor
+  `extended_types` or `bigint`.
 
 ## Value
 

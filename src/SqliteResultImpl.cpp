@@ -40,6 +40,7 @@ SqliteResultImpl::SqliteResultImpl(
       cache(stmt),
       complete_(false),
       ready_(false),
+      bind_started_(false),
       nrows_(0),
       total_changes_start_(sqlite3_total_changes64(conn)),
       group_(0),
@@ -141,9 +142,10 @@ int64_t SqliteResultImpl::n_rows_fetched() {
   return nrows_;
 }
 
-// Before a bind, NA_INTEGER, which result_rows_affected() returns as NA
+// Before the first bind, NA_INTEGER, which result_rows_affected() returns as NA
 int64_t SqliteResultImpl::n_rows_affected() {
-  if (!ready_) {
+  // Changes count from the latest bind, also if it failed partway
+  if (!ready_ && !bind_started_) {
     return NA_INTEGER;
   }
   return sqlite3_total_changes64(conn) - total_changes_start_;
@@ -177,14 +179,27 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
   group_ = 0;
 
   total_changes_start_ = sqlite3_total_changes64(conn);
+  bind_started_ = true;
 
   // A new execution starts: the error kept from the previous one is dropped
   error_kept_ = false;
   kept_error_.clear();
   kept_error_code_ = SQLITE_OK;
 
-  bool has_params = bind_row();
-  after_bind(has_params);
+  try {
+    bool has_params = bind_row();
+    after_bind(has_params);
+  } catch (...) {
+    // Parameters that fail to bind or to execute leave the result unbound:
+    // fetching asks for a new bind instead of running them again,
+    // while dbGetRowsAffected() counts from this bind
+    params_ = cpp11::list();
+    groups_ = 0;
+    ready_ = false;
+    complete_ = false;
+    nrows_ = 0;
+    throw;
+  }
 }
 
 cpp11::list SqliteResultImpl::fetch(const int n_max) {
@@ -351,43 +366,79 @@ void SqliteResultImpl::after_bind(bool params_have_rows) {
 cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
-  // The step past the rows of the previous fetch failed
-  if (error_kept_) {
-    raise_kept_error();
-  }
-
   SqliteDataFrame data(stmt, cache.names_, n_max, types_, with_alt_types_);
 
   if (complete_ && data.get_ncols() == 0) {
-    Rf_warning(
+    // Through cpp11, so that an error made of it unwinds the C++ frames
+    cpp11::warning(
+      "%s",
       "`dbGetQuery()`, `dbSendQuery()` and `dbFetch()` should only be used "
       "with `SELECT` queries. Did you mean `dbExecute()`, `dbSendStatement()` "
       "or `dbGetRowsAffected()`?"
     );
   }
 
-  int n_read = 0;
-  while (!complete_) {
-    data.set_col_values();
-    // The step past the last row of a full fetch only reads ahead
-    if (++n_read == n_max) {
-      read_ahead();
-    } else {
-      step();
+  // Rows count as fetched once they are returned, not if the fetch fails,
+  // also not if the conversion fails
+  int64_t n_fetched = 0;
+  cpp11::list out;
+  try {
+    // The step past the rows of the previous fetch failed
+    if (error_kept_) {
+      raise_kept_error();
     }
-    nrows_++;
-    if (!data.advance()) {
-      break;
+
+    while (!complete_) {
+      data.set_col_values();
+      // The step past the last row of a full fetch only reads ahead
+      if (++n_fetched == n_max) {
+        read_ahead();
+      } else {
+        step();
+      }
+      if (!data.advance()) {
+        break;
+      }
     }
+
+    out = data.get_data(types_);
+  } catch (...) {
+    // An error that unwinds through the C++ frames of a fetch ends the
+    // execution: a failed step or a kept error, an error that the conversion
+    // raises through cpp11, a warning raised through cpp11 that becomes an
+    // error or that a handler leaves the fetch on, or an interrupt.
+    // Stepping again would silently restart a statement that failed,
+    // and fetching again would convert the same value again
+    // or go on after the rows of this fetch.
+    // Resetting the statement ends it, so that it releases its read lock.
+    // The statement is still there: a handler can't clear the result while
+    // the fetch runs, see run_guarded() in DbResult.cpp.
+    // An R error that longjmps past these frames, such as a failed allocation
+    // in R's API while values are read, skips this: the result stays
+    // incomplete, and the next fetch goes on after the rows that were lost.
+    complete_ = true;
+    error_kept_ = false;
+    kept_error_.clear();
+    kept_error_code_ = SQLITE_OK;
+    sqlite3_reset(stmt);
+    throw;
   }
 
-  return data.get_data(types_);
+  nrows_ += n_fetched;
+  return out;
 }
 
-// A failed step throws a step_error, which reaches R at the entry point
+// A failed step ends the execution for every caller, and its error,
+// a step_error, reaches R at the entry point:
+// stepping again would silently restart a statement that failed
 void SqliteResultImpl::step() {
-  while (step_run())
-    ;
+  try {
+    while (step_run())
+      ;
+  } catch (...) {
+    complete_ = true;
+    throw;
+  }
 }
 
 // Steps past the last row of a full fetch.
@@ -435,7 +486,9 @@ cpp11::list SqliteResultImpl::peek_first_row() {
   SqliteDataFrame data(stmt, cache.names_, 1, types_, with_alt_types_);
 
   // After a failed step, the statement is on no row:
-  // the kept error is left for the next fetch that reads rows
+  // the kept error is left for the next fetch that reads rows.
+  // An error while converting the row leaves the result as it is,
+  // because peeking reads no row.
   if (!complete_ && !error_kept_) {
     data.set_col_values();
   }

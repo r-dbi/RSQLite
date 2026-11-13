@@ -30,6 +30,8 @@ private:
   // State
   bool complete_;
   bool ready_;
+  // Set once a bind has started, also if it failed: see n_rows_affected()
+  bool bind_started_;
   // 64 bits: a result read in chunks can pass INT_MAX rows,
   // and a statement can change as many
   int64_t nrows_;

@@ -14,6 +14,8 @@ typedef boost::shared_ptr<DbConnection> DbConnectionPtr;
 
 class DbResult : boost::noncopyable {
   DbConnectionPtr pConn_;
+  // Set while a fetch or a bind runs, see run_guarded() in DbResult.cpp
+  bool busy_;
 
 protected:
   boost::scoped_ptr<DbResultImpl> impl;
@@ -29,6 +31,7 @@ public:
 
   bool complete() const;
   bool is_active() const;
+  bool busy() const;
   int64_t n_rows_fetched();
   int64_t n_rows_affected();
 

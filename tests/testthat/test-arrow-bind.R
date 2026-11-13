@@ -15,7 +15,7 @@ test_that("a stream binds each row, and round-trips through the Arrow read path"
     d = blob::blob(as.raw(1:2), NULL, raw()),
     e = as.Date(c("2020-01-01", NA, "1960-05-06")),
     f = hms::hms(c(1.5, NA, 3600)),
-    g = as.POSIXct(c(0.5, NA, 1e9), tz = "UTC")
+    g = .POSIXct(c(0.5, NA, 1e9), tz = "UTC")
   )
 
   res <- dbSendStatement(con, "INSERT INTO t VALUES (:a, :b, :c, :d, :e, :f, :g)")
@@ -91,7 +91,7 @@ test_that("large types, other time units, time zones and durations bind, and nul
     as_array(blob::blob(as.raw(1), NULL, as.raw(3)), schema = nanoarrow::na_large_binary()),
     as_array(hms::hms(c(1.5, NA, 3)), schema = nanoarrow::na_time32("ms")),
     as_array(
-      as.POSIXct(c(2, NA, 3), tz = "UTC"),
+      .POSIXct(c(2, NA, 3), tz = "UTC"),
       schema = nanoarrow::na_timestamp("s", "Europe/Zurich")
     )
   )

@@ -5,6 +5,32 @@
 #include "DbColumnStorage.h"
 #include "DbConnection.h"
 #include "integer64.h"
+#include <stdexcept>
+
+namespace {
+
+// An error of a step, from SQLite or from a parameter that cannot be bound,
+// with SQLite's result code:
+// the code of SQLite's refusal for a value it does not accept,
+// such as SQLITE_TOOBIG,
+// and SQLITE_ERROR for a parameter of a type that cannot be bound.
+// It leaves the C++ code only through cpp11's entry points,
+// which turn it into an R error with its message,
+// so that read_ahead() can keep it for the next fetch instead.
+class step_error : public std::runtime_error {
+public:
+  step_error(const std::string& message, int code)
+      : std::runtime_error(message), code_(code) {}
+
+  int code() const {
+    return code_;
+  }
+
+private:
+  int code_;
+};
+
+}  // namespace
 
 // Construction ////////////////////////////////////////////////////////////////
 
@@ -23,7 +49,10 @@ SqliteResultImpl::SqliteResultImpl(
       groups_(0),
       types_(get_initial_field_types(cache.ncols_)),
       with_alt_types_(conn_->with_alt_types()),
-      check_utf8_(conn_->check_utf8()) {
+      check_utf8_(conn_->check_utf8()),
+      error_kept_(false),
+      kept_error_completes_(false),
+      kept_error_code_(SQLITE_OK) {
   try {
     if (cache.nparams_ == 0) {
       after_bind(true);
@@ -159,6 +188,12 @@ void SqliteResultImpl::bind(const cpp11::list& params) {
   ready_ = false;
   complete_ = true;
   nrows_ = 0;
+
+  // A new execution starts: the error kept from the previous one is dropped
+  error_kept_ = false;
+  kept_error_completes_ = false;
+  kept_error_.clear();
+  kept_error_code_ = SQLITE_OK;
 
   bool has_params = bind_row();
   after_bind(has_params);
@@ -305,17 +340,21 @@ void SqliteResultImpl::bind_parameter_pos(int j, SEXP value_) {
         SQLITE_TRANSIENT
       );
     } else {
-      cpp11::stop("Can only bind lists of raw vectors (or NULL)");
+      throw step_error(
+        "Can only bind lists of raw vectors (or NULL)",
+        SQLITE_ERROR
+      );
     }
   } else {
-    cpp11::stop(
-      "Don't know how to handle parameter of type %s.",
-      Rf_type2char(TYPEOF(value_))
+    throw step_error(
+      std::string("Don't know how to handle parameter of type ") +
+        Rf_type2char(TYPEOF(value_)) + ".",
+      SQLITE_ERROR
     );
   }
 
   if (rc != SQLITE_OK) {
-    raise_bind_exception(j);
+    raise_bind_exception(j, rc);
   }
 }
 
@@ -329,6 +368,11 @@ void SqliteResultImpl::after_bind(bool params_have_rows) {
 cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   n = (n_max < 0) ? 100 : n_max;
 
+  // The step past the rows of the previous fetch failed
+  if (error_kept_) {
+    raise_kept_error();
+  }
+
   SqliteDataFrame
     data(stmt, cache.names_, n_max, types_, with_alt_types_, check_utf8_);
 
@@ -340,9 +384,15 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
     );
   }
 
+  int n_read = 0;
   while (!complete_) {
     data.set_col_values();
-    step();
+    // The step past the last row of a full fetch only reads ahead
+    if (++n_read == n_max) {
+      read_ahead();
+    } else {
+      step();
+    }
     nrows_++;
     if (!data.advance()) {
       break;
@@ -352,9 +402,32 @@ cpp11::list SqliteResultImpl::fetch_rows(const int n_max, int& n) {
   return data.get_data(types_);
 }
 
+// A failed step throws a step_error, which reaches R at the entry point
 void SqliteResultImpl::step() {
   while (step_run())
     ;
+}
+
+// Steps past the last row of a full fetch.
+// This step only tells whether the result is complete,
+// and finishes the statement if it is, so that it releases its locks.
+// An error is kept for the next fetch instead of costing the rows of this one;
+// SQLite's message and result code are saved now,
+// before later calls overwrite them.
+void SqliteResultImpl::read_ahead() {
+  try {
+    while (step_run())
+      ;
+  } catch (const step_error& e) {
+    error_kept_ = true;
+    kept_error_ = e.what();
+    kept_error_code_ = e.code();
+    // A value SQLite refused to bind completes the result,
+    // but only once the next fetch has raised the error:
+    // until then, dbHasCompleted() stays FALSE.
+    kept_error_completes_ = complete_;
+    complete_ = false;
+  }
 }
 
 bool SqliteResultImpl::step_run() {
@@ -366,7 +439,7 @@ bool SqliteResultImpl::step_run() {
   case SQLITE_ROW:
     return false;
   default:
-    raise_sqlite_exception();
+    throw step_error(sqlite3_errmsg(conn), rc);
   }
 }
 
@@ -385,7 +458,9 @@ cpp11::list SqliteResultImpl::peek_first_row() {
   SqliteDataFrame
     data(stmt, cache.names_, 1, types_, with_alt_types_, check_utf8_);
 
-  if (!complete_) {
+  // After a failed step, the statement is on no row:
+  // the kept error is left for the next fetch that reads rows
+  if (!complete_ && !error_kept_) {
     data.set_col_values();
   }
   // Not calling data.advance(), remains a zero-row data frame
@@ -393,34 +468,38 @@ cpp11::list SqliteResultImpl::peek_first_row() {
   return data.get_data(types_);
 }
 
-void SqliteResultImpl::raise_sqlite_exception() const {
-  raise_sqlite_exception(conn);
+void SqliteResultImpl::raise_kept_error() {
+  step_error error(kept_error_, kept_error_code_);
+  if (kept_error_completes_) {
+    complete_ = true;
+  }
+  error_kept_ = false;
+  kept_error_completes_ = false;
+  kept_error_.clear();
+  kept_error_code_ = SQLITE_OK;
+  throw error;
 }
 
+// Throws a C++ exception rather than an R error: cpp11 turns it into an R error
+// at the entry point, with the message as it is, not as a format string.
 void SqliteResultImpl::raise_sqlite_exception(sqlite3* conn) {
-  cpp11::stop("%s", sqlite3_errmsg(conn));
+  throw std::runtime_error(sqlite3_errmsg(conn));
 }
 
 // A value SQLite refuses to bind, such as one over its length limit,
 // would otherwise be bound as NULL.
 // The result is marked complete, so that no fetch reads the reset statement;
 // the next dbBind() resets the statement and binds afresh.
-void SqliteResultImpl::raise_bind_exception(int j) {
+// It throws a step_error with SQLite's result code,
+// so that read_ahead() can keep it like the error of a step.
+void SqliteResultImpl::raise_bind_exception(int j, int rc) {
   complete_ = true;
+  std::string message = "Can't bind parameter " + std::to_string(j);
   const char* name = sqlite3_bind_parameter_name(stmt, j);
-  if (name == NULL) {
-    cpp11::stop(
-      "Can't bind parameter %d in row %d: %s.",
-      j,
-      group_ + 1,
-      sqlite3_errmsg(conn)
-    );
+  if (name != NULL) {
+    message += std::string(" (") + name + ")";
   }
-  cpp11::stop(
-    "Can't bind parameter %d (%s) in row %d: %s.",
-    j,
-    name,
-    group_ + 1,
-    sqlite3_errmsg(conn)
-  );
+  message +=
+    " in row " + std::to_string(group_ + 1) + ": " + sqlite3_errmsg(conn) + ".";
+  throw step_error(message, rc);
 }

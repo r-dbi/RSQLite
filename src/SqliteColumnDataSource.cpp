@@ -109,8 +109,10 @@ SEXP SqliteColumnDataSource::fetch_checked_string(const int field_type) const {
   }
   if (data == NULL) {
     // An empty blob, or out of memory: then the next sqlite3_step() fails
-    // with SQLITE_NOMEM. A fetch steps after every row it reads, and a peek
-    // returns no rows, so this "" never reaches the caller.
+    // with SQLITE_NOMEM. A peek returns no rows,
+    // and a fetch steps after every row it reads:
+    // that step raises the error, or, after the last row of a full fetch,
+    // keeps it for the next fetch, so this "" reaches the caller only then.
     return R_BlankString;
   }
 

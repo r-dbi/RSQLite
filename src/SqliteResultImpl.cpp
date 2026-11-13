@@ -10,7 +10,10 @@
 namespace {
 
 // An error of a step, from SQLite or from a parameter that cannot be bound,
-// with SQLite's result code; SQLITE_ERROR for a parameter.
+// with SQLite's result code:
+// the code of SQLite's refusal for a value it does not accept,
+// such as SQLITE_TOOBIG,
+// and SQLITE_ERROR for a parameter of a type that cannot be bound.
 // It leaves the C++ code only through cpp11's entry points,
 // which turn it into an R error with its message,
 // so that read_ahead() can keep it for the next fetch instead.

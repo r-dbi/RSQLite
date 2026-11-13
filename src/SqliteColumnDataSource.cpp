@@ -113,9 +113,7 @@ void SqliteColumnDataSource::check_out_of_memory(const void* data) const {
   }
   sqlite3* conn = sqlite3_db_handle(get_stmt());
   if (sqlite3_errcode(conn) == SQLITE_NOMEM) {
-    cpp11::stop(
-      "Cannot read column %d: %s", get_j() + 1, sqlite3_errmsg(conn)
-    );
+    cpp11::stop("Cannot read column %d: %s", get_j() + 1, sqlite3_errmsg(conn));
   }
 }
 

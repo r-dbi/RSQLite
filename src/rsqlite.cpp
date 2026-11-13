@@ -23,10 +23,10 @@ cpp11::doubles sqlite_heap_limits(double hard, double soft) {
   const sqlite3_int64 prior_soft = sqlite3_soft_heap_limit64(-1);
   sqlite3_hard_heap_limit64(static_cast<sqlite3_int64>(hard));
   sqlite3_soft_heap_limit64(static_cast<sqlite3_int64>(soft));
-  return cpp11::doubles({
-    "hard"_nm = static_cast<double>(prior_hard),
-    "soft"_nm = static_cast<double>(prior_soft)
-  });
+  return cpp11::doubles(
+    { "hard"_nm = static_cast<double>(prior_hard),
+      "soft"_nm = static_cast<double>(prior_soft) }
+  );
 }
 
 [[cpp11::register]]

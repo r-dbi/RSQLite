@@ -32,7 +32,7 @@ private:
 class ArrowChunk {
   boost::ptr_vector<SqliteArrowColumn>& columns_;
   const int n_max_;
-  int i_;
+  int64_t i_;
 
 public:
   ArrowChunk(boost::ptr_vector<SqliteArrowColumn>& columns, const int n_max)

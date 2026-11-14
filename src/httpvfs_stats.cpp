@@ -13,11 +13,14 @@ cpp11::writable::list sqlite_http_stats() {
 #ifdef RSQLITE_ENABLE_HTTPVFS
   sqlite3_http_stats(&bytes, &ranges, &fulldl);
 #endif
-  // Each element is held in a protected cpp11::sexp while the list is allocated.
+  // Each element is held in a protected cpp11::sexp while the list is
+  // allocated.
   using namespace cpp11::literals;
-  return cpp11::writable::list({
-    "bytes_fetched"_nm = cpp11::as_sexp(bytes),
-    "range_requests"_nm = cpp11::as_sexp(ranges),
-    "full_download"_nm = cpp11::as_sexp(fulldl != 0),
-  });
+  return cpp11::writable::list(
+    {
+      "bytes_fetched"_nm = cpp11::as_sexp(bytes),
+      "range_requests"_nm = cpp11::as_sexp(ranges),
+      "full_download"_nm = cpp11::as_sexp(fulldl != 0),
+    }
+  );
 }

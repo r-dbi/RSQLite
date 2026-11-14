@@ -1,5 +1,36 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.53.3.9023 (2026-11-14)
+
+## Bug fixes
+
+- `dbConnect()` closes the SQLite handle when the database fails to open (#826, #884).
+
+- `dbFetch()` no longer leaks column storage when a column spills over twice or a warning handler errors (#879, #883).
+
+- `dbBind()` fails when SQLite refuses to bind a value (#868).
+
+- Count rows in 64 bits, so that `dbGetRowCount()` and `dbGetRowsAffected()` stay right beyond `INT_MAX` (#858).
+
+- Never use query text or SQLite messages as a `printf()` format, and guard `fetch_blob()` against `NULL` (#869).
+
+## Features
+
+- Deprecate setting the `row.names` default via pkgconfig, and move pkgconfig to Suggests (#805).
+
+- Check text read into a character column with `dbConnect(check_utf8 = TRUE)` (#846).
+
+- Add a UTF-8 validator for strings read from SQLite (#845).
+
+## Build system, external dependencies
+
+- Keep system headers out of the generated `.dd` files on gcc's continuation lines (#853).
+
+## Testing
+
+- Declare DBItest 1.8.3.6 in the DBItest context (#854).
+
+
 # RSQLite 3.53.3.9022 (2026-11-11)
 
 ## Chore

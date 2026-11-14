@@ -55,6 +55,7 @@
 #' @param db A \code{\linkS4class{SQLiteConnection}} object to load these extensions into.
 #' @param extension The extension to load.
 #'
+#' @return `TRUE`, invisibly.
 #' @export
 #' @examples
 #' library(DBI)

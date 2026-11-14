@@ -78,6 +78,7 @@ is_url_or_special_filename <- function(x) grepl("^(?:file|http|ftp|https|):", x)
 #' Check for HTTP VFS support
 #'
 #' @description Capability query for optional HTTP VFS support.
+#' @return A logical scalar.
 #' @export
 sqliteHasHttpVFS <- function() {
   # Call C++ helper if registered by cpp11, else FALSE.

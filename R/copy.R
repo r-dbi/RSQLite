@@ -9,6 +9,7 @@
 #' @param to A `SQLiteConnection` object pointing to an empty database.
 #' @author Seth Falcon
 #' @references \url{https://www.sqlite.org/backup.html}
+#' @return `NULL`, invisibly.
 #' @export
 #' @examples
 #' library(DBI)

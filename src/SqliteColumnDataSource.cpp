@@ -7,6 +7,105 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <cmath>
+#include <stdexcept>
+#include <string>
+
+namespace {
+
+bool is_ascii_digit(char c) {
+  return c >= '0' && c <= '9';
+}
+
+bool is_ascii_space(char c) {
+  return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' ||
+         c == '\v';
+}
+
+// Splits a trailing UTC offset off a time or timestamp,
+// in the forms SQLite's date and time functions accept:
+// `Z`, or a sign, two digits for hours up to 14, a colon and two digits for
+// minutes, optionally surrounded by whitespace. Returns the text before the
+// offset, and stores whether there is one and its value in seconds east of UTC.
+// Anything else after the time that starts with a sign or `Z` throws,
+// because boost would read it as part of the time.
+std::string split_utc_offset(
+  const char* str,
+  bool& has_offset,
+  int& offset_secs
+) {
+  std::string text(str);
+  has_offset = false;
+  offset_secs = 0;
+
+  // The offset can only follow the time,
+  // so it is looked for after the first colon.
+  const std::string::size_type colon = text.find(':');
+  if (colon == std::string::npos) {
+    return text;
+  }
+  const std::string::size_type pos = text.find_first_of("+-Zz", colon);
+  if (pos == std::string::npos) {
+    return text;
+  }
+
+  std::string::size_type end = pos + 1;
+  const char sign = text[pos];
+  if (sign == '+' || sign == '-') {
+    if (text.size() < pos + 6 || !is_ascii_digit(text[pos + 1]) ||
+        !is_ascii_digit(text[pos + 2]) || text[pos + 3] != ':' ||
+        !is_ascii_digit(text[pos + 4]) || !is_ascii_digit(text[pos + 5])) {
+      throw std::invalid_argument("Invalid UTC offset");
+    }
+    const int hours = (text[pos + 1] - '0') * 10 + (text[pos + 2] - '0');
+    const int minutes = (text[pos + 4] - '0') * 10 + (text[pos + 5] - '0');
+    if (hours > 14 || minutes > 59) {
+      throw std::invalid_argument("Invalid UTC offset");
+    }
+    offset_secs = (sign == '-' ? -1 : 1) * (hours * 3600 + minutes * 60);
+    end = pos + 6;
+  }
+
+  for (; end < text.size(); ++end) {
+    if (!is_ascii_space(text[end])) {
+      throw std::invalid_argument("Invalid UTC offset");
+    }
+  }
+
+  has_offset = true;
+  std::string::size_type value_end = pos;
+  while (value_end > 0 && is_ascii_space(text[value_end - 1])) {
+    --value_end;
+  }
+  return text.substr(0, value_end);
+}
+
+// Throws unless a time with an offset is a time of day
+// in the form SQLite's `time()` accepts: `HH:MM`, `HH:MM:SS` or `HH:MM:SS.SSS`,
+// with hours up to 24 and minutes and seconds up to 59.
+// Boost reads any duration, such as `25:00:00` or `12:60:00`.
+void check_time_of_day(const std::string& text) {
+  const std::string::size_type n = text.size();
+  bool valid = n >= 5 && is_ascii_digit(text[0]) && is_ascii_digit(text[1]) &&
+               text[2] == ':' && is_ascii_digit(text[3]) &&
+               is_ascii_digit(text[4]) &&
+               (text[0] - '0') * 10 + (text[1] - '0') <= 24 && text[3] <= '5';
+  if (valid && n > 5) {
+    valid = n >= 8 && text[5] == ':' && is_ascii_digit(text[6]) &&
+            is_ascii_digit(text[7]) && text[6] <= '5';
+    if (valid && n > 8) {
+      valid = n >= 10 && text[8] == '.';
+      for (std::string::size_type i = 9; valid && i < n; ++i) {
+        valid = is_ascii_digit(text[i]);
+      }
+    }
+  }
+  if (!valid) {
+    throw std::invalid_argument("Invalid time of day");
+  }
+}
+
+}  // namespace
 
 SqliteColumnDataSource::SqliteColumnDataSource(
   sqlite3_stmt* stmt_,
@@ -191,10 +290,14 @@ double SqliteColumnDataSource::fetch_datetime_local() const {
       reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
     double dateval;
     try {
-      bp::ptime dttm(bd::parse_delimited_time<bp::ptime>(dtstr, ' '));
+      bool has_offset;
+      int offset_secs;
+      const std::string text = split_utc_offset(dtstr, has_offset, offset_secs);
+      bp::ptime dttm(bd::parse_delimited_time<bp::ptime>(text, ' '));
       bp::time_duration delta =
         dttm - bp::ptime(bg::date(1970, 1, 1), bp::seconds(0));
-      dateval = delta.total_microseconds() * 1e-6;
+      // A time east of UTC is ahead of it, as in SQLite's `datetime()`.
+      dateval = delta.total_microseconds() * 1e-6 - offset_secs;
     } catch (...) {
       cpp11::warning(std::string("Unknown string format, NA is returned."));
       dateval = NA_REAL;
@@ -223,8 +326,26 @@ double SqliteColumnDataSource::fetch_time() const {
       reinterpret_cast<const char*>(sqlite3_column_text(get_stmt(), get_j()));
     double dateval;
     try {
-      bp::time_duration secs(bp::duration_from_string(tmstr));
+      bool has_offset;
+      int offset_secs;
+      const std::string text = split_utc_offset(tmstr, has_offset, offset_secs);
+      if (has_offset) {
+        check_time_of_day(text);
+      }
+      bp::time_duration secs(bp::duration_from_string(text));
       dateval = secs.total_microseconds() * 1e-6;
+      if (has_offset) {
+        // As in SQLite's `time()`,
+        // a time with an offset is a time of day in UTC,
+        // and hour 24 is allowed only for 24:00:00.
+        if (dateval > 86400.0) {
+          throw std::invalid_argument("Invalid time of day");
+        }
+        dateval = std::fmod(dateval - offset_secs, 86400.0);
+        if (dateval < 0) {
+          dateval += 86400.0;
+        }
+      }
     } catch (...) {
       cpp11::warning(std::string("Unknown string format, NA is returned."));
       dateval = NA_REAL;

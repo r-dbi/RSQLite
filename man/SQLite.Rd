@@ -131,6 +131,11 @@ How exactly depends on whether the actual value is a number or a string:\tabular
 }
 
 
+Text in a TIME, DATETIME or TIMESTAMP column may end in a UTC offset,
+\code{Z} or \code{+HH:MM} or \code{-HH:MM},
+which is applied as SQLite's \code{datetime()} and \code{time()} apply it.
+A TIME with an offset becomes a time of day in UTC, wrapping around midnight.
+
 If a value cannot be mapped an \code{NA} is returned in its place with a warning.
 }
 

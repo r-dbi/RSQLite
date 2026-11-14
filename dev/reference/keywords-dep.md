@@ -29,3 +29,12 @@ make.db.names(
   ...
 )
 ```
+
+## Value
+
+[`SQLKeywords()`](https://dbi.r-dbi.org/reference/make.db.names.html)
+and
+[`make.db.names()`](https://dbi.r-dbi.org/reference/make.db.names.html)
+return a character vector.
+[`isSQLKeyword()`](https://dbi.r-dbi.org/reference/make.db.names.html)
+returns a logical vector.

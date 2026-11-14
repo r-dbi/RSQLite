@@ -9,6 +9,12 @@ in the datasets package.
 datasetsDb()
 ```
 
+## Value
+
+A read-only
+[SQLiteConnection](https://rsqlite.r-dbi.org/dev/reference/SQLiteConnection-class.md)
+object.
+
 ## Examples
 
 ``` r

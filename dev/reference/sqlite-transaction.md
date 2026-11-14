@@ -51,6 +51,14 @@ sqliteIsTransacting(conn)
   Supply a name to use a named savepoint. This allows you to nest
   multiple transaction
 
+## Value
+
+[`dbBegin()`](https://dbi.r-dbi.org/reference/transactions.html),
+[`dbCommit()`](https://dbi.r-dbi.org/reference/transactions.html), and
+[`dbRollback()`](https://dbi.r-dbi.org/reference/transactions.html)
+return `TRUE`, invisibly. `sqliteIsTransacting()` returns a logical
+scalar.
+
 ## See also
 
 The corresponding generic functions

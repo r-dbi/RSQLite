@@ -128,6 +128,10 @@ dbWriteTable(
   a logical specifying whether the new table should be temporary. Its
   default is `FALSE`.
 
+## Value
+
+`TRUE`, invisibly.
+
 ## Details
 
 In a primary key column qualified with

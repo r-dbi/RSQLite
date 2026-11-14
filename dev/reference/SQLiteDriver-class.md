@@ -26,3 +26,14 @@ dbIsValid(dbObj, ...)
 # S4 method for class 'SQLiteDriver'
 dbUnloadDriver(drv, ...)
 ```
+
+## Value
+
+[`dbDataType()`](https://dbi.r-dbi.org/reference/dbDataType.html)
+returns a character vector of SQL data types.
+[`dbGetInfo()`](https://dbi.r-dbi.org/reference/dbGetInfo.html) returns
+a list with elements `driver.version` and `client.version`.
+[`dbIsValid()`](https://dbi.r-dbi.org/reference/dbIsValid.html) always
+returns `TRUE`.
+[`dbUnloadDriver()`](https://dbi.r-dbi.org/reference/dbDriver.html)
+returns `TRUE`, invisibly.

@@ -111,6 +111,23 @@ The "Usage" section lists the class methods overridden by <span class="pkg">RSQL
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p><code><a href="https://rdrr.io/r/base/format.html" class="external-link">format()</a></code> returns a character string.
+<code><a href="https://dbi.r-dbi.org/reference/dbAppendTable.html" class="external-link">dbAppendTable()</a></code> returns the number of rows appended.
+<code><a href="https://dbi.r-dbi.org/reference/dbDataType.html" class="external-link">dbDataType()</a></code> returns a character vector of SQL data types.
+<code><a href="https://dbi.r-dbi.org/reference/dbExistsTable.html" class="external-link">dbExistsTable()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbIsValid.html" class="external-link">dbIsValid()</a></code> return a logical scalar.
+<code><a href="https://dbi.r-dbi.org/reference/dbGetException.html" class="external-link">dbGetException()</a></code> returns a list with elements <code>errorNum</code> and <code>errorMsg</code>.
+<code><a href="https://dbi.r-dbi.org/reference/dbGetInfo.html" class="external-link">dbGetInfo()</a></code> returns a named list.
+<code><a href="https://dbi.r-dbi.org/reference/dbListObjects.html" class="external-link">dbListObjects()</a></code> returns a data frame with columns <code>table</code> and <code>is_prefix</code>.
+<code><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables()</a></code> returns a character vector.
+<code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html" class="external-link">dbQuoteIdentifier()</a></code> returns an <a href="https://dbi.r-dbi.org/reference/SQL.html" class="external-link">SQL</a> object.
+<code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">dbRemoveTable()</a></code> returns <code>TRUE</code>, invisibly.
+<code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery()</a></code> returns an object of class <a href="SQLiteResult-class.html">SQLiteResult</a>.
+<code><a href="https://dbi.r-dbi.org/reference/dbUnquoteIdentifier.html" class="external-link">dbUnquoteIdentifier()</a></code> returns a list of <a href="https://dbi.r-dbi.org/reference/Id.html" class="external-link">Id</a> objects.
+<code><a href="https://rdrr.io/r/methods/show.html" class="external-link">show()</a></code> is called for its side effect of printing and returns <code>NULL</code>.
+<code><a href="https://dbi.r-dbi.org/reference/sqlData.html" class="external-link">sqlData()</a></code> returns a data frame with character columns quoted as SQL strings.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>The corresponding generic functions
 <code><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">DBI::dbSendQuery()</a></code>, <code><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">DBI::dbGetQuery()</a></code>,

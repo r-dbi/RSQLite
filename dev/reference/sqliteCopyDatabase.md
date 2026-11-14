@@ -22,6 +22,10 @@ sqliteCopyDatabase(from, to)
 
   A `SQLiteConnection` object pointing to an empty database.
 
+## Value
+
+`NULL`, invisibly.
+
 ## References
 
 <https://www.sqlite.org/backup.html>

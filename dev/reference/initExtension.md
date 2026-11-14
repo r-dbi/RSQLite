@@ -25,6 +25,10 @@ initExtension(
 
   The extension to load.
 
+## Value
+
+`TRUE`, invisibly.
+
 ## Details
 
 The `"math"` extension functions are written by Liam Healy and made
@@ -151,6 +155,6 @@ db <- dbConnect(RSQLite::SQLite())
 RSQLite::initExtension(db, "uuid")
 dbGetQuery(db, "SELECT uuid();")
 #>                                 uuid()
-#> 1 80049b77-1e36-43da-8cfb-7c9bf8794b08
+#> 1 97468408-b1a7-46d1-927f-13da75225ebd
 dbDisconnect(db)
 ```

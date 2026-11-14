@@ -7,3 +7,7 @@ Deprecated. Please use dbIsValid instead.
 ``` r
 isIdCurrent(obj)
 ```
+
+## Value
+
+A logical scalar.

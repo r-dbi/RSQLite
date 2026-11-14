@@ -17,3 +17,8 @@ dbBeginTransaction(conn, ...)
 - ...:
 
   Other arguments used by methods
+
+## Value
+
+The value returned by
+[`dbBegin()`](https://dbi.r-dbi.org/reference/transactions.html).

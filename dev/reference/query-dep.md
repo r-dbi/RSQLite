@@ -36,3 +36,9 @@ dbSendPreparedQuery(conn, statement, bind.data, ...)
 - ...:
 
   Other arguments used by methods
+
+## Value
+
+`dbGetPreparedQuery()` returns a data frame. `dbSendPreparedQuery()`
+returns an object of class
+[SQLiteResult](https://rsqlite.r-dbi.org/dev/reference/SQLiteResult-class.md).

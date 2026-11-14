@@ -12,29 +12,9 @@
 
 ## Bug fixes
 
-- `dbFetch()` raises "out of memory" instead of crashing when SQLite cannot convert a text value (#889, #890).
+- Fix various protection and memory issues (#889, #890, #894, #826, #884, #879, #883, #868).
 
-- Keep the elements of `sqliteHttpStats()` protected while its list is built (#894).
-
-- `dbConnect()` closes the SQLite handle when the database fails to open (#826, #884).
-
-- `dbFetch()` no longer leaks column storage when a column spills over twice or a warning handler errors (#879, #883).
-
-- `dbBind()` fails when SQLite refuses to bind a value (#868).
-
-- Count rows in 64 bits, so that `dbGetRowCount()` and `dbGetRowsAffected()` stay right beyond `INT_MAX` (#858).
-
-- Never use query text or SQLite messages as a `printf()` format, and guard `fetch_blob()` against `NULL` (#869).
-
-## Documentation
-
-- State the goals and non-goals (#788).
-
-- Fix the typos in the `dbConnect()` documentation (#790).
-
-## Chore
-
-- Keep system headers out of the generated `.dd` files on gcc's continuation lines (#853).
+- Count rows in 64 bits, so that `dbGetRowCount()` and `dbGetRowsAffected()` report correct counts (as `numeric`) for very large results (#858).
 
 
 # RSQLite 3.53.3 (2026-06-28)

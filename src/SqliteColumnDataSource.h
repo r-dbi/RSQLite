@@ -40,6 +40,8 @@ public:
 
 private:
   SEXP fetch_checked_string(const int field_type) const;
+  const char* fetch_text() const;
+  void check_out_of_memory(const void* data) const;
 
   static DATA_TYPE datatype_from_decltype(
     const char* decl_type,

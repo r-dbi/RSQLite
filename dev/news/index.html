@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RSQLite</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">3.53.3.9022</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">3.53.3.9023</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,31 @@
       <small>Source: <a href="https://github.com/r-dbi/RSQLite/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="3.53.3.9023" id="rsqlite-35339023-2026-11-14">RSQLite 3.53.3.9023 (2026-11-14)<a class="anchor" aria-label="anchor" href="#rsqlite-35339023-2026-11-14"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-3-53-3-9023">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-3-53-3-9023"></a></h3>
+<ul><li><p><code><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect()</a></code> closes the SQLite handle when the database fails to open (<a href="https://github.com/r-dbi/RSQLite/issues/826" class="external-link">#826</a>, <a href="https://github.com/r-dbi/RSQLite/issues/884" class="external-link">#884</a>).</p></li>
+<li><p><code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch()</a></code> no longer leaks column storage when a column spills over twice or a warning handler errors (<a href="https://github.com/r-dbi/RSQLite/issues/879" class="external-link">#879</a>, <a href="https://github.com/r-dbi/RSQLite/issues/883" class="external-link">#883</a>).</p></li>
+<li><p><code><a href="https://dbi.r-dbi.org/reference/dbBind.html" class="external-link">dbBind()</a></code> fails when SQLite refuses to bind a value (<a href="https://github.com/r-dbi/RSQLite/issues/868" class="external-link">#868</a>).</p></li>
+<li><p>Count rows in 64 bits, so that <code><a href="https://dbi.r-dbi.org/reference/dbGetRowCount.html" class="external-link">dbGetRowCount()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbGetRowsAffected.html" class="external-link">dbGetRowsAffected()</a></code> stay right beyond <code>INT_MAX</code> (<a href="https://github.com/r-dbi/RSQLite/issues/858" class="external-link">#858</a>).</p></li>
+<li><p>Never use query text or SQLite messages as a <code>printf()</code> format, and guard <code>fetch_blob()</code> against <code>NULL</code> (<a href="https://github.com/r-dbi/RSQLite/issues/869" class="external-link">#869</a>).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="features-3-53-3-9023">Features<a class="anchor" aria-label="anchor" href="#features-3-53-3-9023"></a></h3>
+<ul><li><p>Deprecate setting the <code>row.names</code> default via pkgconfig, and move pkgconfig to Suggests (<a href="https://github.com/r-dbi/RSQLite/issues/805" class="external-link">#805</a>).</p></li>
+<li><p>Check text read into a character column with <code>dbConnect(check_utf8 = TRUE)</code> (<a href="https://github.com/r-dbi/RSQLite/issues/846" class="external-link">#846</a>).</p></li>
+<li><p>Add a UTF-8 validator for strings read from SQLite (<a href="https://github.com/r-dbi/RSQLite/issues/845" class="external-link">#845</a>).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="build-system-external-dependencies-3-53-3-9023">Build system, external dependencies<a class="anchor" aria-label="anchor" href="#build-system-external-dependencies-3-53-3-9023"></a></h3>
+<ul><li>Keep system headers out of the generated <code>.dd</code> files on gcc’s continuation lines (<a href="https://github.com/r-dbi/RSQLite/issues/853" class="external-link">#853</a>).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="testing-3-53-3-9023">Testing<a class="anchor" aria-label="anchor" href="#testing-3-53-3-9023"></a></h3>
+<ul><li>Declare DBItest 1.8.3.6 in the DBItest context (<a href="https://github.com/r-dbi/RSQLite/issues/854" class="external-link">#854</a>).</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="3.53.3.9022" id="rsqlite-35339022-2026-11-11">RSQLite 3.53.3.9022 (2026-11-11)<a class="anchor" aria-label="anchor" href="#rsqlite-35339022-2026-11-11"></a></h2>
 <div class="section level3">

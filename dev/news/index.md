@@ -1,5 +1,58 @@
 # Changelog
 
+## RSQLite 3.53.3.9023 (2026-11-14)
+
+### Bug fixes
+
+- [`dbConnect()`](https://dbi.r-dbi.org/reference/dbConnect.html) closes
+  the SQLite handle when the database fails to open
+  ([\#826](https://github.com/r-dbi/RSQLite/issues/826),
+  [\#884](https://github.com/r-dbi/RSQLite/issues/884)).
+
+- [`dbFetch()`](https://dbi.r-dbi.org/reference/dbFetch.html) no longer
+  leaks column storage when a column spills over twice or a warning
+  handler errors ([\#879](https://github.com/r-dbi/RSQLite/issues/879),
+  [\#883](https://github.com/r-dbi/RSQLite/issues/883)).
+
+- [`dbBind()`](https://dbi.r-dbi.org/reference/dbBind.html) fails when
+  SQLite refuses to bind a value
+  ([\#868](https://github.com/r-dbi/RSQLite/issues/868)).
+
+- Count rows in 64 bits, so that
+  [`dbGetRowCount()`](https://dbi.r-dbi.org/reference/dbGetRowCount.html)
+  and
+  [`dbGetRowsAffected()`](https://dbi.r-dbi.org/reference/dbGetRowsAffected.html)
+  stay right beyond `INT_MAX`
+  ([\#858](https://github.com/r-dbi/RSQLite/issues/858)).
+
+- Never use query text or SQLite messages as a `printf()` format, and
+  guard `fetch_blob()` against `NULL`
+  ([\#869](https://github.com/r-dbi/RSQLite/issues/869)).
+
+### Features
+
+- Deprecate setting the `row.names` default via pkgconfig, and move
+  pkgconfig to Suggests
+  ([\#805](https://github.com/r-dbi/RSQLite/issues/805)).
+
+- Check text read into a character column with
+  `dbConnect(check_utf8 = TRUE)`
+  ([\#846](https://github.com/r-dbi/RSQLite/issues/846)).
+
+- Add a UTF-8 validator for strings read from SQLite
+  ([\#845](https://github.com/r-dbi/RSQLite/issues/845)).
+
+### Build system, external dependencies
+
+- Keep system headers out of the generated `.dd` files on gcc’s
+  continuation lines
+  ([\#853](https://github.com/r-dbi/RSQLite/issues/853)).
+
+### Testing
+
+- Declare DBItest 1.8.3.6 in the DBItest context
+  ([\#854](https://github.com/r-dbi/RSQLite/issues/854)).
+
 ## RSQLite 3.53.3.9022 (2026-11-11)
 
 ### Chore

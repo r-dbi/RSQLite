@@ -20,8 +20,8 @@
 #   so the `urls` job below is the one to read for URLs.
 # - `urls` runs urlchecker::url_check() on the source tree, prints the result to the log,
 #   lists every broken or redirected URL with its file and line, status, and replacement in the job summary,
-#   and fails on any of them, because CRAN asks for a 301 to be replaced by its target.
-#   It reports without holding up a release, like `docs`,
+#   and goes red on any of them, because CRAN asks for a 301 to be replaced by its target.
+#   Like `docs`, it only reports: a red `urls` job does not fail the release gate,
 #   because a third-party host can be down for a moment.
 # Only on r-dbi/RSQLite: in a fork, every job is skipped.
 # Each job writes its findings to the job summary,
@@ -185,8 +185,21 @@ jobs:
           res <- urlchecker::url_check(".", fail = FALSE, progress = FALSE)
           print(res)
 
-          cell <- function(x) gsub("|", "\\|", gsub("[\r\n]+", " ", x), fixed = TRUE)
-          code <- function(x) ifelse(nzchar(x), paste0("`", cell(x), "`"), "")
+          # Text from files and servers goes into a Markdown table:
+          # no line breaks or pipes, no HTML, and no backticks inside a code span.
+          cell <- function(x) {
+            x <- gsub("[\r\n]+", " ", x)
+            x <- gsub("&", "&amp;", x, fixed = TRUE)
+            x <- gsub("<", "&lt;", x, fixed = TRUE)
+            x <- gsub(">", "&gt;", x, fixed = TRUE)
+            gsub("|", "\\|", x, fixed = TRUE)
+          }
+          code <- function(x) {
+            x <- gsub("[\r\n]+", " ", x)
+            x <- gsub("`", "'", x, fixed = TRUE)
+            x <- gsub("|", "\\|", x, fixed = TRUE)
+            ifelse(nzchar(x), paste0("`", x, "`"), "")
+          }
           rows <- character()
           for (i in seq_len(NROW(res))) {
             cran <- res$CRAN[[i]]

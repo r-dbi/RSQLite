@@ -32,7 +32,7 @@ Run `revdepcheck::revdep_details(, "GitStats")` for more info
        Actual comparison: 1.0 <= 1.0
        Difference: 0.0 <= 0
        
-       [ FAIL 10 | WARN 0 | SKIP 160 | PASS 1383 ]
+       [ FAIL 13 | WARN 0 | SKIP 160 | PASS 1374 ]
        Error:
        ! Test failures.
        Execution halted

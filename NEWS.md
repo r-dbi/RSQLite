@@ -1,8 +1,20 @@
-<!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
+# RSQLite 3.54.1
 
-# RSQLite 3.53.3.9023 (2026-11-14)
+## Breaking changes
+
+- Deprecate setting the `row.names` default via pkgconfig, and move pkgconfig to Suggests (#805). The `row.names` arguments now default to `FALSE`; a default set with `pkgconfig::set_config()` is honored with a warning only if pkgconfig is already loaded. Pass `row.names` explicitly instead.
+
+## Features
+
+- Upgrade bundled SQLite to 3.54.1 (#827).
+
+- Check text read into a character column for valid UTF-8 with the new opt-in `dbConnect(check_utf8 = TRUE)` (#845, #846).
 
 ## Bug fixes
+
+- `dbFetch()` raises "out of memory" instead of crashing when SQLite cannot convert a text value (#889, #890).
+
+- Keep the elements of `sqliteHttpStats()` protected while its list is built (#894).
 
 - `dbConnect()` closes the SQLite handle when the database fails to open (#826, #884).
 
@@ -14,290 +26,15 @@
 
 - Never use query text or SQLite messages as a `printf()` format, and guard `fetch_blob()` against `NULL` (#869).
 
-## Features
-
-- Deprecate setting the `row.names` default via pkgconfig, and move pkgconfig to Suggests (#805).
-
-- Check text read into a character column with `dbConnect(check_utf8 = TRUE)` (#846).
-
-- Add a UTF-8 validator for strings read from SQLite (#845).
-
-## Build system, external dependencies
-
-- Keep system headers out of the generated `.dd` files on gcc's continuation lines (#853).
-
-## Testing
-
-- Declare DBItest 1.8.3.6 in the DBItest context (#854).
-
-
-# RSQLite 3.53.3.9022 (2026-11-11)
-
-## Chore
-
-- Add CRAN submission and release workflows (#820).
-
 ## Documentation
 
 - State the goals and non-goals (#788).
 
-
-# RSQLite 3.53.3.9021 (2026-11-08)
-
-## Features
-
-- Upgrade bundled SQLite to 3.54.1 (#827).
-
-
-# RSQLite 3.53.3.9020 (2026-11-01)
-
-## Features
-
-- Upgrade bundled SQLite to 3.54.1 (#824).
-
-
-# RSQLite 3.53.3.9019 (2026-10-29)
-
-## Features
-
-- Upgrade bundled SQLite to 3.54.1 (#822).
-
-
-# RSQLite 3.53.3.9018 (2026-10-22)
-
-## Features
-
-- Upgrade bundled SQLite to 3.54.1 (#819).
-
-
-# RSQLite 3.53.3.9017 (2026-10-18)
-
-## Features
-
-- Upgrade bundled SQLite to 3.54.1 (#817).
-
-
-# RSQLite 3.53.3.9016 (2026-10-17)
-
-## Features
-
-- Upgrade bundled SQLite to 3.54.1 (#815).
-
-
-# RSQLite 3.53.3.9015 (2026-10-11)
-
-## Features
-
-- Upgrade bundled SQLite to 3.54.0 (#813).
+- Fix the typos in the `dbConnect()` documentation (#790).
 
 ## Chore
 
-- Auto-update from GitHub Actions (#812).
-
-
-# RSQLite 3.53.3.9014 (2026-09-29)
-
-## Bug fixes
-
-### ci
-
-- Restore the custom actions and the `upgrade` workflow (#809).
-
-## Chore
-
-- Auto-update from GitHub Actions (#811).
-
-## Continuous integration
-
-- Run coverage checks after pkgdown push.
-
-## Uncategorized
-
-- Feat(ci): Render `README.md` and `index.md` in CI (cynkra/cynkratemplate#118).
-
-
-# RSQLite 3.53.3.9013 (2026-09-26)
-
-## Documentation
-
-- Pin `max.print` so rendering `README.md` is reproducible (#804).
-
-- Fix the typos in the `dbConnect()` roxygen (#790).
-
-## Testing
-
-- Drop the astyle formatting test (#798).
-
-## Uncategorized
-
-- Refactor(ci): Serve the revdep scripts with the actions instead of copying them (cynkra/cynkratemplate#149).
-
-- Feat(ci): Report coverage on pull requests from this repository (cynkra/cynkratemplate#146).
-
-- Ci: Bound every job with `timeout-minutes` (cynkra/cynkratemplate#144).
-
-- Fix(revdep2): Let a slice with no packages check nothing instead of failing (cynkra/cynkratemplate#150).
-
-- Feat: Build a binary package in every check job and share it as an artifact (cynkra/cynkratemplate#141).
-
-- Fix(ci): Collect the fleet's workflow fixes after the move to central actions (cynkra/cynkratemplate#139).
-
-
-# RSQLite 3.53.3.9012 (2026-09-15)
-
-## Chore
-
-- Update revdep report from revdep4 run (most, depth 1) (#793).
-
-
-# RSQLite 3.53.3.9011 (2026-09-13)
-
-## Chore
-
-- Remove Copilot setup steps.
-
-## Documentation
-
-- Break lines at meaning boundaries (#787).
-
-- Drop the branch from the coverage badge (#785).
-
-- Harmonize README and pkgdown front page rendering (#786).
-
-- Use `pak::pak()` for the development install (#783).
-
-## Uncategorized
-
-- Refactor(ci): Serve the actions from this repository instead of copying them (cynkra/cynkratemplate#121).
-
-- Refactor(ci): Move every script out of the workflows and into a named action (cynkra/cynkratemplate#120).
-
-- Refactor(ci): Make an action of what the workflows say more than once.
-
-- Refactor(ci): Move every script that could change out of the workflows.
-
-- Refactor(ci): Extract the last three scripts, which only a named action can hold.
-
-- Fix(fledge): Push the bump to the default branch wherever that is allowed (cynkra/cynkratemplate#117).
-
-- Fix(ci): Make a failing `rcc` run say what failed, and link to it (cynkra/cynkratemplate#115).
-
-- Fix(ci): Exempt deprecation warnings from the roxygenize warning gate (cynkra/cynkratemplate#114).
-
-
-# RSQLite 3.53.3.9010 (2026-09-13)
-
-## Features
-
-### ci
-
-- Align the `revdep2`, `revdep4` and `revdepx` subsystems with `rigraph`.
-
-## Uncategorized
-
-- Perf(revdepx): Compile the revdeps' checks through ccache.
-
-- Fix(ci): Survive an archived CRAN package, and install it from where it still lives.
-
-- Ci: Fail the roxygenize step on roxygen2 warnings (#111).
-
-
-# RSQLite 3.53.3.9009 (2026-09-05)
-
-## Bug fixes
-
-### ci
-
-- Backport kit fixes from `rigraph`, `duckdb-r` and `dm`.
-
-
-# RSQLite 3.53.3.9008 (2026-08-08)
-
-## Continuous integration
-
-- Wrap the commit status update into an action.
-
-- Route ccache through one-word compiler wrappers on Unix.
-
-- Name every step and restore the log entry `setup-pandoc` swallows.
-
-
-# RSQLite 3.53.3.9007 (2026-08-06)
-
-## Continuous integration
-
-- Add sharded `revdep2` workflow.
-
-## Uncategorized
-
-- Ci: Harden `workflow_run` workflows against untrusted pull requests (#106).
-
-
-# RSQLite 3.53.3.9006 (2026-08-05)
-
-## Chore
-
-- Auto-update from GitHub Actions (#777).
-
-## Continuous integration
-
-- Remove unused pr-commands workflow.
-
-## Uncategorized
-
-- Ci: Give every workflow and job an explicit `permissions` block (#103).
-
-- Ci: Pass workflow context through the environment, not into script text (#102).
-
-- Ci: Add a Windows arm64 (`windows-11-arm`) check on R-release (#99).
-
-
-# RSQLite 3.53.3.9005 (2026-07-29)
-
-- Ci: Apply matrix `env` vars in the workflow, not in custom actions (#95).
-
-- Ci: Link the responsible workflow run in snapshot update PRs (#96).
-
-
-# RSQLite 3.53.3.9004 (2026-07-26)
-
-## Features
-
-- Upgrade bundled SQLite to 3.53.4 (#773).
-
-
-# RSQLite 3.53.3.9003 (2026-07-25)
-
-## Continuous integration
-
-- Lock down `format-suggest` egress (audit → block).
-
-
-# RSQLite 3.53.3.9002 (2026-07-24)
-
-## Bug fixes
-
-### ci
-
-- Emit empty package matrix when there are no (rev)deps.
-
-
-# RSQLite 3.53.3.9001 (2026-07-22)
-
-## Continuous integration
-
-- Run on Ubuntu 26.04.
-
-
-# RSQLite 3.53.3.9000 (2026-07-17)
-
-## Chore
-
-- Auto-update from GitHub Actions (#766).
-
-## Uncategorized
-
-- Merge branch 'cran-3.53.3'.
+- Keep system headers out of the generated `.dd` files on gcc's continuation lines (#853).
 
 
 # RSQLite 3.53.3 (2026-06-28)

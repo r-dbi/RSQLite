@@ -6,6 +6,9 @@
 \usage{
 isIdCurrent(obj)
 }
+\value{
+A logical scalar.
+}
 \description{
 Deprecated. Please use dbIsValid instead.
 }

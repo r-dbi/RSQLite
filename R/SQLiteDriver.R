@@ -12,6 +12,12 @@ NULL
 #' The "Usage" section lists the class methods overridden by \pkg{RSQLite}.
 #' The [dbUnloadDriver()] method is a null-op.
 #'
+#' @return
+#' `dbDataType()` returns a character vector of SQL data types.
+#' `dbGetInfo()` returns a list with elements `driver.version` and `client.version`.
+#' `dbIsValid()` always returns `TRUE`.
+#' `dbUnloadDriver()` returns `TRUE`, invisibly.
+#'
 #' @keywords internal
 #' @export
 setClass("SQLiteDriver",

@@ -89,6 +89,22 @@
 
 \item{fail_if_missing}{If \code{FALSE}, \code{dbRemoveTable()} succeeds if the table doesn't exist.}
 }
+\value{
+\code{format()} returns a character string.
+\code{dbAppendTable()} returns the number of rows appended.
+\code{dbDataType()} returns a character vector of SQL data types.
+\code{dbExistsTable()} and \code{dbIsValid()} return a logical scalar.
+\code{dbGetException()} returns a list with elements \code{errorNum} and \code{errorMsg}.
+\code{dbGetInfo()} returns a named list.
+\code{dbListObjects()} returns a data frame with columns \code{table} and \code{is_prefix}.
+\code{dbListTables()} returns a character vector.
+\code{dbQuoteIdentifier()} returns an \link[DBI:SQL]{SQL} object.
+\code{dbRemoveTable()} returns \code{TRUE}, invisibly.
+\code{dbSendQuery()} returns an object of class \link[=SQLiteResult-class]{SQLiteResult}.
+\code{dbUnquoteIdentifier()} returns a list of \link[DBI:Id]{Id} objects.
+\code{show()} is called for its side effect of printing and returns \code{NULL}.
+\code{sqlData()} returns a data frame with character columns quoted as SQL strings.
+}
 \description{
 SQLiteConnection objects are created by passing \code{\link[=SQLite]{SQLite()}} as first argument to \code{\link[DBI:dbConnect]{DBI::dbConnect()}}.
 They are a superclass of the \link[DBI:DBIConnection-class]{DBIConnection} class.

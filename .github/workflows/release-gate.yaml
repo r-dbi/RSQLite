@@ -16,6 +16,13 @@
 #   and for a README.md that matches its README.Rmd.
 # - `soft` reports spelling, URLs and the NOTEs of R CMD check --as-cran --run-donttest
 #   with the CRAN incoming checks turned on, and never fails on a finding.
+#   Its URL check prints nothing to the log when every URL resolves,
+#   so the `urls` job below is the one to read for URLs.
+# - `urls` runs urlchecker::url_check() on the source tree, prints the result to the log,
+#   lists every broken or redirected URL with its file and line, status, and replacement in the job summary,
+#   and fails on any of them, because CRAN asks for a 301 to be replaced by its target.
+#   It reports without holding up a release, like `docs`,
+#   because a third-party host can be down for a moment.
 # Only on r-dbi/RSQLite: in a fork, every job is skipped.
 # Each job writes its findings to the job summary,
 # and the `report` job posts the results to the open release pull request.
@@ -136,9 +143,100 @@ jobs:
       - name: Run the soft checks
         uses: BristolMyersSquibb/blockr.ci/.github/actions/release-soft@5ee8e2be16e71e96628c6c5c60c20c03f1b35155
 
+  urls:
+    if: github.repository == 'r-dbi/RSQLite'
+
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+
+    name: "URLs"
+
+    # A third-party host can be down for a moment, so this job reports without holding up a release.
+    continue-on-error: true
+
+    # With continue-on-error, `needs.urls.result` reads `success` even when the job failed,
+    # so the job hands its own status to the report.
+    outputs:
+      result: ${{ steps.result.outputs.result }}
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      # urlchecker converts README.md and NEWS.md with pandoc to find their URLs.
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      # urlchecker reads the source tree only, so the package and its dependencies are not installed.
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: any::urlchecker
+          cache-version: release-gate-urls-1
+
+      - name: Check the URLs
+        env:
+          # Lifts the rate limit on the GitHub URLs.
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          res <- urlchecker::url_check(".", fail = FALSE, progress = FALSE)
+          print(res)
+
+          cell <- function(x) gsub("|", "\\|", gsub("[\r\n]+", " ", x), fixed = TRUE)
+          code <- function(x) ifelse(nzchar(x), paste0("`", cell(x), "`"), "")
+          rows <- character()
+          for (i in seq_len(NROW(res))) {
+            cran <- res$CRAN[[i]]
+            url <- if (nzchar(cran)) cran else res$URL[[i]]
+            status <- if (nzchar(cran)) "Error" else res$Status[[i]]
+            message <- if (nzchar(cran)) "CRAN URL not in canonical form" else res$Message[[i]]
+            new <- res$New[[i]]
+            for (file in res$From[[i]]) {
+              lines <- tryCatch(
+                which(grepl(url, readLines(file.path(res$root[[i]], file), warn = FALSE), fixed = TRUE)),
+                error = function(e) integer()
+              )
+              where <- if (length(lines)) paste0(file, ":", lines, collapse = ", ") else file
+              rows <- c(rows, sprintf(
+                "| %s | %s | %s | %s |",
+                code(where), code(url), cell(paste(c(status, message)[nzchar(c(status, message))], collapse = ": ")), code(new)
+              ))
+            }
+          }
+
+          md <- c("### URLs", "")
+          md <- if (NROW(res) == 0) {
+            c(md, ":white_check_mark: All URLs are correct.")
+          } else {
+            c(
+              md,
+              sprintf(":x: %d URL(s) to fix: broken, or moved to the replacement shown.", NROW(res)),
+              "",
+              "| Where | URL | Status | Replacement |",
+              "| --- | --- | --- | --- |",
+              rows
+            )
+          }
+          summary <- Sys.getenv("GITHUB_STEP_SUMMARY")
+          if (nzchar(summary)) write(md, file = summary, append = TRUE)
+          if (NROW(res) > 0) quit(status = 1)
+        shell: Rscript {0}
+
+      - name: Hand the job's status to the report
+        id: result
+        if: always()
+        env:
+          STATUS: ${{ job.status }}
+        run: |
+          echo "result=$STATUS" >> "$GITHUB_OUTPUT"
+        shell: bash
+
   # Posts the result to the open release pull request, one comment per workflow, updated in place.
   report:
-    needs: [gate, docs, soft]
+    needs: [gate, docs, soft, urls]
     if: always() && github.repository == 'r-dbi/RSQLite'
 
     runs-on: ubuntu-26.04
@@ -165,4 +263,5 @@ jobs:
             gate=${{ needs.gate.result }}
             docs=${{ needs.docs.outputs.result || needs.docs.result }} (reports only)
             soft=${{ needs.soft.result }}
+            urls=${{ needs.urls.outputs.result || needs.urls.result }} (reports only)
           token: ${{ github.token }}

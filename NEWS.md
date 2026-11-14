@@ -12,7 +12,7 @@
 
 ## Bug fixes
 
-- Fix various protection and memory issues (#889, #890, #894, #826, #884, #879, #883, #868).
+- Fix various protection and memory issues (#889, #890, #894, #826, #884, #879, #883, #868, #869).
 
 - Count rows in 64 bits, so that `dbGetRowCount()` and `dbGetRowsAffected()` report correct counts (as `numeric`) for very large results (#858).
 

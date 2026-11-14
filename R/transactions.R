@@ -19,6 +19,9 @@ NULL
 #' @param name Supply a name to use a named savepoint.
 #'   This allows you to nest multiple transaction
 #' @param .name For backward compatibility, do not use.
+#' @return
+#' `dbBegin()`, `dbCommit()`, and `dbRollback()` return `TRUE`, invisibly.
+#' `sqliteIsTransacting()` returns a logical scalar.
 #' @examples
 #' library(DBI)
 #' con <- dbConnect(SQLite(), ":memory:")

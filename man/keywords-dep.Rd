@@ -30,6 +30,10 @@
   ...
 )
 }
+\value{
+\code{SQLKeywords()} and \code{make.db.names()} return a character vector.
+\code{isSQLKeyword()} returns a logical vector.
+}
 \description{
 Deprecated. Please use \code{\link[DBI:dbQuoteIdentifier]{dbQuoteIdentifier()}} instead.
 }

@@ -6,6 +6,9 @@
 \usage{
 sqliteHasHttpVFS()
 }
+\value{
+A logical scalar.
+}
 \description{
 Capability query for optional HTTP VFS support.
 }

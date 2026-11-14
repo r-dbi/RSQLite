@@ -32,6 +32,10 @@ Otherwise ignored.}
 \item{name}{Supply a name to use a named savepoint.
 This allows you to nest multiple transaction}
 }
+\value{
+\code{dbBegin()}, \code{dbCommit()}, and \code{dbRollback()} return \code{TRUE}, invisibly.
+\code{sqliteIsTransacting()} returns a logical scalar.
+}
 \description{
 By default, SQLite is in auto-commit mode.
 \code{dbBegin()} starts a SQLite transaction and turns auto-commit off.

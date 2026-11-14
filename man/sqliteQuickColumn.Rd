@@ -6,6 +6,9 @@
 \usage{
 sqliteQuickColumn(con, table, column)
 }
+\value{
+A vector with the values of the column.
+}
 \description{
 A shortcut for
 \code{\link[DBI]{dbReadTable}(con, table, select.cols = column, row.names = FALSE)[[1]]},

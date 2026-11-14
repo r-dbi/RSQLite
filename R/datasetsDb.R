@@ -3,6 +3,7 @@
 #' This database is bundled with the package,
 #' and contains all data frames in the datasets package.
 #'
+#' @return A read-only [SQLiteConnection-class] object.
 #' @export
 #' @examples
 #' library(DBI)

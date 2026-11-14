@@ -7,6 +7,9 @@
 \usage{
 \S4method{fetch}{SQLiteResult}(res, n = -1, ...)
 }
+\value{
+A data frame.
+}
 \description{
 A shortcut for \code{\link[DBI]{dbFetch}(res, n = n, row.names = FALSE)},
 kept for compatibility reasons.

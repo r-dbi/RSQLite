@@ -45,6 +45,14 @@
 
 \S4method{dbIsValid}{SQLiteResult}(dbObj, ...)
 }
+\value{
+\code{dbBind()} returns the result object, invisibly.
+\code{dbClearResult()} returns \code{TRUE}, invisibly.
+\code{dbColumnInfo()} and \code{dbFetch()} return a data frame.
+\code{dbGetRowCount()} and \code{dbGetRowsAffected()} return a numeric scalar.
+\code{dbGetStatement()} returns a character string.
+\code{dbHasCompleted()} and \code{dbIsValid()} return a logical scalar.
+}
 \description{
 SQLiteDriver objects are created by \code{\link[DBI:dbSendQuery]{dbSendQuery()}} or \code{\link[DBI:dbSendStatement]{dbSendStatement()}},
 and encapsulate the result of an SQL statement (either \code{SELECT} or not).

@@ -6,6 +6,9 @@
 \usage{
 datasetsDb()
 }
+\value{
+A read-only \link[=SQLiteConnection-class]{SQLiteConnection} object.
+}
 \description{
 This database is bundled with the package,
 and contains all data frames in the datasets package.

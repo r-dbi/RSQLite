@@ -6,11 +6,15 @@
 
 ## Features
 
-- Upgrade bundled SQLite to 3.54.1 (#773, #813, #815, #817, #819, #822, #824, #827).
+- Upgrade bundled SQLite to 3.54.1 (#827).
 
-- Check text read into a character column with `dbConnect(check_utf8 = TRUE)` (#845, #846).
+- Check text read into a character column for valid UTF-8 with the new opt-in `dbConnect(check_utf8 = TRUE)` (#845, #846).
 
 ## Bug fixes
+
+- `dbFetch()` raises "out of memory" instead of crashing when SQLite cannot convert a text value (#889, #890).
+
+- Keep the elements of `sqliteHttpStats()` protected while its list is built (#894).
 
 - `dbConnect()` closes the SQLite handle when the database fails to open (#826, #884).
 

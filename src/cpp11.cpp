@@ -188,6 +188,20 @@ extern "C" SEXP _RSQLite_rsqliteVersion() {
     return cpp11::as_sexp(rsqliteVersion());
   END_CPP11
 }
+// rsqlite.cpp
+cpp11::doubles sqlite_heap_limits(double hard, double soft);
+extern "C" SEXP _RSQLite_sqlite_heap_limits(SEXP hard, SEXP soft) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(sqlite_heap_limits(cpp11::as_cpp<cpp11::decay_t<double>>(hard), cpp11::as_cpp<cpp11::decay_t<double>>(soft)));
+  END_CPP11
+}
+// rsqlite.cpp
+double sqlite_memory_used();
+extern "C" SEXP _RSQLite_sqlite_memory_used() {
+  BEGIN_CPP11
+    return cpp11::as_sexp(sqlite_memory_used());
+  END_CPP11
+}
 // utf8.cpp
 cpp11::logicals utf8_valid(cpp11::list x);
 extern "C" SEXP _RSQLite_utf8_valid(SEXP x) {
@@ -221,8 +235,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RSQLite_rsqliteVersion",               (DL_FUNC) &_RSQLite_rsqliteVersion,               0},
     {"_RSQLite_set_busy_handler",             (DL_FUNC) &_RSQLite_set_busy_handler,             2},
     {"_RSQLite_sqlite_has_http_vfs",          (DL_FUNC) &_RSQLite_sqlite_has_http_vfs,          0},
+    {"_RSQLite_sqlite_heap_limits",           (DL_FUNC) &_RSQLite_sqlite_heap_limits,           2},
     {"_RSQLite_sqlite_http_stats",            (DL_FUNC) &_RSQLite_sqlite_http_stats,            0},
     {"_RSQLite_sqlite_httpvfs_compiled",      (DL_FUNC) &_RSQLite_sqlite_httpvfs_compiled,      0},
+    {"_RSQLite_sqlite_memory_used",           (DL_FUNC) &_RSQLite_sqlite_memory_used,           0},
     {"_RSQLite_utf8_valid",                   (DL_FUNC) &_RSQLite_utf8_valid,                   1},
     {NULL, NULL, 0}
 };

@@ -1,15 +1,15 @@
-# GitStats (2.5.2)
+# roadDB (1.0.0)
 
-* GitHub mirror: <https://github.com/cran/GitStats>
+* GitHub mirror: <https://github.com/cran/roadDB>
 
-Run `revdepcheck::revdep_details(, "GitStats")` for more info
+Run `revdepcheck::revdep_details(, "roadDB")` for more info
 
 ## Error before installation
 
 ### Devel
 
 ```
-old check timed out after 1800s, at: * checking tests ...
+new check timed out after 1800s, at: * checking tests ...
 
 
 
@@ -19,7 +19,7 @@ old check timed out after 1800s, at: * checking tests ...
 ### CRAN
 
 ```
-old check timed out after 1800s, at: * checking tests ...
+new check timed out after 1800s, at: * checking tests ...
 
 
 

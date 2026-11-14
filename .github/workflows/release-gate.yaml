@@ -172,9 +172,10 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v2
 
       # urlchecker reads the source tree only, so the package and its dependencies are not installed.
+      # It refuses to read the vignettes without their builder, knitr, and rmarkdown is knitr's engine here.
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          packages: any::urlchecker
+          packages: any::urlchecker, any::knitr, any::rmarkdown
           cache-version: release-gate-urls-1
 
       - name: Check the URLs

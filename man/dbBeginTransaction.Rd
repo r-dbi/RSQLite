@@ -11,6 +11,9 @@ dbBeginTransaction(conn, ...)
 
 \item{...}{Other arguments used by methods}
 }
+\value{
+The value returned by \code{\link[DBI:dbBegin]{dbBegin()}}.
+}
 \description{
 See method documentation for details.
 }

@@ -86,6 +86,9 @@ Defaults to 0.}
 \item{temporary}{a logical specifying whether the new table should be temporary.
 Its default is \code{FALSE}.}
 }
+\value{
+\code{TRUE}, invisibly.
+}
 \description{
 Functions for writing data frames or delimiter-separated files to database tables.
 }

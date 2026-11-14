@@ -7,6 +7,9 @@
 \usage{
 \S4method{dbListResults}{SQLiteConnection}(conn, ...)
 }
+\value{
+A list containing the open result set, or an empty list.
+}
 \description{
 DEPRECATED
 }

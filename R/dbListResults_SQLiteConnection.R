@@ -2,6 +2,8 @@
 #'
 #' DEPRECATED
 #'
+#' @return A list containing the open result set, or an empty list.
+#'
 #' @rdname dbListResults
 #' @keywords internal
 #' @usage NULL

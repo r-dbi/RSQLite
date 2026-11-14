@@ -31,6 +31,10 @@ dbSendPreparedQuery(conn, statement, bind.data, ...)
 
 \item{...}{Other arguments used by methods}
 }
+\value{
+\code{dbGetPreparedQuery()} returns a data frame.
+\code{dbSendPreparedQuery()} returns an object of class \link[=SQLiteResult-class]{SQLiteResult}.
+}
 \description{
 These functions have been deprecated.
 Please switch to using \code{\link[DBI:dbSendQuery]{dbSendQuery()}}/\code{\link[DBI:dbGetQuery]{dbGetQuery()}} with the \code{params} argument

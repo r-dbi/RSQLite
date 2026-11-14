@@ -23,6 +23,12 @@
 
 \S4method{dbUnloadDriver}{SQLiteDriver}(drv, ...)
 }
+\value{
+\code{dbDataType()} returns a character vector of SQL data types.
+\code{dbGetInfo()} returns a list with elements \code{driver.version} and \code{client.version}.
+\code{dbIsValid()} always returns \code{TRUE}.
+\code{dbUnloadDriver()} returns \code{TRUE}, invisibly.
+}
 \description{
 SQLiteDriver objects are created by \code{\link[=SQLite]{SQLite()}},
 and used to select the correct method in \code{\link[DBI:dbConnect]{dbConnect()}}.

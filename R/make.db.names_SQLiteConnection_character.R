@@ -2,6 +2,9 @@
 #'
 #' Deprecated. Please use [dbQuoteIdentifier()] instead.
 #'
+#' @return
+#' `SQLKeywords()` and `make.db.names()` return a character vector.
+#' `isSQLKeyword()` returns a logical vector.
 #' @keywords internal
 #' @rdname keywords-dep
 #' @usage NULL

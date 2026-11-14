@@ -11,6 +11,22 @@
 #' [DBI::dbExistsTable()], [DBI::dbListTables()], [DBI::dbListFields()],
 #' [DBI::dbRemoveTable()], and [DBI::sqlData()].
 #'
+#' @return
+#' `format()` returns a character string.
+#' `dbAppendTable()` returns the number of rows appended.
+#' `dbDataType()` returns a character vector of SQL data types.
+#' `dbExistsTable()` and `dbIsValid()` return a logical scalar.
+#' `dbGetException()` returns a list with elements `errorNum` and `errorMsg`.
+#' `dbGetInfo()` returns a named list.
+#' `dbListObjects()` returns a data frame with columns `table` and `is_prefix`.
+#' `dbListTables()` returns a character vector.
+#' `dbQuoteIdentifier()` returns an [SQL][DBI::SQL] object.
+#' `dbRemoveTable()` returns `TRUE`, invisibly.
+#' `dbSendQuery()` returns an object of class [SQLiteResult-class].
+#' `dbUnquoteIdentifier()` returns a list of [Id][DBI::Id] objects.
+#' `show()` is called for its side effect of printing and returns `NULL`.
+#' `sqlData()` returns a data frame with character columns quoted as SQL strings.
+#'
 #' @keywords internal
 #' @export
 setClass("SQLiteConnection",

@@ -14,6 +14,9 @@ initExtension(
 
 \item{extension}{The extension to load.}
 }
+\value{
+\code{TRUE}, invisibly.
+}
 \description{
 Several extension functions are included in the \pkg{RSQLite} package.
 When enabled via \code{initExtension()}, these extension functions can be used in SQL queries.

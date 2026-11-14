@@ -5,6 +5,8 @@
 #' @seealso
 #' The corresponding generic function [DBI::dbWriteTable()].
 #'
+#' @return `TRUE`, invisibly.
+#'
 #' @rdname dbWriteTable
 #' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by [DBI::dbConnect()]
 #' @param name a character string specifying a table name.

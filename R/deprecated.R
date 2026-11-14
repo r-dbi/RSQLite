@@ -53,6 +53,7 @@ dbBuildTableDefinition <- function(...) {
 #'
 #' Deprecated. Please use dbIsValid instead.
 #'
+#' @return A logical scalar.
 #' @keywords internal
 #' @export
 isIdCurrent <- function(obj) {
@@ -66,6 +67,9 @@ isIdCurrent <- function(obj) {
 #' Please switch to using [dbSendQuery()]/[dbGetQuery()] with the `params` argument
 #' or with calling [dbBind()] instead.
 #'
+#' @return
+#' `dbGetPreparedQuery()` returns a data frame.
+#' `dbSendPreparedQuery()` returns an object of class [SQLiteResult-class].
 #' @keywords internal
 #' @name query-dep
 NULL
@@ -76,6 +80,7 @@ NULL
 #' \code{\link[DBI]{dbReadTable}(con, table, select.cols = column, row.names = FALSE)[[1]]},
 #' kept for compatibility reasons.
 #'
+#' @return A vector with the values of the column.
 #' @keywords internal
 #' @export
 sqliteQuickColumn <- function(con, table, column) {

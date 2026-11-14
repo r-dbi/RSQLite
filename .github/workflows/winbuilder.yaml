@@ -8,7 +8,7 @@
 #
 # Every upload is started by hand, because each one sends an email:
 # `gh workflow run winbuilder.yaml --repo r-dbi/RSQLite --ref <branch> [-f queues="R-devel R-release"]`.
-# Only on r-dbi/RSQLite: in a fork, every job is skipped, so that nothing is uploaded under the maintainer's address.
+# Not in a fork: there, every job is skipped, so that nothing is uploaded under the maintainer's address.
 # The `report` job posts what was uploaded to the open release pull request;
 # win-builder's verdict arrives only by e-mail.
 on:
@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   winbuilder:
-    if: github.repository == 'r-dbi/RSQLite'
+    if: ${{ !github.event.repository.fork }}
 
     runs-on: ubuntu-26.04
     timeout-minutes: 60
@@ -127,7 +127,7 @@ jobs:
   # Posts the result to the open release pull request, one comment per workflow, updated in place.
   report:
     needs: [winbuilder]
-    if: always() && github.repository == 'r-dbi/RSQLite'
+    if: always() && !github.event.repository.fork
 
     runs-on: ubuntu-26.04
     timeout-minutes: 5

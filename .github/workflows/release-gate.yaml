@@ -23,7 +23,6 @@
 #   and goes red on any of them, because CRAN asks for a 301 to be replaced by its target.
 #   Like `docs`, it only reports: a red `urls` job does not fail the release gate,
 #   because a third-party host can be down for a moment.
-# Not in a fork: there, every job is skipped.
 # Each job writes its findings to the job summary,
 # and the `report` job posts the results to the open release pull request.
 on:
@@ -40,8 +39,6 @@ permissions:
 
 jobs:
   gate:
-    if: ${{ !github.event.repository.fork }}
-
     runs-on: ubuntu-26.04
     timeout-minutes: 15
 
@@ -60,8 +57,6 @@ jobs:
         uses: BristolMyersSquibb/blockr.ci/.github/actions/release-gate@5ee8e2be16e71e96628c6c5c60c20c03f1b35155
 
   docs:
-    if: ${{ !github.event.repository.fork }}
-
     runs-on: ubuntu-26.04
     timeout-minutes: 60
 
@@ -107,8 +102,6 @@ jobs:
         shell: bash
 
   soft:
-    if: ${{ !github.event.repository.fork }}
-
     runs-on: ubuntu-26.04
     timeout-minutes: 120
 
@@ -144,8 +137,6 @@ jobs:
         uses: BristolMyersSquibb/blockr.ci/.github/actions/release-soft@5ee8e2be16e71e96628c6c5c60c20c03f1b35155
 
   urls:
-    if: ${{ !github.event.repository.fork }}
-
     runs-on: ubuntu-26.04
     timeout-minutes: 15
 
@@ -251,7 +242,7 @@ jobs:
   # Posts the result to the open release pull request, one comment per workflow, updated in place.
   report:
     needs: [gate, docs, soft, urls]
-    if: always() && !github.event.repository.fork
+    if: always()
 
     runs-on: ubuntu-26.04
     timeout-minutes: 5

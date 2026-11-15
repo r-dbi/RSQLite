@@ -1,5 +1,18 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.53.3.9024 (2026-11-15)
+
+## Bug fixes
+
+- Keep the elements of `sqliteHttpStats()` protected while its list is built (#894).
+
+- `dbFetch()` raises "out of memory" instead of crashing when SQLite cannot convert a text value (#889, #890).
+
+## Documentation
+
+- Document the return value of every function with a usage section (#896).
+
+
 # RSQLite 3.53.3.9023 (2026-11-14)
 
 ## Bug fixes

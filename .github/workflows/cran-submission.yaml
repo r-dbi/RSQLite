@@ -12,7 +12,8 @@
 # (handbook/operations/releases/cran/README.md and process/README.md at 86ac17f6b).
 # Every run below is dispatched by hand, usually on the repository itself.
 # When it cannot run there, it runs from a fork:
-# the tag and the draft release are then created in the fork, and the repository is cleaned up afterwards.
+# the tag and the draft release are then created in the fork, and step 7 does not run there,
+# so pushing the tag to the repository and publishing the release are part of the cleanup afterwards.
 #
 # 1. Review: before the cut, go through the open issues and pull requests,
 #    the CI history on `main` (scheduled runs and R-devel included),

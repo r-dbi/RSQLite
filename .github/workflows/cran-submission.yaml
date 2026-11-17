@@ -10,9 +10,10 @@
 #
 # The release process, adapted from duckdb/duckdb-r's handbook
 # (handbook/operations/releases/cran/README.md and process/README.md at 86ac17f6b).
-# Every run below is dispatched by hand on r-dbi/RSQLite itself, never on a fork,
-# where a run would tag and draft in the fork and upload to CRAN under the maintainer's address:
-# in a fork, the jobs of this workflow and of the other release workflows are skipped.
+# Every run below is dispatched by hand, usually on the repository itself.
+# When it cannot run there, it runs from a fork:
+# the tag and the draft release are then created in the fork, and step 7 does not run there,
+# so pushing the tag to the repository and publishing the release are part of the cleanup afterwards.
 #
 # 1. Review: before the cut, go through the open issues and pull requests,
 #    the CI history on `main` (scheduled runs and R-devel included),
@@ -132,9 +133,6 @@ jobs:
   # A few seconds, so that a development version stops the run
   # before anything is built, tagged or uploaded.
   check-version:
-    # Only on r-dbi/RSQLite; in a fork, this job and every job that needs it are skipped.
-    if: github.repository == 'r-dbi/RSQLite'
-
     runs-on: ubuntu-26.04
     timeout-minutes: 5
 
@@ -423,7 +421,7 @@ jobs:
   # Posts the result to the open release pull request, one comment per workflow, updated in place.
   report:
     needs: [check-version, tag, cran-submission, attach-tarball]
-    if: always() && github.repository == 'r-dbi/RSQLite'
+    if: always()
 
     runs-on: ubuntu-26.04
     timeout-minutes: 5

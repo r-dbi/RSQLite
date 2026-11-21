@@ -26,8 +26,11 @@
 #    Record the review's findings there.
 # 3. Date: before each round of checks, one commit sets the date in the NEWS.md heading,
 #    `# RSQLite X.Y.Z (YYYY-MM-DD)`, and in `Date:` in DESCRIPTION.
-# 4. Check: dispatch R-CMD-check.yaml on the release branch, which builds, checks and uploads the source tarball;
-#    then release-gate.yaml, builders.yaml, rhub.yaml and revdep.yaml.
+# 4. Check: dispatch R-CMD-check.yaml on the release branch with `cran-submission` on,
+#    which builds the source tarball, recompresses it with pigz -11, checks it and uploads it:
+#    `gh workflow run R-CMD-check.yaml --repo r-dbi/RSQLite --ref <branch> -f cran-submission=true`.
+#    Only a tarball from such a run is recompressed, so dispatch it again after every change to the branch.
+#    Then dispatch release-gate.yaml, builders.yaml, rhub.yaml and revdep.yaml.
 #    The release workflows post their results to the checklist pull request;
 #    win-builder mails its verdict to the maintainer.
 #    Every error, warning and note is a blocker unless the checklist pull request explains it.

@@ -18,11 +18,6 @@ on:
 
 name: builders
 
-# A newer run on the same ref cancels one still pending or running, as winbuilder.yaml did.
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 permissions: {}
 
 jobs:

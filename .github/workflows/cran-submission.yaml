@@ -30,6 +30,8 @@
 #    which builds the source tarball, recompresses it with pigz -11, checks it and uploads it:
 #    `gh workflow run R-CMD-check.yaml --repo r-dbi/RSQLite --ref <branch> -f cran-submission=true`.
 #    Only a tarball from such a run is recompressed, so dispatch it again after every change to the branch.
+#    Dispatch it after the push, not before: a push run and a dispatch run of the same commit share a concurrency group,
+#    so the later one cancels the earlier one; R-CMD-check.yaml starts push runs on `main`, for a fix made there.
 #    Then dispatch release-gate.yaml, builders.yaml, rhub.yaml and revdep.yaml.
 #    The release workflows post their results to the checklist pull request;
 #    win-builder mails its verdict to the maintainer.

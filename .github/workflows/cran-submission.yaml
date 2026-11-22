@@ -65,7 +65,7 @@ permissions: {}
 jobs:
   submit:
     if: github.repository == 'r-dbi/RSQLite'
-    uses: krlmlr/r-release-actions/.github/workflows/cran-submission.yaml@4594a4f450d571d1b986db961441e9135ff626bd # main
+    uses: krlmlr/r-release-actions/.github/workflows/cran-submission.yaml@main
     permissions:
       actions: read
       contents: write

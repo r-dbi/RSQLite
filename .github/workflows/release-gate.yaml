@@ -15,7 +15,7 @@ permissions: {}
 jobs:
   gate:
     if: github.repository == 'r-dbi/RSQLite'
-    uses: krlmlr/r-release-actions/.github/workflows/release-gate.yaml@4594a4f450d571d1b986db961441e9135ff626bd # main
+    uses: krlmlr/r-release-actions/.github/workflows/release-gate.yaml@main
     permissions:
       actions: read
       contents: read

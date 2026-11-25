@@ -8,9 +8,15 @@
 #'   There are two exceptions:
 #'
 #'   \itemize{
-#'   \item `""` will create a temporary on-disk database.
-#'     The file will be deleted when the connection is closed.
-#'   \item `":memory:"` or `"file::memory:"` will create a temporary in-memory database.
+#'   \item `""` will create a temporary on-disk database. The file
+#'     will be deleted when the connection is closed.
+#'   \item `":memory:"` or `"file::memory:"` will create a temporary
+#'     in-memory database.
+#'   \item If the optional HTTP VFS is available, remote read-only SQLite
+#'     databases can be opened with [sqliteRemote()] or with a SQLite URI
+#'     filename such as
+#'     `"file:https://example.org/db.sqlite?vfs=http&immutable=1"` and
+#'     `flags = SQLITE_RO`.
 #'   }
 #' @param cache_size Advanced option.
 #'   A positive integer to change the maximum number of disk pages that SQLite holds in memory (SQLite's default is 2000 pages).

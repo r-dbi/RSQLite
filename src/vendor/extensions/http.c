@@ -120,10 +120,12 @@ static int httpOpen(sqlite3_vfs*, const char *zName, sqlite3_file *pFile, int fl
 static int httpDelete(sqlite3_vfs *pVfs, const char *zName, int syncDir){ (void)pVfs; (void)zName; (void)syncDir; return SQLITE_READONLY; }
 static int httpAccess(sqlite3_vfs *pVfs, const char *zName, int flags, int *pResOut){ (void)pVfs; (void)zName; (void)flags; /* Stat not reliable; assume exists */ *pResOut = 1; return  SQLITE_OK; }
 static int httpFullPathname(sqlite3_vfs *pVfs, const char *zName, int nOut, char *zOut){ (void)pVfs; sqlite3_snprintf(nOut, zOut, "%s", zName); return SQLITE_OK; }
-static void *httpDlOpen(sqlite3_vfs *pVfs, const char *z){ (void)pVfs; (void)z; return 0; }
-static void httpDlError(sqlite3_vfs *pVfs, int nOut, char *zOut){ (void)pVfs; if(nOut>0) zOut[0] = 0; }
-static void (*httpDlSym(sqlite3_vfs *pVfs, void *pH, const char *zSymbol)) (void){ (void)pVfs; (void)pH; (void)zSymbol; return 0; }
-static void httpDlClose(sqlite3_vfs *pVfs, void *pH){ (void)pVfs; (void)pH; }
+/* sqlite3_load_extension() loads through the connection's VFS,
+   so delegate to the default VFS for extensions to load on remote connections. */
+static void *httpDlOpen(sqlite3_vfs *pVfs, const char *z){ (void)pVfs; sqlite3_vfs *pParent = sqlite3_vfs_find(0); return pParent->xDlOpen(pParent, z); }
+static void httpDlError(sqlite3_vfs *pVfs, int nOut, char *zOut){ (void)pVfs; sqlite3_vfs *pParent = sqlite3_vfs_find(0); pParent->xDlError(pParent, nOut, zOut); }
+static void (*httpDlSym(sqlite3_vfs *pVfs, void *pH, const char *zSymbol)) (void){ (void)pVfs; sqlite3_vfs *pParent = sqlite3_vfs_find(0); return pParent->xDlSym(pParent, pH, zSymbol); }
+static void httpDlClose(sqlite3_vfs *pVfs, void *pH){ (void)pVfs; sqlite3_vfs *pParent = sqlite3_vfs_find(0); pParent->xDlClose(pParent, pH); }
 static int httpRandomness(sqlite3_vfs *pVfs, int nByte, char *zOut){ (void)pVfs; /* delegate to default vfs */ sqlite3_vfs *pParent = sqlite3_vfs_find(0); return pParent && pParent->xRandomness ? pParent->xRandomness(pParent, nByte, zOut) : SQLITE_ERROR; }
 static int httpSleep(sqlite3_vfs *pVfs, int micro){ (void)pVfs; sqlite3_vfs *pParent = sqlite3_vfs_find(0); return pParent->xSleep(pParent, micro); }
 static int httpCurrentTime(sqlite3_vfs *pVfs, double *pTime){ (void)pVfs; sqlite3_vfs *pParent = sqlite3_vfs_find(0); return pParent->xCurrentTime(pParent, pTime); }
@@ -219,7 +221,8 @@ static int http_probe_meta(HttpFile *hf){
   HeaderProbe hp; hp.content_length = -1; hp.accept_ranges = 0;
   curl_easy_setopt(hf->curl, CURLOPT_URL, hf->url);
   curl_easy_setopt(hf->curl, CURLOPT_NOBODY, 1L);
-  curl_easy_setopt(hf->curl, CURLOPT_HEADER, 1L);
+  /* No CURLOPT_HEADER: the header callback sees the headers anyway,
+     and the default write callback would print them to stdout. */
   curl_easy_setopt(hf->curl, CURLOPT_HEADERFUNCTION, curl_header_cb);
   curl_easy_setopt(hf->curl, CURLOPT_HEADERDATA, &hp);
   curl_easy_setopt(hf->curl, CURLOPT_FOLLOWLOCATION, 1L);
@@ -228,7 +231,6 @@ static int http_probe_meta(HttpFile *hf){
   curl_easy_getinfo(hf->curl, CURLINFO_RESPONSE_CODE, &code);
   /* Reset options that shouldn't persist */
   curl_easy_setopt(hf->curl, CURLOPT_NOBODY, 0L);
-  curl_easy_setopt(hf->curl, CURLOPT_HEADER, 0L);
   curl_easy_setopt(hf->curl, CURLOPT_HEADERFUNCTION, NULL);
   curl_easy_setopt(hf->curl, CURLOPT_HEADERDATA, NULL);
   if(rc == CURLE_OK && code < 400){

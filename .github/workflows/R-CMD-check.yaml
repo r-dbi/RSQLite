@@ -521,7 +521,7 @@ jobs:
         with:
           name: ${{ needs.rcc-smoke.outputs.binary }}
 
-      - name: Remove ${{ matrix.package }} and all strong dependencies
+      - name: Remove ${{ matrix.package }} and its recursive strong reverse dependencies
         run: |
           pkg <- "${{ matrix.package }}"
           # Recursive: a package whose strong dependency is gone is broken.

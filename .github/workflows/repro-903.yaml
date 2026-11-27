@@ -1,0 +1,272 @@
+# Reproduction only for r-dbi/RSQLite#903:
+# link failure on Windows with rtools42 (R 4.2) when configure.win enables the HTTP VFS,
+# `libcrypto.a(b_addr.o): undefined reference to 'gai_strerrorW'`.
+# Drop this commit before any fix merges.
+#
+# No cache by design: a cold build takes a few minutes,
+# so the cached-toolchain loop of the reproduction rules is not needed here.
+# Also no assertion step yet, since the cause is unconfirmed:
+# every job ends green, and the verdicts (LINK-FAIL, OK, OTHER-FAIL) live in the job summary.
+
+name: repro-903
+
+on:
+  push:
+    branches:
+      - claude/repro-903
+    paths:
+      - .github/workflows/repro-903.yaml
+      - configure.win
+      - cleanup.win
+      - src/Makevars*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  repro:
+    name: ${{ matrix.name }}
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: main-r4.2
+            r: '4.2'
+            rtools: '42'
+            source: branch
+          - name: main-release
+            r: release
+            rtools: ''
+            source: branch
+          - name: cran-3.53.3-r4.2
+            r: '4.2'
+            rtools: '42'
+            source: cran-tarball
+          - name: release-3.54.1-r4.2
+            r: '4.2'
+            rtools: '42'
+            source: cran-release-ref
+
+    env:
+      MATRIX_NAME: ${{ matrix.name }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout claude/cran-release
+        if: matrix.source == 'cran-release-ref'
+        uses: actions/checkout@v4
+        with:
+          ref: claude/cran-release
+          path: rel
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.r }}
+          rtools-version: ${{ matrix.rtools }}
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          dependencies: '"hard"'
+
+      - name: Write helpers
+        shell: bash
+        run: |
+          mkdir -p _repro
+          cat > _repro/lib.sh <<'EOF'
+          # build <variant> <source>: install into a temporary library, log to _repro/install-<variant>.log
+          build() {
+            v="$1"; src="$2"
+            mkdir -p "_repro/lib-$v"
+            set -o pipefail
+            R CMD INSTALL --preclean -l "_repro/lib-$v" "$src" 2>&1 | tee "_repro/install-$v.log"
+          }
+
+          # report <variant> <outcome>: extract the key lines and write the verdict to log and summary
+          report() {
+            v="$1"; outcome="$2"; log="_repro/install-$v.log"
+            if [ ! -f "$log" ]; then
+              verdict=NOT-RUN
+            elif [ "$outcome" = success ]; then
+              verdict=OK
+            elif grep -q gai_strerrorW "$log"; then
+              verdict=LINK-FAIL
+            else
+              verdict=OTHER-FAIL
+            fi
+            found=$( (grep -m1 -E 'Found libcurl|libcurl not found' "$log" 2>/dev/null || true) )
+            undef=$( (grep -E 'gai_strerrorW|undefined reference' "$log" 2>/dev/null || true) | head -n 100)
+            link=$( (grep -F -e '-o RSQLite.dll' "$log" 2>/dev/null || true) )
+
+            echo "===== BEGIN $MATRIX_NAME / $v ====="
+            echo "verdict: $verdict (step outcome: $outcome)"
+            echo "----- libcurl -----"
+            echo "${found:-(no libcurl line)}"
+            echo "----- undefined references -----"
+            echo "${undef:-(none)}"
+            echo "----- link command -----"
+            echo "${link:-(no link command)}"
+            echo "===== END $MATRIX_NAME / $v ====="
+
+            {
+              echo "### $MATRIX_NAME / $v: \`$verdict\`"
+              echo
+              echo "libcurl:"
+              echo '```'
+              echo "${found:-(no libcurl line)}"
+              echo '```'
+              echo "Undefined references:"
+              echo '```'
+              echo "${undef:-(none)}"
+              echo '```'
+              echo "Link command:"
+              echo '```'
+              echo "${link:-(no link command)}"
+              echo '```'
+              echo
+            } >> "$GITHUB_STEP_SUMMARY"
+          }
+          EOF
+
+          cat > _repro/diag.sh <<'EOF'
+          echo "PATH=$PATH"
+          if command -v pkg-config; then
+            echo "--- pkg-config --version"; pkg-config --version || echo "(failed: $?)"
+            echo "--- pkg-config --cflags libcurl"; pkg-config --cflags libcurl || echo "(failed: $?)"
+            echo "--- pkg-config --libs libcurl"; pkg-config --libs libcurl || echo "(failed: $?)"
+            echo "--- pkg-config --static --libs libcurl"; pkg-config --static --libs libcurl || echo "(failed: $?)"
+          else
+            echo "pkg-config not found; searched PATH above"
+          fi
+          command -v curl-config || echo "curl-config not found"
+          if command -v gcc; then gcc --version | head -n 1; else echo "gcc not found"; fi
+          EOF
+
+      - name: Diagnostics
+        shell: bash
+        run: |
+          echo "===== shell PATH ====="
+          bash _repro/diag.sh || true
+          echo "===== R's PATH, as R CMD INSTALL sees it ====="
+          Rscript -e 'print(Sys.which(c("sh", "make", "gcc", "pkg-config", "curl-config")))' || true
+          Rscript -e 'invisible(system2("sh", "_repro/diag.sh"))' || true
+          Rscript -e 'sessionInfo()' || true
+
+      - name: Prepare sources
+        shell: bash
+        run: |
+          case "${{ matrix.source }}" in
+            branch)
+              mkdir -p _repro/src-unchanged
+              git archive HEAD | tar -x -C _repro/src-unchanged
+              echo "SRC=_repro/src-unchanged" >> "$GITHUB_ENV"
+              ;;
+            cran-release-ref)
+              mkdir -p _repro/src-unchanged
+              git -C rel archive HEAD | tar -x -C _repro/src-unchanged
+              echo "SRC=_repro/src-unchanged" >> "$GITHUB_ENV"
+              ;;
+            cran-tarball)
+              tgz=_repro/RSQLite_3.53.3.tar.gz
+              curl -fsSL -o "$tgz" https://cloud.r-project.org/src/contrib/RSQLite_3.53.3.tar.gz ||
+                curl -fsSL -o "$tgz" https://cloud.r-project.org/src/contrib/Archive/RSQLite/RSQLite_3.53.3.tar.gz
+              echo "SRC=$tgz" >> "$GITHUB_ENV"
+              ;;
+          esac
+
+      - name: Build unchanged
+        id: unchanged
+        continue-on-error: true
+        shell: bash
+        run: |
+          source _repro/lib.sh
+          build unchanged "$SRC"
+
+      - name: Report unchanged
+        if: always()
+        shell: bash
+        run: |
+          source _repro/lib.sh
+          report unchanged "${{ steps.unchanged.outcome }}"
+
+      # Theory variants, main-r4.2 only: one change each, applied on the runner and never committed.
+
+      - name: Prepare variant nodedup
+        id: prep_nodedup
+        if: always() && matrix.name == 'main-r4.2'
+        shell: bash
+        run: |
+          d=_repro/src-nodedup
+          mkdir -p "$d"
+          git archive HEAD | tar -x -C "$d"
+          sed -i 's/CURL_LIBS_DEDUP=\$(dedup_libs "\$CURL_LIBS")/CURL_LIBS_DEDUP="$CURL_LIBS"/' "$d/configure.win"
+          if ! grep -qF 'CURL_LIBS_DEDUP="$CURL_LIBS"' "$d/configure.win" ||
+             grep -qF 'CURL_LIBS_DEDUP=$(dedup_libs' "$d/configure.win"; then
+            echo "::error::sed for variant nodedup did not apply to configure.win"
+            exit 1
+          fi
+          grep -n 'CURL_LIBS_DEDUP=' "$d/configure.win"
+
+      - name: Build variant nodedup
+        id: nodedup
+        if: always() && steps.prep_nodedup.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          source _repro/lib.sh
+          build nodedup _repro/src-nodedup
+
+      - name: Report variant nodedup
+        if: always() && matrix.name == 'main-r4.2'
+        shell: bash
+        run: |
+          source _repro/lib.sh
+          report nodedup "${{ steps.nodedup.outcome }}"
+
+      - name: Prepare variant append-ws2_32
+        id: prep_append
+        if: always() && matrix.name == 'main-r4.2'
+        shell: bash
+        run: |
+          d=_repro/src-append-ws2_32
+          mkdir -p "$d"
+          git archive HEAD | tar -x -C "$d"
+          sed -i 's/CURL_LIBS_DEDUP=\$(dedup_libs "\$CURL_LIBS")/CURL_LIBS_DEDUP="$(dedup_libs "$CURL_LIBS") -lws2_32"/' "$d/configure.win"
+          if ! grep -qF 'CURL_LIBS_DEDUP="$(dedup_libs "$CURL_LIBS") -lws2_32"' "$d/configure.win"; then
+            echo "::error::sed for variant append-ws2_32 did not apply to configure.win"
+            exit 1
+          fi
+          grep -n 'CURL_LIBS_DEDUP=' "$d/configure.win"
+
+      - name: Build variant append-ws2_32
+        id: append
+        if: always() && steps.prep_append.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          source _repro/lib.sh
+          build append-ws2_32 _repro/src-append-ws2_32
+
+      - name: Report variant append-ws2_32
+        if: always() && matrix.name == 'main-r4.2'
+        shell: bash
+        run: |
+          source _repro/lib.sh
+          report append-ws2_32 "${{ steps.append.outcome }}"
+
+      - name: Upload install logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-logs-${{ matrix.name }}
+          path: _repro/*.log
+          retention-days: 7
+          if-no-files-found: warn

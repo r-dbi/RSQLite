@@ -123,6 +123,14 @@ jobs:
             echo "${undef:-(none)}"
             echo "----- link command -----"
             echo "${link:-(no link command)}"
+            dll=$(find "_repro/lib-$v/RSQLite/libs" -name RSQLite.dll 2>/dev/null | head -n 1)
+            if [ -n "$dll" ]; then
+              imports=$(Rscript -e 'invisible(system2("sh", c("_repro/dlls.sh", commandArgs(TRUE)[1])))' "$dll" 2>&1 || true)
+            else
+              imports="(no installed RSQLite.dll)"
+            fi
+            echo "----- imported DLLs of $dll -----"
+            echo "$imports"
             echo "===== END $MATRIX_NAME / $v ====="
 
             {
@@ -140,9 +148,62 @@ jobs:
               echo '```'
               echo "${link:-(no link command)}"
               echo '```'
+              echo "Imported DLLs:"
+              echo '```'
+              echo "$imports"
+              echo '```'
               echo
             } >> "$GITHUB_STEP_SUMMARY"
           }
+
+          # smoke <variant>: load the installed build and query an in-memory database, stage by stage.
+          # Writes smoke_verdict (OK, CRASH, FAIL) to the step output; returns non-zero unless OK.
+          smoke() {
+            v="$1"; mk="_repro/smoke-$v"
+            set +e
+            Rscript _repro/smoke.R "_repro/lib-$v" "$mk" 2>&1 | tee "_repro/smoke-$v.log"
+            rc=${PIPESTATUS[0]}
+            set -e
+            if [ "$rc" -eq 0 ]; then
+              verdict=OK
+            elif [ "$rc" -ge 128 ] || grep -qi 'segfault' "_repro/smoke-$v.log"; then
+              verdict=CRASH
+            else
+              verdict=FAIL
+            fi
+            stages=$(ls "$mk" 2>/dev/null | tr '\n' ' ')
+            echo "smoke_verdict=$verdict" >> "$GITHUB_OUTPUT"
+            echo "===== smoke $MATRIX_NAME / $v: $verdict (exit $rc), stages done: ${stages:-none} ====="
+            echo "- smoke $v: \`$verdict\` (exit $rc), stages done: ${stages:-none}" >> "$GITHUB_STEP_SUMMARY"
+            [ "$verdict" = OK ]
+          }
+          EOF
+
+          cat > _repro/dlls.sh <<'EOF'
+          # Print the DLLs imported by $1, with the toolchain on R's PATH
+          objdump -p "$1" | grep "DLL Name" || echo "(objdump failed: $?)"
+          EOF
+
+          cat > _repro/smoke.R <<'EOF'
+          args <- commandArgs(TRUE)
+          lib <- args[[1]]
+          mk <- args[[2]]
+          dir.create(mk, showWarnings = FALSE, recursive = TRUE)
+          print(sessionInfo())
+          stage <- function(name, expr) {
+            cat("=== smoke stage", name, "start\n"); flush.console()
+            val <- expr
+            file.create(file.path(mk, name))
+            cat("=== smoke stage", name, "done\n"); flush.console()
+            invisible(val)
+          }
+          stage("a-library", library(RSQLite, lib.loc = lib))
+          con <- stage("b-connect", DBI::dbConnect(SQLite(), ":memory:"))
+          res <- stage("c-select", DBI::dbGetQuery(con, "SELECT 1 AS x"))
+          print(res)
+          stopifnot(identical(res$x, 1L))
+          stage("d-disconnect", DBI::dbDisconnect(con))
+          print(packageVersion("RSQLite", lib.loc = lib))
           EOF
 
           cat > _repro/diag.sh <<'EOF'
@@ -237,6 +298,15 @@ jobs:
           source _repro/lib.sh
           report unchanged "${{ steps.unchanged.outcome }}"
 
+      - name: Smoke test unchanged
+        id: smoke_unchanged
+        if: always() && steps.unchanged.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          source _repro/lib.sh
+          smoke unchanged
+
       - name: Prepare fixed
         id: prep_fixed
         if: always()
@@ -288,27 +358,22 @@ jobs:
           fi
 
       - name: Smoke test fixed
-        id: smoke
+        id: smoke_fixed
         if: always() && steps.fixed.outcome == 'success'
         continue-on-error: true
         shell: bash
         run: |
-          Rscript -e '
-            library(RSQLite, lib.loc = "_repro/lib-fixed")
-            con <- DBI::dbConnect(SQLite(), ":memory:")
-            res <- DBI::dbGetQuery(con, "SELECT 1 AS x")
-            print(res)
-            stopifnot(identical(res$x, 1L))
-            DBI::dbDisconnect(con)
-            print(packageVersion("RSQLite", lib.loc = "_repro/lib-fixed"))
-          '
+          source _repro/lib.sh
+          smoke fixed
 
       - name: Upload install logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: install-logs-${{ matrix.name }}
-          path: _repro/*.log
+          path: |
+            _repro/*.log
+            _repro/smoke-*/
           retention-days: 7
           if-no-files-found: warn
 
@@ -318,19 +383,25 @@ jobs:
         env:
           UNCHANGED: ${{ steps.report_unchanged.outputs.verdict }}
           FIXED: ${{ steps.report_fixed.outputs.verdict }}
-          SMOKE: ${{ steps.smoke.outcome }}
+          SMOKE_UNCHANGED: ${{ steps.smoke_unchanged.outputs.smoke_verdict }}
+          SMOKE_FIXED: ${{ steps.smoke_fixed.outputs.smoke_verdict }}
           R_VERSION: ${{ matrix.r }}
           SOURCE: ${{ matrix.source }}
         run: |
-          if [ "$R_VERSION" = release ]; then exp_unchanged=OK; else exp_unchanged=LINK-FAIL; fi
           ok=true
+          if [ "$R_VERSION" = release ]; then
+            exp_unchanged=OK; exp_smoke_unchanged=OK
+            [ "$SMOKE_UNCHANGED" = OK ] || ok=false
+          else
+            exp_unchanged=LINK-FAIL; exp_smoke_unchanged="(not checked)"
+          fi
           [ "$UNCHANGED" = "$exp_unchanged" ] || ok=false
           if [ "$SOURCE" = cran-tarball ] && [ "$FIXED" = NOT-APPLICABLE ]; then
-            exp_fixed="OK or NOT-APPLICABLE"; exp_smoke="success (skipped if NOT-APPLICABLE)"
+            exp_fixed="OK or NOT-APPLICABLE"; exp_smoke_fixed="OK (not run if NOT-APPLICABLE)"
           else
-            exp_fixed=OK; exp_smoke=success
+            exp_fixed=OK; exp_smoke_fixed=OK
             [ "$FIXED" = OK ] || ok=false
-            [ "$SMOKE" = success ] || ok=false
+            [ "$SMOKE_FIXED" = OK ] || ok=false
           fi
           if $ok; then result=PASS; else result=MISMATCH; fi
           {
@@ -340,6 +411,7 @@ jobs:
             echo "|---|---|---|"
             echo "| unchanged | \`${UNCHANGED:-none}\` | \`$exp_unchanged\` |"
             echo "| fixed | \`${FIXED:-none}\` | $exp_fixed |"
-            echo "| smoke test | \`${SMOKE:-none}\` | $exp_smoke |"
+            echo "| smoke unchanged | \`${SMOKE_UNCHANGED:-NOT-RUN}\` | $exp_smoke_unchanged |"
+            echo "| smoke fixed | \`${SMOKE_FIXED:-NOT-RUN}\` | $exp_smoke_fixed |"
           } | tee -a "$GITHUB_STEP_SUMMARY"
           $ok || { echo "::error::verdicts do not match the expectation"; exit 1; }

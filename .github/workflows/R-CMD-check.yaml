@@ -524,7 +524,10 @@ jobs:
       - name: Remove ${{ matrix.package }} and all strong dependencies
         run: |
           pkg <- "${{ matrix.package }}"
-          pkgs <- tools::package_dependencies(pkg, reverse = TRUE)[[1]]
+          # Recursive: a package whose strong dependency is gone is broken.
+          # Without it, removing pkgconfig removes hms but keeps DBItest,
+          # which imports hms, and DBItest's tests then fail on `hms::`.
+          pkgs <- tools::package_dependencies(pkg, reverse = TRUE, recursive = TRUE)[[1]]
           installed <- rownames(utils::installed.packages())
           # `pkg` belongs inside the intersect() as much as its reverse
           # dependencies do. It may legitimately not be installed -- a package

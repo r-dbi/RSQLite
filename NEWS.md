@@ -1,4 +1,4 @@
-# RSQLite 3.54.1
+# RSQLite 3.54.1 (2026-11-27)
 
 ## Breaking changes
 

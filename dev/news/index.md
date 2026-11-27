@@ -1,5 +1,15 @@
 # Changelog
 
+## RSQLite 3.53.3.9026 (2026-11-27)
+
+### Continuous integration
+
+- Align the release workflows with r-release-actions
+  ([\#908](https://github.com/r-dbi/RSQLite/issues/908)).
+
+- Sync the workflows with cynkra/cynkratemplate
+  ([\#907](https://github.com/r-dbi/RSQLite/issues/907)).
+
 ## RSQLite 3.53.3.9025 (2026-11-17)
 
 ### Features

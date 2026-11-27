@@ -18,6 +18,10 @@
 
 - Build from source on Windows with Rtools 4.2, by keeping the last occurrence of each library when deduplicating the libcurl flags (#903, #905).
 
+- Stop printing the response headers of every remote open over the HTTP VFS (#839).
+
+- Load the default extensions on HTTP VFS connections, including those opened by `sqliteRemote()` (#840, #841).
+
 
 # RSQLite 3.53.3 (2026-06-28)
 

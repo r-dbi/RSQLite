@@ -1,0 +1,29 @@
+--- a/configure.win
++++ b/configure.win
+@@ -42,15 +42,18 @@
+   CURL_LIBS="$(curl-config --libs 2>/dev/null || true)"
+ fi
+ 
++# Keep the last occurrence of each token, not the first:
++# with static libraries the linker resolves left to right,
++# so every library must stay after everything that needs it
++# (e.g. -lws2_32 after -lcrypto, see #903).
+ dedup_libs() {
+-  out=""
+-  for tok in $1; do
+-    case " $out " in
+-      *" $tok "*) ;;
+-      *) out="$out $tok" ;;
+-    esac
+-  done
+-  echo "$out" | sed -e 's/^ *//' -e 's/  */ /g'
++  echo "$1" | awk '{
++    n = split($0, a, " "); m = 0
++    for (i = n; i >= 1; i--) if (!(a[i] in s)) { s[a[i]] = 1; r[++m] = a[i] }
++    out = ""
++    for (i = m; i >= 1; i--) out = out (out == "" ? "" : " ") r[i]
++    print out
++  }'
+ }
+ 
+ if [ -n "$CURL_LIBS" ] && [ -f "src/vendor/extensions/http.c" ]; then

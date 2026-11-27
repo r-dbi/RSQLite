@@ -1,12 +1,15 @@
 # Reproduction only for r-dbi/RSQLite#903:
 # link failure on Windows with rtools42 (R 4.2) when configure.win enables the HTTP VFS,
 # `libcrypto.a(b_addr.o): undefined reference to 'gai_strerrorW'`.
-# Drop this commit before any fix merges.
+#
+# Red then green in one run: each job builds the unchanged sources (expected LINK-FAIL on R 4.2, OK on release),
+# then the sources with .github/repro-903/configure.win.patch applied (the fix, expected OK),
+# runs a smoke test, and asserts the verdicts in its last step.
+# The patch file is the fix; this workflow and .github/repro-903/ are not.
+# Drop these commits before the fix merges.
 #
 # No cache by design: a cold build takes a few minutes,
 # so the cached-toolchain loop of the reproduction rules is not needed here.
-# Also no assertion step yet, since the cause is unconfirmed:
-# every job ends green, and the verdicts (LINK-FAIL, OK, OTHER-FAIL) live in the job summary.
 
 name: repro-903
 
@@ -16,6 +19,7 @@ on:
       - claude/repro-903
     paths:
       - .github/workflows/repro-903.yaml
+      - .github/repro-903/**
       - configure.win
       - cleanup.win
       - src/Makevars*
@@ -56,6 +60,7 @@ jobs:
 
     env:
       MATRIX_NAME: ${{ matrix.name }}
+      PATCH: .github/repro-903/configure.win.patch
 
     steps:
       - uses: actions/checkout@v4
@@ -90,10 +95,13 @@ jobs:
             R CMD INSTALL --preclean -l "_repro/lib-$v" "$src" 2>&1 | tee "_repro/install-$v.log"
           }
 
-          # report <variant> <outcome>: extract the key lines and write the verdict to log and summary
+          # report <variant> <outcome> [<forced verdict>]:
+          # extract the key lines, write the verdict to log, summary and step output
           report() {
             v="$1"; outcome="$2"; log="_repro/install-$v.log"
-            if [ ! -f "$log" ]; then
+            if [ -n "${3:-}" ]; then
+              verdict="$3"
+            elif [ ! -f "$log" ]; then
               verdict=NOT-RUN
             elif [ "$outcome" = success ]; then
               verdict=OK
@@ -102,6 +110,7 @@ jobs:
             else
               verdict=OTHER-FAIL
             fi
+            echo "verdict=$verdict" >> "$GITHUB_OUTPUT"
             found=$( (grep -m1 -E 'Found libcurl|libcurl not found' "$log" 2>/dev/null || true) )
             undef=$( (grep -E 'gai_strerrorW|undefined reference' "$log" 2>/dev/null || true) | head -n 100)
             link=$( (grep -F -e '-o RSQLite.dll' "$log" 2>/dev/null || true) )
@@ -146,8 +155,24 @@ jobs:
           else
             echo "pkg-config not found; searched PATH above"
           fi
-          command -v curl-config || echo "curl-config not found"
+          if command -v curl-config; then
+            echo "--- curl-config --libs"; curl-config --libs || echo "(failed: $?)"
+            echo "--- curl-config --static-libs"; curl-config --static-libs || echo "(failed: $?)"
+          else
+            echo "curl-config not found; searched PATH above"
+          fi
           if command -v gcc; then gcc --version | head -n 1; else echo "gcc not found"; fi
+          EOF
+
+          cat > _repro/cran-deps.R <<'EOF'
+          # Install the dependencies of the CRAN tarball that the workspace DESCRIPTION does not cover
+          d <- read.dcf("_repro/cran/RSQLite/DESCRIPTION")
+          fields <- intersect(c("Depends", "Imports", "LinkingTo"), colnames(d))
+          deps <- unlist(strsplit(gsub("\\([^)]*\\)", "", d[, fields]), ","))
+          deps <- setdiff(trimws(deps), c("", "R", rownames(installed.packages())))
+          cat("Missing dependencies of the tarball:", if (length(deps)) deps else "(none)", "\n")
+          if (length(deps)) install.packages(deps)
+          stopifnot(all(deps %in% rownames(installed.packages())))
           EOF
 
       - name: Diagnostics
@@ -156,31 +181,39 @@ jobs:
           echo "===== shell PATH ====="
           bash _repro/diag.sh || true
           echo "===== R's PATH, as R CMD INSTALL sees it ====="
-          Rscript -e 'print(Sys.which(c("sh", "make", "gcc", "pkg-config", "curl-config")))' || true
+          Rscript -e 'print(Sys.which(c("sh", "make", "gcc", "pkg-config", "curl-config", "patch")))' || true
           Rscript -e 'invisible(system2("sh", "_repro/diag.sh"))' || true
           Rscript -e 'sessionInfo()' || true
 
+      # Sources are exported with LF line endings, as in a CRAN tarball, so that the patch applies.
       - name: Prepare sources
         shell: bash
         run: |
           case "${{ matrix.source }}" in
             branch)
               mkdir -p _repro/src-unchanged
-              git archive HEAD | tar -x -C _repro/src-unchanged
+              git -c core.autocrlf=false archive HEAD | tar -x -C _repro/src-unchanged
               echo "SRC=_repro/src-unchanged" >> "$GITHUB_ENV"
               ;;
             cran-release-ref)
               mkdir -p _repro/src-unchanged
-              git -C rel archive HEAD | tar -x -C _repro/src-unchanged
+              git -C rel -c core.autocrlf=false archive HEAD | tar -x -C _repro/src-unchanged
               echo "SRC=_repro/src-unchanged" >> "$GITHUB_ENV"
               ;;
             cran-tarball)
               tgz=_repro/RSQLite_3.53.3.tar.gz
               curl -fsSL -o "$tgz" https://cloud.r-project.org/src/contrib/RSQLite_3.53.3.tar.gz ||
                 curl -fsSL -o "$tgz" https://cloud.r-project.org/src/contrib/Archive/RSQLite/RSQLite_3.53.3.tar.gz
+              mkdir -p _repro/cran
+              tar -xzf "$tgz" -C _repro/cran
               echo "SRC=$tgz" >> "$GITHUB_ENV"
               ;;
           esac
+
+      - name: Install dependencies of the CRAN tarball
+        if: matrix.source == 'cran-tarball'
+        shell: bash
+        run: Rscript _repro/cran-deps.R
 
       - name: Build unchanged
         id: unchanged
@@ -191,76 +224,78 @@ jobs:
           build unchanged "$SRC"
 
       - name: Report unchanged
+        id: report_unchanged
         if: always()
         shell: bash
         run: |
           source _repro/lib.sh
           report unchanged "${{ steps.unchanged.outcome }}"
 
-      # Theory variants, main-r4.2 only: one change each, applied on the runner and never committed.
-
-      - name: Prepare variant nodedup
-        id: prep_nodedup
-        if: always() && matrix.name == 'main-r4.2'
+      - name: Prepare fixed
+        id: prep_fixed
+        if: always()
         shell: bash
         run: |
-          d=_repro/src-nodedup
+          d=_repro/src-fixed
           mkdir -p "$d"
-          git archive HEAD | tar -x -C "$d"
-          sed -i 's/CURL_LIBS_DEDUP=\$(dedup_libs "\$CURL_LIBS")/CURL_LIBS_DEDUP="$CURL_LIBS"/' "$d/configure.win"
-          if ! grep -qF 'CURL_LIBS_DEDUP="$CURL_LIBS"' "$d/configure.win" ||
-             grep -qF 'CURL_LIBS_DEDUP=$(dedup_libs' "$d/configure.win"; then
-            echo "::error::sed for variant nodedup did not apply to configure.win"
+          if [ "${{ matrix.source }}" = cran-tarball ]; then
+            cp -R _repro/cran/RSQLite/. "$d"
+          else
+            cp -R "$SRC"/. "$d"
+          fi
+          if ! patch -p1 -d "$d" --dry-run --batch < "$PATCH"; then
+            if [ "${{ matrix.source }}" = cran-tarball ]; then
+              echo "::warning::fix does not apply to the CRAN 3.53.3 tarball: NOT-APPLICABLE"
+              echo "applicable=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "::error::fix $PATCH does not apply"
             exit 1
           fi
-          grep -n 'CURL_LIBS_DEDUP=' "$d/configure.win"
+          patch -p1 -d "$d" --batch < "$PATCH"
+          grep -q "Keep the last occurrence of each token" "$d/configure.win" || {
+            echo "::error::patched configure.win lacks the fix"
+            exit 1
+          }
+          sed -n '/^dedup_libs() {/,/^}/p' "$d/configure.win"
+          echo "applicable=true" >> "$GITHUB_OUTPUT"
 
-      - name: Build variant nodedup
-        id: nodedup
-        if: always() && steps.prep_nodedup.outcome == 'success'
+      - name: Build fixed
+        id: fixed
+        if: always() && steps.prep_fixed.outputs.applicable == 'true'
         continue-on-error: true
         shell: bash
         run: |
           source _repro/lib.sh
-          build nodedup _repro/src-nodedup
+          build fixed _repro/src-fixed
 
-      - name: Report variant nodedup
-        if: always() && matrix.name == 'main-r4.2'
+      - name: Report fixed
+        id: report_fixed
+        if: always()
         shell: bash
         run: |
           source _repro/lib.sh
-          report nodedup "${{ steps.nodedup.outcome }}"
-
-      - name: Prepare variant append-ws2_32
-        id: prep_append
-        if: always() && matrix.name == 'main-r4.2'
-        shell: bash
-        run: |
-          d=_repro/src-append-ws2_32
-          mkdir -p "$d"
-          git archive HEAD | tar -x -C "$d"
-          sed -i 's/CURL_LIBS_DEDUP=\$(dedup_libs "\$CURL_LIBS")/CURL_LIBS_DEDUP="$(dedup_libs "$CURL_LIBS") -lws2_32"/' "$d/configure.win"
-          if ! grep -qF 'CURL_LIBS_DEDUP="$(dedup_libs "$CURL_LIBS") -lws2_32"' "$d/configure.win"; then
-            echo "::error::sed for variant append-ws2_32 did not apply to configure.win"
-            exit 1
+          if [ "${{ steps.prep_fixed.outputs.applicable }}" = false ]; then
+            report fixed "${{ steps.fixed.outcome }}" NOT-APPLICABLE
+          else
+            report fixed "${{ steps.fixed.outcome }}"
           fi
-          grep -n 'CURL_LIBS_DEDUP=' "$d/configure.win"
 
-      - name: Build variant append-ws2_32
-        id: append
-        if: always() && steps.prep_append.outcome == 'success'
+      - name: Smoke test fixed
+        id: smoke
+        if: always() && steps.fixed.outcome == 'success'
         continue-on-error: true
         shell: bash
         run: |
-          source _repro/lib.sh
-          build append-ws2_32 _repro/src-append-ws2_32
-
-      - name: Report variant append-ws2_32
-        if: always() && matrix.name == 'main-r4.2'
-        shell: bash
-        run: |
-          source _repro/lib.sh
-          report append-ws2_32 "${{ steps.append.outcome }}"
+          Rscript -e '
+            library(RSQLite, lib.loc = "_repro/lib-fixed")
+            con <- DBI::dbConnect(SQLite(), ":memory:")
+            res <- DBI::dbGetQuery(con, "SELECT 1 AS x")
+            print(res)
+            stopifnot(identical(res$x, 1L))
+            DBI::dbDisconnect(con)
+            print(packageVersion("RSQLite", lib.loc = "_repro/lib-fixed"))
+          '
 
       - name: Upload install logs
         if: always()
@@ -270,3 +305,35 @@ jobs:
           path: _repro/*.log
           retention-days: 7
           if-no-files-found: warn
+
+      - name: Assert verdicts
+        if: always()
+        shell: bash
+        env:
+          UNCHANGED: ${{ steps.report_unchanged.outputs.verdict }}
+          FIXED: ${{ steps.report_fixed.outputs.verdict }}
+          SMOKE: ${{ steps.smoke.outcome }}
+          R_VERSION: ${{ matrix.r }}
+          SOURCE: ${{ matrix.source }}
+        run: |
+          if [ "$R_VERSION" = release ]; then exp_unchanged=OK; else exp_unchanged=LINK-FAIL; fi
+          ok=true
+          [ "$UNCHANGED" = "$exp_unchanged" ] || ok=false
+          if [ "$SOURCE" = cran-tarball ] && [ "$FIXED" = NOT-APPLICABLE ]; then
+            exp_fixed="OK or NOT-APPLICABLE"; exp_smoke="success (skipped if NOT-APPLICABLE)"
+          else
+            exp_fixed=OK; exp_smoke=success
+            [ "$FIXED" = OK ] || ok=false
+            [ "$SMOKE" = success ] || ok=false
+          fi
+          if $ok; then result=PASS; else result=MISMATCH; fi
+          {
+            echo "### $MATRIX_NAME: $result"
+            echo
+            echo "| Build | Verdict | Expected |"
+            echo "|---|---|---|"
+            echo "| unchanged | \`${UNCHANGED:-none}\` | \`$exp_unchanged\` |"
+            echo "| fixed | \`${FIXED:-none}\` | $exp_fixed |"
+            echo "| smoke test | \`${SMOKE:-none}\` | $exp_smoke |"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          $ok || { echo "::error::verdicts do not match the expectation"; exit 1; }

@@ -1,5 +1,31 @@
 # Changelog
 
+## RSQLite 3.53.3.9025 (2026-11-17)
+
+### Features
+
+- Upgrade bundled SQLite to 3.54.1
+  ([\#901](https://github.com/r-dbi/RSQLite/issues/901)).
+
+## RSQLite 3.53.3.9024 (2026-11-15)
+
+### Bug fixes
+
+- Keep the elements of
+  [`sqliteHttpStats()`](https://rsqlite.r-dbi.org/dev/reference/sqliteHttpStats.md)
+  protected while its list is built
+  ([\#894](https://github.com/r-dbi/RSQLite/issues/894)).
+
+- [`dbFetch()`](https://dbi.r-dbi.org/reference/dbFetch.html) raises
+  “out of memory” instead of crashing when SQLite cannot convert a text
+  value ([\#889](https://github.com/r-dbi/RSQLite/issues/889),
+  [\#890](https://github.com/r-dbi/RSQLite/issues/890)).
+
+### Documentation
+
+- Document the return value of every function with a usage section
+  ([\#896](https://github.com/r-dbi/RSQLite/issues/896)).
+
 ## RSQLite 3.53.3.9023 (2026-11-14)
 
 ### Bug fixes

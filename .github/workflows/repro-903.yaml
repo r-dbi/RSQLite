@@ -334,11 +334,11 @@ jobs:
             exit 1
           fi
           patch -p1 -d "$d" --batch < "$PATCH"
-          grep -q "Keep the last occurrence of each token" "$d/configure.win" || {
+          grep -q "CURL_LIBS_ONELINE=" "$d/configure.win" && ! grep -q "dedup_libs" "$d/configure.win" || {
             echo "::error::patched configure.win lacks the fix"
             exit 1
           }
-          sed -n '/^dedup_libs() {/,/^}/p' "$d/configure.win"
+          sed -n '/^oneline() {/,/^}/p' "$d/configure.win"
           echo "applicable=true" >> "$GITHUB_OUTPUT"
 
       - name: Build fixed

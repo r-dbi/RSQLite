@@ -6,7 +6,7 @@
 
 ## Features
 
-- Upgrade bundled SQLite to 3.54.1 (#827).
+- Upgrade bundled SQLite to 3.54.1 (#827, #901).
 
 - Check text read into a character column for valid UTF-8 with the new opt-in `dbConnect(check_utf8 = TRUE)` (#845, #846).
 
@@ -15,6 +15,8 @@
 - Fix various protection and memory issues (#889, #890, #894, #826, #884, #879, #883, #868, #869).
 
 - Count rows in 64 bits, so that `dbGetRowCount()` and `dbGetRowsAffected()` report correct counts (as `numeric`) for very large results (#858).
+
+- Build from source on Windows with Rtools 4.2, by keeping the last occurrence of each library when deduplicating the libcurl flags (#903, #905).
 
 
 # RSQLite 3.53.3 (2026-06-28)

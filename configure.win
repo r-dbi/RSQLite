@@ -42,23 +42,20 @@ if [ -z "$CURL_LIBS" ] && command -v curl-config >/dev/null 2>&1; then
   CURL_LIBS="$(curl-config --libs 2>/dev/null || true)"
 fi
 
-dedup_libs() {
-  out=""
-  for tok in $1; do
-    case " $out " in
-      *" $tok "*) ;;
-      *) out="$out $tok" ;;
-    esac
-  done
-  echo "$out" | sed -e 's/^ *//' -e 's/  */ /g'
+# Join the flags into one line with single spaces, keeping every token in its original order:
+# static link order matters, so no deduplication (#903).
+# printf, not echo, so that backslashes are kept as they are.
+oneline() {
+  printf '%s\n' "$1" | tr -s ' \t\n' '   ' | sed -e 's/^ *//' -e 's/ *$//'
 }
 
 if [ -n "$CURL_LIBS" ] && [ -f "src/vendor/extensions/http.c" ]; then
-  CURL_LIBS_DEDUP=$(dedup_libs "$CURL_LIBS")
-  echo "Found libcurl (deduped): $CURL_LIBS_DEDUP"
+  CURL_CFLAGS_ONELINE=$(oneline "$CURL_CFLAGS")
+  CURL_LIBS_ONELINE=$(oneline "$CURL_LIBS")
+  echo "Found libcurl: $CURL_LIBS_ONELINE"
   update_makevars_var "HTTPVFS_CPPFLAGS" "-DRSQLITE_ENABLE_HTTPVFS"
-  update_makevars_var "CURL_CFLAGS" "$CURL_CFLAGS"
-  update_makevars_var "CURL_LIBS" "$CURL_LIBS_DEDUP"
+  update_makevars_var "CURL_CFLAGS" "$CURL_CFLAGS_ONELINE"
+  update_makevars_var "CURL_LIBS" "$CURL_LIBS_ONELINE"
 else
   echo "libcurl not found; building without httpvfs (ok)"
   update_makevars_var "HTTPVFS_CPPFLAGS" ""

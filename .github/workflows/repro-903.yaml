@@ -8,6 +8,9 @@
 # The patch file is the fix; this workflow and .github/repro-903/ are not.
 # Drop these commits before the fix merges.
 #
+# The earlier single-script smoke test segfaulted (exit 139) in run 46034648463,
+# while the staged smoke test of the same builds passes; cause not identified.
+#
 # No cache by design: a cold build takes a few minutes,
 # so the cached-toolchain loop of the reproduction rules is not needed here.
 
@@ -96,8 +99,10 @@ jobs:
           }
 
           # report <variant> <outcome> [<forced verdict>]:
-          # extract the key lines, write the verdict to log, summary and step output
+          # extract the key lines, write the verdict to log, summary and step output.
+          # Only reports: never fails, the assert step decides.
           report() {
+            set +e +o pipefail
             v="$1"; outcome="$2"; log="_repro/install-$v.log"
             if [ -n "${3:-}" ]; then
               verdict="$3"
@@ -296,7 +301,7 @@ jobs:
         shell: bash
         run: |
           source _repro/lib.sh
-          report unchanged "${{ steps.unchanged.outcome }}"
+          report unchanged "${{ steps.unchanged.outcome }}" || true
 
       - name: Smoke test unchanged
         id: smoke_unchanged
@@ -352,9 +357,9 @@ jobs:
         run: |
           source _repro/lib.sh
           if [ "${{ steps.prep_fixed.outputs.applicable }}" = false ]; then
-            report fixed "${{ steps.fixed.outcome }}" NOT-APPLICABLE
+            report fixed "${{ steps.fixed.outcome }}" NOT-APPLICABLE || true
           else
-            report fixed "${{ steps.fixed.outcome }}"
+            report fixed "${{ steps.fixed.outcome }}" || true
           fi
 
       - name: Smoke test fixed

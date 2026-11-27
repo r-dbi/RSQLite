@@ -171,8 +171,14 @@ jobs:
           deps <- unlist(strsplit(gsub("\\([^)]*\\)", "", d[, fields]), ","))
           deps <- setdiff(trimws(deps), c("", "R", rownames(installed.packages())))
           cat("Missing dependencies of the tarball:", if (length(deps)) deps else "(none)", "\n")
-          if (length(deps)) install.packages(deps)
-          stopifnot(all(deps %in% rownames(installed.packages())))
+          repos <- getOption("repos")
+          if (is.null(repos) || !"CRAN" %in% names(repos) || !nzchar(repos[["CRAN"]]) || repos[["CRAN"]] == "@CRAN@") {
+            repos <- c(CRAN = "https://cloud.r-project.org")
+          }
+          cat("Repositories:", repos, "\n")
+          if (length(deps)) install.packages(deps, repos = repos)
+          missing <- setdiff(deps, rownames(installed.packages()))
+          if (length(missing)) stop("Still missing after install: ", paste(missing, collapse = ", "))
           EOF
 
       - name: Diagnostics

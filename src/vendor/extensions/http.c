@@ -219,7 +219,8 @@ static int http_probe_meta(HttpFile *hf){
   HeaderProbe hp; hp.content_length = -1; hp.accept_ranges = 0;
   curl_easy_setopt(hf->curl, CURLOPT_URL, hf->url);
   curl_easy_setopt(hf->curl, CURLOPT_NOBODY, 1L);
-  curl_easy_setopt(hf->curl, CURLOPT_HEADER, 1L);
+  /* No CURLOPT_HEADER: the header callback sees the headers anyway,
+     and the default write callback would print them to stdout. */
   curl_easy_setopt(hf->curl, CURLOPT_HEADERFUNCTION, curl_header_cb);
   curl_easy_setopt(hf->curl, CURLOPT_HEADERDATA, &hp);
   curl_easy_setopt(hf->curl, CURLOPT_FOLLOWLOCATION, 1L);
@@ -228,7 +229,6 @@ static int http_probe_meta(HttpFile *hf){
   curl_easy_getinfo(hf->curl, CURLINFO_RESPONSE_CODE, &code);
   /* Reset options that shouldn't persist */
   curl_easy_setopt(hf->curl, CURLOPT_NOBODY, 0L);
-  curl_easy_setopt(hf->curl, CURLOPT_HEADER, 0L);
   curl_easy_setopt(hf->curl, CURLOPT_HEADERFUNCTION, NULL);
   curl_easy_setopt(hf->curl, CURLOPT_HEADERDATA, NULL);
   if(rc == CURLE_OK && code < 400){

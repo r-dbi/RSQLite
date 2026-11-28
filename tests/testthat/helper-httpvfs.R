@@ -28,13 +28,15 @@ http_test_db <- function(sql) {
 }
 
 # Serves `body` at the returned `url` until `.local_envir` exits,
-# honoring Range requests only with `ranges = TRUE`.
+# honoring Range requests only with `ranges = TRUE`,
+# and accepting requests without ever answering them with `answer = FALSE`.
 # `bytes_sent()` and `requests()` report the bytes sent and the methods seen.
 # The server runs in a separate process,
 # because the HTTP VFS blocks this one while it waits for a response.
 local_http_server <- function(
   body,
   ranges,
+  answer = TRUE,
   .local_envir = parent.frame()
 ) {
   dir <- withr::local_tempdir(.local_envir = .local_envir)
@@ -47,7 +49,7 @@ local_http_server <- function(
   # The killed process leaves its session directory behind in its TMPDIR.
   server <- callr::r_bg(
     serve_http_file,
-    list(body_path, ranges, log_path, requests_path, port_path),
+    list(body_path, ranges, answer, log_path, requests_path, port_path),
     env = c(callr::rcmd_safe_env(), TMPDIR = dir),
     supervise = TRUE
   )
@@ -90,6 +92,7 @@ local_http_server <- function(
 serve_http_file <- function(
   body_path,
   ranges,
+  answer,
   log_path,
   requests_path,
   port_path
@@ -98,8 +101,12 @@ serve_http_file <- function(
   total <- length(body)
 
   call <- function(req) {
-    # One line per request.
+    # One line per request, also for requests that are never answered.
+    # While a request is not answered, no other request reaches this function.
     cat(req$REQUEST_METHOD, "\n", file = requests_path, append = TRUE, sep = "")
+    if (!answer) {
+      Sys.sleep(3600)
+    }
     status <- 200L
     headers <- list("Content-Type" = "application/octet-stream")
     out <- body

@@ -65,6 +65,11 @@
 #' | TIME | Count of (fractional) seconds | HMS formatted string (e.g. 12:34:56) | `hms` (and `difftime`) |
 #' | DATETIME / TIMESTAMP | Count of (fractional) seconds since midnight 1970-01-01 UTC | DATE and TIME as above separated by a space | `POSIXct` with time zone UTC |
 #'
+#' Text in a TIME, DATETIME or TIMESTAMP column may end in a UTC offset,
+#' `Z` or `+HH:MM` or `-HH:MM`,
+#' which is applied as SQLite's `datetime()` and `time()` apply it.
+#' A TIME with an offset becomes a time of day in UTC, wrapping around midnight.
+#'
 #' If a value cannot be mapped an `NA` is returned in its place with a warning.
 #'
 #' @aliases SQLITE_RWC SQLITE_RW SQLITE_RO

@@ -10,3 +10,7 @@ kept for compatibility reasons.
 # S4 method for class 'SQLiteResult'
 fetch(res, n = -1, ...)
 ```
+
+## Value
+
+A data frame.

@@ -7,3 +7,7 @@ Capability query for optional HTTP VFS support.
 ``` r
 sqliteHasHttpVFS()
 ```
+
+## Value
+
+A logical scalar.

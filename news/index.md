@@ -1,5 +1,62 @@
 # Changelog
 
+## RSQLite 3.54.1 (2026-11-28)
+
+### Breaking changes
+
+- Deprecate setting the `row.names` default via pkgconfig, and move
+  pkgconfig to Suggests
+  ([\#805](https://github.com/r-dbi/RSQLite/issues/805)). The
+  `row.names` arguments now default to `FALSE`; a default set with
+  [`pkgconfig::set_config()`](https://rdrr.io/pkg/pkgconfig/man/set_config.html)
+  is honored with a warning only if pkgconfig is already loaded. Pass
+  `row.names` explicitly instead.
+
+### Features
+
+- Upgrade bundled SQLite to 3.54.1
+  ([\#827](https://github.com/r-dbi/RSQLite/issues/827),
+  [\#901](https://github.com/r-dbi/RSQLite/issues/901)).
+
+- Check text read into a character column for valid UTF-8 with the new
+  opt-in `dbConnect(check_utf8 = TRUE)`
+  ([\#845](https://github.com/r-dbi/RSQLite/issues/845),
+  [\#846](https://github.com/r-dbi/RSQLite/issues/846)).
+
+### Bug fixes
+
+- Fix various protection and memory issues
+  ([\#889](https://github.com/r-dbi/RSQLite/issues/889),
+  [\#890](https://github.com/r-dbi/RSQLite/issues/890),
+  [\#894](https://github.com/r-dbi/RSQLite/issues/894),
+  [\#826](https://github.com/r-dbi/RSQLite/issues/826),
+  [\#884](https://github.com/r-dbi/RSQLite/issues/884),
+  [\#879](https://github.com/r-dbi/RSQLite/issues/879),
+  [\#883](https://github.com/r-dbi/RSQLite/issues/883),
+  [\#868](https://github.com/r-dbi/RSQLite/issues/868),
+  [\#869](https://github.com/r-dbi/RSQLite/issues/869)).
+
+- Count rows in 64 bits, so that
+  [`dbGetRowCount()`](https://dbi.r-dbi.org/reference/dbGetRowCount.html)
+  and
+  [`dbGetRowsAffected()`](https://dbi.r-dbi.org/reference/dbGetRowsAffected.html)
+  report correct counts (as `numeric`) for very large results
+  ([\#858](https://github.com/r-dbi/RSQLite/issues/858)).
+
+- Build from source on Windows with Rtools 4.2, by keeping the last
+  occurrence of each library when deduplicating the libcurl flags
+  ([\#903](https://github.com/r-dbi/RSQLite/issues/903),
+  [\#905](https://github.com/r-dbi/RSQLite/issues/905)).
+
+- Stop printing the response headers of every remote open over the HTTP
+  VFS ([\#839](https://github.com/r-dbi/RSQLite/issues/839)).
+
+- Load the default extensions on HTTP VFS connections, including those
+  opened by
+  [`sqliteRemote()`](https://rsqlite.r-dbi.org/reference/sqliteRemote.md)
+  ([\#840](https://github.com/r-dbi/RSQLite/issues/840),
+  [\#841](https://github.com/r-dbi/RSQLite/issues/841)).
+
 ## RSQLite 3.53.3 (2026-06-28)
 
 ### Features

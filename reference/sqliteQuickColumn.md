@@ -9,3 +9,7 @@ kept for compatibility reasons.
 ``` r
 sqliteQuickColumn(con, table, column)
 ```
+
+## Value
+
+A vector with the values of the column.

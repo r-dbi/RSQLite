@@ -61,12 +61,7 @@ dbUnquoteIdentifier(conn, x, ...)
 show(object)
 
 # S4 method for class 'SQLiteConnection'
-sqlData(
-  con,
-  value,
-  row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE),
-  ...
-)
+sqlData(con, value, row.names = FALSE, ...)
 ```
 
 ## Arguments
@@ -80,6 +75,39 @@ sqlData(
   If `FALSE`,
   [`dbRemoveTable()`](https://dbi.r-dbi.org/reference/dbRemoveTable.html)
   succeeds if the table doesn't exist.
+
+## Value
+
+[`format()`](https://rdrr.io/r/base/format.html) returns a character
+string.
+[`dbAppendTable()`](https://dbi.r-dbi.org/reference/dbAppendTable.html)
+returns the number of rows appended.
+[`dbDataType()`](https://dbi.r-dbi.org/reference/dbDataType.html)
+returns a character vector of SQL data types.
+[`dbExistsTable()`](https://dbi.r-dbi.org/reference/dbExistsTable.html)
+and [`dbIsValid()`](https://dbi.r-dbi.org/reference/dbIsValid.html)
+return a logical scalar.
+[`dbGetException()`](https://dbi.r-dbi.org/reference/dbGetException.html)
+returns a list with elements `errorNum` and `errorMsg`.
+[`dbGetInfo()`](https://dbi.r-dbi.org/reference/dbGetInfo.html) returns
+a named list.
+[`dbListObjects()`](https://dbi.r-dbi.org/reference/dbListObjects.html)
+returns a data frame with columns `table` and `is_prefix`.
+[`dbListTables()`](https://dbi.r-dbi.org/reference/dbListTables.html)
+returns a character vector.
+[`dbQuoteIdentifier()`](https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html)
+returns an [SQL](https://dbi.r-dbi.org/reference/SQL.html) object.
+[`dbRemoveTable()`](https://dbi.r-dbi.org/reference/dbRemoveTable.html)
+returns `TRUE`, invisibly.
+[`dbSendQuery()`](https://dbi.r-dbi.org/reference/dbSendQuery.html)
+returns an object of class
+[SQLiteResult](https://rsqlite.r-dbi.org/reference/SQLiteResult-class.md).
+[`dbUnquoteIdentifier()`](https://dbi.r-dbi.org/reference/dbUnquoteIdentifier.html)
+returns a list of [Id](https://dbi.r-dbi.org/reference/Id.html) objects.
+[`show()`](https://rdrr.io/r/methods/show.html) is called for its side
+effect of printing and returns `NULL`.
+[`sqlData()`](https://dbi.r-dbi.org/reference/sqlData.html) returns a
+data frame with character columns quoted as SQL strings.
 
 ## See also
 

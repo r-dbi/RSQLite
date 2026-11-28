@@ -21,12 +21,7 @@ dbClearResult(res, ...)
 dbColumnInfo(res, ...)
 
 # S4 method for class 'SQLiteResult'
-dbFetch(
-  res,
-  n = -1,
-  ...,
-  row.names = pkgconfig::get_config("RSQLite::row.names.query", FALSE)
-)
+dbFetch(res, n = -1, ..., row.names = FALSE)
 
 # S4 method for class 'SQLiteResult'
 dbGetRowCount(res, ...)
@@ -43,6 +38,25 @@ dbHasCompleted(res, ...)
 # S4 method for class 'SQLiteResult'
 dbIsValid(dbObj, ...)
 ```
+
+## Value
+
+[`dbBind()`](https://dbi.r-dbi.org/reference/dbBind.html) returns the
+result object, invisibly.
+[`dbClearResult()`](https://dbi.r-dbi.org/reference/dbClearResult.html)
+returns `TRUE`, invisibly.
+[`dbColumnInfo()`](https://dbi.r-dbi.org/reference/dbColumnInfo.html)
+and [`dbFetch()`](https://dbi.r-dbi.org/reference/dbFetch.html) return a
+data frame.
+[`dbGetRowCount()`](https://dbi.r-dbi.org/reference/dbGetRowCount.html)
+and
+[`dbGetRowsAffected()`](https://dbi.r-dbi.org/reference/dbGetRowsAffected.html)
+return a numeric scalar.
+[`dbGetStatement()`](https://dbi.r-dbi.org/reference/dbGetStatement.html)
+returns a character string.
+[`dbHasCompleted()`](https://dbi.r-dbi.org/reference/dbHasCompleted.html)
+and [`dbIsValid()`](https://dbi.r-dbi.org/reference/dbIsValid.html)
+return a logical scalar.
 
 ## See also
 

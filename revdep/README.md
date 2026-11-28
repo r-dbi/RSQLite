@@ -3,19 +3,19 @@
 | field | value |
 | --- | --- |
 | package | RSQLite |
-| dev | 3.53.3.9011 |
+| dev | 3.54.1 |
 | CRAN | 3.53.3 |
-| commit | 69075a236 |
+| commit | 799421212 |
 | R | 4.6 |
 | platform | x86_64-pc-linux-gnu |
-| run | 34809472593 |
-| date | 2026-09-14 |
+| run | 46071464431 |
+| date | 2026-11-27 |
 
 # Revdeps
 
-## Failed to check (1)
+## New problems (1)
 
-|package  |version |error |warning |note |
-|:--------|:-------|:-----|:-------|:----|
-|GitStats |?       |      |        |     |
+|package  |version |error  |warning |note |
+|:--------|:-------|:------|:-------|:----|
+|[GitStats](problems.md#gitstats)|2.5.2   |__+1__ |        |     |
 

@@ -1,3 +1,7 @@
+# RSQLite (development version)
+
+Changes since v3.54.1: <https://github.com/r-dbi/RSQLite/compare/v3.54.1...main>
+
 # RSQLite 3.54.1 (2026-11-28)
 
 ## Breaking changes

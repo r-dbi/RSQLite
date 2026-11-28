@@ -1,5 +1,36 @@
 <!-- NEWS.md is maintained by https://fledge.cynkra.com, contributors should not edit this file -->
 
+# RSQLite 3.53.3.9027 (2026-11-28)
+
+## Bug fixes
+
+- `sqliteRemote()` loads the default extensions (#841).
+
+- Load the default extensions on HTTP VFS connections (#840).
+
+- Stop printing the response headers of every remote open over the HTTP VFS (#839).
+
+- Build from source with rtools42, and check on Windows with R oldrel-4 (#903, #905).
+
+## Chore
+
+- Declare every vignette builder in DESCRIPTION (#915).
+
+- Tidy DESCRIPTION with usethis::use_tidy_description() (#914).
+
+## Continuous integration
+
+- Sync the workflows with cynkra/cynkratemplate (#912).
+
+## Testing
+
+- Run the HTTP VFS tests for real, and make their errors fail the check (#832).
+
+## Uncategorized
+
+- Ci: Remove reverse dependencies recursively before checking (cynkra/cynkratemplate#173) (#911).
+
+
 # RSQLite 3.53.3.9026 (2026-11-27)
 
 ## Continuous integration
